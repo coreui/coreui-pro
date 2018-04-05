@@ -1,3 +1,4 @@
+// stylelint-disable selector-max-compound-selectors, selector-max-class, selector-max-combinators
 .email-app {
   display: flex;
   flex-direction: row;
@@ -15,34 +16,34 @@
 
     .nav {
       flex-direction: column;
+    }
 
-      .nav-item {
-        position: relative;
+    .nav-item {
+      position: relative;
+    }
 
-        .nav-link {
-          color: $body-color;
-          border-bottom: 1px solid $border-color;
+    .nav-link {
+      color: $body-color;
+      border-bottom: 1px solid $border-color;
 
-          i {
-            width: 20px;
-            margin: 0 10px 0 0;
-            font-size: 14px;
-            text-align: center;
-          }
+      i {
+        width: 20px;
+        margin: 0 10px 0 0;
+        font-size: 14px;
+        text-align: center;
+      }
 
-          .badge {
-            float: right;
-            margin-top: 4px;
-            margin-left: 10px;
-          }
-        }
+      .badge {
+        float: right;
+        margin-top: 4px;
+        margin-left: 10px;
       }
     }
   }
 
   main {
-    min-width: 0;
     flex: 1;
+    min-width: 0;
     padding: $spacer;
   }
 
@@ -89,8 +90,9 @@
       }
 
       &.unread {
-        .header, .title {
-          font-weight: bold;
+        .header,
+        .title {
+          font-weight: $font-weight-bold;
         }
       }
 
@@ -127,7 +129,7 @@
     .details {
       .title {
         padding: $spacer 0;
-        font-weight: bold;
+        font-weight: $font-weight-bold;
       }
 
       .header {
@@ -144,13 +146,13 @@
         }
 
         .from {
+          align-self: center;
           font-size: 12px;
           color: $text-muted;
-          align-self: center;
 
           span {
             display: block;
-            font-weight: bold;
+            font-weight: $font-weight-bold;
           }
         }
 
@@ -167,9 +169,9 @@
 
         .attachment {
           display: flex;
+          align-self: center;
           margin: ($spacer / 2) 0;
           font-size: 12px;
-          align-self: center;
 
           .badge {
             margin: 0 ($spacer / 2);
