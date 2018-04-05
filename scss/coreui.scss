@@ -1,7 +1,7 @@
 /*!
- * CoreUI - Open Source Dashboard UI Kit
+ * CoreUI Pro - Dashboard UI Kit
  * @version v2.0.0-beta.2
- * @link https://coreui.io
+ * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://coreui.io/license)
  */
@@ -57,6 +57,9 @@
 
 // Utility classes
 @import "utilities";
+
+// Apps
+@import "apps";
 
 // Right-to-left
 @import "rtl";
