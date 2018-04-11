@@ -1,10 +1,10 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI Utilities (v1.0.0): get-style.js
+ * CoreUI Utilities (v2.0.0-beta.5): get-style.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
-var GetStyle = function GetStyle(property, element) {
+var getStyle = function getStyle(property, element) {
   if (element === void 0) {
     element = document.body;
   }

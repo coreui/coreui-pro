@@ -1,5 +1,9 @@
 /*!
-  * CoreUI Pro v2.0.0-beta.3 (https://coreui.io/pro/)
+<<<<<<< HEAD
+  * CoreUI Pro v2.0.0-beta.5 (https://coreui.io/pro/)
+=======
+  * CoreUI v2.0.0-beta.5 (https://coreui.io)
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
   * Copyright 2018 Łukasz Holeczek
   * Licensed under MIT (https://coreui.io/pro/)
   */
@@ -30,7 +34,11 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.0-beta.3): ajax-load.js
+<<<<<<< HEAD
+   * CoreUI (v2.0.0-beta.5): ajax-load.js
+=======
+   * CoreUI (v2.0.0-beta.5): ajax-load.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -42,7 +50,11 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'ajaxLoad';
-    var VERSION = '2.0.0-beta.3';
+<<<<<<< HEAD
+    var VERSION = '2.0.0-beta.5';
+=======
+    var VERSION = '2.0.0-beta.5';
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
     var DATA_KEY = 'coreui.ajaxLoad';
     var JQUERY_NO_CONFLICT = $$$1.fn[NAME];
     var ClassName = {
@@ -197,7 +209,11 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.0-beta.3): toggle-classes.js
+<<<<<<< HEAD
+   * CoreUI (v2.0.0-beta.5): toggle-classes.js
+=======
+   * CoreUI (v2.0.0-beta.5): toggle-classes.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -223,7 +239,11 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.0-beta.3): aside-menu.js
+<<<<<<< HEAD
+   * CoreUI (v2.0.0-beta.5): aside-menu.js
+=======
+   * CoreUI (v2.0.0-beta.5): aside-menu.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -235,7 +255,11 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'aside-menu';
-    var VERSION = '2.0.0-beta.3';
+<<<<<<< HEAD
+    var VERSION = '2.0.0-beta.5';
+=======
+    var VERSION = '2.0.0-beta.5';
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
     var DATA_KEY = 'coreui.aside-menu';
     var EVENT_KEY = "." + DATA_KEY;
     var DATA_API_KEY = '.data-api';
@@ -332,7 +356,11 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.0-beta.3): sidebar.js
+<<<<<<< HEAD
+   * CoreUI (v2.0.0-beta.5): sidebar.js
+=======
+   * CoreUI (v2.0.0-beta.5): sidebar.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -344,7 +372,11 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'sidebar';
-    var VERSION = '2.0.0-beta.3';
+<<<<<<< HEAD
+    var VERSION = '2.0.0-beta.5';
+=======
+    var VERSION = '2.0.0-beta.5';
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
     var DATA_KEY = 'coreui.sidebar';
     var EVENT_KEY = "." + DATA_KEY;
     var DATA_API_KEY = '.data-api';
@@ -534,11 +566,11 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v1.0.0): get-style.js
+   * CoreUI Utilities (v2.0.0-beta.5): get-style.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
-  var GetStyle = function GetStyle(property, element) {
+  var getStyle = function getStyle(property, element) {
     if (element === void 0) {
       element = document.body;
     }
@@ -549,13 +581,17 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.0-beta.3): hex-to-rgb.js
+<<<<<<< HEAD
+   * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgb.js
+=======
+   * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgb.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
 
   /* eslint-disable no-magic-numbers */
-  var HexToRgb = function HexToRgb(color) {
+  var hexToRgb = function hexToRgb(color) {
     var hex = color.replace('#', '');
     var r = parseInt(hex.substring(0, 2), 16);
     var g = parseInt(hex.substring(2, 4), 16);
@@ -566,13 +602,17 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.0-beta.3): hex-to-rgba.js
+<<<<<<< HEAD
+   * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgba.js
+=======
+   * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgba.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
 
   /* eslint-disable no-magic-numbers */
-  var HexToRgba = function HexToRgba(color, opacity) {
+  var hexToRgba = function hexToRgba(color, opacity) {
     if (opacity === void 0) {
       opacity = 100;
     }
@@ -587,23 +627,31 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.0-beta.3): rgb-to-hex.js
+<<<<<<< HEAD
+   * CoreUI (v2.0.0-beta.5): rgb-to-hex.js
+=======
+   * CoreUI (v2.0.0-beta.5): rgb-to-hex.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
 
   /* eslint-disable no-magic-numbers */
-  var RgbToHex = function RgbToHex(color) {
+  var rgbToHex = function rgbToHex(color) {
     var rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
     var r = "0" + parseInt(rgb[1], 10).toString(16);
     var g = "0" + parseInt(rgb[2], 10).toString(16);
     var b = "0" + parseInt(rgb[3], 10).toString(16);
-    return rgb && rgb.length === 4 ? "#" + r.slice(-2) + g.slice(-2) + b.slice(-2) : ''; // return (rgb && rgb.length === 4) ? '#' + ('0' + parseInt(rgb[1], 10).toString(16)).slice(-2) + ('0' + parseInt(rgb[2], 10).toString(16)).slice(-2) + ('0' + parseInt(rgb[3], 10).toString(16)).slice(-2) : '';
+    return rgb && rgb.length === 4 ? "#" + r.slice(-2) + g.slice(-2) + b.slice(-2) : '';
   };
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.0-beta.3): index.js
+<<<<<<< HEAD
+   * CoreUI (v2.0.0-beta.5): index.js
+=======
+   * CoreUI (v2.0.0-beta.5): index.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -624,10 +672,10 @@
       throw new Error('CoreUI\'s JavaScript requires at least jQuery v1.9.1 but less than v4.0.0');
     }
   })($);
-  window.GetStyle = GetStyle;
-  window.HexToRgb = HexToRgb;
-  window.HexToRgba = HexToRgba;
-  window.RgbToHex = RgbToHex;
+  window.getStyle = getStyle;
+  window.hexToRgb = hexToRgb;
+  window.hexToRgba = hexToRgba;
+  window.rgbToHex = rgbToHex;
 
   exports.AjaxLoad = AjaxLoad;
   exports.AsideMenu = AsideMenu;

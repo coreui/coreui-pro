@@ -1,12 +1,16 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI Utilities (v2.0.0-beta.3): hex-to-rgba.js
+<<<<<<< HEAD
+ * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgba.js
+=======
+ * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgba.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
 
 /* eslint-disable no-magic-numbers */
-var HexToRgba = function HexToRgba(color, opacity) {
+var hexToRgba = function hexToRgba(color, opacity) {
   if (opacity === void 0) {
     opacity = 100;
   }

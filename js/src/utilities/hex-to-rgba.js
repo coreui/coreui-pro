@@ -1,12 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI Utilities (v2.0.0-beta.3): hex-to-rgba.js
+ * CoreUI Utilities (v2.0.0-beta.5): hex-to-rgba.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
 
 /* eslint-disable no-magic-numbers */
-const HexToRgba = (color, opacity = 100) => {
+const hexToRgba = (color, opacity = 100) => {
   const hex = color.replace('#', '')
   const r = parseInt(hex.substring(0, 2), 16)
   const g = parseInt(hex.substring(2, 4), 16)
@@ -16,4 +16,4 @@ const HexToRgba = (color, opacity = 100) => {
   return result
 }
 
-export default HexToRgba
+export default hexToRgba

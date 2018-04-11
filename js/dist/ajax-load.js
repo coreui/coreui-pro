@@ -4,7 +4,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.0-beta.3): ajax-load.js
+<<<<<<< HEAD
+ * CoreUI (v2.0.0-beta.5): ajax-load.js
+=======
+ * CoreUI (v2.0.0-beta.5): ajax-load.js
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -15,7 +19,11 @@ var AjaxLoad = function ($) {
    * ------------------------------------------------------------------------
    */
   var NAME = 'ajaxLoad';
-  var VERSION = '2.0.0-beta.3';
+<<<<<<< HEAD
+  var VERSION = '2.0.0-beta.5';
+=======
+  var VERSION = '2.0.0-beta.5';
+>>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
   var DATA_KEY = 'coreui.ajaxLoad';
   var JQUERY_NO_CONFLICT = $.fn[NAME];
   var ClassName = {
