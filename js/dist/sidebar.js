@@ -4,11 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
-<<<<<<< HEAD
- * CoreUI (v2.0.0-beta.5): sidebar.js
-=======
- * CoreUI (v2.0.0-beta.5): sidebar.js
->>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
+ * CoreUI (v2.0.0-beta.6): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -19,11 +15,7 @@ var Sidebar = function ($) {
    * ------------------------------------------------------------------------
    */
   var NAME = 'sidebar';
-<<<<<<< HEAD
-  var VERSION = '2.0.0-beta.5';
-=======
-  var VERSION = '2.0.0-beta.5';
->>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
+  var VERSION = '2.0.0-beta.6';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';

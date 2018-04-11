@@ -1,10 +1,6 @@
 /**
  * --------------------------------------------------------------------------
-<<<<<<< HEAD
- * CoreUI (v2.0.0-beta.5): toggle-classes.js
-=======
- * CoreUI (v2.0.0-beta.5): toggle-classes.js
->>>>>>> a926b65c2932926c6b52b4c2e2c2438166fb77be
+ * CoreUI (v2.0.0-beta.6): toggle-classes.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */

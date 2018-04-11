@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.0-beta.5): ajax-load.js
+ * CoreUI (v2.0.0-beta.6): ajax-load.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -16,7 +16,7 @@ const AjaxLoad = (($) => {
    */
 
   const NAME                       = 'ajaxLoad'
-  const VERSION                    = '2.0.0-beta.5'
+  const VERSION                    = '2.0.0-beta.6'
   const DATA_KEY                   = 'coreui.ajaxLoad'
   const JQUERY_NO_CONFLICT         = $.fn[NAME]
 
@@ -49,6 +49,7 @@ const AjaxLoad = (($) => {
       this._element = element
 
       const url = location.hash.replace(/^#/, '')
+      // eslint-disable-next-line no-unused-expressions
       url !== '' ? this.setUpUrl(url) : this.setUpUrl(this._config.defaultPage)
       this._addEventListeners()
     }
@@ -77,6 +78,7 @@ const AjaxLoad = (($) => {
         async: false,
         success: function success() {
           if (typeof Pace !== 'undefined') {
+            // eslint-disable-next-line no-undef
             Pace.restart()
           }
           $('body').animate({
@@ -122,6 +124,7 @@ const AjaxLoad = (($) => {
     }
 
     _addEventListeners() {
+      // eslint-disable-next-line prefer-template
       $(document).on(Event.CLICK, Selector.NAV_LINK + '[href!="#"]', (event) => {
         event.preventDefault()
         event.stopPropagation()
