@@ -1,6 +1,6 @@
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.0.0-beta.10
+ * @version v2.0.0-rc.1
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://coreui.io/license)
@@ -29,7 +29,7 @@
 @import "breadcrumb-menu";
 @import "breadcrumb";
 @import "brand-card";
-@import "brands-buttons";
+@import "brand-buttons";
 @import "buttons";
 @import "callout";
 @import "card";
@@ -37,12 +37,12 @@
 @import "dropdown";
 @import "footer";
 @import "grid";
+@import "header";
 @import "input-group";
 @import "images";
 @import "list-group";
 @import "modal";
 @import "nav";
-@import "navbar";
 @import "progress";
 @import "progress-group";
 @import "sidebar";
@@ -63,3 +63,6 @@
 
 // Right-to-left
 @import "rtl";
+
+// Custom Properties support for Internet Explorer
+@import "ie-custom-properties"

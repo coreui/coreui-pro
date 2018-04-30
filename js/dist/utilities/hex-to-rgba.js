@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI Utilities (v2.0.0-beta.10): hex-to-rgba.js
+ * CoreUI Utilities (v2.0.0-rc.1): hex-to-rgba.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -35,6 +35,6 @@ var hexToRgba = function hexToRgba(color, opacity) {
     b = parseInt(color.substring(3, 5), 16);
   }
 
-  return "rgba(" + r + ", " + g + ", " + b + ", " + opacity / 100;
+  return "rgba(" + r + ", " + g + ", " + b + ", " + opacity / 100 + ")";
 };
 //# sourceMappingURL=hex-to-rgba.js.map
