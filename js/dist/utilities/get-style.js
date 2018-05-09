@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI Utilities (v2.0.0-rc.2): get-style.js
+ * CoreUI Utilities (v2.0.0): get-style.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -9,6 +9,11 @@ var getCssCustomProperties = function getCssCustomProperties() {
   var root = Object.entries(document.styleSheets).filter(function (value) {
     return value[1].cssText.substring(0, ':root'.length) === ':root';
   });
+
+  if (root.length === 0) {
+    root = Object.entries(document.styleSheets);
+  }
+
   var rule = Object.entries(root[0][1].cssRules).filter(function (value) {
     return value[1].selectorText === '.ie-custom-properties';
   });
