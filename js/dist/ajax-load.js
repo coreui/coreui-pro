@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.0): ajax-load.js
+ * CoreUI (v2.0.1): ajax-load.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -15,7 +15,7 @@ var AjaxLoad = function ($) {
    * ------------------------------------------------------------------------
    */
   var NAME = 'ajaxLoad';
-  var VERSION = '2.0.0';
+  var VERSION = '2.0.1';
   var DATA_KEY = 'coreui.ajaxLoad';
   var JQUERY_NO_CONFLICT = $.fn[NAME];
   var ClassName = {
@@ -155,7 +155,7 @@ var AjaxLoad = function ($) {
         } else if (event.currentTarget.target === '_blank') {
           _this.loadBlank(event.currentTarget.href);
         } else {
-          _this.setUpUrl(event.currentTarget.pathname);
+          _this.setUpUrl(event.currentTarget.getAttribute('href'));
         }
       });
     }; // Static

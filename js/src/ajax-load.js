@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.0): ajax-load.js
+ * CoreUI (v2.0.1): ajax-load.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -16,7 +16,7 @@ const AjaxLoad = (($) => {
    */
 
   const NAME                       = 'ajaxLoad'
-  const VERSION                    = '2.0.0'
+  const VERSION                    = '2.0.1'
   const DATA_KEY                   = 'coreui.ajaxLoad'
   const JQUERY_NO_CONFLICT         = $.fn[NAME]
 
@@ -162,7 +162,7 @@ const AjaxLoad = (($) => {
         } else if (event.currentTarget.target === '_blank') {
           this.loadBlank(event.currentTarget.href)
         } else {
-          this.setUpUrl(event.currentTarget.pathname)
+          this.setUpUrl(event.currentTarget.getAttribute('href'))
         }
       })
     }
