@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.0.1
+ * @version v2.0.2
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://coreui.io/license)
@@ -3885,7 +3885,7 @@ input[type="button"].btn-block {
 }
 
 .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
-  border-color: #e4e7ea #e4e7ea #c8ced3;
+  border-color: #c8ced3 #c8ced3 #c8ced3;
 }
 
 .nav-tabs .nav-link.disabled {
@@ -3896,9 +3896,9 @@ input[type="button"].btn-block {
 
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-  color: #5c6873;
-  background-color: #e4e5e6;
-  border-color: #c8ced3 #c8ced3 #e4e5e6;
+  color: #23282c;
+  background-color: #fff;
+  border-color: #c8ced3 #c8ced3 #fff;
 }
 
 .nav-tabs .dropdown-menu {
@@ -11020,7 +11020,7 @@ canvas {
   width: 20px;
   margin-right: 10px;
   margin-left: -10px;
-  color: #c8ced3;
+  color: #73818f;
   text-align: center;
 }
 
@@ -11371,23 +11371,11 @@ canvas {
   cursor: pointer;
 }
 
-.nav-tabs .nav-link.active {
-  color: #2f353a;
-  background: #fff;
-  border-color: #c8ced3;
-  border-bottom-color: #fff;
-}
-
-.nav-tabs .nav-link.active:focus {
-  background: #fff;
-  border-color: #c8ced3;
-  border-bottom-color: #fff;
-}
-
 .tab-content {
   margin-top: -1px;
   background: #fff;
   border: 1px solid #c8ced3;
+  border-radius: 0 0 0.25rem 0.25rem;
 }
 
 .tab-content .tab-pane {

@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.0.1
+ * @version v2.0.2
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://coreui.io/license)
@@ -2029,7 +2029,7 @@ canvas {
   width: 20px;
   margin-right: 10px;
   margin-left: -10px;
-  color: #c8ced3;
+  color: #73818f;
   text-align: center;
 }
 
@@ -2326,23 +2326,11 @@ canvas {
   cursor: pointer;
 }
 
-.nav-tabs .nav-link.active {
-  color: #2f353a;
-  background: #fff;
-  border-color: #c8ced3;
-  border-bottom-color: #fff;
-}
-
-.nav-tabs .nav-link.active:focus {
-  background: #fff;
-  border-color: #c8ced3;
-  border-bottom-color: #fff;
-}
-
 .tab-content {
   margin-top: -1px;
   background: #fff;
   border: 1px solid #c8ced3;
+  border-radius: 0 0 0.25rem 0.25rem;
 }
 
 .tab-content .tab-pane {
