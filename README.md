@@ -52,13 +52,13 @@ $ npm install @coreui/coreui --save
 ### Yarn
 
 ``` bash
-$ yarn add @coreui/coreui@2.0.3
+$ yarn add @coreui/coreui@2.0.4
 ```
 
 ### Composer
 
 ``` bash
-$ composer require coreui/coreui:2.0.3
+$ composer require coreui/coreui:2.0.4
 ```
 
 ## Usage
@@ -130,8 +130,7 @@ Get updates on CoreUI's development and chat with the project maintainers and co
 
 ## Copyright and license
 
-copyright 2018 creativeLabs Łukasz Holeczek. Code released under [the MIT license](https://github.com/coreui/coreui/blob/master/LICENSE).
-There is only one limitation you can't can’t re-distribute the CoreUI as stock. You can’t do this if you modify the CoreUI. In past we faced some problems with persons who tried to sell CoreUI based templates.
+copyright 2018 creativeLabs Łukasz Holeczek. 
 
 ## Support CoreUI Development
 

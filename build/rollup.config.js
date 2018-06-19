@@ -38,7 +38,6 @@ module.exports = {
     banner: `/*!
   * CoreUI Pro v${pkg.version} (${pkg.homepage})
   * Copyright ${year} ${pkg.author.name}
-  * Licensed under MIT (${pkg.homepage})
   */`,
     file: path.resolve(__dirname, `../dist/js/${fileDest}`),
     format: 'umd',

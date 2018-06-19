@@ -32,9 +32,8 @@ export default {
   input: path.resolve(__dirname, '../js/src/utilities/index.js'),
   output: {
     banner: `/*!
-  * CoreUI v${pkg.version} (${pkg.homepage})
+  * CoreUI Pro v${pkg.version} (${pkg.homepage})
   * Copyright ${year} ${pkg.author.name}
-  * Licensed under MIT (${pkg.homepage})
   */`,
     file: path.resolve(__dirname, `../dist/js/${fileDest}`),
     format: 'umd',
