@@ -1,4 +1,4 @@
-# CoreUI - Free WebApp UI Kit built on top of Bootstrap 4 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=CoreUI%20-%20Free%20Bootstrap%204%20Admin%20Template%20&url=https://coreui.io&hashtags=bootstrap,admin,template,dashboard,panel,free,angular,react,vue)
+# CoreUI - WebApp UI Kit built on top of Bootstrap 4 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=CoreUI%20-%20Free%20Bootstrap%204%20Admin%20Template%20&url=https://coreui.io&hashtags=bootstrap,admin,template,dashboard,panel,free,angular,react,vue)
 
 Please help us on [Product Hunt](https://www.producthunt.com/posts/coreui-open-source-bootstrap-4-admin-template-with-angular-2-react-js-vue-js-support) and [Designer News](https://www.designernews.co/stories/81127). Thanks in advance!
 
@@ -52,21 +52,13 @@ $ npm install @coreui/coreui --save
 ### Yarn
 
 ``` bash
-<<<<<<< HEAD
-$ yarn add @coreui/coreui@2.0.6
-=======
-$ yarn add @coreui/coreui@2.0.4
->>>>>>> a14b70d7ed6f4fbd99af9d867079549a2398c646
+$ yarn add @coreui/coreui@2.0.7
 ```
 
 ### Composer
 
 ``` bash
-<<<<<<< HEAD
-$ composer require coreui/coreui:2.0.6
-=======
-$ composer require coreui/coreui:2.0.4
->>>>>>> a14b70d7ed6f4fbd99af9d867079549a2398c646
+$ composer require coreui/coreui:2.0.7
 ```
 
 ## Usage
@@ -76,7 +68,7 @@ $ composer require coreui/coreui:2.0.4
 Copy-paste the stylesheet `<link>` into your `<head>` before all other stylesheets to load our CSS.
 
 ``` html
-<link rel="stylesheet" href="node_modules/@coreui/coreui/dist/css/coreui.min.css">
+<link rel="stylesheet" href="node_modules/@coreui/coreui-pro/dist/css/coreui.min.css">
 ```
 
 ### JS
@@ -87,7 +79,7 @@ Many of our components require the use of JavaScript to function. Specifically, 
 <script src="node_modules/jquery/dist/jquery.min.js"></script>
 <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="node_modules/@coreui/coreui/dist/js/coreui.min.js"></script>
+<script src="node_modules/@coreui/coreui-pro/dist/js/coreui.min.js"></script>
 ```
 
 ## What's included
@@ -114,7 +106,7 @@ Editor preferences are available in the [editor config](https://github.com/coreu
 
 ## Versioning
 
-For transparency into our release cycle and in striving to maintain backward compatibility,CoreUI Free Admin Template is maintained under [the Semantic Versioning guidelines](http://semver.org/).
+For transparency into our release cycle and in striving to maintain backward compatibility, CoreUI Free Admin Template is maintained under [the Semantic Versioning guidelines](http://semver.org/).
 
 See [the Releases section of our project](https://github.com/coreui/coreui/releases) for changelogs for each release version.
 
@@ -139,9 +131,3 @@ Get updates on CoreUI's development and chat with the project maintainers and co
 ## Copyright and license
 
 copyright 2018 creativeLabs Łukasz Holeczek. 
-
-## Support CoreUI Development
-
-CoreUI is an MIT licensed open source project and completely free to use. However, the amount of effort needed to maintain and develop new features for the project is not sustainable without proper financial backing. You can support development by donating on [PayPal](https://www.paypal.me/holeczek), buying [CoreUI Pro Version](https://coreui.io/pro) or buying one of our [premium admin templates](https://genesisui.com/?support=1).
-
-As of now I am exploring the possibility of working on CoreUI fulltime - if you are a business that is building core products using CoreUI, I am also open to conversations regarding custom sponsorship / consulting arrangements. Get in touch on [Twitter](https://twitter.com/lukaszholeczek).
