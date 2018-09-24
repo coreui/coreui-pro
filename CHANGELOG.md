@@ -1,4 +1,15 @@
-=======
+## v2.0.9
+- fix(sidebar) remove scrollbar when `sidebar-minimized`
+- refactor(sidebar) extract `makeScrollbar()` and `destroyScrollbar()`
+- chore: update `@babel/cli` to `7.1.0`
+- chore: update `@babel/core` to `7.1.0`
+- chore: update `@babel/plugin-transform-runtime` to `7.1.0`
+- chore: update `@babel/preset-env` to `7.1.0`
+- chore: update `copyfiles` to `2.1.0`
+- chore: update `eslint` to `5.6.0`
+- chore: update `rollup` to `0.66.2`
+- chore: update `stylelint-scss` to `3.3.1`
+
 ## v2.0.8
 - fix(sidebar) minimizing sidebar with bottom chevron does not allow to maximize it again #404
 - fix(sidebar) show scrollbar after height change #419
@@ -60,7 +71,6 @@
 - chore: update `stylelint-scss` to `3.3.0`
 - chore: update `uglify-js` to `3.4.9`
 
->>>>>>> 44dcda9b743365ac454c57725263ca6adbc95749
 ## v2.0.4
 - **Refactor: SCSS Variables**
 - Update: @babel/cli to 7.0.0-beta.53
