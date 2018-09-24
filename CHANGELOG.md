@@ -1,5 +1,9 @@
-<<<<<<< HEAD
+=======
 ## v2.0.8
+- fix(sidebar) minimizing sidebar with bottom chevron does not allow to maximize it again #404
+- fix(sidebar) show scrollbar after height change #419
+
+## v2.0.7
 - fix(sidebar) mobile sidebar not dismissed on link click
 - chore: update `bootstrap` to `4.1.3`
 - chore: update `@babel/cli` to `7.0.0`
@@ -26,15 +30,10 @@
 - chore: update `stylelint-scss` to `3.3.0`
 - chore: update `uglify-js` to `3.4.9`
 
-=======
-## v2.0.7
-- fix(sidebar) minimizing sidebar with bottom chevron does not allow to maximize it again #404
-- fix(sidebar) show scrollbar after height change #419
-
 ## v2.0.6
 - fix(sidebar) static mobile sidebar not dismissed on link click
 
-## v2.0.8
+## v2.0.5
 - fix(sidebar) mobile sidebar not dismissed on link click #409
 - chore: update `bootstrap` to `4.1.3`
 - chore: update `@babel/cli` to `7.0.0`
