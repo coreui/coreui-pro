@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 ## v2.0.8
-- fix(sidebar) mobile sidebar not dismissed on link click 
+- fix(sidebar) mobile sidebar not dismissed on link click
 - chore: update `bootstrap` to `4.1.3`
 - chore: update `@babel/cli` to `7.0.0`
 - chore: update `@babel/core` to `7.0.0`
@@ -27,7 +27,7 @@
 - chore: update `uglify-js` to `3.4.9`
 
 =======
-## v2.0.8
+## v2.0.7
 - fix(sidebar) minimizing sidebar with bottom chevron does not allow to maximize it again #404
 - fix(sidebar) show scrollbar after height change #419
 
