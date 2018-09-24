@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.7): sidebar.js
+ * CoreUI (v2.0.8): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -15,11 +15,14 @@ var Sidebar = function ($) {
    * ------------------------------------------------------------------------
    */
   var NAME = 'sidebar';
-  var VERSION = '2.0.7';
+  var VERSION = '2.0.8';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
   var JQUERY_NO_CONFLICT = $.fn[NAME];
+  var Default = {
+    transition: 400
+  };
   var ClassName = {
     ACTIVE: 'active',
     BRAND_MINIMIZED: 'brand-minimized',
@@ -34,7 +37,8 @@ var Sidebar = function ($) {
     DESTROY: 'destroy',
     INIT: 'init',
     LOAD_DATA_API: "load" + EVENT_KEY + DATA_API_KEY,
-    TOGGLE: 'toggle'
+    TOGGLE: 'toggle',
+    UPDATE: 'update'
   };
   var Selector = {
     BODY: 'body',
@@ -102,6 +106,15 @@ var Sidebar = function ($) {
             });
           }
         }
+
+        if (event === Event.UPDATE) {
+          // ToDo: Add smooth transition
+          setTimeout(function () {
+            ps = new PerfectScrollbar(document.querySelector(Selector.NAVIGATION_CONTAINER), {
+              suppressScrollX: true
+            });
+          }, Default.transition);
+        }
       }
     };
 
@@ -137,6 +150,8 @@ var Sidebar = function ($) {
         event.stopPropagation();
         var dropdown = event.target;
         $(dropdown).parent().toggleClass(ClassName.OPEN);
+
+        _this.perfectScrollbar(Event.UPDATE);
       });
       $(Selector.SIDEBAR_MINIMIZER).on(Event.CLICK, function (event) {
         event.preventDefault();

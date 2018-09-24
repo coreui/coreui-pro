@@ -4,7 +4,7 @@ import toggleClasses from './toggle-classes'
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.7): sidebar.js
+ * CoreUI (v2.0.8): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -17,11 +17,15 @@ const Sidebar = (($) => {
    */
 
   const NAME                = 'sidebar'
-  const VERSION             = '2.0.7'
+  const VERSION             = '2.0.8'
   const DATA_KEY            = 'coreui.sidebar'
   const EVENT_KEY           = `.${DATA_KEY}`
   const DATA_API_KEY        = '.data-api'
   const JQUERY_NO_CONFLICT  = $.fn[NAME]
+
+  const Default = {
+    transition : 400
+  }
 
   const ClassName = {
     ACTIVE              : 'active',
@@ -38,7 +42,8 @@ const Sidebar = (($) => {
     DESTROY       : 'destroy',
     INIT          : 'init',
     LOAD_DATA_API : `load${EVENT_KEY}${DATA_API_KEY}`,
-    TOGGLE        : 'toggle'
+    TOGGLE        : 'toggle',
+    UPDATE        : 'update'
   }
 
   const Selector = {
@@ -116,6 +121,15 @@ const Sidebar = (($) => {
             })
           }
         }
+
+        if (event === Event.UPDATE) {
+          // ToDo: Add smooth transition
+          setTimeout(() => {
+            ps = new PerfectScrollbar(document.querySelector(Selector.NAVIGATION_CONTAINER), {
+              suppressScrollX: true
+            })
+          }, Default.transition)
+        }
       }
     }
 
@@ -151,6 +165,7 @@ const Sidebar = (($) => {
         event.stopPropagation()
         const dropdown = event.target
         $(dropdown).parent().toggleClass(ClassName.OPEN)
+        this.perfectScrollbar(Event.UPDATE)
       })
 
       $(Selector.SIDEBAR_MINIMIZER).on(Event.CLICK, (event) => {
