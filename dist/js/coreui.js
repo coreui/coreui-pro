@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro v2.0.10 (https://coreui.io/pro/)
+  * CoreUI Pro v2.0.11 (https://coreui.io/pro/)
   * Copyright 2018 Łukasz Holeczek
   */
 (function (global, factory) {
@@ -29,7 +29,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.10): ajax-load.js
+   * CoreUI (v2.0.11): ajax-load.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -41,7 +41,7 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'ajaxLoad';
-    var VERSION = '2.0.10';
+    var VERSION = '2.0.11';
     var DATA_KEY = 'coreui.ajaxLoad';
     var JQUERY_NO_CONFLICT = $$$1.fn[NAME];
     var ClassName = {
@@ -234,7 +234,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.10): toggle-classes.js
+   * CoreUI (v2.0.11): toggle-classes.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -259,7 +259,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.10): aside-menu.js
+   * CoreUI (v2.0.11): aside-menu.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -271,7 +271,7 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'aside-menu';
-    var VERSION = '2.0.10';
+    var VERSION = '2.0.11';
     var DATA_KEY = 'coreui.aside-menu';
     var EVENT_KEY = "." + DATA_KEY;
     var DATA_API_KEY = '.data-api';
@@ -368,7 +368,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.10): sidebar.js
+   * CoreUI (v2.0.11): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -380,7 +380,7 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'sidebar';
-    var VERSION = '2.0.10';
+    var VERSION = '2.0.11';
     var DATA_KEY = 'coreui.sidebar';
     var EVENT_KEY = "." + DATA_KEY;
     var DATA_API_KEY = '.data-api';
@@ -595,7 +595,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.10): get-style.js
+   * CoreUI Utilities (v2.0.11): get-style.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -662,7 +662,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.10): hex-to-rgb.js
+   * CoreUI Utilities (v2.0.11): hex-to-rgb.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -698,7 +698,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.10): hex-to-rgba.js
+   * CoreUI Utilities (v2.0.11): hex-to-rgba.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -738,7 +738,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.10): rgb-to-hex.js
+   * CoreUI (v2.0.11): rgb-to-hex.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -763,7 +763,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.10): index.js
+   * CoreUI (v2.0.11): index.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
