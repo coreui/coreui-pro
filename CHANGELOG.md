@@ -1,3 +1,9 @@
+## v2.0.13
+- fix(scss): add missing `light-blue` color variable
+- chore: update `@babel/core` to `7.1.2`
+- chore: update `@babel/cli` to `7.1.2`
+- chore: update `eslint` to `5.6.1`
+
 ## v2.0.12
 - fix(layout) `aside` IE issue with `.main` margin on mobile
 - fix(sidebar) `rtl` IE issue with `sidebar-minimized` captions
