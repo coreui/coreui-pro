@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.14): sidebar.js
+ * CoreUI (v2.0.19): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -15,7 +15,7 @@ var Sidebar = function ($) {
    * ------------------------------------------------------------------------
    */
   var NAME = 'sidebar';
-  var VERSION = '2.0.14';
+  var VERSION = '2.0.19';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -47,6 +47,7 @@ var Sidebar = function ($) {
     NAV_DROPDOWN_ITEMS: '.nav-dropdown-items',
     NAV_ITEM: '.nav-item',
     NAV_LINK: '.nav-link',
+    NAV_LINK_QUERIED: '.nav-link-queried',
     NAVIGATION_CONTAINER: '.sidebar-nav',
     NAVIGATION: '.sidebar-nav > .nav',
     SIDEBAR: '.sidebar',
@@ -92,9 +93,7 @@ var Sidebar = function ($) {
           if (document.body.classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
             this.destroyScrollbar();
           } else {
-            this.ps = this.makeScrollbar(); // ToDo: find real fix for ps rtl
-
-            this.ps.isRtl = false;
+            this.ps = this.makeScrollbar();
           }
         }
 
@@ -103,9 +102,7 @@ var Sidebar = function ($) {
           setTimeout(function () {
             _this.destroyScrollbar();
 
-            _this.ps = _this.makeScrollbar(); // ToDo: find real fix for ps rtl
-
-            _this.ps.isRtl = false;
+            _this.ps = _this.makeScrollbar();
           }, Default.transition);
         }
       }
@@ -116,9 +113,12 @@ var Sidebar = function ($) {
         container = Selector.NAVIGATION_CONTAINER;
       }
 
-      return new PerfectScrollbar(document.querySelector(container), {
+      var ps = new PerfectScrollbar(document.querySelector(container), {
         suppressScrollX: true
-      });
+      }); // ToDo: find real fix for ps rtl
+
+      ps.isRtl = false;
+      return ps;
     };
 
     _proto.destroyScrollbar = function destroyScrollbar() {
@@ -131,7 +131,13 @@ var Sidebar = function ($) {
     _proto.setActiveLink = function setActiveLink() {
       $(Selector.NAVIGATION).find(Selector.NAV_LINK).each(function (key, value) {
         var link = value;
-        var cUrl = String(window.location).split('?')[0];
+        var cUrl;
+
+        if (link.classList.contains(Selector.NAV_LINK_QUERIED)) {
+          cUrl = String(window.location);
+        } else {
+          cUrl = String(window.location).split('?')[0];
+        }
 
         if (cUrl.substr(cUrl.length - 1) === '#') {
           cUrl = cUrl.slice(0, -1);

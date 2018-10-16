@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro v2.0.14 (https://coreui.io/pro/)
+  * CoreUI Pro v2.0.19 (https://coreui.io/pro/)
   * Copyright 2018 Łukasz Holeczek
   */
 (function (global, factory) {
@@ -8,10 +8,28 @@
   (factory((global.utilities = {})));
 }(this, (function (exports) { 'use strict';
 
+  var deepObjectsMerge = function deepObjectsMerge(target, source) {
+    // Iterate through `source` properties and if an `Object` set property to merge of `target` and `source` properties
+    var _arr = Object.keys(source);
+
+    for (var _i = 0; _i < _arr.length; _i++) {
+      var key = _arr[_i];
+
+      if (source[key] instanceof Object) {
+        Object.assign(source[key], deepObjectsMerge(target[key], source[key]));
+      }
+    } // Join `target` and modified `source`
+
+
+    Object.assign(target || {}, source);
+    return target;
+  };
+
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.14): get-style.js
+   * CoreUI Utilities (v2.0.19): get-css-custom-properties.js
    * Licensed under MIT (https://coreui.io/license)
+   * @returns {string} css custom property name
    * --------------------------------------------------------------------------
    */
   var getCssCustomProperties = function getCssCustomProperties() {
@@ -48,6 +66,12 @@
     return cssCustomProperties;
   };
 
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI Utilities (v2.0.19): get-color.js
+   * Licensed under MIT (https://coreui.io/license)
+   * --------------------------------------------------------------------------
+   */
   var minIEVersion = 10;
 
   var isIE1x = function isIE1x() {
@@ -58,6 +82,40 @@
     return property.match(/^--.*/i);
   };
 
+  var getColor = function getColor(rawProperty, element) {
+    if (element === void 0) {
+      element = document.body;
+    }
+
+    var property = "--" + rawProperty;
+    var style;
+
+    if (isCustomProperty(property) && isIE1x()) {
+      var cssCustomProperties = getCssCustomProperties();
+      style = cssCustomProperties[property];
+    } else {
+      style = window.getComputedStyle(element, null).getPropertyValue(property).replace(/^\s/, '');
+    }
+
+    return style ? style : rawProperty;
+  };
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI Utilities (v2.0.19): get-style.js
+   * Licensed under MIT (https://coreui.io/license)
+   * --------------------------------------------------------------------------
+   */
+  var minIEVersion$1 = 10;
+
+  var isIE1x$1 = function isIE1x() {
+    return Boolean(document.documentMode) && document.documentMode >= minIEVersion$1;
+  };
+
+  var isCustomProperty$1 = function isCustomProperty(property) {
+    return property.match(/^--.*/i);
+  };
+
   var getStyle = function getStyle(property, element) {
     if (element === void 0) {
       element = document.body;
@@ -65,7 +123,7 @@
 
     var style;
 
-    if (isCustomProperty(property) && isIE1x()) {
+    if (isCustomProperty$1(property) && isIE1x$1()) {
       var cssCustomProperties = getCssCustomProperties();
       style = cssCustomProperties[property];
     } else {
@@ -77,7 +135,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.14): hex-to-rgb.js
+   * CoreUI Utilities (v2.0.19): hex-to-rgb.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -113,7 +171,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.0.14): hex-to-rgba.js
+   * CoreUI Utilities (v2.0.19): hex-to-rgba.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -153,7 +211,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.0.14): rgb-to-hex.js
+   * CoreUI (v2.0.19): rgb-to-hex.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -162,6 +220,10 @@
   var rgbToHex = function rgbToHex(color) {
     if (typeof color === 'undefined') {
       throw new Error('Hex color is not defined');
+    }
+
+    if (color === 'transparent') {
+      return '#00000000';
     }
 
     var rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
@@ -176,6 +238,8 @@
     return "#" + r.slice(-2) + g.slice(-2) + b.slice(-2);
   };
 
+  exports.deepObjectsMerge = deepObjectsMerge;
+  exports.getColor = getColor;
   exports.getStyle = getStyle;
   exports.hexToRgb = hexToRgb;
   exports.hexToRgba = hexToRgba;
