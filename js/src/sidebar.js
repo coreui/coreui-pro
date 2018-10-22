@@ -4,7 +4,7 @@ import toggleClasses from './toggle-classes'
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.0.19): sidebar.js
+ * CoreUI (v2.0.20): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -17,7 +17,7 @@ const Sidebar = (($) => {
    */
 
   const NAME                = 'sidebar'
-  const VERSION             = '2.0.19'
+  const VERSION             = '2.0.20'
   const DATA_KEY            = 'coreui.sidebar'
   const EVENT_KEY           = `.${DATA_KEY}`
   const DATA_API_KEY        = '.data-api'
@@ -94,7 +94,8 @@ const Sidebar = (($) => {
 
     perfectScrollbar(event) {
       if (typeof PerfectScrollbar !== 'undefined') {
-        if (event === Event.INIT && !document.body.classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
+        const classList = document.body.classList
+        if (event === Event.INIT && !classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
           this.ps = this.makeScrollbar()
         }
 
@@ -103,14 +104,15 @@ const Sidebar = (($) => {
         }
 
         if (event === Event.TOGGLE) {
-          if (document.body.classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
+          if (classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
             this.destroyScrollbar()
           } else {
+            this.destroyScrollbar()
             this.ps = this.makeScrollbar()
           }
         }
 
-        if (event === Event.UPDATE && !document.body.classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
+        if (event === Event.UPDATE && !classList.contains(ClassName.SIDEBAR_MINIMIZED)) {
           // ToDo: Add smooth transition
           setTimeout(() => {
             this.destroyScrollbar()

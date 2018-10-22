@@ -1,3 +1,10 @@
+## v2.0.20
+- fix(layout): sidebar on mobile issue [#23](https://github.com/coreui/coreui-angular/issues/23) 
+- fix: sidebar, sidebar-minimizer `rtl` ie issues, tweaks
+- refactor(sidebar.js): ps minor cleanup
+- chore: update `autoprefixer` to `9.2.1`
+- chore: update `postcss-cli` to `6.0.1`
+
 ## v2.0.19
 - refactor: extract getCssCustomProperties function
 - feat: add getColor function
