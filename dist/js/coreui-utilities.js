@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro v2.0.20 (https://coreui.io/pro/)
+  * CoreUI Pro v2.0.25 (https://coreui.io/pro/)
   * Copyright 2018 Łukasz Holeczek
   */
 (function (global, factory) {
