@@ -10346,10 +10346,6 @@ a.text-dark:hover, a.text-dark:focus {
   box-shadow: 0 0 0 0.2rem rgba(170, 212, 80, 0.5);
 }
 
-button {
-  cursor: pointer;
-}
-
 .btn-transparent {
   color: #fff;
   background-color: transparent;
