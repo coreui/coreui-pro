@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.0.20
+ * @version v2.0.25
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  */
@@ -1313,10 +1313,6 @@
 .btn-vimeo:not(:disabled):not(.disabled):active:focus, .btn-vimeo:not(:disabled):not(.disabled).active:focus,
 .show > .btn-vimeo.dropdown-toggle:focus {
   box-shadow: 0 0 0 0.2rem rgba(170, 212, 80, 0.5);
-}
-
-button {
-  cursor: pointer;
 }
 
 .btn-transparent {
