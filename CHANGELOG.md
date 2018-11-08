@@ -1,3 +1,17 @@
+## v2.1.0
+- chore: update `@babel/cli` to `7.1.5`
+- chore: update `@babel/core` to `7.1.5`
+- chore: update `@babel/preset-env` to `7.1.5`
+- chore: update `stylelint-scss` to `3.4.0`
+---
+- feat(scss): sidebar-nav-link-disabled
+- chore: update `nodemon` to `1.18.6`
+---
+- fix(.sidebar-minimizer): add `cursor: pointer` 
+- feat: delegated event handlers to support turbolinks (sidebar, aside-menu)- thanks @RyanVasichko
+- chore: update `node-sass` to `4.10.0`
+- chore: update `rollup` to `0.67.0`
+
 ## v2.0.25
 - chore: update `eslint-plugin-compat` to `2.6.3`
 - fix(buttons.scss): remove `button { @extend .btn; }`
