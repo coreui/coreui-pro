@@ -1,3 +1,8 @@
+## v2.1.3
+- fix: update `nodemon` to `1.18.7` (vulnerability removed)
+- fix: update `npm-run-all` to `^4.1.5` (vulnerability removed)
+- chore: update `stylelint-order` to `2.0.0`
+
 ## v2.1.1
 - fix(sidebar): `url("data:,")` turns into `url("'data:,'")`  
   now replaced with Base64 Encode of 1x1px Transparent gif, closes #49
