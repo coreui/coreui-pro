@@ -1,4 +1,4 @@
-// scss-lint:disable all
+// stylelint-disable selector-class-pattern
 .animated {
   animation-duration: 1s;
   // animation-fill-mode: both;
@@ -21,7 +21,7 @@
     opacity: 1;
   }
 }
-
+//
 .fadeIn {
   animation-name: fadeIn;
 }

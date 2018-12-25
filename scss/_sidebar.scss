@@ -105,10 +105,12 @@
     .nav-icon {
       display: inline-block;
       width: ($font-size-base * 1.25);
+      height: ($font-size-base * 1.25);
       margin: 0 ($sidebar-nav-link-padding-x / 2) 0 0;
       font-size: $font-size-base;
       color: $sidebar-nav-link-icon-color;
       text-align: center;
+      fill: $sidebar-nav-link-icon-color;
     }
 
     .badge {
@@ -123,6 +125,7 @@
 
       .nav-icon {
         color: $sidebar-nav-link-active-icon-color;
+        fill: $sidebar-nav-link-active-icon-color;
       }
     }
 
@@ -133,6 +136,7 @@
 
       .nav-icon {
         color: $sidebar-nav-link-hover-icon-color;
+        fill: $sidebar-nav-link-hover-icon-color;
       }
 
       &.nav-dropdown-toggle::before {
@@ -148,6 +152,7 @@
 
       .nav-icon {
         color: $sidebar-nav-link-disabled-icon-color;
+        fill: $sidebar-nav-link-disabled-icon-color;
       }
 
       &:hover {
@@ -156,6 +161,7 @@
 
         .nav-icon {
           color: $sidebar-nav-link-disabled-icon-color;
+          fill: $sidebar-nav-link-disabled-icon-color;
         }
 
         &.nav-dropdown-toggle::before {
@@ -169,11 +175,13 @@
         background: $value;
         .nav-icon {
           color: rgba(255, 255, 255, .7);
+          fill: rgba(255, 255, 255, .7);
         }
         &:hover {
           background: darken($value, 5%);
-          i {
+          .nav-icon {
             color: #fff;
+            fill: #fff;
           }
         }
       }
@@ -418,11 +426,8 @@
             .nav-icon {
               color: $sidebar-nav-link-hover-color;
             }
-          }
-          .nav-link {
 
-            &.disabled,
-            :disabled {
+            &.disabled {
               background: $sidebar-nav-link-disabled-bg;
 
               .nav-icon {
@@ -432,17 +437,6 @@
           }
         }
       }
-      // temp fix for vue version
-      section {
-        :not(.nav-dropdown-items) > {
-          .nav-item:last-child::after {
-            display: block;
-            margin-bottom: $sidebar-minimizer-height;
-            content: "";
-          }
-        }
-      }
-      // temp fix end
 
       .nav-link {
         position: relative;

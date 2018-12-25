@@ -17,7 +17,7 @@
   display: block;
   height: inherit;
   cursor: pointer;
-  background-color: $switch-bg;
+  background-color: #fff;
   border: $border-width solid $border-color;
   transition: .15s ease-out;
   @include border-radius($border-radius);
@@ -30,7 +30,7 @@
     width: $switch-height - ($switch-handle-margin * 2) - ($border-width * 2);
     height: $switch-height - ($switch-handle-margin * 2) - ($border-width * 2);
     content: "";
-    background-color: $switch-handle-bg;
+    background-color: #fff;
     border: 1px solid $border-color;
     transition: .15s ease-out;
     @include border-radius($border-radius / 2);

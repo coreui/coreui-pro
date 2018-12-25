@@ -1,8 +1,9 @@
 /*!
- * CoreUI Pro - Dashboard UI Kit
- * @version v2.1.4
- * @link https://coreui.io/pro/
+ * CoreUI - Open Source Dashboard UI Kit
+ * @version v2.1.3
+ * @link https://coreui.io
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
+ * Licensed under MIT (https://coreui.io/license)
  */
 
 // Override Boostrap variables
@@ -56,9 +57,6 @@
 
 // Utility classes
 @import "utilities";
-
-// Apps
-@import "apps";
 
 // Right-to-left
 @import "rtl";
