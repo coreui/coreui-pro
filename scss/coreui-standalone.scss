@@ -1,6 +1,6 @@
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.1.4
+ * @version v2.1.6
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  */
@@ -9,9 +9,9 @@
 @import "variables";
 
 // Import Bootstrap source files
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
-@import "node_modules/bootstrap/scss/mixins";
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
 
 // Import core styles
 @import "mixins";

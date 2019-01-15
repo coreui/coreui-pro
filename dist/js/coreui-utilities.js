@@ -1,16 +1,16 @@
 /*!
-  * CoreUI Pro v2.1.4 (https://coreui.io/pro/)
-  * Copyright 2018 Łukasz Holeczek
+  * CoreUI Pro v2.1.6 (https://coreui.io/pro/)
+  * Copyright 2019 Łukasz Holeczek
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.utilities = {})));
-}(this, (function (exports) { 'use strict';
+  (global = global || self, factory(global.utilities = {}));
+}(this, function (exports) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.4): classes.js
+   * CoreUI Utilities (v2.1.6): classes.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -26,7 +26,7 @@
   }
 
   var _core = createCommonjsModule(function (module) {
-  var core = module.exports = { version: '2.6.0' };
+  var core = module.exports = { version: '2.6.2' };
   if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
   });
   var _core_1 = _core.version;
@@ -51,7 +51,7 @@
   })('versions', []).push({
     version: _core.version,
     mode: _library ? 'pure' : 'global',
-    copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+    copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
 
@@ -1028,12 +1028,12 @@
             break;
           default: // \d\d?
             var n = +ch;
-            if (n === 0) return ch;
+            if (n === 0) return match;
             if (n > m) {
               var f = floor$1(n / 10);
-              if (f === 0) return ch;
+              if (f === 0) return match;
               if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
-              return ch;
+              return match;
             }
             capture = captures[n - 1];
         }
@@ -1106,7 +1106,7 @@
 
   // @@split logic
   _fixReWks('split', 2, function (defined, SPLIT, $split, maybeCallNative) {
-    var internalSplit = $split;
+    var internalSplit;
     if (
       'abbc'[$SPLIT](/(b)*/)[1] == 'c' ||
       'test'[$SPLIT](/(?:)/, -1)[LENGTH] != 4 ||
@@ -1152,6 +1152,8 @@
       internalSplit = function (separator, limit) {
         return separator === undefined && limit === 0 ? [] : $split.call(this, separator, limit);
       };
+    } else {
+      internalSplit = $split;
     }
 
     return [
@@ -1219,7 +1221,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.4): get-css-custom-properties.js
+   * CoreUI Utilities (v2.1.6): get-css-custom-properties.js
    * Licensed under MIT (https://coreui.io/license)
    * @returns {string} css custom property name
    * --------------------------------------------------------------------------
@@ -1287,7 +1289,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.4): get-color.js
+   * CoreUI Utilities (v2.1.6): get-color.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1304,7 +1306,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.4): hex-to-rgb.js
+   * CoreUI Utilities (v2.1.6): hex-to-rgb.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1340,7 +1342,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.4): hex-to-rgba.js
+   * CoreUI Utilities (v2.1.6): hex-to-rgba.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1407,7 +1409,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.4): rgb-to-hex.js
+   * CoreUI (v2.1.6): rgb-to-hex.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1447,5 +1449,5 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
 //# sourceMappingURL=coreui-utilities.js.map
