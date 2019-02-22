@@ -1,3 +1,22 @@
+## v2.1.7
+- update `bootstrap` to `^4.3.1` fixes *Class 'btn' style white-space: nowrap; has been removed creating issues with the btn with favicon* [#151](https://github.com/coreui/coreui-free-react-admin-template/issues/151) 
+###### Dependencies update:
+- update `bootstrap` to `^4.3.1` 
+- update `@babel/core` to `^7.3.3`
+- update `@babel/plugin-proposal-object-rest-spread` to `^7.3.2`
+- update `@babel/preset-env` to `^7.3.1`
+- update `autoprefixer` to `^9.4.8`
+- update `babel-plugin-istanbul` to `^5.1.1`
+- update `eslint` to `^5.14.1`
+- update `eslint-plugin-compat` to `^2.7.0`
+- update `nodemon` to `^1.18.10`
+- update `rollup` to `^1.2.2`
+- update `rollup-plugin-babel` to `^4.3.2`
+- update `rollup-plugin-node-resolve` to `^4.0.0`
+- update `stylelint` to `^9.10.1`
+- update `stylelint-scss` to `^3.5.3`
+- update `popper.js` to `^1.14.7`
+
 ## v2.1.6
 ###### Dependencies update:
 - chore: update `bootstrap` to `^4.2.1`
