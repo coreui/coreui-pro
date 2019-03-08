@@ -7,7 +7,7 @@
  */
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.1.7
+ * @version v2.1.8
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  */
@@ -14696,6 +14696,14 @@ body {
   breakpoint-md: 768px;
   breakpoint-lg: 992px;
   breakpoint-xl: 1200px;
+}
+
+.was-validated .form-control:valid, .form-control.is-valid {
+  background-position: right calc(0.375em + 0.1875rem) center;
+}
+
+.was-validated .form-control:invalid, .form-control.is-invalid {
+  background-position: right calc(0.375em + 0.1875rem) center;
 }
 
 /*# sourceMappingURL=coreui-dark.css.map */
