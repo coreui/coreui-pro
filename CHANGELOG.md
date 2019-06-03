@@ -1,3 +1,56 @@
+## v2.1.11
+- fix(sidebar): add optional container `sidebar-scroll`. Thanks @MartijnBastiaansen
+  - fixes an issue where `sidebar-toggler` causes an error when there is no `sidebar-nav` element in it
+  - if no container is set, returns null for perfectScrollbar
+
+###### Dependencies update:
+- update `rollup` to `^1.13.1`
+- update `stylelint-scss` to `^3.8.0`
+
+## v2.1.10
+- chore: drop `@babel/polyfill` in favour of `core-js@3` and `regenerator-runtime`
+
+###### Dependencies update:
+- update `@babel/polyfill` to `^7.4.4`
+- update `@babel/cli` to `^7.4.4`
+- update `@babel/core` to `^7.4.5`
+- update `@babel/plugin-proposal-object-rest-spread` to `^7.4.4`
+- update `@babel/plugin-transform-runtime` to `^7.4.4`
+- update `@babel/preset-env` to `^7.4.5`
+- update `autoprefixer` to `^9.5.1`
+- update `babel-plugin-istanbul` to `^5.1.4`
+- update `clean-css-cli` to `^4.3.0`
+- update `eslint` to `^5.16.0`
+- update `node-sass` to `^4.12.0`
+- update `nodemon` to `^1.19.1`
+- update `rollup` to `^1.13.0`
+- update `stylelint-config-recommended-scss` to `^3.3.0`
+- update `stylelint-config-standard` to `^18.3.0`
+- update `stylelint-order` to `^2.2.1`
+- update `stylelint-scss` to `^3.7.0`
+- update `uglify-js` to `^3.6.0`
+- update `eslint-plugin-compat` to `^3.1.1`
+- update `rollup-plugin-commonjs` to `^10.0.0`
+- update `rollup-plugin-node-resolve` to `^5.0.1`
+- update `semver` to `^6.1.1`
+- update `stylelint` to `^10.0.1`
+- update `stylelint-order` to `^3.0.0`
+    
+## v2.1.9
+- fix(dropdown): rtl caret spacing
+- fix(input-group): rtl append, prepend border radius and margins
+- fix(rtl): rtl float, margin and padding
+- fix(button-group): rtl margin and border-radius
+###### Dependencies update:
+- update `@babel/core` to `^7.4.0`
+- update `@babel/plugin-proposal-object-rest-spread` to `^7.4.0`
+- update `@babel/plugin-transform-runtime` to `^7.4.0`
+- update `@babel/preset-env` to `^7.4.2`
+- update `autoprefixer` to `^9.5.0`
+- update `eslint` to `^5.15.3`
+- update `rollup` to `^1.7.0`
+- update `uglify-js` to `^3.5.1`
+
 ## v2.1.8
 - fix(scss): `cssnano` mangles `background-position` temp fix (re: BS4 misplaced validation feedback icons)
 ###### Dependencies update:

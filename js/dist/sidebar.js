@@ -1,10 +1,14 @@
+import "core-js/modules/es.array.find";
+import "core-js/modules/es.array.slice";
+import "core-js/modules/es.string.split";
+
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.1.8): sidebar.js
+ * CoreUI (v2.1.11): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -15,7 +19,7 @@ var Sidebar = function ($) {
    * ------------------------------------------------------------------------
    */
   var NAME = 'sidebar';
-  var VERSION = '2.1.8';
+  var VERSION = '2.1.11';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -52,7 +56,8 @@ var Sidebar = function ($) {
     NAVIGATION: '.sidebar-nav > .nav',
     SIDEBAR: '.sidebar',
     SIDEBAR_MINIMIZER: '.sidebar-minimizer',
-    SIDEBAR_TOGGLER: '.sidebar-toggler'
+    SIDEBAR_TOGGLER: '.sidebar-toggler',
+    SIDEBAR_SCROLL: '.sidebar-scroll'
   };
   var ShowClassNames = ['sidebar-show', 'sidebar-sm-show', 'sidebar-md-show', 'sidebar-lg-show', 'sidebar-xl-show'];
   /**
@@ -116,9 +121,15 @@ var Sidebar = function ($) {
       }
     };
 
-    _proto.makeScrollbar = function makeScrollbar(container) {
-      if (container === void 0) {
+    _proto.makeScrollbar = function makeScrollbar() {
+      var container = Selector.SIDEBAR_SCROLL;
+
+      if (document.querySelector(container) === null) {
         container = Selector.NAVIGATION_CONTAINER;
+
+        if (document.querySelector(container) === null) {
+          return null;
+        }
       }
 
       var ps = new PerfectScrollbar(document.querySelector(container), {
