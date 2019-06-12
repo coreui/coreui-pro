@@ -1,563 +1,504 @@
 // stylelint-disable selector-max-class, declaration-no-important, selector-max-compound-selectors, function-url-quotes, selector-max-combinators
-.sidebar {
+.#{$prefix}sidebar {
   display: flex;
+  // $sidebar-width is the width of the columns
+  flex: 0 0 $sidebar-width;
   flex-direction: column;
+  // put the nav on the left
+  order: -1;
   padding: $sidebar-padding;
-  color: $sidebar-color;
-  background: $sidebar-bg;
-  @include borders($sidebar-borders);
+  transition: margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, flex $layout-transition-speed;
 
-  .sidebar-close {
-    position: absolute;
-    right: 0;
-    display: none;
-    padding: 0 $spacer;
-    font-size: 24px;
-    font-weight: 800;
-    line-height: $navbar-height;
-    color: $sidebar-color;
-    background: 0;
-    border: 0;
-    opacity: .8;
+  html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right){
+    margin-left: - $sidebar-width;
+  }
+  html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+    order: 99;
+    margin-right: - $sidebar-width;
+  }
 
-    &:hover {
-      opacity: 1;
+  &[class*="bg-"]  {
+    border-color: rgba($black, .1);
+
+    .#{$prefix}nav-link .#{$prefix}nav-icon {
+      color: rgba($black, .3);
     }
   }
 
-  // Will be added soon
-  // .sidebar-brand { }
+  &.#{$prefix}sidebar-fixed {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: $zindex-sticky - 1;
+    width: $sidebar-width;
 
-  .sidebar-header {
+    html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right) {
+      left: 0;
+    }
+
+    html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+      right: 0;
+    }
+
+    &.#{$prefix}sidebar-under-header {
+      top: $header-height;
+    }
+  }
+
+  .#{$prefix}sidebar-brand {
+    display: flex;
+    flex: 0 0 $sidebar-brand-height;
+    align-items: center;
+    justify-content: center;
+
+    .#{$prefix}sidebar-brand-minimized {
+      display: none;
+    }
+  }
+
+  .#{$prefix}sidebar-header {
     flex: 0 0 $sidebar-header-height;
     padding: $sidebar-header-padding-y $sidebar-header-padding-x;
     text-align: center;
-    background: $sidebar-header-bg;
+    transition: $layout-transition-speed;
   }
 
-  .sidebar-form .form-control {
-    color: $sidebar-form-color;
-    background: $sidebar-form-bg;
-    border: $sidebar-form-border;
+  // Sidebar navigation
 
-    &::placeholder {
-      color: $sidebar-form-placeholder-color;
-    }
-  }
-
-  .sidebar-nav {
+  .#{$prefix}sidebar-nav {
     position: relative;
     flex: 1;
     overflow-x: hidden;
     overflow-y: auto;
-    @include sidebar-width($sidebar-borders, $sidebar-width);
   }
 
-  .nav {
-    @include sidebar-width($sidebar-borders, $sidebar-width);
+  .#{$prefix}nav:not(.#{$prefix}nav-tabs) {
     flex-direction: column;
+    width: 100%;
     min-height: 100%;
-    padding: 0;
   }
 
-  .nav-title {
+  .#{$prefix}nav-title {
     padding: $sidebar-nav-title-padding-y $sidebar-nav-title-padding-x;
     font-size: 80%;
     font-weight: 700;
-    color: $sidebar-nav-title-color;
     text-transform: uppercase;
+    transition: $layout-transition-speed;
   }
 
-  .nav-divider {
+  .#{$prefix}nav-divider {
     height: 10px;
+    transition: height $layout-transition-speed;
   }
-
-  .nav-item {
-    position: relative;
-    margin: 0;
-    transition: background .3s ease-in-out;
+  .#{$prefix}nav-item {
+    width: inherit;
   }
-
-  .nav-dropdown-items {
-    max-height: 0;
-    padding: 0;
-    margin: 0;
-    overflow-y: hidden;
-    transition: max-height .3s ease-in-out;
-
-    .nav-item {
-      padding: 0;
-      list-style: none;
-    }
-  }
-
-  .nav-link {
-    display: block;
-    padding: $sidebar-nav-link-padding-y $sidebar-nav-link-padding-x;
-    color: $sidebar-nav-link-color;
+  .#{$prefix}nav-link {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding: $sidebar-nav-link-padding-y 0;
     text-decoration: none;
-    background: $sidebar-nav-link-bg;
-    @include borders($sidebar-nav-link-borders);
+    white-space: nowrap;
+    transition: background $layout-transition-speed, color $layout-transition-speed;
     @if $enable-sidebar-nav-rounded {
       border-radius: $border-radius;
     }
 
-    .nav-icon {
-      display: inline-block;
-      width: ($font-size-base * 1.25);
+    .#{$prefix}nav-icon {
+      flex: 0 0 $sidebar-nav-icon-width;
       height: ($font-size-base * 1.25);
-      margin: 0 ($sidebar-nav-link-padding-x / 2) 0 0;
       font-size: $font-size-base;
-      color: $sidebar-nav-link-icon-color;
       text-align: center;
-      fill: $sidebar-nav-link-icon-color;
+      transition: $layout-transition-speed;
     }
 
-    .badge {
-      float: right;
-      margin-top: 2px;
+    .#{$prefix}badge {
+      margin-right: $sidebar-nav-link-padding-x;
+      margin-left: auto;
     }
 
-    &.active {
-      color: $sidebar-nav-link-active-color;
-      background: $sidebar-nav-link-active-bg;
-      @include borders($sidebar-nav-link-active-borders);
-
-      .nav-icon {
-        color: $sidebar-nav-link-active-icon-color;
-        fill: $sidebar-nav-link-active-icon-color;
-      }
-    }
-
-    &:hover {
-      color: $sidebar-nav-link-hover-color;
-      background: $sidebar-nav-link-hover-bg;
-      @include borders($sidebar-nav-link-hover-borders);
-
-      .nav-icon {
-        color: $sidebar-nav-link-hover-icon-color;
-        fill: $sidebar-nav-link-hover-icon-color;
-      }
-
-      &.nav-dropdown-toggle::before {
-        background-image: $sidebar-nav-dropdown-indicator-hover;
-      }
-    }
-
-    &.disabled {
-      color: $sidebar-nav-link-disabled-color;
+    &.#{$prefix}disabled {
       cursor: $cursor-disabled;
-      background: transparent;
-      @include borders($sidebar-nav-link-disabled-borders);
-
-      .nav-icon {
-        color: $sidebar-nav-link-disabled-icon-color;
-        fill: $sidebar-nav-link-disabled-icon-color;
-      }
-
-      &:hover {
-        color: $sidebar-nav-link-disabled-color;
-        @include borders($sidebar-nav-link-hover-borders);
-
-        .nav-icon {
-          color: $sidebar-nav-link-disabled-icon-color;
-          fill: $sidebar-nav-link-disabled-icon-color;
-        }
-
-        &.nav-dropdown-toggle::before {
-          background-image: $sidebar-nav-dropdown-indicator-hover;
-        }
-      }
     }
+  }
 
-    @each $color, $value in $theme-colors {
-      &.nav-link-#{$color} {
-        background: $value;
-        .nav-icon {
-          color: rgba(255, 255, 255, .7);
-          fill: rgba(255, 255, 255, .7);
-        }
-        &:hover {
-          background: darken($value, 5%);
-          .nav-icon {
-            color: #fff;
-            fill: #fff;
-          }
-        }
+  .#{$prefix}nav-dropdown {
+    position: relative;
+    transition: background $layout-transition-speed ease-in-out;
+
+    &.#{$prefix}open {
+      @if $enable-sidebar-nav-rounded {
+        border-radius: $border-radius;
+      }
+      > .#{$prefix}nav-dropdown-items {
+        max-height: 1500px;
+      }
+
+      > .#{$prefix}nav-dropdown-toggle::after {
+        transform: rotate(-90deg);
       }
     }
   }
 
-  .nav-dropdown-toggle {
-    position: relative;
+  .#{$prefix}nav-dropdown-toggle {
 
-    &::before {
-      position: absolute;
-      top: 50%;
-      right: $sidebar-nav-link-padding-x;
+    &::after {
       display: block;
-      width: 8px;
+      flex: 0 8px;
       height: 8px;
-      padding: 0;
-      margin-top: -4px;
+      margin-right: $sidebar-nav-link-padding-x;
+      margin-left: auto;
       content: "";
-      background-image: $sidebar-nav-dropdown-indicator;
       background-repeat: no-repeat;
       background-position: center;
-      transition: transform .3s;
+      transition: transform $layout-transition-speed;
     }
 
-    .badge {
-      margin-right: 16px;
-    }
-  }
-
-  .nav-dropdown.open {
-    background: $sidebar-nav-dropdown-bg;
-    @include borders($sidebar-nav-dropdown-borders);
-    @if $enable-sidebar-nav-rounded {
-      border-radius: $border-radius;
-    }
-    > .nav-dropdown-items {
-      max-height: 1500px;
-    }
-
-    .nav-link {
-      color: $sidebar-nav-dropdown-color;
-      border-left: 0;
-
-      &.disabled {
-        color: $sidebar-nav-link-disabled-color;
-        background: transparent;
-
-        &:hover {
-          color: $sidebar-nav-link-disabled-color;
-
-          .nav-icon {
-            color: $sidebar-nav-link-disabled-icon-color;
-          }
-        }
-      }
-    }
-
-    > .nav-dropdown-toggle::before {
-      transform: rotate(-90deg);
-    }
-
-    .nav-dropdown.open {
-      border-left: 0;
+    .#{$prefix}badge {
+      margin-right: $sidebar-nav-link-padding-x;
     }
   }
 
-  .nav-label {
+  .#{$prefix}nav-dropdown-items {
+    max-height: 0;
+    padding: 0;
+    overflow-y: hidden;
+    transition: max-height $layout-transition-speed ease-in-out;
+  }
+
+  .#{$prefix}nav-label {
     display: block;
     padding: ($sidebar-nav-link-padding-y / 8) $sidebar-nav-link-padding-x;
-    color: $sidebar-nav-title-color;
+    transition: $layout-transition-speed;
 
     &:hover {
-      color: $sidebar-color;
       text-decoration: none;
     }
 
-    .nav-icon {
+    .#{$prefix}nav-icon {
       width: 20px;
       margin: -3px ($sidebar-nav-link-padding-x / 2) 0 0;
       font-size: 10px;
-      color: $sidebar-nav-link-icon-color;
       text-align: center;
       vertical-align: middle;
     }
   }
 
-  @if (lightness( $sidebar-bg ) < 40) {
-    .progress {
-      background-color: lighten($sidebar-bg, 15%) !important;
+  // TODO: refactor
+  // @if (lightness( $sidebar-bg ) < 40) {
+  //   .#{$prefix}progress {
+  //     background-color: lighten($sidebar-bg, 15%) !important;
+  //   }
+  // }
+
+  // Tabs
+
+  .#{$prefix}nav-tabs {
+    // border-color: $border-color;
+    .#{$prefix}nav-link {
+      display: block;
+      padding: $sidebar-nav-tabs-link-padding-y $sidebar-nav-tabs-link-padding-x;
+      // color: $body-color;
+      border-top: 0;
+      @include border-radius(0);
+      &.#{$prefix}active {
+        // color: theme-color("primary");
+      }
+    }
+    .#{$prefix}nav-item:first-child {
+      .#{$prefix}nav-link {
+        border-left: 0;
+      }
     }
   }
 
-  .sidebar-footer {
-    flex: 0 0 $sidebar-footer-height;
-    padding: $sidebar-footer-padding-y $sidebar-footer-padding-x;
-    background: $sidebar-footer-bg;
-    @include borders($sidebar-footer-borders);
+  .#{$prefix}tab-content {
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: transparent;
+    border: 0;
+
+    .#{$prefix}tab-pane {
+      padding: 0;
+    }
   }
 
-  .sidebar-minimizer {
-    position: relative;
+  .#{$prefix}sidebar-footer {
+    flex: 0 0 $sidebar-footer-height;
+    padding: $sidebar-footer-padding-y $sidebar-footer-padding-x;
+    transition: $layout-transition-speed;
+  }
+
+  .#{$prefix}sidebar-minimizer {
+    display: flex;
     flex: 0 0 $sidebar-minimizer-height;
+    justify-content: flex-end;
+    width: inherit;
+    padding: 0;
     cursor: pointer;
-    background-color: $sidebar-minimizer-bg;
     border: 0;
-    @include borders($sidebar-minimizer-borders);
 
     &::before {
-      position: absolute;
-      top: 0;
-      right: 0;
+      display: block;
       width: $sidebar-minimizer-height;
       height: $sidebar-minimizer-height;
       content: "";
-      background-image: $sidebar-minimizer-indicator;
       background-repeat: no-repeat;
       background-position: center;
       background-size: $sidebar-minimizer-height / 4;
-      transition: .3s;
+      transition: $layout-transition-speed;
     }
 
     &:focus,
-    &.focus {
+    &.#{$prefix}focus {
       outline: 0;
     }
+  }
 
-    &:hover {
-      background-color: $sidebar-minimizer-hover-bg;
+  &.#{$prefix}sidebar-right {
+    .#{$prefix}sidebar-minimizer {
+      justify-content: flex-start;
       &::before {
-        background-image: $sidebar-minimizer-hover-indicator;
+        transform: rotate(-180deg);
       }
     }
   }
-}
 
-@include media-breakpoint-up(lg) {
-  .sidebar-compact {
-    .sidebar {
-      .sidebar-nav {
-        @include sidebar-width($sidebar-borders, $sidebar-compact-width);
+  // Minimized Sidebar
+
+  &.#{$prefix}sidebar-minimized {
+    z-index: $zindex-sticky - 1;
+    flex: 0 0 $sidebar-minimized-width;
+
+    &.#{$prefix}sidebar-fixed {
+      width: $sidebar-minimized-width;
+    }
+
+    &:not(.#{$prefix}sidebar-right){
+      margin-left: - $sidebar-minimized-width;
+    }
+    &.#{$prefix}sidebar-right {
+      margin-right: - $sidebar-minimized-width;
+    }
+
+    .#{$prefix}sidebar-brand-full {
+      display: none;
+    }
+
+    .#{$prefix}sidebar-brand-minimized {
+      display: initial;
+    }
+
+    .#{$prefix}sidebar-nav {
+      padding-bottom: $sidebar-minimizer-height;
+      overflow: visible;
+    }
+
+    .#{$prefix}d-minimized-none,
+    .#{$prefix}nav-divider,
+    .#{$prefix}nav-label,
+    .#{$prefix}nav-title,
+    .#{$prefix}sidebar-footer,
+    .#{$prefix}sidebar-form,
+    .#{$prefix}sidebar-header {
+      height: 0;
+      padding: 0;
+      margin: 0;
+      visibility: hidden;
+      opacity: 0;
+    }
+
+    // Temporary fix for this issue: https://github.com/coreui/coreui-free-bootstrap-admin-template/issues/404
+    // TODO: find better solution
+    .#{$prefix}sidebar-minimizer {
+      position: fixed;
+      bottom: 0;
+      width: inherit;
+
+      &::before {
+        transform: rotate(-180deg);
+      }
+    }
+
+    &.#{$prefix}sidebar-right .#{$prefix}sidebar-minimizer::before {
+      transform: rotate(0deg);
+    }
+
+    .#{$prefix}nav-dropdown {
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        width: $sidebar-width + $sidebar-minimized-width;
+        overflow: visible;
+      }
+    }
+
+    &.#{$prefix}sidebar-right .#{$prefix}sidebar-nav > .#{$prefix}nav > .#{$prefix}nav-item:hover {
+      margin-left: - $sidebar-width;
+    }
+
+    .#{$prefix}nav-link {
+      overflow: hidden;
+      white-space: nowrap;
+      border-left: 0;
+
+      .#{$prefix}nav-icon {
+        display: block;
+        float: left;
+        width: $sidebar-minimized-height;
+        font-size: 18px;
       }
 
-      .nav {
-        @include sidebar-width($sidebar-borders, $sidebar-compact-width);
-      }
-
-      .d-compact-none {
+      .#{$prefix}badge {
         display: none;
       }
 
-      .nav-title {
+      &:hover {
+        width: $sidebar-width + $sidebar-minimized-width;
+
+        .#{$prefix}badge {
+          display: inline;
+        }
+      }
+
+      &.#{$prefix}nav-dropdown-toggle::after {
+        display: none;
+      }
+    }
+
+    .#{$prefix}nav-dropdown-items {
+      .#{$prefix}nav-link {
+        width: $sidebar-width;
+      }
+    }
+
+    .#{$prefix}nav > .#{$prefix}nav-dropdown {
+      > .#{$prefix}nav-dropdown-items {
+        display: none;
+        max-height: 1000px;
+      }
+
+      &:hover {
+        > .#{$prefix}nav-dropdown-items {
+          position: absolute;
+          left: $sidebar-minimized-width;
+          display: inline;
+        }
+      }
+    }
+
+    &.#{$prefix}sidebar-right .#{$prefix}nav > .#{$prefix}nav-dropdown:hover > .#{$prefix}nav-dropdown-items {
+      left: 0;
+    }
+
+    // Right-to-Left Support
+    @if $enable-rtl {
+      *[dir="rtl"] {
+        .#{$prefix}sidebar-minimized {
+          .#{$prefix}sidebar {
+            .#{$prefix}nav {
+              list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+              .#{$prefix}nav-divider {
+                height: 0;
+              }
+            }
+
+            .#{$prefix}sidebar-minimizer::before {
+              transform: rotate(0deg);
+            }
+
+            .#{$prefix}nav-dropdown:hover > .#{$prefix}nav-dropdown-items {
+              left: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+  @include media-breakpoint-up(lg) {
+    &.#{$prefix}sidebar-compact {
+      width: $sidebar-compact-width;
+      .#{$prefix}d-compact-none {
+        display: none;
+      }
+
+      .#{$prefix}nav-title {
         text-align: center;
       }
 
-      .nav-item {
+      .#{$prefix}nav-item {
         width: $sidebar-compact-width;
         border-left: 0;
       }
 
-      .nav-link {
+      .#{$prefix}nav-link {
         text-align: center;
 
-        .nav-icon {
+        .#{$prefix}nav-icon {
           display: block;
           width: 100%;
           margin: $spacer / 4 0;
           font-size: 24px;
         }
 
-        .badge {
+        .#{$prefix}badge {
           position: absolute;
           top: 18px;
           right: 10px;
         }
 
-        &.nav-dropdown-toggle {
-
-          &::before {
-            top: 30px;
-          }
+        &.#{$prefix}nav-dropdown-toggle::after {
+          top: 30px;
         }
       }
     }
   }
 
-  // Minimized Sidebar
-  .sidebar-minimized {
-    .sidebar {
-      z-index: $zindex-sticky - 1;
-
-      .sidebar-nav {
-        overflow: visible;
-        @include sidebar-width($sidebar-borders, $sidebar-minimized-width);
-      }
-
-      .nav {
-        @include sidebar-width($sidebar-borders, $sidebar-minimized-width);
-      }
-
-      .d-minimized-none,
-      .nav-divider,
-      .nav-label,
-      .nav-title,
-      .sidebar-footer,
-      .sidebar-form,
-      .sidebar-header {
-        display: none;
-      }
-
-      // Temporary fix for this issue: https://github.com/coreui/coreui-free-bootstrap-admin-template/issues/404
-      // ToDo: find better solution
-      .sidebar-minimizer {
-        position: fixed;
-        bottom: 0;
-        width: $sidebar-minimized-width;
-        height: $sidebar-minimizer-height;
-        background-color: darken($sidebar-bg, 5%);
-      }
-      // stylelint-disable no-duplicate-selectors
-      .sidebar-nav {
-        padding-bottom: $sidebar-minimizer-height;
-      }
-      // Temporary fix end
-
-      .sidebar-minimizer::before {
-        width: 100%;
-        transform: rotate(-180deg);
-      }
-
-      .nav-item {
-        width: $sidebar-minimized-width;
-        overflow: hidden;
-
-        &:hover {
-          width: $sidebar-width + $sidebar-minimized-width;
-          overflow: visible;
-
-          > .nav-link {
-            background: $sidebar-nav-link-hover-bg;
-
-            .nav-icon {
-              color: $sidebar-nav-link-hover-color;
+  @each $breakpoint in map-keys($grid-breakpoints) {
+    @include media-breakpoint-up($breakpoint) {
+      $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+      html:not([dir="rtl"]) &.#{$prefix}sidebar#{$infix}-show,
+      html:not([dir="rtl"]) &.#{$prefix}sidebar-show {
+        &:not(.#{$prefix}sidebar-right){
+          margin-left: 0;
+          @if $breakpoint != "xs" {
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
+              margin-left: $sidebar-width;
             }
-
-            &.disabled {
-              background: $sidebar-nav-link-disabled-bg;
-
-              .nav-icon {
-                color: $sidebar-nav-link-disabled-icon-color;
-              }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
+              margin-left: $sidebar-compact-width;
+            }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+              margin-left: $sidebar-minimized-width;
             }
           }
         }
-      }
-
-      .nav-link {
-        position: relative;
-        padding-left: 0;
-        margin: 0;
-        white-space: nowrap;
-        border-left: 0;
-
-        .nav-icon {
-          display: block;
-          float: left;
-          width: $sidebar-minimized-height;
-          font-size: 18px;
-        }
-
-        .badge {
-          position: absolute;
-          right: 15px;
-          display: none;
-        }
-
-        &:hover {
-          width: $sidebar-width + $sidebar-minimized-width;
-          background: $sidebar-nav-link-hover-bg;
-
-          .badge {
-            display: inline;
-          }
-        }
-
-        &.nav-dropdown-toggle::before {
-          display: none;
-        }
-      }
-
-      .nav-dropdown-items {
-        .nav-item {
-          width: $sidebar-width;
-
-          .nav-link {
-            width: $sidebar-width;
-          }
-        }
-      }
-
-      .nav > .nav-dropdown {
-        > .nav-dropdown-items {
-          display: none;
-          max-height: 1000px;
-          background: $sidebar-bg;
-        }
-
-        &:hover {
-          background: $sidebar-nav-link-hover-bg;
-          > .nav-dropdown-items {
-            position: absolute;
-            left: $sidebar-minimized-width;
-            display: inline;
-          }
-        }
-      }
-    }
-  }
-
-  *[dir="rtl"] {
-    .sidebar-minimized {
-      .sidebar {
-        .nav {
-          list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
-          .divider {
-            height: 0;
-          }
-        }
-
-        //.d-minimized-none,
-        //.nav-divider,
-        //.nav-label,
-        //.nav-title,
-        //.sidebar-footer,
-        //.sidebar-form,
-        //.sidebar-header {
-        //  display: none;
-        //}
-
-        .sidebar-minimizer::before {
-          width: 100%;
-          transform: rotate(0deg);
-        }
-
-        .nav-link {
-          padding-right: 0;
-
-          .nav-icon {
-            float: right;
-          }
-
-          .badge {
-            right: auto;
-            left: 15px;
-          }
-
-          &:hover {
-            .badge {
-              display: inline;
+        &.#{$prefix}sidebar-right {
+          margin-right: 0;
+          @if $breakpoint != "xs" {
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
+              margin-right: $sidebar-width;
             }
-          }
-        }
-
-        .nav > .nav-dropdown {
-          > .nav-dropdown-items {
-            display: none;
-            max-height: 1000px;
-            background: $sidebar-bg;
-          }
-
-          &:hover {
-            background: $sidebar-nav-link-hover-bg;
-            > .nav-dropdown-items {
-              position: absolute;
-              left: 0;
-              display: inline;
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
+              margin-right: $sidebar-compact-width;
+            }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+              margin-right: $sidebar-minimized-width;
             }
           }
         }
@@ -566,49 +507,389 @@
   }
 }
 
-*[dir="rtl"] {
-  .sidebar {
-    .nav-dropdown-toggle::before {
-      position: absolute;
-      right: auto;
-      left: $sidebar-nav-link-padding-x;
-      transform: rotate(180deg);
-    }
+// Right-to-Left Support
+@if $enable-rtl {
+  *[dir="rtl"] {
+    .#{$prefix}sidebar {
 
-    .nav-dropdown.open {
-      > .nav-dropdown-toggle::before {
-        transform: rotate(270deg);
+      &:not(.#{$prefix}sidebar-right){
+        margin-right: - $sidebar-width;
       }
-    }
-
-    .nav-link {
-      .nav-icon {
-        margin: 0 0 0 ($sidebar-nav-link-padding-x / 2);
+      &.#{$prefix}sidebar-right {
+        order: 99;
+        margin-left: - $sidebar-width;
       }
 
-      .badge {
-        float: left;
-        margin-top: 2px;
-      }
-    }
+      &.#{$prefix}sidebar-fixed {
+        &:not(.#{$prefix}sidebar-right) {
+          right: 0;
+        }
 
-    .nav-link.nav-dropdown-toggle {
-      .badge  {
+        &.#{$prefix}sidebar-right {
+          left: 0;
+        }
+      }
+
+      .#{$prefix}nav-dropdown-toggle::after {
         margin-right: auto;
-        margin-left: 16px;
+        margin-left: $sidebar-nav-link-padding-x;
+        transform: rotate(180deg);
+      }
+
+      .#{$prefix}nav-dropdown.#{$prefix}open {
+        > .#{$prefix}nav-dropdown-toggle::after {
+          transform: rotate(270deg);
+        }
+      }
+
+      .#{$prefix}sidebar-minimizer::before {
+        transform: rotate(180deg);
+      }
+
+      &.#{$prefix}sidebar-right .#{$prefix}sidebar-minimizer::before {
+        transform: rotate(0deg);
+      }
+
+      &.#{$prefix}sidebar-minimized {
+        .#{$prefix}nav {
+          list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+          .#{$prefix}nav-divider {
+            height: 0;
+          }
+        }
+
+        .#{$prefix}sidebar-minimizer::before {
+          transform: rotate(0deg);
+        }
+
+        &.#{$prefix}sidebar-right {
+          .#{$prefix}sidebar-minimizer::before {
+            transform: rotate(180deg);
+          }
+
+          .#{$prefix}sidebar-nav > .#{$prefix}nav {
+            > .#{$prefix}nav-item:hover {
+              margin-right: - $sidebar-width;
+            }
+            > .#{$prefix}nav-dropdown:hover .#{$prefix}nav-dropdown-items {
+              right: 0;
+              // left: auto;
+            }
+          }
+        }
+
+        .#{$prefix}nav-dropdown:hover > .#{$prefix}nav-dropdown-items {
+          left: 0;
+        }
+      }
+
+      @each $breakpoint in map-keys($grid-breakpoints) {
+        @include media-breakpoint-up($breakpoint) {
+          $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+          &.#{$prefix}sidebar#{$infix}-show,
+          &.#{$prefix}sidebar-show {
+            &:not(.#{$prefix}sidebar-right){
+              margin-right: 0;
+              @if $breakpoint != "xs" {
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
+                  margin-right: $sidebar-width;
+                }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
+                  margin-right: $sidebar-compact-width;
+                }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+                  margin-right: $sidebar-minimized-width;
+                }
+              }
+            }
+            &.#{$prefix}sidebar-right {
+              margin-left: 0;
+              @if $breakpoint != "xs" {
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
+                  margin-left: $sidebar-width;
+                }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
+                  margin-left: $sidebar-compact-width;
+                }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+                  margin-left: $sidebar-minimized-width;
+                }
+              }
+            }
+          }
+        }
       }
     }
+  }
+}
 
-    .sidebar-minimizer::before {
-      right: auto;
-      left: 0;
-      transform: rotate(180deg);
+@include themes($sidebar-theme-map, $create: append, $parent: ".#{$prefix}sidebar") {
+  color: themes-get-value("sidebar-color");
+  background: themes-get-value("sidebar-bg");
+
+  @include borders(themes-get-value("sidebar-borders"));
+
+  html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+    @include borders(themes-get-value("sidebar-borders"),true);
+  }
+
+  *[dir="rtl"] & {
+    @include borders(themes-get-value("sidebar-borders"),true);
+    &.#{$prefix}sidebar-right {
+      border: 0;
+      @include borders(themes-get-value("sidebar-borders"));
     }
   }
 
-  // Temp fix for rtl sidebar-toggler
-  // ToDo: find better solution
-  .sidebar-toggler {
-    margin-right: 0 !important;
+  .#{$prefix}sidebar-close {
+    color: themes-get-value("sidebar-color");
+  }
+
+  .#{$prefix}sidebar-brand {
+    background: themes-get-value("sidebar-brand-bg");
+  }
+
+  .#{$prefix}sidebar-header {
+    background: themes-get-value("sidebar-header-bg");
+  }
+
+  .#{$prefix}sidebar-form .#{$prefix}form-control {
+    color: themes-get-value("sidebar-form-color");
+    background: themes-get-value("sidebar-form-bg");
+    border: themes-get-value("sidebar-form-border");
+
+    &::placeholder {
+      color: themes-get-value("sidebar-form-placeholder-color");
+    }
+  }
+
+  .#{$prefix}nav-title {
+    color: themes-get-value("sidebar-nav-title-color");
+  }
+
+  .#{$prefix}nav-link {
+    color: themes-get-value("sidebar-nav-link-color");
+    background: themes-get-value("sidebar-nav-link-bg");
+    @include borders(themes-get-value("sidebar-nav-link-borders"));
+
+    .#{$prefix}nav-icon {
+      color: themes-get-value("sidebar-nav-link-icon-color");
+      fill: themes-get-value("sidebar-nav-link-icon-color");
+    }
+
+    &.#{$prefix}active {
+      color: themes-get-value("sidebar-nav-link-active-color");
+      background: themes-get-value("sidebar-nav-link-active-bg");
+      @include borders(themes-get-value("sidebar-nav-link-active-borders"));
+
+      .#{$prefix}nav-icon {
+        color: themes-get-value("sidebar-nav-link-active-icon-color");
+        fill: themes-get-value("sidebar-nav-link-active-icon-color");
+      }
+    }
+
+    &:hover {
+      color: themes-get-value("sidebar-nav-link-hover-color");
+      background: themes-get-value("sidebar-nav-link-hover-bg");
+      @include borders(themes-get-value("sidebar-nav-link-hover-borders"));
+
+      .#{$prefix}nav-icon {
+        color: themes-get-value("sidebar-nav-link-hover-icon-color");
+        fill: themes-get-value("sidebar-nav-link-hover-icon-color");
+      }
+
+      &.#{$prefix}nav-dropdown-toggle::after {
+        background-image: themes-get-value("sidebar-nav-dropdown-indicator-hover");
+      }
+    }
+
+    &.#{$prefix}disabled {
+      color: themes-get-value("sidebar-nav-link-disabled-color");
+      background: transparent;
+      @include borders(themes-get-value("sidebar-nav-link-disabled-borders"));
+
+      .#{$prefix}nav-icon {
+        color: themes-get-value("sidebar-nav-link-disabled-icon-color");
+        fill: themes-get-value("sidebar-nav-link-disabled-icon-color");
+      }
+
+      &:hover {
+        color: themes-get-value("sidebar-nav-link-disabled-color");
+        @include borders(themes-get-value("sidebar-nav-link-hover-borders"));
+
+        .#{$prefix}nav-icon {
+          color: themes-get-value("sidebar-nav-link-disabled-icon-color");
+          fill: themes-get-value("sidebar-nav-link-disabled-icon-color");
+        }
+
+        &.#{$prefix}nav-dropdown-toggle::after {
+          background-image: themes-get-value("sidebar-nav-dropdown-indicator-hover");
+        }
+      }
+    }
+  }
+  .#{$prefix}nav-dropdown-toggle {
+    position: relative;
+
+    &::after {
+      background-image: themes-get-value("sidebar-nav-dropdown-indicator");
+    }
+  }
+
+  .#{$prefix}nav-dropdown.#{$prefix}open {
+    background: themes-get-value("sidebar-nav-dropdown-bg");
+    @include borders(themes-get-value("sidebar-nav-dropdown-borders"));
+
+    .#{$prefix}nav-link {
+      color: themes-get-value("sidebar-nav-dropdown-color");
+
+      &.#{$prefix}disabled {
+        color: themes-get-value("sidebar-nav-link-disabled-color");
+        background: transparent;
+
+        &:hover {
+          color: themes-get-value("sidebar-nav-link-disabled-color");
+
+          .#{$prefix}nav-icon {
+            color: themes-get-value("sidebar-nav-link-disabled-icon-color");
+          }
+        }
+      }
+    }
+  }
+
+  .#{$prefix}nav-label {
+    color: themes-get-value("sidebar-nav-title-color");
+
+    &:hover {
+      color: themes-get-value("sidebar-color");
+    }
+
+    .#{$prefix}nav-icon {
+      color: themes-get-value("sidebar-nav-link-icon-color");
+    }
+  }
+
+  .#{$prefix}nav-tabs {
+    border-color: themes-get-value("sidebar-nav-tabs-border-color");
+
+    .#{$prefix}nav-link {
+      &:hover,
+      &:focus {
+        background: themes-get-value("sidebar-nav-tabs-link-hover-bg");
+        border-color: themes-get-value("sidebar-nav-tabs-link-hover-border-color");
+      }
+      &.#{$prefix}active {
+        background: themes-get-value("sidebar-nav-tabs-link-active-bg");
+        border-color: themes-get-value("sidebar-nav-tabs-link-active-border-color");
+      }
+    }
+  }
+
+  @if (lightness( themes-get-value("sidebar-bg") ) < 40) {
+    .#{$prefix}progress {
+      background-color: lighten(themes-get-value("sidebar-bg"), 15%) !important;
+    }
+  }
+
+  .#{$prefix}sidebar-footer {
+    background: themes-get-value("sidebar-footer-bg");
+    @include borders(themes-get-value("sidebar-footer-borders"));
+  }
+
+  .#{$prefix}sidebar-minimizer {
+    background-color: themes-get-value("sidebar-minimizer-bg");
+    @include borders(themes-get-value("sidebar-minimizer-borders"));
+
+    &::before {
+      background-image: themes-get-value("sidebar-minimizer-indicator");
+    }
+
+    &:focus,
+    &.#{$prefix}focus {
+      outline: 0;
+    }
+
+    &:hover {
+      background-color: themes-get-value("sidebar-minimizer-hover-bg");
+      &::before {
+        background-image: themes-get-value("sidebar-minimizer-hover-indicator");
+      }
+    }
+    @include media-breakpoint-down(xs) {
+      display: none;
+    }
+  }
+  &.#{$prefix}sidebar-minimized {
+
+    .#{$prefix}nav-item {
+
+      &:hover {
+
+        > .#{$prefix}nav-link {
+          background: themes-get-value("sidebar-nav-link-hover-bg");
+
+          .#{$prefix}nav-icon {
+            color: themes-get-value("sidebar-nav-link-hover-color");
+          }
+
+          &.#{$prefix}disabled {
+            background: themes-get-value("sidebar-nav-link-disabled-bg");
+
+            .#{$prefix}nav-icon {
+              color: themes-get-value("sidebar-nav-link-disabled-icon-color");
+            }
+          }
+        }
+      }
+    }
+
+    .#{$prefix}nav-link:hover {
+      background: themes-get-value("sidebar-nav-link-hover-bg");
+    }
+
+    .#{$prefix}nav > .#{$prefix}nav-dropdown {
+      > .#{$prefix}nav-dropdown-items {
+        background: themes-get-value("sidebar-bg");
+      }
+
+      &:hover {
+        background: themes-get-value("sidebar-nav-link-hover-bg");
+      }
+    }
+  }
+}
+
+// stylelint-disable-next-line no-duplicate-selectors
+.#{$prefix}sidebar {
+  @include theme-variant() {
+    .#{$prefix}nav-link {
+      &.#{$prefix}nav-link-#{$color} {
+        background: $value;
+        .#{$prefix}nav-icon {
+          color: rgba(255, 255, 255, .7);
+          fill: rgba(255, 255, 255, .7);
+        }
+        &:hover {
+          background: darken($value, 5%);
+          .#{$prefix}nav-icon {
+            color: #fff;
+            fill: #fff;
+          }
+        }
+      }
+    }
   }
 }

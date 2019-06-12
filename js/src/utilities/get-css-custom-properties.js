@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI Utilities (v2.1.4): get-css-custom-properties.js
+ * CoreUI Utilities (v3.0.0-alpha.12): get-css-custom-properties.js
  * Licensed under MIT (https://coreui.io/license)
  * @returns {string} css custom property name
  * --------------------------------------------------------------------------
@@ -13,10 +13,12 @@ const getCssCustomProperties = () => {
     const rules = sheets[i].cssRules
     for (let j = rules.length - 1; j > -1; j--) {
       if (rules[j].selectorText === '.ie-custom-properties') {
+        // eslint-disable-next-line prefer-destructuring
         cssText = rules[j].cssText
         break
       }
     }
+
     if (cssText) {
       break
     }
@@ -27,7 +29,7 @@ const getCssCustomProperties = () => {
     cssText.lastIndexOf('}')
   )
 
-  cssText.split(';').forEach((property) => {
+  cssText.split(';').forEach(property => {
     if (property) {
       const name = property.split(': ')[0]
       const value = property.split(': ')[1]

@@ -1,6 +1,6 @@
-.close {
+.#{$bs-prefix}close {
   float: right;
-  font-size: $close-font-size;
+  @include font-size($close-font-size);
   font-weight: $close-font-weight;
   line-height: 1;
   color: $close-color;
@@ -13,13 +13,10 @@
     text-decoration: none;
   }
 
-  &:not(:disabled):not(.disabled) {
+  &:not(:disabled):not(.#{$bs-prefix}disabled) {
     @include hover-focus {
       opacity: .75;
     }
-
-    // Opinionated: add "hand" cursor to non-disabled .close elements
-    cursor: pointer;
   }
 }
 
@@ -29,7 +26,7 @@
 // See https://developer.mozilla.org/en-US/docs/Web/Events/click#Safari_Mobile
 
 // stylelint-disable-next-line selector-no-qualifying-type
-button.close {
+button.#{$bs-prefix}close {
   padding: 0;
   background-color: transparent;
   border: 0;
@@ -39,6 +36,6 @@ button.close {
 // Future-proof disabling of clicks on `<a>` elements
 
 // stylelint-disable-next-line selector-no-qualifying-type
-a.close.disabled {
+a.#{$bs-prefix}close.#{$bs-prefix}disabled {
   pointer-events: none;
 }

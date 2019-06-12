@@ -4,8 +4,10 @@
 // Base styles
 //
 
-.btn {
-  display: inline-block;
+.#{$bs-prefix}btn {
+  display: inline-flex;
+  align-items: center;
+  font-family: $btn-font-family;
   font-weight: $btn-font-weight;
   color: $body-color;
   text-align: center;
@@ -22,25 +24,20 @@
   }
 
   &:focus,
-  &.focus {
+  &.#{$bs-prefix}focus {
     outline: 0;
     box-shadow: $btn-focus-box-shadow;
   }
 
   // Disabled comes first so active can properly restyle
-  &.disabled,
+  &.#{$bs-prefix}disabled,
   &:disabled {
     opacity: $btn-disabled-opacity;
     @include box-shadow(none);
   }
 
-  // Opinionated: add "hand" cursor to non-disabled .btn elements
-  &:not(:disabled):not(.disabled) {
-    cursor: pointer;
-  }
-
-  &:not(:disabled):not(.disabled):active,
-  &:not(:disabled):not(.disabled).active {
+  &:not(:disabled):not(.#{$bs-prefix}disabled):active,
+  &:not(:disabled):not(.#{$bs-prefix}disabled).#{$bs-prefix}active {
     @include box-shadow($btn-active-box-shadow);
 
     &:focus {
@@ -48,20 +45,19 @@
     }
   }
 
-  // ToDo: refactor
-  // CoreUI specific changes start
-  [class^="icon-"],
-  [class*=" icon-"] {
-    display: inline-block;
-    margin-top: -2px;
-    vertical-align: middle;
+  // CoreUI start
+  i,
+  .#{$bs-prefix}btn-icon {
+    min-width: ($btn-font-size * $btn-line-height);
+    height: $btn-font-size;
+    fill: currentColor;
   }
-  // CoreUI specific changes end
+  // CoreUI end
 }
 
 // Future-proof disabling of clicks on `<a>` elements
-a.btn.disabled,
-fieldset:disabled a.btn {
+a.#{$bs-prefix}btn.#{$bs-prefix}disabled,
+fieldset:disabled a.#{$bs-prefix}btn {
   pointer-events: none;
 }
 
@@ -70,34 +66,36 @@ fieldset:disabled a.btn {
 // Alternate buttons
 //
 
-@each $color, $value in $theme-colors {
-  .btn-#{$color} {
+@include theme-variant() {
+  .#{$bs-prefix}btn-#{$color} {
     @include button-variant($value, $value);
   }
 }
 
-@each $color, $value in $theme-colors {
-  .btn-outline-#{$color} {
+.#{$bs-prefix}btn-transparent {
+  color: rgba(255, 255, 255, .8);
+
+  &:hover {
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
+@include theme-variant() {
+  .#{$bs-prefix}btn-outline-#{$color} {
     @include button-outline-variant($value);
   }
 }
 
-// CoreUI specific changes start
-@each $color, $value in $theme-colors {
-  .btn-ghost-#{$color} {
-    @include button-ghost-variant($value);
-  }
-}
-// CoreUI specific changes end
 
 //
 // Link buttons
 //
 
 // Make a button look and behave like a link
-.btn-link {
+.#{$bs-prefix}btn-link {
   font-weight: $font-weight-normal;
   color: $link-color;
+  text-decoration: $link-decoration;
 
   @include hover {
     color: $link-hover-color;
@@ -105,13 +103,13 @@ fieldset:disabled a.btn {
   }
 
   &:focus,
-  &.focus {
+  &.#{$bs-prefix}focus {
     text-decoration: $link-hover-decoration;
     box-shadow: none;
   }
 
   &:disabled,
-  &.disabled {
+  &.#{$bs-prefix}disabled {
     color: $btn-link-disabled-color;
     pointer-events: none;
   }
@@ -119,43 +117,16 @@ fieldset:disabled a.btn {
   // No need for an active state here
 }
 
-// CoreUI specific changes start
-
-//
-// Pill buttons
-//
-
-.btn-pill {
-  border-radius: 50em;
-}
-
-
-//
-// Square buttons
-//
-
-.btn-square {
-  border-radius: 0;
-}
-
-// ToDo: refactor
-.btn-transparent {
-  color: #fff;
-  background-color: transparent;
-  border-color: transparent;
-}
-
-// CoreUI specific changes end
 
 //
 // Button Sizes
 //
 
-.btn-lg {
+.#{$bs-prefix}btn-lg {
   @include button-size($btn-padding-y-lg, $btn-padding-x-lg, $btn-font-size-lg, $btn-line-height-lg, $btn-border-radius-lg);
 }
 
-.btn-sm {
+.#{$bs-prefix}btn-sm {
   @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
 }
 
@@ -164,12 +135,12 @@ fieldset:disabled a.btn {
 // Block button
 //
 
-.btn-block {
+.#{$bs-prefix}btn-block {
   display: block;
   width: 100%;
 
   // Vertically space out multiple block buttons
-  + .btn-block {
+  + .#{$bs-prefix}btn-block {
     margin-top: $btn-block-spacing-y;
   }
 }
@@ -178,7 +149,41 @@ fieldset:disabled a.btn {
 input[type="submit"],
 input[type="reset"],
 input[type="button"] {
-  &.btn-block {
+  &.#{$bs-prefix}btn-block {
     width: 100%;
   }
 }
+
+.#{$prefix}btn-pill {
+  border-radius: 50em;
+}
+
+.#{$prefix}btn-square {
+  border-radius: 0;
+}
+
+//
+// Ghost button
+//
+
+@include theme-variant() {
+  .#{$prefix}btn-ghost-#{$color} {
+    @include button-ghost-variant($value);
+  }
+}
+
+//
+// Brand button
+//
+
+@each $color, $value in $brands-colors {
+  .#{$bs-prefix}btn-#{$color} {
+    @include button-variant($value, $value);
+  }
+}
+
+// @each $color, $value in $brands-colors {
+//   .#{$bs-prefix}btn-outline-#{$color} {
+//     @include button-outline-variant($value);
+//   }
+// }

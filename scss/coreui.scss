@@ -1,11 +1,10 @@
 /*!
  * CoreUI - Open Source Dashboard UI Kit
- * @version v2.1.3
+ * @version v3.0.0-alpha.12
  * @link https://coreui.io
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  * Licensed under MIT (https://coreui.io/license)
  */
-
 
 @import "functions";
 @import "variables";
@@ -18,13 +17,10 @@
 
 // Components
 @import "alert";
-@import "aside";
 @import "avatars";
 @import "badge";
 @import "breadcrumb-menu";
 @import "breadcrumb";
-@import "brand-card";
-@import "brand-buttons";
 @import "button-group";
 @import "buttons";
 @import "callout";
@@ -61,12 +57,8 @@
 @import "type";
 @import "widgets";
 
-@import "animate";
-
 // Layout Options
 @import "layout";
-
-@import "others";
 
 // Utility classes
 @import "utilities";

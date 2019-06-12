@@ -1,15 +1,20 @@
-.jumbotron {
+.#{$bs-prefix}jumbotron {
   padding: $jumbotron-padding ($jumbotron-padding / 2);
   margin-bottom: $jumbotron-padding;
-  background-color: $jumbotron-bg;
   @include border-radius($border-radius-lg);
+
+  @include themes($jumbotron-theme-map, $create: parent) {
+    color: themes-get-value("jumbotron-color");
+    background-color: themes-get-value("jumbotron-bg");
+  }
+
 
   @include media-breakpoint-up(sm) {
     padding: ($jumbotron-padding * 2) $jumbotron-padding;
   }
 }
 
-.jumbotron-fluid {
+.#{$bs-prefix}jumbotron-fluid {
   padding-right: 0;
   padding-left: 0;
   @include border-radius(0);

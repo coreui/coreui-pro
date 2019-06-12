@@ -4,109 +4,110 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v2.1.4): aside-menu.js
+ * CoreUI (v3.0.0-alpha.12): aside-menu.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
-var AsideMenu = function ($) {
-  /**
-   * ------------------------------------------------------------------------
-   * Constants
-   * ------------------------------------------------------------------------
-   */
-  var NAME = 'aside-menu';
-  var VERSION = '2.1.4';
-  var DATA_KEY = 'coreui.aside-menu';
-  var EVENT_KEY = "." + DATA_KEY;
-  var DATA_API_KEY = '.data-api';
-  var JQUERY_NO_CONFLICT = $.fn[NAME];
-  var Event = {
-    CLICK: 'click',
-    LOAD_DATA_API: "load" + EVENT_KEY + DATA_API_KEY,
-    TOGGLE: 'toggle'
-  };
-  var Selector = {
-    BODY: 'body',
-    ASIDE_MENU: '.aside-menu',
-    ASIDE_MENU_TOGGLER: '.aside-menu-toggler'
-  };
-  var ShowClassNames = ['aside-menu-show', 'aside-menu-sm-show', 'aside-menu-md-show', 'aside-menu-lg-show', 'aside-menu-xl-show'];
-  /**
-   * ------------------------------------------------------------------------
-   * Class Definition
-   * ------------------------------------------------------------------------
-   */
+import $ from 'jquery';
+import toggleClasses from './toggle-classes';
+/**
+ * ------------------------------------------------------------------------
+ * Constants
+ * ------------------------------------------------------------------------
+ */
 
-  var AsideMenu =
-  /*#__PURE__*/
-  function () {
-    function AsideMenu(element) {
-      this._element = element;
+var NAME = 'aside-menu';
+var VERSION = '3.0.0';
+var DATA_KEY = 'coreui.aside-menu';
+var EVENT_KEY = "." + DATA_KEY;
+var DATA_API_KEY = '.data-api';
+var JQUERY_NO_CONFLICT = $.fn[NAME];
+var Event = {
+  CLICK: 'click',
+  LOAD_DATA_API: "load" + EVENT_KEY + DATA_API_KEY,
+  TOGGLE: 'toggle'
+};
+var Selector = {
+  BODY: 'body',
+  ASIDE_MENU: '.aside-menu',
+  ASIDE_MENU_TOGGLER: '.aside-menu-toggler'
+};
+var ShowClassNames = ['aside-menu-show', 'aside-menu-sm-show', 'aside-menu-md-show', 'aside-menu-lg-show', 'aside-menu-xl-show'];
+/**
+ * ------------------------------------------------------------------------
+ * Class Definition
+ * ------------------------------------------------------------------------
+ */
 
-      this._addEventListeners();
-    } // Getters
+var AsideMenu =
+/*#__PURE__*/
+function () {
+  function AsideMenu(element) {
+    this._element = element;
 
-
-    var _proto = AsideMenu.prototype;
-
-    // Private
-    _proto._addEventListeners = function _addEventListeners() {
-      $(document).on(Event.CLICK, Selector.ASIDE_MENU_TOGGLER, function (event) {
-        event.preventDefault();
-        event.stopPropagation();
-        var toggle = event.currentTarget.dataset ? event.currentTarget.dataset.toggle : $(event.currentTarget).data('toggle');
-        toggleClasses(toggle, ShowClassNames);
-      });
-    }; // Static
+    this._addEventListeners();
+  } // Getters
 
 
-    AsideMenu._jQueryInterface = function _jQueryInterface() {
-      return this.each(function () {
-        var $element = $(this);
-        var data = $element.data(DATA_KEY);
+  var _proto = AsideMenu.prototype;
 
-        if (!data) {
-          data = new AsideMenu(this);
-          $element.data(DATA_KEY, data);
-        }
-      });
-    };
+  // Private
+  _proto._addEventListeners = function _addEventListeners() {
+    $(document).on(Event.CLICK, Selector.ASIDE_MENU_TOGGLER, function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      var toggle = event.currentTarget.dataset ? event.currentTarget.dataset.toggle : $(event.currentTarget).data('toggle');
+      toggleClasses(toggle, ShowClassNames);
+    });
+  } // Static
+  ;
 
-    _createClass(AsideMenu, null, [{
-      key: "VERSION",
-      get: function get() {
-        return VERSION;
+  AsideMenu._jQueryInterface = function _jQueryInterface() {
+    return this.each(function () {
+      var $element = $(this);
+      var data = $element.data(DATA_KEY);
+
+      if (!data) {
+        data = new AsideMenu(this);
+        $element.data(DATA_KEY, data);
       }
-    }]);
-
-    return AsideMenu;
-  }();
-  /**
-   * ------------------------------------------------------------------------
-   * Data Api implementation
-   * ------------------------------------------------------------------------
-   */
-
-
-  $(window).on(Event.LOAD_DATA_API, function () {
-    var asideMenu = $(Selector.ASIDE_MENU);
-
-    AsideMenu._jQueryInterface.call(asideMenu);
-  });
-  /**
-   * ------------------------------------------------------------------------
-   * jQuery
-   * ------------------------------------------------------------------------
-   */
-
-  $.fn[NAME] = AsideMenu._jQueryInterface;
-  $.fn[NAME].Constructor = AsideMenu;
-
-  $.fn[NAME].noConflict = function () {
-    $.fn[NAME] = JQUERY_NO_CONFLICT;
-    return AsideMenu._jQueryInterface;
+    });
   };
+
+  _createClass(AsideMenu, null, [{
+    key: "VERSION",
+    get: function get() {
+      return VERSION;
+    }
+  }]);
 
   return AsideMenu;
-}($);
+}();
+/**
+ * ------------------------------------------------------------------------
+ * Data Api implementation
+ * ------------------------------------------------------------------------
+ */
+
+
+$(window).on(Event.LOAD_DATA_API, function () {
+  var asideMenu = $(Selector.ASIDE_MENU);
+
+  AsideMenu._jQueryInterface.call(asideMenu);
+});
+/**
+ * ------------------------------------------------------------------------
+ * jQuery
+ * ------------------------------------------------------------------------
+ */
+
+$.fn[NAME] = AsideMenu._jQueryInterface;
+$.fn[NAME].Constructor = AsideMenu;
+
+$.fn[NAME].noConflict = function () {
+  $.fn[NAME] = JQUERY_NO_CONFLICT;
+  return AsideMenu._jQueryInterface;
+};
+
+export default AsideMenu;
 //# sourceMappingURL=aside-menu.js.map

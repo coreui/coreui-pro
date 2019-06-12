@@ -1,25 +1,30 @@
-.pagination {
+.#{$bs-prefix}pagination {
   display: flex;
   @include list-unstyled();
   @include border-radius();
 }
 
-.page-link {
+.#{$bs-prefix}page-link {
   position: relative;
   display: block;
   padding: $pagination-padding-y $pagination-padding-x;
   margin-left: -$pagination-border-width;
   line-height: $pagination-line-height;
-  color: $pagination-color;
-  background-color: $pagination-bg;
-  border: $pagination-border-width solid $pagination-border-color;
+  border: $pagination-border-width solid;
+  @include themes($pagination-theme-map, $create: parent) {
+    color: themes-get-value("pagination-color");
+    background-color: themes-get-value("pagination-bg");
+    border-color: themes-get-value("pagination-border-color");
+  }
 
   &:hover {
     z-index: 2;
-    color: $pagination-hover-color;
     text-decoration: none;
-    background-color: $pagination-hover-bg;
-    border-color: $pagination-hover-border-color;
+    @include themes($pagination-theme-map, $create: parent) {
+      color: themes-get-value("pagination-hover-color");
+      background-color: themes-get-value("pagination-hover-bg");
+      border-color: themes-get-value("pagination-hover-border-color");
+    }
   }
 
   &:focus {
@@ -27,40 +32,39 @@
     outline: $pagination-focus-outline;
     box-shadow: $pagination-focus-box-shadow;
   }
-
-  // Opinionated: add "hand" cursor to non-disabled .page-link elements
-  &:not(:disabled):not(.disabled) {
-    cursor: pointer;
-  }
 }
 
-.page-item {
+.#{$bs-prefix}page-item {
   &:first-child {
-    .page-link {
+    .#{$bs-prefix}page-link {
       margin-left: 0;
       @include border-left-radius($border-radius);
     }
   }
   &:last-child {
-    .page-link {
+    .#{$bs-prefix}page-link {
       @include border-right-radius($border-radius);
     }
   }
 
-  &.active .page-link {
+  &.#{$bs-prefix}active .#{$bs-prefix}page-link {
     z-index: 1;
-    color: $pagination-active-color;
-    background-color: $pagination-active-bg;
-    border-color: $pagination-active-border-color;
+    @include themes($pagination-theme-map, $create: parent) {
+      color: themes-get-value("pagination-active-color");
+      background-color: themes-get-value("pagination-active-bg");
+      border-color: themes-get-value("pagination-active-border-color");
+    }
   }
 
-  &.disabled .page-link {
-    color: $pagination-disabled-color;
+  &.#{$bs-prefix}disabled .#{$bs-prefix}page-link {
     pointer-events: none;
-    // Opinionated: remove the "hand" cursor set previously for .page-link
+    // Opinionated: remove the "hand" cursor set previously for .#{$bs-prefix}page-link
     cursor: auto;
-    background-color: $pagination-disabled-bg;
-    border-color: $pagination-disabled-border-color;
+    @include themes($pagination-theme-map, $create: parent) {
+      color: themes-get-value("pagination-disabled-color");
+      background-color: themes-get-value("pagination-disabled-bg");
+      border-color: themes-get-value("pagination-disabled-border-color");
+    }
   }
 }
 
@@ -69,10 +73,10 @@
 // Sizing
 //
 
-.pagination-lg {
+.#{$bs-prefix}pagination-lg {
   @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $border-radius-lg);
 }
 
-.pagination-sm {
+.#{$bs-prefix}pagination-sm {
   @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $line-height-sm, $border-radius-sm);
 }
