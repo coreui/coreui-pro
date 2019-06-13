@@ -1,13 +1,13 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.1.12
+ * @version v2.1.13
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  */
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.1.12
+ * @version v2.1.13
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  */
@@ -14674,7 +14674,7 @@ body {
 .email-app {
   display: flex;
   flex-direction: row;
-  background: #fff;
+  background: #3a4149;
   border: 1px solid #23282c;
 }
 
@@ -14694,6 +14694,14 @@ body {
 
 .email-app nav .nav-item {
   position: relative;
+}
+
+.email-app nav .nav-item:hover {
+  background-color: #2f353a;
+}
+
+.email-app nav .nav-item a:focus {
+  outline: #23282c auto 0.2rem;
 }
 
 .email-app nav .nav-link {
@@ -14738,7 +14746,7 @@ body {
 }
 
 .email-app .inbox .message:hover {
-  background: #f3f4f5;
+  background-color: #2f353a;
 }
 
 .email-app .inbox .message .actions {
@@ -14756,11 +14764,15 @@ body {
 }
 
 .email-app .inbox .message a {
-  color: #000;
+  color: #e4e7ea;
 }
 
 .email-app .inbox .message a:hover {
   text-decoration: none;
+}
+
+.email-app .inbox .message a:focus {
+  outline: #23282c auto 0.2rem;
 }
 
 .email-app .inbox .message.unread .header,
@@ -15880,6 +15892,56 @@ body {
 
 .was-validated .form-control:invalid, .form-control.is-invalid {
   background-position: right calc(0.375em + 0.1875rem) center;
+}
+
+.email-app .toolbar .btn {
+  color: #e4e7ea;
+  background-color: #2f353a;
+  border-color: #2f353a;
+}
+
+.email-app .toolbar .btn:hover {
+  background-color: #343b41;
+}
+
+.email-app .toolbar .dropdown-menu.show {
+  background-color: #2f353a;
+}
+
+.email-app .toolbar .dropdown-item:active {
+  color: #e4e7ea;
+  background-color: #3a4149;
+}
+
+.email-app .toolbar .dropdown-item:hover {
+  color: #e4e7ea;
+  background-color: #343b41;
+}
+
+.email-app .form-control {
+  border-color: #343b41;
+}
+
+.ql-toolbar.ql-snow {
+  color: #e4e7ea;
+  background-color: #2f353a;
+}
+
+.ql-toolbar.ql-snow .ql-stroke {
+  stroke: #e4e7ea;
+}
+
+.ql-toolbar.ql-snow .ql-fill {
+  fill: #e4e7ea;
+}
+
+.ql-toolbar.ql-snow .ql-picker {
+  color: #e4e7ea;
+}
+
+.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+  background-color: #343b41;
+  border: 1px solid #3a4149;
 }
 
 /*# sourceMappingURL=coreui-dark.css.map */

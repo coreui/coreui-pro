@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro - Dashboard UI Kit
- * @version v2.1.12
+ * @version v2.1.13
  * @link https://coreui.io/pro/
  * Copyright (c) 2018 creativeLabs Łukasz Holeczek
  */
@@ -5258,6 +5258,14 @@ body {
   position: relative;
 }
 
+.email-app nav .nav-item:hover {
+  background-color: #f0f3f5;
+}
+
+.email-app nav .nav-item a:focus {
+  outline: #c8ced3 auto 0.2rem;
+}
+
 .email-app nav .nav-link {
   color: #23282c;
   border-bottom: 1px solid #c8ced3;
@@ -5301,7 +5309,7 @@ body {
 }
 
 .email-app .inbox .message:hover {
-  background: #f0f3f5;
+  background-color: #f0f3f5;
 }
 
 .email-app .inbox .message .actions {
@@ -5321,11 +5329,15 @@ body {
 }
 
 .email-app .inbox .message a {
-  color: #000;
+  color: #23282c;
 }
 
 .email-app .inbox .message a:hover {
   text-decoration: none;
+}
+
+.email-app .inbox .message a:focus {
+  outline: #c8ced3 auto 0.2rem;
 }
 
 .email-app .inbox .message.unread .header,
