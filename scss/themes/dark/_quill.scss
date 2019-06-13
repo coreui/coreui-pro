@@ -1,0 +1,18 @@
+// stylelint-disable selector-max-compound-selectors, selector-max-class, selector-max-combinators
+.ql-toolbar.ql-snow {
+  color: $gray-200;
+  background-color: $gray-800;
+  .ql-stroke {
+    stroke: $gray-200;
+  }
+  .ql-fill {
+    fill: $gray-200;
+  }
+  .ql-picker {
+    color: $gray-200;
+    &.ql-expanded .ql-picker-options {
+      background-color: $gray-750;
+      border: 1px solid $gray-700;
+    }
+  }
+}
