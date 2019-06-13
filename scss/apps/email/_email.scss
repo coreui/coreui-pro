@@ -2,7 +2,7 @@
 .email-app {
   display: flex;
   flex-direction: row;
-  background: #fff;
+  background: $card-bg;
   border: 1px solid $border-color;
 
   nav {
@@ -20,6 +20,12 @@
 
     .nav-item {
       position: relative;
+      &:hover {
+        background-color: $list-group-hover-bg;
+      }
+      a:focus {
+        outline: $border-color auto .2rem;
+      }
     }
 
     .nav-link {
@@ -65,7 +71,7 @@
       border-bottom: 1px solid $border-color;
 
       &:hover {
-        background: $gray-100;
+        background-color: $list-group-hover-bg;
       }
 
       .actions {
@@ -83,9 +89,12 @@
       }
 
       a {
-        color: #000;
+        color: $body-color;
         &:hover {
           text-decoration: none;
+        }
+        &:focus {
+          outline: $border-color auto .2rem;
         }
       }
 
@@ -191,7 +200,6 @@
       }
     }
   }
-  // .compones { }
 }
 
 @include media-breakpoint-down(sm) {

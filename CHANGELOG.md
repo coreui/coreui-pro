@@ -1,3 +1,11 @@
+## v2.1.13
+- fix(scss): hotfix for email dark
+- fix(scss): hotfix for quill toolbar dark
+
+###### Dependencies update:
+- update `rollup-plugin-node-resolve` to `5.0.2`
+- update `rollup` to `1.15.3`
+
 ## v2.1.12
 - fix(scss): new mobile breakpoint variables
 ```scss
