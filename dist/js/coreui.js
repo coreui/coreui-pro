@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro v2.1.13 (https://coreui.io/pro/)
+  * CoreUI Pro v2.1.14 (https://coreui.io/pro/)
   * Copyright 2019 Łukasz Holeczek
   */
 (function (global, factory) {
@@ -1627,7 +1627,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.13): ajax-load.js
+   * CoreUI (v2.1.14): ajax-load.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1639,7 +1639,7 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'ajaxLoad';
-    var VERSION = '2.1.13';
+    var VERSION = '2.1.14';
     var DATA_KEY = 'coreui.ajaxLoad';
     var JQUERY_NO_CONFLICT = $.fn[NAME];
     var ClassName = {
@@ -1869,7 +1869,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.13): toggle-classes.js
+   * CoreUI (v2.1.14): toggle-classes.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1894,7 +1894,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.13): aside-menu.js
+   * CoreUI (v2.1.14): aside-menu.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1906,7 +1906,7 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'aside-menu';
-    var VERSION = '2.1.13';
+    var VERSION = '2.1.14';
     var DATA_KEY = 'coreui.aside-menu';
     var EVENT_KEY = "." + DATA_KEY;
     var DATA_API_KEY = '.data-api';
@@ -2110,7 +2110,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.13): get-css-custom-properties.js
+   * CoreUI Utilities (v2.1.14): get-css-custom-properties.js
    * Licensed under MIT (https://coreui.io/license)
    * @returns {string} css custom property name
    * --------------------------------------------------------------------------
@@ -2178,7 +2178,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.13): sidebar.js
+   * CoreUI (v2.1.14): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -2190,7 +2190,7 @@
      * ------------------------------------------------------------------------
      */
     var NAME = 'sidebar';
-    var VERSION = '2.1.13';
+    var VERSION = '2.1.14';
     var DATA_KEY = 'coreui.sidebar';
     var EVENT_KEY = "." + DATA_KEY;
     var DATA_API_KEY = '.data-api';
@@ -2485,7 +2485,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.13): hex-to-rgb.js
+   * CoreUI Utilities (v2.1.14): hex-to-rgb.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -2521,7 +2521,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.13): hex-to-rgba.js
+   * CoreUI Utilities (v2.1.14): hex-to-rgba.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -2600,7 +2600,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.13): rgb-to-hex.js
+   * CoreUI (v2.1.14): rgb-to-hex.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -2629,7 +2629,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.13): index.js
+   * CoreUI (v2.1.14): index.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

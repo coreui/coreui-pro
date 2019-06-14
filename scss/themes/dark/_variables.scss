@@ -185,3 +185,8 @@ $table-head-color:            $body-color !default;
 
 // List group with accent
 $list-group-accent-divider-bg: $gray-800 !default;
+
+// Popovers
+$popover-bg:           $gray-900 !default;
+$popover-border-color: rgba($white, .2) !default;
+$popover-header-bg:    lighten($popover-bg, 3%) !default;
