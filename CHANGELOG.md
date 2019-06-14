@@ -1,4 +1,5 @@
 ## v2.1.14
+- fix(scss): dark popover variables
 
 ###### Dependencies update:
 - update `rollup` to `^1.15.4`
