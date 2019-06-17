@@ -35,19 +35,13 @@ const ClassName = {
 
 const Event = {
   CLICK_DATA_API: `click${EVENT_KEY}${DATA_API_KEY}`,
-  // TODO: clean-up
-  // LOAD_DATA_API: `load${EVENT_KEY}${DATA_API_KEY}`,
   XHR_STATUS: 'xhr'
 }
 
 const Selector = {
-  // TODO: clean-up
-  // HEAD: 'head',
   NAV_DROPDOWN: `.${PREFIX}nav .${PREFIX}nav-dropdown`,
   NAV_LINK: `.${PREFIX}dropdown-nav-link, .${PREFIX}nav .${PREFIX}nav-link`,
   NAV_ITEM: `.${PREFIX}nav .${PREFIX}nav-item`,
-  // TODO: clean-up
-  // SIDEBAT_NAV: `.${PREFIX}sidebar-nav, .${PREFIX}sidebar-nav`,
   VIEW_SCRIPT: '.view-script'
 }
 
