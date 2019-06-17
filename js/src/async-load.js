@@ -29,7 +29,7 @@ const ClassName = {
   NAV_DROPDOWN_TOGGLE: `${PREFIX}nav-dropdown-toggle`,
   NAV_PILLS: `${PREFIX}nav-pills`,
   NAV_TABS: `${PREFIX}nav-tabs`,
-  OPEN: 'open',
+  OPEN: `${PREFIX}open`,
   VIEW_SCRIPT: 'view-script'
 }
 
