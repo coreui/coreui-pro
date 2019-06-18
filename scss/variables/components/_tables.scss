@@ -66,8 +66,8 @@ $table-theme-map: map-merge(
       "table-hover-color":  $body-dark-theme-color,
       "table-hover-bg":     rgba($white, .075),
       "table-active-bg":    rgba($white, .075),
-      "table-border-color": $gray-900,
-      "table-head-bg":      $gray-800,
+      "table-border-color": $border-dark-theme-color,
+      "table-head-bg":      $gray-dark-theme-800,
       "table-head-color":   $body-dark-theme-color,
     )
   ),

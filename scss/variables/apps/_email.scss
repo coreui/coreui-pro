@@ -1,0 +1,35 @@
+// Email App
+
+$email-app-bg:                 $white !default;
+$email-app-border-color:       $border-color !default;
+$email-app-message-color:      $body-color !default;
+$email-app-message-read-color: $gray-700 !default;
+$email-app-message-body-color: $gray-800 !default;
+
+$email-app-dark-theme-bg:                 $gray-dark-theme-600 !default;
+$email-app-dark-theme-border-color:       $border-dark-theme-color !default;
+$email-app-dark-theme-message-color:      $body-dark-theme-color !default;
+$email-app-dark-theme-message-read-color: darken($body-dark-theme-color, 30%) !default;
+$email-app-dark-theme-message-body-color: $body-dark-theme-color !default;
+
+$email-app-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$email-app-theme-map: map-merge(
+  (
+    light: (
+      "email-app-bg":                    $email-app-bg,
+      "email-app-border-color":          $email-app-border-color,
+      "email-app-message-color":         $email-app-message-color,
+      "email-app-message-read-color":    $email-app-message-read-color,
+      "email-app-message-body-color":    $email-app-message-body-color
+    ),
+    dark: (
+      "email-app-bg":                    $email-app-dark-theme-bg,
+      "email-app-border-color":          $email-app-dark-theme-border-color,
+      "email-app-message-color":         $email-app-dark-theme-message-color,
+      "email-app-message-read-color":    $email-app-dark-theme-message-read-color,
+      "email-app-message-body-color":    $email-app-dark-theme-message-body-color
+    )
+  ),
+  $email-app-theme-map
+);
