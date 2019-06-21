@@ -48,6 +48,7 @@
       }
     }
   }
+
   @include media-breakpoint-up(lg) {
     &.#{$prefix}header-brand-minimized {
       width: $header-brand-minimized-width;

@@ -292,74 +292,74 @@
   background-color: #4d4e5c;
 }
 
-.c-dark-theme .c-modal-primary .c-modal-content {
+.c-dark-theme &.c-modal-primary .c-modal-content {
   border-color: #5848e5;
 }
 
-.c-dark-theme .c-modal-primary .c-modal-header {
+.c-dark-theme &.c-modal-primary .c-modal-header {
   color: #fff;
   background-color: #5848e5;
 }
 
-.c-dark-theme .c-modal-secondary .c-modal-content {
+.c-dark-theme &.c-modal-secondary .c-modal-content {
   border-color: #4f6384;
 }
 
-.c-dark-theme .c-modal-secondary .c-modal-header {
+.c-dark-theme &.c-modal-secondary .c-modal-header {
   color: #fff;
   background-color: #4f6384;
 }
 
-.c-dark-theme .c-modal-success .c-modal-content {
+.c-dark-theme &.c-modal-success .c-modal-content {
   border-color: #48d176;
 }
 
-.c-dark-theme .c-modal-success .c-modal-header {
+.c-dark-theme &.c-modal-success .c-modal-header {
   color: #fff;
   background-color: #48d176;
 }
 
-.c-dark-theme .c-modal-info .c-modal-content {
+.c-dark-theme &.c-modal-info .c-modal-content {
   border-color: #66b3ff;
 }
 
-.c-dark-theme .c-modal-info .c-modal-header {
+.c-dark-theme &.c-modal-info .c-modal-header {
   color: #fff;
   background-color: #66b3ff;
 }
 
-.c-dark-theme .c-modal-warning .c-modal-content {
+.c-dark-theme &.c-modal-warning .c-modal-content {
   border-color: #fac247;
 }
 
-.c-dark-theme .c-modal-warning .c-modal-header {
+.c-dark-theme &.c-modal-warning .c-modal-header {
   color: #fff;
   background-color: #fac247;
 }
 
-.c-dark-theme .c-modal-danger .c-modal-content {
+.c-dark-theme &.c-modal-danger .c-modal-content {
   border-color: #ec7f7f;
 }
 
-.c-dark-theme .c-modal-danger .c-modal-header {
+.c-dark-theme &.c-modal-danger .c-modal-header {
   color: #fff;
   background-color: #ec7f7f;
 }
 
-.c-dark-theme .c-modal-light .c-modal-content {
+.c-dark-theme &.c-modal-light .c-modal-content {
   border-color: #252525;
 }
 
-.c-dark-theme .c-modal-light .c-modal-header {
+.c-dark-theme &.c-modal-light .c-modal-header {
   color: #fff;
   background-color: #252525;
 }
 
-.c-dark-theme .c-modal-dark .c-modal-content {
+.c-dark-theme &.c-modal-dark .c-modal-content {
   border-color: #1e1e1e;
 }
 
-.c-dark-theme .c-modal-dark .c-modal-header {
+.c-dark-theme &.c-modal-dark .c-modal-header {
   color: #fff;
   background-color: #1e1e1e;
 }

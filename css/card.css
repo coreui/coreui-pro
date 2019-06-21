@@ -109,74 +109,74 @@
   border-color: #303139;
 }
 
-.c-card .c-dark-theme.c-bg-primary {
+.c-dark-theme .c-card.c-bg-primary {
   border-color: #2f1dd0;
 }
 
-.c-card .c-dark-theme.c-bg-primary .c-card-header {
+.c-dark-theme .c-card.c-bg-primary .c-card-header {
   background-color: #4c3be3;
   border-color: #2f1dd0;
 }
 
-.c-card .c-dark-theme.c-bg-secondary {
+.c-dark-theme .c-card.c-bg-secondary {
   border-color: #37455c;
 }
 
-.c-card .c-dark-theme.c-bg-secondary .c-card-header {
+.c-dark-theme .c-card.c-bg-secondary .c-card-header {
   background-color: #495c7a;
   border-color: #37455c;
 }
 
-.c-card .c-dark-theme.c-bg-success {
+.c-dark-theme .c-card.c-bg-success {
   border-color: #2bae57;
 }
 
-.c-card .c-dark-theme.c-bg-success .c-card-header {
+.c-dark-theme .c-card.c-bg-success .c-card-header {
   background-color: #3cce6c;
   border-color: #2bae57;
 }
 
-.c-card .c-dark-theme.c-bg-info {
+.c-dark-theme .c-card.c-bg-info {
   border-color: #2693ff;
 }
 
-.c-card .c-dark-theme.c-bg-info .c-card-header {
+.c-dark-theme .c-card.c-bg-info .c-card-header {
   background-color: #57abff;
   border-color: #2693ff;
 }
 
-.c-card .c-dark-theme.c-bg-warning {
+.c-dark-theme .c-card.c-bg-warning {
   border-color: #f9ad09;
 }
 
-.c-card .c-dark-theme.c-bg-warning .c-card-header {
+.c-dark-theme .c-card.c-bg-warning .c-card-header {
   background-color: #fabd38;
   border-color: #f9ad09;
 }
 
-.c-card .c-dark-theme.c-bg-danger {
+.c-dark-theme .c-card.c-bg-danger {
   border-color: #e34848;
 }
 
-.c-card .c-dark-theme.c-bg-danger .c-card-header {
+.c-dark-theme .c-card.c-bg-danger .c-card-header {
   background-color: #ea7272;
   border-color: #e34848;
 }
 
-.c-card .c-dark-theme.c-bg-light {
+.c-dark-theme .c-card.c-bg-light {
   border-color: #050505;
 }
 
-.c-card .c-dark-theme.c-bg-light .c-card-header {
+.c-dark-theme .c-card.c-bg-light .c-card-header {
   background-color: #1d1d1d;
   border-color: #050505;
 }
 
-.c-card .c-dark-theme.c-bg-dark {
+.c-dark-theme .c-card.c-bg-dark {
   border-color: black;
 }
 
-.c-card .c-dark-theme.c-bg-dark .c-card-header {
+.c-dark-theme .c-card.c-bg-dark .c-card-header {
   background-color: #161616;
   border-color: black;
 }
@@ -497,42 +497,42 @@
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-primary {
+.c-dark-theme &.c-card-accent-primary {
   border-top-color: #5848e5;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-secondary {
+.c-dark-theme &.c-card-accent-secondary {
   border-top-color: #4f6384;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-success {
+.c-dark-theme &.c-card-accent-success {
   border-top-color: #48d176;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-info {
+.c-dark-theme &.c-card-accent-info {
   border-top-color: #66b3ff;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-warning {
+.c-dark-theme &.c-card-accent-warning {
   border-top-color: #fac247;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-danger {
+.c-dark-theme &.c-card-accent-danger {
   border-top-color: #ec7f7f;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-light {
+.c-dark-theme &.c-card-accent-light {
   border-top-color: #252525;
   border-top-width: 2px;
 }
 
-.c-dark-theme .c-card-accent-dark {
+.c-dark-theme &.c-card-accent-dark {
   border-top-color: #1e1e1e;
   border-top-width: 2px;
 }

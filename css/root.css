@@ -7,6 +7,14 @@
   --danger: #e55353;
   --light: #e9e9eb;
   --dark: #4d4e5c;
+  --primary-dark-theme: #5848e5;
+  --secondary-dark-theme: #4f6384;
+  --success-dark-theme: #48d176;
+  --info-dark-theme: #66b3ff;
+  --warning-dark-theme: #fac247;
+  --danger-dark-theme: #ec7f7f;
+  --light-dark-theme: #252525;
+  --dark-dark-theme: #1e1e1e;
   --breakpoint-xs: 0;
   --breakpoint-sm: 576px;
   --breakpoint-md: 768px;

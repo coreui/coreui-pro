@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.12): class-toggler.js
+ * CoreUI (v3.0.0-apha.13): class-toggler.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -18,7 +18,7 @@ import EventHandler from './dom/event-handler';
  */
 
 var NAME = 'class-toggler';
-var VERSION = '3.0.0-alpha.12';
+var VERSION = '3.0.0-apha.13';
 var DATA_KEY = 'coreui.class-toggler';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
