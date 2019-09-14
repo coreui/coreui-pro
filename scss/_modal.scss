@@ -116,6 +116,7 @@
     background-color: themes-get-value("modal-content-bg");
     border-color: themes-get-value("modal-content-border-color");
   }
+  @include elevation(24);
 }
 
 // Modal background

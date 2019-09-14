@@ -37,6 +37,7 @@
     background-color: themes-get-value("dropdown-bg");
     border-color: themes-get-value("dropdown-border-color");
   }
+  @include elevation(4);
 }
 
 @each $breakpoint in map-keys($grid-breakpoints) {

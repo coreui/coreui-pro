@@ -1,0 +1,6 @@
+@each $level, $value in $elevations {
+  .#{$prefix}elevation-#{$level} {
+    border: 0;
+    box-shadow: unquote($value);
+  }
+}

@@ -16,6 +16,7 @@
     background-color: themes-get-value("card-bg");
     border-color: themes-get-value("card-border-color");
   }
+  @include elevation(1);
 
   > hr {
     margin-right: 0;
@@ -110,7 +111,7 @@
     }
   }
 
-  .#{$bs-prefix}chart-wrapper {
+  .#{$prefix}chart-wrapper {
     position: absolute;
     top: 0;
     right: 0;
