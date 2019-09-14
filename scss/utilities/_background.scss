@@ -4,17 +4,16 @@
   @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
 }
 
-@each $color, $value in $theme-colors-dark-theme {
-  .c-dark-theme {
-    @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
-  }
-}
-
 @if $enable-gradients {
   @include theme-variant() {
     @include bg-gradient-variant(".#{$bs-prefix}bg-gradient-#{$color}", $value);
   }
 }
+
+@each $color, $value in $theme-gradients {
+  @include coreui-bg-gradient-variant(".#{$bs-prefix}bg-gradient-#{$color}", $value);
+}
+
 
 .#{$bs-prefix}bg-white {
   background-color: $white !important;
@@ -25,13 +24,8 @@
 }
 
 // CoreUI start
-.#{$bs-prefix}bg-primary,
-.#{$bs-prefix}bg-success,
-.#{$bs-prefix}bg-info,
-.#{$bs-prefix}bg-warning,
-.#{$bs-prefix}bg-danger,
-.#{$bs-prefix}bg-dark {
-  color: #fff;
+[class^="#{$bs-prefix}bg-"] {
+  color: $white;
 }
 
 @each $color, $value in $brands-colors {

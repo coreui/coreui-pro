@@ -2,13 +2,14 @@
 // Sidebar
 
 $sidebar-width:                       250px !default;
+$sidebar-lg-width:                    350px !default;
 $sidebar-padding:                     0 !default;
 $sidebar-minimized-width:             50px !default;
 $sidebar-minimized-height:            $sidebar-minimized-width !default;
 $sidebar-compact-width:               150px !default;
 
 $sidebar-dark-color:                  $white !default;
-$sidebar-dark-bg:                     $gray-800 !default;
+$sidebar-dark-bg:                     $graphite-blue !default;
 $sidebar-dark-borders:                none !default;
 
 $sidebar-light-color:                 $body-color !default;
@@ -19,7 +20,7 @@ $sidebar-light-borders: (
 
 // Sidebar Brand
 
-$sidebar-brand-height:                55px !default;
+$sidebar-brand-height:               60px !default;
 
 $sidebar-dark-brand-bg:              rgba($black, .2) !default;
 $sidebar-light-brand-bg:             rgba($black, .2) !default;
@@ -50,6 +51,7 @@ $sidebar-light-form-placeholder-color:     rgba($white, .7) !default;
 
 $sidebar-nav-title-padding-y:         .75rem !default;
 $sidebar-nav-title-padding-x:         1rem !default;
+$sidebar-nav-title-margin-top:        1rem !default;
 $sidebar-nav-link-padding-y:          .75rem !default;
 $sidebar-nav-link-padding-x:          1rem !default;
 $sidebar-nav-icon-width:              50px !default;
@@ -80,12 +82,12 @@ $sidebar-light-nav-link-hover-borders:      0 !default;
 
 $sidebar-dark-nav-link-active-color:       $white !default;
 $sidebar-dark-nav-link-active-bg:          rgba($white, .05) !default;
-$sidebar-dark-nav-link-active-icon-color:  theme-color("primary") !default;
+$sidebar-dark-nav-link-active-icon-color:  $white !default;
 $sidebar-dark-nav-link-active-borders:     0 !default;
 
 $sidebar-light-nav-link-active-color:       theme-color("primary") !default;
 $sidebar-light-nav-link-active-bg:          rgba($black, .05) !default;
-$sidebar-light-nav-link-active-icon-color:  theme-color("primary") !default;
+$sidebar-light-nav-link-active-icon-color:  $white !default;
 $sidebar-light-nav-link-active-borders:     0 !default;
 
 

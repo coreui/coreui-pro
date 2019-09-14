@@ -19,3 +19,12 @@
     background: $color linear-gradient(180deg, mix($body-bg, $color, 15%), $color) repeat-x !important;
   }
 }
+
+@mixin coreui-bg-gradient-variant($parent, $colors) {
+  #{$parent} {
+    background: map-get($colors, "stop");
+    background: linear-gradient(45deg, map-get($colors, "start") 0%, map-get($colors, "stop") 100%);
+    border-color: map-get($colors, "stop");
+    // background: $color linear-gradient(180deg, mix($body-bg, $color, 15%), $color) repeat-x !important;
+  }
+}

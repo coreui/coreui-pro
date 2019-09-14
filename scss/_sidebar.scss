@@ -6,6 +6,7 @@
   flex-direction: column;
   // put the nav on the left
   order: -1;
+  width: $sidebar-width;
   padding: $sidebar-padding;
   transition: margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, flex $layout-transition-speed;
 
@@ -25,12 +26,25 @@
     }
   }
 
+  &.#{$prefix}sidebar-lg {
+    width: $sidebar-lg-width;
+
+    html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right){
+      margin-left: - $sidebar-lg-width;
+    }
+    html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+      order: 99;
+      margin-right: - $sidebar-lg-width;
+    }
+  }
+
   &.#{$prefix}sidebar-fixed {
     position: fixed;
     top: 0;
     bottom: 0;
-    z-index: $zindex-sticky - 1;
-    width: $sidebar-width;
+    z-index: $zindex-sticky;
+    // width: $sidebar-width;
+    @include elevation(2);
 
     html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right) {
       left: 0;
@@ -43,6 +57,31 @@
     &.#{$prefix}sidebar-under-header {
       top: $header-height;
     }
+  }
+
+  &.#{$prefix}sidebar-on-top {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: $zindex-sticky + 2;
+    @include elevation(3);
+
+    html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right) {
+      left: 0;
+    }
+
+    html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+      right: 0;
+    }
+  }
+
+  .#{$prefix}sidebar-close {
+    position: absolute;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: transparent;
+    border: 0;
   }
 
   .#{$prefix}sidebar-brand {
@@ -73,13 +112,18 @@
   }
 
   .#{$prefix}nav:not(.#{$prefix}nav-tabs) {
+    display: flex;
     flex-direction: column;
     width: 100%;
     min-height: 100%;
+    padding: 0;
+    margin-bottom: 0;
+    list-style: none;
   }
 
   .#{$prefix}nav-title {
     padding: $sidebar-nav-title-padding-y $sidebar-nav-title-padding-x;
+    margin-top: $sidebar-nav-title-margin-top;
     font-size: 80%;
     font-weight: 700;
     text-transform: uppercase;
@@ -113,7 +157,7 @@
       transition: $layout-transition-speed;
     }
 
-    .#{$prefix}badge {
+    .#{$bs-prefix}badge {
       margin-right: $sidebar-nav-link-padding-x;
       margin-left: auto;
     }
@@ -191,39 +235,6 @@
   //     background-color: lighten($sidebar-bg, 15%) !important;
   //   }
   // }
-
-  // Tabs
-
-  .#{$prefix}nav-tabs {
-    // border-color: $border-color;
-    .#{$prefix}nav-link {
-      display: block;
-      padding: $sidebar-nav-tabs-link-padding-y $sidebar-nav-tabs-link-padding-x;
-      // color: $body-color;
-      border-top: 0;
-      @include border-radius(0);
-      &.#{$prefix}active {
-        // color: theme-color("primary");
-      }
-    }
-    .#{$prefix}nav-item:first-child {
-      .#{$prefix}nav-link {
-        border-left: 0;
-      }
-    }
-  }
-
-  .#{$prefix}tab-content {
-    position: relative;
-    overflow-x: hidden;
-    overflow-y: auto;
-    background-color: transparent;
-    border: 0;
-
-    .#{$prefix}tab-pane {
-      padding: 0;
-    }
-  }
 
   .#{$prefix}sidebar-footer {
     flex: 0 0 $sidebar-footer-height;
@@ -418,6 +429,17 @@
       }
     }
   }
+
+  &.#{$prefix}sidebar-minimized-unfoldable:not(:hover) {
+    @extend .#{$prefix}sidebar-minimized;
+  }
+  &.#{$prefix}sidebar-minimized-unfoldable {
+    z-index: $zindex-sticky + 1 !important;
+    &:hover {
+      @include elevation(3);
+    }
+  }
+
   @include media-breakpoint-up(lg) {
     &.#{$prefix}sidebar-compact {
       width: $sidebar-compact-width;
@@ -465,19 +487,26 @@
         &:not(.#{$prefix}sidebar-right){
           margin-left: 0;
           @if $breakpoint != "xs" {
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}header,
             &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
             &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
             &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
               margin-left: $sidebar-width;
             }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}header,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
               margin-left: $sidebar-compact-width;
             }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}header,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
-            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}header,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}footer {
               margin-left: $sidebar-minimized-width;
             }
           }
@@ -485,19 +514,26 @@
         &.#{$prefix}sidebar-right {
           margin-right: 0;
           @if $breakpoint != "xs" {
+            &.#{$prefix}sidebar-fixed ~ .#{$prefix}header,
             &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
             &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
             &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
               margin-right: $sidebar-width;
             }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}header,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
               margin-right: $sidebar-compact-width;
             }
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}header,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
             &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
-            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}header,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}main,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}body,
+            &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}footer {
               margin-right: $sidebar-minimized-width;
             }
           }
@@ -591,19 +627,26 @@
             &:not(.#{$prefix}sidebar-right){
               margin-right: 0;
               @if $breakpoint != "xs" {
+                &.#{$prefix}sidebar-fixed ~ .#{$prefix}header,
                 &.#{$prefix}sidebar-fixed ~ .#{$prefix}main,
                 &.#{$prefix}sidebar-fixed ~ .#{$prefix}body,
                 &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
                   margin-right: $sidebar-width;
                 }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}header,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
                   margin-right: $sidebar-compact-width;
                 }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}header,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
-                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}header,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}footer {
                   margin-right: $sidebar-minimized-width;
                 }
               }
@@ -616,14 +659,20 @@
                 &.#{$prefix}sidebar-fixed ~ .#{$prefix}footer {
                   margin-left: $sidebar-width;
                 }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}header,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}main,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}body,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-compact ~ .#{$prefix}footer {
                   margin-left: $sidebar-compact-width;
                 }
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}header,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}main,
                 &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}body,
-                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer {
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized ~ .#{$prefix}footer,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}header,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}main,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}body,
+                &.#{$prefix}sidebar-fixed.#{$prefix}sidebar-minimized-unfoldable ~ .#{$prefix}footer {
                   margin-left: $sidebar-minimized-width;
                 }
               }
@@ -782,21 +831,21 @@
     }
   }
 
-  .#{$prefix}nav-tabs {
-    border-color: themes-get-value("sidebar-nav-tabs-border-color");
+  // .#{$bs-prefix}nav-tabs {
+  //   border-color: themes-get-value("sidebar-nav-tabs-border-color");
 
-    .#{$prefix}nav-link {
-      &:hover,
-      &:focus {
-        background: themes-get-value("sidebar-nav-tabs-link-hover-bg");
-        border-color: themes-get-value("sidebar-nav-tabs-link-hover-border-color");
-      }
-      &.#{$prefix}active {
-        background: themes-get-value("sidebar-nav-tabs-link-active-bg");
-        border-color: themes-get-value("sidebar-nav-tabs-link-active-border-color");
-      }
-    }
-  }
+  //   .#{$bs-prefix}nav-link {
+  //     &:hover,
+  //     &:focus {
+  //       background: themes-get-value("sidebar-nav-tabs-link-hover-bg");
+  //       border-color: themes-get-value("sidebar-nav-tabs-link-hover-border-color");
+  //     }
+  //     &.#{$bs-prefix}active {
+  //       background: themes-get-value("sidebar-nav-tabs-link-active-bg");
+  //       border-color: themes-get-value("sidebar-nav-tabs-link-active-border-color");
+  //     }
+  //   }
+  // }
 
   @if (lightness( themes-get-value("sidebar-bg") ) < 40) {
     .#{$prefix}progress {
