@@ -1,7 +1,7 @@
 //
 // CoreUI default layout
 //
-.#{$prefix}app.#{$prefix}layout-default {
+.#{$prefix}app.#{$prefix}layout-sidebar-left-full-height {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -23,6 +23,7 @@
     .#{$prefix}main {
       flex: 1;
       min-width: 0;
+      padding-top: 2 * $spacer;
 
       > .#{$bs-prefix}container-fluid {
         padding-right: $grid-gutter-width;
@@ -31,7 +32,7 @@
     }
   }
   .#{$prefix}sidebar.#{$prefix}sidebar-fixed {
-    top: $header-height;
+    // top: $header-height;
   }
 }
 
