@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): sidebar.js
+ * CoreUI (v3.0.0-alpha.13): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -20,11 +20,12 @@ import getStyle from './utilities/get-style'
  */
 
 const NAME = 'sidebar'
-const VERSION = '3.0.0-apha.13'
+const VERSION = '3.0.0-alpha.13'
 const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
+// const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
 const Default = {
   transition: 400
@@ -35,6 +36,7 @@ const ClassName = {
   NAV_DROPDOWN_TOGGLE: `${PREFIX}nav-dropdown-toggle`,
   OPEN: `${PREFIX}open`,
   SIDEBAR_MINIMIZED: `${PREFIX}sidebar-minimized`,
+  SIDEBAR_ON_TOP: `${PREFIX}sidebar-on-top`,
   SIDEBAR_SHOW: `${PREFIX}sidebar-show`
 }
 
@@ -53,7 +55,7 @@ const Selector = {
   NAV_DROPDOWN_TOGGLE: `.${PREFIX}nav-dropdown-toggle`,
   NAV_DROPDOWN: `.${PREFIX}nav-dropdown`,
   NAV_LINK: `.${PREFIX}nav-link`,
-  NAV_LINK_QUERIED: `.${PREFIX}nav-link-queried`,
+  // NAV_LINK_QUERIED: `.${PREFIX}nav-link-queried`,
   NAVIGATION_CONTAINER: `.${PREFIX}sidebar-nav`,
   SIDEBAR: `.${PREFIX}sidebar`
 }
@@ -72,6 +74,7 @@ class Sidebar {
     this._perfectScrollbar(Event.INIT)
     this._setActiveLink()
     this._breakpointTest = this._breakpointTest.bind(this)
+    this._toggleClickOut()
     this._clickOutListener = this._clickOutListener.bind(this)
     this._addEventListeners()
     this._addMediaQuery()
@@ -191,10 +194,17 @@ class Sidebar {
     // eslint-disable-next-line unicorn/prefer-spread
     Array.from(this._element.querySelectorAll(Selector.NAV_LINK)).forEach(element => {
       let currentUrl
-      if (element.classList.contains(Selector.NAV_LINK_QUERIED)) {
-        currentUrl = String(window.location)
-      } else {
+
+      const urlHasParams = new RegExp('\\?.*=')
+      const urlHasQueryString = new RegExp('\\?.')
+      const urlHasHash = new RegExp('#.')
+
+      if (urlHasParams.test(String(window.location)) || urlHasQueryString.test(String(window.location))) {
         currentUrl = String(window.location).split('?')[0]
+      } else if (urlHasHash.test(String(window.location))) {
+        currentUrl = String(window.location).split('#')[0]
+      } else {
+        currentUrl = String(window.location)
       }
 
       if (currentUrl.substr(currentUrl.length - 1) === '#') {
@@ -227,7 +237,6 @@ class Sidebar {
 
   _breakpointTest(event) {
     this.mobile = Boolean(event.matches)
-    this._toggleClickOut()
   }
 
   _clickOutListener(event) {
@@ -249,6 +258,8 @@ class Sidebar {
 
   _toggleClickOut() {
     if (this.mobile && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
+      this._addClickOut()
+    } else if (this._element.classList.contains(ClassName.SIDEBAR_ON_TOP) && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
       this._addClickOut()
     } else {
       this._removeClickOut()
