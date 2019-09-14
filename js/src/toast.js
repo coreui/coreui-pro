@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): toast.js
+ * CoreUI (v3.0.0-alpha.13): toast.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's toast.js
@@ -27,10 +27,10 @@ import Manipulator from './dom/manipulator'
  */
 
 const NAME = 'toast'
-const VERSION = '3.0.0-apha.13'
+const VERSION = '3.0.0-alpha.13'
 const DATA_KEY = 'coreui.toast'
 const EVENT_KEY = `.${DATA_KEY}`
-const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
+const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
 const Event = {
   CLICK_DISMISS: `click.dismiss${EVENT_KEY}`,
@@ -41,10 +41,10 @@ const Event = {
 }
 
 const ClassName = {
-  FADE: `${PREFIX}fade`,
-  HIDE: `${PREFIX}hide`,
-  SHOW: `${PREFIX}show`,
-  SHOWING: `${PREFIX}showing`
+  FADE: `${BS_PREFIX}fade`,
+  HIDE: `${BS_PREFIX}hide`,
+  SHOW: `${BS_PREFIX}show`,
+  SHOWING: `${BS_PREFIX}showing`
 }
 
 const DefaultType = {
@@ -60,7 +60,7 @@ const Default = {
 }
 
 const Selector = {
-  DATA_DISMISS: `[data-dismiss="${PREFIX}toast"]`
+  DATA_DISMISS: `[data-dismiss="${BS_PREFIX}toast"]`
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): alerj.js
+ * CoreUI (v3.0.0-alpha.13): alerj.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's alert.js
@@ -27,14 +27,14 @@ import SelectorEngine from './dom/selector-engine'
  */
 
 const NAME = 'alert'
-const VERSION = '3.0.0-apha.13'
+const VERSION = '3.0.0-alpha.13'
 const DATA_KEY = 'coreui.alert'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
+const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
 const Selector = {
-  DISMISS: '[data-dismiss="alert"]'
+  DISMISS: `[data-dismiss="${BS_PREFIX}alert"]`
 }
 
 const Event = {
@@ -44,9 +44,9 @@ const Event = {
 }
 
 const ClassName = {
-  ALERT: `${PREFIX}alert`,
-  FADE: `${PREFIX}fade`,
-  SHOW: `${PREFIX}show`
+  ALERT: `${BS_PREFIX}alert`,
+  FADE: `${BS_PREFIX}fade`,
+  SHOW: `${BS_PREFIX}show`
 }
 
 /**

@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): collapse.js
+ * CoreUI (v3.0.0-alpha.13): collapse.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's collapse.js
@@ -32,11 +32,11 @@ import SelectorEngine from './dom/selector-engine'
  */
 
 const NAME = 'collapse'
-const VERSION = '3.0.0-apha.13'
+const VERSION = '3.0.0-alpha.13'
 const DATA_KEY = 'coreui.collapse'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
+const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
 const Default = {
   toggle: true,
@@ -57,10 +57,10 @@ const Event = {
 }
 
 const ClassName = {
-  SHOW: `${PREFIX}show`,
-  COLLAPSE: `${PREFIX}collapse`,
-  COLLAPSING: `${PREFIX}collapsing`,
-  COLLAPSED: `${PREFIX}collapsed`
+  SHOW: `${BS_PREFIX}show`,
+  COLLAPSE: `${BS_PREFIX}collapse`,
+  COLLAPSING: `${BS_PREFIX}collapsing`,
+  COLLAPSED: `${BS_PREFIX}collapsed`
 }
 
 const Dimension = {
@@ -69,8 +69,8 @@ const Dimension = {
 }
 
 const Selector = {
-  ACTIVES: `.${PREFIX}show, .${PREFIX}collapsing`,
-  DATA_TOGGLE: `[data-toggle="${PREFIX}collapse"]`
+  ACTIVES: `.${BS_PREFIX}show, .${BS_PREFIX}collapsing`,
+  DATA_TOGGLE: `[data-toggle="${BS_PREFIX}collapse"]`
 }
 
 /**

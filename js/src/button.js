@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): button.js
+ * CoreUI (v3.0.0-alpha.13): button.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's buttons.js
@@ -21,15 +21,15 @@ import SelectorEngine from './dom/selector-engine'
  */
 
 const NAME = 'button'
-const VERSION = '3.0.0-apha.13'
+const VERSION = '3.0.0-alpha.13'
 const DATA_KEY = 'coreui.button'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
+const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
 const ClassName = {
-  ACTIVE: `${PREFIX}active`,
-  BUTTON: `${PREFIX}btn`,
+  ACTIVE: `${BS_PREFIX}active`,
+  BUTTON: `${BS_PREFIX}btn`,
   FOCUS: 'focus'
 }
 
@@ -37,8 +37,8 @@ const Selector = {
   DATA_TOGGLE_CARROT: '[data-toggle^="button"]',
   DATA_TOGGLE: '[data-toggle="buttons"]',
   INPUT: 'input:not([type="hidden"])',
-  ACTIVE: `.${PREFIX}active`,
-  BUTTON: `.${PREFIX}btn`
+  ACTIVE: `.${BS_PREFIX}active`,
+  BUTTON: `.${BS_PREFIX}btn`
 }
 
 const Event = {
