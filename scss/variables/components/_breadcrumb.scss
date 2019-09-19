@@ -15,13 +15,13 @@ $breadcrumb-borders: (
 ) !default;
 
 // Default theme
-$breadcrumb-bg:                     $white !default; // was: $gray-200
+$breadcrumb-bg:                     transparent !default; // was: $gray-200
 $breadcrumb-border-color:           $border-color !default;
 $breadcrumb-divider-color:          $gray-600 !default;
 $breadcrumb-active-color:           $gray-600 !default;
 
 // Dark theme
-$breadcrumb-dark-bg:                $component-dark-theme-bg !default;
+$breadcrumb-dark-bg:                transparent !default;
 $breadcrumb-dark-border-color:      $component-dark-theme-bg !default;
 $breadcrumb-dark-divider-color:     $body-dark-theme-color !default;
 $breadcrumb-dark-active-color:      $gray-600 !default;
