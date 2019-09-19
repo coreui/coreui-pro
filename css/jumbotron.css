@@ -1,21 +1,21 @@
-.c-jumbotron {
+.jumbotron {
   padding: 2rem 1rem;
   margin-bottom: 2rem;
   border-radius: 0.3rem;
-  background-color: #d3d3d6;
+  background-color: #d8dbe0;
 }
 
-.c-dark-theme .c-jumbotron {
-  background-color: #373847;
+.c-dark-theme .jumbotron {
+  background-color: #4f5d73;
 }
 
 @media (min-width: 576px) {
-  .c-jumbotron {
+  .jumbotron {
     padding: 4rem 2rem;
   }
 }
 
-.c-jumbotron-fluid {
+.jumbotron-fluid {
   padding-right: 0;
   padding-left: 0;
   border-radius: 0;

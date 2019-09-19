@@ -8,7 +8,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): dropdown.js
+ * CoreUI (v3.0.0-alpha.13): dropdown.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's dropdown.js
@@ -29,7 +29,7 @@ import SelectorEngine from './dom/selector-engine';
  */
 
 var NAME = 'dropdown';
-var VERSION = '3.0.0-apha.13';
+var VERSION = '3.0.0-alpha.13';
 var DATA_KEY = 'coreui.dropdown';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
@@ -46,6 +46,7 @@ var ARROW_DOWN_KEYCODE = 40; // KeyboardEvent.which value for down arrow key
 var RIGHT_MOUSE_BUTTON_WHICH = 3; // MouseEvent.which value for the right button (assuming a right-handed mouse)
 
 var REGEXP_KEYDOWN = new RegExp(ARROW_UP_KEYCODE + "|" + ARROW_DOWN_KEYCODE + "|" + ESCAPE_KEYCODE);
+var BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
 var PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-';
 var Event = {
   HIDE: "hide" + EVENT_KEY,
@@ -59,19 +60,20 @@ var Event = {
 };
 var ClassName = {
   DISABLED: 'disabled',
-  SHOW: PREFIX + "show",
-  DROPUP: PREFIX + "dropup",
-  DROPRIGHT: PREFIX + "dropright",
-  DROPLEFT: PREFIX + "dropleft",
-  MENURIGHT: PREFIX + "dropdown-menu-right",
+  SHOW: BS_PREFIX + "show",
+  DROPUP: BS_PREFIX + "dropup",
+  DROPRIGHT: BS_PREFIX + "dropright",
+  DROPLEFT: BS_PREFIX + "dropleft",
+  MENURIGHT: BS_PREFIX + "dropdown-menu-right",
   POSITION_STATIC: 'position-static'
 };
 var Selector = {
-  DATA_TOGGLE: "[data-toggle=\"" + PREFIX + "dropdown\"]",
-  FORM_CHILD: "." + PREFIX + "dropdown form",
-  MENU: "." + PREFIX + "dropdown-menu",
-  NAVBAR_NAV: "." + PREFIX + "navbar-nav",
-  VISIBLE_ITEMS: "." + PREFIX + "dropdown-menu ." + PREFIX + "dropdown-item:not(.disabled):not(:disabled)"
+  DATA_TOGGLE: "[data-toggle=\"" + BS_PREFIX + "dropdown\"]",
+  FORM_CHILD: "." + BS_PREFIX + "dropdown form",
+  MENU: "." + BS_PREFIX + "dropdown-menu",
+  NAVBAR_NAV: "." + BS_PREFIX + "navbar-nav",
+  HEADER_NAV: "." + PREFIX + "header-nav",
+  VISIBLE_ITEMS: "." + BS_PREFIX + "dropdown-menu ." + BS_PREFIX + "dropdown-item:not(.disabled):not(:disabled)"
 };
 var AttachmentMap = {
   TOP: 'top-start',
@@ -113,6 +115,7 @@ function () {
     this._config = this._getConfig(config);
     this._menu = this._getMenuElement();
     this._inNavbar = this._detectNavbar();
+    this._inHeader = this._detectHeader();
 
     this._addEventListeners();
 
@@ -145,10 +148,10 @@ function () {
 
     if (showEvent.defaultPrevented) {
       return;
-    } // Disable totally Popper.js for Dropdown in Navbar
+    } // Disable totally Popper.js for Dropdown in Navbar and Header
 
 
-    if (!this._inNavbar) {
+    if (!this._inNavbar && !this._inHeader) {
       /**
        * Check for Popper dependency
        * Popper - https://popper.js.org
@@ -184,6 +187,12 @@ function () {
 
 
     if ('ontouchstart' in document.documentElement && !makeArray(SelectorEngine.closest(parent, Selector.NAVBAR_NAV)).length) {
+      makeArray(document.body.children).forEach(function (elem) {
+        return EventHandler.on(elem, 'mouseover', null, noop());
+      });
+    }
+
+    if ('ontouchstart' in document.documentElement && !makeArray(SelectorEngine.closest(parent, Selector.HEADER_NAV)).length) {
       makeArray(document.body.children).forEach(function (elem) {
         return EventHandler.on(elem, 'mouseover', null, noop());
       });
@@ -255,6 +264,7 @@ function () {
 
   _proto.update = function update() {
     this._inNavbar = this._detectNavbar();
+    this._inHeader = this._detectHeader();
 
     if (this._popper !== null) {
       this._popper.scheduleUpdate();
@@ -313,7 +323,11 @@ function () {
   };
 
   _proto._detectNavbar = function _detectNavbar() {
-    return Boolean(SelectorEngine.closest(this._element, '.navbar'));
+    return Boolean(SelectorEngine.closest(this._element, "." + BS_PREFIX + "navbar"));
+  };
+
+  _proto._detectHeader = function _detectHeader() {
+    return Boolean(SelectorEngine.closest(this._element, "." + PREFIX + "header"));
   };
 
   _proto._getOffset = function _getOffset() {

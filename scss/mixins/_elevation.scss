@@ -1,6 +1,7 @@
 @mixin elevation($level, $direction: false) {
   @if $enable-elevations {
     .c-app:not(.c-dark-theme) & {
+      // stylelint-disable-next-line declaration-no-important
       border: 0 !important;
       box-shadow: unquote(map-get($elevations, $level));
 

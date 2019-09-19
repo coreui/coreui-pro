@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): sidebar.js
+ * CoreUI (v3.0.0-alpha.13): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -20,11 +20,12 @@ import getStyle from './utilities/get-style';
  */
 
 var NAME = 'sidebar';
-var VERSION = '3.0.0-apha.13';
+var VERSION = '3.0.0-alpha.13';
 var DATA_KEY = 'coreui.sidebar';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
-var PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-';
+var PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'; // const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
+
 var Default = {
   transition: 400
 };
@@ -33,6 +34,7 @@ var ClassName = {
   NAV_DROPDOWN_TOGGLE: PREFIX + "nav-dropdown-toggle",
   OPEN: PREFIX + "open",
   SIDEBAR_MINIMIZED: PREFIX + "sidebar-minimized",
+  SIDEBAR_OVERLAID: PREFIX + "sidebar-overlaid",
   SIDEBAR_SHOW: PREFIX + "sidebar-show"
 };
 var Event = {
@@ -49,7 +51,7 @@ var Selector = {
   NAV_DROPDOWN_TOGGLE: "." + PREFIX + "nav-dropdown-toggle",
   NAV_DROPDOWN: "." + PREFIX + "nav-dropdown",
   NAV_LINK: "." + PREFIX + "nav-link",
-  NAV_LINK_QUERIED: "." + PREFIX + "nav-link-queried",
+  // NAV_LINK_QUERIED: `.${PREFIX}nav-link-queried`,
   NAVIGATION_CONTAINER: "." + PREFIX + "sidebar-nav",
   SIDEBAR: "." + PREFIX + "sidebar"
   /**
@@ -73,6 +75,9 @@ function () {
     this._setActiveLink();
 
     this._breakpointTest = this._breakpointTest.bind(this);
+
+    this._toggleClickOut();
+
     this._clickOutListener = this._clickOutListener.bind(this);
 
     this._addEventListeners();
@@ -202,11 +207,16 @@ function () {
     // eslint-disable-next-line unicorn/prefer-spread
     Array.from(this._element.querySelectorAll(Selector.NAV_LINK)).forEach(function (element) {
       var currentUrl;
+      var urlHasParams = new RegExp('\\?.*=');
+      var urlHasQueryString = new RegExp('\\?.');
+      var urlHasHash = new RegExp('#.');
 
-      if (element.classList.contains(Selector.NAV_LINK_QUERIED)) {
-        currentUrl = String(window.location);
-      } else {
+      if (urlHasParams.test(String(window.location)) || urlHasQueryString.test(String(window.location))) {
         currentUrl = String(window.location).split('?')[0];
+      } else if (urlHasHash.test(String(window.location))) {
+        currentUrl = String(window.location).split('#')[0];
+      } else {
+        currentUrl = String(window.location);
       }
 
       if (currentUrl.substr(currentUrl.length - 1) === '#') {
@@ -240,8 +250,6 @@ function () {
 
   _proto._breakpointTest = function _breakpointTest(event) {
     this.mobile = Boolean(event.matches);
-
-    this._toggleClickOut();
   };
 
   _proto._clickOutListener = function _clickOutListener(event) {
@@ -266,6 +274,8 @@ function () {
 
   _proto._toggleClickOut = function _toggleClickOut() {
     if (this.mobile && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
+      this._addClickOut();
+    } else if (this._element.classList.contains(ClassName.SIDEBAR_OVERLAID) && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
       this._addClickOut();
     } else {
       this._removeClickOut();

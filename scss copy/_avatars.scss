@@ -1,0 +1,50 @@
+.#{$prefix}img-avatar {
+  max-width: 100%;
+  height: auto;
+  border-radius: 50em;
+}
+
+.#{$prefix}avatar {
+  @include avatar($avatar-width,$avatar-status-width);
+
+  > img {
+    @extend .#{$prefix}img-avatar;
+    vertical-align: initial;
+  }
+}
+
+.#{$prefix}avatar-lg {
+  @include avatar($avatar-lg-width,$avatar-lg-status-width);
+}
+
+.#{$prefix}avatar-sm {
+  @include avatar($avatar-sm-width,$avatar-sm-status-width);
+}
+
+.#{$prefix}avatar-xs {
+  @include avatar($avatar-xs-width,$avatar-xs-status-width);
+}
+
+.#{$prefix}avatars-stack {
+
+  .#{$prefix}avatar {
+    margin-right: - ($avatar-width / 2);
+    transition: margin-right $layout-transition-speed;
+
+    &:hover {
+      margin-right: 0;
+    }
+  }
+
+  .#{$prefix}avatar-lg {
+    margin-right: - ($avatar-lg-width / 2);
+  }
+
+  .#{$prefix}avatar-sm {
+    margin-right: - ($avatar-sm-width / 2);
+  }
+
+  .#{$prefix}avatar-xs {
+    margin-right: - ($avatar-xs-width / 2);
+  }
+}

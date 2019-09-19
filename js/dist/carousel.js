@@ -8,7 +8,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): carousel.js
+ * CoreUI (v3.0.0-alpha.13): carousel.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's carousel.js
@@ -28,7 +28,7 @@ import SelectorEngine from './dom/selector-engine';
  */
 
 var NAME = 'carousel';
-var VERSION = '3.0.0-apha.13';
+var VERSION = '3.0.0-alpha.13';
 var DATA_KEY = 'coreui.carousel';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
@@ -39,7 +39,7 @@ var ARROW_RIGHT_KEYCODE = 39; // KeyboardEvent.which value for right arrow key
 var TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
 
 var SWIPE_THRESHOLD = 40;
-var PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-';
+var BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
 var Default = {
   interval: 5000,
   keyboard: true,
@@ -78,23 +78,23 @@ var Event = {
   CLICK_DATA_API: "click" + EVENT_KEY + DATA_API_KEY
 };
 var ClassName = {
-  CAROUSEL: PREFIX + "carousel",
-  ACTIVE: PREFIX + "active",
+  CAROUSEL: BS_PREFIX + "carousel",
+  ACTIVE: BS_PREFIX + "active",
   SLIDE: 'slide',
-  RIGHT: PREFIX + "carousel-item-right",
-  LEFT: PREFIX + "carousel-item-left",
-  NEXT: PREFIX + "carousel-item-next",
-  PREV: PREFIX + "carousel-item-prev",
-  ITEM: PREFIX + "carousel-item",
-  POINTER_EVENT: PREFIX + "pointer-event"
+  RIGHT: BS_PREFIX + "carousel-item-right",
+  LEFT: BS_PREFIX + "carousel-item-left",
+  NEXT: BS_PREFIX + "carousel-item-next",
+  PREV: BS_PREFIX + "carousel-item-prev",
+  ITEM: BS_PREFIX + "carousel-item",
+  POINTER_EVENT: BS_PREFIX + "pointer-event"
 };
 var Selector = {
-  ACTIVE: "." + PREFIX + "active",
-  ACTIVE_ITEM: "." + PREFIX + "active." + PREFIX + "carousel-item",
-  ITEM: "." + PREFIX + "carousel-item",
-  ITEM_IMG: "." + PREFIX + "carousel-item img",
-  NEXT_PREV: "." + PREFIX + "carousel-item-next, ." + PREFIX + "carousel-item-prev",
-  INDICATORS: "." + PREFIX + "carousel-indicators",
+  ACTIVE: "." + BS_PREFIX + "active",
+  ACTIVE_ITEM: "." + BS_PREFIX + "active." + BS_PREFIX + "carousel-item",
+  ITEM: "." + BS_PREFIX + "carousel-item",
+  ITEM_IMG: "." + BS_PREFIX + "carousel-item img",
+  NEXT_PREV: "." + BS_PREFIX + "carousel-item-next, ." + BS_PREFIX + "carousel-item-prev",
+  INDICATORS: "." + BS_PREFIX + "carousel-indicators",
   DATA_SLIDE: '[data-slide], [data-slide-to]',
   DATA_RIDE: '[data-ride="carousel"]'
 };

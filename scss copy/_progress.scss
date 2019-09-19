@@ -1,0 +1,67 @@
+// Disable animation if transitions are disabled
+@if $enable-transitions {
+  @keyframes progress-bar-stripes {
+    from { background-position: $progress-height 0; }
+    to { background-position: 0 0; }
+  }
+}
+
+.#{$bs-prefix}progress {
+  display: flex;
+  height: $progress-height;
+  overflow: hidden; // force rounded corners by cropping it
+  @include font-size($progress-font-size);
+  @include border-radius($progress-border-radius);
+  @include box-shadow($progress-box-shadow);
+
+  @include themes($progress-theme-map, $create: parent) {
+    background-color: themes-get-value("progress-bg");
+  }
+}
+
+.#{$bs-prefix}progress-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  @include transition($progress-bar-transition);
+
+  @include themes($progress-theme-map, $create: parent) {
+    color: themes-get-value("progress-bar-color");
+    background-color: themes-get-value("progress-bar-bg");
+  }
+}
+
+.#{$bs-prefix}progress-bar-striped {
+  @include gradient-striped();
+  background-size: $progress-height $progress-height;
+}
+
+@if $enable-transitions {
+  .#{$bs-prefix}progress-bar-animated {
+    animation: progress-bar-stripes $progress-bar-animation-timing;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+}
+
+// CoreUI specific changes start
+.#{$bs-prefix}progress-xs {
+  height: 4px;
+}
+
+.#{$bs-prefix}progress-sm {
+  height: 8px;
+}
+
+// White progress bar
+.#{$bs-prefix}progress.#{$bs-prefix}progress-white {
+  background-color: rgba(255, 255, 255, .2);
+  .#{$bs-prefix}progress-bar {
+    background-color: #fff;
+  }
+}
+// CoreUI specific changes end

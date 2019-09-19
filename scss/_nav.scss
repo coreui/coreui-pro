@@ -271,65 +271,12 @@
     .#{$bs-prefix}nav-link {
       display: flex;
       align-items: center;
-      height: $header-height;
+      height: $sidebar-brand-height;
       padding-top: 0;
       padding-bottom: 0;
     }
   }
 }
-
-// CoreUI specific changes start
-// ToDo: refactor
-// .#{$bs-prefix}nav-tabs {
-//   .#{$bs-prefix}nav-link {
-//     color: $gray-600;
-//     &:hover {
-//       cursor: pointer;
-//     }
-//     &.#{$bs-prefix}active {
-//       color: $gray-800;
-//       background: #fff;
-//       border-color: $border-color;
-//       border-bottom-color: #fff;
-//       &:focus {
-//         background: #fff;
-//         border-color: $border-color;
-//         border-bottom-color: #fff;
-//       }
-//     }
-//   }
-// }
-
-// .#{$bs-prefix}tab-content {
-//   margin-top: -1px;
-//   background: #fff;
-//   border: 1px solid $border-color;
-//   .#{$bs-prefix}tab-pane {
-//     padding: $spacer;
-//   }
-// }
-
-// .#{$bs-prefix}card-block {
-//   .#{$bs-prefix}tab-content {
-//     margin-top: 0;
-//     border: 0;
-//   }
-// }
-
-// .#{$bs-prefix}nav-fill {
-//   .#{$bs-prefix}nav-link {
-//     background-color: #fff;
-//     border-color: $border-color;
-//   }
-//   .#{$bs-prefix}nav-link + .#{$bs-prefix}nav-link {
-//     margin-left: -1px;
-//   }
-//   .#{$bs-prefix}nav-link.#{$bs-prefix}active {
-//     margin-top: -1px;
-//     // margin-left: 0;
-//     border-top: 2px solid $primary;
-//   }
-// }
 
 // Right-to-Left Support
 *[dir="rtl"] {

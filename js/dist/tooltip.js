@@ -8,7 +8,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): tooltip.js
+ * CoreUI (v3.0.0-alpha.13): tooltip.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tooltip.js
@@ -30,11 +30,11 @@ import SelectorEngine from './dom/selector-engine';
  */
 
 var NAME = 'tooltip';
-var VERSION = '3.0.0-apha.13';
+var VERSION = '3.0.0-alpha.13';
 var DATA_KEY = 'coreui.tooltip';
 var EVENT_KEY = "." + DATA_KEY;
-var PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-';
-var CLASS_PREFIX = PREFIX + "bs-tooltip";
+var BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
+var CLASS_PREFIX = BS_PREFIX + "bs-tooltip";
 var BSCLS_PREFIX_REGEX = new RegExp("(^|\\s)" + CLASS_PREFIX + "\\S+", 'g');
 var DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn'];
 var DefaultType = {
@@ -63,7 +63,7 @@ var AttachmentMap = {
 };
 var Default = {
   animation: true,
-  template: "<div class=\"" + PREFIX + "tooltip\" role=\"tooltip\">\n               <div class=\"" + PREFIX + "tooltip-arrow\"></div>\n               <div class=\"" + PREFIX + "tooltip-inner\"></div>\n             </div>",
+  template: "<div class=\"" + BS_PREFIX + "tooltip\" role=\"tooltip\">\n               <div class=\"" + BS_PREFIX + "tooltip-arrow\"></div>\n               <div class=\"" + BS_PREFIX + "tooltip-inner\"></div>\n             </div>",
   trigger: 'hover focus',
   title: '',
   delay: 0,
@@ -95,12 +95,12 @@ var Event = {
   MOUSELEAVE: "mouseleave" + EVENT_KEY
 };
 var ClassName = {
-  FADE: PREFIX + "fade",
-  SHOW: PREFIX + "show"
+  FADE: BS_PREFIX + "fade",
+  SHOW: BS_PREFIX + "show"
 };
 var Selector = {
-  TOOLTIP_INNER: "." + PREFIX + "tooltip-inner",
-  TOOLTIP_ARROW: "." + PREFIX + "tooltip-arrow"
+  TOOLTIP_INNER: "." + BS_PREFIX + "tooltip-inner",
+  TOOLTIP_ARROW: "." + BS_PREFIX + "tooltip-arrow"
 };
 var Trigger = {
   HOVER: 'hover',

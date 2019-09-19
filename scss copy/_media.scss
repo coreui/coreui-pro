@@ -1,0 +1,8 @@
+.#{$bs-prefix}media {
+  display: flex;
+  align-items: flex-start;
+}
+
+.#{$bs-prefix}media-body {
+  flex: 1;
+}

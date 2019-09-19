@@ -1,0 +1,10 @@
+.ie-custom-properties {
+  // Custom variable values only support SassScript inside `#{}`.
+  @each $color, $value in $theme-colors {
+    #{$color}: #{$value};
+  }
+
+  @each $bp, $value in $grid-breakpoints {
+    breakpoint-#{$bp}: #{$value};
+  }
+}

@@ -87,8 +87,8 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
 
   .#{$prefix}sidebar-close {
     position: absolute;
-    width: 60px;
-    height: 60px;
+    width: $sidebar-brand-height;
+    height: $sidebar-brand-height;
     background: transparent;
     border: 0;
 

@@ -1,0 +1,40 @@
+//
+// CoreUI default layout
+//
+.#{$prefix}app.#{$prefix}default-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .#{$prefix}header {
+    flex: 0 0 $header-height;
+  }
+
+  .#{$prefix}footer {
+    flex: 0 0 $footer-height;
+  }
+
+  .#{$prefix}body {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    overflow-x: hidden;
+
+    .#{$prefix}main {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+  .#{$prefix}sidebar.#{$prefix}sidebar-fixed {
+    top: $header-height;
+  }
+}
+
+// IE10&11 Flexbox fix
+@media all and (-ms-high-contrast: none) {
+  html {
+    display: flex;
+    flex-direction: column;
+  }
+}
+

@@ -8,7 +8,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-apha.13): toast.js
+ * CoreUI (v3.0.0-alpha.13): toast.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's toast.js
@@ -27,10 +27,10 @@ import Manipulator from './dom/manipulator';
  */
 
 var NAME = 'toast';
-var VERSION = '3.0.0-apha.13';
+var VERSION = '3.0.0-alpha.13';
 var DATA_KEY = 'coreui.toast';
 var EVENT_KEY = "." + DATA_KEY;
-var PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-';
+var BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
 var Event = {
   CLICK_DISMISS: "click.dismiss" + EVENT_KEY,
   HIDE: "hide" + EVENT_KEY,
@@ -39,10 +39,10 @@ var Event = {
   SHOWN: "shown" + EVENT_KEY
 };
 var ClassName = {
-  FADE: PREFIX + "fade",
-  HIDE: PREFIX + "hide",
-  SHOW: PREFIX + "show",
-  SHOWING: PREFIX + "showing"
+  FADE: BS_PREFIX + "fade",
+  HIDE: BS_PREFIX + "hide",
+  SHOW: BS_PREFIX + "show",
+  SHOWING: BS_PREFIX + "showing"
 };
 var DefaultType = {
   animation: 'boolean',
@@ -55,7 +55,7 @@ var Default = {
   delay: 500
 };
 var Selector = {
-  DATA_DISMISS: "[data-dismiss=\"" + PREFIX + "toast\"]"
+  DATA_DISMISS: "[data-dismiss=\"" + BS_PREFIX + "toast\"]"
   /**
    * ------------------------------------------------------------------------
    * Class Definition

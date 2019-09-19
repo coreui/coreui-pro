@@ -1,44 +1,44 @@
-.c-toast {
+.toast {
   max-width: 350px;
   overflow: hidden;
   font-size: 0.875rem;
   background-color: rgba(255, 255, 255, 0.85);
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 21, 0.1);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 21, 0.1);
   backdrop-filter: blur(10px);
   opacity: 0;
   border-radius: 0.25rem;
 }
 
-.c-toast:not(:last-child) {
+.toast:not(:last-child) {
   margin-bottom: 0.75rem;
 }
 
-.c-toast.c-showing {
+.toast.showing {
   opacity: 1;
 }
 
-.c-toast.c-show {
+.toast.show {
   display: block;
   opacity: 1;
 }
 
-.c-toast.c-hide {
+.toast.hide {
   display: none;
 }
 
-.c-toast-header {
+.toast-header {
   display: flex;
   align-items: center;
   padding: 0.25rem 0.75rem;
-  color: #7a7a85;
+  color: #8a93a2;
   background-color: rgba(255, 255, 255, 0.85);
   background-clip: padding-box;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 21, 0.05);
 }
 
-.c-toast-body {
+.toast-body {
   padding: 0.75rem;
 }
 

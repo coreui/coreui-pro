@@ -1,0 +1,17 @@
+
+.#{$prefix}footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 $spacer;
+
+  &[class*="bg-"] {
+    border-color: rgba($black, .1);
+  }
+}
+
+@include themes($footer-theme-map, $parent: ".#{$prefix}footer") {
+  color: themes-get-value("footer-color");
+  background: themes-get-value("footer-bg");
+  @include borders(themes-get-value("footer-borders"));
+}
