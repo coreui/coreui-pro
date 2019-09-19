@@ -36,7 +36,7 @@ const ClassName = {
   NAV_DROPDOWN_TOGGLE: `${PREFIX}nav-dropdown-toggle`,
   OPEN: `${PREFIX}open`,
   SIDEBAR_MINIMIZED: `${PREFIX}sidebar-minimized`,
-  SIDEBAR_ON_TOP: `${PREFIX}sidebar-on-top`,
+  SIDEBAR_OVERLAID: `${PREFIX}sidebar-overlaid`,
   SIDEBAR_SHOW: `${PREFIX}sidebar-show`
 }
 
@@ -259,7 +259,7 @@ class Sidebar {
   _toggleClickOut() {
     if (this.mobile && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
       this._addClickOut()
-    } else if (this._element.classList.contains(ClassName.SIDEBAR_ON_TOP) && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
+    } else if (this._element.classList.contains(ClassName.SIDEBAR_OVERLAID) && this._element.classList.contains(ClassName.SIDEBAR_SHOW)) {
       this._addClickOut()
     } else {
       this._removeClickOut()

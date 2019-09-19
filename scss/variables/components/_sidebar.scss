@@ -1,15 +1,15 @@
 
 // Sidebar
 
-$sidebar-width:                       250px !default;
-$sidebar-lg-width:                    350px !default;
+$sidebar-width:                       256px !default;
+$sidebar-lg-width:                    352px !default;
 $sidebar-padding:                     0 !default;
-$sidebar-minimized-width:             50px !default;
+$sidebar-minimized-width:             56px !default;
 $sidebar-minimized-height:            $sidebar-minimized-width !default;
 $sidebar-compact-width:               150px !default;
 
 $sidebar-dark-color:                  $white !default;
-$sidebar-dark-bg:                     $graphite-blue !default;
+$sidebar-dark-bg:                     $gray-base !default;
 $sidebar-dark-borders:                none !default;
 
 $sidebar-light-color:                 $body-color !default;
@@ -20,7 +20,7 @@ $sidebar-light-borders: (
 
 // Sidebar Brand
 
-$sidebar-brand-height:               60px !default;
+$sidebar-brand-height:               56px !default;
 
 $sidebar-dark-brand-bg:              rgba($black, .2) !default;
 $sidebar-light-brand-bg:             rgba($black, .2) !default;
@@ -52,9 +52,9 @@ $sidebar-light-form-placeholder-color:     rgba($white, .7) !default;
 $sidebar-nav-title-padding-y:         .75rem !default;
 $sidebar-nav-title-padding-x:         1rem !default;
 $sidebar-nav-title-margin-top:        1rem !default;
-$sidebar-nav-link-padding-y:          .75rem !default;
+$sidebar-nav-link-padding-y:          .8445rem !default;
 $sidebar-nav-link-padding-x:          1rem !default;
-$sidebar-nav-icon-width:              50px !default;
+$sidebar-nav-icon-width:              56px !default;
 
 $sidebar-dark-nav-title-color:             rgba($white, .6) !default;
 $sidebar-dark-nav-link-color:              rgba($white, .8) !default;
@@ -306,12 +306,12 @@ $sidebar-dark-theme-nav-link-bg:                 transparent !default;
 $sidebar-dark-theme-nav-link-icon-color:         $gray-600 !default;
 $sidebar-dark-theme-nav-link-borders:            0 !default;
 $sidebar-dark-theme-nav-link-hover-color:        $white !default;
-$sidebar-dark-theme-nav-link-hover-bg:           theme-color("primary") !default;
+$sidebar-dark-theme-nav-link-hover-bg:           desaturate($primary, 20%) !default;
 $sidebar-dark-theme-nav-link-hover-icon-color:   $white !default;
 $sidebar-dark-theme-nav-link-hover-borders:      0 !default;
 $sidebar-dark-theme-nav-link-active-color:       $white !default;
 $sidebar-dark-theme-nav-link-active-bg:          rgba($white, .05) !default;
-$sidebar-dark-theme-nav-link-active-icon-color:  theme-color("primary") !default;
+$sidebar-dark-theme-nav-link-active-icon-color:  $white !default;
 $sidebar-dark-theme-nav-link-active-borders:     0 !default;
 $sidebar-dark-theme-nav-link-disabled-color:       darken($white, 30%) !default;
 $sidebar-dark-theme-nav-link-disabled-bg:          $sidebar-dark-theme-bg !default;
@@ -326,7 +326,7 @@ $sidebar-dark-theme-nav-dropdown-indicator-hover-color: $sidebar-dark-theme-nav-
 $sidebar-dark-theme-nav-dropdown-indicator-hover: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-theme-nav-dropdown-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 $sidebar-dark-theme-nav-tabs-border-color:             rgba($black, .2) !default;
 $sidebar-dark-theme-nav-tabs-link-active-bg:           rgba($white, .05) !default;
-$sidebar-dark-theme-nav-tabs-link-active-border-color: rgba($black, .2) rgba($black, .2) theme-color("primary") !default;
+$sidebar-dark-theme-nav-tabs-link-active-border-color: rgba($black, .2) rgba($black, .2) desaturate($primary, 20%) !default;
 $sidebar-dark-theme-nav-tabs-link-hover-bg:            rgba($black, .2) !default;
 $sidebar-dark-theme-nav-tabs-link-hover-border-color:  rgba($black, .2) rgba($black, .2) $gray-200 !default;
 $sidebar-dark-theme-tab-content-borders: (
