@@ -1,9 +1,9 @@
 // Header
 
-$header-height:                         60px !default;
-$header-brand-width:                    250px !default;
-$header-brand-minimized-width:          50px !default;
-$header-subheader-height:               45px !default;
+$header-height:                         56px !default;
+$header-brand-width:                    256px !default;
+$header-brand-minimized-width:          56px !default;
+$header-subheader-height:               48px !default;
 
 $header-padding-y:                      $spacer / 2 !default;
 $header-padding-x:                      $spacer !default;
@@ -62,6 +62,15 @@ $header-dark-brand-hover-color:         $header-dark-active-color !default;
 $header-dark-brand-minimized-bg:        transparent !default;
 $header-dark-brand-minimized-border:    0 !default;
 
+$subheader-light-border: (
+  top: 1px solid $border-color
+) !default;
+
+$subheader-dark-border: (
+  top: 1px solid $gray-800
+) !default;
+
+
 $header-variants-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $header-variants-map: map-merge(
@@ -82,7 +91,8 @@ $header-variants-map: map-merge(
       "header-brand-color":             $header-dark-brand-color,
       "header-brand-hover-color":       $header-dark-brand-hover-color,
       "header-brand-minimized-bg":      $header-dark-brand-minimized-bg,
-      "header-brand-minimized-border":  $header-dark-brand-minimized-border
+      "header-brand-minimized-border":  $header-dark-brand-minimized-border,
+      "subheader-border":               $subheader-dark-border
     ),
     light: (
       "header-bg":                      $header-light-bg,
@@ -100,7 +110,8 @@ $header-variants-map: map-merge(
       "header-brand-color":             $header-light-brand-color,
       "header-brand-hover-color":       $header-light-brand-hover-color,
       "header-brand-minimized-bg":      $header-light-brand-minimized-bg,
-      "header-brand-minimized-border":  $header-light-brand-minimized-border
+      "header-brand-minimized-border":  $header-light-brand-minimized-border,
+      "subheader-border":               $subheader-light-border
     )
   ),
   $header-variants-map
@@ -133,6 +144,11 @@ $header-dark-theme-brand-hover-color:         $header-dark-theme-active-color !d
 $header-dark-theme-brand-minimized-bg:        transparent !default;
 $header-dark-theme-brand-minimized-border:    0 !default;
 
+$subheader-dark-theme-border: (
+  top: 1px solid $border-dark-theme-color
+) !default;
+
+
 $header-dark-theme-variants-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $header-dark-theme-variants-map: map-merge(
@@ -153,7 +169,8 @@ $header-dark-theme-variants-map: map-merge(
       "header-brand-color":             $header-dark-theme-brand-color,
       "header-brand-hover-color":       $header-dark-theme-brand-hover-color,
       "header-brand-minimized-bg":      $header-dark-theme-brand-minimized-bg,
-      "header-brand-minimized-border":  $header-dark-theme-brand-minimized-border
+      "header-brand-minimized-border":  $header-dark-theme-brand-minimized-border,
+      "subheader-border":               $subheader-dark-theme-border
     )
   ),
   $header-dark-theme-variants-map
