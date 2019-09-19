@@ -4,6 +4,12 @@
   @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
 }
 
+@each $color, $value in $theme-colors-dark-theme {
+  .c-dark-theme {
+    @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
+  }
+}
+
 @if $enable-gradients {
   @include theme-variant() {
     @include bg-gradient-variant(".#{$bs-prefix}bg-gradient-#{$color}", $value);
@@ -12,6 +18,9 @@
 
 @each $color, $value in $theme-gradients {
   @include coreui-bg-gradient-variant(".#{$bs-prefix}bg-gradient-#{$color}", $value);
+  .c-dark-theme {
+    @include coreui-bg-gradient-variant-dark-theme(".#{$bs-prefix}bg-gradient-#{$color}", $value);
+  }
 }
 
 
