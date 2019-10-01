@@ -27,9 +27,9 @@ const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.Cor
 
 const ClassName = {
   ACTIVE: `${PREFIX}active`,
-  NAV_DROPDOWN_TOGGLE: `${PREFIX}nav-dropdown-toggle`,
-  NAV_PILLS: `${PREFIX}nav-pills`,
-  NAV_TABS: `${PREFIX}nav-tabs`,
+  NAV_DROPDOWN_TOGGLE: `${PREFIX}sidebar-nav-dropdown-toggle`,
+  // NAV_PILLS: `${PREFIX}nav-pills`,
+  // NAV_TABS: `${PREFIX}nav-tabs`,
   OPEN: `${PREFIX}open`,
   VIEW_SCRIPT: 'view-script'
 }
@@ -40,9 +40,9 @@ const Event = {
 }
 
 const Selector = {
-  NAV_DROPDOWN: `.${PREFIX}nav .${PREFIX}nav-dropdown`,
-  NAV_LINK: `.${PREFIX}dropdown-nav-link, .${PREFIX}nav .${PREFIX}nav-link`,
-  NAV_ITEM: `.${PREFIX}nav .${PREFIX}nav-item`,
+  NAV_DROPDOWN: `.${PREFIX}sidebar-nav-dropdown`,
+  NAV_LINK: `.${PREFIX}xhr-link, .${PREFIX}sidebar-nav-link`,
+  NAV_ITEM: `.${PREFIX}sidebar-nav-item`,
   VIEW_SCRIPT: '.view-script'
 }
 

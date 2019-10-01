@@ -10,6 +10,7 @@ import {
 } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
+import Manipulator from './dom/manipulator'
 import PerfectScrollbar from 'perfect-scrollbar'
 import getStyle from './utilities/get-style'
 
@@ -25,15 +26,21 @@ const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
+const DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn']
 // const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
+
+const DefaultType = {
+  dropdownAccordion: 'boolean'
+}
 
 const Default = {
   transition: 400
+  // dropdownAccordion: false
 }
 
 const ClassName = {
   ACTIVE: `${PREFIX}active`,
-  NAV_DROPDOWN_TOGGLE: `${PREFIX}nav-dropdown-toggle`,
+  NAV_DROPDOWN_TOGGLE: `${PREFIX}sidebar-nav-dropdown-toggle`,
   OPEN: `${PREFIX}open`,
   SIDEBAR_MINIMIZED: `${PREFIX}sidebar-minimized`,
   SIDEBAR_OVERLAID: `${PREFIX}sidebar-overlaid`,
@@ -52,10 +59,10 @@ const Event = {
 }
 
 const Selector = {
-  NAV_DROPDOWN_TOGGLE: `.${PREFIX}nav-dropdown-toggle`,
-  NAV_DROPDOWN: `.${PREFIX}nav-dropdown`,
-  NAV_LINK: `.${PREFIX}nav-link`,
-  // NAV_LINK_QUERIED: `.${PREFIX}nav-link-queried`,
+  NAV_DROPDOWN_TOGGLE: `.${PREFIX}sidebar-nav-dropdown-toggle`,
+  NAV_DROPDOWN: `.${PREFIX}sidebar-nav-dropdown`,
+  NAV_LINK: `.${PREFIX}sidebar-nav-link`,
+  // NAV_LINK_QUERIED: `.${PREFIX}sidebar-nav-link-queried`,
   NAVIGATION_CONTAINER: `.${PREFIX}sidebar-nav`,
   SIDEBAR: `.${PREFIX}sidebar`
 }
@@ -86,15 +93,33 @@ class Sidebar {
     return VERSION
   }
 
+  static get DefaultType() {
+    return DefaultType
+  }
+
   // Private
 
   _toggleDropdown(event) {
+
     let toggler = event.target
     if (!toggler.classList.contains(ClassName.NAV_DROPDOWN_TOGGLE)) {
       toggler = toggler.closest(Selector.NAV_DROPDOWN_TOGGLE)
     }
 
+    const dataAttributes = toggler.closest(Selector.NAVIGATION_CONTAINER).dataset
+
+    // TODO: find better solution
+    if (dataAttributes.drodpownAccordion) {
+      toggler.closest(Selector.NAVIGATION_CONTAINER).querySelectorAll(Selector.NAV_DROPDOWN).forEach(element => {
+        if (element !== toggler.parentNode) {
+          element.classList.remove(ClassName.OPEN)
+        }
+      })
+    }
+
     toggler.parentNode.classList.toggle(ClassName.OPEN)
+    // TODO: Setting the toggler's position near to cursor after the click.
+
     this._perfectScrollbar(Event.UPDATE)
   }
 
