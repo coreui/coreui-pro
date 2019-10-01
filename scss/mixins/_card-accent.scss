@@ -1,3 +1,4 @@
 @mixin card-accent-variant($color) {
+  // stylelint-disable-next-line declaration-no-important
   border-top: 2px solid $color !important;
 }
