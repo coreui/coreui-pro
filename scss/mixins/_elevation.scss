@@ -2,7 +2,7 @@
   @if $enable-elevations {
     .c-app:not(.c-dark-theme) & {
       // stylelint-disable-next-line declaration-no-important
-      border: 0 !important;
+      border: 0; // TODO: check if "!important" is necessary
       box-shadow: unquote(map-get($elevations, $level));
 
       @if $direction == "bottom" {
