@@ -4,11 +4,11 @@
   @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
 }
 
-@each $color, $value in $theme-colors-dark-theme {
-  .c-dark-theme {
-    @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
-  }
-}
+// @each $color, $value in $theme-colors-dark-theme {
+//   .c-dark-theme {
+//     @include bg-variant(".#{$bs-prefix}bg-#{$color}", $value);
+//   }
+// }
 
 @if $enable-gradients {
   @include theme-variant() {
