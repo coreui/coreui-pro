@@ -377,7 +377,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
     }
 
     &.#{$prefix}sidebar-right .#{$prefix}sidebar-nav {
-      > .#{$prefix}sidebar-nav-item:hover
+      > .#{$prefix}sidebar-nav-item:hover,
       > .#{$prefix}sidebar-nav-dropdown:hover {
         margin-left: - $sidebar-width;
       }
@@ -418,12 +418,15 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
         width: $sidebar-width;
       }
     }
+
+    // stylelint-disable-next-line no-duplicate-selectors
     .#{$prefix}sidebar-nav-dropdown {
       > .#{$prefix}sidebar-nav-dropdown-items {
         display: none;
         max-height: 1000px;
       }
 
+      // stylelint-disable-next-line no-duplicate-selectors
       &:hover {
         > .#{$prefix}sidebar-nav-dropdown-items {
           position: absolute;
@@ -495,7 +498,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
             //   }
             // }
             &.#{$prefix}sidebar-minimized,
-            &.#{$prefix}sidebar-minimized-unfoldable {
+            &.#{$prefix}sidebar-unfoldable {
               ~ .#{$prefix}wrapper {
                 margin-left: $sidebar-minimized-width;
               }
@@ -516,7 +519,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
             //   }
             // }
             &.#{$prefix}sidebar-minimized,
-            &.#{$prefix}sidebar-minimized-unfoldable {
+            &.#{$prefix}sidebar-unfoldable {
               ~ .#{$prefix}wrapper {
                 margin-right: $sidebar-minimized-width;
               }
@@ -647,7 +650,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
                   //   }
                   // }
                   &.#{$prefix}sidebar-minimized,
-                  &.#{$prefix}sidebar-minimized-unfoldable {
+                  &.#{$prefix}sidebar-unfoldable {
                     ~ .#{$prefix}wrapper {
                       margin-right: $sidebar-minimized-width;
                     }
@@ -668,7 +671,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
                   //   }
                   // }
                   &.#{$prefix}sidebar-minimized,
-                  &.#{$prefix}sidebar-minimized-unfoldable {
+                  &.#{$prefix}sidebar-unfoldable {
                     ~ .#{$prefix}wrapper {
                       margin-left: $sidebar-minimized-width;
                     }

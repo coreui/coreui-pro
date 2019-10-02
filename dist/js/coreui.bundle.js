@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  v3.0.0-alpha.13 (https://coreui.io)
+  * CoreUI Pro  v3.0.0-alpha.14 (https://coreui.io)
   * Copyright 2019 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -40,20 +40,35 @@
     return obj;
   }
 
-  function _objectSpread(target) {
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i] != null ? arguments[i] : {};
-      var ownKeys = Object.keys(source);
 
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
+      if (i % 2) {
+        ownKeys(source, true).forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys(source).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
       }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
     }
 
     return target;
@@ -105,7 +120,7 @@
     }
 
     try {
-      return document.querySelector(selector) ? selector : null;
+      return document.querySelector(selector) ? selector : null; // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return null;
     }
@@ -383,7 +398,7 @@
     var element = document.createElement('div');
 
     try {
-      element.querySelectorAll(':scope *');
+      element.querySelectorAll(':scope *'); // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return false;
     }
@@ -643,6 +658,7 @@
 
       if (isNamespace) {
         Object.keys(events).forEach(function (elementEvent) {
+          // eslint-disable-next-line unicorn/prefer-string-slice
           removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.substr(1));
         });
       }
@@ -731,7 +747,7 @@
    */
 
   var NAME = 'asyncLoad';
-  var VERSION = '3.0.0-alpha.13';
+  var VERSION = '3.0.0-alpha.14';
   var DATA_KEY = 'coreui.asyncLoad';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -739,10 +755,10 @@
 
   var ClassName = {
     ACTIVE: PREFIX + "active",
-    NAV_DROPDOWN_TOGGLE: PREFIX + "nav-dropdown-toggle",
-    NAV_PILLS: PREFIX + "nav-pills",
-    NAV_TABS: PREFIX + "nav-tabs",
-    OPEN: PREFIX + "open",
+    NAV_DROPDOWN_TOGGLE: PREFIX + "sidebar-nav-dropdown-toggle",
+    // NAV_PILLS: `${PREFIX}nav-pills`,
+    // NAV_TABS: `${PREFIX}nav-tabs`,
+    SHOW: PREFIX + "show",
     VIEW_SCRIPT: 'view-script'
   };
   var Event$1 = {
@@ -750,9 +766,9 @@
     XHR_STATUS: 'xhr'
   };
   var Selector = {
-    NAV_DROPDOWN: "." + PREFIX + "nav ." + PREFIX + "nav-dropdown",
-    NAV_LINK: "." + PREFIX + "dropdown-nav-link, ." + PREFIX + "nav ." + PREFIX + "nav-link",
-    NAV_ITEM: "." + PREFIX + "nav ." + PREFIX + "nav-item",
+    NAV_DROPDOWN: "." + PREFIX + "sidebar-nav-dropdown",
+    NAV_LINK: "." + PREFIX + "xhr-link, ." + PREFIX + "sidebar-nav-link",
+    NAV_ITEM: "." + PREFIX + "sidebar-nav-item",
     VIEW_SCRIPT: '.view-script'
   };
   var Default = {
@@ -783,7 +799,7 @@
 
     // Private
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, Default, config);
+      config = _objectSpread2({}, Default, {}, config);
       return config;
     };
 
@@ -883,13 +899,13 @@
       }); // eslint-disable-next-line unicorn/prefer-spread
 
       Array.from(document.querySelectorAll(Selector.NAV_DROPDOWN)).forEach(function (element) {
-        element.classList.remove(ClassName.OPEN);
+        element.classList.remove(ClassName.SHOW);
       }); // eslint-disable-next-line unicorn/prefer-spread
 
       Array.from(document.querySelectorAll(Selector.NAV_DROPDOWN)).forEach(function (element) {
         // eslint-disable-next-line unicorn/prefer-spread
         if (Array.from(element.querySelectorAll("a[href*=\"" + url + "\"]")).length > 0) {
-          element.classList.add(ClassName.OPEN);
+          element.classList.add(ClassName.SHOW);
         }
       }); // eslint-disable-next-line unicorn/prefer-spread
 
@@ -1100,7 +1116,7 @@
    */
 
   var NAME$1 = 'alert';
-  var VERSION$1 = '3.0.0-alpha.13';
+  var VERSION$1 = '3.0.0-alpha.14';
   var DATA_KEY$1 = 'coreui.alert';
   var EVENT_KEY$1 = "." + DATA_KEY$1;
   var DATA_API_KEY$1 = '.data-api';
@@ -1117,13 +1133,12 @@
     ALERT: BS_PREFIX + "alert",
     FADE: BS_PREFIX + "fade",
     SHOW: BS_PREFIX + "show"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Alert =
   /*#__PURE__*/
@@ -1278,7 +1293,7 @@
    */
 
   var NAME$2 = 'button';
-  var VERSION$2 = '3.0.0-alpha.13';
+  var VERSION$2 = '3.0.0-alpha.14';
   var DATA_KEY$2 = 'coreui.button';
   var EVENT_KEY$2 = "." + DATA_KEY$2;
   var DATA_API_KEY$2 = '.data-api';
@@ -1299,13 +1314,12 @@
     CLICK_DATA_API: "click" + EVENT_KEY$2 + DATA_API_KEY$2,
     FOCUS_DATA_API: "focus" + EVENT_KEY$2 + DATA_API_KEY$2,
     BLUR_DATA_API: "blur" + EVENT_KEY$2 + DATA_API_KEY$2
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Button =
   /*#__PURE__*/
@@ -1496,7 +1510,7 @@
         return {};
       }
 
-      var attributes = _objectSpread({}, element.dataset);
+      var attributes = _objectSpread2({}, element.dataset);
 
       Object.keys(attributes).forEach(function (key) {
         attributes[key] = normalizeData(attributes[key]);
@@ -1539,7 +1553,7 @@
    */
 
   var NAME$3 = 'carousel';
-  var VERSION$3 = '3.0.0-alpha.13';
+  var VERSION$3 = '3.0.0-alpha.14';
   var DATA_KEY$3 = 'coreui.carousel';
   var EVENT_KEY$3 = "." + DATA_KEY$3;
   var DATA_API_KEY$3 = '.data-api';
@@ -1612,13 +1626,12 @@
   var PointerType = {
     TOUCH: 'touch',
     PEN: 'pen'
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Carousel =
   /*#__PURE__*/
@@ -1740,7 +1753,7 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, Default$1, config);
+      config = _objectSpread2({}, Default$1, {}, config);
       typeCheckConfig(NAME$3, config, DefaultType);
       return config;
     };
@@ -2043,10 +2056,10 @@
     Carousel._carouselInterface = function _carouselInterface(element, config) {
       var data = Data.getData(element, DATA_KEY$3);
 
-      var _config = _objectSpread({}, Default$1, Manipulator.getDataAttributes(element));
+      var _config = _objectSpread2({}, Default$1, {}, Manipulator.getDataAttributes(element));
 
       if (typeof config === 'object') {
-        _config = _objectSpread({}, _config, config);
+        _config = _objectSpread2({}, _config, {}, config);
       }
 
       var action = typeof config === 'string' ? config : _config.slide;
@@ -2088,7 +2101,7 @@
         return;
       }
 
-      var config = _objectSpread({}, Manipulator.getDataAttributes(target), Manipulator.getDataAttributes(this));
+      var config = _objectSpread2({}, Manipulator.getDataAttributes(target), {}, Manipulator.getDataAttributes(this));
 
       var slideIndex = this.getAttribute('data-slide-to');
 
@@ -2163,7 +2176,7 @@
    */
 
   var NAME$4 = 'class-toggler';
-  var VERSION$4 = '3.0.0-alpha.13';
+  var VERSION$4 = '3.0.0-alpha.14';
   var DATA_KEY$4 = 'coreui.class-toggler';
   var EVENT_KEY$4 = "." + DATA_KEY$4;
   var DATA_API_KEY$4 = '.data-api';
@@ -2183,13 +2196,12 @@
   };
   var Selector$4 = {
     CLASS_TOGGLER: "." + PREFIX$1 + "class-toggler"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var ClassToggler =
   /*#__PURE__*/
@@ -2308,7 +2320,8 @@
     };
 
     _proto._getToggleDetails = function _getToggleDetails(classNames, responsive, breakpoints, postfix) {
-      var ToggleDetails = function ToggleDetails(className, responsive, breakpoints, postfix) {
+      var ToggleDetails = // eslint-disable-next-line default-param-last
+      function ToggleDetails(className, responsive, breakpoints, postfix) {
         if (responsive === void 0) {
           responsive = Default$2.responsive;
         }
@@ -2444,7 +2457,7 @@
    */
 
   var NAME$5 = 'collapse';
-  var VERSION$5 = '3.0.0-alpha.13';
+  var VERSION$5 = '3.0.0-alpha.14';
   var DATA_KEY$5 = 'coreui.collapse';
   var EVENT_KEY$5 = "." + DATA_KEY$5;
   var DATA_API_KEY$5 = '.data-api';
@@ -2477,13 +2490,12 @@
   var Selector$5 = {
     ACTIVES: "." + BS_PREFIX$3 + "show, ." + BS_PREFIX$3 + "collapsing",
     DATA_TOGGLE: "[data-toggle=\"" + BS_PREFIX$3 + "collapse\"]"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Collapse =
   /*#__PURE__*/
@@ -2703,7 +2715,7 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, Default$3, config);
+      config = _objectSpread2({}, Default$3, {}, config);
       config.toggle = Boolean(config.toggle); // Coerce string values
 
       typeCheckConfig(NAME$5, config, DefaultType$1);
@@ -2764,7 +2776,7 @@
     Collapse._collapseInterface = function _collapseInterface(element, config) {
       var data = Data.getData(element, DATA_KEY$5);
 
-      var _config = _objectSpread({}, Default$3, Manipulator.getDataAttributes(element), typeof config === 'object' && config ? config : {});
+      var _config = _objectSpread2({}, Default$3, {}, Manipulator.getDataAttributes(element), {}, typeof config === 'object' && config ? config : {});
 
       if (!data && _config.toggle && /show|hide/.test(config)) {
         _config.toggle = false;
@@ -5469,7 +5481,7 @@
    */
 
   var NAME$6 = 'dropdown';
-  var VERSION$6 = '3.0.0-alpha.13';
+  var VERSION$6 = '3.0.0-alpha.14';
   var DATA_KEY$6 = 'coreui.dropdown';
   var EVENT_KEY$6 = "." + DATA_KEY$6;
   var DATA_API_KEY$6 = '.data-api';
@@ -5538,13 +5550,12 @@
     boundary: '(string|element)',
     reference: '(string|element)',
     display: 'string'
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Dropdown =
   /*#__PURE__*/
@@ -5724,7 +5735,7 @@
     };
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, this.constructor.Default, Manipulator.getDataAttributes(this._element), config);
+      config = _objectSpread2({}, this.constructor.Default, {}, Manipulator.getDataAttributes(this._element), {}, config);
       typeCheckConfig(NAME$6, config, this.constructor.DefaultType);
       return config;
     };
@@ -5777,7 +5788,7 @@
 
       if (typeof this._config.offset === 'function') {
         offset.fn = function (data) {
-          data.offsets = _objectSpread({}, data.offsets, _this2._config.offset(data.offsets, _this2._element) || {});
+          data.offsets = _objectSpread2({}, data.offsets, {}, _this2._config.offset(data.offsets, _this2._element) || {});
           return data;
         };
       } else {
@@ -5798,9 +5809,8 @@
           preventOverflow: {
             boundariesElement: this._config.boundary
           }
-        } // Disable Popper.js if we have a static display
-
-      };
+        }
+      }; // Disable Popper.js if we have a static display
 
       if (this._config.display === 'static') {
         popperConfig.modifiers.applyStyle = {
@@ -6027,7 +6037,7 @@
    */
 
   var NAME$7 = 'modal';
-  var VERSION$7 = '3.0.0-alpha.13';
+  var VERSION$7 = '3.0.0-alpha.14';
   var DATA_KEY$7 = 'coreui.modal';
   var EVENT_KEY$7 = "." + DATA_KEY$7;
   var DATA_API_KEY$7 = '.data-api';
@@ -6074,13 +6084,12 @@
     DATA_DISMISS: "[data-dismiss=\"" + BS_PREFIX$5 + "modal\"]",
     FIXED_CONTENT: "." + BS_PREFIX$5 + "fixed-top, ." + BS_PREFIX$5 + "fixed-bottom, ." + BS_PREFIX$5 + "is-fixed, ." + BS_PREFIX$5 + "sticky-top",
     STICKY_CONTENT: "." + BS_PREFIX$5 + "sticky-top"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Modal =
   /*#__PURE__*/
@@ -6229,7 +6238,7 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, Default$5, config);
+      config = _objectSpread2({}, Default$5, {}, config);
       typeCheckConfig(NAME$7, config, DefaultType$3);
       return config;
     };
@@ -6530,7 +6539,7 @@
       return this.each(function () {
         var data = Data.getData(this, DATA_KEY$7);
 
-        var _config = _objectSpread({}, Default$5, Manipulator.getDataAttributes(this), typeof config === 'object' && config ? config : {});
+        var _config = _objectSpread2({}, Default$5, {}, Manipulator.getDataAttributes(this), {}, typeof config === 'object' && config ? config : {});
 
         if (!data) {
           data = new Modal(this, _config);
@@ -6583,7 +6592,7 @@
       target = SelectorEngine.findOne(selector);
     }
 
-    var config = Data.getData(target, DATA_KEY$7) ? 'toggle' : _objectSpread({}, Manipulator.getDataAttributes(target), Manipulator.getDataAttributes(this));
+    var config = Data.getData(target, DATA_KEY$7) ? 'toggle' : _objectSpread2({}, Manipulator.getDataAttributes(target), {}, Manipulator.getDataAttributes(this));
 
     if (this.tagName === 'A' || this.tagName === 'AREA') {
       event.preventDefault();
@@ -6754,7 +6763,7 @@
    */
 
   var NAME$8 = 'tooltip';
-  var VERSION$8 = '3.0.0-alpha.13';
+  var VERSION$8 = '3.0.0-alpha.14';
   var DATA_KEY$8 = 'coreui.tooltip';
   var EVENT_KEY$8 = "." + DATA_KEY$8;
   var BS_PREFIX$6 = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
@@ -6831,13 +6840,12 @@
     FOCUS: 'focus',
     CLICK: 'click',
     MANUAL: 'manual'
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Tooltip =
   /*#__PURE__*/
@@ -7179,7 +7187,7 @@
 
       if (typeof this.config.offset === 'function') {
         offset.fn = function (data) {
-          data.offsets = _objectSpread({}, data.offsets, _this3.config.offset(data.offsets, _this3.element) || {});
+          data.offsets = _objectSpread2({}, data.offsets, {}, _this3.config.offset(data.offsets, _this3.element) || {});
           return data;
         };
       } else {
@@ -7232,7 +7240,7 @@
       });
 
       if (this.config.selector) {
-        this.config = _objectSpread({}, this.config, {
+        this.config = _objectSpread2({}, this.config, {
           trigger: 'manual',
           selector: ''
         });
@@ -7245,7 +7253,7 @@
       var titleType = typeof this.element.getAttribute('data-original-title');
 
       if (this.element.getAttribute('title') || titleType !== 'string') {
-        this.element.setAttribute('data-original-title', this.element.getAttribute('title') || '');
+        this.element.dataset.originalTitle = this.element.getAttribute('title') || '';
         this.element.setAttribute('title', '');
       }
     };
@@ -7337,7 +7345,7 @@
         config.container = config.container[0];
       }
 
-      config = _objectSpread({}, this.constructor.Default, dataAttributes, typeof config === 'object' && config ? config : {});
+      config = _objectSpread2({}, this.constructor.Default, {}, dataAttributes, {}, typeof config === 'object' && config ? config : {});
 
       if (typeof config.delay === 'number') {
         config.delay = {
@@ -7508,21 +7516,21 @@
    */
 
   var NAME$9 = 'popover';
-  var VERSION$9 = '3.0.0-alpha.13';
+  var VERSION$9 = '3.0.0-alpha.14';
   var DATA_KEY$9 = 'coreui.popover';
   var EVENT_KEY$9 = "." + DATA_KEY$9;
   var BS_PREFIX$7 = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
   var CLASS_PREFIX$1 = BS_PREFIX$7 + "bs-popover";
   var BSCLS_PREFIX_REGEX$1 = new RegExp("(^|\\s)" + CLASS_PREFIX$1 + "\\S+", 'g');
 
-  var Default$7 = _objectSpread({}, Tooltip.Default, {
+  var Default$7 = _objectSpread2({}, Tooltip.Default, {
     placement: 'right',
     trigger: 'click',
     content: '',
     template: "<div class=\"" + BS_PREFIX$7 + "popover\" role=\"tooltip\">\n               <div class=\"" + BS_PREFIX$7 + "popover-arrow\"></div>\n               <h3 class=\"" + BS_PREFIX$7 + "popover-header\"></h3>\n               <div class=\"" + BS_PREFIX$7 + "popover-body\"></div>\n             </div>"
   });
 
-  var DefaultType$5 = _objectSpread({}, Tooltip.DefaultType, {
+  var DefaultType$5 = _objectSpread2({}, Tooltip.DefaultType, {
     content: '(string|element|function)'
   });
 
@@ -7545,13 +7553,12 @@
     FOCUSOUT: "focusout" + EVENT_KEY$9,
     MOUSEENTER: "mouseenter" + EVENT_KEY$9,
     MOUSELEAVE: "mouseleave" + EVENT_KEY$9
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Popover =
   /*#__PURE__*/
@@ -7702,7 +7709,7 @@
    */
 
   var NAME$a = 'scrollspy';
-  var VERSION$a = '3.0.0-alpha.13';
+  var VERSION$a = '3.0.0-alpha.14';
   var DATA_KEY$a = 'coreui.scrollspy';
   var EVENT_KEY$a = "." + DATA_KEY$a;
   var DATA_API_KEY$8 = '.data-api';
@@ -7738,13 +7745,12 @@
   var OffsetMethod = {
     OFFSET: 'offset',
     POSITION: 'position'
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var ScrollSpy =
   /*#__PURE__*/
@@ -7827,7 +7833,7 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, Default$8, typeof config === 'object' && config ? config : {});
+      config = _objectSpread2({}, Default$8, {}, typeof config === 'object' && config ? config : {});
 
       if (typeof config.target !== 'string') {
         var id = config.target.id;
@@ -9326,7 +9332,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v3.0.0-alpha.13): get-css-custom-properties.js
+   * CoreUI Utilities (v3.0.0-alpha.14): get-css-custom-properties.js
    * Licensed under MIT (https://coreui.io/license)
    * @returns {string} css custom property name
    * --------------------------------------------------------------------------
@@ -9350,7 +9356,8 @@
       if (cssText) {
         break;
       }
-    }
+    } // eslint-disable-next-line unicorn/prefer-string-slice
+
 
     cssText = cssText.substring(cssText.lastIndexOf('{') + 1, cssText.lastIndexOf('}'));
     cssText.split(';').forEach(function (property) {
@@ -9368,7 +9375,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v3.0.0-alpha.13): get-style.js
+   * CoreUI Utilities (v3.0.0-alpha.14): get-style.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -9406,19 +9413,25 @@
    */
 
   var NAME$b = 'sidebar';
-  var VERSION$b = '3.0.0-alpha.13';
+  var VERSION$b = '3.0.0-alpha.14';
   var DATA_KEY$b = 'coreui.sidebar';
   var EVENT_KEY$b = "." + DATA_KEY$b;
   var DATA_API_KEY$9 = '.data-api';
-  var PREFIX$3 = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'; // const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
+  var PREFIX$3 = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'; // const DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn']
+  // const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
+  var DefaultType$7 = {
+    dropdownAccordion: 'boolean'
+  };
   var Default$9 = {
-    transition: 400
+    transition: 400 // dropdownAccordion: false
+
   };
   var ClassName$b = {
     ACTIVE: PREFIX$3 + "active",
-    NAV_DROPDOWN_TOGGLE: PREFIX$3 + "nav-dropdown-toggle",
-    OPEN: PREFIX$3 + "open",
+    NAV_DROPDOWN: PREFIX$3 + "sidebar-nav-dropdown",
+    NAV_DROPDOWN_TOGGLE: PREFIX$3 + "sidebar-nav-dropdown-toggle",
+    SHOW: PREFIX$3 + "show",
     SIDEBAR_MINIMIZED: PREFIX$3 + "sidebar-minimized",
     SIDEBAR_OVERLAID: PREFIX$3 + "sidebar-overlaid",
     SIDEBAR_SHOW: PREFIX$3 + "sidebar-show"
@@ -9434,19 +9447,18 @@
     UPDATE: 'update'
   };
   var Selector$b = {
-    NAV_DROPDOWN_TOGGLE: "." + PREFIX$3 + "nav-dropdown-toggle",
-    NAV_DROPDOWN: "." + PREFIX$3 + "nav-dropdown",
-    NAV_LINK: "." + PREFIX$3 + "nav-link",
-    // NAV_LINK_QUERIED: `.${PREFIX}nav-link-queried`,
+    NAV_DROPDOWN_TOGGLE: "." + PREFIX$3 + "sidebar-nav-dropdown-toggle",
+    NAV_DROPDOWN: "." + PREFIX$3 + "sidebar-nav-dropdown",
+    NAV_LINK: "." + PREFIX$3 + "sidebar-nav-link",
+    // NAV_LINK_QUERIED: `.${PREFIX}sidebar-nav-link-queried`,
     NAVIGATION_CONTAINER: "." + PREFIX$3 + "sidebar-nav",
     SIDEBAR: "." + PREFIX$3 + "sidebar"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Sidebar =
   /*#__PURE__*/
@@ -9475,6 +9487,24 @@
     var _proto = Sidebar.prototype;
 
     // Private
+    _proto._getAllSiblings = function _getAllSiblings(element, filter) {
+      var siblings = [];
+      element = element.parentNode.firstChild;
+
+      do {
+        if (element.nodeType === 3) {
+          continue; // text node
+        }
+
+        if (!filter || filter(element)) {
+          siblings.push(element);
+        } // eslint-disable-next-line no-cond-assign
+
+      } while (element = element.nextSibling);
+
+      return siblings;
+    };
+
     _proto._toggleDropdown = function _toggleDropdown(event) {
       var toggler = event.target;
 
@@ -9482,7 +9512,25 @@
         toggler = toggler.closest(Selector$b.NAV_DROPDOWN_TOGGLE);
       }
 
-      toggler.parentNode.classList.toggle(ClassName$b.OPEN);
+      var dataAttributes = toggler.closest(Selector$b.NAVIGATION_CONTAINER).dataset; // TODO: find better solution
+
+      if (dataAttributes.drodpownAccordion) {
+        // toggler.closest(Selector.NAVIGATION_CONTAINER).querySelectorAll(Selector.NAV_DROPDOWN).forEach(element => {
+        //   if (element !== toggler.parentNode) {
+        //     element.classList.remove(ClassName.SHOW)
+        //   }
+        // })
+        // toggler.parentElement
+        this._getAllSiblings(toggler.parentElement).forEach(function (element) {
+          if (element !== toggler.parentNode) {
+            if (element.classList.contains(ClassName$b.NAV_DROPDOWN)) {
+              element.classList.remove(ClassName$b.SHOW);
+            }
+          }
+        });
+      }
+
+      toggler.parentNode.classList.toggle(ClassName$b.SHOW); // TODO: Setting the toggler's position near to cursor after the click.
 
       this._perfectScrollbar(Event$c.UPDATE);
     };
@@ -9539,7 +9587,7 @@
         container = Selector$b.NAVIGATION_CONTAINER;
       }
 
-      var ps = new PerfectScrollbar(document.querySelector(container), {
+      var ps = new PerfectScrollbar(this._element.querySelector(container), {
         suppressScrollX: true
       }); // TODO: find real fix for ps rtl
 
@@ -9592,9 +9640,12 @@
 
       // eslint-disable-next-line unicorn/prefer-spread
       Array.from(this._element.querySelectorAll(Selector$b.NAV_LINK)).forEach(function (element) {
-        var currentUrl;
-        var urlHasParams = new RegExp('\\?.*=');
-        var urlHasQueryString = new RegExp('\\?.');
+        var currentUrl; // eslint-disable-next-line prefer-regex-literals
+
+        var urlHasParams = new RegExp('\\?.*='); // eslint-disable-next-line prefer-regex-literals
+
+        var urlHasQueryString = new RegExp('\\?.'); // eslint-disable-next-line prefer-regex-literals
+
         var urlHasHash = new RegExp('#.');
 
         if (urlHasParams.test(String(window.location)) || urlHasQueryString.test(String(window.location))) {
@@ -9603,7 +9654,8 @@
           currentUrl = String(window.location).split('#')[0];
         } else {
           currentUrl = String(window.location);
-        }
+        } // eslint-disable-next-line unicorn/prefer-string-slice
+
 
         if (currentUrl.substr(currentUrl.length - 1) === '#') {
           currentUrl = currentUrl.slice(0, -1);
@@ -9613,7 +9665,7 @@
           element.classList.add(ClassName$b.ACTIVE); // eslint-disable-next-line unicorn/prefer-spread
 
           Array.from(_this2._getParents(element, Selector$b.NAV_DROPDOWN)).forEach(function (element) {
-            element.classList.add(ClassName$b.OPEN);
+            element.classList.add(ClassName$b.SHOW);
           });
         }
       });
@@ -9720,6 +9772,11 @@
       get: function get() {
         return VERSION$b;
       }
+    }, {
+      key: "DefaultType",
+      get: function get() {
+        return DefaultType$7;
+      }
     }]);
 
     return Sidebar;
@@ -9762,7 +9819,7 @@
    */
 
   var NAME$c = 'tab';
-  var VERSION$c = '3.0.0-alpha.13';
+  var VERSION$c = '3.0.0-alpha.14';
   var DATA_KEY$c = 'coreui.tab';
   var EVENT_KEY$c = "." + DATA_KEY$c;
   var DATA_API_KEY$a = '.data-api';
@@ -9789,13 +9846,12 @@
     DATA_TOGGLE: "[data-toggle=\"" + BS_PREFIX$9 + "tab\"], [data-toggle=\"" + BS_PREFIX$9 + "pill\"], [data-toggle=\"" + BS_PREFIX$9 + "list\"]",
     DROPDOWN_TOGGLE: "." + BS_PREFIX$9 + "dropdown-toggle",
     DROPDOWN_ACTIVE_CHILD: ":scope > ." + BS_PREFIX$9 + "dropdown-menu ." + BS_PREFIX$9 + "active"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Tab =
   /*#__PURE__*/
@@ -10000,7 +10056,7 @@
    */
 
   var NAME$d = 'toast';
-  var VERSION$d = '3.0.0-alpha.13';
+  var VERSION$d = '3.0.0-alpha.14';
   var DATA_KEY$d = 'coreui.toast';
   var EVENT_KEY$d = "." + DATA_KEY$d;
   var BS_PREFIX$a = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : '';
@@ -10017,7 +10073,7 @@
     SHOW: BS_PREFIX$a + "show",
     SHOWING: BS_PREFIX$a + "showing"
   };
-  var DefaultType$7 = {
+  var DefaultType$8 = {
     animation: 'boolean',
     autohide: 'boolean',
     delay: 'number'
@@ -10029,13 +10085,12 @@
   };
   var Selector$d = {
     DATA_DISMISS: "[data-dismiss=\"" + BS_PREFIX$a + "toast\"]"
-    /**
-     * ------------------------------------------------------------------------
-     * Class Definition
-     * ------------------------------------------------------------------------
-     */
-
   };
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
 
   var Toast =
   /*#__PURE__*/
@@ -10122,7 +10177,7 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread({}, Default$a, Manipulator.getDataAttributes(this._element), typeof config === 'object' && config ? config : {});
+      config = _objectSpread2({}, Default$a, {}, Manipulator.getDataAttributes(this._element), {}, typeof config === 'object' && config ? config : {});
       typeCheckConfig(NAME$d, config, this.constructor.DefaultType);
       return config;
     };
@@ -10188,7 +10243,7 @@
     }, {
       key: "DefaultType",
       get: function get() {
-        return DefaultType$7;
+        return DefaultType$8;
       }
     }, {
       key: "Default",
@@ -10220,7 +10275,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v3.0.0-alpha.13): hex-to-rgb.js
+   * CoreUI Utilities (v3.0.0-alpha.14): hex-to-rgb.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -10256,7 +10311,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v3.0.0-alpha.13): hex-to-rgba.js
+   * CoreUI Utilities (v3.0.0-alpha.14): hex-to-rgba.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -10296,7 +10351,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v3.0.0-alpha.13): rgb-to-hex.js
+   * CoreUI (v3.0.0-alpha.14): rgb-to-hex.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -10325,7 +10380,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v3.0.0-alpha.13): index.umd.js
+   * CoreUI (v3.0.0-alpha.14): index.umd.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -10343,9 +10398,8 @@
     Sidebar: Sidebar,
     Tab: Tab,
     Toast: Toast,
-    Tooltip: Tooltip // Global functions
-
-  };
+    Tooltip: Tooltip
+  }; // Global functions
   window.getStyle = getStyle;
   window.hexToRgb = hexToRgb;
   window.hexToRgba = hexToRgba;

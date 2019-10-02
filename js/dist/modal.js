@@ -1,4 +1,6 @@
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -8,7 +10,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.13): modal.js
+ * CoreUI (v3.0.0-alpha.14): modal.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's modal.js
@@ -28,7 +30,7 @@ import SelectorEngine from './dom/selector-engine';
  */
 
 var NAME = 'modal';
-var VERSION = '3.0.0-alpha.13';
+var VERSION = '3.0.0-alpha.14';
 var DATA_KEY = 'coreui.modal';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
@@ -75,13 +77,12 @@ var Selector = {
   DATA_DISMISS: "[data-dismiss=\"" + BS_PREFIX + "modal\"]",
   FIXED_CONTENT: "." + BS_PREFIX + "fixed-top, ." + BS_PREFIX + "fixed-bottom, ." + BS_PREFIX + "is-fixed, ." + BS_PREFIX + "sticky-top",
   STICKY_CONTENT: "." + BS_PREFIX + "sticky-top"
-  /**
-   * ------------------------------------------------------------------------
-   * Class Definition
-   * ------------------------------------------------------------------------
-   */
-
 };
+/**
+ * ------------------------------------------------------------------------
+ * Class Definition
+ * ------------------------------------------------------------------------
+ */
 
 var Modal =
 /*#__PURE__*/
@@ -230,7 +231,7 @@ function () {
   ;
 
   _proto._getConfig = function _getConfig(config) {
-    config = _objectSpread({}, Default, config);
+    config = _objectSpread({}, Default, {}, config);
     typeCheckConfig(NAME, config, DefaultType);
     return config;
   };
@@ -531,7 +532,7 @@ function () {
     return this.each(function () {
       var data = Data.getData(this, DATA_KEY);
 
-      var _config = _objectSpread({}, Default, Manipulator.getDataAttributes(this), typeof config === 'object' && config ? config : {});
+      var _config = _objectSpread({}, Default, {}, Manipulator.getDataAttributes(this), {}, typeof config === 'object' && config ? config : {});
 
       if (!data) {
         data = new Modal(this, _config);
@@ -584,7 +585,7 @@ EventHandler.on(document, Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (
     target = SelectorEngine.findOne(selector);
   }
 
-  var config = Data.getData(target, DATA_KEY) ? 'toggle' : _objectSpread({}, Manipulator.getDataAttributes(target), Manipulator.getDataAttributes(this));
+  var config = Data.getData(target, DATA_KEY) ? 'toggle' : _objectSpread({}, Manipulator.getDataAttributes(target), {}, Manipulator.getDataAttributes(this));
 
   if (this.tagName === 'A' || this.tagName === 'AREA') {
     event.preventDefault();

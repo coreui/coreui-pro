@@ -52,7 +52,7 @@
 }
 
 .c-app:not(.c-dark-theme) .dropdown-menu {
-  border: 0 !important;
+  border: 0;
   box-shadow: 0 4px 5px 0 rgba(60, 75, 100, .14), 0 1px 10px 0 rgba(60, 75, 100, .12), 0 2px 4px -1px rgba(60, 75, 100, .20);
 }
 

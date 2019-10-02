@@ -51,7 +51,7 @@
   transition: margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s;
 }
 
-.c-sidebar.c-sidebar-minimized-unfoldable {
+.c-sidebar.c-sidebar-unfoldable {
   transition: margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0s;
 }
 

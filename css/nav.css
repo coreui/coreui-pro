@@ -184,6 +184,12 @@
   background-color: #321fdb;
 }
 
+.c-dark-theme .nav-pills .nav-link.active, .c-dark-theme
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #321fdb;
+}
+
 .nav-underline {
   border-bottom: 2px solid;
   border-color: #c4c9d0;
@@ -255,50 +261,50 @@
   border-color: #636f83;
 }
 
-.dark-theme .nav-underline.nav-underline-primary .nav-link.active,
-.dark-theme .nav-underline.nav-underline-primary .show > .nav-link {
+.c-dark-theme.nav-underline-primary .nav-link.active,
+.c-dark-theme.nav-underline-primary .show > .nav-link {
   color: #4638c2;
   border-color: #4638c2;
 }
 
-.dark-theme .nav-underline.nav-underline-secondary .nav-link.active,
-.dark-theme .nav-underline.nav-underline-secondary .show > .nav-link {
+.c-dark-theme.nav-underline-secondary .nav-link.active,
+.c-dark-theme.nav-underline-secondary .show > .nav-link {
   color: #4c4f54;
   border-color: #4c4f54;
 }
 
-.dark-theme .nav-underline.nav-underline-success .nav-link.active,
-.dark-theme .nav-underline.nav-underline-success .show > .nav-link {
+.c-dark-theme.nav-underline-success .nav-link.active,
+.c-dark-theme.nav-underline-success .show > .nav-link {
   color: #45a164;
   border-color: #45a164;
 }
 
-.dark-theme .nav-underline.nav-underline-info .nav-link.active,
-.dark-theme .nav-underline.nav-underline-info .show > .nav-link {
+.c-dark-theme.nav-underline-info .nav-link.active,
+.c-dark-theme.nav-underline-info .show > .nav-link {
   color: #4799eb;
   border-color: #4799eb;
 }
 
-.dark-theme .nav-underline.nav-underline-warning .nav-link.active,
-.dark-theme .nav-underline.nav-underline-warning .show > .nav-link {
+.c-dark-theme.nav-underline-warning .nav-link.active,
+.c-dark-theme.nav-underline-warning .show > .nav-link {
   color: #e1a82d;
   border-color: #e1a82d;
 }
 
-.dark-theme .nav-underline.nav-underline-danger .nav-link.active,
-.dark-theme .nav-underline.nav-underline-danger .show > .nav-link {
+.c-dark-theme.nav-underline-danger .nav-link.active,
+.c-dark-theme.nav-underline-danger .show > .nav-link {
   color: #d16767;
   border-color: #d16767;
 }
 
-.dark-theme .nav-underline.nav-underline-light .nav-link.active,
-.dark-theme .nav-underline.nav-underline-light .show > .nav-link {
+.c-dark-theme.nav-underline-light .nav-link.active,
+.c-dark-theme.nav-underline-light .show > .nav-link {
   color: #20202a;
   border-color: #20202a;
 }
 
-.dark-theme .nav-underline.nav-underline-dark .nav-link.active,
-.dark-theme .nav-underline.nav-underline-dark .show > .nav-link {
+.c-dark-theme.nav-underline-dark .nav-link.active,
+.c-dark-theme.nav-underline-dark .show > .nav-link {
   color: #181924;
   border-color: #181924;
 }

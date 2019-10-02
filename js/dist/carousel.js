@@ -1,4 +1,6 @@
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; var ownKeys = Object.keys(source); if (typeof Object.getOwnPropertySymbols === 'function') { ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) { return Object.getOwnPropertyDescriptor(source, sym).enumerable; })); } ownKeys.forEach(function (key) { _defineProperty(target, key, source[key]); }); } return target; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -8,7 +10,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.13): carousel.js
+ * CoreUI (v3.0.0-alpha.14): carousel.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's carousel.js
@@ -28,7 +30,7 @@ import SelectorEngine from './dom/selector-engine';
  */
 
 var NAME = 'carousel';
-var VERSION = '3.0.0-alpha.13';
+var VERSION = '3.0.0-alpha.14';
 var DATA_KEY = 'coreui.carousel';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
@@ -101,13 +103,12 @@ var Selector = {
 var PointerType = {
   TOUCH: 'touch',
   PEN: 'pen'
-  /**
-   * ------------------------------------------------------------------------
-   * Class Definition
-   * ------------------------------------------------------------------------
-   */
-
 };
+/**
+ * ------------------------------------------------------------------------
+ * Class Definition
+ * ------------------------------------------------------------------------
+ */
 
 var Carousel =
 /*#__PURE__*/
@@ -229,7 +230,7 @@ function () {
   ;
 
   _proto._getConfig = function _getConfig(config) {
-    config = _objectSpread({}, Default, config);
+    config = _objectSpread({}, Default, {}, config);
     typeCheckConfig(NAME, config, DefaultType);
     return config;
   };
@@ -532,10 +533,10 @@ function () {
   Carousel._carouselInterface = function _carouselInterface(element, config) {
     var data = Data.getData(element, DATA_KEY);
 
-    var _config = _objectSpread({}, Default, Manipulator.getDataAttributes(element));
+    var _config = _objectSpread({}, Default, {}, Manipulator.getDataAttributes(element));
 
     if (typeof config === 'object') {
-      _config = _objectSpread({}, _config, config);
+      _config = _objectSpread({}, _config, {}, config);
     }
 
     var action = typeof config === 'string' ? config : _config.slide;
@@ -577,7 +578,7 @@ function () {
       return;
     }
 
-    var config = _objectSpread({}, Manipulator.getDataAttributes(target), Manipulator.getDataAttributes(this));
+    var config = _objectSpread({}, Manipulator.getDataAttributes(target), {}, Manipulator.getDataAttributes(this));
 
     var slideIndex = this.getAttribute('data-slide-to');
 

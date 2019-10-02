@@ -30,7 +30,7 @@
 }
 
 .c-app:not(.c-dark-theme) .c-header.c-header-fixed {
-  border: 0 !important;
+  border: 0;
   box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
   clip-path: inset(0 0 -1000px 0);
 }

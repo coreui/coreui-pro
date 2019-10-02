@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.13): sidebar.js
+ * CoreUI (v3.0.0-alpha.14): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -21,7 +21,7 @@ import getStyle from './utilities/get-style'
  */
 
 const NAME = 'sidebar'
-const VERSION = '3.0.0-alpha.13'
+const VERSION = '3.0.0-alpha.14'
 const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
@@ -246,8 +246,11 @@ class Sidebar {
     Array.from(this._element.querySelectorAll(Selector.NAV_LINK)).forEach(element => {
       let currentUrl
 
+      // eslint-disable-next-line prefer-regex-literals
       const urlHasParams = new RegExp('\\?.*=')
+      // eslint-disable-next-line prefer-regex-literals
       const urlHasQueryString = new RegExp('\\?.')
+      // eslint-disable-next-line prefer-regex-literals
       const urlHasHash = new RegExp('#.')
 
       if (urlHasParams.test(String(window.location)) || urlHasQueryString.test(String(window.location))) {
@@ -258,6 +261,7 @@ class Sidebar {
         currentUrl = String(window.location)
       }
 
+      // eslint-disable-next-line unicorn/prefer-string-slice
       if (currentUrl.substr(currentUrl.length - 1) === '#') {
         currentUrl = currentUrl.slice(0, -1)
       }

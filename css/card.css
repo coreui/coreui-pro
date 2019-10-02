@@ -18,7 +18,7 @@
 }
 
 .c-app:not(.c-dark-theme) .card {
-  border: 0 !important;
+  border: 0;
   box-shadow: 0 1px 1px 0 rgba(60, 75, 100, .14), 0 2px 1px -1px rgba(60, 75, 100, .12), 0 1px 3px 0 rgba(60, 75, 100, .20);
 }
 
@@ -114,74 +114,74 @@
   border-color: #48505f;
 }
 
-.dark-theme .card.bg-primary {
+.c-dark-theme .card.bg-primary {
   border-color: #342a91;
 }
 
-.dark-theme .card.bg-primary .card-header {
+.c-dark-theme .card.bg-primary .card-header {
   background-color: #4235b6;
   border-color: #342a91;
 }
 
-.dark-theme .card.bg-secondary {
+.c-dark-theme .card.bg-secondary {
   border-color: #2e3033;
 }
 
-.dark-theme .card.bg-secondary .card-header {
+.c-dark-theme .card.bg-secondary .card-header {
   background-color: #45474c;
   border-color: #2e3033;
 }
 
-.dark-theme .card.bg-success {
+.c-dark-theme .card.bg-success {
   border-color: #327448;
 }
 
-.dark-theme .card.bg-success .card-header {
+.c-dark-theme .card.bg-success .card-header {
   background-color: #40965d;
   border-color: #327448;
 }
 
-.dark-theme .card.bg-info {
+.c-dark-theme .card.bg-info {
   border-color: #1879da;
 }
 
-.dark-theme .card.bg-info .card-header {
+.c-dark-theme .card.bg-info .card-header {
   background-color: #3a91e9;
   border-color: #1879da;
 }
 
-.dark-theme .card.bg-warning {
+.c-dark-theme .card.bg-warning {
   border-color: #b4841a;
 }
 
-.dark-theme .card.bg-warning .card-header {
+.c-dark-theme .card.bg-warning .card-header {
   background-color: #dfa320;
   border-color: #b4841a;
 }
 
-.dark-theme .card.bg-danger {
+.c-dark-theme .card.bg-danger {
   border-color: #bf3939;
 }
 
-.dark-theme .card.bg-danger .card-header {
+.c-dark-theme .card.bg-danger .card-header {
   background-color: #ce5b5b;
   border-color: #bf3939;
 }
 
-.dark-theme .card.bg-light {
+.c-dark-theme .card.bg-light {
   border-color: #040406;
 }
 
-.dark-theme .card.bg-light .card-header {
+.c-dark-theme .card.bg-light .card-header {
   background-color: #191a22;
   border-color: #040406;
 }
 
-.dark-theme .card.bg-dark {
+.c-dark-theme .card.bg-dark {
   border-color: black;
 }
 
-.dark-theme .card.bg-dark .card-header {
+.c-dark-theme .card.bg-dark .card-header {
   background-color: #12121b;
   border-color: black;
 }
@@ -463,83 +463,67 @@
 }
 
 .card-accent-primary {
-  border-top-color: #321fdb;
-  border-top-width: 2px;
+  border-top: 2px solid #321fdb !important;
 }
 
 .card-accent-secondary {
-  border-top-color: #ced2d8;
-  border-top-width: 2px;
+  border-top: 2px solid #ced2d8 !important;
 }
 
 .card-accent-success {
-  border-top-color: #2eb85c;
-  border-top-width: 2px;
+  border-top: 2px solid #2eb85c !important;
 }
 
 .card-accent-info {
-  border-top-color: #39f;
-  border-top-width: 2px;
+  border-top: 2px solid #39f !important;
 }
 
 .card-accent-warning {
-  border-top-color: #f9b115;
-  border-top-width: 2px;
+  border-top: 2px solid #f9b115 !important;
 }
 
 .card-accent-danger {
-  border-top-color: #e55353;
-  border-top-width: 2px;
+  border-top: 2px solid #e55353 !important;
 }
 
 .card-accent-light {
-  border-top-color: #ebedef;
-  border-top-width: 2px;
+  border-top: 2px solid #ebedef !important;
 }
 
 .card-accent-dark {
-  border-top-color: #636f83;
-  border-top-width: 2px;
+  border-top: 2px solid #636f83 !important;
 }
 
-.dark-theme &.card-accent-primary {
-  border-top-color: #4638c2;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-primary {
+  border-top: 2px solid #4638c2 !important;
 }
 
-.dark-theme &.card-accent-secondary {
-  border-top-color: #4c4f54;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-secondary {
+  border-top: 2px solid #4c4f54 !important;
 }
 
-.dark-theme &.card-accent-success {
-  border-top-color: #45a164;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-success {
+  border-top: 2px solid #45a164 !important;
 }
 
-.dark-theme &.card-accent-info {
-  border-top-color: #4799eb;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-info {
+  border-top: 2px solid #4799eb !important;
 }
 
-.dark-theme &.card-accent-warning {
-  border-top-color: #e1a82d;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-warning {
+  border-top: 2px solid #e1a82d !important;
 }
 
-.dark-theme &.card-accent-danger {
-  border-top-color: #d16767;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-danger {
+  border-top: 2px solid #d16767 !important;
 }
 
-.dark-theme &.card-accent-light {
-  border-top-color: #20202a;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-light {
+  border-top: 2px solid #20202a !important;
 }
 
-.dark-theme &.card-accent-dark {
-  border-top-color: #181924;
-  border-top-width: 2px;
+.c-dark-theme .card-accent-dark {
+  border-top: 2px solid #181924 !important;
 }
 
 .card-full {
