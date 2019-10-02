@@ -30,7 +30,7 @@ const ClassName = {
   NAV_DROPDOWN_TOGGLE: `${PREFIX}sidebar-nav-dropdown-toggle`,
   // NAV_PILLS: `${PREFIX}nav-pills`,
   // NAV_TABS: `${PREFIX}nav-tabs`,
-  OPEN: `${PREFIX}open`,
+  SHOW: `${PREFIX}show`,
   VIEW_SCRIPT: 'view-script'
 }
 
@@ -178,14 +178,14 @@ class AsyncLoad {
 
     // eslint-disable-next-line unicorn/prefer-spread
     Array.from(document.querySelectorAll(Selector.NAV_DROPDOWN)).forEach(element => {
-      element.classList.remove(ClassName.OPEN)
+      element.classList.remove(ClassName.SHOW)
     })
 
     // eslint-disable-next-line unicorn/prefer-spread
     Array.from(document.querySelectorAll(Selector.NAV_DROPDOWN)).forEach(element => {
       // eslint-disable-next-line unicorn/prefer-spread
       if (Array.from(element.querySelectorAll(`a[href*="${url}"]`)).length > 0) {
-        element.classList.add(ClassName.OPEN)
+        element.classList.add(ClassName.SHOW)
       }
     })
 

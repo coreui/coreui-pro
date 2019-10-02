@@ -10,7 +10,7 @@ import {
 } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
+// import Manipulator from './dom/manipulator'
 import PerfectScrollbar from 'perfect-scrollbar'
 import getStyle from './utilities/get-style'
 
@@ -26,7 +26,7 @@ const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 const PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.prefix ? window.CoreUIDefaults.prefix : 'c-' : 'c-'
-const DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn']
+// const DISALLOWED_ATTRIBUTES = ['sanitize', 'whiteList', 'sanitizeFn']
 // const BS_PREFIX = window.CoreUIDefaults ? window.CoreUIDefaults.bsPrefix ? window.CoreUIDefaults.bsPrefix : '' : ''
 
 const DefaultType = {
@@ -40,8 +40,9 @@ const Default = {
 
 const ClassName = {
   ACTIVE: `${PREFIX}active`,
+  NAV_DROPDOWN: `${PREFIX}sidebar-nav-dropdown`,
   NAV_DROPDOWN_TOGGLE: `${PREFIX}sidebar-nav-dropdown-toggle`,
-  OPEN: `${PREFIX}open`,
+  SHOW: `${PREFIX}show`,
   SIDEBAR_MINIMIZED: `${PREFIX}sidebar-minimized`,
   SIDEBAR_OVERLAID: `${PREFIX}sidebar-overlaid`,
   SIDEBAR_SHOW: `${PREFIX}sidebar-show`
@@ -99,8 +100,25 @@ class Sidebar {
 
   // Private
 
-  _toggleDropdown(event) {
+  _getAllSiblings(element, filter) {
+    const siblings = []
+    element = element.parentNode.firstChild
+    do {
+      if (element.nodeType === 3) {
+        continue // text node
+      }
 
+      if (!filter || filter(element)) {
+        siblings.push(element)
+      }
+
+    // eslint-disable-next-line no-cond-assign
+    } while (element = element.nextSibling)
+
+    return siblings
+  }
+
+  _toggleDropdown(event) {
     let toggler = event.target
     if (!toggler.classList.contains(ClassName.NAV_DROPDOWN_TOGGLE)) {
       toggler = toggler.closest(Selector.NAV_DROPDOWN_TOGGLE)
@@ -110,14 +128,22 @@ class Sidebar {
 
     // TODO: find better solution
     if (dataAttributes.drodpownAccordion) {
-      toggler.closest(Selector.NAVIGATION_CONTAINER).querySelectorAll(Selector.NAV_DROPDOWN).forEach(element => {
+      // toggler.closest(Selector.NAVIGATION_CONTAINER).querySelectorAll(Selector.NAV_DROPDOWN).forEach(element => {
+      //   if (element !== toggler.parentNode) {
+      //     element.classList.remove(ClassName.SHOW)
+      //   }
+      // })
+      // toggler.parentElement
+      this._getAllSiblings(toggler.parentElement).forEach(element => {
         if (element !== toggler.parentNode) {
-          element.classList.remove(ClassName.OPEN)
+          if (element.classList.contains(ClassName.NAV_DROPDOWN)) {
+            element.classList.remove(ClassName.SHOW)
+          }
         }
       })
     }
 
-    toggler.parentNode.classList.toggle(ClassName.OPEN)
+    toggler.parentNode.classList.toggle(ClassName.SHOW)
     // TODO: Setting the toggler's position near to cursor after the click.
 
     this._perfectScrollbar(Event.UPDATE)
@@ -165,7 +191,7 @@ class Sidebar {
   }
 
   _makeScrollbar(container = Selector.NAVIGATION_CONTAINER) {
-    const ps = new PerfectScrollbar(document.querySelector(container), {
+    const ps = new PerfectScrollbar(this._element.querySelector(container), {
       suppressScrollX: true
     })
     // TODO: find real fix for ps rtl
@@ -240,7 +266,7 @@ class Sidebar {
         element.classList.add(ClassName.ACTIVE)
         // eslint-disable-next-line unicorn/prefer-spread
         Array.from(this._getParents(element, Selector.NAV_DROPDOWN)).forEach(element => {
-          element.classList.add(ClassName.OPEN)
+          element.classList.add(ClassName.SHOW)
         })
       }
     })
