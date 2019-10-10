@@ -5,12 +5,12 @@ $primary-gradient: (
 
 $secondary-gradient: (
   "start": #c8d2dc,
-  "stop": #fff
+  "stop": $white
 ) !default;
 
 $light-gradient: (
   "start": #e3e8ed,
-  "stop": #fff
+  "stop": $white
 ) !default;
 
 $dark-gradient: (
