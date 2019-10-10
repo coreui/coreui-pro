@@ -25,7 +25,6 @@ $enable-deprecation-messages:                 true !default;
 $enable-sidebar-nav-rounded:                  false !default;
 $layout-transition-speed:                     .25s !default;
 $enable-elevations:                           true !default;
-// $default-themes:                              light, dark !default;
 $default-themes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $default-themes: map-merge(
@@ -43,7 +42,5 @@ $default-themes: map-merge(
   ),
   $default-themes
 );
-
-// $default-theme:                               light !default;
-$enable-elevation:                            false !default;
-$enable-prefers-color-scheme:                 true !default;
+// TODO: add this feature
+// $enable-prefers-color-scheme:                 true !default;
