@@ -13,11 +13,11 @@ $body-theme-map: () !default;
 $body-theme-map: map-merge(
   (
     light: (
-      "body-bg":  $gray-100,
+      "body-bg":    $gray-100,
       "body-color": $gray-base
     ),
     dark: (
-      "body-bg":  $body-dark-theme-bg,
+      "body-bg":    $body-dark-theme-bg,
       "body-color": $body-dark-theme-color
     )
   ),
