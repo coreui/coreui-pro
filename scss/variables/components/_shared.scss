@@ -9,7 +9,6 @@ $line-height-sm:              1.5 !default;
 
 $border-width:                1px !default;
 $border-color:                $gray-200 !default;
-$border-dark-theme-color:     $gray-dark-theme-900 !default;
 
 $border-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -17,9 +16,6 @@ $border-theme-map: map-merge(
   (
     light: (
       "border-color": $border-color
-    ),
-    dark: (
-      "border-color": $border-dark-theme-color
     )
   ),
   $border-theme-map
@@ -40,12 +36,6 @@ $component-bg:                $white !default;
 
 $component-active-color:      $white !default;
 $component-active-bg:         theme-color("primary") !default;
-
-$component-dark-theme-color:  $body-dark-theme-color !default;
-$component-dark-theme-bg:     $gray-dark-theme-800 !default;
-
-$component-dark-theme-active-color: $black !default;
-$component-dark-theme-active-bg:    $primary-50 !default;
 
 $caret-width:                 .3em !default;
 $caret-vertical-align:        $caret-width * .85 !default;

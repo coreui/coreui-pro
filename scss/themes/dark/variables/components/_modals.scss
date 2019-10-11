@@ -1,0 +1,22 @@
+// Modals
+
+// Dark theme
+$modal-dark-theme-content-color:          null !default;
+$modal-dark-theme-content-bg:             $gray-dark-theme-400 !default;
+$modal-dark-theme-content-border-color:   $gray-dark-theme-400 !default;
+$modal-dark-theme-header-border-color:    $gray-dark-theme-400 !default;
+$modal-dark-theme-footer-border-color:    $gray-dark-theme-400 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$modal-theme-map: map-merge(
+  $modal-theme-map,
+  (
+    dark: (
+      "modal-content-color":               $modal-dark-theme-content-color,
+      "modal-content-bg":                  $modal-dark-theme-content-bg,
+      "modal-content-border-color":        $modal-dark-theme-content-border-color,
+      "modal-header-border-color":         $modal-dark-theme-header-border-color,
+      "modal-footer-border-color":         $modal-dark-theme-footer-border-color
+    )
+  ),
+);

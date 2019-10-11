@@ -5,9 +5,6 @@
 $body-bg:                   #e4e5e6 !default; // was: $white
 $body-color:                $gray-900 !default;
 
-$body-dark-theme-bg:        $gray-dark-theme-base !default;
-$body-dark-theme-color:     #e1e1e1 !default;
-
 $body-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $body-theme-map: map-merge(
@@ -15,10 +12,6 @@ $body-theme-map: map-merge(
     light: (
       "body-bg":    $gray-100,
       "body-color": $gray-base
-    ),
-    dark: (
-      "body-bg":    $body-dark-theme-bg,
-      "body-color": $body-dark-theme-color
     )
   ),
   $body-theme-map

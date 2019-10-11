@@ -1,0 +1,24 @@
+//
+// Cards
+//
+
+// Dark theme
+$card-dark-border-color:   $border-dark-theme-color !default;
+$card-dark-cap-bg:         $gray-dark-theme-700 !default;
+$card-dark-cap-color:      null !default;
+$card-dark-color:          null !default;
+$card-dark-bg:             $gray-dark-theme-600 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$card-theme-map: map-merge(
+  $card-theme-map,
+  (
+    dark: (
+      "card-border-color":   $card-dark-border-color,
+      "card-cap-bg":         $card-dark-cap-bg,
+      "card-cap-color":      $card-dark-cap-color,
+      "card-color":          $card-dark-color,
+      "card-bg":             $card-dark-bg
+    )
+  ),
+);

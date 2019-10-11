@@ -29,13 +29,6 @@ $card-cap-color:           null !default;
 $card-color:               null !default;
 $card-bg:                  $white !default;
 
-// Dark theme
-$card-dark-border-color:   $border-dark-theme-color !default;
-$card-dark-cap-bg:         $gray-dark-theme-700 !default;
-$card-dark-cap-color:      null !default;
-$card-dark-color:          null !default;
-$card-dark-bg:             $gray-dark-theme-600 !default;
-
 $card-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $card-theme-map: map-merge(
@@ -46,13 +39,6 @@ $card-theme-map: map-merge(
       "card-cap-color":      $card-cap-color,
       "card-color":          $card-color,
       "card-bg":             $card-bg
-    ),
-    dark: (
-      "card-border-color":   $card-dark-border-color,
-      "card-cap-bg":         $card-dark-cap-bg,
-      "card-cap-color":      $card-dark-cap-color,
-      "card-color":          $card-dark-color,
-      "card-bg":             $card-dark-bg
     )
   ),
   $card-theme-map

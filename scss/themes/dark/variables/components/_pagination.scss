@@ -1,0 +1,42 @@
+
+// Pagination
+
+// Dark theme
+$pagination-dark-theme-color:                      $link-color !default;
+$pagination-dark-theme-bg:                         $gray-800 !default;
+$pagination-dark-theme-border-color:               $border-dark-theme-color !default;
+$pagination-dark-theme-focus-box-shadow:           $input-btn-focus-box-shadow !default;
+$pagination-dark-theme-focus-outline:              0 !default;
+$pagination-dark-theme-hover-color:                $link-hover-color !default;
+$pagination-dark-theme-hover-bg:                   $gray-900 !default;
+$pagination-dark-theme-hover-border-color:         $gray-900 !default;
+$pagination-dark-theme-active-color:               $component-dark-theme-active-color !default;
+$pagination-dark-theme-active-bg:                  $component-dark-theme-active-bg !default;
+$pagination-dark-theme-active-border-color:        $pagination-active-bg !default;
+$pagination-dark-theme-disabled-color:             $gray-600 !default;
+$pagination-dark-theme-disabled-bg:                $gray-900 !default;
+$pagination-dark-theme-disabled-border-color:      $gray-900 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$pagination-theme-map: map-merge(
+  $pagination-theme-map,
+  (
+    dark: (
+      "pagination-color":                      $pagination-dark-theme-color,
+      "pagination-bg":                         $pagination-dark-theme-bg,
+      "pagination-border-color":               $pagination-dark-theme-border-color,
+      "pagination-focus-box-shadow":           $pagination-dark-theme-focus-box-shadow,
+      "pagination-focus-outline":              $pagination-dark-theme-focus-outline,
+      "pagination-hover-color":                $pagination-dark-theme-hover-color,
+      "pagination-hover-bg":                   $pagination-dark-theme-hover-bg,
+      "pagination-hover-border-color":         $pagination-dark-theme-hover-border-color,
+      "pagination-active-color":               $pagination-dark-theme-active-color,
+      "pagination-active-bg":                  $pagination-dark-theme-active-bg,
+      "pagination-active-border-color":        $pagination-dark-theme-active-border-color,
+      "pagination-disabled-color":             $pagination-dark-theme-disabled-color,
+      "pagination-disabled-bg":                $pagination-dark-theme-disabled-bg,
+      "pagination-disabled-border-color":      $pagination-dark-theme-disabled-border-color
+    )
+  )
+);
+

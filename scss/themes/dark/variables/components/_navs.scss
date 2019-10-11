@@ -1,0 +1,42 @@
+// Navs
+
+// Dark Theme
+$nav-link-dark-theme-disabled-color:           $gray-900 !default;
+$nav-tabs-dark-theme-border-color:             $gray-dark-theme-600 !default;
+$nav-tabs-dark-theme-link-hover-border-color:  $gray-dark-theme-600 $gray-dark-theme-600 $gray-dark-theme-600 !default;
+$nav-tabs-dark-theme-link-active-color:        $body-dark-theme-color !default;
+$nav-tabs-dark-theme-link-active-bg:           $gray-dark-theme-600 !default;
+$nav-tabs-dark-theme-link-active-border-color: $gray-dark-theme-600 $gray-dark-theme-600 $gray-dark-theme-600 !default;
+
+$nav-tabs-boxed-dark-theme-link-active-bg:             $gray-dark-theme-600 !default;
+$nav-tabs-boxed-dark-theme-content-bg:                 $gray-dark-theme-600 !default;
+$nav-tabs-boxed-dark-theme-content-border-color:       $gray-dark-theme-600 !default;
+$nav-tabs-boxed-dark-theme-content-border-radius:      $border-radius !default;
+
+$nav-tabs-boxed-left-dark-theme-active-border-color:   $gray-dark-theme-600 !default;
+$nav-tabs-boxed-right-dark-theme-active-border-color:  $gray-dark-theme-600 $gray-dark-theme-600 $gray-dark-theme-600 $gray-dark-theme-600 !default;
+
+$nav-pills-dark-theme-link-active-color:               $component-active-color !default;
+$nav-pills-dark-theme-link-active-bg:                  $component-active-bg !default;
+$nav-divider-dark-theme-color:                         $gray-200 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$nav-theme-map: map-merge(
+  $nav-theme-map,
+  (
+    dark: (
+      "nav-link-disabled-color":                     $nav-link-dark-theme-disabled-color,
+      "nav-tabs-border-color":                       $nav-tabs-dark-theme-border-color,
+      "nav-tabs-link-hover-border-color":            $nav-tabs-dark-theme-link-hover-border-color,
+      "nav-tabs-link-active-color":                  $nav-tabs-dark-theme-link-active-color,
+      "nav-tabs-link-active-bg":                     $nav-tabs-dark-theme-link-active-bg,
+      "nav-tabs-link-active-border-color":           $nav-tabs-dark-theme-link-active-border-color,
+      "nav-divider-color":                           $nav-divider-color,
+      "nav-tabs-boxed-link-active-bg":               $nav-tabs-boxed-dark-theme-link-active-bg,
+      "nav-tabs-boxed-content-bg":                   $nav-tabs-boxed-dark-theme-content-bg,
+      "nav-tabs-boxed-content-border-color":         $nav-tabs-boxed-dark-theme-content-border-color,
+      "nav-tabs-boxed-left-active-border-color":     $nav-tabs-boxed-left-dark-theme-active-border-color,
+      "nav-tabs-boxed-right-active-border-color":    $nav-tabs-boxed-right-dark-theme-active-border-color
+    )
+  )
+);

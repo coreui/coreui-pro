@@ -1,0 +1,47 @@
+//
+// CoreUI 3.x Color system
+//
+
+$gray-dark-theme-base: desaturate(#08091a, 10%) !default;
+$gray-dark-theme-100:  desaturate(#313243, 10%) !default;
+$gray-dark-theme-200:  desaturate(#2e2f40, 10%) !default;
+$gray-dark-theme-300:  desaturate(#2c2d3e, 10%) !default;
+$gray-dark-theme-400:  desaturate(#272839, 10%) !default;
+$gray-dark-theme-500:  desaturate(#242536, 10%) !default;
+$gray-dark-theme-600:  desaturate(#1f2031, 10%) !default;
+$gray-dark-theme-700:  desaturate(#1c1d2e, 10%) !default;
+$gray-dark-theme-800:  desaturate(#1a1b2c, 10%) !default;
+$gray-dark-theme-900:  desaturate(#151627, 10%) !default;
+
+$grays-dark-theme: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$grays-dark-theme: map-merge(
+  (
+    "100": $gray-dark-theme-100,
+    "200": $gray-dark-theme-200,
+    "300": $gray-dark-theme-300,
+    "400": $gray-dark-theme-400,
+    "500": $gray-dark-theme-500,
+    "600": $gray-dark-theme-600,
+    "700": $gray-dark-theme-700,
+    "800": $gray-dark-theme-800,
+    "900": $gray-dark-theme-900
+  ),
+  $grays-dark-theme
+);
+
+$theme-colors-dark-theme: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors-dark-theme: map-merge(
+  (
+    "primary":    desaturate($primary, 20%),
+    "secondary":  desaturate($secondary, 20%),
+    "success":    desaturate($success, 20%),
+    "info":       desaturate($info, 20%),
+    "warning":    desaturate($warning, 20%),
+    "danger":     desaturate($danger, 20%),
+    "light":      $gray-dark-theme-700,
+    "dark":       $gray-dark-theme-900
+  ),
+  $theme-colors-dark-theme
+);

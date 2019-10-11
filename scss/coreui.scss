@@ -8,6 +8,7 @@
 
 @import "functions";
 @import "variables";
+@import "themes";
 @import "mixins";
 @import "root";
 @import "reboot";
@@ -74,3 +75,6 @@
 @import "ie-custom-properties";
 
 @import "print";
+
+
+@debug $sidebar-theme-map;

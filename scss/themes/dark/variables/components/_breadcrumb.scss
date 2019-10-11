@@ -1,0 +1,20 @@
+// Breadcrumbs
+
+// Dark theme
+$breadcrumb-dark-bg:                transparent !default;
+$breadcrumb-dark-border-color:      $component-dark-theme-bg !default;
+$breadcrumb-dark-divider-color:     $body-dark-theme-color !default;
+$breadcrumb-dark-active-color:      $gray-600 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$breadcrumb-theme-map: map-merge(
+  $breadcrumb-theme-map,
+  (
+    dark: (
+      "breadcrumb-bg":                $breadcrumb-dark-bg,
+      "breadcrumb-border-color":      $breadcrumb-dark-border-color,
+      "breadcrumb-divider-color":     $breadcrumb-dark-divider-color,
+      "breadcrumb-active-color":      $breadcrumb-dark-active-color
+    )
+  )
+);

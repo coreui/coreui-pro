@@ -33,11 +33,6 @@ $default-themes: map-merge(
       "default":      true,
       "theme-colors": $theme-colors,
       "grays":        $grays
-    ),
-    dark: (
-      "default":      false,
-      "theme-colors": $theme-colors-dark-theme,
-      "grays":        $grays-dark-theme
     )
   ),
   $default-themes

@@ -8,10 +8,6 @@
     --#{$color}: #{$value};
   }
 
-  @each $color, $value in $theme-colors-dark-theme {
-    --#{$color}-dark-theme: #{$value};
-  }
-
   @each $bp, $value in $grid-breakpoints {
     --breakpoint-#{$bp}: #{$value};
   }

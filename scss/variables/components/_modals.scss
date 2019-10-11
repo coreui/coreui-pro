@@ -37,14 +37,6 @@ $modal-content-border-color:        rgba($black, .2) !default;
 $modal-header-border-color:         $border-color !default;
 $modal-footer-border-color:         $modal-header-border-color !default;
 
-// Dark theme
-$modal-dark-theme-content-color:          null !default;
-$modal-dark-theme-content-bg:             $gray-dark-theme-400 !default;
-$modal-dark-theme-content-border-color:   $gray-dark-theme-400 !default;
-$modal-dark-theme-header-border-color:    $gray-dark-theme-400 !default;
-$modal-dark-theme-footer-border-color:    $gray-dark-theme-400 !default;
-
-
 $modal-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $modal-theme-map: map-merge(
@@ -55,13 +47,6 @@ $modal-theme-map: map-merge(
       "modal-content-border-color":        $modal-content-border-color,
       "modal-header-border-color":         $modal-header-border-color,
       "modal-footer-border-color":         $modal-footer-border-color,
-    ),
-    dark: (
-      "modal-content-color":               $modal-dark-theme-content-color,
-      "modal-content-bg":                  $modal-dark-theme-content-bg,
-      "modal-content-border-color":        $modal-dark-theme-content-border-color,
-      "modal-header-border-color":         $modal-dark-theme-header-border-color,
-      "modal-footer-border-color":         $modal-dark-theme-footer-border-color
     )
   ),
   $modal-theme-map

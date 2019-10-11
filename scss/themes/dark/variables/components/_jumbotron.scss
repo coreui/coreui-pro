@@ -1,0 +1,17 @@
+
+// Jumbotron
+
+// Dark theme
+$jumbotron-dark-theme-color: null !default;
+$jumbotron-dark-theme-bg:    $gray-900 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$jumbotron-theme-map: map-merge(
+  $jumbotron-theme-map,
+  (
+    dark: (
+      "jumbotron-color": $jumbotron-dark-theme-color,
+      "jumbotron-bg":    $jumbotron-dark-theme-bg
+    )
+  )
+);

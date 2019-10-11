@@ -14,11 +14,6 @@ $progress-bg:                       $gray-100 !default; // was: $gray-200 !defau
 $progress-bar-color:                $white !default;
 $progress-bar-bg:                   theme-color("primary") !default;
 
-// Dark theme
-$progress-dark-theme-bg:                  $gray-700 !default;
-$progress-dark-theme-bar-color:           $white !default;
-$progress-dark-theme-bar-bg:              theme-color("primary") !default;
-
 $progress-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $progress-theme-map: map-merge(
@@ -27,11 +22,6 @@ $progress-theme-map: map-merge(
       "progress-bg":                  $progress-bg,
       "progress-bar-color":           $progress-bar-color,
       "progress-bar-bg":              $progress-bar-bg
-    ),
-    dark: (
-      "progress-bg":                  $progress-dark-theme-bg,
-      "progress-bar-color":           $progress-dark-theme-bar-color,
-      "progress-bar-bg":              $progress-dark-theme-bar-bg
     )
   ),
   $progress-theme-map

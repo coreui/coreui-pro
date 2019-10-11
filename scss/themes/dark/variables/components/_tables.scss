@@ -1,0 +1,32 @@
+// Tables
+//
+// Customizes the `.table` component with basic values, each used across all table variations.
+
+// Dark Theme
+$table-dark-theme-color:                 $body-dark-theme-color !default;
+$table-dark-theme-bg:                    transparent !default;
+$table-dark-theme-accent-bg:             rgba($black, .05) !default;
+$table-dark-theme-hover-color:           $body-dark-theme-color !default;
+$table-dark-theme-hover-bg:              rgba($black, .075) !default;
+$table-dark-theme-active-bg:             rgba($white, .075) !default;
+$table-dark-theme-border-color:          $gray-900 !default;
+$table-dark-theme-head-bg:               $gray-800 !default;
+$table-dark-theme-head-color:            $body-dark-theme-color !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$table-theme-map: map-merge(
+  $table-theme-map,
+  (
+    "dark": (
+      "table-color":        $body-dark-theme-color,
+      "table-bg":           transparent,
+      "table-accent-bg":    rgba($white, .05),
+      "table-hover-color":  $body-dark-theme-color,
+      "table-hover-bg":     rgba($white, .075),
+      "table-active-bg":    rgba($white, .075),
+      "table-border-color": $border-dark-theme-color,
+      "table-head-bg":      $gray-dark-theme-800,
+      "table-head-color":   $body-dark-theme-color,
+    )
+  )
+);

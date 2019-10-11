@@ -1,0 +1,69 @@
+// Header
+
+// Dark theme
+
+$header-dark-theme-bg:                        $gray-dark-theme-400 !default;
+$header-dark-theme-color:                     rgba($white, .75) !default;
+$header-dark-theme-border: (
+  bottom: 0
+) !default;
+$header-dark-theme-hover-color:               rgba($white, .9) !default;
+$header-dark-theme-active-color:              $white !default;
+$header-dark-theme-disabled-color:            rgba($white, .25) !default;
+$header-dark-theme-toggler-icon-bg:           str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-dark-theme-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
+$header-dark-theme-toggler-hover-icon-bg:     str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-dark-theme-hover-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
+$header-dark-theme-toggler-border-color:      rgba($white, .1) !default;
+
+$header-dark-theme-brand-bg:                  transparent !default;
+$header-dark-theme-brand-border:              0 !default;
+$header-dark-theme-brand-color:               $header-dark-theme-active-color !default;
+$header-dark-theme-brand-hover-color:         $header-dark-theme-active-color !default;
+$header-dark-theme-brand-minimized-bg:        transparent !default;
+$header-dark-theme-brand-minimized-border:    0 !default;
+
+$subheader-dark-theme-border: (
+  top: 1px solid $border-dark-theme-color
+) !default;
+
+
+$header-dark-theme-variants-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$header-dark-theme-variants-map: map-merge(
+  (
+    dark: (
+      "header-bg":                      $header-dark-theme-bg,
+      "header-color":                   $header-dark-theme-color,
+      "header-border":                  $header-dark-theme-border,
+      "dark-theme-header-border":       0,
+      "header-hover-color":             $header-dark-theme-hover-color,
+      "header-active-color":            $header-dark-theme-active-color,
+      "header-disabled-color":          $header-dark-theme-disabled-color,
+      "header-toggler-icon-bg":         $header-dark-theme-toggler-icon-bg,
+      "header-toggler-hover-icon-bg":   $header-dark-theme-toggler-hover-icon-bg,
+      "header-toggler-border-color":    $header-dark-theme-toggler-border-color,
+      "header-brand-bg":                $header-dark-theme-brand-bg,
+      "header-brand-border":            $header-dark-theme-brand-border,
+      "header-brand-color":             $header-dark-theme-brand-color,
+      "header-brand-hover-color":       $header-dark-theme-brand-hover-color,
+      "header-brand-minimized-bg":      $header-dark-theme-brand-minimized-bg,
+      "header-brand-minimized-border":  $header-dark-theme-brand-minimized-border,
+      "subheader-border":               $subheader-dark-theme-border
+    )
+  ),
+  $header-dark-theme-variants-map
+);
+
+$header-dark-theme-default-variant: "dark" !default;
+$header-dark-theme-variants: (
+  default: $header-dark-theme-default-variant,
+  map: $header-dark-theme-variants-map
+) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$header-theme-map: map-merge(
+  $header-theme-map,
+  (
+    dark: $header-dark-theme-variants
+  )
+);
+

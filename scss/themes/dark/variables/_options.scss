@@ -1,0 +1,14 @@
+
+// Options
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$default-themes: map-merge(
+  (
+    dark: (
+      "default":      false,
+      "theme-colors": $theme-colors-dark-theme,
+      "grays":        $grays-dark-theme
+    )
+  ),
+  $default-themes
+);

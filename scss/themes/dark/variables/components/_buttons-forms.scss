@@ -1,0 +1,38 @@
+// Buttons + Forms
+//
+// Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+
+// Dark theme
+$input-dark-theme-bg:                          $gray-dark-theme-400 !default;
+$input-dark-theme-disabled-bg:                 rgba($white, .12) !default;
+$input-dark-theme-color:                       $gray-100 !default;
+$input-dark-theme-border-color:                $gray-dark-theme-400 !default;
+$input-dark-theme-focus-bg:                    lighten($gray-dark-theme-400, 12%) !default;
+$input-dark-theme-focus-border-color:          lighten($gray-dark-theme-400, 12%) !default;
+$input-dark-theme-focus-color:                 $gray-100 !default;
+$input-placeholder-dark-theme-color:           $gray-500 !default;
+$input-plaintext-dark-theme-color:             $body-dark-theme-color !default;
+$input-group-addon-dark-theme-color:           $gray-100 !default;
+$input-group-addon-dark-theme-bg:              $gray-800 !default;
+$input-group-addon-dark-theme-border-color:    $gray-900 !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-theme-map: map-merge(
+  $form-theme-map,
+  (
+    dark: (
+      "input-bg":                              $input-dark-theme-bg,
+      "input-disabled-bg":                     $input-dark-theme-disabled-bg,
+      "input-color":                           $input-dark-theme-color,
+      "input-border-color":                    $input-dark-theme-border-color,
+      "input-focus-bg":                        $input-dark-theme-focus-bg,
+      "input-focus-border-color":              $input-dark-theme-focus-border-color,
+      "input-focus-color":                     $input-dark-theme-focus-color,
+      "input-placeholder-color":               $input-placeholder-dark-theme-color,
+      "input-plaintext-color":                 $input-plaintext-dark-theme-color,
+      "input-group-addon-color":               $input-group-addon-dark-theme-color,
+      "input-group-addon-bg":                  $input-group-addon-dark-theme-bg,
+      "input-group-addon-border-color":        $input-group-addon-dark-theme-border-color
+    )
+  )
+);

@@ -1,0 +1,38 @@
+
+// Dropdowns
+//
+// Dropdown menu container and contents.
+
+// Dark theme
+$dropdown-dark-theme-color:               $body-dark-theme-color !default;
+$dropdown-dark-theme-bg:                  $gray-dark-theme-200 !default;
+$dropdown-dark-theme-border-color:        $border-dark-theme-color !default; // was: rgba($black, .15) !default;
+$dropdown-dark-theme-divider-bg:          $gray-800 !default;
+$dropdown-dark-theme-link-color:          $body-dark-theme-color !default;
+$dropdown-dark-theme-link-hover-color:    $body-dark-theme-color !default;
+$dropdown-dark-theme-link-hover-bg:       $gray-900 !default;
+$dropdown-dark-theme-link-active-color:   $component-active-color !default;
+$dropdown-dark-theme-link-active-bg:      $component-active-bg !default;
+$dropdown-dark-theme-link-disabled-color: $gray-600 !default;
+$dropdown-dark-theme-header-color:        $gray-200 !default;
+
+$dropdown-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$dropdown-theme-map: map-merge(
+  $dropdown-theme-map,
+  (
+    dark: (
+      "dropdown-color":               $dropdown-dark-theme-color,
+      "dropdown-border-color":        $dropdown-dark-theme-border-color,
+      "dropdown-bg":                  $dropdown-dark-theme-bg,
+      "dropdown-divider-bg":          $dropdown-dark-theme-divider-bg,
+      "dropdown-link-color":          $dropdown-dark-theme-link-color,
+      "dropdown-link-hover-color":    $dropdown-dark-theme-link-hover-color,
+      "dropdown-link-hover-bg":       $dropdown-dark-theme-link-hover-bg,
+      "dropdown-link-active-color":   $dropdown-dark-theme-link-active-color,
+      "dropdown-link-active-bg":      $dropdown-dark-theme-link-active-bg,
+      "dropdown-link-disabled-color": $dropdown-dark-theme-link-disabled-color,
+      "dropdown-header-color":        $dropdown-dark-theme-header-color
+    )
+  )
+);
