@@ -14,8 +14,8 @@ $link-theme-map: () !default;
 $link-theme-map: map-merge(
   (
     light: (
-      "link-color":                       $link-color,
-      "link-hover-color":                 $link-hover-color
+      "link-color":       $link-color,
+      "link-hover-color": $link-hover-color
     )
   ),
   $link-theme-map

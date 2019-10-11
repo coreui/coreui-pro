@@ -101,21 +101,21 @@ $sidebar-light-nav-link-disabled-bg:          $sidebar-light-bg !default;
 $sidebar-light-nav-link-disabled-icon-color:  $sidebar-light-nav-link-icon-color !default;
 $sidebar-light-nav-link-disabled-borders:     0 !default;
 
-$sidebar-dark-nav-dropdown-color:          $white !default;
-$sidebar-dark-nav-dropdown-bg:             rgba(0, 0, 0, .2) !default;
-$sidebar-dark-nav-dropdown-borders:        0 !default;
-$sidebar-dark-nav-dropdown-indicator-color: $gray-600 !default;
-$sidebar-dark-nav-dropdown-indicator:      str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-nav-dropdown-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-dark-nav-dropdown-color:                 $white !default;
+$sidebar-dark-nav-dropdown-bg:                   rgba(0, 0, 0, .2) !default;
+$sidebar-dark-nav-dropdown-borders:               0 !default;
+$sidebar-dark-nav-dropdown-indicator-color:       $gray-600 !default;
+$sidebar-dark-nav-dropdown-indicator:             str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-nav-dropdown-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 $sidebar-dark-nav-dropdown-indicator-hover-color: $sidebar-dark-nav-link-hover-color !default;
-$sidebar-dark-nav-dropdown-indicator-hover: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-nav-dropdown-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-dark-nav-dropdown-indicator-hover:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-nav-dropdown-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 
-$sidebar-light-nav-dropdown-color:          $white !default;
-$sidebar-light-nav-dropdown-bg:             rgba(0, 0, 0, .2) !default;
-$sidebar-light-nav-dropdown-borders:        0 !default;
-$sidebar-light-nav-dropdown-indicator-color: $gray-600 !default;
-$sidebar-light-nav-dropdown-indicator:      str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-dropdown-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-nav-dropdown-color:                 $white !default;
+$sidebar-light-nav-dropdown-bg:                  rgba(0, 0, 0, .2) !default;
+$sidebar-light-nav-dropdown-borders:               0 !default;
+$sidebar-light-nav-dropdown-indicator-color:       $gray-600 !default;
+$sidebar-light-nav-dropdown-indicator:             str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-dropdown-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 $sidebar-light-nav-dropdown-indicator-hover-color: $sidebar-dark-nav-link-hover-color !default;
-$sidebar-light-nav-dropdown-indicator-hover: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-dropdown-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-nav-dropdown-indicator-hover:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-dropdown-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 
 // Sidebar Tabs
 
@@ -135,41 +135,41 @@ $sidebar-light-nav-tabs-border-color:             rgba(darken($border-color, 20%
 $sidebar-light-nav-tabs-link-active-bg:            $white !default;
 $sidebar-light-nav-tabs-link-active-border-color: rgba(darken($border-color, 20%), .5) rgba(darken($border-color, 20%), .5) $white !default;
 $sidebar-light-nav-tabs-link-hover-bg:            $white !default;
-$sidebar-light-nav-tabs-link-hover-border-color: rgba(darken($border-color, 20%), .5) rgba(darken($border-color, 20%), .5) $white !default;
+$sidebar-light-nav-tabs-link-hover-border-color:  rgba(darken($border-color, 20%), .5) rgba(darken($border-color, 20%), .5) $white !default;
 $sidebar-light-tab-content-borders: (
   top: 1px solid rgba(darken($border-color, 20%), .5)
 ) !default;
 
 // Sidebar Footer
 
-$sidebar-footer-height:               auto !default;
-$sidebar-footer-padding-y:            .75rem !default;
-$sidebar-footer-padding-x:            1rem !default;
+$sidebar-footer-height:     auto !default;
+$sidebar-footer-padding-y:  .75rem !default;
+$sidebar-footer-padding-x:  1rem !default;
 
-$sidebar-dark-footer-bg:                   rgba($black, .2) !default;
-$sidebar-dark-footer-borders:              0 !default;
-$sidebar-light-footer-bg:                   rgba($black, .2) !default;
-$sidebar-light-footer-borders:              0 !default;
+$sidebar-dark-footer-bg:        rgba($black, .2) !default;
+$sidebar-dark-footer-borders:   0 !default;
+$sidebar-light-footer-bg:       rgba($black, .2) !default;
+$sidebar-light-footer-borders:  0 !default;
 
 // Sidebar Minimizer
 
-$sidebar-minimizer-height:                        50px !default;
+$sidebar-minimizer-height:                      50px !default;
 
-$sidebar-dark-minimizer-borders:                  0 !default;
-$sidebar-dark-minimizer-bg:                       rgba($black, .2) !default;
-$sidebar-dark-minimizer-indicator-color:          $gray-600 !default;
-$sidebar-dark-minimizer-indicator:                str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-minimizer-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
-$sidebar-dark-minimizer-hover-bg:               rgba(0, 0, 0, .3) !default;
-$sidebar-dark-minimizer-hover-indicator-color:    $sidebar-dark-nav-link-hover-color !default;
-$sidebar-dark-minimizer-hover-indicator:          str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-minimizer-hover-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-dark-minimizer-borders:                0 !default;
+$sidebar-dark-minimizer-bg:                     rgba($black, .2) !default;
+$sidebar-dark-minimizer-indicator-color:        $gray-600 !default;
+$sidebar-dark-minimizer-indicator:              str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-minimizer-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-dark-minimizer-hover-bg:              rgba(0, 0, 0, .3) !default;
+$sidebar-dark-minimizer-hover-indicator-color:  $sidebar-dark-nav-link-hover-color !default;
+$sidebar-dark-minimizer-hover-indicator:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-minimizer-hover-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 
-$sidebar-light-minimizer-borders:                 0 !default;
-$sidebar-light-minimizer-bg:                      rgba($black, .2) !default;
-$sidebar-light-minimizer-indicator-color:         $gray-600 !default;
-$sidebar-light-minimizer-indicator:               str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-minimizer-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
-$sidebar-light-minimizer-hover-bg:              rgba(0, 0, 0, .3) !default;
-$sidebar-light-minimizer-hover-indicator-color:   $sidebar-dark-nav-link-hover-color !default;
-$sidebar-light-minimizer-hover-indicator:         str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-minimizer-hover-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-minimizer-borders:               0 !default;
+$sidebar-light-minimizer-bg:                    rgba($black, .2) !default;
+$sidebar-light-minimizer-indicator-color:       $gray-600 !default;
+$sidebar-light-minimizer-indicator:             str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-minimizer-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-minimizer-hover-bg:             rgba(0, 0, 0, .3) !default;
+$sidebar-light-minimizer-hover-indicator-color: $sidebar-dark-nav-link-hover-color !default;
+$sidebar-light-minimizer-hover-indicator:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-minimizer-hover-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
 
 $sidebar-variants-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
