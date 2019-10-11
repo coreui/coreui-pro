@@ -125,7 +125,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
 .#{$prefix}sidebar-nav {
   position: relative;
   display: flex;
-  // flex: 1;
+  flex: 1;
   flex-direction: column;
   // width: 100%;
   // min-height: 100%;
@@ -240,7 +240,7 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
 }
 
 .#{$prefix}sidebar-nav-label {
-  display: block;
+  display: flex;
   padding: ($sidebar-nav-link-padding-y / 8) $sidebar-nav-link-padding-x;
   transition: $layout-transition-speed;
 
@@ -921,8 +921,8 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
         &:hover {
           background: darken($value, 5%);
           .#{$prefix}sidebar-nav-icon {
-            color: #fff;
-            fill: #fff;
+            color: $white;
+            fill: $white;
           }
         }
       }
