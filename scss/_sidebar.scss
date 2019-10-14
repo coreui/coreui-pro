@@ -167,7 +167,6 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
   }
 
   .#{$bs-prefix}badge {
-    margin-right: $sidebar-nav-link-padding-x;
     margin-left: auto;
   }
 
@@ -187,6 +186,10 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
   text-align: center;
   transition: $layout-transition-speed;
   fill: currentColor;
+
+  &:first-child {
+    margin-left: - $sidebar-nav-link-padding-x;
+  }
 }
 
 .#{$prefix}sidebar-nav-dropdown {
@@ -219,7 +222,6 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
     display: block;
     flex: 0 8px;
     height: 8px;
-    margin-right: $sidebar-nav-link-padding-x;
     margin-left: auto;
     content: "";
     background-repeat: no-repeat;
@@ -248,13 +250,9 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
     text-decoration: none;
   }
 
-  // .#{$prefix}sidebar-nav-icon {
-  //   width: 20px;
-  //   margin: -3px ($sidebar-nav-link-padding-x / 2) 0 0;
-  //   font-size: 10px;
-  //   text-align: center;
-  //   vertical-align: middle;
-  // }
+  .#{$prefix}sidebar-nav-icon {
+    margin-top: 1px;
+  }
 }
 
 .#{$prefix}sidebar-footer {
