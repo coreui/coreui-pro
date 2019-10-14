@@ -486,6 +486,13 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
             ~ .#{$prefix}wrapper {
               margin-left: $sidebar-width;
             }
+            @each $width, $value in $sidebar-widths {
+              &.#{$prefix}sidebar-#{$width} {
+                ~ .#{$prefix}wrapper {
+                  margin-left: $value;
+                }
+              }
+            }
             // &.#{$prefix}sidebar-compact {
             //   ~ .#{$prefix}wrapper {
             //     margin-left: $sidebar-compact-width;
@@ -506,6 +513,13 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
           &.#{$prefix}sidebar-fixed {
             ~ .#{$prefix}wrapper {
               margin-right: $sidebar-width;
+            }
+            @each $width, $value in $sidebar-widths {
+              &.#{$prefix}sidebar-#{$width} {
+                ~ .#{$prefix}wrapper {
+                  margin-right: $value;
+                }
+              }
             }
             // &.#{$prefix}sidebar-compact {
             //   ~ .#{$prefix}wrapper {
@@ -649,6 +663,13 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
                   ~ .#{$prefix}wrapper {
                     margin-right: $sidebar-width;
                   }
+                  @each $width, $value in $sidebar-widths {
+                    &.#{$prefix}sidebar-#{$width} {
+                      ~ .#{$prefix}wrapper {
+                        margin-right: $value;
+                      }
+                    }
+                  }
                   // &.#{$prefix}sidebar-compact {
                   //   ~ .#{$prefix}wrapper {
                   //     margin-right: $sidebar-compact-width;
@@ -669,6 +690,13 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
                 &.#{$prefix}sidebar-fixed {
                   ~ .#{$prefix}wrapper {
                     margin-left: $sidebar-width;
+                  }
+                  @each $width, $value in $sidebar-widths {
+                    &.#{$prefix}sidebar-#{$width} {
+                      ~ .#{$prefix}wrapper {
+                        margin-left: $value;
+                      }
+                    }
                   }
                   // &.#{$prefix}sidebar-compact {
                   //   ~ .#{$prefix}wrapper {
