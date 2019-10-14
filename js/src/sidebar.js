@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.14): sidebar.js
+ * CoreUI (v3.0.0-alpha.15): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -21,7 +21,7 @@ import getStyle from './utilities/get-style'
  */
 
 const NAME = 'sidebar'
-const VERSION = '3.0.0-alpha.14'
+const VERSION = '3.0.0-alpha.15'
 const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
@@ -144,7 +144,7 @@ class Sidebar {
     }
 
     toggler.parentNode.classList.toggle(ClassName.SHOW)
-    // TODO: Setting the toggler's position near to cursor after the click.
+    // TODO: Set the toggler's position near to cursor after the click.
 
     this._perfectScrollbar(Event.UPDATE)
   }
@@ -191,12 +191,14 @@ class Sidebar {
   }
 
   _makeScrollbar(container = Selector.NAVIGATION_CONTAINER) {
-    const ps = new PerfectScrollbar(this._element.querySelector(container), {
-      suppressScrollX: true
-    })
-    // TODO: find real fix for ps rtl
-    ps.isRtl = false
-    return ps
+    if (this._element.querySelector(container)) {
+      const ps = new PerfectScrollbar(this._element.querySelector(container), {
+        suppressScrollX: true
+      })
+      // TODO: find real fix for ps rtl
+      ps.isRtl = false
+      return ps
+    }
   }
 
   _destroyScrollbar() {
