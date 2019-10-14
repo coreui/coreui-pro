@@ -1,8 +1,5 @@
 
-// stylelint-disable-next-line scss/dollar-variable-default
-$sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $sidebar-width);
-// stylelint-disable-next-line scss/dollar-variable-default
-$sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px), - $sidebar-lg-width);
+$sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $sidebar-width) !default;
 
 // stylelint-disable selector-max-class, declaration-no-important, selector-max-compound-selectors, function-url-quotes, selector-max-combinators
 .#{$prefix}sidebar {
@@ -40,16 +37,31 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
     }
   }
 
-  &.#{$prefix}sidebar-lg {
-    width: $sidebar-lg-width;
+  @each $width, $value in $sidebar-widths {
+    &.#{$prefix}sidebar-#{$width} {
+      width: $value;
 
-    html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right){
-      margin-left: $sidebar-lg-negative-margin;
-    }
-    html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
-      margin-right: $sidebar-lg-negative-margin;
+      $sidebar-negative-margin: if($enable-elevations, - ($value + 5px), - $value);
+
+      html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right){
+        margin-left: $sidebar-negative-margin;
+      }
+      html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+        margin-right: $sidebar-negative-margin;
+      }
     }
   }
+
+  // &.#{$prefix}sidebar-lg {
+  //   width: $sidebar-lg-width;
+
+  //   html:not([dir="rtl"]) &:not(.#{$prefix}sidebar-right){
+  //     margin-left: $sidebar-lg-negative-margin;
+  //   }
+  //   html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
+  //     margin-right: $sidebar-lg-negative-margin;
+  //   }
+  // }
 
   &.#{$prefix}sidebar-fixed {
     @include media-breakpoint-up(md) {
@@ -543,13 +555,16 @@ $sidebar-lg-negative-margin: if($enable-elevations, - ($sidebar-lg-width + 5px),
         margin-left: $sidebar-negative-margin;
       }
 
-      &.#{$prefix}sidebar-lg {
+      @each $width, $value in $sidebar-widths {
+        &.#{$prefix}sidebar-#{$width} {
+          $sidebar-negative-margin: if($enable-elevations, - ($value + 5px), - $value);
 
-        &:not(.#{$prefix}sidebar-right){
-          margin-right: $sidebar-lg-negative-margin;
-        }
-        &.#{$prefix}sidebar-right {
-          margin-left: $sidebar-lg-negative-margin;
+          &:not(.#{$prefix}sidebar-right){
+            margin-right: $sidebar-negative-margin;
+          }
+          &.#{$prefix}sidebar-right {
+            margin-left: $sidebar-negative-margin;
+          }
         }
       }
 

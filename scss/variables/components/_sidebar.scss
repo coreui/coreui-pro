@@ -2,7 +2,16 @@
 // Sidebar
 
 $sidebar-width:                       256px !default;
-$sidebar-lg-width:                    352px !default;
+$sidebar-sm-width:                    192px !default;
+$sidebar-lg-width:                    320px !default;
+$sidebar-xl-width:                    384px !default;
+
+$sidebar-widths: (
+  sm: 192px,
+  lg: 320px,
+  xl: 384px
+) !default;
+
 $sidebar-padding:                     0 !default;
 $sidebar-minimized-width:             56px !default;
 $sidebar-minimized-height:            $sidebar-minimized-width !default;
