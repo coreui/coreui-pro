@@ -26,11 +26,6 @@ body {
   background-color: #ebedef;
 }
 
-body.c-dark-theme {
-  color: #e1e1e1;
-  background-color: #0a0b18;
-}
-
 [tabindex="-1"]:focus {
   outline: 0 !important;
 }
@@ -124,17 +119,9 @@ a {
   color: #321fdb;
 }
 
-.c-dark-theme a {
-  color: #988fed;
-}
-
 a:hover {
   text-decoration: underline;
   color: #321fdb;
-}
-
-.c-dark-theme a:hover {
-  color: #988fed;
 }
 
 a:not([href]):not([tabindex]) {

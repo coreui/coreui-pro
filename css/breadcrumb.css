@@ -10,11 +10,6 @@
   border-color: #d8dbe0;
 }
 
-.c-dark-theme .breadcrumb {
-  background-color: transparent;
-  border-color: #1e1e29;
-}
-
 .breadcrumb-item + .breadcrumb-item {
   padding-left: 0.5rem;
 }

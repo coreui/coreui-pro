@@ -4,11 +4,6 @@
   color: #4f5d73;
 }
 
-.c-dark-theme .table {
-  color: #e1e1e1;
-  background-color: transparent;
-}
-
 .table th,
 .table td {
   padding: 0.75rem;
@@ -17,28 +12,15 @@
   border-top-color: #d8dbe0;
 }
 
-.c-dark-theme .table th, .c-dark-theme
-.table td {
-  border-top-color: #181924;
-}
-
 .table thead th {
   vertical-align: bottom;
   border-bottom: 2px solid;
   border-bottom-color: #d8dbe0;
 }
 
-.c-dark-theme .table thead th {
-  border-bottom-color: #181924;
-}
-
 .table tbody + tbody {
   border-top: 2px solid;
   border-top-color: #d8dbe0;
-}
-
-.c-dark-theme .table tbody + tbody {
-  border-top-color: #181924;
 }
 
 .table-sm th,
@@ -51,19 +33,10 @@
   border-color: #d8dbe0;
 }
 
-.c-dark-theme .table-bordered {
-  border-color: #181924;
-}
-
 .table-bordered th,
 .table-bordered td {
   border: 1px solid;
   border-color: #d8dbe0;
-}
-
-.c-dark-theme .table-bordered th, .c-dark-theme
-.table-bordered td {
-  border-color: #181924;
 }
 
 .table-bordered thead th,
@@ -82,18 +55,9 @@
   background-color: rgba(0, 0, 21, 0.05);
 }
 
-.c-dark-theme .table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
 .table-hover tbody tr:hover {
   color: #4f5d73;
   background-color: rgba(0, 0, 21, 0.075);
-}
-
-.c-dark-theme .table-hover tbody tr:hover {
-  color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.075);
 }
 
 .table-primary,
@@ -272,182 +236,6 @@
   background-color: #c5cad1;
 }
 
-.c-dark-theme .table-primary,
-.c-dark-theme .table-primary > th,
-.c-dark-theme .table-primary > td {
-  background-color: #c6c0f5;
-}
-
-.c-dark-theme .table-primary th,
-.c-dark-theme .table-primary td,
-.c-dark-theme .table-primary thead th,
-.c-dark-theme .table-primary tbody + tbody {
-  border-color: #948bec;
-}
-
-.c-dark-theme .table-hover .table-primary:hover {
-  background-color: #b2aaf2;
-}
-
-.c-dark-theme .table-hover .table-primary:hover > td,
-.c-dark-theme .table-hover .table-primary:hover > th {
-  background-color: #b2aaf2;
-}
-
-.c-dark-theme .table-secondary,
-.c-dark-theme .table-secondary > th,
-.c-dark-theme .table-secondary > td {
-  background-color: #f1f2f4;
-}
-
-.c-dark-theme .table-secondary th,
-.c-dark-theme .table-secondary td,
-.c-dark-theme .table-secondary thead th,
-.c-dark-theme .table-secondary tbody + tbody {
-  border-color: #e6e8eb;
-}
-
-.c-dark-theme .table-hover .table-secondary:hover {
-  background-color: #e3e5e9;
-}
-
-.c-dark-theme .table-hover .table-secondary:hover > td,
-.c-dark-theme .table-hover .table-secondary:hover > th {
-  background-color: #e3e5e9;
-}
-
-.c-dark-theme .table-success,
-.c-dark-theme .table-success > th,
-.c-dark-theme .table-success > td {
-  background-color: #c4ebd1;
-}
-
-.c-dark-theme .table-success th,
-.c-dark-theme .table-success td,
-.c-dark-theme .table-success thead th,
-.c-dark-theme .table-success tbody + tbody {
-  border-color: #92daaa;
-}
-
-.c-dark-theme .table-hover .table-success:hover {
-  background-color: #b1e5c2;
-}
-
-.c-dark-theme .table-hover .table-success:hover > td,
-.c-dark-theme .table-hover .table-success:hover > th {
-  background-color: #b1e5c2;
-}
-
-.c-dark-theme .table-info,
-.c-dark-theme .table-info > th,
-.c-dark-theme .table-info > td {
-  background-color: #c6e2ff;
-}
-
-.c-dark-theme .table-info th,
-.c-dark-theme .table-info td,
-.c-dark-theme .table-info thead th,
-.c-dark-theme .table-info tbody + tbody {
-  border-color: #95caff;
-}
-
-.c-dark-theme .table-hover .table-info:hover {
-  background-color: #add5ff;
-}
-
-.c-dark-theme .table-hover .table-info:hover > td,
-.c-dark-theme .table-hover .table-info:hover > th {
-  background-color: #add5ff;
-}
-
-.c-dark-theme .table-warning,
-.c-dark-theme .table-warning > th,
-.c-dark-theme .table-warning > td {
-  background-color: #fde9bd;
-}
-
-.c-dark-theme .table-warning th,
-.c-dark-theme .table-warning td,
-.c-dark-theme .table-warning thead th,
-.c-dark-theme .table-warning tbody + tbody {
-  border-color: #fcd685;
-}
-
-.c-dark-theme .table-hover .table-warning:hover {
-  background-color: #fce1a4;
-}
-
-.c-dark-theme .table-hover .table-warning:hover > td,
-.c-dark-theme .table-hover .table-warning:hover > th {
-  background-color: #fce1a4;
-}
-
-.c-dark-theme .table-danger,
-.c-dark-theme .table-danger > th,
-.c-dark-theme .table-danger > td {
-  background-color: #f8cfcf;
-}
-
-.c-dark-theme .table-danger th,
-.c-dark-theme .table-danger td,
-.c-dark-theme .table-danger thead th,
-.c-dark-theme .table-danger tbody + tbody {
-  border-color: #f1a6a6;
-}
-
-.c-dark-theme .table-hover .table-danger:hover {
-  background-color: #f5b9b9;
-}
-
-.c-dark-theme .table-hover .table-danger:hover > td,
-.c-dark-theme .table-hover .table-danger:hover > th {
-  background-color: #f5b9b9;
-}
-
-.c-dark-theme .table-light,
-.c-dark-theme .table-light > th,
-.c-dark-theme .table-light > td {
-  background-color: #f9fafb;
-}
-
-.c-dark-theme .table-light th,
-.c-dark-theme .table-light td,
-.c-dark-theme .table-light thead th,
-.c-dark-theme .table-light tbody + tbody {
-  border-color: #f5f6f7;
-}
-
-.c-dark-theme .table-hover .table-light:hover {
-  background-color: #eaedf1;
-}
-
-.c-dark-theme .table-hover .table-light:hover > td,
-.c-dark-theme .table-hover .table-light:hover > th {
-  background-color: #eaedf1;
-}
-
-.c-dark-theme .table-dark,
-.c-dark-theme .table-dark > th,
-.c-dark-theme .table-dark > td {
-  background-color: #d3d7dc;
-}
-
-.c-dark-theme .table-dark th,
-.c-dark-theme .table-dark td,
-.c-dark-theme .table-dark thead th,
-.c-dark-theme .table-dark tbody + tbody {
-  border-color: #aeb4bf;
-}
-
-.c-dark-theme .table-hover .table-dark:hover {
-  background-color: #c5cad1;
-}
-
-.c-dark-theme .table-hover .table-dark:hover > td,
-.c-dark-theme .table-hover .table-dark:hover > th {
-  background-color: #c5cad1;
-}
-
 .table-active,
 .table-active > th,
 .table-active > td {
@@ -463,31 +251,10 @@
   background-color: rgba(0, 0, 0, 0.075);
 }
 
-.c-dark-theme .table-active,
-.c-dark-theme .table-active > th,
-.c-dark-theme .table-active > td {
-  background-color: rgba(255, 255, 255, 0.075);
-}
-
-.c-dark-theme .table-hover .table-active:hover {
-  background-color: rgba(242, 242, 242, 0.075);
-}
-
-.c-dark-theme .table-hover .table-active:hover > td,
-.c-dark-theme .table-hover .table-active:hover > th {
-  background-color: rgba(242, 242, 242, 0.075);
-}
-
 .table .thead-light th {
   color: #768192;
   background-color: #d8dbe0;
   border-color: #d8dbe0;
-}
-
-.c-dark-theme .table .thead-light th {
-  color: #e1e1e1;
-  background-color: #1e1e29;
-  border-color: #181924;
 }
 
 .table-dark.table-bordered {
@@ -556,10 +323,6 @@
 .table-outline {
   border: 1px solid;
   border-color: #d8dbe0;
-}
-
-.c-dark-theme .table-outline {
-  border-color: #181924;
 }
 
 .table-outline td {

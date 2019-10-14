@@ -4,7 +4,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.14): sidebar.js
+ * CoreUI (v3.0.0-alpha.15): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -21,7 +21,7 @@ import getStyle from './utilities/get-style';
  */
 
 var NAME = 'sidebar';
-var VERSION = '3.0.0-alpha.14';
+var VERSION = '3.0.0-alpha.15';
 var DATA_KEY = 'coreui.sidebar';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
@@ -138,7 +138,7 @@ function () {
       });
     }
 
-    toggler.parentNode.classList.toggle(ClassName.SHOW); // TODO: Setting the toggler's position near to cursor after the click.
+    toggler.parentNode.classList.toggle(ClassName.SHOW); // TODO: Set the toggler's position near to cursor after the click.
 
     this._perfectScrollbar(Event.UPDATE);
   };
@@ -195,12 +195,14 @@ function () {
       container = Selector.NAVIGATION_CONTAINER;
     }
 
-    var ps = new PerfectScrollbar(this._element.querySelector(container), {
-      suppressScrollX: true
-    }); // TODO: find real fix for ps rtl
+    if (this._element.querySelector(container)) {
+      var ps = new PerfectScrollbar(this._element.querySelector(container), {
+        suppressScrollX: true
+      }); // TODO: find real fix for ps rtl
 
-    ps.isRtl = false;
-    return ps;
+      ps.isRtl = false;
+      return ps;
+    }
   };
 
   _proto._destroyScrollbar = function _destroyScrollbar() {

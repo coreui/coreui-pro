@@ -1,0 +1,1 @@
+{"version":3,"sources":["../scss/themes/dark/_root.scss"],"names":[],"mappings":"AAAA,MAEI,qBAAmC,QAAnC,uBAAmC,QAAnC,qBAAmC,QAAnC,kBAAmC,QAAnC,qBAAmC,QAAnC,oBAAmC,QAAnC,mBAAmC,QAAnC,kBAAmC","sourcesContent":[":root {\n  @each $color, $value in $theme-colors-dark-theme {\n    --#{$color}-dark-theme: #{$value};\n  }\n}\n"]}

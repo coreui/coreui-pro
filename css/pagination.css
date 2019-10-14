@@ -17,24 +17,12 @@
   border-color: #d8dbe0;
 }
 
-.c-dark-theme .page-link {
-  color: #321fdb;
-  background-color: #636f83;
-  border-color: #181924;
-}
-
 .page-link:hover {
   z-index: 2;
   text-decoration: none;
   color: #231698;
   background-color: #d8dbe0;
   border-color: #c4c9d0;
-}
-
-.c-dark-theme .page-link:hover {
-  color: #231698;
-  background-color: #4f5d73;
-  border-color: #4f5d73;
 }
 
 .page-link:focus {
@@ -61,24 +49,12 @@
   border-color: #321fdb;
 }
 
-.c-dark-theme .page-item.active .page-link {
-  color: #000015;
-  background-color: #988fed;
-  border-color: #321fdb;
-}
-
 .page-item.disabled .page-link {
   pointer-events: none;
   cursor: auto;
   color: #8a93a2;
   background-color: #fff;
   border-color: #c4c9d0;
-}
-
-.c-dark-theme .page-item.disabled .page-link {
-  color: #8a93a2;
-  background-color: #4f5d73;
-  border-color: #4f5d73;
 }
 
 .pagination-lg .page-link {

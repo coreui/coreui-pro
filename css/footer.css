@@ -12,21 +12,14 @@
 }
 
 .c-footer.c-footer-dark {
-  color: #e1e1e1;
+  color: #fff;
   background: #636f83;
-  border-top: 1px solid #181924;
 }
 
 .c-footer {
   color: #4f5d73;
   background: #ebedef;
   border-top: 1px solid #d8dbe0;
-}
-
-.c-dark-theme .c-footer {
-  color: #e1e1e1;
-  background: #1e1e29;
-  border-top: 1px solid #181924;
 }
 
 /*# sourceMappingURL=footer.css.map */

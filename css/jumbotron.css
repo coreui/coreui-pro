@@ -5,10 +5,6 @@
   background-color: #d8dbe0;
 }
 
-.c-dark-theme .jumbotron {
-  background-color: #4f5d73;
-}
-
 @media (min-width: 576px) {
   .jumbotron {
     padding: 4rem 2rem;

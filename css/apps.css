@@ -2,10 +2,6 @@
   background-color: #fff;
 }
 
-.c-dark-theme .c-email-app {
-  background-color: #23242d;
-}
-
 @media (max-width: 991.98px) {
   .c-email-app .c-body {
     display: block !important;
@@ -20,10 +16,6 @@
   border-color: #d8dbe0;
 }
 
-.c-dark-theme .c-email-app .c-toolbar {
-  border-color: #181924;
-}
-
 .c-email-app .c-messages {
   padding: 1rem;
 }
@@ -35,16 +27,8 @@
   color: #4f5d73;
 }
 
-.c-dark-theme .c-email-app .c-message {
-  color: #e1e1e1;
-}
-
 .c-email-app .c-message.c-message-read {
   color: #768192;
-}
-
-.c-dark-theme .c-email-app .c-message.c-message-read {
-  color: #959595;
 }
 
 .c-email-app .c-message:last-child .c-message-details {
@@ -60,10 +44,6 @@
   padding-bottom: 1rem;
   border-bottom: 1px solid;
   border-color: #d8dbe0;
-}
-
-.c-dark-theme .c-email-app .c-message-details {
-  border-color: #181924;
 }
 
 .c-email-app .c-message-headers {
@@ -83,7 +63,7 @@
 }
 
 .c-email-app .c-message-body {
-  color: #e1e1e1;
+  color: #636f83;
 }
 
 .c-email-app .c-message-attachment {

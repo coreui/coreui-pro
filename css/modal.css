@@ -100,11 +100,6 @@
   border-color: rgba(0, 0, 21, 0.2);
 }
 
-.c-dark-theme .modal-content {
-  background-color: #2c2c34;
-  border-color: #2c2c34;
-}
-
 .c-app:not(.c-dark-theme) .modal-content {
   border: 0;
   box-shadow: 0 24px 38px 3px rgba(60, 75, 100, .14), 0 9px 46px 8px rgba(60, 75, 100, .12), 0 11px 15px -7px rgba(60, 75, 100, .20);
@@ -139,10 +134,6 @@
   border-color: #d8dbe0;
 }
 
-.c-dark-theme .modal-header {
-  border-color: #2c2c34;
-}
-
 .modal-header .close {
   padding: 1rem 1rem;
   margin: -1rem -1rem -1rem auto;
@@ -168,10 +159,6 @@
   border-bottom-right-radius: 0.3rem;
   border-bottom-left-radius: 0.3rem;
   border-color: #d8dbe0;
-}
-
-.c-dark-theme .modal-footer {
-  border-color: #2c2c34;
 }
 
 .modal-footer > :not(:first-child) {
@@ -295,78 +282,6 @@
 .modal-dark .modal-header {
   color: #fff;
   background-color: #636f83;
-}
-
-.c-dark-theme .modal-primary .modal-content {
-  border-color: #4638c2;
-}
-
-.c-dark-theme .modal-primary .modal-header {
-  color: #fff;
-  background-color: #4638c2;
-}
-
-.c-dark-theme .modal-secondary .modal-content {
-  border-color: #4c4f54;
-}
-
-.c-dark-theme .modal-secondary .modal-header {
-  color: #fff;
-  background-color: #4c4f54;
-}
-
-.c-dark-theme .modal-success .modal-content {
-  border-color: #45a164;
-}
-
-.c-dark-theme .modal-success .modal-header {
-  color: #fff;
-  background-color: #45a164;
-}
-
-.c-dark-theme .modal-info .modal-content {
-  border-color: #4799eb;
-}
-
-.c-dark-theme .modal-info .modal-header {
-  color: #fff;
-  background-color: #4799eb;
-}
-
-.c-dark-theme .modal-warning .modal-content {
-  border-color: #e1a82d;
-}
-
-.c-dark-theme .modal-warning .modal-header {
-  color: #fff;
-  background-color: #e1a82d;
-}
-
-.c-dark-theme .modal-danger .modal-content {
-  border-color: #d16767;
-}
-
-.c-dark-theme .modal-danger .modal-header {
-  color: #fff;
-  background-color: #d16767;
-}
-
-.c-dark-theme .modal-light .modal-content {
-  border-color: #20202a;
-}
-
-.c-dark-theme .modal-light .modal-header {
-  color: #fff;
-  background-color: #20202a;
-}
-
-.c-dark-theme .modal-dark .modal-content {
-  border-color: #181924;
-}
-
-.c-dark-theme .modal-dark .modal-header {
-  color: #fff;
-  background-color: #181924;
 }
 
 /*# sourceMappingURL=modal.css.map */
