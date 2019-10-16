@@ -45,13 +45,25 @@
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
     .#{$bs-prefix}dropdown-menu#{$infix}-left {
-      right: auto;
-      left: 0;
+      @include ltr {
+        right: auto;
+        left: 0;
+      }
+      @include rtl {
+        right: 0;
+        left: auto;
+      }
     }
 
     .#{$bs-prefix}dropdown-menu#{$infix}-right {
-      right: 0;
-      left: auto;
+      @include ltr {
+        right: 0;
+        left: auto;
+      }
+      @include rtl {
+        right: auto;
+        left: 0;
+      }
     }
   }
 }
