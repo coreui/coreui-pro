@@ -540,30 +540,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
         right: 0;
       }
     }
-
-    // Right-to-Left Support
-    @if $enable-rtl {
-      *[dir="rtl"] {
-        .#{$prefix}sidebar-minimized {
-          .#{$prefix}sidebar {
-            .#{$prefix}sidebar-nav {
-              list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
-              .#{$prefix}sidebar-nav-divider {
-                height: 0;
-              }
-            }
-
-            .#{$prefix}sidebar-minimizer::before {
-              transform: rotate(0deg);
-            }
-
-            .#{$prefix}sidebar-nav-dropdown:hover > .#{$prefix}sidebar-nav-dropdown-items {
-              left: 0;
-            }
-          }
-        }
-      }
-    }
   }
 }
 
@@ -687,196 +663,19 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-// Right-to-Left Support
-@if $enable-rtl {
-  *[dir="rtl"] {
-    .#{$prefix}sidebar {
-
-      // old rtls
-      // &:not(.#{$prefix}sidebar-right){
-      //   margin-right: $sidebar-negative-margin;
-      // }
-      // &.#{$prefix}sidebar-right {
-      //   margin-left: $sidebar-negative-margin;
-      // }
-
-      // @each $width, $value in $sidebar-widths {
-      //   &.#{$prefix}sidebar-#{$width} {
-      //     $sidebar-negative-margin: if($enable-elevations, - ($value + 5px), - $value);
-
-      //     &:not(.#{$prefix}sidebar-right){
-      //       margin-right: $sidebar-negative-margin;
-      //     }
-      //     &.#{$prefix}sidebar-right {
-      //       margin-left: $sidebar-negative-margin;
-      //     }
-      //   }
-      // }
-      // old rtl
-      // &.#{$prefix}sidebar-fixed {
-      //   &:not(.#{$prefix}sidebar-right) {
-      //     right: 0;
-      //   }
-
-      //   &.#{$prefix}sidebar-right {
-      //     left: 0;
-      //   }
-      // }
-      // old rtl
-      // &.#{$prefix}sidebar-overlaid {
-      //   &:not(.#{$prefix}sidebar-right) {
-      //     right: 0;
-      //   }
-
-      //   &.#{$prefix}sidebar-right {
-      //     left: 0;
-      //   }
-      // }
-
-      // .#{$prefix}sidebar-close {
-      //   left: 0;
-      // }
-
-      // .#{$bs-prefix}badge {
-      //   margin-right: auto;
-      // }
-
-      // .#{$prefix}sidebar-nav-icon {
-      //   margin-right: - $sidebar-nav-link-padding-x;
-      // }
-
-      // .#{$prefix}sidebar-nav-dropdown-toggle::after {
-      //   margin-right: auto;
-      //   margin-left: initial;
-      //   transform: rotate(180deg);
-      // }
-
-      // .#{$prefix}sidebar-nav-dropdown.#{$prefix}show {
-      //   > .#{$prefix}sidebar-nav-dropdown-toggle::after {
-      //     transform: rotate(270deg);
-      //   }
-      // }
-
-      // .#{$prefix}sidebar-minimizer::before {
-      //   transform: rotate(180deg);
-      // }
-
-      // &.#{$prefix}sidebar-right .#{$prefix}sidebar-minimizer::before {
-      //   transform: rotate(0deg);
-      // }
-
-      &.#{$prefix}sidebar-minimized {
-        .#{$prefix}sidebar-nav {
-          list-style-image: url("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
-          .#{$prefix}sidebar-nav-divider {
-            height: 0;
-          }
-        }
-
-        // .#{$prefix}sidebar-minimizer::before {
-        //   transform: rotate(0deg);
-        // }
-
-        &.#{$prefix}sidebar-right {
-          // .#{$prefix}sidebar-minimizer::before {
-          //   transform: rotate(180deg);
-          // }
-
-          .#{$prefix}sidebar-nav {
-            // > .#{$prefix}sidebar-nav-item:hover {
-            //   margin-right: - $sidebar-width;
-            // }
-            > .#{$prefix}sidebar-nav-dropdown:hover .#{$prefix}sidebar-nav-dropdown-items {
-              // right: 0;
-              // left: auto;
-            }
-          }
-        }
-
-        // .#{$prefix}sidebar-nav-dropdown:hover > .#{$prefix}sidebar-nav-dropdown-items {
-        //   left: 0;
-        // }
-      }
-
-      // @each $breakpoint in map-keys($grid-breakpoints) {
-      //   @include media-breakpoint-up($breakpoint) {
-      //     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-      //     &.#{$prefix}sidebar#{$infix}-show,
-      //     &.#{$prefix}sidebar-show {
-      //       &:not(.#{$prefix}sidebar-right){
-      //         margin-right: 0;
-      //         @if $breakpoint != "xs" {
-      //           &.#{$prefix}sidebar-fixed {
-      //             ~ .#{$prefix}wrapper {
-      //               margin-right: $sidebar-width;
-      //             }
-      //             @each $width, $value in $sidebar-widths {
-      //               &.#{$prefix}sidebar-#{$width} {
-      //                 ~ .#{$prefix}wrapper {
-      //                   margin-right: $value;
-      //                 }
-      //               }
-      //             }
-      //             // &.#{$prefix}sidebar-compact {
-      //             //   ~ .#{$prefix}wrapper {
-      //             //     margin-right: $sidebar-compact-width;
-      //             //   }
-      //             // }
-      //             &.#{$prefix}sidebar-minimized,
-      //             &.#{$prefix}sidebar-unfoldable {
-      //               ~ .#{$prefix}wrapper {
-      //                 margin-right: $sidebar-minimized-width;
-      //               }
-      //             }
-      //           }
-      //         }
-      //       }
-      //       &.#{$prefix}sidebar-right {
-      //         margin-left: 0;
-      //         @if $breakpoint != "xs" {
-      //           &.#{$prefix}sidebar-fixed {
-      //             ~ .#{$prefix}wrapper {
-      //               margin-left: $sidebar-width;
-      //             }
-      //             @each $width, $value in $sidebar-widths {
-      //               &.#{$prefix}sidebar-#{$width} {
-      //                 ~ .#{$prefix}wrapper {
-      //                   margin-left: $value;
-      //                 }
-      //               }
-      //             }
-      //             // &.#{$prefix}sidebar-compact {
-      //             //   ~ .#{$prefix}wrapper {
-      //             //     margin-left: $sidebar-compact-width;
-      //             //   }
-      //             // }
-      //             &.#{$prefix}sidebar-minimized,
-      //             &.#{$prefix}sidebar-unfoldable {
-      //               ~ .#{$prefix}wrapper {
-      //                 margin-left: $sidebar-minimized-width;
-      //               }
-      //             }
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
-    }
-  }
-}
-
 @include themes($sidebar-theme-map, $create: append, $parent: ".#{$prefix}sidebar") {
   color: themes-get-value("sidebar-color");
   background: themes-get-value("sidebar-bg");
 
   @include borders(themes-get-value("sidebar-borders"));
 
-  html:not([dir="rtl"]) &.#{$prefix}sidebar-right {
-    @include borders(themes-get-value("sidebar-borders"),true);
+  @include ltr {
+    &.#{$prefix}sidebar-right {
+      @include borders(themes-get-value("sidebar-borders"),true);
+    }
   }
 
-  *[dir="rtl"] & {
+  @include rtl {
     @include borders(themes-get-value("sidebar-borders"),true);
     &.#{$prefix}sidebar-right {
       border: 0;

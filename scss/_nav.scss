@@ -6,9 +6,15 @@
 .#{$bs-prefix}nav {
   display: flex;
   flex-wrap: wrap;
-  padding-left: 0;
   margin-bottom: 0;
   list-style: none;
+
+  @include ltr {
+    padding-left: 0;
+  }
+  @include rtl {
+    padding-right: 0;
+  }
 }
 
 .#{$bs-prefix}nav-link {
@@ -277,11 +283,3 @@
     }
   }
 }
-
-// Right-to-Left Support
-*[dir="rtl"] {
-  .#{$bs-prefix}nav {
-    padding-right: 0;
-  }
-}
-// CoreUI specific changes end
