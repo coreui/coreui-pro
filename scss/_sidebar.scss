@@ -587,7 +587,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
                     margin-left: $value;
                   }
                   @include rtl {
-                    margin-right: $value;;
+                    margin-right: $value;
                   }
                 }
               }
