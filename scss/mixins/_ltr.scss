@@ -8,7 +8,7 @@
       }
     }
     @else {
-      html:not([dir="rtl"]) & {
+      html:not([dir="rtl"]) {
         @content;
       }
     }

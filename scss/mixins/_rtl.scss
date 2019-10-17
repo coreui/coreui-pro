@@ -8,7 +8,7 @@
       }
     }
     @else {
-      *[dir="rtl"] & {
+      *[dir="rtl"] {
         @content;
       }
     }
