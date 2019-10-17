@@ -39,7 +39,12 @@
   // Prevent double borders when buttons are next to each other
   > .#{$bs-prefix}btn:not(:first-child),
   > .#{$bs-prefix}btn-group:not(:first-child) {
-    margin-left: -$btn-border-width;
+    @include ltr {
+      margin-left: -$btn-border-width;
+    }
+    @include rtl {
+      margin-right: -$btn-border-width;
+    }
   }
 
   // Reset rounded corners
@@ -87,11 +92,21 @@
   &::after,
   .#{$bs-prefix}dropup &::after,
   .#{$bs-prefix}dropright &::after {
-    margin-left: 0;
+    @include ltr {
+      margin-left: 0;
+    }
+    @include rtl {
+      margin-right: 0;
+    }
   }
 
   .#{$bs-prefix}dropleft &::before {
-    margin-right: 0;
+    @include ltr {
+      margin-right: 0;
+    }
+    @include rtl {
+      margin-left: 0;
+    }
   }
 }
 

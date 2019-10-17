@@ -141,7 +141,9 @@
   }
 
   &.#{$bs-prefix}nav-tabs-boxed-left {
-    display: flex;
+    @include rtl {
+      flex-direction: row-reverse;
+    }
 
     .#{$bs-prefix}nav-item {
       margin-right: -$nav-tabs-border-width;
@@ -159,10 +161,20 @@
   }
 
   &.#{$bs-prefix}nav-tabs-boxed-right {
-    flex-direction: row-reverse;
+    @include ltr {
+      flex-direction: row-reverse;
+    }
+    @include rtl {
+      flex-direction: row;
+    }
 
     .#{$bs-prefix}nav-item {
-      margin-left: -$nav-tabs-border-width;
+      @include ltr {
+        margin-left: -$nav-tabs-border-width;
+      }
+      @include rtl {
+        margin-right: -$nav-tabs-border-width;
+      }
     }
 
     .#{$bs-prefix}nav-link {

@@ -394,10 +394,20 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
 
     &:not(.#{$prefix}sidebar-right){
-      margin-left: - $sidebar-minimized-width;
+      @include ltr {
+        margin-left: - $sidebar-minimized-width;
+      }
+      @include rtl {
+        margin-right: - $sidebar-minimized-width;
+      }
     }
     &.#{$prefix}sidebar-right {
-      margin-right: - $sidebar-minimized-width;
+      @include ltr {
+        margin-right: - $sidebar-minimized-width;
+      }
+      @include ltr {
+        margin-left: - $sidebar-minimized-width;
+      }
     }
 
     .#{$prefix}sidebar-brand-full {

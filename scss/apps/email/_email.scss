@@ -43,7 +43,12 @@
   }
 
   .#{$prefix}message-actions {
-    margin-right: $spacer;
+    @include ltr {
+      margin-right: $spacer;
+    }
+    @include rtl {
+      margin-left: $spacer;
+    }
   }
 
   .#{$prefix}message-details {
@@ -66,7 +71,12 @@
   }
 
   .#{$prefix}message-headers-date {
-    margin-left: auto;
+    @include ltr {
+      margin-left: auto;
+    }
+    @include rtl {
+      margin-right: auto;
+    }
   }
 
   .#{$prefix}message-headers-subject {
