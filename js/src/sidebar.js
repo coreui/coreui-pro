@@ -189,6 +189,7 @@ class Sidebar {
       const ps = new PerfectScrollbar(this._element.querySelector(container), {
         suppressScrollX: true
       })
+      return ps
     }
   }
 
