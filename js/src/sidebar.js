@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-alpha.15): sidebar.js
+ * CoreUI (v3.0.0-beta.0): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -21,7 +21,7 @@ import getStyle from './utilities/get-style'
  */
 
 const NAME = 'sidebar'
-const VERSION = '3.0.0-alpha.15'
+const VERSION = '3.0.0-beta.0'
 const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'

@@ -35,8 +35,12 @@
   border: 0;
 }
 
-.c-email-app .c-message-actions {
+html:not([dir="rtl"]) .c-email-app .c-message-actions {
   margin-right: 1rem;
+}
+
+*[dir="rtl"] .c-email-app .c-message-actions {
+  margin-left: 1rem;
 }
 
 .c-email-app .c-message-details {
@@ -52,8 +56,12 @@
   width: 100%;
 }
 
-.c-email-app .c-message-headers-date {
+html:not([dir="rtl"]) .c-email-app .c-message-headers-date {
   margin-left: auto;
+}
+
+*[dir="rtl"] .c-email-app .c-message-headers-date {
+  margin-right: auto;
 }
 
 .c-email-app .c-message-headers-subject {
