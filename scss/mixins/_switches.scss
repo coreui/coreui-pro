@@ -62,7 +62,7 @@
   }
 }
 
-@mixin switch-outline-variant-alt($color) {
+@mixin switch-opposite-variant($color) {
   .#{$prefix}switch-input:checked + .#{$prefix}switch-slider {
     background-color: $white;
     border-color: $color;

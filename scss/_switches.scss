@@ -173,8 +173,8 @@
     @include switch-outline-variant($value);
   }
   //outline alternative style
-  .#{$prefix}switch-outline-#{$color}-alt {
-    @include switch-outline-variant-alt($value);
+  .#{$prefix}switch-opposite-alt {
+    @include switch-opposite-variant($value);
   }
 }
 
