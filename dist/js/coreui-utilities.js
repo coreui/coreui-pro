@@ -1,16 +1,16 @@
 /*!
-  * CoreUI Pro v2.1.14 (https://coreui.io/pro/)
+  * CoreUI Pro v2.1.15 (https://coreui.io/pro/)
   * Copyright 2019 Łukasz Holeczek
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = global || self, factory(global.utilities = {}));
-}(this, function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.14): classes.js
+   * CoreUI Utilities (v2.1.15): classes.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -27,7 +27,6 @@
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
 
-  var O = 'object';
   var check = function (it) {
     return it && it.Math == Math && it;
   };
@@ -35,10 +34,10 @@
   // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
   var global_1 =
     // eslint-disable-next-line no-undef
-    check(typeof globalThis == O && globalThis) ||
-    check(typeof window == O && window) ||
-    check(typeof self == O && self) ||
-    check(typeof commonjsGlobal == O && commonjsGlobal) ||
+    check(typeof globalThis == 'object' && globalThis) ||
+    check(typeof window == 'object' && window) ||
+    check(typeof self == 'object' && self) ||
+    check(typeof commonjsGlobal == 'object' && commonjsGlobal) ||
     // eslint-disable-next-line no-new-func
     Function('return this')();
 
@@ -61,6 +60,8 @@
   // Nashorn ~ JDK8 bug
   var NASHORN_BUG = getOwnPropertyDescriptor && !nativePropertyIsEnumerable.call({ 1: 2 }, 1);
 
+  // `Object.prototype.propertyIsEnumerable` method implementation
+  // https://tc39.github.io/ecma262/#sec-object.prototype.propertyisenumerable
   var f = NASHORN_BUG ? function propertyIsEnumerable(V) {
     var descriptor = getOwnPropertyDescriptor(this, V);
     return !!descriptor && descriptor.enumerable;
@@ -85,12 +86,9 @@
     return toString.call(it).slice(8, -1);
   };
 
-  // fallback for non-array-like ES3 and non-enumerable old V8 strings
-
-
-
   var split = ''.split;
 
+  // fallback for non-array-like ES3 and non-enumerable old V8 strings
   var indexedObject = fails(function () {
     // throws an error in rhino, see https://github.com/mozilla/rhino/issues/346
     // eslint-disable-next-line no-prototype-builtins
@@ -118,15 +116,16 @@
     return typeof it === 'object' ? it !== null : typeof it === 'function';
   };
 
-  // 7.1.1 ToPrimitive(input [, PreferredType])
+  // `ToPrimitive` abstract operation
+  // https://tc39.github.io/ecma262/#sec-toprimitive
   // instead of the ES6 spec version, we didn't implement @@toPrimitive case
   // and the second argument - flag - preferred type is a string
-  var toPrimitive = function (it, S) {
-    if (!isObject(it)) return it;
+  var toPrimitive = function (input, PREFERRED_STRING) {
+    if (!isObject(input)) return input;
     var fn, val;
-    if (S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
-    if (typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it))) return val;
-    if (!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+    if (PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
+    if (typeof (fn = input.valueOf) == 'function' && !isObject(val = fn.call(input))) return val;
+    if (!PREFERRED_STRING && typeof (fn = input.toString) == 'function' && !isObject(val = fn.call(input))) return val;
     throw TypeError("Can't convert object to primitive value");
   };
 
@@ -138,10 +137,10 @@
 
   var document$1 = global_1.document;
   // typeof document.createElement is 'object' in old IE
-  var exist = isObject(document$1) && isObject(document$1.createElement);
+  var EXISTS = isObject(document$1) && isObject(document$1.createElement);
 
   var documentCreateElement = function (it) {
-    return exist ? document$1.createElement(it) : {};
+    return EXISTS ? document$1.createElement(it) : {};
   };
 
   // Thank's IE8 for his funny defineProperty
@@ -153,6 +152,8 @@
 
   var nativeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
+  // `Object.getOwnPropertyDescriptor` method
+  // https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptor
   var f$1 = descriptors ? nativeGetOwnPropertyDescriptor : function getOwnPropertyDescriptor(O, P) {
     O = toIndexedObject(O);
     P = toPrimitive(P, true);
@@ -174,6 +175,8 @@
 
   var nativeDefineProperty = Object.defineProperty;
 
+  // `Object.defineProperty` method
+  // https://tc39.github.io/ecma262/#sec-object.defineproperty
   var f$2 = descriptors ? nativeDefineProperty : function defineProperty(O, P, Attributes) {
     anObject(O);
     P = toPrimitive(P, true);
@@ -190,7 +193,7 @@
   	f: f$2
   };
 
-  var hide = descriptors ? function (object, key, value) {
+  var createNonEnumerableProperty = descriptors ? function (object, key, value) {
     return objectDefineProperty.f(object, key, createPropertyDescriptor(1, value));
   } : function (object, key, value) {
     object[key] = value;
@@ -199,21 +202,23 @@
 
   var setGlobal = function (key, value) {
     try {
-      hide(global_1, key, value);
+      createNonEnumerableProperty(global_1, key, value);
     } catch (error) {
       global_1[key] = value;
     } return value;
   };
 
-  var shared = createCommonjsModule(function (module) {
   var SHARED = '__core-js_shared__';
   var store = global_1[SHARED] || setGlobal(SHARED, {});
 
+  var sharedStore = store;
+
+  var shared = createCommonjsModule(function (module) {
   (module.exports = function (key, value) {
-    return store[key] || (store[key] = value !== undefined ? value : {});
+    return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
   })('versions', []).push({
-    version: '3.1.3',
-    mode: 'global',
+    version: '3.3.4',
+    mode:  'global',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -228,7 +233,7 @@
   var postfix = Math.random();
 
   var uid = function (key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + postfix).toString(36));
+    return 'Symbol(' + String(key === undefined ? '' : key) + ')_' + (++id + postfix).toString(36);
   };
 
   var keys = shared('keys');
@@ -256,25 +261,25 @@
   };
 
   if (nativeWeakMap) {
-    var store = new WeakMap$1();
-    var wmget = store.get;
-    var wmhas = store.has;
-    var wmset = store.set;
+    var store$1 = new WeakMap$1();
+    var wmget = store$1.get;
+    var wmhas = store$1.has;
+    var wmset = store$1.set;
     set = function (it, metadata) {
-      wmset.call(store, it, metadata);
+      wmset.call(store$1, it, metadata);
       return metadata;
     };
     get = function (it) {
-      return wmget.call(store, it) || {};
+      return wmget.call(store$1, it) || {};
     };
     has$1 = function (it) {
-      return wmhas.call(store, it);
+      return wmhas.call(store$1, it);
     };
   } else {
     var STATE = sharedKey('state');
     hiddenKeys[STATE] = true;
     set = function (it, metadata) {
-      hide(it, STATE, metadata);
+      createNonEnumerableProperty(it, STATE, metadata);
       return metadata;
     };
     get = function (it) {
@@ -307,7 +312,7 @@
     var simple = options ? !!options.enumerable : false;
     var noTargetGet = options ? !!options.noTargetGet : false;
     if (typeof value == 'function') {
-      if (typeof key == 'string' && !has(value, 'name')) hide(value, 'name', key);
+      if (typeof key == 'string' && !has(value, 'name')) createNonEnumerableProperty(value, 'name', key);
       enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
     }
     if (O === global_1) {
@@ -320,12 +325,23 @@
       simple = true;
     }
     if (simple) O[key] = value;
-    else hide(O, key, value);
+    else createNonEnumerableProperty(O, key, value);
   // add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
   })(Function.prototype, 'toString', function toString() {
     return typeof this == 'function' && getInternalState(this).source || functionToString.call(this);
   });
   });
+
+  var path = global_1;
+
+  var aFunction = function (variable) {
+    return typeof variable == 'function' ? variable : undefined;
+  };
+
+  var getBuiltIn = function (namespace, method) {
+    return arguments.length < 2 ? aFunction(path[namespace]) || aFunction(global_1[namespace])
+      : path[namespace] && path[namespace][method] || global_1[namespace] && global_1[namespace][method];
+  };
 
   var ceil = Math.ceil;
   var floor = Math.floor;
@@ -356,11 +372,7 @@
   };
 
   // `Array.prototype.{ indexOf, includes }` methods implementation
-  // false -> Array#indexOf
-  // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
-  // true  -> Array#includes
-  // https://tc39.github.io/ecma262/#sec-array.prototype.includes
-  var arrayIncludes = function (IS_INCLUDES) {
+  var createMethod = function (IS_INCLUDES) {
     return function ($this, el, fromIndex) {
       var O = toIndexedObject($this);
       var length = toLength(O.length);
@@ -373,13 +385,23 @@
         // eslint-disable-next-line no-self-compare
         if (value != value) return true;
       // Array#indexOf ignores holes, Array#includes - not
-      } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
-        if (O[index] === el) return IS_INCLUDES || index || 0;
+      } else for (;length > index; index++) {
+        if ((IS_INCLUDES || index in O) && O[index] === el) return IS_INCLUDES || index || 0;
       } return !IS_INCLUDES && -1;
     };
   };
 
-  var arrayIndexOf = arrayIncludes(false);
+  var arrayIncludes = {
+    // `Array.prototype.includes` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.includes
+    includes: createMethod(true),
+    // `Array.prototype.indexOf` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.indexof
+    indexOf: createMethod(false)
+  };
+
+  var indexOf = arrayIncludes.indexOf;
+
 
   var objectKeysInternal = function (object, names) {
     var O = toIndexedObject(object);
@@ -389,7 +411,7 @@
     for (key in O) !has(hiddenKeys, key) && has(O, key) && result.push(key);
     // Don't enum bug & hidden keys
     while (names.length > i) if (has(O, key = names[i++])) {
-      ~arrayIndexOf(result, key) || result.push(key);
+      ~indexOf(result, key) || result.push(key);
     }
     return result;
   };
@@ -405,12 +427,10 @@
     'valueOf'
   ];
 
-  // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-
-
-
   var hiddenKeys$1 = enumBugKeys.concat('length', 'prototype');
 
+  // `Object.getOwnPropertyNames` method
+  // https://tc39.github.io/ecma262/#sec-object.getownpropertynames
   var f$3 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
     return objectKeysInternal(O, hiddenKeys$1);
   };
@@ -425,10 +445,8 @@
   	f: f$4
   };
 
-  var Reflect = global_1.Reflect;
-
   // all object keys, includes non-enumerable and symbols
-  var ownKeys = Reflect && Reflect.ownKeys || function ownKeys(it) {
+  var ownKeys = getBuiltIn('Reflect', 'ownKeys') || function ownKeys(it) {
     var keys = objectGetOwnPropertyNames.f(anObject(it));
     var getOwnPropertySymbols = objectGetOwnPropertySymbols.f;
     return getOwnPropertySymbols ? keys.concat(getOwnPropertySymbols(it)) : keys;
@@ -511,14 +529,15 @@
       }
       // add a flag to not completely full polyfills
       if (options.sham || (targetProperty && targetProperty.sham)) {
-        hide(sourceProperty, 'sham', true);
+        createNonEnumerableProperty(sourceProperty, 'sham', true);
       }
       // extend global
       redefine(target, key, sourceProperty, options);
     }
   };
 
-  // 19.1.2.14 / 15.2.3.14 Object.keys(O)
+  // `Object.keys` method
+  // https://tc39.github.io/ecma262/#sec-object.keys
   var objectKeys = Object.keys || function keys(O) {
     return objectKeysInternal(O, enumBugKeys);
   };
@@ -531,7 +550,8 @@
 
   var nativeAssign = Object.assign;
 
-  // 19.1.2.1 Object.assign(target, source, ...)
+  // `Object.assign` method
+  // https://tc39.github.io/ecma262/#sec-object.assign
   // should work with symbols and should have deterministic property order (V8 bug)
   var objectAssign = !nativeAssign || fails(function () {
     var A = {};
@@ -599,10 +619,10 @@
   });
 
   var Symbol$1 = global_1.Symbol;
-  var store$1 = shared('wks');
+  var store$2 = shared('wks');
 
   var wellKnownSymbol = function (name) {
-    return store$1[name] || (store$1[name] = nativeSymbol && Symbol$1[name]
+    return store$2[name] || (store$2[name] = nativeSymbol && Symbol$1[name]
       || (nativeSymbol ? Symbol$1 : uid)('Symbol.' + name));
   };
 
@@ -614,6 +634,7 @@
     if (that.global) result += 'g';
     if (that.ignoreCase) result += 'i';
     if (that.multiline) result += 'm';
+    if (that.dotAll) result += 's';
     if (that.unicode) result += 'u';
     if (that.sticky) result += 'y';
     return result;
@@ -710,14 +731,21 @@
       // Symbol-named RegExp methods call .exec
       var execCalled = false;
       var re = /a/;
-      re.exec = function () { execCalled = true; return null; };
 
       if (KEY === 'split') {
+        // We can't use real regex here since it causes deoptimization
+        // and serious performance degradation in V8
+        // https://github.com/zloirock/core-js/issues/306
+        re = {};
         // RegExp[@@split] doesn't call the regex's exec method, but first creates
         // a new one. We need to return the patched regex when creating the new one.
         re.constructor = {};
         re.constructor[SPECIES] = function () { return re; };
+        re.flags = '';
+        re[SYMBOL] = /./[SYMBOL];
       }
+
+      re.exec = function () { execCalled = true; return null; };
 
       re[SYMBOL]('');
       return !execCalled;
@@ -754,29 +782,41 @@
         // 21.2.5.9 RegExp.prototype[@@search](string)
         : function (string) { return regexMethod.call(string, this); }
       );
-      if (sham) hide(RegExp.prototype[SYMBOL], 'sham', true);
+      if (sham) createNonEnumerableProperty(RegExp.prototype[SYMBOL], 'sham', true);
     }
   };
 
-  // CONVERT_TO_STRING: true  -> String#at
-  // CONVERT_TO_STRING: false -> String#codePointAt
-  var stringAt = function (that, pos, CONVERT_TO_STRING) {
-    var S = String(requireObjectCoercible(that));
-    var position = toInteger(pos);
-    var size = S.length;
-    var first, second;
-    if (position < 0 || position >= size) return CONVERT_TO_STRING ? '' : undefined;
-    first = S.charCodeAt(position);
-    return first < 0xD800 || first > 0xDBFF || position + 1 === size
-      || (second = S.charCodeAt(position + 1)) < 0xDC00 || second > 0xDFFF
-        ? CONVERT_TO_STRING ? S.charAt(position) : first
-        : CONVERT_TO_STRING ? S.slice(position, position + 2) : (first - 0xD800 << 10) + (second - 0xDC00) + 0x10000;
+  // `String.prototype.{ codePointAt, at }` methods implementation
+  var createMethod$1 = function (CONVERT_TO_STRING) {
+    return function ($this, pos) {
+      var S = String(requireObjectCoercible($this));
+      var position = toInteger(pos);
+      var size = S.length;
+      var first, second;
+      if (position < 0 || position >= size) return CONVERT_TO_STRING ? '' : undefined;
+      first = S.charCodeAt(position);
+      return first < 0xD800 || first > 0xDBFF || position + 1 === size
+        || (second = S.charCodeAt(position + 1)) < 0xDC00 || second > 0xDFFF
+          ? CONVERT_TO_STRING ? S.charAt(position) : first
+          : CONVERT_TO_STRING ? S.slice(position, position + 2) : (first - 0xD800 << 10) + (second - 0xDC00) + 0x10000;
+    };
   };
+
+  var stringMultibyte = {
+    // `String.prototype.codePointAt` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.codepointat
+    codeAt: createMethod$1(false),
+    // `String.prototype.at` method
+    // https://github.com/mathiasbynens/String.prototype.at
+    charAt: createMethod$1(true)
+  };
+
+  var charAt = stringMultibyte.charAt;
 
   // `AdvanceStringIndex` abstract operation
   // https://tc39.github.io/ecma262/#sec-advancestringindex
   var advanceStringIndex = function (S, index, unicode) {
-    return index + (unicode ? stringAt(S, index, true).length : 1);
+    return index + (unicode ? charAt(S, index).length : 1);
   };
 
   // `RegExpExec` abstract operation
@@ -961,7 +1001,7 @@
     return isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : classofRaw(it) == 'RegExp');
   };
 
-  var aFunction = function (it) {
+  var aFunction$1 = function (it) {
     if (typeof it != 'function') {
       throw TypeError(String(it) + ' is not a function');
     } return it;
@@ -974,7 +1014,7 @@
   var speciesConstructor = function (O, defaultConstructor) {
     var C = anObject(O).constructor;
     var S;
-    return C === undefined || (S = anObject(C)[SPECIES$1]) == undefined ? defaultConstructor : aFunction(S);
+    return C === undefined || (S = anObject(C)[SPECIES$1]) == undefined ? defaultConstructor : aFunction$1(S);
   };
 
   var arrayPush = [].push;
@@ -1108,14 +1148,26 @@
   var ltrim = RegExp('^' + whitespace + whitespace + '*');
   var rtrim = RegExp(whitespace + whitespace + '*$');
 
-  // 1 -> String#trimStart
-  // 2 -> String#trimEnd
-  // 3 -> String#trim
-  var stringTrim = function (string, TYPE) {
-    string = String(requireObjectCoercible(string));
-    if (TYPE & 1) string = string.replace(ltrim, '');
-    if (TYPE & 2) string = string.replace(rtrim, '');
-    return string;
+  // `String.prototype.{ trim, trimStart, trimEnd, trimLeft, trimRight }` methods implementation
+  var createMethod$2 = function (TYPE) {
+    return function ($this) {
+      var string = String(requireObjectCoercible($this));
+      if (TYPE & 1) string = string.replace(ltrim, '');
+      if (TYPE & 2) string = string.replace(rtrim, '');
+      return string;
+    };
+  };
+
+  var stringTrim = {
+    // `String.prototype.{ trimLeft, trimStart }` methods
+    // https://tc39.github.io/ecma262/#sec-string.prototype.trimstart
+    start: createMethod$2(1),
+    // `String.prototype.{ trimRight, trimEnd }` methods
+    // https://tc39.github.io/ecma262/#sec-string.prototype.trimend
+    end: createMethod$2(2),
+    // `String.prototype.trim` method
+    // https://tc39.github.io/ecma262/#sec-string.prototype.trim
+    trim: createMethod$2(3)
   };
 
   var non = '\u200B\u0085\u180E';
@@ -1128,13 +1180,14 @@
     });
   };
 
-  var FORCED = forcedStringTrimMethod('trim');
+  var $trim = stringTrim.trim;
+
 
   // `String.prototype.trim` method
   // https://tc39.github.io/ecma262/#sec-string.prototype.trim
-  _export({ target: 'String', proto: true, forced: FORCED }, {
+  _export({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
     trim: function trim() {
-      return stringTrim(this, 3);
+      return $trim(this);
     }
   });
 
@@ -1176,7 +1229,7 @@
 
   // optional / simple context binding
   var bindContext = function (fn, that, length) {
-    aFunction(fn);
+    aFunction$1(fn);
     if (that === undefined) return fn;
     switch (length) {
       case 0: return function () {
@@ -1220,35 +1273,23 @@
     } return new (C === undefined ? Array : C)(length === 0 ? 0 : length);
   };
 
+  var push = [].push;
+
   // `Array.prototype.{ forEach, map, filter, some, every, find, findIndex }` methods implementation
-  // 0 -> Array#forEach
-  // https://tc39.github.io/ecma262/#sec-array.prototype.foreach
-  // 1 -> Array#map
-  // https://tc39.github.io/ecma262/#sec-array.prototype.map
-  // 2 -> Array#filter
-  // https://tc39.github.io/ecma262/#sec-array.prototype.filter
-  // 3 -> Array#some
-  // https://tc39.github.io/ecma262/#sec-array.prototype.some
-  // 4 -> Array#every
-  // https://tc39.github.io/ecma262/#sec-array.prototype.every
-  // 5 -> Array#find
-  // https://tc39.github.io/ecma262/#sec-array.prototype.find
-  // 6 -> Array#findIndex
-  // https://tc39.github.io/ecma262/#sec-array.prototype.findIndex
-  var arrayMethods = function (TYPE, specificCreate) {
+  var createMethod$3 = function (TYPE) {
     var IS_MAP = TYPE == 1;
     var IS_FILTER = TYPE == 2;
     var IS_SOME = TYPE == 3;
     var IS_EVERY = TYPE == 4;
     var IS_FIND_INDEX = TYPE == 6;
     var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
-    var create = specificCreate || arraySpeciesCreate;
-    return function ($this, callbackfn, that) {
+    return function ($this, callbackfn, that, specificCreate) {
       var O = toObject($this);
       var self = indexedObject(O);
       var boundFunction = bindContext(callbackfn, that, 3);
       var length = toLength(self.length);
       var index = 0;
+      var create = specificCreate || arraySpeciesCreate;
       var target = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
       var value, result;
       for (;length > index; index++) if (NO_HOLES || index in self) {
@@ -1260,12 +1301,36 @@
             case 3: return true;              // some
             case 5: return value;             // find
             case 6: return index;             // findIndex
-            case 2: target.push(value);       // filter
+            case 2: push.call(target, value); // filter
           } else if (IS_EVERY) return false;  // every
         }
       }
       return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : target;
     };
+  };
+
+  var arrayIteration = {
+    // `Array.prototype.forEach` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.foreach
+    forEach: createMethod$3(0),
+    // `Array.prototype.map` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.map
+    map: createMethod$3(1),
+    // `Array.prototype.filter` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.filter
+    filter: createMethod$3(2),
+    // `Array.prototype.some` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.some
+    some: createMethod$3(3),
+    // `Array.prototype.every` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.every
+    every: createMethod$3(4),
+    // `Array.prototype.find` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.find
+    find: createMethod$3(5),
+    // `Array.prototype.findIndex` method
+    // https://tc39.github.io/ecma262/#sec-array.prototype.findIndex
+    findIndex: createMethod$3(6)
   };
 
   var sloppyArrayMethod = function (METHOD_NAME, argument) {
@@ -1276,13 +1341,13 @@
     });
   };
 
-  var internalForEach = arrayMethods(0);
-  var SLOPPY_METHOD = sloppyArrayMethod('forEach');
+  var $forEach = arrayIteration.forEach;
+
 
   // `Array.prototype.forEach` method implementation
   // https://tc39.github.io/ecma262/#sec-array.prototype.foreach
-  var arrayForEach = SLOPPY_METHOD ? function forEach(callbackfn /* , thisArg */) {
-    return internalForEach(this, callbackfn, arguments[1]);
+  var arrayForEach = sloppyArrayMethod('forEach') ? function forEach(callbackfn /* , thisArg */) {
+    return $forEach(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   } : [].forEach;
 
   for (var COLLECTION_NAME in domIterables) {
@@ -1290,7 +1355,7 @@
     var CollectionPrototype = Collection && Collection.prototype;
     // some Chrome versions have non-configurable methods on DOMTokenList
     if (CollectionPrototype && CollectionPrototype.forEach !== arrayForEach) try {
-      hide(CollectionPrototype, 'forEach', arrayForEach);
+      createNonEnumerableProperty(CollectionPrototype, 'forEach', arrayForEach);
     } catch (error) {
       CollectionPrototype.forEach = arrayForEach;
     }
@@ -1298,7 +1363,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.14): get-css-custom-properties.js
+   * CoreUI Utilities (v2.1.15): get-css-custom-properties.js
    * Licensed under MIT (https://coreui.io/license)
    * @returns {string} css custom property name
    * --------------------------------------------------------------------------
@@ -1366,7 +1431,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.14): get-color.js
+   * CoreUI Utilities (v2.1.15): get-color.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1383,7 +1448,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.14): hex-to-rgb.js
+   * CoreUI Utilities (v2.1.15): hex-to-rgb.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1419,7 +1484,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI Utilities (v2.1.14): hex-to-rgba.js
+   * CoreUI Utilities (v2.1.15): hex-to-rgba.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1463,10 +1528,30 @@
     else object[propertyKey] = value;
   };
 
+  var userAgent = getBuiltIn('navigator', 'userAgent') || '';
+
+  var process = global_1.process;
+  var versions = process && process.versions;
+  var v8 = versions && versions.v8;
+  var match, version;
+
+  if (v8) {
+    match = v8.split('.');
+    version = match[0] + match[1];
+  } else if (userAgent) {
+    match = userAgent.match(/Chrome\/(\d+)/);
+    if (match) version = match[1];
+  }
+
+  var v8Version = version && +version;
+
   var SPECIES$3 = wellKnownSymbol('species');
 
   var arrayMethodHasSpeciesSupport = function (METHOD_NAME) {
-    return !fails(function () {
+    // We can't use this feature detection in V8 since it causes
+    // deoptimization and serious performance degradation
+    // https://github.com/zloirock/core-js/issues/677
+    return v8Version >= 51 || !fails(function () {
       var array = [];
       var constructor = array.constructor = {};
       constructor[SPECIES$3] = function () {
@@ -1480,12 +1565,10 @@
   var nativeSlice = [].slice;
   var max$2 = Math.max;
 
-  var SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('slice');
-
   // `Array.prototype.slice` method
   // https://tc39.github.io/ecma262/#sec-array.prototype.slice
   // fallback for not array-like ES3 strings and DOM objects
-  _export({ target: 'Array', proto: true, forced: !SPECIES_SUPPORT }, {
+  _export({ target: 'Array', proto: true, forced: !arrayMethodHasSpeciesSupport('slice') }, {
     slice: function slice(start, end) {
       var O = toIndexedObject(this);
       var length = toLength(O.length);
@@ -1556,8 +1639,8 @@
   }
 
   var TO_STRING = 'toString';
-  var nativeToString = /./[TO_STRING];
   var RegExpPrototype = RegExp.prototype;
+  var nativeToString = RegExpPrototype[TO_STRING];
 
   var NOT_GENERIC = fails(function () { return nativeToString.call({ source: 'a', flags: 'b' }) != '/a/b'; });
   // FF44- RegExp#toString has a wrong name
@@ -1577,7 +1660,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v2.1.14): rgb-to-hex.js
+   * CoreUI (v2.1.15): rgb-to-hex.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -1617,5 +1700,5 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=coreui-utilities.js.map
