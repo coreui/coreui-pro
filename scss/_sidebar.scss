@@ -2,7 +2,7 @@
 $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $sidebar-width) !default;
 
 // stylelint-disable selector-max-class, declaration-no-important, selector-max-compound-selectors, function-url-quotes, selector-max-combinators
-.#{$prefix}sidebar {
+.c-sidebar {
   display: flex;
   // $sidebar-width is the width of the columns
   flex: 0 0 $sidebar-width;
@@ -24,20 +24,20 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 
   @include ltr {
-    &:not(.#{$prefix}sidebar-right){
+    &:not(.c-sidebar-right){
       margin-left: $sidebar-negative-margin;
     }
-    &.#{$prefix}sidebar-right {
+    &.c-sidebar-right {
       order: 99;
       margin-right: $sidebar-negative-margin;
     }
   }
 
   @include rtl {
-    &:not(.#{$prefix}sidebar-right){
+    &:not(.c-sidebar-right){
       margin-right: $sidebar-negative-margin;
     }
-    &.#{$prefix}sidebar-right {
+    &.c-sidebar-right {
       margin-left: $sidebar-negative-margin;
     }
   }
@@ -45,37 +45,37 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   &[class*="bg-"]  {
     border-color: rgba($black, .1);
 
-    .#{$prefix}sidebar-nav-link .#{$prefix}sidebar-nav-icon {
+    .c-sidebar-nav-link .c-sidebar-nav-icon {
       color: rgba($black, .3);
     }
   }
 
   @each $width, $value in $sidebar-widths {
-    &.#{$prefix}sidebar-#{$width} {
+    &.c-sidebar-#{$width} {
       width: $value;
       $sidebar-negative-margin: if($enable-elevations, - ($value + 5px), - $value);
 
       @include ltr {
-        &:not(.#{$prefix}sidebar-right){
+        &:not(.c-sidebar-right){
           margin-left: $sidebar-negative-margin;
         }
-        &.#{$prefix}sidebar-right {
+        &.c-sidebar-right {
           margin-right: $sidebar-negative-margin;
         }
       }
 
       @include rtl {
-        &:not(.#{$prefix}sidebar-right){
+        &:not(.c-sidebar-right){
           margin-right: $sidebar-negative-margin;
         }
-        &.#{$prefix}sidebar-right {
+        &.c-sidebar-right {
           margin-left: $sidebar-negative-margin;
         }
       }
     }
   }
 
-  &.#{$prefix}sidebar-fixed {
+  &.c-sidebar-fixed {
     @include media-breakpoint-up(md) {
       position: fixed;
       top: 0;
@@ -84,28 +84,28 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       @include elevation(2);
 
       @include ltr {
-        &:not(.#{$prefix}sidebar-right) {
+        &:not(.c-sidebar-right) {
           left: 0;
         }
 
-        &.#{$prefix}sidebar-right {
+        &.c-sidebar-right {
           right: 0;
         }
       }
 
       @include rtl {
-        &:not(.#{$prefix}sidebar-right) {
+        &:not(.c-sidebar-right) {
           right: 0;
         }
 
-        &.#{$prefix}sidebar-right {
+        &.c-sidebar-right {
           left: 0;
         }
       }
     }
   }
 
-  &.#{$prefix}sidebar-overlaid {
+  &.c-sidebar-overlaid {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -113,21 +113,21 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     @include elevation(3);
 
     @include ltr {
-      &:not(.#{$prefix}sidebar-right) {
+      &:not(.c-sidebar-right) {
         left: 0;
       }
 
-      &.#{$prefix}sidebar-right {
+      &.c-sidebar-right {
         right: 0;
       }
     }
 
     @include rtl {
-      &:not(.#{$prefix}sidebar-right) {
+      &:not(.c-sidebar-right) {
         right: 0;
       }
 
-      &.#{$prefix}sidebar-right {
+      &.c-sidebar-right {
         left: 0;
       }
     }
@@ -138,7 +138,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 // Sidebar components
 //
 
-.#{$prefix}sidebar-close {
+.c-sidebar-close {
   position: absolute;
   width: $sidebar-brand-height;
   height: $sidebar-brand-height;
@@ -154,18 +154,18 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-.#{$prefix}sidebar-brand {
+.c-sidebar-brand {
   display: flex;
   flex: 0 0 $sidebar-brand-height;
   align-items: center;
   justify-content: center;
 
-  .#{$prefix}sidebar-brand-minimized {
+  .c-sidebar-brand-minimized {
     display: none;
   }
 }
 
-.#{$prefix}sidebar-header {
+.c-sidebar-header {
   flex: 0 0 $sidebar-header-height;
   padding: $sidebar-header-padding-y $sidebar-header-padding-x;
   text-align: center;
@@ -174,7 +174,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
 // Sidebar navigation
 
-.#{$prefix}sidebar-nav {
+.c-sidebar-nav {
   position: relative;
   display: flex;
   flex: 1;
@@ -188,7 +188,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   list-style: none;
 }
 
-.#{$prefix}sidebar-nav-title {
+.c-sidebar-nav-title {
   padding: $sidebar-nav-title-padding-y $sidebar-nav-title-padding-x;
   margin-top: $sidebar-nav-title-margin-top;
   font-size: 80%;
@@ -197,16 +197,16 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   transition: $layout-transition-speed;
 }
 
-.#{$prefix}sidebar-nav-divider {
+.c-sidebar-nav-divider {
   height: 10px;
   transition: height $layout-transition-speed;
 }
 
-.#{$prefix}sidebar-nav-item {
+.c-sidebar-nav-item {
   width: inherit;
 }
 
-.#{$prefix}sidebar-nav-link {
+.c-sidebar-nav-link {
   display: flex;
   flex: 1;
   align-items: center;
@@ -218,7 +218,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     border-radius: $border-radius;
   }
 
-  .#{$bs-prefix}badge {
+  .badge {
     @include ltr {
       margin-left: auto;
     }
@@ -227,7 +227,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
   }
 
-  &.#{$prefix}disabled {
+  &.c-disabled {
     cursor: $cursor-disabled;
   }
 
@@ -236,7 +236,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-.#{$prefix}sidebar-nav-icon {
+.c-sidebar-nav-icon {
   flex: 0 0 $sidebar-nav-icon-width;
   height: ($font-size-base * 1.25);
   font-size: ($font-size-base * 1.25);
@@ -254,19 +254,19 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-.#{$prefix}sidebar-nav-dropdown {
+.c-sidebar-nav-dropdown {
   position: relative;
   transition: background $layout-transition-speed ease-in-out;
 
-  &.#{$prefix}show {
+  &.c-show {
     @if $enable-sidebar-nav-rounded {
       border-radius: $border-radius;
     }
-    > .#{$prefix}sidebar-nav-dropdown-items {
+    > .c-sidebar-nav-dropdown-items {
       max-height: 1500px;
     }
 
-    > .#{$prefix}sidebar-nav-dropdown-toggle::after {
+    > .c-sidebar-nav-dropdown-toggle::after {
       @include ltr {
         transform: rotate(-90deg);
       }
@@ -275,14 +275,14 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    + .#{$prefix}sidebar-nav-dropdown.#{$prefix}show {
+    + .c-sidebar-nav-dropdown.c-show {
       margin-top: 1px;
     }
   }
 }
 
-.#{$prefix}sidebar-nav-dropdown-toggle {
-  @extend .#{$prefix}sidebar-nav-link;
+.c-sidebar-nav-dropdown-toggle {
+  @extend .c-sidebar-nav-link;
   cursor: pointer;
 
   &::after {
@@ -303,7 +303,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
   }
 
-  .#{$prefix}badge {
+  .badge {
     @include ltr {
       margin-right: $sidebar-nav-link-padding-x;
     }
@@ -313,14 +313,14 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-.#{$prefix}sidebar-nav-dropdown-items {
+.c-sidebar-nav-dropdown-items {
   max-height: 0;
   padding: 0;
   overflow-y: hidden;
   transition: max-height $layout-transition-speed ease-in-out;
 }
 
-.#{$prefix}sidebar-nav-label {
+.c-sidebar-nav-label {
   display: flex;
   padding: ($sidebar-nav-link-padding-y / 4) $sidebar-nav-link-padding-x;
   transition: $layout-transition-speed;
@@ -329,18 +329,18 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     text-decoration: none;
   }
 
-  .#{$prefix}sidebar-nav-icon {
+  .c-sidebar-nav-icon {
     margin-top: 1px;
   }
 }
 
-.#{$prefix}sidebar-footer {
+.c-sidebar-footer {
   flex: 0 0 $sidebar-footer-height;
   padding: $sidebar-footer-padding-y $sidebar-footer-padding-x;
   transition: $layout-transition-speed;
 }
 
-.#{$prefix}sidebar-minimizer {
+.c-sidebar-minimizer {
   display: flex;
   flex: 0 0 $sidebar-minimizer-height;
   justify-content: flex-end;
@@ -365,11 +365,11 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 
   &:focus,
-  &.#{$prefix}focus {
+  &.c-focus {
     outline: 0;
   }
 
-  .#{$prefix}sidebar-right & {
+  .c-sidebar-right & {
     justify-content: flex-start;
     &::before {
       @include ltr {
@@ -382,19 +382,35 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
+// Modal background
+.c-sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: $zindex-fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color: $sidebar-backdrop-bg;
+  transition: $layout-transition-speed;
+
+  // Fade for backdrop
+  &.c-fade { opacity: 0; }
+  &.c-show { opacity: $sidebar-backdrop-opacity; }
+}
+
 // Minimized Sidebar
 
-.#{$prefix}sidebar-minimized {
+.c-sidebar-minimized {
   @include media-breakpoint-up(md) {
     z-index: $zindex-fixed + 1;
     flex: 0 0 $sidebar-minimized-width;
 
-    &.#{$prefix}sidebar-fixed {
+    &.c-sidebar-fixed {
       z-index: $zindex-fixed + 1;
       width: $sidebar-minimized-width;
     }
 
-    &:not(.#{$prefix}sidebar-right){
+    &:not(.c-sidebar-right){
       @include ltr {
         margin-left: - $sidebar-minimized-width;
       }
@@ -402,7 +418,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
         margin-right: - $sidebar-minimized-width;
       }
     }
-    &.#{$prefix}sidebar-right {
+    &.c-sidebar-right {
       @include ltr {
         margin-right: - $sidebar-minimized-width;
       }
@@ -411,26 +427,26 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    .#{$prefix}sidebar-brand-full {
+    .c-sidebar-brand-full {
       display: none;
     }
 
-    .#{$prefix}sidebar-brand-minimized {
+    .c-sidebar-brand-minimized {
       display: initial;
     }
 
-    .#{$prefix}sidebar-nav {
+    .c-sidebar-nav {
       padding-bottom: $sidebar-minimizer-height;
       overflow: visible;
     }
 
-    .#{$prefix}d-minimized-none,
-    .#{$prefix}sidebar-nav-divider,
-    .#{$prefix}sidebar-nav-label,
-    .#{$prefix}sidebar-nav-title,
-    .#{$prefix}sidebar-footer,
-    .#{$prefix}sidebar-form,
-    .#{$prefix}sidebar-header {
+    .c-d-minimized-none,
+    .c-sidebar-nav-divider,
+    .c-sidebar-nav-label,
+    .c-sidebar-nav-title,
+    .c-sidebar-footer,
+    .c-sidebar-form,
+    .c-sidebar-header {
       height: 0;
       padding: 0;
       margin: 0;
@@ -440,7 +456,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
     // Temporary fix for this issue: https://github.com/coreui/coreui-free-bootstrap-admin-template/issues/404
     // TODO: find better solution
-    .#{$prefix}sidebar-minimizer {
+    .c-sidebar-minimizer {
       position: fixed;
       bottom: 0;
       width: inherit;
@@ -455,7 +471,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    &.#{$prefix}sidebar-right .#{$prefix}sidebar-minimizer::before {
+    &.c-sidebar-right .c-sidebar-minimizer::before {
       @include ltr {
         transform: rotate(0deg);
       }
@@ -464,7 +480,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    .#{$prefix}sidebar-nav-dropdown {
+    .c-sidebar-nav-dropdown {
       position: relative;
       overflow: hidden;
 
@@ -474,9 +490,9 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    &.#{$prefix}sidebar-right .#{$prefix}sidebar-nav {
-      > .#{$prefix}sidebar-nav-item:hover,
-      > .#{$prefix}sidebar-nav-dropdown:hover {
+    &.c-sidebar-right .c-sidebar-nav {
+      > .c-sidebar-nav-item:hover,
+      > .c-sidebar-nav-dropdown:hover {
         @include ltr {
           margin-left: - $sidebar-width;
         }
@@ -486,52 +502,52 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    .#{$prefix}sidebar-nav-link,
-    .#{$prefix}sidebar-nav-dropdown-toggle {
+    .c-sidebar-nav-link,
+    .c-sidebar-nav-dropdown-toggle {
       overflow: hidden;
       white-space: nowrap;
       border-left: 0;
 
-      // .#{$prefix}sidebar-nav-icon {
+      // .c-sidebar-nav-icon {
       //   display: block;
       //   float: left;
       //   width: $sidebar-minimized-height;
       //   font-size: 18px;
       // }
 
-      // .#{$prefix}badge {
+      // .badge {
       //   display: none;
       // }
 
       &:hover {
         width: $sidebar-width + $sidebar-minimized-width;
 
-        // .#{$prefix}badge {
+        // .badge {
         //   display: inline;
         // }
       }
     }
 
-    .#{$prefix}sidebar-nav-dropdown-toggle::after {
+    .c-sidebar-nav-dropdown-toggle::after {
       display: none;
     }
 
-    .#{$prefix}sidebar-nav-dropdown-items {
-      .#{$prefix}sidebar-nav-link {
+    .c-sidebar-nav-dropdown-items {
+      .c-sidebar-nav-link {
         width: $sidebar-width;
       }
     }
 
     // stylelint-disable-next-line no-duplicate-selectors
-    .#{$prefix}sidebar-nav-dropdown {
-      > .#{$prefix}sidebar-nav-dropdown-items {
+    .c-sidebar-nav-dropdown {
+      > .c-sidebar-nav-dropdown-items {
         display: none;
         max-height: 1000px;
       }
 
       // stylelint-disable-next-line no-duplicate-selectors
       &:hover {
-        > .#{$prefix}sidebar-nav-dropdown-items {
+        > .c-sidebar-nav-dropdown-items {
           position: absolute;
           display: inline;
 
@@ -545,7 +561,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    &.#{$prefix}sidebar-right > .#{$prefix}sidebar-nav-dropdown:hover > .#{$prefix}sidebar-nav-dropdown-items {
+    &.c-sidebar-right > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
       @include ltr {
         left: 0;
       }
@@ -556,10 +572,10 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-.#{$prefix}sidebar-unfoldable:not(:hover) {
-  @extend .#{$prefix}sidebar-minimized;
+.c-sidebar-unfoldable:not(:hover) {
+  @extend .c-sidebar-minimized;
 }
-.#{$prefix}sidebar-unfoldable {
+.c-sidebar-unfoldable {
   @include media-breakpoint-up(md) {
     z-index: $zindex-fixed + 1 !important;
     &:hover {
@@ -573,9 +589,9 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 @each $breakpoint in map-keys($grid-breakpoints) {
   @include media-breakpoint-up($breakpoint) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-    .#{$prefix}sidebar.#{$prefix}sidebar#{$infix}-show,
-    .#{$prefix}sidebar.#{$prefix}sidebar-show {
-      &:not(.#{$prefix}sidebar-right){
+    .c-sidebar.c-sidebar#{$infix}-show,
+    .c-sidebar.c-sidebar-show {
+      &:not(.c-sidebar-right){
         @include ltr {
           margin-left: 0;
         }
@@ -584,8 +600,8 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
         }
 
         @if $breakpoint != "xs" {
-          &.#{$prefix}sidebar-fixed {
-            ~ .#{$prefix}wrapper {
+          &.c-sidebar-fixed {
+            ~ .c-wrapper {
               @include ltr {
                 margin-left: $sidebar-width;
               }
@@ -594,8 +610,8 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
               }
             }
             @each $width, $value in $sidebar-widths {
-              &.#{$prefix}sidebar-#{$width} {
-                ~ .#{$prefix}wrapper {
+              &.c-sidebar-#{$width} {
+                ~ .c-wrapper {
                   @include ltr {
                     margin-left: $value;
                   }
@@ -605,14 +621,14 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
                 }
               }
             }
-            // &.#{$prefix}sidebar-compact {
-            //   ~ .#{$prefix}wrapper {
+            // &.c-sidebar-compact {
+            //   ~ .c-wrapper {
             //     margin-left: $sidebar-compact-width;
             //   }
             // }
-            &.#{$prefix}sidebar-minimized,
-            &.#{$prefix}sidebar-unfoldable {
-              ~ .#{$prefix}wrapper {
+            &.c-sidebar-minimized,
+            &.c-sidebar-unfoldable {
+              ~ .c-wrapper {
                 @include ltr {
                   margin-left: $sidebar-minimized-width;
                 }
@@ -624,7 +640,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
           }
         }
       }
-      &.#{$prefix}sidebar-right {
+      &.c-sidebar-right {
         @include ltr {
           margin-right: 0;
         }
@@ -632,8 +648,8 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
           margin-left: 0;
         }
         @if $breakpoint != "xs" {
-          &.#{$prefix}sidebar-fixed {
-            ~ .#{$prefix}wrapper {
+          &.c-sidebar-fixed {
+            ~ .c-wrapper {
               @include ltr {
                 margin-right: $sidebar-width;
               }
@@ -642,8 +658,8 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
               }
             }
             @each $width, $value in $sidebar-widths {
-              &.#{$prefix}sidebar-#{$width} {
-                ~ .#{$prefix}wrapper {
+              &.c-sidebar-#{$width} {
+                ~ .c-wrapper {
                   @include ltr {
                     margin-right: $value;
                   }
@@ -653,14 +669,14 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
                 }
               }
             }
-            // &.#{$prefix}sidebar-compact {
-            //   ~ .#{$prefix}wrapper {
+            // &.c-sidebar-compact {
+            //   ~ .c-wrapper {
             //     margin-right: $sidebar-compact-width;
             //   }
             // }
-            &.#{$prefix}sidebar-minimized,
-            &.#{$prefix}sidebar-unfoldable {
-              ~ .#{$prefix}wrapper {
+            &.c-sidebar-minimized,
+            &.c-sidebar-unfoldable {
+              ~ .c-wrapper {
                 @include ltr {
                   margin-right: $sidebar-minimized-width;
                 }
@@ -676,39 +692,39 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 
-@include themes($sidebar-theme-map, $create: append, $parent: ".#{$prefix}sidebar") {
+@include themes($sidebar-theme-map, $create: append, $parent: ".c-sidebar") {
   color: themes-get-value("sidebar-color");
   background: themes-get-value("sidebar-bg");
 
   @include borders(themes-get-value("sidebar-borders"));
 
   @include ltr {
-    &.#{$prefix}sidebar-right {
+    &.c-sidebar-right {
       @include borders(themes-get-value("sidebar-borders"),true);
     }
   }
 
   @include rtl {
     @include borders(themes-get-value("sidebar-borders"),true);
-    &.#{$prefix}sidebar-right {
+    &.c-sidebar-right {
       border: 0;
       @include borders(themes-get-value("sidebar-borders"));
     }
   }
 
-  .#{$prefix}sidebar-close {
+  .c-sidebar-close {
     color: themes-get-value("sidebar-color");
   }
 
-  .#{$prefix}sidebar-brand {
+  .c-sidebar-brand {
     background: themes-get-value("sidebar-brand-bg");
   }
 
-  .#{$prefix}sidebar-header {
+  .c-sidebar-header {
     background: themes-get-value("sidebar-header-bg");
   }
 
-  .#{$prefix}sidebar-form .#{$prefix}form-control {
+  .c-sidebar-form .c-form-control {
     color: themes-get-value("sidebar-form-color");
     background: themes-get-value("sidebar-form-bg");
     border: themes-get-value("sidebar-form-border");
@@ -718,26 +734,26 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
   }
 
-  .#{$prefix}sidebar-nav-title {
+  .c-sidebar-nav-title {
     color: themes-get-value("sidebar-nav-title-color");
   }
 
-  .#{$prefix}sidebar-nav-link {
+  .c-sidebar-nav-link {
     color: themes-get-value("sidebar-nav-link-color");
     background: themes-get-value("sidebar-nav-link-bg");
     @include borders(themes-get-value("sidebar-nav-link-borders"));
 
-    .#{$prefix}sidebar-nav-icon {
+    .c-sidebar-nav-icon {
       color: themes-get-value("sidebar-nav-link-icon-color");
       fill: themes-get-value("sidebar-nav-link-icon-color");
     }
 
-    &.#{$prefix}active {
+    &.c-active {
       color: themes-get-value("sidebar-nav-link-active-color");
       background: themes-get-value("sidebar-nav-link-active-bg");
       @include borders(themes-get-value("sidebar-nav-link-active-borders"));
 
-      .#{$prefix}sidebar-nav-icon {
+      .c-sidebar-nav-icon {
         color: themes-get-value("sidebar-nav-link-active-icon-color");
         fill: themes-get-value("sidebar-nav-link-active-icon-color");
       }
@@ -748,22 +764,22 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       background: themes-get-value("sidebar-nav-link-hover-bg");
       @include borders(themes-get-value("sidebar-nav-link-hover-borders"));
 
-      .#{$prefix}sidebar-nav-icon {
+      .c-sidebar-nav-icon {
         color: themes-get-value("sidebar-nav-link-hover-icon-color");
         fill: themes-get-value("sidebar-nav-link-hover-icon-color");
       }
 
-      &.#{$prefix}sidebar-nav-dropdown-toggle::after {
+      &.c-sidebar-nav-dropdown-toggle::after {
         background-image: themes-get-value("sidebar-nav-dropdown-indicator-hover");
       }
     }
 
-    &.#{$prefix}disabled {
+    &.c-disabled {
       color: themes-get-value("sidebar-nav-link-disabled-color");
       background: transparent;
       @include borders(themes-get-value("sidebar-nav-link-disabled-borders"));
 
-      .#{$prefix}sidebar-nav-icon {
+      .c-sidebar-nav-icon {
         color: themes-get-value("sidebar-nav-link-disabled-icon-color");
         fill: themes-get-value("sidebar-nav-link-disabled-icon-color");
       }
@@ -772,18 +788,18 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
         color: themes-get-value("sidebar-nav-link-disabled-color");
         @include borders(themes-get-value("sidebar-nav-link-hover-borders"));
 
-        .#{$prefix}sidebar-nav-icon {
+        .c-sidebar-nav-icon {
           color: themes-get-value("sidebar-nav-link-disabled-icon-color");
           fill: themes-get-value("sidebar-nav-link-disabled-icon-color");
         }
 
-        &.#{$prefix}sidebar-nav-dropdown-toggle::after {
+        &.c-sidebar-nav-dropdown-toggle::after {
           background-image: themes-get-value("sidebar-nav-dropdown-indicator-hover");
         }
       }
     }
   }
-  .#{$prefix}sidebar-nav-dropdown-toggle {
+  .c-sidebar-nav-dropdown-toggle {
     position: relative;
 
     &::after {
@@ -791,21 +807,21 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
   }
 
-  .#{$prefix}sidebar-nav-dropdown.#{$prefix}show {
+  .c-sidebar-nav-dropdown.c-show {
     background: themes-get-value("sidebar-nav-dropdown-bg");
     @include borders(themes-get-value("sidebar-nav-dropdown-borders"));
 
-    .#{$prefix}sidebar-nav-link {
+    .c-sidebar-nav-link {
       color: themes-get-value("sidebar-nav-dropdown-color");
 
-      &.#{$prefix}disabled {
+      &.c-disabled {
         color: themes-get-value("sidebar-nav-link-disabled-color");
         background: transparent;
 
         &:hover {
           color: themes-get-value("sidebar-nav-link-disabled-color");
 
-          .#{$prefix}sidebar-nav-icon {
+          .c-sidebar-nav-icon {
             color: themes-get-value("sidebar-nav-link-disabled-icon-color");
           }
         }
@@ -813,30 +829,30 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
   }
 
-  .#{$prefix}sidebar-nav-label {
+  .c-sidebar-nav-label {
     color: themes-get-value("sidebar-nav-title-color");
 
     &:hover {
       color: themes-get-value("sidebar-color");
     }
 
-    .#{$prefix}sidebar-nav-icon {
+    .c-sidebar-nav-icon {
       color: themes-get-value("sidebar-nav-link-icon-color");
     }
   }
 
   @if (lightness( themes-get-value("sidebar-bg") ) < 40) {
-    .#{$prefix}progress {
+    .c-progress {
       background-color: lighten(themes-get-value("sidebar-bg"), 15%) !important;
     }
   }
 
-  .#{$prefix}sidebar-footer {
+  .c-sidebar-footer {
     background: themes-get-value("sidebar-footer-bg");
     @include borders(themes-get-value("sidebar-footer-borders"));
   }
 
-  .#{$prefix}sidebar-minimizer {
+  .c-sidebar-minimizer {
     background-color: themes-get-value("sidebar-minimizer-bg");
     @include borders(themes-get-value("sidebar-minimizer-borders"));
 
@@ -845,7 +861,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
 
     &:focus,
-    &.#{$prefix}focus {
+    &.c-focus {
       outline: 0;
     }
 
@@ -859,23 +875,23 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       display: none;
     }
   }
-  &.#{$prefix}sidebar-minimized {
+  &.c-sidebar-minimized {
 
-    .#{$prefix}sidebar-nav-item {
+    .c-sidebar-nav-item {
 
       &:hover {
 
-        > .#{$prefix}sidebar-nav-link, {
+        > .c-sidebar-nav-link, {
           background: themes-get-value("sidebar-nav-link-hover-bg");
 
-          .#{$prefix}sidebar-nav-icon {
+          .c-sidebar-nav-icon {
             color: themes-get-value("sidebar-nav-link-hover-color");
           }
 
-          &.#{$prefix}disabled {
+          &.c-disabled {
             background: themes-get-value("sidebar-nav-link-disabled-bg");
 
-            .#{$prefix}sidebar-nav-icon {
+            .c-sidebar-nav-icon {
               color: themes-get-value("sidebar-nav-link-disabled-icon-color");
             }
           }
@@ -883,12 +899,12 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       }
     }
 
-    .#{$prefix}sidebar-nav-link:hover {
+    .c-sidebar-nav-link:hover {
       background: themes-get-value("sidebar-nav-link-hover-bg");
     }
-    .#{$prefix}sidebar-nav {
-      > .#{$prefix}sidebar-nav-dropdown {
-        > .#{$prefix}sidebar-nav-dropdown-items {
+    .c-sidebar-nav {
+      > .c-sidebar-nav-dropdown {
+        > .c-sidebar-nav-dropdown-items {
           background: themes-get-value("sidebar-bg");
         }
 
@@ -901,18 +917,18 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 }
 
 // stylelint-disable-next-line no-duplicate-selectors
-.#{$prefix}sidebar {
+.c-sidebar {
   @include theme-variant() {
-    .#{$prefix}sidebar-nav-link {
-      &.#{$prefix}sidebar-nav-link-#{$color} {
+    .c-sidebar-nav-link {
+      &.c-sidebar-nav-link-#{$color} {
         background: $value;
-        .#{$prefix}sidebar-nav-icon {
+        .c-sidebar-nav-icon {
           color: rgba(255, 255, 255, .7);
           fill: rgba(255, 255, 255, .7);
         }
         &:hover {
           background: darken($value, 5%);
-          .#{$prefix}sidebar-nav-icon {
+          .c-sidebar-nav-icon {
             color: $white;
             fill: $white;
           }
