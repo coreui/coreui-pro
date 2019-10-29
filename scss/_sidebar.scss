@@ -508,6 +508,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       white-space: nowrap;
       border-left: 0;
 
+      // TODO: clean-up
       // .c-sidebar-nav-icon {
       //   display: block;
       //   float: left;
@@ -522,6 +523,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       &:hover {
         width: $sidebar-width + $sidebar-minimized-width;
 
+        // TODO: clean-up
         // .badge {
         //   display: inline;
         // }

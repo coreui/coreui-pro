@@ -1,3 +1,14 @@
+:root {
+  --primary-dark-theme: #4638c2;
+  --secondary-dark-theme: #4c4f54;
+  --success-dark-theme: #45a164;
+  --info-dark-theme: #4799eb;
+  --warning-dark-theme: #e1a82d;
+  --danger-dark-theme: #d16767;
+  --light-dark-theme: #20202a;
+  --dark-dark-theme: #181924;
+}
+
 .c-callout {
   position: relative;
   padding: 0 1rem;
@@ -33,6 +44,102 @@ html:not([dir="rtl"]) .c-callout {
 
 .c-callout + .c-callout {
   margin-top: -0.25rem;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-primary {
+  border-left-color: #4638c2;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-primary {
+  border-right-color: #4638c2;
+}
+
+.c-dark-theme .c-callout-primary h4 {
+  color: #4638c2;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-secondary {
+  border-left-color: #4c4f54;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-secondary {
+  border-right-color: #4c4f54;
+}
+
+.c-dark-theme .c-callout-secondary h4 {
+  color: #4c4f54;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-success {
+  border-left-color: #45a164;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-success {
+  border-right-color: #45a164;
+}
+
+.c-dark-theme .c-callout-success h4 {
+  color: #45a164;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-info {
+  border-left-color: #4799eb;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-info {
+  border-right-color: #4799eb;
+}
+
+.c-dark-theme .c-callout-info h4 {
+  color: #4799eb;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-warning {
+  border-left-color: #e1a82d;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-warning {
+  border-right-color: #e1a82d;
+}
+
+.c-dark-theme .c-callout-warning h4 {
+  color: #e1a82d;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-danger {
+  border-left-color: #d16767;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-danger {
+  border-right-color: #d16767;
+}
+
+.c-dark-theme .c-callout-danger h4 {
+  color: #d16767;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-light {
+  border-left-color: #20202a;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-light {
+  border-right-color: #20202a;
+}
+
+.c-dark-theme .c-callout-light h4 {
+  color: #20202a;
+}
+
+html:not([dir="rtl"]) .c-dark-theme .c-callout-dark {
+  border-left-color: #181924;
+}
+
+*[dir="rtl"] .c-dark-theme .c-callout-dark {
+  border-right-color: #181924;
+}
+
+.c-dark-theme .c-callout-dark h4 {
+  color: #181924;
 }
 
 html:not([dir="rtl"]) .c-callout-primary {

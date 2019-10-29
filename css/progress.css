@@ -1,3 +1,14 @@
+:root {
+  --primary-dark-theme: #4638c2;
+  --secondary-dark-theme: #4c4f54;
+  --success-dark-theme: #45a164;
+  --info-dark-theme: #4799eb;
+  --warning-dark-theme: #e1a82d;
+  --danger-dark-theme: #d16767;
+  --light-dark-theme: #20202a;
+  --dark-dark-theme: #181924;
+}
+
 @keyframes progress-bar-stripes {
   from {
     background-position: 1rem 0;
@@ -16,6 +27,10 @@
   background-color: #ebedef;
 }
 
+.c-dark-theme .progress {
+  background-color: #768192;
+}
+
 .progress-bar {
   display: flex;
   flex-direction: column;
@@ -31,6 +46,11 @@
   .progress-bar {
     transition: none;
   }
+}
+
+.c-dark-theme .progress-bar {
+  color: #fff;
+  background-color: #321fdb;
 }
 
 .progress-bar-striped {

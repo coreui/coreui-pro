@@ -1,3 +1,14 @@
+:root {
+  --primary-dark-theme: #4638c2;
+  --secondary-dark-theme: #4c4f54;
+  --success-dark-theme: #45a164;
+  --info-dark-theme: #4799eb;
+  --warning-dark-theme: #e1a82d;
+  --danger-dark-theme: #d16767;
+  --light-dark-theme: #20202a;
+  --dark-dark-theme: #181924;
+}
+
 .c-header {
   position: relative;
   display: flex;
@@ -383,6 +394,78 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 
 .c-header .c-subheader {
   border-top: 1px solid #d8dbe0;
+}
+
+.c-dark-theme .c-header {
+  background: #2c2c34;
+  border-bottom: 0;
+}
+
+.c-dark-theme .c-header .c-header-brand {
+  color: #fff;
+  background-color: transparent;
+}
+
+.c-dark-theme .c-header .c-header-brand:hover, .c-dark-theme .c-header .c-header-brand:focus {
+  color: #fff;
+}
+
+@media (min-width: 992px) {
+  .c-dark-theme .c-header .c-header-brand.c-header-brand-minimized {
+    background-color: transparent;
+  }
+}
+
+.c-dark-theme .c-header .c-header-nav .c-header-nav-link,
+.c-dark-theme .c-header .c-header-nav .c-header-nav-btn {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.c-dark-theme .c-header .c-header-nav .c-header-nav-link:hover, .c-dark-theme .c-header .c-header-nav .c-header-nav-link:focus,
+.c-dark-theme .c-header .c-header-nav .c-header-nav-btn:hover,
+.c-dark-theme .c-header .c-header-nav .c-header-nav-btn:focus {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.c-dark-theme .c-header .c-header-nav .c-header-nav-link.c-disabled,
+.c-dark-theme .c-header .c-header-nav .c-header-nav-btn.c-disabled {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.c-dark-theme .c-header .c-header-nav .c-show > .c-header-nav-link,
+.c-dark-theme .c-header .c-header-nav .c-active > .c-header-nav-link,
+.c-dark-theme .c-header .c-header-nav .c-header-nav-link.c-show,
+.c-dark-theme .c-header .c-header-nav .c-header-nav-link.c-active {
+  color: #fff;
+}
+
+.c-dark-theme .c-header .c-header-toggler {
+  color: rgba(255, 255, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.c-dark-theme .c-header .c-header-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.75)' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.c-dark-theme .c-header .c-header-toggler-icon:hover {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.9)' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+.c-dark-theme .c-header .c-header-text {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.c-dark-theme .c-header .c-header-text a {
+  color: #fff;
+}
+
+.c-dark-theme .c-header .c-header-text a:hover, .c-dark-theme .c-header .c-header-text a:focus {
+  color: #fff;
+}
+
+.c-dark-theme .c-header .c-subheader {
+  border-top: 1px solid #181924;
 }
 
 /*# sourceMappingURL=header.css.map */
