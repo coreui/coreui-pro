@@ -173,7 +173,7 @@
     @include switch-outline-variant($value);
   }
   //outline alternative style
-  .c-switch-opposite-alt {
+  .c-switch-opposite-#{$color} {
     @include switch-opposite-variant($value);
   }
 }
@@ -188,6 +188,16 @@
 
     &::before {
       border-radius: 50em;
+    }
+  }
+}
+
+.c-switch-square {
+  .c-switch-slider {
+    border-radius: 0;
+
+    &::before {
+      border-radius: 0;
     }
   }
 }
