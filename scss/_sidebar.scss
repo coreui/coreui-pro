@@ -582,6 +582,15 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     z-index: $zindex-fixed + 1 !important;
     &:hover {
       @include elevation(3);
+
+      .c-sidebar-minimizer::before {
+        @include ltr {
+          transform: rotate(-180deg);
+        }
+        @include rtl {
+          transform: rotate(0deg);
+        }
+      }
     }
   }
 }
