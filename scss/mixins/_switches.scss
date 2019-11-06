@@ -40,11 +40,6 @@
 @mixin switch-3d-variant($color) {
   .c-switch-input:checked + .c-switch-slider {
     background-color: $color;
-    // border-color: darken($color, 10%);
-
-    &::before {
-      // border-color: darken($color, 10%);
-    }
   }
 }
 

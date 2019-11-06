@@ -518,7 +518,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     // stylelint-disable-next-line no-duplicate-selectors
     .c-sidebar-nav > .c-sidebar-nav-dropdown {
       position: relative;
-      overflow: hidden;
+      // overflow: hidden;
 
       > .c-sidebar-nav-dropdown-items {
         display: none;
@@ -564,6 +564,11 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
 .c-sidebar-unfoldable:not(:hover) {
   @extend .c-sidebar-minimized;
+
+  // fix for perfect scrollbar
+  .ps {
+    overflow: initial !important;
+  }
 }
 .c-sidebar-unfoldable {
   @include media-breakpoint-up(md) {

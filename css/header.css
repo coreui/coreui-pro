@@ -66,8 +66,8 @@
 
 .c-header-brand.c-header-brand-centered {
   position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: 56px;
+  transform: translate(-50%, -100%);
 }
 
 html:not([dir="rtl"]) .c-header-brand.c-header-brand-centered {
@@ -81,8 +81,8 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-centered {
 @media (max-width: 575.98px) {
   .c-header-brand.c-header-brand-xs-down-centered {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 56px;
+    transform: translate(-50%, -100%);
   }
   html:not([dir="rtl"]) .c-header-brand.c-header-brand-xs-down-centered {
     left: 50%;
@@ -95,8 +95,8 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-centered {
 @media (max-width: 767.98px) {
   .c-header-brand.c-header-brand-sm-down-centered {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 56px;
+    transform: translate(-50%, -100%);
   }
   html:not([dir="rtl"]) .c-header-brand.c-header-brand-sm-down-centered {
     left: 50%;
@@ -109,8 +109,8 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-centered {
 @media (max-width: 991.98px) {
   .c-header-brand.c-header-brand-md-down-centered {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 56px;
+    transform: translate(-50%, -100%);
   }
   html:not([dir="rtl"]) .c-header-brand.c-header-brand-md-down-centered {
     left: 50%;
@@ -123,8 +123,8 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-centered {
 @media (max-width: 1199.98px) {
   .c-header-brand.c-header-brand-lg-down-centered {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 56px;
+    transform: translate(-50%, -100%);
   }
   html:not([dir="rtl"]) .c-header-brand.c-header-brand-lg-down-centered {
     left: 50%;
@@ -136,8 +136,8 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-centered {
 
 .c-header-brand.c-header-brand-xl-down-centered {
   position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: 56px;
+  transform: translate(-50%, -100%);
 }
 
 html:not([dir="rtl"]) .c-header-brand.c-header-brand-xl-down-centered {
