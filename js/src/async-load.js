@@ -36,7 +36,7 @@ const Event = {
 }
 
 const Selector = {
-  NAV_DROPDOWN: 'c-sidebar-nav-dropdown',
+  NAV_DROPDOWN: '.c-sidebar-nav-dropdown',
   NAV_LINK: '.c-xhr-link, .c-sidebar-nav-link',
   NAV_ITEM: '.c-sidebar-nav-item',
   VIEW_SCRIPT: '.view-script'
