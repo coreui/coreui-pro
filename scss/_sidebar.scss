@@ -318,6 +318,24 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   padding: 0;
   overflow-y: hidden;
   transition: max-height $layout-transition-speed ease-in-out;
+
+  .c-sidebar-nav-link {
+    @include ltr {
+      padding-left: $sidebar-nav-icon-width;
+    }
+    @include rtl {
+      padding-right: $sidebar-nav-icon-width;
+    }
+
+    .c-sidebar-nav-icon {
+      @include ltr {
+        margin-left: - $sidebar-nav-icon-width;
+      }
+      @include rtl {
+        margin-right: - $sidebar-nav-icon-width;
+      }
+    }
+  }
 }
 
 .c-sidebar-nav-label {
