@@ -39,7 +39,7 @@ var Event = {
   XHR_STATUS: 'xhr'
 };
 var Selector = {
-  NAV_DROPDOWN: 'c-sidebar-nav-dropdown',
+  NAV_DROPDOWN: '.c-sidebar-nav-dropdown',
   NAV_LINK: '.c-xhr-link, .c-sidebar-nav-link',
   NAV_ITEM: '.c-sidebar-nav-item',
   VIEW_SCRIPT: '.view-script'

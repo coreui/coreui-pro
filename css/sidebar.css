@@ -337,6 +337,22 @@ html:not([dir="rtl"]) .c-sidebar-nav-dropdown-toggle .badge {
   transition: max-height 0.25s ease-in-out;
 }
 
+html:not([dir="rtl"]) .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, html:not([dir="rtl"]) .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle {
+  padding-left: 56px;
+}
+
+*[dir="rtl"] .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, *[dir="rtl"] .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle {
+  padding-right: 56px;
+}
+
+html:not([dir="rtl"]) .c-sidebar-nav-dropdown-items .c-sidebar-nav-link .c-sidebar-nav-icon, html:not([dir="rtl"]) .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+  margin-left: -56px;
+}
+
+*[dir="rtl"] .c-sidebar-nav-dropdown-items .c-sidebar-nav-link .c-sidebar-nav-icon, *[dir="rtl"] .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+  margin-right: -56px;
+}
+
 .c-sidebar-nav-label {
   display: flex;
   padding: 0.211125rem 1rem;
