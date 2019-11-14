@@ -756,7 +756,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
     .c-sidebar-nav-icon {
       color: themes-get-value("sidebar-nav-link-icon-color");
-      fill: themes-get-value("sidebar-nav-link-icon-color");
     }
 
     &.c-active {
@@ -766,7 +765,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
       .c-sidebar-nav-icon {
         color: themes-get-value("sidebar-nav-link-active-icon-color");
-        fill: themes-get-value("sidebar-nav-link-active-icon-color");
       }
     }
 
@@ -777,7 +775,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
       .c-sidebar-nav-icon {
         color: themes-get-value("sidebar-nav-link-hover-icon-color");
-        fill: themes-get-value("sidebar-nav-link-hover-icon-color");
       }
 
       &.c-sidebar-nav-dropdown-toggle::after {
@@ -792,7 +789,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
       .c-sidebar-nav-icon {
         color: themes-get-value("sidebar-nav-link-disabled-icon-color");
-        fill: themes-get-value("sidebar-nav-link-disabled-icon-color");
       }
 
       &:hover {
@@ -801,7 +797,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
         .c-sidebar-nav-icon {
           color: themes-get-value("sidebar-nav-link-disabled-icon-color");
-          fill: themes-get-value("sidebar-nav-link-disabled-icon-color");
         }
 
         &.c-sidebar-nav-dropdown-toggle::after {
@@ -935,13 +930,11 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
         background: $value;
         .c-sidebar-nav-icon {
           color: rgba(255, 255, 255, .7);
-          fill: rgba(255, 255, 255, .7);
         }
         &:hover {
           background: darken($value, 5%);
           .c-sidebar-nav-icon {
             color: $white;
-            fill: $white;
           }
         }
       }
