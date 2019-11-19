@@ -1,6 +1,6 @@
 {
   "name": "@coreui/coreui-pro",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.3",
   "description": "UI Kit built on top of Bootstrap 4",
   "keywords": [
     "bootstrap",
@@ -18,7 +18,7 @@
     "url": "https://github.com/coreui/coreui-pro/issues",
     "email": "support@coreui.io"
   },
-  "license": "MIT",
+  "license": "",
   "author": {
     "name": "Łukasz Holeczek",
     "url": "http://holeczek.pl",
