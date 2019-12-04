@@ -6,7 +6,7 @@
  */
 
 import {
-  jQuery as $
+  getjQuery
 } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
@@ -248,12 +248,14 @@ class AsyncLoad {
     }
   }
 
-  static _jQueryInterface(config) {
+  static jQueryInterface(config) {
     return this.each(function () {
       AsyncLoad._asyncLoadInterface(this, config)
     })
   }
 }
+
+const $ = getjQuery()
 
 /**
  * ------------------------------------------------------------------------
@@ -262,13 +264,13 @@ class AsyncLoad {
  * add .asyncLoad to jQuery only if jQuery is present
  */
 
-if (typeof $ !== 'undefined') {
+if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = AsyncLoad._jQueryInterface
+  $.fn[NAME] = AsyncLoad.jQueryInterface
   $.fn[NAME].Constructor = AsyncLoad
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return AsyncLoad._jQueryInterface
+    return AsyncLoad.jQueryInterface
   }
 }
 

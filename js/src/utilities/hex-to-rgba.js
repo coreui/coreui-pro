@@ -22,13 +22,13 @@ const hexToRgba = (color, opacity = 100) => {
   let b
 
   if (color.length === 7) {
-    r = parseInt(color.substring(1, 3), 16)
-    g = parseInt(color.substring(3, 5), 16)
-    b = parseInt(color.substring(5, 7), 16)
+    r = parseInt(color.slice(1, 3), 16)
+    g = parseInt(color.slice(3, 5), 16)
+    b = parseInt(color.slice(5, 7), 16)
   } else {
-    r = parseInt(color.substring(1, 2), 16)
-    g = parseInt(color.substring(2, 3), 16)
-    b = parseInt(color.substring(3, 5), 16)
+    r = parseInt(color.slice(1, 2), 16)
+    g = parseInt(color.slice(2, 3), 16)
+    b = parseInt(color.slice(3, 5), 16)
   }
 
   return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`
