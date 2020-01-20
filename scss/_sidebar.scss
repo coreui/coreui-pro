@@ -71,7 +71,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 
   &.c-sidebar-fixed {
-    @include media-breakpoint-up(md) {
+    @include media-breakpoint-up($mobile-breakpoint) {
       position: fixed;
       top: 0;
       bottom: 0;
