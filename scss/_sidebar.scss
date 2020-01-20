@@ -44,10 +44,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 
   &[class*="bg-"]  {
     border-color: rgba($black, .1);
-
-    .c-sidebar-nav-link .c-sidebar-nav-icon {
-      color: rgba($black, .3);
-    }
   }
 
   @each $width, $value in $sidebar-widths {
