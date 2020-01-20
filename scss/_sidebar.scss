@@ -11,7 +11,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   order: -1;
   width: $sidebar-width;
   padding: $sidebar-padding;
-  transition: margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, flex $layout-transition-speed;
 
   @include media-breakpoint-down(breakpoint-before($mobile-breakpoint)) {
     // Some of our components use this property to detect if the sidebar has mobile behavior.
