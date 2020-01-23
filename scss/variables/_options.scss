@@ -31,7 +31,7 @@ $default-themes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $default-themes: map-merge(
   (
-    light: (
+    default: (
       "default":      true,
       "theme-colors": $theme-colors,
       "grays":        $grays

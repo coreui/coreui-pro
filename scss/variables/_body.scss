@@ -9,7 +9,7 @@ $body-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $body-theme-map: map-merge(
   (
-    light: (
+    default: (
       "body-bg":    $body-bg,
       "body-color": $gray-base
     )

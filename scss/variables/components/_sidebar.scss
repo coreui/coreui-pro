@@ -310,7 +310,7 @@ $sidebar-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $sidebar-theme-map: map-merge(
   (
-    light: $sidebar-variants,
+    default: $sidebar-variants,
   ),
   $sidebar-theme-map
 );

@@ -10,7 +10,7 @@ $email-app-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $email-app-theme-map: map-merge(
   (
-    light: (
+    default: (
       "email-app-bg":                    $email-app-bg,
       "email-app-border-color":          $email-app-border-color,
       "email-app-message-color":         $email-app-message-color,

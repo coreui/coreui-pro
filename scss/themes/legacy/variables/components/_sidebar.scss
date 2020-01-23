@@ -8,10 +8,13 @@ $sidebar-legacy-theme-variants-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $sidebar-legacy-theme-variants-map: map-merge(
   (
-    legacy: (
+    dark: (
       "sidebar-bg":           $sidebar-legacy-theme-bg,
       "sidebar-brand-color":  $sidebar-legacy-theme-brand-color,
       "sidebar-brand-bg":     $sidebar-legacy-theme-brand-bg,
+    ),
+    light: (
+      "sidebar-bg":           $sidebar-light-bg
     )
   ),
   $sidebar-legacy-theme-variants-map
