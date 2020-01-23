@@ -36,16 +36,3 @@ export {
   Toast,
   Tooltip
 }
-
-// Global functions
-import getStyle from './src/utilities/get-style'
-window.getStyle = getStyle
-
-import hexToRgb from './src/utilities/hex-to-rgb'
-window.hexToRgb = hexToRgb
-
-import hexToRgba from './src/utilities/hex-to-rgba'
-window.hexToRgba = hexToRgba
-
-import rgbToHex from './src/utilities/rgb-to-hex'
-window.rgbToHex = rgbToHex
