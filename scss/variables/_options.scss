@@ -25,6 +25,8 @@ $enable-sidebar-nav-rounded:                  false !default;
 $layout-transition-speed:                     .25s !default;
 $enable-elevations:                           true !default;
 
+$options: () !default;
+
 $default-themes: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $default-themes: map-merge(
