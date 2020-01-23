@@ -34,7 +34,10 @@ $sidebar-light-borders: (
 
 $sidebar-brand-height:               56px !default;
 
+$sidebar-dark-brand-color:           $white !default;
 $sidebar-dark-brand-bg:              rgba($black, .2) !default;
+
+$sidebar-light-brand-color:          $white !default;
 $sidebar-light-brand-bg:             $primary !default;
 
 // Sidebar Header
@@ -193,6 +196,7 @@ $sidebar-variants-map: map-merge(
       "dark-theme-sidebar-bg":                      0,
       "sidebar-borders":                            $sidebar-dark-borders,
       "dark-theme-sidebar-borders":                 0,
+      "sidebar-brand-color":                        $sidebar-dark-brand-color,
       "sidebar-brand-bg":                           $sidebar-dark-brand-bg,
       "sidebar-header-bg":                          $sidebar-dark-header-bg,
       "sidebar-form-border":                        $sidebar-dark-form-border,
@@ -245,6 +249,7 @@ $sidebar-variants-map: map-merge(
       "dark-theme-sidebar-bg":                      0,
       "sidebar-borders":                            $sidebar-light-borders,
       "dark-theme-sidebar-borders":                 0,
+      "sidebar-brand-color":                        $sidebar-light-brand-color,
       "sidebar-brand-bg":                           $sidebar-light-brand-bg,
       "sidebar-header-bg":                          $sidebar-light-header-bg,
       "sidebar-form-border":                        $sidebar-light-form-border,

@@ -723,6 +723,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 
   .c-sidebar-brand {
+    color: themes-get-value("sidebar-brand-color");
     background: themes-get-value("sidebar-brand-bg");
   }
 
@@ -842,7 +843,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     }
   }
 
-  @if (lightness( themes-get-value("sidebar-bg") ) < 40) {
+  @if (lightness(themes-get-value("sidebar-bg")) < 40) {
     .c-progress {
       background-color: lighten(themes-get-value("sidebar-bg"), 15%) !important;
     }
