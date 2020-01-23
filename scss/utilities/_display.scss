@@ -15,7 +15,7 @@
 @each $breakpoint in map-keys($grid-breakpoints) {
   @include media-breakpoint-down($breakpoint) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-    .d#{$infix}-down-none { display: none !important; } // CoreUI
+    .d#{$infix}-down-none { display: none !important; }
   }
 }
 
