@@ -7,15 +7,11 @@
 
 import {
   getjQuery,
-  // TRANSITION_END,
-  // emulateTransitionEnd,
-  // getTransitionDurationFromElement,
   reflow
 } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import PerfectScrollbar from 'perfect-scrollbar'
-// import getStyle from './utilities/get-style'
 
 /**
  * ------------------------------------------------------------------------
