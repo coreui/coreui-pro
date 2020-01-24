@@ -1,4 +1,15 @@
 :root {
+  --primary-legacy-theme: #321fdb;
+  --secondary-legacy-theme: #ced2d8;
+  --success-legacy-theme: #2eb85c;
+  --info-legacy-theme: #39f;
+  --warning-legacy-theme: #f9b115;
+  --danger-legacy-theme: #e55353;
+  --light-legacy-theme: #ebedef;
+  --dark-legacy-theme: #636f83;
+}
+
+:root {
   --primary-dark-theme: #4638c2;
   --secondary-dark-theme: #4c4f54;
   --success-dark-theme: #45a164;
@@ -120,7 +131,7 @@
   border-color: #2c2c34;
 }
 
-.c-app:not(.c-dark-theme) .modal-content {
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .modal-content {
   border: 0;
   box-shadow: 0 24px 38px 3px rgba(60, 75, 100, .14), 0 9px 46px 8px rgba(60, 75, 100, .12), 0 11px 15px -7px rgba(60, 75, 100, .20);
 }
@@ -314,6 +325,78 @@ html:not([dir="rtl"]) .modal-header .close {
 .c-dark-theme .modal-dark .modal-header {
   color: #fff;
   background-color: #181924;
+}
+
+.c-legacy-theme .modal-primary .modal-content {
+  border-color: #321fdb;
+}
+
+.c-legacy-theme .modal-primary .modal-header {
+  color: #fff;
+  background-color: #321fdb;
+}
+
+.c-legacy-theme .modal-secondary .modal-content {
+  border-color: #ced2d8;
+}
+
+.c-legacy-theme .modal-secondary .modal-header {
+  color: #fff;
+  background-color: #ced2d8;
+}
+
+.c-legacy-theme .modal-success .modal-content {
+  border-color: #2eb85c;
+}
+
+.c-legacy-theme .modal-success .modal-header {
+  color: #fff;
+  background-color: #2eb85c;
+}
+
+.c-legacy-theme .modal-info .modal-content {
+  border-color: #39f;
+}
+
+.c-legacy-theme .modal-info .modal-header {
+  color: #fff;
+  background-color: #39f;
+}
+
+.c-legacy-theme .modal-warning .modal-content {
+  border-color: #f9b115;
+}
+
+.c-legacy-theme .modal-warning .modal-header {
+  color: #fff;
+  background-color: #f9b115;
+}
+
+.c-legacy-theme .modal-danger .modal-content {
+  border-color: #e55353;
+}
+
+.c-legacy-theme .modal-danger .modal-header {
+  color: #fff;
+  background-color: #e55353;
+}
+
+.c-legacy-theme .modal-light .modal-content {
+  border-color: #ebedef;
+}
+
+.c-legacy-theme .modal-light .modal-header {
+  color: #fff;
+  background-color: #ebedef;
+}
+
+.c-legacy-theme .modal-dark .modal-content {
+  border-color: #636f83;
+}
+
+.c-legacy-theme .modal-dark .modal-header {
+  color: #fff;
+  background-color: #636f83;
 }
 
 .modal-primary .modal-content {

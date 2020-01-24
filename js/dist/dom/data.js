@@ -1,6 +1,6 @@
 /*!
-  * CoreUI Pro  data.js v3.0.0-beta.4 (https://coreui.io)
-  * Copyright 2019 Łukasz Holeczek
+  * CoreUI Pro  data.js v3.0.0-rc.0 (https://coreui.io)
+  * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {

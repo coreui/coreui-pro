@@ -1,4 +1,15 @@
 :root {
+  --primary-legacy-theme: #321fdb;
+  --secondary-legacy-theme: #ced2d8;
+  --success-legacy-theme: #2eb85c;
+  --info-legacy-theme: #39f;
+  --warning-legacy-theme: #f9b115;
+  --danger-legacy-theme: #e55353;
+  --light-legacy-theme: #ebedef;
+  --dark-legacy-theme: #636f83;
+}
+
+:root {
   --primary-dark-theme: #4638c2;
   --secondary-dark-theme: #4c4f54;
   --success-dark-theme: #45a164;
@@ -140,6 +151,102 @@ html:not([dir="rtl"]) .c-dark-theme .c-callout-dark {
 
 .c-dark-theme .c-callout-dark h4 {
   color: #181924;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-primary {
+  border-left-color: #321fdb;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-primary {
+  border-right-color: #321fdb;
+}
+
+.c-legacy-theme .c-callout-primary h4 {
+  color: #321fdb;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-secondary {
+  border-left-color: #ced2d8;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-secondary {
+  border-right-color: #ced2d8;
+}
+
+.c-legacy-theme .c-callout-secondary h4 {
+  color: #ced2d8;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-success {
+  border-left-color: #2eb85c;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-success {
+  border-right-color: #2eb85c;
+}
+
+.c-legacy-theme .c-callout-success h4 {
+  color: #2eb85c;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-info {
+  border-left-color: #39f;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-info {
+  border-right-color: #39f;
+}
+
+.c-legacy-theme .c-callout-info h4 {
+  color: #39f;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-warning {
+  border-left-color: #f9b115;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-warning {
+  border-right-color: #f9b115;
+}
+
+.c-legacy-theme .c-callout-warning h4 {
+  color: #f9b115;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-danger {
+  border-left-color: #e55353;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-danger {
+  border-right-color: #e55353;
+}
+
+.c-legacy-theme .c-callout-danger h4 {
+  color: #e55353;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-light {
+  border-left-color: #ebedef;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-light {
+  border-right-color: #ebedef;
+}
+
+.c-legacy-theme .c-callout-light h4 {
+  color: #ebedef;
+}
+
+html:not([dir="rtl"]) .c-legacy-theme .c-callout-dark {
+  border-left-color: #636f83;
+}
+
+*[dir="rtl"] .c-legacy-theme .c-callout-dark {
+  border-right-color: #636f83;
+}
+
+.c-legacy-theme .c-callout-dark h4 {
+  color: #636f83;
 }
 
 html:not([dir="rtl"]) .c-callout-primary {

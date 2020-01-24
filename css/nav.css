@@ -1,4 +1,15 @@
 :root {
+  --primary-legacy-theme: #321fdb;
+  --secondary-legacy-theme: #ced2d8;
+  --success-legacy-theme: #2eb85c;
+  --info-legacy-theme: #39f;
+  --warning-legacy-theme: #f9b115;
+  --danger-legacy-theme: #e55353;
+  --light-legacy-theme: #ebedef;
+  --dark-legacy-theme: #636f83;
+}
+
+:root {
   --primary-dark-theme: #4638c2;
   --secondary-dark-theme: #4c4f54;
   --success-dark-theme: #45a164;
@@ -84,8 +95,8 @@ html:not([dir="rtl"]) .nav {
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
   color: #768192;
-  background-color: #e4e5e6;
-  border-color: #c4c9d0 #c4c9d0 #e4e5e6;
+  background-color: #ebedef;
+  border-color: #c4c9d0 #c4c9d0 #ebedef;
 }
 
 .c-dark-theme .nav-tabs .nav-link.active, .c-dark-theme
@@ -285,6 +296,54 @@ html:not([dir="rtl"]) .nav-tabs-boxed.nav-tabs-boxed-right .nav-item {
 .c-dark-theme.nav-underline-dark .show > .nav-link {
   color: #181924;
   border-color: #181924;
+}
+
+.c-legacy-theme.nav-underline-primary .nav-link.active,
+.c-legacy-theme.nav-underline-primary .show > .nav-link {
+  color: #321fdb;
+  border-color: #321fdb;
+}
+
+.c-legacy-theme.nav-underline-secondary .nav-link.active,
+.c-legacy-theme.nav-underline-secondary .show > .nav-link {
+  color: #ced2d8;
+  border-color: #ced2d8;
+}
+
+.c-legacy-theme.nav-underline-success .nav-link.active,
+.c-legacy-theme.nav-underline-success .show > .nav-link {
+  color: #2eb85c;
+  border-color: #2eb85c;
+}
+
+.c-legacy-theme.nav-underline-info .nav-link.active,
+.c-legacy-theme.nav-underline-info .show > .nav-link {
+  color: #39f;
+  border-color: #39f;
+}
+
+.c-legacy-theme.nav-underline-warning .nav-link.active,
+.c-legacy-theme.nav-underline-warning .show > .nav-link {
+  color: #f9b115;
+  border-color: #f9b115;
+}
+
+.c-legacy-theme.nav-underline-danger .nav-link.active,
+.c-legacy-theme.nav-underline-danger .show > .nav-link {
+  color: #e55353;
+  border-color: #e55353;
+}
+
+.c-legacy-theme.nav-underline-light .nav-link.active,
+.c-legacy-theme.nav-underline-light .show > .nav-link {
+  color: #ebedef;
+  border-color: #ebedef;
+}
+
+.c-legacy-theme.nav-underline-dark .nav-link.active,
+.c-legacy-theme.nav-underline-dark .show > .nav-link {
+  color: #636f83;
+  border-color: #636f83;
 }
 
 .nav-underline.nav-underline-primary .nav-link.active,
