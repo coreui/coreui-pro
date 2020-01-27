@@ -19,7 +19,7 @@ import Sidebar from './src/sidebar'
 import Tab from './src/tab'
 import Toast from './src/toast'
 import Tooltip from './src/tooltip'
-import './src/pollyfills'
+import './src/polyfills'
 
 export default {
   AsyncLoad,
