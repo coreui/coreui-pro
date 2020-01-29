@@ -22,14 +22,14 @@ $sidebar-legacy-theme-variants-map: map-merge(
 
 $sidebar-legacy-theme-default-variant: "legacy" !default;
 $sidebar-legacy-theme-variants: (
-  map: $sidebar-legacy-theme-variants-map,
-  default: $sidebar-legacy-theme-default-variant
+  map:      $sidebar-legacy-theme-variants-map,
+  default:  $sidebar-legacy-theme-default-variant
 ) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $sidebar-theme-map: map-merge(
   $sidebar-theme-map,
   (
-    legacy: $sidebar-legacy-theme-variants
+    legacy:  $sidebar-legacy-theme-variants
   )
 );
