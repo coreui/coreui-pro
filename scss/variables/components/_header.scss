@@ -111,15 +111,15 @@ $header-variants-map: map-merge(
 
 $header-default-variant: "light" !default;
 $header-variants: (
-  default: $header-default-variant,
-  map: $header-variants-map
+  default:  $header-default-variant,
+  map:      $header-variants-map
 ) !default;
 
 $header-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $header-theme-map: map-merge(
   (
-    default: $header-variants
+    default:  $header-variants
   ),
   $header-theme-map
 );
