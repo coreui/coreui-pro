@@ -76,7 +76,9 @@
     "test": "npm-run-all css-lint js-lint dist bundlesize",
     "watch": "npm-run-all --parallel watch-css watch-js",
     "watch-js": "nodemon --ignore js/dist/ --ignore dist/ -e js -x \"npm-run-all js-compile* js-minify*\"",
-    "watch-css": "nodemon --ignore dist/ --ignore css/ --ignore scss/partials/ -e scss -x \"npm run css\""
+    "watch-css": "nodemon --ignore dist/ --ignore css/ --ignore scss/partials/ -e scss -x \"npm run css\"",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "peerDependencies": {
     "perfect-scrollbar": "^1.5.0",
@@ -91,8 +93,13 @@
     "@babel/plugin-transform-runtime": "^7.8.3",
     "@babel/polyfill": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
+    "@storybook/addon-docs": "^5.3.9",
+    "@storybook/addon-knobs": "^5.3.9",
+    "@storybook/addon-storysource": "^5.3.9",
+    "@storybook/html": "^5.3.9",
     "autoprefixer": "^9.7.4",
     "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
     "babel-plugin-istanbul": "^6.0.0",
     "bundlesize": "^0.18.0",
     "chalk": "^3.0.0",
@@ -158,5 +165,6 @@
       "path": "./dist/js/coreui.min.js",
       "maxSize": "15 kB"
     }
-  ]
+  ],
+  "dependencies": {}
 }

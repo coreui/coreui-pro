@@ -25,6 +25,9 @@
   color: inherit;
   text-align: center;
   fill: currentColor;
+}
+
+.c-icon:not(.c-icon-c-s):not(.c-icon-custom-size) {
   width: 1rem;
   height: 1rem;
   font-size: 1rem;
@@ -94,12 +97,6 @@
   width: 0.875rem;
   height: 0.875rem;
   font-size: 0.875rem;
-}
-
-.c-icon-c-s,
-.c-icon-custom-size {
-  width: initial !important;
-  height: initial !important;
 }
 
 /*# sourceMappingURL=icon.css.map */
