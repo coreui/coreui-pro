@@ -35,3 +35,46 @@ $navbar-light-brand-color:        $navbar-light-active-color !default;
 $navbar-light-brand-hover-color:  $navbar-light-active-color !default;
 $navbar-dark-brand-color:         $navbar-dark-active-color !default;
 $navbar-dark-brand-hover-color:   $navbar-dark-active-color !default;
+
+$navbar-variants-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$navbar-variants-map: map-merge(
+  (
+    dark: (
+      "navbar-color":                 $navbar-dark-color,
+      "navbar-hover-color":           $navbar-dark-hover-color,
+      "navbar-active-color":          $navbar-dark-active-color,
+      "navbar-disabled-color":        $navbar-dark-disabled-color,
+      "navbar-toggler-icon-bg":       $navbar-dark-toggler-icon-bg,
+      "navbar-toggler-border-color":  $navbar-dark-toggler-border-color,
+      "navbar-brand-color":           $navbar-dark-brand-color,
+      "navbar-brand-hover-color":     $navbar-dark-brand-hover-color
+    ),
+    light: (
+      "navbar-color":                 $navbar-light-color,
+      "navbar-hover-color":           $navbar-light-hover-color,
+      "navbar-active-color":          $navbar-light-active-color,
+      "navbar-disabled-color":        $navbar-light-disabled-color,
+      "navbar-toggler-icon-bg":       $navbar-light-toggler-icon-bg,
+      "navbar-toggler-border-color":  $navbar-light-toggler-border-color,
+      "navbar-brand-color":           $navbar-light-brand-color,
+      "navbar-brand-hover-color":     $navbar-light-brand-hover-color
+    )
+  ),
+  $navbar-variants-map
+);
+
+$navbar-default-variant: null !default;
+$navbar-variants: (
+  default:  $navbar-default-variant,
+  map:      $navbar-variants-map
+) !default;
+
+$navbar-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$navbar-theme-map: map-merge(
+  (
+    default:  $navbar-variants
+  ),
+  $navbar-theme-map
+);
