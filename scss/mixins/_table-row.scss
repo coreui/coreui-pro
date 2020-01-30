@@ -7,7 +7,14 @@
     &,
     > th,
     > td {
-      color: color-yiq($background);
+      @debug $current-theme;
+      @debug map-get(map-get($yiq-theme-map, $current-theme), "yiq-text-dark");
+      @debug map-get(map-get($yiq-theme-map, $current-theme), "yiq-text-light");
+      @debug map-has-key($yiq-theme-map, $current-theme);
+
+      @if map-has-key($yiq-theme-map, $current-theme) {
+        color: color-yiq($background, map-get(map-get($yiq-theme-map, $current-theme), "yiq-text-dark"), map-get(map-get($yiq-theme-map, $current-theme), "yiq-text-light"));
+      }
       background-color: $background;
     }
 

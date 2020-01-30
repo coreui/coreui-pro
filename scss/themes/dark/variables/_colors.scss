@@ -45,3 +45,18 @@ $theme-colors-dark-theme: map-merge(
   ),
   $theme-colors-dark-theme
 );
+
+// Customize the light and dark text colors for use in our YIQ color contrast function.
+$yiq-dark-theme-text-dark:   $gray-dark-theme-base !default;
+$yiq-dark-theme-text-light:  $white !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$yiq-theme-map: map-merge(
+  $yiq-theme-map,
+  (
+    dark: (
+      "yiq-text-dark":  $yiq-dark-theme-text-dark,
+      "yiq-text-light":  $yiq-dark-theme-text-light
+    )
+  ),
+);

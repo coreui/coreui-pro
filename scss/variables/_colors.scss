@@ -119,6 +119,18 @@ $yiq-contrasted-threshold:  150 !default;
 $yiq-text-dark:   $gray-900 !default;
 $yiq-text-light:  $white !default;
 
+$yiq-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$yiq-theme-map: map-merge(
+  (
+    default: (
+      "yiq-text-dark":  $yiq-text-dark,
+      "yiq-text-light":  $yiq-text-light
+    )
+  ),
+  $yiq-theme-map
+);
+
 // Characters which are escaped by the escape-svg function
 $escaped-characters:  (
   ("<","%3c"),
