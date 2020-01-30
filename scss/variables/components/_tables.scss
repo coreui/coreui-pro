@@ -7,14 +7,6 @@ $table-cell-padding-sm:   .3rem !default;
 
 $table-border-width:  $border-width !default;
 
-$table-dark-color:         $white !default;
-$table-dark-bg:            $gray-800 !default;
-$table-dark-accent-bg:     rgba($white, .05) !default;
-$table-dark-hover-color:   $table-dark-color !default;
-$table-dark-hover-bg:      rgba($white, .075) !default;
-$table-dark-border-color:  lighten($table-dark-bg, 7.5%) !default;
-$table-dark-color:         $white !default;
-
 $table-striped-order:  odd !default;
 
 $table-caption-color:  $text-muted !default;
@@ -33,20 +25,33 @@ $table-border-color:  $border-color !default;
 $table-head-bg:       $gray-200 !default;
 $table-head-color:    $gray-700 !default;
 
+$table-dark-color:         $white !default;
+$table-dark-bg:            $gray-800 !default;
+$table-dark-accent-bg:     rgba($white, .05) !default;
+$table-dark-hover-color:   $table-dark-color !default;
+$table-dark-hover-bg:      rgba($white, .075) !default;
+$table-dark-border-color:  lighten($table-dark-bg, 7.5%) !default;
+
 $table-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $table-theme-map: map-merge(
   (
     default: (
-      "table-color":         $table-color,
-      "table-bg":            $table-bg,
-      "table-accent-bg":     $table-accent-bg,
-      "table-hover-color":   $table-hover-color,
-      "table-hover-bg":      $table-hover-bg,
-      "table-active-bg":     $table-active-bg,
-      "table-border-color":  $table-border-color,
-      "table-head-bg":       $table-head-bg,
-      "table-head-color":    $table-head-color
+      "table-color":              $table-color,
+      "table-bg":                 $table-bg,
+      "table-accent-bg":          $table-accent-bg,
+      "table-hover-color":        $table-hover-color,
+      "table-hover-bg":           $table-hover-bg,
+      "table-active-bg":          $table-active-bg,
+      "table-border-color":       $table-border-color,
+      "table-head-bg":            $table-head-bg,
+      "table-head-color":         $table-head-color,
+      "table-dark-color":         $table-dark-color,
+      "table-dark-bg":            $table-dark-bg,
+      "table-dark-accent-bg":     $table-dark-accent-bg,
+      "table-dark-hover-color":   $table-dark-hover-color,
+      "table-dark-hover-bg":      $table-dark-hover-bg,
+      "table-dark-border-color":  $table-dark-border-color
     )
   ),
   $table-theme-map
