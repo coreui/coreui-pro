@@ -362,6 +362,10 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   cursor: pointer;
   border: 0;
 
+  @include media-breakpoint-down(breakpoint-before($mobile-breakpoint)) {
+    display: none;
+  }
+
   &::before {
     display: block;
     width: $sidebar-minimizer-height;
@@ -416,7 +420,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 // Minimized Sidebar
 
 .c-sidebar-minimized {
-  @include media-breakpoint-up(md) {
+  @include media-breakpoint-up($mobile-breakpoint) {
     z-index: $zindex-fixed + 1;
     flex: 0 0 $sidebar-minimized-width;
 
@@ -584,7 +588,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   }
 }
 .c-sidebar-unfoldable {
-  @include media-breakpoint-up(md) {
+  @include media-breakpoint-up($mobile-breakpoint) {
     z-index: $zindex-fixed + 1 !important;
     &:hover {
       @include elevation(3);
@@ -872,9 +876,6 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       &::before {
         background-image: themes-get-value("sidebar-minimizer-hover-indicator");
       }
-    }
-    @include media-breakpoint-down(xs) {
-      display: none;
     }
   }
   &.c-sidebar-minimized {
