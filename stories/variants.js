@@ -4,7 +4,9 @@ const variants = {
   Success: 'success',
   Info: 'info',
   Danger: 'danger',
-  Warning: 'warning'
+  Warning: 'warning',
+  Light: 'light',
+  Dark: 'dark'
 }
 
 export default variants
