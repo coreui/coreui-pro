@@ -46,7 +46,7 @@
     display: none;
   }
 
-  &.c-header-brand-centered {
+  &.c-header-brand-center {
     position: absolute;
     top: $header-height;
     transform: translate(-50%, -100%);
@@ -61,7 +61,20 @@
 
   @each $breakpoint in map-keys($grid-breakpoints) {
     @include media-breakpoint-down($breakpoint) {
-      &.c-header-brand-#{$breakpoint}-down-centered {
+      &.c-header-brand-#{$breakpoint}-down-center {
+        position: absolute;
+        top: $header-height;
+        transform: translate(-50%, -100%);
+        @include ltr {
+          left: 50%;
+        }
+        @include rtl {
+          right: 50%;
+        }
+      }
+    }
+    @include media-breakpoint-up($breakpoint) {
+      &.c-header-brand-#{$breakpoint}-up-center {
         position: absolute;
         top: $header-height;
         transform: translate(-50%, -100%);
