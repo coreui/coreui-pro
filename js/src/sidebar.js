@@ -26,10 +26,11 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const DefaultType = {
-  dropdownAccordion: 'boolean'
+  dropdownAccordion: 'string'
 }
 
 const Default = {
+  dropdownAccordion: true,
   transition: 400
 }
 
@@ -122,8 +123,12 @@ class Sidebar {
 
     const dataAttributes = toggler.closest(Selector.NAVIGATION_CONTAINER).dataset
 
+    if (typeof dataAttributes.dropdownAccordion !== 'undefined' || dataAttributes.dropdownAccordion !== null) {
+      Default.dropdownAccordion = dataAttributes.dropdownAccordion
+    }
+
     // TODO: find better solution
-    if (dataAttributes.drodpownAccordion) {
+    if (dataAttributes.dropdownAccordion === true) {
       this._getAllSiblings(toggler.parentElement).forEach(element => {
         if (element !== toggler.parentNode) {
           if (element.classList.contains(ClassName.NAV_DROPDOWN)) {
