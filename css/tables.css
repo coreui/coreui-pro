@@ -41,7 +41,7 @@
 
 .c-dark-theme .table th, .c-dark-theme
 .table td {
-  border-top-color: #181924;
+  border-top-color: #4f5d73;
 }
 
 .table thead th {
@@ -51,7 +51,7 @@
 }
 
 .c-dark-theme .table thead th {
-  border-bottom-color: #181924;
+  border-bottom-color: #4f5d73;
 }
 
 .table tbody + tbody {
@@ -60,7 +60,7 @@
 }
 
 .c-dark-theme .table tbody + tbody {
-  border-top-color: #181924;
+  border-top-color: #4f5d73;
 }
 
 .table-sm th,
@@ -74,7 +74,7 @@
 }
 
 .c-dark-theme .table-bordered {
-  border-color: #181924;
+  border-color: #4f5d73;
 }
 
 .table-bordered th,
@@ -85,7 +85,7 @@
 
 .c-dark-theme .table-bordered th, .c-dark-theme
 .table-bordered td {
-  border-color: #181924;
+  border-color: #4f5d73;
 }
 
 .table-bordered thead th,
@@ -105,7 +105,7 @@
 }
 
 .c-dark-theme .table-striped tbody tr:nth-of-type(odd) {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(0, 0, 21, 0.05);
 }
 
 .table-hover tbody tr:hover {
@@ -115,12 +115,13 @@
 
 .c-dark-theme .table-hover tbody tr:hover {
   color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.075);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .c-dark-theme .table-primary,
 .c-dark-theme .table-primary > th,
 .c-dark-theme .table-primary > td {
+  color: #0a0b18;
   background-color: #c6c0f5;
 }
 
@@ -143,6 +144,7 @@
 .c-dark-theme .table-secondary,
 .c-dark-theme .table-secondary > th,
 .c-dark-theme .table-secondary > td {
+  color: #0a0b18;
   background-color: #f1f2f4;
 }
 
@@ -165,6 +167,7 @@
 .c-dark-theme .table-success,
 .c-dark-theme .table-success > th,
 .c-dark-theme .table-success > td {
+  color: #0a0b18;
   background-color: #c4ebd1;
 }
 
@@ -187,6 +190,7 @@
 .c-dark-theme .table-info,
 .c-dark-theme .table-info > th,
 .c-dark-theme .table-info > td {
+  color: #0a0b18;
   background-color: #c6e2ff;
 }
 
@@ -209,6 +213,7 @@
 .c-dark-theme .table-warning,
 .c-dark-theme .table-warning > th,
 .c-dark-theme .table-warning > td {
+  color: #0a0b18;
   background-color: #fde9bd;
 }
 
@@ -231,6 +236,7 @@
 .c-dark-theme .table-danger,
 .c-dark-theme .table-danger > th,
 .c-dark-theme .table-danger > td {
+  color: #0a0b18;
   background-color: #f8cfcf;
 }
 
@@ -253,6 +259,7 @@
 .c-dark-theme .table-light,
 .c-dark-theme .table-light > th,
 .c-dark-theme .table-light > td {
+  color: #0a0b18;
   background-color: #f9fafb;
 }
 
@@ -275,6 +282,7 @@
 .c-dark-theme .table-dark,
 .c-dark-theme .table-dark > th,
 .c-dark-theme .table-dark > td {
+  color: #0a0b18;
   background-color: #d3d7dc;
 }
 
@@ -297,6 +305,7 @@
 .c-legacy-theme .table-primary,
 .c-legacy-theme .table-primary > th,
 .c-legacy-theme .table-primary > td {
+  color: #0a0b18;
   background-color: #c6c0f5;
 }
 
@@ -319,6 +328,7 @@
 .c-legacy-theme .table-secondary,
 .c-legacy-theme .table-secondary > th,
 .c-legacy-theme .table-secondary > td {
+  color: #0a0b18;
   background-color: #f1f2f4;
 }
 
@@ -341,6 +351,7 @@
 .c-legacy-theme .table-success,
 .c-legacy-theme .table-success > th,
 .c-legacy-theme .table-success > td {
+  color: #0a0b18;
   background-color: #c4ebd1;
 }
 
@@ -363,6 +374,7 @@
 .c-legacy-theme .table-info,
 .c-legacy-theme .table-info > th,
 .c-legacy-theme .table-info > td {
+  color: #0a0b18;
   background-color: #c6e2ff;
 }
 
@@ -385,6 +397,7 @@
 .c-legacy-theme .table-warning,
 .c-legacy-theme .table-warning > th,
 .c-legacy-theme .table-warning > td {
+  color: #0a0b18;
   background-color: #fde9bd;
 }
 
@@ -407,6 +420,7 @@
 .c-legacy-theme .table-danger,
 .c-legacy-theme .table-danger > th,
 .c-legacy-theme .table-danger > td {
+  color: #0a0b18;
   background-color: #f8cfcf;
 }
 
@@ -429,6 +443,7 @@
 .c-legacy-theme .table-light,
 .c-legacy-theme .table-light > th,
 .c-legacy-theme .table-light > td {
+  color: #0a0b18;
   background-color: #f9fafb;
 }
 
@@ -451,6 +466,7 @@
 .c-legacy-theme .table-dark,
 .c-legacy-theme .table-dark > th,
 .c-legacy-theme .table-dark > td {
+  color: #0a0b18;
   background-color: #d3d7dc;
 }
 
@@ -473,6 +489,7 @@
 .table-primary,
 .table-primary > th,
 .table-primary > td {
+  color: #0a0b18;
   background-color: #c6c0f5;
 }
 
@@ -495,6 +512,7 @@
 .table-secondary,
 .table-secondary > th,
 .table-secondary > td {
+  color: #0a0b18;
   background-color: #f1f2f4;
 }
 
@@ -517,6 +535,7 @@
 .table-success,
 .table-success > th,
 .table-success > td {
+  color: #0a0b18;
   background-color: #c4ebd1;
 }
 
@@ -539,6 +558,7 @@
 .table-info,
 .table-info > th,
 .table-info > td {
+  color: #0a0b18;
   background-color: #c6e2ff;
 }
 
@@ -561,6 +581,7 @@
 .table-warning,
 .table-warning > th,
 .table-warning > td {
+  color: #0a0b18;
   background-color: #fde9bd;
 }
 
@@ -583,6 +604,7 @@
 .table-danger,
 .table-danger > th,
 .table-danger > td {
+  color: #0a0b18;
   background-color: #f8cfcf;
 }
 
@@ -605,6 +627,7 @@
 .table-light,
 .table-light > th,
 .table-light > td {
+  color: #0a0b18;
   background-color: #f9fafb;
 }
 
@@ -627,6 +650,7 @@
 .table-dark,
 .table-dark > th,
 .table-dark > td {
+  color: #0a0b18;
   background-color: #d3d7dc;
 }
 
@@ -649,6 +673,7 @@
 .table-active,
 .table-active > th,
 .table-active > td {
+  color: #fff;
   background-color: rgba(0, 0, 21, 0.075);
 }
 
@@ -664,6 +689,7 @@
 .c-dark-theme .table-active,
 .c-dark-theme .table-active > th,
 .c-dark-theme .table-active > td {
+  color: #0a0b18;
   background-color: rgba(255, 255, 255, 0.075);
 }
 
@@ -676,6 +702,18 @@
   background-color: rgba(242, 242, 242, 0.075);
 }
 
+.table .thead-dark th {
+  color: #fff;
+  background-color: #636f83;
+  border-color: #758297;
+}
+
+.c-dark-theme .table .thead-dark th {
+  color: #fff;
+  background-color: rgba(0, 0, 21, 0.5);
+  border-color: rgba(0, 0, 21, 0.9);
+}
+
 .table .thead-light th {
   color: #768192;
   background-color: #d8dbe0;
@@ -684,12 +722,52 @@
 
 .c-dark-theme .table .thead-light th {
   color: #e1e1e1;
-  background-color: #1e1e29;
-  border-color: #181924;
+  background-color: #636f83;
+  border-color: #4f5d73;
+}
+
+.table-dark {
+  color: #fff;
+  background-color: #636f83;
+}
+
+.c-dark-theme .table-dark {
+  color: #fff;
+  background-color: rgba(0, 0, 21, 0.5);
+}
+
+.table-dark th,
+.table-dark td,
+.table-dark thead th {
+  border-color: #758297;
+}
+
+.c-dark-theme .table-dark th, .c-dark-theme
+.table-dark td, .c-dark-theme
+.table-dark thead th {
+  border-color: rgba(0, 0, 21, 0.9);
 }
 
 .table-dark.table-bordered {
   border: 0;
+}
+
+.table-dark.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.c-dark-theme .table-dark.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.table-dark.table-hover tbody tr:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.075);
+}
+
+.c-dark-theme .table-dark.table-hover tbody tr:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 575.98px) {
@@ -757,7 +835,7 @@
 }
 
 .c-dark-theme .table-outline {
-  border-color: #181924;
+  border-color: #4f5d73;
 }
 
 .table-outline td {

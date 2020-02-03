@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  button.js v3.0.0-rc.0 (https://coreui.io)
+  * CoreUI Pro  button.js v3.0.0-rc.1 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -54,7 +54,7 @@
    */
 
   var NAME = 'button';
-  var VERSION = '3.0.0-rc.0';
+  var VERSION = '3.0.0-rc.1';
   var DATA_KEY = 'coreui.button';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';

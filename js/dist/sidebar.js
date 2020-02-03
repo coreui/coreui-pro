@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  sidebar.js v3.0.0-rc.0 (https://coreui.io)
+  * CoreUI Pro  sidebar.js v3.0.0-rc.1 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -58,14 +58,15 @@
    */
 
   var NAME = 'sidebar';
-  var VERSION = '3.0.0-rc.0';
+  var VERSION = '3.0.0-rc.1';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
   var DefaultType = {
-    dropdownAccordion: 'boolean'
+    dropdownAccordion: 'string'
   };
   var Default = {
+    dropdownAccordion: true,
     transition: 400
   };
   var ClassName = {
@@ -152,9 +153,14 @@
         toggler = toggler.closest(Selector.NAV_DROPDOWN_TOGGLE);
       }
 
-      var dataAttributes = toggler.closest(Selector.NAVIGATION_CONTAINER).dataset; // TODO: find better solution
+      var dataAttributes = toggler.closest(Selector.NAVIGATION_CONTAINER).dataset;
 
-      if (dataAttributes.drodpownAccordion) {
+      if (typeof dataAttributes.dropdownAccordion !== 'undefined') {
+        Default.dropdownAccordion = JSON.parse(dataAttributes.dropdownAccordion);
+      } // TODO: find better solution
+
+
+      if (Default.dropdownAccordion === true) {
         this._getAllSiblings(toggler.parentElement).forEach(function (element) {
           if (element !== toggler.parentNode) {
             if (element.classList.contains(ClassName.NAV_DROPDOWN)) {
