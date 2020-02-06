@@ -56,9 +56,9 @@ html:not([dir="rtl"]) .custom-control-input {
 }
 
 .custom-control-input:checked ~ .custom-control-label::before {
-  color: #fff;
-  border-color: #321fdb;
-  background-color: #321fdb;
+  color: #000015;
+  border-color: #988fed;
+  background-color: #988fed;
 }
 
 .custom-control-input:focus ~ .custom-control-label::before {
@@ -66,13 +66,13 @@ html:not([dir="rtl"]) .custom-control-input {
 }
 
 .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
-  border-color: #958bef;
+  border-color: #484855;
 }
 
 .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
-  color: #fff;
-  background-color: #beb8f5;
-  border-color: #beb8f5;
+  color: #000015;
+  background-color: white;
+  border-color: white;
 }
 
 .custom-control-input[disabled] ~ .custom-control-label, .custom-control-input:disabled ~ .custom-control-label {
@@ -80,7 +80,7 @@ html:not([dir="rtl"]) .custom-control-input {
 }
 
 .custom-control-input[disabled] ~ .custom-control-label::before, .custom-control-input:disabled ~ .custom-control-label::before {
-  background-color: #d8dbe0;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .custom-control-label {
@@ -97,8 +97,9 @@ html:not([dir="rtl"]) .custom-control-input {
   height: 1rem;
   pointer-events: none;
   content: "";
-  background-color: #fff;
-  border: #9da5b1 solid 1px;
+  border: solid 1px;
+  background-color: #2c2c34;
+  border-color: rgba(0, 0, 21, 0.3);
 }
 
 html:not([dir="rtl"]) .custom-control-label::before {
@@ -132,11 +133,11 @@ html:not([dir="rtl"]) .custom-control-label::after {
 }
 
 .custom-checkbox .custom-control-input:checked ~ .custom-control-label::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%23000015' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/%3e%3c/svg%3e");
 }
 
 .custom-checkbox .custom-control-input:indeterminate ~ .custom-control-label::before {
-  border-color: #321fdb;
+  border-color: #988fed;
   background-color: #321fdb;
 }
 
@@ -157,7 +158,7 @@ html:not([dir="rtl"]) .custom-control-label::after {
 }
 
 .custom-radio .custom-control-input:checked ~ .custom-control-label::after {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23000015'/%3e%3c/svg%3e");
 }
 
 .custom-radio .custom-control-input:disabled:checked ~ .custom-control-label::before {
@@ -193,6 +194,7 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::before {
   background-color: #9da5b1;
   border-radius: 0.5rem;
   transition: transform 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  background-color: rgba(0, 0, 21, 0.3);
 }
 
 html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
@@ -210,7 +212,7 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
 }
 
 .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
-  background-color: #fff;
+  background-color: #2c2c34;
   transform: translateX(0.75rem);
 }
 
@@ -226,16 +228,17 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #768192;
   vertical-align: middle;
-  background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23636f83' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
-  border: 1px solid #d8dbe0;
+  border: 1px solid;
   border-radius: 0.25rem;
   appearance: none;
+  color: #ebedef;
+  background: #2c2c34 url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23636f83' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+  border-color: rgba(0, 0, 21, 0.3);
 }
 
 .custom-select:focus {
-  border-color: #958bef;
+  border-color: #484855;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
 }
@@ -243,6 +246,11 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
 .custom-select:focus::-ms-value {
   color: #768192;
   background-color: #fff;
+}
+
+.c-dark-theme .custom-select:focus::-ms-value {
+  color: #ebedef;
+  background-color: #2c2c34;
 }
 
 .custom-select[multiple], .custom-select[size]:not([size="1"]) {
@@ -260,7 +268,7 @@ html:not([dir="rtl"]) .custom-select[multiple], html:not([dir="rtl"]) .custom-se
 
 .custom-select:disabled {
   color: #8a93a2;
-  background-color: #d8dbe0;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .custom-select::-ms-expand {
@@ -320,13 +328,13 @@ html:not([dir="rtl"]) .custom-select-lg {
 }
 
 .custom-file-input:focus ~ .custom-file-label {
-  border-color: #958bef;
   box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
+  border-color: #484855;
 }
 
 .custom-file-input[disabled] ~ .custom-file-label,
 .custom-file-input:disabled ~ .custom-file-label {
-  background-color: #d8dbe0;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .custom-file-input:lang(en) ~ .custom-file-label::after {
@@ -347,10 +355,11 @@ html:not([dir="rtl"]) .custom-select-lg {
   padding: 0.375rem 0.75rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #768192;
-  background-color: #fff;
-  border: 1px solid #d8dbe0;
+  border: 1px solid;
   border-radius: 0.25rem;
+  color: #ebedef;
+  background-color: #2c2c34;
+  border-color: rgba(0, 0, 21, 0.3);
 }
 
 .custom-file-label::after {
@@ -362,11 +371,11 @@ html:not([dir="rtl"]) .custom-select-lg {
   height: calc(1.5em + 0.75rem);
   padding: 0.375rem 0.75rem;
   line-height: 1.5;
-  color: #768192;
   content: "Browse";
-  background-color: #ebedef;
   border-left: inherit;
   border-radius: 0 0.25rem 0.25rem 0;
+  color: #ebedef;
+  background-color: #636f83;
 }
 
 html:not([dir="rtl"]) .custom-file-label::after {
@@ -409,7 +418,7 @@ html:not([dir="rtl"]) .custom-file-label::after {
   width: 1rem;
   height: 1rem;
   margin-top: -0.25rem;
-  background-color: #321fdb;
+  background-color: #988fed;
   border: 0;
   border-radius: 1rem;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -423,7 +432,7 @@ html:not([dir="rtl"]) .custom-file-label::after {
 }
 
 .custom-range::-webkit-slider-thumb:active {
-  background-color: #beb8f5;
+  background-color: white;
 }
 
 .custom-range::-webkit-slider-runnable-track {
@@ -431,15 +440,15 @@ html:not([dir="rtl"]) .custom-file-label::after {
   height: 0.5rem;
   color: transparent;
   cursor: pointer;
-  background-color: #c4c9d0;
   border-color: transparent;
   border-radius: 1rem;
+  background-color: #c4c9d0;
 }
 
 .custom-range::-moz-range-thumb {
   width: 1rem;
   height: 1rem;
-  background-color: #321fdb;
+  background-color: #988fed;
   border: 0;
   border-radius: 1rem;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -453,7 +462,7 @@ html:not([dir="rtl"]) .custom-file-label::after {
 }
 
 .custom-range::-moz-range-thumb:active {
-  background-color: #beb8f5;
+  background-color: white;
 }
 
 .custom-range::-moz-range-track {
@@ -472,7 +481,7 @@ html:not([dir="rtl"]) .custom-file-label::after {
   margin-top: 0;
   margin-right: 0.2rem;
   margin-left: 0.2rem;
-  background-color: #321fdb;
+  background-color: #988fed;
   border: 0;
   border-radius: 1rem;
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -486,7 +495,7 @@ html:not([dir="rtl"]) .custom-file-label::after {
 }
 
 .custom-range::-ms-thumb:active {
-  background-color: #beb8f5;
+  background-color: white;
 }
 
 .custom-range::-ms-track {

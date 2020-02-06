@@ -175,4 +175,4 @@ Please use following commit message format.
 
 ## Copyright and license
 
-copyright 2018 creativeLabs Łukasz Holeczek.
+copyright 2020 creativeLabs Łukasz Holeczek.
