@@ -1,0 +1,15 @@
+// Default theme
+$close-dark-theme-color:        $white !default;
+$close-dark-theme-text-shadow:  0 1px 0 $black !default;
+
+$close-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$close-theme-map: map-merge(
+  $close-theme-map,
+  (
+    default: (
+      "close-color":        $close-dark-theme-color,
+      "close-text-shadow":  $close-dark-theme-text-shadow
+    )
+  )
+);
