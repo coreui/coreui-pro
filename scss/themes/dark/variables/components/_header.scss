@@ -19,9 +19,7 @@ $header-dark-theme-brand-hover-color:       $header-dark-theme-active-color !def
 $header-dark-theme-brand-minimized-bg:      transparent !default;
 $header-dark-theme-brand-minimized-border:  0 !default;
 
-$subheader-dark-theme-border: (
-  top: 1px solid $border-dark-theme-color
-) !default;
+$subheader-dark-theme-separator:            1px solid $border-dark-theme-color !default;
 
 
 $header-dark-theme-variants-map: () !default;
@@ -45,7 +43,7 @@ $header-dark-theme-variants-map: map-merge(
       "header-brand-hover-color":       $header-dark-theme-brand-hover-color,
       "header-brand-minimized-bg":      $header-dark-theme-brand-minimized-bg,
       "header-brand-minimized-border":  $header-dark-theme-brand-minimized-border,
-      "subheader-border":               $subheader-dark-theme-border
+      "subheader-separator":            $subheader-dark-theme-separator
     )
   ),
   $header-dark-theme-variants-map
