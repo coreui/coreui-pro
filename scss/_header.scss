@@ -3,21 +3,8 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  height: $header-height;
-
-  &.c-header-with-subheader {
-    height: $header-height + $header-subheader-height;
-
-    .c-header-nav {
-      height: $header-height;
-    }
-
-    .c-subheader {
-      .c-header-nav {
-        height: $header-subheader-height;
-      }
-    }
-  }
+  flex-shrink: 0;
+  min-height: $header-height;
 
   &[class*="bg-"]  {
     border-color: rgba($black, .1);
@@ -39,7 +26,7 @@
   @include media-breakpoint-up(md) {
     width: $header-brand-width;
   }
-  height: $header-height;
+  min-height: $header-height;
   transition: width $layout-transition-speed;
 
   .c-header-brand-minimized {
@@ -132,6 +119,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  min-height: $header-height;
   padding: 0;
   margin-bottom: 0;
   list-style: none;
@@ -181,17 +169,6 @@
   }
 }
 
-
-.c-subheader {
-  display: flex;
-  flex-basis: 100%;
-  flex-shrink: 0;
-  flex-grow: 1;
-  width: 100%;
-  height: $header-subheader-height;
-}
-
-
 //
 // Header variants
 //
@@ -199,6 +176,10 @@
 @include themes($header-theme-map, $create: append, $parent: ".c-header") {
   background: themes-get-value("header-bg");
   @include borders(themes-get-value("header-border"));
+
+  .c-subheader {
+    border-top: themes-get-value("subheader-separator");
+  }
 
   .c-header-brand {
     color: themes-get-value("header-brand-color");
@@ -261,9 +242,5 @@
         color: themes-get-value("header-active-color");
       }
     }
-  }
-
-  .c-subheader {
-    @include borders(themes-get-value("subheader-border"));
   }
 }
