@@ -17,6 +17,10 @@
     z-index: $zindex-fixed;
     @include elevation(2, "bottom");
   }
+
+  .c-subheader {
+    border-bottom: 0;
+  }
 }
 
 .c-header-brand {
