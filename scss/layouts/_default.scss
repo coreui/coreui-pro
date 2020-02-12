@@ -29,7 +29,7 @@
     height: 100vh;
 
     .c-header-fixed {
-      margin: initial;
+      margin: 0;
     }
 
     .c-header-fixed,
@@ -40,7 +40,7 @@
 
     .c-body {
       flex-direction: column;
-      overflow: scroll;
+      overflow-y: scroll;
     }
   }
 }
@@ -52,7 +52,9 @@
 }
 
 .c-main {
-  flex: 1;
+  flex-basis: auto;
+  flex-shrink: 0;
+  flex-grow: 1;
   min-width: 0;
   padding-top: 2 * $spacer;
 
