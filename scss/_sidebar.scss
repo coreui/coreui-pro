@@ -1,5 +1,5 @@
 
-$sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $sidebar-width) !default;
+// $sidebar-negative-margin: - $sidebar-width !default;
 
 // stylelint-disable selector-max-class, declaration-no-important, selector-max-compound-selectors, function-url-quotes, selector-max-combinators
 .c-sidebar {
@@ -11,6 +11,7 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   order: -1;
   width: $sidebar-width;
   padding: $sidebar-padding;
+  box-shadow: none;
 
   @include media-breakpoint-down(breakpoint-before($mobile-breakpoint)) {
     // Some of our components use this property to detect if the sidebar has mobile behavior.
@@ -19,25 +20,27 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 1;
-    @include elevation(3);
+    &[class*="-show"] {
+      @include elevation(3);
+    }
   }
 
   @include ltr {
     &:not(.c-sidebar-right){
-      margin-left: $sidebar-negative-margin;
+      margin-left: - $sidebar-width;
     }
     &.c-sidebar-right {
       order: 99;
-      margin-right: $sidebar-negative-margin;
+      margin-right: - $sidebar-width;
     }
   }
 
   @include rtl {
     &:not(.c-sidebar-right){
-      margin-right: $sidebar-negative-margin;
+      margin-right: - $sidebar-width;
     }
     &.c-sidebar-right {
-      margin-left: $sidebar-negative-margin;
+      margin-left: - $sidebar-width;
     }
   }
 
@@ -48,23 +51,22 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
   @each $width, $value in $sidebar-widths {
     &.c-sidebar-#{$width} {
       width: $value;
-      $sidebar-negative-margin: if($enable-elevations, - ($value + 5px), - $value);
 
       @include ltr {
         &:not(.c-sidebar-right){
-          margin-left: $sidebar-negative-margin;
+          margin-left: - $value;
         }
         &.c-sidebar-right {
-          margin-right: $sidebar-negative-margin;
+          margin-right: - $value;
         }
       }
 
       @include rtl {
         &:not(.c-sidebar-right){
-          margin-right: $sidebar-negative-margin;
+          margin-right: - $value;
         }
         &.c-sidebar-right {
-          margin-left: $sidebar-negative-margin;
+          margin-left: - $value;
         }
       }
     }
@@ -76,7 +78,9 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
       top: 0;
       bottom: 0;
       z-index: $zindex-fixed;
-      @include elevation(2);
+      &[class*="-show"] {
+        @include elevation(2);
+      }
 
       @include ltr {
         &:not(.c-sidebar-right) {
@@ -105,7 +109,10 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 2;
-    @include elevation(3);
+    &[class*="-show"] {
+      @include elevation(3);
+    }
+
 
     @include ltr {
       &:not(.c-sidebar-right) {
@@ -701,8 +708,10 @@ $sidebar-negative-margin: if($enable-elevations, - ($sidebar-width + 5px), - $si
 .c-sidebar-unfoldable {
   @include media-breakpoint-up($mobile-breakpoint) {
     z-index: $zindex-fixed + 1 !important;
-    &:hover {
+    &[class*="-show"] {
       @include elevation(3);
+    }
+    &:hover {
 
       .c-sidebar-minimizer::before {
         @include ltr {
