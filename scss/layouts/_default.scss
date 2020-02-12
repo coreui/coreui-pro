@@ -21,8 +21,16 @@
   flex-direction: column;
   min-height: 100vh;
 
+  .c-header-fixed {
+    margin: inherit;
+  }
+
   &.c-fixed-components {
     height: 100vh;
+
+    .c-header-fixed {
+      margin: initial;
+    }
 
     .c-header-fixed,
     .c-subheader-fixed,
