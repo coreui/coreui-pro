@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.0.0-rc.1): sidebar.js
+ * CoreUI (v3.0.0-rc.2): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -20,7 +20,7 @@ import PerfectScrollbar from 'perfect-scrollbar'
  */
 
 const NAME = 'sidebar'
-const VERSION = '3.0.0-rc.1'
+const VERSION = '3.0.0-rc.2'
 const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
