@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro UI Kit
- * @version v3.0.0-rc.1
+ * @version v3.0.0-rc.2
  * @link https://coreui.io/pro/
  * Copyright (c) 2020 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -6985,6 +6985,19 @@ html:not([dir="rtl"]) .dropleft .dropdown-toggle:empty::after {
   border-color: rgba(0, 0, 21, 0.1);
 }
 
+.c-footer.c-footer-fixed {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1030;
+}
+
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-footer.c-footer-fixed {
+  border: 0;
+  box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+}
+
 .c-footer.c-footer-dark {
   color: #fff;
   background: #636f83;
@@ -8759,21 +8772,11 @@ html:not([dir="rtl"]) .was-validated .custom-select:invalid, html:not([dir="rtl"
   flex-direction: row;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  height: 56px;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  min-height: 56px;
   background: #fff;
   border-bottom: 1px solid #d8dbe0;
-}
-
-.c-header.c-header-with-subheader {
-  height: 104px;
-}
-
-.c-header.c-header-with-subheader .c-header-nav {
-  height: 56px;
-}
-
-.c-header.c-header-with-subheader .c-subheader .c-header-nav {
-  height: 48px;
 }
 
 .c-header[class*="bg-"] {
@@ -8794,6 +8797,11 @@ html:not([dir="rtl"]) .was-validated .custom-select:invalid, html:not([dir="rtl"
   clip-path: inset(0 0 -1000px 0);
 }
 
+.c-header .c-subheader {
+  border-bottom: 0;
+  border-top: 1px solid #d8dbe0;
+}
+
 .c-header-brand {
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -8801,7 +8809,7 @@ html:not([dir="rtl"]) .was-validated .custom-select:invalid, html:not([dir="rtl"
   align-items: center;
   -ms-flex-pack: center;
   justify-content: center;
-  height: 56px;
+  min-height: 56px;
   transition: width 0.25s;
 }
 
@@ -9023,6 +9031,7 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-xl-down-center {
   flex-direction: row;
   -ms-flex-align: center;
   align-items: center;
+  min-height: 56px;
   padding: 0;
   margin-bottom: 0;
   list-style: none;
@@ -9080,22 +9089,13 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
   min-width: 180px;
 }
 
-.c-subheader {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-preferred-size: 100%;
-  flex-basis: 100%;
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-  width: 100%;
-  height: 48px;
+.c-header.c-header-dark {
+  background: #3c4b64;
+  border-bottom: 1px solid #636f83;
 }
 
-.c-header.c-header-dark {
-  background: #636f83;
-  border-bottom: 1px solid #636f83;
+.c-header.c-header-dark .c-subheader {
+  border-top: 1px solid #636f83;
 }
 
 .c-header.c-header-dark .c-header-brand {
@@ -9157,10 +9157,6 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
   color: #fff;
 }
 
-.c-header.c-header-dark .c-subheader {
-  border-top: 1px solid #636f83;
-}
-
 .c-header .c-header-brand {
   color: #4f5d73;
   background-color: transparent;
@@ -9220,13 +9216,13 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
   color: rgba(0, 0, 21, 0.9);
 }
 
-.c-header .c-subheader {
-  border-top: 1px solid #d8dbe0;
-}
-
 .c-dark-theme .c-header {
   background: #2c2c34;
   border-bottom: 0;
+}
+
+.c-dark-theme .c-header .c-subheader {
+  border-top: 1px solid #181924;
 }
 
 .c-dark-theme .c-header .c-header-brand {
@@ -9286,10 +9282,6 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 
 .c-dark-theme .c-header .c-header-text a,.c-dark-theme .c-header .c-header-text a:hover, .c-dark-theme .c-header .c-header-text a:focus {
   color: #fff;
-}
-
-.c-dark-theme .c-header .c-subheader {
-  border-top: 1px solid #181924;
 }
 
 .c-icon {
@@ -12264,12 +12256,13 @@ html:not([dir="rtl"]) .progress-group-icon {
   order: -1;
   width: 256px;
   padding: 0;
+  box-shadow: none;
   color: #fff;
   background: #3c4b64;
   will-change: auto;
-  transition: margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s, -webkit-transform 0.25s;
-  transition: transform 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s;
-  transition: transform 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s, -webkit-transform 0.25s;
+  transition: box-shadow 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s, -webkit-transform 0.25s;
+  transition: box-shadow 0.25s, transform 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s;
+  transition: box-shadow 0.25s, transform 0.25s, margin-left 0.25s, margin-right 0.25s, width 0.25s, z-index 0s ease 0.25s, -webkit-transform 0.25s;
 }
 
 @media (max-width: 991.98px) {
@@ -12280,28 +12273,28 @@ html:not([dir="rtl"]) .progress-group-icon {
     bottom: 0;
     z-index: 1031;
   }
-  .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar {
+  .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar[class*="-show"] {
     border: 0;
     box-shadow: 0 3px 4px 0 rgba(60, 75, 100, .14), 0 3px 3px -2px rgba(60, 75, 100, .12), 0 1px 8px 0 rgba(60, 75, 100, .20);
   }
 }
 
 html:not([dir="rtl"]) .c-sidebar:not(.c-sidebar-right) {
-  margin-left: -261px;
+  margin-left: -256px;
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-right {
   -ms-flex-order: 99;
   order: 99;
-  margin-right: -261px;
+  margin-right: -256px;
 }
 
 *[dir="rtl"] .c-sidebar:not(.c-sidebar-right) {
-  margin-right: -261px;
+  margin-right: -256px;
 }
 
 *[dir="rtl"] .c-sidebar.c-sidebar-right {
-  margin-left: -261px;
+  margin-left: -256px;
   border: 0;
 }
 
@@ -12314,15 +12307,15 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-right {
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm:not(.c-sidebar-right) {
-  margin-left: -197px;
+  margin-left: -192px;
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm.c-sidebar-right,*[dir="rtl"] .c-sidebar.c-sidebar-sm:not(.c-sidebar-right) {
-  margin-right: -197px;
+  margin-right: -192px;
 }
 
 *[dir="rtl"] .c-sidebar.c-sidebar-sm.c-sidebar-right {
-  margin-left: -197px;
+  margin-left: -192px;
 }
 
 .c-sidebar.c-sidebar-lg {
@@ -12330,15 +12323,15 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm.c-sidebar-right,*[dir="rtl"] .c-si
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg:not(.c-sidebar-right) {
-  margin-left: -325px;
+  margin-left: -320px;
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg.c-sidebar-right,*[dir="rtl"] .c-sidebar.c-sidebar-lg:not(.c-sidebar-right) {
-  margin-right: -325px;
+  margin-right: -320px;
 }
 
 *[dir="rtl"] .c-sidebar.c-sidebar-lg.c-sidebar-right {
-  margin-left: -325px;
+  margin-left: -320px;
 }
 
 .c-sidebar.c-sidebar-xl {
@@ -12346,15 +12339,15 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg.c-sidebar-right,*[dir="rtl"] .c-si
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl:not(.c-sidebar-right) {
-  margin-left: -389px;
+  margin-left: -384px;
 }
 
 html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl.c-sidebar-right,*[dir="rtl"] .c-sidebar.c-sidebar-xl:not(.c-sidebar-right) {
-  margin-right: -389px;
+  margin-right: -384px;
 }
 
 *[dir="rtl"] .c-sidebar.c-sidebar-xl.c-sidebar-right {
-  margin-left: -389px;
+  margin-left: -384px;
 }
 
 @media (min-width: 992px) {
@@ -12364,7 +12357,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl.c-sidebar-right,*[dir="rtl"] .c-si
     bottom: 0;
     z-index: 1030;
   }
-  .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar.c-sidebar-fixed {
+  .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar.c-sidebar-fixed[class*="-show"] {
     border: 0;
     box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
   }
@@ -12386,7 +12379,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl.c-sidebar-right,*[dir="rtl"] .c-si
   z-index: 1032;
 }
 
-.c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar.c-sidebar-overlaid {
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar.c-sidebar-overlaid[class*="-show"] {
   border: 0;
   box-shadow: 0 3px 4px 0 rgba(60, 75, 100, .14), 0 3px 3px -2px rgba(60, 75, 100, .12), 0 1px 8px 0 rgba(60, 75, 100, .20);
 }
@@ -12699,47 +12692,156 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
 }
 
 @media (min-width: 992px) {
-  .c-sidebar-minimized, .c-sidebar-unfoldable:not(:hover) {
+  .c-sidebar-minimized {
     z-index: 1031;
     -ms-flex: 0 0 56px;
     flex: 0 0 56px;
   }
-  .c-sidebar-minimized.c-sidebar-fixed, .c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) {
+  .c-sidebar-minimized.c-sidebar-fixed {
     z-index: 1031;
     width: 56px;
   }
-  html:not([dir="rtl"]) .c-sidebar-minimized:not(.c-sidebar-right), html:not([dir="rtl"]) .c-sidebar-unfoldable:not(.c-sidebar-right):not(:hover) {
+  html:not([dir="rtl"]) .c-sidebar-minimized:not(.c-sidebar-right) {
     margin-left: -56px;
   }
-  *[dir="rtl"] .c-sidebar-minimized:not(.c-sidebar-right), *[dir="rtl"] .c-sidebar-unfoldable:not(.c-sidebar-right):not(:hover) {
+  *[dir="rtl"] .c-sidebar-minimized:not(.c-sidebar-right) {
     margin-right: -56px;
   }
-  html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right, html:not([dir="rtl"]) .c-sidebar-right.c-sidebar-unfoldable:not(:hover) {
+  html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right {
     margin-right: -56px;
     margin-left: -56px;
   }
-  .c-sidebar-minimized .c-sidebar-brand-full, .c-sidebar-unfoldable:not(:hover) .c-sidebar-brand-full {
+  .c-sidebar-minimized .c-sidebar-brand-full {
     display: none;
   }
-  .c-sidebar-minimized .c-sidebar-brand-minimized, .c-sidebar-unfoldable:not(:hover) .c-sidebar-brand-minimized {
+  .c-sidebar-minimized .c-sidebar-brand-minimized {
     display: initial;
   }
-  .c-sidebar-minimized .c-sidebar-nav, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav {
+  .c-sidebar-minimized .c-sidebar-nav {
     padding-bottom: 50px;
     overflow: visible;
   }
-  .c-sidebar-minimized .c-d-minimized-none, .c-sidebar-unfoldable:not(:hover) .c-d-minimized-none,
+  .c-sidebar-minimized .c-d-minimized-none,
   .c-sidebar-minimized .c-sidebar-nav-divider,
-  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-divider,
   .c-sidebar-minimized .c-sidebar-nav-label,
-  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-label,
   .c-sidebar-minimized .c-sidebar-nav-title,
-  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-title,
   .c-sidebar-minimized .c-sidebar-footer,
-  .c-sidebar-unfoldable:not(:hover) .c-sidebar-footer,
   .c-sidebar-minimized .c-sidebar-form,
+  .c-sidebar-minimized .c-sidebar-header {
+    height: 0;
+    padding: 0;
+    margin: 0;
+    visibility: hidden;
+    opacity: 0;
+  }
+  .c-sidebar-minimized .c-sidebar-minimizer {
+    position: fixed;
+    bottom: 0;
+    width: inherit;
+  }
+  html:not([dir="rtl"]) .c-sidebar-minimized .c-sidebar-minimizer::before {
+    -webkit-transform: rotate(-180deg);
+    transform: rotate(-180deg);
+  }
+  *[dir="rtl"] .c-sidebar-minimized .c-sidebar-minimizer::before,html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right .c-sidebar-minimizer::before {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right .c-sidebar-minimizer::before {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+  html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-item:hover, html:not([dir="rtl"])
+  .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+    margin-left: -256px;
+  }
+  *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-item:hover, *[dir="rtl"]
+  .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+    margin-right: -256px;
+  }
+  .c-sidebar-minimized .c-sidebar-nav-link, .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle,
+  .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle {
+    overflow: hidden;
+    white-space: nowrap;
+    border-left: 0;
+  }
+  .c-sidebar-minimized .c-sidebar-nav-link:hover, .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle:hover,
+  .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle:hover {
+    width: 312px;
+  }
+  .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle::after {
+    display: none;
+  }
+  .c-sidebar-minimized .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, .c-sidebar-minimized .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle {
+    width: 256px;
+  }
+  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown {
+    position: relative;
+  }
+  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items,.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown:not(.c-show) > .c-sidebar-nav-dropdown-items {
+    display: none;
+  }
+  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown .c-sidebar-nav-dropdown-items {
+    max-height: 1500px;
+  }
+  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+    width: 312px;
+    overflow: visible;
+  }
+  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
+    position: absolute;
+    display: inline;
+  }
+  html:not([dir="rtl"]) .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
+    left: 56px;
+  }
+  *[dir="rtl"] .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
+    right: 56px;
+  }
+  html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
+    left: 0;
+  }
+  *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
+    right: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .c-sidebar-unfoldable:not(:hover) {
+    z-index: 1031;
+    -ms-flex: 0 0 56px;
+    flex: 0 0 56px;
+  }
+  .c-sidebar-unfoldable:not(:hover).c-sidebar-fixed {
+    z-index: 1031;
+    width: 56px;
+  }
+  html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover):not(.c-sidebar-right) {
+    margin-left: -56px;
+  }
+  *[dir="rtl"] .c-sidebar-unfoldable:not(:hover):not(.c-sidebar-right) {
+    margin-right: -56px;
+  }
+  html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover).c-sidebar-right {
+    margin-right: -56px;
+    margin-left: -56px;
+  }
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-brand-full {
+    display: none;
+  }
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-brand-minimized {
+    display: initial;
+  }
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav {
+    padding-bottom: 50px;
+    overflow: visible;
+  }
+  .c-sidebar-unfoldable:not(:hover) .c-d-minimized-none,
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-divider,
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-label,
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-title,
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-footer,
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-form,
-  .c-sidebar-minimized .c-sidebar-header,
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-header {
     height: 0;
     padding: 0;
@@ -12747,75 +12849,46 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
     visibility: hidden;
     opacity: 0;
   }
-  .c-sidebar-minimized .c-sidebar-minimizer, .c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer {
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer {
     position: fixed;
     bottom: 0;
     width: inherit;
   }
-  html:not([dir="rtl"]) .c-sidebar-minimized .c-sidebar-minimizer::before, html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer::before {
+  html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer::before {
     -webkit-transform: rotate(-180deg);
     transform: rotate(-180deg);
   }
-  *[dir="rtl"] .c-sidebar-minimized .c-sidebar-minimizer::before, *[dir="rtl"] .c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer::before,html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right .c-sidebar-minimizer::before, html:not([dir="rtl"]) .c-sidebar-right.c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer::before {
+  *[dir="rtl"] .c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer::before,html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover).c-sidebar-right .c-sidebar-minimizer::before {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
   }
-  *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right .c-sidebar-minimizer::before, *[dir="rtl"] .c-sidebar-right.c-sidebar-unfoldable:not(:hover) .c-sidebar-minimizer::before {
+  *[dir="rtl"] .c-sidebar-unfoldable:not(:hover).c-sidebar-right .c-sidebar-minimizer::before {
     -webkit-transform: rotate(180deg);
     transform: rotate(180deg);
   }
-  html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-item:hover, html:not([dir="rtl"]) .c-sidebar-right.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-item:hover, html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-dropdown:hover, html:not([dir="rtl"]) .c-sidebar-right.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+  html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover).c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-item:hover, html:not([dir="rtl"])
+  .c-sidebar-unfoldable:not(:hover).c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
     margin-left: -256px;
   }
-  *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-item:hover, *[dir="rtl"] .c-sidebar-right.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-item:hover, *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-dropdown:hover, *[dir="rtl"] .c-sidebar-right.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+  *[dir="rtl"] .c-sidebar-unfoldable:not(:hover).c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-item:hover, *[dir="rtl"]
+  .c-sidebar-unfoldable:not(:hover).c-sidebar-right .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
     margin-right: -256px;
   }
-  .c-sidebar-minimized .c-sidebar-nav-link, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-link, .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle,
-  .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle,
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-link, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle,
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle {
     overflow: hidden;
     white-space: nowrap;
     border-left: 0;
   }
-  .c-sidebar-minimized .c-sidebar-nav-link:hover, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-link:hover, .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle:hover, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle:hover,
-  .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle:hover,
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-link:hover, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle:hover,
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle:hover {
     width: 312px;
   }
-  .c-sidebar-minimized .c-sidebar-nav-dropdown-toggle::after, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle::after {
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-toggle::after {
     display: none;
   }
-  .c-sidebar-minimized .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, .c-sidebar-minimized .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle {
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle {
     width: 256px;
-  }
-  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown {
-    position: relative;
-  }
-  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items,.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown:not(.c-show) > .c-sidebar-nav-dropdown-items, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown:not(.c-show) > .c-sidebar-nav-dropdown-items {
-    display: none;
-  }
-  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown .c-sidebar-nav-dropdown-items, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown .c-sidebar-nav-dropdown-items {
-    max-height: 1500px;
-  }
-  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
-    width: 312px;
-    overflow: visible;
-  }
-  .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
-    position: absolute;
-    display: inline;
-  }
-  html:not([dir="rtl"]) .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items, html:not([dir="rtl"]) .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
-    left: 56px;
-  }
-  *[dir="rtl"] .c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items, *[dir="rtl"] .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
-    right: 56px;
-  }
-  html:not([dir="rtl"]) .c-sidebar-minimized.c-sidebar-right > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items, html:not([dir="rtl"]) .c-sidebar-right.c-sidebar-unfoldable:not(:hover) > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
-    left: 0;
-  }
-  *[dir="rtl"] .c-sidebar-minimized.c-sidebar-right > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items, *[dir="rtl"] .c-sidebar-right.c-sidebar-unfoldable:not(:hover) > .c-sidebar-nav-dropdown:hover > .c-sidebar-nav-dropdown-items {
-    right: 0;
   }
 }
 
@@ -12827,7 +12900,7 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
   .c-sidebar-unfoldable {
     z-index: 1031 !important;
   }
-  .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar-unfoldable:hover {
+  .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar-unfoldable[class*="-show"] {
     border: 0;
     box-shadow: 0 3px 4px 0 rgba(60, 75, 100, .14), 0 3px 3px -2px rgba(60, 75, 100, .12), 0 1px 8px 0 rgba(60, 75, 100, .20);
   }
@@ -12884,11 +12957,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right), html:not(
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-right: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
@@ -12937,11 +13012,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-left: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
@@ -12991,11 +13068,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-right: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-sm-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-sm-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
@@ -13045,11 +13124,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-left: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-sm-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
@@ -13099,11 +13180,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-right: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-md-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-md-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
@@ -13153,11 +13236,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-left: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-md-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
@@ -13207,11 +13292,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-right: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-lg-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-lg-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
@@ -13261,11 +13348,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-left: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-lg-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
@@ -13315,11 +13404,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-right: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-xl-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-unfoldable:not(.c-sidebar-right).c-sidebar-fixed:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-xl-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show:not(.c-sidebar-right).c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
@@ -13369,11 +13460,13 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-xl ~ .c-wrapper {
     margin-left: 384px;
   }
-  html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, html:not([dir="rtl"])
+  html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"]) .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, html:not([dir="rtl"])
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, html:not([dir="rtl"])
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-right: 56px;
   }
-  *[dir="rtl"] .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable:not(:hover) ~ .c-wrapper, *[dir="rtl"]
+  *[dir="rtl"] .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"] .c-sidebar.c-sidebar-xl-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper, *[dir="rtl"]
+  .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-minimized ~ .c-wrapper, *[dir="rtl"]
   .c-sidebar.c-sidebar-show.c-sidebar-right.c-sidebar-fixed.c-sidebar-unfoldable ~ .c-wrapper {
     margin-left: 56px;
   }
@@ -13538,27 +13631,27 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-show.c-sidebar-right, html:not([dir="
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='%23fff' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E");
 }
 
-.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle {
+.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle {
   background: #321fdb;
 }
 
-.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
   color: #fff;
 }
 
-.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle {
+.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle {
   background: #3c4b64;
 }
 
-.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+.c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
+.c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
   background: #3c4b64;
 }
 
-.c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover, .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+.c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
   background: #321fdb;
 }
 
@@ -13738,27 +13831,27 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-light.c-sidebar-right,*[dir="rtl"] .c
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='%23768192' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E");
 }
 
-.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle {
+.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle {
   background: #321fdb;
 }
 
-.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
   color: #fff;
 }
 
-.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle {
+.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle {
   background: #fff;
 }
 
-.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
   color: rgba(0, 0, 21, 0.5);
 }
 
-.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
+.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
   background: #fff;
 }
 
-.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover, .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
+.c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover {
   background: #321fdb;
 }
 
@@ -13795,7 +13888,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-light.c-sidebar-right,*[dir="rtl"] .c
   outline: 0;
 }
 
-.c-legacy-theme .c-sidebar.c-sidebar-dark.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items, .c-legacy-theme .c-sidebar.c-sidebar-dark.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
+.c-legacy-theme .c-sidebar.c-sidebar-dark.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
   background: #3c4b64;
 }
 
@@ -13823,7 +13916,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-light.c-sidebar-right,*[dir="rtl"] .c
   outline: 0;
 }
 
-.c-legacy-theme .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items, .c-legacy-theme .c-sidebar.c-sidebar-light.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
+.c-legacy-theme .c-sidebar.c-sidebar-light.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
   background: #fff;
 }
 
@@ -13996,27 +14089,27 @@ html:not([dir="rtl"]) .c-dark-theme .c-sidebar.c-sidebar-right,*[dir="rtl"] .c-d
   background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='%23fff' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E");
 }
 
-.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle {
+.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle {
   background: #4638c2;
 }
 
-.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
   color: #fff;
 }
 
-.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle {
+.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle {
   background: #2c2c34;
 }
 
-.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
+.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-sidebar-nav-link.c-disabled .c-sidebar-nav-icon, .c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav-item:hover > .c-disabled.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
   color: #8a93a2;
 }
 
-.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
+.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items {
   background: #2c2c34;
 }
 
-.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover, .c-dark-theme .c-sidebar.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown:hover,.c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-primary, .c-dark-theme .c-sidebar-nav-link-primary.c-sidebar-nav-dropdown-toggle {
+.c-dark-theme .c-sidebar.c-sidebar-minimized .c-sidebar-nav > .c-sidebar-nav-dropdown:hover,.c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-primary, .c-dark-theme .c-sidebar-nav-link-primary.c-sidebar-nav-dropdown-toggle {
   background: #4638c2;
 }
 
@@ -14467,6 +14560,197 @@ html:not([dir="rtl"]) .c-dark-theme .c-sidebar.c-sidebar-right,*[dir="rtl"] .c-d
 .spinner-grow-sm {
   width: 1rem;
   height: 1rem;
+}
+
+.c-subheader {
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 48px;
+  background: #fff;
+  border-bottom: 1px solid #d8dbe0;
+}
+
+.c-subheader[class*="bg-"] {
+  border-color: rgba(0, 0, 21, 0.1);
+}
+
+.c-subheader.c-subheader-fixed {
+  position: fixed;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+}
+
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-subheader.c-subheader-fixed {
+  border: 0;
+  box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+  -webkit-clip-path: inset(0 0 -1000px 0);
+  clip-path: inset(0 0 -1000px 0);
+}
+
+.c-subheader-nav {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -ms-flex-align: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+.c-subheader-nav .c-subheader-nav-item {
+  position: relative;
+}
+
+.c-subheader-nav .c-subheader-nav-btn {
+  background-color: transparent;
+  border: 1px solid transparent;
+}
+
+.c-subheader-nav .c-subheader-nav-link,
+.c-subheader-nav .c-subheader-nav-btn {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.c-subheader-nav .c-subheader-nav-link .badge,
+.c-subheader-nav .c-subheader-nav-btn .badge {
+  position: absolute;
+  top: 50%;
+  margin-top: -16px;
+}
+
+html:not([dir="rtl"]) .c-subheader-nav .c-subheader-nav-link .badge, html:not([dir="rtl"])
+.c-subheader-nav .c-subheader-nav-btn .badge {
+  left: 50%;
+  margin-left: 0;
+}
+
+*[dir="rtl"] .c-subheader-nav .c-subheader-nav-link .badge, *[dir="rtl"]
+.c-subheader-nav .c-subheader-nav-btn .badge {
+  right: 50%;
+  margin-right: 0;
+}
+
+.c-subheader-nav .c-subheader-nav-link:hover,
+.c-subheader-nav .c-subheader-nav-btn:hover {
+  text-decoration: none;
+}
+
+.c-subheader.c-subheader-dark {
+  background: #3c4b64;
+  border-bottom: 1px solid #636f83;
+}
+
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-link,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-btn {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-link:hover, .c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-link:focus,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-btn:hover,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-btn:focus {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-link.c-disabled,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-btn.c-disabled {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.c-subheader.c-subheader-dark .c-subheader-nav .c-show > .c-subheader-nav-link,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-active > .c-subheader-nav-link,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-link.c-show,
+.c-subheader.c-subheader-dark .c-subheader-nav .c-subheader-nav-link.c-active {
+  color: #fff;
+}
+
+.c-subheader.c-subheader-dark .c-subheader-text {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.c-subheader.c-subheader-dark .c-subheader-text a,.c-subheader.c-subheader-dark .c-subheader-text a:hover, .c-subheader.c-subheader-dark .c-subheader-text a:focus {
+  color: #fff;
+}
+
+.c-subheader .c-subheader-nav .c-subheader-nav-link,
+.c-subheader .c-subheader-nav .c-subheader-nav-btn {
+  color: rgba(0, 0, 21, 0.5);
+}
+
+.c-subheader .c-subheader-nav .c-subheader-nav-link:hover, .c-subheader .c-subheader-nav .c-subheader-nav-link:focus,
+.c-subheader .c-subheader-nav .c-subheader-nav-btn:hover,
+.c-subheader .c-subheader-nav .c-subheader-nav-btn:focus {
+  color: rgba(0, 0, 21, 0.7);
+}
+
+.c-subheader .c-subheader-nav .c-subheader-nav-link.c-disabled,
+.c-subheader .c-subheader-nav .c-subheader-nav-btn.c-disabled {
+  color: rgba(0, 0, 21, 0.3);
+}
+
+.c-subheader .c-subheader-nav .c-show > .c-subheader-nav-link,
+.c-subheader .c-subheader-nav .c-active > .c-subheader-nav-link,
+.c-subheader .c-subheader-nav .c-subheader-nav-link.c-show,
+.c-subheader .c-subheader-nav .c-subheader-nav-link.c-active {
+  color: rgba(0, 0, 21, 0.9);
+}
+
+.c-subheader .c-subheader-text {
+  color: rgba(0, 0, 21, 0.5);
+}
+
+.c-subheader .c-subheader-text a,.c-subheader .c-subheader-text a:hover, .c-subheader .c-subheader-text a:focus {
+  color: rgba(0, 0, 21, 0.9);
+}
+
+.c-dark-theme .c-subheader {
+  background: #2c2c34;
+  border-bottom: 0;
+}
+
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-link,
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-btn {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-link:hover, .c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-link:focus,
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-btn:hover,
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-btn:focus {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-link.c-disabled,
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-btn.c-disabled {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.c-dark-theme .c-subheader .c-subheader-nav .c-show > .c-subheader-nav-link,
+.c-dark-theme .c-subheader .c-subheader-nav .c-active > .c-subheader-nav-link,
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-link.c-show,
+.c-dark-theme .c-subheader .c-subheader-nav .c-subheader-nav-link.c-active {
+  color: #fff;
+}
+
+.c-dark-theme .c-subheader .c-subheader-text {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.c-dark-theme .c-subheader .c-subheader-text a,.c-dark-theme .c-subheader .c-subheader-text a:hover, .c-dark-theme .c-subheader .c-subheader-text a:focus {
+  color: #fff;
 }
 
 .c-switch {
@@ -16834,12 +17118,24 @@ html:not([dir="rtl"]) .list-inline {
   margin: inherit;
 }
 
-.c-header ~ .c-sidebar,.c-header.c-header-fixed ~ .c-wrapper {
-  margin-top: 56px;
+.c-wrapper.c-fixed-components {
+  height: 100vh;
 }
 
-.c-header.c-header-with-subheader ~ .c-sidebar,.c-header.c-header-with-subheader.c-header-fixed ~ .c-wrapper {
-  margin-top: 104px;
+.c-wrapper.c-fixed-components .c-header-fixed {
+  margin: initial;
+}
+
+.c-wrapper.c-fixed-components .c-header-fixed,
+.c-wrapper.c-fixed-components .c-subheader-fixed,
+.c-wrapper.c-fixed-components .c-footer-fixed {
+  position: relative;
+}
+
+.c-wrapper.c-fixed-components .c-body {
+  -ms-flex-direction: column;
+  flex-direction: column;
+  overflow: scroll;
 }
 
 .c-body {
@@ -16863,14 +17159,6 @@ html:not([dir="rtl"]) .list-inline {
     padding-right: 30px;
     padding-left: 30px;
   }
-}
-
-.c-header-fixed ~ .c-body {
-  padding-top: 56px;
-}
-
-.c-header-fixed.c-header-with-subheader ~ .c-body {
-  padding-top: 104px;
 }
 
 .align-baseline {

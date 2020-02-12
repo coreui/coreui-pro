@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  sidebar.js v3.0.0-rc.1 (https://coreui.io)
+  * CoreUI Pro  sidebar.js v3.0.0-rc.2 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -58,7 +58,7 @@
    */
 
   var NAME = 'sidebar';
-  var VERSION = '3.0.0-rc.1';
+  var VERSION = '3.0.0-rc.2';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
