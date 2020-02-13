@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro UI Kit
- * @version v3.0.0-rc.2
+ * @version v3.0.0-rc.3
  * @link https://coreui.io/pro/
  * Copyright (c) 2020 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -17123,7 +17123,7 @@ html:not([dir="rtl"]) .list-inline {
 }
 
 .c-wrapper.c-fixed-components .c-header-fixed {
-  margin: initial;
+  margin: 0;
 }
 
 .c-wrapper.c-fixed-components .c-header-fixed,
@@ -17135,7 +17135,7 @@ html:not([dir="rtl"]) .list-inline {
 .c-wrapper.c-fixed-components .c-body {
   -ms-flex-direction: column;
   flex-direction: column;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .c-body {
@@ -17148,8 +17148,12 @@ html:not([dir="rtl"]) .list-inline {
 }
 
 .c-main {
-  -ms-flex: 1;
-  flex: 1;
+  -ms-flex-preferred-size: auto;
+  flex-basis: auto;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
   min-width: 0;
   padding-top: 2rem;
 }

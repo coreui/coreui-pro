@@ -48,7 +48,7 @@
 }
 
 .c-wrapper.c-fixed-components .c-header-fixed {
-  margin: initial;
+  margin: 0;
 }
 
 .c-wrapper.c-fixed-components .c-header-fixed,
@@ -59,7 +59,7 @@
 
 .c-wrapper.c-fixed-components .c-body {
   flex-direction: column;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .c-body {
@@ -69,7 +69,9 @@
 }
 
 .c-main {
-  flex: 1;
+  flex-basis: auto;
+  flex-shrink: 0;
+  flex-grow: 1;
   min-width: 0;
   padding-top: 2rem;
 }

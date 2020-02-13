@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  carousel.js v3.0.0-rc.2 (https://coreui.io)
+  * CoreUI Pro  carousel.js v3.0.0-rc.3 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -215,7 +215,7 @@
    */
 
   var NAME = 'carousel';
-  var VERSION = '3.0.0-rc.2';
+  var VERSION = '3.0.0-rc.3';
   var DATA_KEY = 'coreui.carousel';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
