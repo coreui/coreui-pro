@@ -26,7 +26,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const DefaultType = {
-  dropdownAccordion: 'string'
+  dropdownAccordion: '(string|boolean)'
 }
 
 const Default = {
@@ -237,7 +237,7 @@ class Sidebar {
         currentUrl = String(window.location)
       }
 
-      if (currentUrl.slice(currentUrl.length - 1) === '#') {
+      if (currentUrl.slice(- 1) === '#') {
         currentUrl = currentUrl.slice(0, -1)
       }
 
