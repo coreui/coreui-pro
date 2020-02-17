@@ -16,7 +16,6 @@ $dropdown-dark-theme-link-active-bg:       $component-active-bg !default;
 $dropdown-dark-theme-link-disabled-color:  $gray-600 !default;
 $dropdown-dark-theme-header-color:         $gray-200 !default;
 
-$dropdown-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $dropdown-theme-map: map-merge(
   $dropdown-theme-map,

@@ -6,7 +6,6 @@
 
 $border-dark-theme-color: $gray-dark-theme-900 !default;
 
-$border-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $border-theme-map: map-merge(
   $border-theme-map,

@@ -53,7 +53,7 @@ $custom-dark-theme-file-button-bg:           $input-group-addon-dark-theme-bg !d
 $custom-forms-theme-map: map-merge(
   $custom-forms-theme-map,
   (
-    default: (
+    dark: (
       "custom-control-indicator-bg":                           $custom-dark-theme-control-indicator-bg,
       "custom-control-indicator-border-color":                 $custom-dark-theme-control-indicator-border-color,
       "custom-control-indicator-disabled-bg":                  $custom-dark-theme-control-indicator-disabled-bg,
