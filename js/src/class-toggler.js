@@ -77,10 +77,11 @@ class ClassToggler {
 
         // eslint-disable-next-line no-negated-condition
         if (!responsive) {
-          element.classList.toggle(className)
+          const add = element.classList.toggle(className)
           const event = new CustomEvent(Event.CLASS_TOGGLE, {
             detail: {
               target,
+              add,
               className
             }
           })
@@ -115,6 +116,7 @@ class ClassToggler {
               const event = new CustomEvent(Event.CLASS_TOGGLE, {
                 detail: {
                   target,
+                  add: false,
                   className: responsiveClassName
                 }
               })
@@ -125,6 +127,7 @@ class ClassToggler {
             const event = new CustomEvent(Event.CLASS_TOGGLE, {
               detail: {
                 target,
+                add: true,
                 className
               }
             })
