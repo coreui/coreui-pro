@@ -54,18 +54,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: auto;
   min-height: 56px;
   transition: width 0.25s;
-}
-
-@media (min-width: 768px) {
-  .c-header-brand {
-    width: auto;
-  }
-}
-
-.c-header-brand .c-header-brand-minimized {
-  display: none;
 }
 
 .c-header-brand.c-header-brand-center {
@@ -222,18 +213,6 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-xl-down-center {
   }
 }
 
-@media (min-width: 992px) {
-  .c-header-brand.c-header-brand-minimized {
-    width: 56px;
-  }
-  .c-header-brand.c-header-brand-minimized .c-header-brand-full {
-    display: none;
-  }
-  .c-header-brand.c-header-brand-minimized .c-header-brand-minimized {
-    display: block;
-  }
-}
-
 .c-header-toggler {
   min-width: 50px;
   font-size: 1.09375rem;
@@ -309,11 +288,6 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
   text-decoration: none;
 }
 
-.c-header-nav .dropdown-menu {
-  padding-bottom: 0;
-  line-height: 1.5;
-}
-
 .c-header-nav .dropdown-item {
   min-width: 180px;
 }
@@ -324,6 +298,7 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 }
 
 .c-header.c-header-dark .c-subheader {
+  margin-top: -1px;
   border-top: 1px solid #636f83;
 }
 
@@ -334,12 +309,6 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 
 .c-header.c-header-dark .c-header-brand:hover, .c-header.c-header-dark .c-header-brand:focus {
   color: #fff;
-}
-
-@media (min-width: 992px) {
-  .c-header.c-header-dark .c-header-brand.c-header-brand-minimized {
-    background-color: transparent;
-  }
 }
 
 .c-header.c-header-dark .c-header-nav .c-header-nav-link,
@@ -396,6 +365,7 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 }
 
 .c-header .c-subheader {
+  margin-top: -1px;
   border-top: 1px solid #d8dbe0;
 }
 
@@ -406,12 +376,6 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 
 .c-header .c-header-brand:hover, .c-header .c-header-brand:focus {
   color: #3a4555;
-}
-
-@media (min-width: 992px) {
-  .c-header .c-header-brand.c-header-brand-minimized {
-    background-color: transparent;
-  }
 }
 
 .c-header .c-header-nav .c-header-nav-link,
@@ -468,6 +432,7 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 }
 
 .c-dark-theme .c-header .c-subheader {
+  margin-top: -1px;
   border-top: 1px solid #181924;
 }
 
@@ -478,12 +443,6 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 
 .c-dark-theme .c-header .c-header-brand:hover, .c-dark-theme .c-header .c-header-brand:focus {
   color: #fff;
-}
-
-@media (min-width: 992px) {
-  .c-dark-theme .c-header .c-header-brand.c-header-brand-minimized {
-    background-color: transparent;
-  }
 }
 
 .c-dark-theme .c-header .c-header-nav .c-header-nav-link,

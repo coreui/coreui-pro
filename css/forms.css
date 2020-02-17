@@ -38,9 +38,9 @@
 }
 
 .c-dark-theme .form-control {
-  color: #ebedef;
-  background-color: #2c2c34;
-  border-color: #2c2c34;
+  color: #e1e1e1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -68,9 +68,9 @@
 }
 
 .c-dark-theme .form-control:focus {
-  color: #ebedef;
-  background-color: #484855;
-  border-color: #484855;
+  color: #e1e1e1;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .form-control::placeholder {
@@ -79,7 +79,7 @@
 }
 
 .c-dark-theme .form-control::placeholder {
-  color: #9da5b1;
+  color: rgba(225, 225, 225, 0.25);
 }
 
 .form-control:disabled, .form-control[readonly] {
@@ -88,7 +88,7 @@
 }
 
 .c-dark-theme .form-control:disabled, .c-dark-theme .form-control[readonly] {
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 select.form-control:focus::-ms-value {
@@ -97,8 +97,8 @@ select.form-control:focus::-ms-value {
 }
 
 .c-dark-theme select.form-control:focus::-ms-value {
-  color: #ebedef;
-  background-color: #2c2c34;
+  color: #e1e1e1;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .form-control-file,

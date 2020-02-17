@@ -471,7 +471,7 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
     display: none;
   }
   .c-sidebar-minimized .c-sidebar-brand-minimized {
-    display: initial;
+    display: block;
   }
   .c-sidebar-minimized .c-sidebar-nav {
     padding-bottom: 50px;
@@ -590,7 +590,7 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
     display: none;
   }
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-brand-minimized {
-    display: initial;
+    display: block;
   }
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav {
     padding-bottom: 50px;

@@ -3,7 +3,7 @@
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
 // Dark theme
-$input-dark-theme-bg:                        rgba($white, .10) !default;
+$input-dark-theme-bg:                        rgba($white, .1) !default;
 $input-dark-theme-disabled-bg:               rgba($white, .05) !default;
 $input-dark-theme-color:                     $body-dark-theme-color !default;
 $input-dark-theme-border-color:              rgba($white, .15) !default;

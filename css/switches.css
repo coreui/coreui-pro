@@ -70,9 +70,9 @@
 }
 
 .c-dark-theme .c-switch-input:focus ~ .c-switch-slider {
-  color: #ebedef;
-  background-color: #484855;
-  border-color: #484855;
+  color: #e1e1e1;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .c-switch-input:disabled ~ .c-switch-slider {

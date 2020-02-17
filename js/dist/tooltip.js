@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  tooltip.js v3.0.0-rc.3 (https://coreui.io)
+  * CoreUI Pro  tooltip.js v3.0.0-rc.4 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -344,7 +344,7 @@
    */
 
   var NAME = 'tooltip';
-  var VERSION = '3.0.0-rc.3';
+  var VERSION = '3.0.0-rc.4';
   var DATA_KEY = 'coreui.tooltip';
   var EVENT_KEY = "." + DATA_KEY;
   var CLASS_PREFIX = 'bs-tooltip';
