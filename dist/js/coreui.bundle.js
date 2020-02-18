@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  v3.0.0-rc.4 (https://coreui.io)
+  * CoreUI Pro  v3.0.0-rc.5 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -9425,7 +9425,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v3.0.0-rc.4): index.umd.js
+   * CoreUI (v3.0.0-rc.5): index.umd.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

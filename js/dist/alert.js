@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  alert.js v3.0.0-rc.4 (https://coreui.io)
+  * CoreUI Pro  alert.js v3.0.0-rc.5 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */

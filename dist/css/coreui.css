@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI Pro UI Kit
- * @version v3.0.0-rc.4
+ * @version v3.0.0-rc.5
  * @link https://coreui.io/pro/
  * Copyright (c) 2020 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -12977,6 +12977,12 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
   .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-items .c-sidebar-nav-link, .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown-toggle {
     width: 256px;
   }
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown {
+    position: relative;
+  }
+  .c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items,.c-sidebar-unfoldable:not(:hover) .c-sidebar-nav > .c-sidebar-nav-dropdown > .c-sidebar-nav-dropdown-items .c-sidebar-nav-dropdown:not(.c-show) > .c-sidebar-nav-dropdown-items {
+    display: none;
+  }
 }
 
 .c-sidebar-unfoldable:not(:hover) .ps {
@@ -12990,6 +12996,9 @@ html:not([dir="rtl"]) .c-sidebar-right .c-sidebar-minimizer::before {
   .c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-sidebar-unfoldable[class*="-show"] {
     border: 0;
     box-shadow: 0 3px 4px 0 rgba(60, 75, 100, .14), 0 3px 3px -2px rgba(60, 75, 100, .12), 0 1px 8px 0 rgba(60, 75, 100, .20);
+  }
+  .c-sidebar-unfoldable:hover .c-sidebar-nav-dropdown-items {
+    overflow-x: hidden;
   }
   html:not([dir="rtl"]) .c-sidebar-unfoldable:hover .c-sidebar-minimizer::before {
     -webkit-transform: rotate(-180deg);
