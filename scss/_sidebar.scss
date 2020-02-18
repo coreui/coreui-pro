@@ -698,6 +698,20 @@
         width: $sidebar-width;
       }
     }
+
+    // stylelint-disable-next-line no-duplicate-selectors
+    .c-sidebar-nav > .c-sidebar-nav-dropdown {
+      position: relative;
+      // overflow: hidden;
+
+      > .c-sidebar-nav-dropdown-items {
+        display: none;
+
+        .c-sidebar-nav-dropdown:not(.c-show) > .c-sidebar-nav-dropdown-items {
+          display: none;
+        }
+      }
+    }
   }
 
   // fix for perfect scrollbar
@@ -712,6 +726,9 @@
       @include elevation(3);
     }
     &:hover {
+      .c-sidebar-nav-dropdown-items {
+        overflow-x: hidden;
+      }
 
       .c-sidebar-minimizer::before {
         @include ltr {
