@@ -254,7 +254,7 @@ class Sidebar {
   }
 
   _firstBreakpointClassName() {
-    return Object.values(Default.breakpoints)[0]
+    return Object.keys(Default.breakpoints).map(key => Default.breakpoints[key])[0]
   }
 
   _getBreakpointClassName(breakpoint) {
