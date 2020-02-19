@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  v3.0.0-rc.5 (https://coreui.io)
+  * CoreUI PRO  v3.0.0 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -5622,7 +5622,9 @@ function () {
   };
 
   _proto._firstBreakpointClassName = function _firstBreakpointClassName() {
-    return Object.values(Default$9.breakpoints)[0];
+    return Object.keys(Default$9.breakpoints).map(function (key) {
+      return Default$9.breakpoints[key];
+    })[0];
   };
 
   _proto._getBreakpointClassName = function _getBreakpointClassName(breakpoint) {

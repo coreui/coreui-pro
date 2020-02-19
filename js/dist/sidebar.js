@@ -1,5 +1,5 @@
 /*!
-  * CoreUI Pro  sidebar.js v3.0.0-rc.5 (https://coreui.io)
+  * CoreUI PRO  sidebar.js v3.0.0 (https://coreui.io)
   * Copyright 2020 Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -349,7 +349,9 @@
     };
 
     _proto._firstBreakpointClassName = function _firstBreakpointClassName() {
-      return Object.values(Default.breakpoints)[0];
+      return Object.keys(Default.breakpoints).map(function (key) {
+        return Default.breakpoints[key];
+      })[0];
     };
 
     _proto._getBreakpointClassName = function _getBreakpointClassName(breakpoint) {

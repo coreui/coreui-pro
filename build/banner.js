@@ -6,7 +6,7 @@ const year = new Date().getFullYear()
 
 function getBanner(pluginFilename) {
   return `/*!
-  * CoreUI Pro ${pluginFilename ? ` ${pluginFilename}` : ''} v${pkg.version} (${pkg.homepage})
+  * CoreUI PRO ${pluginFilename ? ` ${pluginFilename}` : ''} v${pkg.version} (${pkg.homepage})
   * Copyright ${year} ${pkg.author.name}
   * License (${pkg.homepage}/pro/license/)
   */`
