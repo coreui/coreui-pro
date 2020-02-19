@@ -1,0 +1,45 @@
+// Tables
+//
+// Customizes the `.table` component with basic values, each used across all table variations.
+
+// Dark Theme
+$table-dark-theme-color:         $body-dark-theme-color !default;
+$table-dark-theme-bg:            transparent !default;
+$table-dark-theme-accent-bg:     rgba($black, .05) !default;
+$table-dark-theme-hover-color:   $body-dark-theme-color !default;
+$table-dark-theme-hover-bg:      rgba($white, .1) !default;
+$table-dark-theme-active-bg:     rgba($white, .075) !default;
+$table-dark-theme-border-color:  $gray-900 !default;
+$table-dark-theme-head-bg:       $gray-800 !default;
+$table-dark-theme-head-color:    $body-dark-theme-color !default;
+
+$table-dark-theme-dark-color:         $white !default;
+$table-dark-theme-dark-bg:            rgba($black, .5) !default;
+$table-dark-theme-dark-accent-bg:     rgba($white, .05) !default;
+$table-dark-theme-dark-hover-color:   $table-dark-color !default;
+$table-dark-theme-dark-hover-bg:      rgba($white, .1) !default;
+$table-dark-theme-dark-border-color:  rgba($black, .9) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$table-theme-map: map-merge(
+  $table-theme-map,
+  (
+    "dark": (
+      "table-color":              $table-dark-theme-color,
+      "table-bg":                 $table-dark-theme-bg,
+      "table-accent-bg":          $table-dark-theme-accent-bg,
+      "table-hover-color":        $table-dark-theme-hover-color,
+      "table-hover-bg":           $table-dark-theme-hover-bg,
+      "table-active-bg":          $table-dark-theme-active-bg,
+      "table-border-color":       $table-dark-theme-border-color,
+      "table-head-bg":            $table-dark-theme-head-bg,
+      "table-head-color":         $table-dark-theme-head-color,
+      "table-dark-color":         $table-dark-theme-dark-color,
+      "table-dark-bg":            $table-dark-theme-dark-bg,
+      "table-dark-accent-bg":     $table-dark-theme-dark-accent-bg,
+      "table-dark-hover-color":   $table-dark-theme-dark-hover-color,
+      "table-dark-hover-bg":      $table-dark-theme-dark-hover-bg,
+      "table-dark-border-color":  $table-dark-theme-dark-border-color
+    )
+  )
+);

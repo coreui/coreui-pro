@@ -1,0 +1,23 @@
+// Dark theme
+$toast-dark-theme-background-color:  $gray-dark-theme-100 !default;
+$toast-dark-theme-color:             $body-dark-theme-color !default;
+$toast-dark-theme-border-color:      transparent !default;
+
+$toast-dark-theme-header-color:             $body-dark-theme-color !default;
+$toast-dark-theme-header-background-color:  $gray-dark-theme-100 !default;
+$toast-dark-theme-header-border-color:      rgba($black, .2) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$toast-theme-map: map-merge(
+  $toast-theme-map,
+  (
+    dark: (
+      "toast-background-color":         $toast-dark-theme-background-color,
+      "toast-color":                    $toast-dark-theme-color,
+      "toast-border-color":             $toast-dark-theme-border-color,
+      "toast-header-color":             $toast-dark-theme-header-color,
+      "toast-header-background-color":  $toast-dark-theme-header-background-color,
+      "toast-header-border-color":      $toast-dark-theme-header-border-color
+    )
+  )
+);

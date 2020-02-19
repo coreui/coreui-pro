@@ -1,0 +1,41 @@
+// Header
+
+// Dark theme
+
+$subheader-dark-theme-bg:                     $gray-dark-theme-400 !default;
+$subheader-dark-theme-color:                  rgba($white, .75) !default;
+$subheader-dark-theme-border:                 ( bottom: 0 ) !default;
+$subheader-dark-theme-hover-color:            rgba($white, .9) !default;
+$subheader-dark-theme-active-color:           $white !default;
+$subheader-dark-theme-disabled-color:         rgba($white, .25) !default;
+
+$subheader-dark-theme-variants-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$subheader-dark-theme-variants-map: map-merge(
+  (
+    dark: (
+      "subheader-bg":                      $subheader-dark-theme-bg,
+      "subheader-color":                   $subheader-dark-theme-color,
+      "subheader-border":                  $subheader-dark-theme-border,
+      "subheader-hover-color":             $subheader-dark-theme-hover-color,
+      "subheader-active-color":            $subheader-dark-theme-active-color,
+      "subheader-disabled-color":          $subheader-dark-theme-disabled-color,
+    )
+  ),
+  $subheader-dark-theme-variants-map
+);
+
+$subheader-dark-theme-default-variant: "dark" !default;
+$subheader-dark-theme-variants: (
+  default:  $subheader-dark-theme-default-variant,
+  map:      $subheader-dark-theme-variants-map
+) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$subheader-theme-map: map-merge(
+  $subheader-theme-map,
+  (
+    dark:  $subheader-dark-theme-variants
+  )
+);
+

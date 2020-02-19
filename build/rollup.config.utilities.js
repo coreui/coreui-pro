@@ -1,9 +1,9 @@
 'use strict'
 
-const path    = require('path')
-const babel   = require('rollup-plugin-babel')
-const resolve = require('rollup-plugin-node-resolve')
-const commonjs = require('rollup-plugin-commonjs')
+const path     = require('path')
+const babel    = require('rollup-plugin-babel')
+const resolve  = require('@rollup/plugin-node-resolve')
+const commonjs = require('@rollup/plugin-commonjs')
 
 const pkg     = require(path.resolve(__dirname, '../package.json'))
 const BUNDLE  = process.env.BUNDLE === 'true'
@@ -33,8 +33,9 @@ export default {
   input: path.resolve(__dirname, '../js/src/utilities/index.js'),
   output: {
     banner: `/*!
-  * CoreUI Pro v${pkg.version} (${pkg.homepage})
+  * CoreUI v${pkg.version} (${pkg.homepage})
   * Copyright ${year} ${pkg.author.name}
+  * Licensed under MIT (${pkg.homepage})
   */`,
     file: path.resolve(__dirname, `../dist/js/${fileDest}`),
     format: 'umd',

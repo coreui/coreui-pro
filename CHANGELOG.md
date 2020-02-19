@@ -1,215 +1,38 @@
-## v2.1.16
-- fix: Event listeners for Sidebar and AsideMenu plugins persist in jQuery instance - thanks @nesterow closes #77
-
-###### Dependencies update:
-- update `core-js` to `^3.3.4`
-
-## v2.1.15
-- fix(sidebar): Selector.NAV_LINK_QUERIED must be "nav-link-queried"
-
-###### Dependencies update:
-- update `core-js` to `^3.3.3`
-- update `regenerator-runtime` to `^0.13.3`
-- update `@babel/cli` to `^7.6.4`
-- update `@babel/core` to `^7.6.4`
-- update `@babel/plugin-proposal-object-rest-spread` to `^7.6.2`
-- update `@babel/plugin-transform-runtime` to `^7.6.2`
-- update `@babel/preset-env` to `^7.6.3`
-- update `autoprefixer` to `^9.7.0`
-- update `babel-eslint` to `^10.0.3`
-- update `babel-plugin-istanbul` to `^5.2.0`
-- update `copyfiles` to `^2.1.1`
-- update `cross-env` to `^5.2.1`
-- update `eslint` to `^6.5.1`
-- update `eslint-plugin-compat` to `^3.3.0`
-- update `node-sass` to `^4.13.0`
-- update `nodemon` to `^1.19.4`
-- update `postcss-cli` to `^6.1.3`
-- update `rimraf` to `^2.7.1`
-- update `rollup` to `^1.25.2`
-- update `rollup-plugin-babel` to `^4.3.3`
-- update `rollup-plugin-commonjs` to `^10.1.0`
-- update `rollup-plugin-node-resolve` to `^5.2.0`
-- update `semver` to `^6.3.0`
-- update `stylelint` to `^11.1.1`
-- update `stylelint-config-recommended-scss` to `^4.0.0`
-- update `stylelint-config-standard` to `^19.0.0`
-- update `stylelint-order` to `^3.1.1`
-- update `stylelint-scss` to `^3.12.0`
-- update `uglify-js` to `^3.6.4`
-   
-## v2.1.14
-- fix(scss): dark popover variables
-
-###### Dependencies update:
-- update `rollup` to `^1.15.4`
-
-## v2.1.13
-- fix(scss): hotfix for email dark
-- fix(scss): hotfix for quill toolbar dark
-
-###### Dependencies update:
-- update `rollup` to `1.15.3`
-- update `rollup-plugin-node-resolve` to `5.0.2`
-
-## v2.1.12
-- fix(scss): new mobile breakpoint variables
-```scss
-// Breakpoints for mobile defaults:
-$breakpoint-mobile-up: lg !default;
-$breakpoint-mobile-down: md !default;
- ```
-usage: to shift mobile breakpoint in your template:
-1. override `_variables.scss`
-    ```scss
-    // Variable overrides
-    $breakpoint-mobile-up: md;
-    $breakpoint-mobile-down: sm;
-    ```
-
-2. and complementary changes in `index.html`  
-  - body: `sidebar-lg-show` -> `sidebar-md-show`
-  - mobile sidebar toggler button: `d-lg-none` -> `d-md-none`
-  - sidebar toggler button: 
-    - `d-md-down-none` -> `d-sm-down-none` 
-    - `data-toggle="sidebar-lg-show"` -> `data-toggle="sidebar-md-show"`  
-
-###### Dependencies update:
-- update `autoprefixer` to `^9.6.0`
-- update `rollup` to `^1.15.1`
-- update `stylelint` to `^10.1.0`
-
-## v2.1.11
-- fix(sidebar): add optional container `sidebar-scroll`. Thanks @MartijnBastiaansen
-  - fixes an issue where `sidebar-toggler` causes an error when there is no `sidebar-nav` element in it
-  - if no container is set, returns null for perfectScrollbar
-
-###### Dependencies update:
-- update `rollup` to `^1.13.1`
-- update `stylelint-scss` to `^3.8.0`
-
-## v2.1.10
-- chore: drop `@babel/polyfill` in favour of `core-js@3` and `regenerator-runtime`
-
-###### Dependencies update:
-- update `@babel/polyfill` to `^7.4.4`
-- update `@babel/cli` to `^7.4.4`
-- update `@babel/core` to `^7.4.5`
-- update `@babel/plugin-proposal-object-rest-spread` to `^7.4.4`
-- update `@babel/plugin-transform-runtime` to `^7.4.4`
-- update `@babel/preset-env` to `^7.4.5`
-- update `autoprefixer` to `^9.5.1`
-- update `babel-plugin-istanbul` to `^5.1.4`
-- update `clean-css-cli` to `^4.3.0`
-- update `eslint` to `^5.16.0`
-- update `node-sass` to `^4.12.0`
-- update `nodemon` to `^1.19.1`
-- update `rollup` to `^1.13.0`
-- update `stylelint-config-recommended-scss` to `^3.3.0`
-- update `stylelint-config-standard` to `^18.3.0`
-- update `stylelint-order` to `^2.2.1`
-- update `stylelint-scss` to `^3.7.0`
-- update `uglify-js` to `^3.6.0`
-- update `eslint-plugin-compat` to `^3.1.1`
-- update `rollup-plugin-commonjs` to `^10.0.0`
-- update `rollup-plugin-node-resolve` to `^5.0.1`
-- update `semver` to `^6.1.1`
-- update `stylelint` to `^10.0.1`
-- update `stylelint-order` to `^3.0.0`
-    
-## v2.1.9
-- fix(dropdown): rtl caret spacing
-- fix(input-group): rtl append, prepend border radius and margins
-- fix(rtl): rtl float, margin and padding
-- fix(button-group): rtl margin and border-radius
-###### Dependencies update:
-- update `@babel/core` to `^7.4.0`
-- update `@babel/plugin-proposal-object-rest-spread` to `^7.4.0`
-- update `@babel/plugin-transform-runtime` to `^7.4.0`
-- update `@babel/preset-env` to `^7.4.2`
-- update `autoprefixer` to `^9.5.0`
-- update `eslint` to `^5.15.3`
-- update `rollup` to `^1.7.0`
-- update `uglify-js` to `^3.5.1`
-
-## v2.1.8
-- fix(scss): `cssnano` mangles `background-position` temp fix (re: BS4 misplaced validation feedback icons)
-###### Dependencies update:
-- update `@babel/core` to `^7.3.4`
-- update `@babel/plugin-proposal-object-rest-spread` to `^7.3.4`
-- update `@babel/plugin-transform-runtime` to `^7.3.4`
-- update `@babel/preset-env` to `^7.3.4`
-- update `autoprefixer` to `^9.4.10`
-- update `eslint` to `^5.15.1`
-- update `postcss-cli` to `^6.1.2`
-- update `rollup` to `^1.6.0`
-- update `rollup-plugin-commonjs` to `^9.2.1`
-- update `rollup-plugin-node-resolve` to `^4.0.1`
-- update `stylelint-order` to `^2.1.0`
-- update `stylelint-scss` to `^3.5.4`
-
-## v2.1.7
-- update `bootstrap` to `^4.3.1` fixes *Class 'btn' style white-space: nowrap; has been removed creating issues with the btn with favicon* [#151](https://github.com/coreui/coreui-free-react-admin-template/issues/151) 
-###### Dependencies update:
-- update `bootstrap` to `^4.3.1` 
-- update `@babel/core` to `^7.3.3`
-- update `@babel/plugin-proposal-object-rest-spread` to `^7.3.2`
-- update `@babel/preset-env` to `^7.3.1`
-- update `autoprefixer` to `^9.4.8`
-- update `babel-plugin-istanbul` to `^5.1.1`
-- update `eslint` to `^5.14.1`
-- update `eslint-plugin-compat` to `^2.7.0`
-- update `nodemon` to `^1.18.10`
-- update `rollup` to `^1.2.2`
-- update `rollup-plugin-babel` to `^4.3.2`
-- update `rollup-plugin-node-resolve` to `^4.0.0`
-- update `stylelint` to `^9.10.1`
-- update `stylelint-scss` to `^3.5.3`
-- update `popper.js` to `^1.14.7`
-
-## v2.1.6
-###### Dependencies update:
-- chore: update `bootstrap` to `^4.2.1`
-- chore: update `@babel/polyfill` to `^7.2.5`
-- chore: update `@babel/cli` to `^7.2.3`
-- chore: update `@babel/core` to `^7.2.2`
-- chore: update `@babel/preset-env` to `^7.2.3`
-- chore: update `autoprefixer` to `^9.4.5`
-- chore: update `eslint` to `^5.12.0`
-- chore: update `node-sass` to `^4.11.0`
-- chore: update `nodemon` to `^1.18.9`
-- chore: update `postcss-cli` to `^6.1.1`
-- chore: update `rimraf` to `^2.6.3`
-- chore: update `rollup` to `^0.68.2`
-- chore: update `rollup-plugin-babel` to `^4.3.0`
-- chore: update `stylelint-scss` to `^3.5.0`
-###### Pull Requests:
-- Re-added composer file 
-  - Re-added composer file so new versions can be downloaded via composer
-  - Replaced relative paths in .scss files so files can be generated correctly
-  
-## v2.1.4
-- fix(scss): .sidebar .nav-link.disabled
-- chore: update `@babel/cli` to `^7.2.0`
-- chore: update `@babel/core` to `^7.2.0`
-- chore: update `@babel/plugin-external-helpers` to `^7.2.0`
-- chore: update `@babel/plugin-proposal-object-rest-spread` to `^7.2.0`
-- chore: update `@babel/plugin-proposal-throw-expressions` to `^7.2.0`
-- chore: update `@babel/plugin-transform-runtime` to `^7.2.0`
-- chore: update `@babel/preset-env` to `^7.2.0`
-- chore: update `autoprefixer` to `^9.4.2`
-- chore: update `rollup` to `^0.67.4`
-- chore: update `stylelint` to `^9.9.0`
-- chore: update `stylelint-order` to `^2.0.0`
-- chore: update `stylelint-scss` to `^3.4.1`
-- chore: update `eslint` to `5.9.0`
+## v3.0.0-next
+- chore: Move the browserslist config to a separate file.
+- chore add `bundlesize`
+- chore add `find-unused-sass-variables`
+- chore: update `bootstrap` to `4.2.1`
+- chore: update `@babel/cli` to `7.2.0`
+- chore: update `@babel/core` to `7.2.0`
+- chore: update `@babel/plugin-external-helpers` to `7.2.0`
+- chore: update `@babel/plugin-proposal-object-rest-spread` to `7.2.0`
+- chore: update `@babel/plugin-proposal-throw-expressions` to `7.2.0`
+- chore: update `@babel/plugin-transform-runtime` to `7.2.0`
+- chore: update `@babel/preset-env` to `7.2.0`
+- chore: update `autoprefixer` to `9.4.2`
+- chore: update `eslint` to `5.10.0`
 - chore: update `node-sass` to `4.11.0`
 - chore: update `nodemon` to `1.18.8`
+- chore: update `rollup` to `0.67.4`
+- chore: update `rollup-plugin-babel` to `4.1.0`
+- chore: update `rollup-plugin-node-resolve` to `4.0.0`
+- chore: update `stylelint` to `9.9.0`
+- chore: update `stylelint-order` to `2.0.0`
+- chore: update `stylelint-scss` to `3.4.1`
 
 ## v2.1.3
-- fix: update `nodemon` to `1.18.7` (vulnerability removed)
-- fix: update `npm-run-all` to `^4.1.5` (vulnerability removed)
-- chore: update `stylelint-order` to `2.0.0`
+- chore: update `nodemon` to `1.18.7` (remove vulnerability)
+
+## v2.1.2
+- fix: devDependencies security issues (event-stream, flatmap-stream)
+- chore: dependencies update
+  - update `npm-run-all` to `^4.1.5`
+  - reinstall `nodemon`
+  ```bash
+  npm uninstall nodemon
+  npm install --save-dev nodemon
+  ```
 
 ## v2.1.1
 - fix(sidebar): `url("data:,")` turns into `url("'data:,'")`  
@@ -217,7 +40,9 @@ usage: to shift mobile breakpoint in your template:
   1. `ie11` ignores `list-style:none` (ie11 rtl sidebar minimized issue)
   2. `url("data:,")` turns into `url("'data:,'")` after minification
   3. angular 7 cli build complains on `url("'data:,'")`
+- chore: update `@babel/cli` to `7.1.5`
 - chore: update `stylelint` to `9.8.0`
+- chore: update `stylelint-scss` to `3.4.0`
 - chore: update `shelljs` to `0.8.3`
 - chore: update `@babel/preset-env` to `7.1.6`
 - chore: update `@babel/core` to `7.1.6`
@@ -225,44 +50,47 @@ usage: to shift mobile breakpoint in your template:
 - chore: update `rollup` to `0.67.3`
 
 ## v2.1.0
-- chore: update `@babel/cli` to `7.1.5`
-- chore: update `@babel/core` to `7.1.5`
-- chore: update `@babel/preset-env` to `7.1.5`
-- chore: update `stylelint-scss` to `3.4.0`
----
 - feat(scss): sidebar-nav-link-disabled
 - chore: update `nodemon` to `1.18.6`
----
-- fix(.sidebar-minimizer): add `cursor: pointer` 
+
+## v2.0.26
+- fix(.sidebar-minimizer): add `cursor: pointer`
 - feat: delegated event handlers to support turbolinks (sidebar, aside-menu)- thanks @RyanVasichko
 - chore: update `node-sass` to `4.10.0`
 - chore: update `rollup` to `0.67.0`
 
 ## v2.0.25
-- chore: update `eslint-plugin-compat` to `2.6.3`
 - fix(buttons.scss): remove `button { @extend .btn; }`
+
+## v2.0.24
 - fix(build): add missing `commonjs` for utilities
 - chore: add `@babel/polyfill`
-- fix(ie): add `NodeList` `forEach` polyfill 
+- fix(ie): add `NodeList` `forEach` polyfill
 - fix(sidebar): add `dataset.toggle` ie10 fix  
-- fix(aside-menu): add `dataset.toggle` ie10 fix 
+- fix(aside-menu): add `dataset.toggle` ie10 fix
 - chore(build): add `rollup-plugin-commonjs`
+
+## v2.0.23
+_broken build, do not use_
+
+## v2.0.22
 - fix(buttons.scss): wrong cursor for disabled state
 - chore: update `eslint` to `5.8.0`
 - chore: update `nodemon` to `1.18.5`
 - chore: update `stylelint` to `9.7.1`
-- feat(sidebar): mobile clickout behaviour 
+
+## v2.0.21
+- feat(sidebar): mobile clickout behaviour
 - chore: update `@babel/plugin-external-helpers` to `7.0.0`
 - chore: update `autoprefixer` to `9.3.1`
 - chore: update `postcss-cli` to `6.0.1`
 - chore: update `stylelint-scss` to `3.3.2`
 
 ## v2.0.20
-- fix(layout): sidebar on mobile issue [#23](https://github.com/coreui/coreui-angular/issues/23) 
+- fix(layout): sidebar on mobile issue [#23](https://github.com/coreui/coreui-angular/issues/23)
 - fix: sidebar, sidebar-minimizer `rtl` ie issues, tweaks
 - refactor(sidebar.js): ps minor cleanup
 - chore: update `autoprefixer` to `9.2.1`
-- chore: update `postcss-cli` to `6.0.1`
 
 ## v2.0.19
 - refactor: extract getCssCustomProperties function
@@ -281,7 +109,7 @@ usage: to shift mobile breakpoint in your template:
 
 ## v2.0.17
 - fix(card): `rtl` for `card-header` icon margins
-- fix(sidebar): `rtl` for `sidebar-minimizer` icon 
+- fix(sidebar): `rtl` for `sidebar-minimizer` icon
 - chore: update `rollup` to `0.66.6`
 - thanks @MrDevIr
 
@@ -334,33 +162,6 @@ usage: to shift mobile breakpoint in your template:
 ## v2.0.8
 - fix(sidebar) minimizing sidebar with bottom chevron does not allow to maximize it again #404
 - fix(sidebar) show scrollbar after height change #419
-
-## v2.0.7
-- fix(sidebar) mobile sidebar not dismissed on link click
-- chore: update `bootstrap` to `4.1.3`
-- chore: update `@babel/cli` to `7.0.0`
-- chore: update `@babel/core` to `7.0.0`
-- chore: update `@babel/plugin-proposal-object-rest-spread` to `7.0.0`
-- chore: update `@babel/plugin-proposal-throw-expressions` to `7.0.0`
-- chore: update `@babel/plugin-transform-runtime` to `7.0.0`
-- chore: update `@babel/preset-env` to `7.0.0`
-- chore: update `autoprefixer` to `9.1.5`
-- chore: update `babel-eslint` to `9.0.0`
-- chore: update `babel-plugin-istanbul` to `5.0.1`
-- chore: update `clean-css-cli` to `4.2.1`
-- chore: update `eslint` to `5.5.0`
-- chore: update `eslint-plugin-compat` to `2.5.1`
-- chore: update `node-sass` to `4.9.3`
-- chore: update `nodemon` to `1.18.4`
-- chore: update `postcss-cli` to `6.0.0`
-- chore: update `rollup` to `0.65.0`
-- chore: update `rollup-plugin-babel` to `4.0.3`
-- chore: update `rollup-plugin-node-resolve` to `3.4.0`
-- chore: update `semver` to `5.5.1`
-- chore: update `stylelint` to `9.5.0`
-- chore: update `stylelint-order` to `1.0.0`
-- chore: update `stylelint-scss` to `3.3.0`
-- chore: update `uglify-js` to `3.4.9`
 
 ## v2.0.6
 - fix(sidebar) static mobile sidebar not dismissed on link click

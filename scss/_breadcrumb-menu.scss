@@ -1,5 +1,11 @@
 .breadcrumb-menu {
-  margin-left: auto;
+  @include ltr {
+    margin-left: auto;
+  }
+  @include ltr {
+    margin-right: auto;
+  }
+
 
   &::before {
     display: none;
@@ -11,7 +17,7 @@
 
   .btn {
     padding: 0 $input-btn-padding-x;
-    color: $breadcrumb-menu-color;
+    color: $text-muted;
     vertical-align: top;
     border: 0;
 
@@ -22,7 +28,7 @@
     }
   }
 
-  .open {
+  .show {
     .btn {
       color: $body-color;
       background: transparent;
@@ -32,13 +38,5 @@
   .dropdown-menu {
     min-width: 180px;
     line-height: $line-height-base;
-  }
-}
-
-// Right-to-Left Support
-*[dir="rtl"] {
-  .breadcrumb-menu {
-    margin-right: auto;
-    margin-left: initial;
   }
 }

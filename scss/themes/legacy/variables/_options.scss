@@ -1,0 +1,26 @@
+
+// Options
+
+$legacy-theme-enable-elevations:  false !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$options: map-merge(
+  $options,
+  (
+    legacy: (
+      "enable-elevations":  $legacy-theme-enable-elevations
+    )
+  )
+);
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$default-themes: map-merge(
+  (
+    legacy: (
+      "default":       false,
+      "theme-colors":  $theme-colors,
+      "grays":         $grays
+    )
+  ),
+  $default-themes
+);

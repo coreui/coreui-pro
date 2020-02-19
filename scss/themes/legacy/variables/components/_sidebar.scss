@@ -1,0 +1,35 @@
+// Legacy theme
+
+$sidebar-legacy-theme-bg:           $gray-base !default;
+$sidebar-legacy-theme-brand-color:  $gray-900 !default;
+$sidebar-legacy-theme-brand-bg:     $white !default;
+
+$sidebar-legacy-theme-variants-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$sidebar-legacy-theme-variants-map: map-merge(
+  (
+    dark: (
+      "sidebar-bg":           $sidebar-legacy-theme-bg,
+      "sidebar-brand-color":  $sidebar-legacy-theme-brand-color,
+      "sidebar-brand-bg":     $sidebar-legacy-theme-brand-bg,
+    ),
+    light: (
+      "sidebar-bg":           $sidebar-light-bg
+    )
+  ),
+  $sidebar-legacy-theme-variants-map
+);
+
+$sidebar-legacy-theme-default-variant: "legacy" !default;
+$sidebar-legacy-theme-variants: (
+  map:      $sidebar-legacy-theme-variants-map,
+  default:  $sidebar-legacy-theme-default-variant
+) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$sidebar-theme-map: map-merge(
+  $sidebar-theme-map,
+  (
+    legacy:  $sidebar-legacy-theme-variants
+  )
+);

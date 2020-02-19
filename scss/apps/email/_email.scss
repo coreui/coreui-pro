@@ -1,225 +1,96 @@
-// stylelint-disable selector-max-compound-selectors, selector-max-class, selector-max-combinators
-.email-app {
-  display: flex;
-  flex-direction: row;
-  background: $card-bg;
-  border: 1px solid $border-color;
-
-  nav {
-    flex: 0 0 200px;
-    padding: $spacer;
-    border-right: 1px solid $border-color;
-
-    .btn-block {
-      margin-bottom: 15px;
+.c-email-app {
+  @include themes($email-app-theme-map) {
+    background-color: themes-get-value("email-app-bg");
+  }
+  @include media-breakpoint-down(md) {
+    .c-body {
+      // stylelint-disable-next-line declaration-no-important
+      display: block !important;
     }
-
-    .nav {
-      flex-direction: column;
+    .c-sidebar {
+      border: 0;
     }
-
-    .nav-item {
-      position: relative;
-      &:hover {
-        background-color: $list-group-hover-bg;
-      }
-      a:focus {
-        outline: $border-color auto .2rem;
-      }
-    }
-
-    .nav-link {
-      color: $body-color;
-      border-bottom: 1px solid $border-color;
-
-      i {
-        width: 20px;
-        margin: 0 10px 0 0;
-        font-size: 14px;
-        text-align: center;
-      }
-
-      .badge {
-        float: right;
-        margin-top: 4px;
-        margin-left: 10px;
-      }
+  }
+  .c-toolbar {
+    border-bottom: 1px solid;
+    @include themes($email-app-theme-map) {
+      border-color: themes-get-value("email-app-border-color");
     }
   }
 
-  main {
-    flex: 1;
-    min-width: 0;
+
+  .c-messages {
     padding: $spacer;
   }
 
-  .inbox {
-    .toolbar {
-      padding-bottom: $spacer;
-      border-bottom: 1px solid $border-color;
+  .c-message {
+    display: flex;
+    margin-bottom: $spacer;
+    text-decoration: none;
+    @include themes($email-app-theme-map) {
+      color: themes-get-value("email-app-message-color");
     }
 
-    .messages {
-      padding: 0;
-      list-style: none;
+    &.c-message-read {
+      @include themes($email-app-theme-map) {
+        color: themes-get-value("email-app-message-read-color");
+      }
     }
 
-    .message {
-      position: relative;
-      padding: $spacer $spacer $spacer (2 * $spacer);
-      cursor: pointer;
-      border-bottom: 1px solid $border-color;
-
-      &:hover {
-        background-color: $list-group-hover-bg;
-      }
-
-      .actions {
-        position: absolute;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-
-        .action {
-          width: 2 * $spacer;
-          margin-bottom: $spacer / 2;
-          color: $gray-300;
-          text-align: center;
-        }
-      }
-
-      a {
-        color: $body-color;
-        &:hover {
-          text-decoration: none;
-        }
-        &:focus {
-          outline: $border-color auto .2rem;
-        }
-      }
-
-      &.unread {
-        .header,
-        .title {
-          font-weight: $font-weight-bold;
-        }
-      }
-
-      .header {
-        display: flex;
-        flex-direction: row;
-        margin-bottom: ($spacer / 2);
-        // .from { }
-
-        .date {
-          margin-left: auto;
-        }
-      }
-
-      .title {
-        margin-bottom: ($spacer / 2);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .description {
-        font-size: 12px;
-      }
+    &:last-child .c-message-details {
+      border: 0;
     }
   }
 
-  .message {
-    .toolbar {
-      padding-bottom: $spacer;
-      border-bottom: 1px solid $border-color;
+  .c-message-actions {
+    @include ltr {
+      margin-right: $spacer;
     }
-
-    .details {
-      .title {
-        padding: $spacer 0;
-        font-weight: $font-weight-bold;
-      }
-
-      .header {
-        display: flex;
-        padding: $spacer 0;
-        margin: $spacer 0;
-        border-top: 1px solid $border-color;
-        border-bottom: 1px solid $border-color;
-
-        .avatar {
-          width: 40px;
-          height: 40px;
-          margin-right: $spacer;
-        }
-
-        .from {
-          align-self: center;
-          font-size: 12px;
-          color: $text-muted;
-
-          span {
-            display: block;
-            font-weight: $font-weight-bold;
-          }
-        }
-
-        .date {
-          margin-left: auto;
-        }
-      }
-
-      .attachments {
-        padding: $spacer 0;
-        margin-bottom: $spacer;
-        border-top: 3px solid $gray-100;
-        border-bottom: 3px solid $gray-100;
-
-        .attachment {
-          display: flex;
-          align-self: center;
-          margin: ($spacer / 2) 0;
-          font-size: 12px;
-
-          .badge {
-            margin: 0 ($spacer / 2);
-            line-height: inherit;
-          }
-
-          .menu {
-            margin-left: auto;
-
-            a {
-              padding: 0 ($spacer / 2);
-              font-size: 14px;
-              color: $border-color;
-            }
-          }
-        }
-      }
+    @include rtl {
+      margin-left: $spacer;
     }
   }
-}
 
-@include media-breakpoint-down(sm) {
-  .email-app {
-    flex-direction: column;
-    nav {
-      flex: 0 0 100%;
+  .c-message-details {
+    flex-wrap: wrap;
+    padding-bottom: $spacer;
+    border-bottom: 1px solid;
+    @include themes($email-app-theme-map) {
+      border-color: themes-get-value("email-app-border-color");
     }
   }
-}
 
-@include media-breakpoint-down(xs) {
-  .email-app {
-    .message {
-      .header {
-        flex-flow: row wrap;
-        .date {
-          flex: 0 0 100%;
-        }
-      }
+  .c-message-headers {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .c-message-headers-from {
+    // font-weight: 600;
+  }
+
+  .c-message-headers-date {
+    @include ltr {
+      margin-left: auto;
     }
+    @include rtl {
+      margin-right: auto;
+    }
+  }
+
+  .c-message-headers-subject {
+    width: 100%;
+    font-size: $font-size-lg;
+    font-weight: 600;
+  }
+
+  .c-message-body {
+    color: themes-get-value("email-app-message-body-color");
+  }
+
+  .c-message-attachment {
+    display: flex;
+    align-items: center;
   }
 }

@@ -1,0 +1,31 @@
+@mixin add-elevation($level, $direction: false) {
+  border: 0;
+  box-shadow: unquote(map-get($elevations, $level));
+
+  @if $direction == "bottom" {
+    clip-path: inset(0 0 -1000px 0);
+  }
+}
+
+@mixin elevation($level, $direction: false) {
+  @if $enable-elevations {
+    $selector: selector-append(".c-app");
+    @each $theme in map-keys($options) {
+      @if map-has-key(map-get($options, $theme), "enable-elevations") {
+        @if (map-get((map-get($options, $theme)), "enable-elevations") == false) {
+          $selector: selector-append($selector, ":not(.c-#{$theme}#{$theme-suffix})");
+        }
+      }
+    }
+
+    @if ($selector != selector-append(".c-app")) {
+      #{$selector} & {
+        @include add-elevation($level, $direction);
+      }
+    } @else {
+      & {
+        @include add-elevation($level, $direction);
+      }
+    }
+  }
+}
