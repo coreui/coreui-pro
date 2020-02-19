@@ -1,15 +1,13 @@
-# CoreUI - WebApp UI Kit built on top of Bootstrap 4 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=CoreUI%20-%20Free%20Bootstrap%204%20Admin%20Template%20&url=https://coreui.io&hashtags=bootstrap,admin,template,dashboard,panel,free,angular,react,vue)
+# CoreUI PRO - UI Kit built on top of Bootstrap 4 and plain JavaScript without jQuery. [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?text=CoreUI%20-%20Free%20Bootstrap%204%20Admin%20Template%20&url=https://coreui.io&hashtags=bootstrap,admin,template,dashboard,panel,free,angular,react,vue)
 
-Please help us on [Product Hunt](https://www.producthunt.com/posts/coreui-open-source-bootstrap-4-admin-template-with-angular-2-react-js-vue-js-support) and [Designer News](https://www.designernews.co/stories/81127). Thanks in advance!
-
-Curious why I decided to create CoreUI? Please read this article: [Jack of all trades, master of none. Why Bootstrap Admin Templates suck.](https://medium.com/@lukaszholeczek/jack-of-all-trades-master-of-none-5ea53ef8a1f#.7eqx1bcd8)
+Please help us on [Product Hunt](https://www.producthunt.com/posts/coreui-open-source-bootstrap-4-admin-template-with-angular-2-react-js-vue-js-support). Thanks in advance!
 
 CoreUI is an Open Source UI Kit built on top of Bootstrap 4. CoreUI is the fastest way to build modern dashboard for any platforms, browser or device. A complete Dashboard and WebApp UI Kit that allows you to quickly build eye-catching, high-quality, high-performance responsive applications using your framework of choice.
 
 ## Table of Contents
 
 * [Templates](#templates)
-* [Admin Templates built on top of CoreUI Pro](#admin-templates-built-on-top-of-coreui-pro)
+* [CoreUI PRO Bootstrap Admin Templates](#coreui-pro-bootstrap-admin-templates)
 * [Installation](#installation)
 * [Usage](#usage)
 * [What's included](#whats-included)
@@ -23,15 +21,18 @@ CoreUI is an Open Source UI Kit built on top of Bootstrap 4. CoreUI is the faste
 
 ## Templates
 
-* [CoreUI Free Bootstrap Admin Template](https://github.com/coreui/coreui-free-bootstrap-admin-template)
-* 💪  [CoreUI Pro Bootstrap Admin Template](https://coreui.io/pro/)
+* [CoreUI PRO Bootstrap Admin Template](https://github.com/coreui/coreui-pro-bootstrap-admin-template)
+* [CoreUI PRO Angular Admin Template](https://github.com/coreui/coreui-pro-angular-admin-template)
+* [CoreUI PRO Laravel Admin Template](https://github.com/coreui/coreui-pro-laravel-admin-template)
+* [CoreUI PRO React.js Admin Template](https://github.com/coreui/coreui-pro-react-admin-template)
+* [CoreUI PRO Vue.js Admin Template](https://github.com/coreui/coreui-pro-vue-admin-template)
 
-## Admin Templates built on top of CoreUI Pro
 
-| CoreUI Pro | Prime | Root | Alba | Leaf |
-| --- | --- | --- | --- | --- |
-| [![CoreUI Pro Admin Template](https://coreui.io/assets/img/example-coureui.jpg)](https://coreui.io/pro/) | [![Prime Admin Template](https://genesisui.com/assets/img/templates/prime1280.jpg)](https://genesisui.com/admin-templates/bootstrap/prime/?support=1) | [![Root Admin Template](https://genesisui.com/assets/img/templates/root1280.jpg)](https://genesisui.com/admin-templates/bootstrap/root/?support=1) | [![Alba Admin Template](https://genesisui.com/assets/img/templates/alba1280.jpg)](https://genesisui.com/admin-templates/bootstrap/alba/?support=1) | [![Leaf Admin Template](https://genesisui.com/assets/img/templates/leaf1280.jpg)](https://genesisui.com/admin-templates/bootstrap/leaf/?support=1)
+## CoreUI PRO Bootstrap Admin Templates
 
+| Default Layout | Dark Layout |
+| --- | --- |
+| [![CoreUI Pro Bootstrap Admin Template](https://coreui.io/images/mockups/mockup_3_light.png)](https://coreui.io/pro/) | [![CoreUI Pro Bootstrap Admin Template](https://coreui.io/images/mockups/mockup_3_dark.png)](https://coreui.io/pro/)
 
 ## Installation
 
@@ -40,25 +41,19 @@ Several options are available:
 ### Clone repo
 
 ``` bash
-$ git clone https://github.com/coreui/coreui.git
+$ git clone https://github.com/coreui/coreui-pro.git
 ```
 
 ### NPM
 
 ``` bash
-$ npm install @coreui/coreui --save
+$ npm install @coreui/coreui-pro --save
 ```
 
 ### Yarn
 
 ``` bash
-$ yarn add @coreui/coreui@2.1.4
-```
-
-### Composer
-
-``` bash
-$ composer require coreui/coreui:2.1.4
+$ yarn add @coreui/coreui-pro
 ```
 
 ## Usage
@@ -73,13 +68,10 @@ Copy-paste the stylesheet `<link>` into your `<head>` before all other styleshee
 
 ### JS
 
-Many of our components require the use of JavaScript to function. Specifically, they require [jQuery](https://jquery.com), [Popper.js](https://popper.js.org/), [Bootstrap](https://getbootstrap.com) and our own JavaScript plugins. Place the following `<script>`s near the end of your pages, right before the closing `</body>` tag, to enable them. jQuery must come first, then Popper.js, then Bootstrap, and then our JavaScript plugins.
+Many of our components require the use of JavaScript to function. Specifically, they require our own JavaScript plugins. Place the following `<script>`s near the end of your pages, right before the closing `</body>` tag, to enable them. jQuery must come first, then Popper.js, then Bootstrap, and then our JavaScript plugins.
 
 ``` html
-<script src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
-<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="node_modules/@coreui/coreui-pro/dist/js/coreui.min.js"></script>
+<script src="node_modules/@coreui/coreui-pro/dist/js/coreui.bundle.min.js"></script>
 ```
 
 ## What's included
@@ -88,7 +80,6 @@ Within the download you'll find the following directories and files, logically g
 
 ```
 coreui/
-├── build/
 ├── dist/
 ├── js/
 └── scss/
@@ -96,19 +87,19 @@ coreui/
 
 ## Documentation
 
-The documentation for the CoreUI Free Bootstrap Admin Template is hosted at our website [CoreUI](https://coreui.io/)
+The documentation for the CoreUI & CoreUI PRO is hosted at our website [CoreUI](https://coreui.io/)
 
 ## Contributing
 
-Please read through our [contributing guidelines](https://github.com/coreui/coreui/blob/master/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
+Please read through our [contributing guidelines](https://github.com/coreui/coreui-pro/blob/master/CONTRIBUTING.md). Included are directions for opening issues, coding standards, and notes on development.
 
-Editor preferences are available in the [editor config](https://github.com/coreui/coreui/blob/master/.editorconfig) for easy use in common text editors. Read more and download plugins at <http://editorconfig.org>.
+Editor preferences are available in the [editor config](https://github.com/coreui/coreui-pro/blob/master/.editorconfig) for easy use in common text editors. Read more and download plugins at <http://editorconfig.org>.
 
 ## Versioning
 
-For transparency into our release cycle and in striving to maintain backward compatibility, CoreUI Free Admin Template is maintained under [the Semantic Versioning guidelines](http://semver.org/).
+For transparency into our release cycle and in striving to maintain backward compatibility,CoreUI Free Admin Template is maintained under [the Semantic Versioning guidelines](http://semver.org/).
 
-See [the Releases section of our project](https://github.com/coreui/coreui/releases) for changelogs for each release version.
+See [the Releases section of our project](https://github.com/coreui/coreui-pro/releases) for changelogs for each release version.
 
 ## Creators
 
@@ -130,4 +121,4 @@ Get updates on CoreUI's development and chat with the project maintainers and co
 
 ## Copyright and license
 
-copyright 2018 creativeLabs Łukasz Holeczek. 
+copyright 2020 creativeLabs Łukasz Holeczek.
