@@ -85,6 +85,7 @@
     "@popperjs/core": "^2.0.6"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.4",
     "@babel/plugin-external-helpers": "^7.8.3",
@@ -95,6 +96,13 @@
     "@babel/preset-env": "^7.8.4",
     "@popperjs/core": "^2.0.6",
     "@rollup/plugin-commonjs": "^11.0.2",
+=======
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@popperjs/core": "^2.0.6",
+>>>>>>> v3.0.0-next
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@rollup/plugin-replace": "^2.3.1",
     "@storybook/addon-docs": "^5.3.13",
@@ -104,18 +112,30 @@
     "@storybook/html": "^5.3.13",
     "autoprefixer": "^9.7.4",
     "babel-eslint": "^10.0.3",
+<<<<<<< HEAD
     "babel-loader": "^8.0.6",
     "babel-plugin-istanbul": "^6.0.0",
+=======
+>>>>>>> v3.0.0-next
     "bundlesize": "^0.18.0",
     "chalk": "^3.0.0",
     "clean-css-cli": "^4.3.0",
     "copyfiles": "^2.2.0",
+<<<<<<< HEAD
     "cross-env": "^7.0.0",
     "cssnano": "^4.1.10",
     "eslint": "^6.8.0",
     "eslint-config-xo": "^0.29.1",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-unicorn": "^16.1.1",
+=======
+    "cross-env": "^6.0.3",
+    "cssnano": "^4.1.10",
+    "eslint": "^6.8.0",
+    "eslint-config-xo": "^0.27.2",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-unicorn": "^15.0.1",
+>>>>>>> v3.0.0-next
     "find-unused-sass-variables": "^1.0.5",
     "foreach-cli": "^1.8.1",
     "node-sass": "^4.13.1",
@@ -125,6 +145,7 @@
     "postcss-cli": "^7.1.0",
     "postcss-combine-duplicated-selectors": "^8.1.0",
     "postcss-merge-rules": "^4.0.3",
+<<<<<<< HEAD
     "rimraf": "^3.0.2",
     "rollup": "^1.31.1",
     "rollup-plugin-babel": "^4.3.3",
@@ -135,6 +156,17 @@
     "stylelint": "^13.2.0",
     "stylelint-config-recommended-scss": "^4.2.0",
     "stylelint-config-standard": "^20.0.0",
+=======
+    "rimraf": "^3.0.0",
+    "rollup": "^1.29.1",
+    "rollup-plugin-babel": "^4.3.3",
+    "shelljs": "^0.8.3",
+    "shx": "^0.3.2",
+    "storybook-addon-root-attribute": "^0.2.3",
+    "stylelint": "^13.0.0",
+    "stylelint-config-recommended-scss": "^4.1.0",
+    "stylelint-config-standard": "^19.0.0",
+>>>>>>> v3.0.0-next
     "stylelint-order": "^4.0.0",
     "stylelint-scss": "^3.14.2",
     "terser": "^4.6.3"
