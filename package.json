@@ -1,7 +1,7 @@
 {
   "name": "@coreui/coreui-pro",
   "version": "3.0.0",
-  "description": "UI Kit built on top of Bootstrap 4",
+  "description": "HTML, CSS, and JavaScript UI Components Library",
   "keywords": [
     "bootstrap",
     "css",
@@ -20,22 +20,21 @@
   },
   "license": "",
   "author": {
-    "name": "Łukasz Holeczek",
-    "url": "http://holeczek.pl",
-    "github": "https://github.com/mrholek",
-    "twitter": "https://twitter.com/lukaszholeczek"
+    "name": "creativeLabs Łukasz Holeczek",
+    "url": "https://coreui.io",
+    "github": "https://github.com/coreui",
+    "twitter": "https://twitter.com/core_ui"
   },
   "contributors": [
     {
-      "name": "Andrzej Kopański",
-      "url": "https://github.com/xidedix"
+      "name": "CoreUI Team",
+      "url": "https://github.com/orgs/coreui/people"
     }
   ],
   "files": [
     "css/",
     "dist/",
     "js/",
-    "migration/",
     "scss/"
   ],
   "style": "dist/css/coreui.css",
@@ -79,6 +78,9 @@
     "watch-css": "nodemon --ignore dist/ --ignore css/ --ignore scss/partials/ -e scss -x \"npm run css\"",
     "storybook": "start-storybook -s ./stories/static,./node_modules -p 6006",
     "build-storybook": "build-storybook"
+  },
+  "dependencies": {
+    "@coreui/icons": "^1.0.1"
   },
   "peerDependencies": {
     "perfect-scrollbar": "^1.5.0",
@@ -160,8 +162,5 @@
       "path": "./dist/js/coreui.min.js",
       "maxSize": "15 kB"
     }
-  ],
-  "dependencies": {
-    "@coreui/icons": "^1.0.1"
-  }
+  ]
 }

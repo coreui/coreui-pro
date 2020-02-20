@@ -1,6 +1,6 @@
 /*!
   * CoreUI PRO  v3.0.0 (https://coreui.io)
-  * Copyright 2020 Łukasz Holeczek
+  * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 import { createPopper } from '@popperjs/core';
