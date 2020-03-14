@@ -48,26 +48,27 @@
 @each $breakpoint in map-keys($grid-breakpoints) {
   @include media-breakpoint-up($breakpoint) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+    .dropdown-menu[data-display^="static"] {
+      &.dropdown-menu#{$infix}-left {
+        @include ltr {
+          right: auto;
+          left: 0;
+        }
+        @include rtl {
+          right: 0;
+          left: auto;
+        }
+      }
 
-    .dropdown-menu#{$infix}-left {
-      @include ltr {
-        right: auto;
-        left: 0;
-      }
-      @include rtl {
-        right: 0;
-        left: auto;
-      }
-    }
-
-    .dropdown-menu#{$infix}-right {
-      @include ltr {
-        right: 0;
-        left: auto;
-      }
-      @include rtl {
-        right: auto;
-        left: 0;
+      &.dropdown-menu#{$infix}-right {
+        @include ltr {
+          right: 0;
+          left: auto;
+        }
+        @include rtl {
+          right: auto;
+          left: 0;
+        }
       }
     }
   }
@@ -134,18 +135,6 @@
     &::before {
       vertical-align: 0;
     }
-  }
-}
-
-// When enabled Popper.js, reset basic dropdown position
-// stylelint-disable-next-line no-duplicate-selectors
-.dropdown-menu {
-  &[x-placement^="top"],
-  &[x-placement^="right"],
-  &[x-placement^="bottom"],
-  &[x-placement^="left"] {
-    right: auto;
-    bottom: auto;
   }
 }
 
