@@ -20,7 +20,7 @@
     border-color: themes-get-value("popover-border-color");
   }
 
-  .arrow {
+  .popover-arrow {
     position: absolute;
     display: block;
     width: $popover-arrow-width;
@@ -39,9 +39,10 @@
 }
 
 .bs-popover-top {
-  margin-bottom: $popover-arrow-height;
+  // stylelint-disable-next-line declaration-no-important
+  margin-bottom: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
-  > .arrow {
+  > .popover-arrow {
     bottom: subtract(-$popover-arrow-height, $popover-border-width);
 
     &::before {
@@ -63,13 +64,15 @@
 }
 
 .bs-popover-right {
-  margin-left: $popover-arrow-height;
+  // stylelint-disable-next-line declaration-no-important
+  margin-left: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
-  > .arrow {
+  > .popover-arrow {
     left: subtract(-$popover-arrow-height, $popover-border-width);
     width: $popover-arrow-height;
-    height: $popover-arrow-width;
-    margin: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
+    height: add($popover-arrow-width, (2 * $popover-border-radius));
+    padding: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
+    margin: 0;
 
     &::before {
       left: 0;
@@ -90,9 +93,10 @@
 }
 
 .bs-popover-bottom {
-  margin-top: $popover-arrow-height;
+  // stylelint-disable-next-line declaration-no-important
+  margin-top: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
-  > .arrow {
+  > .popover-arrow {
     top: subtract(-$popover-arrow-height, $popover-border-width);
 
     &::before {
@@ -129,13 +133,15 @@
 }
 
 .bs-popover-left {
-  margin-right: $popover-arrow-height;
+  // stylelint-disable-next-line declaration-no-important
+  margin-left: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
-  > .arrow {
+  > .popover-arrow {
     right: subtract(-$popover-arrow-height, $popover-border-width);
     width: $popover-arrow-height;
-    height: $popover-arrow-width;
-    margin: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
+    height: add($popover-arrow-width, (2 * $popover-border-radius));
+    padding: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
+    margin: 0;
 
     &::before {
       right: 0;
@@ -156,16 +162,16 @@
 }
 
 .bs-popover-auto {
-  &[x-placement^="top"] {
+  &[data-popper-placement^="top"] {
     @extend .bs-popover-top;
   }
-  &[x-placement^="right"] {
+  &[data-popper-placement^="right"] {
     @extend .bs-popover-right;
   }
-  &[x-placement^="bottom"] {
+  &[data-popper-placement^="bottom"] {
     @extend .bs-popover-bottom;
   }
-  &[x-placement^="left"] {
+  &[data-popper-placement^="left"] {
     @extend .bs-popover-left;
   }
 }

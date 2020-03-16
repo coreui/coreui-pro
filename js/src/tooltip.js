@@ -85,7 +85,7 @@ const Default = {
   placement: 'top',
   offset: 0,
   container: false,
-  fallbackPlacement: ['top', 'right', 'bottom', 'left'],
+  fallbackPlacement: 'flip',
   boundary: 'scrollParent',
   sanitize: true,
   sanitizeFn: null,
@@ -113,6 +113,7 @@ const Event = {
 
 const ClassName = {
   FADE: 'fade',
+  MODAL: 'modal',
   SHOW: 'show'
 }
 
@@ -239,7 +240,7 @@ class Tooltip {
     Data.removeData(this.element, this.constructor.DATA_KEY)
 
     EventHandler.off(this.element, this.constructor.EVENT_KEY)
-    EventHandler.off(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler)
+    EventHandler.off(SelectorEngine.closest(this.element, `.${ClassName.MODAL}`), 'hide.coreui.modal', this._hideModalHandler)
 
     if (this.tip) {
       this.tip.parentNode.removeChild(this.tip)
@@ -584,7 +585,7 @@ class Tooltip {
     }
 
     EventHandler.on(SelectorEngine.closest(this.element, '.modal'),
-      'hide.bs.modal',
+      'hide.coreui.modal',
       this._hideModalHandler
     )
 
@@ -765,9 +766,8 @@ class Tooltip {
   _cleanTipClass() {
     const tip = this.getTipElement()
     const tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX)
-    if (tabClass !== null && tabClass.length) {
-      tabClass
-        .map(token => token.trim())
+    if (tabClass !== null && tabClass.length > 0) {
+      tabClass.map(token => token.trim())
         .forEach(tClass => tip.classList.remove(tClass))
     }
   }
@@ -782,7 +782,7 @@ class Tooltip {
   _fixTransition() {
     const tip = this.getTipElement()
     const initConfigAnimation = this.config.animation
-    if (tip.getAttribute('x-placement') !== null) {
+    if (tip.getAttribute('data-popper-placement') !== null) {
       return
     }
 
