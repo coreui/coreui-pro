@@ -58,6 +58,28 @@ $theme-has-variants: false !default;
   // }
 }
 
+@mixin property($property, $key, $theme: $current-theme, $variant: $current-variant, $map: $themes-map) {
+  $current-theme-map: map-get($map, $theme);
+
+  @if $theme-has-variants {
+    $current-variant-map: map-get(map-get($current-theme-map, "map"), $variant);
+    $value: map-get($current-variant-map, $key);
+
+    // @return $value;
+    #{$property}: $value;
+  } @else {
+    @if map-has-key($current-theme-map, $key) {
+      $value: map-get($current-theme-map, $key);
+      // @return $value;
+      #{$property}: $value;
+    } @else {
+      $value: map-get(map-get($map, $default-theme), $key);
+      // @return $value;
+      #{$property}: $value;
+    }
+  }
+}
+
 @function themes-get-option($key, $fallback: null, $theme: $current-theme, $variant: $current-variant, $map: $themes-map) {
 
   $current-theme-map: map-get($map, $theme);
@@ -141,11 +163,11 @@ $theme-has-variants: false !default;
 @mixin themes($loop: $themes-map, $parent: false, $create: false) {
   $themes-map: $loop !global;
   $parent-element: $parent !global;
-
   $default-theme: null !global;
 
   @each $key in map-keys($default-themes) {
 
+    // Check if the theme is default
     @if map-get(map-get($default-themes, $key), "default") == true {
       $default-theme: $key !global;
     }
