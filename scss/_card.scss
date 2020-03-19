@@ -43,7 +43,8 @@
 }
 
 // Cards with color accent
-.card[class^="bg-"], .card[class*=" bg-"] {
+.card[class^="bg-"],
+.card[class*=" bg-"] {
   border-color: rgba(0, 0, 0, .125); //darken($value, 12.5%);
   .card-header {
     background-color: rgba(0, 0, 0, .05); //darken($value, 3%);

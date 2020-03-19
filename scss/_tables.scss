@@ -126,7 +126,7 @@
 // inheritance to nested tables.
 
 @include theme-variant() {
-  @include table-row-variant($color, theme-color-level($color, $table-bg-level), theme-color-level($color, $table-border-level));
+  @include table-row-variant($color,  theme-color-level($value, $table-bg-level),  theme-color-level($value, $table-border-level));
 }
 
 @include themes($table-theme-map, $create: parent) {

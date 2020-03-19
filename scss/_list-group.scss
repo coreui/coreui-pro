@@ -173,7 +173,7 @@
 // Organizationally, this must come after the `:hover` states.
 
 @include theme-variant() {
-  @include list-group-item-variant($color, theme-color-level($color, -9), theme-color-level($color, 6));
+  @include list-group-item-variant($color,  theme-color-level($value, -9),  theme-color-level($value, 6));
 }
 
 // List items with accent

@@ -58,6 +58,15 @@ $theme-has-variants: false !default;
   // }
 }
 
+@function default-theme() {
+  @each $key in map-keys($default-themes) {
+    // Check if the theme is default
+    @if map-get(map-get($default-themes, $key), "default") == true {
+      @return $key;
+    }
+  }
+}
+
 @mixin property($property, $key, $theme: $current-theme, $variant: $current-variant, $map: $themes-map) {
   $current-theme-map: map-get($map, $theme);
 
@@ -229,9 +238,12 @@ $theme-has-variants: false !default;
       @if $get-default {
         @content;
       } @else {
-        @at-root{
-          .c-#{$theme}#{$theme-suffix} {
-            @content;
+        $default-color: map-get(map-get(map-get($default-themes, default-theme()), "theme-colors"), $color);
+        @if $default-color != $value {
+          @at-root{
+            .c-#{$theme}#{$theme-suffix} {
+              @content;
+            }
           }
         }
       }
