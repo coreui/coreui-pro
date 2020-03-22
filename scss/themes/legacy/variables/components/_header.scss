@@ -1,0 +1,103 @@
+// Legacy theme
+
+$header-toggler-bg__lt:            transparent !default;
+$header-toggler-font-size__lt:     $font-size-lg !default;
+$header-toggler-border__lt:        0 !default;
+$header-toggler-border-radius__lt: $btn-border-radius !default;
+
+$header-light-bg__lt:                    $white !default;
+$header-light-color__lt:                 rgba($black__lt, .5) !default;
+$header-light-border__lt:                ( bottom: 1px solid $border-color__lt ) !default;
+$header-light-hover-color__lt:           rgba($black__lt, .7) !default;
+$header-light-active-color__lt:          rgba($black__lt, .9) !default;
+$header-light-disabled-color__lt:        rgba($black__lt, .3) !default;
+$header-light-toggler-icon-bg__lt:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-light-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
+$header-light-toggler-hover-icon-bg__lt: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-light-hover-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
+$header-light-toggler-border-color__lt:  rgba($black__lt, .1) !default;
+
+$header-dark-bg__lt:                    $gray-base__lt !default;
+$header-dark-color__lt:                 rgba($white, .75) !default;
+$header-dark-border__lt:                ( bottom: 1px solid $gray-800__lt ) !default;
+$header-dark-hover-color__lt:           rgba($white, .9) !default;
+$header-dark-active-color__lt:          $white !default;
+$header-dark-disabled-color__lt:        rgba($white, .25) !default;
+$header-dark-toggler-icon-bg__lt:       str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-dark-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
+$header-dark-toggler-hover-icon-bg__lt: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-dark-hover-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
+$header-dark-toggler-border-color__lt:  rgba($white, .1) !default;
+
+$header-light-brand-bg__lt:               transparent !default;
+$header-light-brand-border__lt:           0 !default;
+$header-light-brand-color__lt:            $gray-900__lt !default;
+$header-light-brand-hover-color__lt:      darken($gray-900__lt, 10%) !default;
+$header-light-brand-minimized-bg__lt:     transparent !default;
+$header-light-brand-minimized-border__lt: 0 !default;
+
+$header-dark-brand-bg__lt:               transparent !default;
+$header-dark-brand-border__lt:           0 !default;
+$header-dark-brand-color__lt:            $header-dark-active-color__lt !default;
+$header-dark-brand-hover-color__lt:      $header-dark-active-color__lt !default;
+$header-dark-brand-minimized-bg__lt:     transparent !default;
+$header-dark-brand-minimized-border__lt: 0 !default;
+
+$subheader-light-separator__lt: 1px solid $border-color__lt !default;
+
+$subheader-dark-separator__lt: 1px solid $gray-800__lt !default;
+
+
+$header-variants-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$header-variants-map: map-merge(
+  (
+    dark: (
+      "header-bg":                      $header-dark-bg__lt,
+      "header-color":                   $header-dark-color__lt,
+      "header-border":                  $header-dark-border__lt,
+      "header-hover-color":             $header-dark-hover-color__lt,
+      "header-active-color":            $header-dark-active-color__lt,
+      "header-disabled-color":          $header-dark-disabled-color__lt,
+      "header-toggler-icon-bg":         $header-dark-toggler-icon-bg__lt,
+      "header-toggler-hover-icon-bg":   $header-dark-toggler-hover-icon-bg__lt,
+      "header-toggler-border-color":    $header-dark-toggler-border-color__lt,
+      "header-brand-bg":                $header-dark-brand-bg__lt,
+      "header-brand-border":            $header-dark-brand-border__lt,
+      "header-brand-color":             $header-dark-brand-color__lt,
+      "header-brand-hover-color":       $header-dark-brand-hover-color__lt,
+      "header-brand-minimized-bg":      $header-dark-brand-minimized-bg__lt,
+      "header-brand-minimized-border":  $header-dark-brand-minimized-border__lt,
+      "subheader-separator":            $subheader-dark-separator
+    ),
+    light: (
+      "header-bg":                      $header-light-bg__lt,
+      "header-color":                   $header-light-color__lt,
+      "header-border":                  $header-light-border__lt,
+      "header-hover-color":             $header-light-hover-color__lt,
+      "header-active-color":            $header-light-active-color__lt,
+      "header-disabled-color":          $header-light-disabled-color__lt,
+      "header-toggler-icon-bg":         $header-light-toggler-icon-bg__lt,
+      "header-toggler-hover-icon-bg":   $header-light-toggler-hover-icon-bg__lt,
+      "header-toggler-border-color":    $header-light-toggler-border-color__lt,
+      "header-brand-bg":                $header-light-brand-bg__lt,
+      "header-brand-border":            $header-light-brand-border__lt,
+      "header-brand-color":             $header-light-brand-color__lt,
+      "header-brand-hover-color":       $header-light-brand-hover-color__lt,
+      "header-brand-minimized-bg":      $header-light-brand-minimized-bg__lt,
+      "header-brand-minimized-border":  $header-light-brand-minimized-border__lt,
+      "subheader-separator":            $subheader-light-separator__lt
+    )
+  ),
+  $header-variants-map
+);
+
+$header-default-variant: "light" !default;
+$header-variants: (
+  default:  $header-default-variant,
+  map:      $header-variants-map
+) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$header-theme-map: map-merge(
+  $header-theme-map,
+  (
+    legacy:  $header-variants
+  )
+);

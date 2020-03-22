@@ -1,35 +1,270 @@
-// Legacy theme
+// Legacy Theme
 
-$sidebar-legacy-theme-bg:           $gray-base !default;
-$sidebar-legacy-theme-brand-color:  $gray-900 !default;
-$sidebar-legacy-theme-brand-bg:     $white !default;
+$sidebar-backdrop-bg__lt:       $black__lt !default;
 
-$sidebar-legacy-theme-variants-map: () !default;
+$sidebar-dark-color__lt:    $white !default;
+$sidebar-dark-bg__lt:       $gray-800__lt !default;
+$sidebar-dark-borders__lt:  none !default;
+
+$sidebar-light-color__lt:    $body-color__lt !default;
+$sidebar-light-bg__lt:       $white !default;
+$sidebar-light-borders__lt:  (
+  right: 1px solid rgba(darken($border-color__lt, 20%), .5)
+) !default;
+
+// Sidebar Brand
+
+$sidebar-dark-brand-color__lt:  $body-color__lt !default;
+$sidebar-dark-brand-bg__lt:     $white !default;
+
+$sidebar-light-brand-color__lt:  $white !default;
+$sidebar-light-brand-bg__lt:     $primary__lt !default;
+
+// Sidebar Header
+
+$sidebar-dark-header-bg__lt:  rgba($black__lt, .2) !default;
+$sidebar-light-header-bg__lt: rgba($black__lt, .2) !default;
+
+// Sidebar Form
+
+$sidebar-dark-form-border__lt:              0 !default;
+$sidebar-dark-form-bg__lt:                  rgba($black__lt, .1) !default;
+$sidebar-dark-form-color__lt:               $white !default;
+$sidebar-dark-form-placeholder-color__lt:   rgba($white, .7) !default;
+
+$sidebar-light-form-border__lt:             0 !default;
+$sidebar-light-form-bg__lt:                 rgba($black__lt, .1) !default;
+$sidebar-light-form-color__lt:              $white !default;
+$sidebar-light-form-placeholder-color__lt:  rgba($white, .7) !default;
+
+
+// Sidebar Navigation
+
+$sidebar-dark-nav-title-color__lt:      rgba($white, .6) !default;
+$sidebar-dark-nav-link-color__lt:       rgba($white, .8) !default;
+$sidebar-dark-nav-link-bg__lt:          transparent !default;
+$sidebar-dark-nav-link-icon-color__lt:  rgba($white, .5) !default;
+$sidebar-dark-nav-link-borders__lt:     0 !default;
+
+$sidebar-light-nav-title-color__lt:      rgba($black__lt, .4) !default;
+$sidebar-light-nav-link-color__lt:       rgba($black__lt, .8) !default;
+$sidebar-light-nav-link-bg__lt:          transparent !default;
+$sidebar-light-nav-link-icon-color__lt:  rgba($black__lt, .5) !default;
+$sidebar-light-nav-link-borders__lt:     0 !default;
+
+
+$sidebar-dark-nav-link-hover-color__lt:       $white !default;
+$sidebar-dark-nav-link-hover-bg__lt:          $primary__lt !default;
+$sidebar-dark-nav-link-hover-icon-color__lt:  $white !default;
+$sidebar-dark-nav-link-hover-borders__lt:     0 !default;
+
+$sidebar-light-nav-link-hover-color__lt:       $white !default;
+$sidebar-light-nav-link-hover-bg__lt:          $primary__lt !default;
+$sidebar-light-nav-link-hover-icon-color__lt:  $white !default;
+$sidebar-light-nav-link-hover-borders__lt:     0 !default;
+
+
+$sidebar-dark-nav-link-active-color__lt:       $white !default;
+$sidebar-dark-nav-link-active-bg__lt:          rgba($white, .05) !default;
+$sidebar-dark-nav-link-active-icon-color__lt:  $white !default;
+$sidebar-dark-nav-link-active-borders__lt:     0 !default;
+
+$sidebar-light-nav-link-active-color__lt:       rgba($black__lt, .8) !default;
+$sidebar-light-nav-link-active-bg__lt:          rgba($black__lt, .05) !default;
+$sidebar-light-nav-link-active-icon-color__lt:  $primary__lt !default;
+$sidebar-light-nav-link-active-borders__lt:     0 !default;
+
+
+$sidebar-dark-nav-link-disabled-color__lt:       darken($white, 30%) !default;
+$sidebar-dark-nav-link-disabled-bg__lt:          $sidebar-dark-bg__lt !default;
+$sidebar-dark-nav-link-disabled-icon-color__lt:  $sidebar-dark-nav-link-icon-color__lt !default;
+$sidebar-dark-nav-link-disabled-borders__lt:     0 !default;
+
+$sidebar-light-nav-link-disabled-color__lt:       darken($white, 30%) !default;
+$sidebar-light-nav-link-disabled-bg__lt:          $sidebar-light-bg__lt !default;
+$sidebar-light-nav-link-disabled-icon-color__lt:  $sidebar-light-nav-link-icon-color__lt !default;
+$sidebar-light-nav-link-disabled-borders__lt:     0 !default;
+
+$sidebar-dark-nav-dropdown-color__lt:                  $white !default;
+$sidebar-dark-nav-dropdown-bg__lt:                   rgba(0, 0, 0, .2) !default;
+$sidebar-dark-nav-dropdown-borders__lt:                0 !default;
+$sidebar-dark-nav-dropdown-indicator-color__lt:        rgba($white, .5) !default;
+$sidebar-dark-nav-dropdown-indicator__lt:              str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-nav-dropdown-indicator-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-dark-nav-dropdown-indicator-hover-color__lt:  $sidebar-dark-nav-link-hover-color__lt !default;
+$sidebar-dark-nav-dropdown-indicator-hover__lt:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-nav-dropdown-indicator-hover-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$sidebar-light-nav-dropdown-color__lt:                  rgba($black__lt, .8) !default;
+$sidebar-light-nav-dropdown-bg__lt:                   rgba(0, 0, 0, .05) !default;
+$sidebar-light-nav-dropdown-borders__lt:                0 !default;
+$sidebar-light-nav-dropdown-indicator-color__lt:        rgba($black__lt, .5) !default;
+$sidebar-light-nav-dropdown-indicator__lt:              str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-dropdown-indicator-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-nav-dropdown-indicator-hover-color__lt:  $sidebar-dark-nav-link-hover-color__lt !default;
+$sidebar-light-nav-dropdown-indicator-hover__lt:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-dropdown-indicator-hover-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+// Sidebar Tabs
+
+$sidebar-dark-nav-tabs-border-color__lt:              rgba($black__lt, .2) !default;
+$sidebar-dark-nav-tabs-link-active-bg__lt:            rgba($white, .05) !default;
+$sidebar-dark-nav-tabs-link-active-border-color__lt:  rgba($black__lt, .2) rgba($black__lt, .2) $primary__lt !default;
+$sidebar-dark-nav-tabs-link-hover-bg__lt:             rgba($black__lt, .2) !default;
+$sidebar-dark-nav-tabs-link-hover-border-color__lt:   rgba($black__lt, .2) rgba($black__lt, .2) $gray-200__lt !default;
+$sidebar-dark-tab-content-borders__lt:                ( top: 1px solid rgba($black__lt, .2)) !default;
+
+$sidebar-light-nav-tabs-border-color__lt:              rgba(darken($border-color__lt, 20%), .5) !default;
+$sidebar-light-nav-tabs-link-active-bg__lt:            $white !default;
+$sidebar-light-nav-tabs-link-active-border-color__lt:  rgba(darken($border-color__lt, 20%), .5) rgba(darken($border-color__lt, 20%), .5) $white !default;
+$sidebar-light-nav-tabs-link-hover-bg__lt:             $white !default;
+$sidebar-light-nav-tabs-link-hover-border-color__lt:   rgba(darken($border-color__lt, 20%), .5) rgba(darken($border-color__lt, 20%), .5) $white !default;
+$sidebar-light-tab-content-borders__lt:                ( top: 1px solid rgba(darken($border-color__lt, 20%), .5)) !default;
+
+// Sidebar Footer
+
+$sidebar-dark-footer-bg__lt:        rgba($black__lt, .2) !default;
+$sidebar-dark-footer-borders__lt:   0 !default;
+
+$sidebar-light-footer-bg__lt:       rgba($black__lt, .2) !default;
+$sidebar-light-footer-borders__lt:  0 !default;
+
+// Sidebar Minimizer
+
+$sidebar-minimizer-height__lt:                      50px !default;
+
+$sidebar-dark-minimizer-borders__lt:                0 !default;
+$sidebar-dark-minimizer-bg__lt:                     rgba($black__lt, .2) !default;
+$sidebar-dark-minimizer-indicator-color__lt:        $gray-600__lt !default;
+$sidebar-dark-minimizer-indicator__lt:              str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-minimizer-indicator-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-dark-minimizer-hover-bg__lt:              rgba(0, 0, 0, .3) !default;
+$sidebar-dark-minimizer-hover-indicator-color__lt:  $sidebar-dark-nav-link-hover-color__lt !default;
+$sidebar-dark-minimizer-hover-indicator__lt:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-dark-minimizer-hover-indicator-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$sidebar-light-minimizer-borders__lt:                0 !default;
+$sidebar-light-minimizer-bg__lt:                     rgba(0, 0, 0, .05) !default;
+$sidebar-light-minimizer-indicator-color__lt:        $gray-600__lt !default;
+$sidebar-light-minimizer-indicator__lt:              str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-minimizer-indicator-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-minimizer-hover-bg__lt:               rgba(0, 0, 0, .1) !default;
+$sidebar-light-minimizer-hover-indicator-color__lt:  $gray-700__lt !default;
+$sidebar-light-minimizer-hover-indicator__lt:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-minimizer-hover-indicator-color__lt}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$sidebar-variants-map__lt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$sidebar-legacy-theme-variants-map: map-merge(
+$sidebar-variants-map__lt: map-merge(
   (
     dark: (
-      "sidebar-bg":           $sidebar-legacy-theme-bg,
-      "sidebar-brand-color":  $sidebar-legacy-theme-brand-color,
-      "sidebar-brand-bg":     $sidebar-legacy-theme-brand-bg,
+      "sidebar-color":                               $sidebar-dark-color__lt,
+      "sidebar-bg":                                  $sidebar-dark-bg__lt,
+      "sidebar-borders":                             $sidebar-dark-borders__lt,
+      "sidebar-brand-color":                         $sidebar-dark-brand-color__lt,
+      "sidebar-brand-bg":                            $sidebar-dark-brand-bg__lt,
+      "sidebar-header-bg":                           $sidebar-dark-header-bg__lt,
+      "sidebar-form-border":                         $sidebar-dark-form-border__lt,
+      "sidebar-form-bg":                             $sidebar-dark-form-bg__lt,
+      "sidebar-form-color":                          $sidebar-dark-form-color__lt,
+      "sidebar-form-placeholder-color":              $sidebar-dark-form-placeholder-color__lt,
+      "sidebar-nav-title-color":                     $sidebar-dark-nav-title-color__lt,
+      "sidebar-nav-link-color":                      $sidebar-dark-nav-link-color__lt,
+      "sidebar-nav-link-bg":                         $sidebar-dark-nav-link-bg__lt,
+      "sidebar-nav-link-icon-color":                 $sidebar-dark-nav-link-icon-color__lt,
+      "sidebar-nav-link-borders":                    $sidebar-dark-nav-link-borders__lt,
+      "sidebar-nav-link-hover-color":                $sidebar-dark-nav-link-hover-color__lt,
+      "sidebar-nav-link-hover-bg":                   $sidebar-dark-nav-link-hover-bg__lt,
+      "sidebar-nav-link-hover-icon-color":           $sidebar-dark-nav-link-hover-icon-color__lt,
+      "sidebar-nav-link-hover-borders":              $sidebar-dark-nav-link-hover-borders__lt,
+      "sidebar-nav-link-active-color":               $sidebar-dark-nav-link-active-color__lt,
+      "sidebar-nav-link-active-bg":                  $sidebar-dark-nav-link-active-bg__lt,
+      "sidebar-nav-link-active-icon-color":          $sidebar-dark-nav-link-active-icon-color__lt,
+      "sidebar-nav-link-active-borders":             $sidebar-dark-nav-link-active-borders__lt,
+      "sidebar-nav-link-disabled-color":             $sidebar-dark-nav-link-disabled-color__lt,
+      "sidebar-nav-link-disabled-bg":                $sidebar-dark-nav-link-disabled-bg__lt,
+      "sidebar-nav-link-disabled-icon-color":        $sidebar-dark-nav-link-disabled-icon-color__lt,
+      "sidebar-nav-link-disabled-borders":           $sidebar-dark-nav-link-disabled-borders__lt,
+      "sidebar-nav-dropdown-color":                  $sidebar-dark-nav-dropdown-color__lt,
+      "sidebar-nav-dropdown-bg":                     $sidebar-dark-nav-dropdown-bg__lt,
+      "sidebar-nav-dropdown-borders":                $sidebar-dark-nav-dropdown-borders__lt,
+      "sidebar-nav-dropdown-indicator-color":        $sidebar-dark-nav-dropdown-indicator-color__lt,
+      "sidebar-nav-dropdown-indicator":              $sidebar-dark-nav-dropdown-indicator__lt,
+      "sidebar-nav-dropdown-indicator-hover-color":  $sidebar-dark-nav-dropdown-indicator-hover-color__lt,
+      "sidebar-nav-dropdown-indicator-hover":        $sidebar-dark-nav-dropdown-indicator-hover__lt,
+      "sidebar-nav-tabs-border-color":               $sidebar-dark-nav-tabs-border-color__lt,
+      "sidebar-nav-tabs-link-active-bg":             $sidebar-dark-nav-tabs-link-active-bg__lt,
+      "sidebar-nav-tabs-link-active-border-color":   $sidebar-dark-nav-tabs-link-active-border-color__lt,
+      "sidebar-nav-tabs-link-hover-bg":              $sidebar-dark-nav-tabs-link-hover-bg__lt,
+      "sidebar-nav-tabs-link-hover-border-color":    $sidebar-dark-nav-tabs-link-hover-border-color__lt,
+      "sidebar-tab-content-borders":                 $sidebar-dark-tab-content-borders__lt,
+      "sidebar-footer-bg":                           $sidebar-dark-footer-bg__lt,
+      "sidebar-footer-borders":                      $sidebar-dark-footer-borders__lt,
+      "sidebar-minimizer-borders":                   $sidebar-dark-minimizer-borders__lt,
+      "sidebar-minimizer-bg":                        $sidebar-dark-minimizer-bg__lt,
+      "sidebar-minimizer-indicator-color":           $sidebar-dark-minimizer-indicator-color__lt,
+      "sidebar-minimizer-indicator":                 $sidebar-dark-minimizer-indicator__lt,
+      "sidebar-minimizer-hover-bg":                  $sidebar-dark-minimizer-hover-bg__lt,
+      "sidebar-minimizer-hover-indicator-color":     $sidebar-dark-minimizer-hover-indicator-color__lt,
+      "sidebar-minimizer-hover-indicator":           $sidebar-dark-minimizer-hover-indicator__lt
     ),
     light: (
-      "sidebar-bg":           $sidebar-light-bg
+      "sidebar-color":                               $sidebar-light-color__lt,
+      "sidebar-bg":                                  $sidebar-light-bg__lt,
+      "sidebar-borders":                             $sidebar-light-borders__lt,
+      "sidebar-brand-color":                         $sidebar-light-brand-color__lt,
+      "sidebar-brand-bg":                            $sidebar-light-brand-bg__lt,
+      "sidebar-header-bg":                           $sidebar-light-header-bg__lt,
+      "sidebar-form-border":                         $sidebar-light-form-border__lt,
+      "sidebar-form-bg":                             $sidebar-light-form-bg__lt,
+      "sidebar-form-color":                          $sidebar-light-form-color__lt,
+      "sidebar-form-placeholder-color":              $sidebar-light-form-placeholder-color__lt,
+      "sidebar-nav-title-color":                     $sidebar-light-nav-title-color__lt,
+      "sidebar-nav-link-color":                      $sidebar-light-nav-link-color__lt,
+      "sidebar-nav-link-bg":                         $sidebar-light-nav-link-bg__lt,
+      "sidebar-nav-link-icon-color":                 $sidebar-light-nav-link-icon-color__lt,
+      "sidebar-nav-link-borders":                    $sidebar-light-nav-link-borders__lt,
+      "sidebar-nav-link-hover-color":                $sidebar-light-nav-link-hover-color__lt,
+      "sidebar-nav-link-hover-bg":                   $sidebar-light-nav-link-hover-bg__lt,
+      "sidebar-nav-link-hover-icon-color":           $sidebar-light-nav-link-hover-icon-color__lt,
+      "sidebar-nav-link-hover-borders":              $sidebar-light-nav-link-hover-borders__lt,
+      "sidebar-nav-link-active-color":               $sidebar-light-nav-link-active-color__lt,
+      "sidebar-nav-link-active-bg":                  $sidebar-light-nav-link-active-bg__lt,
+      "sidebar-nav-link-active-icon-color":          $sidebar-light-nav-link-active-icon-color__lt,
+      "sidebar-nav-link-active-borders":             $sidebar-light-nav-link-active-borders__lt,
+      "sidebar-nav-link-disabled-color":             $sidebar-light-nav-link-disabled-color__lt,
+      "sidebar-nav-link-disabled-bg":                $sidebar-light-nav-link-disabled-bg__lt,
+      "sidebar-nav-link-disabled-icon-color":        $sidebar-light-nav-link-disabled-icon-color__lt,
+      "sidebar-nav-link-disabled-borders":           $sidebar-light-nav-link-disabled-borders__lt,
+      "sidebar-nav-dropdown-color":                  $sidebar-light-nav-dropdown-color__lt,
+      "sidebar-nav-dropdown-bg":                     $sidebar-light-nav-dropdown-bg__lt,
+      "sidebar-nav-dropdown-borders":                $sidebar-light-nav-dropdown-borders__lt,
+      "sidebar-nav-dropdown-indicator-color":        $sidebar-light-nav-dropdown-indicator-color__lt,
+      "sidebar-nav-dropdown-indicator":              $sidebar-light-nav-dropdown-indicator__lt,
+      "sidebar-nav-dropdown-indicator-hover-color":  $sidebar-light-nav-dropdown-indicator-hover-color__lt,
+      "sidebar-nav-dropdown-indicator-hover":        $sidebar-light-nav-dropdown-indicator-hover__lt,
+      "sidebar-nav-tabs-border-color":               $sidebar-light-nav-tabs-border-color__lt,
+      "sidebar-nav-tabs-link-active-bg":             $sidebar-light-nav-tabs-link-active-bg__lt,
+      "sidebar-nav-tabs-link-active-border-color":   $sidebar-light-nav-tabs-link-active-border-color__lt,
+      "sidebar-nav-tabs-link-hover-bg":              $sidebar-light-nav-tabs-link-hover-bg__lt,
+      "sidebar-nav-tabs-link-hover-border-color":    $sidebar-light-nav-tabs-link-hover-border-color__lt,
+      "sidebar-tab-content-borders":                 $sidebar-light-tab-content-borders__lt,
+      "sidebar-footer-bg":                           $sidebar-light-footer-bg__lt,
+      "sidebar-footer-borders":                      $sidebar-light-footer-borders__lt,
+      "sidebar-minimizer-borders":                   $sidebar-light-minimizer-borders__lt,
+      "sidebar-minimizer-bg":                        $sidebar-light-minimizer-bg__lt,
+      "sidebar-minimizer-indicator-color":           $sidebar-light-minimizer-indicator-color__lt,
+      "sidebar-minimizer-indicator":                 $sidebar-light-minimizer-indicator__lt,
+      "sidebar-minimizer-hover-bg":                  $sidebar-light-minimizer-hover-bg__lt,
+      "sidebar-minimizer-hover-indicator-color":     $sidebar-light-minimizer-hover-indicator-color__lt,
+      "sidebar-minimizer-hover-indicator":           $sidebar-light-minimizer-hover-indicator__lt
     )
   ),
-  $sidebar-legacy-theme-variants-map
+  $sidebar-variants-map__lt
 );
 
-$sidebar-legacy-theme-default-variant: "legacy" !default;
-$sidebar-legacy-theme-variants: (
-  map:      $sidebar-legacy-theme-variants-map,
-  default:  $sidebar-legacy-theme-default-variant
+$sidebar-default-variant__lt: "dark" !default;
+$sidebar-variants__lt: (
+  map: $sidebar-variants-map__lt,
+  default: $sidebar-default-variant__lt
 ) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $sidebar-theme-map: map-merge(
   $sidebar-theme-map,
   (
-    legacy:  $sidebar-legacy-theme-variants
+    legacy: $sidebar-variants__lt,
   )
 );

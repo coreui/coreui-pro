@@ -1,0 +1,54 @@
+// Legacy theme
+
+$subheader-dark-bg__lt:                     $gray-base__lt !default;
+$subheader-dark-color__lt:                  rgba($white, .75) !default;
+$subheader-dark-border__lt:                 ( bottom: 1px solid $gray-800__lt ) !default;
+$subheader-dark-hover-color__lt:            rgba($white, .9) !default;
+$subheader-dark-active-color__lt:           $white !default;
+$subheader-dark-disabled-color__lt:         rgba($white, .25) !default;
+
+$subheader-light-bg__lt:                     $white !default;
+$subheader-light-color__lt:                  rgba($black__lt, .5) !default;
+$subheader-light-border__lt:                 ( bottom: 1px solid $border-color__lt ) !default;
+$subheader-light-hover-color__lt:            rgba($black__lt, .7) !default;
+$subheader-light-active-color__lt:           rgba($black__lt, .9) !default;
+$subheader-light-disabled-color__lt:         rgba($black__lt, .3) !default;
+
+
+$subheader-variants-map__lt: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$subheader-variants-map__lt: map-merge(
+  (
+    dark: (
+      "subheader-bg":                      $subheader-dark-bg__lt,
+      "subheader-color":                   $subheader-dark-color__lt,
+      "subheader-border":                  $subheader-dark-border__lt,
+      "subheader-hover-color":             $subheader-dark-hover-color__lt,
+      "subheader-active-color":            $subheader-dark-active-color__lt,
+      "subheader-disabled-color":          $subheader-dark-disabled-color__lt,
+    ),
+    light: (
+      "subheader-bg":                      $subheader-light-bg__lt,
+      "subheader-color":                   $subheader-light-color__lt,
+      "subheader-border":                  $subheader-light-border__lt,
+      "subheader-hover-color":             $subheader-light-hover-color__lt,
+      "subheader-active-color":            $subheader-light-active-color__lt,
+      "subheader-disabled-color":          $subheader-light-disabled-color__lt,
+    )
+  ),
+  $subheader-variants-map__lt
+);
+
+$subheader-default-variant__lt: "light" !default;
+$subheader-variants__lt: (
+  default:  $subheader-default-variant__lt,
+  map:      $subheader-variants-map__lt
+) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$subheader-theme-map: map-merge(
+  $subheader-theme-map,
+  (
+    legacy:  $subheader-variants__lt
+  )
+);

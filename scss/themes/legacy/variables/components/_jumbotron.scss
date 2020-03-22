@@ -1,0 +1,16 @@
+
+// legacy theme
+$jumbotron-color__lt:  null !default;
+$jumbotron-bg__lt:     $gray-200__lt !default;
+
+$jumbotron-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$jumbotron-theme-map: map-merge(
+  $jumbotron-theme-map,
+  (
+    legacy: (
+      "jumbotron-color":  $jumbotron-color__lt,
+      "jumbotron-bg":     $jumbotron-bg__lt
+    )
+  )
+);

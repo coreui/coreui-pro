@@ -1,0 +1,25 @@
+// Legacy theme
+
+$toast-background-color__lt:  rgba($white, .85) !default;
+$toast-color__lt:             null !default;
+$toast-border-color__lt:      rgba($black__lt, .1) !default;
+
+$toast-header-color__lt:             $gray-600__lt !default;
+$toast-header-background-color__lt:  rgba($white, .85) !default;
+$toast-header-border-color__lt:      rgba($black__lt, .05) !default;
+
+$toast-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$toast-theme-map: map-merge(
+  $toast-theme-map,
+  (
+    legacy: (
+      "toast-background-color":         $toast-background-color__lt,
+      "toast-color":                    $toast-color__lt,
+      "toast-border-color":             $toast-border-color__lt,
+      "toast-header-color":             $toast-header-color__lt,
+      "toast-header-background-color":  $toast-header-background-color__lt,
+      "toast-header-border-color":      $toast-header-border-color__lt
+    )
+  )
+);

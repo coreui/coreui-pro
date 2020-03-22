@@ -1,7 +1,35 @@
 // Variables
 
+// Color system
+@import "variables/colors";
+@import "variables/gradients";
+
 // Options
 @import "variables/options";
 
+@import "variables/body";
+@import "variables/components/shared";
+@import "variables/typography";
+
 // Components
+@import "variables/components/links";
+@import "variables/components/tables";
+@import "variables/components/buttons-forms";
+@import "variables/components/custom-forms";
+@import "variables/components/navs";
+@import "variables/components/navbar";
+@import "variables/components/header";
+@import "variables/components/subheader";
 @import "variables/components/sidebar";
+@import "variables/components/footer";
+@import "variables/components/dropdowns";
+@import "variables/components/pagination";
+@import "variables/components/cards";
+@import "variables/components/jumbotron";
+@import "variables/components/popovers";
+@import "variables/components/toasts";
+@import "variables/components/modals";
+@import "variables/components/progress-bars";
+@import "variables/components/list-group";
+@import "variables/components/breadcrumb";
+@import "variables/components/close";

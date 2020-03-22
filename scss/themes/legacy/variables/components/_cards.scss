@@ -1,0 +1,24 @@
+// Legacy theme
+
+// $card-icon-bg:     transparent !default;
+// $card-icon-color:  $body-color__lt !default;
+
+$card-border-color__lt:  $border-color__lt !default;
+$card-cap-bg__lt:        $gray-100__lt !default;
+$card-cap-color__lt:     null !default;
+$card-color__lt:         null !default;
+$card-bg__lt:            $white !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$card-theme-map: map-merge(
+  $card-theme-map,
+  (
+    legacy: (
+      "card-border-color":  $card-border-color__lt,
+      "card-cap-bg":        $card-cap-bg__lt,
+      "card-cap-color":     $card-cap-color__lt,
+      "card-color":         $card-color__lt,
+      "card-bg":            $card-bg__lt
+    )
+  )
+);

@@ -1,0 +1,59 @@
+//
+// CoreUI legacy theme gradients
+//
+
+$primary-gradient__lt: (
+  "start":  lighten($primary__lt, 5%),
+  "stop":   darken($primary__lt, 5%)
+) !default;
+
+$secondary-gradient__lt: (
+  "start":  lighten($secondary__lt, 5%),
+  "stop":   darken($secondary__lt, 5%)
+) !default;
+
+$light-gradient__lt: (
+  "start":  lighten($light__lt, 5%),
+  "stop":   darken($light__lt, 5%)
+) !default;
+
+$dark-gradient__lt: (
+  "start":  lighten($dark__lt, 5%),
+  "stop":   darken($dark__lt, 5%)
+) !default;
+
+$danger-gradient__lt: (
+  "start":  lighten($danger__lt, 5%),
+  "stop":   darken($danger__lt, 5%)
+) !default;
+
+$warning-gradient__lt: (
+  "start":  lighten($warning__lt, 5%),
+  "stop":   darken($warning__lt, 5%)
+) !default;
+
+$success-gradient__lt: (
+  "start":  lighten($success__lt, 5%),
+  "stop":   darken($success__lt, 5%)
+) !default;
+
+$info-gradient__lt: (
+  "start":  lighten($info__lt, 5%),
+  "stop":   darken($info__lt, 5%)
+) !default;
+
+$theme-gradients-legacy-theme: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-gradients-legacy-theme: map-merge(
+  (
+    "primary":    $primary-gradient__lt,
+    "secondary":  $secondary-gradient__lt,
+    "success":    $success-gradient__lt,
+    "info":       $info-gradient__lt,
+    "warning":    $warning-gradient__lt,
+    "danger":     $danger-gradient__lt,
+    "light":      $light-gradient__lt,
+    "dark":       $dark-gradient__lt
+  ),
+  $theme-gradients-legacy-theme
+);

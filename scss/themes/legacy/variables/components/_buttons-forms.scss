@@ -1,0 +1,67 @@
+// Legacy theme
+
+// $btn-link-disabled-color:  $gray-600__lt !default;
+
+$input-bg__lt:           $white !default;
+$input-disabled-bg__lt:  $gray-200__lt !default;
+
+$input-color__lt:         $gray-700__lt !default;
+$input-border-color__lt:  $gray-200__lt !default;
+
+$input-focus-bg__lt:            $input-bg__lt !default;
+$input-focus-border-color__lt:   lighten($component-active-bg__lt, 25%) !default;
+$input-focus-color__lt:         $input-color__lt !default;
+
+$input-placeholder-color__lt:  $gray-600__lt !default;
+$input-plaintext-color__lt:    $body-color__lt !default;
+
+$input-group-addon-color__lt:         $input-color__lt !default;
+$input-group-addon-bg__lt:            $gray-100__lt !default;
+$input-group-addon-border-color__lt:  $input-border-color__lt !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-theme-map: map-merge(
+  $form-theme-map,
+  (
+    default: (
+      "input-bg":                        $input-bg__lt,
+      "input-disabled-bg":               $input-disabled-bg__lt,
+      "input-color":                     $input-color__lt,
+      "input-border-color":              $input-border-color__lt,
+      "input-focus-bg":                  $input-focus-bg__lt,
+      "input-focus-border-color":        $input-focus-border-color__lt,
+      "input-focus-color":               $input-focus-color__lt,
+      "input-placeholder-color":         $input-placeholder-color__lt,
+      "input-plaintext-color":           $input-plaintext-color__lt,
+      "input-group-addon-color":         $input-group-addon-color__lt,
+      "input-group-addon-bg":            $input-group-addon-bg__lt,
+      "input-group-addon-border-color":  $input-group-addon-border-color__lt
+    )
+  )
+);
+
+// Form validation
+
+// $form-feedback-valid-color:    $success__lt !default;
+// $form-feedback-invalid-color:  $danger__lt !default;
+
+// $form-feedback-icon-valid-color:    $form-feedback-valid-color !default;
+// $form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/></svg>") !default;
+// $form-feedback-icon-invalid-color:  $form-feedback-invalid-color !default;
+// $form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}' viewBox='0 0 12 12'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/></svg>") !default;
+
+// $form-validation-states: () !default;
+// // stylelint-disable-next-line scss/dollar-variable-default
+// $form-validation-states: map-merge(
+//   (
+//     "valid": (
+//       "color":  $form-feedback-valid-color,
+//       "icon":   $form-feedback-icon-valid
+//     ),
+//     "invalid": (
+//       "color":  $form-feedback-invalid-color,
+//       "icon":   $form-feedback-icon-invalid
+//     ),
+//   ),
+//   $form-validation-states
+// );

@@ -1,0 +1,20 @@
+// Legacy theme
+
+$breadcrumb-bg__lt:             transparent !default;
+$breadcrumb-border-color__lt:   $border-color__lt !default;
+$breadcrumb-divider-color__lt:  $gray-600__lt !default;
+$breadcrumb-active-color__lt:   $gray-600__lt !default;
+
+$breadcrumb-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$breadcrumb-theme-map: map-merge(
+  $breadcrumb-theme-map,
+  (
+    legacy: (
+      "breadcrumb-bg":             $breadcrumb-bg__lt,
+      "breadcrumb-border-color":   $breadcrumb-border-color__lt,
+      "breadcrumb-divider-color":  $breadcrumb-divider-color__lt,
+      "breadcrumb-active-color":   $breadcrumb-active-color__lt
+    )
+  )
+);

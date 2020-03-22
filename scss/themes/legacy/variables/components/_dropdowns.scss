@@ -1,0 +1,35 @@
+// Legacy theme
+
+$dropdown-color__lt:                $body-color__lt !default;
+$dropdown-bg__lt:                   $white !default;
+$dropdown-border-color__lt:         $border-color__lt !default;
+$dropdown-divider-bg__lt:           $gray-200__lt !default;
+$dropdown-link-color__lt:           $gray-900__lt !default;
+$dropdown-link-hover-color__lt:     darken($gray-900__lt, 5%) !default;
+$dropdown-link-hover-bg__lt:        $gray-100__lt !default;
+$dropdown-link-active-color__lt:    $component-active-color__lt !default;
+$dropdown-link-active-bg__lt:       $component-active-bg__lt !default;
+$dropdown-link-disabled-color__lt:  $gray-600__lt !default;
+$dropdown-header-color__lt:         $gray-600__lt !default;
+
+
+$dropdown-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$dropdown-theme-map: map-merge(
+  $dropdown-theme-map,
+  (
+    legacy: (
+      "dropdown-color":                $dropdown-color__lt,
+      "dropdown-border-color":         $dropdown-border-color__lt,
+      "dropdown-bg":                   $dropdown-bg__lt,
+      "dropdown-divider-bg":           $dropdown-divider-bg__lt,
+      "dropdown-link-color":           $dropdown-link-color__lt,
+      "dropdown-link-hover-color":     $dropdown-link-hover-color__lt,
+      "dropdown-link-hover-bg":        $dropdown-link-hover-bg__lt,
+      "dropdown-link-active-color":    $dropdown-link-active-color__lt,
+      "dropdown-link-active-bg":       $dropdown-link-active-bg__lt,
+      "dropdown-link-disabled-color":  $dropdown-link-disabled-color__lt,
+      "dropdown-header-color":         $dropdown-header-color__lt
+    )
+  )
+);

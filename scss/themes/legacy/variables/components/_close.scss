@@ -1,0 +1,16 @@
+// Close
+
+// Default theme
+$close-color__lt:        $black__lt !default;
+$close-text-shadow__lt:  0 1px 0 $white !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$close-theme-map: map-merge(
+  $close-theme-map,
+  (
+    legacy: (
+      "close-color":        $close-color__lt,
+      "close-text-shadow":  $close-text-shadow__lt
+    )
+  )
+);

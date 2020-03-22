@@ -18,8 +18,9 @@ $default-themes: map-merge(
   (
     legacy: (
       "default":       false,
-      "theme-colors":  $theme-colors,
-      "grays":         $grays
+      "theme-colors":  $theme-colors-legacy-theme,
+      "grays":         $grays-legacy-theme,
+      "gradients":     $theme-gradients-legacy-theme
     )
   ),
   $default-themes

@@ -1,0 +1,47 @@
+// Footer
+
+$footer-height:  50px !default;
+
+
+// Default Theme
+$footer-dark-bg__lt:       $gray-800__lt !default;
+$footer-dark-color__lt:    $white !default;
+$footer-dark-borders__lt:  0 !default;
+
+$footer-light-bg__lt:       $gray-100__lt !default;
+$footer-light-color__lt:    $body-color__lt !default;
+$footer-light-borders__lt:  ( top: 1px solid $border-color__lt ) !default;
+
+$footer-variants-map:  () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$footer-variants-map: map-merge(
+  (
+    dark: (
+      "footer-bg":       $footer-dark-bg__lt,
+      "footer-color":    $footer-dark-color__lt,
+      "footer-borders":  $footer-dark-borders__lt
+    ),
+    light: (
+      "footer-bg":       $footer-light-bg__lt,
+      "footer-color":    $footer-light-color__lt,
+      "footer-borders":  $footer-light-borders__lt
+    )
+  ),
+  $footer-variants-map
+);
+
+$footer-default-variant: "light" !default;
+$footer-variants: (
+  "default": $footer-default-variant,
+  "map":     $footer-variants-map
+) !default;
+
+
+$footer-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$footer-theme-map: map-merge(
+  $footer-theme-map,
+  (
+    legacy: $footer-variants
+  )
+);

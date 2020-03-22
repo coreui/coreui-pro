@@ -1,0 +1,38 @@
+// Legacy theme
+
+$list-group-color__lt:                null !default;
+$list-group-bg__lt:                   inherit !default;
+$list-group-border-color__lt:         rgba($black__lt, .125) !default;
+$list-group-hover-bg__lt:             $gray-100__lt !default;
+$list-group-active-color__lt:         $component-active-color__lt !default;
+$list-group-active-bg__lt:            $component-active-bg__lt !default;
+$list-group-active-border-color__lt:  $list-group-active-bg__lt !default;
+$list-group-disabled-color__lt:       $gray-600__lt !default;
+$list-group-disabled-bg__lt:          $list-group-bg__lt !default;
+$list-group-action-color__lt:         $gray-700__lt !default;
+$list-group-action-hover-color__lt:   $list-group-action-color__lt !default;
+$list-group-action-active-color__lt:  $body-color__lt !default;
+$list-group-action-active-bg__lt:     $gray-200__lt !default;
+
+$list-group-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$list-group-theme-map: map-merge(
+  $list-group-theme-map,
+  (
+    legacy: (
+      "list-group-color":                $list-group-color__lt,
+      "list-group-bg":                   $list-group-bg__lt,
+      "list-group-border-color":         $list-group-border-color__lt,
+      "list-group-hover-bg":             $list-group-hover-bg__lt,
+      "list-group-active-color":         $list-group-active-color__lt,
+      "list-group-active-bg":            $list-group-active-bg__lt,
+      "list-group-active-border-color":  $list-group-active-border-color__lt,
+      "list-group-disabled-color":       $list-group-disabled-color__lt,
+      "list-group-disabled-bg":          $list-group-disabled-bg__lt,
+      "list-group-action-color":         $list-group-action-color__lt,
+      "list-group-action-hover-color":   $list-group-action-hover-color__lt,
+      "list-group-action-active-color":  $list-group-action-active-color__lt,
+      "list-group-action-active-bg":     $list-group-action-active-bg__lt,
+    )
+  )
+);

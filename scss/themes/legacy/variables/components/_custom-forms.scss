@@ -1,0 +1,96 @@
+// Default Theme
+
+$custom-control-indicator-bg__lt:            $input-bg__lt !default;
+$custom-control-indicator-border-color__lt:  $gray-500__lt !default;
+$custom-control-indicator-disabled-bg__lt:   $input-disabled-bg__lt !default;
+
+$custom-control-label-disabled-color__lt:  $gray-600__lt !default;
+
+$custom-control-indicator-checked-color__lt:         $component-active-color__lt !default;
+$custom-control-indicator-checked-bg__lt:            $component-active-bg__lt !default;
+$custom-control-indicator-checked-disabled-bg__lt:   rgba($primary__lt, .5) !default;
+$custom-control-indicator-checked-border-color__lt:  $custom-control-indicator-checked-bg !default;
+
+$custom-control-indicator-focus-border-color__lt:  $input-focus-border-color__lt !default;
+
+$custom-control-indicator-active-color__lt:         $component-active-color__lt !default;
+$custom-control-indicator-active-bg__lt:            lighten($component-active-bg__lt, 35%) !default;
+$custom-control-indicator-active-border-color__lt:  $custom-control-indicator-active-bg__lt !default;
+
+$custom-checkbox-indicator-icon-checked__lt:                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'><path fill='#{$custom-control-indicator-checked-color}' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/></svg>") !default;
+$custom-checkbox-indicator-indeterminate-bg__lt:            $component-active-bg__lt !default;
+$custom-checkbox-indicator-indeterminate-color__lt:         $custom-control-indicator-checked-color__lt !default;
+$custom-checkbox-indicator-indeterminate-border-color__lt:  $custom-checkbox-indicator-indeterminate-bg__lt !default;
+$custom-checkbox-indicator-icon-indeterminate__lt:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'><path stroke='#{$custom-checkbox-indicator-indeterminate-color}' d='M0 2h4'/></svg>") !default;
+
+$custom-radio-indicator-icon-checked__lt:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='-4 -4 8 8'><circle r='3' fill='#{$custom-control-indicator-checked-color}'/></svg>") !default;
+
+$custom-select-color__lt:               $input-color__lt !default;
+$custom-select-disabled-color__lt:      $gray-600__lt !default;
+$custom-select-bg__lt:                  $input-bg__lt !default;
+$custom-select-disabled-bg__lt:         $gray-200__lt !default;
+$custom-select-indicator-color__lt:     $gray-800__lt !default;
+$custom-select-indicator__lt:           url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#{$custom-select-indicator-color__lt}' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;
+$custom-select-background__lt:          escape-svg($custom-select-indicator__lt) no-repeat right $custom-select-padding-x center / $custom-select-bg-size !default; // Used so we can have multiple background elements (e.g., arrow and feedback icon)
+$custom-select-border-color__lt:        $input-border-color__lt !default;
+$custom-select-focus-border-color__lt:  $input-focus-border-color__lt !default;
+
+$custom-range-track-bg__lt:           $gray-300__lt !default;
+$custom-range-thumb-bg__lt:           $component-active-bg__lt !default;
+$custom-range-thumb-active-bg__lt:    ghten($component-active-bg__lt, 35%) !default;
+$custom-range-thumb-disabled-bg__lt:  $gray-500__lt !default;
+
+$custom-file-focus-border-color__lt:  $input-focus-border-color__lt !default;
+$custom-file-disabled-bg__lt:         $input-disabled-bg__lt !default;
+$custom-file-color__lt:               $input-color__lt !default;
+$custom-file-bg__lt:                  $input-bg__lt !default;
+$custom-file-border-color__lt:        $input-border-color__lt !default;
+$custom-file-button-color__lt:        $custom-file-color__lt !default;
+$custom-file-button-bg__lt:           $input-group-addon-bg__lt !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$custom-forms-theme-map: map-merge(
+  $custom-forms-theme-map,
+  (
+    legacy: (
+      "custom-control-indicator-bg":                           $custom-control-indicator-bg__lt,
+      "custom-control-indicator-border-color":                 $custom-control-indicator-border-color__lt,
+      "custom-control-indicator-disabled-bg":                  $custom-control-indicator-disabled-bg__lt,
+      "custom-control-label-disabled-color":                   $custom-control-label-disabled-color__lt,
+      "custom-control-indicator-checked-color":                $custom-control-indicator-checked-color__lt,
+      "custom-control-indicator-checked-bg":                   $custom-control-indicator-checked-bg__lt,
+      "custom-control-indicator-checked-disabled-bg":          $custom-control-indicator-checked-disabled-bg__lt,
+      "custom-control-indicator-checked-border-color":         $custom-control-indicator-checked-border-color__lt,
+      "custom-control-indicator-focus-border-color":           $custom-control-indicator-focus-border-color__lt,
+      "custom-control-indicator-active-color":                 $custom-control-indicator-active-color__lt,
+      "custom-control-indicator-active-bg":                    $custom-control-indicator-active-bg__lt,
+      "custom-control-indicator-active-border-color":          $custom-control-indicator-active-border-color__lt,
+      "custom-checkbox-indicator-icon-checked":                $custom-checkbox-indicator-icon-checked__lt,
+      "custom-checkbox-indicator-indeterminate-bg":            $custom-checkbox-indicator-indeterminate-bg__lt,
+      "custom-checkbox-indicator-indeterminate-color":         $custom-checkbox-indicator-indeterminate-color__lt,
+      "custom-checkbox-indicator-indeterminate-border-color":  $custom-checkbox-indicator-indeterminate-border-color__lt,
+      "custom-checkbox-indicator-icon-indeterminate":          $custom-checkbox-indicator-icon-indeterminate__lt,
+      "custom-radio-indicator-icon-checked":                   $custom-radio-indicator-icon-checked__lt,
+      "custom-select-color":                                   $custom-select-color__lt,
+      "custom-select-disabled-color":                          $custom-select-disabled-color__lt,
+      "custom-select-bg":                                      $custom-select-bg__lt,
+      "custom-select-disabled-bg":                             $custom-select-disabled-bg__lt,
+      "custom-select-indicator-color":                         $custom-select-indicator-color__lt,
+      "custom-select-indicator":                               $custom-select-indicator__lt,
+      "custom-select-background":                              $custom-select-background__lt,
+      "custom-select-border-color":                            $custom-select-border-color__lt,
+      "custom-select-focus-border-color":                      $custom-select-focus-border-color__lt,
+      "custom-range-track-bg":                                 $custom-range-track-bg__lt,
+      "custom-range-thumb-bg":                                 $custom-range-thumb-bg__lt,
+      "custom-range-thumb-active-bg":                          $custom-range-thumb-active-bg__lt,
+      "custom-range-thumb-disabled-bg":                        $custom-range-thumb-disabled-bg__lt,
+      "custom-file-focus-border-color":                        $custom-file-focus-border-color__lt,
+      "custom-file-disabled-bg":                               $custom-file-disabled-bg__lt,
+      "custom-file-color":                                     $custom-file-color__lt,
+      "custom-file-bg":                                        $custom-file-bg__lt,
+      "custom-file-border-color":                              $custom-file-border-color__lt,
+      "custom-file-button-color":                              $custom-file-button-color__lt,
+      "custom-file-button-bg":                                 $custom-file-button-bg__lt
+    )
+  )
+);

@@ -1,0 +1,74 @@
+//
+// CoreUI 3.x Color system
+//
+
+$white-legacy-theme:  #fff !default;
+$black__lt:  #000 !default;
+
+$gray-base__lt:  #181b1e !default;
+$gray-100__lt:  #f0f3f5 !default;
+$gray-200__lt:  #e4e7ea !default;
+$gray-300__lt:  #c8ced3 !default;
+$gray-400__lt:  #acb4bc !default;
+$gray-500__lt:  #8f9ba6 !default;
+$gray-600__lt:  #73818f !default;
+$gray-700__lt:  #5c6873 !default;
+$gray-800__lt:  #2f353a !default;
+$gray-900__lt:  #23282c !default;
+
+$grays-legacy-theme: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$grays-legacy-theme: map-merge(
+  (
+    "100":  $gray-100__lt,
+    "200":  $gray-200__lt,
+    "300":  $gray-300__lt,
+    "400":  $gray-400__lt,
+    "500":  $gray-500__lt,
+    "600":  $gray-600__lt,
+    "700":  $gray-700__lt,
+    "800":  $gray-800__lt,
+    "900":  $gray-900__lt
+  ),
+  $grays-legacy-theme
+);
+
+$primary__lt:    #20a8d8 !default;
+$secondary__lt:  #c8ced3 !default;
+$success__lt:    #4dbd74 !default;
+$info__lt:       #63c2de !default;
+$warning__lt:    #ffc107 !default;
+$danger__lt:     #f86c6b !default;
+$light__lt:      #f0f3f5 !default;
+$dark__lt:       #2f353a !default;
+
+$theme-colors-legacy-theme: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-colors-legacy-theme: map-merge(
+  (
+    "primary":    $primary__lt,
+    "secondary":  $secondary__lt,
+    "success":    $success__lt,
+    "info":       $info__lt,
+    "warning":    $warning__lt,
+    "danger":     $danger__lt,
+    "light":      $light__lt,
+    "dark":       $dark__lt
+  ),
+  $theme-colors-legacy-theme
+);
+
+// Customize the light and dark text colors for use in our YIQ color contrast function.
+$yiq-text-dark__lt:   $gray-base__lt !default;
+$yiq-text-light__lt:  $white !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$yiq-theme-map: map-merge(
+  $yiq-theme-map,
+  (
+    legacy: (
+      "yiq-text-dark":  $yiq-text-dark__lt,
+      "yiq-text-light":  $yiq-text-light__lt
+    )
+  ),
+);

@@ -1,0 +1,42 @@
+// Legacy Theme
+
+$table-color__lt:         $body-color__lt !default;
+$table-bg__lt:            null !default;
+$table-accent-bg__lt:     rgba($black__lt, .05) !default;
+$table-hover-color__lt:   $table-color__lt !default;
+$table-hover-bg__lt:      rgba($black__lt, .075) !default;
+$table-active-bg__lt:     $table-hover-bg__lt !default;
+$table-border-color__lt:  $border-color__lt !default;
+$table-head-bg__lt:       $gray-200__lt !default;
+$table-head-color__lt:    $gray-700__lt !default;
+
+$table-dark-color__lt:         $white !default;
+$table-dark-bg__lt:            $gray-800__lt !default;
+$table-dark-accent-bg__lt:     rgba($white, .05) !default;
+$table-dark-hover-color__lt:   $table-dark-color__lt !default;
+$table-dark-hover-bg__lt:      rgba($white, .075) !default;
+$table-dark-border-color__lt:  lighten($table-dark-bg__lt, 7.5%) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$table-theme-map: map-merge(
+  $table-theme-map,
+  (
+    legacy: (
+      "table-color":              $table-color__lt,
+      "table-bg":                 $table-bg__lt,
+      "table-accent-bg":          $table-accent-bg__lt,
+      "table-hover-color":        $table-hover-color__lt,
+      "table-hover-bg":           $table-hover-bg__lt,
+      "table-active-bg":          $table-active-bg__lt,
+      "table-border-color":       $table-border-color__lt,
+      "table-head-bg":            $table-head-bg__lt,
+      "table-head-color":         $table-head-color__lt,
+      "table-dark-color":         $table-dark-color__lt,
+      "table-dark-bg":            $table-dark-bg__lt,
+      "table-dark-accent-bg":     $table-dark-accent-bg__lt,
+      "table-dark-hover-color":   $table-dark-hover-color__lt,
+      "table-dark-hover-bg":      $table-dark-hover-bg__lt,
+      "table-dark-border-color":  $table-dark-border-color__lt
+    )
+  )
+);

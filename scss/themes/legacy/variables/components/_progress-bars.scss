@@ -1,0 +1,18 @@
+// Legacy theme
+
+$progress-bg__lt:         $gray-100__lt !default;
+$progress-bar-color__lt:  $white !default;
+$progress-bar-bg__lt:     $primary__lt !default;
+
+$progress-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$progress-theme-map: map-merge(
+  $progress-theme-map,
+  (
+    legacy: (
+      "progress-bg":         $progress-bg__lt,
+      "progress-bar-color":  $progress-bar-color__lt,
+      "progress-bar-bg":     $progress-bar-bg__lt
+    )
+  )
+);

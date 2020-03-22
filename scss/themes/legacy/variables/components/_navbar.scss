@@ -1,0 +1,63 @@
+// Legacy theme
+
+$navbar-dark-color__lt:                 rgba($white, .5) !default;
+$navbar-dark-hover-color__lt:           rgba($white, .75) !default;
+$navbar-dark-active-color__lt:          $white !default;
+$navbar-dark-disabled-color__lt:        rgba($white, .25) !default;
+$navbar-dark-toggler-icon-bg__lt:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color__lt}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+$navbar-dark-toggler-border-color__lt:  rgba($white, .1) !default;
+
+$navbar-light-color__lt:                 rgba($black__lt, .5) !default;
+$navbar-light-hover-color__lt:           rgba($black__lt, .7) !default;
+$navbar-light-active-color__lt:          rgba($black__lt, .9) !default;
+$navbar-light-disabled-color__lt:        rgba($black__lt, .3) !default;
+$navbar-light-toggler-icon-bg__lt:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color__lt}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+$navbar-light-toggler-border-color__lt:  rgba($black__lt, .1) !default;
+
+$navbar-light-brand-color__lt:        $navbar-light-active-color__lt !default;
+$navbar-light-brand-hover-color__lt:  $navbar-light-active-color__lt !default;
+$navbar-dark-brand-color__lt:         $navbar-dark-active-color__lt !default;
+$navbar-dark-brand-hover-color__lt:   $navbar-dark-active-color__lt !default;
+
+$navbar-variants-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$navbar-variants-map: map-merge(
+  (
+    dark: (
+      "navbar-color":                 $navbar-dark-color__lt,
+      "navbar-hover-color":           $navbar-dark-hover-color__lt,
+      "navbar-active-color":          $navbar-dark-active-color__lt,
+      "navbar-disabled-color":        $navbar-dark-disabled-color__lt,
+      "navbar-toggler-icon-bg":       $navbar-dark-toggler-icon-bg__lt,
+      "navbar-toggler-border-color":  $navbar-dark-toggler-border-color__lt,
+      "navbar-brand-color":           $navbar-dark-brand-color__lt,
+      "navbar-brand-hover-color":     $navbar-dark-brand-hover-color__lt
+    ),
+    light: (
+      "navbar-color":                 $navbar-light-color__lt,
+      "navbar-hover-color":           $navbar-light-hover-color__lt,
+      "navbar-active-color":          $navbar-light-active-color__lt,
+      "navbar-disabled-color":        $navbar-light-disabled-color__lt,
+      "navbar-toggler-icon-bg":       $navbar-light-toggler-icon-bg__lt,
+      "navbar-toggler-border-color":  $navbar-light-toggler-border-color__lt,
+      "navbar-brand-color":           $navbar-light-brand-color__lt,
+      "navbar-brand-hover-color":     $navbar-light-brand-hover-color__lt
+    )
+  ),
+  $navbar-variants-map
+);
+
+$navbar-default-variant: null !default;
+$navbar-variants: (
+  default:  $navbar-default-variant,
+  map:      $navbar-variants-map
+) !default;
+
+$navbar-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$navbar-theme-map: map-merge(
+  $navbar-theme-map,
+  (
+    legacy:  $navbar-variants
+  )
+);

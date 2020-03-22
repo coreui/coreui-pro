@@ -1,0 +1,23 @@
+
+// Legacy theme
+
+$modal-content-color_lt:         null !default;
+$modal-content-bg_lt:            $white !default;
+$modal-content-border-color_lt:  rgba($black__lt, .2) !default;
+$modal-header-border-color_lt:   $border-color__lt !default;
+$modal-footer-border-color_lt:   $modal-header-border-color_lt !default;
+
+$modal-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$modal-theme-map: map-merge(
+  $modal-theme-map,
+  (
+    legacy: (
+      "modal-content-color":         $modal-content-color_lt,
+      "modal-content-bg":            $modal-content-bg_lt,
+      "modal-content-border-color":  $modal-content-border-color_lt,
+      "modal-header-border-color":   $modal-header-border-color_lt,
+      "modal-footer-border-color":   $modal-footer-border-color_lt
+    )
+  )
+);

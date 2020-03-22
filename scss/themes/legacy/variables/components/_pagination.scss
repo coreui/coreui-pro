@@ -1,0 +1,41 @@
+// Legacy theme
+
+$pagination-color__lt:                  $link-color__lt !default;
+$pagination-bg__lt:                     $white !default;
+$pagination-border-color__lt:           $border-color__lt !default;
+$pagination-focus-box-shadow__lt:       $input-btn-focus-box-shadow !default; //TODO: check this variable
+$pagination-focus-outline__lt:          0 !default;
+$pagination-hover-color__lt:            $link-hover-color__lt !default;
+$pagination-hover-bg__lt:               $gray-200__lt !default;
+$pagination-hover-border-color__lt:     $gray-300__lt !default;
+$pagination-active-color__lt:           $component-active-color__lt !default;
+$pagination-active-bg__lt:              $component-active-bg__lt !default;
+$pagination-active-border-color__lt:    $pagination-active-bg__lt !default;
+$pagination-disabled-color__lt:         $gray-600__lt !default;
+$pagination-disabled-bg__lt:            $white !default;
+$pagination-disabled-border-color__lt:  $gray-300__lt !default;
+
+$pagination-theme-map: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$pagination-theme-map: map-merge(
+  $pagination-theme-map,
+  (
+    legacy: (
+      "pagination-color":                  $pagination-color__lt,
+      "pagination-bg":                     $pagination-bg__lt,
+      "pagination-border-color":           $pagination-border-color__lt,
+      "pagination-focus-box-shadow":       $pagination-focus-box-shadow__lt,
+      "pagination-focus-outline":          $pagination-focus-outline__lt,
+      "pagination-hover-color":            $pagination-hover-color__lt,
+      "pagination-hover-bg":               $pagination-hover-bg__lt,
+      "pagination-hover-border-color":     $pagination-hover-border-color__lt,
+      "pagination-active-color":           $pagination-active-color__lt,
+      "pagination-active-bg":              $pagination-active-bg__lt,
+      "pagination-active-border-color":    $pagination-active-border-color__lt,
+      "pagination-disabled-color":         $pagination-disabled-color__lt,
+      "pagination-disabled-bg":            $pagination-disabled-bg__lt,
+      "pagination-disabled-border-color":  $pagination-disabled-border-color__lt
+    )
+  )
+);
+

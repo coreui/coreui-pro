@@ -1,0 +1,17 @@
+// Body
+//
+// Settings for the `<body>` element.
+
+$body-bg__lt:     #e4e5e6 !default;
+$body-color__lt:  $gray-900__lt !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$body-theme-map: map-merge(
+  $body-theme-map,
+  (
+    legacy: (
+      "body-bg":     $body-bg__lt,
+      "body-color":  $body-color__lt
+    )
+  )
+);

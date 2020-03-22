@@ -1,0 +1,17 @@
+// Links
+//
+// Style anchor elements.
+
+$link-color__lt:        $primary__lt !default;
+$link-hover-color__lt:  darken($link-color__lt, 15%) !default;
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$link-theme-map: map-merge(
+  $link-theme-map,
+  (
+    legacy: (
+      "link-color":        $link-color__lt,
+      "link-hover-color":  $link-hover-color__lt
+    )
+  ),
+);
