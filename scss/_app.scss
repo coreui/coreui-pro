@@ -8,8 +8,7 @@
   @include themes($body-theme-map, $create: append) {
     color: themes-get-value("body-color");
     background-color: themes-get-value("body-bg");
-    $color: themes-get-value("body-color");
 
-    --color: #{$color};
+    --color: #{themes-get-value("body-color")};
   }
 }
