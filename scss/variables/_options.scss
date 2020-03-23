@@ -31,9 +31,10 @@ $default-themes: () !default;
 $default-themes: map-merge(
   (
     default: (
-      "default":      true,
-      "theme-colors": $theme-colors,
-      "grays":        $grays
+      "default":       true,
+      "theme-colors":  $theme-colors,
+      "grays":         $grays,
+      "gradients":     $theme-gradients
     )
   ),
   $default-themes

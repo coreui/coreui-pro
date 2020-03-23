@@ -21,6 +21,14 @@
   }
 }
 
+// @mixin coreui-bg-gradient-variant($parent, $colors) {
+//   #{$parent} {
+//     background: map-get($colors, "stop") !important;
+//     background: linear-gradient(45deg, map-get($colors, "start") 0%, map-get($colors, "stop") 100%) !important;
+//     border-color: map-get($colors, "stop") !important;
+//   }
+// }
+
 @mixin coreui-bg-gradient-variant($parent, $colors) {
   #{$parent} {
     background: map-get($colors, "stop") !important;
@@ -29,10 +37,10 @@
   }
 }
 
-@mixin coreui-bg-gradient-variant-dark-theme($parent, $colors) {
-  #{$parent} {
-    background: desaturate(map-get($colors, "stop"), 20%) !important;
-    background: linear-gradient(45deg, desaturate(map-get($colors, "start"), 20%) 0%, desaturate(map-get($colors, "stop"), 20%) 100%) !important;
-    border-color: desaturate(map-get($colors, "stop"), 20%) !important;
-  }
-}
+// @mixin coreui-bg-gradient-variant-dark-theme($parent, $colors) {
+//   #{$parent} {
+//     background: desaturate(map-get($colors, "stop"), 20%) !important;
+//     background: linear-gradient(45deg, desaturate(map-get($colors, "start"), 20%) 0%, desaturate(map-get($colors, "stop"), 20%) 100%) !important;
+//     border-color: desaturate(map-get($colors, "stop"), 20%) !important;
+//   }
+// }
