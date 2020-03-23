@@ -1,5 +1,5 @@
 :root {
-  @each $color, $value in $theme-colors-dark-theme {
+  @each $color, $value in $theme-colors__dt {
     --#{$color}-dark-theme: #{$value};
   }
 }

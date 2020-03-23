@@ -1,0 +1,59 @@
+//
+// CoreUI default gradients
+//
+
+$primary-gradient__dt: (
+  "start":  desaturate(#321fdb, 20%),
+  "stop":   desaturate(#1f1498, 20%)
+) !default;
+
+$secondary-gradient__dt: (
+  "start":  desaturate(#c8d2dc, 20%),
+  "stop":    desaturate($white, 20%)
+) !default;
+
+$light-gradient__dt: (
+  "start":  desaturate(#e3e8ed, 20%),
+  "stop":    desaturate($white, 20%)
+) !default;
+
+$dark-gradient__dt: (
+  "start":  desaturate(#3c4b64, 20%),
+  "stop":   desaturate(#212333, 20%)
+) !default;
+
+$danger-gradient__dt: (
+  "start":  desaturate(#e55353, 20%),
+  "stop":   desaturate(#d93737, 20%)
+) !default;
+
+$warning-gradient__dt: (
+  "start":  desaturate(#f9b115, 20%),
+  "stop":   desaturate(#f6960b, 20%)
+) !default;
+
+$success-gradient__dt: (
+  "start":  desaturate(#2eb85c, 20%),
+  "stop":   desaturate(#1b9e3e, 20%)
+) !default;
+
+$info-gradient__dt: (
+  "start":  desaturate(#39f, 20%),
+  "stop":   desaturate(#2982cc, 20%)
+) !default;
+
+$theme-gradients__dt: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$theme-gradients__dt: map-merge(
+  (
+    "primary":    $primary-gradient__dt,
+    "secondary":  $secondary-gradient__dt,
+    "success":    $success-gradient__dt,
+    "info":       $info-gradient__dt,
+    "warning":    $warning-gradient__dt,
+    "danger":     $danger-gradient__dt,
+    "light":      $light-gradient__dt,
+    "dark":       $dark-gradient__dt
+  ),
+  $theme-gradients__dt
+);

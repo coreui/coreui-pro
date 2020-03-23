@@ -3,11 +3,11 @@
 //
 
 // Dark theme
-$card-dark-border-color:  $border-dark-theme-color !default;
-$card-dark-cap-bg:        $gray-dark-theme-700 !default;
+$card-dark-border-color:  $border-color__dt !default;
+$card-dark-cap-bg:        $gray-700__dt !default;
 $card-dark-cap-color:     null !default;
 $card-dark-color:         null !default;
-$card-dark-bg:            $gray-dark-theme-600 !default;
+$card-dark-bg:            $gray-600__dt !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $card-theme-map: map-merge(

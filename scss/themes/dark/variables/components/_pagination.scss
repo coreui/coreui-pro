@@ -2,40 +2,40 @@
 // Pagination
 
 // Dark theme
-$pagination-dark-theme-color:                  $link-color !default;
-$pagination-dark-theme-bg:                     $gray-800 !default;
-$pagination-dark-theme-border-color:           $border-dark-theme-color !default;
-$pagination-dark-theme-focus-box-shadow:       $input-btn-focus-box-shadow !default;
-$pagination-dark-theme-focus-outline:          0 !default;
-$pagination-dark-theme-hover-color:            $link-hover-color !default;
-$pagination-dark-theme-hover-bg:               $gray-900 !default;
-$pagination-dark-theme-hover-border-color:     $gray-900 !default;
-$pagination-dark-theme-active-color:           $component-dark-theme-active-color !default;
-$pagination-dark-theme-active-bg:              $component-dark-theme-active-bg !default;
-$pagination-dark-theme-active-border-color:    $pagination-active-bg !default;
-$pagination-dark-theme-disabled-color:         $gray-600 !default;
-$pagination-dark-theme-disabled-bg:            $gray-900 !default;
-$pagination-dark-theme-disabled-border-color:  $gray-900 !default;
+$pagination-color__dt:                  $link-color !default;
+$pagination-bg__dt:                     $gray-800 !default;
+$pagination-border-color__dt:           $border-color__dt !default;
+$pagination-focus-box-shadow__dt:       $input-btn-focus-box-shadow !default;
+$pagination-focus-outline__dt:          0 !default;
+$pagination-hover-color__dt:            $link-hover-color !default;
+$pagination-hover-bg__dt:               $gray-900 !default;
+$pagination-hover-border-color__dt:     $gray-900 !default;
+$pagination-active-color__dt:           $component-active-color__dt !default;
+$pagination-active-bg__dt:              $component-active-bg__dt !default;
+$pagination-active-border-color__dt:    $pagination-active-bg !default;
+$pagination-disabled-color__dt:         $gray-600 !default;
+$pagination-disabled-bg__dt:            $gray-900 !default;
+$pagination-disabled-border-color__dt:  $gray-900 !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $pagination-theme-map: map-merge(
   $pagination-theme-map,
   (
     dark: (
-      "pagination-color":                  $pagination-dark-theme-color,
-      "pagination-bg":                     $pagination-dark-theme-bg,
-      "pagination-border-color":           $pagination-dark-theme-border-color,
-      "pagination-focus-box-shadow":       $pagination-dark-theme-focus-box-shadow,
-      "pagination-focus-outline":          $pagination-dark-theme-focus-outline,
-      "pagination-hover-color":            $pagination-dark-theme-hover-color,
-      "pagination-hover-bg":               $pagination-dark-theme-hover-bg,
-      "pagination-hover-border-color":     $pagination-dark-theme-hover-border-color,
-      "pagination-active-color":           $pagination-dark-theme-active-color,
-      "pagination-active-bg":              $pagination-dark-theme-active-bg,
-      "pagination-active-border-color":    $pagination-dark-theme-active-border-color,
-      "pagination-disabled-color":         $pagination-dark-theme-disabled-color,
-      "pagination-disabled-bg":            $pagination-dark-theme-disabled-bg,
-      "pagination-disabled-border-color":  $pagination-dark-theme-disabled-border-color
+      "pagination-color":                  $pagination-color__dt,
+      "pagination-bg":                     $pagination-bg__dt,
+      "pagination-border-color":           $pagination-border-color__dt,
+      "pagination-focus-box-shadow":       $pagination-focus-box-shadow__dt,
+      "pagination-focus-outline":          $pagination-focus-outline__dt,
+      "pagination-hover-color":            $pagination-hover-color__dt,
+      "pagination-hover-bg":               $pagination-hover-bg__dt,
+      "pagination-hover-border-color":     $pagination-hover-border-color__dt,
+      "pagination-active-color":           $pagination-active-color__dt,
+      "pagination-active-bg":              $pagination-active-bg__dt,
+      "pagination-active-border-color":    $pagination-active-border-color__dt,
+      "pagination-disabled-color":         $pagination-disabled-color__dt,
+      "pagination-disabled-bg":            $pagination-disabled-bg__dt,
+      "pagination-disabled-border-color":  $pagination-disabled-border-color__dt
     )
   )
 );

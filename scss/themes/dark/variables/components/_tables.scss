@@ -3,43 +3,43 @@
 // Customizes the `.table` component with basic values, each used across all table variations.
 
 // Dark Theme
-$table-dark-theme-color:         $body-dark-theme-color !default;
-$table-dark-theme-bg:            transparent !default;
-$table-dark-theme-accent-bg:     rgba($black, .05) !default;
-$table-dark-theme-hover-color:   $body-dark-theme-color !default;
-$table-dark-theme-hover-bg:      rgba($white, .1) !default;
-$table-dark-theme-active-bg:     rgba($white, .075) !default;
-$table-dark-theme-border-color:  $gray-900 !default;
-$table-dark-theme-head-bg:       $gray-800 !default;
-$table-dark-theme-head-color:    $body-dark-theme-color !default;
+$table-color__dt:         $body-color__dt !default;
+$table-bg__dt:            transparent !default;
+$table-accent-bg__dt:     rgba($black, .05) !default;
+$table-hover-color__dt:   $body-color__dt !default;
+$table-hover-bg__dt:      rgba($white, .1) !default;
+$table-active-bg__dt:     rgba($white, .075) !default;
+$table-border-color__dt:  $gray-900 !default;
+$table-head-bg__dt:       $gray-800 !default;
+$table-head-color__dt:    $body-color__dt !default;
 
-$table-dark-theme-dark-color:         $white !default;
-$table-dark-theme-dark-bg:            rgba($black, .5) !default;
-$table-dark-theme-dark-accent-bg:     rgba($white, .05) !default;
-$table-dark-theme-dark-hover-color:   $table-dark-color !default;
-$table-dark-theme-dark-hover-bg:      rgba($white, .1) !default;
-$table-dark-theme-dark-border-color:  rgba($black, .9) !default;
+$table-dark-color__dt:         $white !default;
+$table-dark-bg__dt:            rgba($black, .5) !default;
+$table-dark-accent-bg__dt:     rgba($white, .05) !default;
+$table-dark-hover-color__dt:   $table-dark-color !default;
+$table-dark-hover-bg__dt:      rgba($white, .1) !default;
+$table-dark-border-color__dt:  rgba($black, .9) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $table-theme-map: map-merge(
   $table-theme-map,
   (
     "dark": (
-      "table-color":              $table-dark-theme-color,
-      "table-bg":                 $table-dark-theme-bg,
-      "table-accent-bg":          $table-dark-theme-accent-bg,
-      "table-hover-color":        $table-dark-theme-hover-color,
-      "table-hover-bg":           $table-dark-theme-hover-bg,
-      "table-active-bg":          $table-dark-theme-active-bg,
-      "table-border-color":       $table-dark-theme-border-color,
-      "table-head-bg":            $table-dark-theme-head-bg,
-      "table-head-color":         $table-dark-theme-head-color,
-      "table-dark-color":         $table-dark-theme-dark-color,
-      "table-dark-bg":            $table-dark-theme-dark-bg,
-      "table-dark-accent-bg":     $table-dark-theme-dark-accent-bg,
-      "table-dark-hover-color":   $table-dark-theme-dark-hover-color,
-      "table-dark-hover-bg":      $table-dark-theme-dark-hover-bg,
-      "table-dark-border-color":  $table-dark-theme-dark-border-color
+      "table-color":              $table-color__dt,
+      "table-bg":                 $table-bg__dt,
+      "table-accent-bg":          $table-accent-bg__dt,
+      "table-hover-color":        $table-hover-color__dt,
+      "table-hover-bg":           $table-hover-bg__dt,
+      "table-active-bg":          $table-active-bg__dt,
+      "table-border-color":       $table-border-color__dt,
+      "table-head-bg":            $table-head-bg__dt,
+      "table-head-color":         $table-head-color__dt,
+      "table-dark-color":         $table-dark-color__dt,
+      "table-dark-bg":            $table-dark-bg__dt,
+      "table-dark-accent-bg":     $table-dark-accent-bg__dt,
+      "table-dark-hover-color":   $table-dark-hover-color__dt,
+      "table-dark-hover-bg":      $table-dark-hover-bg__dt,
+      "table-dark-border-color":  $table-dark-border-color__dt
     )
   )
 );

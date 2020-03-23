@@ -1,33 +1,33 @@
 // Footer
 
 // Dark Theme
-$footer-dark-theme-dark-bg:       $gray-dark-theme-800 !default;
-$footer-dark-theme-dark-color:    $body-dark-theme-color !default;
-$footer-dark-theme-dark-borders:  ( top: 1px solid $gray-dark-theme-900 ) !default;
+$footer-dark-bg__dt:       $gray-800__dt !default;
+$footer-dark-color__dt:    $body-color__dt !default;
+$footer-dark-borders__dt:  ( top: 1px solid $gray-900__dt ) !default;
 
-$footer-dark-theme-variants-map: () !default;
+$footer-variants-map__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$footer-dark-theme-variants-map: map-merge(
+$footer-variants-map__dt: map-merge(
   (
     dark: (
-      "footer-bg":       $footer-dark-theme-dark-bg,
-      "footer-color":    $footer-dark-theme-dark-color,
-      "footer-borders":  $footer-dark-theme-dark-borders
+      "footer-bg":       $footer-dark-bg__dt,
+      "footer-color":    $footer-dark-color__dt,
+      "footer-borders":  $footer-dark-borders__dt
     )
   ),
-  $footer-dark-theme-variants-map
+  $footer-variants-map__dt
 );
 
-$footer-dark-theme-default-variant: "dark" !default;
-$footer-dark-theme-variants: (
-  "default":  $footer-dark-theme-default-variant,
-  "map":      $footer-dark-theme-variants-map
+$footer-default-variant__dt: "dark" !default;
+$footer-variants__dt: (
+  "default":  $footer-default-variant__dt,
+  "map":      $footer-variants-map__dt
 ) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $footer-theme-map: map-merge(
   $footer-theme-map,
   (
-    dark:  $footer-dark-theme-variants
+    dark:  $footer-variants__dt
   )
 );

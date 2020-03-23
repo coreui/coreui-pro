@@ -1,23 +1,23 @@
 // Dark theme
-$toast-dark-theme-background-color:  $gray-dark-theme-100 !default;
-$toast-dark-theme-color:             $body-dark-theme-color !default;
-$toast-dark-theme-border-color:      transparent !default;
+$toast-background-color__dt:  $gray-100__dt !default;
+$toast-color__dt:             $body-color__dt !default;
+$toast-border-color__dt:      transparent !default;
 
-$toast-dark-theme-header-color:             $body-dark-theme-color !default;
-$toast-dark-theme-header-background-color:  $gray-dark-theme-100 !default;
-$toast-dark-theme-header-border-color:      rgba($black, .2) !default;
+$toast-header-color__dt:             $body-color__dt !default;
+$toast-header-background-color__dt:  $gray-100__dt !default;
+$toast-header-border-color__dt:      rgba($black, .2) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $toast-theme-map: map-merge(
   $toast-theme-map,
   (
     dark: (
-      "toast-background-color":         $toast-dark-theme-background-color,
-      "toast-color":                    $toast-dark-theme-color,
-      "toast-border-color":             $toast-dark-theme-border-color,
-      "toast-header-color":             $toast-dark-theme-header-color,
-      "toast-header-background-color":  $toast-dark-theme-header-background-color,
-      "toast-header-border-color":      $toast-dark-theme-header-border-color
+      "toast-background-color":         $toast-background-color__dt,
+      "toast-color":                    $toast-color__dt,
+      "toast-border-color":             $toast-border-color__dt,
+      "toast-header-color":             $toast-header-color__dt,
+      "toast-header-background-color":  $toast-header-background-color__dt,
+      "toast-header-border-color":      $toast-header-border-color__dt
     )
   )
 );

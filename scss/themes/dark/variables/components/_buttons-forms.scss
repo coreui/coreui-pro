@@ -3,36 +3,36 @@
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
 // Dark theme
-$input-dark-theme-bg:                        rgba($white, .1) !default;
-$input-dark-theme-disabled-bg:               rgba($white, .05) !default;
-$input-dark-theme-color:                     $body-dark-theme-color !default;
-$input-dark-theme-border-color:              rgba($white, .15) !default;
-$input-dark-theme-focus-bg:                  rgba($white, .15) !default;
-$input-dark-theme-focus-border-color:        rgba($white, .2) !default;
-$input-dark-theme-focus-color:               $body-dark-theme-color !default;
-$input-placeholder-dark-theme-color:         rgba($body-dark-theme-color, .25) !default;
-$input-plaintext-dark-theme-color:           $body-dark-theme-color !default;
-$input-group-addon-dark-theme-color:         rgba($body-dark-theme-color, .5) !default;
-$input-group-addon-dark-theme-bg:            $gray-dark-theme-900 !default;
-$input-group-addon-dark-theme-border-color:  $gray-dark-theme-900 !default;
+$input-bg__dt:                        rgba($white, .1) !default;
+$input-disabled-bg__dt:               rgba($white, .05) !default;
+$input-color__dt:                     $body-color__dt !default;
+$input-border-color__dt:              rgba($white, .15) !default;
+$input-focus-bg__dt:                  rgba($white, .15) !default;
+$input-focus-border-color__dt:        rgba($white, .2) !default;
+$input-focus-color__dt:               $body-color__dt !default;
+$input-placeholder-color__dt:         rgba($body-color__dt, .25) !default;
+$input-plaintext-color__dt:           $body-color__dt !default;
+$input-group-addon-color__dt:         rgba($body-color__dt, .5) !default;
+$input-group-addon-bg__dt:            $gray-900__dt !default;
+$input-group-addon-border-color__dt:  $gray-900__dt !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $form-theme-map: map-merge(
   $form-theme-map,
   (
     dark: (
-      "input-bg":                        $input-dark-theme-bg,
-      "input-disabled-bg":               $input-dark-theme-disabled-bg,
-      "input-color":                     $input-dark-theme-color,
-      "input-border-color":              $input-dark-theme-border-color,
-      "input-focus-bg":                  $input-dark-theme-focus-bg,
-      "input-focus-border-color":        $input-dark-theme-focus-border-color,
-      "input-focus-color":               $input-dark-theme-focus-color,
-      "input-placeholder-color":         $input-placeholder-dark-theme-color,
-      "input-plaintext-color":           $input-plaintext-dark-theme-color,
-      "input-group-addon-color":         $input-group-addon-dark-theme-color,
-      "input-group-addon-bg":            $input-group-addon-dark-theme-bg,
-      "input-group-addon-border-color":  $input-group-addon-dark-theme-border-color
+      "input-bg":                        $input-bg__dt,
+      "input-disabled-bg":               $input-disabled-bg__dt,
+      "input-color":                     $input-color__dt,
+      "input-border-color":              $input-border-color__dt,
+      "input-focus-bg":                  $input-focus-bg__dt,
+      "input-focus-border-color":        $input-focus-border-color__dt,
+      "input-focus-color":               $input-focus-color__dt,
+      "input-placeholder-color":         $input-placeholder-color__dt,
+      "input-plaintext-color":           $input-plaintext-color__dt,
+      "input-group-addon-color":         $input-group-addon-color__dt,
+      "input-group-addon-bg":            $input-group-addon-bg__dt,
+      "input-group-addon-border-color":  $input-group-addon-border-color__dt
     )
   )
 );

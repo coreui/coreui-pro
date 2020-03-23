@@ -2,37 +2,37 @@
 // CoreUI 3.x Color system
 //
 
-$gray-dark-theme-base:  desaturate(#08091a, 10%) !default;
-$gray-dark-theme-100:   desaturate(#313243, 10%) !default;
-$gray-dark-theme-200:   desaturate(#2e2f40, 10%) !default;
-$gray-dark-theme-300:   desaturate(#2c2d3e, 10%) !default;
-$gray-dark-theme-400:   desaturate(#272839, 10%) !default;
-$gray-dark-theme-500:   desaturate(#242536, 10%) !default;
-$gray-dark-theme-600:   desaturate(#1f2031, 10%) !default;
-$gray-dark-theme-700:   desaturate(#1c1d2e, 10%) !default;
-$gray-dark-theme-800:   desaturate(#1a1b2c, 10%) !default;
-$gray-dark-theme-900:   desaturate(#151627, 10%) !default;
+$gray-base__dt:  desaturate(#08091a, 10%) !default;
+$gray-100__dt:   desaturate(#313243, 10%) !default;
+$gray-200__dt:   desaturate(#2e2f40, 10%) !default;
+$gray-300__dt:   desaturate(#2c2d3e, 10%) !default;
+$gray-400__dt:   desaturate(#272839, 10%) !default;
+$gray-500__dt:   desaturate(#242536, 10%) !default;
+$gray-600__dt:   desaturate(#1f2031, 10%) !default;
+$gray-700__dt:   desaturate(#1c1d2e, 10%) !default;
+$gray-800__dt:   desaturate(#1a1b2c, 10%) !default;
+$gray-900__dt:   desaturate(#151627, 10%) !default;
 
-$grays-dark-theme: () !default;
+$grays__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$grays-dark-theme: map-merge(
+$grays__dt: map-merge(
   (
-    "100":  $gray-dark-theme-100,
-    "200":  $gray-dark-theme-200,
-    "300":  $gray-dark-theme-300,
-    "400":  $gray-dark-theme-400,
-    "500":  $gray-dark-theme-500,
-    "600":  $gray-dark-theme-600,
-    "700":  $gray-dark-theme-700,
-    "800":  $gray-dark-theme-800,
-    "900":  $gray-dark-theme-900
+    "100":  $gray-100__dt,
+    "200":  $gray-200__dt,
+    "300":  $gray-300__dt,
+    "400":  $gray-400__dt,
+    "500":  $gray-500__dt,
+    "600":  $gray-600__dt,
+    "700":  $gray-700__dt,
+    "800":  $gray-800__dt,
+    "900":  $gray-900__dt
   ),
-  $grays-dark-theme
+  $grays__dt
 );
 
-$theme-colors-dark-theme: () !default;
+$theme-colors__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$theme-colors-dark-theme: map-merge(
+$theme-colors__dt: map-merge(
   (
     "primary":    desaturate($primary, 20%),
     "secondary":  desaturate($secondary, 20%),
@@ -40,23 +40,23 @@ $theme-colors-dark-theme: map-merge(
     "info":       desaturate($info, 20%),
     "warning":    desaturate($warning, 20%),
     "danger":     desaturate($danger, 20%),
-    "light":      $gray-dark-theme-700,
-    "dark":       $gray-dark-theme-900
+    "light":      $gray-700__dt,
+    "dark":       $gray-900__dt
   ),
-  $theme-colors-dark-theme
+  $theme-colors__dt
 );
 
 // Customize the light and dark text colors for use in our YIQ color contrast function.
-$yiq-dark-theme-text-dark:   $gray-dark-theme-base !default;
-$yiq-dark-theme-text-light:  $white !default;
+$yiq-text-dark__dt:   $gray-base__dt !default;
+$yiq-text-light__dt:  $white !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $yiq-theme-map: map-merge(
   $yiq-theme-map,
   (
     dark: (
-      "yiq-text-dark":  $yiq-dark-theme-text-dark,
-      "yiq-text-light":  $yiq-dark-theme-text-light
+      "yiq-text-dark":  $yiq-text-dark__dt,
+      "yiq-text-light":  $yiq-text-light__dt
     )
   ),
 );

@@ -1,38 +1,38 @@
 // List group
 
 // Dark theme
-$list-group-dark-theme-color:                $body-dark-theme-color !default;
-$list-group-dark-theme-bg:                   inherit !default;
-$list-group-dark-theme-border-color:         $border-dark-theme-color !default;
-$list-group-dark-theme-hover-bg:             $gray-800 !default;
-$list-group-dark-theme-active-color:         $component-active-color !default;
-$list-group-dark-theme-active-bg:            $component-active-bg !default;
-$list-group-dark-theme-active-border-color:  $list-group-dark-theme-active-bg !default;
-$list-group-dark-theme-disabled-color:       $gray-600 !default;
-$list-group-dark-theme-disabled-bg:          $gray-800 !default;
-$list-group-dark-theme-action-color:         $body-dark-theme-color !default;
-$list-group-dark-theme-action-hover-color:   $body-dark-theme-color !default;
-$list-group-dark-theme-action-active-color:  $body-dark-theme-color !default;
-$list-group-dark-theme-action-active-bg:     $gray-900 !default;
+$list-group-color__dt:                $body-color__dt !default;
+$list-group-bg__dt:                   inherit !default;
+$list-group-border-color__dt:         $border-color__dt !default;
+$list-group-hover-bg__dt:             $gray-800 !default;
+$list-group-active-color__dt:         $component-active-color !default;
+$list-group-active-bg__dt:            $component-active-bg !default;
+$list-group-active-border-color__dt:  $list-group-active-bg__dt !default;
+$list-group-disabled-color__dt:       $gray-600 !default;
+$list-group-disabled-bg__dt:          $gray-800 !default;
+$list-group-action-color__dt:         $body-color__dt !default;
+$list-group-action-hover-color__dt:   $body-color__dt !default;
+$list-group-action-active-color__dt:  $body-color__dt !default;
+$list-group-action-active-bg__dt:     $gray-900 !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $list-group-theme-map: map-merge(
   $list-group-theme-map,
   (
     dark: (
-      "list-group-color":                $list-group-dark-theme-color,
-      "list-group-bg":                   $list-group-dark-theme-bg,
-      "list-group-border-color":         $list-group-dark-theme-border-color,
-      "list-group-hover-bg":             $list-group-dark-theme-hover-bg,
-      "list-group-active-color":         $list-group-dark-theme-active-color,
-      "list-group-active-bg":            $list-group-dark-theme-active-bg,
-      "list-group-active-border-color":  $list-group-dark-theme-active-border-color,
-      "list-group-disabled-color":       $list-group-dark-theme-disabled-color,
-      "list-group-disabled-bg":          $list-group-dark-theme-disabled-bg,
-      "list-group-action-color":         $list-group-dark-theme-action-color,
-      "list-group-action-hover-color":   $list-group-dark-theme-action-hover-color,
-      "list-group-action-active-color":  $list-group-dark-theme-action-active-color,
-      "list-group-action-active-bg":     $list-group-dark-theme-action-active-bg
+      "list-group-color":                $list-group-color__dt,
+      "list-group-bg":                   $list-group-bg__dt,
+      "list-group-border-color":         $list-group-border-color__dt,
+      "list-group-hover-bg":             $list-group-hover-bg__dt,
+      "list-group-active-color":         $list-group-active-color__dt,
+      "list-group-active-bg":            $list-group-active-bg__dt,
+      "list-group-active-border-color":  $list-group-active-border-color__dt,
+      "list-group-disabled-color":       $list-group-disabled-color__dt,
+      "list-group-disabled-bg":          $list-group-disabled-bg__dt,
+      "list-group-action-color":         $list-group-action-color__dt,
+      "list-group-action-hover-color":   $list-group-action-hover-color__dt,
+      "list-group-action-active-color":  $list-group-action-active-color__dt,
+      "list-group-action-active-bg":     $list-group-action-active-bg__dt
     )
   )
 );

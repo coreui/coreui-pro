@@ -4,34 +4,34 @@
 // Dropdown menu container and contents.
 
 // Dark theme
-$dropdown-dark-theme-color:                $body-dark-theme-color !default;
-$dropdown-dark-theme-bg:                   $gray-dark-theme-200 !default;
-$dropdown-dark-theme-border-color:         $border-dark-theme-color !default;
-$dropdown-dark-theme-divider-bg:           $gray-800 !default;
-$dropdown-dark-theme-link-color:           $body-dark-theme-color !default;
-$dropdown-dark-theme-link-hover-color:     $body-dark-theme-color !default;
-$dropdown-dark-theme-link-hover-bg:        $gray-900 !default;
-$dropdown-dark-theme-link-active-color:    $component-active-color !default;
-$dropdown-dark-theme-link-active-bg:       $component-active-bg !default;
-$dropdown-dark-theme-link-disabled-color:  $gray-600 !default;
-$dropdown-dark-theme-header-color:         $gray-200 !default;
+$dropdown-color__dt:                $body-color__dt !default;
+$dropdown-bg__dt:                   $gray-200__dt !default;
+$dropdown-border-color__dt:         $border-color__dt !default;
+$dropdown-divider-bg__dt:           $gray-800 !default;
+$dropdown-link-color__dt:           $body-color__dt !default;
+$dropdown-link-hover-color__dt:     $body-color__dt !default;
+$dropdown-link-hover-bg__dt:        $gray-900 !default;
+$dropdown-link-active-color__dt:    $component-active-color !default;
+$dropdown-link-active-bg__dt:       $component-active-bg !default;
+$dropdown-link-disabled-color__dt:  $gray-600 !default;
+$dropdown-header-color__dt:         $gray-200 !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $dropdown-theme-map: map-merge(
   $dropdown-theme-map,
   (
     dark: (
-      "dropdown-color":                $dropdown-dark-theme-color,
-      "dropdown-border-color":         $dropdown-dark-theme-border-color,
-      "dropdown-bg":                   $dropdown-dark-theme-bg,
-      "dropdown-divider-bg":           $dropdown-dark-theme-divider-bg,
-      "dropdown-link-color":           $dropdown-dark-theme-link-color,
-      "dropdown-link-hover-color":     $dropdown-dark-theme-link-hover-color,
-      "dropdown-link-hover-bg":        $dropdown-dark-theme-link-hover-bg,
-      "dropdown-link-active-color":    $dropdown-dark-theme-link-active-color,
-      "dropdown-link-active-bg":       $dropdown-dark-theme-link-active-bg,
-      "dropdown-link-disabled-color":  $dropdown-dark-theme-link-disabled-color,
-      "dropdown-header-color":         $dropdown-dark-theme-header-color
+      "dropdown-color":                $dropdown-color__dt,
+      "dropdown-border-color":         $dropdown-border-color__dt,
+      "dropdown-bg":                   $dropdown-bg__dt,
+      "dropdown-divider-bg":           $dropdown-divider-bg__dt,
+      "dropdown-link-color":           $dropdown-link-color__dt,
+      "dropdown-link-hover-color":     $dropdown-link-hover-color__dt,
+      "dropdown-link-hover-bg":        $dropdown-link-hover-bg__dt,
+      "dropdown-link-active-color":    $dropdown-link-active-color__dt,
+      "dropdown-link-active-bg":       $dropdown-link-active-bg__dt,
+      "dropdown-link-disabled-color":  $dropdown-link-disabled-color__dt,
+      "dropdown-header-color":         $dropdown-header-color__dt
     )
   )
 );

@@ -1,26 +1,26 @@
 // Popovers
 
 // Dark Theme
-$popover-dark-theme-bg:                 $gray-dark-theme-800 !default;
-$popover-dark-theme-border-color:       $gray-dark-theme-900 !default;
-$popover-dark-theme-header-bg:          $gray-dark-theme-900 !default;
-$popover-dark-theme-header-color:       $body-dark-theme-color !default;
-$popover-dark-theme-body-color:         $body-dark-theme-color !default;
-$popover-dark-theme-arrow-color:        $popover-dark-theme-bg !default;
-$popover-dark-theme-arrow-outer-color:  fade-in($popover-dark-theme-border-color, .05) !default;
+$popover-bg__dt:                 $gray-800__dt !default;
+$popover-border-color__dt:       $gray-900__dt !default;
+$popover-header-bg__dt:          $gray-900__dt !default;
+$popover-header-color__dt:       $body-color__dt !default;
+$popover-body-color__dt:         $body-color__dt !default;
+$popover-arrow-color__dt:        $popover-bg__dt !default;
+$popover-arrow-outer-color__dt:  fade-in($popover-border-color__dt, .05) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $popover-theme-map: map-merge(
   $popover-theme-map,
   (
     dark: (
-      "popover-bg":                 $popover-dark-theme-bg,
-      "popover-border-color":       $popover-dark-theme-border-color,
-      "popover-header-bg":          $popover-dark-theme-header-bg,
-      "popover-header-color":       $popover-dark-theme-header-color,
-      "popover-body-color":         $popover-dark-theme-body-color,
-      "popover-arrow-color":        $popover-dark-theme-arrow-color,
-      "popover-arrow-outer-color":  $popover-dark-theme-arrow-outer-color
+      "popover-bg":                 $popover-bg__dt,
+      "popover-border-color":       $popover-border-color__dt,
+      "popover-header-bg":          $popover-header-bg__dt,
+      "popover-header-color":       $popover-header-color__dt,
+      "popover-body-color":         $popover-body-color__dt,
+      "popover-arrow-color":        $popover-arrow-color__dt,
+      "popover-arrow-outer-color":  $popover-arrow-outer-color__dt
     )
   )
 );

@@ -1,13 +1,13 @@
 
 // Options
-$dark-theme-enable-elevations:  false !default;
+$enable-elevations__dt:  false !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $options: map-merge(
   $options,
   (
     dark: (
-      "enable-elevations":  $dark-theme-enable-elevations
+      "enable-elevations":  $enable-elevations__dt
     )
   )
 );
@@ -17,8 +17,9 @@ $default-themes: map-merge(
   (
     dark: (
       "default":       false,
-      "theme-colors":  $theme-colors-dark-theme,
-      "grays":         $grays-dark-theme
+      "theme-colors":  $theme-colors__dt,
+      "grays":         $grays__dt,
+      "gradients":     $theme-gradients__dt
     )
   ),
   $default-themes
