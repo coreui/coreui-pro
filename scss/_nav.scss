@@ -235,14 +235,14 @@
   .show > .nav-link {
     background: transparent;
   }
+}
 
-  @include theme-variant() {
-    &.nav-underline-#{$color} {
-      .nav-link.active,
-      .show > .nav-link {
-        color: $value;
-        border-color: $value;
-      }
+@include theme-variant() {
+  .nav-underline-#{$color} {
+    .nav-link.active,
+    .show > .nav-link {
+      color: $value;
+      border-color: $value;
     }
   }
 }
