@@ -8,7 +8,7 @@ $custom-control-label-disabled-color__dt:  $gray-600 !default;
 
 $custom-control-indicator-checked-color__dt:         $component-active-color__dt !default;
 $custom-control-indicator-checked-bg__dt:            $component-active-bg__dt !default;
-$custom-control-indicator-checked-disabled-bg__dt:   rgba(theme-color("primary"), .5) !default;
+$custom-control-indicator-checked-disabled-bg__dt:   rgba($primary__dt, .5) !default;
 $custom-control-indicator-checked-border-color__dt:  $custom-control-indicator-checked-bg__dt !default;
 
 $custom-control-indicator-focus-border-color__dt:  $input-focus-border-color__dt !default;

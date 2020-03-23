@@ -3,7 +3,7 @@
 
 // Dark theme
 $jumbotron-color__dt:  null !default;
-$jumbotron-bg__dt:     $gray-900 !default;
+$jumbotron-bg__dt:     rgba($white, .1) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $jumbotron-theme-map: map-merge(

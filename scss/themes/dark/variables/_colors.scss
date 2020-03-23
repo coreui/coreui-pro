@@ -30,18 +30,27 @@ $grays__dt: map-merge(
   $grays__dt
 );
 
+$primary__dt:    desaturate($primary, 20%) !default;
+$secondary__dt:  desaturate($secondary, 20%) !default;
+$success__dt:    desaturate($success, 20%) !default;
+$info__dt:       desaturate($info, 20%) !default;
+$warning__dt:    desaturate($warning, 20%) !default;
+$danger__dt:     desaturate($danger, 20%) !default;
+$light__dt:      $gray-700__dt !default;
+$dark__dt:       $gray-900__dt !default;
+
 $theme-colors__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $theme-colors__dt: map-merge(
   (
-    "primary":    desaturate($primary, 20%),
-    "secondary":  desaturate($secondary, 20%),
-    "success":    desaturate($success, 20%),
-    "info":       desaturate($info, 20%),
-    "warning":    desaturate($warning, 20%),
-    "danger":     desaturate($danger, 20%),
-    "light":      $gray-700__dt,
-    "dark":       $gray-900__dt
+    "primary":    $primary__dt,
+    "secondary":  $secondary__dt,
+    "success":    $success__dt,
+    "info":       $info__dt,
+    "warning":    $warning__dt,
+    "danger":     $danger__dt,
+    "light":      $light__dt,
+    "dark":       $dark__dt
   ),
   $theme-colors__dt
 );

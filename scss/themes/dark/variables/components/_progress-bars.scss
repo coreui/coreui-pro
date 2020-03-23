@@ -1,9 +1,9 @@
 // Progress bars
 
 // Dark theme
-$progress-bg__dt:         $gray-700 !default;
+$progress-bg__dt:         rgba($white, .2) !default;
 $progress-bar-color__dt:  $white !default;
-$progress-bar-bg__dt:     theme-color("primary") !default;
+$progress-bar-bg__dt:     $primary__dt !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $progress-theme-map: map-merge(

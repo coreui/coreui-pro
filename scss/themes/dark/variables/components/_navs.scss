@@ -1,7 +1,7 @@
 // Navs
 
 // Dark Theme
-$nav-link-disabled-color__dt:            $gray-900 !default;
+$nav-link-disabled-color__dt:            rgba($white, .5) !default;
 $nav-tabs-border-color__dt:              $gray-600__dt !default;
 $nav-tabs-link-hover-border-color__dt:   $gray-600__dt $gray-600__dt $gray-600__dt !default;
 $nav-tabs-link-active-color__dt:         $body-color__dt !default;
@@ -16,8 +16,8 @@ $nav-tabs-boxed-content-border-radius__dt:  $border-radius !default;
 $nav-tabs-boxed-left-active-border-color__dt:   $gray-600__dt !default;
 $nav-tabs-boxed-right-active-border-color__dt:  $gray-600__dt $gray-600__dt $gray-600__dt $gray-600__dt !default;
 
-$nav-pills-link-active-color__dt:  $component-active-color !default;
-$nav-pills-link-active-bg__dt:     $component-active-bg !default;
+$nav-pills-link-active-color__dt:  $component-active-color__dt !default;
+$nav-pills-link-active-bg__dt:     $component-active-bg__dt !default;
 $nav-divider-color__dt:            $gray-200 !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -31,7 +31,9 @@ $nav-theme-map: map-merge(
       "nav-tabs-link-active-color":                $nav-tabs-link-active-color__dt,
       "nav-tabs-link-active-bg":                   $nav-tabs-link-active-bg__dt,
       "nav-tabs-link-active-border-color":         $nav-tabs-link-active-border-color__dt,
-      "nav-divider-color":                         $nav-divider-color,
+      "nav-divider-color":                         $nav-divider-color__dt,
+      "nav-pills-link-active-color":               $nav-pills-link-active-color__dt,
+      "nav-pills-link-active-bg":                  $nav-pills-link-active-bg__dt,
       "nav-tabs-boxed-link-active-bg":             $nav-tabs-boxed-link-active-bg__dt,
       "nav-tabs-boxed-content-bg":                 $nav-tabs-boxed-content-bg__dt,
       "nav-tabs-boxed-content-border-color":       $nav-tabs-boxed-content-border-color__dt,

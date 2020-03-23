@@ -4,12 +4,12 @@
 $list-group-color__dt:                $body-color__dt !default;
 $list-group-bg__dt:                   inherit !default;
 $list-group-border-color__dt:         $border-color__dt !default;
-$list-group-hover-bg__dt:             $gray-800 !default;
-$list-group-active-color__dt:         $component-active-color !default;
-$list-group-active-bg__dt:            $component-active-bg !default;
+$list-group-hover-bg__dt:             rgba($white, .1) !default;
+$list-group-active-color__dt:         $component-active-color__dt !default;
+$list-group-active-bg__dt:            $component-active-bg__dt !default;
 $list-group-active-border-color__dt:  $list-group-active-bg__dt !default;
-$list-group-disabled-color__dt:       $gray-600 !default;
-$list-group-disabled-bg__dt:          $gray-800 !default;
+$list-group-disabled-color__dt:       rgba($body-color__dt, .5) !default;
+$list-group-disabled-bg__dt:          rgba($border-color__dt, .8) !default;
 $list-group-action-color__dt:         $body-color__dt !default;
 $list-group-action-hover-color__dt:   $body-color__dt !default;
 $list-group-action-active-color__dt:  $body-color__dt !default;

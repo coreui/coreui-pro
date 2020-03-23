@@ -7,14 +7,14 @@
 $dropdown-color__dt:                $body-color__dt !default;
 $dropdown-bg__dt:                   $gray-200__dt !default;
 $dropdown-border-color__dt:         $border-color__dt !default;
-$dropdown-divider-bg__dt:           $gray-800 !default;
+$dropdown-divider-bg__dt:           $border-color__dt !default;
 $dropdown-link-color__dt:           $body-color__dt !default;
 $dropdown-link-hover-color__dt:     $body-color__dt !default;
-$dropdown-link-hover-bg__dt:        $gray-900 !default;
-$dropdown-link-active-color__dt:    $component-active-color !default;
-$dropdown-link-active-bg__dt:       $component-active-bg !default;
-$dropdown-link-disabled-color__dt:  $gray-600 !default;
-$dropdown-header-color__dt:         $gray-200 !default;
+$dropdown-link-hover-bg__dt:        rgba($white, .1) !default;
+$dropdown-link-active-color__dt:    $component-active-color__dt !default;
+$dropdown-link-active-bg__dt:       $component-active-bg__dt !default;
+$dropdown-link-disabled-color__dt:  rgba($body-color__dt, .6) !default;
+$dropdown-header-color__dt:         $body-color__dt !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $dropdown-theme-map: map-merge(
