@@ -1,14 +1,14 @@
 
 // Options
 
-$legacy-theme-enable-elevations:  false !default;
+$enable-elevations__lt:  false !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $options: map-merge(
   $options,
   (
     legacy: (
-      "enable-elevations":  $legacy-theme-enable-elevations
+      "enable-elevations":  $enable-elevations__lt
     )
   )
 );
@@ -18,9 +18,9 @@ $default-themes: map-merge(
   (
     legacy: (
       "default":       false,
-      "theme-colors":  $theme-colors-legacy-theme,
-      "grays":         $grays-legacy-theme,
-      "gradients":     $theme-gradients-legacy-theme
+      "theme-colors":  $theme-colors__lt,
+      "grays":         $grays__lt,
+      "gradients":     $theme-gradients__lt
     )
   ),
   $default-themes

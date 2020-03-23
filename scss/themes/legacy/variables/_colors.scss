@@ -2,7 +2,7 @@
 // CoreUI 3.x Color system
 //
 
-$white-legacy-theme:  #fff !default;
+$white__lt:  #fff !default;
 $black__lt:  #000 !default;
 
 $gray-base__lt:  #181b1e !default;
@@ -16,9 +16,9 @@ $gray-700__lt:  #5c6873 !default;
 $gray-800__lt:  #2f353a !default;
 $gray-900__lt:  #23282c !default;
 
-$grays-legacy-theme: () !default;
+$grays__lt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$grays-legacy-theme: map-merge(
+$grays__lt: map-merge(
   (
     "100":  $gray-100__lt,
     "200":  $gray-200__lt,
@@ -30,7 +30,7 @@ $grays-legacy-theme: map-merge(
     "800":  $gray-800__lt,
     "900":  $gray-900__lt
   ),
-  $grays-legacy-theme
+  $grays__lt
 );
 
 $primary__lt:    #20a8d8 !default;
@@ -42,9 +42,9 @@ $danger__lt:     #f86c6b !default;
 $light__lt:      #f0f3f5 !default;
 $dark__lt:       #2f353a !default;
 
-$theme-colors-legacy-theme: () !default;
+$theme-colors__lt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$theme-colors-legacy-theme: map-merge(
+$theme-colors__lt: map-merge(
   (
     "primary":    $primary__lt,
     "secondary":  $secondary__lt,
@@ -55,7 +55,7 @@ $theme-colors-legacy-theme: map-merge(
     "light":      $light__lt,
     "dark":       $dark__lt
   ),
-  $theme-colors-legacy-theme
+  $theme-colors__lt
 );
 
 // Customize the light and dark text colors for use in our YIQ color contrast function.

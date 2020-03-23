@@ -42,9 +42,9 @@ $info-gradient__lt: (
   "stop":   darken($info__lt, 5%)
 ) !default;
 
-$theme-gradients-legacy-theme: () !default;
+$theme-gradients__lt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
-$theme-gradients-legacy-theme: map-merge(
+$theme-gradients__lt: map-merge(
   (
     "primary":    $primary-gradient__lt,
     "secondary":  $secondary-gradient__lt,
@@ -55,5 +55,5 @@ $theme-gradients-legacy-theme: map-merge(
     "light":      $light-gradient__lt,
     "dark":       $dark-gradient__lt
   ),
-  $theme-gradients-legacy-theme
+  $theme-gradients__lt
 );
