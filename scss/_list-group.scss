@@ -42,7 +42,7 @@
   &:active {
     @include themes($list-group-theme-map, $create: parent) {
       color: themes-get-value("list-group-action-active-color");
-      background-color: themes-get-value("list-group-active-bg");
+      background-color: themes-get-value("list-group-action-active-bg");
     }
   }
 }
