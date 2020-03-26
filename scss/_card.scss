@@ -17,7 +17,7 @@
     background-color: themes-get-value("card-bg");
     border-color: themes-get-value("card-border-color");
   }
-  @include elevation(1);
+  @include elevation(1, false, true);
 
   > hr {
     margin-right: 0;

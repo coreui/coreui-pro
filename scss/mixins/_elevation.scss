@@ -7,7 +7,23 @@
   }
 }
 
-@mixin elevation($level, $direction: false) {
+@mixin add-elevation-before($level, $direction) {
+  position: relative;
+  border: 0;
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    content: "";
+    border-radius: inherit;
+    @include add-elevation($level, $direction);
+  }
+}
+
+@mixin elevation($level, $direction: false, $before: false) {
   @if $enable-elevations {
     $selector: selector-append(".c-app");
     @each $theme in map-keys($options) {
@@ -20,11 +36,19 @@
 
     @if ($selector != selector-append(".c-app")) {
       #{$selector} & {
-        @include add-elevation($level, $direction);
+        @if $before == true {
+          @include add-elevation-before($level, $direction);
+        } @else {
+          @include add-elevation($level, $direction);
+        }
       }
     } @else {
       & {
-        @include add-elevation($level, $direction);
+        @if $before == true {
+          @include add-elevation-before($level, $direction);
+        } @else {
+          @include add-elevation($level, $direction);
+        }
       }
     }
   }
