@@ -39,17 +39,18 @@
 //
 
 .c-wrapper {
-  transition: all $layout-transition-speed ease;
+  transition: margin $layout-transition-speed ease;
 }
 
 .c-body {
-  will-change: contents;
-  transform: translateZ(0);
+  contain: paint;
+  // will-change: contents;
+  // transform: translateZ(0);
 }
 
 
 .c-sidebar {
-  transition: box-shadow $layout-transition-speed, transform $layout-transition-speed, margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, z-index 0s ease $layout-transition-speed;
+  transition: box-shadow $layout-transition-speed $layout-transition-speed, transform $layout-transition-speed, margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, z-index 0s ease $layout-transition-speed;
   &.c-sidebar-unfoldable {
     transition: transform $layout-transition-speed, margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, z-index 0s ease 0s;
   }
