@@ -15,7 +15,7 @@
     right: 0;
     left: 0;
     z-index: $zindex-fixed;
-    @include elevation(2, "bottom", true);
+    @include elevation(2);
   }
 
   .c-subheader {
