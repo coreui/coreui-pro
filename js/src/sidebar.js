@@ -226,6 +226,29 @@ class Sidebar {
     return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--is-mobile'))
   }
 
+  _isIOS() {
+    const iOSDevices = [
+      'iPad Simulator',
+      'iPhone Simulator',
+      'iPod Simulator',
+      'iPad',
+      'iPhone',
+      'iPod'
+    ]
+
+    const platform = Boolean(navigator.platform)
+
+    if (platform) {
+      while (iOSDevices.length) {
+        if (navigator.platform === iOSDevices.pop()) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+
   _isMinimized() {
     return this._element.classList.contains(ClassName.SIDEBAR_MINIMIZED)
   }
@@ -350,9 +373,11 @@ class Sidebar {
   // PerfectScrollbar
 
   _psInit() {
-    if (this._element.querySelector(Selector.NAVIGATION_CONTAINER)) {
+    if (this._element.querySelector(Selector.NAVIGATION_CONTAINER) && !this._isIOS()) {
+      console.log('ps')
       this._ps = new PerfectScrollbar(this._element.querySelector(Selector.NAVIGATION_CONTAINER), {
-        suppressScrollX: true
+        suppressScrollX: true,
+        wheelPropagation: false
       })
     }
   }
