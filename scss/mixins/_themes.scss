@@ -227,7 +227,7 @@ $theme-has-variants: false !default;
   }
 }
 
-@mixin theme-variant() {
+@mixin theme-variant($extend-class: false) {
   @each $theme in map-keys($default-themes) {
     $get-colors: map-get(map-get($default-themes, $theme), "theme-colors");
     $get-default: map-get(map-get($default-themes, $theme), "default");
@@ -240,9 +240,15 @@ $theme-has-variants: false !default;
       } @else {
         $default-color: map-get(map-get(map-get($default-themes, default-theme()), "theme-colors"), $color);
         @if $default-color != $value {
-          @at-root{
-            .c-#{$theme}#{$theme-suffix} {
+          @if $extend-class {
+            &.c-#{$theme}#{$theme-suffix} {
               @content;
+            }
+          } @else {
+            @at-root{
+              .c-#{$theme}#{$theme-suffix} {
+                @content;
+              }
             }
           }
         }

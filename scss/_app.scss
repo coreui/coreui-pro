@@ -1,10 +1,7 @@
-@include theme-variant() {
-  &.c-app {
+.c-app {
+  @include theme-variant(true) {
     --#{$color}: #{$value};
   }
-}
-
-.c-app {
   @include themes($body-theme-map, $create: append) {
     color: themes-get-value("body-color");
     background-color: themes-get-value("body-bg");
