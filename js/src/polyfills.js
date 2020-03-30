@@ -1,4 +1,6 @@
+/* eslint-disable unicorn/no-abusive-eslint-disable */
 /* eslint-disable */
+
 // Production steps of ECMA-262, Edition 6, 22.1.2.1
 // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
 if (!Array.from) {
