@@ -17,10 +17,12 @@ const plugins = [
     exclude: 'node_modules/**',
     // Include only required helpers
     externalHelpersWhitelist: [
-      'defineProperties',
       'createClass',
-      'inheritsLoose',
+      'createSuper',
+      'defineProperties',
       'defineProperty',
+      'getPrototypeOf',
+      'inheritsLoose',
       'objectSpread2'
     ]
   }),
