@@ -392,7 +392,6 @@ class Sidebar {
 
   _psInit() {
     if (this._element.querySelector(Selector.NAVIGATION_CONTAINER) && !this._isIOS()) {
-      console.log('ps')
       this._ps = new PerfectScrollbar(this._element.querySelector(Selector.NAVIGATION_CONTAINER), {
         suppressScrollX: true,
         wheelPropagation: false
