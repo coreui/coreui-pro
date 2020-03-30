@@ -4,14 +4,9 @@
 // @type String
 $themes-default-post-class: "-theme" !default;
 
-/// Current _entity_ during the loop. Can be used in custom creation mode.
-///
-/// @type String
-$themes-loop-entity: "" !default;
-
-
 // @type String
 $current-variant: "" !default;
+
 /// Current _map_ during the loop. Can be used in custom creation.
 ///
 // @type Map
