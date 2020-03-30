@@ -134,6 +134,15 @@
   @include table-row-variant(selected, themes-get-value("table-active-bg"));
 }
 
+.table {
+  tbody tr {
+    &:focus {
+      outline: 0;
+      @extend .table-selected;
+    }
+  }
+}
+
 
 // Dark styles
 //
