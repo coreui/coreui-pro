@@ -134,7 +134,7 @@
     "terser": "^4.6.7"
   },
   "engines": {
-    "node": ">= 8",
+    "node": ">= 10",
     "npm": ">= 5"
   },
   "bundlesize": [
