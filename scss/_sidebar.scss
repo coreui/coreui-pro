@@ -1,6 +1,4 @@
 
-// $sidebar-negative-margin: - $sidebar-width !default;
-
 // stylelint-disable selector-max-class, declaration-no-important, selector-max-compound-selectors, function-url-quotes, selector-max-combinators
 .c-sidebar {
   display: flex;
@@ -20,9 +18,6 @@
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 1;
-    &[class*="-show"] {
-      @include elevation(3);
-    }
   }
 
   @include ltr {
@@ -78,9 +73,6 @@
       top: 0;
       bottom: 0;
       z-index: $zindex-fixed;
-      &[class*="-show"] {
-        @include elevation(2);
-      }
 
       @include ltr {
         &:not(.c-sidebar-right) {
@@ -109,10 +101,6 @@
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 2;
-    &[class*="-show"] {
-      @include elevation(3);
-    }
-
 
     @include ltr {
       &:not(.c-sidebar-right) {
@@ -724,9 +712,6 @@
 .c-sidebar-unfoldable {
   @include media-breakpoint-up($mobile-breakpoint) {
     z-index: $zindex-fixed + 1 !important;
-    &[class*="-show"] {
-      @include elevation(3);
-    }
     &:hover {
       .c-sidebar-nav-dropdown-items {
         overflow-x: hidden;
@@ -751,6 +736,23 @@
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
     .c-sidebar.c-sidebar#{$infix}-show,
     .c-sidebar.c-sidebar-show {
+      @include media-breakpoint-down(breakpoint-before($mobile-breakpoint)) {
+        @include elevation(3);
+      }
+
+      @include media-breakpoint-up($mobile-breakpoint) {
+        &.c-sidebar-fixed {
+          @include elevation(2);
+        }
+        &.c-sidebar-unfoldable {
+          @include elevation(3);
+        }
+      }
+
+      &.c-sidebar-overlaid {
+        @include elevation(3);
+      }
+
       &:not(.c-sidebar-right){
         @include ltr {
           margin-left: 0;
