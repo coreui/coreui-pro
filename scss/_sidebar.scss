@@ -169,8 +169,6 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  // width: 100%;
-  // min-height: 100%;
   padding: 0;
   margin-bottom: 0;
   overflow-x: hidden;
@@ -532,7 +530,6 @@
     // stylelint-disable-next-line no-duplicate-selectors
     .c-sidebar-nav > .c-sidebar-nav-dropdown {
       position: relative;
-      // overflow: hidden;
 
       > .c-sidebar-nav-dropdown-items {
         display: none;
@@ -692,7 +689,6 @@
     // stylelint-disable-next-line no-duplicate-selectors
     .c-sidebar-nav > .c-sidebar-nav-dropdown {
       position: relative;
-      // overflow: hidden;
 
       > .c-sidebar-nav-dropdown-items {
         display: none;
@@ -1044,9 +1040,6 @@
       }
     }
 
-    // .c-sidebar-nav-link:hover {
-    //   background: themes-get-value("sidebar-nav-link-hover-bg");
-    // }
     .c-sidebar-nav {
       > .c-sidebar-nav-dropdown {
         > .c-sidebar-nav-dropdown-items {
