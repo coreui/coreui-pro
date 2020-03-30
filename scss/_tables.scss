@@ -134,6 +134,7 @@
   @include table-row-variant(selected, themes-get-value("table-active-bg"), themes-get-value("table-active-bg"));
 }
 
+// stylelint-disable-next-line no-duplicate-selectors
 .table {
   tbody tr {
     &:focus {
