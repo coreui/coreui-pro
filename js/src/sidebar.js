@@ -131,8 +131,20 @@ class Sidebar {
       })
     } else if (breakpoint) {
       this._addClassName(this._getBreakpointClassName(breakpoint))
+
+      if (this._isOverlaid()) {
+        EventHandler.one(this._element, TRANSITION_END, () => {
+          this._addClickOutListener()
+        })
+      }
     } else {
       this._addClassName(this._firstBreakpointClassName())
+
+      if (this._isOverlaid()) {
+        EventHandler.one(this._element, TRANSITION_END, () => {
+          this._addClickOutListener()
+        })
+      }
     }
 
     const complete = () => {
@@ -154,8 +166,14 @@ class Sidebar {
       this._removeClickOutListener()
     } else if (breakpoint) {
       this._element.classList.remove(this._getBreakpointClassName(breakpoint))
+      if (this._isOverlaid()) {
+        this._removeClickOutListener()
+      }
     } else {
       this._element.classList.remove(this._firstBreakpointClassName())
+      if (this._isOverlaid()) {
+        this._removeClickOutListener()
+      }
     }
 
     const complete = () => {
