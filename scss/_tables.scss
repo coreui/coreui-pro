@@ -131,7 +131,7 @@
 
 @include themes($table-theme-map, $create: parent) {
   @include table-row-variant(active, themes-get-value("table-active-bg"));
-  @include table-row-variant(selected, themes-get-value("table-active-bg"));
+  @include table-row-variant(selected, themes-get-value("table-active-bg"), themes-get-value("table-active-bg"));
 }
 
 .table {
