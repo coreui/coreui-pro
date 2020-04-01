@@ -139,7 +139,10 @@
   tbody tr {
     &:focus {
       outline: 0;
-      @extend .table-selected;
+      @include themes($table-theme-map, $create: parent) {
+        color: themes-get-value("table-hover-color");
+        background-color: themes-get-value("table-hover-bg");
+      }
     }
   }
 }
