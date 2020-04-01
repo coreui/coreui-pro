@@ -48,3 +48,28 @@
     transition: transform $layout-transition-speed, margin-left $layout-transition-speed, margin-right $layout-transition-speed, width $layout-transition-speed, z-index 0s ease 0s;
   }
 }
+
+.c-no-layout-transition {
+  .c-wrapper,
+  .c-sidebar {
+    transition: none;
+
+    .c-sidebar-header,
+    .c-sidebar-nav-title,
+    .c-sidebar-nav-divider,
+    .c-sidebar-nav-link,
+    .c-sidebar-nav-icon,
+    .c-sidebar-nav-dropdown,
+    .c-sidebar-nav-dropdown-toggle,
+    .c-sidebar-nav-dropdown-items,
+    .c-sidebar-nav-label,
+    .c-sidebar-footer,
+    .c-sidebar-minimizer  {
+      transition: none;
+    }
+  }
+}
+
+.c-no-transition {
+  transition: none;
+}
