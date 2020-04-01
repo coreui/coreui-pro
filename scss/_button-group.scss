@@ -4,6 +4,7 @@
 .btn-group,
 .btn-group-vertical {
   position: relative;
+  z-index: 1;
   display: inline-flex;
   vertical-align: middle; // match .btn alignment given font-size hack above
 
@@ -14,13 +15,18 @@
     // Bring the hover, focused, and "active" buttons to the front to overlay
     // the borders properly
     @include hover() {
-      z-index: 1;
+      z-index: 2;
     }
     &:focus,
     &:active,
     &.active {
-      z-index: 1;
+      z-index: 2;
     }
+  }
+
+  .btn-group,
+  .btn-group-vertical {
+    z-index: auto;
   }
 }
 
@@ -123,12 +129,15 @@
 
 // The clickable button for toggling the menu
 // Set the same inset shadow as the :active state
-.btn-group.show .dropdown-toggle {
-  @include box-shadow($btn-active-box-shadow);
+.btn-group.show {
+  z-index: 3;
+  .dropdown-toggle {
+    @include box-shadow($btn-active-box-shadow);
 
-  // Show no shadow for `.btn-link` since it has no other button styles.
-  &.btn-link {
-    @include box-shadow(none);
+    // Show no shadow for `.btn-link` since it has no other button styles.
+    &.btn-link {
+      @include box-shadow(none);
+    }
   }
 }
 
