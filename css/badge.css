@@ -63,12 +63,12 @@ a.badge:hover, a.badge:focus {
   background-color: #4638c2;
 }
 
-a.c-dark-theme .badge-primary:hover, a.c-dark-theme .badge-primary:focus {
+.c-dark-theme a.badge-primary:hover, .c-dark-theme a.badge-primary:focus {
   color: #fff;
   background-color: #382d9a;
 }
 
-a.c-dark-theme .badge-primary:focus, a.c-dark-theme .badge-primary.focus {
+.c-dark-theme a.badge-primary:focus, .c-dark-theme a.badge-primary.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(70, 56, 194, 0.5);
 }
@@ -78,12 +78,12 @@ a.c-dark-theme .badge-primary:focus, a.c-dark-theme .badge-primary.focus {
   background-color: #4c4f54;
 }
 
-a.c-dark-theme .badge-secondary:hover, a.c-dark-theme .badge-secondary:focus {
+.c-dark-theme a.badge-secondary:hover, .c-dark-theme a.badge-secondary:focus {
   color: #fff;
   background-color: #343639;
 }
 
-a.c-dark-theme .badge-secondary:focus, a.c-dark-theme .badge-secondary.focus {
+.c-dark-theme a.badge-secondary:focus, .c-dark-theme a.badge-secondary.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(76, 79, 84, 0.5);
 }
@@ -93,12 +93,12 @@ a.c-dark-theme .badge-secondary:focus, a.c-dark-theme .badge-secondary.focus {
   background-color: #45a164;
 }
 
-a.c-dark-theme .badge-success:hover, a.c-dark-theme .badge-success:focus {
+.c-dark-theme a.badge-success:hover, .c-dark-theme a.badge-success:focus {
   color: #fff;
   background-color: #367d4e;
 }
 
-a.c-dark-theme .badge-success:focus, a.c-dark-theme .badge-success.focus {
+.c-dark-theme a.badge-success:focus, .c-dark-theme a.badge-success.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(69, 161, 100, 0.5);
 }
@@ -108,12 +108,12 @@ a.c-dark-theme .badge-success:focus, a.c-dark-theme .badge-success.focus {
   background-color: #4799eb;
 }
 
-a.c-dark-theme .badge-info:hover, a.c-dark-theme .badge-info:focus {
+.c-dark-theme a.badge-info:hover, .c-dark-theme a.badge-info:focus {
   color: #fff;
   background-color: #1a80e6;
 }
 
-a.c-dark-theme .badge-info:focus, a.c-dark-theme .badge-info.focus {
+.c-dark-theme a.badge-info:focus, .c-dark-theme a.badge-info.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(71, 153, 235, 0.5);
 }
@@ -123,12 +123,12 @@ a.c-dark-theme .badge-info:focus, a.c-dark-theme .badge-info.focus {
   background-color: #e1a82d;
 }
 
-a.c-dark-theme .badge-warning:hover, a.c-dark-theme .badge-warning:focus {
+.c-dark-theme a.badge-warning:hover, .c-dark-theme a.badge-warning:focus {
   color: #4f5d73;
   background-color: #c08c1b;
 }
 
-a.c-dark-theme .badge-warning:focus, a.c-dark-theme .badge-warning.focus {
+.c-dark-theme a.badge-warning:focus, .c-dark-theme a.badge-warning.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(225, 168, 45, 0.5);
 }
@@ -138,12 +138,12 @@ a.c-dark-theme .badge-warning:focus, a.c-dark-theme .badge-warning.focus {
   background-color: #d16767;
 }
 
-a.c-dark-theme .badge-danger:hover, a.c-dark-theme .badge-danger:focus {
+.c-dark-theme a.badge-danger:hover, .c-dark-theme a.badge-danger:focus {
   color: #fff;
   background-color: #c54040;
 }
 
-a.c-dark-theme .badge-danger:focus, a.c-dark-theme .badge-danger.focus {
+.c-dark-theme a.badge-danger:focus, .c-dark-theme a.badge-danger.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(209, 103, 103, 0.5);
 }
@@ -153,12 +153,12 @@ a.c-dark-theme .badge-danger:focus, a.c-dark-theme .badge-danger.focus {
   background-color: #20202a;
 }
 
-a.c-dark-theme .badge-light:hover, a.c-dark-theme .badge-light:focus {
+.c-dark-theme a.badge-light:hover, .c-dark-theme a.badge-light:focus {
   color: #fff;
   background-color: #0a0a0d;
 }
 
-a.c-dark-theme .badge-light:focus, a.c-dark-theme .badge-light.focus {
+.c-dark-theme a.badge-light:focus, .c-dark-theme a.badge-light.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(32, 32, 42, 0.5);
 }
@@ -168,134 +168,134 @@ a.c-dark-theme .badge-light:focus, a.c-dark-theme .badge-light.focus {
   background-color: #181924;
 }
 
-a.c-dark-theme .badge-dark:hover, a.c-dark-theme .badge-dark:focus {
+.c-dark-theme a.badge-dark:hover, .c-dark-theme a.badge-dark:focus {
   color: #fff;
   background-color: #040405;
 }
 
-a.c-dark-theme .badge-dark:focus, a.c-dark-theme .badge-dark.focus {
+.c-dark-theme a.badge-dark:focus, .c-dark-theme a.badge-dark.focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(24, 25, 36, 0.5);
 }
 
 .c-legacy-theme .badge-primary {
   color: #fff;
-  background-color: #321fdb;
+  background-color: #20a8d8;
 }
 
-a.c-legacy-theme .badge-primary:hover, a.c-legacy-theme .badge-primary:focus {
+.c-legacy-theme a.badge-primary:hover, .c-legacy-theme a.badge-primary:focus {
   color: #fff;
-  background-color: #2819ae;
+  background-color: #1985ac;
 }
 
-a.c-legacy-theme .badge-primary:focus, a.c-legacy-theme .badge-primary.focus {
+.c-legacy-theme a.badge-primary:focus, .c-legacy-theme a.badge-primary.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.5);
 }
 
 .c-legacy-theme .badge-secondary {
   color: #4f5d73;
-  background-color: #ced2d8;
+  background-color: #c8ced3;
 }
 
-a.c-legacy-theme .badge-secondary:hover, a.c-legacy-theme .badge-secondary:focus {
+.c-legacy-theme a.badge-secondary:hover, .c-legacy-theme a.badge-secondary:focus {
   color: #4f5d73;
-  background-color: #b2b8c1;
+  background-color: #acb5bc;
 }
 
-a.c-legacy-theme .badge-secondary:focus, a.c-legacy-theme .badge-secondary.focus {
+.c-legacy-theme a.badge-secondary:focus, .c-legacy-theme a.badge-secondary.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(206, 210, 216, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(200, 206, 211, 0.5);
 }
 
 .c-legacy-theme .badge-success {
   color: #fff;
-  background-color: #2eb85c;
+  background-color: #4dbd74;
 }
 
-a.c-legacy-theme .badge-success:hover, a.c-legacy-theme .badge-success:focus {
+.c-legacy-theme a.badge-success:hover, .c-legacy-theme a.badge-success:focus {
   color: #fff;
-  background-color: #248f48;
+  background-color: #3a9d5d;
 }
 
-a.c-legacy-theme .badge-success:focus, a.c-legacy-theme .badge-success.focus {
+.c-legacy-theme a.badge-success:focus, .c-legacy-theme a.badge-success.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(46, 184, 92, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(77, 189, 116, 0.5);
 }
 
 .c-legacy-theme .badge-info {
-  color: #fff;
-  background-color: #39f;
+  color: #4f5d73;
+  background-color: #63c2de;
 }
 
-a.c-legacy-theme .badge-info:hover, a.c-legacy-theme .badge-info:focus {
-  color: #fff;
-  background-color: #0080ff;
+.c-legacy-theme a.badge-info:hover, .c-legacy-theme a.badge-info:focus {
+  color: #4f5d73;
+  background-color: #39b2d5;
 }
 
-a.c-legacy-theme .badge-info:focus, a.c-legacy-theme .badge-info.focus {
+.c-legacy-theme a.badge-info:focus, .c-legacy-theme a.badge-info.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(51, 153, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(99, 194, 222, 0.5);
 }
 
 .c-legacy-theme .badge-warning {
   color: #4f5d73;
-  background-color: #f9b115;
+  background-color: #ffc107;
 }
 
-a.c-legacy-theme .badge-warning:hover, a.c-legacy-theme .badge-warning:focus {
+.c-legacy-theme a.badge-warning:hover, .c-legacy-theme a.badge-warning:focus {
   color: #4f5d73;
-  background-color: #d69405;
+  background-color: #d39e00;
 }
 
-a.c-legacy-theme .badge-warning:focus, a.c-legacy-theme .badge-warning.focus {
+.c-legacy-theme a.badge-warning:focus, .c-legacy-theme a.badge-warning.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(249, 177, 21, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.5);
 }
 
 .c-legacy-theme .badge-danger {
   color: #fff;
-  background-color: #e55353;
+  background-color: #f86c6b;
 }
 
-a.c-legacy-theme .badge-danger:hover, a.c-legacy-theme .badge-danger:focus {
+.c-legacy-theme a.badge-danger:hover, .c-legacy-theme a.badge-danger:focus {
   color: #fff;
-  background-color: #de2727;
+  background-color: #f63c3a;
 }
 
-a.c-legacy-theme .badge-danger:focus, a.c-legacy-theme .badge-danger.focus {
+.c-legacy-theme a.badge-danger:focus, .c-legacy-theme a.badge-danger.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(229, 83, 83, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(248, 108, 107, 0.5);
 }
 
 .c-legacy-theme .badge-light {
   color: #4f5d73;
-  background-color: #ebedef;
+  background-color: #f0f3f5;
 }
 
-a.c-legacy-theme .badge-light:hover, a.c-legacy-theme .badge-light:focus {
+.c-legacy-theme a.badge-light:hover, .c-legacy-theme a.badge-light:focus {
   color: #4f5d73;
-  background-color: #cfd4d8;
+  background-color: #d1dbe1;
 }
 
-a.c-legacy-theme .badge-light:focus, a.c-legacy-theme .badge-light.focus {
+.c-legacy-theme a.badge-light:focus, .c-legacy-theme a.badge-light.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(235, 237, 239, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(240, 243, 245, 0.5);
 }
 
 .c-legacy-theme .badge-dark {
   color: #fff;
-  background-color: #636f83;
+  background-color: #2f353a;
 }
 
-a.c-legacy-theme .badge-dark:hover, a.c-legacy-theme .badge-dark:focus {
+.c-legacy-theme a.badge-dark:hover, .c-legacy-theme a.badge-dark:focus {
   color: #fff;
-  background-color: #4d5666;
+  background-color: #181b1e;
 }
 
-a.c-legacy-theme .badge-dark:focus, a.c-legacy-theme .badge-dark.focus {
+.c-legacy-theme a.badge-dark:focus, .c-legacy-theme a.badge-dark.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(99, 111, 131, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(47, 53, 58, 0.5);
 }
 
 .badge-primary {

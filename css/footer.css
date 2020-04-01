@@ -57,6 +57,17 @@
   border-top: 1px solid #d8dbe0;
 }
 
+.c-legacy-theme .c-footer.c-footer-dark {
+  color: #fff;
+  background: #636f83;
+}
+
+.c-legacy-theme .c-footer {
+  color: #4f5d73;
+  background: #ebedef;
+  border-top: 1px solid #d8dbe0;
+}
+
 .c-dark-theme .c-footer {
   color: #e1e1e1;
   background: #1e1e29;

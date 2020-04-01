@@ -30,9 +30,19 @@
   text-shadow: 0 1px 0 #000015;
 }
 
-.close:hover {
-  text-decoration: none;
-  color: #fff;
+.c-legacy-theme .close {
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+}
+
+@media (hover: hover), (-ms-high-contrast: none) {
+  .close:hover {
+    text-decoration: none;
+    color: #fff;
+  }
+  .c-legacy-theme .close:hover {
+    color: #000;
+  }
 }
 
 .close:not(:disabled):not(.disabled):hover, .close:not(:disabled):not(.disabled):focus {

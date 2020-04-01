@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  sidebar.js v3.0.0 (https://coreui.io)
+  * CoreUI PRO  sidebar.jsv3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -9,10 +9,10 @@
   (global = global || self, global.Sidebar = factory(global.Data, global.EventHandler, global.Manipulator, global.PerfectScrollbar));
 }(this, (function (Data, EventHandler, Manipulator, PerfectScrollbar) { 'use strict';
 
-  Data = Data && Data.hasOwnProperty('default') ? Data['default'] : Data;
-  EventHandler = EventHandler && EventHandler.hasOwnProperty('default') ? EventHandler['default'] : EventHandler;
-  Manipulator = Manipulator && Manipulator.hasOwnProperty('default') ? Manipulator['default'] : Manipulator;
-  PerfectScrollbar = PerfectScrollbar && PerfectScrollbar.hasOwnProperty('default') ? PerfectScrollbar['default'] : PerfectScrollbar;
+  Data = Data && Object.prototype.hasOwnProperty.call(Data, 'default') ? Data['default'] : Data;
+  EventHandler = EventHandler && Object.prototype.hasOwnProperty.call(EventHandler, 'default') ? EventHandler['default'] : EventHandler;
+  Manipulator = Manipulator && Object.prototype.hasOwnProperty.call(Manipulator, 'default') ? Manipulator['default'] : Manipulator;
+  PerfectScrollbar = PerfectScrollbar && Object.prototype.hasOwnProperty.call(PerfectScrollbar, 'default') ? PerfectScrollbar['default'] : PerfectScrollbar;
 
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -129,7 +129,7 @@
    */
 
   var NAME = 'sidebar';
-  var VERSION = '3.0.0-rc.4';
+  var VERSION = '3.1.0';
   var DATA_KEY = 'coreui.sidebar';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -182,9 +182,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Sidebar =
-  /*#__PURE__*/
-  function () {
+  var Sidebar = /*#__PURE__*/function () {
     function Sidebar(element, config) {
       if (typeof PerfectScrollbar === 'undefined') {
         throw new TypeError('CoreUI\'s sidebar require Perfect Scrollbar');
@@ -229,8 +227,20 @@
         });
       } else if (breakpoint) {
         this._addClassName(this._getBreakpointClassName(breakpoint));
+
+        if (this._isOverlaid()) {
+          EventHandler.one(this._element, TRANSITION_END, function () {
+            _this._addClickOutListener();
+          });
+        }
       } else {
         this._addClassName(this._firstBreakpointClassName());
+
+        if (this._isOverlaid()) {
+          EventHandler.one(this._element, TRANSITION_END, function () {
+            _this._addClickOutListener();
+          });
+        }
       }
 
       var complete = function complete() {
@@ -256,8 +266,16 @@
         this._removeClickOutListener();
       } else if (breakpoint) {
         this._element.classList.remove(this._getBreakpointClassName(breakpoint));
+
+        if (this._isOverlaid()) {
+          this._removeClickOutListener();
+        }
       } else {
         this._element.classList.remove(this._firstBreakpointClassName());
+
+        if (this._isOverlaid()) {
+          this._removeClickOutListener();
+        }
       }
 
       var complete = function complete() {
@@ -320,6 +338,21 @@
 
     _proto._isMobile = function _isMobile() {
       return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--is-mobile'));
+    };
+
+    _proto._isIOS = function _isIOS() {
+      var iOSDevices = ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'];
+      var platform = Boolean(navigator.platform);
+
+      if (platform) {
+        while (iOSDevices.length) {
+          if (navigator.platform === iOSDevices.pop()) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     };
 
     _proto._isMinimized = function _isMinimized() {
@@ -452,9 +485,10 @@
     ;
 
     _proto._psInit = function _psInit() {
-      if (this._element.querySelector(Selector.NAVIGATION_CONTAINER)) {
+      if (this._element.querySelector(Selector.NAVIGATION_CONTAINER) && !this._isIOS()) {
         this._ps = new PerfectScrollbar(this._element.querySelector(Selector.NAVIGATION_CONTAINER), {
-          suppressScrollX: true
+          suppressScrollX: true,
+          wheelPropagation: false
         });
       }
     };

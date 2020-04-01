@@ -34,6 +34,11 @@
   border-color: #d8dbe0;
 }
 
+.c-legacy-theme .card {
+  background-color: #fff;
+  border-color: #c8ced3;
+}
+
 .c-dark-theme .card {
   background-color: #23242d;
   border-color: #181924;
@@ -64,220 +69,15 @@
   cursor: move;
 }
 
-.c-dark-theme .card.bg-primary {
-  border-color: #342a91;
+.card[class^="bg-"],
+.card[class*=" bg-"] {
+  border-color: rgba(0, 0, 0, 0.125);
 }
 
-.c-dark-theme .card.bg-primary .card-header {
-  background-color: #4235b6;
-  border-color: #342a91;
-}
-
-.c-dark-theme .card.bg-secondary {
-  border-color: #2e3033;
-}
-
-.c-dark-theme .card.bg-secondary .card-header {
-  background-color: #45474c;
-  border-color: #2e3033;
-}
-
-.c-dark-theme .card.bg-success {
-  border-color: #327448;
-}
-
-.c-dark-theme .card.bg-success .card-header {
-  background-color: #40965d;
-  border-color: #327448;
-}
-
-.c-dark-theme .card.bg-info {
-  border-color: #1879da;
-}
-
-.c-dark-theme .card.bg-info .card-header {
-  background-color: #3a91e9;
-  border-color: #1879da;
-}
-
-.c-dark-theme .card.bg-warning {
-  border-color: #b4841a;
-}
-
-.c-dark-theme .card.bg-warning .card-header {
-  background-color: #dfa320;
-  border-color: #b4841a;
-}
-
-.c-dark-theme .card.bg-danger {
-  border-color: #bf3939;
-}
-
-.c-dark-theme .card.bg-danger .card-header {
-  background-color: #ce5b5b;
-  border-color: #bf3939;
-}
-
-.c-dark-theme .card.bg-light {
-  border-color: #040406;
-}
-
-.c-dark-theme .card.bg-light .card-header {
-  background-color: #191a22;
-  border-color: #040406;
-}
-
-.c-dark-theme .card.bg-dark {
-  border-color: black;
-}
-
-.c-dark-theme .card.bg-dark .card-header {
-  background-color: #12121b;
-  border-color: black;
-}
-
-.c-legacy-theme .card.bg-primary {
-  border-color: #2517a3;
-}
-
-.c-legacy-theme .card.bg-primary .card-header {
-  background-color: #2f1dce;
-  border-color: #2517a3;
-}
-
-.c-legacy-theme .card.bg-secondary {
-  border-color: #abb1bc;
-}
-
-.c-legacy-theme .card.bg-secondary .card-header {
-  background-color: #c5cad1;
-  border-color: #abb1bc;
-}
-
-.c-legacy-theme .card.bg-success {
-  border-color: #218543;
-}
-
-.c-legacy-theme .card.bg-success .card-header {
-  background-color: #2bac56;
-  border-color: #218543;
-}
-
-.c-legacy-theme .card.bg-info {
-  border-color: #0079f2;
-}
-
-.c-legacy-theme .card.bg-info .card-header {
-  background-color: #2491ff;
-  border-color: #0079f2;
-}
-
-.c-legacy-theme .card.bg-warning {
-  border-color: #c98b05;
-}
-
-.c-legacy-theme .card.bg-warning .card-header {
-  background-color: #f8ac06;
-  border-color: #c98b05;
-}
-
-.c-legacy-theme .card.bg-danger {
-  border-color: #d82121;
-}
-
-.c-legacy-theme .card.bg-danger .card-header {
-  background-color: #e34646;
-  border-color: #d82121;
-}
-
-.c-legacy-theme .card.bg-light {
-  border-color: #c8cdd3;
-}
-
-.c-legacy-theme .card.bg-light .card-header {
-  background-color: #e3e5e8;
-  border-color: #c8cdd3;
-}
-
-.c-legacy-theme .card.bg-dark {
-  border-color: #48505f;
-}
-
-.c-legacy-theme .card.bg-dark .card-header {
-  background-color: #5c687a;
-  border-color: #48505f;
-}
-
-.card.bg-primary {
-  border-color: #2517a3;
-}
-
-.card.bg-primary .card-header {
-  background-color: #2f1dce;
-  border-color: #2517a3;
-}
-
-.card.bg-secondary {
-  border-color: #abb1bc;
-}
-
-.card.bg-secondary .card-header {
-  background-color: #c5cad1;
-  border-color: #abb1bc;
-}
-
-.card.bg-success {
-  border-color: #218543;
-}
-
-.card.bg-success .card-header {
-  background-color: #2bac56;
-  border-color: #218543;
-}
-
-.card.bg-info {
-  border-color: #0079f2;
-}
-
-.card.bg-info .card-header {
-  background-color: #2491ff;
-  border-color: #0079f2;
-}
-
-.card.bg-warning {
-  border-color: #c98b05;
-}
-
-.card.bg-warning .card-header {
-  background-color: #f8ac06;
-  border-color: #c98b05;
-}
-
-.card.bg-danger {
-  border-color: #d82121;
-}
-
-.card.bg-danger .card-header {
-  background-color: #e34646;
-  border-color: #d82121;
-}
-
-.card.bg-light {
-  border-color: #c8cdd3;
-}
-
-.card.bg-light .card-header {
-  background-color: #e3e5e8;
-  border-color: #c8cdd3;
-}
-
-.card.bg-dark {
-  border-color: #48505f;
-}
-
-.card.bg-dark .card-header {
-  background-color: #5c687a;
-  border-color: #48505f;
+.card[class^="bg-"] .card-header,
+.card[class*=" bg-"] .card-header {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.125);
 }
 
 .card-body {
@@ -299,8 +99,10 @@
   margin-bottom: 0;
 }
 
-.card-link:hover {
-  text-decoration: none;
+@media (hover: hover), (-ms-high-contrast: none) {
+  .card-link:hover {
+    text-decoration: none;
+  }
 }
 
 html:not([dir="rtl"]) .card-link + .card-link {
@@ -317,6 +119,11 @@ html:not([dir="rtl"]) .card-link + .card-link {
   border-bottom: 1px solid;
   background-color: #fff;
   border-color: #d8dbe0;
+}
+
+.c-legacy-theme .card-header {
+  background-color: #f0f3f5;
+  border-color: #c8ced3;
 }
 
 .c-dark-theme .card-header {
@@ -345,6 +152,11 @@ html:not([dir="rtl"]) .card-link + .card-link {
   border-top: 1px solid;
   background-color: #fff;
   border-color: #d8dbe0;
+}
+
+.c-legacy-theme .card-footer {
+  background-color: #f0f3f5;
+  border-color: #c8ced3;
 }
 
 .c-dark-theme .card-footer {
@@ -517,6 +329,10 @@ html:not([dir="rtl"]) .card-link + .card-link {
   border-right: #d8dbe0;
 }
 
+.c-legacy-theme .card-header-icon-bg {
+  border-right: #c8ced3;
+}
+
 .c-dark-theme .card-header-icon-bg {
   border-right: #181924;
 }
@@ -578,35 +394,35 @@ html:not([dir="rtl"]) .card-header-actions {
 }
 
 .c-legacy-theme .card-accent-primary {
-  border-top: 2px solid #321fdb !important;
+  border-top: 2px solid #20a8d8 !important;
 }
 
 .c-legacy-theme .card-accent-secondary {
-  border-top: 2px solid #ced2d8 !important;
+  border-top: 2px solid #c8ced3 !important;
 }
 
 .c-legacy-theme .card-accent-success {
-  border-top: 2px solid #2eb85c !important;
+  border-top: 2px solid #4dbd74 !important;
 }
 
 .c-legacy-theme .card-accent-info {
-  border-top: 2px solid #39f !important;
+  border-top: 2px solid #63c2de !important;
 }
 
 .c-legacy-theme .card-accent-warning {
-  border-top: 2px solid #f9b115 !important;
+  border-top: 2px solid #ffc107 !important;
 }
 
 .c-legacy-theme .card-accent-danger {
-  border-top: 2px solid #e55353 !important;
+  border-top: 2px solid #f86c6b !important;
 }
 
 .c-legacy-theme .card-accent-light {
-  border-top: 2px solid #ebedef !important;
+  border-top: 2px solid #f0f3f5 !important;
 }
 
 .c-legacy-theme .card-accent-dark {
-  border-top: 2px solid #636f83 !important;
+  border-top: 2px solid #2f353a !important;
 }
 
 .card-accent-primary {

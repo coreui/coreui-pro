@@ -27,8 +27,12 @@
   background-color: #d8dbe0;
 }
 
+.c-legacy-theme .jumbotron {
+  background-color: #e4e7ea;
+}
+
 .c-dark-theme .jumbotron {
-  background-color: #4f5d73;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 @media (min-width: 576px) {

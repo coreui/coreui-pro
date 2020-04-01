@@ -154,99 +154,99 @@ html:not([dir="rtl"]) .c-dark-theme .c-callout-dark {
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-primary {
-  border-left-color: #321fdb;
+  border-left-color: #20a8d8;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-primary {
-  border-right-color: #321fdb;
+  border-right-color: #20a8d8;
 }
 
 .c-legacy-theme .c-callout-primary h4 {
-  color: #321fdb;
+  color: #20a8d8;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-secondary {
-  border-left-color: #ced2d8;
+  border-left-color: #c8ced3;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-secondary {
-  border-right-color: #ced2d8;
+  border-right-color: #c8ced3;
 }
 
 .c-legacy-theme .c-callout-secondary h4 {
-  color: #ced2d8;
+  color: #c8ced3;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-success {
-  border-left-color: #2eb85c;
+  border-left-color: #4dbd74;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-success {
-  border-right-color: #2eb85c;
+  border-right-color: #4dbd74;
 }
 
 .c-legacy-theme .c-callout-success h4 {
-  color: #2eb85c;
+  color: #4dbd74;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-info {
-  border-left-color: #39f;
+  border-left-color: #63c2de;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-info {
-  border-right-color: #39f;
+  border-right-color: #63c2de;
 }
 
 .c-legacy-theme .c-callout-info h4 {
-  color: #39f;
+  color: #63c2de;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-warning {
-  border-left-color: #f9b115;
+  border-left-color: #ffc107;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-warning {
-  border-right-color: #f9b115;
+  border-right-color: #ffc107;
 }
 
 .c-legacy-theme .c-callout-warning h4 {
-  color: #f9b115;
+  color: #ffc107;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-danger {
-  border-left-color: #e55353;
+  border-left-color: #f86c6b;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-danger {
-  border-right-color: #e55353;
+  border-right-color: #f86c6b;
 }
 
 .c-legacy-theme .c-callout-danger h4 {
-  color: #e55353;
+  color: #f86c6b;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-light {
-  border-left-color: #ebedef;
+  border-left-color: #f0f3f5;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-light {
-  border-right-color: #ebedef;
+  border-right-color: #f0f3f5;
 }
 
 .c-legacy-theme .c-callout-light h4 {
-  color: #ebedef;
+  color: #f0f3f5;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-dark {
-  border-left-color: #636f83;
+  border-left-color: #2f353a;
 }
 
 *[dir="rtl"] .c-legacy-theme .c-callout-dark {
-  border-right-color: #636f83;
+  border-right-color: #2f353a;
 }
 
 .c-legacy-theme .c-callout-dark h4 {
-  color: #636f83;
+  color: #2f353a;
 }
 
 html:not([dir="rtl"]) .c-callout-primary {

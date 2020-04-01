@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  v3.0.0 (https://coreui.io)
+  * CoreUI PRO v3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -764,7 +764,7 @@ var EventHandler = {
  */
 
 var NAME = 'asyncLoad';
-var VERSION = '3.0.0-rc.4';
+var VERSION = '3.1.0';
 var DATA_KEY = 'coreui.asyncLoad';
 var EVENT_KEY = "." + DATA_KEY;
 var DATA_API_KEY = '.data-api';
@@ -790,9 +790,7 @@ var Default = {
   subpagesDirectory: 'views/'
 };
 
-var AsyncLoad =
-/*#__PURE__*/
-function () {
+var AsyncLoad = /*#__PURE__*/function () {
   function AsyncLoad(element, config) {
     this._config = this._getConfig(config);
     this._element = element;
@@ -1106,7 +1104,7 @@ var SelectorEngine = {
  */
 
 var NAME$1 = 'alert';
-var VERSION$1 = '3.0.0-rc.4';
+var VERSION$1 = '3.1.0';
 var DATA_KEY$1 = 'coreui.alert';
 var EVENT_KEY$1 = "." + DATA_KEY$1;
 var DATA_API_KEY$1 = '.data-api';
@@ -1129,9 +1127,7 @@ var ClassName$1 = {
  * ------------------------------------------------------------------------
  */
 
-var Alert =
-/*#__PURE__*/
-function () {
+var Alert = /*#__PURE__*/function () {
   function Alert(element) {
     this._element = element;
 
@@ -1280,7 +1276,7 @@ if ($$2) {
  */
 
 var NAME$2 = 'button';
-var VERSION$2 = '3.0.0-rc.4';
+var VERSION$2 = '3.1.0';
 var DATA_KEY$2 = 'coreui.button';
 var EVENT_KEY$2 = "." + DATA_KEY$2;
 var DATA_API_KEY$2 = '.data-api';
@@ -1307,9 +1303,7 @@ var Event$3 = {
  * ------------------------------------------------------------------------
  */
 
-var Button =
-/*#__PURE__*/
-function () {
+var Button = /*#__PURE__*/function () {
   function Button(element) {
     this._element = element;
     Data.setData(element, DATA_KEY$2, this);
@@ -1539,7 +1533,7 @@ var Manipulator = {
  */
 
 var NAME$3 = 'carousel';
-var VERSION$3 = '3.0.0-rc.4';
+var VERSION$3 = '3.1.0';
 var DATA_KEY$3 = 'coreui.carousel';
 var EVENT_KEY$3 = "." + DATA_KEY$3;
 var DATA_API_KEY$3 = '.data-api';
@@ -1618,9 +1612,7 @@ var PointerType = {
  * ------------------------------------------------------------------------
  */
 
-var Carousel =
-/*#__PURE__*/
-function () {
+var Carousel = /*#__PURE__*/function () {
   function Carousel(element, config) {
     this._items = null;
     this._interval = null;
@@ -2152,7 +2144,7 @@ if ($$4) {
  */
 
 var NAME$4 = 'class-toggler';
-var VERSION$4 = '3.0.0-rc.4';
+var VERSION$4 = '3.1.0';
 var DATA_KEY$4 = 'coreui.class-toggler';
 var EVENT_KEY$4 = "." + DATA_KEY$4;
 var DATA_API_KEY$4 = '.data-api';
@@ -2178,9 +2170,7 @@ var Selector$4 = {
  * ------------------------------------------------------------------------
  */
 
-var ClassToggler =
-/*#__PURE__*/
-function () {
+var ClassToggler = /*#__PURE__*/function () {
   function ClassToggler(element) {
     this._element = element;
   } // Getters
@@ -2436,7 +2426,7 @@ if ($$5) {
  */
 
 var NAME$5 = 'collapse';
-var VERSION$5 = '3.0.0-rc.4';
+var VERSION$5 = '3.1.0';
 var DATA_KEY$5 = 'coreui.collapse';
 var EVENT_KEY$5 = "." + DATA_KEY$5;
 var DATA_API_KEY$5 = '.data-api';
@@ -2475,9 +2465,7 @@ var Selector$5 = {
  * ------------------------------------------------------------------------
  */
 
-var Collapse =
-/*#__PURE__*/
-function () {
+var Collapse = /*#__PURE__*/function () {
   function Collapse(element, config) {
     this._isTransitioning = false;
     this._element = element;
@@ -2853,7 +2841,7 @@ if ($$6) {
  */
 
 var NAME$6 = 'dropdown';
-var VERSION$6 = '3.0.0-rc.4';
+var VERSION$6 = '3.1.0';
 var DATA_KEY$6 = 'coreui.dropdown';
 var EVENT_KEY$6 = "." + DATA_KEY$6;
 var DATA_API_KEY$6 = '.data-api';
@@ -2929,9 +2917,7 @@ var DefaultType$2 = {
  * ------------------------------------------------------------------------
  */
 
-var Dropdown =
-/*#__PURE__*/
-function () {
+var Dropdown = /*#__PURE__*/function () {
   function Dropdown(element, config) {
     this._element = element;
     this._popper = null;
@@ -3389,7 +3375,7 @@ if ($$7) {
  */
 
 var NAME$7 = 'modal';
-var VERSION$7 = '3.0.0-rc.4';
+var VERSION$7 = '3.1.0';
 var DATA_KEY$7 = 'coreui.modal';
 var EVENT_KEY$7 = "." + DATA_KEY$7;
 var DATA_API_KEY$7 = '.data-api';
@@ -3444,9 +3430,7 @@ var Selector$7 = {
  * ------------------------------------------------------------------------
  */
 
-var Modal =
-/*#__PURE__*/
-function () {
+var Modal = /*#__PURE__*/function () {
   function Modal(element, config) {
     this._config = this._getConfig(config);
     this._element = element;
@@ -4127,7 +4111,7 @@ function sanitizeHtml(unsafeHtml, whiteList, sanitizeFn) {
  */
 
 var NAME$8 = 'tooltip';
-var VERSION$8 = '3.0.0-rc.4';
+var VERSION$8 = '3.1.0';
 var DATA_KEY$8 = 'coreui.tooltip';
 var EVENT_KEY$8 = "." + DATA_KEY$8;
 var CLASS_PREFIX = 'bs-tooltip';
@@ -4169,7 +4153,7 @@ var Default$6 = {
   placement: 'top',
   offset: 0,
   container: false,
-  fallbackPlacement: ['top', 'right', 'bottom', 'left'],
+  fallbackPlacement: 'flip',
   boundary: 'scrollParent',
   sanitize: true,
   sanitizeFn: null,
@@ -4194,6 +4178,7 @@ var Event$9 = {
 };
 var ClassName$8 = {
   FADE: 'fade',
+  MODAL: 'modal',
   SHOW: 'show'
 };
 var Selector$8 = {
@@ -4211,9 +4196,7 @@ var Trigger = {
  * ------------------------------------------------------------------------
  */
 
-var Tooltip =
-/*#__PURE__*/
-function () {
+var Tooltip = /*#__PURE__*/function () {
   function Tooltip(element, config) {
     if (typeof createPopper === 'undefined') {
       throw new TypeError('Bootstrap\'s tooltips require Popper.js (https://popper.js.org)');
@@ -4287,7 +4270,7 @@ function () {
     clearTimeout(this._timeout);
     Data.removeData(this.element, this.constructor.DATA_KEY);
     EventHandler.off(this.element, this.constructor.EVENT_KEY);
-    EventHandler.off(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler);
+    EventHandler.off(SelectorEngine.closest(this.element, "." + ClassName$8.MODAL), 'hide.coreui.modal', this._hideModalHandler);
 
     if (this.tip) {
       this.tip.parentNode.removeChild(this.tip);
@@ -4610,7 +4593,7 @@ function () {
       }
     };
 
-    EventHandler.on(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler);
+    EventHandler.on(SelectorEngine.closest(this.element, '.modal'), 'hide.coreui.modal', this._hideModalHandler);
 
     if (this.config.selector) {
       this.config = _objectSpread2({}, this.config, {
@@ -4762,7 +4745,7 @@ function () {
     var tip = this.getTipElement();
     var tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX);
 
-    if (tabClass !== null && tabClass.length) {
+    if (tabClass !== null && tabClass.length > 0) {
       tabClass.map(function (token) {
         return token.trim();
       }).forEach(function (tClass) {
@@ -4784,7 +4767,7 @@ function () {
     var tip = this.getTipElement();
     var initConfigAnimation = this.config.animation;
 
-    if (tip.getAttribute('x-placement') !== null) {
+    if (tip.getAttribute('data-popper-placement') !== null) {
       return;
     }
 
@@ -4892,7 +4875,7 @@ if ($$9) {
  */
 
 var NAME$9 = 'popover';
-var VERSION$9 = '3.0.0-rc.4';
+var VERSION$9 = '3.1.0';
 var DATA_KEY$9 = 'coreui.popover';
 var EVENT_KEY$9 = "." + DATA_KEY$9;
 var CLASS_PREFIX$1 = 'bs-popover';
@@ -4935,9 +4918,7 @@ var Event$a = {
  * ------------------------------------------------------------------------
  */
 
-var Popover =
-/*#__PURE__*/
-function (_Tooltip) {
+var Popover = /*#__PURE__*/function (_Tooltip) {
   _inheritsLoose(Popover, _Tooltip);
 
   function Popover() {
@@ -5087,7 +5068,7 @@ if ($$a) {
  */
 
 var NAME$a = 'scrollspy';
-var VERSION$a = '3.0.0-rc.4';
+var VERSION$a = '3.1.0';
 var DATA_KEY$a = 'coreui.scrollspy';
 var EVENT_KEY$a = "." + DATA_KEY$a;
 var DATA_API_KEY$8 = '.data-api';
@@ -5129,9 +5110,7 @@ var OffsetMethod = {
  * ------------------------------------------------------------------------
  */
 
-var ScrollSpy =
-/*#__PURE__*/
-function () {
+var ScrollSpy = /*#__PURE__*/function () {
   function ScrollSpy(element, config) {
     var _this = this;
 
@@ -5402,7 +5381,7 @@ if ($$b) {
  */
 
 var NAME$b = 'sidebar';
-var VERSION$b = '3.0.0-rc.4';
+var VERSION$b = '3.1.0';
 var DATA_KEY$b = 'coreui.sidebar';
 var EVENT_KEY$b = "." + DATA_KEY$b;
 var DATA_API_KEY$9 = '.data-api';
@@ -5455,9 +5434,7 @@ var Selector$b = {
  * ------------------------------------------------------------------------
  */
 
-var Sidebar =
-/*#__PURE__*/
-function () {
+var Sidebar = /*#__PURE__*/function () {
   function Sidebar(element, config) {
     if (typeof PerfectScrollbar === 'undefined') {
       throw new TypeError('CoreUI\'s sidebar require Perfect Scrollbar');
@@ -5502,8 +5479,20 @@ function () {
       });
     } else if (breakpoint) {
       this._addClassName(this._getBreakpointClassName(breakpoint));
+
+      if (this._isOverlaid()) {
+        EventHandler.one(this._element, TRANSITION_END, function () {
+          _this._addClickOutListener();
+        });
+      }
     } else {
       this._addClassName(this._firstBreakpointClassName());
+
+      if (this._isOverlaid()) {
+        EventHandler.one(this._element, TRANSITION_END, function () {
+          _this._addClickOutListener();
+        });
+      }
     }
 
     var complete = function complete() {
@@ -5529,8 +5518,16 @@ function () {
       this._removeClickOutListener();
     } else if (breakpoint) {
       this._element.classList.remove(this._getBreakpointClassName(breakpoint));
+
+      if (this._isOverlaid()) {
+        this._removeClickOutListener();
+      }
     } else {
       this._element.classList.remove(this._firstBreakpointClassName());
+
+      if (this._isOverlaid()) {
+        this._removeClickOutListener();
+      }
     }
 
     var complete = function complete() {
@@ -5593,6 +5590,21 @@ function () {
 
   _proto._isMobile = function _isMobile() {
     return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--is-mobile'));
+  };
+
+  _proto._isIOS = function _isIOS() {
+    var iOSDevices = ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'];
+    var platform = Boolean(navigator.platform);
+
+    if (platform) {
+      while (iOSDevices.length) {
+        if (navigator.platform === iOSDevices.pop()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   };
 
   _proto._isMinimized = function _isMinimized() {
@@ -5725,9 +5737,10 @@ function () {
   ;
 
   _proto._psInit = function _psInit() {
-    if (this._element.querySelector(Selector$b.NAVIGATION_CONTAINER)) {
+    if (this._element.querySelector(Selector$b.NAVIGATION_CONTAINER) && !this._isIOS()) {
       this._ps = new PerfectScrollbar(this._element.querySelector(Selector$b.NAVIGATION_CONTAINER), {
-        suppressScrollX: true
+        suppressScrollX: true,
+        wheelPropagation: false
       });
     }
   };
@@ -5937,7 +5950,7 @@ if ($$c) {
  */
 
 var NAME$c = 'tab';
-var VERSION$c = '3.0.0-rc.4';
+var VERSION$c = '3.1.0';
 var DATA_KEY$c = 'coreui.tab';
 var EVENT_KEY$c = "." + DATA_KEY$c;
 var DATA_API_KEY$a = '.data-api';
@@ -5970,9 +5983,7 @@ var Selector$c = {
  * ------------------------------------------------------------------------
  */
 
-var Tab =
-/*#__PURE__*/
-function () {
+var Tab = /*#__PURE__*/function () {
   function Tab(element) {
     this._element = element;
     Data.setData(this._element, DATA_KEY$c, this);
@@ -6171,7 +6182,7 @@ if ($$d) {
  */
 
 var NAME$d = 'toast';
-var VERSION$d = '3.0.0-rc.4';
+var VERSION$d = '3.1.0';
 var DATA_KEY$d = 'coreui.toast';
 var EVENT_KEY$d = "." + DATA_KEY$d;
 var Event$e = {
@@ -6206,9 +6217,7 @@ var Selector$d = {
  * ------------------------------------------------------------------------
  */
 
-var Toast =
-/*#__PURE__*/
-function () {
+var Toast = /*#__PURE__*/function () {
   function Toast(element, config) {
     this._element = element;
     this._config = this._getConfig(config);

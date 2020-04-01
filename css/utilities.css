@@ -125,83 +125,83 @@
 }
 
 .c-legacy-theme .bg-primary {
-  background-color: #321fdb !important;
+  background-color: #20a8d8 !important;
 }
 
 .c-legacy-theme a.bg-primary:hover, .c-legacy-theme a.bg-primary:focus,
 .c-legacy-theme button.bg-primary:hover,
 .c-legacy-theme button.bg-primary:focus {
-  background-color: #2819ae !important;
+  background-color: #1985ac !important;
 }
 
 .c-legacy-theme .bg-secondary {
-  background-color: #ced2d8 !important;
+  background-color: #c8ced3 !important;
 }
 
 .c-legacy-theme a.bg-secondary:hover, .c-legacy-theme a.bg-secondary:focus,
 .c-legacy-theme button.bg-secondary:hover,
 .c-legacy-theme button.bg-secondary:focus {
-  background-color: #b2b8c1 !important;
+  background-color: #acb5bc !important;
 }
 
 .c-legacy-theme .bg-success {
-  background-color: #2eb85c !important;
+  background-color: #4dbd74 !important;
 }
 
 .c-legacy-theme a.bg-success:hover, .c-legacy-theme a.bg-success:focus,
 .c-legacy-theme button.bg-success:hover,
 .c-legacy-theme button.bg-success:focus {
-  background-color: #248f48 !important;
+  background-color: #3a9d5d !important;
 }
 
 .c-legacy-theme .bg-info {
-  background-color: #39f !important;
+  background-color: #63c2de !important;
 }
 
 .c-legacy-theme a.bg-info:hover, .c-legacy-theme a.bg-info:focus,
 .c-legacy-theme button.bg-info:hover,
 .c-legacy-theme button.bg-info:focus {
-  background-color: #0080ff !important;
+  background-color: #39b2d5 !important;
 }
 
 .c-legacy-theme .bg-warning {
-  background-color: #f9b115 !important;
+  background-color: #ffc107 !important;
 }
 
 .c-legacy-theme a.bg-warning:hover, .c-legacy-theme a.bg-warning:focus,
 .c-legacy-theme button.bg-warning:hover,
 .c-legacy-theme button.bg-warning:focus {
-  background-color: #d69405 !important;
+  background-color: #d39e00 !important;
 }
 
 .c-legacy-theme .bg-danger {
-  background-color: #e55353 !important;
+  background-color: #f86c6b !important;
 }
 
 .c-legacy-theme a.bg-danger:hover, .c-legacy-theme a.bg-danger:focus,
 .c-legacy-theme button.bg-danger:hover,
 .c-legacy-theme button.bg-danger:focus {
-  background-color: #de2727 !important;
+  background-color: #f63c3a !important;
 }
 
 .c-legacy-theme .bg-light {
-  background-color: #ebedef !important;
+  background-color: #f0f3f5 !important;
 }
 
 .c-legacy-theme a.bg-light:hover, .c-legacy-theme a.bg-light:focus,
 .c-legacy-theme button.bg-light:hover,
 .c-legacy-theme button.bg-light:focus {
-  background-color: #cfd4d8 !important;
+  background-color: #d1dbe1 !important;
 }
 
 .c-legacy-theme .bg-dark {
-  background-color: #636f83 !important;
+  background-color: #2f353a !important;
 }
 
 .c-legacy-theme a.bg-dark:hover, .c-legacy-theme a.bg-dark:focus,
 .c-legacy-theme button.bg-dark:hover,
 .c-legacy-theme button.bg-dark:focus {
-  background-color: #4d5666 !important;
+  background-color: #181b1e !important;
 }
 
 .bg-primary {
@@ -284,22 +284,10 @@ button.bg-dark:focus {
   background-color: #4d5666 !important;
 }
 
-.bg-gradient-primary {
-  background: #1f1498 !important;
-  background: linear-gradient(45deg, #321fdb 0%, #1f1498 100%) !important;
-  border-color: #1f1498 !important;
-}
-
 .c-dark-theme .bg-gradient-primary {
   background: #2d2587 !important;
   background: linear-gradient(45deg, #4638c2 0%, #2d2587 100%) !important;
   border-color: #2d2587 !important;
-}
-
-.bg-gradient-secondary {
-  background: #fff !important;
-  background: linear-gradient(45deg, #c8d2dc 0%, #fff 100%) !important;
-  border-color: #fff !important;
 }
 
 .c-dark-theme .bg-gradient-secondary {
@@ -308,22 +296,10 @@ button.bg-dark:focus {
   border-color: white !important;
 }
 
-.bg-gradient-success {
-  background: #1b9e3e !important;
-  background: linear-gradient(45deg, #2eb85c 0%, #1b9e3e 100%) !important;
-  border-color: #1b9e3e !important;
-}
-
 .c-dark-theme .bg-gradient-success {
   background: #2e8c47 !important;
   background: linear-gradient(45deg, #45a164 0%, #2e8c47 100%) !important;
   border-color: #2e8c47 !important;
-}
-
-.bg-gradient-info {
-  background: #2982cc !important;
-  background: linear-gradient(45deg, #39f 0%, #2982cc 100%) !important;
-  border-color: #2982cc !important;
 }
 
 .c-dark-theme .bg-gradient-info {
@@ -332,22 +308,10 @@ button.bg-dark:focus {
   border-color: #4280b4 !important;
 }
 
-.bg-gradient-warning {
-  background: #f6960b !important;
-  background: linear-gradient(45deg, #f9b115 0%, #f6960b 100%) !important;
-  border-color: #f6960b !important;
-}
-
 .c-dark-theme .bg-gradient-warning {
   background: #dd9124 !important;
   background: linear-gradient(45deg, #e1a82d 0%, #dd9124 100%) !important;
   border-color: #dd9124 !important;
-}
-
-.bg-gradient-danger {
-  background: #d93737 !important;
-  background: linear-gradient(45deg, #e55353 0%, #d93737 100%) !important;
-  border-color: #d93737 !important;
 }
 
 .c-dark-theme .bg-gradient-danger {
@@ -356,28 +320,112 @@ button.bg-dark:focus {
   border-color: #c14f4f !important;
 }
 
-.bg-gradient-light {
-  background: #fff !important;
-  background: linear-gradient(45deg, #e3e8ed 0%, #fff 100%) !important;
-  border-color: #fff !important;
-}
-
 .c-dark-theme .bg-gradient-light {
   background: white !important;
   background: linear-gradient(45deg, #e8e8e8 0%, white 100%) !important;
   border-color: white !important;
 }
 
-.bg-gradient-dark {
-  background: #212333 !important;
-  background: linear-gradient(45deg, #3c4b64 0%, #212333 100%) !important;
-  border-color: #212333 !important;
-}
-
 .c-dark-theme .bg-gradient-dark {
   background: #292a2b !important;
   background: linear-gradient(45deg, #4c4f54 0%, #292a2b 100%) !important;
   border-color: #292a2b !important;
+}
+
+.c-legacy-theme .bg-gradient-primary {
+  background: #1d97c2 !important;
+  background: linear-gradient(45deg, #31b3e0 0%, #1d97c2 100%) !important;
+  border-color: #1d97c2 !important;
+}
+
+.c-legacy-theme .bg-gradient-secondary {
+  background: #bac1c8 !important;
+  background: linear-gradient(45deg, #d6dbde 0%, #bac1c8 100%) !important;
+  border-color: #bac1c8 !important;
+}
+
+.c-legacy-theme .bg-gradient-success {
+  background: #41af67 !important;
+  background: linear-gradient(45deg, #60c483 0%, #41af67 100%) !important;
+  border-color: #41af67 !important;
+}
+
+.c-legacy-theme .bg-gradient-info {
+  background: #4ebada !important;
+  background: linear-gradient(45deg, #78cae2 0%, #4ebada 100%) !important;
+  border-color: #4ebada !important;
+}
+
+.c-legacy-theme .bg-gradient-warning {
+  background: #edb100 !important;
+  background: linear-gradient(45deg, #ffc721 0%, #edb100 100%) !important;
+  border-color: #edb100 !important;
+}
+
+.c-legacy-theme .bg-gradient-danger {
+  background: #f75453 !important;
+  background: linear-gradient(45deg, #f98483 0%, #f75453 100%) !important;
+  border-color: #f75453 !important;
+}
+
+.c-legacy-theme .bg-gradient-light {
+  background: #e1e7eb !important;
+  background: linear-gradient(45deg, white 0%, #e1e7eb 100%) !important;
+  border-color: #e1e7eb !important;
+}
+
+.c-legacy-theme .bg-gradient-dark {
+  background: #24282c !important;
+  background: linear-gradient(45deg, #3a4248 0%, #24282c 100%) !important;
+  border-color: #24282c !important;
+}
+
+.bg-gradient-primary {
+  background: #1f1498 !important;
+  background: linear-gradient(45deg, #321fdb 0%, #1f1498 100%) !important;
+  border-color: #1f1498 !important;
+}
+
+.bg-gradient-secondary {
+  background: #fff !important;
+  background: linear-gradient(45deg, #c8d2dc 0%, #fff 100%) !important;
+  border-color: #fff !important;
+}
+
+.bg-gradient-success {
+  background: #1b9e3e !important;
+  background: linear-gradient(45deg, #2eb85c 0%, #1b9e3e 100%) !important;
+  border-color: #1b9e3e !important;
+}
+
+.bg-gradient-info {
+  background: #2982cc !important;
+  background: linear-gradient(45deg, #39f 0%, #2982cc 100%) !important;
+  border-color: #2982cc !important;
+}
+
+.bg-gradient-warning {
+  background: #f6960b !important;
+  background: linear-gradient(45deg, #f9b115 0%, #f6960b 100%) !important;
+  border-color: #f6960b !important;
+}
+
+.bg-gradient-danger {
+  background: #d93737 !important;
+  background: linear-gradient(45deg, #e55353 0%, #d93737 100%) !important;
+  border-color: #d93737 !important;
+}
+
+.bg-gradient-light {
+  background: #fff !important;
+  background: linear-gradient(45deg, #e3e8ed 0%, #fff 100%) !important;
+  border-color: #fff !important;
+}
+
+.bg-gradient-dark {
+  background: #212333 !important;
+  background: linear-gradient(45deg, #3c4b64 0%, #212333 100%) !important;
+  border-color: #212333 !important;
 }
 
 .bg-white {
@@ -680,6 +728,26 @@ button.bg-gray-900:focus {
   border-left: 1px solid #d8dbe0 !important;
 }
 
+.c-legacy-theme .border {
+  border: 1px solid #c8ced3 !important;
+}
+
+.c-legacy-theme .border-top {
+  border-top: 1px solid #c8ced3 !important;
+}
+
+.c-legacy-theme .border-right {
+  border-right: 1px solid #c8ced3 !important;
+}
+
+.c-legacy-theme .border-bottom {
+  border-bottom: 1px solid #c8ced3 !important;
+}
+
+.c-legacy-theme .border-left {
+  border-left: 1px solid #c8ced3 !important;
+}
+
 .c-dark-theme .border {
   border: 1px solid #181924 !important;
 }
@@ -762,42 +830,42 @@ button.bg-gray-900:focus {
 
 .c-legacy-theme .border-primary {
   border: 1px solid !important;
-  border-color: #321fdb !important;
+  border-color: #20a8d8 !important;
 }
 
 .c-legacy-theme .border-secondary {
   border: 1px solid !important;
-  border-color: #ced2d8 !important;
+  border-color: #c8ced3 !important;
 }
 
 .c-legacy-theme .border-success {
   border: 1px solid !important;
-  border-color: #2eb85c !important;
+  border-color: #4dbd74 !important;
 }
 
 .c-legacy-theme .border-info {
   border: 1px solid !important;
-  border-color: #39f !important;
+  border-color: #63c2de !important;
 }
 
 .c-legacy-theme .border-warning {
   border: 1px solid !important;
-  border-color: #f9b115 !important;
+  border-color: #ffc107 !important;
 }
 
 .c-legacy-theme .border-danger {
   border: 1px solid !important;
-  border-color: #e55353 !important;
+  border-color: #f86c6b !important;
 }
 
 .c-legacy-theme .border-light {
   border: 1px solid !important;
-  border-color: #ebedef !important;
+  border-color: #f0f3f5 !important;
 }
 
 .c-legacy-theme .border-dark {
   border: 1px solid !important;
-  border-color: #636f83 !important;
+  border-color: #2f353a !important;
 }
 
 .border-primary {
@@ -5223,67 +5291,67 @@ html:not([dir="rtl"]) .mfe-auto {
 }
 
 .c-legacy-theme .text-primary {
-  color: #321fdb !important;
+  color: #20a8d8 !important;
 }
 
 .c-legacy-theme a.text-primary:hover, .c-legacy-theme a.text-primary:focus {
-  color: #231698 !important;
+  color: #167495 !important;
 }
 
 .c-legacy-theme .text-secondary {
-  color: #ced2d8 !important;
+  color: #c8ced3 !important;
 }
 
 .c-legacy-theme a.text-secondary:hover, .c-legacy-theme a.text-secondary:focus {
-  color: #a3abb6 !important;
+  color: #9ea8b1 !important;
 }
 
 .c-legacy-theme .text-success {
-  color: #2eb85c !important;
+  color: #4dbd74 !important;
 }
 
 .c-legacy-theme a.text-success:hover, .c-legacy-theme a.text-success:focus {
-  color: #1f7b3d !important;
+  color: #338a52 !important;
 }
 
 .c-legacy-theme .text-info {
-  color: #39f !important;
+  color: #63c2de !important;
 }
 
 .c-legacy-theme a.text-info:hover, .c-legacy-theme a.text-info:focus {
-  color: #0073e6 !important;
+  color: #2ba6ca !important;
 }
 
 .c-legacy-theme .text-warning {
-  color: #f9b115 !important;
+  color: #ffc107 !important;
 }
 
 .c-legacy-theme a.text-warning:hover, .c-legacy-theme a.text-warning:focus {
-  color: #bd8305 !important;
+  color: #ba8b00 !important;
 }
 
 .c-legacy-theme .text-danger {
-  color: #e55353 !important;
+  color: #f86c6b !important;
 }
 
 .c-legacy-theme a.text-danger:hover, .c-legacy-theme a.text-danger:focus {
-  color: #cd1f1f !important;
+  color: #f52322 !important;
 }
 
 .c-legacy-theme .text-light {
-  color: #ebedef !important;
+  color: #f0f3f5 !important;
 }
 
 .c-legacy-theme a.text-light:hover, .c-legacy-theme a.text-light:focus {
-  color: #c1c7cd !important;
+  color: #c2ced6 !important;
 }
 
 .c-legacy-theme .text-dark {
-  color: #636f83 !important;
+  color: #2f353a !important;
 }
 
 .c-legacy-theme a.text-dark:hover, .c-legacy-theme a.text-dark:focus {
-  color: #424a57 !important;
+  color: #0d0e10 !important;
 }
 
 .text-primary {

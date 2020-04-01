@@ -46,10 +46,6 @@
   border-color: #181924;
 }
 
-.c-email-app .c-messages {
-  padding: 1rem;
-}
-
 .c-email-app .c-message {
   display: flex;
   margin-bottom: 1rem;

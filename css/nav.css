@@ -51,13 +51,21 @@ html:not([dir="rtl"]) .nav {
   color: #8a93a2;
 }
 
+.c-legacy-theme .nav-link.disabled {
+  color: #73818f;
+}
+
 .c-dark-theme .nav-link.disabled {
-  color: #4f5d73;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .nav-tabs {
   border-bottom: 1px solid;
   border-color: #c4c9d0;
+}
+
+.c-legacy-theme .nav-tabs {
+  border-color: #c8ced3;
 }
 
 .c-dark-theme .nav-tabs {
@@ -78,6 +86,10 @@ html:not([dir="rtl"]) .nav {
   border-color: #d8dbe0 #d8dbe0 #c4c9d0;
 }
 
+.c-legacy-theme .nav-tabs .nav-link:hover, .c-legacy-theme .nav-tabs .nav-link:focus {
+  border-color: #e4e7ea #e4e7ea #c8ced3;
+}
+
 .c-dark-theme .nav-tabs .nav-link:hover, .c-dark-theme .nav-tabs .nav-link:focus {
   border-color: #23242d #23242d #23242d;
 }
@@ -88,8 +100,12 @@ html:not([dir="rtl"]) .nav {
   color: #8a93a2;
 }
 
+.c-legacy-theme .nav-tabs .nav-link.disabled {
+  color: #73818f;
+}
+
 .c-dark-theme .nav-tabs .nav-link.disabled {
-  color: #4f5d73;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .nav-tabs .nav-link.active,
@@ -97,6 +113,13 @@ html:not([dir="rtl"]) .nav {
   color: #768192;
   background-color: #ebedef;
   border-color: #c4c9d0 #c4c9d0 #ebedef;
+}
+
+.c-legacy-theme .nav-tabs .nav-link.active, .c-legacy-theme
+.nav-tabs .nav-item.show .nav-link {
+  color: #5c6873;
+  background-color: #e4e5e6;
+  border-color: #c8ced3 #c8ced3 #e4e5e6;
 }
 
 .c-dark-theme .nav-tabs .nav-link.active, .c-dark-theme
@@ -121,6 +144,11 @@ html:not([dir="rtl"]) .nav {
   border-bottom-color: #fff;
 }
 
+.c-legacy-theme .nav-tabs-boxed .nav-tabs .nav-link.active {
+  background-color: #fff;
+  border-bottom-color: #fff;
+}
+
 .c-dark-theme .nav-tabs-boxed .nav-tabs .nav-link.active {
   background-color: #23242d;
   border-bottom-color: #23242d;
@@ -133,6 +161,12 @@ html:not([dir="rtl"]) .nav {
   color: #768192;
   background-color: #fff;
   border-color: #d8dbe0;
+}
+
+.c-legacy-theme .nav-tabs-boxed .tab-content {
+  color: #5c6873;
+  background-color: #fff;
+  border-color: #c8ced3;
 }
 
 .c-dark-theme .nav-tabs-boxed .tab-content {
@@ -175,6 +209,10 @@ html:not([dir="rtl"]) .nav {
   border-color: #d8dbe0 #fff #d8dbe0 #d8dbe0;
 }
 
+.c-legacy-theme .nav-tabs-boxed.nav-tabs-boxed-left .nav-link.active {
+  border-color: #c8ced3 #fff #c8ced3 #c8ced3;
+}
+
 .c-dark-theme .nav-tabs-boxed.nav-tabs-boxed-left .nav-link.active {
   border-color: #23242d;
 }
@@ -203,6 +241,10 @@ html:not([dir="rtl"]) .nav-tabs-boxed.nav-tabs-boxed-right .nav-item {
   border-color: #d8dbe0 #d8dbe0 #d8dbe0 #fff;
 }
 
+.c-legacy-theme .nav-tabs-boxed.nav-tabs-boxed-right .nav-link.active {
+  border-color: #c8ced3 #c8ced3 #c8ced3 #fff;
+}
+
 .c-dark-theme .nav-tabs-boxed.nav-tabs-boxed-right .nav-link.active {
   border-color: #23242d #23242d #23242d #23242d;
 }
@@ -221,15 +263,25 @@ html:not([dir="rtl"]) .nav-tabs-boxed.nav-tabs-boxed-right .nav-item {
   background-color: #321fdb;
 }
 
+.c-legacy-theme .nav-pills .nav-link.active, .c-legacy-theme
+.nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #20a8d8;
+}
+
 .c-dark-theme .nav-pills .nav-link.active, .c-dark-theme
 .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: #321fdb;
+  background-color: #4638c2;
 }
 
 .nav-underline {
   border-bottom: 2px solid;
   border-color: #c4c9d0;
+}
+
+.c-legacy-theme .nav-underline {
+  border-color: #c8ced3;
 }
 
 .c-dark-theme .nav-underline {
@@ -250,146 +302,146 @@ html:not([dir="rtl"]) .nav-tabs-boxed.nav-tabs-boxed-right .nav-item {
   background: transparent;
 }
 
-.c-dark-theme.nav-underline-primary .nav-link.active,
-.c-dark-theme.nav-underline-primary .show > .nav-link {
+.c-dark-theme .nav-underline-primary .nav-link.active,
+.c-dark-theme .nav-underline-primary .show > .nav-link {
   color: #4638c2;
   border-color: #4638c2;
 }
 
-.c-dark-theme.nav-underline-secondary .nav-link.active,
-.c-dark-theme.nav-underline-secondary .show > .nav-link {
+.c-dark-theme .nav-underline-secondary .nav-link.active,
+.c-dark-theme .nav-underline-secondary .show > .nav-link {
   color: #4c4f54;
   border-color: #4c4f54;
 }
 
-.c-dark-theme.nav-underline-success .nav-link.active,
-.c-dark-theme.nav-underline-success .show > .nav-link {
+.c-dark-theme .nav-underline-success .nav-link.active,
+.c-dark-theme .nav-underline-success .show > .nav-link {
   color: #45a164;
   border-color: #45a164;
 }
 
-.c-dark-theme.nav-underline-info .nav-link.active,
-.c-dark-theme.nav-underline-info .show > .nav-link {
+.c-dark-theme .nav-underline-info .nav-link.active,
+.c-dark-theme .nav-underline-info .show > .nav-link {
   color: #4799eb;
   border-color: #4799eb;
 }
 
-.c-dark-theme.nav-underline-warning .nav-link.active,
-.c-dark-theme.nav-underline-warning .show > .nav-link {
+.c-dark-theme .nav-underline-warning .nav-link.active,
+.c-dark-theme .nav-underline-warning .show > .nav-link {
   color: #e1a82d;
   border-color: #e1a82d;
 }
 
-.c-dark-theme.nav-underline-danger .nav-link.active,
-.c-dark-theme.nav-underline-danger .show > .nav-link {
+.c-dark-theme .nav-underline-danger .nav-link.active,
+.c-dark-theme .nav-underline-danger .show > .nav-link {
   color: #d16767;
   border-color: #d16767;
 }
 
-.c-dark-theme.nav-underline-light .nav-link.active,
-.c-dark-theme.nav-underline-light .show > .nav-link {
+.c-dark-theme .nav-underline-light .nav-link.active,
+.c-dark-theme .nav-underline-light .show > .nav-link {
   color: #20202a;
   border-color: #20202a;
 }
 
-.c-dark-theme.nav-underline-dark .nav-link.active,
-.c-dark-theme.nav-underline-dark .show > .nav-link {
+.c-dark-theme .nav-underline-dark .nav-link.active,
+.c-dark-theme .nav-underline-dark .show > .nav-link {
   color: #181924;
   border-color: #181924;
 }
 
-.c-legacy-theme.nav-underline-primary .nav-link.active,
-.c-legacy-theme.nav-underline-primary .show > .nav-link {
+.c-legacy-theme .nav-underline-primary .nav-link.active,
+.c-legacy-theme .nav-underline-primary .show > .nav-link {
+  color: #20a8d8;
+  border-color: #20a8d8;
+}
+
+.c-legacy-theme .nav-underline-secondary .nav-link.active,
+.c-legacy-theme .nav-underline-secondary .show > .nav-link {
+  color: #c8ced3;
+  border-color: #c8ced3;
+}
+
+.c-legacy-theme .nav-underline-success .nav-link.active,
+.c-legacy-theme .nav-underline-success .show > .nav-link {
+  color: #4dbd74;
+  border-color: #4dbd74;
+}
+
+.c-legacy-theme .nav-underline-info .nav-link.active,
+.c-legacy-theme .nav-underline-info .show > .nav-link {
+  color: #63c2de;
+  border-color: #63c2de;
+}
+
+.c-legacy-theme .nav-underline-warning .nav-link.active,
+.c-legacy-theme .nav-underline-warning .show > .nav-link {
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.c-legacy-theme .nav-underline-danger .nav-link.active,
+.c-legacy-theme .nav-underline-danger .show > .nav-link {
+  color: #f86c6b;
+  border-color: #f86c6b;
+}
+
+.c-legacy-theme .nav-underline-light .nav-link.active,
+.c-legacy-theme .nav-underline-light .show > .nav-link {
+  color: #f0f3f5;
+  border-color: #f0f3f5;
+}
+
+.c-legacy-theme .nav-underline-dark .nav-link.active,
+.c-legacy-theme .nav-underline-dark .show > .nav-link {
+  color: #2f353a;
+  border-color: #2f353a;
+}
+
+.nav-underline-primary .nav-link.active,
+.nav-underline-primary .show > .nav-link {
   color: #321fdb;
   border-color: #321fdb;
 }
 
-.c-legacy-theme.nav-underline-secondary .nav-link.active,
-.c-legacy-theme.nav-underline-secondary .show > .nav-link {
+.nav-underline-secondary .nav-link.active,
+.nav-underline-secondary .show > .nav-link {
   color: #ced2d8;
   border-color: #ced2d8;
 }
 
-.c-legacy-theme.nav-underline-success .nav-link.active,
-.c-legacy-theme.nav-underline-success .show > .nav-link {
+.nav-underline-success .nav-link.active,
+.nav-underline-success .show > .nav-link {
   color: #2eb85c;
   border-color: #2eb85c;
 }
 
-.c-legacy-theme.nav-underline-info .nav-link.active,
-.c-legacy-theme.nav-underline-info .show > .nav-link {
+.nav-underline-info .nav-link.active,
+.nav-underline-info .show > .nav-link {
   color: #39f;
   border-color: #39f;
 }
 
-.c-legacy-theme.nav-underline-warning .nav-link.active,
-.c-legacy-theme.nav-underline-warning .show > .nav-link {
+.nav-underline-warning .nav-link.active,
+.nav-underline-warning .show > .nav-link {
   color: #f9b115;
   border-color: #f9b115;
 }
 
-.c-legacy-theme.nav-underline-danger .nav-link.active,
-.c-legacy-theme.nav-underline-danger .show > .nav-link {
+.nav-underline-danger .nav-link.active,
+.nav-underline-danger .show > .nav-link {
   color: #e55353;
   border-color: #e55353;
 }
 
-.c-legacy-theme.nav-underline-light .nav-link.active,
-.c-legacy-theme.nav-underline-light .show > .nav-link {
+.nav-underline-light .nav-link.active,
+.nav-underline-light .show > .nav-link {
   color: #ebedef;
   border-color: #ebedef;
 }
 
-.c-legacy-theme.nav-underline-dark .nav-link.active,
-.c-legacy-theme.nav-underline-dark .show > .nav-link {
-  color: #636f83;
-  border-color: #636f83;
-}
-
-.nav-underline.nav-underline-primary .nav-link.active,
-.nav-underline.nav-underline-primary .show > .nav-link {
-  color: #321fdb;
-  border-color: #321fdb;
-}
-
-.nav-underline.nav-underline-secondary .nav-link.active,
-.nav-underline.nav-underline-secondary .show > .nav-link {
-  color: #ced2d8;
-  border-color: #ced2d8;
-}
-
-.nav-underline.nav-underline-success .nav-link.active,
-.nav-underline.nav-underline-success .show > .nav-link {
-  color: #2eb85c;
-  border-color: #2eb85c;
-}
-
-.nav-underline.nav-underline-info .nav-link.active,
-.nav-underline.nav-underline-info .show > .nav-link {
-  color: #39f;
-  border-color: #39f;
-}
-
-.nav-underline.nav-underline-warning .nav-link.active,
-.nav-underline.nav-underline-warning .show > .nav-link {
-  color: #f9b115;
-  border-color: #f9b115;
-}
-
-.nav-underline.nav-underline-danger .nav-link.active,
-.nav-underline.nav-underline-danger .show > .nav-link {
-  color: #e55353;
-  border-color: #e55353;
-}
-
-.nav-underline.nav-underline-light .nav-link.active,
-.nav-underline.nav-underline-light .show > .nav-link {
-  color: #ebedef;
-  border-color: #ebedef;
-}
-
-.nav-underline.nav-underline-dark .nav-link.active,
-.nav-underline.nav-underline-dark .show > .nav-link {
+.nav-underline-dark .nav-link.active,
+.nav-underline-dark .show > .nav-link {
   color: #636f83;
   border-color: #636f83;
 }

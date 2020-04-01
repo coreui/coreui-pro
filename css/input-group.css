@@ -205,9 +205,9 @@ html:not([dir="rtl"]) .input-group-append {
   white-space: nowrap;
   border: 1px solid;
   border-radius: 0.25rem;
-  color: #768192;
-  background-color: #ebedef;
-  border-color: #d8dbe0;
+  color: #5c6873;
+  background-color: #f0f3f5;
+  border-color: #e4e7ea;
 }
 
 .c-dark-theme .input-group-text {

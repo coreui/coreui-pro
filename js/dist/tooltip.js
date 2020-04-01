@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  tooltip.js v3.0.0 (https://coreui.io)
+  * CoreUI PRO  tooltip.jsv3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -9,10 +9,10 @@
   (global = global || self, global.Tooltip = factory(global.Data, global.EventHandler, global.Manipulator, global.createPopper, global.SelectorEngine));
 }(this, (function (Data, EventHandler, Manipulator, core, SelectorEngine) { 'use strict';
 
-  Data = Data && Data.hasOwnProperty('default') ? Data['default'] : Data;
-  EventHandler = EventHandler && EventHandler.hasOwnProperty('default') ? EventHandler['default'] : EventHandler;
-  Manipulator = Manipulator && Manipulator.hasOwnProperty('default') ? Manipulator['default'] : Manipulator;
-  SelectorEngine = SelectorEngine && SelectorEngine.hasOwnProperty('default') ? SelectorEngine['default'] : SelectorEngine;
+  Data = Data && Object.prototype.hasOwnProperty.call(Data, 'default') ? Data['default'] : Data;
+  EventHandler = EventHandler && Object.prototype.hasOwnProperty.call(EventHandler, 'default') ? EventHandler['default'] : EventHandler;
+  Manipulator = Manipulator && Object.prototype.hasOwnProperty.call(Manipulator, 'default') ? Manipulator['default'] : Manipulator;
+  SelectorEngine = SelectorEngine && Object.prototype.hasOwnProperty.call(SelectorEngine, 'default') ? SelectorEngine['default'] : SelectorEngine;
 
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -344,7 +344,7 @@
    */
 
   var NAME = 'tooltip';
-  var VERSION = '3.0.0-rc.4';
+  var VERSION = '3.1.0';
   var DATA_KEY = 'coreui.tooltip';
   var EVENT_KEY = "." + DATA_KEY;
   var CLASS_PREFIX = 'bs-tooltip';
@@ -386,7 +386,7 @@
     placement: 'top',
     offset: 0,
     container: false,
-    fallbackPlacement: ['top', 'right', 'bottom', 'left'],
+    fallbackPlacement: 'flip',
     boundary: 'scrollParent',
     sanitize: true,
     sanitizeFn: null,
@@ -411,6 +411,7 @@
   };
   var ClassName = {
     FADE: 'fade',
+    MODAL: 'modal',
     SHOW: 'show'
   };
   var Selector = {
@@ -428,9 +429,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Tooltip =
-  /*#__PURE__*/
-  function () {
+  var Tooltip = /*#__PURE__*/function () {
     function Tooltip(element, config) {
       if (typeof core.createPopper === 'undefined') {
         throw new TypeError('Bootstrap\'s tooltips require Popper.js (https://popper.js.org)');
@@ -504,7 +503,7 @@
       clearTimeout(this._timeout);
       Data.removeData(this.element, this.constructor.DATA_KEY);
       EventHandler.off(this.element, this.constructor.EVENT_KEY);
-      EventHandler.off(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler);
+      EventHandler.off(SelectorEngine.closest(this.element, "." + ClassName.MODAL), 'hide.coreui.modal', this._hideModalHandler);
 
       if (this.tip) {
         this.tip.parentNode.removeChild(this.tip);
@@ -827,7 +826,7 @@
         }
       };
 
-      EventHandler.on(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler);
+      EventHandler.on(SelectorEngine.closest(this.element, '.modal'), 'hide.coreui.modal', this._hideModalHandler);
 
       if (this.config.selector) {
         this.config = _objectSpread2({}, this.config, {
@@ -979,7 +978,7 @@
       var tip = this.getTipElement();
       var tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX);
 
-      if (tabClass !== null && tabClass.length) {
+      if (tabClass !== null && tabClass.length > 0) {
         tabClass.map(function (token) {
           return token.trim();
         }).forEach(function (tClass) {
@@ -1001,7 +1000,7 @@
       var tip = this.getTipElement();
       var initConfigAnimation = this.config.animation;
 
-      if (tip.getAttribute('x-placement') !== null) {
+      if (tip.getAttribute('data-popper-placement') !== null) {
         return;
       }
 

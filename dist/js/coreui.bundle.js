@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  v3.0.0 (https://coreui.io)
+  * CoreUI PRO v3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -767,7 +767,7 @@
    */
 
   var NAME = 'asyncLoad';
-  var VERSION = '3.0.0-rc.4';
+  var VERSION = '3.1.0';
   var DATA_KEY = 'coreui.asyncLoad';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -793,9 +793,7 @@
     subpagesDirectory: 'views/'
   };
 
-  var AsyncLoad =
-  /*#__PURE__*/
-  function () {
+  var AsyncLoad = /*#__PURE__*/function () {
     function AsyncLoad(element, config) {
       this._config = this._getConfig(config);
       this._element = element;
@@ -1109,7 +1107,7 @@
    */
 
   var NAME$1 = 'alert';
-  var VERSION$1 = '3.0.0-rc.4';
+  var VERSION$1 = '3.1.0';
   var DATA_KEY$1 = 'coreui.alert';
   var EVENT_KEY$1 = "." + DATA_KEY$1;
   var DATA_API_KEY$1 = '.data-api';
@@ -1132,9 +1130,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Alert =
-  /*#__PURE__*/
-  function () {
+  var Alert = /*#__PURE__*/function () {
     function Alert(element) {
       this._element = element;
 
@@ -1283,7 +1279,7 @@
    */
 
   var NAME$2 = 'button';
-  var VERSION$2 = '3.0.0-rc.4';
+  var VERSION$2 = '3.1.0';
   var DATA_KEY$2 = 'coreui.button';
   var EVENT_KEY$2 = "." + DATA_KEY$2;
   var DATA_API_KEY$2 = '.data-api';
@@ -1310,9 +1306,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Button =
-  /*#__PURE__*/
-  function () {
+  var Button = /*#__PURE__*/function () {
     function Button(element) {
       this._element = element;
       Data.setData(element, DATA_KEY$2, this);
@@ -1542,7 +1536,7 @@
    */
 
   var NAME$3 = 'carousel';
-  var VERSION$3 = '3.0.0-rc.4';
+  var VERSION$3 = '3.1.0';
   var DATA_KEY$3 = 'coreui.carousel';
   var EVENT_KEY$3 = "." + DATA_KEY$3;
   var DATA_API_KEY$3 = '.data-api';
@@ -1621,9 +1615,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Carousel =
-  /*#__PURE__*/
-  function () {
+  var Carousel = /*#__PURE__*/function () {
     function Carousel(element, config) {
       this._items = null;
       this._interval = null;
@@ -2155,7 +2147,7 @@
    */
 
   var NAME$4 = 'class-toggler';
-  var VERSION$4 = '3.0.0-rc.4';
+  var VERSION$4 = '3.1.0';
   var DATA_KEY$4 = 'coreui.class-toggler';
   var EVENT_KEY$4 = "." + DATA_KEY$4;
   var DATA_API_KEY$4 = '.data-api';
@@ -2181,9 +2173,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var ClassToggler =
-  /*#__PURE__*/
-  function () {
+  var ClassToggler = /*#__PURE__*/function () {
     function ClassToggler(element) {
       this._element = element;
     } // Getters
@@ -2439,7 +2429,7 @@
    */
 
   var NAME$5 = 'collapse';
-  var VERSION$5 = '3.0.0-rc.4';
+  var VERSION$5 = '3.1.0';
   var DATA_KEY$5 = 'coreui.collapse';
   var EVENT_KEY$5 = "." + DATA_KEY$5;
   var DATA_API_KEY$5 = '.data-api';
@@ -2478,9 +2468,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Collapse =
-  /*#__PURE__*/
-  function () {
+  var Collapse = /*#__PURE__*/function () {
     function Collapse(element, config) {
       this._isTransitioning = false;
       this._element = element;
@@ -2890,7 +2878,7 @@
 
   function isElement$1(node) {
     var OwnElement = getWindow(node).Element;
-    return node instanceof OwnElement;
+    return node instanceof OwnElement || node instanceof Element;
   }
   /*:: declare function isHTMLElement(node: mixed): boolean %checks(node instanceof
     HTMLElement); */
@@ -2898,7 +2886,7 @@
 
   function isHTMLElement(node) {
     var OwnElement = getWindow(node).HTMLElement;
-    return node instanceof OwnElement;
+    return node instanceof OwnElement || node instanceof HTMLElement;
   }
 
   function getHTMLElementScroll(element) {
@@ -4060,6 +4048,7 @@
         padding = options.padding,
         boundary = options.boundary,
         rootBoundary = options.rootBoundary,
+        altBoundary = options.altBoundary,
         _options$flipVariatio = options.flipVariations,
         flipVariations = _options$flipVariatio === void 0 ? true : _options$flipVariatio;
     var preferredPlacement = state.options.placement;
@@ -4093,6 +4082,7 @@
         placement: placement,
         boundary: boundary,
         rootBoundary: rootBoundary,
+        altBoundary: altBoundary,
         padding: padding
       });
       var mainVariationSide = isVertical ? isStartVariation ? right : left : isStartVariation ? bottom : top;
@@ -4179,6 +4169,7 @@
         checkAltAxis = _options$altAxis === void 0 ? false : _options$altAxis,
         boundary = options.boundary,
         rootBoundary = options.rootBoundary,
+        altBoundary = options.altBoundary,
         padding = options.padding,
         _options$tether = options.tether,
         tether = _options$tether === void 0 ? true : _options$tether,
@@ -4187,7 +4178,8 @@
     var overflow = detectOverflow(state, {
       boundary: boundary,
       rootBoundary: rootBoundary,
-      padding: padding
+      padding: padding,
+      altBoundary: altBoundary
     });
     var basePlacement = getBasePlacement(state.placement);
     var variation = getVariation(state.placement);
@@ -4233,8 +4225,10 @@
       var arrowLen = within(0, referenceRect[len], arrowRect[len]);
       var minOffset = isBasePlacement ? referenceRect[len] / 2 - additive - arrowLen - arrowPaddingMin - tetherOffsetValue : minLen - arrowLen - arrowPaddingMin - tetherOffsetValue;
       var maxOffset = isBasePlacement ? -referenceRect[len] / 2 + additive + arrowLen + arrowPaddingMax + tetherOffsetValue : maxLen + arrowLen + arrowPaddingMax + tetherOffsetValue;
+      var arrowOffsetParent = state.elements.arrow && getOffsetParent(state.elements.arrow);
+      var clientOffset = arrowOffsetParent ? mainAxis === 'y' ? arrowOffsetParent.clientTop || 0 : arrowOffsetParent.clientLeft || 0 : 0;
       var offsetModifierValue = state.modifiersData.offset ? state.modifiersData.offset[state.placement][mainAxis] : 0;
-      var tetherMin = popperOffsets[mainAxis] + minOffset - offsetModifierValue;
+      var tetherMin = popperOffsets[mainAxis] + minOffset - offsetModifierValue - clientOffset;
       var tetherMax = popperOffsets[mainAxis] + maxOffset - offsetModifierValue;
       var preventedOffset = within(tether ? Math.min(min, tetherMin) : min, offset, tether ? Math.max(max, tetherMax) : max);
       popperOffsets[mainAxis] = preventedOffset;
@@ -4291,7 +4285,9 @@
     var maxProp = axis === 'y' ? bottom : right;
     var endDiff = state.rects.reference[len] + state.rects.reference[axis] - popperOffsets[axis] - state.rects.popper[len];
     var startDiff = popperOffsets[axis] - state.rects.reference[axis];
-    var centerToReference = endDiff / 2 - startDiff / 2; // Make sure the arrow doesn't overflow the popper if the center point is
+    var arrowOffsetParent = state.elements.arrow && getOffsetParent(state.elements.arrow);
+    var clientOffset = arrowOffsetParent ? axis === 'y' ? arrowOffsetParent.clientLeft || 0 : arrowOffsetParent.clientTop || 0 : 0;
+    var centerToReference = endDiff / 2 - startDiff / 2 - clientOffset; // Make sure the arrow doesn't overflow the popper if the center point is
     // outside of the popper bounds
 
     var center = within(paddingObject[minProp], state.rects.popper[len] / 2 - arrowRect[len] / 2 + centerToReference, state.rects.popper[len] - arrowRect[len] - paddingObject[maxProp]); // Prevents breaking syntax highlighting...
@@ -4410,7 +4406,7 @@
    */
 
   var NAME$6 = 'dropdown';
-  var VERSION$6 = '3.0.0-rc.4';
+  var VERSION$6 = '3.1.0';
   var DATA_KEY$6 = 'coreui.dropdown';
   var EVENT_KEY$6 = "." + DATA_KEY$6;
   var DATA_API_KEY$6 = '.data-api';
@@ -4486,9 +4482,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Dropdown =
-  /*#__PURE__*/
-  function () {
+  var Dropdown = /*#__PURE__*/function () {
     function Dropdown(element, config) {
       this._element = element;
       this._popper = null;
@@ -4946,7 +4940,7 @@
    */
 
   var NAME$7 = 'modal';
-  var VERSION$7 = '3.0.0-rc.4';
+  var VERSION$7 = '3.1.0';
   var DATA_KEY$7 = 'coreui.modal';
   var EVENT_KEY$7 = "." + DATA_KEY$7;
   var DATA_API_KEY$7 = '.data-api';
@@ -5001,9 +4995,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Modal =
-  /*#__PURE__*/
-  function () {
+  var Modal = /*#__PURE__*/function () {
     function Modal(element, config) {
       this._config = this._getConfig(config);
       this._element = element;
@@ -5684,7 +5676,7 @@
    */
 
   var NAME$8 = 'tooltip';
-  var VERSION$8 = '3.0.0-rc.4';
+  var VERSION$8 = '3.1.0';
   var DATA_KEY$8 = 'coreui.tooltip';
   var EVENT_KEY$8 = "." + DATA_KEY$8;
   var CLASS_PREFIX = 'bs-tooltip';
@@ -5726,7 +5718,7 @@
     placement: 'top',
     offset: 0,
     container: false,
-    fallbackPlacement: ['top', 'right', 'bottom', 'left'],
+    fallbackPlacement: 'flip',
     boundary: 'scrollParent',
     sanitize: true,
     sanitizeFn: null,
@@ -5751,6 +5743,7 @@
   };
   var ClassName$8 = {
     FADE: 'fade',
+    MODAL: 'modal',
     SHOW: 'show'
   };
   var Selector$8 = {
@@ -5768,9 +5761,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Tooltip =
-  /*#__PURE__*/
-  function () {
+  var Tooltip = /*#__PURE__*/function () {
     function Tooltip(element, config) {
       if (typeof createPopper === 'undefined') {
         throw new TypeError('Bootstrap\'s tooltips require Popper.js (https://popper.js.org)');
@@ -5844,7 +5835,7 @@
       clearTimeout(this._timeout);
       Data.removeData(this.element, this.constructor.DATA_KEY);
       EventHandler.off(this.element, this.constructor.EVENT_KEY);
-      EventHandler.off(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler);
+      EventHandler.off(SelectorEngine.closest(this.element, "." + ClassName$8.MODAL), 'hide.coreui.modal', this._hideModalHandler);
 
       if (this.tip) {
         this.tip.parentNode.removeChild(this.tip);
@@ -6167,7 +6158,7 @@
         }
       };
 
-      EventHandler.on(SelectorEngine.closest(this.element, '.modal'), 'hide.bs.modal', this._hideModalHandler);
+      EventHandler.on(SelectorEngine.closest(this.element, '.modal'), 'hide.coreui.modal', this._hideModalHandler);
 
       if (this.config.selector) {
         this.config = _objectSpread2({}, this.config, {
@@ -6319,7 +6310,7 @@
       var tip = this.getTipElement();
       var tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX);
 
-      if (tabClass !== null && tabClass.length) {
+      if (tabClass !== null && tabClass.length > 0) {
         tabClass.map(function (token) {
           return token.trim();
         }).forEach(function (tClass) {
@@ -6341,7 +6332,7 @@
       var tip = this.getTipElement();
       var initConfigAnimation = this.config.animation;
 
-      if (tip.getAttribute('x-placement') !== null) {
+      if (tip.getAttribute('data-popper-placement') !== null) {
         return;
       }
 
@@ -6449,7 +6440,7 @@
    */
 
   var NAME$9 = 'popover';
-  var VERSION$9 = '3.0.0-rc.4';
+  var VERSION$9 = '3.1.0';
   var DATA_KEY$9 = 'coreui.popover';
   var EVENT_KEY$9 = "." + DATA_KEY$9;
   var CLASS_PREFIX$1 = 'bs-popover';
@@ -6492,9 +6483,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Popover =
-  /*#__PURE__*/
-  function (_Tooltip) {
+  var Popover = /*#__PURE__*/function (_Tooltip) {
     _inheritsLoose(Popover, _Tooltip);
 
     function Popover() {
@@ -6644,7 +6633,7 @@
    */
 
   var NAME$a = 'scrollspy';
-  var VERSION$a = '3.0.0-rc.4';
+  var VERSION$a = '3.1.0';
   var DATA_KEY$a = 'coreui.scrollspy';
   var EVENT_KEY$a = "." + DATA_KEY$a;
   var DATA_API_KEY$8 = '.data-api';
@@ -6686,9 +6675,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var ScrollSpy =
-  /*#__PURE__*/
-  function () {
+  var ScrollSpy = /*#__PURE__*/function () {
     function ScrollSpy(element, config) {
       var _this = this;
 
@@ -8298,7 +8285,7 @@
    */
 
   var NAME$b = 'sidebar';
-  var VERSION$b = '3.0.0-rc.4';
+  var VERSION$b = '3.1.0';
   var DATA_KEY$b = 'coreui.sidebar';
   var EVENT_KEY$b = "." + DATA_KEY$b;
   var DATA_API_KEY$9 = '.data-api';
@@ -8351,9 +8338,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Sidebar =
-  /*#__PURE__*/
-  function () {
+  var Sidebar = /*#__PURE__*/function () {
     function Sidebar(element, config) {
       if (typeof PerfectScrollbar === 'undefined') {
         throw new TypeError('CoreUI\'s sidebar require Perfect Scrollbar');
@@ -8398,8 +8383,20 @@
         });
       } else if (breakpoint) {
         this._addClassName(this._getBreakpointClassName(breakpoint));
+
+        if (this._isOverlaid()) {
+          EventHandler.one(this._element, TRANSITION_END, function () {
+            _this._addClickOutListener();
+          });
+        }
       } else {
         this._addClassName(this._firstBreakpointClassName());
+
+        if (this._isOverlaid()) {
+          EventHandler.one(this._element, TRANSITION_END, function () {
+            _this._addClickOutListener();
+          });
+        }
       }
 
       var complete = function complete() {
@@ -8425,8 +8422,16 @@
         this._removeClickOutListener();
       } else if (breakpoint) {
         this._element.classList.remove(this._getBreakpointClassName(breakpoint));
+
+        if (this._isOverlaid()) {
+          this._removeClickOutListener();
+        }
       } else {
         this._element.classList.remove(this._firstBreakpointClassName());
+
+        if (this._isOverlaid()) {
+          this._removeClickOutListener();
+        }
       }
 
       var complete = function complete() {
@@ -8489,6 +8494,21 @@
 
     _proto._isMobile = function _isMobile() {
       return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--is-mobile'));
+    };
+
+    _proto._isIOS = function _isIOS() {
+      var iOSDevices = ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'];
+      var platform = Boolean(navigator.platform);
+
+      if (platform) {
+        while (iOSDevices.length) {
+          if (navigator.platform === iOSDevices.pop()) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     };
 
     _proto._isMinimized = function _isMinimized() {
@@ -8621,9 +8641,10 @@
     ;
 
     _proto._psInit = function _psInit() {
-      if (this._element.querySelector(Selector$b.NAVIGATION_CONTAINER)) {
+      if (this._element.querySelector(Selector$b.NAVIGATION_CONTAINER) && !this._isIOS()) {
         this._ps = new PerfectScrollbar(this._element.querySelector(Selector$b.NAVIGATION_CONTAINER), {
-          suppressScrollX: true
+          suppressScrollX: true,
+          wheelPropagation: false
         });
       }
     };
@@ -8833,7 +8854,7 @@
    */
 
   var NAME$c = 'tab';
-  var VERSION$c = '3.0.0-rc.4';
+  var VERSION$c = '3.1.0';
   var DATA_KEY$c = 'coreui.tab';
   var EVENT_KEY$c = "." + DATA_KEY$c;
   var DATA_API_KEY$a = '.data-api';
@@ -8866,9 +8887,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Tab =
-  /*#__PURE__*/
-  function () {
+  var Tab = /*#__PURE__*/function () {
     function Tab(element) {
       this._element = element;
       Data.setData(this._element, DATA_KEY$c, this);
@@ -9067,7 +9086,7 @@
    */
 
   var NAME$d = 'toast';
-  var VERSION$d = '3.0.0-rc.4';
+  var VERSION$d = '3.1.0';
   var DATA_KEY$d = 'coreui.toast';
   var EVENT_KEY$d = "." + DATA_KEY$d;
   var Event$e = {
@@ -9102,9 +9121,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Toast =
-  /*#__PURE__*/
-  function () {
+  var Toast = /*#__PURE__*/function () {
     function Toast(element, config) {
       this._element = element;
       this._config = this._getConfig(config);
@@ -9285,6 +9302,8 @@
       return Toast.jQueryInterface;
     };
   }
+
+  /* eslint-disable unicorn/no-abusive-eslint-disable */
 
   /* eslint-disable */
   // Production steps of ECMA-262, Edition 6, 22.1.2.1
@@ -9468,9 +9487,343 @@
     });
   }
 
+  if (typeof Object.assign != 'function') {
+    Object.assign = function (target, varArgs) {
+
+      if (target == null) {
+        // TypeError if undefined or null
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var to = Object(target);
+
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+
+        if (nextSource != null) {
+          // Skip over if undefined or null
+          for (var nextKey in nextSource) {
+            // Avoid bugs when hasOwnProperty is shadowed
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+
+      return to;
+    };
+  }
+
+  (function (global, factory) {
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory() : typeof define === 'function' && define.amd ? define(factory) : factory();
+  })(undefined, function () {
+    /**
+     * @this {Promise}
+     */
+
+    function finallyConstructor(callback) {
+      var constructor = this.constructor;
+      return this.then(function (value) {
+        // @ts-ignore
+        return constructor.resolve(callback()).then(function () {
+          return value;
+        });
+      }, function (reason) {
+        // @ts-ignore
+        return constructor.resolve(callback()).then(function () {
+          // @ts-ignore
+          return constructor.reject(reason);
+        });
+      });
+    } // Store setTimeout reference so promise-polyfill will be unaffected by
+    // other code modifying setTimeout (like sinon.useFakeTimers())
+
+
+    var setTimeoutFunc = setTimeout;
+
+    function isArray(x) {
+      return Boolean(x && typeof x.length !== 'undefined');
+    }
+
+    function noop() {} // Polyfill for Function.prototype.bind
+
+
+    function bind(fn, thisArg) {
+      return function () {
+        fn.apply(thisArg, arguments);
+      };
+    }
+    /**
+     * @constructor
+     * @param {Function} fn
+     */
+
+
+    function Promise(fn) {
+      if (!(this instanceof Promise)) throw new TypeError('Promises must be constructed via new');
+      if (typeof fn !== 'function') throw new TypeError('not a function');
+      /** @type {!number} */
+
+      this._state = 0;
+      /** @type {!boolean} */
+
+      this._handled = false;
+      /** @type {Promise|undefined} */
+
+      this._value = undefined;
+      /** @type {!Array<!Function>} */
+
+      this._deferreds = [];
+      doResolve(fn, this);
+    }
+
+    function handle(self, deferred) {
+      while (self._state === 3) {
+        self = self._value;
+      }
+
+      if (self._state === 0) {
+        self._deferreds.push(deferred);
+
+        return;
+      }
+
+      self._handled = true;
+
+      Promise._immediateFn(function () {
+        var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+
+        if (cb === null) {
+          (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+          return;
+        }
+
+        var ret;
+
+        try {
+          ret = cb(self._value);
+        } catch (e) {
+          reject(deferred.promise, e);
+          return;
+        }
+
+        resolve(deferred.promise, ret);
+      });
+    }
+
+    function resolve(self, newValue) {
+      try {
+        // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+        if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.');
+
+        if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+          var then = newValue.then;
+
+          if (newValue instanceof Promise) {
+            self._state = 3;
+            self._value = newValue;
+            finale(self);
+            return;
+          } else if (typeof then === 'function') {
+            doResolve(bind(then, newValue), self);
+            return;
+          }
+        }
+
+        self._state = 1;
+        self._value = newValue;
+        finale(self);
+      } catch (e) {
+        reject(self, e);
+      }
+    }
+
+    function reject(self, newValue) {
+      self._state = 2;
+      self._value = newValue;
+      finale(self);
+    }
+
+    function finale(self) {
+      if (self._state === 2 && self._deferreds.length === 0) {
+        Promise._immediateFn(function () {
+          if (!self._handled) {
+            Promise._unhandledRejectionFn(self._value);
+          }
+        });
+      }
+
+      for (var i = 0, len = self._deferreds.length; i < len; i++) {
+        handle(self, self._deferreds[i]);
+      }
+
+      self._deferreds = null;
+    }
+    /**
+     * @constructor
+     */
+
+
+    function Handler(onFulfilled, onRejected, promise) {
+      this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+      this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+      this.promise = promise;
+    }
+    /**
+     * Take a potentially misbehaving resolver function and make sure
+     * onFulfilled and onRejected are only called once.
+     *
+     * Makes no guarantees about asynchrony.
+     */
+
+
+    function doResolve(fn, self) {
+      var done = false;
+
+      try {
+        fn(function (value) {
+          if (done) return;
+          done = true;
+          resolve(self, value);
+        }, function (reason) {
+          if (done) return;
+          done = true;
+          reject(self, reason);
+        });
+      } catch (ex) {
+        if (done) return;
+        done = true;
+        reject(self, ex);
+      }
+    }
+
+    Promise.prototype['catch'] = function (onRejected) {
+      return this.then(null, onRejected);
+    };
+
+    Promise.prototype.then = function (onFulfilled, onRejected) {
+      // @ts-ignore
+      var prom = new this.constructor(noop);
+      handle(this, new Handler(onFulfilled, onRejected, prom));
+      return prom;
+    };
+
+    Promise.prototype['finally'] = finallyConstructor;
+
+    Promise.all = function (arr) {
+      return new Promise(function (resolve, reject) {
+        if (!isArray(arr)) {
+          return reject(new TypeError('Promise.all accepts an array'));
+        }
+
+        var args = Array.prototype.slice.call(arr);
+        if (args.length === 0) return resolve([]);
+        var remaining = args.length;
+
+        function res(i, val) {
+          try {
+            if (val && (typeof val === 'object' || typeof val === 'function')) {
+              var then = val.then;
+
+              if (typeof then === 'function') {
+                then.call(val, function (val) {
+                  res(i, val);
+                }, reject);
+                return;
+              }
+            }
+
+            args[i] = val;
+
+            if (--remaining === 0) {
+              resolve(args);
+            }
+          } catch (ex) {
+            reject(ex);
+          }
+        }
+
+        for (var i = 0; i < args.length; i++) {
+          res(i, args[i]);
+        }
+      });
+    };
+
+    Promise.resolve = function (value) {
+      if (value && typeof value === 'object' && value.constructor === Promise) {
+        return value;
+      }
+
+      return new Promise(function (resolve) {
+        resolve(value);
+      });
+    };
+
+    Promise.reject = function (value) {
+      return new Promise(function (resolve, reject) {
+        reject(value);
+      });
+    };
+
+    Promise.race = function (arr) {
+      return new Promise(function (resolve, reject) {
+        if (!isArray(arr)) {
+          return reject(new TypeError('Promise.race accepts an array'));
+        }
+
+        for (var i = 0, len = arr.length; i < len; i++) {
+          Promise.resolve(arr[i]).then(resolve, reject);
+        }
+      });
+    }; // Use polyfill for setImmediate for performance gains
+
+
+    Promise._immediateFn = // @ts-ignore
+    typeof setImmediate === 'function' && function (fn) {
+      // @ts-ignore
+      setImmediate(fn);
+    } || function (fn) {
+      setTimeoutFunc(fn, 0);
+    };
+
+    Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+      if (typeof console !== 'undefined' && console) {
+        console.warn('Possible Unhandled Promise Rejection:', err); // eslint-disable-line no-console
+      }
+    };
+    /** @suppress {undefinedVars} */
+
+
+    var globalNS = function () {
+      // the only reliable means to get the global object is
+      // `Function('return this')()`
+      // However, this causes CSP violations in Chrome apps.
+      if (typeof self !== 'undefined') {
+        return self;
+      }
+
+      if (typeof window !== 'undefined') {
+        return window;
+      }
+
+      if (typeof global !== 'undefined') {
+        return global;
+      }
+
+      throw new Error('unable to locate global object');
+    }();
+
+    if (!('Promise' in globalNS)) {
+      globalNS['Promise'] = Promise;
+    } else if (!globalNS.Promise.prototype['finally']) {
+      globalNS.Promise.prototype['finally'] = finallyConstructor;
+    }
+  });
+
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v3.0.0): index.umd.js
+   * CoreUI (v3.1.0): index.umd.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

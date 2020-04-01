@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  toast.js v3.0.0 (https://coreui.io)
+  * CoreUI PRO  toast.jsv3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -9,9 +9,9 @@
   (global = global || self, global.Toast = factory(global.Data, global.EventHandler, global.Manipulator));
 }(this, (function (Data, EventHandler, Manipulator) { 'use strict';
 
-  Data = Data && Data.hasOwnProperty('default') ? Data['default'] : Data;
-  EventHandler = EventHandler && EventHandler.hasOwnProperty('default') ? EventHandler['default'] : EventHandler;
-  Manipulator = Manipulator && Manipulator.hasOwnProperty('default') ? Manipulator['default'] : Manipulator;
+  Data = Data && Object.prototype.hasOwnProperty.call(Data, 'default') ? Data['default'] : Data;
+  EventHandler = EventHandler && Object.prototype.hasOwnProperty.call(EventHandler, 'default') ? EventHandler['default'] : EventHandler;
+  Manipulator = Manipulator && Object.prototype.hasOwnProperty.call(Manipulator, 'default') ? Manipulator['default'] : Manipulator;
 
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -176,7 +176,7 @@
    */
 
   var NAME = 'toast';
-  var VERSION = '3.0.0-rc.4';
+  var VERSION = '3.1.0';
   var DATA_KEY = 'coreui.toast';
   var EVENT_KEY = "." + DATA_KEY;
   var Event = {
@@ -211,9 +211,7 @@
    * ------------------------------------------------------------------------
    */
 
-  var Toast =
-  /*#__PURE__*/
-  function () {
+  var Toast = /*#__PURE__*/function () {
     function Toast(element, config) {
       this._element = element;
       this._config = this._getConfig(config);

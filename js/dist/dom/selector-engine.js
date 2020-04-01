@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  selector-engine.js v3.0.0 (https://coreui.io)
+  * CoreUI PRO  selector-engine.jsv3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */

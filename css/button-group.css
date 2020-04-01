@@ -23,6 +23,7 @@
 .btn-group,
 .btn-group-vertical {
   position: relative;
+  z-index: 1;
   display: inline-flex;
   vertical-align: middle;
 }
@@ -33,16 +34,25 @@
   flex: 1 1 auto;
 }
 
-.btn-group > .btn:hover,
-.btn-group-vertical > .btn:hover {
-  z-index: 1;
+@media (hover: hover), (-ms-high-contrast: none) {
+  .btn-group > .btn:hover,
+  .btn-group-vertical > .btn:hover {
+    z-index: 2;
+  }
 }
 
 .btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active,
 .btn-group-vertical > .btn:focus,
 .btn-group-vertical > .btn:active,
 .btn-group-vertical > .btn.active {
-  z-index: 1;
+  z-index: 2;
+}
+
+.btn-group .btn-group,
+.btn-group .btn-group-vertical,
+.btn-group-vertical .btn-group,
+.btn-group-vertical .btn-group-vertical {
+  z-index: auto;
 }
 
 .btn-toolbar {
@@ -122,6 +132,10 @@ html:not([dir="rtl"]) .dropleft .dropdown-toggle-split::before {
 .btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {
   padding-right: 0.75rem;
   padding-left: 0.75rem;
+}
+
+.btn-group.show {
+  z-index: 3;
 }
 
 .btn-group-vertical {

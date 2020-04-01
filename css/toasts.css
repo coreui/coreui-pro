@@ -35,6 +35,11 @@
   border-color: rgba(0, 0, 21, 0.1);
 }
 
+.c-legacy-theme .toast {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
 .c-dark-theme .toast {
   color: #e1e1e1;
   background-color: #37373d;
@@ -72,6 +77,12 @@
   color: #8a93a2;
   background-color: rgba(255, 255, 255, 0.85);
   border-color: rgba(0, 0, 21, 0.05);
+}
+
+.c-legacy-theme .toast-header {
+  color: #73818f;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.05);
 }
 
 .c-dark-theme .toast-header {

@@ -30,9 +30,9 @@
   line-height: 1.5;
   background-clip: padding-box;
   border: 1px solid;
-  color: #768192;
+  color: #5c6873;
   background-color: #fff;
-  border-color: #d8dbe0;
+  border-color: #e4e7ea;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -60,9 +60,9 @@
 }
 
 .form-control:focus {
-  color: #768192;
+  color: #5c6873;
   background-color: #fff;
-  border-color: #958bef;
+  border-color: #8ad4ee;
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(50, 31, 219, 0.25);
 }
@@ -74,7 +74,7 @@
 }
 
 .form-control::placeholder {
-  color: #8a93a2;
+  color: #73818f;
   opacity: 1;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .form-control:disabled, .form-control[readonly] {
-  background-color: #d8dbe0;
+  background-color: #e4e7ea;
   opacity: 1;
 }
 
@@ -92,7 +92,7 @@
 }
 
 select.form-control:focus::-ms-value {
-  color: #768192;
+  color: #5c6873;
   background-color: #fff;
 }
 
@@ -139,7 +139,7 @@ select.form-control:focus::-ms-value {
   background-color: transparent;
   border: solid transparent;
   border-width: 1px 0;
-  color: #4f5d73;
+  color: #23282c;
 }
 
 .c-dark-theme .form-control-plaintext {

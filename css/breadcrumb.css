@@ -32,6 +32,11 @@
   border-color: #d8dbe0;
 }
 
+.c-legacy-theme .breadcrumb {
+  background-color: transparent;
+  border-color: #c8ced3;
+}
+
 .c-dark-theme .breadcrumb {
   background-color: transparent;
   border-color: #1e1e29;

@@ -38,8 +38,12 @@
   background-color: #ebedef;
 }
 
+.c-legacy-theme .progress {
+  background-color: #f0f3f5;
+}
+
 .c-dark-theme .progress {
-  background-color: #768192;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .progress-bar {
@@ -60,9 +64,14 @@
   }
 }
 
+.c-legacy-theme .progress-bar {
+  color: #fff;
+  background-color: #20a8d8;
+}
+
 .c-dark-theme .progress-bar {
   color: #fff;
-  background-color: #321fdb;
+  background-color: #4638c2;
 }
 
 .progress-bar-striped {

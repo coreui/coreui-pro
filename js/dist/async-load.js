@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  async-load.js v3.0.0 (https://coreui.io)
+  * CoreUI PRO  async-load.jsv3.1.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -9,8 +9,8 @@
   (global = global || self, global.AsyncLoad = factory(global.Data, global.EventHandler));
 }(this, (function (Data, EventHandler) { 'use strict';
 
-  Data = Data && Data.hasOwnProperty('default') ? Data['default'] : Data;
-  EventHandler = EventHandler && EventHandler.hasOwnProperty('default') ? EventHandler['default'] : EventHandler;
+  Data = Data && Object.prototype.hasOwnProperty.call(Data, 'default') ? Data['default'] : Data;
+  EventHandler = EventHandler && Object.prototype.hasOwnProperty.call(EventHandler, 'default') ? EventHandler['default'] : EventHandler;
 
   function _defineProperties(target, props) {
     for (var i = 0; i < props.length; i++) {
@@ -102,7 +102,7 @@
    */
 
   var NAME = 'asyncLoad';
-  var VERSION = '3.0.0-rc.4';
+  var VERSION = '3.1.0';
   var DATA_KEY = 'coreui.asyncLoad';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -128,9 +128,7 @@
     subpagesDirectory: 'views/'
   };
 
-  var AsyncLoad =
-  /*#__PURE__*/
-  function () {
+  var AsyncLoad = /*#__PURE__*/function () {
     function AsyncLoad(element, config) {
       this._config = this._getConfig(config);
       this._element = element;

@@ -48,17 +48,12 @@ body {
   background-color: #ebedef;
 }
 
+body.c-legacy-theme {
+  color: #23282c;
+  background-color: #e4e5e6;
+}
+
 body.c-dark-theme {
-  color: #e1e1e1;
-  background-color: #0a0b18;
-}
-
-.c-app {
-  color: #3c4b64;
-  background-color: #ebedef;
-}
-
-.c-app.c-dark-theme {
   color: #e1e1e1;
   background-color: #0a0b18;
 }
@@ -163,17 +158,25 @@ a {
   color: #321fdb;
 }
 
+.c-legacy-theme a {
+  color: #20a8d8;
+}
+
 .c-dark-theme a {
-  color: #988fed;
+  color: #7267d3;
 }
 
-a:hover {
-  text-decoration: underline;
-  color: #321fdb;
-}
-
-.c-dark-theme a:hover {
-  color: #988fed;
+@media (hover: hover), (-ms-high-contrast: none) {
+  a:hover {
+    text-decoration: underline;
+    color: #321fdb;
+  }
+  .c-legacy-theme a:hover {
+    color: #20a8d8;
+  }
+  .c-dark-theme a:hover {
+    color: #7267d3;
+  }
 }
 
 a:not([href]) {
@@ -181,9 +184,11 @@ a:not([href]) {
   text-decoration: none;
 }
 
-a:not([href]):hover {
-  color: inherit;
-  text-decoration: none;
+@media (hover: hover), (-ms-high-contrast: none) {
+  a:not([href]):hover {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 pre,
