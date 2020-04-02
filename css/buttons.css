@@ -51,19 +51,6 @@
 }
 
 .c-app:not(.c-legacy-theme):not(.c-dark-theme) .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"]) {
-  position: relative;
-  border: 0;
-}
-
-.c-app:not(.c-legacy-theme):not(.c-dark-theme) .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"])::before {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  content: "";
-  border-radius: inherit;
   border: 0;
   box-shadow: 0 1px 1px 0 rgba(60, 75, 100, .14), 0 2px 1px -1px rgba(60, 75, 100, .12), 0 1px 3px 0 rgba(60, 75, 100, .20);
 }

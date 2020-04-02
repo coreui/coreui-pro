@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO v3.1.0 (https://coreui.io)
+  * CoreUI PRO v3.1.1 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -6924,7 +6924,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v3.1.0): index.umd.js
+   * CoreUI (v3.1.1): index.umd.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

@@ -23,7 +23,6 @@
 .btn-group,
 .btn-group-vertical {
   position: relative;
-  z-index: 1;
   display: inline-flex;
   vertical-align: middle;
 }
@@ -34,10 +33,35 @@
   flex: 1 1 auto;
 }
 
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .btn-group > .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"]), .c-app:not(.c-legacy-theme):not(.c-dark-theme)
+.btn-group-vertical > .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"]) {
+  border: 0;
+  box-shadow: none;
+}
+
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .btn-group > .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"]), .c-app:not(.c-legacy-theme):not(.c-dark-theme)
+.btn-group-vertical > .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"]) {
+  border: 0;
+}
+
+.c-app:not(.c-legacy-theme):not(.c-dark-theme) .btn-group > .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"])::before, .c-app:not(.c-legacy-theme):not(.c-dark-theme)
+.btn-group-vertical > .btn:not([class*="ghost"]):not([class*="link"]):not([class*="outline"]):not([class*="transparent"])::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  content: "";
+  border-radius: inherit;
+  border: 0;
+  box-shadow: 0 1px 1px 0 rgba(60, 75, 100, .14), 0 2px 1px -1px rgba(60, 75, 100, .12), 0 1px 3px 0 rgba(60, 75, 100, .20);
+}
+
 @media (hover: hover), (-ms-high-contrast: none) {
   .btn-group > .btn:hover,
   .btn-group-vertical > .btn:hover {
-    z-index: 2;
+    z-index: 1;
   }
 }
 
@@ -45,14 +69,19 @@
 .btn-group-vertical > .btn:focus,
 .btn-group-vertical > .btn:active,
 .btn-group-vertical > .btn.active {
-  z-index: 2;
+  z-index: 1;
+}
+
+.btn-group:not(.show),
+.btn-group-vertical:not(.show) {
+  z-index: 1;
 }
 
 .btn-group .btn-group,
 .btn-group .btn-group-vertical,
 .btn-group-vertical .btn-group,
 .btn-group-vertical .btn-group-vertical {
-  z-index: auto;
+  z-index: initial;
 }
 
 .btn-toolbar {
@@ -132,10 +161,6 @@ html:not([dir="rtl"]) .dropleft .dropdown-toggle-split::before {
 .btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {
   padding-right: 0.75rem;
   padding-left: 0.75rem;
-}
-
-.btn-group.show {
-  z-index: 3;
 }
 
 .btn-group-vertical {
