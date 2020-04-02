@@ -8,7 +8,6 @@
 }
 
 @mixin add-elevation-before($level, $direction) {
-  position: relative;
   border: 0;
   &::before {
     position: absolute;
