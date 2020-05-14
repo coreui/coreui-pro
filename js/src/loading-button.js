@@ -1,11 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.1.1): button.js
- * Licensed under MIT (https://coreui.io/license)
- *
- * This component is a modified version of the Bootstrap's buttons.js
- * Bootstrap (v5.0.0): buttons.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * CoreUI PRO (v3.1.1): button.js
+ * Licensed (https://coreui.io/pro/license)
  * --------------------------------------------------------------------------
  */
 
@@ -20,25 +16,31 @@ import SelectorEngine from './dom/selector-engine'
  * ------------------------------------------------------------------------
  */
 
-const NAME = 'button'
+const NAME = 'loading-button'
 const VERSION = '3.1.0'
-const DATA_KEY = 'coreui.button'
+const DATA_KEY = 'coreui.loading-button'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const CLASS_NAME_ACTIVE = 'active'
-const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_FOCUS = 'focus'
+const ClassName = {
+  ACTIVE: 'active',
+  BUTTON_LOADING: 'btn-loading',
+  FOCUS: 'focus'
+}
 
-const SELECTOR_DATA_TOGGLE_CARROT = '[data-toggle^="button"]'
-const SELECTOR_DATA_TOGGLE = '[data-toggle="buttons"]'
-const SELECTOR_INPUT = 'input:not([type="hidden"])'
-const SELECTOR_ACTIVE = '.active'
-const SELECTOR_BUTTON = '.btn'
+const Selector = {
+  DATA_TOGGLE_CARROT: '[data-toggle^="button"]',
+  DATA_TOGGLE: '[data-toggle="buttons"]',
+  INPUT: 'input:not([type="hidden"])',
+  ACTIVE: '.active',
+  BUTTON: '.btn-loading'
+}
 
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_FOCUS_DATA_API = `focus${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_BLUR_DATA_API = `blur${EVENT_KEY}${DATA_API_KEY}`
+const Event = {
+  CLICK_DATA_API: `click${EVENT_KEY}${DATA_API_KEY}`,
+  FOCUS_DATA_API: `focus${EVENT_KEY}${DATA_API_KEY}`,
+  BLUR_DATA_API: `blur${EVENT_KEY}${DATA_API_KEY}`
+}
 
 /**
  * ------------------------------------------------------------------------
@@ -46,7 +48,7 @@ const EVENT_BLUR_DATA_API = `blur${EVENT_KEY}${DATA_API_KEY}`
  * ------------------------------------------------------------------------
  */
 
-class Button {
+class LoadingButton {
   constructor(element) {
     this._element = element
     Data.setData(element, DATA_KEY, this)
@@ -64,32 +66,35 @@ class Button {
     let triggerChangeEvent = true
     let addAriaPressed = true
 
-    const rootElement = this._element.closest(SELECTOR_DATA_TOGGLE)
+    const rootElement = SelectorEngine.closest(
+      this._element,
+      Selector.DATA_TOGGLE
+    )
 
     if (rootElement) {
-      const input = SelectorEngine.findOne(SELECTOR_INPUT, this._element)
+      const input = SelectorEngine.findOne(Selector.INPUT, this._element)
 
       if (input && input.type === 'radio') {
         if (input.checked &&
-          this._element.classList.contains(CLASS_NAME_ACTIVE)) {
+          this._element.classList.contains(ClassName.ACTIVE)) {
           triggerChangeEvent = false
         } else {
-          const activeElement = SelectorEngine.findOne(SELECTOR_ACTIVE, rootElement)
+          const activeElement = SelectorEngine.findOne(Selector.ACTIVE, rootElement)
 
           if (activeElement) {
-            activeElement.classList.remove(CLASS_NAME_ACTIVE)
+            activeElement.classList.remove(ClassName.ACTIVE)
           }
         }
 
         if (triggerChangeEvent) {
           if (input.hasAttribute('disabled') ||
             rootElement.hasAttribute('disabled') ||
-            input.classList.contains(CLASS_NAME_DISABLED) ||
-            rootElement.classList.contains(CLASS_NAME_DISABLED)) {
+            input.classList.contains('disabled') ||
+            rootElement.classList.contains('disabled')) {
             return
           }
 
-          input.checked = !this._element.classList.contains(CLASS_NAME_ACTIVE)
+          input.checked = !this._element.classList.contains(ClassName.ACTIVE)
           EventHandler.trigger(input, 'change')
         }
 
@@ -100,11 +105,11 @@ class Button {
 
     if (addAriaPressed) {
       this._element.setAttribute('aria-pressed',
-        !this._element.classList.contains(CLASS_NAME_ACTIVE))
+        !this._element.classList.contains(ClassName.ACTIVE))
     }
 
     if (triggerChangeEvent) {
-      this._element.classList.toggle(CLASS_NAME_ACTIVE)
+      this._element.classList.toggle(ClassName.ACTIVE)
     }
   }
 
@@ -120,7 +125,7 @@ class Button {
       let data = Data.getData(this, DATA_KEY)
 
       if (!data) {
-        data = new Button(this)
+        data = new LoadingButton(this)
       }
 
       if (config === 'toggle') {
@@ -140,32 +145,35 @@ class Button {
  * ------------------------------------------------------------------------
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE_CARROT, event => {
+EventHandler.on(document, Event.CLICK_DATA_API, Selector.DATA_TOGGLE_CARROT, event => {
   event.preventDefault()
 
-  const button = event.target.closest(SELECTOR_BUTTON)
+  let button = event.target
+  if (!button.classList.contains(ClassName.BUTTON)) {
+    button = SelectorEngine.closest(button, Selector.BUTTON)
+  }
 
   let data = Data.getData(button, DATA_KEY)
   if (!data) {
-    data = new Button(button)
+    data = new LoadingButton(button)
   }
 
   data.toggle()
 })
 
-EventHandler.on(document, EVENT_FOCUS_DATA_API, SELECTOR_DATA_TOGGLE_CARROT, event => {
-  const button = event.target.closest(SELECTOR_BUTTON)
+EventHandler.on(document, Event.FOCUS_DATA_API, Selector.DATA_TOGGLE_CARROT, event => {
+  const button = SelectorEngine.closest(event.target, Selector.BUTTON)
 
   if (button) {
-    button.classList.add(CLASS_NAME_FOCUS)
+    button.classList.add(ClassName.FOCUS)
   }
 })
 
-EventHandler.on(document, EVENT_BLUR_DATA_API, SELECTOR_DATA_TOGGLE_CARROT, event => {
-  const button = event.target.closest(SELECTOR_BUTTON)
+EventHandler.on(document, Event.BLUR_DATA_API, Selector.DATA_TOGGLE_CARROT, event => {
+  const button = SelectorEngine.closest(event.target, Selector.BUTTON)
 
   if (button) {
-    button.classList.remove(CLASS_NAME_FOCUS)
+    button.classList.remove(ClassName.FOCUS)
   }
 })
 
@@ -180,13 +188,13 @@ const $ = getjQuery()
 /* istanbul ignore if */
 if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Button.jQueryInterface
-  $.fn[NAME].Constructor = Button
+  $.fn[NAME] = LoadingButton.jQueryInterface
+  $.fn[NAME].Constructor = LoadingButton
 
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Button.jQueryInterface
+    return LoadingButton.jQueryInterface
   }
 }
 
-export default Button
+export default LoadingButton
