@@ -5,7 +5,7 @@
 
 // @if $enable-gradients {
 //   @include theme-variant() {
-//     @include bg-gradient-variant(".bg-gradient-#{$color}", $value);
+//     @include bg-gradient-variant(".bg-gradient-#{$color}", $value, true);
 //   }
 // }
 
