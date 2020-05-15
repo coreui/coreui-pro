@@ -1,7 +1,4 @@
 .popover {
-  position: absolute;
-  top: 0;
-  left: 0;
   z-index: $zindex-popover;
   display: block;
   max-width: $popover-max-width;
@@ -23,9 +20,6 @@
   .popover-arrow {
     position: absolute;
     display: block;
-    width: $popover-arrow-width;
-    height: $popover-arrow-height;
-    margin: 0 $popover-border-radius;
 
     &::before,
     &::after {
@@ -38,7 +32,26 @@
   }
 }
 
-.bs-popover-top {
+%bs-popover-top,
+%bs-popover-bottom {
+  .popover-arrow {
+    width: add($popover-arrow-width, (2 * $popover-border-radius));
+    height: $popover-arrow-height;
+    padding: 0 $popover-border-radius; // make sure the arrow does not touch the popover's rounded corners
+  }
+}
+
+%bs-popover-right,
+%bs-popover-left {
+  .popover-arrow {
+    width: $popover-arrow-height;
+    height: add($popover-arrow-width, (2 * $popover-border-radius));
+    padding: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
+    margin: 0;
+  }
+}
+
+%bs-popover-top {
   // stylelint-disable-next-line declaration-no-important
   margin-bottom: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
@@ -63,16 +76,12 @@
   }
 }
 
-.bs-popover-right {
+%bs-popover-right {
   // stylelint-disable-next-line declaration-no-important
   margin-left: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
   > .popover-arrow {
     left: subtract(-$popover-arrow-height, $popover-border-width);
-    width: $popover-arrow-height;
-    height: add($popover-arrow-width, (2 * $popover-border-radius));
-    padding: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
-    margin: 0;
 
     &::before {
       left: 0;
@@ -92,7 +101,7 @@
   }
 }
 
-.bs-popover-bottom {
+%bs-popover-bottom {
   // stylelint-disable-next-line declaration-no-important
   margin-top: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
@@ -132,16 +141,12 @@
   }
 }
 
-.bs-popover-left {
+%bs-popover-left {
   // stylelint-disable-next-line declaration-no-important
   margin-left: $popover-arrow-height !important; // Overwrite Popper 2 margins.
 
   > .popover-arrow {
     right: subtract(-$popover-arrow-height, $popover-border-width);
-    width: $popover-arrow-height;
-    height: add($popover-arrow-width, (2 * $popover-border-radius));
-    padding: $popover-border-radius 0; // make sure the arrow does not touch the popover's rounded corners
-    margin: 0;
 
     &::before {
       right: 0;
@@ -161,18 +166,19 @@
   }
 }
 
-.bs-popover-auto {
+// stylelint-disable-next-line no-duplicate-selectors
+.popover {
   &[data-popper-placement^="top"] {
-    @extend .bs-popover-top;
+    @extend %bs-popover-top;
   }
   &[data-popper-placement^="right"] {
-    @extend .bs-popover-right;
+    @extend %bs-popover-right;
   }
   &[data-popper-placement^="bottom"] {
-    @extend .bs-popover-bottom;
+    @extend %bs-popover-bottom;
   }
   &[data-popper-placement^="left"] {
-    @extend .bs-popover-left;
+    @extend %bs-popover-left;
   }
 }
 

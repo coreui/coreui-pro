@@ -55,7 +55,6 @@ const DefaultType = {
   placement: '(string|function)',
   offset: '(number|string|function)',
   container: '(string|element|boolean)',
-  fallbackPlacement: '(string|array)',
   boundary: '(string|element)',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
@@ -84,7 +83,6 @@ const Default = {
   placement: 'top',
   offset: 0,
   container: false,
-  fallbackPlacement: 'flip',
   boundary: 'scrollParent',
   sanitize: true,
   sanitizeFn: null,
@@ -284,7 +282,7 @@ class Tooltip {
         this.config.placement
 
       const attachment = this._getAttachment(placement)
-      this._addAttachmentClass(attachment)
+      // this._addAttachmentClass(attachment)
 
       const container = this._getContainer()
       Data.setData(tip, this.constructor.DATA_KEY, this)
@@ -466,12 +464,6 @@ class Tooltip {
           }
         },
         {
-          name: 'flip',
-          options: {
-            fallbackPlacements: this.config.fallbackPlacement
-          }
-        },
-        {
           name: 'arrow',
           options: {
             element: `.${this.constructor.NAME}-arrow`
@@ -484,12 +476,15 @@ class Tooltip {
           }
         }
       ],
-      onCreate: data => {
+      onFirstUpdate: data => {
         if (data.originalPlacement !== data.placement) {
-          this._handlePopperPlacementChange(data)
+          // this._handlePopperPlacementChange(data)
+
+          // fix Popper position issue
+          //TODO: find where is the problem or find better solution
+          this._popper.update()
         }
-      },
-      onUpdate: data => this._handlePopperPlacementChange(data)
+      }
     }
 
     return {
@@ -498,9 +493,9 @@ class Tooltip {
     }
   }
 
-  _addAttachmentClass(attachment) {
-    this.getTipElement().classList.add(`${CLASS_PREFIX}-${attachment}`)
-  }
+  // _addAttachmentClass(attachment) {
+  //   this.getTipElement().classList.add(`${CLASS_PREFIX}-${attachment}`)
+  // }
 
   _getOffset() {
     const offset = {}
@@ -755,6 +750,7 @@ class Tooltip {
 
   _cleanTipClass() {
     const tip = this.getTipElement()
+    console.log(this.tip)
     const tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX)
     if (tabClass !== null && tabClass.length > 0) {
       tabClass.map(token => token.trim())
@@ -762,12 +758,14 @@ class Tooltip {
     }
   }
 
-  _handlePopperPlacementChange(popperData) {
-    const popperInstance = popperData.instance
-    this.tip = popperInstance.popper
-    this._cleanTipClass()
-    this._addAttachmentClass(this._getAttachment(popperData.placement))
-  }
+  // _handlePopperPlacementChange(popperData) {
+  //   console.log(popperData)
+  //   const popperInstance = popperData.elements.popper
+  //   this.tip = document.getElementById(popperInstance.getAttribute('id'))
+  //   console.log(this.tip)
+  //   this._cleanTipClass()
+  //   this._addAttachmentClass(this._getAttachment(popperData.placement))
+  // }
 
   _fixTransition() {
     const tip = this.getTipElement()
