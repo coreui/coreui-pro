@@ -58,6 +58,12 @@
     }
 
     .c-body {
+      // deprecate v4
+      // fix footer position to avoid breking change.
+      display: flex;
+      flex-direction: column;
+      // ---
+
       flex-grow: 1;
     }
   }
