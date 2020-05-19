@@ -59,7 +59,7 @@
 
     .c-body {
       // deprecate v4
-      // fix footer position to avoid breking change.
+      // fix footer position to avoid breaking change.
       display: flex;
       flex-direction: column;
       // ---
@@ -68,6 +68,7 @@
     }
   }
 
+  // deprecate v4
   &.c-wrapper-fluid {
     min-height: 100vh;
 

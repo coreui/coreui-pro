@@ -45,6 +45,7 @@
 
   @each $width, $value in $sidebar-widths {
     &.c-sidebar-#{$width} {
+      flex: 0 0 $value;
       width: $value;
 
       @include ltr {
