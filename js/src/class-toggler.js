@@ -30,18 +30,12 @@ const Default = {
   target: 'body'
 }
 
-const ClassName = {
-  CLASS_TOGGLER: 'c-class-toggler'
-}
+const CLASS_NAME_CLASS_TOGGLER = 'c-class-toggler'
 
-const Event = {
-  CLASS_TOGGLE: 'classtoggle',
-  CLICK_DATA_API: `click${EVENT_KEY}${DATA_API_KEY}`
-}
+const EVENT_CLASS_TOGGLE = 'classtoggle'
+const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
-const Selector = {
-  CLASS_TOGGLER: '.c-class-toggler'
-}
+const SELECTOR_CLASS_TOGGLER = '.c-class-toggler'
 
 /**
  * ------------------------------------------------------------------------
@@ -78,7 +72,7 @@ class ClassToggler {
         // eslint-disable-next-line no-negated-condition
         if (!responsive) {
           const add = element.classList.toggle(className)
-          const event = new CustomEvent(Event.CLASS_TOGGLE, {
+          const event = new CustomEvent(EVENT_CLASS_TOGGLE, {
             detail: {
               target,
               add,
@@ -113,7 +107,7 @@ class ClassToggler {
           if (addResponsiveClasses) {
             responsiveClassNames.forEach(responsiveClassName => {
               element.classList.remove(responsiveClassName)
-              const event = new CustomEvent(Event.CLASS_TOGGLE, {
+              const event = new CustomEvent(EVENT_CLASS_TOGGLE, {
                 detail: {
                   target,
                   add: false,
@@ -124,7 +118,7 @@ class ClassToggler {
             })
           } else {
             element.classList.add(className)
-            const event = new CustomEvent(Event.CLASS_TOGGLE, {
+            const event = new CustomEvent(EVENT_CLASS_TOGGLE, {
               detail: {
                 target,
                 add: true,
@@ -255,11 +249,11 @@ class ClassToggler {
  * ------------------------------------------------------------------------
  */
 
-EventHandler.on(document, Event.CLICK_DATA_API, Selector.CLASS_TOGGLER, event => {
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_CLASS_TOGGLER, event => {
   event.preventDefault()
   let toggler = event.target
-  if (!toggler.classList.contains(ClassName.CLASS_TOGGLER)) {
-    toggler = toggler.closest(Selector.CLASS_TOGGLER)
+  if (!toggler.classList.contains(CLASS_NAME_CLASS_TOGGLER)) {
+    toggler = toggler.closest(SELECTOR_CLASS_TOGGLER)
   }
 
   ClassToggler._classTogglerInterface(toggler, 'toggle')
