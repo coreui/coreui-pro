@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  class-toggler.jsv3.1.1 (https://coreui.io)
+  * CoreUI PRO  class-toggler.jsv3.2.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -30,7 +30,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v4.3.1): util/index.js
+   * Bootstrap (v5.0.0-alpha1): util/index.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -53,7 +53,7 @@
    */
 
   var NAME = 'class-toggler';
-  var VERSION = '3.1.0';
+  var VERSION = '3.2.0';
   var DATA_KEY = 'coreui.class-toggler';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -63,16 +63,10 @@
     responsive: false,
     target: 'body'
   };
-  var ClassName = {
-    CLASS_TOGGLER: 'c-class-toggler'
-  };
-  var Event = {
-    CLASS_TOGGLE: 'classtoggle',
-    CLICK_DATA_API: "click" + EVENT_KEY + DATA_API_KEY
-  };
-  var Selector = {
-    CLASS_TOGGLER: '.c-class-toggler'
-  };
+  var CLASS_NAME_CLASS_TOGGLER = 'c-class-toggler';
+  var EVENT_CLASS_TOGGLE = 'classtoggle';
+  var EVENT_CLICK_DATA_API = "click" + EVENT_KEY + DATA_API_KEY;
+  var SELECTOR_CLASS_TOGGLER = '.c-class-toggler';
   /**
    * ------------------------------------------------------------------------
    * Class Definition
@@ -110,7 +104,7 @@
 
           if (!responsive) {
             var add = element.classList.toggle(className);
-            var event = new CustomEvent(Event.CLASS_TOGGLE, {
+            var event = new CustomEvent(EVENT_CLASS_TOGGLE, {
               detail: {
                 target: target,
                 add: add,
@@ -146,7 +140,7 @@
             if (addResponsiveClasses) {
               responsiveClassNames.forEach(function (responsiveClassName) {
                 element.classList.remove(responsiveClassName);
-                var event = new CustomEvent(Event.CLASS_TOGGLE, {
+                var event = new CustomEvent(EVENT_CLASS_TOGGLE, {
                   detail: {
                     target: target,
                     add: false,
@@ -158,7 +152,7 @@
             } else {
               element.classList.add(className);
 
-              var _event = new CustomEvent(Event.CLASS_TOGGLE, {
+              var _event = new CustomEvent(EVENT_CLASS_TOGGLE, {
                 detail: {
                   target: target,
                   add: true,
@@ -299,12 +293,12 @@
    */
 
 
-  EventHandler.on(document, Event.CLICK_DATA_API, Selector.CLASS_TOGGLER, function (event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_CLASS_TOGGLER, function (event) {
     event.preventDefault();
     var toggler = event.target;
 
-    if (!toggler.classList.contains(ClassName.CLASS_TOGGLER)) {
-      toggler = toggler.closest(Selector.CLASS_TOGGLER);
+    if (!toggler.classList.contains(CLASS_NAME_CLASS_TOGGLER)) {
+      toggler = toggler.closest(SELECTOR_CLASS_TOGGLER);
     }
 
     ClassToggler._classTogglerInterface(toggler, 'toggle');

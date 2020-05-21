@@ -62,6 +62,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-right {
 }
 
 .c-sidebar.c-sidebar-sm {
+  flex: 0 0 192px;
   width: 192px;
 }
 
@@ -82,6 +83,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-sm.c-sidebar-right {
 }
 
 .c-sidebar.c-sidebar-lg {
+  flex: 0 0 320px;
   width: 320px;
 }
 
@@ -102,6 +104,7 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-lg.c-sidebar-right {
 }
 
 .c-sidebar.c-sidebar-xl {
+  flex: 0 0 384px;
   width: 384px;
 }
 
@@ -209,6 +212,15 @@ html:not([dir="rtl"]) .c-sidebar-close {
   overflow-x: hidden;
   overflow-y: auto;
   list-style: none;
+}
+
+.c-sidebar-nav.ps {
+  overflow: -moz-scrollbars-none;
+  -ms-overflow-style: none;
+}
+
+.c-sidebar-nav.ps::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 .c-sidebar-nav-title {

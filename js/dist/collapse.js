@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  collapse.jsv3.1.1 (https://coreui.io)
+  * CoreUI PRO  collapse.jsv3.2.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -81,7 +81,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v4.3.1): util/index.js
+   * Bootstrap (v5.0.0-alpha1): util/index.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -89,6 +89,10 @@
   var TRANSITION_END = 'transitionend'; // Shoutout AngusCroll (https://goo.gl/pxwQGp)
 
   var toType = function toType(obj) {
+    if (obj === null || obj === undefined) {
+      return "" + obj;
+    }
+
     return {}.toString.call(obj).match(/\s([a-z]+)/i)[1].toLowerCase();
   };
 
@@ -142,9 +146,7 @@
   };
 
   var triggerTransitionEnd = function triggerTransitionEnd(element) {
-    var evt = document.createEvent('HTMLEvents');
-    evt.initEvent(TRANSITION_END, true, true);
-    element.dispatchEvent(evt);
+    element.dispatchEvent(new Event(TRANSITION_END));
   };
 
   var isElement = function isElement(obj) {
@@ -181,14 +183,6 @@
     });
   };
 
-  var makeArray = function makeArray(nodeList) {
-    if (!nodeList) {
-      return [];
-    }
-
-    return [].slice.call(nodeList);
-  };
-
   var reflow = function reflow(element) {
     return element.offsetHeight;
   };
@@ -211,7 +205,7 @@
    */
 
   var NAME = 'collapse';
-  var VERSION = '3.1.0';
+  var VERSION = '3.2.0';
   var DATA_KEY = 'coreui.collapse';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -223,27 +217,19 @@
     toggle: 'boolean',
     parent: '(string|element)'
   };
-  var Event = {
-    SHOW: "show" + EVENT_KEY,
-    SHOWN: "shown" + EVENT_KEY,
-    HIDE: "hide" + EVENT_KEY,
-    HIDDEN: "hidden" + EVENT_KEY,
-    CLICK_DATA_API: "click" + EVENT_KEY + DATA_API_KEY
-  };
-  var ClassName = {
-    SHOW: 'show',
-    COLLAPSE: 'collapse',
-    COLLAPSING: 'collapsing',
-    COLLAPSED: 'collapsed'
-  };
-  var Dimension = {
-    WIDTH: 'width',
-    HEIGHT: 'height'
-  };
-  var Selector = {
-    ACTIVES: '.show, .collapsing',
-    DATA_TOGGLE: '[data-toggle="collapse"]'
-  };
+  var EVENT_SHOW = "show" + EVENT_KEY;
+  var EVENT_SHOWN = "shown" + EVENT_KEY;
+  var EVENT_HIDE = "hide" + EVENT_KEY;
+  var EVENT_HIDDEN = "hidden" + EVENT_KEY;
+  var EVENT_CLICK_DATA_API = "click" + EVENT_KEY + DATA_API_KEY;
+  var CLASS_NAME_SHOW = 'show';
+  var CLASS_NAME_COLLAPSE = 'collapse';
+  var CLASS_NAME_COLLAPSING = 'collapsing';
+  var CLASS_NAME_COLLAPSED = 'collapsed';
+  var WIDTH = 'width';
+  var HEIGHT = 'height';
+  var SELECTOR_ACTIVES = '.show, .collapsing';
+  var SELECTOR_DATA_TOGGLE = '[data-toggle="collapse"]';
   /**
    * ------------------------------------------------------------------------
    * Class Definition
@@ -255,13 +241,13 @@
       this._isTransitioning = false;
       this._element = element;
       this._config = this._getConfig(config);
-      this._triggerArray = makeArray(SelectorEngine.find("[data-toggle=\"collapse\"][href=\"#" + element.id + "\"]," + ("[data-toggle=\"collapse\"][data-target=\"#" + element.id + "\"]")));
-      var toggleList = makeArray(SelectorEngine.find(Selector.DATA_TOGGLE));
+      this._triggerArray = SelectorEngine.find(SELECTOR_DATA_TOGGLE + "[href=\"#" + element.id + "\"]," + (SELECTOR_DATA_TOGGLE + "[data-target=\"#" + element.id + "\"]"));
+      var toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
 
       for (var i = 0, len = toggleList.length; i < len; i++) {
         var elem = toggleList[i];
         var selector = getSelectorFromElement(elem);
-        var filterElement = makeArray(SelectorEngine.find(selector)).filter(function (foundElem) {
+        var filterElement = SelectorEngine.find(selector).filter(function (foundElem) {
           return foundElem === element;
         });
 
@@ -290,7 +276,7 @@
 
     // Public
     _proto.toggle = function toggle() {
-      if (this._element.classList.contains(ClassName.SHOW)) {
+      if (this._element.classList.contains(CLASS_NAME_SHOW)) {
         this.hide();
       } else {
         this.show();
@@ -300,7 +286,7 @@
     _proto.show = function show() {
       var _this = this;
 
-      if (this._isTransitioning || this._element.classList.contains(ClassName.SHOW)) {
+      if (this._isTransitioning || this._element.classList.contains(CLASS_NAME_SHOW)) {
         return;
       }
 
@@ -308,12 +294,12 @@
       var activesData;
 
       if (this._parent) {
-        actives = makeArray(SelectorEngine.find(Selector.ACTIVES, this._parent)).filter(function (elem) {
+        actives = SelectorEngine.find(SELECTOR_ACTIVES, this._parent).filter(function (elem) {
           if (typeof _this._config.parent === 'string') {
             return elem.getAttribute('data-parent') === _this._config.parent;
           }
 
-          return elem.classList.contains(ClassName.COLLAPSE);
+          return elem.classList.contains(CLASS_NAME_COLLAPSE);
         });
 
         if (actives.length === 0) {
@@ -334,7 +320,7 @@
         }
       }
 
-      var startEvent = EventHandler.trigger(this._element, Event.SHOW);
+      var startEvent = EventHandler.trigger(this._element, EVENT_SHOW);
 
       if (startEvent.defaultPrevented) {
         return;
@@ -354,15 +340,15 @@
 
       var dimension = this._getDimension();
 
-      this._element.classList.remove(ClassName.COLLAPSE);
+      this._element.classList.remove(CLASS_NAME_COLLAPSE);
 
-      this._element.classList.add(ClassName.COLLAPSING);
+      this._element.classList.add(CLASS_NAME_COLLAPSING);
 
       this._element.style[dimension] = 0;
 
       if (this._triggerArray.length) {
         this._triggerArray.forEach(function (element) {
-          element.classList.remove(ClassName.COLLAPSED);
+          element.classList.remove(CLASS_NAME_COLLAPSED);
           element.setAttribute('aria-expanded', true);
         });
       }
@@ -370,17 +356,15 @@
       this.setTransitioning(true);
 
       var complete = function complete() {
-        _this._element.classList.remove(ClassName.COLLAPSING);
+        _this._element.classList.remove(CLASS_NAME_COLLAPSING);
 
-        _this._element.classList.add(ClassName.COLLAPSE);
-
-        _this._element.classList.add(ClassName.SHOW);
+        _this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW);
 
         _this._element.style[dimension] = '';
 
         _this.setTransitioning(false);
 
-        EventHandler.trigger(_this._element, Event.SHOWN);
+        EventHandler.trigger(_this._element, EVENT_SHOWN);
       };
 
       var capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1);
@@ -394,11 +378,11 @@
     _proto.hide = function hide() {
       var _this2 = this;
 
-      if (this._isTransitioning || !this._element.classList.contains(ClassName.SHOW)) {
+      if (this._isTransitioning || !this._element.classList.contains(CLASS_NAME_SHOW)) {
         return;
       }
 
-      var startEvent = EventHandler.trigger(this._element, Event.HIDE);
+      var startEvent = EventHandler.trigger(this._element, EVENT_HIDE);
 
       if (startEvent.defaultPrevented) {
         return;
@@ -409,11 +393,9 @@
       this._element.style[dimension] = this._element.getBoundingClientRect()[dimension] + "px";
       reflow(this._element);
 
-      this._element.classList.add(ClassName.COLLAPSING);
+      this._element.classList.add(CLASS_NAME_COLLAPSING);
 
-      this._element.classList.remove(ClassName.COLLAPSE);
-
-      this._element.classList.remove(ClassName.SHOW);
+      this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW);
 
       var triggerArrayLength = this._triggerArray.length;
 
@@ -422,8 +404,8 @@
           var trigger = this._triggerArray[i];
           var elem = getElementFromSelector(trigger);
 
-          if (elem && !elem.classList.contains(ClassName.SHOW)) {
-            trigger.classList.add(ClassName.COLLAPSED);
+          if (elem && !elem.classList.contains(CLASS_NAME_SHOW)) {
+            trigger.classList.add(CLASS_NAME_COLLAPSED);
             trigger.setAttribute('aria-expanded', false);
           }
         }
@@ -434,11 +416,11 @@
       var complete = function complete() {
         _this2.setTransitioning(false);
 
-        _this2._element.classList.remove(ClassName.COLLAPSING);
+        _this2._element.classList.remove(CLASS_NAME_COLLAPSING);
 
-        _this2._element.classList.add(ClassName.COLLAPSE);
+        _this2._element.classList.add(CLASS_NAME_COLLAPSE);
 
-        EventHandler.trigger(_this2._element, Event.HIDDEN);
+        EventHandler.trigger(_this2._element, EVENT_HIDDEN);
       };
 
       this._element.style[dimension] = '';
@@ -462,7 +444,7 @@
     ;
 
     _proto._getConfig = function _getConfig(config) {
-      config = _objectSpread2({}, Default, {}, config);
+      config = _objectSpread2(_objectSpread2({}, Default), config);
       config.toggle = Boolean(config.toggle); // Coerce string values
 
       typeCheckConfig(NAME, config, DefaultType);
@@ -470,9 +452,9 @@
     };
 
     _proto._getDimension = function _getDimension() {
-      var hasWidth = this._element.classList.contains(Dimension.WIDTH);
+      var hasWidth = this._element.classList.contains(WIDTH);
 
-      return hasWidth ? Dimension.WIDTH : Dimension.HEIGHT;
+      return hasWidth ? WIDTH : HEIGHT;
     };
 
     _proto._getParent = function _getParent() {
@@ -489,8 +471,8 @@
         parent = SelectorEngine.findOne(parent);
       }
 
-      var selector = "[data-toggle=\"collapse\"][data-parent=\"" + parent + "\"]";
-      makeArray(SelectorEngine.find(selector, parent)).forEach(function (element) {
+      var selector = SELECTOR_DATA_TOGGLE + "[data-parent=\"" + parent + "\"]";
+      SelectorEngine.find(selector, parent).forEach(function (element) {
         var selected = getElementFromSelector(element);
 
         _this3._addAriaAndCollapsedClass(selected, [element]);
@@ -500,14 +482,14 @@
 
     _proto._addAriaAndCollapsedClass = function _addAriaAndCollapsedClass(element, triggerArray) {
       if (element) {
-        var isOpen = element.classList.contains(ClassName.SHOW);
+        var isOpen = element.classList.contains(CLASS_NAME_SHOW);
 
         if (triggerArray.length) {
           triggerArray.forEach(function (elem) {
             if (isOpen) {
-              elem.classList.remove(ClassName.COLLAPSED);
+              elem.classList.remove(CLASS_NAME_COLLAPSED);
             } else {
-              elem.classList.add(ClassName.COLLAPSED);
+              elem.classList.add(CLASS_NAME_COLLAPSED);
             }
 
             elem.setAttribute('aria-expanded', isOpen);
@@ -520,9 +502,9 @@
     Collapse.collapseInterface = function collapseInterface(element, config) {
       var data = Data.getData(element, DATA_KEY);
 
-      var _config = _objectSpread2({}, Default, {}, Manipulator.getDataAttributes(element), {}, typeof config === 'object' && config ? config : {});
+      var _config = _objectSpread2(_objectSpread2(_objectSpread2({}, Default), Manipulator.getDataAttributes(element)), typeof config === 'object' && config ? config : {});
 
-      if (!data && _config.toggle && /show|hide/.test(config)) {
+      if (!data && _config.toggle && typeof config === 'string' && /show|hide/.test(config)) {
         _config.toggle = false;
       }
 
@@ -570,7 +552,7 @@
    */
 
 
-  EventHandler.on(document, Event.CLICK_DATA_API, Selector.DATA_TOGGLE, function (event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
     // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
     if (event.target.tagName === 'A') {
       event.preventDefault();
@@ -578,7 +560,7 @@
 
     var triggerData = Manipulator.getDataAttributes(this);
     var selector = getSelectorFromElement(this);
-    var selectorElements = makeArray(SelectorEngine.find(selector));
+    var selectorElements = SelectorEngine.find(selector);
     selectorElements.forEach(function (element) {
       var data = Data.getData(element, DATA_KEY);
       var config;

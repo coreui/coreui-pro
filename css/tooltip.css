@@ -51,8 +51,6 @@
 .tooltip .tooltip-arrow {
   position: absolute;
   display: block;
-  width: 0.8rem;
-  height: 0.4rem;
 }
 
 .tooltip .tooltip-arrow::before {
@@ -62,61 +60,65 @@
   border-style: solid;
 }
 
-.bs-tooltip-top, .bs-tooltip-auto[data-popper-placement^="top"] {
+.tooltip[data-popper-placement^="top"],
+.tooltip[data-popper-placement^="bottom"] {
   padding: 0.4rem 0;
 }
 
-.bs-tooltip-top .tooltip-arrow, .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow {
+.tooltip[data-popper-placement^="top"] .tooltip-arrow,
+.tooltip[data-popper-placement^="bottom"] .tooltip-arrow {
+  width: 0.8rem;
+  height: 0.4rem;
+}
+
+.tooltip[data-popper-placement^="right"],
+.tooltip[data-popper-placement^="left"] {
+  padding: 0 0.4rem;
+}
+
+.tooltip[data-popper-placement^="right"] .tooltip-arrow,
+.tooltip[data-popper-placement^="left"] .tooltip-arrow {
+  width: 0.4rem;
+  height: 0.8rem;
+}
+
+.tooltip[data-popper-placement^="top"] .tooltip-arrow {
   bottom: 0;
 }
 
-.bs-tooltip-top .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+.tooltip[data-popper-placement^="top"] .tooltip-arrow::before {
   top: 0;
   border-width: 0.4rem 0.4rem 0;
   border-top-color: #000015;
 }
 
-.bs-tooltip-right, .bs-tooltip-auto[data-popper-placement^="right"] {
-  padding: 0 0.4rem;
-}
-
-.bs-tooltip-right .tooltip-arrow, .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow {
+.tooltip[data-popper-placement^="right"] .tooltip-arrow {
   left: 0;
-  width: 0.4rem;
-  height: 0.8rem;
 }
 
-.bs-tooltip-right .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+.tooltip[data-popper-placement^="right"] .tooltip-arrow::before {
   right: 0;
   border-width: 0.4rem 0.4rem 0.4rem 0;
   border-right-color: #000015;
 }
 
-.bs-tooltip-bottom, .bs-tooltip-auto[data-popper-placement^="bottom"] {
-  padding: 0.4rem 0;
-}
 
-.bs-tooltip-bottom .tooltip-arrow, .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow {
+.tooltip[data-popper-placement^="bottom"] .tooltip-arrow {
   top: 0;
 }
 
-.bs-tooltip-bottom .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+.tooltip[data-popper-placement^="bottom"] .tooltip-arrow::before {
   bottom: 0;
   border-width: 0 0.4rem 0.4rem;
   border-bottom-color: #000015;
 }
 
-.bs-tooltip-left, .bs-tooltip-auto[data-popper-placement^="left"] {
-  padding: 0 0.4rem;
-}
 
-.bs-tooltip-left .tooltip-arrow, .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow {
+.tooltip[data-popper-placement^="left"] .tooltip-arrow {
   right: 0;
-  width: 0.4rem;
-  height: 0.8rem;
 }
 
-.bs-tooltip-left .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+.tooltip[data-popper-placement^="left"] .tooltip-arrow::before {
   left: 0;
   border-width: 0.4rem 0 0.4rem 0.4rem;
   border-left-color: #000015;

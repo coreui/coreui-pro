@@ -42,6 +42,10 @@
   border-color: #1e1e29;
 }
 
+.breadcrumb-item {
+  display: flex;
+}
+
 html:not([dir="rtl"]) .breadcrumb-item + .breadcrumb-item {
   padding-left: 0.5rem;
 }

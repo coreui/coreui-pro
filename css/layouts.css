@@ -76,6 +76,8 @@
 }
 
 .c-wrapper:not(.c-wrapper-fluid) .c-body {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
 }
 

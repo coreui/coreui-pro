@@ -117,6 +117,7 @@
 .col {
   flex-basis: 0;
   flex-grow: 1;
+  min-width: 0;
   max-width: 100%;
 }
 
@@ -324,6 +325,7 @@
   .col-sm {
     flex-basis: 0;
     flex-grow: 1;
+    min-width: 0;
     max-width: 100%;
   }
   .row-cols-sm-1 > * {
@@ -490,6 +492,7 @@
   .col-md {
     flex-basis: 0;
     flex-grow: 1;
+    min-width: 0;
     max-width: 100%;
   }
   .row-cols-md-1 > * {
@@ -656,6 +659,7 @@
   .col-lg {
     flex-basis: 0;
     flex-grow: 1;
+    min-width: 0;
     max-width: 100%;
   }
   .row-cols-lg-1 > * {
@@ -822,6 +826,7 @@
   .col-xl {
     flex-basis: 0;
     flex-grow: 1;
+    min-width: 0;
     max-width: 100%;
   }
   .row-cols-xl-1 > * {

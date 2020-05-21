@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  data.jsv3.1.1 (https://coreui.io)
+  * CoreUI PRO  data.jsv3.2.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v4.3.1): dom/data.js
+   * Bootstrap (v5.0.0-alpha1): dom/data.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
    * --------------------------------------------------------------------------
    */

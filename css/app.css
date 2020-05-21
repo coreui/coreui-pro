@@ -21,6 +21,7 @@
 }
 
 .c-app {
+  overflow-x: hidden;
   --primary: #321fdb;
   --secondary: #ced2d8;
   --success: #2eb85c;

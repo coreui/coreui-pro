@@ -203,6 +203,7 @@ pre {
   margin-top: 0;
   margin-bottom: 1rem;
   overflow: auto;
+  -ms-overflow-style: scrollbar;
 }
 
 figure {
@@ -270,6 +271,10 @@ select {
   text-transform: none;
 }
 
+[role="button"] {
+  cursor: pointer;
+}
+
 select {
   word-wrap: normal;
 }
@@ -300,13 +305,6 @@ input[type="radio"],
 input[type="checkbox"] {
   box-sizing: border-box;
   padding: 0;
-}
-
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"],
-input[type="month"] {
-  -webkit-appearance: listbox;
 }
 
 textarea {

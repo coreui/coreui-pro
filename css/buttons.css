@@ -80,6 +80,10 @@
   opacity: 0.65;
 }
 
+.btn:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
 .btn i,
 .btn .c-icon {
   height: 0.875rem;
@@ -2298,7 +2302,6 @@ fieldset:disabled a.btn {
 
 .btn-link:focus, .btn-link.focus {
   text-decoration: underline;
-  box-shadow: none;
 }
 
 .btn-link:disabled, .btn-link.disabled {
