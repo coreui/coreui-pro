@@ -1,6 +1,7 @@
 
 // stylelint-disable selector-max-class, declaration-no-important, selector-max-compound-selectors, function-url-quotes, selector-max-combinators
 .c-sidebar {
+  position: relative;
   display: flex;
   // $sidebar-width is the width of the columns
   flex: 0 0 $sidebar-width;
@@ -135,6 +136,15 @@
   height: $sidebar-brand-height;
   background: transparent;
   border: 0;
+
+  @include hover() {
+    text-decoration: none;
+  }
+
+  &:focus,
+  &.focus {
+    outline: 0;
+  }
 
   @include ltr {
     right: 0;
