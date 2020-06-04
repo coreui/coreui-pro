@@ -1,0 +1,93 @@
+.#{$namespace-prefix}-box[data-theme~='cpopover'] {
+  z-index: $zindex-popover;
+  display: block;
+  max-width: $popover-max-width;
+  @include reset-text();
+  @include font-size($popover-font-size);
+  word-wrap: break-word;
+  background-clip: padding-box;
+  border: $popover-border-width solid;
+  @include border-radius($popover-border-radius);
+  @include box-shadow($popover-box-shadow);
+
+  @include themes($popover-theme-map) {
+    background-color: themes-get-value("popover-bg");
+    border-color: themes-get-value("popover-border-color");
+  }
+
+  >.#{$namespace-prefix}-content {
+    max-width: auto;
+    padding: 0;
+    color: initial;
+    text-align: initial;
+    background-color: initial;
+    border-radius: initial;
+  }
+
+  >.#{$namespace-prefix}-arrow {
+    position: absolute;
+    display: block;
+    width: $popover-arrow-width;
+    height: $popover-arrow-height;
+    // margin: 0 $popover-border-radius;
+
+    &::after {
+      position: absolute;
+      display: block;
+      content: "";
+      border-color: transparent;
+      border-style: solid;
+    }
+  }
+  .#{$namespace-prefix}-arrow {
+    @include themes($popover-theme-map) {
+      border-color: themes-get-value("popover-arrow-outer-color");
+      color: themes-get-value("popover-arrow-color");
+    }
+
+    &::after {
+      content: '';
+      z-index: -1;
+      position: absolute;
+      border-color: transparent;
+      border-style: solid;
+      border-width: 8px;
+    }
+  }
+
+  &[data-placement^='top']>.#{$namespace-prefix}-arrow {
+    &::after {
+      border-top-color: inherit;
+      border-width: 8px 8px 0;
+      bottom: -8px;
+      left: -1.5px;
+    }
+  }
+
+  &[data-placement^='bottom']>.#{$namespace-prefix}-arrow {
+    &::after {
+      border-bottom-color: inherit;
+      border-width: 0 8px 8px;
+      top: -8px;
+      left: -1.5px;
+    }
+  }
+
+  &[data-placement^='left']>.#{$namespace-prefix}-arrow {
+    &::after {
+      border-left-color: inherit;
+      border-width: 8px 0 8px 8px;
+      right: -8px;
+      top: -1.5px;
+    }
+  }
+
+  &[data-placement^='right']>.#{$namespace-prefix}-arrow {
+    &::after {
+      border-width: 8px 8px 8px 0;
+      left: -8px;
+      top: -1.5px;
+      border-right-color: inherit;
+    }
+  }
+}
