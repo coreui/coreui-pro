@@ -377,7 +377,7 @@ class Tooltip {
 
   update() {
     if (this._popper !== null) {
-      this._popper.scheduleUpdate()
+      this._popper.update()
     }
   }
 

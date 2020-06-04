@@ -119,7 +119,7 @@
 
   function normalizeParams(originalTypeEvent, handler, delegationFn) {
     var delegation = typeof handler === 'string';
-    var originalHandler = delegation ? delegationFn : handler; // allow to get the native events from namespaced events ('click.coreui.button' --> 'click')
+    var originalHandler = delegation ? delegationFn : handler; // allow to get the native events from namespaced events ('click.bs.button' --> 'click')
 
     var typeEvent = originalTypeEvent.replace(stripNameRegex, '');
     var custom = customEvents[typeEvent];
