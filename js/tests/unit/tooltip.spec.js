@@ -352,13 +352,13 @@ describe('Tooltip', () => {
       })
 
       tooltipEl.addEventListener('inserted.coreui.tooltip', () => {
-        expect(tooltip.getTipElement().classList.contains('bs-tooltip-bottom')).toEqual(true)
+        expect(tooltip.getTipElement().dataset.popperPlacement).toEqual('bottom')
       })
 
       tooltipEl.addEventListener('shown.coreui.tooltip', () => {
         const tooltipShown = document.querySelector('.tooltip')
 
-        expect(tooltipShown.classList.contains('bs-tooltip-bottom')).toEqual(true)
+        expect(tooltipShown.dataset.popperPlacement).toEqual('bottom')
         done()
       })
 
