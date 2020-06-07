@@ -21,6 +21,7 @@
 }
 
 .c-sidebar {
+  position: relative;
   display: flex;
   flex: 0 0 256px;
   flex-direction: column;
@@ -37,6 +38,12 @@
     top: 0;
     bottom: 0;
     z-index: 1031;
+  }
+  .c-sidebar:not(.c-sidebar-right) {
+    left: 0;
+  }
+  .c-sidebar.c-sidebar-right {
+    right: 0;
   }
 }
 
@@ -174,6 +181,16 @@ html:not([dir="rtl"]) .c-sidebar.c-sidebar-overlaid.c-sidebar-right {
   height: 56px;
   background: transparent;
   border: 0;
+}
+
+@media (hover: hover), (-ms-high-contrast: none) {
+  .c-sidebar-close:hover {
+    text-decoration: none;
+  }
+}
+
+.c-sidebar-close:focus, .c-sidebar-close.focus {
+  outline: 0;
 }
 
 html:not([dir="rtl"]) .c-sidebar-close {
