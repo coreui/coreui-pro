@@ -46,6 +46,7 @@ article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
 
 body {
   margin: 0; // 1
+  // TODO: find a better solution to avoid horizontal scroll if a sidebar doesn't have a fixed position.
   overflow-x: hidden; // 4
   font-family: $font-family-base;
   @include font-size($font-size-base);
