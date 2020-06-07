@@ -5,6 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
+import './src/polyfills'
 import AsyncLoad from './src/async-load'
 import Alert from './src/alert'
 import Button from './src/button'
@@ -19,7 +20,6 @@ import Sidebar from './src/sidebar'
 import Tab from './src/tab'
 import Toast from './src/toast'
 import Tooltip from './src/tooltip'
-import './src/polyfills'
 
 export default {
   AsyncLoad,
