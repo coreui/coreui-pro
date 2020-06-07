@@ -19,6 +19,13 @@
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 1;
+
+    &:not(.c-sidebar-right){
+      left: 0;
+    }
+    &.c-sidebar-right {
+      right: 0;
+    }
   }
 
   @include ltr {
