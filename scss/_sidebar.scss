@@ -20,11 +20,21 @@
     bottom: 0;
     z-index: $zindex-fixed + 1;
 
-    &:not(.c-sidebar-right){
-      left: 0;
+    @include ltr {
+      &:not(.c-sidebar-right){
+        left: 0;
+      }
+      &.c-sidebar-right {
+        right: 0;
+      }
     }
-    &.c-sidebar-right {
-      right: 0;
+    @include rtl {
+      &:not(.c-sidebar-right){
+        right: 0;
+      }
+      &.c-sidebar-right {
+        left: 0;
+      }
     }
   }
 
