@@ -6,7 +6,7 @@ $close-text-shadow__dt:  0 1px 0 $black !default;
 $close-theme-map: map-merge(
   $close-theme-map,
   (
-    default: (
+    dark: (
       "close-color":        $close-color__dt,
       "close-text-shadow":  $close-text-shadow__dt
     )
