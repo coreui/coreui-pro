@@ -255,7 +255,7 @@ class Dropdown {
     this._inNavbar = this._detectNavbar()
     this._inHeader = this._detectHeader()
     if (this._popper) {
-      this._popper.scheduleUpdate()
+      this._popper.update()
     }
   }
 
@@ -364,7 +364,8 @@ class Dropdown {
 
     // Disable Popper.js if we have a static display
     if (this._config.display === 'static') {
-      popperConfig.modifiers.applyStyle = {
+      popperConfig.modifiers = {
+        name: 'applyStyles',
         enabled: false
       }
     }
