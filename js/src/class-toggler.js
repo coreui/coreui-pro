@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.2.0): class-toggler.js
+ * CoreUI (v3.2.1): class-toggler.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -18,7 +18,7 @@ import EventHandler from './dom/event-handler'
  */
 
 const NAME = 'class-toggler'
-const VERSION = '3.2.0'
+const VERSION = '3.2.1'
 const DATA_KEY = 'coreui.class-toggler'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'

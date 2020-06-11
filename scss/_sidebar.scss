@@ -12,6 +12,10 @@
   padding: $sidebar-padding;
   box-shadow: none;
 
+  &.c-sidebar-right {
+    order: 99;
+  }
+
   @include media-breakpoint-down(breakpoint-before($mobile-breakpoint)) {
     // Some of our components use this property to detect if the sidebar has mobile behavior.
     --is-mobile: true;
@@ -19,6 +23,23 @@
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 1;
+
+    @include ltr {
+      &:not(.c-sidebar-right){
+        left: 0;
+      }
+      &.c-sidebar-right {
+        right: 0;
+      }
+    }
+    @include rtl {
+      &:not(.c-sidebar-right){
+        right: 0;
+      }
+      &.c-sidebar-right {
+        left: 0;
+      }
+    }
   }
 
   @include ltr {
@@ -26,7 +47,6 @@
       margin-left: - $sidebar-width;
     }
     &.c-sidebar-right {
-      order: 99;
       margin-right: - $sidebar-width;
     }
   }
