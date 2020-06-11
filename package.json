@@ -1,6 +1,6 @@
 {
   "name": "@coreui/coreui-pro",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "HTML, CSS, and JavaScript UI Components Library",
   "keywords": [
     "bootstrap",
@@ -121,6 +121,7 @@
     "eslint-plugin-unicorn": "^20.1.0",
     "find-unused-sass-variables": "^2.0.0",
     "foreach-cli": "^1.8.1",
+    "hammer-simulator": "0.0.1",
     "ip": "^1.1.5",
     "jquery": "^3.5.1",
     "karma": "^5.0.9",

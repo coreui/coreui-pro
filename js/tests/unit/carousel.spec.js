@@ -6,6 +6,8 @@ import { getFixture, clearFixture, createEvent, jQueryMock } from '../helpers/fi
 
 describe('Carousel', () => {
   const { Simulator, PointerEvent } = window
+
+  console.log(Simulator)
   const originWinPointerEvent = PointerEvent
   const supportPointerEvent = Boolean(PointerEvent)
 
