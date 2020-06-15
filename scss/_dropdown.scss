@@ -23,7 +23,6 @@
   float: left;
   min-width: $dropdown-min-width;
   padding: $dropdown-padding-y 0;
-  margin: $dropdown-spacer 0 0; // override default ul
   @include font-size($dropdown-font-size);
   text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
   list-style: none;
@@ -38,6 +37,10 @@
     border-color: themes-get-value("dropdown-border-color");
   }
   @include elevation(4);
+}
+
+[data-display^="static"] ~ .dropdown-menu {
+  margin: $dropdown-spacer 0 0; // override default ul
 }
 
 @each $breakpoint in map-keys($grid-breakpoints) {
