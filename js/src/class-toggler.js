@@ -26,29 +26,28 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const DefaultType = {
-  attach: '(null|array|string)',
+  addClass: '(null|array|string)',
   breakpoints: '(null|array|string)',
-  detach: '(null|array|string)',
-  postfix: '(null|string)',
+  removeClass: '(null|array|string)',
   responsive: '(null|boolean)',
   target: '(null|string)',
-  toggle: '(null|array|string)'
+  toggleClass: '(null|array|string)'
 }
 
 const Default = {
-  attach: null,
+  addClass: null,
   breakpoints: ['', 'sm', 'md', 'lg', 'xl'],
-  detach: null,
-  postfix: '-show',
+  removeClass: null,
   responsive: false,
   target: 'body',
-  toggle: null
+  toggleClass: null
 }
 
 const CLASS_NAME_CLASS_TOGGLER = 'c-class-toggler'
 
-const EVENT_CLASS_ATTACH = 'classattached'
-const EVENT_CLASS_DETACH = 'classdetached'
+const EVENT_CLASS_ADDED = 'classadded'
+const EVENT_CLASS_REMOVED = 'classremoved'
+const EVENT_CLASS_TOGGLE = 'classtoggle'
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_CLASS_TOGGLER = '.c-class-toggler'
@@ -82,60 +81,96 @@ class ClassToggler {
   }
 
   // Public
-  attach() {
-    const target = document.querySelector(this._config.target)
-    const classNames = this._config.attach.split(',')
+  add() {
+    const target = this._target()
+    const classNames = this._config.addClass.replace(/\s/g, '').split(',')
 
     classNames.forEach(className => {
       target.classList.add(className)
-      this._customEvent(EVENT_CLASS_ATTACH, target, className)
+      this._customEvent(EVENT_CLASS_ADDED, target, true, className)
     })
   }
 
-  detach() {
-    const target = document.querySelector(this._config.target)
-    const classNames = this._config.detach.split(',')
+  remove() {
+    const target = this._target()
+    const classNames = this._config.removeClass.replace(/\s/g, '').split(',')
 
     classNames.forEach(className => {
       if (this._config.responsive) {
         this._updateResponsiveClassNames(className).forEach(className => {
           target.classList.remove(className)
-          this._customEvent(EVENT_CLASS_DETACH, target, className)
+          this._customEvent(EVENT_CLASS_REMOVED, target, false, className)
         })
       } else {
         target.classList.remove(className)
-        this._customEvent(EVENT_CLASS_DETACH, target, className)
+        this._customEvent(EVENT_CLASS_REMOVED, target, false, className)
       }
     })
   }
 
   toggle() {
-    const target = document.querySelector(this._config.target)
-    const classNames = this._config.toggle.split(',')
+    const target = this._target()
+    const classNames = this._config.toggleClass.replace(/\s/g, '').split(',')
 
-    classNames.forEach(className => {
-      if (target.classList.contains(className)) {
-        this._config.detach = className
-        this.detach()
-      }
+    if (this._config.responsive) {
+      classNames.forEach(className => {
+        const responsiveClassNames = this._updateResponsiveClassNames(className)
 
-      if (!target.classList.contains(className)) {
-        this._config.attach = className
-        this.attach()
-      }
-    })
+        if (responsiveClassNames.filter(className => target.classList.contains(className)).length) {
+          this._updateResponsiveClassNames(className).forEach(className => {
+            this._config.removeClass = className
+            this.remove()
+            this._customEvent(EVENT_CLASS_TOGGLE, target, false, className)
+          })
+        } else {
+          this._config.addClass = className
+          this.add()
+          this._customEvent(EVENT_CLASS_TOGGLE, target, true, className)
+        }
+      })
+    } else {
+      classNames.forEach(className => {
+        if (target.classList.contains(className)) {
+          this._config.removeClass = className
+          this.remove()
+          this._customEvent(EVENT_CLASS_TOGGLE, target, false, className)
+        } else {
+          this._config.addClass = className
+          this.add()
+          this._customEvent(EVENT_CLASS_TOGGLE, target, true, className)
+        }
+      })
+    }
   }
 
   class() {
-    this._config.toggle = this.config.class
+    this._config.toggleClass = this._config.class
+    if (this._element.getAttribute('responsive')) {
+      this._config.responsive = this._element.getAttribute('responsive')
+    }
+
+    this.toggle()
   }
 
   // Private
 
-  _customEvent(eventName, target, className) {
+  _target() {
+    if (this._config.target === 'body') {
+      return document.querySelector(this._config.target)
+    }
+
+    if (this._config.target === '_parent') {
+      return this._element.parentNode
+    }
+
+    return document.querySelector(this._config.target)
+  }
+
+  _customEvent(eventName, target, add, className) {
     const event = new CustomEvent(eventName, {
       detail: {
         target,
+        add,
         className
       }
     })
@@ -157,194 +192,9 @@ class ClassToggler {
     return this._breakpoints(className).map(breakpoint => breakpoint.length > 0 ? className.replace(bp, breakpoint) : className.replace(`-${bp}`, breakpoint))
   }
 
-  // _newBreakpoints(className)
-
-  // _breakpoints(className) {
-  //   const { breakpoints } = this._config
-  //   let newBp = []
-  //   breakpoints.some((element, index, array) => {
-  //     if (element.lenght > 0) {
-  //       if (className.includes(element)) {
-  //         newBp.push(element)
-  //       }
-  //     }
-  //   })
-  // }
-
-  // _classNamesWithBreakpoint(className) {
-  //   const { breakpoints } = this._config
-  //   const idx = breakpoints.filter((breakpoint, index) => breakpoint.lenght > 0 ? className.includes(breakpoint) ? index : false : false)
-  //   const selectedBreakpoints = breakpoints.filter((breakpoint, index) => )
-  // }
-
-  // _whichBreakpoint(className) {
-  //   const { breakpoints } = this._config
-
-  //   return breakpoints.filter((breakpoint, index) => breakpoint.lenght > 0 ? className.includes(breakpoint) ? index : false : false)
-  // }
-
-  // toggle() {
-  //   this._getElementDataAttributes(this._element).forEach(dataAttributes => {
-  //     let element
-  //     const { target, toggle } = dataAttributes
-  //     if (target === '_parent' || target === 'parent') {
-  //       element = this._element.parentNode
-  //     } else {
-  //       element = document.querySelector(target)
-  //     }
-
-  //     toggle.forEach(object => {
-  //       const { className, responsive, postfix } = object
-  //       const breakpoints = (typeof object.breakpoints === 'undefined' || object.breakpoints === null) ? null : this._arrayFromString(object.breakpoints)
-
-  //       // eslint-disable-next-line no-negated-condition
-  //       if (!responsive) {
-  //         const add = element.classList.toggle(className)
-  //         const event = new CustomEvent(EVENT_CLASS_TOGGLE, {
-  //           detail: {
-  //             target,
-  //             add,
-  //             className
-  //           }
-  //         })
-  //         element.dispatchEvent(event)
-  //       } else {
-  //         let currentBreakpoint
-  //         breakpoints.forEach(breakpoint => {
-  //           if (className.includes(breakpoint)) {
-  //             currentBreakpoint = breakpoint
-  //           }
-  //         })
-  //         const responsiveClassNames = []
-  //         if (typeof currentBreakpoint === 'undefined') {
-  //           responsiveClassNames.push(className)
-  //         } else {
-  //           responsiveClassNames.push(className.replace(`${currentBreakpoint}${postfix}`, postfix))
-  //           breakpoints.splice(0, breakpoints.indexOf(currentBreakpoint) + 1).forEach(breakpoint => {
-  //             responsiveClassNames.push(className.replace(`${currentBreakpoint}${postfix}`, `${breakpoint}${postfix}`))
-  //           })
-  //         }
-
-  //         let addResponsiveClasses = false
-  //         responsiveClassNames.forEach(responsiveClassName => {
-  //           if (element.classList.contains(responsiveClassName)) {
-  //             addResponsiveClasses = true
-  //           }
-  //         })
-
-  //         if (addResponsiveClasses) {
-  //           responsiveClassNames.forEach(responsiveClassName => {
-  //             element.classList.remove(responsiveClassName)
-  //             const event = new CustomEvent(EVENT_CLASS_TOGGLE, {
-  //               detail: {
-  //                 target,
-  //                 add: false,
-  //                 className: responsiveClassName
-  //               }
-  //             })
-  //             element.dispatchEvent(event)
-  //           })
-  //         } else {
-  //           element.classList.add(className)
-  //           const event = new CustomEvent(EVENT_CLASS_TOGGLE, {
-  //             detail: {
-  //               target,
-  //               add: true,
-  //               className
-  //             }
-  //           })
-  //           element.dispatchEvent(event)
-  //         }
-  //       }
-  //     })
-  //   })
-  // }
-
-  // Private
-
-  _arrayFromString(string) {
-    return string.replace(/ /g, '').split(',')
+  _includesResponsiveClass(className) {
+    return this._updateResponsiveClassNames(className).filter(className => this._config.target.contains(className))
   }
-
-  _isArray(array) {
-    // console.log(array.replace(/'/g, '"'))
-    // try {
-    //   JSON.parse(array.replace(/'/g, '"'))
-    //   return true
-    // } catch {
-    //   return false
-    // }
-  }
-
-  _convertToArray(array) {
-    return JSON.parse(array.replace(/'/g, '"'))
-  }
-
-  _getDataAttributes(data, attribute) {
-    const dataAttribute = data[attribute]
-    return this._isArray(dataAttribute) ? this._convertToArray(dataAttribute) : dataAttribute
-  }
-
-  _getToggleDetails(classNames, responsive, breakpoints, postfix) {
-    class ToggleDetails {
-      // eslint-disable-next-line default-param-last
-      constructor(className, responsive = Default.responsive, breakpoints, postfix) {
-        this.className = className
-        this.responsive = responsive
-        this.breakpoints = breakpoints
-        this.postfix = postfix
-      }
-    }
-
-    const toggle = []
-
-    if (Array.isArray(classNames)) {
-      classNames.forEach((className, index) => {
-        responsive = Array.isArray(responsive) ? responsive[index] : responsive
-        breakpoints = responsive ? (Array.isArray(breakpoints) ? breakpoints[index] : breakpoints) : null
-        postfix = responsive ? (Array.isArray(postfix) ? postfix[index] : postfix) : null
-        toggle.push(new ToggleDetails(className, responsive, breakpoints, postfix))
-      })
-    } else {
-      breakpoints = responsive ? breakpoints : null
-      postfix = responsive ? postfix : null
-      toggle.push(new ToggleDetails(classNames, responsive, breakpoints, postfix))
-    }
-
-    return toggle
-  }
-
-  _ifArray(array, index) {
-    return Array.isArray(array) ? array[index] : array
-  }
-
-  // _getElementDataAttributes(element) {
-  //   const data = element.dataset
-  //   const targets = (typeof data.target === 'undefined') ? Default.target : this._getDataAttributes(data, 'target')
-  //   const classNames = (typeof data.class === 'undefined') ? 'undefined' : this._getDataAttributes(data, 'class')
-  //   const responsive = (typeof data.responsive === 'undefined') ? Default.responsive : this._getDataAttributes(data, 'responsive')
-  //   const breakpoints = (typeof data.breakpoints === 'undefined') ? Default.breakpoints : this._getDataAttributes(data, 'breakpoints')
-  //   const postfix = (typeof data.postfix === 'undefined') ? Default.postfix : this._getDataAttributes(data, 'postfix')
-
-  //   const toggle = []
-
-  //   class TargetDetails {
-  //     constructor(target, toggle) {
-  //       this.target = target
-  //       this.toggle = toggle
-  //     }
-  //   }
-
-  //   if (Array.isArray(targets)) {
-  //     targets.forEach((target, index) => {
-  //       toggle.push(new TargetDetails(target, this._getToggleDetails(this._ifArray(classNames, index), this._ifArray(responsive, index), this._ifArray(breakpoints, index), this._ifArray(postfix, index))))
-  //     })
-  //   } else {
-  //     toggle.push(new TargetDetails(targets, this._getToggleDetails(classNames, responsive, breakpoints, postfix)))
-  //   }
-
-  //   return toggle
-  // }
 
   // Static
 
@@ -363,22 +213,6 @@ class ClassToggler {
 
     return config
   }
-
-  // _getConfig(config) {
-  //   config = {
-  //     ...Default,
-  //     ...Manipulator.getDataAttributes(this.element),
-  //     ...config
-  //   }
-
-  //   typeCheckConfig(
-  //     NAME,
-  //     config,
-  //     DefaultType
-  //   )
-
-  //   return config
-  // }
 
   static classTogglerInterface(element, config) {
     let data = Data.getData(element, DATA_KEY)
@@ -410,25 +244,29 @@ class ClassToggler {
  * ------------------------------------------------------------------------
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_CLASS_TOGGLER, function (event) {
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_CLASS_TOGGLER, event => {
   event.preventDefault()
   event.stopPropagation()
-  const toggler = event.target
+  let toggler = event.target
 
-  if (typeof toggler.dataset.attach !== 'undefined') {
-    ClassToggler.classTogglerInterface(this, 'attach')
+  if (!toggler.classList.contains(CLASS_NAME_CLASS_TOGGLER)) {
+    toggler = toggler.closest(SELECTOR_CLASS_TOGGLER)
   }
 
-  if (typeof toggler.dataset.detach !== 'undefined') {
-    ClassToggler.classTogglerInterface(this, 'detach')
+  if (typeof toggler.dataset.addClass !== 'undefined') {
+    ClassToggler.classTogglerInterface(toggler, 'add')
   }
 
-  if (typeof toggler.dataset.toggle !== 'undefined') {
-    ClassToggler.classTogglerInterface(this, 'toggle')
+  if (typeof toggler.dataset.removeClass !== 'undefined') {
+    ClassToggler.classTogglerInterface(toggler, 'remove')
+  }
+
+  if (typeof toggler.dataset.toggleClass !== 'undefined') {
+    ClassToggler.classTogglerInterface(toggler, 'toggle')
   }
 
   if (typeof toggler.dataset.class !== 'undefined') {
-    ClassToggler.classTogglerInterface(this, 'class')
+    ClassToggler.classTogglerInterface(toggler, 'class')
   }
 })
 
