@@ -74,7 +74,6 @@
     "js-debug": "cross-env PRODUCTION=true DEBUG=true npm run js-test-karma",
     "js-test-karma": "karma start js/tests/karma.conf.js",
     "js-test-integration": "rollup --config js/tests/integration/rollup.bundle.js && rollup --config js/tests/integration/rollup.bundle-modularity.js",
-    "js-test-cloud": "cross-env BROWSER=true npm run js-test-karma",
     "js-test-jquery": "cross-env JQUERY=true npm run js-test-karma",
     "release-version": "node build/change-version.js",
     "release-zip": "cd dist/ && zip -r9 coreui-$npm_package_version-dist.zip * && shx mv coreui-$npm_package_version-dist.zip ..",
@@ -85,9 +84,6 @@
     "storybook": "start-storybook -s ./stories/static,./node_modules -p 6006",
     "build-storybook": "build-storybook"
   },
-  "dependencies": {
-    "@coreui/icons": "^1.0.1"
-  },
   "peerDependencies": {
     "perfect-scrollbar": "^1.5.0",
     "@popperjs/core": "^2.4.0"
@@ -97,6 +93,7 @@
     "@babel/core": "^7.10.2",
     "@babel/plugin-proposal-object-rest-spread": "^7.10.1",
     "@babel/preset-env": "^7.10.2",
+    "@coreui/icons": "^1.0.1",
     "@popperjs/core": "^2.4.0",
     "@rollup/plugin-babel": "^5.0.2",
     "@rollup/plugin-commonjs": "^12.0.0",
