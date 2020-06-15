@@ -9,6 +9,8 @@ import {
   getjQuery,
   reflow,
   TRANSITION_END,
+  emulateTransitionEnd,
+  getTransitionDurationFromElement,
   typeCheckConfig
 } from './util/index'
 import Data from './dom/data'
@@ -146,7 +148,10 @@ class Sidebar {
       }
     }
 
+    const transitionDuration = getTransitionDurationFromElement(this._element)
+
     EventHandler.one(this._element, TRANSITION_END, complete)
+    emulateTransitionEnd(this._element, transitionDuration)
   }
 
   close(breakpoint) {
@@ -175,7 +180,10 @@ class Sidebar {
       }
     }
 
+    const transitionDuration = getTransitionDurationFromElement(this._element)
+
     EventHandler.one(this._element, TRANSITION_END, complete)
+    emulateTransitionEnd(this._element, transitionDuration)
   }
 
   toggle(breakpoint) {
