@@ -39,6 +39,8 @@
   @include elevation(4);
 }
 
+.c-header .dropdown-menu,
+.navbar .dropdown-menu,
 [data-display^="static"] ~ .dropdown-menu {
   margin: $dropdown-spacer 0 0; // override default ul
 }
@@ -49,7 +51,7 @@
 
     .c-header .dropdown-menu#{$infix}-left,
     .navbar .dropdown-menu#{$infix}-left,
-    [data-display^="static"] ~ .dropdown-menu#{$infix}-left, {
+    [data-display^="static"] ~ .dropdown-menu#{$infix}-left {
       @include ltr {
         right: auto;
         left: 0;
