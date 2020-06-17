@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  toast.jsv3.2.0 (https://coreui.io)
+  * CoreUI PRO  toast.jsv3.2.2 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -122,7 +122,7 @@
    */
 
   var NAME = 'toast';
-  var VERSION = '3.2.0';
+  var VERSION = '3.2.2';
   var DATA_KEY = 'coreui.toast';
   var EVENT_KEY = "." + DATA_KEY;
   var EVENT_CLICK_DISMISS = "click.dismiss" + EVENT_KEY;

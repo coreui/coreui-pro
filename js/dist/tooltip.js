@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  tooltip.jsv3.2.0 (https://coreui.io)
+  * CoreUI PRO  tooltip.jsv3.2.2 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -288,7 +288,7 @@
    */
 
   var NAME = 'tooltip';
-  var VERSION = '3.2.0';
+  var VERSION = '3.2.2';
   var DATA_KEY = 'coreui.tooltip';
   var EVENT_KEY = "." + DATA_KEY;
   var CLASS_PREFIX = 'bs-tooltip';
@@ -303,7 +303,7 @@
     html: 'boolean',
     selector: '(string|boolean)',
     placement: '(string|function)',
-    offset: '(number|string|function)',
+    offset: '(array|function)',
     container: '(string|element|boolean)',
     boundary: '(string|element)',
     sanitize: 'boolean',
@@ -327,7 +327,7 @@
     html: false,
     selector: false,
     placement: 'top',
-    offset: 0,
+    offset: [0, 0],
     container: false,
     boundary: 'scrollParent',
     sanitize: true,
@@ -694,20 +694,41 @@
     } // _addAttachmentClass(attachment) {
     //   this.getTipElement().classList.add(`${CLASS_PREFIX}-${attachment}`)
     // }
+    // _getOffset() {
+    //   const offset = {}
+    //   if (typeof this.config.offset === 'function') {
+    //     offset.fn = data => {
+    //       data.offsets = {
+    //         ...data.offsets,
+    //         ...this.config.offset(data.offsets, this.element) || {}
+    //       }
+    //       return data
+    //     }
+    //   } else {
+    //     offset.offset = this.config.offset
+    //   }
+    //   return offset
+    // }
     ;
 
     _proto._getOffset = function _getOffset() {
       var _this4 = this;
 
-      var offset = {};
+      var offset = [];
 
       if (typeof this.config.offset === 'function') {
-        offset.fn = function (data) {
-          data.offsets = _objectSpread(_objectSpread({}, data.offsets), _this4.config.offset(data.offsets, _this4.element) || {});
-          return data;
+        offset = function offset(_ref3) {
+          var placement = _ref3.placement,
+              reference = _ref3.reference,
+              popper = _ref3.popper;
+          return _this4.config.offset({
+            placement: placement,
+            reference: reference,
+            popper: popper
+          });
         };
       } else {
-        offset.offset = this.config.offset;
+        offset = this.config.offset;
       }
 
       return offset;
@@ -906,7 +927,6 @@
 
     _proto._cleanTipClass = function _cleanTipClass() {
       var tip = this.getTipElement();
-      console.log(this.tip);
       var tabClass = tip.getAttribute('class').match(BSCLS_PREFIX_REGEX);
 
       if (tabClass !== null && tabClass.length > 0) {

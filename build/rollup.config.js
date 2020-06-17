@@ -17,16 +17,6 @@ const plugins = [
     exclude: 'node_modules/**',
     // Include the helpers in the bundle, at most one copy of each
     babelHelpers: 'bundled'
-    // Include only required helpers
-    // externalHelpersWhitelist: [
-    //   'createClass',
-    //   'createSuper',
-    //   'defineProperties',
-    //   'defineProperty',
-    //   'getPrototypeOf',
-    //   'inheritsLoose',
-    //   'objectSpread2'
-    // ]
   }),
   replace({
     'process.env.NODE_ENV': JSON.stringify('production')

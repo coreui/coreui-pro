@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  async-load.jsv3.2.0 (https://coreui.io)
+  * CoreUI PRO  async-load.jsv3.2.2 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -46,7 +46,7 @@
    */
 
   var NAME = 'asyncLoad';
-  var VERSION = '3.2.0';
+  var VERSION = '3.2.2';
   var DATA_KEY = 'coreui.asyncLoad';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';

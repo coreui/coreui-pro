@@ -26,8 +26,8 @@
   font-weight: 700;
   line-height: 1;
   opacity: .5;
-  color: #fff;
-  text-shadow: 0 1px 0 #000015;
+  color: #000015;
+  text-shadow: 0 1px 0 #fff;
 }
 
 .c-legacy-theme .close {
@@ -35,13 +35,21 @@
   text-shadow: 0 1px 0 #fff;
 }
 
+.c-dark-theme .close {
+  color: #fff;
+  text-shadow: 0 1px 0 #000015;
+}
+
 @media (hover: hover), (-ms-high-contrast: none) {
   .close:hover {
     text-decoration: none;
-    color: #fff;
+    color: #000015;
   }
   .c-legacy-theme .close:hover {
     color: #000;
+  }
+  .c-dark-theme .close:hover {
+    color: #fff;
   }
 }
 

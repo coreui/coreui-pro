@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  dropdown.jsv3.2.0 (https://coreui.io)
+  * CoreUI PRO  dropdown.jsv3.2.2 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -106,7 +106,7 @@
    */
 
   var NAME = 'dropdown';
-  var VERSION = '3.2.0';
+  var VERSION = '3.2.2';
   var DATA_KEY = 'coreui.dropdown';
   var EVENT_KEY = "." + DATA_KEY;
   var DATA_API_KEY = '.data-api';
@@ -317,7 +317,7 @@
       this._inHeader = this._detectHeader();
 
       if (this._popper) {
-        this._popper.scheduleUpdate();
+        this._popper.update();
       }
     } // Private
     ;
@@ -371,20 +371,41 @@
 
     _proto._detectHeader = function _detectHeader() {
       return Boolean(this._element.closest("." + CLASS_NAME_HEADER));
-    };
+    } // _getOffset() {
+    //   const offset = {}
+    //   if (typeof this._config.offset === 'function') {
+    //     offset.fn = data => {
+    //       data.offsets = {
+    //         ...data.offsets,
+    //         ...this._config.offset(data.offsets, this._element) || {}
+    //       }
+    //       return data
+    //     }
+    //   } else {
+    //     offset.offset = this._config.offset
+    //   }
+    //   return offset
+    // }
+    ;
 
     _proto._getOffset = function _getOffset() {
       var _this2 = this;
 
-      var offset = {};
+      var offset = [];
 
       if (typeof this._config.offset === 'function') {
-        offset.fn = function (data) {
-          data.offsets = _objectSpread(_objectSpread({}, data.offsets), _this2._config.offset(data.offsets, _this2._element) || {});
-          return data;
+        offset = function offset(_ref3) {
+          var placement = _ref3.placement,
+              reference = _ref3.reference,
+              popper = _ref3.popper;
+          return _this2._config.offset({
+            placement: placement,
+            reference: reference,
+            popper: popper
+          });
         };
       } else {
-        offset.offset = this._config.offset;
+        offset = this._config.offset;
       }
 
       return offset;
@@ -410,7 +431,8 @@
       }; // Disable Popper.js if we have a static display
 
       if (this._config.display === 'static') {
-        popperConfig.modifiers.applyStyle = {
+        popperConfig.modifiers = {
+          name: 'applyStyles',
           enabled: false
         };
       }
@@ -484,9 +506,9 @@
 
 
         if ('ontouchstart' in document.documentElement) {
-          var _ref3;
+          var _ref4;
 
-          (_ref3 = []).concat.apply(_ref3, document.body.children).forEach(function (elem) {
+          (_ref4 = []).concat.apply(_ref4, document.body.children).forEach(function (elem) {
             return EventHandler.off(elem, 'mouseover', null, noop());
           });
         }
