@@ -7,8 +7,8 @@ $input-bg__dt:                        rgba($white, .1) !default;
 $input-disabled-bg__dt:               rgba($white, .05) !default;
 $input-color__dt:                     $body-color__dt !default;
 $input-border-color__dt:              rgba($white, .15) !default;
-$input-focus-bg__dt:                  rgba($white, .15) !default;
-$input-focus-border-color__dt:        rgba($white, .2) !default;
+$input-focus-bg__dt:                  $gray-200__dt !default;
+$input-focus-border-color__dt:        $gray-100__dt !default;
 $input-focus-color__dt:               $body-color__dt !default;
 $input-placeholder-color__dt:         rgba($body-color__dt, .25) !default;
 $input-plaintext-color__dt:           $body-color__dt !default;
@@ -32,7 +32,7 @@ $form-theme-map: map-merge(
       "input-plaintext-color":           $input-plaintext-color__dt,
       "input-group-addon-color":         $input-group-addon-color__dt,
       "input-group-addon-bg":            $input-group-addon-bg__dt,
-      "input-group-addon-border-color":  $input-group-addon-border-color__dt
+      "input-group-addon-border-color":  $input-group-addon-border-color__dt,
     )
   )
 );
