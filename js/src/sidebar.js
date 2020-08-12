@@ -36,7 +36,8 @@ const Default = {
     sm: 'c-sidebar-sm-show',
     md: 'c-sidebar-md-show',
     lg: 'c-sidebar-lg-show',
-    xl: 'c-sidebar-xl-show'
+    xl: 'c-sidebar-xl-show',
+    xxl: 'c-sidebar-xxl-show'
   },
   dropdownAccordion: true
 }
