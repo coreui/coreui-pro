@@ -2,7 +2,7 @@
 
 const path = require('path')
 const { babel } = require('@rollup/plugin-babel')
-const resolve = require('@rollup/plugin-node-resolve')
+const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const banner = require('./banner.js')
 const replace = require('@rollup/plugin-replace')
 
@@ -17,16 +17,6 @@ const plugins = [
     exclude: 'node_modules/**',
     // Include the helpers in the bundle, at most one copy of each
     babelHelpers: 'bundled'
-    // Include only required helpers
-    // externalHelpersWhitelist: [
-    //   'createClass',
-    //   'createSuper',
-    //   'defineProperties',
-    //   'defineProperty',
-    //   'getPrototypeOf',
-    //   'inheritsLoose',
-    //   'objectSpread2'
-    // ]
   }),
   replace({
     'process.env.NODE_ENV': JSON.stringify('production')
@@ -39,12 +29,12 @@ const globals = {
 
 if (BUNDLE) {
   fileDest += '.bundle'
-  // Remove last entry in external array to bundle Popper and Perfect Scrollbar
+  // Remove entries to bundle Popper and Perfect Scrollbar
   external.pop()
   external.pop()
   delete globals['@popperjs/core']
   delete globals['perfect-scrollbar']
-  plugins.push(resolve())
+  plugins.push(nodeResolve())
 }
 
 const rollupConfig = {
