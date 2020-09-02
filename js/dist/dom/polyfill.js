@@ -1,12 +1,12 @@
 /*!
-  * CoreUI PRO  polyfill.jsv3.2.2 (https://coreui.io)
+  * CoreUI PRO  polyfill.jsv3.3.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = global || self, factory(global.Polyfill = {}));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.Polyfill = {}));
 }(this, (function (exports) { 'use strict';
 
   /**
