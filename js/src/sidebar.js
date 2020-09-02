@@ -31,6 +31,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const Default = {
+  activeLinksExact: true,
   breakpoints: {
     xs: 'c-sidebar-show',
     sm: 'c-sidebar-sm-show',
@@ -43,6 +44,7 @@ const Default = {
 }
 
 const DefaultType = {
+  activeLinksExact: 'boolean',
   breakpoints: 'object',
   dropdownAccordion: '(string|boolean)'
 }
@@ -349,6 +351,10 @@ class Sidebar {
         continue // text node
       }
 
+      if (element.nodeType === 8) {
+        continue // comment node
+      }
+
       if (!filter || filter(element)) {
         siblings.push(element)
       }
@@ -373,7 +379,7 @@ class Sidebar {
 
     // TODO: find better solution
     if (Default.dropdownAccordion === true) {
-      this._getAllSiblings(toggler.parentElement).forEach(element => {
+      this._getAllSiblings(toggler.parentElement, element => Boolean(element.classList.contains(CLASS_NAME_NAV_DROPDOWN))).forEach(element => {
         if (element !== toggler.parentNode) {
           if (element.classList.contains(CLASS_NAME_NAV_DROPDOWN)) {
             element.classList.remove(CLASS_NAME_SHOW)
@@ -453,7 +459,21 @@ class Sidebar {
         currentUrl = currentUrl.slice(0, -1)
       }
 
-      if (element.href === currentUrl) {
+      const dataAttributes = element.closest(SELECTOR_NAVIGATION_CONTAINER).dataset
+
+      if (typeof dataAttributes.activeLinksExact !== 'undefined') {
+        Default.activeLinksExact = JSON.parse(dataAttributes.activeLinksExact)
+      }
+
+      if (Default.activeLinksExact && element.href === currentUrl) {
+        element.classList.add(CLASS_NAME_ACTIVE)
+        // eslint-disable-next-line unicorn/prefer-spread
+        Array.from(this._getParents(element, SELECTOR_NAV_DROPDOWN)).forEach(element => {
+          element.classList.add(CLASS_NAME_SHOW)
+        })
+      }
+
+      if (!Default.activeLinksExact && element.href.startsWith(currentUrl)) {
         element.classList.add(CLASS_NAME_ACTIVE)
         // eslint-disable-next-line unicorn/prefer-spread
         Array.from(this._getParents(element, SELECTOR_NAV_DROPDOWN)).forEach(element => {
