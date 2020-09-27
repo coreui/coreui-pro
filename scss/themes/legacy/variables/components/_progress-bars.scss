@@ -1,8 +1,9 @@
 // Legacy theme
-
+// scss-docs-start progress-bar-legacy-theme
 $progress-bg__lt:         $gray-100__lt !default;
 $progress-bar-color__lt:  $white !default;
 $progress-bar-bg__lt:     $primary__lt !default;
+// scss-docs-end progress-bar-legacy-theme
 
 $progress-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

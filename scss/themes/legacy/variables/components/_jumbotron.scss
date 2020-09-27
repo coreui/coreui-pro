@@ -1,7 +1,9 @@
 
 // legacy theme
+// scss-docs-start jumbotron-legacy-theme
 $jumbotron-color__lt:  null !default;
 $jumbotron-bg__lt:     $gray-200__lt !default;
+// scss-docs-end jumbotron-legacy-theme
 
 $jumbotron-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

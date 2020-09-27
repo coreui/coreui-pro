@@ -1,6 +1,7 @@
 
 // Navbar
 
+// scss-docs-start navbar-dark-theme
 $navbar-dark-color__dt:                 rgba($white, .5) !default;
 $navbar-dark-hover-color__dt:           rgba($white, .75) !default;
 $navbar-dark-active-color__dt:          $white !default;
@@ -19,6 +20,7 @@ $navbar-light-brand-color__dt:        $navbar-light-active-color__dt !default;
 $navbar-light-brand-hover-color__dt:  $navbar-light-active-color__dt !default;
 $navbar-dark-brand-color__dt:         $navbar-dark-active-color__dt !default;
 $navbar-dark-brand-hover-color__dt:   $navbar-dark-active-color__dt !default;
+// scss-docs-end navbar-dark-theme
 
 $navbar-variants-map__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

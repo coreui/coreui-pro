@@ -1,5 +1,5 @@
 // Legacy Theme
-
+// scss-docs-start table-legacy-theme
 $table-color__lt:         $body-color__lt !default;
 $table-bg__lt:            null !default;
 $table-accent-bg__lt:     rgba($black__lt, .05) !default;
@@ -16,6 +16,7 @@ $table-dark-accent-bg__lt:     rgba($white, .05) !default;
 $table-dark-hover-color__lt:   $table-dark-color__lt !default;
 $table-dark-hover-bg__lt:      rgba($white, .075) !default;
 $table-dark-border-color__lt:  lighten($table-dark-bg__lt, 7.5%) !default;
+// scss-docs-end table-legacy-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $table-theme-map: map-merge(

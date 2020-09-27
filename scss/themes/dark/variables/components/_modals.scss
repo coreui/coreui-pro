@@ -1,11 +1,13 @@
 // Modals
 
 // Dark theme
+// scss-docs-start modal-dark-theme
 $modal-content-color__dt:         null !default;
 $modal-content-bg__dt:            $gray-400__dt !default;
 $modal-content-border-color__dt:  $gray-400__dt !default;
 $modal-header-border-color__dt:   $gray-400__dt !default;
 $modal-footer-border-color__dt:   $gray-400__dt !default;
+// scss-docs-end modal-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $modal-theme-map: map-merge(

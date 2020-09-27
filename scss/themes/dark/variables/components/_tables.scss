@@ -3,6 +3,7 @@
 // Customizes the `.table` component with basic values, each used across all table variations.
 
 // Dark Theme
+// scss-docs-start table-dark-theme
 $table-color__dt:         $body-color__dt !default;
 $table-bg__dt:            transparent !default;
 $table-accent-bg__dt:     rgba($black, .05) !default;
@@ -19,6 +20,7 @@ $table-dark-accent-bg__dt:     rgba($white, .05) !default;
 $table-dark-hover-color__dt:   $table-dark-color !default;
 $table-dark-hover-bg__dt:      rgba($white, .1) !default;
 $table-dark-border-color__dt:  rgba($black, .9) !default;
+// scss-docs-end table-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $table-theme-map: map-merge(

@@ -1,13 +1,12 @@
 // Legacy theme
 
-// $card-icon-bg:     transparent !default;
-// $card-icon-color:  $body-color__lt !default;
-
+// scss-docs-start cards-legacy-theme
 $card-border-color__lt:  $border-color__lt !default;
 $card-cap-bg__lt:        $gray-100__lt !default;
 $card-cap-color__lt:     null !default;
 $card-color__lt:         null !default;
 $card-bg__lt:            $white !default;
+// scss-docs-end cards-legacy-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $card-theme-map: map-merge(

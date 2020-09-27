@@ -1,4 +1,5 @@
 // Dark theme
+// scss-docs-start toast-dark-theme
 $toast-background-color__dt:  $gray-100__dt !default;
 $toast-color__dt:             $body-color__dt !default;
 $toast-border-color__dt:      transparent !default;
@@ -6,6 +7,7 @@ $toast-border-color__dt:      transparent !default;
 $toast-header-color__dt:             $body-color__dt !default;
 $toast-header-background-color__dt:  $gray-100__dt !default;
 $toast-header-border-color__dt:      rgba($black, .2) !default;
+// scss-docs-end toast-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $toast-theme-map: map-merge(

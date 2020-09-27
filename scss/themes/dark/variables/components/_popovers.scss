@@ -1,6 +1,7 @@
 // Popovers
 
 // Dark Theme
+// scss-docs-start popover-dark-theme
 $popover-bg__dt:                 $gray-800__dt !default;
 $popover-border-color__dt:       $gray-900__dt !default;
 $popover-header-bg__dt:          $gray-900__dt !default;
@@ -8,6 +9,7 @@ $popover-header-color__dt:       $body-color__dt !default;
 $popover-body-color__dt:         $body-color__dt !default;
 $popover-arrow-color__dt:        $popover-bg__dt !default;
 $popover-arrow-outer-color__dt:  fade-in($popover-border-color__dt, .05) !default;
+// scss-docs-end popover-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $popover-theme-map: map-merge(

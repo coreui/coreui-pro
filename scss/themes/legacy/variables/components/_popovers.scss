@@ -1,5 +1,6 @@
-// Default Theme
+// Legacy Theme
 
+// scss-docs-start popover-legacy-theme
 $popover-bg__lt:                 $white !default;
 $popover-border-color__lt:       rgba($black__lt, .2) !default;
 $popover-header-bg__lt:          darken($popover-bg__lt, 3%) !default;
@@ -7,6 +8,7 @@ $popover-header-color__lt:       $headings-color !default; //TODO: check this va
 $popover-body-color__lt:         $body-color__lt !default;
 $popover-arrow-color__lt:        $popover-bg__lt !default;
 $popover-arrow-outer-color__lt:  fade-in($popover-border-color__lt, .05) !default;
+// scss-docs-end popover-legacy-theme
 
 $popover-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

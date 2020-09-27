@@ -1,5 +1,6 @@
 // Legacy Theme
 
+// scss-docs-start nav-legacy-theme
 $nav-link-disabled-color__lt:            $gray-600__lt !default;
 $nav-tabs-border-color__lt:              $gray-300__lt !default;
 $nav-tabs-link-hover-border-color__lt:   $gray-200__lt $gray-200__lt $nav-tabs-border-color__lt !default;
@@ -17,6 +18,7 @@ $nav-tabs-boxed-right-active-border-color__lt:  $border-color__lt $border-color_
 $nav-pills-link-active-color__lt:  $component-active-color__lt !default;
 $nav-pills-link-active-bg__lt:     $component-active-bg__lt !default;
 $nav-divider-color__lt:            $gray-200__lt !default;
+// scss-docs-end nav-legacy-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $nav-theme-map: map-merge(

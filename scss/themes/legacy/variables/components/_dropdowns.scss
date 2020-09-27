@@ -1,5 +1,6 @@
 // Legacy theme
 
+// scss-docs-start dropdowns-legacy-theme
 $dropdown-color__lt:                $body-color__lt !default;
 $dropdown-bg__lt:                   $white !default;
 $dropdown-border-color__lt:         $border-color__lt !default;
@@ -11,6 +12,7 @@ $dropdown-link-active-color__lt:    $component-active-color__lt !default;
 $dropdown-link-active-bg__lt:       $component-active-bg__lt !default;
 $dropdown-link-disabled-color__lt:  $gray-600__lt !default;
 $dropdown-header-color__lt:         $gray-600__lt !default;
+// scss-docs-end dropdowns-legacy-theme
 
 
 $dropdown-theme-map: () !default;

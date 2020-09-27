@@ -1,6 +1,7 @@
 // Navs
 
 // Dark Theme
+// scss-docs-start nav-dark-theme
 $nav-link-disabled-color__dt:            rgba($white, .5) !default;
 $nav-tabs-border-color__dt:              $gray-600__dt !default;
 $nav-tabs-link-hover-border-color__dt:   $gray-600__dt $gray-600__dt $gray-600__dt !default;
@@ -19,6 +20,7 @@ $nav-tabs-boxed-right-active-border-color__dt:  $gray-600__dt $gray-600__dt $gra
 $nav-pills-link-active-color__dt:  $component-active-color__dt !default;
 $nav-pills-link-active-bg__dt:     $component-active-bg__dt !default;
 $nav-divider-color__dt:            $gray-200 !default;
+// scss-docs-end nav-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $nav-theme-map: map-merge(

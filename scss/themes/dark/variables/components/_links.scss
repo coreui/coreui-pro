@@ -2,8 +2,10 @@
 //
 // Style anchor elements.
 
+// scss-docs-start link-dark-theme
 $link-color__dt:        lighten($primary__dt, 12.5%) !default;
 $link-hover-color__dt:  darken($link-color__dt, 15%) !default;
+// scss-docs-end link-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $link-theme-map: map-merge(

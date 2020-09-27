@@ -1,5 +1,6 @@
 // Legacy theme
 
+// scss-docs-start navbar-legacy-theme
 $navbar-dark-color__lt:                 rgba($white, .5) !default;
 $navbar-dark-hover-color__lt:           rgba($white, .75) !default;
 $navbar-dark-active-color__lt:          $white !default;
@@ -18,6 +19,7 @@ $navbar-light-brand-color__lt:        $navbar-light-active-color__lt !default;
 $navbar-light-brand-hover-color__lt:  $navbar-light-active-color__lt !default;
 $navbar-dark-brand-color__lt:         $navbar-dark-active-color__lt !default;
 $navbar-dark-brand-hover-color__lt:   $navbar-dark-active-color__lt !default;
+// scss-docs-end navbar-legacy-theme
 
 $navbar-variants-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

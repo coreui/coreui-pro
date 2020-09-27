@@ -1,5 +1,5 @@
 // Legacy theme
-
+// scss-docs-start subheader-legacy-themes
 $subheader-dark-bg__lt:                     $gray-base__lt !default;
 $subheader-dark-color__lt:                  rgba($white, .75) !default;
 $subheader-dark-border__lt:                 ( bottom: 1px solid $gray-800__lt ) !default;
@@ -13,7 +13,7 @@ $subheader-light-border__lt:                 ( bottom: 1px solid $border-color__
 $subheader-light-hover-color__lt:            rgba($black__lt, .7) !default;
 $subheader-light-active-color__lt:           rgba($black__lt, .9) !default;
 $subheader-light-disabled-color__lt:         rgba($black__lt, .3) !default;
-
+// scss-docs-end subheader-legacy-themes
 
 $subheader-variants-map__lt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
