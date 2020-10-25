@@ -1,0 +1,399 @@
+//
+// Multi select
+//
+
+// .c-multi-select
+// .c-multi-select-search
+// .c-multi-select-tags
+// .c-multi-select-option
+// .c-multi-select-options
+// .c-multi-select-optgroup
+// .c-multi-select-optgroup-label
+
+.c-multi-select {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  min-height: $custom-select-height;
+  padding: $custom-select-padding-y ($custom-select-padding-x + $custom-select-indicator-padding) $custom-select-padding-y $custom-select-padding-x;
+  font-family: $custom-select-font-family;
+  @include font-size($custom-select-font-size);
+  font-weight: $custom-select-font-weight;
+  line-height: $custom-select-line-height;
+  vertical-align: middle;
+  border: $custom-select-border-width solid;
+  @include border-radius($custom-select-border-radius, 0);
+  @include box-shadow($custom-select-box-shadow);
+  appearance: none;
+  @include themes($custom-forms-theme-map, $create: parent) {
+    color: themes-get-value("custom-select-color");
+    background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
+    border-color: themes-get-value("custom-select-border-color");
+  }
+
+  &:focus {
+    @include themes($custom-forms-theme-map, $create: parent) {
+      border-color: themes-get-value("custom-select-focus-border-color");
+    }
+    outline: 0;
+    @if $enable-shadows {
+      @include box-shadow($custom-select-box-shadow, $custom-select-focus-box-shadow);
+    } @else {
+      // Avoid using mixin so we can pass custom focus shadow properly
+      box-shadow: $custom-select-focus-box-shadow;
+    }
+
+    &::-ms-value {
+      // For visual consistency with other platforms/browsers,
+      // suppress the default white text on blue background highlight given to
+      // the selected option text when the (still closed) <select> receives focus
+      // in IE and (under certain conditions) Edge.
+      // See https://github.com/twbs/bootstrap/issues/19398.
+      @include themes($form-theme-map, $create: parent) {
+        color: themes-get-value("input-color");
+        background-color: themes-get-value("input-bg");
+      }
+    }
+  }
+
+  &[multiple],
+  &[size]:not([size="1"]) {
+    height: auto;
+    @include ltr {
+      padding-right: $custom-select-padding-x;
+    }
+    @include rtl {
+      padding-left: $custom-select-padding-x;
+    }
+    background-image: none;
+  }
+
+  &:disabled {
+    @include themes($custom-forms-theme-map, $create: parent) {
+      color: themes-get-value("custom-select-disabled-color");
+      background-color: themes-get-value("custom-select-disabled-bg");
+    }
+  }
+
+  // Hides the default caret in IE11
+  &::-ms-expand {
+    display: none;
+  }
+
+  // Remove outline from select box in FF
+  &:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 $custom-select-color;
+  }
+}
+
+.c-multi-select-sm {
+  height: $custom-select-height-sm;
+  padding-top: $custom-select-padding-y-sm;
+  padding-bottom: $custom-select-padding-y-sm;
+  @include ltr {
+    padding-left: $custom-select-padding-x-sm;
+  }
+  @include rtl {
+    padding-right: $custom-select-padding-x-sm;
+  }
+  @include font-size($custom-select-font-size-sm);
+}
+
+.c-multi-select-lg {
+  height: $custom-select-height-lg;
+  padding-top: $custom-select-padding-y-lg;
+  padding-bottom: $custom-select-padding-y-lg;
+  @include ltr {
+    padding-left: $custom-select-padding-x-lg;
+  }
+  @include rtl {
+    padding-right: $custom-select-padding-x-lg;
+  }
+  @include font-size($custom-select-font-size-lg);
+}
+
+.c-multi-select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: $zindex-dropdown;
+  display: none; // none by default, but block on "open" of the menu
+  float: left;
+  min-width: $dropdown-min-width;
+  padding: $dropdown-padding-y 0;
+  @include font-size($dropdown-font-size);
+  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
+  list-style: none;
+  background-clip: padding-box;
+  border: $dropdown-border-width solid;
+  @include border-radius($dropdown-border-radius);
+  @include box-shadow($dropdown-box-shadow);
+
+  @include themes($dropdown-theme-map, $create: parent) {
+    color: themes-get-value("dropdown-color");
+    background-color: themes-get-value("dropdown-bg");
+    border-color: themes-get-value("dropdown-border-color");
+  }
+  @include elevation(4);
+}
+
+.c-multi-select.c-open {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+
+  @include elevation(4);
+
+  &::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $zindex-dropdown;
+    content: "";
+    @include themes($custom-forms-theme-map, $create: parent) {
+      color: themes-get-value("custom-select-color");
+      background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
+      border-color: themes-get-value("custom-select-border-color");
+    }
+  }
+
+  .c-multi-select-tags,
+  .c-multi-select-search {
+    position: relative;
+    z-index: $zindex-dropdown + 1;
+    display: inline;
+  }
+
+  .c-multi-select-options {
+    z-index: $zindex-dropdown;
+    display: initial;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}
+
+.c-multi-select-tags {
+}
+
+.c-multi-select-search {
+  border: 0;
+  // margin-left: 1rem;
+  appearance: none;
+  width: auto;
+  height: $input-height;
+  padding: $input-padding-y $input-padding-x;
+  font-family: $input-font-family;
+  @include font-size($input-font-size);
+  font-weight: $input-font-weight;
+  line-height: $input-line-height;
+  background-clip: padding-box;
+  border: $input-border-width solid;
+  @include themes($form-theme-map, $create: parent) {
+    color: themes-get-value("input-color");
+    background-color: themes-get-value("input-bg");
+    border-color: themes-get-value("input-border-color");
+  }
+
+  // @extend .form-control;
+  // width: calc(100% - 1.5rem);
+  // margin: $input-padding-y $input-padding-x;
+}
+
+.c-multi-select-option,
+.c-multi-select-optgroup {
+  display: flex;
+  flex-direction: column;
+  // align-items: center;
+  width: 100%; // For `<button>`s
+  padding: $dropdown-item-padding-y $dropdown-item-padding-x;
+  clear: both;
+  font-weight: $font-weight-normal;
+  text-align: inherit; // For `<button>`s
+  text-decoration: if($link-decoration == none, null, none);
+  white-space: nowrap; // prevent links from randomly breaking onto new lines
+  background-color: transparent; // For `<button>`s
+  border: 0; // For `<button>`s
+
+  @include themes($dropdown-theme-map, $create: parent) {
+    color: themes-get-value("dropdown-link-color");
+  }
+
+  // Prevent dropdown overflow if there"s no padding
+  // See https://github.com/twbs/bootstrap/pull/27703
+  @if $dropdown-padding-y == 0 {
+    &:first-child {
+      @include border-top-radius($dropdown-inner-border-radius);
+    }
+
+    &:last-child {
+      @include border-bottom-radius($dropdown-inner-border-radius);
+    }
+  }
+}
+
+.c-multi-select-option {
+
+  @include hover-focus() {
+    text-decoration: none;
+    // @include gradient-bg($dropdown-link-hover-bg);
+
+    @include themes($dropdown-theme-map, $create: parent) {
+      color: themes-get-value("dropdown-link-hover-color");
+      @include gradient-bg(themes-get-value("dropdown-link-hover-bg"));
+    }
+  }
+
+  &.active,
+  &:active {
+    text-decoration: none;
+    // @include gradient-bg($dropdown-link-active-bg);
+
+    @include themes($dropdown-theme-map, $create: parent) {
+      color: themes-get-value("dropdown-link-active-color");
+      @include gradient-bg(themes-get-value("dropdown-link-active-bg"));
+    }
+  }
+
+  &.disabled,
+  &:disabled {
+    pointer-events: none;
+    background-color: transparent;
+    // Remove CSS gradients if they're enabled
+    @if $enable-gradients {
+      background-image: none;
+    }
+
+    @include themes($dropdown-theme-map, $create: parent) {
+      color: themes-get-value("dropdown-link-disabled-color");
+    }
+  }
+
+  &.c-hidden {
+    display: none;
+  }
+
+  &.c-selected {
+    display: none;
+  }
+}
+
+
+.c-select {
+  padding: 5px;
+  border: 1px solid;
+
+  /* variables */
+  border-color: #aaa;
+  border-radius: 3px;
+}
+
+.c-select > select{
+  border: none;
+  border-top: 1px solid #aaa;
+  border-radius: 0;
+
+  /* variables */
+}
+.c-select > select::after{
+  display: none;
+
+  /* variables */
+}
+.c-select > select.hide{
+  display: none;
+}
+
+.c-select > select optgroup{
+  /* variables */
+}
+
+.c-select > ul{
+  max-height: 115px;
+  padding: 0;
+  margin-bottom: 0;
+  overflow-y: scroll;
+  background-color: #fff;
+  border-top: 1px solid #aaa;
+
+  /* variables */
+  transition: max-height .2s;
+}
+.c-select > ul.hide{
+  max-height: 0px;
+  border-top: none;
+}
+
+.c-select > ul li{
+  line-height: 25px;
+  list-style-type: none;
+  cursor: pointer;
+
+  /* variables */
+}
+.c-select > ul li:hover{
+  background-color: #d0d0d0;
+}
+.c-select > ul li.active{
+  background-color: #d0d0d0;
+
+  /* variables */
+}
+.c-select > ul li.c-label{
+  /* variables */
+  color: #b0b0b0;
+}
+.c-select > ul li.c-label:hover{
+  /* variables */
+  background: none;
+}
+.c-select > ul ul{
+  padding-left: 20px;
+
+  /* variables */
+}
+
+.c-tag-area{
+  /* variables */
+}
+
+.c-multi-select-tag {
+  display: inline-block;
+  min-width: 50px;
+  min-height: 25px;
+  padding: 1px 5px;
+  margin: 2px;
+  line-height: 25px;
+  background-color: #e0e0e0;
+  border: 1px solid;
+  border-color: #d0d0d0;
+  border-radius: 3px;
+}
+
+.c-tag > button{
+  margin-top: 2px;
+  margin-left: 2px;
+
+  /* variables */
+}
+
+.c-select-search{
+  margin: 5px 0;
+
+  /* variables */
+}
+
+.c-select-search input {
+  width: 100%;
+  border: none;
+
+  /* variables */
+}
+
+.c-select-search input:focus {
+  outline: none;
+
+  /* variables */
+}
