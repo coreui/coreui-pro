@@ -26,8 +26,12 @@ const DATA_KEY = 'coreui.multiselect'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const SELECTOR_LIST = '.c-multi-select-options'
+const TAB_KEY = 'Tab'
+const RIGHT_MOUSE_BUTTON = 2
+
 const SELECTOR_INPUT = '.c-multi-select-search'
+const SELECTOR_LIST = '.c-multi-select-options'
+const SELECTOR_MULTI_SELECT = '.c-multi-select'
 const SELECTOR_OPTION = '.c-multi-select-option'
 const SELECTOR_TAGS = '.c-multi-select-tags'
 const SELECTOR_TAG_DELETE = '.c-multi-select-tag-delete'
@@ -40,6 +44,9 @@ const EVENT_FOCUS = `focus${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_OPEN = `open${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASSNAME_MULTI_SELECT = 'c-multi-select'
 const CLASSNAME_OPTGROUP = 'c-multi-select-optgroup'
@@ -48,6 +55,7 @@ const CLASSNAME_OPTION = 'c-multi-select-option'
 const CLASSNAME_OPTIONS = 'c-multi-select-options'
 const CLASSNAME_SEARCH = 'c-multi-select-search'
 const CLASSNAME_SELECTED = 'c-selected'
+const CLASSNAME_SHOW = 'c-show'
 const CLASSNAME_TAG = 'c-multi-select-tag'
 const CLASSNAME_TAG_DELETE = 'c-multi-select-tag-delete'
 const CLASSNAME_TAGS = 'c-multi-select-tags'
@@ -55,18 +63,14 @@ const CLASSNAME_TAGS = 'c-multi-select-tags'
 const CLASSNAME_LABEL = 'c-label'
 
 const Default = {
+  options: [],
   selected: []
 }
 
 const DefaultType = {
+  options: 'array',
   selected: 'array'
 }
-
-/*
-
-1. Jezeli element nie ma klasy `c-multiselect` to ją dodać
-
-*/
 
 /**
  * ------------------------------------------------------------------------
@@ -84,22 +88,27 @@ class MultiSelect {
 
     this._element = element
     this._clone = null
+    this._search = ''
     this._options = {}
     this._config = this._getConfig(config)
 
-    // data
-    if (this._element) {
+    if (this._config.options.length > 0) {
+      this._createNativeSelect(this._config.options)
+    } else {
       Data.setData(element, DATA_KEY, this)
     }
+
+    // data
+    // if (this._element) {
+    //   Data.setData(element, DATA_KEY, this)
+    // }
 
     this._createMultiSelect()
 
 
     // list
     this._elementList = SelectorEngine.findOne(SELECTOR_LIST, this._clone)
-    if (this._elementList) {
-      this._elementList.style.display = 'none'
-    }
+    this._updateList(this._elementList)
 
     // set init values
     this._getNames()
@@ -112,9 +121,11 @@ class MultiSelect {
 
     // tags
     this._elementTags = SelectorEngine.findOne(SELECTOR_TAGS, this._clone)
+    this._updateTags()
 
     // events
     this._addEventListeners()
+    // Data.setData(element, DATA_KEY, this)
   }
 
   // Getters
@@ -144,28 +155,15 @@ class MultiSelect {
 
   //
 
-  open(element) {
-    const rootElement = this._elementList
-
-    const customEvent = this._triggerOpenEvent(rootElement)
-
-    if (customEvent === null || customEvent.defaultPrevented) {
-      return
-    }
-
-    this._open(rootElement)
+  open() {
+    this._clone.classList.add(CLASSNAME_SHOW)
+    SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus()
+    // TODO: trigger
   }
 
-  close(element) {
-    const rootElement = this._elementList
-
-    const customEvent = this._triggerCloseEvent(rootElement)
-
-    if (customEvent === null || customEvent.defaultPrevented) {
-      return
-    }
-
-    this._close(rootElement)
+  close() {
+    this._clone.classList.remove(CLASSNAME_SHOW)
+    // TODO: trigger
   }
 
   search(text) {
@@ -176,7 +174,7 @@ class MultiSelect {
       return
     }
 
-    this._search = text
+    this._search = text.lenght > 0 ? text.toLowerCase() : text
     this._updateList(rootElement)
   }
 
@@ -187,12 +185,13 @@ class MultiSelect {
   // Private
 
   _getConfig(config, update) {
-    if (update !== true)
+    if (update !== true) {
       config = {
         ...this.constructor.Default,
         ...Manipulator.getDataAttributes(this._element),
         ...config
       }
+    }
 
     typeCheckConfig(
       NAME,
@@ -203,16 +202,56 @@ class MultiSelect {
     return config
   }
 
+  _createNativeSelect(data) {
+    const select = document.createElement('select')
+    select.classList.add(CLASSNAME_MULTI_SELECT)
+    select.multiple = true
+
+    this._createNativeOptions(select, data)
+
+    this._element.parentNode.insertBefore(select, this._element.nextSibling)
+    this._element.remove()
+    this._element = select
+
+    Data.setData(select, DATA_KEY, this)
+  }
+
+  _createNativeOptions(parentElement, options) {
+    options.forEach(option => {
+      // eslint-disable-next-line no-negated-condition
+      if ((typeof option.options !== 'undefined')) {
+        const optgroup = document.createElement('optgroup')
+        optgroup.label = option.text
+        this._createNativeOptions(optgroup, option.options)
+        parentElement.append(optgroup)
+      } else {
+        const opt = document.createElement('option')
+        opt.value = option.value
+        if (option.selected === true) {
+          opt.setAttribute('selected', 'selected')
+        }
+
+        opt.innerHTML = option.text
+        parentElement.append(opt)
+      }
+    })
+  }
+
+  _hideNativeSelect() {
+    this._element.tabIndex = '-1'
+    this._element.style.display = 'none'
+  }
+
   _createMultiSelect() {
     const div = document.createElement('div')
     div.classList.add(CLASSNAME_MULTI_SELECT)
-    div.classList.add('c-open')
 
     this._clone = div
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
     this._createOptionsContainer()
     this._createSearchInput()
     this._createTagsArea()
+    this._hideNativeSelect()
   }
 
   _createTagsArea() {
@@ -243,6 +282,11 @@ class MultiSelect {
         optionDiv.dataset.value = option.value
         optionDiv.tabIndex = 0
         optionDiv.innerHTML = option.text
+        if (option.selected) {
+          optionDiv.classList.add(CLASSNAME_SELECTED)
+          this._options[option.value] = option.text
+        }
+
         parentElement.append(optionDiv)
       }
 
@@ -269,7 +313,8 @@ class MultiSelect {
       if (node.nodeName === 'OPTION') {
         options.push({
           value: node.value,
-          text: node.outerText
+          text: node.outerText,
+          selected: node.selected
         })
       }
 
@@ -284,19 +329,51 @@ class MultiSelect {
     return options
   }
 
+  _clickOutListener(event) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    if (event && (event.button === RIGHT_MOUSE_BUTTON ||
+      (event.type === 'keyup' && event.key !== TAB_KEY))) {
+      return
+    }
+
+    console.log(this._clone)
+
+    if (!this._clone.contains(event.target)) {
+      console.log('click outside')
+      this.close()
+      this._removeClickOutListener()
+    }
+  }
+
+  _addClickOutListener() {
+    EventHandler.on(document, EVENT_CLICK_DATA_API, event => {
+      console.log('click outside 1')
+      this._clickOutListener(event)
+    })
+  }
+
+  _removeClickOutListener() {
+    EventHandler.off(document, EVENT_CLICK_DATA_API)
+  }
+
   // events
 
   _addEventListeners() {
-    EventHandler.on(this._elementInput, EVENT_FOCUS, event => {
-      event.preventDefault()
-      event.stopPropagation()
-      this._onSearchFocus(this._elementInput)
+    EventHandler.on(this._clone, EVENT_CLICK_DATA_API, () => {
+      this.open()
     })
-    EventHandler.on(this._elementInput, EVENT_BLUR, event => {
-      event.preventDefault()
-      event.stopPropagation()
-      // this._onSearchFocusOut(this._elementInput);
-    })
+    // EventHandler.on(this._elementInput, EVENT_FOCUS, event => {
+    //   event.preventDefault()
+    //   event.stopPropagation()
+    //   this._onSearchFocus(this._elementInput)
+    // })
+    // EventHandler.on(this._elementInput, EVENT_BLUR, event => {
+    //   event.preventDefault()
+    //   event.stopPropagation()
+    //   // this._onSearchFocusOut(this._elementInput);
+    // })
     EventHandler.on(this._elementInput, EVENT_CHANGE, event => {
       event.preventDefault()
       event.stopPropagation()
@@ -353,13 +430,15 @@ class MultiSelect {
 
   // actions
 
-  _open(element) {
-    if (element) element.style.display = 'initial'
-  }
+  // _open(element) {
+  //   // if (element) element.style.display = 'initial'
+  //   if (element) element.classList.add(CLASSNAME_SHOW)
+  // }
 
-  _close(element) {
-    if (element) element.style.display = 'none'
-  }
+  // _close(element) {
+  //   // if (element) element.style.display = 'none'
+  //   if (element) element.classList.remove(CLASSNAME_SHOW)
+  // }
 
   // list
 
@@ -368,7 +447,7 @@ class MultiSelect {
     const val = element.dataset.value || element.textContent
     element.classList.add(CLASSNAME_SELECTED)
 
-    SelectorEngine.findOne(`option[value=${val}]`, this._element).selected = true
+    SelectorEngine.findOne(`option[value="${val}"]`, this._element).setAttribute('selected', 'selected')
 
     if (this._options[val] === undefined) {
       this._options[val] = element.textContent
@@ -380,13 +459,13 @@ class MultiSelect {
 
   // search
 
-  _onSearchFocus(element) {
-    this.open()
-  }
+  // _onSearchFocus(element) {
+  //   this.open()
+  // }
 
-  _onSearchFocusOut(element) {
-    this.close()
-  }
+  // _onSearchFocusOut(element) {
+  //   this.close()
+  // }
 
   _onSearchChange(element) {
     if (element)
@@ -403,9 +482,7 @@ class MultiSelect {
       }
 
       if (!node.classList.contains(CLASSNAME_OPTION) || node.classList.contains(CLASSNAME_LABEL)) return
-
-
-      if (node.textContent.toLowerCase().indexOf(this._search.toLowerCase()) === -1) {
+      if (node.textContent.toLowerCase().indexOf(this._search) === -1) {
         // node.style.display = 'none'
         node.classList.add('c-hidden')
       } else {
@@ -450,7 +527,7 @@ class MultiSelect {
     if (!element) return
     const val = element.value
     if (val !== undefined) {
-      SelectorEngine.findOne(`option[value=${val}]`, this._element).selected = false
+      SelectorEngine.findOne(`option[value="${val}"]`, this._element).selected = false
       SelectorEngine.findOne(`[data-value="${val}"]`, this._clone).classList.remove(CLASSNAME_SELECTED)
       delete this._options[val]
       this._updateTags()
@@ -459,7 +536,7 @@ class MultiSelect {
 
   _deleteLastTag() {
     const lastVal = Object.keys(this._options)[Object.keys(this._options).length-1]
-    SelectorEngine.findOne(`option[value=${lastVal}]`, this._element).selected = false
+    SelectorEngine.findOne(`option[value="${lastVal}"]`, this._element).selected = false
     SelectorEngine.findOne(`[data-value="${lastVal}"]`, this._clone).classList.remove(CLASSNAME_SELECTED)
     delete this._options[lastVal]
     this._updateTags()
@@ -491,6 +568,51 @@ class MultiSelect {
     })
   }
 
+  static clearMenus(event) {
+    if (event && (event.button === RIGHT_MOUSE_BUTTON ||
+      (event.type === 'keyup' && event.key !== TAB_KEY))) {
+      return
+    }
+
+    const selects = SelectorEngine.find(SELECTOR_MULTI_SELECT)
+
+    for (let i = 0, len = selects.length; i < len; i++) {
+      const context = Data.getData(selects[i], DATA_KEY)
+      const relatedTarget = {
+        relatedTarget: selects[i]
+      }
+
+      if (event && event.type === 'click') {
+        relatedTarget.clickEvent = event
+      }
+
+      if (!context) {
+        continue
+      }
+
+      if (!context._clone.classList.contains(CLASSNAME_SHOW)) {
+        continue
+      }
+
+      if (context._clone.contains(event.target)) {
+        continue
+      }
+
+      // if (event && ((event.type === 'click' &&
+      //   /input|textarea/i.test(event.target.tagName)) ||
+      //   (event.type === 'keyup' && event.key === TAB_KEY)) &&
+      //   context._clone.contains(event.target)) {
+      //   continue
+      // }
+
+      context._clone.classList.remove(CLASSNAME_SHOW)
+
+      // if (!context._clone.contains(event.target)) {
+      //   context._clone.classList.remove(CLASSNAME_SHOW)
+      // }
+    }
+  }
+
   static getInstance(element) {
     return Data.getData(element, DATA_KEY)
   }
@@ -500,7 +622,7 @@ class MultiSelect {
   // functions available for dom element
 
   static new(element, config) {
-    let data = Data.getData(element, DATA_KEY)
+    const data = Data.getData(element, DATA_KEY)
     if (!data) {
       return new MultiSelect(element, config)
     }
@@ -509,7 +631,7 @@ class MultiSelect {
   }
 
   static destroy(element) { // remove instance connected to element
-    let data = Data.getData(element, DATA_KEY)
+    const data = Data.getData(element, DATA_KEY)
     if (data) {
       if (element.parentNode) {
         element.parentNode.removeChild(element)
@@ -529,6 +651,9 @@ class MultiSelect {
  * Data Api implementation
  * ------------------------------------------------------------------------
  */
+
+EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
+EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 
 const $ = getjQuery()
 

@@ -137,9 +137,13 @@
     border-color: themes-get-value("dropdown-border-color");
   }
   @include elevation(4);
+  border-top: 1px solid;
+  @include themes($dropdown-theme-map, $create: parent) {
+    border-top: 1px solid themes-get-value("dropdown-border-color") !important;
+  }
 }
 
-.c-multi-select.c-open {
+.c-multi-select.c-show {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 
@@ -153,6 +157,7 @@
     left: 0;
     z-index: $zindex-dropdown;
     content: "";
+    @include border-top-radius($dropdown-border-radius);
     @include themes($custom-forms-theme-map, $create: parent) {
       color: themes-get-value("custom-select-color");
       background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
@@ -162,9 +167,9 @@
 
   .c-multi-select-tags,
   .c-multi-select-search {
+    display: inline;
     position: relative;
     z-index: $zindex-dropdown + 1;
-    display: inline;
   }
 
   .c-multi-select-options {
@@ -176,9 +181,11 @@
 }
 
 .c-multi-select-tags {
+  display: inline;
 }
 
 .c-multi-select-search {
+  display: none;
   border: 0;
   // margin-left: 1rem;
   appearance: none;
@@ -190,11 +197,15 @@
   font-weight: $input-font-weight;
   line-height: $input-line-height;
   background-clip: padding-box;
-  border: $input-border-width solid;
+  // border: $input-border-width solid;
   @include themes($form-theme-map, $create: parent) {
     color: themes-get-value("input-color");
     background-color: themes-get-value("input-bg");
-    border-color: themes-get-value("input-border-color");
+    // border-color: themes-get-value("input-border-color");
+  }
+
+  &:focus {
+    outline: 0;
   }
 
   // @extend .form-control;
@@ -235,6 +246,7 @@
 }
 
 .c-multi-select-option {
+  cursor: pointer;
 
   @include hover-focus() {
     text-decoration: none;
@@ -366,9 +378,8 @@
   padding: 1px 5px;
   margin: 2px;
   line-height: 25px;
-  background-color: #e0e0e0;
-  border: 1px solid;
-  border-color: #d0d0d0;
+  background-color: #ebedef;
+  border: 1px solid $border-color;
   border-radius: 3px;
 }
 
