@@ -32,8 +32,10 @@ const RIGHT_MOUSE_BUTTON = 2
 const SELECTOR_INPUT = '.c-select-search'
 const SELECTOR_LIST = '.c-select-options'
 const SELECTOR_MULTI_SELECT = '.c-select'
+const SELECTOR_OPTGROUP = '.c-select-optgroup'
 const SELECTOR_OPTION = '.c-select-option'
 const SELECTOR_OPTIONS = '.c-select-options'
+const SELECTOR_OPTIONS_EMPTY = '.c-select-options-empty'
 const SELECTOR_SELECTED = '.c-selected'
 const SELECTOR_SELECTION = '.c-select-selection'
 const SELECTOR_TAGS = '.c-select-tags'
@@ -53,6 +55,7 @@ const CLASS_NAME_OPTGROUP = 'c-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'c-select-optgroup-label'
 const CLASS_NAME_OPTION = 'c-select-option'
 const CLASS_NAME_OPTIONS = 'c-select-options'
+const CLASS_NAME_OPTIONS_EMPTY = 'c-select-options-empty'
 const CLASS_NAME_SEARCH = 'c-select-search'
 const CLASS_NAME_SELECTED = 'c-selected'
 const CLASS_NAME_SELECTION = 'c-select-selection'
@@ -66,17 +69,18 @@ const Default = {
   inline: false,
   multiple: false,
   options: [],
+  optionsEmptyPlaceholder: 'no items',
   search: false,
   searchPlaceholder: 'Select...',
   selectionType: 'counter',
-  selected: [],
-  tags: false
+  selected: []
 }
 
 const DefaultType = {
   inline: 'boolean',
   multiple: 'boolean',
   options: 'array',
+  optionsEmptyPlaceholder: 'string',
   search: 'boolean',
   searchPlaceholder: 'string',
   selectionType: 'string',
@@ -183,7 +187,7 @@ class Select {
       const key = event.keyCode || event.charCode
 
       if ((key === 8 || key === 46) && event.target.value.length === 0) {
-        this._deleteLastTag()
+        this._selectionDeleteLast()
       }
     })
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
@@ -328,6 +332,7 @@ class Select {
     this._createSelection()
     if (this._config.search) {
       this._createSearchInput()
+      this._updateSearch()
     }
 
     this._createOptionsContainer()
@@ -347,18 +352,18 @@ class Select {
   _createSearchInput() {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
-    if (this._selection.length === 0) {
-      input.placeholder = this._config.searchPlaceholder
-    }
+    // if (this._selection.length === 0) {
+    //   input.placeholder = this._config.searchPlaceholder
+    // }
 
-    if (this._selection.length > 0 && !this._config.multiple) {
-      input.placeholder = this._selection[0].text
-      this._selectionElement.style.display = 'none'
-    }
+    // if (this._selection.length > 0 && !this._config.multiple) {
+    //   input.placeholder = this._selection[0].text
+    //   this._selectionElement.style.display = 'none'
+    // }
 
-    if (this._selection.length > 0 && this._config.multiple) {
-      input.placeholder = ''
-    }
+    // if (this._selection.length > 0 && this._config.multiple) {
+    //   input.placeholder = ''
+    // }
 
     this._clone.append(input)
     this._searchElement = input
@@ -425,6 +430,7 @@ class Select {
       tag.remove()
       this._selectionDelete(value)
       this._updateOptionsList()
+      this._updateSearch()
     })
 
     return tag
@@ -460,38 +466,13 @@ class Select {
 
     if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
       this._selectionDelete(value)
-    }
-
-    if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
+    } else if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
       this._selectionAdd(value, text)
-    }
-
-    if (!this._config.multiple) {
+    } else if (!this._config.multiple) {
       this._selectionAdd(value, text)
     }
 
     this._updateSelection()
-    this._updateSearch()
-  }
-
-  _onListClick(element) {
-    if (!element.classList.contains(CLASS_NAME_OPTION) || element.classList.contains(CLASS_NAME_LABEL)) {
-      return
-    }
-
-    const value = String(element.dataset.value)
-    const text = element.textContent
-
-    if (this._config.multiple) {
-      if (element.classList.contains(CLASS_NAME_SELECTED)) {
-        this._selectionDelete(value)
-      } else {
-        this._selectionAdd(value, text)
-      }
-    } else {
-      this._selectionAdd(value, element.textContent)
-    }
-
     this._updateSearch()
   }
 
@@ -516,10 +497,19 @@ class Select {
   }
 
   _selectionDelete(value) {
-    this._selection = this._selection.filter(e => e.value !== value)
+    const selected = this._selection.filter(e => e.value !== value)
+    this._selection = selected
     this._unSelectOption(value)
   }
 
+  _selectionDeleteLast() {
+    if (this._selection.length > 0) {
+      const last = this._selection.pop()
+      this._selectionDelete(last.value)
+      this._updateSelection()
+      this._updateSearch()
+    }
+  }
   // .c-select-selections
 
   _updateSelection() {
@@ -546,34 +536,28 @@ class Select {
     if (this._selection.length > 0) {
       selection.innerHTML = this._selection[0].text
     }
-
-    // selection.innerHTML = this._selection[0].text
-    // console.log(this._selection)
   }
 
   _updateSearch() {
-    // if (this._selection.length === 0) {
-    //   this._searchElement.placeholder = this._config.searchPlaceholder
-    // }
-
     if (this._selection.length > 0 && !this._config.multiple) {
       this._searchElement.placeholder = this._selection[0].text
       this._selectionElement.style.display = 'none'
     }
 
-    if (this._selection.length > 0 && this._config.multiple) {
+    if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter') {
       this._searchElement.placeholder = ''
       this._selectionElement.style.display = 'initial'
     }
 
+    if (this._selection.length === 0 && this._config.multiple) {
+      this._searchElement.placeholder = this._config.searchPlaceholder
+      this._selectionElement.style.display = 'initial'
+    }
 
-    // if (!this._config.multiple) {
-    //   if (this._selection.length > 0) {
-    //     this._searchElement.placeholder = this._selection[0].text
-    //   }
-
-    //   return
-    // }
+    if (this._config.multiple && this._config.selectionType === 'counter') {
+      this._searchElement.placeholder = `${this._selection.length} item(s) selected`
+      this._selectionElement.style.display = 'none'
+    }
   }
 
   // .c-select-selections
@@ -634,22 +618,54 @@ class Select {
     })
   }
 
+  _isHidden(element) {
+    return element.offsetParent === null
+  }
+
+  _isVisible(element) {
+    const style = window.getComputedStyle(element)
+    return (style.display !== 'none')
+  }
+
   _filterOptionsList() {
     const options = SelectorEngine.find(SELECTOR_OPTION, this._clone)
+    let visibleOptions = 0
 
     options.forEach(option => {
       if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
         option.style.display = 'none'
       } else {
         option.style.display = 'block'
+        visibleOptions++
+      }
+
+      const optgroup = option.closest(SELECTOR_OPTGROUP)
+      if (optgroup) {
+        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
+          optgroup.style.display = 'block'
+        } else {
+          optgroup.style.display = 'none'
+        }
       }
     })
-  }
 
-  _deleteLastTag() {
-    const lastVal = Object.keys(this._selection)[Object.keys(this._selection).length - 1]
-    this._selectionDelete(lastVal)
-    this._updateSelection()
+    if (visibleOptions > 0) {
+      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
+        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove()
+      }
+
+      return
+    }
+
+    if (visibleOptions === 0) {
+      const placeholder = document.createElement('div')
+      placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
+      placeholder.innerHTML = this._config.optionsEmptyPlaceholder
+
+      if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
+        SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder)
+      }
+    }
   }
 
   // Static
