@@ -16,6 +16,7 @@ import Modal from './src/modal'
 import MultiSelect from './src/multi-select'
 import Popover from './src/popover'
 import Scrollspy from './src/scrollspy'
+import Select from './src/select'
 import Sidebar from './src/sidebar'
 import Tab from './src/tab'
 import Toast from './src/toast'
@@ -33,6 +34,7 @@ export {
   MultiSelect,
   Popover,
   Scrollspy,
+  Select,
   Sidebar,
   Tab,
   Toast,

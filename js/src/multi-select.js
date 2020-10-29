@@ -63,13 +63,21 @@ const CLASSNAME_TAGS = 'c-multi-select-tags'
 const CLASSNAME_LABEL = 'c-label'
 
 const Default = {
+  inline: true,
+  multiple: false,
   options: [],
-  selected: []
+  search: false,
+  selected: [],
+  tags: false
 }
 
 const DefaultType = {
+  inline: 'boolean',
+  multiple: 'boolean',
   options: 'array',
-  selected: 'array'
+  search: 'boolean',
+  selected: 'array',
+  tags: 'boolean'
 }
 
 /**
@@ -205,7 +213,10 @@ class MultiSelect {
   _createNativeSelect(data) {
     const select = document.createElement('select')
     select.classList.add(CLASSNAME_MULTI_SELECT)
-    select.multiple = true
+
+    if (this._config.multiple) {
+      select.multiple = true
+    }
 
     this._createNativeOptions(select, data)
 
@@ -263,6 +274,7 @@ class MultiSelect {
   _createSearchInput() {
     const input = document.createElement('input')
     input.classList.add(CLASSNAME_SEARCH)
+    input.placeholder = "Select..."
     this._clone.insertBefore(input, this._clone.firstChild)
   }
 

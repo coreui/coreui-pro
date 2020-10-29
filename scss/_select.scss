@@ -2,15 +2,19 @@
 // Multi select
 //
 
-// .c-multi-select
-// .c-multi-select-search
-// .c-multi-select-tags
-// .c-multi-select-option
-// .c-multi-select-options
-// .c-multi-select-optgroup
-// .c-multi-select-optgroup-label
+// .c-select
+// .c-select-search
+// .c-select-tags
+// .c-select-option
+// .c-select-options
+// .c-select-optgroup
+// .c-select-optgroup-label
 
-.c-multi-select {
+.c-select + .c-select {
+  margin-top: 20px;
+}
+
+.c-select {
   position: relative;
   display: inline-block;
   width: 100%;
@@ -29,31 +33,6 @@
     color: themes-get-value("custom-select-color");
     background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
     border-color: themes-get-value("custom-select-border-color");
-  }
-
-  &:focus {
-    @include themes($custom-forms-theme-map, $create: parent) {
-      border-color: themes-get-value("custom-select-focus-border-color");
-    }
-    outline: 0;
-    @if $enable-shadows {
-      @include box-shadow($custom-select-box-shadow, $custom-select-focus-box-shadow);
-    } @else {
-      // Avoid using mixin so we can pass custom focus shadow properly
-      box-shadow: $custom-select-focus-box-shadow;
-    }
-
-    &::-ms-value {
-      // For visual consistency with other platforms/browsers,
-      // suppress the default white text on blue background highlight given to
-      // the selected option text when the (still closed) <select> receives focus
-      // in IE and (under certain conditions) Edge.
-      // See https://github.com/twbs/bootstrap/issues/19398.
-      @include themes($form-theme-map, $create: parent) {
-        color: themes-get-value("input-color");
-        background-color: themes-get-value("input-bg");
-      }
-    }
   }
 
   &[multiple],
@@ -87,7 +66,7 @@
   }
 }
 
-.c-multi-select-sm {
+.c-select-sm {
   height: $custom-select-height-sm;
   padding-top: $custom-select-padding-y-sm;
   padding-bottom: $custom-select-padding-y-sm;
@@ -100,7 +79,7 @@
   @include font-size($custom-select-font-size-sm);
 }
 
-.c-multi-select-lg {
+.c-select-lg {
   height: $custom-select-height-lg;
   padding-top: $custom-select-padding-y-lg;
   padding-bottom: $custom-select-padding-y-lg;
@@ -113,7 +92,7 @@
   @include font-size($custom-select-font-size-lg);
 }
 
-.c-multi-select-options {
+.c-select-options {
   position: absolute;
   top: 100%;
   left: 0;
@@ -122,6 +101,7 @@
   display: none; // none by default, but block on "open" of the menu
   float: left;
   min-width: $dropdown-min-width;
+  margin-top: 10px;
   padding: $dropdown-padding-y 0;
   @include font-size($dropdown-font-size);
   text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
@@ -143,65 +123,125 @@
   }
 }
 
-.c-multi-select-option {
-  @extend .custom-control-label;
+.c-select-option {
+  position: relative;
+  padding-left: 2rem !important;
+  margin-bottom: 0;
+  vertical-align: top;
+  cursor: $custom-control-cursor;
+  @include themes($custom-forms-theme-map, $create: parent) {
+    background-color: themes-get-value("custom-control-label-color");
+  }
 
   &::before {
-    @include border-radius($custom-checkbox-indicator-border-radius);
-    @include themes($custom-forms-theme-map, $create: parent) {
-      border-color: themes-get-value("custom-checkbox-indicator-indeterminate-border-color");
+    position: absolute;
+    top: .7rem;
+    @include ltr {
+      left: .5rem;
     }
-    @include gradient-bg($custom-checkbox-indicator-indeterminate-bg);
-    @include box-shadow($custom-checkbox-indicator-indeterminate-box-shadow);
+    @include rtl {
+      right: .5rem;
+    }
+    display: block;
+    width: $custom-control-indicator-size;
+    height: $custom-control-indicator-size;
+    pointer-events: none;
+    content: "";
+    border: solid $custom-control-indicator-border-width;
+    @include box-shadow($custom-control-indicator-box-shadow);
+    @include themes($custom-forms-theme-map, $create: parent) {
+      background-color: themes-get-value("custom-control-indicator-bg");
+      border-color: themes-get-value("custom-control-indicator-border-color");
+    }
+    @include border-radius($custom-checkbox-indicator-border-radius);
   }
-  &::after {
-    background-image: escape-svg($custom-checkbox-indicator-icon-indeterminate);
-  }
-}
-
-.c-multi-select.c-show {
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-
-  @include elevation(4);
 
   &::after {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: $zindex-dropdown;
-    content: "";
-    @include border-top-radius($dropdown-border-radius);
-    @include themes($custom-forms-theme-map, $create: parent) {
-      color: themes-get-value("custom-select-color");
-      background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
-      border-color: themes-get-value("custom-select-border-color");
+    top: .7rem;
+    @include ltr {
+      left: .5rem;
     }
+    @include rtl {
+      right: .5rem;
+    }
+    display: block;
+    width: $custom-control-indicator-size;
+    height: $custom-control-indicator-size;
+    content: "";
+    background: no-repeat 50% / #{$custom-control-indicator-bg-size};
   }
 
-  .c-multi-select-tags,
-  .c-multi-select-search {
+  &.c-selected {
+    &::before {
+      @include box-shadow($custom-control-indicator-checked-box-shadow);
+      @include themes($custom-forms-theme-map, $create: parent) {
+        color: themes-get-value("custom-control-indicator-checked-color");
+        border-color: themes-get-value("custom-control-indicator-checked-border-color");
+        @include gradient-bg(themes-get-value("custom-control-indicator-checked-bg"));
+      }
+    }
+    &::after {
+      @include themes($custom-forms-theme-map, $create: parent) {
+        background-image: escape-svg(themes-get-value("custom-checkbox-indicator-icon-checked"));
+      }
+    }
+  }
+}
+
+.c-select.c-show {
+
+  @include themes($form-theme-map) {
+    color: themes-get-value("input-focus-color");
+    background-color: themes-get-value("input-focus-bg");
+    border-color: themes-get-value("input-focus-border-color");
+  }
+  outline: 0;
+  // Avoid using mixin so we can pass custom focus shadow properly
+  @if $enable-shadows {
+    @include box-shadow($input-box-shadow, $input-focus-box-shadow);
+  } @else {
+    // Avoid using mixin so we can pass custom focus shadow properly
+    box-shadow: $input-focus-box-shadow;
+  }
+
+  // @include elevation(4);
+
+  // &::after {
+  //   position: absolute;
+  //   top: 0;
+  //   right: 0;
+  //   bottom: 0;
+  //   left: 0;
+  //   z-index: $zindex-dropdown;
+  //   content: "";
+  //   @include border-top-radius($dropdown-border-radius);
+  //   @include themes($custom-forms-theme-map, $create: parent) {
+  //     color: themes-get-value("custom-select-color");
+  //     background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
+  //     border-color: themes-get-value("custom-select-border-color");
+  //   }
+  // }
+
+  .c-select-tags,
+  .c-select-search {
     display: inline;
     position: relative;
     z-index: $zindex-dropdown + 1;
   }
 
-  .c-multi-select-options {
+  .c-select-options {
     z-index: $zindex-dropdown;
     display: initial;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
   }
 }
 
-.c-multi-select-tags {
+.c-select-tags {
   display: inline;
 }
 
-.c-multi-select-search {
-  display: none;
+.c-select-search {
+  // display: none;
   border: 0;
   // margin-left: 1rem;
   appearance: none;
@@ -229,8 +269,9 @@
   // margin: $input-padding-y $input-padding-x;
 }
 
-.c-multi-select-option,
-.c-multi-select-optgroup {
+.c-select-option,
+.c-select-optgroup {
+  position: relative;
   display: flex;
   flex-direction: column;
   // align-items: center;
@@ -261,7 +302,7 @@
   }
 }
 
-.c-multi-select-option {
+.c-select-option {
   cursor: pointer;
 
   @include hover-focus() {
@@ -304,11 +345,11 @@
   }
 
   &.c-selected {
-    display: none;
+    color: red;
   }
 }
 
-.c-multi-select-optgroup-label {
+.c-select-optgroup-label {
   font-weight: 600;
 }
 
@@ -391,7 +432,7 @@
   /* variables */
 }
 
-.c-multi-select-tag {
+.c-select-tag {
   display: inline-block;
   min-width: 50px;
   min-height: 25px;
