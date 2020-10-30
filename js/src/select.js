@@ -30,15 +30,13 @@ const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2
 
 const SELECTOR_INPUT = '.c-select-search'
-const SELECTOR_LIST = '.c-select-options'
-const SELECTOR_MULTI_SELECT = '.c-select'
 const SELECTOR_OPTGROUP = '.c-select-optgroup'
 const SELECTOR_OPTION = '.c-select-option'
 const SELECTOR_OPTIONS = '.c-select-options'
 const SELECTOR_OPTIONS_EMPTY = '.c-select-options-empty'
+const SELECTOR_SELECT = '.c-select'
 const SELECTOR_SELECTED = '.c-selected'
 const SELECTOR_SELECTION = '.c-select-selection'
-const SELECTOR_TAGS = '.c-select-tags'
 
 const EVENT_CHANGE = `keyup${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -50,6 +48,7 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_SELECT = 'c-select'
+const CLASS_NAME_SELECT_INLINE = 'c-select-inline'
 const CLASS_NAME_SELECT_MULTIPLE = 'c-select-multiple'
 const CLASS_NAME_OPTGROUP = 'c-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'c-select-optgroup-label'
@@ -59,6 +58,7 @@ const CLASS_NAME_OPTIONS_EMPTY = 'c-select-options-empty'
 const CLASS_NAME_SEARCH = 'c-select-search'
 const CLASS_NAME_SELECTED = 'c-selected'
 const CLASS_NAME_SELECTION = 'c-select-selection'
+const CLASS_NAME_SELECTION_TAGS = 'c-select-selection-tags'
 const CLASS_NAME_SHOW = 'c-show'
 const CLASS_NAME_TAG = 'c-select-tag'
 const CLASS_NAME_TAG_DELETE = 'c-select-tag-delete'
@@ -72,6 +72,7 @@ const Default = {
   optionsEmptyPlaceholder: 'no items',
   search: false,
   searchPlaceholder: 'Select...',
+  selection: true,
   selectionType: 'counter',
   selected: []
 }
@@ -83,6 +84,7 @@ const DefaultType = {
   optionsEmptyPlaceholder: 'string',
   search: 'boolean',
   searchPlaceholder: 'string',
+  selection: 'boolean',
   selectionType: 'string',
   selected: 'array'
 }
@@ -315,8 +317,8 @@ class Select {
   }
 
   _hideNativeSelect() {
-    // this._element.tabIndex = '-1'
-    // this._element.style.display = 'none'
+    this._element.tabIndex = '-1'
+    this._element.style.display = 'none'
   }
 
   _createSelect() {
@@ -327,9 +329,16 @@ class Select {
       div.classList.add(CLASS_NAME_SELECT_MULTIPLE)
     }
 
+    if (this._config.inline) {
+      div.classList.add(CLASS_NAME_SELECT_INLINE)
+    }
+
     this._clone = div
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
-    this._createSelection()
+    if (!this._config.inline || (this._config.inline && this._config.selection)) {
+      this._createSelection()
+    }
+
     if (this._config.search) {
       this._createSearchInput()
       this._updateSearch()
@@ -343,6 +352,9 @@ class Select {
   _createSelection() {
     const span = document.createElement('span')
     span.classList.add(CLASS_NAME_SELECTION)
+    if (this._config.selectionType === 'tags') {
+      span.classList.add(CLASS_NAME_SELECTION_TAGS)
+    }
     this._clone.append(span)
 
     this._updateSelection()
@@ -364,6 +376,10 @@ class Select {
     // if (this._selection.length > 0 && this._config.multiple) {
     //   input.placeholder = ''
     // }
+
+    if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+      input.size = 2
+    }
 
     this._clone.append(input)
     this._searchElement = input
@@ -513,6 +529,10 @@ class Select {
   // .c-select-selections
 
   _updateSelection() {
+    if (this._config.inline && !this._config.selection) {
+      return
+    }
+
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
@@ -539,24 +559,36 @@ class Select {
   }
 
   _updateSearch() {
-    if (this._selection.length > 0 && !this._config.multiple) {
+    if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+      this._searchElement.removeAttribute('size')
+    }
+
+    if (this._selection.length > 0 && !this._config.multiple && !this._config.inline) {
       this._searchElement.placeholder = this._selection[0].text
       this._selectionElement.style.display = 'none'
+      return
     }
 
-    if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter') {
+    if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter' && !this._config.inline) {
       this._searchElement.placeholder = ''
-      this._selectionElement.style.display = 'initial'
+      this._selectionElement.style.removeProperty('display')
+      return
     }
 
-    if (this._selection.length === 0 && this._config.multiple) {
+    if (this._selection.length === 0 && this._config.multiple && !this._config.inline) {
       this._searchElement.placeholder = this._config.searchPlaceholder
-      this._selectionElement.style.display = 'initial'
+      this._selectionElement.style.display = 'none'
+      return
     }
 
-    if (this._config.multiple && this._config.selectionType === 'counter') {
+    if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.inline) {
       this._searchElement.placeholder = `${this._selection.length} item(s) selected`
       this._selectionElement.style.display = 'none'
+      return
+    }
+
+    if (this._config.inline) {
+      this._searchElement.placeholder = this._config.searchPlaceholder
     }
   }
 
@@ -600,8 +632,18 @@ class Select {
   // }
 
   _onSearchChange(element) {
-    if (element)
+    if (element) {
       this.search(element.value)
+
+      if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+        element.size = element.value.length + 1
+        return
+      }
+
+      if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+        element.removeAttribute('size')
+      }
+    }
   }
 
   _updateOptionsList() {
@@ -635,14 +677,14 @@ class Select {
       if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
         option.style.display = 'none'
       } else {
-        option.style.display = 'block'
+        option.style.removeProperty('display')
         visibleOptions++
       }
 
       const optgroup = option.closest(SELECTOR_OPTGROUP)
       if (optgroup) {
         if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
-          optgroup.style.display = 'block'
+          optgroup.style.removeProperty('display')
         } else {
           optgroup.style.display = 'none'
         }
@@ -700,7 +742,7 @@ class Select {
       return
     }
 
-    const selects = SelectorEngine.find(SELECTOR_MULTI_SELECT)
+    const selects = SelectorEngine.find(SELECTOR_SELECT)
 
     for (let i = 0, len = selects.length; i < len; i++) {
       const context = Data.getData(selects[i], DATA_KEY)

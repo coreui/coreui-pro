@@ -10,16 +10,12 @@
 // .c-select-optgroup
 // .c-select-optgroup-label
 
-.c-select + .c-select {
-  margin-top: 20px;
-}
-
 .c-select {
   position: relative;
   display: inline-block;
   width: 100%;
   min-height: $custom-select-height;
-  padding: $custom-select-padding-y ($custom-select-padding-x + $custom-select-indicator-padding) $custom-select-padding-y $custom-select-padding-x;
+  padding: 0 ($custom-select-padding-x + $custom-select-indicator-padding) 0 0;
   font-family: $custom-select-font-family;
   @include font-size($custom-select-font-size);
   font-weight: $custom-select-font-weight;
@@ -33,18 +29,6 @@
     color: themes-get-value("custom-select-color");
     background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
     border-color: themes-get-value("custom-select-border-color");
-  }
-
-  &[multiple],
-  &[size]:not([size="1"]) {
-    height: auto;
-    @include ltr {
-      padding-right: $custom-select-padding-x;
-    }
-    @include rtl {
-      padding-left: $custom-select-padding-x;
-    }
-    background-image: none;
   }
 
   &:disabled {
@@ -66,46 +50,64 @@
   }
 }
 
-.c-select-sm {
-  height: $custom-select-height-sm;
-  padding-top: $custom-select-padding-y-sm;
-  padding-bottom: $custom-select-padding-y-sm;
-  @include ltr {
-    padding-left: $custom-select-padding-x-sm;
-  }
-  @include rtl {
-    padding-right: $custom-select-padding-x-sm;
-  }
-  @include font-size($custom-select-font-size-sm);
+.c-select-selection,
+.c-select-search {
+  padding: $custom-select-padding-y $custom-select-padding-x;
 }
 
-.c-select-lg {
-  height: $custom-select-height-lg;
-  padding-top: $custom-select-padding-y-lg;
-  padding-bottom: $custom-select-padding-y-lg;
-  @include ltr {
-    padding-left: $custom-select-padding-x-lg;
+.c-select-selection {
+  display: inline;
+}
+
+.c-select-selection-tags {
+  padding: 0;
+
+  + .c-select-search {
+    height: unset;
+    padding: 0 $input-padding-x;
   }
-  @include rtl {
-    padding-right: $custom-select-padding-x-lg;
+}
+
+.c-select-search {
+  border: 0;
+  appearance: none;
+  max-width: 100%;
+  height: $input-height;
+  padding: $input-padding-y $input-padding-x;
+  font-family: $input-font-family;
+  @include font-size($input-font-size);
+  font-weight: $input-font-weight;
+  line-height: $input-line-height;
+  background-clip: padding-box;
+  // border: $input-border-width solid;
+  @include themes($form-theme-map, $create: parent) {
+    color: themes-get-value("input-color");
+    background-color: themes-get-value("input-bg");
+    // border-color: red;
   }
-  @include font-size($custom-select-font-size-lg);
+
+  &:focus {
+    outline: 0;
+  }
+
+  // @extend .form-control;
+  // width: calc(100% - 1.5rem);
+  // margin: $input-padding-y $input-padding-x;
 }
 
 .c-select-options {
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100%;
   z-index: $zindex-dropdown;
   display: none; // none by default, but block on "open" of the menu
   float: left;
+  width: 100%;
   min-width: $dropdown-min-width;
-  margin-top: 10px;
   padding: $dropdown-padding-y 0;
+  margin-top: 10px;
   @include font-size($dropdown-font-size);
   text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
-  list-style: none;
   background-clip: padding-box;
   border: $dropdown-border-width solid;
   @include border-radius($dropdown-border-radius);
@@ -117,10 +119,6 @@
     border-color: themes-get-value("dropdown-border-color");
   }
   @include elevation(4);
-  border-top: 1px solid;
-  @include themes($dropdown-theme-map, $create: parent) {
-    border-top: 1px solid themes-get-value("dropdown-border-color") !important;
-  }
 }
 
 .c-select-option {
@@ -205,30 +203,12 @@
     box-shadow: $input-focus-box-shadow;
   }
 
-  // @include elevation(4);
-
-  // &::after {
-  //   position: absolute;
-  //   top: 0;
-  //   right: 0;
-  //   bottom: 0;
-  //   left: 0;
-  //   z-index: $zindex-dropdown;
-  //   content: "";
-  //   @include border-top-radius($dropdown-border-radius);
-  //   @include themes($custom-forms-theme-map, $create: parent) {
-  //     color: themes-get-value("custom-select-color");
-  //     background: themes-get-value("custom-select-bg") themes-get-value("custom-select-background");
-  //     border-color: themes-get-value("custom-select-border-color");
-  //   }
+  // .c-select-tags,
+  // .c-select-search {
+  //   display: inline;
+  //   position: relative;
+  //   z-index: $zindex-dropdown + 1;
   // }
-
-  .c-select-tags,
-  .c-select-search {
-    display: inline;
-    position: relative;
-    z-index: $zindex-dropdown + 1;
-  }
 
   .c-select-options {
     z-index: $zindex-dropdown;
@@ -236,38 +216,9 @@
   }
 }
 
-.c-select-tags {
-  display: inline;
-}
-
-.c-select-search {
-  // display: none;
-  border: 0;
-  // margin-left: 1rem;
-  appearance: none;
-  width: auto;
-  height: $input-height;
-  padding: $input-padding-y $input-padding-x;
-  font-family: $input-font-family;
-  @include font-size($input-font-size);
-  font-weight: $input-font-weight;
-  line-height: $input-line-height;
-  background-clip: padding-box;
-  // border: $input-border-width solid;
-  @include themes($form-theme-map, $create: parent) {
-    color: themes-get-value("input-color");
-    background-color: themes-get-value("input-bg");
-    // border-color: themes-get-value("input-border-color");
-  }
-
-  &:focus {
-    outline: 0;
-  }
-
-  // @extend .form-control;
-  // width: calc(100% - 1.5rem);
-  // margin: $input-padding-y $input-padding-x;
-}
+// .c-select-tags {
+//   display: inline;
+// }
 
 .c-select-option,
 .c-select-optgroup {
@@ -354,118 +305,80 @@
 }
 
 
-.c-select {
-  padding: 5px;
-  border: 1px solid;
-
-  /* variables */
-  border-color: #aaa;
-  border-radius: 3px;
-}
-
-.c-select > select{
-  border: none;
-  border-top: 1px solid #aaa;
-  border-radius: 0;
-
-  /* variables */
-}
-.c-select > select::after{
-  display: none;
-
-  /* variables */
-}
-.c-select > select.hide{
-  display: none;
-}
-
-.c-select > select optgroup{
-  /* variables */
-}
-
-.c-select > ul{
-  max-height: 115px;
-  padding: 0;
-  margin-bottom: 0;
-  overflow-y: scroll;
-  background-color: #fff;
-  border-top: 1px solid #aaa;
-
-  /* variables */
-  transition: max-height .2s;
-}
-.c-select > ul.hide{
-  max-height: 0px;
-  border-top: none;
-}
-
-.c-select > ul li{
-  line-height: 25px;
-  list-style-type: none;
-  cursor: pointer;
-
-  /* variables */
-}
-.c-select > ul li:hover{
-  background-color: #d0d0d0;
-}
-.c-select > ul li.active{
-  background-color: #d0d0d0;
-
-  /* variables */
-}
-.c-select > ul li.c-label{
-  /* variables */
-  color: #b0b0b0;
-}
-.c-select > ul li.c-label:hover{
-  /* variables */
-  background: none;
-}
-.c-select > ul ul{
-  padding-left: 20px;
-
-  /* variables */
-}
-
-.c-tag-area{
-  /* variables */
-}
-
 .c-select-tag {
   display: inline-block;
-  min-width: 50px;
-  min-height: 25px;
-  padding: 1px 5px;
-  margin: 2px;
-  line-height: 25px;
+  height: 24px;
+  padding: 0 8px;
+  margin: 5px 0 0 5px;
+  // margin: (- $custom-select-padding-y) 0 (- $custom-select-padding-y) (- ($custom-select-padding-x / 2));
   background-color: #ebedef;
   border: 1px solid $border-color;
   border-radius: 3px;
+
+  &:last-child {
+    margin: 5px 0 5px 5px;
+  }
 }
 
-.c-tag > button{
-  margin-top: 2px;
-  margin-left: 2px;
-
-  /* variables */
+.c-select-tag-delete {
+  margin-left: 6px;
 }
 
-.c-select-search{
-  margin: 5px 0;
+// .c-tag > button{
+//   margin-top: 2px;
+//   margin-left: 2px;
 
-  /* variables */
-}
+//   /* variables */
+// }
 
-.c-select-search input {
-  width: 100%;
-  border: none;
+// .c-select-search{
+//   margin: 5px 0;
 
-  /* variables */
-}
+//   /* variables */
+// }
 
-.c-select-search input:focus {
-  outline: none;
+// .c-select-search input {
+//   width: 100%;
+//   border: none;
 
-  /* variables */
+//   /* variables */
+// }
+
+// .c-select-search input:focus {
+//   outline: none;
+
+//   /* variables */
+// }
+
+
+.c-select-inline {
+  padding: $custom-select-padding-y;
+  @include themes($custom-forms-theme-map, $create: parent) {
+    background: themes-get-value("custom-select-bg");
+  }
+
+  .c-select-selection{
+    display: block;
+    padding: $custom-select-padding-y;
+    margin-bottom: $custom-select-padding-y;
+  }
+
+  .c-select-selection-tags {
+    padding: 0;
+  }
+
+  .c-select-search {
+    width: 100%;
+    padding: $custom-select-padding-y $custom-select-padding-x;
+    border: $input-border-width solid;
+    @include border-radius($input-border-radius, 0);
+    @include themes($form-theme-map, $create: parent) {
+      border-color: themes-get-value("input-border-color");
+    }
+  }
+  .c-select-options {
+    position: relative;
+    display: block;
+    @include elevation(0);
+  }
 }
