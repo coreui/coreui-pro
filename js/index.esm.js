@@ -13,7 +13,6 @@ import ClassToggler from './src/class-toggler'
 import Collapse from './src/collapse'
 import Dropdown from './src/dropdown'
 import Modal from './src/modal'
-import MultiSelect from './src/multi-select'
 import Popover from './src/popover'
 import Scrollspy from './src/scrollspy'
 import Select from './src/select'
@@ -31,7 +30,6 @@ export {
   Collapse,
   Dropdown,
   Modal,
-  MultiSelect,
   Popover,
   Scrollspy,
   Select,

@@ -45,8 +45,12 @@
 
   &:not(.c-select-inline) {
     .c-select-search {
-      height: $c-select-tag-height + 3px;
+      height: $c-select-tag-height + 4px;
       margin-left: $c-select-padding-x;
+
+      &[size] {
+        height: $c-select-tag-height;
+      }
     }
   }
 }
@@ -58,7 +62,6 @@
 
 .c-select-search {
   max-width: 100%;
-  // height: $input-height;
   padding: 0;
   font-family: inherit;
   font-size: inherit;
@@ -200,41 +203,33 @@
   }
 }
 
-// .c-select-optgroup {
-//   @include themes($dropdown-theme-map) {
-//     color: themes-get-value("dropdown-link-color");
-//   }
-// }
-
 .c-select-optgroup-label {
   padding: $c-select-option-padding-y ($c-select-option-padding-x / 2);
   font-weight: $c-select-optgroup-label-font-weight;
+}
+
+.c-select-options-empty{
+  padding: $c-select-option-padding-y $c-select-option-padding-x;
 }
 
 
 .c-select-tag {
   display: inline-block;
   height: $c-select-tag-height;
-  padding: 0 8px;
-  margin: 2px;
+  padding: $c-select-tag-padding-y $c-select-tag-padding-x;
+  margin: $c-select-tag-margin;
   border: $c-select-tag-border-width solid;
   border-radius: $c-select-tag-border-radius;
 
   @include themes($c-select-theme-map) {
-    // color: themes-get-value("c-select-focus-color");
     background-color: themes-get-value("c-select-tag-bg");
     border-color: themes-get-value("c-select-tag-border-color");
-  }
-
-  &:last-child {
-    // margin: 3px 0 3px 3px;
   }
 }
 
 .c-select-tag-delete {
   margin-left: 6px;
   cursor: pointer;
-
 }
 
 .c-select.c-show {

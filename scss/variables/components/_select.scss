@@ -17,9 +17,12 @@ $c-select-box-shadow:        inset 0 1px 2px rgba($black, .075) !default;
 $c-select-focus-width:       $input-focus-width !default;
 $c-select-focus-box-shadow:  0 0 0 $c-select-focus-width $input-btn-focus-color !default;
 
-$c-select-tag-height:         24px !default;
+$c-select-tag-height:         25px !default;
 $c-select-tag-border-width:   $border-width !default;
 $c-select-tag-border-radius:  $border-radius !default;
+$c-select-tag-padding-y:      0 !default;
+$c-select-tag-padding-x:      .5rem !default;
+$c-select-tag-margin:         2px !default;
 
 $c-select-search-border-width:   $input-btn-border-width !default;
 $c-select-search-border-radius:  $border-radius !default;
@@ -31,12 +34,12 @@ $c-select-options-font-size:      $font-size-base !default;
 $c-select-options-border-radius:  $border-radius !default;
 $c-select-options-border-width:   $border-width !default;
 
-$c-select-option-padding-y:       .5rem !default;
-$c-select-option-padding-x:       1.25rem !default;
-$c-select-indicator-size:         1rem !default;
+$c-select-option-padding-y:        .5rem !default;
+$c-select-option-padding-x:        1.25rem !default;
+$c-select-indicator-size:          1rem !default;
 $c-select-indicator-bg-size:       50% 50% !default;
 $c-select-indicator-border-width:  $input-border-width !default;
-$c-select-option-border-radius:  $border-radius !default;
+$c-select-option-border-radius:    $border-radius !default;
 
 $c-select-checkbox-indicator-border-radius:  $border-radius !default;
 

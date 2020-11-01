@@ -38,12 +38,15 @@ const SELECTOR_SELECT = '.c-select'
 const SELECTOR_SELECTED = '.c-selected'
 const SELECTOR_SELECTION = '.c-select-selection'
 
-const EVENT_CHANGE = `keyup${EVENT_KEY}`
+const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
-const EVENT_CLOSE = `close${EVENT_KEY}`
+const EVENT_HIDE = `hide${EVENT_KEY}`
+const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_OPEN = `open${EVENT_KEY}`
+const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_SHOW = `show${EVENT_KEY}`
+const EVENT_SHOWN = `showN${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 
@@ -68,24 +71,26 @@ const CLASS_NAME_LABEL = 'c-label'
 const Default = {
   inline: false,
   multiple: false,
-  options: [],
+  options: false,
   optionsEmptyPlaceholder: 'no items',
   search: false,
   searchPlaceholder: 'Select...',
   selection: true,
   selectionType: 'counter',
+  selectionTypeCounterText: 'item(s) selected',
   selected: []
 }
 
 const DefaultType = {
   inline: 'boolean',
   multiple: 'boolean',
-  options: 'array',
+  options: '(boolean|array)',
   optionsEmptyPlaceholder: 'string',
   search: 'boolean',
   searchPlaceholder: 'string',
   selection: 'boolean',
   selectionType: 'string',
+  selectionTypeCounterText: 'string',
   selected: 'array'
 }
 
@@ -110,13 +115,11 @@ class Select {
 
     if (this._config.options.length > 0) {
       this._createNativeSelect(this._config.options)
-    } else {
-      Data.setData(element, DATA_KEY, this)
     }
 
     this._createSelect()
     this._addEventListeners()
-    // Data.setData(element, DATA_KEY, this)
+    Data.setData(this._element, DATA_KEY, this)
   }
 
   // Getters
@@ -146,45 +149,47 @@ class Select {
 
   //
 
-  open() {
+  show() {
+    EventHandler.trigger(this._element, EVENT_SHOW)
     this._clone.classList.add(CLASS_NAME_SHOW)
 
     if (this._config.search) {
       SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus()
     }
 
-    // TODO: trigger
+    EventHandler.trigger(this._element, EVENT_SHOWN)
   }
 
-  close() {
+  hide() {
+    EventHandler.trigger(this._element, EVENT_HIDE)
     this._clone.classList.remove(CLASS_NAME_SHOW)
-    // TODO: trigger
+    EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
   search(text) {
-    const rootElement = this._optionsElement
-    const customEvent = this._triggerSearchEvent(rootElement)
+    // const rootElement = this._optionsElement
+    // const customEvent = this._triggerSearchEvent(rootElement)
 
-    if (customEvent === null || customEvent.defaultPrevented) {
-      return
-    }
+    // if (customEvent === null || customEvent.defaultPrevented) {
+    //   return
+    // }
 
-    this._search = text.lenght > 0 ? text.toLowerCase() : text
+    this._search = text.length > 0 ? text.toLowerCase() : text
     this._filterOptionsList()
+    EventHandler.trigger(this._element, EVENT_SEARCH)
   }
 
   // Private
 
   _addEventListeners() {
-    EventHandler.on(this._clone, EVENT_CLICK_DATA_API, () => {
-      this.open()
+    EventHandler.on(this._clone, EVENT_CLICK, () => {
+      this.show()
     })
 
-    EventHandler.on(this._searchElement, EVENT_CHANGE, event => {
-      event.preventDefault()
-      event.stopPropagation()
+    EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
       this._onSearchChange(this._searchElement)
     })
+
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
       const key = event.keyCode || event.charCode
 
@@ -197,6 +202,7 @@ class Select {
       event.stopPropagation()
       this._onOptionsClick(event.target)
     })
+
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
       const key = event.keyCode || event.charCode
 
@@ -205,7 +211,6 @@ class Select {
         SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus()
       }
     })
-
   }
 
   _getConfig(config, update) {
@@ -226,12 +231,12 @@ class Select {
     return config
   }
 
-  _getOptions() {
+  _getOptions(node = this._element) {
     if (this._config.options) {
       return this._config.options
     }
 
-    const nodes = Array.from(this._element.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP')
+    const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP')
     const options = []
 
     nodes.forEach(node => {
@@ -282,6 +287,9 @@ class Select {
   _createNativeSelect(data) {
     const select = document.createElement('select')
     select.classList.add(CLASS_NAME_SELECT)
+    if (this._element.id) {
+      select.id = this._element.id
+    }
 
     if (this._config.multiple) {
       select.multiple = true
@@ -289,11 +297,8 @@ class Select {
 
     this._createNativeOptions(select, data)
 
-    this._element.parentNode.insertBefore(select, this._element.nextSibling)
-    this._element.remove()
+    this._element.parentNode.replaceChild(select, this._element)
     this._element = select
-
-    Data.setData(select, DATA_KEY, this)
   }
 
   _createNativeOptions(parentElement, options) {
@@ -301,7 +306,7 @@ class Select {
       // eslint-disable-next-line no-negated-condition
       if ((typeof option.options !== 'undefined')) {
         const optgroup = document.createElement('optgroup')
-        optgroup.label = option.text
+        optgroup.label = option.label
         this._createNativeOptions(optgroup, option.options)
         parentElement.append(optgroup)
       } else {
@@ -438,26 +443,6 @@ class Select {
     return tag
   }
 
-  // events
-
-
-
-  // user event triggers
-
-  _triggerOpenEvent(element) {
-    return EventHandler.trigger(element, EVENT_OPEN)
-  }
-
-  _triggerCloseEvent(element) {
-    return EventHandler.trigger(element, EVENT_CLOSE)
-  }
-
-  _triggerSearchEvent(element) {
-    return EventHandler.trigger(element, EVENT_SEARCH)
-  }
-
-  // list
-
   _onOptionsClick(element) {
     if (!element.classList.contains(CLASS_NAME_OPTION) || element.classList.contains(CLASS_NAME_LABEL)) {
       return
@@ -523,7 +508,7 @@ class Select {
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
-      selection.innerHTML = `${this._selection.length} item(s) selected`
+      selection.innerHTML = `${this._selection.length} ${this._config.selectionTypeCounterText}`
       return
     }
 
@@ -590,7 +575,7 @@ class Select {
     }
 
     if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-      this._searchElement.size.removeAttribute('size')
+      this._searchElement.removeAttribute('size')
     }
   }
 
@@ -604,6 +589,10 @@ class Select {
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
     }
+
+    EventHandler.trigger(this._element, EVENT_CHANGED, {
+      value: this._selection
+    })
   }
 
   _unSelectOption(value) {
@@ -614,6 +603,10 @@ class Select {
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
     }
+
+    EventHandler.trigger(this._element, EVENT_CHANGED, {
+      value: this._selection
+    })
   }
 
   _clearOptions() {
@@ -621,32 +614,18 @@ class Select {
     SelectorEngine.find(SELECTOR_SELECTED, this._clone).forEach(element => {
       element.classList.remove(CLASS_NAME_SELECTED)
     })
+
+    // EventHandler.trigger(this._element, EVENT_CHANGED, {
+    //   value: this._selection
+    // })
   }
 
-  // search
-
-  // _onSearchFocus(element) {
-  //   this.open()
-  // }
-
-  // _onSearchFocusOut(element) {
-  //   this.close()
-  // }
-
+  // TODO: poprawić tą nazwę
   _onSearchChange(element) {
     if (element) {
       this.search(element.value)
 
       this._updateSearchSize(element.value.length + 1)
-
-      // if (!this._config.inline && this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-      //   element.size = element.value.length + 1
-      //   return
-      // }
-
-      // if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-      //   element.removeAttribute('size')
-      // }
     }
   }
 
@@ -770,18 +749,9 @@ class Select {
         continue
       }
 
-      // if (event && ((event.type === 'click' &&
-      //   /input|textarea/i.test(event.target.tagName)) ||
-      //   (event.type === 'keyup' && event.key === TAB_KEY)) &&
-      //   context._clone.contains(event.target)) {
-      //   continue
-      // }
-
       context._clone.classList.remove(CLASS_NAME_SHOW)
 
-      // if (!context._clone.contains(event.target)) {
-      //   context._clone.classList.remove(CLASS_NAME_SHOW)
-      // }
+      EventHandler.trigger(context._element, EVENT_HIDDEN)
     }
   }
 
