@@ -205,6 +205,7 @@ class Select {
         SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus()
       }
     })
+
   }
 
   _getConfig(config, update) {
@@ -333,6 +334,10 @@ class Select {
       div.classList.add(CLASS_NAME_SELECT_INLINE)
     }
 
+    if (this._config.selectionType === 'tags') {
+      div.classList.add(CLASS_NAME_SELECTION_TAGS)
+    }
+
     this._clone = div
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
     if (!this._config.inline || (this._config.inline && this._config.selection)) {
@@ -352,9 +357,6 @@ class Select {
   _createSelection() {
     const span = document.createElement('span')
     span.classList.add(CLASS_NAME_SELECTION)
-    if (this._config.selectionType === 'tags') {
-      span.classList.add(CLASS_NAME_SELECTION_TAGS)
-    }
     this._clone.append(span)
 
     this._updateSelection()
@@ -364,25 +366,14 @@ class Select {
   _createSearchInput() {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
-    // if (this._selection.length === 0) {
-    //   input.placeholder = this._config.searchPlaceholder
-    // }
 
-    // if (this._selection.length > 0 && !this._config.multiple) {
-    //   input.placeholder = this._selection[0].text
-    //   this._selectionElement.style.display = 'none'
+    // if (!this._config.inline && this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+    //   input.size = 2
     // }
-
-    // if (this._selection.length > 0 && this._config.multiple) {
-    //   input.placeholder = ''
-    // }
-
-    if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-      input.size = 2
-    }
+    this._searchElement = input
+    this._updateSearchSize()
 
     this._clone.append(input)
-    this._searchElement = input
   }
 
   _createOptionsContainer() {
@@ -402,11 +393,6 @@ class Select {
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
         optionDiv.innerHTML = option.text
-        // if (option.selected) {
-        //   optionDiv.classList.add(CLASS_NAME_SELECTED)
-        //   // this._selectionAdd(String(option.value), option.text)
-        // }
-
         parentElement.append(optionDiv)
       }
 
@@ -431,7 +417,7 @@ class Select {
     tag.dataset.value = value
     tag.innerHTML = text
 
-    const closeBtn = document.createElement('button')
+    const closeBtn = document.createElement('span')
     closeBtn.classList.add(CLASS_NAME_TAG_DELETE, 'close')
     closeBtn.setAttribute('aria-label', 'Close')
     closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>'
@@ -490,6 +476,7 @@ class Select {
 
     this._updateSelection()
     this._updateSearch()
+    this._updateSearchSize()
   }
 
   _selectionAdd(value, text) {
@@ -559,6 +546,10 @@ class Select {
   }
 
   _updateSearch() {
+    if (!this._config.search) {
+      return
+    }
+
     if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
       this._searchElement.removeAttribute('size')
     }
@@ -589,6 +580,17 @@ class Select {
 
     if (this._config.inline) {
       this._searchElement.placeholder = this._config.searchPlaceholder
+    }
+  }
+
+  _updateSearchSize(size = 2) {
+    if (!this._config.inline && this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+      this._searchElement.size = size
+      return
+    }
+
+    if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+      this._searchElement.size.removeAttribute('size')
     }
   }
 
@@ -635,14 +637,16 @@ class Select {
     if (element) {
       this.search(element.value)
 
-      if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-        element.size = element.value.length + 1
-        return
-      }
+      this._updateSearchSize(element.value.length + 1)
 
-      if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-        element.removeAttribute('size')
-      }
+      // if (!this._config.inline && this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+      //   element.size = element.value.length + 1
+      //   return
+      // }
+
+      // if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+      //   element.removeAttribute('size')
+      // }
     }
   }
 
