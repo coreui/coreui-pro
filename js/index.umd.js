@@ -12,6 +12,7 @@ import Carousel from './src/carousel'
 import ClassToggler from './src/class-toggler'
 import Collapse from './src/collapse'
 import Dropdown from './src/dropdown'
+import LoadingButton from './src/loading-button'
 import Modal from './src/modal'
 import Popover from './src/popover'
 import Scrollspy from './src/scrollspy'
@@ -29,6 +30,7 @@ export default {
   ClassToggler,
   Collapse,
   Dropdown,
+  LoadingButton,
   Modal,
   Popover,
   Scrollspy,
