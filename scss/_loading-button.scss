@@ -13,12 +13,11 @@
   left: 0;
   width: 0%;
   height: 100%;
-  background: rgba(0, 0, 0, .1);
 }
 
 .c-loading-button-spinner {
-  width: 0;
-  margin-right: 0;
+  margin-right: $spacer;
+  margin-left: - ($spacer * 2);
   opacity: 0;
   transition: margin $layout-transition-speed, opacity $layout-transition-speed, border $layout-transition-speed;
 }
@@ -27,7 +26,7 @@
 
   .c-loading-button-spinner {
     width: 1rem;
-    margin-right: $spacer;
+    margin-left: 0;
     opacity: 1;
   }
 }

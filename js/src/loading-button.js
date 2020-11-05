@@ -7,6 +7,9 @@
 
 import {
   getjQuery,
+  TRANSITION_END,
+  emulateTransitionEnd,
+  getTransitionDurationFromElement,
   typeCheckConfig
 } from './util/index'
 import Data from './dom/data'
@@ -19,9 +22,9 @@ import Manipulator from './dom/manipulator'
  * ------------------------------------------------------------------------
  */
 
-const NAME = 'loadingbutton'
+const NAME = 'loading-button'
 const VERSION = '3.4.0'
-const DATA_KEY = 'coreui.loadingbutton'
+const DATA_KEY = 'coreui.loading-button'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
@@ -34,9 +37,9 @@ const SELECTOR_COMPONENT = '[data-coreui="loading-button"]'
 
 const EVENT_START = `start${EVENT_KEY}`
 const EVENT_STOP = `stop${EVENT_KEY}`
+const EVENT_COMPLETE = `complete${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_LOADING_BUTTON = 'c-loading-button'
 const CLASS_NAME_LOADING_BUTTON_LOADING = 'c-loading-button-loading'
 const CLASS_NAME_LOADING_BUTTON_PROGRESS = 'c-loading-button-progress'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'c-loading-button-spinner'
@@ -65,11 +68,6 @@ const DefaultType = {
 
 class LoadingButton {
   constructor(element, config) {
-    if (Data.getData(element, DATA_KEY)) { // already found
-      console.warn('Instance already exist.')
-      return;
-    }
-
     this._element = element
     this._config = this._getConfig(config)
     this._pause = false
@@ -78,9 +76,6 @@ class LoadingButton {
     this._progressBar = null
     this._spinner = null
     this._state = 'idle'
-
-    this._createSpinner()
-    this._createProgressBar()
 
     if (this._element) {
       Data.setData(element, DATA_KEY, this)
@@ -105,29 +100,42 @@ class LoadingButton {
 
   start() {
     if (this._state !== 'loading') {
-      let rootElement = this._element
+      this._createSpinner()
+      this._createProgressBar()
 
-      const customEvent = this._triggerStartEvent(rootElement)
-      if (customEvent === null || customEvent.defaultPrevented) {
-        return
-      }
-
-      this._element.classList.add(CLASS_NAME_LOADING_BUTTON_LOADING)
-      this._loading()
+      setTimeout(() => {
+        this._element.classList.add(CLASS_NAME_LOADING_BUTTON_LOADING)
+        this._loading()
+        EventHandler.trigger(this._element, EVENT_START)
+      }, 1)
     }
   }
 
   stop() {
-    const customEvent = this._triggerStopEvent(this._element)
-    if (customEvent === null || customEvent.defaultPrevented) {
+    this._element.classList.remove(CLASS_NAME_LOADING_BUTTON_LOADING)
+    const stoped = () => {
+      this._removeSpinner()
+      this._removeProgressBar()
+      this._state = 'idle'
+
+      EventHandler.trigger(this._element, EVENT_STOP)
+      if (this._percent >= 100) {
+        EventHandler.trigger(this._element, EVENT_COMPLETE)
+      }
+
+      this._percent = this._config.percent
+      this._timeout = this._config.timeout
+    }
+
+    if (this._spinner) {
+      const transitionDuration = getTransitionDurationFromElement(this._spinner)
+
+      EventHandler.one(this._spinner, TRANSITION_END, stoped)
+      emulateTransitionEnd(this._spinner, transitionDuration)
       return
     }
 
-    this._element.classList.remove(CLASS_NAME_LOADING_BUTTON_LOADING)
-    this._percent = this._config.percent
-    this._timeout = this._config.timeout
-    this._state = 'idle'
-    this._resetProgressBar()
+    stoped()
   }
 
   pause() {
@@ -175,37 +183,23 @@ class LoadingButton {
     return config
   }
 
-  _triggerStartEvent(element) {
-    return EventHandler.trigger(element, EVENT_START)
-  }
-
-  _triggerStopEvent(element) {
-    return EventHandler.trigger(element, EVENT_STOP)
-  }
-
   _loading() {
     const progress = setInterval(() => {
       this._state = 'loading'
       if (this._percent >= MAX_PERCENT) {
-        clearInterval(progress)
         this.stop()
+        clearInterval(progress)
+        return
       }
 
       if (this._pause) {
         clearInterval(progress)
+        return
       }
 
       const frames = this._timeout / (MAX_PERCENT - this._percent) / MILLISECONDS
-
-      // console.log(this._percent)
       this._percent = Math.round((this._percent + (1 / frames)) * 100) / 100
       this._timeout -= MILLISECONDS
-      // this._progressBar.style.width = `${this._percent}%`
-
-      // console.log(frames)
-      // console.log(this._percent)
-      // console.log('---')
-
       this._animateProgressBar()
     }, MILLISECONDS)
   }
@@ -235,6 +229,20 @@ class LoadingButton {
     }
   }
 
+  _removeProgressBar() {
+    if (this._config.progress) {
+      this._progressBar.remove()
+      this._progressBar = null
+    }
+  }
+
+  _removeSpinner() {
+    if (this._config.spinner) {
+      this._spinner.remove()
+      this._spinner = null
+    }
+  }
+
   _progressBarBg() {
     // The yiq lightness value that determines when the lightness of color changes from "dark" to "light". Acceptable values are between 0 and 255.
     const yiqContrastedThreshold = 150
@@ -253,12 +261,6 @@ class LoadingButton {
     }
 
     return PROGRESS_BAR_BG_COLOR_LIGHT
-  }
-
-  _resetProgressBar() {
-    if (this._config.progress) {
-      this._progressBar.style.width = `${this._config.percent}%`
-    }
   }
 
   _animateProgressBar() {
@@ -289,6 +291,10 @@ class LoadingButton {
         case 'dispose':
         case 'start':
         case 'stop':
+        case 'pause':
+        case 'resume':
+        case 'complete':
+        case 'updatePercent':
           data[config]()
           break
       }
@@ -305,7 +311,6 @@ class LoadingButton {
     return Data.getData(element, DATA_KEY)
   }
 }
-
 
 /**
  * ------------------------------------------------------------------------
