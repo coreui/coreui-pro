@@ -288,6 +288,8 @@
     z-index: 1;
     display: block;
     padding: 0;
+    background-color: transparent;
+    border: 0;
     @include elevation(0);
   }
 }
