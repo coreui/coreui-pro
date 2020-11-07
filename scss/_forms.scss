@@ -249,7 +249,9 @@ textarea.form-control {
   // Use [disabled] and :disabled for workaround https://github.com/twbs/bootstrap/issues/28247
   &[disabled] ~ .form-check-label,
   &:disabled ~ .form-check-label {
-    color: $text-muted;
+    @include themes($typography-theme-map, $create: parent) {
+      color: themes-get-value("text-muted");
+    }
   }
 }
 

@@ -2,20 +2,20 @@
 
 // Dark Theme
 // scss-docs-start nav-dark-theme
-$nav-link-disabled-color__dt:            rgba($white, .5) !default;
-$nav-tabs-border-color__dt:              $gray-600__dt !default;
-$nav-tabs-link-hover-border-color__dt:   $gray-600__dt $gray-600__dt $gray-600__dt !default;
+$nav-link-disabled-color__dt:            $text-disabled__dt !default;
+$nav-tabs-border-color__dt:              $border-color__dt !default;
+$nav-tabs-link-hover-border-color__dt:   $border-color__dt $border-color__dt $border-color__dt !default;
 $nav-tabs-link-active-color__dt:         $body-color__dt !default;
-$nav-tabs-link-active-bg__dt:            $gray-600__dt !default;
-$nav-tabs-link-active-border-color__dt:  $gray-600__dt $gray-600__dt $gray-600__dt !default;
+$nav-tabs-link-active-bg__dt:            $border-color__dt !default;
+$nav-tabs-link-active-border-color__dt:  transparent !default;
 
-$nav-tabs-boxed-link-active-bg__dt:         $gray-600__dt !default;
-$nav-tabs-boxed-content-bg__dt:             $gray-600__dt !default;
-$nav-tabs-boxed-content-border-color__dt:   $gray-600__dt !default;
+$nav-tabs-boxed-link-active-bg__dt:         $bg-elevation-2 !default;
+$nav-tabs-boxed-content-bg__dt:             $bg-elevation-2 !default;
+$nav-tabs-boxed-content-border-color__dt:   $bg-elevation-2 !default;
 $nav-tabs-boxed-content-border-radius__dt:  $border-radius !default;
 
-$nav-tabs-boxed-left-active-border-color__dt:   $gray-600__dt !default;
-$nav-tabs-boxed-right-active-border-color__dt:  $gray-600__dt $gray-600__dt $gray-600__dt $gray-600__dt !default;
+$nav-tabs-boxed-left-active-border-color__dt:   $border-color__dt !default;
+$nav-tabs-boxed-right-active-border-color__dt:  $bg-elevation-2 $bg-elevation-2 $bg-elevation-2 $bg-elevation-2 !default;
 
 $nav-pills-link-active-color__dt:  $component-active-color__dt !default;
 $nav-pills-link-active-bg__dt:     $component-active-bg__dt !default;

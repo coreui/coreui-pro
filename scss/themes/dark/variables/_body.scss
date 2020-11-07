@@ -2,8 +2,9 @@
 //
 // Settings for the `<body>` element.
 
-$body-bg__dt:     $gray-base__dt !default;
-$body-color__dt:  #e1e1e1 !default;
+$body-bg__dt:     $bg-elevation-0 !default;
+$body-color__dt:  $text-high-emphasis__dt !default;
+$elevation-base-color__dt: 0, 0, 0 !default; //#3c4b64
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $body-theme-map: map-merge(
@@ -11,7 +12,8 @@ $body-theme-map: map-merge(
   (
     dark: (
       "body-bg":     $body-bg__dt,
-      "body-color":  $body-color__dt
+      "body-color":  $body-color__dt,
+      "elevation-base-color": $elevation-base-color__dt
     )
   )
 );

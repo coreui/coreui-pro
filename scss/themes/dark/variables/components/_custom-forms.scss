@@ -4,7 +4,7 @@ $custom-control-indicator-bg__dt:            $input-bg__dt !default;
 $custom-control-indicator-border-color__dt:  rgba($black, .3) !default;
 $custom-control-indicator-disabled-bg__dt:   $input-disabled-bg__dt !default;
 
-$custom-control-label-disabled-color__dt:  $gray-600 !default;
+$custom-control-label-disabled-color__dt:  $text-disabled__dt !default;
 
 $custom-control-indicator-checked-color__dt:         $component-active-color__dt !default;
 $custom-control-indicator-checked-bg__dt:            $component-active-bg__dt !default;
@@ -26,7 +26,7 @@ $custom-checkbox-indicator-icon-indeterminate__dt:          url("data:image/svg+
 $custom-radio-indicator-icon-checked__dt:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='-4 -4 8 8'><circle r='3' fill='#{$custom-control-indicator-checked-color__dt}'/></svg>") !default;
 
 $custom-select-color__dt:               $input-color__dt !default;
-$custom-select-disabled-color__dt:      $gray-600 !default;
+$custom-select-disabled-color__dt:      $text-disabled__dt !default;
 $custom-select-bg__dt:                  $input-bg__dt !default;
 $custom-select-disabled-bg__dt:         $input-disabled-bg__dt !default;
 $custom-select-indicator-color__dt:     $gray-800 !default;

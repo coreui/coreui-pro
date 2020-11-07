@@ -4,6 +4,7 @@
 
 $body-bg:     $gray-100 !default;
 $body-color:  $gray-base !default;
+$elevation-base-color: 60, 75, 100 !default; //#3c4b64
 
 $body-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -11,7 +12,8 @@ $body-theme-map: map-merge(
   (
     default: (
       "body-bg":     $body-bg,
-      "body-color":  $body-color
+      "body-color":  $body-color,
+      "elevation-base-color": $elevation-base-color
     )
   ),
   $body-theme-map

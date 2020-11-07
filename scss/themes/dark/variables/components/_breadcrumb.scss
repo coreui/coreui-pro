@@ -3,9 +3,9 @@
 // Dark theme
 // scss-docs-start breadcrumb-dark-theme
 $breadcrumb-bg__dt:             transparent !default;
-$breadcrumb-border-color__dt:   $component-bg__dt !default;
+$breadcrumb-border-color__dt:   $body-color__dt !default;
 $breadcrumb-divider-color__dt:  $body-color__dt !default;
-$breadcrumb-active-color__dt:   $gray-600__dt !default;
+$breadcrumb-active-color__dt:   $text-medium-emphasis__dt !default;
 // scss-docs-end breadcrumb-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
