@@ -52,7 +52,6 @@ $c-select-color:                   $input-color !default;
 $c-select-disabled-color:          $gray-600 !default;
 $c-select-bg:                      $input-bg !default;
 $c-select-disabled-bg:             $gray-200 !default;
-$c-select-bg:                      $input-bg !default;
 $c-select-indicator-color:         $gray-800 !default;
 $c-select-indicator:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'><path fill='#{$c-select-indicator-color}' d='M2 0L0 2h4zm0 5L0 3h4z'/></svg>") !default;
 $c-select-indicator-bg:            $input-bg !default;
