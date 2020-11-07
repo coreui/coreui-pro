@@ -1,7 +1,7 @@
 // Dark theme
 // scss-docs-start sidebar-dark-theme
 $sidebar-color__dt:                               $body-color__dt !default;
-$sidebar-bg__dt:                                  $gray-400__dt !default;
+$sidebar-bg__dt:                                  $bg-elevation-3 !default;
 $sidebar-borders__dt:                             (all: 0) !default;
 $sidebar-brand-bg__dt:                            rgba($black, .2) !default;
 $sidebar-header-bg__dt:                           rgba($black, .2) !default;

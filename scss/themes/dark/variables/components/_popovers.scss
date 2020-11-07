@@ -2,9 +2,9 @@
 
 // Dark Theme
 // scss-docs-start popover-dark-theme
-$popover-bg__dt:                 $gray-800__dt !default;
-$popover-border-color__dt:       $gray-900__dt !default;
-$popover-header-bg__dt:          $gray-900__dt !default;
+$popover-bg__dt:                 $bg-elevation-16 !default;
+$popover-border-color__dt:       $border-color__dt !default;
+$popover-header-bg__dt:          $bg-elevation-16 !default;
 $popover-header-color__dt:       $body-color__dt !default;
 $popover-body-color__dt:         $body-color__dt !default;
 $popover-arrow-color__dt:        $popover-bg__dt !default;

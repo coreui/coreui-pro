@@ -5,10 +5,10 @@
 // Dark theme
 // scss-docs-start cards-dark-theme
 $card-dark-border-color:  $border-color__dt !default;
-$card-dark-cap-bg:        $gray-700__dt !default;
+$card-dark-cap-bg:        $bg-elevation-2 !default;
 $card-dark-cap-color:     null !default;
 $card-dark-color:         null !default;
-$card-dark-bg:            $gray-600__dt !default;
+$card-dark-bg:            $bg-elevation-1 !default;
 // scss-docs-end cards-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
