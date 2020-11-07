@@ -222,7 +222,6 @@ $theme-has-variants: false !default;
 
   @each $theme in $themes {
     $current-theme: $theme !global;
-    @debug $current-theme;
 
     @if map-has-key($default-themes, $theme) {
       $theme-map: map-get($themes-map, $theme);
