@@ -59,8 +59,8 @@ $blockquote-font-size:        $font-size-base * 1.25 !default;
 $hr-border-color:  rgba($black, .2) !default;
 $hr-border-width:  $border-width !default;
 
-$vr-color-bg:  rgba($black, .2) !default;
-$vr-width:     $border-width !default;
+$vr-bg:     rgba($black, .2) !default;
+$vr-width:  $border-width !default;
 
 $mark-padding:  .2em !default;
 
@@ -96,7 +96,9 @@ $typography-theme-map: () !default;
 $typography-theme-map: map-merge(
   (
     default: (
-      "text-muted":  $text-muted
+      "hr-border-color":  $hr-border-color,
+      "vr-bg":            $vr-bg,
+      "text-muted":       $text-muted
     )
   ),
   $typography-theme-map
