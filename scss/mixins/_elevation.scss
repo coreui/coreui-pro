@@ -1,5 +1,8 @@
 @mixin add-elevation($level, $direction: false) {
   border: 0;
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    box-shadow: str-replace(unquote(map-get($elevations, $level)), 'var(--elevation-base-color)', $elevation-base-color);
+  }
   box-shadow: unquote(map-get($elevations, $level));
 
   @if $direction == "bottom" {

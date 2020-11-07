@@ -7,5 +7,6 @@
     background-color: themes-get-value("body-bg");
 
     --color: #{themes-get-value("body-color")};
+    --elevation-base-color: #{themes-get-value("elevation-base-color")};
   }
 }
