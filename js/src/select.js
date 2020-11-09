@@ -37,6 +37,7 @@ const SELECTOR_OPTIONS_EMPTY = '.c-select-options-empty'
 const SELECTOR_SELECT = '.c-select'
 const SELECTOR_SELECTED = '.c-selected'
 const SELECTOR_SELECTION = '.c-select-selection'
+const SELECTOR_SELECTION_CLEANER = '.c-select-selection-cleaner'
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -61,6 +62,7 @@ const CLASS_NAME_OPTIONS_EMPTY = 'c-select-options-empty'
 const CLASS_NAME_SEARCH = 'c-select-search'
 const CLASS_NAME_SELECTED = 'c-selected'
 const CLASS_NAME_SELECTION = 'c-select-selection'
+const CLASS_NAME_SELECTION_CLEANER = 'c-select-selection-cleaner'
 const CLASS_NAME_SELECTION_TAGS = 'c-select-selection-tags'
 const CLASS_NAME_SHOW = 'c-show'
 const CLASS_NAME_TAG = 'c-select-tag'
@@ -104,6 +106,7 @@ class Select {
   constructor(element, config) {
     this._element = element
     this._selectionElement = null
+    this._selectionCleanerElement = null
     this._searchElement = null
     this._optionsElement = null
     this._config = this._getConfig(config)
@@ -167,13 +170,6 @@ class Select {
   }
 
   search(text) {
-    // const rootElement = this._optionsElement
-    // const customEvent = this._triggerSearchEvent(rootElement)
-
-    // if (customEvent === null || customEvent.defaultPrevented) {
-    //   return
-    // }
-
     this._search = text.length > 0 ? text.toLowerCase() : text
     this._filterOptionsList()
     EventHandler.trigger(this._element, EVENT_SEARCH)
@@ -197,10 +193,21 @@ class Select {
         this._selectionDeleteLast()
       }
     })
+
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
       event.preventDefault()
       event.stopPropagation()
       this._onOptionsClick(event.target)
+    })
+
+    EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
+      event.preventDefault()
+      event.stopPropagation()
+      this._selectionClear()
+      this._updateSelection()
+      // this._updateSelectionCleaner()
+      this._updateSearch()
+      this._updateSearchSize()
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
@@ -347,6 +354,7 @@ class Select {
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
     if (!this._config.inline || (this._config.inline && this._config.selection)) {
       this._createSelection()
+      // this._createSelectionCleaner()
     }
 
     if (this._config.search) {
@@ -368,13 +376,20 @@ class Select {
     this._selectionElement = span
   }
 
+  _createSelectionCleaner() {
+    const cleaner = document.createElement('span')
+    cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER)
+    cleaner.innerHTML = '&times;'
+    this._clone.append(cleaner)
+
+    // this._updateSelectionCleaner()
+    this._selectionCleanerElement = cleaner
+  }
+
   _createSearchInput() {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
 
-    // if (!this._config.inline && this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-    //   input.size = 2
-    // }
     this._searchElement = input
     this._updateSearchSize()
 
@@ -460,6 +475,7 @@ class Select {
     }
 
     this._updateSelection()
+    // this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
   }
@@ -495,6 +511,7 @@ class Select {
       const last = this._selection.pop()
       this._selectionDelete(last.value)
       this._updateSelection()
+      // this._updateSelectionCleaner()
       this._updateSearch()
     }
   }
@@ -528,6 +545,21 @@ class Select {
     if (this._selection.length > 0) {
       selection.innerHTML = this._selection[0].text
     }
+  }
+
+  _updateSelectionCleaner() {
+    if (this._selectionCleanerElement === null) {
+      return
+    }
+
+    const selectionCleaner = SelectorEngine.findOne(SELECTOR_SELECTION_CLEANER, this._clone)
+
+    if (this._selection.length > 0) {
+      selectionCleaner.style.removeProperty('display')
+      return
+    }
+
+    selectionCleaner.style.display = 'none'
   }
 
   _updateSearch() {
@@ -614,10 +646,6 @@ class Select {
     SelectorEngine.find(SELECTOR_SELECTED, this._clone).forEach(element => {
       element.classList.remove(CLASS_NAME_SELECTED)
     })
-
-    // EventHandler.trigger(this._element, EVENT_CHANGED, {
-    //   value: this._selection
-    // })
   }
 
   // TODO: poprawić tą nazwę

@@ -60,6 +60,41 @@
   padding: 0;
 }
 
+.c-select-selection-cleaner {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: .5;
+  transform: translateY(-50%);
+
+  @include themes($close-theme-map, $create: parent) {
+    color: themes-get-value("close-color");
+    text-shadow: themes-get-value("close-text-shadow");
+  }
+
+  // Override <a>'s hover style
+  @include hover() {
+    text-decoration: none;
+    @include themes($close-theme-map, $create: parent) {
+      color: themes-get-value("close-color");
+    }
+  }
+
+  &:not(:disabled):not(.disabled) {
+    @include hover-focus() {
+      opacity: .75;
+    }
+  }
+}
+
 .c-select-search {
   max-width: 100%;
   padding: 0;
