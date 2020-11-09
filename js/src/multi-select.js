@@ -20,24 +20,24 @@ import SelectorEngine from './dom/selector-engine'
  * ------------------------------------------------------------------------
  */
 
-const NAME = 'select'
+const NAME = 'mutli-select'
 const VERSION = '3.4.0'
-const DATA_KEY = 'coreui.select'
+const DATA_KEY = 'coreui.mutli-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2
 
-const SELECTOR_INPUT = '.c-select-search'
-const SELECTOR_OPTGROUP = '.c-select-optgroup'
-const SELECTOR_OPTION = '.c-select-option'
-const SELECTOR_OPTIONS = '.c-select-options'
-const SELECTOR_OPTIONS_EMPTY = '.c-select-options-empty'
-const SELECTOR_SELECT = '.c-select'
-const SELECTOR_SELECTED = '.c-selected'
-const SELECTOR_SELECTION = '.c-select-selection'
-const SELECTOR_SELECTION_CLEANER = '.c-select-selection-cleaner'
+const SELECTOR_INPUT = '.c-multi-select-search'
+const SELECTOR_OPTGROUP = '.c-multi-select-optgroup'
+const SELECTOR_OPTION = '.c-multi-select-option'
+const SELECTOR_OPTIONS = '.c-multi-select-options'
+const SELECTOR_OPTIONS_EMPTY = '.c-multi-select-options-empty'
+const SELECTOR_SELECT = '.c-multi-select'
+const SELECTOR_SELECTED = '.c-multi-selected'
+const SELECTOR_SELECTION = '.c-multi-select-selection'
+const SELECTOR_SELECTION_CLEANER = '.c-multi-select-selection-cleaner'
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -51,28 +51,28 @@ const EVENT_SHOWN = `showN${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_SELECT = 'c-select'
-const CLASS_NAME_SELECT_INLINE = 'c-select-inline'
-const CLASS_NAME_SELECT_MULTIPLE = 'c-select-multiple'
-const CLASS_NAME_OPTGROUP = 'c-select-optgroup'
-const CLASS_NAME_OPTGROUP_LABEL = 'c-select-optgroup-label'
-const CLASS_NAME_OPTION = 'c-select-option'
-const CLASS_NAME_OPTIONS = 'c-select-options'
-const CLASS_NAME_OPTIONS_EMPTY = 'c-select-options-empty'
-const CLASS_NAME_SEARCH = 'c-select-search'
-const CLASS_NAME_SELECTED = 'c-selected'
-const CLASS_NAME_SELECTION = 'c-select-selection'
-const CLASS_NAME_SELECTION_CLEANER = 'c-select-selection-cleaner'
-const CLASS_NAME_SELECTION_TAGS = 'c-select-selection-tags'
+const CLASS_NAME_SELECT = 'c-multi-select'
+const CLASS_NAME_SELECT_INLINE = 'c-multi-select-inline'
+const CLASS_NAME_SELECT_MULTIPLE = 'c-multi-select-multiple'
+const CLASS_NAME_OPTGROUP = 'c-multi-select-optgroup'
+const CLASS_NAME_OPTGROUP_LABEL = 'c-multi-select-optgroup-label'
+const CLASS_NAME_OPTION = 'c-multi-select-option'
+const CLASS_NAME_OPTIONS = 'c-multi-select-options'
+const CLASS_NAME_OPTIONS_EMPTY = 'c-multi-select-options-empty'
+const CLASS_NAME_SEARCH = 'c-multi-select-search'
+const CLASS_NAME_SELECTED = 'c-multi-selected'
+const CLASS_NAME_SELECTION = 'c-multi-select-selection'
+const CLASS_NAME_SELECTION_CLEANER = 'c-multi-select-selection-cleaner'
+const CLASS_NAME_SELECTION_TAGS = 'c-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'c-show'
-const CLASS_NAME_TAG = 'c-select-tag'
-const CLASS_NAME_TAG_DELETE = 'c-select-tag-delete'
+const CLASS_NAME_TAG = 'c-multi-select-tag'
+const CLASS_NAME_TAG_DELETE = 'c-multi-select-tag-delete'
 
 const CLASS_NAME_LABEL = 'c-label'
 
 const Default = {
   inline: false,
-  multiple: false,
+  multiple: true,
   options: false,
   optionsEmptyPlaceholder: 'no items',
   search: false,
@@ -102,7 +102,7 @@ const DefaultType = {
  * ------------------------------------------------------------------------
  */
 
-class Select {
+class MultiSelect {
   constructor(element, config) {
     this._element = element
     this._selectionElement = null
@@ -515,7 +515,7 @@ class Select {
       this._updateSearch()
     }
   }
-  // .c-select-selections
+  // .c-multi-select-selections
 
   _updateSelection() {
     if (this._config.inline && !this._config.selection) {
@@ -611,7 +611,7 @@ class Select {
     }
   }
 
-  // .c-select-selections
+  // .c-multi-select-selections
 
   _selectOption(value) {
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = true
@@ -822,8 +822,8 @@ class Select {
  * ------------------------------------------------------------------------
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API, Select.clearMenus)
-EventHandler.on(document, EVENT_KEYUP_DATA_API, Select.clearMenus)
+EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
+EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 
 const $ = getjQuery()
 
@@ -837,12 +837,12 @@ const $ = getjQuery()
 /* istanbul ignore if */
 if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Select.jQueryInterface
-  $.fn[NAME].Constructor = Select
+  $.fn[NAME] = MultiSelect.jQueryInterface
+  $.fn[NAME].Constructor = MultiSelect
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Select.jQueryInterface
+    return MultiSelect.jQueryInterface
   }
 }
 
-export default Select
+export default MultiSelect
