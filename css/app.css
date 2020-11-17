@@ -21,7 +21,6 @@
 }
 
 .c-app {
-  overflow-x: hidden;
   --primary: #321fdb;
   --secondary: #ced2d8;
   --success: #2eb85c;
@@ -33,6 +32,7 @@
   color: #3c4b64;
   background-color: #ebedef;
   --color: #3c4b64;
+  --elevation-base-color: 60, 75, 100;
 }
 
 .c-app.c-dark-theme {
@@ -103,12 +103,14 @@
   color: #23282c;
   background-color: #e4e5e6;
   --color: #23282c;
+  --elevation-base-color: 60, 75, 100;
 }
 
 .c-app.c-dark-theme {
-  color: #e1e1e1;
-  background-color: #0a0b18;
-  --color: #e1e1e1;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #181924;
+  --color: rgba(255, 255, 255, 0.87);
+  --elevation-base-color: 0, 0, 0;
 }
 
 /*# sourceMappingURL=app.css.map */

@@ -38,18 +38,22 @@ html:not([dir="rtl"]) .breadcrumb-menu {
 
 .breadcrumb-menu .btn {
   padding: 0 0.75rem;
-  color: #768192;
   vertical-align: top;
   border: 0;
+  color: #768192;
 }
 
 .breadcrumb-menu .btn:hover, .breadcrumb-menu .btn.active {
-  color: #4f5d73;
+  color: #3c4b64;
   background: transparent;
 }
 
+.c-dark-theme .breadcrumb-menu .btn {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .breadcrumb-menu .show .btn {
-  color: #4f5d73;
+  color: #3c4b64;
   background: transparent;
 }
 

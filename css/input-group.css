@@ -212,9 +212,9 @@ html:not([dir="rtl"]) .input-group-append {
 }
 
 .c-dark-theme .input-group-text {
-  color: rgba(225, 225, 225, 0.5);
-  background-color: #181924;
-  border-color: #181924;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.09);
 }
 
 .input-group-text input[type="radio"],
