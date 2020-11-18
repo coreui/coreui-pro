@@ -51,8 +51,8 @@ $success__dt:    desaturate($success, 20%) !default;
 $info__dt:       desaturate($info, 20%) !default;
 $warning__dt:    desaturate($warning, 20%) !default;
 $danger__dt:     desaturate($danger, 20%) !default;
-$light__dt:      $gray-700__dt !default;
-$dark__dt:       $gray-900__dt !default;
+$light__dt:      lighten($bg-elevation-24, 20%) !default;
+$dark__dt:       darken($bg-elevation-0, 5%) !default;
 
 $theme-colors__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
