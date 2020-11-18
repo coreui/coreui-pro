@@ -140,6 +140,8 @@ $form-group-margin-bottom:  1rem !default;
 $input-group-addon-color:         $input-color !default;
 $input-group-addon-bg:            $gray-100 !default;
 $input-group-addon-border-color:  $input-border-color !default;
+
+$select-option-bg: inherit !default;
 // scss-docs-end forms
 
 $form-theme-map: () !default;
@@ -158,7 +160,8 @@ $form-theme-map: map-merge(
       "input-plaintext-color":           $input-plaintext-color,
       "input-group-addon-color":         $input-group-addon-color,
       "input-group-addon-bg":            $input-group-addon-bg,
-      "input-group-addon-border-color":  $input-group-addon-border-color
+      "input-group-addon-border-color":  $input-group-addon-border-color,
+      "select-option-bg":                $select-option-bg
     )
   ),
   $form-theme-map

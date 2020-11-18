@@ -89,6 +89,15 @@ select.form-control {
   }
 }
 
+@-moz-document url-prefix() {
+  select.form-control option {
+    // Add background-color for elements in Firefox
+    @include themes($form-theme-map, $create: parent) {
+      background-color: themes-get-value("select-option-bg");
+    }
+  }
+}
+
 // Make file inputs better match text inputs by forcing them to new lines.
 .form-control-file,
 .form-control-range {
