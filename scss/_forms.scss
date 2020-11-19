@@ -87,11 +87,9 @@ select.form-control {
       background-color: themes-get-value("input-bg");
     }
   }
-}
 
-@-moz-document url-prefix() {
-  select.form-control option {
-    // Add background-color for elements in Firefox
+  option {
+    // Add background-color for option elements
     @include themes($form-theme-map, $create: parent) {
       background-color: themes-get-value("select-option-bg");
     }
