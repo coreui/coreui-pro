@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.4.0): loading-button.js
- * Licensed under MIT (https://coreui.io/license)
+ * CoreUI PRO (v3.4.0): loading-button.js
+ * Licens (https://coreui.io/pro/license)
  * --------------------------------------------------------------------------
  */
 
@@ -23,7 +23,7 @@ import Manipulator from './dom/manipulator'
  */
 
 const NAME = 'loading-button'
-const VERSION = '3.4.0'
+const VERSION = '3.4.0-alpha.0'
 const DATA_KEY = 'coreui.loading-button'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
