@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO (v3.4.0): multi-select.js
- * Licensed under MIT (https://coreui.io/license)
+ * Licens (https://coreui.io/pro/license)
  * --------------------------------------------------------------------------
  */
 
@@ -21,7 +21,7 @@ import SelectorEngine from './dom/selector-engine'
  */
 
 const NAME = 'mutli-select'
-const VERSION = '3.4.0'
+const VERSION = '3.4.0-alpha.0'
 const DATA_KEY = 'coreui.mutli-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
@@ -616,7 +616,7 @@ class MultiSelect {
   _selectOption(value) {
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = true
 
-    // TODO: nie podoba mi się to rozwiązanie
+    // TODO: improve this solution
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
@@ -630,7 +630,7 @@ class MultiSelect {
   _unSelectOption(value) {
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
 
-    // TODO: nie podoba mi się to rozwiązanie
+    // TODO: improve this solution
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
