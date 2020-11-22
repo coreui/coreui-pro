@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .modal-open {
@@ -331,21 +331,21 @@ html:not([dir="rtl"]) .modal-header .close {
 }
 
 .c-dark-theme .modal-light .modal-content {
-  border-color: #20202a;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .modal-light .modal-header {
   color: #fff;
-  background-color: #20202a;
+  background-color: #6c6e7e;
 }
 
 .c-dark-theme .modal-dark .modal-content {
-  border-color: #181924;
+  border-color: #0e0e15;
 }
 
 .c-dark-theme .modal-dark .modal-header {
   color: #fff;
-  background-color: #181924;
+  background-color: #0e0e15;
 }
 
 .c-legacy-theme .modal-primary .modal-content {

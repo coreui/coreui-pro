@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .toast {
@@ -215,26 +215,26 @@
 
 .c-dark-theme .toast-light {
   color: #fff;
-  background-color: #20202a;
-  border-color: #0a0a0d;
+  background-color: #6c6e7e;
+  border-color: #555662;
 }
 
 .c-dark-theme .toast-light .toast-header {
   color: #fff;
-  background-color: #15151c;
-  border-color: #0a0a0d;
+  background-color: #606270;
+  border-color: #555662;
 }
 
 .c-dark-theme .toast-dark {
   color: #fff;
-  background-color: #181924;
-  border-color: #040405;
+  background-color: #0e0e15;
+  border-color: black;
 }
 
 .c-dark-theme .toast-dark .toast-header {
   color: #fff;
-  background-color: #0e0e15;
-  border-color: #040405;
+  background-color: #040405;
+  border-color: black;
 }
 
 .c-legacy-theme .toast-primary {

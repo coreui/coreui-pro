@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .form-control {
@@ -106,6 +106,10 @@ select.form-control:focus::-ms-value {
 .c-dark-theme select.form-control:focus::-ms-value {
   color: rgba(255, 255, 255, 0.87);
   background-color: rgba(255, 255, 255, 0.05);
+}
+
+.c-dark-theme select.form-control option {
+  background-color: #34353e;
 }
 
 .form-control-file,

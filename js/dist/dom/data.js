@@ -1,12 +1,12 @@
 /*!
-  * CoreUI PRO  data.jsv3.2.0 (https://coreui.io)
+  * CoreUI PRO  data.jsv3.4.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global.Data = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Data = factory());
 }(this, (function () { 'use strict';
 
   /**

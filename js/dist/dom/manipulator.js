@@ -1,12 +1,12 @@
 /*!
-  * CoreUI PRO  manipulator.jsv3.2.0 (https://coreui.io)
+  * CoreUI PRO  manipulator.jsv3.4.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
-  (global = global || self, global.Manipulator = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Manipulator = factory());
 }(this, (function () { 'use strict';
 
   function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -48,6 +48,12 @@
   }
 
   var Manipulator = {
+    createElementFromHTML: function createElementFromHTML(htmlString) {
+      var div = document.createElement('div');
+      div.innerHTML = htmlString.trim(); // Change this to div.childNodes to support multiple top-level nodes
+
+      return div.firstChild;
+    },
     setDataAttribute: function setDataAttribute(element, key, value) {
       element.setAttribute("data-" + normalizeDataKey(key), value);
     },

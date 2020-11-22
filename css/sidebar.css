@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-sidebar {
@@ -2863,7 +2863,7 @@ html:not([dir="rtl"]) .c-dark-theme .c-sidebar.c-sidebar-right {
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-light, .c-dark-theme .c-sidebar-nav-link-light.c-sidebar-nav-dropdown-toggle {
-  background: #20202a;
+  background: #6c6e7e;
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-light .c-sidebar-nav-icon, .c-dark-theme .c-sidebar-nav-link-light.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
@@ -2871,7 +2871,7 @@ html:not([dir="rtl"]) .c-dark-theme .c-sidebar.c-sidebar-right {
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-light:hover, .c-dark-theme .c-sidebar-nav-link-light.c-sidebar-nav-dropdown-toggle:hover {
-  background: #15151c;
+  background: #606270;
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-light:hover .c-sidebar-nav-icon, .c-dark-theme .c-sidebar-nav-link-light.c-sidebar-nav-dropdown-toggle:hover .c-sidebar-nav-icon {
@@ -2879,7 +2879,7 @@ html:not([dir="rtl"]) .c-dark-theme .c-sidebar.c-sidebar-right {
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-dark, .c-dark-theme .c-sidebar-nav-link-dark.c-sidebar-nav-dropdown-toggle {
-  background: #181924;
+  background: #0e0e15;
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-dark .c-sidebar-nav-icon, .c-dark-theme .c-sidebar-nav-link-dark.c-sidebar-nav-dropdown-toggle .c-sidebar-nav-icon {
@@ -2887,7 +2887,7 @@ html:not([dir="rtl"]) .c-dark-theme .c-sidebar.c-sidebar-right {
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-dark:hover, .c-dark-theme .c-sidebar-nav-link-dark.c-sidebar-nav-dropdown-toggle:hover {
-  background: #0e0e15;
+  background: #040405;
 }
 
 .c-dark-theme .c-sidebar-nav-link.c-sidebar-nav-link-dark:hover .c-sidebar-nav-icon, .c-dark-theme .c-sidebar-nav-link-dark.c-sidebar-nav-dropdown-toggle:hover .c-sidebar-nav-icon {

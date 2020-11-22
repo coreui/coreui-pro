@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .list-group {
@@ -417,35 +417,35 @@ html:not([dir="rtl"]) .list-group {
 }
 
 .c-dark-theme .list-group-item-light {
-  color: #101120;
-  background-color: #c0c1c3;
+  color: #38394c;
+  background-color: #d6d6db;
 }
 
 .c-dark-theme .list-group-item-light.list-group-item-action:hover, .c-dark-theme .list-group-item-light.list-group-item-action:focus {
-  color: #101120;
-  background-color: #b3b4b7;
+  color: #38394c;
+  background-color: #c8c8cf;
 }
 
 .c-dark-theme .list-group-item-light.list-group-item-action.active {
   color: #fff;
-  background-color: #101120;
-  border-color: #101120;
+  background-color: #38394c;
+  border-color: #38394c;
 }
 
 .c-dark-theme .list-group-item-dark {
-  color: #0c0d1d;
-  background-color: #bebfc2;
+  color: #070715;
+  background-color: #bbbcbd;
 }
 
 .c-dark-theme .list-group-item-dark.list-group-item-action:hover, .c-dark-theme .list-group-item-dark.list-group-item-action:focus {
-  color: #0c0d1d;
-  background-color: #b1b2b6;
+  color: #070715;
+  background-color: #aeafb0;
 }
 
 .c-dark-theme .list-group-item-dark.list-group-item-action.active {
   color: #fff;
-  background-color: #0c0d1d;
-  border-color: #0c0d1d;
+  background-color: #070715;
+  border-color: #070715;
 }
 
 .c-legacy-theme .list-group-item-primary {
@@ -766,11 +766,11 @@ html:not([dir="rtl"]) .list-group-accent .list-group-item.list-group-item-divide
 }
 
 .c-dark-theme .list-group-item-accent-light {
-  border-left: 4px solid #20202a;
+  border-left: 4px solid #6c6e7e;
 }
 
 .c-dark-theme .list-group-item-accent-dark {
-  border-left: 4px solid #181924;
+  border-left: 4px solid #0e0e15;
 }
 
 .c-legacy-theme .list-group-item-accent-primary {

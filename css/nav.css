@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .nav {
@@ -340,14 +340,14 @@ html:not([dir="rtl"]) .nav-tabs-boxed.nav-tabs-boxed-right .nav-item {
 
 .c-dark-theme .nav-underline-light .nav-link.active,
 .c-dark-theme .nav-underline-light .show > .nav-link {
-  color: #20202a;
-  border-color: #20202a;
+  color: #6c6e7e;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .nav-underline-dark .nav-link.active,
 .c-dark-theme .nav-underline-dark .show > .nav-link {
-  color: #181924;
-  border-color: #181924;
+  color: #0e0e15;
+  border-color: #0e0e15;
 }
 
 .c-legacy-theme .nav-underline-primary .nav-link.active,

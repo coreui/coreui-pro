@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-switch {
@@ -496,83 +496,83 @@ html:not([dir="rtl"]) .c-switch-label .c-switch-slider::after {
 }
 
 .c-dark-theme .c-switch-light .c-switch-input:checked + .c-switch-slider {
-  background-color: #20202a;
-  border-color: #0a0a0d;
+  background-color: #6c6e7e;
+  border-color: #555662;
 }
 
 .c-dark-theme .c-switch-light .c-switch-input:checked + .c-switch-slider::before {
-  border-color: #0a0a0d;
+  border-color: #555662;
 }
 
 .c-dark-theme .c-switch-3d-light .c-switch-input:checked + .c-switch-slider {
-  background-color: #20202a;
+  background-color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-outline-light .c-switch-input:checked + .c-switch-slider {
   background-color: inherit;
-  border-color: #20202a;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-outline-light .c-switch-input:checked + .c-switch-slider::before {
-  border-color: #20202a;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-outline-light .c-switch-input:checked + .c-switch-slider::after {
-  color: #20202a;
+  color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-opposite-light .c-switch-input:checked + .c-switch-slider {
   background-color: inherit;
-  border-color: #20202a;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-opposite-light .c-switch-input:checked + .c-switch-slider::before {
-  background-color: #20202a;
-  border-color: #20202a;
+  background-color: #6c6e7e;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-opposite-light .c-switch-input:checked + .c-switch-slider::after {
-  color: #20202a;
+  color: #6c6e7e;
 }
 
 .c-dark-theme .c-switch-dark .c-switch-input:checked + .c-switch-slider {
-  background-color: #181924;
-  border-color: #040405;
+  background-color: #0e0e15;
+  border-color: black;
 }
 
 .c-dark-theme .c-switch-dark .c-switch-input:checked + .c-switch-slider::before {
-  border-color: #040405;
+  border-color: black;
 }
 
 .c-dark-theme .c-switch-3d-dark .c-switch-input:checked + .c-switch-slider {
-  background-color: #181924;
+  background-color: #0e0e15;
 }
 
 .c-dark-theme .c-switch-outline-dark .c-switch-input:checked + .c-switch-slider {
   background-color: inherit;
-  border-color: #181924;
+  border-color: #0e0e15;
 }
 
 .c-dark-theme .c-switch-outline-dark .c-switch-input:checked + .c-switch-slider::before {
-  border-color: #181924;
+  border-color: #0e0e15;
 }
 
 .c-dark-theme .c-switch-outline-dark .c-switch-input:checked + .c-switch-slider::after {
-  color: #181924;
+  color: #0e0e15;
 }
 
 .c-dark-theme .c-switch-opposite-dark .c-switch-input:checked + .c-switch-slider {
   background-color: inherit;
-  border-color: #181924;
+  border-color: #0e0e15;
 }
 
 .c-dark-theme .c-switch-opposite-dark .c-switch-input:checked + .c-switch-slider::before {
-  background-color: #181924;
-  border-color: #181924;
+  background-color: #0e0e15;
+  border-color: #0e0e15;
 }
 
 .c-dark-theme .c-switch-opposite-dark .c-switch-input:checked + .c-switch-slider::after {
-  color: #181924;
+  color: #0e0e15;
 }
 
 .c-legacy-theme .c-switch-primary .c-switch-input:checked + .c-switch-slider {
