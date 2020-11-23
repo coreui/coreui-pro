@@ -86,7 +86,7 @@ html:not([dir="rtl"]) .custom-control-input {
 }
 
 .c-dark-theme .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
-  border-color: #37373d;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .custom-control-input:not(:disabled):active ~ .custom-control-label::before {
@@ -390,7 +390,7 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
 }
 
 .c-dark-theme .custom-select:focus {
-  border-color: #37373d;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .custom-select:focus::-ms-value {
@@ -497,7 +497,7 @@ html:not([dir="rtl"]) .custom-select-lg {
 }
 
 .c-dark-theme .custom-file-input:focus ~ .custom-file-label {
-  border-color: #37373d;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .custom-file-input[disabled] ~ .custom-file-label,
