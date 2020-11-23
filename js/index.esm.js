@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v3.3.0): index.esm.js
+ * CoreUI (v3.4.0): index.esm.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -12,7 +12,9 @@ import Carousel from './src/carousel'
 import ClassToggler from './src/class-toggler'
 import Collapse from './src/collapse'
 import Dropdown from './src/dropdown'
+import LoadingButton from './src/loading-button'
 import Modal from './src/modal'
+import MultiSelect from './src/multi-select'
 import Popover from './src/popover'
 import Scrollspy from './src/scrollspy'
 import Sidebar from './src/sidebar'
@@ -28,7 +30,9 @@ export {
   ClassToggler,
   Collapse,
   Dropdown,
+  LoadingButton,
   Modal,
+  MultiSelect,
   Popover,
   Scrollspy,
   Sidebar,

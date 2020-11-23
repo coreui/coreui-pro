@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-email-app {
@@ -43,7 +43,7 @@
 }
 
 .c-dark-theme .c-email-app .c-toolbar {
-  border-color: #181924;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .c-email-app .c-message {
@@ -54,7 +54,7 @@
 }
 
 .c-dark-theme .c-email-app .c-message {
-  color: #e1e1e1;
+  color: rgba(255, 255, 255, 0.87);
 }
 
 .c-email-app .c-message.c-message-read {
@@ -62,7 +62,7 @@
 }
 
 .c-dark-theme .c-email-app .c-message.c-message-read {
-  color: #959595;
+  color: rgba(179, 179, 179, 0.87);
 }
 
 .c-email-app .c-message:last-child .c-message-details {
@@ -85,7 +85,7 @@ html:not([dir="rtl"]) .c-email-app .c-message-actions {
 }
 
 .c-dark-theme .c-email-app .c-message-details {
-  border-color: #181924;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .c-email-app .c-message-headers {

@@ -4,6 +4,7 @@ $footer-height:  50px !default;
 
 
 // Default Theme
+// scss-docs-start footer-legacy-theme
 $footer-dark-bg__lt:       $gray-800__lt !default;
 $footer-dark-color__lt:    $white !default;
 $footer-dark-borders__lt:  0 !default;
@@ -11,6 +12,7 @@ $footer-dark-borders__lt:  0 !default;
 $footer-light-bg__lt:       $gray-100__lt !default;
 $footer-light-color__lt:    $body-color__lt !default;
 $footer-light-borders__lt:  ( top: 1px solid $border-color__lt ) !default;
+// scss-docs-end footer-legacy-theme
 
 $footer-variants-map:  () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

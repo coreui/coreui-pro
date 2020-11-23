@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -84,12 +84,21 @@ hr {
   margin-top: 1rem;
   margin-bottom: 1rem;
   border: 0;
-  border-top: 1px solid rgba(0, 0, 21, 0.2);
+  border-top: 1px solid;
+  border-color: rgba(0, 0, 21, 0.2);
+}
+
+.c-dark-theme hr {
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .c-vr {
   width: 1px;
   background-color: rgba(0, 0, 21, 0.2);
+}
+
+.c-dark-theme .c-vr {
+  background-color: rgba(255, 255, 255, 0.075);
 }
 
 small,

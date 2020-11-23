@@ -2,8 +2,9 @@
 // Pagination
 
 // Dark theme
+// scss-docs-start pagination-dark-theme
 $pagination-color__dt:                  $body-color__dt !default;
-$pagination-bg__dt:                     rgba($white, .075) !default;
+$pagination-bg__dt:                     transparent !default;
 $pagination-border-color__dt:           $border-color__dt !default;
 $pagination-focus-box-shadow__dt:       $input-btn-focus-box-shadow !default;
 $pagination-focus-outline__dt:          0 !default;
@@ -13,9 +14,10 @@ $pagination-hover-border-color__dt:     $border-color__dt !default;
 $pagination-active-color__dt:           $component-active-color__dt !default;
 $pagination-active-bg__dt:              $component-active-bg__dt !default;
 $pagination-active-border-color__dt:    $pagination-active-bg !default;
-$pagination-disabled-color__dt:         rgba($white, .5) !default;
-$pagination-disabled-bg__dt:            rgba($white, .025) !default;
+$pagination-disabled-color__dt:         $text-disabled__dt !default;
+$pagination-disabled-bg__dt:            transparent !default;
 $pagination-disabled-border-color__dt:  $border-color__dt !default;
+// scss-docs-end pagination-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $pagination-theme-map: map-merge(

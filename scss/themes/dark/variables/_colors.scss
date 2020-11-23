@@ -1,5 +1,5 @@
 //
-// CoreUI 3.x Color system
+// CoreUI 3.x Color system for dark theme
 //
 
 $gray-base__dt:  desaturate(#08091a, 10%) !default;
@@ -12,6 +12,21 @@ $gray-600__dt:   desaturate(#1f2031, 10%) !default;
 $gray-700__dt:   desaturate(#1c1d2e, 10%) !default;
 $gray-800__dt:   desaturate(#1a1b2c, 10%) !default;
 $gray-900__dt:   desaturate(#151627, 10%) !default;
+
+$bg-elevation-0: #181924 !default;
+$bg-elevation-1: rgba(mix(rgba(255, 255, 255, .1), $bg-elevation-0), 1) !default;
+$bg-elevation-2: rgba(mix(rgba(255, 255, 255, .14), $bg-elevation-0), 1) !default;
+$bg-elevation-3: rgba(mix(rgba(255, 255, 255, .16), $bg-elevation-0), 1) !default;
+$bg-elevation-4: rgba(mix(rgba(255, 255, 255, .18), $bg-elevation-0), 1) !default;
+$bg-elevation-6: rgba(mix(rgba(255, 255, 255, .22), $bg-elevation-0), 1) !default;
+$bg-elevation-8: rgba(mix(rgba(255, 255, 255, .24), $bg-elevation-0), 1) !default;
+$bg-elevation-12: rgba(mix(rgba(255, 255, 255, .28), $bg-elevation-0), 1) !default;
+$bg-elevation-16: rgba(mix(rgba(255, 255, 255, .3), $bg-elevation-0), 1) !default;
+$bg-elevation-24: rgba(mix(rgba(255, 255, 255, .32), $bg-elevation-0), 1) !default;
+
+$text-high-emphasis__dt: rgba(255, 255, 255, .87) !default;
+$text-medium-emphasis__dt: rgba(255, 255, 255, .6) !default;
+$text-disabled__dt: rgba(255, 255, 255, .38) !default;
 
 $grays__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -36,8 +51,8 @@ $success__dt:    desaturate($success, 20%) !default;
 $info__dt:       desaturate($info, 20%) !default;
 $warning__dt:    desaturate($warning, 20%) !default;
 $danger__dt:     desaturate($danger, 20%) !default;
-$light__dt:      $gray-700__dt !default;
-$dark__dt:       $gray-900__dt !default;
+$light__dt:      lighten($bg-elevation-24, 20%) !default;
+$dark__dt:       darken($bg-elevation-0, 5%) !default;
 
 $theme-colors__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -57,7 +72,7 @@ $theme-colors__dt: map-merge(
 
 // Customize the light and dark text colors for use in our YIQ color contrast function.
 $yiq-text-dark__dt:   $gray-base__dt !default;
-$yiq-text-light__dt:  $white !default;
+$yiq-text-light__dt:  rgba(255, 255, 255, .87) !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $yiq-theme-map: map-merge(

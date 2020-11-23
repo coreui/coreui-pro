@@ -1,0 +1,330 @@
+//
+// Multi select
+//
+
+// .c-multi-select
+// .c-multi-select-search
+// .c-multi-select-tags
+// .c-multi-select-option
+// .c-multi-select-options
+// .c-multi-select-optgroup
+// .c-multi-select-optgroup-label
+
+.c-multi-select {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  min-height: $c-multi-select-height;
+  padding: $c-multi-select-padding-y ($c-multi-select-padding-x + $c-multi-select-indicator-padding) $c-multi-select-padding-y $c-multi-select-padding-x;
+  font-family: $c-multi-select-font-family;
+  font-size: $c-multi-select-font-size;
+  font-weight: $c-multi-select-font-weight;
+  line-height: $c-multi-select-line-height;
+  vertical-align: middle;
+  border: $c-multi-select-border-width solid;
+  @include border-radius($c-multi-select-border-radius, 0);
+  // @include box-shadow($custom-select-box-shadow);
+  appearance: none;
+  @include themes($c-multi-select-theme-map) {
+    color: themes-get-value("c-multi-select-color");
+    background: themes-get-value("c-multi-select-bg") themes-get-value("c-multi-select-background");
+    border-color: themes-get-value("c-multi-select-border-color");
+  }
+
+  &:disabled,
+  &.c-disabled {
+    @include themes($c-multi-select-theme-map) {
+      color: themes-get-value("c-multi-select-disabled-color");
+      background-color: themes-get-value("c-multi-select-disabled-bg");
+    }
+  }
+}
+
+.c-multi-select-selection-tags {
+  padding: 2px ($c-multi-select-padding-x + $c-multi-select-indicator-padding) 2px 2px;
+
+  &:not(.c-multi-select-inline) {
+    .c-multi-select-search {
+      height: $c-multi-select-tag-height + 4px;
+      margin-left: $c-multi-select-padding-x;
+
+      &[size] {
+        height: $c-multi-select-tag-height;
+      }
+    }
+  }
+}
+
+.c-multi-select-selection {
+  display: inline;
+  padding: 0;
+}
+
+.c-multi-select-selection-cleaner {
+  position: absolute;
+  top: 50%;
+  right: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  opacity: .5;
+  transform: translateY(-50%);
+
+  @include themes($close-theme-map, $create: parent) {
+    color: themes-get-value("close-color");
+    text-shadow: themes-get-value("close-text-shadow");
+  }
+
+  // Override <a>'s hover style
+  @include hover() {
+    text-decoration: none;
+    @include themes($close-theme-map, $create: parent) {
+      color: themes-get-value("close-color");
+    }
+  }
+
+  &:not(:disabled):not(.disabled) {
+    @include hover-focus() {
+      opacity: .75;
+    }
+  }
+}
+
+.c-multi-select-search {
+  max-width: 100%;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  border: 0;
+  appearance: none;
+
+  @include border-radius($c-multi-select-search-border-radius, 0);
+
+  @include themes($c-multi-select-theme-map) {
+    color: themes-get-value("c-multi-select-search-color");
+    background-color: themes-get-value("c-multi-select-search-bg");
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  &[size] {
+    display: none;
+    margin-left: $c-multi-select-padding-x;
+  }
+}
+
+.c-multi-select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: none; // none by default, but block on "open" of the menu
+  float: left;
+  width: 100%;
+  padding: $c-multi-select-options-padding-y $c-multi-select-options-padding-x;
+  margin-top: $c-multi-select-options-margin-top;
+  font-size: $c-multi-select-options-font-size;
+  text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
+  background-clip: padding-box;
+  border: $c-multi-select-options-border-width solid;
+  @include border-radius($c-multi-select-options-border-radius);
+  // @include box-shadow($dropdown-box-shadow);
+
+  @include themes($c-multi-select-theme-map) {
+    color: themes-get-value("c-multi-select-options-color");
+    background-color: themes-get-value("c-multi-select-options-bg");
+    border-color: themes-get-value("c-multi-select-options-border-color");
+  }
+  @include elevation(4);
+}
+
+.c-multi-select-option {
+  position: relative;
+  padding: $c-multi-select-option-padding-y $c-multi-select-option-padding-x $c-multi-select-option-padding-y ($c-multi-select-option-padding-x + $c-multi-select-indicator-size);
+  // padding-left: 2rem !important;
+  margin-bottom: 2px;
+  vertical-align: top;
+  cursor: pointer;
+
+  @include border-radius($c-multi-select-option-border-radius, 0);
+
+  @include hover-focus() {
+    text-decoration: none;
+    // @include gradient-bg($dropdown-link-hover-bg);
+
+    @include themes($c-multi-select-theme-map) {
+      color: themes-get-value("c-multi-select-option-hover-color");
+      @include gradient-bg(themes-get-value("c-multi-select-option-hover-bg"));
+    }
+  }
+
+  &.disabled,
+  &:disabled {
+    pointer-events: none;
+    background-color: transparent;
+    // Remove CSS gradients if they're enabled
+    @if $enable-gradients {
+      background-image: none;
+    }
+
+    @include themes($c-multi-select-theme-map) {
+      color: themes-get-value("c-multi-select-option-disabled-color");
+    }
+  }
+
+  &::before {
+    position: absolute;
+    top: .7rem;
+    @include ltr {
+      left: $c-multi-select-option-padding-x / 2;
+    }
+    @include rtl {
+      right: $c-multi-select-option-padding-x / 2;
+    }
+    display: block;
+    width: $c-multi-select-indicator-size;
+    height: $c-multi-select-indicator-size;
+    pointer-events: none;
+    content: "";
+    border: solid $c-multi-select-indicator-border-width;
+
+    @include themes($c-multi-select-theme-map) {
+      background-color: themes-get-value("c-multi-select-indicator-bg");
+      border-color: themes-get-value("c-multi-select-indicator-border-color");
+    }
+    @include border-radius($c-multi-select-checkbox-indicator-border-radius);
+  }
+
+  &::after {
+    position: absolute;
+    top: .7rem;
+    @include ltr {
+      left: $c-multi-select-option-padding-x / 2;
+    }
+    @include rtl {
+      right: $c-multi-select-option-padding-x / 2;
+    }
+    display: block;
+    width: $c-multi-select-indicator-size;
+    height: $c-multi-select-indicator-size;
+    content: "";
+    background: no-repeat 50% / #{$c-multi-select-indicator-bg-size};
+  }
+
+  &.c-multi-selected {
+    @include themes($c-multi-select-theme-map) {
+      background-color: themes-get-value("c-multi-select-option-selected-bg");
+    }
+    &::before {
+      @include themes($c-multi-select-theme-map) {
+        color: themes-get-value("c-multi-select-option-indicator-checked-color");
+        border-color: themes-get-value("c-multi-select-option-indicator-checked-border-color");
+        @include gradient-bg(themes-get-value("c-multi-select-option-indicator-checked-bg"));
+      }
+    }
+    &::after {
+      @include themes($c-multi-select-theme-map) {
+        background-image: escape-svg(themes-get-value("c-multi-select-option-checkbox-indicator-icon-checked"));
+      }
+    }
+  }
+}
+
+.c-multi-select-optgroup-label {
+  padding: $c-multi-select-option-padding-y ($c-multi-select-option-padding-x / 2);
+  font-weight: $c-multi-select-optgroup-label-font-weight;
+}
+
+.c-multi-select-options-empty{
+  padding: $c-multi-select-option-padding-y $c-multi-select-option-padding-x;
+}
+
+
+.c-multi-select-tag {
+  display: inline-block;
+  height: $c-multi-select-tag-height;
+  padding: $c-multi-select-tag-padding-y $c-multi-select-tag-padding-x;
+  margin: $c-multi-select-tag-margin;
+  border: $c-multi-select-tag-border-width solid;
+  border-radius: $c-multi-select-tag-border-radius;
+
+  @include themes($c-multi-select-theme-map) {
+    background-color: themes-get-value("c-multi-select-tag-bg");
+    border-color: themes-get-value("c-multi-select-tag-border-color");
+  }
+}
+
+.c-multi-select-tag-delete {
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.c-multi-select.c-show {
+
+  @include themes($c-multi-select-theme-map) {
+    color: themes-get-value("c-multi-select-focus-color");
+    background-color: themes-get-value("c-multi-select-focus-bg");
+    border-color: themes-get-value("c-multi-select-focus-border-color");
+  }
+
+  @if $enable-shadows {
+    @include box-shadow($c-multi-select-box-shadow, $c-multi-select-focus-box-shadow);
+  } @else {
+    // Avoid using mixin so we can pass custom focus shadow properly
+    box-shadow: $c-multi-select-focus-box-shadow;
+  }
+
+  .c-multi-select-search[size] {
+    display: inline;
+  }
+
+  .c-multi-select-options {
+    z-index: $zindex-dropdown;
+    display: initial;
+  }
+}
+
+
+.c-multi-select-inline {
+  padding: $custom-select-padding-y;
+  @include themes($c-multi-select-theme-map) {
+    background: themes-get-value("c-multi-select-bg");
+  }
+
+  .c-multi-select-selection{
+    display: block;
+    margin-bottom: $c-multi-select-padding-y;
+  }
+
+  &:not(.c-multi-select-selection-tags) {
+    .c-multi-select-selection{
+      padding: $c-multi-select-padding-y;
+    }
+  }
+
+  .c-multi-select-search {
+    width: 100%;
+    padding: $c-multi-select-padding-y $c-multi-select-padding-x;
+    border: $c-multi-select-search-border-width solid;
+    @include themes($c-multi-select-theme-map) {
+      border-color: themes-get-value("c-multi-select-search-border-color");
+    }
+  }
+  .c-multi-select-options {
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    @include elevation(0);
+  }
+}

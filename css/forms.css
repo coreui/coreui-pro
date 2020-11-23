@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .form-control {
@@ -38,9 +38,9 @@
 }
 
 .c-dark-theme .form-control {
-  color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.09);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -68,9 +68,9 @@
 }
 
 .c-dark-theme .form-control:focus {
-  color: #e1e1e1;
-  background-color: #34343b;
-  border-color: #37373d;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .form-control::placeholder {
@@ -79,7 +79,7 @@
 }
 
 .c-dark-theme .form-control::placeholder {
-  color: rgba(225, 225, 225, 0.25);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-control:disabled, .form-control[readonly] {
@@ -88,7 +88,7 @@
 }
 
 .c-dark-theme .form-control:disabled, .c-dark-theme .form-control[readonly] {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 input[type="date"].form-control,
@@ -104,8 +104,12 @@ select.form-control:focus::-ms-value {
 }
 
 .c-dark-theme select.form-control:focus::-ms-value {
-  color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.c-dark-theme select.form-control option {
+  background-color: #34353e;
 }
 
 .form-control-file,
@@ -150,7 +154,7 @@ select.form-control:focus::-ms-value {
 }
 
 .c-dark-theme .form-control-plaintext {
-  color: #e1e1e1;
+  color: rgba(255, 255, 255, 0.87);
 }
 
 .form-control-plaintext.form-control-sm, .form-control-plaintext.form-control-lg {
@@ -233,6 +237,11 @@ html:not([dir="rtl"]) .form-check-input {
 .form-check-input[disabled] ~ .form-check-label,
 .form-check-input:disabled ~ .form-check-label {
   color: #768192;
+}
+
+.c-dark-theme .form-check-input[disabled] ~ .form-check-label, .c-dark-theme
+.form-check-input:disabled ~ .form-check-label {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .form-check-label {
@@ -589,6 +598,19 @@ html:not([dir="rtl"]) .was-validated .custom-select:invalid, html:not([dir="rtl"
   .form-inline .custom-control-label {
     margin-bottom: 0;
   }
+}
+
+.form-control-color {
+  max-width: 3rem;
+  padding: 0.375rem;
+}
+
+.form-control-color::-moz-color-swatch {
+  border-radius: 0.25rem;
+}
+
+.form-control-color::-webkit-color-swatch {
+  border-radius: 0.25rem;
 }
 
 /*# sourceMappingURL=forms.css.map */

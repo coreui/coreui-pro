@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  manipulator.jsv3.3.0 (https://coreui.io)
+  * CoreUI PRO  manipulator.jsv3.4.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -48,6 +48,12 @@
   }
 
   var Manipulator = {
+    createElementFromHTML: function createElementFromHTML(htmlString) {
+      var div = document.createElement('div');
+      div.innerHTML = htmlString.trim(); // Change this to div.childNodes to support multiple top-level nodes
+
+      return div.firstChild;
+    },
     setDataAttribute: function setDataAttribute(element, key, value) {
       element.setAttribute("data-" + normalizeDataKey(key), value);
     },

@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .align-baseline {
@@ -105,23 +105,23 @@
 }
 
 .c-dark-theme .bg-light {
-  background-color: #20202a !important;
+  background-color: #6c6e7e !important;
 }
 
 .c-dark-theme a.bg-light:hover, .c-dark-theme a.bg-light:focus,
 .c-dark-theme button.bg-light:hover,
 .c-dark-theme button.bg-light:focus {
-  background-color: #0a0a0d !important;
+  background-color: #555662 !important;
 }
 
 .c-dark-theme .bg-dark {
-  background-color: #181924 !important;
+  background-color: #0e0e15 !important;
 }
 
 .c-dark-theme a.bg-dark:hover, .c-dark-theme a.bg-dark:focus,
 .c-dark-theme button.bg-dark:hover,
 .c-dark-theme button.bg-dark:focus {
-  background-color: #040405 !important;
+  background-color: black !important;
 }
 
 .c-legacy-theme .bg-primary {
@@ -749,23 +749,23 @@ button.bg-gray-900:focus {
 }
 
 .c-dark-theme .border {
-  border: 1px solid #181924 !important;
+  border: 1px solid rgba(255, 255, 255, 0.075) !important;
 }
 
 .c-dark-theme .border-top {
-  border-top: 1px solid #181924 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.075) !important;
 }
 
 .c-dark-theme .border-right {
-  border-right: 1px solid #181924 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.075) !important;
 }
 
 .c-dark-theme .border-bottom {
-  border-bottom: 1px solid #181924 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.075) !important;
 }
 
 .c-dark-theme .border-left {
-  border-left: 1px solid #181924 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.075) !important;
 }
 
 .border-0 {
@@ -820,12 +820,12 @@ button.bg-gray-900:focus {
 
 .c-dark-theme .border-light {
   border: 1px solid !important;
-  border-color: #20202a !important;
+  border-color: #6c6e7e !important;
 }
 
 .c-dark-theme .border-dark {
   border: 1px solid !important;
-  border-color: #181924 !important;
+  border-color: #0e0e15 !important;
 }
 
 .c-legacy-theme .border-primary {
@@ -1299,57 +1299,57 @@ button.bg-gray-900:focus {
 
 .c-elevation-0 {
   border: 0;
-  box-shadow: none;
+  box-shadow: none !important;
 }
 
 .c-elevation-1 {
   border: 0;
-  box-shadow: 0 1px 1px 0 rgba(60, 75, 100, .14), 0 2px 1px -1px rgba(60, 75, 100, .12), 0 1px 3px 0 rgba(60, 75, 100, .20);
+  box-shadow: 0 1px 1px 0 rgba(var(--elevation-base-color), .14), 0 2px 1px -1px rgba(var(--elevation-base-color), .12), 0 1px 3px 0 rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-2 {
   border: 0;
-  box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+  box-shadow: 0 2px 2px 0 rgba(var(--elevation-base-color), .14), 0 3px 1px -2px rgba(var(--elevation-base-color), .12), 0 1px 5px 0 rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-3 {
   border: 0;
-  box-shadow: 0 3px 4px 0 rgba(60, 75, 100, .14), 0 3px 3px -2px rgba(60, 75, 100, .12), 0 1px 8px 0 rgba(60, 75, 100, .20);
+  box-shadow: 0 3px 4px 0 rgba(var(--elevation-base-color), .14), 0 3px 3px -2px rgba(var(--elevation-base-color), .12), 0 1px 8px 0 rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-4 {
   border: 0;
-  box-shadow: 0 4px 5px 0 rgba(60, 75, 100, .14), 0 1px 10px 0 rgba(60, 75, 100, .12), 0 2px 4px -1px rgba(60, 75, 100, .20);
+  box-shadow: 0 4px 5px 0 rgba(var(--elevation-base-color), .14), 0 1px 10px 0 rgba(var(--elevation-base-color), .12), 0 2px 4px -1px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-6 {
   border: 0;
-  box-shadow: 0 6px 10px 0 rgba(60, 75, 100, .14), 0 1px 18px 0 rgba(60, 75, 100, .12), 0 3px 5px -1px rgba(60, 75, 100, .20);
+  box-shadow: 0 6px 10px 0 rgba(var(--elevation-base-color), .14), 0 1px 18px 0 rgba(var(--elevation-base-color), .12), 0 3px 5px -1px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-8 {
   border: 0;
-  box-shadow: 0 8px 10px 1px rgba(60, 75, 100, .14), 0 3px 14px 2px rgba(60, 75, 100, .12), 0 5px 5px -3px rgba(60, 75, 100, .20);
+  box-shadow: 0 8px 10px 1px rgba(var(--elevation-base-color), .14), 0 3px 14px 2px rgba(var(--elevation-base-color), .12), 0 5px 5px -3px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-9 {
   border: 0;
-  box-shadow: 0 9px 12px 1px rgba(60, 75, 100, .14), 0 3px 16px 2px rgba(60, 75, 100, .12), 0 5px 6px -3px rgba(60, 75, 100, .20);
+  box-shadow: 0 9px 12px 1px rgba(var(--elevation-base-color), .14), 0 3px 16px 2px rgba(var(--elevation-base-color), .12), 0 5px 6px -3px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-12 {
   border: 0;
-  box-shadow: 0 12px 17px 2px rgba(60, 75, 100, .14), 0 5px 22px 4px rgba(60, 75, 100, .12), 0 7px 8px -4px rgba(60, 75, 100, .20);
+  box-shadow: 0 12px 17px 2px rgba(var(--elevation-base-color), .14), 0 5px 22px 4px rgba(var(--elevation-base-color), .12), 0 7px 8px -4px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-16 {
   border: 0;
-  box-shadow: 0 16px 24px 2px rgba(60, 75, 100, .14), 0 6px 30px 5px rgba(60, 75, 100, .12), 0 8px 10px -5px rgba(60, 75, 100, .20);
+  box-shadow: 0 16px 24px 2px rgba(var(--elevation-base-color), .14), 0 6px 30px 5px rgba(var(--elevation-base-color), .12), 0 8px 10px -5px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .c-elevation-24 {
   border: 0;
-  box-shadow: 0 24px 38px 3px rgba(60, 75, 100, .14), 0 9px 46px 8px rgba(60, 75, 100, .12), 0 11px 15px -7px rgba(60, 75, 100, .20);
+  box-shadow: 0 24px 38px 3px rgba(var(--elevation-base-color), .14), 0 9px 46px 8px rgba(var(--elevation-base-color), .12), 0 11px 15px -7px rgba(var(--elevation-base-color), .20) !important;
 }
 
 .embed-responsive {
@@ -6051,15 +6051,15 @@ html:not([dir="rtl"]) .mfe-auto {
 }
 
 .c-dark-theme .text-light {
-  color: #20202a !important;
+  color: #6c6e7e !important;
 }
 
 .c-dark-theme a.text-light:hover, .c-dark-theme a.text-light:focus {
-  color: black !important;
+  color: #494a55 !important;
 }
 
 .c-dark-theme .text-dark {
-  color: #181924 !important;
+  color: #0e0e15 !important;
 }
 
 .c-dark-theme a.text-dark:hover, .c-dark-theme a.text-dark:focus {
@@ -6200,6 +6200,10 @@ a.text-dark:hover, a.text-dark:focus {
 
 .text-muted {
   color: #768192 !important;
+}
+
+.c-dark-theme .text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 .text-black-50 {

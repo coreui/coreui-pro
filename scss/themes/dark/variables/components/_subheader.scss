@@ -1,13 +1,14 @@
 // Header
 
 // Dark theme
-
-$subheader-bg__dt:                     $gray-400__dt !default;
+// scss-docs-start subheader-dark-themes
+$subheader-bg__dt:                     $bg-elevation-3 !default;
 $subheader-color__dt:                  rgba($white, .75) !default;
 $subheader-border__dt:                 ( bottom: 0 ) !default;
 $subheader-hover-color__dt:            rgba($white, .9) !default;
 $subheader-active-color__dt:           $white !default;
 $subheader-disabled-color__dt:         rgba($white, .25) !default;
+// scss-docs-end subheader-dark-themes
 
 $subheader-variants-map__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .custom-control {
@@ -116,7 +116,7 @@ html:not([dir="rtl"]) .custom-control-input {
 }
 
 .c-dark-theme .custom-control-input[disabled] ~ .custom-control-label, .c-dark-theme .custom-control-input:disabled ~ .custom-control-label {
-  color: #8a93a2;
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .custom-control-input[disabled] ~ .custom-control-label::before, .custom-control-input:disabled ~ .custom-control-label::before {
@@ -128,7 +128,7 @@ html:not([dir="rtl"]) .custom-control-input {
 }
 
 .c-dark-theme .custom-control-input[disabled] ~ .custom-control-label::before, .c-dark-theme .custom-control-input:disabled ~ .custom-control-label::before {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .custom-control-label {
@@ -164,7 +164,7 @@ html:not([dir="rtl"]) .custom-control-label::before {
 }
 
 .c-dark-theme .custom-control-label::before {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
   border-color: rgba(0, 0, 21, 0.3);
 }
 
@@ -335,7 +335,7 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
 }
 
 .c-dark-theme .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before {
@@ -374,8 +374,8 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
 }
 
 .c-dark-theme .custom-select {
-  color: #e1e1e1;
-  background: rgba(255, 255, 255, 0.1) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23636f83' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
+  color: rgba(255, 255, 255, 0.87);
+  background: rgba(255, 255, 255, 0.05) url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23636f83' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
   border-color: rgba(0, 0, 21, 0.3);
 }
 
@@ -399,8 +399,8 @@ html:not([dir="rtl"]) .custom-switch .custom-control-label::after {
 }
 
 .c-dark-theme .custom-select:focus::-ms-value {
-  color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .custom-select[multiple], .custom-select[size]:not([size="1"]) {
@@ -427,8 +427,8 @@ html:not([dir="rtl"]) .custom-select[multiple], html:not([dir="rtl"]) .custom-se
 }
 
 .c-dark-theme .custom-select:disabled {
-  color: #8a93a2;
-  background-color: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.38);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .custom-select::-ms-expand {
@@ -512,7 +512,7 @@ html:not([dir="rtl"]) .custom-select-lg {
 
 .c-dark-theme .custom-file-input[disabled] ~ .custom-file-label, .c-dark-theme
 .custom-file-input:disabled ~ .custom-file-label {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .custom-file-input:lang(en) ~ .custom-file-label::after {
@@ -547,8 +547,8 @@ html:not([dir="rtl"]) .custom-select-lg {
 }
 
 .c-dark-theme .custom-file-label {
-  color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.05);
   border-color: rgba(0, 0, 21, 0.3);
 }
 
@@ -582,8 +582,8 @@ html:not([dir="rtl"]) .custom-file-label::after {
 }
 
 .c-dark-theme .custom-file-label::after {
-  color: #e1e1e1;
-  background-color: #181924;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.09);
 }
 
 .custom-range {

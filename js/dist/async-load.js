@@ -1,11 +1,11 @@
 /*!
-  * CoreUI PRO  async-load.jsv3.3.0 (https://coreui.io)
+  * CoreUI PRO  async-load.jsv3.4.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./dom/data.js'), require('./dom/event-handler.js')) :
-  typeof define === 'function' && define.amd ? define(['./dom/data.js', './dom/event-handler.js'], factory) :
+  typeof define === 'function' && define.amd ? define(['./dom/data', './dom/event-handler'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.AsyncLoad = factory(global.Data, global.EventHandler));
 }(this, (function (Data, EventHandler) { 'use strict';
 

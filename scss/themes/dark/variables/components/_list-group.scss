@@ -1,6 +1,7 @@
 // List group
 
 // Dark theme
+// scss-docs-start list-group-dark-theme
 $list-group-color__dt:                $body-color__dt !default;
 $list-group-bg__dt:                   inherit !default;
 $list-group-border-color__dt:         $border-color__dt !default;
@@ -14,6 +15,7 @@ $list-group-action-color__dt:         $body-color__dt !default;
 $list-group-action-hover-color__dt:   $body-color__dt !default;
 $list-group-action-active-color__dt:  $body-color__dt !default;
 $list-group-action-active-bg__dt:     $gray-900 !default;
+// scss-docs-end list-group-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $list-group-theme-map: map-merge(

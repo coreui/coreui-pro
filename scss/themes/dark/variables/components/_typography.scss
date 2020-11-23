@@ -1,0 +1,16 @@
+$hr-border-color__dt: $border-color__dt !default;
+$vr-bg__dt:           $border-color__dt !default;
+$text-muted__dt:      $text-medium-emphasis__dt !default;
+
+
+// stylelint-disable-next-line scss/dollar-variable-default
+$typography-theme-map: map-merge(
+  $typography-theme-map,
+  (
+    dark: (
+      "hr-border-color":  $hr-border-color__dt,
+      "vr-bg":            $vr-bg__dt,
+      "text-muted":       $text-muted__dt
+    )
+  )
+);

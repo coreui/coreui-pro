@@ -1,11 +1,12 @@
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v3.3.0
+ * @version v3.4.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2020 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
 
+// scss-docs-start import-stack
 @import "functions";
 @import "variables";
 @import "themes";
@@ -61,6 +62,10 @@
 @import "type";
 @import "widgets";
 
+// PRO Components
+@import "loading-button";
+@import "multi-select";
+
 // Layout Options
 @import "layouts";
 
@@ -77,3 +82,4 @@
 @import "ie-custom-properties";
 
 @import "print";
+// scss-docs-end import-stack

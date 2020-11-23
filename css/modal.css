@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .modal-open {
@@ -133,13 +133,19 @@
 }
 
 .c-dark-theme .modal-content {
-  background-color: #2c2c34;
-  border-color: #2c2c34;
+  background-color: #3d3e47;
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
-.c-app:not(.c-legacy-theme):not(.c-dark-theme) .modal-content {
+.c-app:not(.c-legacy-theme) .modal-content {
   border: 0;
-  box-shadow: 0 24px 38px 3px rgba(60, 75, 100, .14), 0 9px 46px 8px rgba(60, 75, 100, .12), 0 11px 15px -7px rgba(60, 75, 100, .20);
+  box-shadow: 0 24px 38px 3px rgba(var(--elevation-base-color), .14), 0 9px 46px 8px rgba(var(--elevation-base-color), .12), 0 11px 15px -7px rgba(var(--elevation-base-color), .20);
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .c-app:not(.c-legacy-theme) .modal-content {
+    box-shadow: 0 24px 38px 3px rgba(60, 75, 100, .14), 0 9px 46px 8px rgba(60, 75, 100, .12), 0 11px 15px -7px rgba(60, 75, 100, .20);
+  }
 }
 
 .modal-backdrop {
@@ -176,7 +182,7 @@
 }
 
 .c-dark-theme .modal-header {
-  border-color: #2c2c34;
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
 .modal-header .close {
@@ -219,7 +225,7 @@ html:not([dir="rtl"]) .modal-header .close {
 }
 
 .c-dark-theme .modal-footer {
-  border-color: #2c2c34;
+  border-color: rgba(0, 0, 0, 0.2);
 }
 
 .modal-footer > * {
@@ -325,21 +331,21 @@ html:not([dir="rtl"]) .modal-header .close {
 }
 
 .c-dark-theme .modal-light .modal-content {
-  border-color: #20202a;
+  border-color: #6c6e7e;
 }
 
 .c-dark-theme .modal-light .modal-header {
   color: #fff;
-  background-color: #20202a;
+  background-color: #6c6e7e;
 }
 
 .c-dark-theme .modal-dark .modal-content {
-  border-color: #181924;
+  border-color: #0e0e15;
 }
 
 .c-dark-theme .modal-dark .modal-header {
   color: #fff;
-  background-color: #181924;
+  background-color: #0e0e15;
 }
 
 .c-legacy-theme .modal-primary .modal-content {

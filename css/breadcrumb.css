@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .breadcrumb {
@@ -39,7 +39,7 @@
 
 .c-dark-theme .breadcrumb {
   background-color: transparent;
-  border-color: #1e1e29;
+  border-color: rgba(255, 255, 255, 0.87);
 }
 
 .breadcrumb-item {
@@ -60,6 +60,14 @@ html:not([dir="rtl"]) .breadcrumb-item + .breadcrumb-item {
   content: "/";
 }
 
+.c-legacy-theme .breadcrumb-item + .breadcrumb-item::before {
+  color: #73818f;
+}
+
+.c-dark-theme .breadcrumb-item + .breadcrumb-item::before {
+  color: rgba(255, 255, 255, 0.87);
+}
+
 html:not([dir="rtl"]) .breadcrumb-item + .breadcrumb-item::before {
   padding-right: 0.5rem;
 }
@@ -78,6 +86,14 @@ html:not([dir="rtl"]) .breadcrumb-item + .breadcrumb-item::before {
 
 .breadcrumb-item.active {
   color: #8a93a2;
+}
+
+.c-legacy-theme .breadcrumb-item.active {
+  color: #73818f;
+}
+
+.c-dark-theme .breadcrumb-item.active {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /*# sourceMappingURL=breadcrumb.css.map */

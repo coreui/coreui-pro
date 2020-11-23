@@ -1,11 +1,13 @@
 
 // Legacy theme
 
+// scss-docs-start modal-legacy-theme
 $modal-content-color_lt:         null !default;
 $modal-content-bg_lt:            $white !default;
 $modal-content-border-color_lt:  rgba($black__lt, .2) !default;
 $modal-header-border-color_lt:   $border-color__lt !default;
 $modal-footer-border-color_lt:   $modal-header-border-color_lt !default;
+// scss-docs-end modal-legacy-theme
 
 $modal-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

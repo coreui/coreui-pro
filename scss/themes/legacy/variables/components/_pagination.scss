@@ -1,5 +1,5 @@
 // Legacy theme
-
+// scss-docs-start pagination-legacy-theme
 $pagination-color__lt:                  $link-color__lt !default;
 $pagination-bg__lt:                     $white !default;
 $pagination-border-color__lt:           $border-color__lt !default;
@@ -14,6 +14,7 @@ $pagination-active-border-color__lt:    $pagination-active-bg__lt !default;
 $pagination-disabled-color__lt:         $gray-600__lt !default;
 $pagination-disabled-bg__lt:            $white !default;
 $pagination-disabled-border-color__lt:  $gray-300__lt !default;
+// scss-docs-end pagination-legacy-theme
 
 $pagination-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

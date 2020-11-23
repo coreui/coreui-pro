@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 :root {
@@ -38,8 +38,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .popover {
@@ -78,8 +78,8 @@
 }
 
 .c-dark-theme .popover {
-  background-color: #1e1e29;
-  border-color: #181924;
+  background-color: #3b3c45;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .popover .arrow {
@@ -117,7 +117,7 @@
 }
 
 .c-dark-theme .bs-popover-top > .arrow::before, .c-dark-theme .bs-popover-auto[x-placement^="top"] > .arrow::before {
-  border-top-color: #181924;
+  border-top-color: rgba(255, 255, 255, 0.125);
 }
 
 .bs-popover-top > .arrow::after, .bs-popover-auto[x-placement^="top"] > .arrow::after {
@@ -131,7 +131,7 @@
 }
 
 .c-dark-theme .bs-popover-top > .arrow::after, .c-dark-theme .bs-popover-auto[x-placement^="top"] > .arrow::after {
-  border-top-color: #1e1e29;
+  border-top-color: #3b3c45;
 }
 
 .bs-popover-right, .bs-popover-auto[x-placement^="right"] {
@@ -156,7 +156,7 @@
 }
 
 .c-dark-theme .bs-popover-right > .arrow::before, .c-dark-theme .bs-popover-auto[x-placement^="right"] > .arrow::before {
-  border-right-color: #181924;
+  border-right-color: rgba(255, 255, 255, 0.125);
 }
 
 .bs-popover-right > .arrow::after, .bs-popover-auto[x-placement^="right"] > .arrow::after {
@@ -170,7 +170,7 @@
 }
 
 .c-dark-theme .bs-popover-right > .arrow::after, .c-dark-theme .bs-popover-auto[x-placement^="right"] > .arrow::after {
-  border-right-color: #1e1e29;
+  border-right-color: #3b3c45;
 }
 
 .bs-popover-bottom, .bs-popover-auto[x-placement^="bottom"] {
@@ -192,7 +192,7 @@
 }
 
 .c-dark-theme .bs-popover-bottom > .arrow::before, .c-dark-theme .bs-popover-auto[x-placement^="bottom"] > .arrow::before {
-  border-bottom-color: #181924;
+  border-bottom-color: rgba(255, 255, 255, 0.125);
 }
 
 .bs-popover-bottom > .arrow::after, .bs-popover-auto[x-placement^="bottom"] > .arrow::after {
@@ -206,7 +206,7 @@
 }
 
 .c-dark-theme .bs-popover-bottom > .arrow::after, .c-dark-theme .bs-popover-auto[x-placement^="bottom"] > .arrow::after {
-  border-bottom-color: #1e1e29;
+  border-bottom-color: #3b3c45;
 }
 
 .bs-popover-bottom .popover-header::before, .bs-popover-auto[x-placement^="bottom"] .popover-header::before {
@@ -226,7 +226,7 @@
 }
 
 .c-dark-theme .bs-popover-bottom .popover-header::before, .c-dark-theme .bs-popover-auto[x-placement^="bottom"] .popover-header::before {
-  border-bottom-color: #181924;
+  border-bottom-color: #3b3c45;
 }
 
 .bs-popover-left, .bs-popover-auto[x-placement^="left"] {
@@ -251,7 +251,7 @@
 }
 
 .c-dark-theme .bs-popover-left > .arrow::before, .c-dark-theme .bs-popover-auto[x-placement^="left"] > .arrow::before {
-  border-left-color: #181924;
+  border-left-color: rgba(255, 255, 255, 0.125);
 }
 
 .bs-popover-left > .arrow::after, .bs-popover-auto[x-placement^="left"] > .arrow::after {
@@ -265,7 +265,7 @@
 }
 
 .c-dark-theme .bs-popover-left > .arrow::after, .c-dark-theme .bs-popover-auto[x-placement^="left"] > .arrow::after {
-  border-left-color: #1e1e29;
+  border-left-color: #3b3c45;
 }
 
 .popover-header {
@@ -285,9 +285,9 @@
 }
 
 .c-dark-theme .popover-header {
-  color: #e1e1e1;
-  background-color: #181924;
-  border-bottom-color: #0e0e15;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #3b3c45;
+  border-bottom-color: #2f3037;
 }
 
 .popover-header:empty {
@@ -304,7 +304,7 @@
 }
 
 .c-dark-theme .popover-body {
-  color: #e1e1e1;
+  color: rgba(255, 255, 255, 0.87);
 }
 
 /*# sourceMappingURL=old-popover.css.map */

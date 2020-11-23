@@ -1,5 +1,6 @@
 // Legacy theme
 
+// scss-docs-start header-legacy-theme
 $header-toggler-bg__lt:            transparent !default;
 $header-toggler-font-size__lt:     $font-size-lg !default;
 $header-toggler-border__lt:        0 !default;
@@ -42,6 +43,7 @@ $header-dark-brand-minimized-border__lt: 0 !default;
 $subheader-light-separator__lt: 1px solid $border-color__lt !default;
 
 $subheader-dark-separator__lt: 1px solid $gray-800__lt !default;
+// scss-docs-end header-legacy-theme
 
 
 $header-variants-map: () !default;

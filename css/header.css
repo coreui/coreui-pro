@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-header {
@@ -40,9 +40,15 @@
   z-index: 1029;
 }
 
-.c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-header.c-header-fixed {
+.c-app:not(.c-legacy-theme) .c-header.c-header-fixed {
   border: 0;
-  box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+  box-shadow: 0 2px 2px 0 rgba(var(--elevation-base-color), .14), 0 3px 1px -2px rgba(var(--elevation-base-color), .12), 0 1px 5px 0 rgba(var(--elevation-base-color), .20);
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .c-app:not(.c-legacy-theme) .c-header.c-header-fixed {
+    box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+  }
 }
 
 .c-header .c-subheader {
@@ -605,13 +611,13 @@ html:not([dir="rtl"]) .c-header-nav .c-header-nav-link .badge, html:not([dir="rt
 }
 
 .c-dark-theme .c-header {
-  background: #2c2c34;
+  background: #2a2b36;
   border-bottom: 0;
 }
 
 .c-dark-theme .c-header .c-subheader {
   margin-top: -1px;
-  border-top: 1px solid #181924;
+  border-top: 1px solid rgba(255, 255, 255, 0.075);
 }
 
 .c-dark-theme .c-header .c-header-brand {

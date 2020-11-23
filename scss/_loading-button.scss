@@ -1,0 +1,32 @@
+//
+// Loading button
+//
+
+.c-loading-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.c-loading-button-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+}
+
+.c-loading-button-spinner {
+  margin-right: $spacer;
+  margin-left: - ($spacer * 2);
+  opacity: 0;
+  transition: margin $layout-transition-speed, opacity $layout-transition-speed, border $layout-transition-speed;
+}
+
+.c-loading-button-loading {
+
+  .c-loading-button-spinner {
+    width: 1rem;
+    margin-left: 0;
+    opacity: 1;
+  }
+}

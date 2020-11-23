@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 html:not([dir="rtl"]) .breadcrumb-menu {
@@ -38,14 +38,18 @@ html:not([dir="rtl"]) .breadcrumb-menu {
 
 .breadcrumb-menu .btn {
   padding: 0 0.75rem;
-  color: #768192;
   vertical-align: top;
   border: 0;
+  color: #768192;
 }
 
 .breadcrumb-menu .btn:hover, .breadcrumb-menu .btn.active {
   color: #3c4b64;
   background: transparent;
+}
+
+.c-dark-theme .breadcrumb-menu .btn {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .breadcrumb-menu .show .btn {

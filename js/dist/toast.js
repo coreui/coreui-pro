@@ -1,11 +1,11 @@
 /*!
-  * CoreUI PRO  toast.jsv3.3.0 (https://coreui.io)
+  * CoreUI PRO  toast.jsv3.4.0 (https://coreui.io)
   * Copyright 2020 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js')) :
-  typeof define === 'function' && define.amd ? define(['./dom/data.js', './dom/event-handler.js', './dom/manipulator.js'], factory) :
+  typeof define === 'function' && define.amd ? define(['./dom/data', './dom/event-handler', './dom/manipulator'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Toast = factory(global.Data, global.EventHandler, global.Manipulator));
 }(this, (function (Data, EventHandler, Manipulator) { 'use strict';
 

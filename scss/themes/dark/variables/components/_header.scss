@@ -2,7 +2,8 @@
 
 // Dark theme
 
-$header-bg__dt:                     $gray-400__dt !default;
+// scss-docs-start header-dark-theme
+$header-bg__dt:                     $bg-elevation-3 !default;
 $header-color__dt:                  rgba($white, .75) !default;
 $header-border__dt:                 ( bottom: 0 ) !default;
 $header-hover-color__dt:            rgba($white, .9) !default;
@@ -20,6 +21,7 @@ $header-brand-minimized-bg__dt:      transparent !default;
 $header-brand-minimized-border__dt:  0 !default;
 
 $subheader-separator__dt:            1px solid $border-color__dt !default;
+// scss-docs-end header-dark-theme
 
 
 $header-variants-map__dt: () !default;

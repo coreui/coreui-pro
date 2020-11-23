@@ -1,9 +1,10 @@
 // Legacy theme
-
+// scss-docs-start breadcrumb-legacy-theme
 $breadcrumb-bg__lt:             transparent !default;
 $breadcrumb-border-color__lt:   $border-color__lt !default;
 $breadcrumb-divider-color__lt:  $gray-600__lt !default;
 $breadcrumb-active-color__lt:   $gray-600__lt !default;
+// scss-docs-end breadcrumb-legacy-theme
 
 $breadcrumb-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

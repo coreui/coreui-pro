@@ -34,7 +34,11 @@
 @import "variables/components/list-group";
 @import "variables/components/breadcrumb";
 @import "variables/components/toasts";
+@import "variables/components/typography";
 @import "variables/components/close";
+
+// PRO Components
+@import "variables/components/multi-select";
 
 // Apps
 @import "variables/apps/email";

@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-subheader {
@@ -40,10 +40,16 @@
   z-index: 1030;
 }
 
-.c-app:not(.c-legacy-theme):not(.c-dark-theme) .c-subheader.c-subheader-fixed {
+.c-app:not(.c-legacy-theme) .c-subheader.c-subheader-fixed {
   border: 0;
-  box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+  box-shadow: 0 2px 2px 0 rgba(var(--elevation-base-color), .14), 0 3px 1px -2px rgba(var(--elevation-base-color), .12), 0 1px 5px 0 rgba(var(--elevation-base-color), .20);
   clip-path: inset(0 0 -1000px 0);
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .c-app:not(.c-legacy-theme) .c-subheader.c-subheader-fixed {
+    box-shadow: 0 2px 2px 0 rgba(60, 75, 100, .14), 0 3px 1px -2px rgba(60, 75, 100, .12), 0 1px 5px 0 rgba(60, 75, 100, .20);
+  }
 }
 
 .c-subheader-nav {
@@ -258,7 +264,7 @@ html:not([dir="rtl"]) .c-subheader-nav .c-subheader-nav-link .badge, html:not([d
 }
 
 .c-dark-theme .c-subheader {
-  background: #2c2c34;
+  background: #2a2b36;
   border-bottom: 0;
 }
 

@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-app {
@@ -32,6 +32,7 @@
   color: #3c4b64;
   background-color: #ebedef;
   --color: #3c4b64;
+  --elevation-base-color: 60, 75, 100;
 }
 
 .c-app.c-dark-theme {
@@ -59,11 +60,11 @@
 }
 
 .c-app.c-dark-theme {
-  --light: #20202a;
+  --light: #6c6e7e;
 }
 
 .c-app.c-dark-theme {
-  --dark: #181924;
+  --dark: #0e0e15;
 }
 
 .c-app.c-legacy-theme {
@@ -102,12 +103,14 @@
   color: #23282c;
   background-color: #e4e5e6;
   --color: #23282c;
+  --elevation-base-color: 60, 75, 100;
 }
 
 .c-app.c-dark-theme {
-  color: #e1e1e1;
-  background-color: #0a0b18;
-  --color: #e1e1e1;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #181924;
+  --color: rgba(255, 255, 255, 0.87);
+  --elevation-base-color: 0, 0, 0;
 }
 
 /*# sourceMappingURL=app.css.map */

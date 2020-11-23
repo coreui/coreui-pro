@@ -3,18 +3,19 @@
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
 // Dark theme
-$input-bg__dt:                        rgba($white, .1) !default;
-$input-disabled-bg__dt:               rgba($white, .05) !default;
+$input-bg__dt:                        rgba($white, .05) !default;
+$input-disabled-bg__dt:               rgba($white, .1) !default;
 $input-color__dt:                     $body-color__dt !default;
-$input-border-color__dt:              rgba($white, .15) !default;
-$input-focus-bg__dt:                  $gray-200__dt !default;
-$input-focus-border-color__dt:        $gray-100__dt !default;
+$input-border-color__dt:              rgba($white, .09) !default;
+$input-focus-bg__dt:                  rgba($white, .05) !default;
+$input-focus-border-color__dt:        rgba($white, .2) !default;
 $input-focus-color__dt:               $body-color__dt !default;
-$input-placeholder-color__dt:         rgba($body-color__dt, .25) !default;
+$input-placeholder-color__dt:         $text-medium-emphasis__dt !default;
 $input-plaintext-color__dt:           $body-color__dt !default;
-$input-group-addon-color__dt:         rgba($body-color__dt, .5) !default;
-$input-group-addon-bg__dt:            $gray-900__dt !default;
-$input-group-addon-border-color__dt:  $gray-900__dt !default;
+$input-group-addon-color__dt:         $body-color__dt !default;
+$input-group-addon-bg__dt:            rgba($white, .09) !default;
+$input-group-addon-border-color__dt:  rgba($white, .09) !default;
+$select-option-bg__dt:                $bg-elevation-8 !default;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $form-theme-map: map-merge(
@@ -33,6 +34,7 @@ $form-theme-map: map-merge(
       "input-group-addon-color":         $input-group-addon-color__dt,
       "input-group-addon-bg":            $input-group-addon-bg__dt,
       "input-group-addon-border-color":  $input-group-addon-border-color__dt,
+      "select-option-bg":                $select-option-bg__dt
     )
   )
 );

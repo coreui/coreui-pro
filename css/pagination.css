@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .pagination {
@@ -60,9 +60,9 @@ html:not([dir="rtl"]) .page-link {
 }
 
 .c-dark-theme .page-link {
-  color: #e1e1e1;
-  background-color: rgba(255, 255, 255, 0.075);
-  border-color: #181924;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .page-link:hover {
@@ -80,9 +80,9 @@ html:not([dir="rtl"]) .page-link {
 }
 
 .c-dark-theme .page-link:hover {
-  color: #e1e1e1;
-  background-color: #181924;
-  border-color: #181924;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .page-link:focus {
@@ -147,9 +147,9 @@ html:not([dir="rtl"]) .page-item:last-child .page-link {
 }
 
 .c-dark-theme .page-item.disabled .page-link {
-  color: rgba(255, 255, 255, 0.5);
-  background-color: rgba(255, 255, 255, 0.025);
-  border-color: #181924;
+  color: rgba(255, 255, 255, 0.38);
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .pagination-lg .page-link {

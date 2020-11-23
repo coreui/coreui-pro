@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .badge {
@@ -150,32 +150,32 @@ a.badge:hover, a.badge:focus {
 
 .c-dark-theme .badge-light {
   color: #fff;
-  background-color: #20202a;
+  background-color: #6c6e7e;
 }
 
 .c-dark-theme a.badge-light:hover, .c-dark-theme a.badge-light:focus {
   color: #fff;
-  background-color: #0a0a0d;
+  background-color: #555662;
 }
 
 .c-dark-theme a.badge-light:focus, .c-dark-theme a.badge-light.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(32, 32, 42, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(108, 110, 126, 0.5);
 }
 
 .c-dark-theme .badge-dark {
   color: #fff;
-  background-color: #181924;
+  background-color: #0e0e15;
 }
 
 .c-dark-theme a.badge-dark:hover, .c-dark-theme a.badge-dark:focus {
   color: #fff;
-  background-color: #040405;
+  background-color: black;
 }
 
 .c-dark-theme a.badge-dark:focus, .c-dark-theme a.badge-dark.focus {
   outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(24, 25, 36, 0.5);
+  box-shadow: 0 0 0 0.2rem rgba(14, 14, 21, 0.5);
 }
 
 .c-legacy-theme .badge-primary {

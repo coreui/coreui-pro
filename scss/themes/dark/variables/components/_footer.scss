@@ -1,9 +1,11 @@
 // Footer
 
 // Dark Theme
-$footer-dark-bg__dt:       $gray-800__dt !default;
+// scss-docs-start footer-dark-theme
+$footer-dark-bg__dt:       $bg-elevation-3 !default;
 $footer-dark-color__dt:    $body-color__dt !default;
-$footer-dark-borders__dt:  ( top: 1px solid $gray-900__dt ) !default;
+$footer-dark-borders__dt:  ( top: 0 ) !default;
+// scss-docs-end footer-dark-theme
 
 $footer-variants-map__dt: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

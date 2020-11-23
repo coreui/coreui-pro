@@ -1,5 +1,6 @@
 // Legacy theme
 
+// scss-docs-start list-group-legacy-theme
 $list-group-color__lt:                null !default;
 $list-group-bg__lt:                   inherit !default;
 $list-group-border-color__lt:         rgba($black__lt, .125) !default;
@@ -13,6 +14,7 @@ $list-group-action-color__lt:         $gray-700__lt !default;
 $list-group-action-hover-color__lt:   $list-group-action-color__lt !default;
 $list-group-action-active-color__lt:  $body-color__lt !default;
 $list-group-action-active-bg__lt:     $gray-200__lt !default;
+// scss-docs-end list-group-legacy-theme
 
 $list-group-theme-map: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default

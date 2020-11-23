@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .c-callout {
@@ -130,27 +130,27 @@ html:not([dir="rtl"]) .c-dark-theme .c-callout-danger {
 }
 
 html:not([dir="rtl"]) .c-dark-theme .c-callout-light {
-  border-left-color: #20202a;
+  border-left-color: #6c6e7e;
 }
 
 *[dir="rtl"] .c-dark-theme .c-callout-light {
-  border-right-color: #20202a;
+  border-right-color: #6c6e7e;
 }
 
 .c-dark-theme .c-callout-light h4 {
-  color: #20202a;
+  color: #6c6e7e;
 }
 
 html:not([dir="rtl"]) .c-dark-theme .c-callout-dark {
-  border-left-color: #181924;
+  border-left-color: #0e0e15;
 }
 
 *[dir="rtl"] .c-dark-theme .c-callout-dark {
-  border-right-color: #181924;
+  border-right-color: #0e0e15;
 }
 
 .c-dark-theme .c-callout-dark h4 {
-  color: #181924;
+  color: #0e0e15;
 }
 
 html:not([dir="rtl"]) .c-legacy-theme .c-callout-primary {

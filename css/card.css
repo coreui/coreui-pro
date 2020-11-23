@@ -16,8 +16,8 @@
   --info-dark-theme: #4799eb;
   --warning-dark-theme: #e1a82d;
   --danger-dark-theme: #d16767;
-  --light-dark-theme: #20202a;
-  --dark-dark-theme: #181924;
+  --light-dark-theme: #6c6e7e;
+  --dark-dark-theme: #0e0e15;
 }
 
 .card {
@@ -40,13 +40,19 @@
 }
 
 .c-dark-theme .card {
-  background-color: #23242d;
-  border-color: #181924;
+  background-color: #24252f;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
-.c-app:not(.c-legacy-theme):not(.c-dark-theme) .card {
+.c-app:not(.c-legacy-theme) .card {
   border: 0;
-  box-shadow: 0 1px 1px 0 rgba(60, 75, 100, .14), 0 2px 1px -1px rgba(60, 75, 100, .12), 0 1px 3px 0 rgba(60, 75, 100, .20);
+  box-shadow: 0 1px 1px 0 rgba(var(--elevation-base-color), .14), 0 2px 1px -1px rgba(var(--elevation-base-color), .12), 0 1px 3px 0 rgba(var(--elevation-base-color), .20);
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .c-app:not(.c-legacy-theme) .card {
+    box-shadow: 0 1px 1px 0 rgba(60, 75, 100, .14), 0 2px 1px -1px rgba(60, 75, 100, .12), 0 1px 3px 0 rgba(60, 75, 100, .20);
+  }
 }
 
 .card > hr {
@@ -134,8 +140,8 @@ html:not([dir="rtl"]) .card-link + .card-link {
 }
 
 .c-dark-theme .card-header {
-  background-color: #20202a;
-  border-color: #181924;
+  background-color: #282933;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .card-header:first-child {
@@ -167,8 +173,8 @@ html:not([dir="rtl"]) .card-link + .card-link {
 }
 
 .c-dark-theme .card-footer {
-  background-color: #20202a;
-  border-color: #181924;
+  background-color: #282933;
+  border-color: rgba(255, 255, 255, 0.075);
 }
 
 .card-footer:last-child {
@@ -341,7 +347,7 @@ html:not([dir="rtl"]) .card-link + .card-link {
 }
 
 .c-dark-theme .card-header-icon-bg {
-  border-right: #181924;
+  border-right: rgba(255, 255, 255, 0.075);
 }
 
 .card-header-actions {
@@ -393,11 +399,11 @@ html:not([dir="rtl"]) .card-header-actions {
 }
 
 .c-dark-theme .card-accent-light {
-  border-top: 2px solid #20202a !important;
+  border-top: 2px solid #6c6e7e !important;
 }
 
 .c-dark-theme .card-accent-dark {
-  border-top: 2px solid #181924 !important;
+  border-top: 2px solid #0e0e15 !important;
 }
 
 .c-legacy-theme .card-accent-primary {

@@ -4,17 +4,19 @@
 // Dropdown menu container and contents.
 
 // Dark theme
+// scss-docs-start dropdowns-dark-theme
 $dropdown-color__dt:                $body-color__dt !default;
-$dropdown-bg__dt:                   $gray-200__dt !default;
+$dropdown-bg__dt:                   $bg-elevation-8 !default;
 $dropdown-border-color__dt:         $border-color__dt !default;
 $dropdown-divider-bg__dt:           $border-color__dt !default;
 $dropdown-link-color__dt:           $body-color__dt !default;
 $dropdown-link-hover-color__dt:     $body-color__dt !default;
-$dropdown-link-hover-bg__dt:        rgba($white, .1) !default;
+$dropdown-link-hover-bg__dt:        $bg-elevation-16 !default;
 $dropdown-link-active-color__dt:    $component-active-color__dt !default;
 $dropdown-link-active-bg__dt:       $component-active-bg__dt !default;
 $dropdown-link-disabled-color__dt:  rgba($body-color__dt, .6) !default;
 $dropdown-header-color__dt:         $body-color__dt !default;
+// scss-docs-end dropdowns-dark-theme
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $dropdown-theme-map: map-merge(
