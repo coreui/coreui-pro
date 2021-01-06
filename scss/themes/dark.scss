@@ -1,9 +1,131 @@
 @import "./../functions";
 @import "./../mixins";
+@import "./../variables";
 
-@import "dark/custom";
-@import "dark/variables";
+@mixin theme-variants($map, $state, $component) {
+  @each $name, $value in $map {
+    @if $value != null {
+      --#{$variable-prefix}#{$component}-#{$state}-#{$name}: #{$value};
+    }
+  }
+}
+
+@mixin theme-colors($map, $class) {
+  @each $name, $value in $map {
+    --#{$variable-prefix}#{$class}-#{$name}: #{$value};
+  }
+}
+
+@mixin theme($map, $component: null) {
+  @each $name, $value in $map {
+    @if $value != null {
+      @if type-of($value) != "map" {
+        --#{$variable-prefix}#{$name}: #{$value};
+      }
+      @else {
+        @include theme-variants($value, $name, $component);
+      }
+    }
+  }
+}
+
+@mixin theme3($map, $component: null) {
+  @each $name, $value in $map {
+    @if $value != null {
+      @if type-of($value) != "map" {
+        --#{$variable-prefix}#{$name}: #{$value};
+      }
+      @else {
+        @include theme-variants($value, $name, $component);
+      }
+    }
+  }
+}
+
+@mixin theme2($map) {
+  @each $name, $value in $map {
+    @if $name == "root" {
+      @include theme3($value, $name);
+    }
+    @else if $name == "utilities"{
+      @each $class, $variants in $value {
+        @include theme-colors($variants, $class);
+      }
+    }
+    @else {
+      .#{$name},
+      &.#{$name} {
+        @include theme3($value, $name);
+      }
+    }
+  }
+}
 
 .dark-theme {
-  @include css-vars();
+  @import "dark/custom";
+  @import "dark/variables";
+  @include theme2($theme-map);
+
+  // Reboot
+  // --#{$variable-prefix}body-color: #{$body-color-dt};
+  // --#{$variable-prefix}body-bg: #{$body-bg-dt};
+
+  // Link
+  // @include theme($link-theme-map);
+
+  // Background colors
+  // @include theme-colors($theme-colors-dt, "bg");
+
+  // // Text colors
+  // @include theme-colors($theme-colors-dt, "text");
+
+  // Alert
+  // .alert {
+  //   @include theme($alert-theme-variants-dt, "alert");
+  // }
+
+  // Breadcrumb
+  // .breadcrumb {
+  //   @include theme($breadcrumb-theme-map);
+  // }
+
+  // Buttons {
+  // .btn {
+  //   @include theme($button-theme-variants-dt, "btn");
+  // }
+
+  // // Card
+  // .card {
+  //   @include theme($card-theme-map);
+  // }
+
+  // Close
+  // .btn-close {
+  //   @include theme($close-theme-map);
+  // }
+
+  // Dropdown
+  // .dropdown {
+  //   @include theme($dropdown-theme-map);
+  // }
+
+  // List group
+  // .list-group {
+  //   @include theme($list-group-theme-map);
+  // }
+
+  // Popover
+  // .popover {
+  //   @include theme($popover-theme-map);
+  // }
+
+  // // Progress
+  // .progress {
+  //   @include theme($progress-theme-map);
+  // }
+
+  // // Toast
+  // .toast {
+  //   @include theme($toast-theme-map);
+  // }
 }
