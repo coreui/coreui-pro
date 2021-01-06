@@ -165,6 +165,63 @@ $footer-theme-map: (
   "footer-border-color":  $footer-dark-border-color-dt
 ) !default;
 
+// Forms
+
+
+// Buttons + Forms
+//
+// Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
+
+$input-color-dt:                     $body-color-dt !default;
+$input-bg-dt:                        rgba($white, .05) !default;
+$input-border-color-dt:              rgba($white, .09) !default;
+$input-focus-color-dt:               $body-color-dt !default;
+$input-focus-bg-dt:                  rgba($white, .05) !default;
+$input-focus-border-color-dt:        rgba($white, .2) !default;
+$input-disabled-bg-dt:               rgba($white, .1) !default;
+$input-placeholder-color-dt:         $medium-emphasis-dt !default;
+$input-plaintext-color-dt:           $body-color-dt !default;
+
+$input-group-addon-color-dt:         $body-color-dt !default;
+$input-group-addon-bg-dt:            rgba($white, .09) !default;
+$input-group-addon-border-color-dt:  rgba($white, .09) !default;
+
+$form-select-color-dt:               $input-color-dt !default;
+$form-select-bg-dt:                  $input-bg-dt !default;
+$form-select-border-color-dt:        $input-border-color-dt !default;
+$form-select-focus-border-color-dt:        $input-focus-border-color-dt !default;
+// $form-select-disabled-color-dt:         $input-disabled-color-dt !default;
+$form-select-disabled-bg-dt:            $input-disabled-bg-dt !default;
+// $form-select-disabled-border-color-dt:  $input-disabled-border-color-dt !default;
+
+$form-control-theme-map: (
+  "input-color":                     $input-color-dt,
+  "input-bg":                        $input-bg-dt,
+  "input-border-color":              $input-border-color-dt,
+  "input-focus-color":               $input-focus-color-dt,
+  "input-focus-bg":                  $input-focus-bg-dt,
+  "input-focus-border-color":        $input-focus-border-color-dt,
+  "input-disabled-bg":               $input-disabled-bg-dt,
+  "input-placeholder-color":         $input-placeholder-color-dt,
+  "input-plaintext-color":           $input-plaintext-color-dt
+) !default;
+
+$input-group-theme-map: (
+  "input-group-addon-color":         $input-group-addon-color-dt,
+  "input-group-addon-bg":            $input-group-addon-bg-dt,
+  "input-group-addon-border-color":  $input-group-addon-border-color-dt
+) !default;
+
+$form-select-theme-map: (
+  "form-select-color":                  $form-select-color-dt,
+  "form-select-bg":                     $form-select-bg-dt,
+  "form-select-border-color":           $form-select-border-color-dt,
+  "form-select-focus-border-color":     $form-select-focus-border-color-dt,
+  // "form-select-disabled-color":         $form-select-disabled-color-dt,
+  "form-select-disabled-bg":            $form-select-disabled-bg-dt,
+  // "form-select-disabled-border-color":  $form-select-disabled-border-color-dt,
+) !default;
+
 // Header
 
 $header-bg-dt:                     $bg-elevation-3 !default;
@@ -294,6 +351,45 @@ $nav-theme-map: (
   "nav-tabs-link-hover-border-color":   $nav-tabs-link-hover-border-color-dt
 ) !default;
 
+// Pagination
+// scss-docs-start pagination-variables
+
+$pagination-color-dt:                  $link-color-dt !default;
+$pagination-bg-dt:                     transparent !default;
+$pagination-border-color-dt:           $border-color-dt !default;
+
+$pagination-focus-color-dt:            $link-hover-color-dt !default;
+$pagination-focus-bg-dt:               $border-color-dt !default;
+
+$pagination-hover-color-dt:            $link-hover-color-dt !default;
+$pagination-hover-bg-dt:               $border-color-dt !default;
+$pagination-hover-border-color-dt:     $border-color-dt !default;
+
+$pagination-active-color-dt:           $component-active-color-dt !default;
+$pagination-active-bg-dt:              $component-active-bg-dt !default;
+$pagination-active-border-color-dt:    $pagination-active-bg-dt !default;
+
+$pagination-disabled-color-dt:         $disabled-dt !default;
+$pagination-disabled-bg-dt:            transparent !default;
+$pagination-disabled-border-color-dt:  $border-color-dt !default;
+
+$pagination-theme-map: (
+  "pagination-color":                  $pagination-color-dt,
+  "pagination-bg":                     $pagination-bg-dt,
+  "pagination-border-color":           $pagination-border-color-dt,
+  "pagination-focus-color":            $pagination-focus-color-dt,
+  "pagination-focus-bg":               $pagination-focus-bg-dt,
+  "pagination-hover-color":            $pagination-hover-color-dt,
+  "pagination-hover-bg":               $pagination-hover-bg-dt,
+  "pagination-hover-border-color":     $pagination-hover-border-color-dt,
+  "pagination-active-color":           $pagination-active-color-dt,
+  "pagination-active-bg-dt":           $pagination-active-bg-dt,
+  "pagination-active-border-color":    $pagination-active-border-color-dt,
+  "pagination-disabled-color":         $pagination-disabled-color-dt,
+  "pagination-disabled-bg":            $pagination-disabled-bg-dt,
+  "pagination-disabled-border-color":  $pagination-disabled-border-color-dt
+) !default;
+
 
 // Popovers
 
@@ -330,6 +426,34 @@ $progress-theme-map: (
   "progress-bar-color":  $progress-bar-color-dt
 ) !default;
 
+// Sidebar
+
+$sidebar-color-dt:                    $body-color-dt !default;
+$sidebar-bg-dt:                       $bg-elevation-3 !default;
+$sidebar-border-width-dt:             0 !default;
+$sidebar-border-color-dt:             transparent !default;
+$sidebar-brand-color-dt:              inherit !default;
+$sidebar-brand-bg-dt:                 rgba($black, .2) !default;
+$sidebar-footer-bg-dt:                rgba($black, .2) !default;
+$sidebar-header-bg-dt:                rgba($black, .2) !default;
+$sidebar-toggler-bg-dt:               rgba($black, .2) !default;
+$sidebar-toggler-hover-bg-dt:         rgba($black, .3) !default;
+// $sidebar-toggler-hover-indicator-dt:  !default;
+// $sidebar-toggler-indicator-dt:        !default;
+
+$sidebar-theme-map: (
+  "sidebar-color":             $sidebar-color-dt,
+  "sidebar-bg":                $sidebar-bg-dt,
+  "sidebar-border-width":      $sidebar-border-width-dt,
+  "sidebar-border-color":      $sidebar-border-color-dt,
+  "sidebar-brand-color":       $sidebar-brand-color-dt,
+  "sidebar-brand-bg":          $sidebar-brand-bg-dt,
+  "sidebar-footer-bg":         $sidebar-footer-bg-dt,
+  "sidebar-header-bg":         $sidebar-header-bg-dt,
+  "sidebar-toggler-bg":        $sidebar-toggler-bg-dt,
+  "sidebar-toggler-hover-bg":  $sidebar-toggler-hover-bg-dt
+) !default;
+
 
 // Toast
 
@@ -356,23 +480,28 @@ $toast-theme-map: (
 // --cui-tooltip-color
 
 $theme-map: (
-  "root":        map-merge($theme-body-dt, $link-theme-map),
+  "root":          map-merge($theme-body-dt, $link-theme-map),
   "utilities": (
-    "bg":        $theme-colors-dt,
-    "text":      $theme-colors-dt
+    "bg":          $theme-colors-dt,
+    "text":        $theme-colors-dt
   ),
-  "alert":       $alert-theme-variants-dt,
-  "breadcrumb":  $breadcrumb-theme-map,
-  "btn":         $button-theme-variants-dt,
-  "btn-close":   $close-theme-map,
-  "card":        $card-theme-map,
-  "dropdown":    $dropdown-theme-map,
-  "footer":      $footer-theme-map,
-  "header":      $header-theme-map,
-  "list-group":  map-merge($list-group-theme-map, $list-group-variants-dt),
-  "modal":       $modal-theme-map,
-  "nav":         $nav-theme-map,
-  "popover":     $popover-theme-map,
-  "progress":    $progress-theme-map,
-  "toast":       $toast-theme-map
+  "alert":         $alert-theme-variants-dt,
+  "breadcrumb":    $breadcrumb-theme-map,
+  "btn":           $button-theme-variants-dt,
+  "btn-close":     $close-theme-map,
+  "card":          $card-theme-map,
+  "dropdown":      $dropdown-theme-map,
+  "footer":        $footer-theme-map,
+  "form-control":  $form-control-theme-map,
+  "form-select":   $form-select-theme-map,
+  "header":        $header-theme-map,
+  "input-group":   $input-group-theme-map,
+  "list-group":    map-merge($list-group-theme-map, $list-group-variants-dt),
+  "modal":         $modal-theme-map,
+  "nav":           $nav-theme-map,
+  "pagination":    $pagination-theme-map,
+  "popover":       $popover-theme-map,
+  "progress":      $progress-theme-map,
+  "sidebar":       $sidebar-theme-map,
+  "toast":         $toast-theme-map
 ) !default;
