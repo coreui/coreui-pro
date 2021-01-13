@@ -1,6 +1,9 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v5.0.0-beta1): dom/manipulator.js
+ * CoreUI (v4.0.0-alpha.0): alert.js
+ * Licensed under MIT (https://coreui.io/license)
+ *
+ * This component is a modified version of the Bootstrap's  dom/manipulator.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -46,9 +49,9 @@ const Manipulator = {
     const attributes = {}
 
     Object.keys(element.dataset)
-      .filter(key => key.startsWith('bs'))
+      .filter(key => key.startsWith('coreui'))
       .forEach(key => {
-        let pureKey = key.replace(/^bs/, '')
+        let pureKey = key.replace(/^coreui/, '')
         pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1, pureKey.length)
         attributes[pureKey] = normalizeData(element.dataset[key])
       })

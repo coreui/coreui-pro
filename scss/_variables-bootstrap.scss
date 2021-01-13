@@ -1237,17 +1237,13 @@ $modal-scale-transform:             scale(1.02) !default;
 
 // Avatars
 // scss-docs-start avatar-variables
-$avatar-sm-width:         24px !default;
-$avatar-sm-status-width:  8px !default;
+$avatar-width:  2rem !default;
 
-$avatar-width:            36px !default;
-$avatar-status-width:     10px !default;
-
-$avatar-lg-width:         48px !default;
-$avatar-lg-status-width:  12px !default;
-
-$avatar-xl-width:         64px !default;
-$avatar-xl-status-width:  14px !default;
+$avatar-widths: (
+  sm: 1.5rem,
+  lg: 3rem,
+  xl: 4rem
+) !default;
 // scss-docs-end avatar-variables
 
 // Alerts
@@ -1335,7 +1331,7 @@ $list-group-variants: (
 
 // Header
 // scss-docs-start header-variables
-$header-height:                 56px !default;
+$header-min-height:             56px !default;
 $header-padding-y:              $spacer / 2 !default;
 $header-padding-x:              null !default;
 $header-brand-font-size:        $font-size-lg !default;
@@ -1375,7 +1371,7 @@ $header-divider-border-color:   $header-border-color !default;
 
 // Subheader
 // scss-docs-start subheader-variables
-$subheader-height:               48px !default;
+$subheader-min-height:           48px !default;
 $subheader-padding-y:            $spacer / 2 !default;
 $subheader-padding-x:            $spacer !default;
 $subheader-border-color:         $border-color !default;
@@ -1543,7 +1539,7 @@ $sidebar-toggler-hover-indicator:          str-replace(url("data:image/svg+xml;c
 
 // Footer
 // scss-docs-start footer-variables
-$footer-height:        50px !default;
+$footer-min-height:    50px !default;
 $footer-padding-y:     $spacer / 2 !default;
 $footer-padding-x:     $spacer !default;
 $footer-bg:            $gray-100 !default;

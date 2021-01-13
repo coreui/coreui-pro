@@ -1,7 +1,7 @@
 /*!
-  * Bootstrap manipulator.js v4.0.0-alpha.1 (https://bootstrap.coreui.io)
-  * Copyright 2011-2020 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  * CoreUI manipulator.js v4.0.0-alpha.0 (https://coreui.io)
+  * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Licensed under MIT (https://coreui.io)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -11,7 +11,10 @@
 
   /**
    * --------------------------------------------------------------------------
-   * Bootstrap (v5.0.0-beta1): dom/manipulator.js
+   * CoreUI (v4.0.0-alpha.0): alert.js
+   * Licensed under MIT (https://coreui.io/license)
+   *
+   * This component is a modified version of the Bootstrap's  dom/manipulator.js
    * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
    * --------------------------------------------------------------------------
    */
@@ -43,10 +46,10 @@
 
   var Manipulator = {
     setDataAttribute: function setDataAttribute(element, key, value) {
-      element.setAttribute("data-bs-" + normalizeDataKey(key), value);
+      element.setAttribute("data-coreui-" + normalizeDataKey(key), value);
     },
     removeDataAttribute: function removeDataAttribute(element, key) {
-      element.removeAttribute("data-bs-" + normalizeDataKey(key));
+      element.removeAttribute("data-coreui-" + normalizeDataKey(key));
     },
     getDataAttributes: function getDataAttributes(element) {
       if (!element) {
@@ -55,16 +58,16 @@
 
       var attributes = {};
       Object.keys(element.dataset).filter(function (key) {
-        return key.startsWith('bs');
+        return key.startsWith('coreui');
       }).forEach(function (key) {
-        var pureKey = key.replace(/^bs/, '');
+        var pureKey = key.replace(/^coreui/, '');
         pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1, pureKey.length);
         attributes[pureKey] = normalizeData(element.dataset[key]);
       });
       return attributes;
     },
     getDataAttribute: function getDataAttribute(element, key) {
-      return normalizeData(element.getAttribute("data-bs-" + normalizeDataKey(key)));
+      return normalizeData(element.getAttribute("data-coreui-" + normalizeDataKey(key)));
     },
     offset: function offset(element) {
       var rect = element.getBoundingClientRect();

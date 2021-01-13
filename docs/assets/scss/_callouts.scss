@@ -1,0 +1,41 @@
+//
+// Callouts
+//
+
+.docs-callout {
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid $gray-200;
+  border-left-width: .25rem;
+  @include border-radius();
+
+  h4 {
+    margin-bottom: .25rem;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  code {
+    @include border-radius();
+  }
+
+  + .docs-callout {
+    margin-top: -.25rem;
+  }
+}
+
+// Variations
+.docs-callout-info {
+  border-left-color: $bd-info;
+}
+
+.docs-callout-warning {
+  border-left-color: $bd-warning;
+}
+
+.docs-callout-danger {
+  border-left-color: $bd-danger;
+}

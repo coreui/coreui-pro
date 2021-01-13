@@ -1,0 +1,10 @@
+{{- /*
+  Usage: `callout "type"`,
+  where type is one of info (default), danger, warning
+*/ -}}
+
+{{- $css_class := .Get 0 | default "info" -}}
+
+<div class="docs-callout docs-callout-{{ $css_class }}">
+{{ .Inner | markdownify }}
+</div>
