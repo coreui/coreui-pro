@@ -114,6 +114,61 @@ $theme-colors: (
 ) !default;
 // scss-docs-end theme-colors-map
 
+// Gradients
+
+// scss-docs-start theme-gradients
+$primary-gradient: (
+  "start":  #321fdb,
+  "stop":   #1f1498
+) !default;
+
+$secondary-gradient: (
+  "start":  #c8d2dc,
+  "stop":    $white
+) !default;
+
+$light-gradient: (
+  "start":  #e3e8ed,
+  "stop":    $white
+) !default;
+
+$dark-gradient: (
+  "start":  #3c4b64,
+  "stop":   #212333
+) !default;
+
+$danger-gradient: (
+  "start":  #e55353,
+  "stop":   #d93737
+) !default;
+
+$warning-gradient: (
+  "start":  #f9b115,
+  "stop":   #f6960b
+) !default;
+
+$success-gradient: (
+  "start":  #2eb85c,
+  "stop":   #1b9e3e
+) !default;
+
+$info-gradient: (
+  "start":  #39f,
+  "stop":   #2982cc
+) !default;
+
+$theme-gradients: (
+  "primary":    $primary-gradient,
+  "secondary":  $secondary-gradient,
+  "success":    $success-gradient,
+  "info":       $info-gradient,
+  "warning":    $warning-gradient,
+  "danger":     $danger-gradient,
+  "light":      $light-gradient,
+  "dark":       $dark-gradient
+) !default;
+// scss-docs-end theme-gradients
+
 // Text colors
 $high-emphasis-dark:    rgba(shift-color($gray-base, +26), .87) !default;
 $medium-emphasis-dark:  rgba(shift-color($gray-base, +26), .6) !default;
@@ -853,6 +908,84 @@ $form-select-padding-y-lg:        $input-padding-y-lg !default;
 $form-select-padding-x-lg:        $input-padding-x-lg !default;
 $form-select-font-size-lg:        $input-font-size-lg !default;
 // scss-docs-end form-select-variables
+
+// scss-docs-start form-multi-select-variables
+$form-multi-select-height:                  $input-height !default;
+$form-multi-select-padding-y:               $input-padding-y !default;
+$form-multi-select-padding-x:               $input-padding-x !default;
+$form-multi-select-font-family:             $input-font-family !default;
+$form-multi-select-font-size:               $input-font-size !default;
+$form-multi-select-font-weight:             $input-font-weight !default;
+$form-multi-select-line-height:             $input-line-height !default;
+$form-multi-select-color:                   $input-color !default;
+$form-multi-select-disabled-color:          $gray-600 !default;
+$form-multi-select-bg:                      $input-bg !default;
+
+$form-multi-select-bg-position:             right $form-multi-select-padding-x center !default;
+$form-multi-select-bg-size:                 16px 12px !default; // In pixels because image dimensions
+$form-multi-select-disabled-bg:             $gray-200 !default;
+$form-multi-select-indicator-padding:       1rem !default; // Extra padding to account for the presence of the background-image based indicator
+$form-multi-select-indicator-color:         $gray-800 !default;
+$form-multi-select-indicator:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-multi-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>") !default;
+
+$form-multi-select-border-width:            $input-border-width !default;
+$form-multi-select-border-color:            $input-border-color !default;
+$form-multi-select-border-radius:           $border-radius !default;
+$form-multi-select-box-shadow:              inset 0 1px 2px rgba($black, .075) !default;
+
+$form-multi-select-focus-width:             $input-focus-width !default;
+$form-multi-select-focus-color:             $input-color !default;
+$form-multi-select-focus-bg:                $input-bg !default;
+$form-multi-select-focus-border-color:      shift-color($component-active-bg, -25) !default;
+$form-multi-select-focus-box-shadow:        0 0 0 $form-multi-select-focus-width $input-btn-focus-color !default;
+
+$form-multi-select-tag-height:         25px !default;
+$form-multi-select-tag-bg:             $light !default;
+$form-multi-select-tag-border-width:   $border-width !default;
+$form-multi-select-tag-border-color:   $border-color !default;
+$form-multi-select-tag-border-radius:  $border-radius !default;
+$form-multi-select-tag-padding-y:      0 !default;
+$form-multi-select-tag-padding-x:      .5rem !default;
+$form-multi-select-tag-margin:         2px !default;
+
+$form-multi-select-search-border-width:   $input-btn-border-width !default;
+$form-multi-select-search-color:          $input-color !default;
+$form-multi-select-search-bg:             $input-bg !default;
+$form-multi-select-search-border-color:   $input-border-color !default;
+$form-multi-select-search-border-radius:  $border-radius !default;
+
+$form-multi-select-options-padding-y:      .5rem !default;
+$form-multi-select-options-padding-x:      .75rem !default;
+$form-multi-select-options-margin-top:     .625rem !default;
+$form-multi-select-options-font-size:      $font-size-base !default;
+$form-multi-select-options-color:         $body-color !default;
+$form-multi-select-options-bg:            $white !default;
+$form-multi-select-options-border-color:  $border-color !default;
+$form-multi-select-options-border-width:   $border-width !default;
+$form-multi-select-options-border-radius:  $border-radius !default;
+
+$form-multi-select-optgroup-label-font-weight:  $font-weight-bold !default;
+
+$form-multi-select-option-padding-y:        .5rem !default;
+$form-multi-select-option-padding-x:        1.25rem !default;
+$form-multi-select-option-border-radius:    $border-radius !default;
+
+$form-multi-select-option-hover-color:     shift-color($gray-900, 5) !default;
+$form-multi-select-option-hover-bg:        $gray-100 !default;
+
+$form-multi-select-option-indicator-width:          1em !default;
+$form-multi-select-option-indicator-bg:             $form-check-input-bg !default;
+$form-multi-select-option-indicator-border:         $form-check-input-border !default;
+$form-multi-select-option-indicator-border-radius:  $border-radius !default;
+
+$form-multi-select-option-selected-bg:                      $light !default;
+$form-multi-select-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
+$form-multi-select-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
+$form-multi-select-option-selected-indicator-border-color:  $form-multi-select-option-selected-indicator-bg !default;
+
+$form-multi-select-option-disabled-color:  $gray-600 !default;
+
+// scss-docs-end form-multi-select-variables
 
 // scss-docs-start form-range-variables
 $form-range-track-width:          100% !default;

@@ -41,3 +41,8 @@
 @mixin gradient-striped($color: rgba($white, .15), $angle: 45deg) {
   background-image: linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent);
 }
+
+@mixin gradient($color, $value) {
+  background-color: var(--#{$variable-prefix}#{$color}, map-get($value, "stop"));
+  background-image: var(--#{$variable-prefix}#{$color}-gradient, linear-gradient(45deg, map-get($value, "start") 0%, map-get($value, "stop") 100%));
+}
