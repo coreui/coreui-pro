@@ -62,7 +62,7 @@
 }
 
 .dark-theme {
-  @import "dark/custom";
+  // @import "dark/custom";
   @import "dark/variables";
   @include theme2($theme-map);
 
