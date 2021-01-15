@@ -39,6 +39,11 @@ $utilities: map-merge(
         none: none,
       )
     ),
+    "elevation": (
+      property: box-shadow,
+      class: elevation,
+      values: $elevations
+    ),
     "position": (
       property: position,
       values: static relative absolute fixed sticky
