@@ -1,0 +1,45 @@
+@mixin theme-variants($map, $state, $component) {
+  @each $name, $value in $map {
+    @if $value != null {
+      --#{$variable-prefix}#{$component}-#{$state}-#{$name}: #{$value};
+    }
+  }
+}
+
+@mixin theme-colors($map, $class) {
+  @each $name, $value in $map {
+    --#{$variable-prefix}#{$class}-#{$name}: #{$value};
+  }
+}
+
+@mixin theme-components($map, $component: null) {
+  @each $name, $value in $map {
+    @if $value != null {
+      @if type-of($value) != "map" {
+        --#{$variable-prefix}#{$name}: #{$value};
+      }
+      @else {
+        @include theme-variants($value, $name, $component);
+      }
+    }
+  }
+}
+
+@mixin theme($map) {
+  @each $name, $value in $map {
+    @if $name == "root" {
+      @include theme-components($value, $name);
+    }
+    @else if $name == "utilities"{
+      @each $class, $variants in $value {
+        @include theme-colors($variants, $class);
+      }
+    }
+    @else {
+      .#{$name},
+      &.#{$name} {
+        @include theme-components($value, $name);
+      }
+    }
+  }
+}
