@@ -90,6 +90,34 @@
   }
 }
 
+//
+// Underline
+//
+
+.nav-underline {
+  border-bottom: $nav-underline-border-width solid var(--#{$variable-prefix}nav-underline-border-color, $nav-underline-border-color);
+
+  .nav-item {
+    margin-bottom: $nav-underline-border-width * -1;
+  }
+
+  .nav-link {
+    color: var(--#{$variable-prefix}nav-underline-link-color, $nav-underline-link-color);
+    border-bottom: $nav-underline-border-width solid transparent;
+
+    &:hover,
+    &:focus {
+      border-color: var(--#{$variable-prefix}nav-underline-link-active-border-color, $nav-underline-link-active-border-color);
+    }
+  }
+
+  .nav-link.active,
+  .show > .nav-link {
+    color: var(--#{$variable-prefix}nav-underline-link-active-color, $nav-underline-link-active-color);
+    background: transparent;
+    border-color: var(--#{$variable-prefix}nav-underline-link-active-border-color, $nav-underline-link-active-border-color);
+  }
+}
 
 //
 // Justified variants
