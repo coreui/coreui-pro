@@ -315,6 +315,7 @@ $enable-validation-icons:     true !default;
 $enable-negative-margins:     false !default;
 $enable-deprecation-messages: true !default;
 $enable-important-utilities:  true !default;
+$enable-elevations:  true !default;
 
 // Set mobile breakpoint
 
@@ -356,6 +357,25 @@ $position-values: (
   0: 0,
   50: 50%,
   100: 100%
+) !default;
+
+// Elevation
+//
+// Define common box shadows
+$elevation-base-color: 60, 75, 100 !default; //#3c4b64
+
+$elevations: (
+  0: unquote("none"),
+  1: unquote("0 1px 1px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 2px 1px -1px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 1px 3px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  2: unquote("0 2px 2px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 3px 1px -2px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 1px 5px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  3: unquote("0 3px 4px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 3px 3px -2px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 1px 8px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  4: unquote("0 4px 5px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 1px 10px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 2px 4px -1px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  6: unquote("0 6px 10px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 1px 18px 0 rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 3px 5px -1px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  8: unquote("0 8px 10px 1px rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 3px 14px 2px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 5px 5px -3px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  9: unquote("0 9px 12px 1px rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 3px 16px 2px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 5px 6px -3px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  12: unquote("0 12px 17px 2px rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 5px 22px 4px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 7px 8px -4px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  16: unquote("0 16px 24px 2px rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 6px 30px 5px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 8px 10px -5px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)"),
+  24: unquote("0 24px 38px 3px rgba(var(--elevation-base-color, #{$elevation-base-color}), .14), 0 9px 46px 8px rgba(var(--elevation-base-color, #{$elevation-base-color}), .12), 0 11px 15px -7px rgba(var(--elevation-base-color, #{$elevation-base-color}), .20)")
 ) !default;
 
 
@@ -1089,6 +1109,12 @@ $nav-tabs-link-active-border-color: $gray-300 $gray-300 $nav-tabs-link-active-bg
 $nav-pills-border-radius:           $border-radius !default;
 $nav-pills-link-active-color:       $component-active-color !default;
 $nav-pills-link-active-bg:          $component-active-bg !default;
+
+$nav-underline-border-color:              $gray-300 !default;
+$nav-underline-border-width:              $border-width * 2 !default;
+$nav-underline-link-color:                $gray-700 !default;
+$nav-underline-link-active-color:         $primary !default;
+$nav-underline-link-active-border-color:  $primary !default;
 // scss-docs-end nav-variables
 
 // Navbar
@@ -1738,6 +1764,45 @@ $sidebar-toggler-indicator:                str-replace(url("data:image/svg+xml;c
 $sidebar-toggler-hover-bg:                 rgba(0, 0, 0, .3) !default;
 $sidebar-toggler-hover-indicator-color:    $sidebar-nav-link-hover-color !default;
 $sidebar-toggler-hover-indicator:          str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-toggler-hover-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$sidebar-light-color:    $body-color !default;
+$sidebar-light-bg:       $white !default;
+$sidebar-light-border-width:                     0 !default;
+$sidebar-light-border-color:                     transparent !default;
+
+$sidebar-light-brand-color:  $white !default;
+$sidebar-light-brand-bg:     $primary !default;
+
+$sidebar-light-header-bg: rgba($black, .2) !default;
+
+$sidebar-light-nav-title-color:                  $medium-emphasis-dark !default;
+
+$sidebar-light-nav-link-color:                   $medium-emphasis-dark !default;
+$sidebar-light-nav-link-bg:                      transparent !default;
+$sidebar-light-nav-link-icon-color:              $medium-emphasis-dark !default;
+
+$sidebar-light-nav-link-hover-color:             $high-emphasis-dark !default;
+$sidebar-light-nav-link-hover-bg:                theme-color("primary") !default;
+$sidebar-light-nav-link-hover-icon-color:        $high-emphasis-dark !default;
+
+$sidebar-light-nav-link-active-color:            $high-emphasis-dark !default;
+$sidebar-light-nav-link-active-bg:               rgba($white, .05) !default;
+$sidebar-light-nav-link-active-icon-color:       $high-emphasis-dark !default;
+
+$sidebar-light-nav-link-disabled-color:          $disabled-dark !default;
+$sidebar-light-nav-link-disabled-icon-color:     $sidebar-light-nav-link-icon-color !default;
+
+$sidebar-light-nav-group-bg:                     rgba(0, 0, 0, .2) !default;
+$sidebar-light-nav-group-toggle-show-color:      $sidebar-light-nav-link-color !default;
+
+$sidebar-light-nav-group-indicator-color:        $medium-emphasis-dark !default;
+$sidebar-light-nav-group-indicator:              str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-group-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+$sidebar-light-nav-group-indicator-hover-color:  $sidebar-light-nav-link-hover-color !default;
+$sidebar-light-nav-group-indicator-hover:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-nav-group-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E"), "#", "%23") !default;
+
+$sidebar-light-footer-bg:                        rgba($black, .2) !default;
+
+$sidebar-light-toggler-bg:                       rgba($black, .2) !default;
 // scss-docs-end sidebar-variables
 
 // Footer
