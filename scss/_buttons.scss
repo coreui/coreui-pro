@@ -18,10 +18,12 @@
   border: $btn-border-width solid transparent;
   @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-border-radius);
   @include transition($btn-transition);
+  @include elevation(1, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']"));
 
   &:hover {
     color: var(--#{$variable-prefix}body-color, $body-color);
     text-decoration: if($link-hover-decoration == underline, none, null);
+    @include elevation(2, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']"));
   }
 
   .btn-check:focus + &,

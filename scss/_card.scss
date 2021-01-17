@@ -13,6 +13,7 @@
   background-clip: border-box;
   border: $card-border-width solid var(--#{$variable-prefix}card-border-color, $card-border-color);
   @include border-radius($card-border-radius);
+  @include elevation(1);
 
   > hr {
     margin-right: 0;
