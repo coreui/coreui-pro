@@ -234,6 +234,10 @@ class MultiSelect extends BaseComponent {
     return config
   }
 
+  _getClassNames() {
+    return [...this._element.classList.value.split(' ')]
+  }
+
   _getOptions(node = this._element) {
     if (this._config.options) {
       return this._config.options
@@ -334,6 +338,10 @@ class MultiSelect extends BaseComponent {
   _createSelect() {
     const div = document.createElement('div')
     div.classList.add(CLASS_NAME_SELECT)
+
+    this._getClassNames().forEach(className => {
+      div.classList.add(className)
+    })
 
     if (this._config.multiple) {
       div.classList.add(CLASS_NAME_SELECT_MULTIPLE)
