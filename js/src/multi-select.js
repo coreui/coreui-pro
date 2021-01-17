@@ -114,10 +114,9 @@ class MultiSelect extends BaseComponent {
     this._optionsElement = null
     this._config = this._getConfig(config)
     this._clone = null
-    this._optionss = this._getOptions()
+    this._options = this._getOptions()
     this._search = ''
-    this._selection = this._getSelectedOptions(this._optionss)
-    this._options = {}
+    this._selection = this._getSelectedOptions(this._options)
 
     if (this._config.options.length > 0) {
       this._createNativeSelect(this._config.options)
@@ -251,7 +250,7 @@ class MultiSelect extends BaseComponent {
       if (node.nodeName === 'OPTION') {
         options.push({
           value: node.value,
-          text: node.outerText,
+          text: node.innerHTML,
           selected: node.selected
         })
       }
@@ -406,7 +405,7 @@ class MultiSelect extends BaseComponent {
     div.classList.add(CLASS_NAME_OPTIONS)
     this._clone.append(div)
 
-    this._createOptions(div, this._optionss)
+    this._createOptions(div, this._options)
     this._optionsElement = div
   }
 
