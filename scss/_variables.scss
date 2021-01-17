@@ -930,7 +930,7 @@ $form-select-font-size-lg:        $input-font-size-lg !default;
 // scss-docs-end form-select-variables
 
 // scss-docs-start form-multi-select-variables
-$form-multi-select-height:                  $input-height !default;
+// $form-multi-select-height:                  $input-height !default;
 $form-multi-select-padding-y:               $input-padding-y !default;
 $form-multi-select-padding-x:               $input-padding-x !default;
 $form-multi-select-font-family:             $input-font-family !default;
@@ -959,14 +959,17 @@ $form-multi-select-focus-bg:                $input-bg !default;
 $form-multi-select-focus-border-color:      shift-color($component-active-bg, -25) !default;
 $form-multi-select-focus-box-shadow:        0 0 0 $form-multi-select-focus-width $input-btn-focus-color !default;
 
-$form-multi-select-tag-height:         25px !default;
+$form-multi-select-selection-tags-padding-y:  .125rem !default;
+$form-multi-select-selection-tags-padding-x:  .125rem !default;
+
 $form-multi-select-tag-bg:             $light !default;
 $form-multi-select-tag-border-width:   $border-width !default;
 $form-multi-select-tag-border-color:   $border-color !default;
 $form-multi-select-tag-border-radius:  $border-radius !default;
-$form-multi-select-tag-padding-y:      0 !default;
+$form-multi-select-tag-margin-y:       .125rem !default;
+$form-multi-select-tag-margin-x:       .125rem !default;
+$form-multi-select-tag-padding-y:      subtract(($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y - $form-multi-select-tag-margin-y), $form-multi-select-tag-border-width) !default;
 $form-multi-select-tag-padding-x:      .5rem !default;
-$form-multi-select-tag-margin:         2px !default;
 
 $form-multi-select-search-border-width:   $input-btn-border-width !default;
 $form-multi-select-search-color:          $input-color !default;
@@ -978,9 +981,9 @@ $form-multi-select-options-padding-y:      .5rem !default;
 $form-multi-select-options-padding-x:      .75rem !default;
 $form-multi-select-options-margin-top:     .625rem !default;
 $form-multi-select-options-font-size:      $font-size-base !default;
-$form-multi-select-options-color:         $body-color !default;
-$form-multi-select-options-bg:            $white !default;
-$form-multi-select-options-border-color:  $border-color !default;
+$form-multi-select-options-color:          $body-color !default;
+$form-multi-select-options-bg:             $white !default;
+$form-multi-select-options-border-color:   $border-color !default;
 $form-multi-select-options-border-width:   $border-width !default;
 $form-multi-select-options-border-radius:  $border-radius !default;
 
@@ -1005,6 +1008,25 @@ $form-multi-select-option-selected-indicator-border-color:  $form-multi-select-o
 
 $form-multi-select-option-disabled-color:  $gray-600 !default;
 
+$form-multi-select-padding-y-lg:                 $input-padding-y-lg !default;
+$form-multi-select-padding-x-lg:                 $input-padding-x-lg !default;
+$form-multi-select-font-size-lg:                 $input-font-size-lg !default;
+$form-multi-select-selection-tags-padding-y-lg:  .125rem !default;
+$form-multi-select-selection-tags-padding-x-lg:  .125rem !default;
+$form-multi-select-tag-margin-y-lg:              .125rem !default;
+$form-multi-select-tag-margin-x-lg:              .125rem !default;
+$form-multi-select-tag-padding-y-lg:             subtract(($form-multi-select-padding-y-lg - $form-multi-select-selection-tags-padding-y-lg - $form-multi-select-tag-margin-y-lg), $form-multi-select-tag-border-width) !default;
+$form-multi-select-tag-padding-x-lg:             .5rem !default;
+
+$form-multi-select-padding-y-sm:                 $input-padding-y-sm !default;
+$form-multi-select-padding-x-sm:                 $input-padding-x-sm !default;
+$form-multi-select-font-size-sm:                 $input-font-size-sm !default;
+$form-multi-select-selection-tags-padding-y-sm:  .0675rem !default;
+$form-multi-select-selection-tags-padding-x-sm:  .0675rem !default;
+$form-multi-select-tag-margin-y-sm:              .0675rem !default;
+$form-multi-select-tag-margin-x-sm:              .0675rem !default;
+$form-multi-select-tag-padding-y-sm:             subtract(($form-multi-select-padding-y-sm - $form-multi-select-selection-tags-padding-y-sm - $form-multi-select-tag-margin-y-sm), $form-multi-select-tag-border-width) !default;
+$form-multi-select-tag-padding-x-sm:             .5rem !default;
 // scss-docs-end form-multi-select-variables
 
 // scss-docs-start form-range-variables
