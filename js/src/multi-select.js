@@ -80,8 +80,7 @@ const Default = {
   searchPlaceholder: 'Select...',
   selection: true,
   selectionType: 'counter',
-  selectionTypeCounterText: 'item(s) selected',
-  selected: []
+  selectionTypeCounterText: 'item(s) selected'
 }
 
 const DefaultType = {
@@ -93,8 +92,7 @@ const DefaultType = {
   searchPlaceholder: 'string',
   selection: 'boolean',
   selectionType: 'string',
-  selectionTypeCounterText: 'string',
-  selected: 'array'
+  selectionTypeCounterText: 'string'
 }
 
 /**
@@ -107,7 +105,6 @@ class MultiSelect extends BaseComponent {
   constructor(element, config) {
     super(element)
 
-    this._element = element
     this._selectionElement = null
     this._selectionCleanerElement = null
     this._searchElement = null
@@ -143,10 +140,6 @@ class MultiSelect extends BaseComponent {
 
   // Public
 
-  update(config) { // public method
-    this._getConfig(config)
-  }
-
   show() {
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._clone.classList.add(CLASS_NAME_SHOW)
@@ -168,6 +161,21 @@ class MultiSelect extends BaseComponent {
     this._search = text.length > 0 ? text.toLowerCase() : text
     this._filterOptionsList()
     EventHandler.trigger(this._element, EVENT_SEARCH)
+  }
+
+  update(config) {
+    this._config = this._getConfig(config)
+    this._options = this._getOptions()
+    this._selection = this._getSelectedOptions(this._options)
+    this._clone.remove()
+    this._element.innerHTML = ''
+    this._createNativeOptions(this._element, this._options)
+    this._createSelect()
+    this._addEventListeners()
+  }
+
+  getValue() {
+    return this._selection
   }
 
   // Private
@@ -215,20 +223,13 @@ class MultiSelect extends BaseComponent {
     })
   }
 
-  _getConfig(config, update) {
-    if (update !== true) {
-      config = {
-        ...this.constructor.Default,
-        ...Manipulator.getDataAttributes(this._element),
-        ...config
-      }
+  _getConfig(config) {
+    config = {
+      ...Default,
+      ...Manipulator.getDataAttributes(this._element),
+      ...config
     }
-
-    typeCheckConfig(
-      NAME,
-      config,
-      this.constructor.DefaultType
-    )
+    typeCheckConfig(NAME, config, DefaultType)
 
     return config
   }
@@ -304,7 +305,7 @@ class MultiSelect extends BaseComponent {
 
     this._createNativeOptions(select, data)
 
-    this._element.parentNode.replaceChild(select, this._element)
+    this._element.replaceWith(select)
     this._element = select
   }
 
@@ -320,7 +321,7 @@ class MultiSelect extends BaseComponent {
         const opt = document.createElement('OPTION')
         opt.value = option.value
         if (option.selected === true) {
-          opt.selected = true
+          opt.setAttribute('selected', 'selected')
         }
 
         opt.innerHTML = option.text
@@ -732,9 +733,19 @@ class MultiSelect extends BaseComponent {
 
   // Static
 
-  static _multiSelectInterface(element, config) {
+  static multiSelectInterface(element, config) {
     let data = Data.getData(element, DATA_KEY)
-    const _config = typeof config === 'object' && config
+    let _config = {
+      ...Default,
+      ...Manipulator.getDataAttributes(element)
+    }
+
+    if (typeof config === 'object') {
+      _config = {
+        ..._config,
+        ...config
+      }
+    }
 
     if (!data) {
       data = new MultiSelect(element, _config)
@@ -751,25 +762,7 @@ class MultiSelect extends BaseComponent {
 
   static jQueryInterface(config) {
     return this.each(function () {
-      let data = Data.getData(this, DATA_KEY)
-
-      if (!data) {
-        data = new MultiSelect(this)
-      }
-
-      // eslint-disable-next-line default-case
-      switch (config) {
-        // case 'update':
-        //   data[config](this, par)
-        //   break
-        case 'dispose':
-        case 'open':
-        case 'close':
-        case 'search':
-        case 'value':
-          data[config](this)
-          break
-      }
+      MultiSelect.multiSelectInterface(this, config)
     })
   }
 
@@ -816,11 +809,14 @@ class MultiSelect extends BaseComponent {
  * ------------------------------------------------------------------------
  */
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  // eslint-disable-next-line unicorn/prefer-spread
-  Array.from(document.querySelectorAll(SELECTOR_SELECT)).forEach(element => {
-    MultiSelect._multiSelectInterface(element)
-  })
+  SelectorEngine.find(SELECTOR_SELECT)
+    .forEach(ms => {
+      if (ms.tabIndex !== -1) {
+        MultiSelect.multiSelectInterface(ms)
+      }
+    })
 })
+
 EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 
