@@ -148,7 +148,7 @@ Takes the basic nav from above and adds the `.nav-tabs` class to generate a tabb
 
 ### Underline { .include-in-pro }
 
-Takes the basic nav from above and adds the `.nav-underline` class to generate links with underline. Use them to create tabbable regions with our [tab JavaScript plugin](#javascript-behavior).
+Takes the basic nav from above and adds the `.nav-underline` class to generate links with an underline. Use them to create tabbable regions with our [tab JavaScript plugin](#javascript-behavior).
 
 {{< example >}}
 <ul class="nav nav-underline">
