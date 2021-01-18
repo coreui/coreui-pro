@@ -49,14 +49,12 @@ Similar to the contextual text color classes, easily set the background of an el
 
 ## Background gradient
 
-By adding a `.bg-gradient` class, a linear gradient is added as background image to the backgrounds. This gradient starts with a semi-transparent white which fades out to the bottom.
-
-Do you need a gradient in your custom CSS? Just add `background-image: var(--coreui-gradient);`.
+By adding a `.bg-{color}-gradient` class, a linear gradient is added as background image to the backgrounds.
 
 {{< markdown >}}
 {{< colors.inline >}}
 {{- range (index $.Site.Data "theme-colors") }}
-<div class="p-3 mb-2 bg-{{ .name }} bg-gradient{{ with .contrast_color }} text-{{ . }}{{ else }} text-white{{ end }}">.bg-{{ .name }}.bg-gradient</div>
+<div class="p-3 mb-2 bg-{{ .name }}-gradient{{ with .contrast_color }} text-{{ . }}{{ else }} text-white{{ end }}">.bg-{{ .name }}-gradient</div>
 {{- end -}}
 {{< /colors.inline >}}
 {{< /markdown >}}
