@@ -105,7 +105,7 @@
   top: 100%;
   left: 0;
   display: none; // none by default, but block on "open" of the menu
-  float: left;
+  // float: left;
   width: 100%;
   padding: $form-multi-select-options-padding-y $form-multi-select-options-padding-x;
   margin-top: $form-multi-select-options-margin-top;
