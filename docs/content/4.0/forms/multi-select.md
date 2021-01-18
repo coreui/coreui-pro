@@ -6,6 +6,84 @@ group: forms
 toc: true
 ---
 
+## Available styles
+
+### Dropdown
+
+{{< example >}}
+<select class="form-multi-select" data-coreui-search="true" data-coreui-selection-type="tags">
+  <option value="0">enhancement</option>
+  <option value="1">bug</option>
+  <option value="2">duplicate</option>
+  <option value="3">invalid</option>
+  <optgroup label="group">
+    <option value="4">enhancement2</option>
+    <option value="5">bug2</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+### Inline
+
+{{< example >}}
+<select class="form-multi-select" data-coreui-inline="true" data-coreui-search="true" data-coreui-selection-type="tags">
+  <option value="0">enhancement</option>
+  <option value="1">bug</option>
+  <option value="2">duplicate</option>
+  <option value="3">invalid</option>
+  <optgroup label="group">
+    <option value="4">enhancement2</option>
+    <option value="5">bug2</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+## Selection types
+### Text
+
+{{< example >}}
+<select class="form-multi-select" id="multiple-select-text" data-coreui-search="true">
+  <option value="0">enhancement</option>
+  <option value="1">bug</option>
+  <option value="2">duplicate</option>
+  <option value="3">invalid</option>
+  <optgroup label="group">
+    <option value="4">enhancement2</option>
+    <option value="5">bug2</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+### Tag
+
+{{< example >}}
+<select class="form-multi-select" id="multiple-select-tag" data-coreui-selection-type="tags" data-coreui-search="true">
+  <option value="0">enhancement</option>
+  <option value="1">bug</option>
+  <option value="2">duplicate</option>
+  <option value="3">invalid</option>
+  <optgroup label="group">
+    <option value="4">enhancement2</option>
+    <option value="5">bug2</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+### Counter
+
+{{< example >}}
+<select class="form-multi-select" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
+  <option value="0">enhancement</option>
+  <option value="1">bug</option>
+  <option value="2">duplicate</option>
+  <option value="3">invalid</option>
+  <optgroup label="group">
+    <option value="4">enhancement2</option>
+    <option value="5">bug2</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
 ## Single Select
 
 {{< example >}}
@@ -21,110 +99,239 @@ toc: true
 </select>
 {{< /example >}}
 
-## Multiple Select - text selection
-
-{{< example >}}
-<select class="form-multi-select" id="multiple-select-text" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
-  </optgroup>
-</select>
-{{< /example >}}
-
-## Multiple Select - tag selection
-
-{{< example >}}
-<select class="form-multi-select" id="multiple-select-tag" data-coreui-selection-type="tags" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
-  </optgroup>
-</select>
-{{< /example >}}
-
-## Multiple Select - counter selection
-
-{{< example >}}
-<select class="form-multi-select" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
-  </optgroup>
-</select>
-{{< /example >}}
-
 ## Sizing
 
-You may also choose from small and large custom selects to match our similarly sized text inputs.
+You may also choose from small and large multi selects to match our similarly sized text inputs.
 
 {{< example >}}
-<select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-  <option selected>Open this select menu</option>
-  <option value="1">One</option>
-  <option value="2">Two</option>
-  <option value="3">Three</option>
-</select>
-
-<select class="form-select form-select-sm" aria-label=".form-select-sm example">
-  <option selected>Open this select menu</option>
-  <option value="1">One</option>
-  <option value="2">Two</option>
-  <option value="3">Three</option>
-</select>
+<div class="row">
+  <div class="col-md-6">
+    <select class="form-multi-select form-multi-select-lg mb-3" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
+      <option value="0">enhancement</option>
+      <option value="1">bug</option>
+      <option value="2">duplicate</option>
+      <option value="3">invalid</option>
+      <optgroup label="group">
+        <option value="4">enhancement2</option>
+        <option value="5">bug2</option>
+      </optgroup>
+    </select>
+    <select class="form-multi-select form-multi-select-sm" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
+      <option value="0">enhancement</option>
+      <option value="1">bug</option>
+      <option value="2">duplicate</option>
+      <option value="3">invalid</option>
+      <optgroup label="group">
+        <option value="4">enhancement2</option>
+        <option value="5">bug2</option>
+      </optgroup>
+    </select>
+  </div>
+  <div class="col-md-6">
+    <select class="form-multi-select form-multi-select-lg mb-3" id="multiple-select-counter" data-coreui-selection-type="tags" data-coreui-search="true">
+      <option value="0">enhancement</option>
+      <option value="1">bug</option>
+      <option value="2">duplicate</option>
+      <option value="3">invalid</option>
+      <optgroup label="group">
+        <option value="4">enhancement2</option>
+        <option value="5">bug2</option>
+      </optgroup>
+    </select>
+    <select class="form-multi-select form-multi-select-sm" id="multiple-select-counter" data-coreui-selection-type="tags" data-coreui-search="true">
+      <option value="0">enhancement</option>
+      <option value="1">bug</option>
+      <option value="2">duplicate</option>
+      <option value="3">invalid</option>
+      <optgroup label="group">
+        <option value="4">enhancement2</option>
+        <option value="5">bug2</option>
+      </optgroup>
+    </select>
+  </div>
+</div>
 {{< /example >}}
 
-The `multiple` attribute is also supported:
+## Usage
 
-{{< example >}}
-<select class="form-select" multiple aria-label="multiple select example">
-  <option selected>Open this select menu</option>
-  <option value="1">One</option>
-  <option value="2">Two</option>
-  <option value="3">Three</option>
-</select>
-{{< /example >}}
+### Options
 
-As is the `size` attribute:
+Options can be passed via data attributes or JavaScript. For data attributes, append the option name to data-coreui-, as in data-coreui-inline="".
 
-{{< example >}}
-<select class="form-select" size="3" aria-label="size 3 select example">
-  <option selected>Open this select menu</option>
-  <option value="1">One</option>
-  <option value="2">Two</option>
-  <option value="3">Three</option>
-</select>
-{{< /example >}}
+<table class="table">
+  <thead>
+    <tr>
+      <th style="width: 100px;">Name</th>
+      <th style="width: 100px;">Type</th>
+      <th style="width: 120px;">Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>inline</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>multiple</code></td>
+      <td>boolean</td>
+      <td><code>true</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>options</code></td>
+      <td>(boolean|array)</td>
+      <td><code>false</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>optionsEmptyPlaceholder</code></td>
+      <td>string</td>
+      <td><code>'no items'</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>search</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>searchPlaceholder</code></td>
+      <td>string</td>
+      <td><code>'Select...'</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>selection</code></td>
+      <td>boolean</td>
+      <td><code>true</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>selectionType</code></td>
+      <td>string</td>
+      <td><code>'counter'</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>selectionTypeCounterText</code></td>
+      <td>string</td>
+      <td><code>'item(s) selected'</code></td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
 
-## Disabled
+### Methods
 
-Add the `disabled` boolean attribute on a select to give it a grayed out appearance and remove pointer events.
+<table class="table">
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>show</code></td>
+      <td>
+        Shows the multi select's options.
+      </td>
+    </tr>
+    <tr>
+      <td><code>hide</code></td>
+      <td>
+        Hides the multi select's options.
+      </td>
+    </tr>
+    <tr>
+      <td><code>update</code></td>
+      <td>
+        Updates the configuration of multi select.
+      </td>
+    </tr>
+    <tr>
+      <td><code>dispose</code></td>
+      <td>
+        Destroys an element's multi select. (Removes stored data on the DOM element)
+      </td>
+    </tr>
+    <tr>
+      <td><code>getInstance</code></td>
+      <td>
+        Static method which allows you to get the multi select instance associated with a DOM element.
+      </td>
+    </tr>
+    <tr>
+      <td><code>getValue</code></td>
+      <td>
+        Returns the array with selected elements.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
-{{< example >}}
-<select class="form-select" aria-label="Disabled select example" disabled>
-  <option selected>Open this select menu</option>
-  <option value="1">One</option>
-  <option value="2">Two</option>
-  <option value="3">Three</option>
-</select>
-{{< /example >}}
+### Events
+
+Multi Select component exposes a few events for hooking into multi select functionality.
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>show.coreui.multi-select</code>
+      </td>
+      <td>
+        Fires immediately when the show instance method is called.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>shown.coreui.multi-select</code>
+      </td>
+      <td>
+        Fired when the multi select options have been made visible to the user and CSS transitions have completed.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>hide.coreui.multi-select</code>
+      </td>
+      <td>
+        Fires immediately when the hide instance method has been called.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>hidden.coreui.multi-select</code>
+      </td>
+      <td>
+        Fired when the multi select options have finished being hidden from the user and CSS transitions have completed.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+```js
+var myMutliSelect = document.getElementById('myMutliSelect')
+myMutliSelect.addEventListener('show.coreui.multi-select', function () {
+  // do something...
+})
+```
 
 ## Customizing
 
 ### SASS
-{{< scss-docs name="form-select-variables" file="scss/_variables.scss" >}}
+{{< scss-docs name="form-multi-select-variables" file="scss/_variables.scss" >}}
 
 ### CSS Vars
-{{< css-vars-docs file="scss/forms/_form-select.scss" >}}
+{{< css-vars-docs file="scss/forms/_form-multi-select.scss" >}}
