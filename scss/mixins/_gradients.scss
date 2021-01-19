@@ -44,5 +44,5 @@
 
 @mixin gradient($color, $value) {
   background-color: var(--#{$variable-prefix}#{$color}, map-get($value, "stop"));
-  background-image: var(--#{$variable-prefix}#{$color}-gradient, linear-gradient(45deg, map-get($value, "start") 0%, map-get($value, "stop") 100%));
+  background-image: linear-gradient(45deg, var(--#{$variable-prefix}#{$color}-start, map-get($value, "start")) 0%, var(--#{$variable-prefix}#{$color}-stop, map-get($value, "stop") 100%));
 }

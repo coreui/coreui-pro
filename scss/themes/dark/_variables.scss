@@ -33,6 +33,61 @@ $theme-colors-dt: (
 ) !default;
 // fusv-enable
 
+// Gradients
+
+// scss-docs-start theme-gradients
+$primary-gradient-dt: (
+  "start":  desaturate(#321fdb, 20%),
+  "stop":   desaturate(#1f1498, 20%)
+) !default;
+
+$secondary-gradient-dt: (
+  "start":  desaturate(#c8d2dc, 20%),
+  "stop":    desaturate($white, 20%)
+) !default;
+
+$light-gradient-dt: (
+  "start":  desaturate(#e3e8ed, 20%),
+  "stop":    desaturate($white, 20%)
+) !default;
+
+$dark-gradient-dt: (
+  "start":  desaturate(#3c4b64, 20%),
+  "stop":   desaturate(#212333, 20%)
+) !default;
+
+$danger-gradient-dt: (
+  "start":  desaturate(#e55353, 20%),
+  "stop":   desaturate(#d93737, 20%)
+) !default;
+
+$warning-gradient-dt: (
+  "start":  desaturate(#f9b115, 20%),
+  "stop":   desaturate(#f6960b, 20%)
+) !default;
+
+$success-gradient-dt: (
+  "start":  desaturate(#2eb85c, 20%),
+  "stop":   desaturate(#1b9e3e, 20%)
+) !default;
+
+$info-gradient-dt: (
+  "start":  desaturate(#39f, 20%),
+  "stop":   desaturate(#2982cc, 20%)
+) !default;
+
+$theme-gradients-dt: (
+  "primary":    $primary-gradient-dt,
+  "secondary":  $secondary-gradient-dt,
+  "success":    $success-gradient-dt,
+  "info":       $info-gradient-dt,
+  "warning":    $warning-gradient-dt,
+  "danger":     $danger-gradient-dt,
+  "light":      $light-gradient-dt,
+  "dark":       $dark-gradient-dt
+) !default;
+// scss-docs-end theme-gradients
+
 $high-emphasis-dt:    rgba($white, .87) !default;
 $medium-emphasis-dt:  rgba($white, .6) !default;
 $disabled-dt:         rgba($white, .38) !default;
@@ -43,10 +98,12 @@ $disabled-dt:         rgba($white, .38) !default;
 
 $body-bg-dt:                   $bg-elevation-0 !default;
 $body-color-dt:                $high-emphasis-dt !default;
+$elevation-base-color-dt:      0, 0, 0 !default;
 
 $theme-body-dt: (
   "body-bg": $body-bg-dt,
-  "body-color": $body-color-dt
+  "body-color": $body-color-dt,
+  "elevation-base-color": $elevation-base-color-dt
 ) !default;
 
 // Components
@@ -235,6 +292,7 @@ $header-brand-hover-color-dt:      $header-active-color-dt !default;
 $header-toggler-icon-bg-dt:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-color-dt}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
 $header-toggler-hover-icon-bg-dt:  str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-hover-color-dt}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
 $header-toggler-border-color-dt:   rgba($white, .1) !default;
+$header-divider-border-color-dt:   rgba($white, .1) !default;
 
 $header-theme-map: (
   "header-bg":                     $header-bg-dt,
@@ -247,7 +305,8 @@ $header-theme-map: (
   "header-brand-hover-color":      $header-brand-hover-color-dt,
   "header-toggler-icon-bg":        $header-toggler-icon-bg-dt,
   "header-toggler-hover-icon-bg":  $header-toggler-hover-icon-bg-dt,
-  "header-toggler-border-color":   $header-toggler-border-color-dt
+  "header-toggler-border-color":   $header-toggler-border-color-dt,
+  "header-divider-border-color":    $header-divider-border-color-dt
 ) !default;
 
 // Links

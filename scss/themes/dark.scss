@@ -2,7 +2,20 @@
 @import "./../mixins";
 @import "./../variables";
 
+
 .dark-theme {
   @import "dark/variables";
+
+  // Colors
+  @each $color, $value in $theme-colors-dt {
+    --#{$variable-prefix}#{$color}: #{$value};
+  }
+
+  // Gradients
+  @each $color, $map in $theme-gradients-dt {
+    --#{$variable-prefix}#{$color}-start: #{map-get($map, "start")};
+    --#{$variable-prefix}#{$color}-stop: #{map-get($map, "stop")};
+  }
+
   @include theme($theme-map);
 }
