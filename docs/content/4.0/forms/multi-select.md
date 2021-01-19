@@ -156,7 +156,7 @@ You may also choose from small and large multi selects to match our similarly si
 
 ### Options
 
-Options can be passed via data attributes or JavaScript. For data attributes, append the option name to data-coreui-, as in data-coreui-inline="".
+Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-inline=""`.
 
 <table class="table">
   <thead>
