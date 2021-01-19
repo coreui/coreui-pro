@@ -29,23 +29,19 @@ import BaseComponent from './base-component'
 const NAME = 'loading-button'
 const DATA_KEY = 'coreui.loading-button'
 const EVENT_KEY = `.${DATA_KEY}`
-// const DATA_API_KEY = '.data-api'
 
 const MAX_PERCENT = 100
 const MILLISECONDS = 10
 const PROGRESS_BAR_BG_COLOR_LIGHT = 'rgba(255, 255, 255, .2)'
 const PROGRESS_BAR_BG_COLOR_DARK = 'rgba(0, 0, 0, .2)'
 
-// const SELECTOR_COMPONENT = '[data-coreui="loading-button"]'
-
 const EVENT_START = `start${EVENT_KEY}`
 const EVENT_STOP = `stop${EVENT_KEY}`
 const EVENT_COMPLETE = `complete${EVENT_KEY}`
-// const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_LOADING_BUTTON_LOADING = 'loading-button-loading'
-const CLASS_NAME_LOADING_BUTTON_PROGRESS = 'loading-button-progress'
-const CLASS_NAME_LOADING_BUTTON_SPINNER = 'loading-button-spinner'
+const CLASS_NAME_IS_LOADING = 'is-loading'
+const CLASS_NAME_LOADING_BUTTON_PROGRESS = 'btn-loading-progress'
+const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
 
 const Default = {
   percent: 0,
@@ -71,8 +67,6 @@ const DefaultType = {
 
 class LoadingButton extends BaseComponent {
   constructor(element, config) {
-    // eslint-disable-next-line no-console
-    console.log('created')
     super(element)
 
     this._config = this._getConfig(config)
@@ -110,7 +104,7 @@ class LoadingButton extends BaseComponent {
       this._createProgressBar()
 
       setTimeout(() => {
-        this._element.classList.add(CLASS_NAME_LOADING_BUTTON_LOADING)
+        this._element.classList.add(CLASS_NAME_IS_LOADING)
         this._loading()
         EventHandler.trigger(this._element, EVENT_START)
       }, 1)
@@ -118,7 +112,7 @@ class LoadingButton extends BaseComponent {
   }
 
   stop() {
-    this._element.classList.remove(CLASS_NAME_LOADING_BUTTON_LOADING)
+    this._element.classList.remove(CLASS_NAME_IS_LOADING)
     const stoped = () => {
       this._removeSpinner()
       this._removeProgressBar()
@@ -169,7 +163,7 @@ class LoadingButton extends BaseComponent {
     this._element = null
   }
 
-  update(config) { // public method
+  update(config) {
     this._config = this._getConfig(config)
   }
 
@@ -299,23 +293,12 @@ class LoadingButton extends BaseComponent {
     }
   }
 
-  static jQueryInterface(config, par) {
+  static jQueryInterface(config) {
     return this.each(function () {
-      LoadingButton.loadingButtonInterface(this, config, par)
+      LoadingButton.loadingButtonInterface(this, config)
     })
   }
 }
-
-/**
- * ------------------------------------------------------------------------
- * Data Api implementation
- * ------------------------------------------------------------------------
- */
-// EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-//   SelectorEngine.find(SELECTOR_COMPONENT).forEach(element => {
-//     LoadingButton.loadingButtonInterface(element, Manipulator.getDataAttributes(element))
-//   })
-// })
 
 /**
  * ------------------------------------------------------------------------

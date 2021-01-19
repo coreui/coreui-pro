@@ -2,12 +2,12 @@
 // Loading button
 //
 
-.loading-button {
+.btn-loading {
   position: relative;
   overflow: hidden;
 }
 
-.loading-button-progress {
+.btn-loading-progress {
   position: absolute;
   top: 0;
   left: 0;
@@ -15,15 +15,15 @@
   height: 100%;
 }
 
-.loading-button-spinner {
+.btn-loading-spinner {
   margin-right: $spacer;
   margin-left: - ($spacer * 2);
   opacity: 0;
   @include transition(margin .15s, opacity .15s, border .15s);
 }
 
-.loading-button-loading {
-  .loading-button-spinner {
+.btn-loading.is-loading {
+  .btn-loading-spinner {
     width: 1rem;
     margin-left: 0;
     opacity: 1;
