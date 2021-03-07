@@ -73,12 +73,12 @@
   --cui-btn-primary-background: #4638c2;
   --cui-btn-primary-border: #4638c2;
   --cui-btn-primary-color: rgba(255, 255, 255, 0.87);
-  --cui-btn-primary-hover-background: #3c30a5;
-  --cui-btn-primary-hover-border: #382d9b;
+  --cui-btn-primary-hover-background: #6256cb;
+  --cui-btn-primary-hover-border: #594cc8;
   --cui-btn-primary-hover-color: rgba(255, 255, 255, 0.87);
-  --cui-btn-primary-active-background: #382d9b;
-  --cui-btn-primary-active-border: #352a92;
-  --cui-btn-primary-active-color: rgba(255, 255, 255, 0.87);
+  --cui-btn-primary-active-background: #6b60ce;
+  --cui-btn-primary-active-border: #594cc8;
+  --cui-btn-primary-active-color: #fff;
   --cui-btn-primary-disabled-background: #4638c2;
   --cui-btn-primary-disabled-border: #4638c2;
   --cui-btn-primary-disabled-color: rgba(255, 255, 255, 0.87);
