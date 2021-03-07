@@ -1,11 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.0): alert.js
+ * CoreUI (v4.0.0-alpha.2): loading-button.js
  * Licensed under MIT (https://coreui.io/license)
- *
- * This component is a modified version of the Bootstrap's alert.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- * --------------------------------------------------------------------------
  */
 
 import {
@@ -78,7 +74,7 @@ class LoadingButton extends BaseComponent {
     this._state = 'idle'
 
     if (this._element) {
-      Data.setData(element, DATA_KEY, this)
+      Data.set(element, DATA_KEY, this)
     }
   }
 
@@ -267,7 +263,7 @@ class LoadingButton extends BaseComponent {
   // Static
 
   static loadingButtonInterface(element, config) {
-    let data = Data.getData(element, DATA_KEY)
+    let data = Data.get(element, DATA_KEY)
     let _config = {
       ...Default,
       ...Manipulator.getDataAttributes(element)
@@ -304,7 +300,7 @@ class LoadingButton extends BaseComponent {
  * ------------------------------------------------------------------------
  * jQuery
  * ------------------------------------------------------------------------
- * add .Alert to jQuery only if jQuery is present
+ * add .LoadingButton to jQuery only if jQuery is present
  */
 
 defineJQueryPlugin(NAME, LoadingButton)

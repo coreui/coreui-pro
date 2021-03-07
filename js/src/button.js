@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.0): alert.js
+ * CoreUI (v4.0.0-alpha.2): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's button.js
@@ -54,7 +54,7 @@ class Button extends BaseComponent {
 
   static jQueryInterface(config) {
     return this.each(function () {
-      let data = Data.getData(this, DATA_KEY)
+      let data = Data.get(this, DATA_KEY)
 
       if (!data) {
         data = new Button(this)
@@ -78,7 +78,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
 
   const button = event.target.closest(SELECTOR_DATA_TOGGLE)
 
-  let data = Data.getData(button, DATA_KEY)
+  let data = Data.get(button, DATA_KEY)
   if (!data) {
     data = new Button(button)
   }

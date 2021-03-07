@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.0): sidebar.js
+ * CoreUI (v4.0.0-alpha.2): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -28,20 +28,25 @@ const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const Default = {}
+const Default = {
+  breakpoint: false
+}
 
-const DefaultType = {}
+const DefaultType = {
+  breakpoint: '(boolean|string)'
+}
 
 const CLASS_NAME_BACKDROP = 'sidebar-backdrop'
 const CLASS_NAME_FADE = 'fade'
+const CLASS_NAME_HIDE = 'hide'
 const CLASS_NAME_SHOW = 'show'
+const CLASS_NAME_SIDEBAR = 'sidebar'
 const CLASS_NAME_SIDEBAR_NARROW = 'sidebar-narrow'
 const CLASS_NAME_SIDEBAR_OVERLAID = 'sidebar-overlaid'
-const CLASS_NAME_SIDEBAR_SHOW = 'sidebar-show'
 const CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE = 'sidebar-narrow-unfoldable'
 
-// eslint-disable-next-line prefer-regex-literals
-const REGEXP_SIDEBAR_SHOW = new RegExp('sidebar.*show')
+const REGEXP_SIDEBAR_SELF_HIDING = /sidebar-self-hiding/
+// const REGEXP_SIDEBAR_SHOW_BREAKPOINT = /sidebar-(sm|md|lg|xl|xxl)-show/
 
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
@@ -51,8 +56,9 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_CLOSE = '[data-coreui-close="sidebar"]'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle]'
+
 const SELECTOR_SIDEBAR = '.sidebar'
-const SELECTOR_SIDEBAR_TOGGLER = '.sidebar-toggler'
 
 /**
  * ------------------------------------------------------------------------
@@ -64,6 +70,7 @@ class Sidebar extends BaseComponent {
   constructor(element, config) {
     super(element)
     this._config = this._getConfig(config)
+    // this._breakpoint = this._getBreakpoint()
     this._show = this._isVisible()
     this._mobile = this._isMobile()
     this._overlaid = this._isOverlaid()
@@ -72,7 +79,7 @@ class Sidebar extends BaseComponent {
     this._backdrop = null
     this._addEventListeners()
 
-    Data.setData(element, DATA_KEY, this)
+    // Data.set(element, DATA_KEY, this)
   }
 
   // Getters
@@ -87,15 +94,16 @@ class Sidebar extends BaseComponent {
 
   // Public
 
-  show(breakpoint) {
+  show() {
     EventHandler.trigger(this._element, EVENT_SHOW)
 
-    if (typeof breakpoint !== 'undefined') {
-      this._element.classList.add(breakpoint)
+    if (this._element.classList.contains(CLASS_NAME_HIDE)) {
+      this._element.classList.remove(CLASS_NAME_HIDE)
     }
 
-    if (typeof breakpoint === 'undefined' || this._isMobile()) {
-      this._element.classList.add(CLASS_NAME_SIDEBAR_SHOW)
+    if (REGEXP_SIDEBAR_SELF_HIDING.test(this._element.className)) {
+    // if (this._element.className.match(REGEXP_SIDEBAR_SELF_HIDING)) {
+      this._element.classList.add(CLASS_NAME_SHOW)
     }
 
     if (this._isMobile()) {
@@ -119,22 +127,14 @@ class Sidebar extends BaseComponent {
     emulateTransitionEnd(this._element, transitionDuration)
   }
 
-  hide(breakpoint) {
+  hide() {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
-    if (typeof breakpoint !== 'undefined') {
-      this._element.classList.remove(breakpoint)
-      return
+    if (this._element.classList.contains(CLASS_NAME_SHOW)) {
+      this._element.classList.remove(CLASS_NAME_SHOW)
     }
 
-    if (typeof breakpoint === 'undefined' || this._isMobile()) {
-      // eslint-disable-next-line unicorn/prefer-spread
-      Array.from(this._element.classList).forEach(className => {
-        if (className.match(REGEXP_SIDEBAR_SHOW)) {
-          this._element.classList.remove(className)
-        }
-      })
-    }
+    this._element.classList.add(CLASS_NAME_HIDE)
 
     if (this._isMobile()) {
       this._removeBackdrop()
@@ -157,13 +157,13 @@ class Sidebar extends BaseComponent {
     emulateTransitionEnd(this._element, transitionDuration)
   }
 
-  toggle(breakpoint) {
+  toggle() {
     if (this._show) {
-      this.hide(breakpoint)
+      this.hide()
       return
     }
 
-    this.show(breakpoint)
+    this.show()
   }
 
   narrow() {
@@ -230,6 +230,27 @@ class Sidebar extends BaseComponent {
     return config
   }
 
+  // _getBreakpoint() {
+  //   if (this._config.breakpoint) {
+  //     return this._config.breakpoint
+  //   }
+
+  //   const breakpoint = this._element.className.match(REGEXP_SIDEBAR_SHOW_BREAKPOINT)
+  //   if (breakpoint) {
+  //     return breakpoint[1]
+  //   }
+
+  //   return false
+  // }
+
+  _createShowClass() {
+    if (this._breakpoint && !this._isMobile()) {
+      return `${CLASS_NAME_SIDEBAR}-${this._breakpoint}-${CLASS_NAME_SHOW}`
+    }
+
+    return `${CLASS_NAME_SIDEBAR}-${CLASS_NAME_SHOW}`
+  }
+
   _isMobile() {
     return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--is-mobile'))
   }
@@ -270,7 +291,7 @@ class Sidebar extends BaseComponent {
   }
 
   // eslint-disable-next-line no-warning-comments
-  // TODO: ta metoda nie zawsze działa poprawnie
+  // TODO: this method is not bulletproof
   _isVisible() {
     const rect = this._element.getBoundingClientRect()
     return (
@@ -331,7 +352,7 @@ class Sidebar extends BaseComponent {
       this._addClickOutListener()
     }
 
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_SIDEBAR_TOGGLER, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
       event.preventDefault()
       const toggle = Manipulator.getDataAttribute(event.target, 'toggle')
 
@@ -352,8 +373,8 @@ class Sidebar extends BaseComponent {
 
   // Static
 
-  static _sidebarInterface(element, config) {
-    let data = Data.getData(element, DATA_KEY)
+  static sidebarInterface(element, config) {
+    let data = Data.get(element, DATA_KEY)
     const _config = typeof config === 'object' && config
 
     if (!data) {
@@ -371,7 +392,7 @@ class Sidebar extends BaseComponent {
 
   static jQueryInterface(config) {
     return this.each(function () {
-      Sidebar._sidebarInterface(this, config)
+      Sidebar.sidebarInterface(this, config)
     })
   }
 }
@@ -383,9 +404,8 @@ class Sidebar extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  // eslint-disable-next-line unicorn/prefer-spread
   Array.from(document.querySelectorAll(SELECTOR_SIDEBAR)).forEach(element => {
-    Sidebar._sidebarInterface(element)
+    Sidebar.sidebarInterface(element)
   })
 })
 

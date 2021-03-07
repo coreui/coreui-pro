@@ -1,5 +1,5 @@
 /*!
-  * CoreUI event-handler.js v4.0.0-alpha.0 (https://coreui.io)
+  * CoreUI event-handler.js v4.0.0-alpha.2 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-alpha.0): alert.js
+   * CoreUI (v4.0.0-alpha.2): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -30,11 +30,9 @@
     return null;
   };
 
-  var isRTL = document.documentElement.dir === 'rtl';
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-alpha.0): alert.js
+   * CoreUI (v4.0.0-alpha.2): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -97,6 +95,7 @@
             event.delegateTarget = target;
 
             if (handler.oneOff) {
+              // eslint-disable-next-line unicorn/consistent-destructuring
               EventHandler.off(element, event.type, fn);
             }
 

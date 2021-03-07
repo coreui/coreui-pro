@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.0): index.esm.js
+ * CoreUI (v4.0.0-alpha.2): index.esm.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -14,6 +14,7 @@ import LoadingButton from './src/loading-button'
 import Modal from './src/modal'
 import MultiSelect from './src/multi-select'
 import Navigation from './src/navigation'
+import OffCanvas from './src/offcanvas'
 import Popover from './src/popover'
 import ScrollSpy from './src/scrollspy'
 import Sidebar from './src/sidebar'
@@ -31,6 +32,7 @@ export {
   Modal,
   MultiSelect,
   Navigation,
+  OffCanvas,
   Popover,
   ScrollSpy,
   Sidebar,

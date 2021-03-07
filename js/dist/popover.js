@@ -1,5 +1,5 @@
 /*!
-  * CoreUI popover.js v4.0.0-alpha.0 (https://coreui.io)
+  * CoreUI popover.js v4.0.0-alpha.2 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -52,12 +52,22 @@
   function _inheritsLoose(subClass, superClass) {
     subClass.prototype = Object.create(superClass.prototype);
     subClass.prototype.constructor = subClass;
-    subClass.__proto__ = superClass;
+
+    _setPrototypeOf(subClass, superClass);
+  }
+
+  function _setPrototypeOf(o, p) {
+    _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+      o.__proto__ = p;
+      return o;
+    };
+
+    return _setPrototypeOf(o, p);
   }
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-alpha.0): alert.js
+   * CoreUI (v4.0.0-alpha.2): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -83,8 +93,6 @@
       callback();
     }
   };
-
-  var isRTL = document.documentElement.dir === 'rtl';
 
   var defineJQueryPlugin = function defineJQueryPlugin(name, plugin) {
     onDOMContentLoaded(function () {
@@ -118,6 +126,7 @@
 
   var Default = _extends({}, Tooltip__default['default'].Default, {
     placement: 'right',
+    offset: [0, 8],
     trigger: 'click',
     content: '',
     template: '<div class="popover" role="tooltip">' + '<div class="popover-arrow"></div>' + '<h3 class="popover-header"></h3>' + '<div class="popover-body"></div>' + '</div>'
@@ -203,7 +212,7 @@
 
     Popover.jQueryInterface = function jQueryInterface(config) {
       return this.each(function () {
-        var data = Data__default['default'].getData(this, DATA_KEY);
+        var data = Data__default['default'].get(this, DATA_KEY);
 
         var _config = typeof config === 'object' ? config : null;
 
@@ -213,7 +222,7 @@
 
         if (!data) {
           data = new Popover(this, _config);
-          Data__default['default'].setData(this, DATA_KEY, data);
+          Data__default['default'].set(this, DATA_KEY, data);
         }
 
         if (typeof config === 'string') {
@@ -228,8 +237,8 @@
 
     _createClass(Popover, null, [{
       key: "Default",
-      // Getters
-      get: function get() {
+      get: // Getters
+      function get() {
         return Default;
       }
     }, {

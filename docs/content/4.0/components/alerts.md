@@ -10,7 +10,7 @@ toc: true
 
 ## Examples
 
-Bootstrap alert is prepared for any length of text, as well as an optional close button. For a styling, use one of the **required** contextual classes (e.g., `.alert-success`). For inline dismissal, use the (e.g., `.alert-success`). For inline dismissal, use the [alerts JavaScript plugin](#dismissing).
+Bootstrap alert is prepared for any length of text, as well as an optional close button. For a styling, use one of the **required** contextual classes (e.g., `.alert-success`). For inline dismissal, use the [alerts JavaScript plugin](#dismissing).
 
 {{< example >}}
 {{< alerts.inline >}}
@@ -185,6 +185,9 @@ myAlert.addEventListener('closed.coreui.alert', function () {
 ## Customizing
 
 ### SASS
+
+#### Variables
+
 {{< scss-docs name="alert-variables" file="scss/_variables.scss" >}}
 
 #### Variants

@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.0.0-alpha.0): multi-select.js
+ * CoreUI PRO (v4.0.0-alpha.2): multi-select.js
  * License (https://coreui.io/pro/license)
  * --------------------------------------------------------------------------
  */
@@ -121,7 +121,7 @@ class MultiSelect extends BaseComponent {
 
     this._createSelect()
     this._addEventListeners()
-    Data.setData(this._element, DATA_KEY, this)
+    Data.set(this._element, DATA_KEY, this)
   }
 
   // Getters
@@ -243,7 +243,6 @@ class MultiSelect extends BaseComponent {
       return this._config.options
     }
 
-    // eslint-disable-next-line unicorn/prefer-spread
     const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP')
     const options = []
 
@@ -734,7 +733,7 @@ class MultiSelect extends BaseComponent {
   // Static
 
   static multiSelectInterface(element, config) {
-    let data = Data.getData(element, DATA_KEY)
+    let data = Data.get(element, DATA_KEY)
     let _config = {
       ...Default,
       ...Manipulator.getDataAttributes(element)
@@ -775,7 +774,7 @@ class MultiSelect extends BaseComponent {
     const selects = SelectorEngine.find(SELECTOR_SELECT)
 
     for (let i = 0, len = selects.length; i < len; i++) {
-      const context = Data.getData(selects[i], DATA_KEY)
+      const context = Data.get(selects[i], DATA_KEY)
       const relatedTarget = {
         relatedTarget: selects[i]
       }
@@ -824,7 +823,7 @@ EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
  * ------------------------------------------------------------------------
  * jQuery
  * ------------------------------------------------------------------------
- * add .Alert to jQuery only if jQuery is present
+ * add .MultiSelect to jQuery only if jQuery is present
  */
 
 defineJQueryPlugin(NAME, MultiSelect)

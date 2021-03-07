@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.0): alert.js
+ * CoreUI (v4.0.0-alpha.2): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's base-component.js
@@ -16,27 +16,29 @@ import Data from './dom/data'
  * ------------------------------------------------------------------------
  */
 
-const VERSION = '4.0.0-alpha.0'
+const VERSION = '4.0.0-alpha.2'
 
 class BaseComponent {
   constructor(element) {
+    element = typeof element === 'string' ? document.querySelector(element) : element
+
     if (!element) {
       return
     }
 
     this._element = element
-    Data.setData(element, this.constructor.DATA_KEY, this)
+    Data.set(this._element, this.constructor.DATA_KEY, this)
   }
 
   dispose() {
-    Data.removeData(this._element, this.constructor.DATA_KEY)
+    Data.remove(this._element, this.constructor.DATA_KEY)
     this._element = null
   }
 
   /** Static */
 
   static getInstance(element) {
-    return Data.getData(element, this.DATA_KEY)
+    return Data.get(element, this.DATA_KEY)
   }
 
   static get VERSION() {
