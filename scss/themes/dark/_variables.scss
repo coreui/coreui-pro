@@ -100,26 +100,60 @@ $body-bg-dt:                   $bg-elevation-0 !default;
 $body-color-dt:                $high-emphasis-dt !default;
 $elevation-base-color-dt:      0, 0, 0 !default;
 
-$theme-body-dt: (
-  "body-bg": $body-bg-dt,
-  "body-color": $body-color-dt,
-  "elevation-base-color": $elevation-base-color-dt,
-  "text-high-emphasis": $high-emphasis-dt,
-  "text-medium-emphasis": $medium-emphasis-dt,
-  "text-disabled": $disabled-dt,
-) !default;
-
 // Components
 //
 // Define common padding and border radius sizes and more.
 
 $border-color-dt:   rgba(255, 255, 255, .075) !default;
 
+$theme-root-dt: (
+  "body-bg": $body-bg-dt,
+  "body-color": $body-color-dt,
+  "elevation-base-color": $elevation-base-color-dt,
+  "text-high-emphasis": $high-emphasis-dt,
+  "text-medium-emphasis": $medium-emphasis-dt,
+  "text-disabled": $disabled-dt,
+  "border-color": $border-color-dt
+) !default;
+
 // $component-color-dt:  $body-color-dt !default;
 // $component-bg-dt:     $gray-800-dt !default;
 
 $component-active-color-dt:  $white !default;
 $component-active-bg-dt:     $primary-dt !default;
+
+// Accordion
+
+$accordion-button-color-dt:               $body-color-dt !default;
+$accordion-button-bg-dt:                  transparent !default;
+$accordion-border-color-dt:               rgba($white, .125) !default;
+
+$accordion-button-color-dt:               $body-color-dt !default;
+$accordion-button-bg-dt:                  transparent !default;
+$accordion-border-color-dt:               rgba($white, .125) !default;
+
+$accordion-button-active-bg-dt:           tint-color(rgba($component-active-bg-dt, .5), 5%) !default;
+$accordion-button-active-color-dt:        shade-color($component-active-color-dt, 10%) !default;
+
+$accordion-button-focus-border-color-dt:  rgba($white, .2) !default;
+
+$accordion-icon-color-dt:                 $body-color-dt !default;
+$accordion-icon-active-color-dt:          $body-color-dt !default;
+
+$accordion-button-icon-dt:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dt}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
+$accordion-button-active-icon-dt:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dt}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
+
+
+$accordion-theme-map: (
+  "accordion-button-color":               $accordion-button-color-dt,
+  "accordion-button-bg":                  $accordion-button-bg-dt,
+  "accordion-border-color":               $accordion-border-color-dt,
+  "accordion-button-active-bg":           $accordion-button-active-bg-dt,
+  "accordion-button-active-color":        $accordion-button-active-color-dt,
+  "accordion-button-focus-border-color":  $accordion-button-focus-border-color-dt,
+  "accordion-button-icon":                $accordion-button-icon-dt,
+  "accordion-button-active-icon":         $accordion-button-active-icon-dt
+) !default;
 
 // Alert
 
@@ -569,11 +603,12 @@ $toast-theme-map: (
 // --cui-tooltip-color
 
 $theme-map: (
-  "root":          map-merge($theme-body-dt, $link-theme-map),
+  "root":          map-merge($theme-root-dt, $link-theme-map),
   "utilities": (
     "bg":          $theme-colors-dt,
     "text":        $theme-colors-dt
   ),
+  "accordion":     $accordion-theme-map,
   "alert":         $alert-theme-variants-dt,
   "breadcrumb":    $breadcrumb-theme-map,
   "btn":           $button-theme-variants-dt,

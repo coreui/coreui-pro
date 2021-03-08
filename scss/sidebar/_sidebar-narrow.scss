@@ -51,7 +51,7 @@
 
 .sidebar-narrow {
   @extend %sidebar-narrow;
-  ~ * {
+  &:not(.sidebar-overlaid) ~ * {
     --#{$variable-prefix}sidebar-occupy: #{$sidebar-narrow-width};
   }
 }
@@ -60,7 +60,7 @@
   position: fixed;
   z-index: $zindex-fixed + 1;
 
-  ~ * {
+  &:not(.sidebar-overlaid) ~ * {
     --#{$variable-prefix}sidebar-occupy: #{$sidebar-narrow-width};
   }
 
