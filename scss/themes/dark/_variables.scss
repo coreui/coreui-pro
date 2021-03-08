@@ -103,7 +103,10 @@ $elevation-base-color-dt:      0, 0, 0 !default;
 $theme-body-dt: (
   "body-bg": $body-bg-dt,
   "body-color": $body-color-dt,
-  "elevation-base-color": $elevation-base-color-dt
+  "elevation-base-color": $elevation-base-color-dt,
+  "text-high-emphasis": $high-emphasis-dt,
+  "text-medium-emphasis": $medium-emphasis-dt,
+  "text-disabled": $disabled-dt,
 ) !default;
 
 // Components
@@ -513,6 +516,33 @@ $sidebar-theme-map: (
   "sidebar-toggler-hover-bg":  $sidebar-toggler-hover-bg-dt
 ) !default;
 
+$table-color-dt:              $body-color-dt !default;
+$table-bg-dt:                 transparent !default;
+$table-border-color-dt:       $border-color-dt !default;
+
+$table-striped-color-dt:      $table-color-dt !default;
+$table-striped-bg-factor-dt:  .05 !default;
+$table-striped-bg-dt:         rgba($white, $table-striped-bg-factor-dt) !default;
+
+$table-active-color-dt:       $table-color-dt !default;
+$table-active-bg-factor-dt:   .1 !default;
+$table-active-bg-dt:          rgba($black, $table-active-bg-factor-dt) !default;
+
+$table-hover-color-dt:        $table-color-dt !default;
+$table-hover-bg-factor-dt:    .075 !default;
+$table-hover-bg-dt:           rgba($black, $table-hover-bg-factor-dt) !default;
+
+$table-theme-map: (
+  "table-color":          $table-color-dt,
+  "table-bg":             $table-bg-dt,
+  "table-border-color":   $table-border-color-dt,
+  "table-striped-color":  $table-striped-color-dt,
+  "table-striped-bg":     $table-striped-bg-dt,
+  "table-active-color":   $table-active-color-dt,
+  "table-active-bg":      $table-active-bg-dt,
+  "table-hover-color":    $table-hover-color-dt,
+  "table-hover-bg":       $table-hover-bg-dt
+) !default;
 
 // Toast
 
@@ -562,5 +592,6 @@ $theme-map: (
   "popover":       $popover-theme-map,
   "progress":      $progress-theme-map,
   "sidebar":       $sidebar-theme-map,
+  "table":         $table-theme-map,
   "toast":         $toast-theme-map
 ) !default;
