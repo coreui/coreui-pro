@@ -95,7 +95,7 @@ $utilities: map-merge(
       values: (
         null: $border-width solid $border-color,
         0: 0,
-      )
+      ),
     ),
     "border-top": (
       property: border-top,
