@@ -14,7 +14,7 @@
   box-shadow: none;
   @include transition($sidebar-transition);
 
-  ~ * {
+  &:not(.sidebar-overlaid) ~ * {
     --#{$variable-prefix}sidebar-occupy: #{$sidebar-width};
   }
 
@@ -66,7 +66,7 @@
       margin-right: - $sidebar-width;
     }
 
-    ~ * {
+    &:not(.sidebar-overlaid) ~ * {
       --#{$variable-prefix}sidebar-occupy: 0;
     }
   }
@@ -76,7 +76,7 @@
       flex: 0 0 $value;
       width: $value;
 
-      ~ * {
+      &:not(.sidebar-overlaid) ~ * {
         --#{$variable-prefix}sidebar-occupy: #{$value};
       }
 
@@ -95,6 +95,7 @@
       top: 0;
       bottom: 0;
       z-index: $zindex-fixed;
+      @include elevation(2);
 
       &:not(.sidebar-right) {
         left: 0;
@@ -119,6 +120,7 @@
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 2;
+    @include elevation(3);
 
     &:not(.sidebar-right) {
       left: 0;
@@ -269,7 +271,7 @@
           }
         }
       }
-      ~ * {
+      &:not(.sidebar-overlaid) ~ * {
         --#{$variable-prefix}sidebar-occupy: 0;
       }
     }
