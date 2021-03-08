@@ -93,14 +93,14 @@ $utilities: map-merge(
     "border": (
       property: border,
       values: (
-        null: $border-width solid $var(--#{$variable-prefix}border-color, $border-color),
+        null: $border-width solid var(--#{$variable-prefix}border-color, $border-color),
         0: 0,
       ),
     ),
     "border-top": (
       property: border-top,
       values: (
-        null: $border-width solid $var(--#{$variable-prefix}border-color, $border-color),
+        null: $border-width solid var(--#{$variable-prefix}border-color, $border-color),
         0: 0,
       )
     ),
@@ -108,14 +108,14 @@ $utilities: map-merge(
       property: border-right,
       class: border-end,
       values: (
-        null: $border-width solid $var(--#{$variable-prefix}border-color, $border-color),
+        null: $border-width solid var(--#{$variable-prefix}border-color, $border-color),
         0: 0,
       )
     ),
     "border-bottom": (
       property: border-bottom,
       values: (
-        null: $border-width solid $var(--#{$variable-prefix}border-color, $border-color),
+        null: $border-width solid var(--#{$variable-prefix}border-color, $border-color),
         0: 0,
       )
     ),
@@ -123,7 +123,7 @@ $utilities: map-merge(
       property: border-left,
       class: border-start,
       values: (
-        null: $border-width solid $var(--#{$variable-prefix}border-color, $border-color),
+        null: $border-width solid var(--#{$variable-prefix}border-color, $border-color),
         0: 0,
       )
     ),
