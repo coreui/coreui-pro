@@ -1,0 +1,38 @@
+// Utilities
+// stylelint-disable-next-line scss/dollar-variable-default
+$utilities: ();
+// stylelint-disable-next-line scss/dollar-variable-default
+$utilities: map-merge(
+  (
+    "background-color": (
+      property: background-color,
+      prefix: "dark\\:",
+      class: bg,
+      values: map-merge(
+        $theme-colors,
+        (
+          "body": $body-bg,
+          "white": $white,
+          "transparent": transparent
+        )
+      ),
+      vars: true
+    ),
+    "background-color-exclude": (
+      property: background-color,
+      class: bg,
+      postfix: ":not([class*='dark:'])",
+      values: map-merge(
+        $theme-colors,
+        (
+          "body": $body-bg,
+          "white": $white,
+          "transparent": transparent
+        )
+      ),
+      vars: true
+    ),
+  ),
+  $utilities
+);
+

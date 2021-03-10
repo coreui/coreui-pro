@@ -21,6 +21,8 @@ $success-dt:    desaturate($success, 20%) !default;
 $info-dt:       desaturate($info, 20%) !default;
 $warning-dt:    desaturate($warning, 20%) !default;
 $danger-dt:     desaturate($danger, 20%) !default;
+$light-dt:      rgba($white, .1) !default;
+$dark-dt:       rgba($black, .1) !default;
 
 // fusv-disable
 $theme-colors-dt: (
@@ -30,6 +32,8 @@ $theme-colors-dt: (
   "info":       $info-dt,
   "warning":    $warning-dt,
   "danger":     $danger-dt,
+  "light":      $light-dt,
+  "dark":       $dark-dt
 ) !default;
 // fusv-enable
 
@@ -422,29 +426,38 @@ $modal-theme-map: (
 
 // Navs
 
-$nav-link-color-dt:                     null !default;
-$nav-link-disabled-color-dt:            $disabled-dt !default;
-$nav-link-hover-color-dt:               null !default;
-$nav-pills-link-active-bg-dt:           $component-active-bg-dt !default;
-$nav-pills-link-active-color-dt:        $component-active-color-dt !default;
-$nav-tabs-border-color-dt:              $border-color-dt !default;
-$nav-tabs-link-active-bg-dt:            $border-color-dt !default;
-$nav-tabs-link-active-color-dt:         $body-color-dt !default;
-$nav-tabs-link-active-border-color-dt:  transparent !default;
-$nav-tabs-link-hover-border-color-dt:   $border-color-dt $border-color-dt $border-color-dt !default;
+$nav-link-color-dt:                          null !default;
+$nav-link-disabled-color-dt:                 $disabled-dt !default;
+$nav-link-hover-color-dt:                    null !default;
+$nav-pills-link-active-bg-dt:                $component-active-bg-dt !default;
+$nav-pills-link-active-color-dt:             $component-active-color-dt !default;
+$nav-tabs-border-color-dt:                   $border-color-dt !default;
+$nav-tabs-link-active-bg-dt:                 $border-color-dt !default;
+$nav-tabs-link-active-color-dt:              $body-color-dt !default;
+$nav-tabs-link-active-border-color-dt:       transparent !default;
+$nav-tabs-link-hover-border-color-dt:        $border-color-dt $border-color-dt $border-color-dt !default;
+
+$nav-underline-border-color-dt:              $border-color-dt !default;
+$nav-underline-link-color-dt:                $medium-emphasis-dt !default;
+$nav-underline-link-active-color-dt:         $component-active-bg-dt !default;
+$nav-underline-link-active-border-color-dt:  $component-active-bg-dt !default;
 
 
 $nav-theme-map: (
-  "nav-link-color":                     $nav-link-color-dt,
-  "nav-link-disabled-color":            $nav-link-disabled-color-dt,
-  "nav-link-hover-color":               $nav-link-hover-color-dt,
-  "nav-pills-link-active-bg":           $nav-pills-link-active-bg-dt,
-  "nav-pills-link-active-color":        $nav-pills-link-active-color-dt,
-  "nav-tabs-border-color":              $nav-tabs-border-color-dt,
-  "nav-tabs-link-active-bg":            $nav-tabs-link-active-bg-dt,
-  "nav-tabs-link-active-color":         $nav-tabs-link-active-color-dt,
-  "nav-tabs-link-active-border-color":  $nav-tabs-link-active-border-color-dt,
-  "nav-tabs-link-hover-border-color":   $nav-tabs-link-hover-border-color-dt
+  "nav-link-color":                          $nav-link-color-dt,
+  "nav-link-disabled-color":                 $nav-link-disabled-color-dt,
+  "nav-link-hover-color":                    $nav-link-hover-color-dt,
+  "nav-pills-link-active-bg":                $nav-pills-link-active-bg-dt,
+  "nav-pills-link-active-color":             $nav-pills-link-active-color-dt,
+  "nav-tabs-border-color":                   $nav-tabs-border-color-dt,
+  "nav-tabs-link-active-bg":                 $nav-tabs-link-active-bg-dt,
+  "nav-tabs-link-active-color":              $nav-tabs-link-active-color-dt,
+  "nav-tabs-link-active-border-color":       $nav-tabs-link-active-border-color-dt,
+  "nav-tabs-link-hover-border-color":        $nav-tabs-link-hover-border-color-dt,
+  "nav-underline-border-color":              $nav-underline-border-color-dt,
+  "nav-underline-link-color":                $nav-underline-link-color-dt,
+  "nav-underline-link-active-color":         $nav-underline-link-active-color-dt,
+  "nav-underline-link-active-border-color":  $nav-underline-link-active-border-color-dt
 ) !default;
 
 // Pagination
@@ -612,6 +625,7 @@ $theme-map: (
   "alert":         $alert-theme-variants-dt,
   "breadcrumb":    $breadcrumb-theme-map,
   "btn":           $button-theme-variants-dt,
+  "btn-outline":   $button-theme-variants-dt,
   "btn-close":     $close-theme-map,
   "card":          $card-theme-map,
   "dropdown":      $dropdown-theme-map,

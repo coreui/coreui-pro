@@ -1,7 +1,16 @@
 @mixin theme-variants($map, $state, $component) {
-  @each $name, $value in $map {
-    @if $value != null {
-      --#{$variable-prefix}#{$component}-#{$state}-#{$name}: #{$value};
+  $selector: &;
+  $selector-with-prefix: selector-replace($selector, ".#{$component}", ".#{$theme-prefix}\\:#{$component}");
+  @at-root #{$selector-with-prefix}-#{$state}, &-#{$state}:not([class*="#{$theme-prefix}:"]) {
+    @each $name, $value in $map {
+      @if $value != null {
+        // TODO: find solution
+        @if $name == "border" {
+          $name: "border-color";
+        }
+
+        --#{$variable-prefix}#{$component}-#{$name}: #{$value};
+      }
     }
   }
 }
@@ -36,8 +45,7 @@
       }
     }
     @else {
-      .#{$name},
-      &.#{$name} {
+      .#{$name} {
         @include theme-components($value, $name);
       }
     }

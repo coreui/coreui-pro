@@ -1,10 +1,14 @@
 @import "./../functions";
 @import "./../mixins";
 @import "./../variables";
+@import "./../utilities";
 
+$theme-name: "dark-theme" !default;
+$theme-prefix: "dark" !default;
 
-.dark-theme {
+.#{$theme-name} {
   @import "dark/variables";
+  @import "dark/utilities";
 
   // Colors
   @each $color, $value in $theme-colors-dt {
@@ -18,4 +22,7 @@
   }
 
   @include theme($theme-map);
+
+  // Utilities
+  @import "./../utilities/api";
 }
