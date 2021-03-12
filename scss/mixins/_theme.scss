@@ -39,7 +39,7 @@
     @if $name == "root" {
       @include theme-components($value, $name);
     }
-    @else if $name == "utilities"{
+    @else if $name == "utilities" {
       @each $class, $variants in $value {
         @include theme-colors($variants, $class);
       }
