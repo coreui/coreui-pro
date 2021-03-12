@@ -15,12 +15,12 @@ $bg-elevation-16:  rgba(mix(rgba(255, 255, 255, .3), $bg-elevation-0), 1) !defau
 $bg-elevation-24:  rgba(mix(rgba(255, 255, 255, .32), $bg-elevation-0), 1) !default;
 // fusv-enable
 
-$primary-dt:    desaturate($primary, 20%) !default;
-$secondary-dt:  desaturate($secondary, 20%) !default;
-$success-dt:    desaturate($success, 20%) !default;
-$info-dt:       desaturate($info, 20%) !default;
-$warning-dt:    desaturate($warning, 20%) !default;
-$danger-dt:     desaturate($danger, 20%) !default;
+$primary-dt:    tint-color(desaturate($primary, 30%), 30) !default;
+$secondary-dt:  desaturate($secondary, 30%) !default;
+$success-dt:    desaturate($success, 30%) !default;
+$info-dt:       desaturate($info, 30%) !default;
+$warning-dt:    desaturate($warning, 30%) !default;
+$danger-dt:     desaturate($danger, 30%) !default;
 $light-dt:      rgba($white, .1) !default;
 $dark-dt:       rgba($black, .1) !default;
 
