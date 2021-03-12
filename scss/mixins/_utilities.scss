@@ -20,6 +20,14 @@
     $property-class: if(map-has-key($utility, class), map-get($utility, class), nth($properties, 1));
     $property-class: if($property-class == null, "", $property-class);
 
+    // Use class prefix if present
+    $property-class-prefix: if(map-has-key($utility, prefix), map-get($utility, prefix), null);
+    $property-class-prefix: if($property-class-prefix == null, "", $property-class-prefix);
+
+    // Use class postfix if present
+    $property-class-postfix: if(map-has-key($utility, postfix), map-get($utility, postfix), null);
+    $property-class-postfix: if($property-class-postfix == null, "", $property-class-postfix);
+
     // State params to generate pseudo-classes
     $state: if(map-has-key($utility, state), map-get($utility, state), ());
 
@@ -50,7 +58,7 @@
       @if $is-rtl == false {
         /* rtl:begin:remove */
       }
-      .#{$property-class + $infix + $property-class-modifier} {
+      .#{$property-class-prefix + $property-class + $infix + $property-class-modifier + $property-class-postfix} {
         @each $property in $properties {
           @if $generate-vars == true {
             #{$property}: var(--#{$variable-prefix}#{$property-class + $infix + $property-class-modifier}, $value) if($enable-important-utilities, !important, null);
