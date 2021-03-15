@@ -49,7 +49,7 @@
     "js-test-jquery": "cross-env JQUERY=true npm run js-test-karma",
     "lint": "npm-run-all --parallel js-lint css-lint lockfile-lint",
     "docs": "npm-run-all docs-build docs-lint",
-    "docs-build": "hugo --cleanDestinationDir --enableGitInfo",
+    "docs-build": "hugo --cleanDestinationDir --enableGitInfo --environment production",
     "docs-compile": "npm run docs-build",
     "docs-linkinator": "linkinator _gh_pages --recurse --skip \"^(?!http://localhost)\" --verbosity error",
     "docs-vnu": "node build/vnu-jar.js",
