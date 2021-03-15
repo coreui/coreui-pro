@@ -280,6 +280,8 @@ $input-disabled-bg-dt:               rgba($white, .1) !default;
 $input-placeholder-color-dt:         $medium-emphasis-dt !default;
 $input-plaintext-color-dt:           $body-color-dt !default;
 
+$form-text-color-dt:                 $medium-emphasis-dt !default;
+
 $input-group-addon-color-dt:         $body-color-dt !default;
 $input-group-addon-bg-dt:            rgba($white, .09) !default;
 $input-group-addon-border-color-dt:  rgba($white, .09) !default;
@@ -301,7 +303,8 @@ $form-control-theme-map: (
   "input-focus-border-color":        $input-focus-border-color-dt,
   "input-disabled-bg":               $input-disabled-bg-dt,
   "input-placeholder-color":         $input-placeholder-color-dt,
-  "input-plaintext-color":           $input-plaintext-color-dt
+  "input-plaintext-color":           $input-plaintext-color-dt,
+  "form-text-color":                 $form-text-color-dt
 ) !default;
 
 $input-group-theme-map: (
