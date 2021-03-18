@@ -594,6 +594,15 @@ $table-theme-map: (
   "table-hover-bg":       $table-hover-bg-dt
 ) !default;
 
+$table-variants-dt: (
+  "primary":    table-color-map(shift-color($primary-dt, $table-bg-scale)),
+  "secondary":  table-color-map(shift-color($secondary-dt, $table-bg-scale)),
+  "success":    table-color-map(shift-color($success-dt, $table-bg-scale)),
+  "info":       table-color-map(shift-color($info-dt, $table-bg-scale)),
+  "warning":    table-color-map(shift-color($warning-dt, $table-bg-scale)),
+  "danger":     table-color-map(shift-color($danger-dt, $table-bg-scale))
+) !default;
+
 // Toast
 
 $toast-background-color-dt:         $bg-elevation-16 !default;
@@ -644,6 +653,6 @@ $theme-map: (
   "popover":       $popover-theme-map,
   "progress":      $progress-theme-map,
   "sidebar":       $sidebar-theme-map,
-  "table":         $table-theme-map,
+  "table":         map-merge($table-theme-map, $table-variants-dt),
   "toast":         $toast-theme-map
 ) !default;
