@@ -23,6 +23,32 @@ $theme-prefix: "dark" !default;
 
   @include theme($theme-map);
 
+  // Button variants
+
+  @each $state, $variant in $alert-variants-dt {
+    @include alert-variant($state, $variant, true);
+  }
+
+  // Button variants
+
+  @each $state, $variant in $button-variants-dt {
+    @include button-variant($state, $variant, true);
+  }
+
+  @each $state, $variant in $button-outline-ghost-variants-dt {
+    @include button-outline-variant($state, $variant, true);
+  }
+
+  @each $state, $variant in $button-outline-ghost-variants-dt {
+    @include button-ghost-variant($state, $variant, true);
+  }
+
+  // List group variants
+
+  @each $state, $variant in $list-group-variants-dt {
+    @include list-group-item-variant($state, $variant, true);
+  }
+
   // Utilities
   @import "./../utilities/api";
 }

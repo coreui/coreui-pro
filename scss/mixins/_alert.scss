@@ -1,11 +1,13 @@
 // scss-docs-start alert-variant-mixin
-@mixin alert-variant($state, $variant) {
+@mixin alert-variant($state, $variant, $theme-prefix: false) {
   $background: map-get($variant, "bg");
   $border-color: map-get($variant, "border-color");
   $color: contrast-ratio-correction(map-get($variant, "color"), map-get($variant, "bg"), abs($alert-color-scale), $state);
   $link-color: map-get($variant, "link-color");
 
-  .alert-#{$state} {
+  $selector: if($theme-prefix, theme-prefix("alert-#{$state}"), ".alert-#{$state}");
+
+  #{$selector} {
     --#{$variable-prefix}alert-color: #{$color};
     --#{$variable-prefix}alert-bg: #{$background};
     --#{$variable-prefix}alert-border-color: #{$border-color};

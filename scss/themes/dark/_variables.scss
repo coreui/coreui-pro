@@ -15,6 +15,10 @@ $bg-elevation-16:  rgba(mix(rgba(255, 255, 255, .3), $bg-elevation-0), 1) !defau
 $bg-elevation-24:  rgba(mix(rgba(255, 255, 255, .32), $bg-elevation-0), 1) !default;
 // fusv-enable
 
+$high-emphasis-dt:    rgba($white, .87) !default;
+$medium-emphasis-dt:  rgba($white, .6) !default;
+$disabled-dt:         rgba($white, .38) !default;
+
 $primary-dt:    tint-color(desaturate($primary, 30%), 30) !default;
 $secondary-dt:  desaturate($secondary, 30%) !default;
 $success-dt:    desaturate($success, 30%) !default;
@@ -92,10 +96,6 @@ $theme-gradients-dt: (
 ) !default;
 // scss-docs-end theme-gradients
 
-$high-emphasis-dt:    rgba($white, .87) !default;
-$medium-emphasis-dt:  rgba($white, .6) !default;
-$disabled-dt:         rgba($white, .38) !default;
-
 // Body
 //
 // Settings for the `<body>` element.
@@ -111,13 +111,13 @@ $elevation-base-color-dt:      0, 0, 0 !default;
 $border-color-dt:   rgba(255, 255, 255, .075) !default;
 
 $theme-root-dt: (
-  "body-bg": $body-bg-dt,
-  "body-color": $body-color-dt,
-  "elevation-base-color": $elevation-base-color-dt,
-  "text-high-emphasis": $high-emphasis-dt,
-  "text-medium-emphasis": $medium-emphasis-dt,
-  "text-disabled": $disabled-dt,
-  "border-color": $border-color-dt
+  "body-bg":               $body-bg-dt,
+  "body-color":            $body-color-dt,
+  "elevation-base-color":  $elevation-base-color-dt,
+  "high-emphasis":         $high-emphasis-dt,
+  "medium-emphasis":       $medium-emphasis-dt,
+  "disabled":              $disabled-dt,
+  "border-color":          $border-color-dt
 ) !default;
 
 // $component-color-dt:  $body-color-dt !default;
@@ -161,13 +161,13 @@ $accordion-theme-map: (
 
 // Alert
 
-$alert-theme-variants-dt: (
-  "primary": alert-color-map($primary-dt),
-  "secondary": alert-color-map($secondary-dt),
-  "success": alert-color-map($success-dt),
-  "danger": alert-color-map($danger-dt),
-  "warning": alert-color-map($warning-dt),
-  "info": alert-color-map($info-dt)
+$alert-variants-dt: (
+  "primary":    alert-color-map($primary-dt),
+  "secondary":  alert-color-map($secondary-dt),
+  "success":    alert-color-map($success-dt),
+  "danger":     alert-color-map($danger-dt),
+  "warning":    alert-color-map($warning-dt),
+  "info":       alert-color-map($info-dt)
 ) !default;
 
 // Breadcrumb
@@ -184,13 +184,22 @@ $breadcrumb-theme-map: (
 
 // Buttons
 
-$button-theme-variants-dt: (
-  "primary": btn-color-map($primary-dt, $primary-dt),
-  "secondary": btn-color-map($secondary-dt, $secondary-dt),
-  "success": btn-color-map($success-dt, $success-dt),
-  "danger": btn-color-map($danger-dt, $danger-dt),
-  "warning": btn-color-map($warning-dt, $warning-dt),
-  "info": btn-color-map($info-dt, $info-dt)
+$button-variants-dt: (
+  "primary":    btn-color-map($primary-dt, $primary-dt),
+  "secondary":  btn-color-map($secondary-dt, $secondary-dt),
+  "success":    btn-color-map($success-dt, $success-dt),
+  "danger":     btn-color-map($danger-dt, $danger-dt),
+  "warning":    btn-color-map($warning-dt, $warning-dt),
+  "info":       btn-color-map($info-dt, $info-dt)
+) !default;
+
+$button-outline-ghost-variants-dt: (
+  "primary":    btn-outline-color-map($primary-dt),
+  "secondary":  btn-outline-color-map($secondary-dt),
+  "success":    btn-outline-color-map($success-dt),
+  "danger":     btn-outline-color-map($danger-dt),
+  "warning":    btn-outline-color-map($warning-dt),
+  "info":       btn-outline-color-map($info-dt)
 ) !default;
 
 // Cards
@@ -294,23 +303,33 @@ $form-select-focus-border-color-dt:        $input-focus-border-color-dt !default
 $form-select-disabled-bg-dt:            $input-disabled-bg-dt !default;
 // $form-select-disabled-border-color-dt:  $input-disabled-border-color-dt !default;
 
+$form-check-input-checked-color-dt:          $component-active-color-dt !default;
+$form-check-input-checked-bg-color-dt:       $component-active-bg-dt !default;
+$form-check-input-checked-border-color-dt:   $form-check-input-checked-bg-color-dt !default;
+
 $form-control-theme-map: (
-  "input-color":                     $input-color-dt,
-  "input-bg":                        $input-bg-dt,
-  "input-border-color":              $input-border-color-dt,
-  "input-focus-color":               $input-focus-color-dt,
-  "input-focus-bg":                  $input-focus-bg-dt,
-  "input-focus-border-color":        $input-focus-border-color-dt,
-  "input-disabled-bg":               $input-disabled-bg-dt,
-  "input-placeholder-color":         $input-placeholder-color-dt,
-  "input-plaintext-color":           $input-plaintext-color-dt,
-  "form-text-color":                 $form-text-color-dt
+  "input-color":                            $input-color-dt,
+  "input-bg":                               $input-bg-dt,
+  "input-border-color":                     $input-border-color-dt,
+  "input-focus-color":                      $input-focus-color-dt,
+  "input-focus-bg":                         $input-focus-bg-dt,
+  "input-focus-border-color":               $input-focus-border-color-dt,
+  "input-disabled-bg":                      $input-disabled-bg-dt,
+  "input-placeholder-color":                $input-placeholder-color-dt,
+  "input-plaintext-color":                  $input-plaintext-color-dt,
+  "form-text-color":                        $form-text-color-dt,
 ) !default;
 
 $input-group-theme-map: (
   "input-group-addon-color":         $input-group-addon-color-dt,
   "input-group-addon-bg":            $input-group-addon-bg-dt,
   "input-group-addon-border-color":  $input-group-addon-border-color-dt
+) !default;
+
+$form-check-theme-map: (
+  "form-check-input-checked-color":         $form-check-input-checked-color-dt,
+  "form-check-input-checked-bg-color":      $form-check-input-checked-bg-color-dt,
+  "form-check-input-checked-border-color":  $form-check-input-checked-border-color-dt
 ) !default;
 
 $form-select-theme-map: (
@@ -399,12 +418,12 @@ $list-group-theme-map: (
 ) !default;
 
 $list-group-variants-dt: (
-  "primary": list-group-color-map($primary-dt),
-  "secondary": list-group-color-map($secondary-dt),
-  "success": list-group-color-map($success-dt),
-  "danger": list-group-color-map($danger-dt),
-  "warning": list-group-color-map($warning-dt),
-  "info": list-group-color-map($info-dt)
+  "primary":    list-group-color-map($primary-dt),
+  "secondary":  list-group-color-map($secondary-dt),
+  "success":    list-group-color-map($success-dt),
+  "danger":     list-group-color-map($danger-dt),
+  "warning":    list-group-color-map($warning-dt),
+  "info":       list-group-color-map($info-dt)
 ) !default;
 
 // Modals
@@ -600,7 +619,9 @@ $table-variants-dt: (
   "success":    table-color-map(shift-color($success-dt, $table-bg-scale)),
   "info":       table-color-map(shift-color($info-dt, $table-bg-scale)),
   "warning":    table-color-map(shift-color($warning-dt, $table-bg-scale)),
-  "danger":     table-color-map(shift-color($danger-dt, $table-bg-scale))
+  "danger":     table-color-map(shift-color($danger-dt, $table-bg-scale)),
+  "light":      table-color-map($light-dt, $body-bg-dt),
+  "dark":       table-color-map($dark-dt, $body-bg-dt)
 ) !default;
 
 // Toast
@@ -634,19 +655,20 @@ $theme-map: (
     "text":        $theme-colors-dt
   ),
   "accordion":     $accordion-theme-map,
-  "alert":         $alert-theme-variants-dt,
+  // "alert":         $alert-theme-variants-dt,
   "breadcrumb":    $breadcrumb-theme-map,
-  "btn":           $button-theme-variants-dt,
-  "btn-outline":   $button-theme-variants-dt,
+  // "btn":           $button-theme-variants-dt,
+  // "btn-outline":   $button-outline-theme-variants-dt,
   "btn-close":     $close-theme-map,
   "card":          $card-theme-map,
   "dropdown":      $dropdown-theme-map,
   "footer":        $footer-theme-map,
   "form-control":  $form-control-theme-map,
+  "form-check":    $form-check-theme-map,
   "form-select":   $form-select-theme-map,
   "header":        $header-theme-map,
   "input-group":   $input-group-theme-map,
-  "list-group":    map-merge($list-group-theme-map, $list-group-variants-dt),
+  "list-group":    $list-group-theme-map,
   "modal":         $modal-theme-map,
   "nav":           $nav-theme-map,
   "pagination":    $pagination-theme-map,
