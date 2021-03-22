@@ -353,7 +353,7 @@ $form-multi-select-focus-border-color-dt:  $input-focus-border-color-dt !default
 $form-multi-select-disabled-color-dt:      $disabled-dt !default;
 $form-multi-select-disabled-bg-dt:         $input-disabled-bg-dt !default;
 
-// $form-multi-select-tag-bg:             $light !default;
+$form-multi-select-tag-bg-dt:               $light-dt !default;
 $form-multi-select-tag-border-color-dt:      $input-border-color-dt !default;
 
 $form-multi-select-search-color-dt:          $input-color-dt !default;
@@ -367,7 +367,7 @@ $form-multi-select-options-border-color-dt:   $input-border-color-dt !default;
 $form-multi-select-option-hover-color-dt:     $body-color-dt !default;
 $form-multi-select-option-hover-bg-dt:        $light-dt !default;
 
-$form-multi-select-option-selected-bg-dt:        $light-dt !default;
+$form-multi-select-option-selected-bg-dt:     $light-dt !default;
 // $form-multi-select-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
 // $form-multi-select-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
 // $form-multi-select-option-selected-indicator-border-color:  $form-multi-select-option-selected-indicator-bg !default;
@@ -383,6 +383,7 @@ $form-multi-select-theme-map: (
   "form-multi-select-focus-color":           $form-multi-select-focus-color-dt,
   "form-multi-select-focus-bg":              $form-multi-select-focus-bg-dt,
   "form-multi-select-focus-border-color":    $form-multi-select-focus-border-color-dt,
+  "form-multi-select-tag-bg":                $form-multi-select-tag-bg-dt,
   "form-multi-select-tag-border-color":      $form-multi-select-tag-border-color-dt,
   "form-multi-select-search-color":          $form-multi-select-search-color-dt,
   "form-multi-select-search-bg":             $form-multi-select-search-bg-dt,
