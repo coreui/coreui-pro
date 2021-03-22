@@ -1,8 +1,14 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
  * @version v4.0.0-alpha.2
  * @link https://coreui.io/pro/
+=======
+ * CoreUI - HTML, CSS, and JavaScript UI Components Library
+ * @version v4.0.0-alpha.4
+ * @link https://coreui.io/
+>>>>>>> 8e5e9af3b61f0b3041ac0fe60a8286fa62e069f4
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -114,10 +120,8 @@ p {
 abbr[title],
 abbr[data-coreui-original-title] {
   text-decoration: underline;
-  -webkit-text-decoration: underline dotted;
   text-decoration: underline dotted;
   cursor: help;
-  -webkit-text-decoration-skip-ink: none;
   text-decoration-skip-ink: none;
 }
 
