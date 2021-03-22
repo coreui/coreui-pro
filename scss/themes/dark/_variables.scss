@@ -342,6 +342,59 @@ $form-select-theme-map: (
   // "form-select-disabled-border-color":  $form-select-disabled-border-color-dt,
 ) !default;
 
+$form-multi-select-color-dt:               $input-color-dt !default;
+$form-multi-select-bg-dt:                  $input-bg-dt !default;
+$form-multi-select-border-color-dt:        $input-border-color-dt !default;
+
+$form-multi-select-focus-color-dt:         $input-focus-color-dt !default;
+$form-multi-select-focus-bg-dt:            $input-focus-bg-dt !default;
+$form-multi-select-focus-border-color-dt:  $input-focus-border-color-dt !default;
+
+$form-multi-select-disabled-color-dt:      $disabled-dt !default;
+$form-multi-select-disabled-bg-dt:         $input-disabled-bg-dt !default;
+
+// $form-multi-select-tag-bg:             $light !default;
+$form-multi-select-tag-border-color-dt:      $input-border-color-dt !default;
+
+$form-multi-select-search-color-dt:          $input-color-dt !default;
+$form-multi-select-search-bg-dt:             transparent !default;
+$form-multi-select-search-border-color-dt:   $input-border-color-dt !default;
+
+$form-multi-select-options-color-dt:          $body-color-dt !default;
+$form-multi-select-options-bg-dt:             $bg-elevation-8 !default;
+$form-multi-select-options-border-color-dt:   $input-border-color-dt !default;
+
+$form-multi-select-option-hover-color-dt:     $body-color-dt !default;
+$form-multi-select-option-hover-bg-dt:        $light-dt !default;
+
+$form-multi-select-option-selected-bg-dt:        $light-dt !default;
+// $form-multi-select-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
+// $form-multi-select-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
+// $form-multi-select-option-selected-indicator-border-color:  $form-multi-select-option-selected-indicator-bg !default;
+
+// $form-multi-select-option-disabled-color:  $gray-600 !default;
+
+$form-multi-select-theme-map: (
+  "form-multi-select-color":                 $form-multi-select-color-dt,
+  "form-multi-select-bg":                    $form-multi-select-bg-dt,
+  "form-multi-select-border-color":          $form-multi-select-border-color-dt,
+  "form-multi-select-disabled-color":        $form-multi-select-disabled-color-dt,
+  "form-multi-select-disabled-bg":           $form-multi-select-disabled-bg-dt,
+  "form-multi-select-focus-color":           $form-multi-select-focus-color-dt,
+  "form-multi-select-focus-bg":              $form-multi-select-focus-bg-dt,
+  "form-multi-select-focus-border-color":    $form-multi-select-focus-border-color-dt,
+  "form-multi-select-tag-border-color":      $form-multi-select-tag-border-color-dt,
+  "form-multi-select-search-color":          $form-multi-select-search-color-dt,
+  "form-multi-select-search-bg":             $form-multi-select-search-bg-dt,
+  "form-multi-select-search-border-color":   $form-multi-select-search-border-color-dt,
+  "form-multi-select-options-color":         $form-multi-select-options-color-dt,
+  "form-multi-select-options-bg":            $form-multi-select-options-bg-dt,
+  "form-multi-select-options-border-color":  $form-multi-select-options-border-color-dt,
+  "form-multi-select-option-hover-color":    $form-multi-select-option-hover-color-dt,
+  "form-multi-select-option-hover-bg":       $form-multi-select-option-hover-bg-dt,
+  "form-multi-select-option-selected-bg":    $form-multi-select-option-selected-bg-dt,
+) !default;
+
 // Header
 
 $header-bg-dt:                     $bg-elevation-3 !default;
@@ -649,32 +702,33 @@ $toast-theme-map: (
 // --cui-tooltip-color
 
 $theme-map: (
-  "root":          map-merge($theme-root-dt, $link-theme-map),
+  "root":               map-merge($theme-root-dt, $link-theme-map),
   "utilities": (
-    "bg":          $theme-colors-dt,
-    "text":        $theme-colors-dt
+    "bg":               $theme-colors-dt,
+    "text":             $theme-colors-dt
   ),
-  "accordion":     $accordion-theme-map,
+  "accordion":          $accordion-theme-map,
   // "alert":         $alert-theme-variants-dt,
-  "breadcrumb":    $breadcrumb-theme-map,
+  "breadcrumb":         $breadcrumb-theme-map,
   // "btn":           $button-theme-variants-dt,
   // "btn-outline":   $button-outline-theme-variants-dt,
-  "btn-close":     $close-theme-map,
-  "card":          $card-theme-map,
-  "dropdown":      $dropdown-theme-map,
-  "footer":        $footer-theme-map,
-  "form-control":  $form-control-theme-map,
-  "form-check":    $form-check-theme-map,
-  "form-select":   $form-select-theme-map,
-  "header":        $header-theme-map,
-  "input-group":   $input-group-theme-map,
-  "list-group":    $list-group-theme-map,
-  "modal":         $modal-theme-map,
-  "nav":           $nav-theme-map,
-  "pagination":    $pagination-theme-map,
-  "popover":       $popover-theme-map,
-  "progress":      $progress-theme-map,
-  "sidebar":       $sidebar-theme-map,
-  "table":         map-merge($table-theme-map, $table-variants-dt),
-  "toast":         $toast-theme-map
+  "btn-close":          $close-theme-map,
+  "card":               $card-theme-map,
+  "dropdown":           $dropdown-theme-map,
+  "footer":             $footer-theme-map,
+  "form-control":       $form-control-theme-map,
+  "form-check":         $form-check-theme-map,
+  "form-select":        $form-select-theme-map,
+  "form-multi-select":  $form-multi-select-theme-map,
+  "header":             $header-theme-map,
+  "input-group":        $input-group-theme-map,
+  "list-group":         $list-group-theme-map,
+  "modal":              $modal-theme-map,
+  "nav":                $nav-theme-map,
+  "pagination":         $pagination-theme-map,
+  "popover":            $popover-theme-map,
+  "progress":           $progress-theme-map,
+  "sidebar":            $sidebar-theme-map,
+  "table":              map-merge($table-theme-map, $table-variants-dt),
+  "toast":              $toast-theme-map
 ) !default;
