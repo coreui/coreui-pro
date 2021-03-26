@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v3.4.0): multi-select.js
+ * CoreUI PRO (v3.4.1): multi-select.js
  * Licens (https://coreui.io/pro/license)
  * --------------------------------------------------------------------------
  */
@@ -21,7 +21,7 @@ import SelectorEngine from './dom/selector-engine'
  */
 
 const NAME = 'mutli-select'
-const VERSION = '3.4.0-alpha.0'
+const VERSION = '3.4.1-alpha.0'
 const DATA_KEY = 'coreui.mutli-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'

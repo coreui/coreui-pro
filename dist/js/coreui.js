@@ -1,6 +1,6 @@
 /*!
-  * CoreUI PRO v3.4.0 (https://coreui.io)
-  * Copyright 2020 creativeLabs Łukasz Holeczek
+  * CoreUI PRO v3.4.1 (https://coreui.io)
+  * Copyright 2021 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 (function (global, factory) {
@@ -3280,7 +3280,7 @@
    */
 
   var NAME$7 = 'loading-button';
-  var VERSION$7 = '3.4.0-alpha.0';
+  var VERSION$7 = '3.4.1-alpha.0';
   var DATA_KEY$7 = 'coreui.loading-button';
   var EVENT_KEY$7 = "." + DATA_KEY$7;
   var DATA_API_KEY$7 = '.data-api';
@@ -4246,7 +4246,7 @@
    */
 
   var NAME$9 = 'mutli-select';
-  var VERSION$9 = '3.4.0-alpha.0';
+  var VERSION$9 = '3.4.1-alpha.0';
   var DATA_KEY$9 = 'coreui.mutli-select';
   var EVENT_KEY$9 = "." + DATA_KEY$9;
   var DATA_API_KEY$9 = '.data-api';
@@ -4462,7 +4462,7 @@
         if (node.nodeName === 'OPTION') {
           options.push({
             value: node.value,
-            text: node.outerText,
+            text: node.innerHTML,
             selected: node.selected
           });
         }
@@ -8087,7 +8087,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v3.4.0): index.umd.js
+   * CoreUI (v3.4.1): index.umd.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

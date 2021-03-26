@@ -1,6 +1,6 @@
 /*!
-  * CoreUI PRO v3.4.0 (https://coreui.io)
-  * Copyright 2020 creativeLabs Łukasz Holeczek
+  * CoreUI PRO v3.4.1 (https://coreui.io)
+  * Copyright 2021 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
 import { createPopper } from '@popperjs/core';
@@ -3273,7 +3273,7 @@ if ($$7) {
  */
 
 var NAME$7 = 'loading-button';
-var VERSION$7 = '3.4.0-alpha.0';
+var VERSION$7 = '3.4.1-alpha.0';
 var DATA_KEY$7 = 'coreui.loading-button';
 var EVENT_KEY$7 = "." + DATA_KEY$7;
 var DATA_API_KEY$7 = '.data-api';
@@ -4239,7 +4239,7 @@ if ($$9) {
  */
 
 var NAME$9 = 'mutli-select';
-var VERSION$9 = '3.4.0-alpha.0';
+var VERSION$9 = '3.4.1-alpha.0';
 var DATA_KEY$9 = 'coreui.mutli-select';
 var EVENT_KEY$9 = "." + DATA_KEY$9;
 var DATA_API_KEY$9 = '.data-api';
@@ -4455,7 +4455,7 @@ var MultiSelect = /*#__PURE__*/function () {
       if (node.nodeName === 'OPTION') {
         options.push({
           value: node.value,
-          text: node.outerText,
+          text: node.innerHTML,
           selected: node.selected
         });
       }
