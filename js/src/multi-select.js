@@ -250,7 +250,7 @@ class MultiSelect {
       if (node.nodeName === 'OPTION') {
         options.push({
           value: node.value,
-          text: node.outerText,
+          text: node.innerHTML,
           selected: node.selected
         })
       }
