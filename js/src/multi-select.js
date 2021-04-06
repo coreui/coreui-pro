@@ -20,9 +20,9 @@ import SelectorEngine from './dom/selector-engine'
  * ------------------------------------------------------------------------
  */
 
-const NAME = 'mutli-select'
-const VERSION = '3.4.1-alpha.0'
-const DATA_KEY = 'coreui.mutli-select'
+const NAME = 'multi-select'
+const VERSION = '3.4.2-alpha.0'
+const DATA_KEY = 'coreui.multi-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
