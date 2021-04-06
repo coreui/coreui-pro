@@ -112,6 +112,10 @@ html:not([dir="rtl"]) .c-email-app .c-message-headers-date {
   color: #636f83;
 }
 
+.c-dark-theme .c-email-app .c-message-body {
+  color: rgba(255, 255, 255, 0.87);
+}
+
 .c-email-app .c-message-attachment {
   display: flex;
   align-items: center;

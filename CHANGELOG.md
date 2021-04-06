@@ -1,3 +1,16 @@
+## v3.4.2
+- fix(MultiSelect): typo in `DATA_KEY = 'coreui.mutli-select'`
+- fix(_email.scss): text in `c-message-body` not visible in light theme
+## v3.4.1
+- fix(MultiSelect): undefined instead of option text
+## v3.4.0
+## v3.3.0
+## v3.2.2
+## v3.2.1
+## v3.2.0
+## v3.1.1
+## v3.1.0
+## v3.0.0
 ## v3.0.0-next
 - chore: Move the browserslist config to a separate file.
 - chore add `bundlesize`
@@ -19,7 +32,7 @@
 - chore: update `rollup-plugin-node-resolve` to `4.0.0`
 - chore: update `stylelint` to `9.9.0`
 - chore: update `stylelint-order` to `2.0.0`
-- chore: update `stylelint-scss` to `3.4.1`
+- chore: update `stylelint-scss` to `3.4.2`
 
 ## v2.1.3
 - chore: update `nodemon` to `1.18.7` (remove vulnerability)

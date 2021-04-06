@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  popover.jsv3.4.1 (https://coreui.io)
+  * CoreUI PRO  popover.jsv3.4.2 (https://coreui.io)
   * Copyright 2021 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */
@@ -37,7 +37,9 @@
 
   function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-  function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+  function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; _setPrototypeOf(subClass, superClass); }
+
+  function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
   function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -173,8 +175,8 @@
 
     _createClass(Popover, null, [{
       key: "VERSION",
-      // Getters
-      get: function get() {
+      get: // Getters
+      function get() {
         return VERSION;
       }
     }, {

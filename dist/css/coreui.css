@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v3.4.1
+ * @version v3.4.2
  * @link https://coreui.io/pro/
  * Copyright (c) 2020 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -9312,7 +9312,6 @@ html:not([dir="rtl"]) .was-validated .custom-select:invalid, html:not([dir="rtl"
 
 @media (min-width: 576px) {
   .form-inline label {
-    -ms-flex-align: center;
     -ms-flex-pack: center;
     justify-content: center;
   }
@@ -9328,7 +9327,6 @@ html:not([dir="rtl"]) .was-validated .custom-select:invalid, html:not([dir="rtl"
     flex: 0 0 auto;
     -ms-flex-flow: row wrap;
     flex-flow: row wrap;
-    -ms-flex-align: center;
   }
   .form-inline .form-control {
     display: inline-block;
@@ -27562,6 +27560,10 @@ html:not([dir="rtl"]) .c-email-app .c-message-headers-date {
 }
 
 .c-email-app .c-message-body {
+  color: #636f83;
+}
+
+.c-dark-theme .c-email-app .c-message-body {
   color: rgba(255, 255, 255, 0.87);
 }
 

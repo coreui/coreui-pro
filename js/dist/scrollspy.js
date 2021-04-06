@@ -1,5 +1,5 @@
 /*!
-  * CoreUI PRO  scrollspy.jsv3.4.1 (https://coreui.io)
+  * CoreUI PRO  scrollspy.jsv3.4.2 (https://coreui.io)
   * Copyright 2021 creativeLabs Łukasz Holeczek
   * License (https://coreui.io/pro/license/)
   */

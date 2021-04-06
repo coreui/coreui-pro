@@ -1,6 +1,6 @@
 {
   "name": "@coreui/coreui-pro",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "description": "HTML, CSS, and JavaScript UI Components Library",
   "keywords": [
     "bootstrap",
@@ -83,15 +83,15 @@
     "watch-css": "nodemon --ignore dist/ --ignore css/ --ignore scss/partials/ -e scss -x \"npm run css\""
   },
   "peerDependencies": {
-    "perfect-scrollbar": "^1.5.0",
-    "@popperjs/core": "^2.5.4"
+    "@popperjs/core": "^2.5.4",
+    "perfect-scrollbar": "^1.5.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.7",
     "@babel/core": "^7.12.7",
     "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
     "@babel/preset-env": "^7.12.7",
-    "@coreui/icons": "^1.0.1",
+    "@coreui/icons": "^2.0.1",
     "@popperjs/core": "^2.5.4",
     "@rollup/plugin-babel": "^5.2.1",
     "@rollup/plugin-commonjs": "^16.0.0",
