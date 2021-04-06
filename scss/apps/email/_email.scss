@@ -86,7 +86,9 @@
   }
 
   .c-message-body {
-    color: themes-get-value("email-app-message-body-color");
+    @include themes($email-app-theme-map) {
+      color: themes-get-value("email-app-message-body-color");
+    }
   }
 
   .c-message-attachment {
