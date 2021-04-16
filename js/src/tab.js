@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.4): tab.js
+ * CoreUI (v4.0.0-alpha.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tab.js
@@ -13,6 +13,7 @@ import {
   emulateTransitionEnd,
   getElementFromSelector,
   getTransitionDurationFromElement,
+  isDisabled,
   reflow
 } from './util/index'
 import Data from './dom/data'
@@ -39,7 +40,6 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_DROPDOWN_MENU = 'dropdown-menu'
 const CLASS_NAME_ACTIVE = 'active'
-const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_FADE = 'fade'
 const CLASS_NAME_SHOW = 'show'
 
@@ -70,7 +70,7 @@ class Tab extends BaseComponent {
     if ((this._element.parentNode &&
       this._element.parentNode.nodeType === Node.ELEMENT_NODE &&
       this._element.classList.contains(CLASS_NAME_ACTIVE)) ||
-      this._element.classList.contains(CLASS_NAME_DISABLED)) {
+      isDisabled(this._element)) {
       return
     }
 

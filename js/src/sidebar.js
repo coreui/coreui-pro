@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.4): sidebar.js
+ * CoreUI (v4.0.0-alpha.5): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -29,16 +29,15 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const Default = {
-  breakpoint: false
+  //
 }
 
 const DefaultType = {
-  breakpoint: '(boolean|string)'
+  //
 }
 
 const CLASS_NAME_BACKDROP = 'sidebar-backdrop'
 const CLASS_NAME_FADE = 'fade'
-const CLASS_NAME_HIDE = 'hide'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_SIDEBAR = 'sidebar'
 const CLASS_NAME_SIDEBAR_NARROW = 'sidebar-narrow'
@@ -46,7 +45,6 @@ const CLASS_NAME_SIDEBAR_OVERLAID = 'sidebar-overlaid'
 const CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE = 'sidebar-narrow-unfoldable'
 
 const REGEXP_SIDEBAR_SELF_HIDING = /sidebar-self-hiding/
-// const REGEXP_SIDEBAR_SHOW_BREAKPOINT = /sidebar-(sm|md|lg|xl|xxl)-show/
 
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
@@ -70,7 +68,6 @@ class Sidebar extends BaseComponent {
   constructor(element, config) {
     super(element)
     this._config = this._getConfig(config)
-    // this._breakpoint = this._getBreakpoint()
     this._show = this._isVisible()
     this._mobile = this._isMobile()
     this._overlaid = this._isOverlaid()
@@ -97,12 +94,7 @@ class Sidebar extends BaseComponent {
   show() {
     EventHandler.trigger(this._element, EVENT_SHOW)
 
-    if (this._element.classList.contains(CLASS_NAME_HIDE)) {
-      this._element.classList.remove(CLASS_NAME_HIDE)
-    }
-
     if (REGEXP_SIDEBAR_SELF_HIDING.test(this._element.className)) {
-    // if (this._element.className.match(REGEXP_SIDEBAR_SELF_HIDING)) {
       this._element.classList.add(CLASS_NAME_SHOW)
     }
 
@@ -134,8 +126,6 @@ class Sidebar extends BaseComponent {
       this._element.classList.remove(CLASS_NAME_SHOW)
     }
 
-    this._element.classList.add(CLASS_NAME_HIDE)
-
     if (this._isMobile()) {
       this._removeBackdrop()
     }
@@ -158,7 +148,7 @@ class Sidebar extends BaseComponent {
   }
 
   toggle() {
-    if (this._show) {
+    if (this._isVisible()) {
       this.hide()
       return
     }
@@ -230,19 +220,6 @@ class Sidebar extends BaseComponent {
     return config
   }
 
-  // _getBreakpoint() {
-  //   if (this._config.breakpoint) {
-  //     return this._config.breakpoint
-  //   }
-
-  //   const breakpoint = this._element.className.match(REGEXP_SIDEBAR_SHOW_BREAKPOINT)
-  //   if (breakpoint) {
-  //     return breakpoint[1]
-  //   }
-
-  //   return false
-  // }
-
   _createShowClass() {
     if (this._breakpoint && !this._isMobile()) {
       return `${CLASS_NAME_SIDEBAR}-${this._breakpoint}-${CLASS_NAME_SHOW}`
@@ -252,30 +229,7 @@ class Sidebar extends BaseComponent {
   }
 
   _isMobile() {
-    return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--is-mobile'))
-  }
-
-  _isIOS() {
-    const iOSDevices = [
-      'iPad Simulator',
-      'iPhone Simulator',
-      'iPod Simulator',
-      'iPad',
-      'iPhone',
-      'iPod'
-    ]
-
-    const platform = Boolean(navigator.platform)
-
-    if (platform) {
-      while (iOSDevices.length) {
-        if (navigator.platform === iOSDevices.pop()) {
-          return true
-        }
-      }
-    }
-
-    return false
+    return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--cui-is-mobile'))
   }
 
   _isNarrow() {
@@ -290,8 +244,6 @@ class Sidebar extends BaseComponent {
     return this._element.classList.contains(CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE)
   }
 
-  // eslint-disable-next-line no-warning-comments
-  // TODO: this method is not bulletproof
   _isVisible() {
     const rect = this._element.getBoundingClientRect()
     return (
@@ -325,7 +277,7 @@ class Sidebar extends BaseComponent {
   }
 
   _clickOutListener(event, sidebar) {
-    if (event.target.closest(SELECTOR_SIDEBAR) === null) { // or use:
+    if (event.target.closest(SELECTOR_SIDEBAR) === null) {
       event.preventDefault()
       event.stopPropagation()
       sidebar.hide()

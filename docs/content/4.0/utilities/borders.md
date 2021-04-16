@@ -64,11 +64,23 @@ Using utilities you can change the border on one side only, or you can change al
 <span class="border border-4"></span>
 <span class="border border-5"></span>
 
+<span class="border border-1 border-info"></span>
+<span class="border border-2 border-info"></span>
+<span class="border border-3 border-info"></span>
+<span class="border border-4 border-info"></span>
+<span class="border border-5 border-info"></span>
+
 <span class="border-start border-start-1"></span>
 <span class="border-start border-start-2"></span>
 <span class="border-start border-start-3"></span>
 <span class="border-start border-start-4"></span>
 <span class="border-start border-start-5"></span>
+
+<span class="border-start border-start-1 border-start-info"></span>
+<span class="border-start border-start-2 border-start-info"></span>
+<span class="border-start border-start-3 border-start-info"></span>
+<span class="border-start border-start-4 border-start-info"></span>
+<span class="border-start border-start-5 border-start-info"></span>
 {{< /example >}}
 
 ## Border-radius
@@ -108,7 +120,7 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
 
 {{< scss-docs name="border-radius-mixins" file="scss/mixins/_border-radius.scss" >}}
 
-### Utilities
+### Utilities API
 
 Border utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.]({{< docsref "/utilities/api#using-the-api" >}})
 

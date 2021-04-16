@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-alpha.4): alert.js
+ * CoreUI (v4.0.0-alpha.5): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  util/index.js
@@ -156,6 +156,22 @@ const isVisible = element => {
   return false
 }
 
+const isDisabled = element => {
+  if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+    return true
+  }
+
+  if (element.classList.contains('disabled')) {
+    return true
+  }
+
+  if (typeof element.disabled !== 'undefined') {
+    return element.disabled
+  }
+
+  return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false'
+}
+
 const findShadowRoot = element => {
   if (!document.documentElement.attachShadow) {
     return null
@@ -229,6 +245,7 @@ export {
   emulateTransitionEnd,
   typeCheckConfig,
   isVisible,
+  isDisabled,
   findShadowRoot,
   noop,
   reflow,

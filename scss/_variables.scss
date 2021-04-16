@@ -1189,6 +1189,7 @@ $zindex-modal-backdrop:             1050 !default;
 $zindex-modal:                      1060 !default;
 $zindex-popover:                    1070 !default;
 $zindex-tooltip:                    1080 !default;
+$zindex-toaster:                    1090 !default;
 // scss-docs-end zindex-stack
 
 
@@ -1386,10 +1387,11 @@ $card-group-margin:                 $grid-gutter-width / 2 !default;
 $accordion-padding-y:                     1rem !default;
 $accordion-padding-x:                     1.25rem !default;
 $accordion-color:                         $body-color !default;
-$accordion-bg:                            transparent !default;
+$accordion-bg:                            $body-bg !default;
 $accordion-border-width:                  $border-width !default;
 $accordion-border-color:                  rgba($black, .125) !default;
 $accordion-border-radius:                 $border-radius !default;
+$accordion-inner-border-radius:           subtract($accordion-border-radius, $accordion-border-width) !default;
 
 $accordion-body-padding-y:                $accordion-padding-y !default;
 $accordion-body-padding-x:                $accordion-padding-x !default;
