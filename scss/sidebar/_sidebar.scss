@@ -33,36 +33,18 @@
     border-color: rgba($black, .1);
   }
 
-  &.hide {
-    &:not(.sidebar-end){
-      @include ltr-rtl("margin-left", - $sidebar-width);
-      ~ * {
-        --#{$variable-prefix}sidebar-occupy-start: 0;
-      }
-    }
-    &.sidebar-end {
-      @include ltr-rtl("margin-right", - $sidebar-width);
-      ~ * {
-        --#{$variable-prefix}sidebar-occupy-end: 0;
-      }
-    }
-  }
-
   @each $width, $value in $sidebar-widths {
     &.sidebar-#{$width} {
       flex: 0 0 $value;
       width: $value;
 
-      &:not(.sidebar-end).hide {
-        @include ltr-rtl("margin-left", - $value);
-
-        &:not(.sidebar-overlaid) ~ * {
+      &:not(.sidebar-end) {
+        ~ * {
           --#{$variable-prefix}sidebar-occupy-start: #{$value};
         }
       }
-      &.sidebar-end.hide {
-        @include ltr-rtl("margin-right", - $value);
-        &:not(.sidebar-overlaid) ~ * {
+      &.sidebar-end {
+        ~ * {
           --#{$variable-prefix}sidebar-occupy-end: #{$value};
         }
       }
