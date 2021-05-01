@@ -248,6 +248,8 @@
   @include media-breakpoint-down(breakpoint-next($breakpoint)) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
     .sidebar:not(.show).sidebar-self-hiding#{$infix} {
+      @include elevation(0);
+
       &:not(.sidebar-end) {
         @include ltr-rtl("margin-left", - $sidebar-width);
 
@@ -302,10 +304,11 @@
   --#{$variable-prefix}sidebar-nav-link-disabled-icon-color: #{$sidebar-light-nav-link-disabled-icon-color};
   --#{$variable-prefix}sidebar-nav-group-bg: #{$sidebar-light-nav-group-bg};
   --#{$variable-prefix}sidebar-nav-group-toggle-show-color: #{$sidebar-light-nav-group-toggle-show-color};
-  --#{$variable-prefix}sidebar-nav-group-indicator-color: #{$sidebar-light-nav-group-indicator-color};
-  --#{$variable-prefix}sidebar-nav-group-indicator: #{$sidebar-light-nav-group-indicator};
-  --#{$variable-prefix}sidebar-nav-group-indicator-hover-color: #{$sidebar-light-nav-group-indicator-hover-color};
-  --#{$variable-prefix}sidebar-nav-group-indicator-hover: #{$sidebar-light-nav-group-indicator-hover};
+  --#{$variable-prefix}sidebar-nav-group-indicator: #{$sidebar-light-nav-group-indicator-icon};
+  --#{$variable-prefix}sidebar-nav-group-indicator-hover: #{$sidebar-light-nav-group-indicator-hover-icon};
   --#{$variable-prefix}sidebar-footer-bg: #{$sidebar-light-footer-bg};
   --#{$variable-prefix}sidebar-toggler-bg: #{$sidebar-light-toggler-bg};
+  --#{$variable-prefix}sidebar-toggler-hover-bg: #{$sidebar-light-toggler-hover-bg};
+  --#{$variable-prefix}sidebar-toggler-indicator: #{$sidebar-light-toggler-indicator-icon};
+  --#{$variable-prefix}sidebar-toggler-hover-indicator: #{$sidebar-light-toggler-hover-indicator-icon};
 }
