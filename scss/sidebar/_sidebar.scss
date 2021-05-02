@@ -213,7 +213,7 @@
   &:hover {
     background-color: var(--#{$variable-prefix}sidebar-toggler-hover-bg, $sidebar-toggler-hover-bg);
     &::before {
-      background-image: var(--#{$variable-prefix}sidebar-toggler-hover-indicator, escape-svg($sidebar-toggler-hover-indicator-icon));
+      background-image: var(--#{$variable-prefix}sidebar-toggler-indicator-hover, escape-svg($sidebar-toggler-indicator-hover-icon));
     }
   }
 
@@ -310,5 +310,7 @@
   --#{$variable-prefix}sidebar-toggler-bg: #{$sidebar-light-toggler-bg};
   --#{$variable-prefix}sidebar-toggler-hover-bg: #{$sidebar-light-toggler-hover-bg};
   --#{$variable-prefix}sidebar-toggler-indicator: #{$sidebar-light-toggler-indicator-icon};
-  --#{$variable-prefix}sidebar-toggler-hover-indicator: #{$sidebar-light-toggler-hover-indicator-icon};
+  --#{$variable-prefix}sidebar-toggler-indicator-hover: #{$sidebar-light-toggler-indicator-hover-icon};
 }
+
+// sidebar-indicator-toggler-hover-icon

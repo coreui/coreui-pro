@@ -52,6 +52,7 @@
 .dark-theme .accordion {
   --cui-accordion-button-color: rgba(255, 255, 255, 0.87);
   --cui-accordion-button-bg: transparent;
+  --cui-accordion-bg: transparent;
   --cui-accordion-border-color: rgba(255, 255, 255, 0.125);
   --cui-accordion-button-active-bg: rgba(150, 143, 211, 0.525);
   --cui-accordion-button-active-color: #e6e6e6;
@@ -234,6 +235,24 @@
   --cui-sidebar-header-bg: rgba(0, 0, 21, 0.2);
   --cui-sidebar-toggler-bg: rgba(0, 0, 21, 0.2);
   --cui-sidebar-toggler-hover-bg: rgba(0, 0, 21, 0.3);
+  --cui-sidebar-nav-title-color: rgba(255, 255, 255, 0.6);
+  --cui-sidebar-nav-link-color: rgba(255, 255, 255, 0.6);
+  --cui-sidebar-nav-link-bg: transparent;
+  --cui-sidebar-nav-link-icon-color: rgba(255, 255, 255, 0.6);
+  --cui-sidebar-nav-link-hover-color: rgba(255, 255, 255, 0.87);
+  --cui-sidebar-nav-link-hover-bg: rgba(255, 255, 255, 0.05);
+  --cui-sidebar-nav-link-hover-icon-color: rgba(255, 255, 255, 0.87);
+  --cui-sidebar-nav-link-active-color: rgba(255, 255, 255, 0.87);
+  --cui-sidebar-nav-link-active-bg: rgba(255, 255, 255, 0.05);
+  --cui-sidebar-nav-link-active-icon-color: rgba(255, 255, 255, 0.87);
+  --cui-sidebar-nav-link-disabled-color: rgba(255, 255, 255, 0.38);
+  --cui-sidebar-nav-link-disabled-icon-color: rgba(255, 255, 255, 0.6);
+  --cui-sidebar-nav-group-bg: rgba(0, 0, 0, 0.2);
+  --cui-sidebar-nav-group-toggle-show-color: rgba(255, 255, 255, 0.6);
+  --cui-sidebar-nav-group-indicator-color: rgba(255, 255, 255, 0.6);
+  --cui-sidebar-nav-group-indicator-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba(255, 255, 255, 0.6)'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");
+  --cui-sidebar-nav-group-indicator-hover-color: rgba(255, 255, 255, 0.87);
+  --cui-sidebar-nav-group-indicator-hover-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba(255, 255, 255, 0.87)'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");
 }
 .dark-theme .table {
   --cui-table-color: rgba(255, 255, 255, 0.87);
