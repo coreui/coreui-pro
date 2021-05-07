@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-beta.0): alert.js
+ * CoreUI (v4.0.0-rc.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's base-component.js
@@ -9,6 +9,7 @@
  */
 
 import Data from './dom/data'
+import EventHandler from './dom/event-handler'
 
 /**
  * ------------------------------------------------------------------------
@@ -16,7 +17,7 @@ import Data from './dom/data'
  * ------------------------------------------------------------------------
  */
 
-const VERSION = '4.0.0-beta.0'
+const VERSION = '4.0.0-rc.0'
 
 class BaseComponent {
   constructor(element) {
@@ -32,6 +33,7 @@ class BaseComponent {
 
   dispose() {
     Data.remove(this._element, this.constructor.DATA_KEY)
+    EventHandler.off(this._element, `.${this.constructor.DATA_KEY}`)
     this._element = null
   }
 

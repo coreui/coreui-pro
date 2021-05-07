@@ -1,5 +1,5 @@
 /*!
-  * CoreUI toast.js v4.0.0-beta.0 (https://coreui.io)
+  * CoreUI toast.js v4.0.0-rc.0 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -18,7 +18,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-beta.0): alert.js
+   * CoreUI (v4.0.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -90,7 +90,7 @@
       const valueType = value && isElement(value) ? 'element' : toType(value);
 
       if (!new RegExp(expectedTypes).test(valueType)) {
-        throw new TypeError(`${componentName.toUpperCase()}: ` + `Option "${property}" provided type "${valueType}" ` + `but expected type "${expectedTypes}".`);
+        throw new TypeError(`${componentName.toUpperCase()}: Option "${property}" provided type "${valueType}" but expected type "${expectedTypes}".`);
       }
     });
   };
@@ -137,7 +137,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-beta.0): toast.js
+   * CoreUI (v4.0.0-rc.0): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -279,7 +279,6 @@
         this._element.classList.remove(CLASS_NAME_SHOW);
       }
 
-      EventHandler__default['default'].off(this._element, EVENT_CLICK_DISMISS);
       super.dispose();
       this._config = null;
     } // Private

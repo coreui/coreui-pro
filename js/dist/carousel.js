@@ -1,5 +1,5 @@
 /*!
-  * CoreUI carousel.js v4.0.0-beta.0 (https://coreui.io)
+  * CoreUI carousel.js v4.0.0-rc.0 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -19,7 +19,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-beta.0): alert.js
+   * CoreUI (v4.0.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -52,7 +52,7 @@
 
 
       if (hrefAttr.includes('#') && !hrefAttr.startsWith('#')) {
-        hrefAttr = '#' + hrefAttr.split('#')[1];
+        hrefAttr = `#${hrefAttr.split('#')[1]}`;
       }
 
       selector = hrefAttr && hrefAttr !== '#' ? hrefAttr.trim() : null;
@@ -120,7 +120,7 @@
       const valueType = value && isElement(value) ? 'element' : toType(value);
 
       if (!new RegExp(expectedTypes).test(valueType)) {
-        throw new TypeError(`${componentName.toUpperCase()}: ` + `Option "${property}" provided type "${valueType}" ` + `but expected type "${expectedTypes}".`);
+        throw new TypeError(`${componentName.toUpperCase()}: Option "${property}" provided type "${valueType}" but expected type "${expectedTypes}".`);
       }
     });
   };
@@ -183,7 +183,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-beta.0): carousel.js
+   * CoreUI (v4.0.0-rc.0): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -369,7 +369,6 @@
     }
 
     dispose() {
-      EventHandler__default['default'].off(this._element, EVENT_KEY);
       this._items = null;
       this._config = null;
       this._interval = null;
@@ -484,11 +483,11 @@
       if (event.key === ARROW_LEFT_KEY) {
         event.preventDefault();
 
-        this._slide(DIRECTION_LEFT);
+        this._slide(DIRECTION_RIGHT);
       } else if (event.key === ARROW_RIGHT_KEY) {
         event.preventDefault();
 
-        this._slide(DIRECTION_RIGHT);
+        this._slide(DIRECTION_LEFT);
       }
     }
 
@@ -650,10 +649,10 @@
       }
 
       if (isRTL()) {
-        return direction === DIRECTION_RIGHT ? ORDER_PREV : ORDER_NEXT;
+        return direction === DIRECTION_LEFT ? ORDER_PREV : ORDER_NEXT;
       }
 
-      return direction === DIRECTION_RIGHT ? ORDER_NEXT : ORDER_PREV;
+      return direction === DIRECTION_LEFT ? ORDER_NEXT : ORDER_PREV;
     }
 
     _orderToDirection(order) {
@@ -662,10 +661,10 @@
       }
 
       if (isRTL()) {
-        return order === ORDER_NEXT ? DIRECTION_LEFT : DIRECTION_RIGHT;
+        return order === ORDER_PREV ? DIRECTION_LEFT : DIRECTION_RIGHT;
       }
 
-      return order === ORDER_NEXT ? DIRECTION_RIGHT : DIRECTION_LEFT;
+      return order === ORDER_PREV ? DIRECTION_RIGHT : DIRECTION_LEFT;
     } // Static
 
 

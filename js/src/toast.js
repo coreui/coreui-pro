@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-beta.0): toast.js
+ * CoreUI (v4.0.0-rc.0): toast.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's toast.js
@@ -158,8 +158,6 @@ class Toast extends BaseComponent {
     if (this._element.classList.contains(CLASS_NAME_SHOW)) {
       this._element.classList.remove(CLASS_NAME_SHOW)
     }
-
-    EventHandler.off(this._element, EVENT_CLICK_DISMISS)
 
     super.dispose()
     this._config = null

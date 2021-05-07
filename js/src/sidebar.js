@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-beta.0): sidebar.js
+ * CoreUI (v4.0.0-rc.0): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -28,13 +28,9 @@ const DATA_KEY = 'coreui.sidebar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const Default = {
-  //
-}
+const Default = {}
 
-const DefaultType = {
-  //
-}
+const DefaultType = {}
 
 const CLASS_NAME_BACKDROP = 'sidebar-backdrop'
 const CLASS_NAME_FADE = 'fade'
@@ -206,17 +202,11 @@ class Sidebar extends BaseComponent {
 
   _getConfig(config) {
     config = {
-      ...this.constructor.Default,
+      ...Default,
       ...Manipulator.getDataAttributes(this._element),
-      ...config
+      ...(typeof config === 'object' ? config : {})
     }
-
-    typeCheckConfig(
-      NAME,
-      config,
-      this.constructor.DefaultType
-    )
-
+    typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 
