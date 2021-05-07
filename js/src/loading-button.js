@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-beta.0): loading-button.js
+ * CoreUI (v4.0.0-rc.0): loading-button.js
  * Licensed under MIT (https://coreui.io/license)
  */
 
