@@ -1,5 +1,5 @@
 /*!
-  * CoreUI collapse.js v4.0.0-rc.3 (https://coreui.io)
+  * CoreUI collapse.js v4.0.0-rc.4 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -108,7 +108,7 @@
       jQuery
     } = window;
 
-    if (jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
+    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
       return jQuery;
     }
 
@@ -144,7 +144,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.3): collapse.js
+   * CoreUI (v4.0.0-rc.4): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js

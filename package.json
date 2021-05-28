@@ -1,7 +1,7 @@
 {
   "name": "@coreui/coreui-pro",
   "description": "The most popular front-end framework for developing responsive, mobile-first projects on the web rewritten by the CoreUI Team",
-  "version": "4.0.0-rc.3",
+  "version": "4.0.0-rc.4",
   "config": {
     "version_short": "4.0"
   },
@@ -19,7 +19,7 @@
   "scripts": {
     "start": "npm-run-all --parallel watch docs-serve",
     "bundlewatch": "bundlewatch --config .bundlewatch.config.json",
-    "changelog": "auto-changelog --template build/changelog-template.hbs --commit-limit false --package --backfill-limit 0 --starting-version v4.0.0-rc.3",
+    "changelog": "auto-changelog --template build/changelog-template.hbs --commit-limit false --package --backfill-limit 0 --starting-version v4.0.0-rc.4",
     "css": "npm-run-all css-compile css-prefix css-minify",
     "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css scss/:dist/css/",
     "css-lint": "npm-run-all --continue-on-error --parallel css-lint-*",
@@ -63,7 +63,7 @@
     "release": "npm-run-all dist release-sri docs-build release-zip*",
     "release-sri": "node build/generate-sri.js",
     "release-version": "node build/change-version.js",
-    "release-zip": "cross-env-shell \"rm -rf coreui-$npm_package_version-dist && cp -r dist/ coreui-$npm_package_version-dist && zip -r9 coreui-$npm_package_version-dist.zip coreui-$npm_package_version-dist && rm -rf coreui-$npm_package_version-dist\"",
+    "release-zip": "cross-env-shell \"rm -rf coreui-pro-$npm_package_version-dist && cp -r dist/ coreui-pro-$npm_package_version-dist && zip -r9 coreui-pro-$npm_package_version-dist.zip coreui-pro-$npm_package_version-dist && rm -rf coreui-pro-$npm_package_version-dist\"",
     "dist": "npm-run-all --parallel css js",
     "test": "npm-run-all lint dist js-test docs-build docs-lint",
     "netlify": "cross-env-shell HUGO_BASEURL=$DEPLOY_PRIME_URL npm-run-all dist release-sri docs-build",
