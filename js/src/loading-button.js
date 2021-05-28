@@ -92,6 +92,10 @@ class LoadingButton extends BaseComponent {
     return DATA_KEY
   }
 
+  static get NAME() {
+    return NAME
+  }
+
   // Public
 
   start() {
@@ -303,6 +307,6 @@ class LoadingButton extends BaseComponent {
  * add .LoadingButton to jQuery only if jQuery is present
  */
 
-defineJQueryPlugin(NAME, LoadingButton)
+defineJQueryPlugin(LoadingButton)
 
 export default LoadingButton

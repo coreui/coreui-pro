@@ -361,6 +361,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
  * ------------------------------------------------------------------------
  */
 
-defineJQueryPlugin(NAME, Sidebar)
+defineJQueryPlugin(Sidebar)
 
 export default Sidebar

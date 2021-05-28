@@ -138,6 +138,10 @@ class MultiSelect extends BaseComponent {
     return DATA_KEY
   }
 
+  static get NAME() {
+    return NAME
+  }
+
   // Public
 
   show() {
@@ -826,6 +830,6 @@ EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
  * add .MultiSelect to jQuery only if jQuery is present
  */
 
-defineJQueryPlugin(NAME, MultiSelect)
+defineJQueryPlugin(MultiSelect)
 
 export default MultiSelect

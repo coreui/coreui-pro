@@ -215,7 +215,7 @@ const reflow = element => element.offsetHeight
 const getjQuery = () => {
   const { jQuery } = window
 
-  if (jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
+  if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
     return jQuery
   }
 
