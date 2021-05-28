@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-rc.0): sidebar.js
+ * CoreUI (v4.0.0-rc.3): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -83,6 +83,10 @@ class Sidebar extends BaseComponent {
 
   static get DefaultType() {
     return DefaultType
+  }
+
+  static get NAME() {
+    return NAME
   }
 
   // Public

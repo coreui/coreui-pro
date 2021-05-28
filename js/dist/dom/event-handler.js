@@ -1,5 +1,5 @@
 /*!
-  * CoreUI event-handler.js v4.0.0-rc.0 (https://coreui.io)
+  * CoreUI event-handler.js v4.0.0-rc.3 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -8,16 +8,6 @@
   typeof define === 'function' && define.amd ? define(factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.EventHandler = factory());
 }(this, (function () { 'use strict';
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.0): alert.js
-   * Licensed under MIT (https://coreui.io/license)
-   *
-   * This component is a modified version of the Bootstrap's  util/index.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
 
   const getjQuery = () => {
     const {
@@ -33,7 +23,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.0): dom/event-handler.js
+   * CoreUI (v4.0.0-rc.3): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js

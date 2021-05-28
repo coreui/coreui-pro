@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-rc.0): scrollspy.js
+ * CoreUI (v4.0.0-rc.3): scrollspy.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's scrollspy.js
@@ -90,8 +90,8 @@ class ScrollSpy extends BaseComponent {
     return Default
   }
 
-  static get DATA_KEY() {
-    return DATA_KEY
+  static get NAME() {
+    return NAME
   }
 
   // Public
@@ -140,16 +140,8 @@ class ScrollSpy extends BaseComponent {
   }
 
   dispose() {
-    super.dispose()
     EventHandler.off(this._scrollElement, EVENT_KEY)
-
-    this._scrollElement = null
-    this._config = null
-    this._selector = null
-    this._offsets = null
-    this._targets = null
-    this._activeTarget = null
-    this._scrollHeight = null
+    super.dispose()
   }
 
   // Private
@@ -314,6 +306,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
  * add .ScrollSpy to jQuery only if jQuery is present
  */
 
-defineJQueryPlugin(NAME, ScrollSpy)
+defineJQueryPlugin(ScrollSpy)
 
 export default ScrollSpy
