@@ -19,14 +19,14 @@
   @include box-shadow(var(--#{$variable-prefix}btn-box-shadow, $btn-box-shadow));
   @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-border-radius);
   @include transition($btn-transition);
-  @include elevation(1, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']"));
+  @include elevation(1, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']", "[class*='close']"));
 
   &:hover {
     color: var(--#{$variable-prefix}btn-hover-color, $body-color);
     @include gradient-bg(var(--#{$variable-prefix}btn-hover-bg));
     text-decoration: if($link-hover-decoration == underline, none, null);
     border-color: var(--#{$variable-prefix}btn-hover-border-color, transparent);
-    @include elevation(2, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']"));
+    @include elevation(2, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']", "[class*='close']"));
   }
 
   .btn-check:focus + &,
