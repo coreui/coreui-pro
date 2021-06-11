@@ -76,6 +76,7 @@ const Default = {
   multiple: true,
   options: false,
   optionsEmptyPlaceholder: 'no items',
+  optionsMaxHeight: 'auto',
   search: false,
   searchPlaceholder: 'Select...',
   selection: true,
@@ -88,6 +89,7 @@ const DefaultType = {
   multiple: 'boolean',
   options: '(boolean|array)',
   optionsEmptyPlaceholder: 'string',
+  optionsMaxHeight: '(number|string)',
   search: 'boolean',
   searchPlaceholder: 'string',
   selection: 'boolean',
@@ -407,6 +409,11 @@ class MultiSelect extends BaseComponent {
   _createOptionsContainer() {
     const div = document.createElement('div')
     div.classList.add(CLASS_NAME_OPTIONS)
+    if (this._config.optionsMaxHeight !== 'auto') {
+      div.style.maxHeight = `${this._config.optionsMaxHeight}px`
+      div.style.overflow = 'scroll'
+    }
+
     this._clone.append(div)
 
     this._createOptions(div, this._options)
