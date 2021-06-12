@@ -6,14 +6,12 @@
   position: relative;
   display: block;
   width: 100%;
-  // min-height: $form-multi-select-height;
   padding: $form-multi-select-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding) $form-multi-select-padding-y $form-multi-select-padding-x;
   font-family: $form-multi-select-font-family;
   @include font-size($form-multi-select-font-size);
   font-weight: $form-multi-select-font-weight;
   line-height: $form-multi-select-line-height;
   color: var(--#{$variable-prefix}form-multi-select-color, $form-multi-select-color);
-  // vertical-align: middle;
   background-color: var(--#{$variable-prefix}form-multi-select-bg, $form-multi-select-bg);
   background-image: escape-svg($form-multi-select-indicator);
   background-repeat: no-repeat;
@@ -21,7 +19,6 @@
   background-size: $form-multi-select-bg-size;
   border: $form-multi-select-border-width solid var(--#{$variable-prefix}form-multi-select-border-color, $form-multi-select-border-color);
   @include border-radius($form-multi-select-border-radius, 0);
-  // @include box-shadow($form-select-box-shadow);
   appearance: none;
 
   &:disabled,
@@ -29,11 +26,19 @@
     color: var(--#{$variable-prefix}form-multi-select-disabled-color, $form-multi-select-disabled-color);
     background-color: var(--#{$variable-prefix}form-multi-select-disabled-bg, $form-multi-select-disabled-bg);
   }
+
+  &:not(.form-multi-select-inline).form-multi-select-with-cleaner {
+    padding: $form-multi-select-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x) $form-multi-select-padding-y $form-multi-select-padding-x;
+  }
 }
 
 .form-multi-select-selection-tags {
   min-height: add(($form-multi-select-padding-y * 2) + ($form-multi-select-font-size * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
   padding: $form-multi-select-selection-tags-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding) $form-multi-select-selection-tags-padding-y $form-multi-select-selection-tags-padding-x;
+
+  &:not(.form-multi-select-inline).form-multi-select-with-cleaner {
+    padding: $form-multi-select-selection-tags-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x) $form-multi-select-selection-tags-padding-y $form-multi-select-selection-tags-padding-x;
+  }
 
   &:not(.form-multi-select-inline) {
     .form-multi-select-search {
@@ -67,7 +72,7 @@
 
 //   // Override <a>'s hover style
 //   &:hover {
-//     color: var(--#{$variable-prefix}close-color, $close-color);
+//     color: var(--#{$variable-prefix}btn-close-color, $btn-close-color);
 //     text-decoration: none;
 //     opacity: .75;
 //   }
@@ -76,6 +81,41 @@
 //     opacity: .75;
 //   }
 // }
+
+.form-multi-select-selection-cleaner {
+  position: absolute;
+  top: 50%;
+  right: 2rem;
+  box-sizing: content-box;
+  width: $form-multi-select-cleaner-width;
+  height: $form-multi-select-cleaner-height;
+  padding: $form-multi-select-cleaner-padding-y $form-multi-select-cleaner-padding-x;
+  color: var(--#{$variable-prefix}btn-close-color, $form-multi-select-cleaner-color);
+  background: transparent var(--#{$variable-prefix}btn-close-bg, escape-svg($form-multi-select-cleaner-bg)) center / $form-multi-select-cleaner-width auto no-repeat; // include transparent for button elements
+  border: 0; // for button elements
+  border-right: 1px solid $form-multi-select-border-color;
+  opacity: $form-multi-select-cleaner-opacity;
+  transform: translateY(- $form-multi-select-cleaner-height);
+
+  // Override <a>'s hover style
+  &:hover {
+    color: var(--#{$variable-prefix}btn-close-color, $form-multi-select-cleaner-color);
+    opacity: $form-multi-select-cleaner-hover-opacity;
+  }
+
+  &:focus {
+    outline: 0;
+    box-shadow: $form-multi-select-cleaner-focus-shadow;
+    opacity: $form-multi-select-cleaner-focus-opacity;
+  }
+
+  &:disabled,
+  &.disabled {
+    pointer-events: none;
+    user-select: none;
+    opacity: $form-multi-select-cleaner-disabled-opacity;
+  }
+}
 
 .form-multi-select-search {
   max-width: 100%;
@@ -234,6 +274,12 @@
     .form-multi-select-selection{
       padding: $form-multi-select-padding-y;
     }
+  }
+
+  .form-multi-select-selection-cleaner {
+    top: 1.25rem;
+    right: .25rem;
+    border: 0;
   }
 
   .form-multi-select-search {

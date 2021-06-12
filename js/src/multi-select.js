@@ -55,6 +55,7 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_INLINE = 'form-multi-select-inline'
 const CLASS_NAME_SELECT_MULTIPLE = 'form-multi-select-multiple'
+const CLASS_NAME_SELECT_WITH_CLEANER = 'form-multi-select-with-cleaner'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
 const CLASS_NAME_OPTION = 'form-multi-select-option'
@@ -72,6 +73,7 @@ const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 const CLASS_NAME_LABEL = 'label'
 
 const Default = {
+  cleaner: true,
   inline: false,
   multiple: true,
   options: false,
@@ -85,6 +87,7 @@ const Default = {
 }
 
 const DefaultType = {
+  cleaner: 'boolean',
   inline: 'boolean',
   multiple: 'boolean',
   options: '(boolean|array)',
@@ -214,7 +217,7 @@ class MultiSelect extends BaseComponent {
       event.stopPropagation()
       this._selectionClear()
       this._updateSelection()
-      // this._updateSelectionCleaner()
+      this._updateSelectionCleaner()
       this._updateSearch()
       this._updateSearchSize()
     })
@@ -364,7 +367,7 @@ class MultiSelect extends BaseComponent {
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
     if (!this._config.inline || (this._config.inline && this._config.selection)) {
       this._createSelection()
-      // this._createSelectionCleaner()
+      this._createSelectionCleaner()
     }
 
     if (this._config.search) {
@@ -387,13 +390,15 @@ class MultiSelect extends BaseComponent {
   }
 
   _createSelectionCleaner() {
-    const cleaner = document.createElement('span')
-    cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER)
-    cleaner.innerHTML = '&times;'
-    this._clone.append(cleaner)
+    if (this._config.cleaner) {
+      const cleaner = document.createElement('button')
+      cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER)
+      this._clone.append(cleaner)
+      this._clone.classList.add(CLASS_NAME_SELECT_WITH_CLEANER)
 
-    // this._updateSelectionCleaner()
-    this._selectionCleanerElement = cleaner
+      this._updateSelectionCleaner()
+      this._selectionCleanerElement = cleaner
+    }
   }
 
   _createSearchInput() {
@@ -491,7 +496,7 @@ class MultiSelect extends BaseComponent {
     }
 
     this._updateSelection()
-    // this._updateSelectionCleaner()
+    this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
   }
@@ -527,7 +532,7 @@ class MultiSelect extends BaseComponent {
       const last = this._selection.pop()
       this._selectionDelete(last.value)
       this._updateSelection()
-      // this._updateSelectionCleaner()
+      this._updateSelectionCleaner()
       this._updateSearch()
     }
   }
@@ -564,7 +569,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateSelectionCleaner() {
-    if (this._selectionCleanerElement === null) {
+    if (this._config.cleaner === false || this._selectionCleanerElement === null) {
       return
     }
 
