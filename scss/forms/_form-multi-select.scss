@@ -161,7 +161,7 @@
 
 .form-multi-select-option {
   position: relative;
-  padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x $form-multi-select-option-padding-y calc(#{$form-multi-select-option-padding-x} + #{$form-multi-select-option-indicator-width}); // stylelint-disable-line function-disallowed-list
+  padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x;
   margin-bottom: 2px;
   vertical-align: top;
   cursor: pointer;
@@ -185,22 +185,27 @@
     }
   }
 
-  &::before {
-    position: absolute;
-    top: .7rem;
-    left: $form-multi-select-option-padding-x / 2;
-    display: block;
-    width: $form-multi-select-option-indicator-width;
-    height: $form-multi-select-option-indicator-width;
-    pointer-events: none;
-    content: "";
-    background-color: var(--#{$variable-prefix}form-multi-select-option-indicator-bg, $form-multi-select-option-indicator-bg);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    border: var(--#{$variable-prefix}form-multi-select-option-indicator-border, $form-multi-select-option-indicator-border);
-    @include border-radius($form-multi-select-option-indicator-border-radius);
+  &.form-multi-select-option-with-checkbox {
+    padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x $form-multi-select-option-padding-y calc(#{$form-multi-select-option-padding-x} + #{$form-multi-select-option-indicator-width}); // stylelint-disable-line function-disallowed-list
+
+    &::before {
+      position: absolute;
+      top: .7rem;
+      left: $form-multi-select-option-padding-x / 2;
+      display: block;
+      width: $form-multi-select-option-indicator-width;
+      height: $form-multi-select-option-indicator-width;
+      pointer-events: none;
+      content: "";
+      background-color: var(--#{$variable-prefix}form-multi-select-option-indicator-bg, $form-multi-select-option-indicator-bg);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      border: var(--#{$variable-prefix}form-multi-select-option-indicator-border, $form-multi-select-option-indicator-border);
+      @include border-radius($form-multi-select-option-indicator-border-radius);
+    }
   }
+
 
   &.form-multi-selected {
     background-color: var(--#{$variable-prefix}form-multi-select-option-selected-bg, $form-multi-select-option-selected-bg);

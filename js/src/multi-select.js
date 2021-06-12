@@ -59,6 +59,7 @@ const CLASS_NAME_SELECT_WITH_CLEANER = 'form-multi-select-with-cleaner'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
 const CLASS_NAME_OPTION = 'form-multi-select-option'
+const CLASS_NAME_OPTION_WITH_CHECKBOX = 'form-multi-select-option-with-checkbox'
 const CLASS_NAME_OPTIONS = 'form-multi-select-options'
 const CLASS_NAME_OPTIONS_EMPTY = 'form-multi-select-options-empty'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
@@ -79,6 +80,7 @@ const Default = {
   options: false,
   optionsEmptyPlaceholder: 'no items',
   optionsMaxHeight: 'auto',
+  optionsStyle: 'default',
   search: false,
   searchPlaceholder: 'Select...',
   selection: true,
@@ -93,6 +95,7 @@ const DefaultType = {
   options: '(boolean|array)',
   optionsEmptyPlaceholder: 'string',
   optionsMaxHeight: '(number|string)',
+  optionsStyle: 'string',
   search: 'boolean',
   searchPlaceholder: 'string',
   selection: 'boolean',
@@ -414,6 +417,7 @@ class MultiSelect extends BaseComponent {
   _createOptionsContainer() {
     const div = document.createElement('div')
     div.classList.add(CLASS_NAME_OPTIONS)
+
     if (this._config.optionsMaxHeight !== 'auto') {
       div.style.maxHeight = `${this._config.optionsMaxHeight}px`
       div.style.overflow = 'scroll'
@@ -430,6 +434,10 @@ class MultiSelect extends BaseComponent {
       if (typeof option.value !== 'undefined') {
         const optionDiv = document.createElement('div')
         optionDiv.classList.add(CLASS_NAME_OPTION)
+        if (this._config.optionsStyle === 'checkbox') {
+          optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX)
+        }
+
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
         optionDiv.innerHTML = option.text
