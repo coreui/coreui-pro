@@ -77,11 +77,10 @@ const Default = {
   multiple: true,
   placeholder: 'Select...',
   options: false,
-  optionsEmptyPlaceholder: 'no items',
   optionsMaxHeight: 'auto',
   optionsStyle: 'default',
   search: false,
-  selection: true,
+  searchNoResultsLabel: 'No results found',
   selectionType: 'tag',
   selectionTypeCounterText: 'item(s) selected'
 }
@@ -91,11 +90,10 @@ const DefaultType = {
   multiple: 'boolean',
   placeholder: 'string',
   options: '(boolean|array)',
-  optionsEmptyPlaceholder: 'string',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
   search: 'boolean',
-  selection: 'boolean',
+  searchNoResultsLabel: 'string',
   selectionType: 'string',
   selectionTypeCounterText: 'string'
 }
@@ -463,8 +461,6 @@ class MultiSelect extends BaseComponent {
 
     tag.append(closeBtn)
 
-    // eslint-disable-next-line no-warning-comments
-    // TODO: zastanowić się czy nie zrobić tego globalnie
     EventHandler.on(closeBtn, EVENT_CLICK, event => {
       event.preventDefault()
       event.stopPropagation()
@@ -621,13 +617,9 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  // .form-multi-select-selections
-
   _selectOption(value) {
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = true
 
-    // eslint-disable-next-line no-warning-comments
-    // TODO: improve this solution
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
@@ -641,8 +633,6 @@ class MultiSelect extends BaseComponent {
   _unSelectOption(value) {
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
 
-    // eslint-disable-next-line no-warning-comments
-    // TODO: improve this solution
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
@@ -727,7 +717,7 @@ class MultiSelect extends BaseComponent {
     if (visibleOptions === 0) {
       const placeholder = document.createElement('div')
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-      placeholder.innerHTML = this._config.optionsEmptyPlaceholder
+      placeholder.innerHTML = this._config.searchNoResultsLabel
 
       if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
         SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder)
