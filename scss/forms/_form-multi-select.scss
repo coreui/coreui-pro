@@ -129,7 +129,7 @@
   &:focus {
     color: var(--#{$variable-prefix}form-multi-select-option-hover-color, $form-multi-select-option-hover-color);
     text-decoration: none;
-    // @include gradient-bg(var(--#{$variable-prefix}form-multi-select-option-hover-bg, $form-multi-select-option-hover-bg));
+    background-color: var(--#{$variable-prefix}form-multi-select-option-hover-bg, $form-multi-select-option-hover-bg);
   }
 
   &.disabled,
@@ -137,10 +137,6 @@
     color: var(--#{$variable-prefix}form-multi-select-option-disabled-color, $form-multi-select-option-disabled-color);
     pointer-events: none;
     background-color: transparent;
-    // Remove CSS gradients if they're enabled
-    @if $enable-gradients {
-      background-image: none;
-    }
   }
 
   &.form-multi-select-option-with-checkbox {
