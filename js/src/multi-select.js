@@ -77,12 +77,12 @@ const Default = {
   cleaner: false,
   inline: false,
   multiple: true,
+  placeholder: 'Select...',
   options: false,
   optionsEmptyPlaceholder: 'no items',
   optionsMaxHeight: 'auto',
   optionsStyle: 'default',
   search: false,
-  searchPlaceholder: 'Select...',
   selection: true,
   selectionType: 'tag',
   selectionTypeCounterText: 'item(s) selected'
@@ -92,12 +92,12 @@ const DefaultType = {
   cleaner: 'boolean',
   inline: 'boolean',
   multiple: 'boolean',
+  placeholder: 'string',
   options: '(boolean|array)',
   optionsEmptyPlaceholder: 'string',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
   search: 'boolean',
-  searchPlaceholder: 'string',
   selection: 'boolean',
   selectionType: 'string',
   selectionTypeCounterText: 'string'
@@ -613,7 +613,7 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._selection.length === 0 && this._config.multiple && !this._config.inline) {
-      this._searchElement.placeholder = this._config.searchPlaceholder
+      this._searchElement.placeholder = this._config.placeholder
       this._selectionElement.style.display = 'none'
       return
     }
@@ -625,7 +625,7 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._config.inline) {
-      this._searchElement.placeholder = this._config.searchPlaceholder
+      this._searchElement.placeholder = this._config.placeholder
     }
   }
 
