@@ -74,7 +74,7 @@ const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 const CLASS_NAME_LABEL = 'label'
 
 const Default = {
-  cleaner: true,
+  cleaner: false,
   inline: false,
   multiple: true,
   options: false,
@@ -84,7 +84,7 @@ const Default = {
   search: false,
   searchPlaceholder: 'Select...',
   selection: true,
-  selectionType: 'counter',
+  selectionType: 'tag',
   selectionTypeCounterText: 'item(s) selected'
 }
 

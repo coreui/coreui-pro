@@ -53,35 +53,6 @@
   padding: 0;
 }
 
-// .form-multi-select-selection-cleaner {
-//   position: absolute;
-//   top: 50%;
-//   right: 1.5rem;
-//   display: inline-flex;
-//   align-items: center;
-//   justify-content: center;
-//   width: 2rem;
-//   height: 2rem;
-//   font-size: 1.5rem;
-//   font-weight: 700;
-//   // color: var(--#{$variable-prefix}close-color, $close-color);
-//   // text-shadow: var(--#{$variable-prefix}close-text-shadow, $close-text-shadow);
-//   cursor: pointer;
-//   opacity: .5;
-//   transform: translateY(-50%);
-
-//   // Override <a>'s hover style
-//   &:hover {
-//     color: var(--#{$variable-prefix}btn-close-color, $btn-close-color);
-//     text-decoration: none;
-//     opacity: .75;
-//   }
-
-//   &:focus {
-//     opacity: .75;
-//   }
-// }
-
 .form-multi-select-selection-cleaner {
   position: absolute;
   top: 50%;
@@ -90,30 +61,19 @@
   width: $form-multi-select-cleaner-width;
   height: $form-multi-select-cleaner-height;
   padding: $form-multi-select-cleaner-padding-y $form-multi-select-cleaner-padding-x;
-  color: var(--#{$variable-prefix}btn-close-color, $form-multi-select-cleaner-color);
-  background: transparent var(--#{$variable-prefix}btn-close-bg, escape-svg($form-multi-select-cleaner-bg)) center / $form-multi-select-cleaner-width auto no-repeat; // include transparent for button elements
+  // color: var(--#{$variable-prefix}btn-close-color, $form-multi-select-cleaner-color);
+  background: transparent var(--#{$variable-prefix}form-multi-select-selection-cleaner-bg, escape-svg($form-multi-select-cleaner-bg)) center / $form-multi-select-cleaner-width auto no-repeat;
   border: 0; // for button elements
   border-right: 1px solid $form-multi-select-border-color;
-  opacity: $form-multi-select-cleaner-opacity;
-  transform: translateY(- $form-multi-select-cleaner-height);
+  transform: translateY(-50%);
 
-  // Override <a>'s hover style
   &:hover {
-    color: var(--#{$variable-prefix}btn-close-color, $form-multi-select-cleaner-color);
-    opacity: $form-multi-select-cleaner-hover-opacity;
+    background: transparent var(--#{$variable-prefix}form-multi-select-selection-cleaner-hover-bg, escape-svg($form-multi-select-cleaner-hover-bg)) center / $form-multi-select-cleaner-width auto no-repeat;
   }
 
   &:focus {
+    background: transparent var(--#{$variable-prefix}form-multi-select-selection-cleaner-focus-bg, escape-svg($form-multi-select-cleaner-focus-bg)) center / $form-multi-select-cleaner-width auto no-repeat;
     outline: 0;
-    box-shadow: $form-multi-select-cleaner-focus-shadow;
-    opacity: $form-multi-select-cleaner-focus-opacity;
-  }
-
-  &:disabled,
-  &.disabled {
-    pointer-events: none;
-    user-select: none;
-    opacity: $form-multi-select-cleaner-disabled-opacity;
   }
 }
 

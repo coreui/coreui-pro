@@ -1016,7 +1016,6 @@ $form-select-font-size-lg:        $input-font-size-lg !default;
 // scss-docs-end form-select-variables
 
 // scss-docs-start form-multi-select-variables
-// $form-multi-select-height:                  $input-height !default;
 $form-multi-select-padding-y:               $input-padding-y !default;
 $form-multi-select-padding-x:               $input-padding-x !default;
 $form-multi-select-font-family:             $input-font-family !default;
@@ -1067,13 +1066,13 @@ $form-multi-select-cleaner-width:            .75rem !default;
 $form-multi-select-cleaner-height:           .75rem !default;
 $form-multi-select-cleaner-padding-x:        .5rem !default;
 $form-multi-select-cleaner-padding-y:        $form-multi-select-cleaner-padding-x !default;
-$form-multi-select-cleaner-color:            $high-emphasis !default;
+$form-multi-select-cleaner-color:            $medium-emphasis !default;
 $form-multi-select-cleaner-bg:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-cleaner-focus-shadow:     $input-btn-focus-box-shadow !default;
-$form-multi-select-cleaner-opacity:          .5 !default;
-$form-multi-select-cleaner-hover-opacity:    .75 !default;
-$form-multi-select-cleaner-focus-opacity:    1 !default;
-$form-multi-select-cleaner-disabled-opacity: .25 !default;
+$form-multi-select-cleaner-hover-color:      $high-emphasis !default;
+$form-multi-select-cleaner-hover-bg:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-hover-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-cleaner-focus-color:      $high-emphasis !default;
+$form-multi-select-cleaner-focus-bg:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-focus-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+
 
 $form-multi-select-options-padding-y:      .5rem !default;
 $form-multi-select-options-padding-x:      .75rem !default;
