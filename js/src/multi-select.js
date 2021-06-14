@@ -35,7 +35,6 @@ const SELECTOR_OPTION = '.form-multi-select-option'
 const SELECTOR_OPTIONS = '.form-multi-select-options'
 const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
 const SELECTOR_SELECT = '.form-multi-select'
-const SELECTOR_SELECTED = '.form-multi-selected'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_SELECTION_CLEANER = '.form-multi-select-selection-cleaner'
 
@@ -53,8 +52,10 @@ const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_SELECT = 'form-multi-select'
+const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
 const CLASS_NAME_SELECT_MULTIPLE = 'form-multi-select-multiple'
 const CLASS_NAME_SELECT_WITH_CLEANER = 'form-multi-select-with-cleaner'
+const CLASS_NAME_SELECT_ALL = 'form-multi-select-all'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
 const CLASS_NAME_OPTION = 'form-multi-select-option'
@@ -73,14 +74,16 @@ const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 const CLASS_NAME_LABEL = 'label'
 
 const Default = {
-  cleaner: false,
+  cleaner: true,
   multiple: true,
   placeholder: 'Select...',
   options: false,
   optionsMaxHeight: 'auto',
-  optionsStyle: 'default',
+  optionsStyle: 'checkbox',
   search: false,
   searchNoResultsLabel: 'No results found',
+  selectAll: true,
+  selectAllLabel: 'Select all options',
   selectionType: 'tag',
   selectionTypeCounterText: 'item(s) selected'
 }
@@ -94,6 +97,8 @@ const DefaultType = {
   optionsStyle: 'string',
   search: 'boolean',
   searchNoResultsLabel: 'string',
+  selectAll: 'boolean',
+  selectAllLabel: 'string',
   selectionType: 'string',
   selectionTypeCounterText: 'string'
 }
@@ -108,6 +113,7 @@ class MultiSelect extends BaseComponent {
   constructor(element, config) {
     super(element)
 
+    this._selectAllElement = null
     this._selectionElement = null
     this._selectionCleanerElement = null
     this._searchElement = null
@@ -181,6 +187,28 @@ class MultiSelect extends BaseComponent {
     this._addEventListeners()
   }
 
+  selectAll(options = this._options) {
+    options.forEach(option => {
+      if (option.label) {
+        this.selectAll(option.options)
+        return
+      }
+
+      this._selectOption(option.value, option.text)
+    })
+  }
+
+  deselectAll(selection = this._selection) {
+    selection.forEach(option => {
+      if (option.label) {
+        this.deselectAll(option.options)
+        return
+      }
+
+      this._deselectOption(option.value)
+    })
+  }
+
   getValue() {
     return this._selection
   }
@@ -200,8 +228,14 @@ class MultiSelect extends BaseComponent {
       const key = event.keyCode || event.charCode
 
       if ((key === 8 || key === 46) && event.target.value.length === 0) {
-        this._selectionDeleteLast()
+        this._deselectLastOption()
       }
+    })
+
+    EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
+      event.preventDefault()
+      event.stopPropagation()
+      this.selectAll()
     })
 
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
@@ -213,11 +247,7 @@ class MultiSelect extends BaseComponent {
     EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
       event.preventDefault()
       event.stopPropagation()
-      this._selectionClear()
-      this._updateSelection()
-      this._updateSelectionCleaner()
-      this._updateSearch()
-      this._updateSearchSize()
+      this.deselectAll()
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
@@ -382,7 +412,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _createSelectionCleaner() {
-    if (this._config.cleaner) {
+    if (this._config.cleaner && this._config.multiple) {
       const cleaner = document.createElement('button')
       cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER)
       this._clone.append(cleaner)
@@ -404,18 +434,33 @@ class MultiSelect extends BaseComponent {
   }
 
   _createOptionsContainer() {
-    const div = document.createElement('div')
-    div.classList.add(CLASS_NAME_OPTIONS)
+    const dropdownDiv = document.createElement('div')
+    dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
 
-    if (this._config.optionsMaxHeight !== 'auto') {
-      div.style.maxHeight = `${this._config.optionsMaxHeight}px`
-      div.style.overflow = 'scroll'
+    if (this._config.selectAll && this._config.multiple) {
+      const selectAll = document.createElement('button')
+      selectAll.classList.add(CLASS_NAME_SELECT_ALL)
+      selectAll.innerHTML = this._config.selectAllLabel
+
+      this._selectAllElement = selectAll
+
+      dropdownDiv.append(selectAll)
     }
 
-    this._clone.append(div)
+    const optionsDiv = document.createElement('div')
+    optionsDiv.classList.add(CLASS_NAME_OPTIONS)
 
-    this._createOptions(div, this._options)
-    this._optionsElement = div
+    if (this._config.optionsMaxHeight !== 'auto') {
+      optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
+      optionsDiv.style.overflow = 'scroll'
+    }
+
+    dropdownDiv.append(optionsDiv)
+
+    this._clone.append(dropdownDiv)
+
+    this._createOptions(optionsDiv, this._options)
+    this._optionsElement = optionsDiv
   }
 
   _createOptions(parentElement, options) {
@@ -466,7 +511,7 @@ class MultiSelect extends BaseComponent {
       event.stopPropagation()
 
       tag.remove()
-      this._selectionDelete(value)
+      this._deselectOption(value)
       this._updateOptionsList()
       this._updateSearch()
     })
@@ -483,22 +528,17 @@ class MultiSelect extends BaseComponent {
     const text = element.textContent
 
     if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
-      this._selectionDelete(value)
+      this._deselectOption(value)
     } else if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
-      this._selectionAdd(value, text)
+      this._selectOption(value, text)
     } else if (!this._config.multiple) {
-      this._selectionAdd(value, text)
+      this._selectOption(value, text)
     }
-
-    this._updateSelection()
-    this._updateSelectionCleaner()
-    this._updateSearch()
-    this._updateSearchSize()
   }
 
-  _selectionAdd(value, text) {
+  _selectOption(value, text) {
     if (!this._config.multiple) {
-      this._selectionClear()
+      this.deselectAll()
     }
 
     if (this._selection.filter(e => e.value === value).length === 0) {
@@ -508,27 +548,48 @@ class MultiSelect extends BaseComponent {
       })
     }
 
-    this._selectOption(value)
+    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = true
+
+    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
+    if (option) {
+      option.classList.add(CLASS_NAME_SELECTED)
+    }
+
+    EventHandler.trigger(this._element, EVENT_CHANGED, {
+      value: this._selection
+    })
+
+    this._updateSelection()
+    this._updateSelectionCleaner()
+    this._updateSearch()
+    this._updateSearchSize()
   }
 
-  _selectionClear() {
-    this._selection.length = 0
-    this._clearOptions()
-  }
-
-  _selectionDelete(value) {
+  _deselectOption(value) {
     const selected = this._selection.filter(e => e.value !== value)
     this._selection = selected
-    this._unSelectOption(value)
+
+    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
+
+    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
+    if (option) {
+      option.classList.remove(CLASS_NAME_SELECTED)
+    }
+
+    EventHandler.trigger(this._element, EVENT_CHANGED, {
+      value: this._selection
+    })
+
+    this._updateSelection()
+    this._updateSelectionCleaner()
+    this._updateSearch()
+    this._updateSearchSize()
   }
 
-  _selectionDeleteLast() {
+  _deselectLastOption() {
     if (this._selection.length > 0) {
       const last = this._selection.pop()
-      this._selectionDelete(last.value)
-      this._updateSelection()
-      this._updateSelectionCleaner()
-      this._updateSearch()
+      this._deselectOption(last.value)
     }
   }
 
@@ -559,7 +620,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateSelectionCleaner() {
-    if (this._config.cleaner === false || this._selectionCleanerElement === null) {
+    if (!this._config.cleaner || this._selectionCleanerElement === null) {
       return
     }
 
@@ -617,41 +678,6 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _selectOption(value) {
-    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = true
-
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
-    if (option) {
-      option.classList.add(CLASS_NAME_SELECTED)
-    }
-
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: this._selection
-    })
-  }
-
-  _unSelectOption(value) {
-    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
-
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
-    if (option) {
-      option.classList.remove(CLASS_NAME_SELECTED)
-    }
-
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: this._selection
-    })
-  }
-
-  _clearOptions() {
-    this._element.value = null
-    SelectorEngine.find(SELECTOR_SELECTED, this._clone).forEach(element => {
-      element.classList.remove(CLASS_NAME_SELECTED)
-    })
-  }
-
-  // eslint-disable-next-line no-warning-comments
-  // TODO: poprawić tą nazwę
   _onSearchChange(element) {
     if (element) {
       this.search(element.value)
@@ -672,10 +698,6 @@ class MultiSelect extends BaseComponent {
         option.classList.remove(CLASS_NAME_SELECTED)
       }
     })
-  }
-
-  _isHidden(element) {
-    return element.offsetParent === null
   }
 
   _isVisible(element) {
