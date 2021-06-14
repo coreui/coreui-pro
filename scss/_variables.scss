@@ -1056,10 +1056,8 @@ $form-multi-select-tag-margin-x:       .125rem !default;
 $form-multi-select-tag-padding-y:      subtract(($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y - $form-multi-select-tag-margin-y), $form-multi-select-tag-border-width) !default;
 $form-multi-select-tag-padding-x:      .5rem !default;
 
-$form-multi-select-search-border-width:   $input-btn-border-width !default;
 $form-multi-select-search-color:          $input-color !default;
 $form-multi-select-search-bg:             $input-bg !default;
-$form-multi-select-search-border-color:   $input-border-color !default;
 $form-multi-select-search-border-radius:  $border-radius !default;
 
 $form-multi-select-cleaner-width:            .75rem !default;

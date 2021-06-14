@@ -53,7 +53,6 @@ const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_SELECT = 'form-multi-select'
-const CLASS_NAME_SELECT_INLINE = 'form-multi-select-inline'
 const CLASS_NAME_SELECT_MULTIPLE = 'form-multi-select-multiple'
 const CLASS_NAME_SELECT_WITH_CLEANER = 'form-multi-select-with-cleaner'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
@@ -75,7 +74,6 @@ const CLASS_NAME_LABEL = 'label'
 
 const Default = {
   cleaner: false,
-  inline: false,
   multiple: true,
   placeholder: 'Select...',
   options: false,
@@ -90,7 +88,6 @@ const Default = {
 
 const DefaultType = {
   cleaner: 'boolean',
-  inline: 'boolean',
   multiple: 'boolean',
   placeholder: 'string',
   options: '(boolean|array)',
@@ -358,20 +355,14 @@ class MultiSelect extends BaseComponent {
       div.classList.add(CLASS_NAME_SELECT_MULTIPLE)
     }
 
-    if (this._config.inline) {
-      div.classList.add(CLASS_NAME_SELECT_INLINE)
-    }
-
     if (this._config.selectionType === 'tags') {
       div.classList.add(CLASS_NAME_SELECTION_TAGS)
     }
 
     this._clone = div
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
-    if (!this._config.inline || (this._config.inline && this._config.selection)) {
-      this._createSelection()
-      this._createSelectionCleaner()
-    }
+    this._createSelection()
+    this._createSelectionCleaner()
 
     if (this._config.search) {
       this._createSearchInput()
@@ -544,13 +535,8 @@ class MultiSelect extends BaseComponent {
       this._updateSearch()
     }
   }
-  // .form-multi-select-selections
 
   _updateSelection() {
-    if (this._config.inline && !this._config.selection) {
-      return
-    }
-
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
@@ -600,37 +586,32 @@ class MultiSelect extends BaseComponent {
       this._searchElement.removeAttribute('size')
     }
 
-    if (this._selection.length > 0 && !this._config.multiple && !this._config.inline) {
+    if (this._selection.length > 0 && !this._config.multiple) {
       this._searchElement.placeholder = this._selection[0].text
       this._selectionElement.style.display = 'none'
       return
     }
 
-    if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter' && !this._config.inline) {
+    if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter') {
       this._searchElement.placeholder = ''
       this._selectionElement.style.removeProperty('display')
       return
     }
 
-    if (this._selection.length === 0 && this._config.multiple && !this._config.inline) {
+    if (this._selection.length === 0 && this._config.multiple) {
       this._searchElement.placeholder = this._config.placeholder
       this._selectionElement.style.display = 'none'
       return
     }
 
-    if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.inline) {
+    if (this._config.multiple && this._config.selectionType === 'counter') {
       this._searchElement.placeholder = `${this._selection.length} item(s) selected`
       this._selectionElement.style.display = 'none'
-      return
-    }
-
-    if (this._config.inline) {
-      this._searchElement.placeholder = this._config.placeholder
     }
   }
 
   _updateSearchSize(size = 2) {
-    if (!this._config.inline && this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+    if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
       this._searchElement.size = size
       return
     }
