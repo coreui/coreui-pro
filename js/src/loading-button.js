@@ -26,33 +26,24 @@ const NAME = 'loading-button'
 const DATA_KEY = 'coreui.loading-button'
 const EVENT_KEY = `.${DATA_KEY}`
 
-const MAX_PERCENT = 100
-const MILLISECONDS = 10
-const PROGRESS_BAR_BG_COLOR_LIGHT = 'rgba(255, 255, 255, .2)'
-const PROGRESS_BAR_BG_COLOR_DARK = 'rgba(0, 0, 0, .2)'
-
 const EVENT_START = `start${EVENT_KEY}`
 const EVENT_STOP = `stop${EVENT_KEY}`
-const EVENT_COMPLETE = `complete${EVENT_KEY}`
 
 const CLASS_NAME_IS_LOADING = 'is-loading'
-const CLASS_NAME_LOADING_BUTTON_PROGRESS = 'btn-loading-progress'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
 
 const Default = {
-  percent: 0,
-  progress: false,
+  disabledOnLoading: true,
   spinner: true,
   spinnerType: 'border',
-  timeout: 1000
+  timeout: false
 }
 
 const DefaultType = {
-  percent: 'number',
-  progress: 'boolean',
+  disabledOnLoading: 'boolean',
   spinner: 'boolean',
   spinnerType: 'string',
-  timeout: 'number'
+  timeout: '(boolean|number)'
 }
 
 /**
@@ -66,10 +57,7 @@ class LoadingButton extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
-    this._pause = false
-    this._percent = this._config.percent
     this._timeout = this._config.timeout
-    this._progressBar = null
     this._spinner = null
     this._state = 'idle'
 
@@ -101,13 +89,21 @@ class LoadingButton extends BaseComponent {
   start() {
     if (this._state !== 'loading') {
       this._createSpinner()
-      this._createProgressBar()
 
       setTimeout(() => {
         this._element.classList.add(CLASS_NAME_IS_LOADING)
-        this._loading()
         EventHandler.trigger(this._element, EVENT_START)
+
+        if (this._config.disabledOnLoading) {
+          this._element.setAttribute('disabled', true)
+        }
       }, 1)
+
+      if (this._config.timeout) {
+        setTimeout(() => {
+          this.stop()
+        }, this._config.timeout)
+      }
     }
   }
 
@@ -115,16 +111,13 @@ class LoadingButton extends BaseComponent {
     this._element.classList.remove(CLASS_NAME_IS_LOADING)
     const stoped = () => {
       this._removeSpinner()
-      this._removeProgressBar()
       this._state = 'idle'
 
-      EventHandler.trigger(this._element, EVENT_STOP)
-      if (this._percent >= 100) {
-        EventHandler.trigger(this._element, EVENT_COMPLETE)
+      if (this._config.disabledOnLoading) {
+        this._element.removeAttribute('disabled')
       }
 
-      this._percent = this._config.percent
-      this._timeout = this._config.timeout
+      EventHandler.trigger(this._element, EVENT_STOP)
     }
 
     if (this._spinner) {
@@ -138,33 +131,9 @@ class LoadingButton extends BaseComponent {
     stoped()
   }
 
-  pause() {
-    this._pause = true
-    this._state = 'pause'
-  }
-
-  resume() {
-    this._pause = false
-    this._loading()
-  }
-
-  complete() {
-    this._timeout = 1000
-  }
-
-  updatePercent(percent) {
-    const diff = (this._percent - percent) / 100
-    this._timeout *= (1 + diff)
-    this._percent = percent
-  }
-
   dispose() {
     Data.removeData(this._element, DATA_KEY)
     this._element = null
-  }
-
-  update(config) {
-    this._config = this._getConfig(config)
   }
 
   _getConfig(config) {
@@ -176,40 +145,6 @@ class LoadingButton extends BaseComponent {
     typeCheckConfig(NAME, config, DefaultType)
 
     return config
-  }
-
-  _loading() {
-    const progress = setInterval(() => {
-      this._state = 'loading'
-      if (this._percent >= MAX_PERCENT) {
-        this.stop()
-        clearInterval(progress)
-        return
-      }
-
-      if (this._pause) {
-        clearInterval(progress)
-        return
-      }
-
-      const frames = this._timeout / (MAX_PERCENT - this._percent) / MILLISECONDS
-      this._percent = Math.round((this._percent + (1 / frames)) * 100) / 100
-      this._timeout -= MILLISECONDS
-      this._animateProgressBar()
-    }, MILLISECONDS)
-  }
-
-  _createProgressBar() {
-    if (this._config.progress) {
-      const progress = document.createElement('div')
-      progress.classList.add(CLASS_NAME_LOADING_BUTTON_PROGRESS)
-      progress.setAttribute('role', 'progressbar')
-      progress.setAttribute('aria-hidden', 'true')
-      progress.style.backgroundColor = this._progressBarBg()
-
-      this._element.insertBefore(progress, this._element.firstChild)
-      this._progressBar = progress
-    }
   }
 
   _createSpinner() {
@@ -224,43 +159,10 @@ class LoadingButton extends BaseComponent {
     }
   }
 
-  _removeProgressBar() {
-    if (this._config.progress) {
-      this._progressBar.remove()
-      this._progressBar = null
-    }
-  }
-
   _removeSpinner() {
     if (this._config.spinner) {
       this._spinner.remove()
       this._spinner = null
-    }
-  }
-
-  _progressBarBg() {
-    // The yiq lightness value that determines when the lightness of color changes from "dark" to "light". Acceptable values are between 0 and 255.
-    const yiqContrastedThreshold = 150
-    const color = window.getComputedStyle(this._element).getPropertyValue('background-color') === 'rgba(0, 0, 0, 0)' ? 'rgb(255, 255, 255)' : window.getComputedStyle(this._element).getPropertyValue('background-color')
-
-    const rgb = color.match(/^rgb?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i)
-
-    const r = Number.parseInt(rgb[1], 10)
-    const g = Number.parseInt(rgb[2], 10)
-    const b = Number.parseInt(rgb[3], 10)
-
-    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
-
-    if (yiq > yiqContrastedThreshold) {
-      return PROGRESS_BAR_BG_COLOR_DARK
-    }
-
-    return PROGRESS_BAR_BG_COLOR_LIGHT
-  }
-
-  _animateProgressBar() {
-    if (this._config.progress) {
-      this._progressBar.style.width = `${this._percent}%`
     }
   }
 
