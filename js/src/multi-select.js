@@ -77,7 +77,6 @@ const CLASS_NAME_LABEL = 'label'
 const Default = {
   cleaner: true,
   multiple: true,
-  name: '',
   placeholder: 'Select...',
   options: false,
   optionsMaxHeight: 'auto',
@@ -93,7 +92,6 @@ const Default = {
 const DefaultType = {
   cleaner: 'boolean',
   multiple: 'boolean',
-  name: 'string',
   placeholder: 'string',
   options: '(boolean|array)',
   optionsMaxHeight: '(number|string)',
