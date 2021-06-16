@@ -21,8 +21,8 @@ import BaseComponent from './base-component'
  * ------------------------------------------------------------------------
  */
 
-const NAME = 'mutli-select'
-const DATA_KEY = 'coreui.mutli-select'
+const NAME = 'multi-select'
+const DATA_KEY = 'coreui.multi-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
@@ -51,6 +51,7 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
+const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
 const CLASS_NAME_SELECT_MULTIPLE = 'form-multi-select-multiple'
@@ -76,6 +77,7 @@ const CLASS_NAME_LABEL = 'label'
 const Default = {
   cleaner: true,
   multiple: true,
+  name: '',
   placeholder: 'Select...',
   options: false,
   optionsMaxHeight: 'auto',
@@ -84,13 +86,14 @@ const Default = {
   searchNoResultsLabel: 'No results found',
   selectAll: true,
   selectAllLabel: 'Select all options',
-  selectionType: 'tag',
+  selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected'
 }
 
 const DefaultType = {
   cleaner: 'boolean',
   multiple: 'boolean',
+  name: 'string',
   placeholder: 'string',
   options: '(boolean|array)',
   optionsMaxHeight: '(number|string)',
@@ -189,6 +192,10 @@ class MultiSelect extends BaseComponent {
 
   selectAll(options = this._options) {
     options.forEach(option => {
+      if (option.disabled) {
+        return
+      }
+
       if (option.label) {
         this.selectAll(option.options)
         return
@@ -198,8 +205,12 @@ class MultiSelect extends BaseComponent {
     })
   }
 
-  deselectAll(selection = this._selection) {
-    selection.forEach(option => {
+  deselectAll(options = this._options) {
+    options.forEach(option => {
+      if (option.disabled) {
+        return
+      }
+
       if (option.label) {
         this.deselectAll(option.options)
         return
@@ -263,7 +274,6 @@ class MultiSelect extends BaseComponent {
   _getConfig(config) {
     config = {
       ...Default,
-      ...Manipulator.getDataAttributes(this._element),
       ...config
     }
     typeCheckConfig(NAME, config, DefaultType)
@@ -288,7 +298,8 @@ class MultiSelect extends BaseComponent {
         options.push({
           value: node.value,
           text: node.innerHTML,
-          selected: node.selected
+          selected: node.selected,
+          disabled: node.disabled
         })
       }
 
@@ -329,20 +340,13 @@ class MultiSelect extends BaseComponent {
   }
 
   _createNativeSelect(data) {
-    const select = document.createElement('select')
-    select.classList.add(CLASS_NAME_SELECT)
-    if (this._element.id) {
-      select.id = this._element.id
-    }
+    this._element.classList.add(CLASS_NAME_SELECT)
 
     if (this._config.multiple) {
-      select.multiple = true
+      this._element.setAttribute('multiple', true)
     }
 
-    this._createNativeOptions(select, data)
-
-    this._element.replaceWith(select)
-    this._element = select
+    this._createNativeOptions(this._element, data)
   }
 
   _createNativeOptions(parentElement, options) {
@@ -356,6 +360,11 @@ class MultiSelect extends BaseComponent {
       } else {
         const opt = document.createElement('OPTION')
         opt.value = option.value
+
+        if (option.disabled === true) {
+          opt.setAttribute('disabled', 'disabled')
+        }
+
         if (option.selected === true) {
           opt.setAttribute('selected', 'selected')
         }
@@ -383,7 +392,7 @@ class MultiSelect extends BaseComponent {
       div.classList.add(CLASS_NAME_SELECT_MULTIPLE)
     }
 
-    if (this._config.selectionType === 'tags') {
+    if (this._config.multiple && this._config.selectionType === 'tags') {
       div.classList.add(CLASS_NAME_SELECTION_TAGS)
     }
 
@@ -468,6 +477,11 @@ class MultiSelect extends BaseComponent {
       if (typeof option.value !== 'undefined') {
         const optionDiv = document.createElement('div')
         optionDiv.classList.add(CLASS_NAME_OPTION)
+
+        if (option.disabled) {
+          optionDiv.classList.add(CLASS_NAME_DISABLED)
+        }
+
         if (this._config.optionsStyle === 'checkbox') {
           optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX)
         }
@@ -512,8 +526,8 @@ class MultiSelect extends BaseComponent {
 
       tag.remove()
       this._deselectOption(value)
-      this._updateOptionsList()
-      this._updateSearch()
+      // this._updateOptionsList()
+      // this._updateSearch()
     })
 
     return tag
@@ -548,7 +562,11 @@ class MultiSelect extends BaseComponent {
       })
     }
 
-    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = true
+    const nativeOption = SelectorEngine.findOne(`option[value="${value}"]`, this._element)
+
+    if (nativeOption) {
+      nativeOption.selected = true
+    }
 
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
@@ -668,6 +686,10 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateSearchSize(size = 2) {
+    if (!this._searchElement || !this._config.multiple) {
+      return
+    }
+
     if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
       this._searchElement.size = size
       return
@@ -686,16 +708,15 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateOptionsList() {
-    const options = SelectorEngine.find(SELECTOR_OPTION, this._clone)
-
+  _updateOptionsList(options = this._options) {
     options.forEach(option => {
-      if (this._selection.filter(e => e.value === option.dataset.value).length !== 0) {
-        option.classList.add(CLASS_NAME_SELECTED)
+      if (option.label) {
+        this._updateOptionsList(option.options)
+        return
       }
 
-      if (this._selection.filter(e => e.value === option.dataset.value).length === 0) {
-        option.classList.remove(CLASS_NAME_SELECTED)
+      if (option.selected) {
+        this._selectOption(option.value, option.text)
       }
     })
   }
