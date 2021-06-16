@@ -6,50 +6,121 @@ group: forms
 toc: true
 ---
 
-## Available styles
-
-### Dropdown
+## Basic example
 
 {{< example >}}
-<select class="form-multi-select" data-coreui-search="true" data-coreui-selection-type="tags">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
+<select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
   </optgroup>
 </select>
 {{< /example >}}
 
-### Inline
-
 {{< example >}}
-<select class="form-multi-select" data-coreui-inline="true" data-coreui-search="true" data-coreui-selection-type="tags">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
+<select class="form-multi-select" multiple data-coreui-search="true">
+  <option value="0" selected>Angular</option>
+  <option value="1" selected disabled>Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4" disabled>Django</option>
+    <option value="5" selected>Laravel</option>
+    <option value="6">Node.js</option>
   </optgroup>
 </select>
 {{< /example >}}
+
+## Data source
+
+### Option elements
+
+{{< example >}}
+<select class="form-multi-select" multiple data-coreui-search="true">
+  <option value="0" selected>Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5" selected>Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+### Array data
+
+<div class="docs-example">
+  <select id="multiSelect" name="multiSelect"></select>
+</div>
+
+```html
+<select id="multiSelect"></select>
+
+<script type="text/javascript">
+  var myMultiSelect = document.getElementById('multiSelect')
+  var cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
+    options: [
+      {
+        value: 0,
+        text: 'Angular'
+      },
+      {
+        value: 1,
+        text: 'Bootstrap',
+        selected: true
+      },
+      {
+        value: 2,
+        text: 'React.js',
+        selected: true
+      },
+      {
+        value: 3,
+        text: 'Vue.js'
+      },
+      {
+        label: 'backend',
+        options: [
+          {
+            value: 4,
+            text: 'Django'
+          },
+          {
+            value: 5,
+            text: 'Laravel'
+          },
+          {
+            value: 6,
+            text: 'Node.js',
+            selected: true
+          }
+        ]
+      }
+    ]
+  })
+</script>
+```
 
 ## Selection types
 ### Text
 
 {{< example >}}
-<select class="form-multi-select" id="multiple-select-text" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
+<select class="form-multi-select" id="multiple-select-text" multiple data-coreui-selection-type="text" data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
   </optgroup>
 </select>
 {{< /example >}}
@@ -57,14 +128,15 @@ toc: true
 ### Tag
 
 {{< example >}}
-<select class="form-multi-select" id="multiple-select-tag" data-coreui-selection-type="tags" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
+<select class="form-multi-select" id="multiple-select-tag" multiple data-coreui-selection-type="tags" data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
   </optgroup>
 </select>
 {{< /example >}}
@@ -72,14 +144,15 @@ toc: true
 ### Counter
 
 {{< example >}}
-<select class="form-multi-select" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
+<select class="form-multi-select" id="multiple-select-counter" multiple data-coreui-selection-type="counter" data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
   </optgroup>
 </select>
 {{< /example >}}
@@ -87,14 +160,15 @@ toc: true
 ## Single Select
 
 {{< example >}}
-<select class="form-multi-select" id="single-select" data-coreui-multiple="false" data-coreui-search="true">
-  <option value="0">enhancement</option>
-  <option value="1">bug</option>
-  <option value="2">duplicate</option>
-  <option value="3">invalid</option>
-  <optgroup label="group">
-    <option value="4">enhancement2</option>
-    <option value="5">bug2</option>
+<select class="form-multi-select" id="single-select" data-coreui-multiple="false">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
   </optgroup>
 </select>
 {{< /example >}}
@@ -107,45 +181,49 @@ You may also choose from small and large multi selects to match our similarly si
 <div class="row">
   <div class="col-md-6">
     <select class="form-multi-select form-multi-select-lg mb-3" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
-      <option value="0">enhancement</option>
-      <option value="1">bug</option>
-      <option value="2">duplicate</option>
-      <option value="3">invalid</option>
-      <optgroup label="group">
-        <option value="4">enhancement2</option>
-        <option value="5">bug2</option>
+      <option value="0">Angular</option>
+      <option value="1">Bootstrap</option>
+      <option value="2">React.js</option>
+      <option value="3">Vue.js</option>
+      <optgroup label="backend">
+        <option value="4">Django</option>
+        <option value="5">Laravel</option>
+        <option value="6">Node.js</option>
       </optgroup>
     </select>
     <select class="form-multi-select form-multi-select-sm" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
-      <option value="0">enhancement</option>
-      <option value="1">bug</option>
-      <option value="2">duplicate</option>
-      <option value="3">invalid</option>
-      <optgroup label="group">
-        <option value="4">enhancement2</option>
-        <option value="5">bug2</option>
+      <option value="0">Angular</option>
+      <option value="1">Bootstrap</option>
+      <option value="2">React.js</option>
+      <option value="3">Vue.js</option>
+      <optgroup label="backend">
+        <option value="4">Django</option>
+        <option value="5">Laravel</option>
+        <option value="6">Node.js</option>
       </optgroup>
     </select>
   </div>
   <div class="col-md-6">
     <select class="form-multi-select form-multi-select-lg mb-3" id="multiple-select-counter" data-coreui-selection-type="tags" data-coreui-search="true">
-      <option value="0">enhancement</option>
-      <option value="1">bug</option>
-      <option value="2">duplicate</option>
-      <option value="3">invalid</option>
-      <optgroup label="group">
-        <option value="4">enhancement2</option>
-        <option value="5">bug2</option>
+      <option value="0">Angular</option>
+      <option value="1">Bootstrap</option>
+      <option value="2">React.js</option>
+      <option value="3">Vue.js</option>
+      <optgroup label="backend">
+        <option value="4">Django</option>
+        <option value="5">Laravel</option>
+        <option value="6">Node.js</option>
       </optgroup>
     </select>
     <select class="form-multi-select form-multi-select-sm" id="multiple-select-counter" data-coreui-selection-type="tags" data-coreui-search="true">
-      <option value="0">enhancement</option>
-      <option value="1">bug</option>
-      <option value="2">duplicate</option>
-      <option value="3">invalid</option>
-      <optgroup label="group">
-        <option value="4">enhancement2</option>
-        <option value="5">bug2</option>
+      <option value="0">Angular</option>
+      <option value="1">Bootstrap</option>
+      <option value="2">React.js</option>
+      <option value="3">Vue.js</option>
+      <optgroup label="backend">
+        <option value="4">Django</option>
+        <option value="5">Laravel</option>
+        <option value="6">Node.js</option>
       </optgroup>
     </select>
   </div>
@@ -169,9 +247,9 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
   </thead>
   <tbody>
     <tr>
-      <td><code>inline</code></td>
+      <td><code>cleaner</code></td>
       <td>boolean</td>
-      <td><code>false</code></td>
+      <td><code>true</code></td>
       <td></td>
     </tr>
     <tr>
@@ -181,15 +259,27 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td></td>
     </tr>
     <tr>
+      <td><code>placeholder</code></td>
+      <td>string</td>
+      <td><code>'Select...'</code></td>
+      <td></td>
+    </tr>
+    <tr>
       <td><code>options</code></td>
       <td>(boolean|array)</td>
       <td><code>false</code></td>
       <td></td>
     </tr>
     <tr>
-      <td><code>optionsEmptyPlaceholder</code></td>
+      <td><code>optionsMaxHeight</code></td>
+      <td>(number|string)</td>
+      <td><code>'auto'</code></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><code>optionsStyle</code></td>
       <td>string</td>
-      <td><code>'no items'</code></td>
+      <td><code>'checkbox'</code></td>
       <td></td>
     </tr>
     <tr>
@@ -199,21 +289,27 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td></td>
     </tr>
     <tr>
-      <td><code>searchPlaceholder</code></td>
+      <td><code>searchNoResultsLabel</code></td>
       <td>string</td>
-      <td><code>'Select...'</code></td>
+      <td><code>'No results found'</code></td>
       <td></td>
     </tr>
     <tr>
-      <td><code>selection</code></td>
+      <td><code>selectAll</code></td>
       <td>boolean</td>
       <td><code>true</code></td>
       <td></td>
     </tr>
     <tr>
+      <td><code>selectAllLabel</code></td>
+      <td>string</td>
+      <td><code>'Select all options'</code></td>
+      <td></td>
+    </tr>
+    <tr>
       <td><code>selectionType</code></td>
       <td>string</td>
-      <td><code>'counter'</code></td>
+      <td><code>'tag'</code></td>
       <td></td>
     </tr>
     <tr>
@@ -288,6 +384,14 @@ Multi Select component exposes a few events for hooking into multi select functi
   <tbody>
     <tr>
       <td>
+        <code>changed.coreui.multi-select</code>
+      </td>
+      <td>
+        Fires immediately when an option is selected or deselected.
+      </td>
+    </tr>
+    <tr>
+      <td>
         <code>show.coreui.multi-select</code>
       </td>
       <td>
@@ -323,8 +427,9 @@ Multi Select component exposes a few events for hooking into multi select functi
 
 ```js
 var myMutliSelect = document.getElementById('myMutliSelect')
-myMutliSelect.addEventListener('show.coreui.multi-select', function () {
-  // do something...
+myMutliSelect.addEventListener('changed.coreui.multi-select', function (event) {
+  // Get the list of selected options.
+  var selected = event.value
 })
 ```
 
