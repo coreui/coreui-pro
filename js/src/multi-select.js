@@ -511,7 +511,7 @@ class MultiSelect extends BaseComponent {
     tag.dataset.value = value
     tag.innerHTML = text
 
-    const closeBtn = document.createElement('span')
+    const closeBtn = document.createElement('button')
     closeBtn.classList.add(CLASS_NAME_TAG_DELETE, 'close')
     closeBtn.setAttribute('aria-label', 'Close')
     closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>'
@@ -653,10 +653,6 @@ class MultiSelect extends BaseComponent {
   _updateSearch() {
     if (!this._config.search) {
       return
-    }
-
-    if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
-      this._searchElement.removeAttribute('size')
     }
 
     if (this._selection.length > 0 && !this._config.multiple) {
