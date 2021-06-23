@@ -6,14 +6,11 @@
 
 import {
   defineJQueryPlugin,
-  emulateTransitionEnd,
-  getTransitionDurationFromElement,
   typeCheckConfig
 } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
-// import SelectorEngine from './dom/selector-engine'
 import BaseComponent from './base-component'
 
 /**
@@ -89,6 +86,7 @@ class LoadingButton extends BaseComponent {
   start() {
     if (this._state !== 'loading') {
       this._createSpinner()
+      this._state = 'loading'
 
       setTimeout(() => {
         this._element.classList.add(CLASS_NAME_IS_LOADING)
@@ -121,10 +119,7 @@ class LoadingButton extends BaseComponent {
     }
 
     if (this._spinner) {
-      const transitionDuration = getTransitionDurationFromElement(this._spinner)
-
-      EventHandler.one(this._spinner, 'transitionend', stoped)
-      emulateTransitionEnd(this._spinner, transitionDuration)
+      this._queueCallback(stoped, this._spinner, true)
       return
     }
 
@@ -140,10 +135,9 @@ class LoadingButton extends BaseComponent {
     config = {
       ...Default,
       ...Manipulator.getDataAttributes(this._element),
-      ...config
+      ...(typeof config === 'object' ? config : {})
     }
     typeCheckConfig(NAME, config, DefaultType)
-
     return config
   }
 
@@ -169,22 +163,7 @@ class LoadingButton extends BaseComponent {
   // Static
 
   static loadingButtonInterface(element, config) {
-    let data = Data.get(element, DATA_KEY)
-    let _config = {
-      ...Default,
-      ...Manipulator.getDataAttributes(element)
-    }
-
-    if (typeof config === 'object') {
-      _config = {
-        ..._config,
-        ...config
-      }
-    }
-
-    if (!data) {
-      data = new LoadingButton(element, _config)
-    }
+    const data = LoadingButton.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {

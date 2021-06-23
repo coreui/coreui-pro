@@ -130,6 +130,15 @@
   --cui-form-multi-select-search-color: rgba(255, 255, 255, 0.87);
   --cui-form-multi-select-search-bg: transparent;
   --cui-form-multi-select-search-border-color: rgba(255, 255, 255, 0.09);
+  --cui-form-multi-select-cleaner-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba(255, 255, 255, 0.6)'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>");
+  --cui-form-multi-select-cleaner-hover-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba(255, 255, 255, 0.87)'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>");
+  --cui-form-multi-select-cleaner-focus-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba(255, 255, 255, 0.87)'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>");
+  --cui-form-multi-select-cleaner-border-color: rgba(255, 255, 255, 0.09);
+  --cui-form-multi-select-select-all-color: rgba(255, 255, 255, 0.6);
+  --cui-form-multi-select-select-all-bg: transparent;
+  --cui-form-multi-select-select-all-hover-color: rgba(255, 255, 255, 0.87);
+  --cui-form-multi-select-select-all-hover-bg: transparent;
+  --cui-form-multi-select-select-all-border-color: rgba(255, 255, 255, 0.09);
   --cui-form-multi-select-options-color: rgba(255, 255, 255, 0.87);
   --cui-form-multi-select-options-bg: #34353e;
   --cui-form-multi-select-options-border-color: rgba(255, 255, 255, 0.09);

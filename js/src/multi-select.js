@@ -272,10 +272,10 @@ class MultiSelect extends BaseComponent {
   _getConfig(config) {
     config = {
       ...Default,
-      ...config
+      ...Manipulator.getDataAttributes(this._element),
+      ...(typeof config === 'object' ? config : {})
     }
     typeCheckConfig(NAME, config, DefaultType)
-
     return config
   }
 
@@ -765,22 +765,7 @@ class MultiSelect extends BaseComponent {
   // Static
 
   static multiSelectInterface(element, config) {
-    let data = Data.get(element, DATA_KEY)
-    let _config = {
-      ...Default,
-      ...Manipulator.getDataAttributes(element)
-    }
-
-    if (typeof config === 'object') {
-      _config = {
-        ..._config,
-        ...config
-      }
-    }
-
-    if (!data) {
-      data = new MultiSelect(element, _config)
-    }
+    const data = MultiSelect.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {

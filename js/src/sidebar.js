@@ -7,12 +7,9 @@
 
 import {
   defineJQueryPlugin,
-  emulateTransitionEnd,
-  getTransitionDurationFromElement,
   reflow,
   typeCheckConfig
 } from './util/index'
-import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import BaseComponent from './base-component'
@@ -34,6 +31,7 @@ const DefaultType = {}
 
 const CLASS_NAME_BACKDROP = 'sidebar-backdrop'
 const CLASS_NAME_FADE = 'fade'
+const CLASS_NAME_HIDE = 'hide'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_SIDEBAR = 'sidebar'
 const CLASS_NAME_SIDEBAR_NARROW = 'sidebar-narrow'
@@ -44,6 +42,7 @@ const REGEXP_SIDEBAR_SELF_HIDING = /sidebar-self-hiding/
 
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
+const EVENT_RESIZE = 'resize'
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
@@ -94,6 +93,10 @@ class Sidebar extends BaseComponent {
   show() {
     EventHandler.trigger(this._element, EVENT_SHOW)
 
+    if (this._element.classList.contains(CLASS_NAME_HIDE)) {
+      this._element.classList.remove(CLASS_NAME_HIDE)
+    }
+
     if (REGEXP_SIDEBAR_SELF_HIDING.test(this._element.className)) {
       this._element.classList.add(CLASS_NAME_SHOW)
     }
@@ -113,10 +116,7 @@ class Sidebar extends BaseComponent {
       }
     }
 
-    const transitionDuration = getTransitionDurationFromElement(this._element)
-
-    EventHandler.one(this._element, 'transitionend', complete)
-    emulateTransitionEnd(this._element, transitionDuration)
+    this._queueCallback(complete, this._element, true)
   }
 
   hide() {
@@ -124,6 +124,12 @@ class Sidebar extends BaseComponent {
 
     if (this._element.classList.contains(CLASS_NAME_SHOW)) {
       this._element.classList.remove(CLASS_NAME_SHOW)
+    } else {
+      this._element.classList.add(CLASS_NAME_HIDE)
+    }
+
+    if (this._isVisible()) {
+      this._element.classList.add(CLASS_NAME_HIDE)
     }
 
     if (this._isMobile()) {
@@ -141,10 +147,7 @@ class Sidebar extends BaseComponent {
       }
     }
 
-    const transitionDuration = getTransitionDurationFromElement(this._element)
-
-    EventHandler.one(this._element, 'transitionend', complete)
-    emulateTransitionEnd(this._element, transitionDuration)
+    this._queueCallback(complete, this._element, true)
   }
 
   toggle() {
@@ -315,17 +318,18 @@ class Sidebar extends BaseComponent {
       event.preventDefault()
       this.hide()
     })
+
+    EventHandler.on(window, EVENT_RESIZE, () => {
+      if (this._isMobile() && this._isVisible()) {
+        this.hide()
+      }
+    })
   }
 
   // Static
 
   static sidebarInterface(element, config) {
-    let data = Data.get(element, DATA_KEY)
-    const _config = typeof config === 'object' && config
-
-    if (!data) {
-      data = new Sidebar(element, _config)
-    }
+    const data = Sidebar.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {

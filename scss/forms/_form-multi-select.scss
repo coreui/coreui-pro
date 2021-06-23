@@ -161,7 +161,7 @@
     &::before {
       position: absolute;
       top: .7rem;
-      left: $form-multi-select-option-padding-x / 2;
+      left: $form-multi-select-option-padding-x * .5;
       display: block;
       width: $form-multi-select-option-indicator-width;
       height: $form-multi-select-option-indicator-width;
@@ -189,7 +189,7 @@
 }
 
 .form-multi-select-optgroup-label {
-  padding: ($form-multi-select-option-padding-y * 1.5) ($form-multi-select-option-padding-x / 2) $form-multi-select-option-padding-y ($form-multi-select-option-padding-x / 2);
+  padding: ($form-multi-select-option-padding-y * 1.5) ($form-multi-select-option-padding-x * .5) $form-multi-select-option-padding-y ($form-multi-select-option-padding-x * .5);
   font-size: 80%;
   font-weight: $form-multi-select-optgroup-label-font-weight;
   color: $form-multi-select-optgroup-label-color;

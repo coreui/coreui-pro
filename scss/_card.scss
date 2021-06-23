@@ -56,7 +56,7 @@
 }
 
 .card-subtitle {
-  margin-top: -$card-title-spacer-y / 2;
+  margin-top: -$card-title-spacer-y * .5;
   margin-bottom: 0;
 }
 
@@ -107,12 +107,12 @@
 //
 
 .card-header-tabs {
-  margin-right: -$card-cap-padding-x / 2;
+  margin-right: -$card-cap-padding-x * .5;
   margin-bottom: -$card-cap-padding-y;
-  margin-left: -$card-cap-padding-x / 2;
+  margin-left: -$card-cap-padding-x * .5;
   border-bottom: 0;
 
-  @if $nav-tabs-link-active-bg != $card-bg { // TODO: find solution
+  @if $nav-tabs-link-active-bg != $card-bg {
     .nav-link.active {
       background-color: var(--#{$variable-prefix}card-bg, $card-bg);
       border-bottom-color: var(--#{$variable-prefix}card-bg, $card-bg);
@@ -121,8 +121,8 @@
 }
 
 .card-header-pills {
-  margin-right: -$card-cap-padding-x / 2;
-  margin-left: -$card-cap-padding-x / 2;
+  margin-right: -$card-cap-padding-x * .5;
+  margin-left: -$card-cap-padding-x * .5;
 }
 
 // Card image
