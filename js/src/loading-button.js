@@ -33,7 +33,7 @@ const CLASS_NAME_IS_LOADING = 'is-loading'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
 
 const Default = {
-  disabledOnLoading: true,
+  disabledOnLoading: false,
   spinner: true,
   spinnerType: 'border',
   timeout: false
