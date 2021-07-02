@@ -756,11 +756,6 @@ $toast-theme-map: (
   "toast-header-border-color":      $toast-header-border-color-dt
 ) !default;
 
-// TODO: Tooltip
-// --cui-tooltip-arrow-color
-// --cui-tooltip-bg
-// --cui-tooltip-color
-
 $theme-map: (
   "root":               map-merge($theme-root-dt, $link-theme-map),
   "utilities": (
