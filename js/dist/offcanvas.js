@@ -1,5 +1,5 @@
 /*!
-  * CoreUI offcanvas.js v4.0.0-rc.6 (https://coreui.io)
+  * CoreUI offcanvas.js v4.0.0 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -151,7 +151,7 @@
       jQuery
     } = window;
 
-    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
+    if (jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
       return jQuery;
     }
 
@@ -459,7 +459,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dropdown.js
+   * CoreUI (v4.0.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js

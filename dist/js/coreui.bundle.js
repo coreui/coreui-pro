@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.0.0-rc.6 (https://coreui.io)
+  * CoreUI v4.0.0 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dom/selector-engine.js
+   * CoreUI (v4.0.0): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -85,7 +85,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): alert.js
+   * CoreUI (v4.0.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -278,7 +278,7 @@
       jQuery
     } = window;
 
-    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
+    if (jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
       return jQuery;
     }
 
@@ -388,7 +388,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dom/event-handler.js
+   * CoreUI (v4.0.0): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -680,7 +680,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dom/data.js
+   * CoreUI (v4.0.0): dom/data.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dom/data.js
@@ -737,7 +737,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): alert.js
+   * CoreUI (v4.0.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -750,7 +750,7 @@
    * ------------------------------------------------------------------------
    */
 
-  const VERSION = '4.0.0-rc.6';
+  const VERSION = '4.0.0';
 
   class BaseComponent {
     constructor(element) {
@@ -806,7 +806,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): alert.js
+   * CoreUI (v4.0.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's alert.js
@@ -917,7 +917,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): alert.js
+   * CoreUI (v4.0.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's button.js
@@ -991,7 +991,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dom/manipulator.js
+   * CoreUI (v4.0.0): dom/manipulator.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -1068,7 +1068,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): carousel.js
+   * CoreUI (v4.0.0): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -1616,7 +1616,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): collapse.js
+   * CoreUI (v4.0.0): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js
@@ -3728,7 +3728,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dropdown.js
+   * CoreUI (v4.0.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dropdown.js
@@ -4208,7 +4208,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.1): loading-button.js
+   * CoreUI (v4.0.0): loading-button.js
    * Licensed under MIT (https://coreui.io/license)
    */
   /**
@@ -4615,7 +4615,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.0.0-rc.6): modal.js
+    * CoreUI (v4.0.0): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js
@@ -5057,7 +5057,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.0.0-rc.1): multi-select.js
+   * CoreUI PRO (v4.0.0): multi-select.js
    * License (https://coreui.io/pro/license)
    * --------------------------------------------------------------------------
    */
@@ -5561,7 +5561,7 @@
       tag.dataset.value = value;
       tag.innerHTML = text;
       const closeBtn = document.createElement('button');
-      closeBtn.classList.add(CLASS_NAME_TAG_DELETE, 'close');
+      closeBtn.classList.add(CLASS_NAME_TAG_DELETE, 'text-medium-emphasis');
       closeBtn.setAttribute('aria-label', 'Close');
       closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
       tag.append(closeBtn);
@@ -5570,9 +5570,7 @@
         event.stopPropagation();
         tag.remove();
 
-        this._deselectOption(value); // this._updateOptionsList()
-        // this._updateSearch()
-
+        this._deselectOption(value);
       });
       return tag;
     }
@@ -5901,7 +5899,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): alert.js
+   * CoreUI (v4.0.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -6186,7 +6184,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): dropdown.js
+   * CoreUI (v4.0.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js
@@ -6447,7 +6445,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): alert.js
+   * CoreUI (v4.0.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -6563,7 +6561,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): tooltip.js
+   * CoreUI (v4.0.0): tooltip.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tooltip.js
@@ -7254,7 +7252,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): popover.js
+   * CoreUI (v4.0.0): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js
@@ -7406,7 +7404,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): scrollspy.js
+   * CoreUI (v4.0.0): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js
@@ -7644,7 +7642,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): sidebar.js
+   * CoreUI (v4.0.0): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -7998,7 +7996,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): tab.js
+   * CoreUI (v4.0.0): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -8199,7 +8197,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): toast.js
+   * CoreUI (v4.0.0): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -8427,7 +8425,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): index.esm.js
+   * CoreUI (v4.0.0): index.esm.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

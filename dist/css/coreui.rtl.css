@@ -1,14 +1,14 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.0.0-rc.6
+ * @version v4.0.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
 */
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.0.0-rc.6
+ * @version v4.0.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -2608,6 +2608,7 @@ textarea.form-control-lg {
 .form-multi-select-tag-delete {
   padding: 0;
   margin-left: 6px;
+  background-color: transparent;
   border: 0;
 }
 

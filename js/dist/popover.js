@@ -1,5 +1,5 @@
 /*!
-  * CoreUI popover.js v4.0.0-rc.6 (https://coreui.io)
+  * CoreUI popover.js v4.0.0 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -19,7 +19,7 @@
       jQuery
     } = window;
 
-    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
+    if (jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
       return jQuery;
     }
 
@@ -64,7 +64,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.0-rc.6): popover.js
+   * CoreUI (v4.0.0): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js

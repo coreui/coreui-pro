@@ -2,7 +2,7 @@ import SelectorEngine from '../dom/selector-engine'
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.0-rc.6): alert.js
+ * CoreUI (v4.0.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  util/index.js
@@ -197,7 +197,7 @@ const reflow = element => element.offsetHeight
 const getjQuery = () => {
   const { jQuery } = window
 
-  if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
+  if (jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
     return jQuery
   }
 
