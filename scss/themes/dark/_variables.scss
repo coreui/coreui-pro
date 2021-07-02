@@ -165,12 +165,12 @@ $accordion-theme-map: (
 // Alert
 
 $alert-variants-dt: (
-  "primary":    alert-color-map($primary-dt),
-  "secondary":  alert-color-map($secondary-dt),
-  "success":    alert-color-map($success-dt),
-  "danger":     alert-color-map($danger-dt),
-  "warning":    alert-color-map($warning-dt),
-  "info":       alert-color-map($info-dt)
+  "primary":    alert-color-map($primary),
+  "secondary":  alert-color-map($secondary),
+  "success":    alert-color-map($success),
+  "danger":     alert-color-map($danger),
+  "warning":    alert-color-map($warning),
+  "info":       alert-color-map($info)
 ) !default;
 
 // Breadcrumb
@@ -768,10 +768,7 @@ $theme-map: (
     "text":             $theme-colors-dt
   ),
   "accordion":          $accordion-theme-map,
-  // "alert":         $alert-theme-variants-dt,
   "breadcrumb":         $breadcrumb-theme-map,
-  // "btn":           $button-theme-variants-dt,
-  // "btn-outline":   $button-outline-theme-variants-dt,
   "btn-close":          $close-theme-map,
   "card":               $card-theme-map,
   "dropdown":           $dropdown-theme-map,
