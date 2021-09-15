@@ -5904,11 +5904,9 @@ const CLASS_NAME_BACKDROP = 'sidebar-backdrop';
 const CLASS_NAME_FADE$2 = 'fade';
 const CLASS_NAME_HIDE$1 = 'hide';
 const CLASS_NAME_SHOW$2 = 'show';
-const CLASS_NAME_SIDEBAR = 'sidebar';
 const CLASS_NAME_SIDEBAR_NARROW = 'sidebar-narrow';
 const CLASS_NAME_SIDEBAR_OVERLAID = 'sidebar-overlaid';
 const CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE = 'sidebar-narrow-unfoldable';
-const REGEXP_SIDEBAR_SELF_HIDING = /sidebar-self-hiding/;
 const EVENT_HIDE$2 = `hide${EVENT_KEY$2}`;
 const EVENT_HIDDEN$2 = `hidden${EVENT_KEY$2}`;
 const EVENT_RESIZE = 'resize';
@@ -5936,8 +5934,7 @@ class Sidebar extends BaseComponent {
     this._unfoldable = this._isUnfoldable();
     this._backdrop = null;
 
-    this._addEventListeners(); // Data.set(element, DATA_KEY, this)
-
+    this._addEventListeners();
   } // Getters
 
 
@@ -5961,11 +5958,9 @@ class Sidebar extends BaseComponent {
       this._element.classList.remove(CLASS_NAME_HIDE$1);
     }
 
-    if (REGEXP_SIDEBAR_SELF_HIDING.test(this._element.className)) {
-      this._element.classList.add(CLASS_NAME_SHOW$2);
-    }
-
     if (this._isMobile()) {
+      this._element.classList.add(CLASS_NAME_SHOW$2);
+
       this._showBackdrop();
     }
 
@@ -5989,16 +5984,12 @@ class Sidebar extends BaseComponent {
 
     if (this._element.classList.contains(CLASS_NAME_SHOW$2)) {
       this._element.classList.remove(CLASS_NAME_SHOW$2);
-    } else {
-      this._element.classList.add(CLASS_NAME_HIDE$1);
-    }
-
-    if (this._isVisible()) {
-      this._element.classList.add(CLASS_NAME_HIDE$1);
     }
 
     if (this._isMobile()) {
       this._removeBackdrop();
+    } else {
+      this._element.classList.add(CLASS_NAME_HIDE$1);
     }
 
     const complete = () => {
@@ -6085,14 +6076,6 @@ class Sidebar extends BaseComponent {
     return config;
   }
 
-  _createShowClass() {
-    if (this._breakpoint && !this._isMobile()) {
-      return `${CLASS_NAME_SIDEBAR}-${this._breakpoint}-${CLASS_NAME_SHOW$2}`;
-    }
-
-    return `${CLASS_NAME_SIDEBAR}-${CLASS_NAME_SHOW$2}`;
-  }
-
   _isMobile() {
     return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--cui-is-mobile'));
   }
@@ -6112,11 +6095,7 @@ class Sidebar extends BaseComponent {
   _isVisible() {
     const rect = this._element.getBoundingClientRect();
 
-    return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    /* or $(window).height() */
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    /* or $(window).width() */
-    ;
+    return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
   }
 
   _addClassName(className) {

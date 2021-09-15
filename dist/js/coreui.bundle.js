@@ -2128,17 +2128,39 @@
     return placement.split('-')[0];
   }
 
-  function getBoundingClientRect(element) {
+  var round$1 = Math.round;
+  function getBoundingClientRect(element, includeScale) {
+    if (includeScale === void 0) {
+      includeScale = false;
+    }
+
     var rect = element.getBoundingClientRect();
+    var scaleX = 1;
+    var scaleY = 1;
+
+    if (isHTMLElement(element) && includeScale) {
+      var offsetHeight = element.offsetHeight;
+      var offsetWidth = element.offsetWidth; // Do not attempt to divide by 0, otherwise we get `Infinity` as scale
+      // Fallback to 1 in case both values are `0`
+
+      if (offsetWidth > 0) {
+        scaleX = rect.width / offsetWidth || 1;
+      }
+
+      if (offsetHeight > 0) {
+        scaleY = rect.height / offsetHeight || 1;
+      }
+    }
+
     return {
-      width: rect.width,
-      height: rect.height,
-      top: rect.top,
-      right: rect.right,
-      bottom: rect.bottom,
-      left: rect.left,
-      x: rect.left,
-      y: rect.top
+      width: round$1(rect.width / scaleX),
+      height: round$1(rect.height / scaleY),
+      top: round$1(rect.top / scaleY),
+      right: round$1(rect.right / scaleX),
+      bottom: round$1(rect.bottom / scaleY),
+      left: round$1(rect.left / scaleX),
+      x: round$1(rect.left / scaleX),
+      y: round$1(rect.top / scaleY)
     };
   }
 
@@ -2393,6 +2415,10 @@
     requiresIfExists: ['preventOverflow']
   };
 
+  function getVariation(placement) {
+    return placement.split('-')[1];
+  }
+
   var unsetSides = {
     top: 'auto',
     right: 'auto',
@@ -2419,6 +2445,7 @@
     var popper = _ref2.popper,
         popperRect = _ref2.popperRect,
         placement = _ref2.placement,
+        variation = _ref2.variation,
         offsets = _ref2.offsets,
         position = _ref2.position,
         gpuAcceleration = _ref2.gpuAcceleration,
@@ -2445,7 +2472,7 @@
       if (offsetParent === getWindow(popper)) {
         offsetParent = getDocumentElement(popper);
 
-        if (getComputedStyle$1(offsetParent).position !== 'static') {
+        if (getComputedStyle$1(offsetParent).position !== 'static' && position === 'absolute') {
           heightProp = 'scrollHeight';
           widthProp = 'scrollWidth';
         }
@@ -2454,14 +2481,14 @@
 
       offsetParent = offsetParent;
 
-      if (placement === top) {
+      if (placement === top || (placement === left || placement === right) && variation === end) {
         sideY = bottom; // $FlowFixMe[prop-missing]
 
         y -= offsetParent[heightProp] - popperRect.height;
         y *= gpuAcceleration ? 1 : -1;
       }
 
-      if (placement === left) {
+      if (placement === left || (placement === top || placement === bottom) && variation === end) {
         sideX = right; // $FlowFixMe[prop-missing]
 
         x -= offsetParent[widthProp] - popperRect.width;
@@ -2476,7 +2503,7 @@
     if (gpuAcceleration) {
       var _Object$assign;
 
-      return Object.assign({}, commonStyles, (_Object$assign = {}, _Object$assign[sideY] = hasY ? '0' : '', _Object$assign[sideX] = hasX ? '0' : '', _Object$assign.transform = (win.devicePixelRatio || 1) < 2 ? "translate(" + x + "px, " + y + "px)" : "translate3d(" + x + "px, " + y + "px, 0)", _Object$assign));
+      return Object.assign({}, commonStyles, (_Object$assign = {}, _Object$assign[sideY] = hasY ? '0' : '', _Object$assign[sideX] = hasX ? '0' : '', _Object$assign.transform = (win.devicePixelRatio || 1) <= 1 ? "translate(" + x + "px, " + y + "px)" : "translate3d(" + x + "px, " + y + "px, 0)", _Object$assign));
     }
 
     return Object.assign({}, commonStyles, (_Object$assign2 = {}, _Object$assign2[sideY] = hasY ? y + "px" : '', _Object$assign2[sideX] = hasX ? x + "px" : '', _Object$assign2.transform = '', _Object$assign2));
@@ -2494,6 +2521,7 @@
 
     var commonStyles = {
       placement: getBasePlacement(state.placement),
+      variation: getVariation(state.placement),
       popper: state.elements.popper,
       popperRect: state.rects.popper,
       gpuAcceleration: gpuAcceleration
@@ -2796,10 +2824,6 @@
     return clippingRect;
   }
 
-  function getVariation(placement) {
-    return placement.split('-')[1];
-  }
-
   function computeOffsets(_ref) {
     var reference = _ref.reference,
         element = _ref.element,
@@ -2885,11 +2909,10 @@
         padding = _options$padding === void 0 ? 0 : _options$padding;
     var paddingObject = mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
     var altContext = elementContext === popper ? reference : popper;
-    var referenceElement = state.elements.reference;
     var popperRect = state.rects.popper;
     var element = state.elements[altBoundary ? altContext : elementContext];
     var clippingClientRect = getClippingRect(isElement(element) ? element : element.contextElement || getDocumentElement(state.elements.popper), boundary, rootBoundary);
-    var referenceClientRect = getBoundingClientRect(referenceElement);
+    var referenceClientRect = getBoundingClientRect(state.elements.reference);
     var popperOffsets = computeOffsets({
       reference: referenceClientRect,
       element: popperRect,
@@ -3366,16 +3389,24 @@
     }
   }
 
+  function isElementScaled(element) {
+    var rect = element.getBoundingClientRect();
+    var scaleX = rect.width / element.offsetWidth || 1;
+    var scaleY = rect.height / element.offsetHeight || 1;
+    return scaleX !== 1 || scaleY !== 1;
+  } // Returns the composite rect of an element relative to its offsetParent.
   // Composite means it takes into account transforms as well as layout.
+
 
   function getCompositeRect(elementOrVirtualElement, offsetParent, isFixed) {
     if (isFixed === void 0) {
       isFixed = false;
     }
 
-    var documentElement = getDocumentElement(offsetParent);
-    var rect = getBoundingClientRect(elementOrVirtualElement);
     var isOffsetParentAnElement = isHTMLElement(offsetParent);
+    var offsetParentIsScaled = isHTMLElement(offsetParent) && isElementScaled(offsetParent);
+    var documentElement = getDocumentElement(offsetParent);
+    var rect = getBoundingClientRect(elementOrVirtualElement, offsetParentIsScaled);
     var scroll = {
       scrollLeft: 0,
       scrollTop: 0
@@ -3392,7 +3423,7 @@
       }
 
       if (isHTMLElement(offsetParent)) {
-        offsets = getBoundingClientRect(offsetParent);
+        offsets = getBoundingClientRect(offsetParent, true);
         offsets.x += offsetParent.clientLeft;
         offsets.y += offsetParent.clientTop;
       } else if (documentElement) {
@@ -3529,7 +3560,8 @@
       var isDestroyed = false;
       var instance = {
         state: state,
-        setOptions: function setOptions(options) {
+        setOptions: function setOptions(setOptionsAction) {
+          var options = typeof setOptionsAction === 'function' ? setOptionsAction(state.options) : setOptionsAction;
           cleanupModifierEffects();
           state.options = Object.assign({}, defaultOptions, state.options, options);
           state.scrollParents = {
@@ -7662,11 +7694,9 @@
   const CLASS_NAME_FADE$2 = 'fade';
   const CLASS_NAME_HIDE$1 = 'hide';
   const CLASS_NAME_SHOW$2 = 'show';
-  const CLASS_NAME_SIDEBAR = 'sidebar';
   const CLASS_NAME_SIDEBAR_NARROW = 'sidebar-narrow';
   const CLASS_NAME_SIDEBAR_OVERLAID = 'sidebar-overlaid';
   const CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE = 'sidebar-narrow-unfoldable';
-  const REGEXP_SIDEBAR_SELF_HIDING = /sidebar-self-hiding/;
   const EVENT_HIDE$2 = `hide${EVENT_KEY$2}`;
   const EVENT_HIDDEN$2 = `hidden${EVENT_KEY$2}`;
   const EVENT_RESIZE = 'resize';
@@ -7694,8 +7724,7 @@
       this._unfoldable = this._isUnfoldable();
       this._backdrop = null;
 
-      this._addEventListeners(); // Data.set(element, DATA_KEY, this)
-
+      this._addEventListeners();
     } // Getters
 
 
@@ -7719,11 +7748,9 @@
         this._element.classList.remove(CLASS_NAME_HIDE$1);
       }
 
-      if (REGEXP_SIDEBAR_SELF_HIDING.test(this._element.className)) {
-        this._element.classList.add(CLASS_NAME_SHOW$2);
-      }
-
       if (this._isMobile()) {
+        this._element.classList.add(CLASS_NAME_SHOW$2);
+
         this._showBackdrop();
       }
 
@@ -7747,16 +7774,12 @@
 
       if (this._element.classList.contains(CLASS_NAME_SHOW$2)) {
         this._element.classList.remove(CLASS_NAME_SHOW$2);
-      } else {
-        this._element.classList.add(CLASS_NAME_HIDE$1);
-      }
-
-      if (this._isVisible()) {
-        this._element.classList.add(CLASS_NAME_HIDE$1);
       }
 
       if (this._isMobile()) {
         this._removeBackdrop();
+      } else {
+        this._element.classList.add(CLASS_NAME_HIDE$1);
       }
 
       const complete = () => {
@@ -7843,14 +7866,6 @@
       return config;
     }
 
-    _createShowClass() {
-      if (this._breakpoint && !this._isMobile()) {
-        return `${CLASS_NAME_SIDEBAR}-${this._breakpoint}-${CLASS_NAME_SHOW$2}`;
-      }
-
-      return `${CLASS_NAME_SIDEBAR}-${CLASS_NAME_SHOW$2}`;
-    }
-
     _isMobile() {
       return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--cui-is-mobile'));
     }
@@ -7870,11 +7885,7 @@
     _isVisible() {
       const rect = this._element.getBoundingClientRect();
 
-      return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      /* or $(window).height() */
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-      /* or $(window).width() */
-      ;
+      return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
     }
 
     _addClassName(className) {
