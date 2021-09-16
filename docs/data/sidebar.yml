@@ -55,10 +55,23 @@
     - title: Form control
     - title: Select
     - title: Multi Select
+      badge:
+        color: danger
+        text: PRO
     - title: Checks & radios
     - title: Range
     - title: Input group
     - title: Floating labels
+    - title: Form Mask
+      badge:
+        color: warning
+        text: WIP v4.1
+      disabled: true
+    - title: Date Range Picker
+      badge:
+        color: warning
+        text: WIP v4.1
+      disabled: true
     - title: Layout
     - title: Validation
 
@@ -82,11 +95,19 @@
     - title: Header
     - title: List group
     - title: Loading buttons
+      badge:
+        color: danger
+        text: PRO
     - title: Modal
     - title: Navs & tabs
     - title: Navbar
     - title: Offcanvas
     - title: Pagination
+    - title: Placeholder
+      badge:
+        color: warning
+        text: WIP v4.1
+      disabled: true
     - title: Popovers
     - title: Progress
     - title: Scrollspy
