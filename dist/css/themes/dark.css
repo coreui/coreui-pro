@@ -73,7 +73,7 @@
   --cui-card-border-color: rgba(255, 255, 255, 0.075);
   --cui-card-cap-bg: #282933;
 }
-.dark-theme .dropdown {
+.dark-theme .dropdown-menu {
   --cui-dropdown-color: rgba(255, 255, 255, 0.87);
   --cui-dropdown-border-color: rgba(255, 255, 255, 0.075);
   --cui-dropdown-bg: #34353e;
