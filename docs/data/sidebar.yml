@@ -65,12 +65,12 @@
     - title: Form Mask
       badge:
         color: warning
-        text: WIP v4.1
+        text: WIP v4.2
       disabled: true
     - title: Date Range Picker
       badge:
         color: warning
-        text: WIP v4.1
+        text: WIP v4.2
       disabled: true
     - title: Layout
     - title: Validation

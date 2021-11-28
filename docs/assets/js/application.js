@@ -117,6 +117,63 @@
     })
   }
 
+  document.querySelectorAll('.btn-loading')
+  .forEach(function (button) {
+    new coreui.LoadingButton(button)
+    button.addEventListener('click', function (event) {
+      var myBtn = coreui.LoadingButton.getInstance(event.target)
+      myBtn.start()
+    })
+  })
+
+  var myMultiSelect = document.getElementById('multiSelect')
+
+  if (myMultiSelect) {
+    // eslint-disable-next-line no-unused-vars
+    var cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
+      name: 'multiSelect',
+      options: [
+        {
+          value: 0,
+          text: 'Angular'
+        },
+        {
+          value: 1,
+          text: 'Bootstrap',
+          selected: true
+        },
+        {
+          value: 2,
+          text: 'React.js',
+          selected: true
+        },
+        {
+          value: 3,
+          text: 'Vue.js'
+        },
+        {
+          label: 'backend',
+          options: [
+            {
+              value: 4,
+              text: 'Django'
+            },
+            {
+              value: 5,
+              text: 'Laravel'
+            },
+            {
+              value: 6,
+              text: 'Node.js',
+              selected: true
+            }
+          ]
+        }
+      ],
+      search: true
+    })
+  }
+
   // Insert copy to clipboard button before .highlight
   var btnHtml = '<div class="docs-clipboard"><button type="button" class="btn-clipboard btn btn-ghost-primary" title="Copy to clipboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><polygon fill="var(--ci-primary-color, currentColor)" points="408 432 376 432 376 464 112 464 112 136 144 136 144 104 80 104 80 496 408 496 408 432" class="ci-primary"/><path fill="var(--ci-primary-color, currentColor)" d="M176,16V400H496V153.373L358.627,16ZM464,368H208V48H312V200H464Zm0-200H344V48h1.372L464,166.627Z" class="ci-primary"/></svg></button></div>'
   document.querySelectorAll('div.highlight')

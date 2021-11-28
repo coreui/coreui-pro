@@ -64,7 +64,7 @@ toc: true
 <select id="multiSelect"></select>
 
 <script type="text/javascript">
-  var myMultiSelect = document.getElementById('multiSelect')
+  var myMultiSelect = document.querySelector('#multiSelect')
   var cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
     options: [
       {
