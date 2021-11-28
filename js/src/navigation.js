@@ -1,14 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.4): alert.js
+ * CoreUI (v4.0.4): navigation.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
 
 import {
   defineJQueryPlugin,
-  // emulateTransitionEnd,
-  // getTransitionDurationFromElement,
   typeCheckConfig
 } from './util/index'
 import Data from './dom/data'

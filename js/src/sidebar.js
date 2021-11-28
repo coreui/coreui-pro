@@ -59,6 +59,7 @@ const SELECTOR_SIDEBAR = '.sidebar'
 class Sidebar extends BaseComponent {
   constructor(element, config) {
     super(element)
+
     this._config = this._getConfig(config)
     this._show = this._isVisible()
     this._mobile = this._isMobile()
@@ -66,6 +67,7 @@ class Sidebar extends BaseComponent {
     this._narrow = this._isNarrow()
     this._unfoldable = this._isUnfoldable()
     this._backdrop = null
+
     this._addEventListeners()
   }
 
@@ -234,7 +236,7 @@ class Sidebar extends BaseComponent {
 
   _removeBackdrop() {
     if (this._backdrop) {
-      this._backdrop.parentNode.removeChild(this._backdrop)
+      this._backdrop.remove()
       this._backdrop = null
     }
   }
@@ -244,7 +246,7 @@ class Sidebar extends BaseComponent {
       this._backdrop = document.createElement('div')
       this._backdrop.className = CLASS_NAME_BACKDROP
       this._backdrop.classList.add(CLASS_NAME_FADE)
-      document.body.appendChild(this._backdrop)
+      document.body.append(this._backdrop)
       reflow(this._backdrop)
       this._backdrop.classList.add(CLASS_NAME_SHOW)
     }

@@ -697,85 +697,85 @@
   --cui-list-group-action-active-border-color: #315c86;
 }
 .dark-theme .dark\:text-primary, .dark-theme .text-primary:not([class*="dark:"]) {
-  color: var(--cui-primary) !important;
+  color: #321fdb !important;
 }
 .dark-theme .dark\:text-secondary, .dark-theme .text-secondary:not([class*="dark:"]) {
-  color: var(--cui-secondary) !important;
+  color: #9da5b1 !important;
 }
 .dark-theme .dark\:text-success, .dark-theme .text-success:not([class*="dark:"]) {
-  color: var(--cui-success) !important;
+  color: #2eb85c !important;
 }
 .dark-theme .dark\:text-info, .dark-theme .text-info:not([class*="dark:"]) {
-  color: var(--cui-info) !important;
+  color: #39f !important;
 }
 .dark-theme .dark\:text-warning, .dark-theme .text-warning:not([class*="dark:"]) {
-  color: var(--cui-warning) !important;
+  color: #f9b115 !important;
 }
 .dark-theme .dark\:text-danger, .dark-theme .text-danger:not([class*="dark:"]) {
-  color: var(--cui-danger) !important;
+  color: #e55353 !important;
 }
 .dark-theme .dark\:text-light, .dark-theme .text-light:not([class*="dark:"]) {
-  color: var(--cui-light) !important;
+  color: #ebedef !important;
 }
 .dark-theme .dark\:text-dark, .dark-theme .text-dark:not([class*="dark:"]) {
-  color: var(--cui-dark) !important;
+  color: #4f5d73 !important;
 }
 .dark-theme .dark\:text-white, .dark-theme .text-white:not([class*="dark:"]) {
-  color: var(--cui-white) !important;
+  color: #fff !important;
 }
 .dark-theme .dark\:text-body, .dark-theme .text-body:not([class*="dark:"]) {
-  color: var(--cui-body) !important;
+  color: rgba(255, 255, 255, 0.87) !important;
 }
 .dark-theme .dark\:text-black-50, .dark-theme .text-black-50:not([class*="dark:"]) {
-  color: var(--cui-black-50) !important;
+  color: rgba(0, 0, 21, 0.5) !important;
 }
 .dark-theme .dark\:text-white-50, .dark-theme .text-white-50:not([class*="dark:"]) {
-  color: var(--cui-white-50) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
 }
 .dark-theme .dark\:text-reset, .dark-theme .text-reset:not([class*="dark:"]) {
-  color: var(--cui-reset) !important;
+  color: inherit !important;
 }
 .dark-theme .dark\:text-high-emphasis, .dark-theme .text-high-emphasis:not([class*="dark:"]) {
-  color: var(--cui-high-emphasis) !important;
+  color: rgba(255, 255, 255, 0.87) !important;
 }
 .dark-theme .dark\:text-medium-emphasis, .dark-theme .text-medium-emphasis:not([class*="dark:"]) {
-  color: var(--cui-medium-emphasis) !important;
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 .dark-theme .dark\:text-disabled, .dark-theme .text-disabled:not([class*="dark:"]) {
-  color: var(--cui-disabled) !important;
+  color: rgba(255, 255, 255, 0.38) !important;
 }
 .dark-theme .dark\:bg-primary, .dark-theme .bg-primary:not([class*="dark:"]) {
-  background-color: var(--cui-primary) !important;
+  background-color: #321fdb !important;
 }
 .dark-theme .dark\:bg-secondary, .dark-theme .bg-secondary:not([class*="dark:"]) {
-  background-color: var(--cui-secondary) !important;
+  background-color: #9da5b1 !important;
 }
 .dark-theme .dark\:bg-success, .dark-theme .bg-success:not([class*="dark:"]) {
-  background-color: var(--cui-success) !important;
+  background-color: #2eb85c !important;
 }
 .dark-theme .dark\:bg-info, .dark-theme .bg-info:not([class*="dark:"]) {
-  background-color: var(--cui-info) !important;
+  background-color: #39f !important;
 }
 .dark-theme .dark\:bg-warning, .dark-theme .bg-warning:not([class*="dark:"]) {
-  background-color: var(--cui-warning) !important;
+  background-color: #f9b115 !important;
 }
 .dark-theme .dark\:bg-danger, .dark-theme .bg-danger:not([class*="dark:"]) {
-  background-color: var(--cui-danger) !important;
+  background-color: #e55353 !important;
 }
 .dark-theme .dark\:bg-light, .dark-theme .bg-light:not([class*="dark:"]) {
-  background-color: var(--cui-light) !important;
+  background-color: #ebedef !important;
 }
 .dark-theme .dark\:bg-dark, .dark-theme .bg-dark:not([class*="dark:"]) {
-  background-color: var(--cui-dark) !important;
+  background-color: #4f5d73 !important;
 }
 .dark-theme .dark\:bg-body, .dark-theme .bg-body:not([class*="dark:"]) {
-  background-color: var(--cui-body) !important;
+  background-color: #fff !important;
 }
 .dark-theme .dark\:bg-white, .dark-theme .bg-white:not([class*="dark:"]) {
-  background-color: var(--cui-white) !important;
+  background-color: #fff !important;
 }
 .dark-theme .dark\:bg-transparent, .dark-theme .bg-transparent:not([class*="dark:"]) {
-  background-color: var(--cui-transparent) !important;
+  background-color: transparent !important;
 }
 
 /*# sourceMappingURL=dark.css.map */
