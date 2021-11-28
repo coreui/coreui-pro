@@ -146,7 +146,9 @@ Takes the basic nav from above and adds the `.nav-tabs` class to generate a tabb
 </ul>
 {{< /example >}}
 
-### Underline { .include-in-pro }
+### Underline
+
+<span class="badge bg-danger">Available in CoreUI PRO</span>
 
 Takes the basic nav from above and adds the `.nav-underline` class to generate links with an underline. Use them to create tabbable regions with our [tab JavaScript plugin](#javascript-behavior).
 
