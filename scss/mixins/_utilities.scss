@@ -28,10 +28,6 @@
     // Don't prefix if value key is null (eg. with shadow class)
     $property-class-modifier: if($key, if($property-class == "" and $infix == "", "", "-") + $key, "");
 
-    // Generate CSS Variable
-    $generate-vars: if(map-has-key($utility, vars), map-get($utility, vars), false);
-    $generate-only-vars: if(map-has-key($utility, only-vars), map-get($utility, only-vars), false);
-
     // Generate RTL version
     $generate-rtl: if(map-has-key($utility, rtl), map-get($utility, rtl), false);
 
@@ -62,7 +58,6 @@
       $selector: if($theme-prefix, theme-prefix("#{$property-class + $infix + $property-class-modifier}"), ".#{$property-class + $infix + $property-class-modifier}");
 
       @if $is-css-var {
-        // .#{$property-class + $infix + $property-class-modifier} {
         #{$selector} {
           --#{$variable-prefix}#{$property-class}: #{$value};
         }
@@ -74,7 +69,6 @@
         }
       } @else {
         #{$selector} {
-        // .#{$property-class + $infix + $property-class-modifier} {
           @each $property in $properties {
             @if $is-local-vars {
               @each $local-var, $value in $is-local-vars {
