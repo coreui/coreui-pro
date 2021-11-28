@@ -733,6 +733,7 @@ class MultiSelect extends BaseComponent {
 
       const optgroup = option.closest(SELECTOR_OPTGROUP)
       if (optgroup) {
+        // eslint-disable-next-line  unicorn/prefer-array-some
         if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
           optgroup.style.removeProperty('display')
         } else {
