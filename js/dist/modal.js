@@ -1,5 +1,5 @@
 /*!
-  * CoreUI modal.js v4.0.4 (https://coreui.io)
+  * CoreUI modal.js v4.1.0 (https://coreui.io)
   * Copyright 2021 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -18,7 +18,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.0.4): alert.js
+   * CoreUI (v4.1.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -612,7 +612,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.0.4): modal.js
+    * CoreUI (v4.1.0): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js

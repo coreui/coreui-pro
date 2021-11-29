@@ -59,18 +59,18 @@ params:
   icons:                "https://icons.coreui.io/"
 
   download:
-    source:             "https://github.com/coreui/coreui/archive/v4.0.4.zip"
-    dist:               "https://github.com/coreui/coreui/releases/download/v4.0.4/coreui-4.0.4-dist.zip"
+    source:             "https://github.com/coreui/coreui/archive/v4.1.0.zip"
+    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.0/coreui-4.1.0-dist.zip"
 
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
-    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.4/dist/css/coreui.min.css"
-    css_hash:        "sha384-3kr/BkKE9b9xSLiv3JS5fIec31WfbwnBkMy+OSBErKMjf8qc27rkWCBu00JOTTY+"
-    css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.0.4/dist/css/coreui.rtl.min.css"
-    css_rtl_hash:    "sha384-rFt588bihRLYbLu+mUHw0PYuMvJ+Ewh9MHRBvlL6srzUByopuzsieWkPAY3rgZjB"
-    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.4/dist/js/coreui.min.js"
-    js_hash:         "sha384-rkehC6cJS+5qIHrYVkrPoJS9JWoJ3D1pGMdmZqiRKJ/Xa+Bu16qRUo00syXaSR3C"
-    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.0.4/dist/js/coreui.bundle.min.js"
-    js_bundle_hash:  "sha384-yqqrndQYY7iErGwIJAjK29cXiC0BqZ96P+hwvQcyR114ZyDLP5e82pL7uvQhS9W7"
+    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/css/coreui.min.css"
+    css_hash:        "sha384-J2WCKfhPxbtZAT+USOoPNCnZVozpAaGtaH/LUcSKXjdCXN85i5fGMTy1Agp8HChK"
+    css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.0/dist/css/coreui.rtl.min.css"
+    css_rtl_hash:    "sha384-/MAUZUV+dh2nDvEE5NIcV0htwQDwYzxhljL39QcHgEj9yrqT93WJU1A7VA/Alc0U"
+    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/js/coreui.min.js"
+    js_hash:         "sha384-Wup2+VgScxcR/mgqxkf+wR1odkDFo5HSfvwprGVTc3SAdcpj2paGHxOgF7z7nE0I"
+    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/js/coreui.bundle.min.js"
+    js_bundle_hash:  "sha384-CYI4AskcOOUbgXyjrkNZzI5Mbi6ZXe1RWn29fPG/MBZArrlwrfk8u49XbAkCHmzu"
     popper:           "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
-    popper_hash:      "sha384-W8fXfP3gkOKtndU4JGtKDvXbO53Wy8SZCQHczT5FMiiqmQfUpWbYdTil/SxwZgAN"
+    popper_hash:      "sha384-ThCKQ0fDhFQh8PSFLvjhmjy7oRKp5gRbY+bcEnQWtRhuvli/qxsn0xMcMmzXkuIa"

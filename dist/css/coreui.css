@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.0.4
+ * @version v4.1.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -7224,13 +7224,13 @@ textarea.form-control-lg {
   left: 0;
 }
 .sidebar.sidebar-overlaid:not(.sidebar-end) ~ * {
-  --cui-sidebar-occupy-start: 0;
+  --cui-sidebar-occupy-start: 0 !important;
 }
 .sidebar.sidebar-overlaid.sidebar-end {
   right: 0;
 }
 .sidebar.sidebar-overlaid.sidebar-end ~ * {
-  --cui-sidebar-occupy-end: 0;
+  --cui-sidebar-occupy-end: 0 !important;
 }
 @media (max-width: 767.98px) {
   .sidebar {

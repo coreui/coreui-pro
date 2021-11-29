@@ -1,42 +1,23 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.0.4): index.esm.js
+ * CoreUI (v4.1.0): index.esm.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
 
-import Alert from './src/alert'
-import Button from './src/button'
-import Carousel from './src/carousel'
-import Collapse from './src/collapse'
-import Dropdown from './src/dropdown'
-import LoadingButton from './src/loading-button'
-import Modal from './src/modal'
-import MultiSelect from './src/multi-select'
-import Navigation from './src/navigation'
-import OffCanvas from './src/offcanvas'
-import Popover from './src/popover'
-import ScrollSpy from './src/scrollspy'
-import Sidebar from './src/sidebar'
-import Tab from './src/tab'
-import Toast from './src/toast'
-import Tooltip from './src/tooltip'
-
-export {
-  Alert,
-  Button,
-  Carousel,
-  Collapse,
-  Dropdown,
-  LoadingButton,
-  Modal,
-  MultiSelect,
-  Navigation,
-  OffCanvas,
-  Popover,
-  ScrollSpy,
-  Sidebar,
-  Tab,
-  Toast,
-  Tooltip
-}
+export { default as Alert } from './src/alert'
+export { default as Button } from './src/button'
+export { default as Carousel } from './src/carousel'
+export { default as Collapse } from './src/collapse'
+export { default as Dropdown } from './src/dropdown'
+export { default as LoadingButton } from './src/loading-button'
+export { default as Modal } from './src/modal'
+export { default as MultiSelect } from './src/multi-select'
+export { default as Navigation } from './src/navigation'
+export { default as Offcanvas } from './src/offcanvas'
+export { default as Popover } from './src/popover'
+export { default as ScrollSpy } from './src/scrollspy'
+export { default as Sidebar } from './src/sidebar'
+export { default as Tab } from './src/tab'
+export { default as Toast } from './src/toast'
+export { default as Tooltip } from './src/tooltip'
