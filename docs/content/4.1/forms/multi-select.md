@@ -3,6 +3,9 @@ layout: docs
 title: Multi Select
 description: Customize the native `<select>`s with a powerful Multi-Select component that changes the element's initial appearance and brings some new functionalities.
 group: forms
+aliases:
+  - "/forms/multi-select/"
+  - "/4.0/forms/multi-select/"
 toc: true
 ---
 

@@ -3,6 +3,9 @@ layout: docs
 title: Parcel
 description: Learn how to include CoreUI in your project using Parcel.
 group: getting-started
+aliases:
+  - "/getting-started/parcel/"
+  - "/4.0/getting-started/parcel/"
 toc: true
 ---
 

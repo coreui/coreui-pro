@@ -3,6 +3,9 @@ layout: docs
 title: Text
 description: Documentation and examples for common text utilities to control alignment, wrapping, weight, and more.
 group: utilities
+aliases:
+  - "/utilities/text/"
+  - "/4.0/utilities/text/"
 toc: true
 ---
 

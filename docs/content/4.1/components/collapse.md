@@ -6,6 +6,7 @@ group: components
 aliases:
   - "/components/collapse/"
   - "/components/bootstrap/collapse/"
+  - "/4.0/components/collapse/"
 toc: true
 bootstrap: true
 ---

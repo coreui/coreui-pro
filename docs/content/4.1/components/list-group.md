@@ -6,6 +6,7 @@ group: components
 aliases:
   - "/components/list-group/"
   - "/components/bootstrap/list-group/"
+  - "/4.0/components/list-group/"
 toc: true
 bootstrap: true
 ---

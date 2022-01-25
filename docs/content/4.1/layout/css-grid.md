@@ -3,6 +3,9 @@ layout: docs
 title: CSS Grid
 description: Learn how to enable, use, and customize our alternate layout system built on CSS Grid with examples and code snippets.
 group: layout
+aliases:
+  - "/layout/css-grid/"
+  - "/4.0/layout/css-grid/"
 toc: true
 ---
 

@@ -5,7 +5,7 @@ description: Bootstrap Modals offer a lightweight, multi-purpose JavaScript popu
 group: components
 aliases:
   - "/components/modal/"
-  - "/components/bootstrap/modal/"
+  - "/4.0/components/modal/"
 toc: true
 bootstrap: true
 ---

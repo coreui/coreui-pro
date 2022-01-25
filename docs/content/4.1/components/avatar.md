@@ -5,6 +5,7 @@ description: Avatar component can be used to display circular user profile pictu
 group: components
 aliases:
   - "/components/avatar/"
+  - "/4.0/components/avatar/"
 toc: true
 ---
 

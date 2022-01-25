@@ -3,6 +3,9 @@ layout: docs
 title: Optimize
 description: Keep your projects lean, responsive, and maintainable so you can deliver the best experience and focus on more important jobs.
 group: customize
+aliases:
+  - "/customize/optimize/"
+  - "/4.0/customize/optimize/"
 toc: true
 ---
 

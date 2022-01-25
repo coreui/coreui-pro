@@ -3,6 +3,9 @@ layout: docs
 title: Interactions
 description: Utility classes that change how users interact with contents of a website.
 group: utilities
+aliases:
+  - "/utilities/interactions/"
+  - "/4.0/utilities/interactions/"
 toc: false
 ---
 

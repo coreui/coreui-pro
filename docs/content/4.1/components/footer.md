@@ -5,6 +5,7 @@ description: Bootstrap Footer is an additional navigation used for displaying ge
 group: components
 aliases:
   - "/components/footer/"
+  - "/4.0/components/footer/"
 toc: true
 ---
 

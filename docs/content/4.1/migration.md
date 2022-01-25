@@ -4,6 +4,7 @@ title: Migrating to v4
 description: Track and review changes to the CoreUI for Bootstrap source files, documentation, and components to help you migrate from v3 to v4.
 group: migration
 aliases: "/migration/"
+aliases: "/4.0/migration/"
 toc: true
 ---
 

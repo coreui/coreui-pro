@@ -3,7 +3,10 @@ layout: docs
 title: Navs and tabs
 description: Documentation and examples for how to use Bootstrap's included navigation components.
 group: components
-aliases: "/4.1/components/navs/"
+aliases:
+  - "/components/navs/"
+  - "/components/navs-tabs/"
+  - "/4.0/components/navs-tabs/"
 toc: true
 ---
 

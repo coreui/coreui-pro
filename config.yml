@@ -42,7 +42,7 @@ module:
       target:           static/favicon.ico
 
 params:
-  description:          "Open Source Ui Components library built on top of Bootstrap 5."
+  description:          "Open Source UI Components library built on top of Bootstrap 5."
   authors:              "Lukasz Holeczek, Andrzej Kopanski"
   social_image_path:    /4.1/assets/brand/coreui-social.jpg
   social_logo_path:     /4.1/assets/brand/coreui-social-logo.png

@@ -6,6 +6,7 @@ group: components
 aliases:
   - "/components/badge/"
   - "/components/bootstrap/badge/"
+  - "/4.0/components/badge/"
 toc: true
 bootstrap: true
 ---

@@ -5,6 +5,7 @@ description: Callouts provide presentation of content in a visually distinct man
 group: components
 aliases:
   - "/components/callout/"
+  - "/4.0/components/callout/"
 toc: true
 ---
 

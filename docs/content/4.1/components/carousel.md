@@ -6,6 +6,7 @@ group: components
 aliases:
   - "/components/carousel/"
   - "/components/bootstrap/carousel/"
+  - "/4.0/components/carousel/"
 toc: true
 bootstrap: true
 ---

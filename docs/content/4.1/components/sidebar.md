@@ -5,6 +5,7 @@ description: Bootstrap Sidebar is a powerful and customizable responsive navigat
 group: components
 aliases:
   - "/components/sidebar/"
+  - "/4.0/components/sidebar/"
 toc: true
 ---
 

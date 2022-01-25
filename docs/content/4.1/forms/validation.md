@@ -3,6 +3,9 @@ layout: docs
 title: Validation
 description: Provide valuable, actionable feedback to your users with HTML5 form validation, via browser default behaviors or custom styles and JavaScript.
 group: forms
+aliases:
+  - "/forms/validation/"
+  - "/4.0/forms/validation/"
 toc: true
 extra_js:
   - src: "/4.1/assets/js/validate-forms.js"

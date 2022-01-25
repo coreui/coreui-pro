@@ -6,6 +6,7 @@ group: components
 aliases:
   - "/components/breadcrumb/"
   - "/components/bootstrap/breadcrumb/"
+  - "/4.0/components/breadcrumb/"
 bootstrap: true
 ---
 

@@ -3,6 +3,9 @@ layout: docs
 title: Webpack and bundlers
 description: Learn how to include CoreUI for Bootstrap in your project using Webpack or other bundlers.
 group: getting-started
+aliases:
+  - "/getting-started/webpack/"
+  - "/4.0/getting-started/webpack/"
 toc: true
 ---
 

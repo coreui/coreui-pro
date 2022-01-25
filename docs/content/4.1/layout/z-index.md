@@ -3,6 +3,9 @@ layout: docs
 title: Z-index
 description: While not a part of Bootstrap's grid system, z-indexes play an important part in how our components overlay and interact with one another.
 group: layout
+aliases:
+  - "/layout/z-index/"
+  - "/4.0/layout/z-index/"
 ---
 
 Several CoreUI for Bootstrap components utilize `z-index`, the CSS property that helps control layout by providing a third axis to arrange content. We utilize a default z-index scale in CoreUI for Bootstrap that's been designed to properly layer navigation, tooltips and popovers, modals, and more.

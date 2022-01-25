@@ -3,6 +3,9 @@ layout: docs
 title: Navbar
 description: Documentation and examples for Bootstrap's powerful, responsive navigation header, the navbar. Includes support for branding, navigation, and more, including support for our collapse plugin.
 group: components
+aliases:
+  - "/components/navbar/"
+  - "/4.0/components/navbar/"
 toc: true
 ---
 

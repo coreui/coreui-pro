@@ -3,6 +3,9 @@ layout: docs
 title: CSS variables
 description: Use Bootstrap's CSS custom properties for fast and forward-looking design and development.
 group: customize
+aliases:
+  - "/customize/css-variables/"
+  - "/4.0/customize/css-variables/"
 toc: true
 ---
 

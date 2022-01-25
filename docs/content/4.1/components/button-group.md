@@ -5,6 +5,7 @@ description: Bootstrap button group allows to group a series of buttons and powe
 aliases:
   - "/components/button-group/"
   - "/components/bootstrap/button-group/"
+  - "/4.0/components/button-group/"
 toc: true
 bootstrap: true
 ---

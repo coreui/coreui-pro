@@ -7,6 +7,7 @@ aliases:
   - "/components/card/"
   - "/components/cards/"
   - "/components/bootstrap/card/"
+  - "/4.0/components/card/"
 toc: true
 bootstrap: true
 ---

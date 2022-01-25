@@ -3,6 +3,9 @@ layout: docs
 title: Close button
 description: A generic close button for dismissing content like modals and alerts.
 group: components
+aliases:
+  - "/components/close-button/"
+  - "/4.0/components/close-button/"
 toc: true
 ---
 

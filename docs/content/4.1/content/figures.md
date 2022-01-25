@@ -3,6 +3,9 @@ layout: docs
 title: Figures
 description: Documentation and examples for displaying related images and text with the figure component in Bootstrap.
 group: content
+aliases:
+  - "/components/figures/"
+  - "/4.0/components/figures/"
 toc: true
 ---
 

@@ -3,7 +3,10 @@ layout: docs
 title: Checks and radios
 description: Create consistent cross-browser and cross-device checkboxes and radios with our completely rewritten checks component.
 group: forms
-aliases: "/4.1/forms/checks/"
+aliases:
+  - "/forms/sass/"
+  - "/4.0/forms/sass/"
+  - "/4.1/forms/checks/"
 toc: true
 ---
 

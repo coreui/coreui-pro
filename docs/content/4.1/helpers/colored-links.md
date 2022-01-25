@@ -3,6 +3,9 @@ layout: docs
 title: Colored links
 description: Colored links with hover states
 group: helpers
+aliases:
+  - "/helpers/colored-links/"
+  - "/4.0/helpers/colored-links/"
 toc: false
 ---
 

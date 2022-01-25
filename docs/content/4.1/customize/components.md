@@ -3,6 +3,9 @@ layout: docs
 title: Components
 description: Learn how and why we build nearly all our components responsively and with base and modifier classes.
 group: customize
+aliases:
+  - "/customize/components/"
+  - "/4.0/customize/components/"
 toc: true
 ---
 

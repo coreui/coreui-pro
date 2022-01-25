@@ -3,6 +3,9 @@ layout: docs
 title: Images
 description: Documentation and examples for opting images into responsive behavior (so they never become wider than their parent) and add lightweight styles to them—all via classes.
 group: content
+aliases:
+  - "/components/images/"
+  - "/4.0/components/images/"
 toc: true
 ---
 

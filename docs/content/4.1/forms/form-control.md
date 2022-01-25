@@ -3,6 +3,9 @@ layout: docs
 title: Form controls
 description: Give textual form controls like `<input>`s and `<textarea>`s an upgrade with custom styles, sizing, focus states, and more.
 group: forms
+aliases:
+  - "/forms/form-controls/"
+  - "/4.0/forms/form-controls/"
 toc: true
 ---
 

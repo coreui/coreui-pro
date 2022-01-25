@@ -7,6 +7,7 @@ aliases:
   - "/components/button/"
   - "/components/buttons/"
   - "/components/bootstrap/button/"
+  - "/4.0/components/buttons/"
 toc: true
 bootstrap: true
 ---

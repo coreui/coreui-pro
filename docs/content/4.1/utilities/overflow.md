@@ -3,6 +3,9 @@ layout: docs
 title: Overflow
 description: Use these shorthand utilities for quickly configuring how content overflows an element.
 group: utilities
+aliases:
+  - "/utilities/overflow/"
+  - "/4.0/utilities/overflow/"
 ---
 
 Adjust the `overflow` property on the fly with four default values and classes. These classes are not responsive by default.

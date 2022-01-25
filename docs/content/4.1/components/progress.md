@@ -3,6 +3,9 @@ layout: docs
 title: Progress
 description: Documentation and examples for using Bootstrap custom progress bars featuring support for stacked bars, animated backgrounds, and text labels.
 group: components
+aliases:
+  - "/components/progress/"
+  - "/4.0/components/progress/"
 toc: true
 ---
 

@@ -4,7 +4,10 @@ title: Forms
 description: Examples and usage guidelines for form control styles, layout options, and custom components for creating a wide variety of forms.
 group: forms
 toc: true
-aliases: "/4.1/forms/"
+aliases:
+  - "/forms/overview/"
+  - "/4.0/forms/overview/"
+  - "/4.1/forms/"
 sections:
   - title: Form control
     description: Style textual inputs and textareas with support for multiple states.

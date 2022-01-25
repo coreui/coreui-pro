@@ -3,6 +3,9 @@ layout: docs
 title: Placeholders
 description: Use loading placeholders for your components or pages to indicate something may still be loading.
 group: components
+aliases:
+  - "/components/placeholders/"
+  - "/4.0/components/placeholders/"
 toc: true
 ---
 

@@ -5,6 +5,7 @@ description: Bootstrap alerts give contextual feedback information for common us
 group: components
 aliases:
   - "/components/alerts/"
+  - "/4.0/components/alerts/"
 toc: true
 ---
 

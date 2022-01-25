@@ -5,6 +5,7 @@ description: Documentation and examples for CoreUI's powerful, responsive header
 group: components
 aliases:
   - "/components/header/"
+  - "/4.0/components/header/"
 toc: true
 ---
 

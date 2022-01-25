@@ -3,6 +3,9 @@ layout: docs
 title: Contents
 description: Discover what's included in Bootstrap, including our precompiled and source code flavors.
 group: getting-started
+aliases:
+  - "/getting-started/contents/"
+  - "/4.0/getting-started/contents/"
 toc: true
 ---
 

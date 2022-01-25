@@ -3,6 +3,9 @@ layout: docs
 title: Spinners
 description: Indicate the loading state of a component or page with Bootstrap spinners, built entirely with HTML, CSS, and no JavaScript.
 group: components
+aliases:
+  - "/components/spinners/"
+  - "/4.0/components/spinners/"
 toc: true
 ---
 

@@ -3,6 +3,9 @@ layout: docs
 title: JavaScript
 description: Bring CoreUI for Bootstrap to life with our optional JavaScript plugins. Learn about each plugin, our data and programmatic API options, and more.
 group: getting-started
+aliases:
+  - "/getting-started/javascript/"
+  - "/4.0/getting-started/javascript/"
 toc: true
 ---
 

@@ -3,6 +3,9 @@ layout: docs
 title: Pagination
 description: Documentation and examples for showing pagination to indicate a series of related content exists across multiple pages.
 group: components
+aliases:
+  - "/components/pagination/"
+  - "/4.0/components/pagination/"
 toc: true
 ---
 

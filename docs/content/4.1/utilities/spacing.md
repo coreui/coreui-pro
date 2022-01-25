@@ -3,6 +3,9 @@ layout: docs
 title: Spacing
 description: CoreUI for Bootstrap includes a wide range of shorthand responsive margin, padding, and gap utility classes to modify an element's appearance.
 group: utilities
+aliases:
+  - "/utilities/spacing/"
+  - "/4.0/utilities/spacing/"
 toc: true
 ---
 

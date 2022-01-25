@@ -4,6 +4,7 @@ title: Loading Buttons
 description: Buttons with built-in loading indicators. Indicate the loading state of the button bridging the gap between action and feedback.
 aliases:
   - "/components/loading-buttons/"
+  - "/4.0/components/loading-buttons/"
 toc: true
 ---
 

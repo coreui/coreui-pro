@@ -6,6 +6,7 @@ group: components
 aliases:
   - "/components/dropdowns/"
   - "/components/bootstrap/dropdowns/"
+  - "/4.0/components/dropdowns/"
 toc: true
 bootstrap: true
 ---
