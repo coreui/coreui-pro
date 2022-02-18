@@ -1,6 +1,7 @@
 languageCode:           "en"
 title:                  "CoreUI"
 baseURL:                "https://coreui.io/docs/"
+canonifyURLs:           true
 enableInlineShortcodes: true
 
 markup:
@@ -25,7 +26,7 @@ publishDir:             "_gh_pages"
 module:
   mounts:
     - source:           dist
-      target:           static/4.1/dist
+      target:           static/dist
     - source:           docs/assets
       target:           assets
     - source:           docs/content
@@ -36,16 +37,16 @@ module:
       target:           layouts
     - source:           docs/static
       target:           static
-    - source:           docs/static/4.1/assets/img/favicons/apple-touch-icon.png
+    - source:           docs/static/assets/img/favicons/apple-touch-icon.png
       target:           static/apple-touch-icon.png
-    - source:           docs/static/4.1/assets/img/favicons/favicon.ico
+    - source:           docs/static/assets/img/favicons/favicon.ico
       target:           static/favicon.ico
 
 params:
   description:          "Open Source Ui Components library built on top of Bootstrap 5."
   authors:              "Lukasz Holeczek, Andrzej Kopanski"
-  social_image_path:    /4.1/assets/brand/coreui-social.jpg
-  social_logo_path:     /4.1/assets/brand/coreui-social-logo.png
+  social_image_path:    /assets/brand/coreui-social.jpg
+  social_logo_path:     /assets/brand/coreui-social-logo.png
 
   current_version:      "4.1.0"
   current_ruby_version: "4.1.0"
@@ -54,7 +55,7 @@ params:
   github_org:           "https://github.com/coreui"
   repo:                 "https://github.com/coreui/coreui"
   twitter:              "core_ui"
-  community:            "https://community.coreui.io/"
+  community:            "https://github.com/coreui/coreui/discussions"
   blog:                 "https://coreui.io/blog/"
   icons:                "https://icons.coreui.io/"
 
@@ -69,8 +70,8 @@ params:
     css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.0/dist/css/coreui.rtl.min.css"
     css_rtl_hash:    "sha384-/MAUZUV+dh2nDvEE5NIcV0htwQDwYzxhljL39QcHgEj9yrqT93WJU1A7VA/Alc0U"
     js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/js/coreui.min.js"
-    js_hash:         "sha384-Wup2+VgScxcR/mgqxkf+wR1odkDFo5HSfvwprGVTc3SAdcpj2paGHxOgF7z7nE0I"
+    js_hash:         "sha384-WwzRTsOtFf4JE4z8cveD91clsJe2gqCq4N168E3mROD9S8V9TmO/MEa5L8ssecUm"
     js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/js/coreui.bundle.min.js"
-    js_bundle_hash:  "sha384-CYI4AskcOOUbgXyjrkNZzI5Mbi6ZXe1RWn29fPG/MBZArrlwrfk8u49XbAkCHmzu"
+    js_bundle_hash:  "sha384-xrIl/D1LLvXm2eAIEikcV4kDtg/8t0OyMXYhb4v8gWYWAN0lvuEzXiHkPpDsXl9x"
     popper:           "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
-    popper_hash:      "sha384-ThCKQ0fDhFQh8PSFLvjhmjy7oRKp5gRbY+bcEnQWtRhuvli/qxsn0xMcMmzXkuIa"
+    popper_hash:      "sha384-q9CRHqZndzlxGLOj+xrdLDJa9ittGte1NksRmgJKeCV9DrM7Kz868XYqsKWPpAmn"

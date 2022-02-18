@@ -1,0 +1,3 @@
+---
+aliases: "/components/masked-input/"
+---
