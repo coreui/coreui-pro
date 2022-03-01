@@ -1,0 +1,75 @@
+$arrow-icon-color: $gray-600 !default;
+$arrow-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$arrow-icon-color}' points='359.873 121.377 337.246 144.004 433.243 240.001 16 240.001 16 240.002 16 272.001 16 272.002 433.24 272.002 337.246 367.996 359.873 390.623 494.498 256 359.873 121.377'></polygon></svg>") !default;
+
+$arrow-icon-rtl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$arrow-icon-color}' points='497.333 239.999 80.092 239.999 176.087 144.004 153.46 121.377 18.837 256 153.46 390.623 176.087 367.996 80.09 271.999 497.333 271.999 497.333 239.999'></polygon></svg>") !default;
+
+$cleaner-icon-color: $gray-600 !default;
+$cleaner-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$cleaner-icon-color}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$cleaner-icon-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+$cleaner-icon-hover-color: $body-color !default;
+$cleaner-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$cleaner-icon-hover-color}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$cleaner-icon-hover-color})' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+
+$input-icon-color: $gray-600 !default;
+$input-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$input-icon-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$input-icon-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$input-icon-color}'></rect></svg>") !default;
+
+.date-picker-body {
+  display: flex;
+}
+
+.date-picker-ranges {
+  width: 150px;
+  padding: .5rem;
+  border-right: 1px solid var(--#{$variable-prefix}gray-200);
+}
+
+.date-picker-calendars {
+  display: flex;
+
+  .date-picker-calendar {
+    &:not(:last-child) {
+      .calendar-navigation-next {
+        visibility: hidden;
+      }
+    }
+    &:not(:first-child) {
+      .calendar-navigation-prev {
+        visibility: hidden;
+      }
+    }
+  }
+}
+
+.date-picker-arrow-icon {
+  @include ltr-rtl-value-only(
+    "background-image",
+    escape-svg($arrow-icon),
+    escape-svg($arrow-icon-rtl)
+  );
+}
+
+.date-picker-cleaner-icon {
+  background-image: escape-svg($cleaner-icon);
+
+  &:hover {
+    background-image: escape-svg($cleaner-icon-hover);
+  }
+}
+
+.date-picker-input-icon {
+  background-image: escape-svg($input-icon);
+}
+
+.date-picker .time-picker {
+  .form-select {
+    width: initial;
+    padding-right: .25rem;
+    padding-left: .25rem;
+    text-align: right;
+    background: none;
+    border: 0;
+
+    &:disabled {
+      color: $text-disabled;
+      background-color: transparent;
+    }
+  }
+}

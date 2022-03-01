@@ -129,7 +129,6 @@
   var myMultiSelect = document.getElementById('multiSelect')
 
   if (myMultiSelect) {
-    // eslint-disable-next-line no-unused-vars
     var cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
       name: 'multiSelect',
       options: [
@@ -172,6 +171,111 @@
       ],
       search: true
     })
+    cuiMultiSelect.update({
+      options: [
+        {
+          value: 0,
+          text: 'Angular2'
+        },
+        {
+          value: 1,
+          text: 'Bootstrap2',
+          selected: true
+        },
+        {
+          value: 2,
+          text: 'React.js',
+          selected: true
+        },
+        {
+          value: 3,
+          text: 'Vue.js'
+        },
+        {
+          label: 'backend',
+          options: [
+            {
+              value: 4,
+              text: 'Django'
+            },
+            {
+              value: 5,
+              text: 'Laravel'
+            },
+            {
+              value: 6,
+              text: 'Node.js',
+              selected: true
+            }
+          ]
+        }
+      ]
+    })
+  }
+
+  if (document.getElementById('myDateRangePickerDisabledDates')) {
+    var optionsDateRangePickerDisabledDates = {
+      locale: 'en-US',
+      calendarDate: new Date(2022, 2, 1),
+      disabledDates: [
+        [new Date(2022, 2, 4), new Date(2022, 2, 7)],
+        new Date(2022, 2, 16),
+        new Date(2022, 3, 16),
+        [new Date(2022, 4, 2), new Date(2022, 4, 8)]
+      ],
+      maxDate: new Date(2022, 5, 0),
+      minDate: new Date(2022, 1, 1)
+    }
+    // eslint-disable-next-line no-unused-vars
+    var myDateRangePickerDisabledDates = new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), optionsDateRangePickerDisabledDates)
+  }
+
+  if (document.getElementById('myDatePickerDisabledDates')) {
+    var optionsDatePickerDisabledDates = {
+      locale: 'en-US',
+      calendarDate: new Date(2022, 2, 1),
+      disabledDates: [
+        [new Date(2022, 2, 4), new Date(2022, 2, 7)],
+        new Date(2022, 2, 16),
+        new Date(2022, 3, 16),
+        [new Date(2022, 4, 2), new Date(2022, 4, 8)]
+      ],
+      maxDate: new Date(2022, 5, 0),
+      minDate: new Date(2022, 1, 1)
+    }
+    // eslint-disable-next-line no-unused-vars
+    var myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), optionsDatePickerDisabledDates)
+  }
+
+  if (document.getElementById('myDateRangePickerCustomRanges')) {
+    var optionsCustomRanges = {
+      locale: 'en-US',
+      ranges: {
+        Today: [new Date(), new Date()],
+        Yesterday: [
+          new Date(new Date().setDate(new Date().getDate() - 1)),
+          new Date(new Date().setDate(new Date().getDate() - 1))
+        ],
+        'Last 7 Days': [
+          new Date(new Date().setDate(new Date().getDate() - 6)),
+          new Date(new Date())
+        ],
+        'Last 30 Days': [
+          new Date(new Date().setDate(new Date().getDate() - 29)),
+          new Date(new Date())
+        ],
+        'This Month': [
+          new Date(new Date().setDate(1)),
+          new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+        ],
+        'Last Month': [
+          new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+          new Date(new Date().getFullYear(), new Date().getMonth(), 0)
+        ]
+      }
+    }
+    // eslint-disable-next-line no-unused-vars
+    var myDateRangePickerCustomRanges = new coreui.DateRangePicker(document.getElementById('myDateRangePickerCustomRanges'), optionsCustomRanges)
   }
 
   // Insert copy to clipboard button before .highlight

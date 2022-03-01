@@ -1,0 +1,114 @@
+$time-picker-cleaner-icon-color: $gray-600 !default;
+$time-picker-cleaner-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
+$time-picker-cleaner-icon-hover-color: $body-color !default;
+$time-picker-cleaner-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
+
+$time-picker-input-icon-color: $gray-600 !default;
+$time-picker-input-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-input-icon-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$time-picker-input-icon-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
+
+.picker {
+  .dropdown-menu {
+    padding: 0;
+  }
+
+  &.show {
+    .input-group {
+      color: var(--#{$variable-prefix}input-focus-color, $input-focus-color);
+      background-color: var(--#{$variable-prefix}input-focus-bg, $input-focus-bg);
+      border-color: var(--#{$variable-prefix}input-focus-border-color, $input-focus-border-color);
+      outline: 0;
+      @include border-radius($input-border-radius, 0);
+      @if $enable-shadows {
+        @include box-shadow($input-box-shadow, $input-focus-box-shadow);
+      } @else {
+        // Avoid using mixin so we can pass custom focus shadow properly
+        box-shadow: $input-focus-box-shadow;
+      }
+    }
+  }
+}
+
+.picker-input-group {
+  &:hover {
+    .form-control:not(:placeholder-shown) ~ .input-group-text {
+      .picker-input-group-indicator:not(:last-child) {
+        display: none;
+      }
+      .picker-input-group-cleaner {
+        display: initial;
+      }
+    }
+  }
+
+  .form-control {
+    &.hover {
+      color: var(--cui-gray-500);
+    }
+
+    &:focus {
+      border-color: var(--#{$variable-prefix}input-border-color, $input-border-color);
+      outline: 0;
+      box-shadow: none;
+    }
+
+    &:not(:first-child) {
+      @include ltr-rtl("border-left", 0);
+    }
+
+    &:not(:last-child) {
+      @include ltr-rtl("border-right", 0);
+    }
+
+    &[readonly] {
+      background-color: var(--#{$variable-prefix}input-bg, $input-bg);
+    }
+
+    &.form-control:disabled + .input-group-text {
+      background-color: var(--#{$variable-prefix}input-disabled-bg, $input-disabled-bg);
+    }
+  }
+
+  .input-group-lg {
+    .picker-input-group-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+      font-size: 1.25rem;
+    }
+  }
+
+  .input-group-sm {
+    .picker-input-group-icon {
+      width: .875rem;
+      height: .875rem;
+      font-size: .875rem;
+    }
+  }
+
+  .input-group-text {
+    color: var(--cui-gray-400);
+    background-color: transparent;
+  }
+}
+
+.picker-input-group-cleaner {
+  display: none;
+}
+
+.picker-input-group-icon {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+  @include transition(background-image .15s ease-in-out);
+}
+
+.picker-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: .5rem;
+  border-top: 1px solid var(--#{$variable-prefix}gray-200);
+
+  .btn + .btn {
+    @include ltr-rtl("margin-left", .5rem);
+  }
+}

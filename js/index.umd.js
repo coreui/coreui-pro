@@ -7,8 +7,11 @@
 
 import Alert from './src/alert'
 import Button from './src/button'
+import Calendar from './src/calendar'
 import Carousel from './src/carousel'
 import Collapse from './src/collapse'
+import DatePicker from './src/date-picker'
+import DateRangePicker from './src/date-range-picker'
 import Dropdown from './src/dropdown'
 import LoadingButton from './src/loading-button'
 import Modal from './src/modal'
@@ -19,14 +22,18 @@ import Popover from './src/popover'
 import ScrollSpy from './src/scrollspy'
 import Sidebar from './src/sidebar'
 import Tab from './src/tab'
+import Timepicker from './src/time-picker'
 import Toast from './src/toast'
 import Tooltip from './src/tooltip'
 
 export default {
   Alert,
   Button,
+  Calendar,
   Carousel,
   Collapse,
+  DatePicker,
+  DateRangePicker,
   Dropdown,
   LoadingButton,
   Modal,
@@ -37,6 +44,7 @@ export default {
   ScrollSpy,
   Sidebar,
   Tab,
+  Timepicker,
   Toast,
   Tooltip
 }
