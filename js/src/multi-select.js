@@ -659,7 +659,7 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter') {
-      this._searchElement.placeholder = ''
+      this._searchElement.removeAttribute('placeholder')
       this._selectionElement.style.removeProperty('display')
       return
     }
