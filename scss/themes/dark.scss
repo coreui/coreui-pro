@@ -9,28 +9,16 @@ $theme-prefix: "dark" !default;
 .#{$theme-name} {
   @import "dark/variables";
   @import "dark/utilities";
-
-  // Colors
-  @each $color, $value in $theme-colors-dt {
-    --#{$variable-prefix}#{$color}: #{$value};
-  }
-
-  // Gradients
-  @each $color, $map in $theme-gradients-dt {
-    --#{$variable-prefix}#{$color}-start: #{map-get($map, "start")};
-    --#{$variable-prefix}#{$color}-stop: #{map-get($map, "stop")};
-  }
+  @import "dark/root";
 
   @include theme($theme-map);
 
-  // Button variants
-
+  // Alert variants
   @each $state, $variant in $alert-variants-dt {
     @include alert-variant($state, $variant, true);
   }
 
   // Button variants
-
   @each $state, $variant in $button-variants-dt {
     @include button-variant($state, $variant, true);
   }
@@ -44,12 +32,17 @@ $theme-prefix: "dark" !default;
   }
 
   // List group variants
-
   @each $state, $variant in $list-group-variants-dt {
     @include list-group-item-variant($state, $variant, true);
   }
 
+  // Fix Firefox option color
+  @-moz-document url-prefix("") {
+    select:not([multiple]) option {
+      color: initial;
+    }
+  }
+
   // Utilities
-  // stylelint-disable-next-line no-invalid-position-at-import-rule
   @import "./../utilities/api";
 }

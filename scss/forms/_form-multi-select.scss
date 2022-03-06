@@ -95,6 +95,10 @@
     display: none;
     margin-left: $form-multi-select-padding-x;
   }
+
+  &:placeholder-shown {
+    width: 100%;
+  }
 }
 
 .form-multi-select-all {

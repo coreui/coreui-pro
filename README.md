@@ -9,7 +9,7 @@
 <p align="center">
   Open Source UI Components Library built on top of Bootstrap 5.
   <br>
-  <a href="https://coreui.io/docs/4.1/"><strong>Explore CoreUI docs »</strong></a>
+  <a href="https://coreui.io/docs/"><strong>Explore CoreUI docs »</strong></a>
   <br>
   <br>
   <a href="https://github.com/coreui/coreui/issues/new?template=bug_report.md">Report bug</a>
@@ -39,13 +39,13 @@
 
 Several quick start options are available:
 
-- [Download the latest release](https://github.com/coreui/coreui/archive/v4.1.0.zip)
+- [Download the latest release](https://github.com/coreui/coreui/archive/v4.1.1.zip)
 - Clone the repo: `git clone https://github.com/coreui/coreui.git`
 - Install with [npm](https://www.npmjs.com/): `npm install @coreui/coreui`
 - Install with [yarn](https://yarnpkg.com/): `yarn add @coreui/coreui`
-- Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui:4.1.0`
+- Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui:4.1.1`
 
-Read the [Getting started page](https://coreui.io/docs/4.1/getting-started/introduction/) for information on the framework contents, templates and examples, and more.
+Read the [Getting started page](https://coreui.io/docs/getting-started/introduction/) for information on the framework contents, templates and examples, and more.
 
 
 ## Status

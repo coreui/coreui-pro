@@ -43,8 +43,7 @@
       @each $class, $variants in $value {
         @include theme-colors($variants, $class);
       }
-    }
-    @else {
+    } @else {
       .#{$name} {
         @include theme-components($value, $name);
       }

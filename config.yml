@@ -1,7 +1,14 @@
 languageCode:           "en"
 title:                  "CoreUI"
 baseURL:                "https://coreui.io/docs/"
-enableInlineShortcodes: true
+canonifyURLs:           true
+
+security:
+  enableInlineShortcodes: true
+  funcs:
+    getenv:
+      - ^HUGO_
+      - NETLIFY
 
 markup:
   goldmark:
@@ -25,7 +32,7 @@ publishDir:             "_gh_pages"
 module:
   mounts:
     - source:           dist
-      target:           static/4.1/dist
+      target:           static/dist
     - source:           docs/assets
       target:           assets
     - source:           docs/content
@@ -36,41 +43,41 @@ module:
       target:           layouts
     - source:           docs/static
       target:           static
-    - source:           docs/static/4.1/assets/img/favicons/apple-touch-icon.png
+    - source:           docs/static/assets/img/favicons/apple-touch-icon.png
       target:           static/apple-touch-icon.png
-    - source:           docs/static/4.1/assets/img/favicons/favicon.ico
+    - source:           docs/static/assets/img/favicons/favicon.ico
       target:           static/favicon.ico
 
 params:
   description:          "Open Source UI Components library built on top of Bootstrap 5."
   authors:              "Lukasz Holeczek, Andrzej Kopanski"
-  social_image_path:    /4.1/assets/brand/coreui-social.jpg
-  social_logo_path:     /4.1/assets/brand/coreui-social-logo.png
+  social_image_path:    /assets/brand/coreui-social.jpg
+  social_logo_path:     /assets/brand/coreui-social-logo.png
 
-  current_version:      "4.1.0"
-  current_ruby_version: "4.1.0"
+  current_version:      "4.1.1"
+  current_ruby_version: "4.1.1"
   docs_version:         "4.1"
   rfs_version:          "9.0.3"
   github_org:           "https://github.com/coreui"
   repo:                 "https://github.com/coreui/coreui"
   twitter:              "core_ui"
-  community:            "https://community.coreui.io/"
+  community:            "https://github.com/coreui/coreui/discussions"
   blog:                 "https://coreui.io/blog/"
   icons:                "https://icons.coreui.io/"
 
   download:
-    source:             "https://github.com/coreui/coreui/archive/v4.1.0.zip"
-    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.0/coreui-4.1.0-dist.zip"
+    source:             "https://github.com/coreui/coreui/archive/v4.1.1.zip"
+    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.1/coreui-4.1.1-dist.zip"
 
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
-    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/css/coreui.min.css"
-    css_hash:        "sha384-J2WCKfhPxbtZAT+USOoPNCnZVozpAaGtaH/LUcSKXjdCXN85i5fGMTy1Agp8HChK"
-    css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.0/dist/css/coreui.rtl.min.css"
-    css_rtl_hash:    "sha384-/MAUZUV+dh2nDvEE5NIcV0htwQDwYzxhljL39QcHgEj9yrqT93WJU1A7VA/Alc0U"
-    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/js/coreui.min.js"
-    js_hash:         "sha384-Wup2+VgScxcR/mgqxkf+wR1odkDFo5HSfvwprGVTc3SAdcpj2paGHxOgF7z7nE0I"
-    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.0/dist/js/coreui.bundle.min.js"
-    js_bundle_hash:  "sha384-CYI4AskcOOUbgXyjrkNZzI5Mbi6ZXe1RWn29fPG/MBZArrlwrfk8u49XbAkCHmzu"
+    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.1/dist/css/coreui.min.css"
+    css_hash:        "sha384-KkORzXW3J0OCL7KKyZlAr63j6ObziqNUyNrm/uwdas4vaGpfxin2dS3+Wf7sT/Tq"
+    css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.1/dist/css/coreui.rtl.min.css"
+    css_rtl_hash:    "sha384-Zut1J9ACJ9O+ozO8gNnuUfpQpIFIS7yoRyto6yZR74CsaeyPp6j+Y+l23heb39qn"
+    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.1/dist/js/coreui.min.js"
+    js_hash:         "sha384-BJ8bcuD348g3CWqtoXRtsr/dMU7WNU3LIX0Yvwh5SXNklgYiZBKyzDocjlhjD9zS"
+    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.1/dist/js/coreui.bundle.min.js"
+    js_bundle_hash:  "sha384-U458M/BK6nVQU+coBsTWgHPjguSr+qf2gGc1MAXy3+XPNZEJQBI/S8Eh6MxtjytS"
     popper:           "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
-    popper_hash:      "sha384-ThCKQ0fDhFQh8PSFLvjhmjy7oRKp5gRbY+bcEnQWtRhuvli/qxsn0xMcMmzXkuIa"
+    popper_hash:      "sha384-q9CRHqZndzlxGLOj+xrdLDJa9ittGte1NksRmgJKeCV9DrM7Kz868XYqsKWPpAmn"

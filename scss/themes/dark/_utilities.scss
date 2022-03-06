@@ -1,4 +1,28 @@
-// Utilities
+// Utilities maps
+
+$utilities-colors-dt: $theme-colors-rgb-dt !default;
+$utilities-text-dt: map-merge(
+  $utilities-colors,
+  (
+    "black": to-rgb($black),
+    "white": to-rgb($white),
+    "body": to-rgb($body-color-dt),
+    "high-emphasis": to-rgb($high-emphasis-dt),
+    "medium-emphasis": to-rgb($medium-emphasis-dt),
+    "disabled": to-rgb($disabled-dt)
+  )
+) !default;
+$utilities-text-colors-dt: map-loop($utilities-text-dt, rgba-css-var, "$key", "text") !default;
+$utilities-bg-dt: map-merge(
+  $utilities-colors-dt,
+  (
+    "black": to-rgb($black),
+    "white": to-rgb($white),
+    "body": to-rgb($body-bg-dt)
+  )
+) !default;
+$utilities-bg-colors-dt: map-loop($utilities-bg-dt, rgba-css-var, "$key", "bg") !default;
+
 // stylelint-disable-next-line scss/dollar-variable-default
 $utilities: ();
 // stylelint-disable-next-line scss/dollar-variable-default
@@ -8,16 +32,9 @@ $utilities: map-merge(
       property: color,
       class: text,
       values: map-merge(
-        $theme-colors,
+        $utilities-text-colors-dt,
         (
-          "white": $white,
-          "body": $body-color-dt,
-          "black-50": rgba($black, .5),
-          "white-50": rgba($white, .5),
-          "reset": inherit,
-          "high-emphasis": $high-emphasis-dt,
-          "medium-emphasis": $medium-emphasis-dt,
-          "disabled": $disabled-dt
+          "reset": inherit
         )
       ),
       only-vars: true,
@@ -26,17 +43,31 @@ $utilities: map-merge(
     "background-color": (
       property: background-color,
       class: bg,
+      local-vars: (
+        "bg-opacity": 1
+      ),
       values: map-merge(
-        $theme-colors,
+        $utilities-bg-colors-dt,
         (
-          "body": $body-bg,
-          "white": $white,
           "transparent": transparent
         )
       ),
-      only-vars: true,
+      vars: true,
+      theme-prefix: true
+    ),
+    "bg-opacity": (
+      css-var: true,
+      class: bg-opacity,
+      values: (
+        10: .1,
+        25: .25,
+        50: .5,
+        75: .75,
+        100: 1
+      ),
+      // only-vars: true,
       theme-prefix: true,
-    )
+    ),
   ),
   $utilities
 );
