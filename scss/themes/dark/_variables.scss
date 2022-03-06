@@ -756,6 +756,44 @@ $toast-theme-map: (
   "toast-header-border-color":      $toast-header-border-color-dt
 ) !default;
 
+// Calendar & Date & Time Pickers
+
+$calendar-nav-border-color-dt:         $border-color-dt !default;
+$calendar-nav-date-color-dt:           $body-color-dt !default;
+$calendar-nav-date-hover-color-dt:     $primary-dt !default;
+$calendar-cell-header-inner-color-dt:  $medium-emphasis-dt !default;
+$calendar-cell-hover-bg-dt:            rgba($black, .25) !default;
+$calendar-cell-disabled-color-dt:      $disabled-dt !default;
+$calendar-cell-selected-bg-dt:         $primary-dt !default;
+$calendar-cell-range-bg-dt:            tint-color($primary-dt, 25%) !default;
+
+$calendar-theme-map: (
+  "calendar-nav-border":               $calendar-nav-border-width solid $calendar-nav-border-color-dt,
+  "calendar-nav-date-color":           $calendar-nav-date-color-dt,
+  "calendar-nav-date-hover-color":     $calendar-nav-date-hover-color-dt,
+  "calendar-cell-header-inner-color":  $calendar-cell-header-inner-color-dt,
+  "calendar-cell-hover-bg":            $calendar-cell-hover-bg-dt,
+  "calendar-cell-disabled-color":      $calendar-cell-disabled-color-dt,
+  "calendar-cell-selected-bg":         $calendar-cell-selected-bg-dt,
+  "calendar-cell-range-bg":            $calendar-cell-range-bg-dt
+) !default;
+
+$picker-footer-border-color-dt:  $border-color-dt !default;
+
+$picker-theme-map: (
+  "input-bg":                        $input-bg-dt,
+  "input-group-addon-border-color":  transparent,
+  "picker-footer-border-top":        $picker-footer-border-width solid $picker-footer-border-color-dt
+) !default;
+
+$time-picker-body-border-color-dt:  $border-color-dt !default;
+$time-picker-roll-col-color-dt:     $border-color-dt !default;
+
+$time-picker-theme-map: (
+  "time-picker-body-border-top":  $time-picker-body-border-width solid $time-picker-body-border-color-dt,
+  "time-picker-roll-col-border":  $time-picker-body-border-width solid $time-picker-roll-col-color-dt,
+) !default;
+
 $theme-map: (
   "root":               map-merge($theme-root-dt, $link-theme-map),
   "utilities": (
@@ -765,6 +803,7 @@ $theme-map: (
   "accordion":          $accordion-theme-map,
   "breadcrumb":         $breadcrumb-theme-map,
   "btn-close":          $close-theme-map,
+  "calendar":           $calendar-theme-map,
   "card":               $card-theme-map,
   "dropdown-menu":      $dropdown-theme-map,
   "footer":             $footer-theme-map,
@@ -778,9 +817,11 @@ $theme-map: (
   "modal":              $modal-theme-map,
   "nav":                $nav-theme-map,
   "pagination":         $pagination-theme-map,
+  "picker":             $picker-theme-map,
   "popover":            $popover-theme-map,
   "progress":           $progress-theme-map,
   "sidebar":            $sidebar-theme-map,
   "table":              map-merge($table-theme-map, $table-variants-dt),
+  "time-picker":        $time-picker-theme-map,
   "toast":              $toast-theme-map
 ) !default;

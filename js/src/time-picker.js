@@ -2,7 +2,7 @@
 /* eslint-disable indent */
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.1.0): time-picker.js
+ * CoreUI (v4.2.0-alpha.0): time-picker.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -12,7 +12,7 @@ import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
 import { convert12hTo24h, convert24hTo12h, getAmPm, isAmPm } from './util/time'
-import BaseComponent from './base-component'
+import Picker from './picker'
 
 /**
 * ------------------------------------------------------------------------
@@ -31,26 +31,29 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]'
 
 const Default = {
+  ...Picker.Default,
   cleaner: true,
   container: 'dropdown',
-  date: null,
   disabled: false,
+  footer: true,
   inputReadOnly: false,
   locale: navigator.language,
   placeholder: 'Select time',
   size: null,
+  value: null,
   variant: 'roll'
 }
 
 const DefaultType = {
+  ...Picker.DefaultType,
   cleaner: 'boolean',
   container: 'string',
-  date: '(date|string|null)',
   disabled: 'boolean',
   inputReadOnly: 'boolean',
   locale: 'string',
   placeholder: 'string',
   size: '(string|null)',
+  value: '(date|string|null)',
   variant: 'string'
 }
 
@@ -60,12 +63,12 @@ const DefaultType = {
 * ------------------------------------------------------------------------
 */
 
-class TimePicker extends BaseComponent {
+class TimePicker extends Picker {
   constructor(element, config) {
     super(element)
 
     this._config = this._getConfig(config)
-    this._date = this._config.date ? (this._config.date instanceof Date ? new Date(this._config.date) : new Date(`1970-01-01 ${this._config.date}`)) : null
+    this._date = this._convertStringToDate(this._config.value)
     this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am'
     this._uid = Math.random().toString(36).slice(2)
 
@@ -111,6 +114,13 @@ class TimePicker extends BaseComponent {
     this._createTimePickerSelection()
   }
 
+  reset() {
+    this._date = this._convertStringToDate(this._config.value)
+    this._input.value = this._convertStringToDate(this._config.value).toLocaleTimeString(this._config.locale)
+    this._timePickerBody.innerHTML = ''
+    this._createTimePickerSelection()
+  }
+
   update(config) {
     this._config = this._getConfig(config)
     this._element.innerHTML = ''
@@ -124,6 +134,13 @@ class TimePicker extends BaseComponent {
       event.stopPropagation()
       this.clear()
     })
+    EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
+      this.reset()
+    })
+  }
+
+  _convertStringToDate(date) {
+    return date ? (date instanceof Date ? date : new Date(`1970-01-01 ${this._config.value}`)) : null
   }
 
   _createInputGroup() {
@@ -132,11 +149,6 @@ class TimePicker extends BaseComponent {
 
     if (this._config.size) {
       inputGroupEl.classList.add(`input-group-${this._config.size}`)
-    }
-
-    if (!this._config.disabled) {
-      Manipulator.setDataAttribute(inputGroupEl, 'toggle', 'dropdown')
-      Manipulator.setDataAttribute(inputGroupEl, 'autoClose', 'outside')
     }
 
     const inputEl = document.createElement('input')
@@ -162,37 +174,35 @@ class TimePicker extends BaseComponent {
     }
 
     inputGroupEl.append(inputEl, inputGroupTextEl)
-
     this._input = inputEl
 
-    this._element.append(inputGroupEl)
+    return inputGroupEl
   }
 
   _createTimePicker() {
-    this._element.classList.add('time-picker', 'picker')
-    if (this._config.container !== 'inline') {
-      this._createInputGroup()
-    }
-
-    const timePickerSelectEl = document.createElement('div')
-    timePickerSelectEl.classList.add('time-picker-body')
-
-    if (this._config.variant === 'roll') {
-      timePickerSelectEl.classList.add('time-picker-roll')
-    }
-
-    this._timePickerBody = timePickerSelectEl
+    this._element.classList.add('time-picker')
 
     if (this._config.container === 'dropdown') {
-      const dropdownMenuEl = document.createElement('div')
-      dropdownMenuEl.classList.add('dropdown-menu')
-      dropdownMenuEl.append(timePickerSelectEl)
-      this._element.append(dropdownMenuEl)
+      this._dropdownToggleEl.append(this._createInputGroup())
+      this._dropdownMenuEl.prepend(this._createTimePickerBody())
     }
 
     if (this._config.container === 'inline') {
-      this._element.append(timePickerSelectEl)
+      this._element.append(this._createTimePickerBody())
     }
+  }
+
+  _createTimePickerBody() {
+    const timePickerBodyEl = document.createElement('div')
+    timePickerBodyEl.classList.add('time-picker-body')
+
+    if (this._config.variant === 'roll') {
+      timePickerBodyEl.classList.add('time-picker-roll')
+    }
+
+    this._timePickerBody = timePickerBodyEl
+
+    return timePickerBodyEl
   }
 
   _createTimePickerSelection() {
@@ -254,14 +264,9 @@ class TimePicker extends BaseComponent {
         this._createSelect('toggle', [{ value: 'am', label: 'AM' }, { value: 'pm', label: 'PM' }], '_selectAmPm', this._ampm)
       )
     }
-
-    // return timePickerSelectEl
   }
 
   _createTimePickerRoll(selectedHour, selectedMinute, selectedSecond) {
-    // const timePickerRollEl = document.createElement('div')
-    // timePickerRollEl.classList.add('time-picker-body', 'time-picker-roll')
-
     this._timePickerBody.append(
       this._createTimePickerRollCol(this._getHours(), 'hours', selectedHour),
       this._createTimePickerRollCol(this._getMinutesOrSeconds(), 'minutes', selectedMinute),
@@ -273,8 +278,6 @@ class TimePicker extends BaseComponent {
         this._createTimePickerRollCol([{ value: 'am', label: 'AM' }, { value: 'pm', label: 'PM' }], 'toggle', this._ampm)
       )
     }
-
-    // return timePickerRollEl
   }
 
   _createTimePickerRollCol(options, part, selected) {

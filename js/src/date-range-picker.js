@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.1.0): date-range-picker.js
+ * CoreUI (v4.2.0-alpha.0): date-range-picker.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -9,8 +9,8 @@ import { defineJQueryPlugin, typeCheckConfig } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
-import BaseComponent from './base-component'
 import Calendar from './calendar'
+import Picker from './picker'
 import TimePicker from './time-picker'
 
 /**
@@ -31,11 +31,15 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]'
 
 const Default = {
+  ...Picker.Default,
   calendars: 2,
   cleaner: true,
-  calendarDate: new Date(),
+  calendarDate: null,
+  date: null,
+  disabled: false,
   disabledDates: null,
   endDate: null,
+  firstDayOfWeek: 1,
   locale: navigator.language,
   maxDate: null,
   minDate: null,
@@ -49,11 +53,15 @@ const Default = {
 }
 
 const DefaultType = {
+  ...Picker.DefaultType,
   calendars: 'number',
   cleaner: 'boolean',
   calendarDate: '(date|string|null)',
+  date: '(date|string|null)',
   disabledDates: '(array|null)',
+  disabled: 'boolean',
   endDate: '(date|string|null)',
+  firstDayOfWeek: 'number',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
@@ -72,14 +80,15 @@ const DefaultType = {
 * ------------------------------------------------------------------------
 */
 
-class DateRangePicker extends BaseComponent {
+class DateRangePicker extends Picker {
   constructor(element, config) {
     super(element)
 
     this._config = this._getConfig(config)
-    this._calendarDate = this._config.calendarDate
-    this._startDate = this._config.startDate
-    this._endDate = this._config.endDate
+    this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date())
+    this._startDate = this._convertStringToDate(this._config.date || this._config.startDate)
+    this._endDate = this._convertStringToDate(this._config.endDate)
+    this._mobile = window.innerWidth < 768
     this._selectEndDate = this._config.selectEndDate
 
     // nodes
@@ -119,10 +128,19 @@ class DateRangePicker extends BaseComponent {
     this._endInput.value = ''
     this._startDate = null
     this._startInput.value = ''
-    this._element.innerHTML = ''
-    this._createDateRangePicker()
+    this._calendars.innerHTML = ''
     this._createCalendars()
-    this._addEventListeners()
+    this._addCalendarEventListeners()
+  }
+
+  reset() {
+    this._date = null
+    this._endDate = this._config.endDate
+    this._endInput.value = this._setInputValue(this._config.endDate)
+    this._startDate = this._config.startDate
+    this._startInput.value = this._setInputValue(this._config.startDate)
+    this._calendars.innerHTML = ''
+    this._createCalendars()
     this._addCalendarEventListeners()
   }
 
@@ -146,6 +164,12 @@ class DateRangePicker extends BaseComponent {
     EventHandler.on(this._element, 'click', '.picker-input-group-cleaner', event => {
       event.stopPropagation()
       this.clear()
+    })
+    EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
+      this.reset()
+    })
+    EventHandler.on(window, 'resize', () => {
+      this._mobile = window.innerWidth < 768
     })
   }
 
@@ -187,6 +211,22 @@ class DateRangePicker extends BaseComponent {
     })
   }
 
+  _convertStringToDate(date) {
+    return date ? (date instanceof Date ? date : new Date(date)) : null
+  }
+
+  _createInput(placeholder, value) {
+    const inputEl = document.createElement('input')
+    inputEl.classList.add('form-control')
+    inputEl.disabled = this._config.disabled
+    inputEl.placeholder = placeholder
+    inputEl.readOnly = this._config.inputReadOnly
+    inputEl.type = 'text'
+    inputEl.value = value
+
+    return inputEl
+  }
+
   _createInputGroup() {
     const inputGroupEl = document.createElement('div')
     inputGroupEl.classList.add('input-group', 'picker-input-group')
@@ -195,26 +235,8 @@ class DateRangePicker extends BaseComponent {
       inputGroupEl.classList.add(`input-group-${this._config.size}`)
     }
 
-    if (!this._config.disabled) {
-      Manipulator.setDataAttribute(inputGroupEl, 'toggle', 'dropdown')
-      Manipulator.setDataAttribute(inputGroupEl, 'autoClose', 'outside')
-    }
-
-    const startInputEl = document.createElement('input')
-    startInputEl.classList.add('form-control')
-    startInputEl.disabled = this._config.disabled
-    startInputEl.placeholder = this._getPlaceholder()[0]
-    startInputEl.readOnly = this._config.inputReadOnly
-    startInputEl.type = 'text'
-    startInputEl.value = this._setInputValue(this._startDate)
-
-    const endInputEl = document.createElement('input')
-    endInputEl.classList.add('form-control')
-    endInputEl.disabled = this._config.disabled
-    endInputEl.placeholder = this._getPlaceholder()[1]
-    endInputEl.readOnly = this._config.inputReadOnly
-    endInputEl.type = 'text'
-    endInputEl.value = this._setInputValue(this._endDate)
+    const startInputEl = this._createInput(this._getPlaceholder()[0], this._setInputValue(this._startDate))
+    const endInputEl = this._createInput(this._getPlaceholder()[1], this._setInputValue(this._endDate))
 
     const inputGroupTextSeparatorEl = document.createElement('span')
     inputGroupTextSeparatorEl.classList.add('input-group-text')
@@ -250,7 +272,7 @@ class DateRangePicker extends BaseComponent {
     const calendarStartElement = document.createElement('div')
     calendarStartElement.classList.add('date-picker-calendar')
 
-    Array.from({ length: this._config.calendars }).forEach((_, index) => {
+    Array.from({ length: this._mobile ? 1 : this._config.calendars }).forEach((_, index) => {
       const calendarEl = document.createElement('div')
       calendarEl.classList.add('date-picker-calendar')
 
@@ -265,6 +287,7 @@ class DateRangePicker extends BaseComponent {
         ),
         disabledDates: this._config.disabledDates,
         endDate: this._endDate,
+        firstDayOfWeek: this._config.firstDayOfWeek,
         locale: this._config.locale,
         maxDate: this._config.maxDate,
         minDate: this._config.minDate,
@@ -274,16 +297,16 @@ class DateRangePicker extends BaseComponent {
       })
 
       if (this._config.timepicker) {
-        if (this._config.calendars === 1 && this._config.range) {
+        if ((this._config.calendars === 1 || this._mobile) && this._config.range) {
           const timePickerStartEl = document.createElement('div')
           timePickerStartEl.classList.add('time-picker')
 
           // eslint-disable-next-line no-new
           new TimePicker(timePickerStartEl, {
             container: 'inline',
-            date: this._startDate,
             disabled: !this._startDate,
             locale: this._config.locale,
+            value: this._startDate,
             variant: 'select'
           })
           calendarEl.append(timePickerStartEl)
@@ -300,30 +323,30 @@ class DateRangePicker extends BaseComponent {
           // eslint-disable-next-line no-new
           new TimePicker(timePickerEndEl, {
             container: 'inline',
-            date: this._endDate,
             disabled: !this._endDate,
             locale: this._config.locale,
+            value: this._endDate,
             variant: 'select'
           })
           calendarEl.append(timePickerEndEl)
 
           EventHandler.one(timePickerEndEl, 'change.coreui.time-picker', event => {
             this._endDate = event.date
-            this._startInput.value = this._setInputValue(this._endDate)
+            this._endInput.value = this._setInputValue(this._endDate)
             this._updateCalendars()
           })
         }
 
-        if (index === 0 || this._config.calendars - index === 1) {
+        if (!this._mobile && (index === 0 || this._config.calendars - index === 1)) {
           const timePickerEl = document.createElement('div')
           timePickerEl.classList.add('time-picker')
 
           // eslint-disable-next-line no-new
           new TimePicker(timePickerEl, {
             container: 'inline',
-            date: index === 0 ? this._startDate : this._endDate,
             disabled: index === 0 ? !this._startDate : !this._endDate,
             locale: this._config.locale,
+            value: index === 0 ? this._startDate : this._endDate,
             variant: 'select'
           })
           calendarEl.append(timePickerEl)
@@ -347,14 +370,12 @@ class DateRangePicker extends BaseComponent {
   }
 
   _createDateRangePicker() {
-    const dateRangePickerEl = document.createElement('div')
-    dateRangePickerEl.classList.add('date-picker', 'picker')
+    this._element.classList.add('date-picker')
+    this._dropdownToggleEl.append(this._createInputGroup())
+    this._dropdownMenuEl.prepend(this._createDateRangePickerBody())
+  }
 
-    this._dateRangePicker = dateRangePickerEl
-
-    const dropdownMenuEl = document.createElement('div')
-    dropdownMenuEl.classList.add('dropdown-menu')
-
+  _createDateRangePickerBody() {
     const dateRangePickerBodyEl = document.createElement('div')
     dateRangePickerBodyEl.classList.add('date-picker-body')
 
@@ -387,10 +408,8 @@ class DateRangePicker extends BaseComponent {
     this._calendars = calendarsEl
 
     dateRangePickerBodyEl.append(calendarsEl)
-    dropdownMenuEl.append(dateRangePickerBodyEl)
-    dateRangePickerEl.append(this._createInputGroup(), dropdownMenuEl)
 
-    this._element.append(dateRangePickerEl)
+    return dateRangePickerBodyEl
   }
 
   _setInputValue(date) {

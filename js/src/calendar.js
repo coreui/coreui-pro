@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin, isElement, typeCheckConfig } from './util/index'
+import { defineJQueryPlugin, typeCheckConfig } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import {
@@ -24,7 +24,6 @@ import {
   isStartDate,
   isEndDate } from './util/calendar'
 import BaseComponent from './base-component'
-// import CalendarTimepicker from './time-picker'
 
 /**
 * ------------------------------------------------------------------------
@@ -58,10 +57,10 @@ const Default = {
   locale: navigator.language,
   maxDate: null,
   minDate: null,
-  order: 'first',
   range: true,
   startDate: null,
-  selectEndDate: false
+  selectEndDate: false,
+  weekdayLength: 2
 }
 
 const DefaultType = {
@@ -72,10 +71,10 @@ const DefaultType = {
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
-  order: 'string',
   range: 'boolean',
   startDate: '(date|string|null)',
-  selectEndDate: 'boolean'
+  selectEndDate: 'boolean',
+  weekdayLength: 'number'
 }
 
 /**
@@ -117,10 +116,6 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
       event.preventDefault()
       if (event.target.classList.contains('day')) {
-        if (event.target.parentElement.classList.contains('disabled')) {
-          return
-        }
-
         this._selectDate(Manipulator.getDataAttribute(event.target, 'date'))
       }
 
@@ -221,46 +216,61 @@ class Calendar extends BaseComponent {
     this._updateCalendar()
   }
 
+  _setEndDate(date, selectEndDate = false) {
+    this._endDate = new Date(date)
+    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+      date: this._endDate,
+      selectEndDate
+    })
+  }
+
+  _setStartDate(date, selectEndDate = true) {
+    this._startDate = new Date(date)
+    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+      date: this._startDate,
+      selectEndDate
+    })
+  }
+
   _selectDate(date) {
-    if (this._selectEndDate) {
-      this._endDate = new Date(date)
-      this._selectEndDate = false
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-        date: this._endDate,
-        selectEndDate: this._selectEndDate
-      })
+    if (isDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
       return
     }
 
     if (this._config.range) {
-      this._selectEndDate = true
+      if (this._selectEndDate) {
+        if (this._startDate && this._startDate > new Date(date)) {
+          this._setEndDate(this._startDate)
+          this._setStartDate(date)
+        } else {
+          this._setEndDate(date)
+        }
+      } else {
+        this._setStartDate(date, true)
+      }
+    } else {
+      this._setStartDate(date)
     }
-
-    this._startDate = new Date(date)
-    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-      date: this._startDate,
-      selectEndDate: this._selectEndDate
-    })
   }
 
   _createCalendar() {
-    const { firstDayOfWeek, locale } = this._config
+    const { firstDayOfWeek, locale, weekdayLength } = this._config
     const year = this._calendarDate.getFullYear()
     const month = this._calendarDate.getMonth()
 
     // Create navigation
     const navigationElement = document.createElement('div')
-    navigationElement.classList.add('calendar-navigation')
+    navigationElement.classList.add('calendar-nav')
     navigationElement.innerHTML = `
-      <div class="calendar-navigation-prev">
+      <div class="calendar-nav-prev">
         <button class="btn btn-transparent btn-sm btn-double-prev">
-          <span class="double-prev-icon"></span>
+          <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
         <button class="btn btn-transparent btn-sm btn-prev">
-          <span class="prev-icon"></span>
+          <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>
       </div>
-      <div class="calendar-navigation-date">
+      <div class="calendar-nav-date">
         <button class="btn btn-transparent btn-sm btn-month">
           ${this._calendarDate.toLocaleDateString(locale, { month: 'long' })}
         </button>
@@ -268,12 +278,12 @@ class Calendar extends BaseComponent {
           ${this._calendarDate.toLocaleDateString(locale, { year: 'numeric' })}
         </button>
       </div>
-      <div class="calendar-navigation-next">
+      <div class="calendar-nav-next">
         <button class="btn btn-transparent btn-sm btn-next">
-          <span class="next-icon"></span>
+          <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>
         <button class="btn btn-transparent btn-sm btn-double-next">
-          <span class="double-next-icon"></span>
+          <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
     `
@@ -288,7 +298,13 @@ class Calendar extends BaseComponent {
     ${this._view === 'days' ? `
       <thead>
         <tr>
-          ${weekDays.map(({ date }) => (`<th class="calendar-cell">${date.toLocaleDateString(locale, { weekday: 'narrow' })}</th>`)).join('')}
+          ${weekDays.map(({ date }) => (
+            `<th class="calendar-cell">
+              <div class="calendar-header-cell-inner">
+                ${date.toLocaleDateString(locale, { weekday: 'long' }).slice(0, weekdayLength)}
+              </div>
+            </th>`
+          )).join('')}
         </tr>
       </thead>` : ''}
       <tbody>
@@ -330,7 +346,6 @@ class Calendar extends BaseComponent {
   _updateCalendar() {
     this._element.innerHTML = ''
     this._createCalendar()
-    // this._createCalendarTimepicker()
   }
 
   _dayClassNames(date, month) {
@@ -354,15 +369,7 @@ class Calendar extends BaseComponent {
       ...config
     }
 
-    typeCheckConfig(NAME, config, this.constructor.DefaultType)
-
-    if (typeof config.reference === 'object' && !isElement(config.reference) &&
-      typeof config.reference.getBoundingClientRect !== 'function'
-    ) {
-      // Popper virtual elements require a getBoundingClientRect method
-      throw new TypeError(`${NAME.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`)
-    }
-
+    typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 

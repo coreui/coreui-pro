@@ -1,110 +1,96 @@
-$double-prev-icon-color: $gray-600 !default;
-$double-prev-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$double-prev-icon-color}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$double-prev-icon-color}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
-
-$double-prev-icon-hover-color: $body-color !default;
-$double-prev-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$double-prev-icon-hover-color}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$double-prev-icon-hover-color}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
-
-$prev-icon-color: $gray-600 !default;
-$prev-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$prev-icon-color}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
-
-$prev-icon-hover-color: $body-color !default;
-$prev-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$prev-icon-hover-color}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
-
-
-$double-next-icon-color: $gray-600 !default;
-$double-next-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$double-next-icon-color}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$double-next-icon-color}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
-
-$double-next-icon-hover-color: $body-color !default;
-$double-next-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$double-next-icon-hover-color}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$double-next-icon-hover-color}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
-
-$next-icon-color: $gray-600 !default;
-$next-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$next-icon-color}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
-
-$next-icon-hover-color: $body-color !default;
-$next-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$next-icon-hover-color}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
-
 .calendar {
+  // scss-docs-start calendar-css-vars
+  --#{$variable-prefix}calendar-table-margin: #{$calendar-table-margin};
+  --#{$variable-prefix}calendar-table-cell-size: #{$calendar-table-cell-size};
+  --#{$variable-prefix}calendar-nav-padding: #{$calendar-nav-padding};
+  --#{$variable-prefix}calendar-nav-border: #{$calendar-nav-border-width} solid #{$calendar-nav-border-color};
+  --#{$variable-prefix}calendar-nav-date-color: #{$calendar-nav-date-color};
+  --#{$variable-prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
+  --#{$variable-prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};
+  --#{$variable-prefix}calendar-nav-icon-height: #{$calendar-nav-icon-height};
+  --#{$variable-prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color};
+  --#{$variable-prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
+  --#{$variable-prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
+  --#{$variable-prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
+  --#{$variable-prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg};
+  --#{$variable-prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg};
+  --#{$variable-prefix}calendar-cell-today-color: #{$calendar-cell-today-color};
+  // scss-docs-end calendar-css-vars
+
   table {
-    width: 280px;
-    margin: .5rem;
+    width: calc(var(--#{$variable-prefix}calendar-table-cell-size) * 7); // stylelint-disable-line function-disallowed-list
+    margin: var(--#{$variable-prefix}calendar-table-margin);
 
-    th {
-      font-weight: 600;
-      color: $text-medium-emphasis;
-
-      .calendar-header-cell-inner {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-      }
+    th,
+    td {
+      width: var(--#{$variable-prefix}calendar-table-cell-size);
     }
   }
 }
 
-.calendar-navigation {
+.calendar-nav {
   display: flex;
-  flex: 1 294px;
   align-items: baseline;
-  padding: .5rem;
-  border-bottom: 1px solid var(--#{$variable-prefix}gray-200);
+  padding: var(--#{$variable-prefix}calendar-nav-padding);
+  border-bottom: var(--#{$variable-prefix}calendar-nav-border);
 }
 
-// .calendar-navigation-prev {}
-
-// .calendar-navigation-next {}
-
-.calendar-navigation-date {
+.calendar-nav-date {
   flex: 1;
   text-align: center;
 
   .btn {
     font-weight: 600;
+    color: var(--#{$variable-prefix}calendar-nav-date-color);
 
     &:hover {
-      color: var(--#{$variable-prefix}primary);
+      color: var(--#{$variable-prefix}calendar-nav-date-hover-color);
     }
   }
 }
 
-.double-next-icon,
-.double-prev-icon,
-.next-icon,
-.prev-icon {
+.calendar-nav-icon {
   display: block;
-  width: 1rem;
-  height: 1rem;
-  font-size: 1rem;
+  width: var(--#{$variable-prefix}calendar-nav-icon-width);
+  height: var(--#{$variable-prefix}calendar-nav-icon-height);
   @include transition(background-image .15s ease-in-out);
 }
 
-.double-next-icon {
-  @include ltr-rtl-value-only("background-image", escape-svg($double-next-icon), escape-svg($double-prev-icon));
+.calendar-nav-icon-double-next {
+  @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-double-next), escape-svg($calendar-nav-icon-double-prev));
   &:hover {
-    @include ltr-rtl-value-only("background-image", escape-svg($double-next-icon-hover), escape-svg($double-prev-icon-hover));
+    @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-double-next-hover), escape-svg($calendar-nav-icon-double-prev-hover));
   }
 }
 
-.double-prev-icon {
-  @include ltr-rtl-value-only("background-image", escape-svg($double-prev-icon), escape-svg($double-next-icon));
+.calendar-nav-icon-double-prev {
+  @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-double-prev), escape-svg($calendar-nav-icon-double-next));
   &:hover {
-    @include ltr-rtl-value-only("background-image", escape-svg($double-prev-icon-hover), escape-svg($double-next-icon-hover));
+    @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-double-prev-hover), escape-svg($calendar-nav-icon-double-next-hover));
   }
 }
 
-.next-icon {
-  @include ltr-rtl-value-only("background-image", escape-svg($next-icon), escape-svg($prev-icon));
+.calendar-nav-icon-next {
+  @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-next), escape-svg($calendar-nav-icon-prev));
   &:hover {
-    @include ltr-rtl-value-only("background-image", escape-svg($next-icon-hover), escape-svg($prev-icon-hover));
+    @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-next-hover), escape-svg($calendar-nav-icon-prev-hover));
   }
 }
 
-.prev-icon {
-  @include ltr-rtl-value-only("background-image", escape-svg($prev-icon), escape-svg($next-icon));
+.calendar-nav-icon-prev {
+  @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-prev), escape-svg($calendar-nav-icon-next));
   &:hover {
-    @include ltr-rtl-value-only("background-image", escape-svg($prev-icon-hover), escape-svg($next-icon-hover));
+    @include ltr-rtl-value-only("background-image", escape-svg($calendar-nav-icon-prev-hover), escape-svg($calendar-nav-icon-next-hover));
   }
+}
+
+.calendar-header-cell-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--#{$variable-prefix}calendar-table-cell-size);
+  font-weight: 600;
+  color: var(--#{$variable-prefix}calendar-cell-header-inner-color);
 }
 
 .calendar-cell {
@@ -116,17 +102,17 @@ $next-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg
   }
 
   &:hover:not(.disabled) .calendar-cell-inner {
-    background-color: var(--cui-gray-200);
+    background-color: var(--#{$variable-prefix}calendar-cell-hover-bg);
   }
 
   &.today .calendar-cell-inner {
-    color: var(--#{$variable-prefix}danger);
+    color: var(--#{$variable-prefix}calendar-cell-today-color);
   }
 
   &.disabled,
   &.next,
   &.previous .calendar-cell-inner {
-    color: $text-disabled;
+    color: var(--#{$variable-prefix}calendar-cell-disabled-color);
   }
 
   &.disabled .calendar-cell-inner {
@@ -134,7 +120,7 @@ $next-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg
   }
 
   &.range:not(.selected) .calendar-cell-inner {
-    background: rgba(var(--cui-primary-rgb), .125);
+    background: var(--#{$variable-prefix}calendar-cell-range-bg);
     @include border-radius(0);
   }
 
@@ -154,27 +140,25 @@ $next-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg
     @include border-end-radius($border-radius);
   }
 
-  &.selected:not(.previous):not(.next) .calendar-cell-inner {
+  &.selected:not(.previous):not(.next) .calendar-cell-inner,
+  &.selected:not(.previous):not(.next).start .calendar-cell-inner,
+  &.selected:not(.previous):not(.next).end .calendar-cell-inner {
     position: relative;
-    color: var(--cui-white);
-    background: var(--cui-primary);
+    color: var(--#{$variable-prefix}calendar-cell-selected-color);
+    background: var(--#{$variable-prefix}calendar-cell-selected-bg);
   }
 
   &.selected:not(.previous):not(.next).start .calendar-cell-inner,
   &.selected:not(.previous):not(.next).end .calendar-cell-inner {
-    position: relative;
-    color: var(--cui-white);
-    background: var(--cui-primary);
-
     &::before {
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       left: 0;
-      z-index: 1;
+      z-index: -1;
       content: "";
-      background: rgba(var(--cui-primary-rgb), .125);
+      background: var(--#{$variable-prefix}calendar-cell-range-bg);
     }
   }
 
@@ -192,18 +176,6 @@ $next-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
+  height: var(--#{$variable-prefix}calendar-table-cell-size);
   @include border-radius($border-radius);
-}
-
-.calendar-time-picker {
-  display: flex;
-  align-items: baseline;
-  padding: $spacer * .5;
-  border-top: 1px solid var(--#{$variable-prefix}gray-200);
-
-  .form-select {
-    padding-right: 1.25rem;
-    background-position: right .5rem center;
-  }
 }

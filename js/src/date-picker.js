@@ -5,9 +5,8 @@
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin, typeCheckConfig } from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
 import DateRangePicker from './date-range-picker'
 
@@ -30,7 +29,6 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]'
 const Default = {
   ...DateRangePicker.Default,
   calendars: 1,
-  date: null,
   placeholder: ['Select date'],
   range: false
 }
@@ -47,10 +45,6 @@ const DefaultType = {
 */
 
 class DatePicker extends DateRangePicker {
-  constructor(element, config) {
-    super(element, config)
-    this._startDate = this._config.date
-  }
   // Getters
 
   static get Default() {
@@ -81,17 +75,6 @@ class DatePicker extends DateRangePicker {
         })
       })
     })
-  }
-
-  _getConfig(config) {
-    config = {
-      ...this.constructor.Default,
-      ...Manipulator.getDataAttributes(this._element),
-      ...(typeof config === 'object' ? config : {})
-    }
-
-    typeCheckConfig(NAME, config, DefaultType)
-    return config
   }
 
   // Static

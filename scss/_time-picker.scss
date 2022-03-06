@@ -1,21 +1,8 @@
-$time-picker-cleaner-icon-color: $gray-600 !default;
-$time-picker-cleaner-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
-$time-picker-cleaner-icon-hover-color: $body-color !default;
-$time-picker-cleaner-icon-hover: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
-
-$time-picker-input-icon-color: $gray-600 !default;
-$time-picker-input-icon: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-input-icon-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$time-picker-input-icon-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
-
-
-//
-$time-picker-body-padding: $spacer * .5 !default;
-$time-picker-body-border-width: 1px !default;
-$time-picker-body-border-color: $border-color !default;
-
 .time-picker {
   // scss-docs-start time-picker-css-vars
   --#{$variable-prefix}time-picker-body-padding: #{$time-picker-body-padding};
   --#{$variable-prefix}time-picker-body-border-top: #{$time-picker-body-border-width} solid #{$time-picker-body-border-color};
+  --#{$variable-prefix}time-picker-roll-col-border: #{$time-picker-roll-col-border-width} solid #{$time-picker-roll-col-border-color};
   // scss-docs-end time-picker-css-vars
 }
 
@@ -38,7 +25,7 @@ $time-picker-body-border-color: $border-color !default;
     display: block;
     width: 40px;
     height: 1.25rem;
-    background-image: escape-svg($time-picker-input-icon);
+    background-image: escape-svg($time-picker-default-icon);
     background-repeat: no-repeat;
     background-position: center;
   }
@@ -53,7 +40,7 @@ $time-picker-body-border-color: $border-color !default;
 }
 
 .time-picker-input-icon {
-  background-image: escape-svg($time-picker-input-icon);
+  background-image: escape-svg($time-picker-default-icon);
 }
 
 .time-picker-roll {
@@ -65,7 +52,7 @@ $time-picker-body-border-color: $border-color !default;
 .time-picker-roll-col {
   height: calc(8 * 32px); // stylelint-disable-line
   overflow: scroll;
-  border-right: 1px solid var(--#{$variable-prefix}gray-200);
+  border-right: var(--#{$variable-prefix}time-picker-roll-col-border);
 }
 
 .time-picker-roll-cell {
