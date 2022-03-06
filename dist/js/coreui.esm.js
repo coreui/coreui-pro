@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.1.0 (https://coreui.io)
+  * CoreUI v4.1.1 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -2439,7 +2439,7 @@ defineJQueryPlugin(Dropdown);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.1.0): loading-button.js
+ * CoreUI (v4.1.1): loading-button.js
  * Licensed under MIT (https://coreui.io/license)
  */
 /**
@@ -3382,7 +3382,7 @@ defineJQueryPlugin(Modal);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.1.0): multi-select.js
+ * CoreUI PRO (v4.1.1): multi-select.js
  * License (https://coreui.io/pro/license)
  * --------------------------------------------------------------------------
  */
@@ -4040,7 +4040,7 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter') {
-      this._searchElement.placeholder = '';
+      this._searchElement.removeAttribute('placeholder');
 
       this._selectionElement.style.removeProperty('display');
 

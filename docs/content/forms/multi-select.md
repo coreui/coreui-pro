@@ -23,14 +23,14 @@ toc: true
 {{< /example >}}
 
 {{< example >}}
-<select class="form-multi-select" multiple data-coreui-search="true">
-  <option value="0" selected>Angular</option>
-  <option value="1" selected disabled>Bootstrap</option>
+<select class="form-multi-select" multiple data-coreui-search="true" data-coreui-placeholder="sass --style expanded --source-map --embed-sources --no-error-css --load-path=node_modules/ src/scss/:dist/css/">
+  <option value="0">Angular</option>
+  <option value="1" disabled>Bootstrap</option>
   <option value="2">React.js</option>
   <option value="3">Vue.js</option>
   <optgroup label="backend">
     <option value="4" disabled>Django</option>
-    <option value="5" selected>Laravel</option>
+    <option value="5">Laravel</option>
     <option value="6">Node.js</option>
   </optgroup>
 </select>
