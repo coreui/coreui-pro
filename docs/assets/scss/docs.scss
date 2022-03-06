@@ -61,3 +61,24 @@ $enable-cssgrid: true; // stylelint-disable-line scss/dollar-variable-default
 @import "syntax";
 @import "anchor";
 // @import "algolia";
+
+/* stylelint-disable */
+div[dir="rtl"] .input-group > :not(:last-child),
+div[dir="rtl"] .input-group > .dropdown-toggle:nth-last-child(n+3) {
+  border-right: 0 !important;
+  @include border-end-radius($input-border-radius !important);
+}
+
+div[dir="rtl"] .input-group > :not(:first-child) {
+  @include border-start-radius($input-border-radius !important);
+  @include border-end-radius(0 !important);
+}
+
+div[dir="rtl"] .picker .input-group .form-control:first-child {
+  border-right : $input-border-width solid var(--#{$variable-prefix}input-border-color, $input-border-color) !important;
+}
+
+div[dir="rtl"] .picker .input-group > * + *:not(:last-child) {
+  @include border-start-radius(0 !important);
+}
+/* stylelint-enable */
