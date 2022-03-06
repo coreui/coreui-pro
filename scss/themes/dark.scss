@@ -23,7 +23,7 @@ $theme-prefix: "dark" !default;
 
   @include theme($theme-map);
 
-  // Button variants
+  // Alert variants
   @each $state, $variant in $alert-variants-dt {
     @include alert-variant($state, $variant, true);
   }

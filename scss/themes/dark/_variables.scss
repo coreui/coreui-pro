@@ -457,6 +457,17 @@ $link-theme-map: (
   "link-hover-color":  $link-hover-color-dt
 ) !default;
 
+// Btn link
+
+$btn-link-color-dt:           $link-color-dt !default;
+$btn-link-hover-color-dt:     $link-hover-color-dt !default;
+$btn-link-disabled-color-dt:  $disabled-dt !default;
+
+$btn-link-theme-map: (
+  "btn-link-color":           $btn-link-color-dt,
+  "btn-link-hover-color":     $btn-link-hover-color-dt,
+  "btn-link-disabled-color":  $btn-link-disabled-color-dt
+) !default;
 
 // List group
 
@@ -765,6 +776,7 @@ $theme-map: (
   "accordion":          $accordion-theme-map,
   "breadcrumb":         $breadcrumb-theme-map,
   "btn-close":          $close-theme-map,
+  "btn-link":           $btn-link-theme-map,
   "card":               $card-theme-map,
   "dropdown-menu":      $dropdown-theme-map,
   "footer":             $footer-theme-map,
