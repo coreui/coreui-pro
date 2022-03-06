@@ -24,13 +24,11 @@ $theme-prefix: "dark" !default;
   @include theme($theme-map);
 
   // Button variants
-
   @each $state, $variant in $alert-variants-dt {
     @include alert-variant($state, $variant, true);
   }
 
   // Button variants
-
   @each $state, $variant in $button-variants-dt {
     @include button-variant($state, $variant, true);
   }
@@ -44,12 +42,17 @@ $theme-prefix: "dark" !default;
   }
 
   // List group variants
-
   @each $state, $variant in $list-group-variants-dt {
     @include list-group-item-variant($state, $variant, true);
   }
 
+  // Fix Firefox option color
+  @-moz-document url-prefix("") {
+    select:not([multiple]) option {
+      color: initial;
+    }
+  }
+
   // Utilities
-  // stylelint-disable-next-line no-invalid-position-at-import-rule
   @import "./../utilities/api";
 }

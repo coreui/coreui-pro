@@ -696,6 +696,11 @@
   --cui-list-group-action-active-bg: #315c86;
   --cui-list-group-action-active-border-color: #315c86;
 }
+@-moz-document url-prefix("") {
+  .dark-theme select:not([multiple]) option {
+    color: initial;
+  }
+}
 .dark-theme .dark\:text-primary, .dark-theme .text-primary:not([class*="dark:"]) {
   color: #321fdb !important;
 }
