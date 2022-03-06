@@ -57,7 +57,7 @@
       }
 
       @if $is-css-var {
-        .#{$property-class + $infix + $property-class-modifier} {
+        #{if($theme-prefix, theme-prefix("#{$property-class + $infix + $property-class-modifier}"), ".#{$property-class + $infix + $property-class-modifier}")} {
           --#{$variable-prefix}#{$css-variable-name}: #{$value};
         }
 

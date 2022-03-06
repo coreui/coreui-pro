@@ -9,17 +9,7 @@ $theme-prefix: "dark" !default;
 .#{$theme-name} {
   @import "dark/variables";
   @import "dark/utilities";
-
-  // Colors
-  @each $color, $value in $theme-colors-dt {
-    --#{$variable-prefix}#{$color}: #{$value};
-  }
-
-  // Gradients
-  @each $color, $map in $theme-gradients-dt {
-    --#{$variable-prefix}#{$color}-start: #{map-get($map, "start")};
-    --#{$variable-prefix}#{$color}-stop: #{map-get($map, "stop")};
-  }
+  @import "dark/root";
 
   @include theme($theme-map);
 

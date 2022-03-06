@@ -39,6 +39,8 @@ $theme-colors-dt: (
 ) !default;
 // fusv-enable
 
+$theme-colors-rgb-dt: map-loop($theme-colors-dt, to-rgb, "$value") !default;
+
 // Gradients
 
 // scss-docs-start theme-gradients
