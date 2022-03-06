@@ -19,7 +19,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -27,12 +27,12 @@
    * --------------------------------------------------------------------------
    */
 
-  const toType = obj => {
-    if (obj === null || obj === undefined) {
-      return `${obj}`;
+  const toType = object => {
+    if (object === null || object === undefined) {
+      return `${object}`;
     }
 
-    return {}.toString.call(obj).match(/\s([a-z]+)/i)[1].toLowerCase();
+    return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)[1].toLowerCase();
   };
 
   const getSelector = element => {
@@ -175,7 +175,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): collapse.js
+   * CoreUI (v4.1.1): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js

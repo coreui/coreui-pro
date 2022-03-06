@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -22,12 +22,12 @@
   const MILLISECONDS_MULTIPLIER = 1000;
   const TRANSITION_END = 'transitionend'; // Shoutout AngusCroll (https://goo.gl/pxwQGp)
 
-  const toType = obj => {
-    if (obj === null || obj === undefined) {
-      return `${obj}`;
+  const toType = object => {
+    if (object === null || object === undefined) {
+      return `${object}`;
     }
 
-    return {}.toString.call(obj).match(/\s([a-z]+)/i)[1].toLowerCase();
+    return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)[1].toLowerCase();
   };
   /**
    * --------------------------------------------------------------------------
@@ -152,7 +152,27 @@
       return false;
     }
 
-    return getComputedStyle(element).getPropertyValue('visibility') === 'visible';
+    const elementIsVisible = getComputedStyle(element).getPropertyValue('visibility') === 'visible'; // Handle `details` element as its content may falsie appear visible when it is closed
+
+    const closedDetails = element.closest('details:not([open])');
+
+    if (!closedDetails) {
+      return elementIsVisible;
+    }
+
+    if (closedDetails !== element) {
+      const summary = element.closest('summary');
+
+      if (summary && summary.parentNode !== closedDetails) {
+        return false;
+      }
+
+      if (summary === null) {
+        return false;
+      }
+    }
+
+    return elementIsVisible;
   };
 
   const isDisabled = element => {
@@ -325,7 +345,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dom/event-handler.js
+   * CoreUI (v4.1.1): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -616,7 +636,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dom/data.js
+   * CoreUI (v4.1.1): dom/data.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dom/data.js
@@ -673,7 +693,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -686,7 +706,7 @@
    * ------------------------------------------------------------------------
    */
 
-  const VERSION = '4.1.0';
+  const VERSION = '4.1.1';
 
   class BaseComponent {
     constructor(element) {
@@ -768,7 +788,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's alert.js
@@ -786,7 +806,7 @@
   const EVENT_KEY$g = `.${DATA_KEY$g}`;
   const EVENT_CLOSE = `close${EVENT_KEY$g}`;
   const EVENT_CLOSED = `closed${EVENT_KEY$g}`;
-  const CLASS_NAME_FADE$6 = 'fade';
+  const CLASS_NAME_FADE$5 = 'fade';
   const CLASS_NAME_SHOW$b = 'show';
   /**
    * ------------------------------------------------------------------------
@@ -810,7 +830,7 @@
 
       this._element.classList.remove(CLASS_NAME_SHOW$b);
 
-      const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$6);
+      const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$5);
 
       this._queueCallback(() => this._destroyElement(), this._element, isAnimated);
     } // Private
@@ -860,7 +880,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's button.js
@@ -934,7 +954,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dom/manipulator.js
+   * CoreUI (v4.1.1): dom/manipulator.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -1011,7 +1031,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dom/selector-engine.js
+   * CoreUI (v4.1.1): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -1084,7 +1104,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): carousel.js
+   * CoreUI (v4.1.1): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -1412,7 +1432,7 @@
         const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE$1, this._indicatorsElement);
         activeIndicator.classList.remove(CLASS_NAME_ACTIVE$3);
         activeIndicator.removeAttribute('aria-current');
-        const indicators = SelectorEngine.find(SELECTOR_INDICATOR, this._indicatorsElement);
+        const indicators = SelectorEngine.find(SELECTOR_INDICATOR, this._indicatorsElement); // eslint-disable-next-line unicorn/no-for-loop
 
         for (let i = 0; i < indicators.length; i++) {
           if (Number.parseInt(indicators[i].getAttribute('data-coreui-slide-to'), 10) === this._getItemIndex(element)) {
@@ -1636,7 +1656,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): collapse.js
+   * CoreUI (v4.1.1): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js
@@ -3745,7 +3765,7 @@
     defaultModifiers: defaultModifiers
   }); // eslint-disable-next-line import/no-unused-modules
 
-  const Popper = /*#__PURE__*/Object.freeze({
+  const Popper = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
     __proto__: null,
     popperGenerator,
     detectOverflow,
@@ -3785,11 +3805,11 @@
     offset: offset$1,
     popperOffsets: popperOffsets$1,
     preventOverflow: preventOverflow$1
-  });
+  }, Symbol.toStringTag, { value: 'Module' }));
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dropdown.js
+   * CoreUI (v4.1.1): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dropdown.js
@@ -4559,7 +4579,7 @@
     clickCallback: '(function|null)'
   };
   const NAME$b = 'backdrop';
-  const CLASS_NAME_FADE$5 = 'fade';
+  const CLASS_NAME_FADE$4 = 'fade';
   const CLASS_NAME_SHOW$8 = 'show';
   const EVENT_MOUSEDOWN = `mousedown.coreui.${NAME$b}`;
 
@@ -4610,7 +4630,7 @@
         backdrop.className = this._config.className;
 
         if (this._config.isAnimated) {
-          backdrop.classList.add(CLASS_NAME_FADE$5);
+          backdrop.classList.add(CLASS_NAME_FADE$4);
         }
 
         this._element = backdrop;
@@ -4765,7 +4785,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.1.0): modal.js
+    * CoreUI (v4.1.1): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js
@@ -4805,7 +4825,7 @@
   const EVENT_MOUSEDOWN_DISMISS = `mousedown.dismiss${EVENT_KEY$9}`;
   const EVENT_CLICK_DATA_API$5 = `click${EVENT_KEY$9}${DATA_API_KEY$6}`;
   const CLASS_NAME_OPEN = 'modal-open';
-  const CLASS_NAME_FADE$4 = 'fade';
+  const CLASS_NAME_FADE$3 = 'fade';
   const CLASS_NAME_SHOW$7 = 'show';
   const CLASS_NAME_STATIC = 'modal-static';
   const OPEN_SELECTOR$1 = '.modal.show';
@@ -5067,7 +5087,7 @@
     }
 
     _isAnimated() {
-      return this._element.classList.contains(CLASS_NAME_FADE$4);
+      return this._element.classList.contains(CLASS_NAME_FADE$3);
     }
 
     _triggerBackdropTransition() {
@@ -5527,7 +5547,6 @@
 
     _createNativeOptions(parentElement, options) {
       options.forEach(option => {
-        // eslint-disable-next-line no-negated-condition
         if (typeof option.options !== 'undefined') {
           const optgroup = document.createElement('optgroup');
           optgroup.label = option.label;
@@ -6040,7 +6059,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): navigation.js
+   * CoreUI (v4.1.1): navigation.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -6325,7 +6344,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dropdown.js
+   * CoreUI (v4.1.1): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js
@@ -6584,7 +6603,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -6699,7 +6718,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): tooltip.js
+   * CoreUI (v4.1.1): tooltip.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tooltip.js
@@ -6774,7 +6793,7 @@
     MOUSEENTER: `mouseenter${EVENT_KEY$5}`,
     MOUSELEAVE: `mouseleave${EVENT_KEY$5}`
   };
-  const CLASS_NAME_FADE$3 = 'fade';
+  const CLASS_NAME_FADE$2 = 'fade';
   const CLASS_NAME_MODAL = 'modal';
   const CLASS_NAME_SHOW$3 = 'show';
   const HOVER_STATE_SHOW = 'show';
@@ -6914,7 +6933,7 @@
       this._element.setAttribute('aria-describedby', tipId);
 
       if (this._config.animation) {
-        tip.classList.add(CLASS_NAME_FADE$3);
+        tip.classList.add(CLASS_NAME_FADE$2);
       }
 
       const placement = typeof this._config.placement === 'function' ? this._config.placement.call(this, tip, this._element) : this._config.placement;
@@ -6967,7 +6986,7 @@
         }
       };
 
-      const isAnimated = this.tip.classList.contains(CLASS_NAME_FADE$3);
+      const isAnimated = this.tip.classList.contains(CLASS_NAME_FADE$2);
 
       this._queueCallback(complete, this.tip, isAnimated);
     }
@@ -7013,7 +7032,7 @@
       this._activeTrigger[TRIGGER_CLICK] = false;
       this._activeTrigger[TRIGGER_FOCUS] = false;
       this._activeTrigger[TRIGGER_HOVER] = false;
-      const isAnimated = this.tip.classList.contains(CLASS_NAME_FADE$3);
+      const isAnimated = this.tip.classList.contains(CLASS_NAME_FADE$2);
 
       this._queueCallback(complete, this.tip, isAnimated);
 
@@ -7040,7 +7059,7 @@
       element.innerHTML = this._config.template;
       const tip = element.children[0];
       this.setContent(tip);
-      tip.classList.remove(CLASS_NAME_FADE$3, CLASS_NAME_SHOW$3);
+      tip.classList.remove(CLASS_NAME_FADE$2, CLASS_NAME_SHOW$3);
       this.tip = tip;
       return this.tip;
     }
@@ -7412,7 +7431,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): popover.js
+   * CoreUI (v4.1.1): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js
@@ -7525,7 +7544,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): scrollspy.js
+   * CoreUI (v4.1.1): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js
@@ -7763,7 +7782,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): sidebar.js
+   * CoreUI (v4.1.1): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -7780,7 +7799,6 @@
   const Default$1 = {};
   const DefaultType$1 = {};
   const CLASS_NAME_BACKDROP = 'sidebar-backdrop';
-  const CLASS_NAME_FADE$2 = 'fade';
   const CLASS_NAME_HIDE$1 = 'hide';
   const CLASS_NAME_SHOW$2 = 'show';
   const CLASS_NAME_SIDEBAR_NARROW = 'sidebar-narrow';
@@ -7811,7 +7829,7 @@
       this._overlaid = this._isOverlaid();
       this._narrow = this._isNarrow();
       this._unfoldable = this._isUnfoldable();
-      this._backdrop = null;
+      this._backdrop = this._initializeBackDrop();
 
       this._addEventListeners();
     } // Getters
@@ -7840,7 +7858,9 @@
       if (this._isMobile()) {
         this._element.classList.add(CLASS_NAME_SHOW$2);
 
-        this._showBackdrop();
+        this._backdrop.show();
+
+        new ScrollBarHelper().hide();
       }
 
       const complete = () => {
@@ -7866,7 +7886,9 @@
       }
 
       if (this._isMobile()) {
-        this._removeBackdrop();
+        this._backdrop.hide();
+
+        new ScrollBarHelper().reset();
       } else {
         this._element.classList.add(CLASS_NAME_HIDE$1);
       }
@@ -7955,6 +7977,16 @@
       return config;
     }
 
+    _initializeBackDrop() {
+      return new Backdrop({
+        className: CLASS_NAME_BACKDROP,
+        isVisible: this._isMobile(),
+        isAnimated: true,
+        rootElement: this._element.parentNode,
+        clickCallback: () => this.hide()
+      });
+    }
+
     _isMobile() {
       return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--cui-is-mobile'));
     }
@@ -7974,33 +8006,11 @@
     _isVisible() {
       const rect = this._element.getBoundingClientRect();
 
-      return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
+      return rect.top >= 0 && rect.left >= 0 && Math.floor(rect.bottom) <= (window.innerHeight || document.documentElement.clientHeight) && Math.floor(rect.right) <= (window.innerWidth || document.documentElement.clientWidth);
     }
 
     _addClassName(className) {
       this._element.classList.add(className);
-    }
-
-    _removeBackdrop() {
-      if (this._backdrop) {
-        this._backdrop.remove();
-
-        this._backdrop = null;
-      }
-    }
-
-    _showBackdrop() {
-      if (!this._backdrop) {
-        this._backdrop = document.createElement('div');
-        this._backdrop.className = CLASS_NAME_BACKDROP;
-
-        this._backdrop.classList.add(CLASS_NAME_FADE$2);
-
-        document.body.append(this._backdrop);
-        reflow(this._backdrop);
-
-        this._backdrop.classList.add(CLASS_NAME_SHOW$2);
-      }
     }
 
     _clickOutListener(event, sidebar) {
@@ -8050,6 +8060,7 @@
       EventHandler.on(window, EVENT_RESIZE, () => {
         if (this._isMobile() && this._isVisible()) {
           this.hide();
+          this._backdrop = this._initializeBackDrop();
         }
       });
     } // Static
@@ -8096,7 +8107,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): tab.js
+   * CoreUI (v4.1.1): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -8297,7 +8308,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): toast.js
+   * CoreUI (v4.1.1): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -8530,7 +8541,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): index.esm.js
+   * CoreUI (v4.1.1): index.esm.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

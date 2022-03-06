@@ -349,7 +349,6 @@ class MultiSelect extends BaseComponent {
 
   _createNativeOptions(parentElement, options) {
     options.forEach(option => {
-      // eslint-disable-next-line no-negated-condition
       if ((typeof option.options !== 'undefined')) {
         const optgroup = document.createElement('optgroup')
         optgroup.label = option.label

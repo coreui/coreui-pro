@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): alert.js
+   * CoreUI (v4.1.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -36,7 +36,27 @@
       return false;
     }
 
-    return getComputedStyle(element).getPropertyValue('visibility') === 'visible';
+    const elementIsVisible = getComputedStyle(element).getPropertyValue('visibility') === 'visible'; // Handle `details` element as its content may falsie appear visible when it is closed
+
+    const closedDetails = element.closest('details:not([open])');
+
+    if (!closedDetails) {
+      return elementIsVisible;
+    }
+
+    if (closedDetails !== element) {
+      const summary = element.closest('summary');
+
+      if (summary && summary.parentNode !== closedDetails) {
+        return false;
+      }
+
+      if (summary === null) {
+        return false;
+      }
+    }
+
+    return elementIsVisible;
   };
 
   const isDisabled = element => {
@@ -57,7 +77,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): dom/selector-engine.js
+   * CoreUI (v4.1.1): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/selector-engine.js
