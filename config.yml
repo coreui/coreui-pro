@@ -54,8 +54,8 @@ params:
   social_image_path:    /assets/brand/coreui-social.jpg
   social_logo_path:     /assets/brand/coreui-social-logo.png
 
-  current_version:      "4.1.1"
-  current_ruby_version: "4.1.1"
+  current_version:      "4.1.2"
+  current_ruby_version: "4.1.2"
   docs_version:         "4.1"
   rfs_version:          "9.0.3"
   github_org:           "https://github.com/coreui"
@@ -66,18 +66,18 @@ params:
   icons:                "https://icons.coreui.io/"
 
   download:
-    source:             "https://github.com/coreui/coreui/archive/v4.1.1.zip"
-    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.1/coreui-4.1.1-dist.zip"
+    source:             "https://github.com/coreui/coreui/archive/v4.1.2.zip"
+    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.2/coreui-4.1.2-dist.zip"
 
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
-    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.1/dist/css/coreui.min.css"
-    css_hash:        "sha384-KkORzXW3J0OCL7KKyZlAr63j6ObziqNUyNrm/uwdas4vaGpfxin2dS3+Wf7sT/Tq"
-    css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.1/dist/css/coreui.rtl.min.css"
-    css_rtl_hash:    "sha384-Zut1J9ACJ9O+ozO8gNnuUfpQpIFIS7yoRyto6yZR74CsaeyPp6j+Y+l23heb39qn"
-    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.1/dist/js/coreui.min.js"
-    js_hash:         "sha384-BJ8bcuD348g3CWqtoXRtsr/dMU7WNU3LIX0Yvwh5SXNklgYiZBKyzDocjlhjD9zS"
-    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.1/dist/js/coreui.bundle.min.js"
-    js_bundle_hash:  "sha384-U458M/BK6nVQU+coBsTWgHPjguSr+qf2gGc1MAXy3+XPNZEJQBI/S8Eh6MxtjytS"
+    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.2/dist/css/coreui.min.css"
+    css_hash:        "sha384-eidiRNjqxFs5mKpb2r1FzRdTDAFpNido5JZbkZdByYyPTUL1Qnz2loezWjxSzN6Q"
+    css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.2/dist/css/coreui.rtl.min.css"
+    css_rtl_hash:    "sha384-kG+5O6vkrnajK0U1lpeJZEmhMbEU0iMbJvaZFkIN3qC6kzzjGYCWrbDai4Vu5118"
+    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.2/dist/js/coreui.min.js"
+    js_hash:         "sha384-FyK9SVbJTjYdWLlhzWpotrpslJ5xhBhJWoho44s7pID8dOQ4+jujpE3627bQ5PsP"
+    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.2/dist/js/coreui.bundle.min.js"
+    js_bundle_hash:  "sha384-dEOnj/ctikFeEwVq8K7ixcBQ0dMxznkPtfdylOixrO89Zv27hbyi7AYKpYS98ljU"
     popper:           "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
     popper_hash:      "sha384-q9CRHqZndzlxGLOj+xrdLDJa9ittGte1NksRmgJKeCV9DrM7Kz868XYqsKWPpAmn"

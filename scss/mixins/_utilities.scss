@@ -34,6 +34,9 @@
     // Add theme prefix
     $theme-prefix: if(map-has-key($utility, theme-prefix), map-get($utility, theme-prefix), false);
 
+    // Generate RTL version
+    $generate-rtl: if(map-has-key($utility, rtl), map-get($utility, rtl), false);
+
     @if map-get($utility, rfs) {
       // Inside the media query
       @if $is-rfs-media-query {
@@ -74,7 +77,11 @@
                 --#{$variable-prefix}#{$local-var}: #{$variable};
               }
             }
-            #{$property}: $value if($enable-important-utilities, !important, null);
+            @if $generate-rtl == true {
+              @include ltr-rtl($property, $value, null, null, if($enable-important-utilities, !important, null));
+            } @else {
+              #{$property}: $value if($enable-important-utilities, !important, null);
+            }
           }
         }
 
