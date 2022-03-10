@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.1.1 (https://coreui.io)
+  * CoreUI v4.1.2 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -2463,7 +2463,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.1): loading-button.js
+   * CoreUI (v4.1.2): loading-button.js
    * Licensed under MIT (https://coreui.io/license)
    */
   /**
@@ -3406,7 +3406,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.1.1): multi-select.js
+   * CoreUI PRO (v4.1.2): multi-select.js
    * License (https://coreui.io/pro/license)
    * --------------------------------------------------------------------------
    */
