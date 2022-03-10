@@ -17,7 +17,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.1): alert.js
+   * CoreUI (v4.1.3): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -134,7 +134,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.1): tab.js
+   * CoreUI (v4.1.3): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js

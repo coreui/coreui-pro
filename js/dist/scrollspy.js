@@ -18,7 +18,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.1): alert.js
+   * CoreUI (v4.1.3): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -155,7 +155,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.1): scrollspy.js
+   * CoreUI (v4.1.3): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js

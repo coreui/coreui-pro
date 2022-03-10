@@ -54,8 +54,8 @@ params:
   social_image_path:    /assets/brand/coreui-social.jpg
   social_logo_path:     /assets/brand/coreui-social-logo.png
 
-  current_version:      "4.1.1"
-  current_ruby_version: "4.1.1"
+  current_version:      "4.1.3"
+  current_ruby_version: "4.1.3"
   docs_version:         "4.1"
   rfs_version:          "9.0.3"
   github_org:           "https://github.com/coreui"
@@ -66,8 +66,8 @@ params:
   icons:                "https://icons.coreui.io/"
 
   download:
-    source:             "https://github.com/coreui/coreui/archive/v4.1.1.zip"
-    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.1/coreui-4.1.1-dist.zip"
+    source:             "https://github.com/coreui/coreui/archive/v4.1.3.zip"
+    dist:               "https://github.com/coreui/coreui/releases/download/v4.1.3/coreui-4.1.3-dist.zip"
 
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
