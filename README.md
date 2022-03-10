@@ -43,7 +43,7 @@ Several quick start options are available:
 - Clone the repo: `git clone https://github.com/coreui/coreui.git`
 - Install with [npm](https://www.npmjs.com/): `npm install @coreui/coreui`
 - Install with [yarn](https://yarnpkg.com/): `yarn add @coreui/coreui`
-- Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui:4.1.2`
+- Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui:4.1.3`
 
 Read the [Getting started page](https://coreui.io/docs/getting-started/introduction/) for information on the framework contents, templates and examples, and more.
 

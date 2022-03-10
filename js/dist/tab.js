@@ -1,5 +1,5 @@
 /*!
-  * CoreUI tab.js v4.1.2 (https://coreui.io)
+  * CoreUI tab.js v4.1.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
