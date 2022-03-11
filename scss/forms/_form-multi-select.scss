@@ -6,7 +6,8 @@
   position: relative;
   display: block;
   width: 100%;
-  padding: $form-multi-select-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding) $form-multi-select-padding-y $form-multi-select-padding-x;
+  padding: $form-multi-select-padding-y $form-multi-select-padding-x;
+  @include ltr-rtl("padding-right", ($form-select-indicator-padding));
   font-family: $form-multi-select-font-family;
   @include font-size($form-multi-select-font-size);
   font-weight: $form-multi-select-font-weight;
@@ -15,7 +16,7 @@
   background-color: var(--#{$variable-prefix}form-multi-select-bg, $form-multi-select-bg);
   background-image: escape-svg($form-multi-select-indicator);
   background-repeat: no-repeat;
-  background-position: $form-multi-select-bg-position;
+  @include ltr-rtl-value-only("background-position", $form-multi-select-bg-position);
   background-size: $form-multi-select-bg-size;
   border: $form-multi-select-border-width solid var(--#{$variable-prefix}form-multi-select-border-color, $form-multi-select-border-color);
   @include border-radius($form-multi-select-border-radius, 0);
@@ -28,21 +29,18 @@
   }
 
   &.form-multi-select-with-cleaner {
-    padding: $form-multi-select-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x) $form-multi-select-padding-y $form-multi-select-padding-x;
+    @include ltr-rtl("padding-right", ($form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x));
   }
 }
 
 .form-multi-select-selection-tags {
   min-height: add(($form-multi-select-padding-y * 2) + ($form-multi-select-font-size * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-  padding: $form-multi-select-selection-tags-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding) $form-multi-select-selection-tags-padding-y $form-multi-select-selection-tags-padding-x;
-
-  &.form-multi-select-with-cleaner {
-    padding: $form-multi-select-selection-tags-padding-y ($form-multi-select-padding-x + $form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x) $form-multi-select-selection-tags-padding-y $form-multi-select-selection-tags-padding-x;
-  }
+  padding: $form-multi-select-selection-tags-padding-y $form-multi-select-selection-tags-padding-x;
+  @include ltr-rtl("padding-right", $form-multi-select-indicator-padding);
 
   .form-multi-select-search {
     height: ($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y) * 2 + ($form-multi-select-font-size * $form-multi-select-line-height);
-    margin-left: $form-multi-select-padding-x;
+    @include ltr-rtl("margin-left", $form-multi-select-padding-x);
   }
 }
 
@@ -54,14 +52,14 @@
 .form-multi-select-selection-cleaner {
   position: absolute;
   top: 50%;
-  right: 2rem;
+  @include ltr-rtl("right", $form-multi-select-indicator-padding);
   box-sizing: content-box;
   width: $form-multi-select-cleaner-width;
   height: $form-multi-select-cleaner-height;
   padding: $form-multi-select-cleaner-padding-y $form-multi-select-cleaner-padding-x;
   background: transparent var(--#{$variable-prefix}form-multi-select-cleaner-bg, escape-svg($form-multi-select-cleaner-bg)) center / $form-multi-select-cleaner-width auto no-repeat;
   border: 0; // for button elements
-  border-right: 1px solid var(--#{$variable-prefix}form-multi-select-cleaner-border-color, $form-multi-select-cleaner-border-color);
+  @include ltr-rtl("border-right", 1px solid var(--#{$variable-prefix}form-multi-select-cleaner-border-color, $form-multi-select-cleaner-border-color));
   transform: translateY(-50%);
 
   &:hover {
@@ -75,7 +73,7 @@
 }
 
 .form-multi-select-search {
-  max-width: 100%;
+  width: auto;
   padding: 0;
   font-family: inherit;
   font-size: inherit;
@@ -93,7 +91,7 @@
 
   &[size] {
     display: none;
-    margin-left: $form-multi-select-padding-x;
+    @include ltr-rtl("margin-left", $form-multi-select-padding-x);
   }
 
   &:placeholder-shown {
@@ -160,12 +158,12 @@
   }
 
   &.form-multi-select-option-with-checkbox {
-    padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x $form-multi-select-option-padding-y calc(#{$form-multi-select-option-padding-x} + #{$form-multi-select-option-indicator-width}); // stylelint-disable-line function-disallowed-list
-
+    padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x;
+    @include ltr-rtl("padding-left", calc(#{$form-multi-select-option-padding-x} + #{$form-multi-select-option-indicator-width}));
     &::before {
       position: absolute;
       top: .7rem;
-      left: $form-multi-select-option-padding-x * .5;
+      @include ltr-rtl("left",  $form-multi-select-option-padding-x * .5);
       display: block;
       width: $form-multi-select-option-indicator-width;
       height: $form-multi-select-option-indicator-width;
@@ -200,7 +198,7 @@
   text-transform: uppercase;
 }
 
-.form-multi-select-options-empty{
+.form-multi-select-options-empty {
   padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x;
 }
 
@@ -216,7 +214,7 @@
 
 .form-multi-select-tag-delete {
   padding: 0;
-  margin-left: 6px;
+  @include ltr-rtl("margin-left", $spacer * .5);
   background-color: transparent;
   border: 0;
 }
@@ -246,12 +244,14 @@
 .form-multi-select-sm {
   padding-top: $form-multi-select-padding-y-sm;
   padding-bottom: $form-multi-select-padding-y-sm;
-  padding-left: $form-multi-select-padding-x-sm;
+  @include ltr-rtl("padding-left",  $form-multi-select-padding-x-sm);
   @include font-size($form-multi-select-font-size-sm);
 
   &.form-multi-select-selection-tags {
     min-height: add(($form-multi-select-padding-y-sm * 2) + ($form-multi-select-font-size-sm * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-    padding: $form-multi-select-selection-tags-padding-y-sm ($form-multi-select-padding-x-sm + $form-multi-select-indicator-padding) $form-multi-select-selection-tags-padding-y-sm $form-multi-select-selection-tags-padding-x-sm;
+    padding-top: $form-multi-select-selection-tags-padding-y-sm;
+    padding-bottom: $form-multi-select-selection-tags-padding-y-sm;
+    @include ltr-rtl("padding-left",  $form-multi-select-selection-tags-padding-x-sm);
 
     .form-multi-select-search {
       height: ($form-multi-select-padding-y-sm - $form-multi-select-selection-tags-padding-y-sm) * 2 + ($form-multi-select-font-size-sm * $form-multi-select-line-height);
@@ -268,12 +268,14 @@
 .form-multi-select-lg {
   padding-top: $form-multi-select-padding-y-lg;
   padding-bottom: $form-multi-select-padding-y-lg;
-  padding-left: $form-multi-select-padding-x-lg;
+  @include ltr-rtl("padding-left",  $form-multi-select-padding-x-lg);
   @include font-size($form-multi-select-font-size-lg);
 
   &.form-multi-select-selection-tags {
     min-height: add(($form-multi-select-padding-y-lg * 2) + ($form-multi-select-font-size-lg * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-    padding: $form-multi-select-selection-tags-padding-y-lg ($form-multi-select-padding-x-lg + $form-multi-select-indicator-padding) $form-multi-select-selection-tags-padding-y-lg $form-multi-select-selection-tags-padding-x-lg;
+    padding-top: $form-multi-select-selection-tags-padding-y-lg;
+    padding-bottom: $form-multi-select-selection-tags-padding-y-lg;
+    @include ltr-rtl("padding-left",  $form-multi-select-selection-tags-padding-x-lg);
   }
 
   .form-multi-select-tag {
