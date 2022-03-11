@@ -421,6 +421,7 @@ class MultiSelect extends BaseComponent {
     if (this._config.cleaner && this._config.multiple) {
       const cleaner = document.createElement('button')
       cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER)
+      cleaner.style.display = 'none'
       this._clone.append(cleaner)
       this._clone.classList.add(CLASS_NAME_SELECT_WITH_CLEANER)
 
