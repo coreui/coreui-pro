@@ -2,7 +2,8 @@ export const convertToLocalDate = (d, locale, options = {}) => d.toLocaleDateStr
 export const convertToLocalTime = (d, locale, options = {}) => d.toLocaleTimeString(locale, options)
 export const createGroupsInArray = (arr, numberOfGroups) => {
   const perGroup = Math.ceil(arr.length / numberOfGroups)
-  return Array.from({ length: numberOfGroups })
+  // eslint-disable-next-line unicorn/no-new-array
+  return new Array(numberOfGroups)
         .fill('')
         .map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup))
 }
@@ -102,7 +103,7 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   return weeks
 }
 
-export const isDisabled = (date, min, max, dates) => {
+export const isDateDisabled = (date, min, max, dates) => {
   let disabled
   if (dates) {
     dates.forEach(_date => {
@@ -161,4 +162,9 @@ export const isToday = date => {
   return (date.getDate() === today.getDate() &&
         date.getMonth() === today.getMonth() &&
         date.getFullYear() === today.getFullYear())
+}
+
+export const isValidDate = date => {
+  const d = new Date(date)
+  return d instanceof Date && d.getTime()
 }

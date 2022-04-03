@@ -1,10 +1,8 @@
-/* eslint-disable multiline-ternary */
-/* eslint-disable no-mixed-operators */
-/* eslint-disable indent */
+/* eslint-disable indent, multiline-ternary */
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.1.0): calendar.js
- * Licensed under MIT (https://coreui.io/license)
+ * CoreUI PRO (v4.2.0-beta.2): calendar.js
+ * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
@@ -16,7 +14,7 @@ import {
   getMonthDetails,
   getMonthsNames,
   getYears,
-  isDisabled,
+  isDateDisabled,
   isDateInRange,
   isDateSelected,
   isLastDayOfMonth,
@@ -54,13 +52,13 @@ const Default = {
   disabledDates: null,
   endDate: null,
   firstDayOfWeek: 1,
-  locale: navigator.language,
+  locale: 'default',
   maxDate: null,
   minDate: null,
   range: true,
   startDate: null,
   selectEndDate: false,
-  weekdayLength: 2
+  weekdayFormat: 2
 }
 
 const DefaultType = {
@@ -74,7 +72,7 @@ const DefaultType = {
   range: 'boolean',
   startDate: '(date|string|null)',
   selectEndDate: 'boolean',
-  weekdayLength: 'number'
+  weekdayFormat: '(number|string)'
 }
 
 /**
@@ -158,7 +156,7 @@ class Calendar extends BaseComponent {
 
     EventHandler.on(this._element, 'click', '.btn-double-prev', event => {
       event.preventDefault()
-      this._modifyCalendarDate(-1)
+      this._modifyCalendarDate(this._view === 'years' ? -10 : -1)
     })
 
     EventHandler.on(this._element, 'click', '.btn-next', event => {
@@ -168,7 +166,7 @@ class Calendar extends BaseComponent {
 
     EventHandler.on(this._element, 'click', '.btn-double-next', event => {
       event.preventDefault()
-      this._modifyCalendarDate(1)
+      this._modifyCalendarDate(this._view === 'years' ? 10 : 1)
     })
 
     EventHandler.on(this._element, 'click', '.btn-month', event => {
@@ -209,9 +207,11 @@ class Calendar extends BaseComponent {
 
     this._calendarDate = d
 
-    EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-      date: d
-    })
+    if (this._view === 'days') {
+      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+        date: d
+      })
+    }
 
     this._updateCalendar()
   }
@@ -233,7 +233,7 @@ class Calendar extends BaseComponent {
   }
 
   _selectDate(date) {
-    if (isDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -254,7 +254,7 @@ class Calendar extends BaseComponent {
   }
 
   _createCalendar() {
-    const { firstDayOfWeek, locale, weekdayLength } = this._config
+    const { firstDayOfWeek, locale, weekdayFormat } = this._config
     const year = this._calendarDate.getFullYear()
     const month = this._calendarDate.getMonth()
 
@@ -266,9 +266,9 @@ class Calendar extends BaseComponent {
         <button class="btn btn-transparent btn-sm btn-double-prev">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        <button class="btn btn-transparent btn-sm btn-prev">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
-        </button>
+        </button>` : ''}
       </div>
       <div class="calendar-nav-date">
         <button class="btn btn-transparent btn-sm btn-month">
@@ -279,9 +279,9 @@ class Calendar extends BaseComponent {
         </button>
       </div>
       <div class="calendar-nav-next">
-        <button class="btn btn-transparent btn-sm btn-next">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
-        </button>
+        </button>` : ''}
         <button class="btn btn-transparent btn-sm btn-double-next">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
@@ -301,7 +301,11 @@ class Calendar extends BaseComponent {
           ${weekDays.map(({ date }) => (
             `<th class="calendar-cell">
               <div class="calendar-header-cell-inner">
-                ${date.toLocaleDateString(locale, { weekday: 'long' }).slice(0, weekdayLength)}
+              ${typeof weekdayFormat === 'string' ?
+              date.toLocaleDateString(locale, { weekday: weekdayFormat }) :
+              date
+                  .toLocaleDateString(locale, { weekday: 'long' })
+                  .slice(0, weekdayFormat)}
               </div>
             </th>`
           )).join('')}
@@ -311,17 +315,16 @@ class Calendar extends BaseComponent {
         ${this._view === 'days' ? monthDetails.map(week => (
           `<tr>${week.map(({ date, month }) => (
             `<td class="calendar-cell ${this._dayClassNames(date, month)}">
-              <div
-                class="calendar-cell-inner day"
-                data-coreui-date="${date}"
-              >${date.toLocaleDateString(locale, { day: 'numeric' })}</div>
+              <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                ${date.toLocaleDateString(locale, { day: 'numeric' })}
+              </div>
             </td>`
           )).join('')}</tr>`
         )).join('') : ''}
         ${this._view === 'months' ? listOfMonths.map((row, index) => (
           `<tr>${row.map((month, idx) => (
             `<td class="calendar-cell">
-              <div class="calendar-cell-inner month" data-coreui-month="${index * 3 + idx}">
+              <div class="calendar-cell-inner month" data-coreui-month="${(index * 3) + idx}">
                 ${month}
               </div>
             </td>`
@@ -351,7 +354,7 @@ class Calendar extends BaseComponent {
   _dayClassNames(date, month) {
     const classNames = [
       isToday(date) && 'today',
-      isDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled',
+      isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled',
       `${month}`,
       isLastDayOfMonth(date) && 'last',
       month === 'current' && isDateInRange(date, this._startDate, this._endDate) && 'range',

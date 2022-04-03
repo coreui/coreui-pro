@@ -26,6 +26,11 @@
       width: var(--#{$variable-prefix}calendar-table-cell-size);
     }
   }
+
+  &.months ~ .time-picker,
+  &.years ~ .time-picker {
+    display: none;
+  }
 }
 
 .calendar-nav {
