@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.0-alpha.0): date-range-picker.js
- * Licensed under MIT (https://coreui.io/license)
+ * CoreUI PRO (v4.2.0-beta.2): date-range-picker.js
+ * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
@@ -9,6 +9,7 @@ import { defineJQueryPlugin, typeCheckConfig } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
+import { isValidDate } from './util/calendar'
 import Calendar from './calendar'
 import Picker from './picker'
 import TimePicker from './time-picker'
@@ -40,12 +41,15 @@ const Default = {
   disabledDates: null,
   endDate: null,
   firstDayOfWeek: 1,
-  locale: navigator.language,
+  indicator: true,
+  locale: 'default',
   maxDate: null,
   minDate: null,
   placeholder: ['Start date', 'End date'],
   range: true,
   ranges: {},
+  rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
+  separator: true,
   size: null,
   startDate: null,
   selectEndDate: false,
@@ -62,12 +66,15 @@ const DefaultType = {
   disabled: 'boolean',
   endDate: '(date|string|null)',
   firstDayOfWeek: 'number',
+  indicator: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   placeholder: '(array|string)',
   range: 'boolean',
   ranges: 'object',
+  rangesButtonsClasses: '(array|string)',
+  separator: 'boolean',
   size: '(string|null)',
   startDate: '(date|string|null)',
   selectEndDate: 'boolean',
@@ -88,6 +95,8 @@ class DateRangePicker extends Picker {
     this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date())
     this._startDate = this._convertStringToDate(this._config.date || this._config.startDate)
     this._endDate = this._convertStringToDate(this._config.endDate)
+    this._initialStartDate = null
+    this._initialEndDate = null
     this._mobile = window.innerWidth < 768
     this._selectEndDate = this._config.selectEndDate
 
@@ -106,6 +115,7 @@ class DateRangePicker extends Picker {
     this._addEventListeners()
     this._addCalendarEventListeners()
   }
+
   // Getters
 
   static get Default() {
@@ -122,8 +132,17 @@ class DateRangePicker extends Picker {
 
   // Public
 
+  cancel() {
+    this._endDate = this._initialEndDate
+    this._endInput.value = this._setInputValue(this._initialEndDate)
+    this._startDate = this._initialStartDate
+    this._startInput.value = this._setInputValue(this._initialStartDate)
+    this._calendars.innerHTML = ''
+    this._createCalendars()
+    this._addCalendarEventListeners()
+  }
+
   clear() {
-    this._date = null
     this._endDate = null
     this._endInput.value = ''
     this._startDate = null
@@ -134,7 +153,6 @@ class DateRangePicker extends Picker {
   }
 
   reset() {
-    this._date = null
     this._endDate = this._config.endDate
     this._endInput.value = this._setInputValue(this._config.endDate)
     this._startDate = this._config.startDate
@@ -155,19 +173,48 @@ class DateRangePicker extends Picker {
 
   // Private
   _addEventListeners() {
+    EventHandler.on(this._element, 'shown.coreui.dropdown', () => {
+      this._initialStartDate = new Date(this._startDate)
+      this._initialEndDate = new Date(this._endDate)
+    })
+
     EventHandler.on(this._startInput, 'click', () => {
+      this._dropdown.show()
       this._selectEndDate = false
+      this._updateCalendars()
     })
+
+    EventHandler.on(this._startInput, 'input', event => {
+      if (isValidDate(event.target.value)) {
+        this._startDate = this._convertStringToDate(event.target.value)
+        this._calendarDate = this._startDate
+        this._updateCalendars()
+      }
+    })
+
     EventHandler.on(this._endInput, 'click', () => {
+      this._dropdown.show()
       this._selectEndDate = true
+      this._updateCalendars()
     })
+
+    EventHandler.on(this._endInput, 'input', event => {
+      if (isValidDate(event.target.value)) {
+        this._endDate = this._convertStringToDate(event.target.value)
+        this._calendarDate = this._endDate
+        this._updateCalendars()
+      }
+    })
+
     EventHandler.on(this._element, 'click', '.picker-input-group-cleaner', event => {
       event.stopPropagation()
       this.clear()
     })
+
     EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
-      this.reset()
+      this.cancel()
     })
+
     EventHandler.on(window, 'resize', () => {
       this._mobile = window.innerWidth < 768
     })
@@ -175,31 +222,36 @@ class DateRangePicker extends Picker {
 
   _addCalendarEventListeners() {
     SelectorEngine.find('.calendar', this._element).forEach(calendar => {
-      EventHandler.on(calendar, 'calendarDateChange.coreui.calendar', event => {
-        this._calendarDate = event.date
-
-        this._updateCalendars()
-      })
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date
         this._selectEndDate = event.selectEndDate
         this._startInput.value = this._setInputValue(event.date)
         this._updateCalendars()
 
+        if (!this._config.range && (!this._config.footer && !this._config.timepicker)) {
+          this._dropdown.hide()
+        }
+
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
           date: event.date
         })
       })
+
       EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
         this._endDate = event.date
         this._selectEndDate = event.selectEndDate
         this._endInput.value = this._setInputValue(event.date)
         this._updateCalendars()
 
+        if (this._startDate && (!this._config.footer && !this._config.timepicker)) {
+          this._dropdown.hide()
+        }
+
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
           date: event.date
         })
       })
+
       EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
         if (this._selectEndDate) {
           this._endInput.value = event.date ? event.date.toLocaleDateString(this._config.locale) : (this._endDate ? this._setInputValue(this._endDate) : '')
@@ -244,10 +296,12 @@ class DateRangePicker extends Picker {
 
     const inputGroupTextEl = document.createElement('span')
     inputGroupTextEl.classList.add('input-group-text')
-    inputGroupTextEl.innerHTML = `
-      <span class="picker-input-group-indicator">
-        <span class="picker-input-group-icon time-picker-input-icon"></span>
-      </span>`
+    if (this._config.indicator) {
+      inputGroupTextEl.innerHTML = `
+        <span class="picker-input-group-indicator">
+          <span class="picker-input-group-icon time-picker-input-icon"></span>
+        </span>`
+    }
 
     if (this._config.cleaner) {
       inputGroupTextEl.innerHTML += `
@@ -259,19 +313,24 @@ class DateRangePicker extends Picker {
     this._startInput = startInputEl
     this._endInput = endInputEl
 
+    inputGroupEl.append(startInputEl)
+
+    if (this._config.separator) {
+      inputGroupEl.append(inputGroupTextSeparatorEl)
+    }
+
     if (this._config.range) {
-      inputGroupEl.append(startInputEl, inputGroupTextSeparatorEl, endInputEl, inputGroupTextEl)
-    } else {
-      inputGroupEl.append(startInputEl, inputGroupTextEl)
+      inputGroupEl.append(endInputEl)
+    }
+
+    if (this._config.indicator || this._config.cleaner) {
+      inputGroupEl.append(inputGroupTextEl)
     }
 
     return inputGroupEl
   }
 
   _createCalendars() {
-    const calendarStartElement = document.createElement('div')
-    calendarStartElement.classList.add('date-picker-calendar')
-
     Array.from({ length: this._mobile ? 1 : this._config.calendars }).forEach((_, index) => {
       const calendarEl = document.createElement('div')
       calendarEl.classList.add('date-picker-calendar')
@@ -296,6 +355,15 @@ class DateRangePicker extends Picker {
         startDate: this._startDate
       })
 
+      EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
+        this._calendarDate = new Date(
+          event.date.getFullYear(),
+          event.date.getMonth() - index,
+          1
+        )
+        this._updateCalendars()
+      })
+
       if (this._config.timepicker) {
         if ((this._config.calendars === 1 || this._mobile) && this._config.range) {
           const timePickerStartEl = document.createElement('div')
@@ -306,12 +374,12 @@ class DateRangePicker extends Picker {
             container: 'inline',
             disabled: !this._startDate,
             locale: this._config.locale,
-            value: this._startDate,
+            time: this._startDate,
             variant: 'select'
           })
           calendarEl.append(timePickerStartEl)
 
-          EventHandler.one(timePickerStartEl, 'change.coreui.timepicker', event => {
+          EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
             this._startDate = event.date
             this._startInput.value = this._setInputValue(this._startDate)
             this._updateCalendars()
@@ -325,12 +393,12 @@ class DateRangePicker extends Picker {
             container: 'inline',
             disabled: !this._endDate,
             locale: this._config.locale,
-            value: this._endDate,
+            time: this._endDate,
             variant: 'select'
           })
           calendarEl.append(timePickerEndEl)
 
-          EventHandler.one(timePickerEndEl, 'change.coreui.time-picker', event => {
+          EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
             this._endDate = event.date
             this._endInput.value = this._setInputValue(this._endDate)
             this._updateCalendars()
@@ -346,12 +414,12 @@ class DateRangePicker extends Picker {
             container: 'inline',
             disabled: index === 0 ? !this._startDate : !this._endDate,
             locale: this._config.locale,
-            value: index === 0 ? this._startDate : this._endDate,
+            time: index === 0 ? this._startDate : this._endDate,
             variant: 'select'
           })
           calendarEl.append(timePickerEl)
 
-          EventHandler.one(timePickerEl, 'change.coreui.time-picker', event => {
+          EventHandler.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
             if (index === 0) {
               this._startDate = event.date
               this._startInput.value = this._setInputValue(this._startDate)
@@ -385,7 +453,7 @@ class DateRangePicker extends Picker {
 
       Object.keys(this._config.ranges).forEach(key => {
         const buttonEl = document.createElement('button')
-        buttonEl.classList.add('btn', 'btn-ghost-secondary')
+        buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses))
         buttonEl.role = 'button'
         buttonEl.addEventListener('click', () => {
           this._startDate = this._config.ranges[key][0]
