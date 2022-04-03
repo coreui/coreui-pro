@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.2.0-beta.1): multi-select.js
- * License (https://coreui.io/pro/license)
+ * CoreUI PRO (v4.2.0-beta.2): multi-select.js
+ * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 

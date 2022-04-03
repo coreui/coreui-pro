@@ -1,7 +1,8 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.0-beta.1): loading-button.js
- * Licensed under MIT (https://coreui.io/license)
+ * CoreUI PRO (v4.2.0-beta.2): loading-button.js
+ * License (https://coreui.io/pro/license-new/)
+ * --------------------------------------------------------------------------
  */
 
 import {
