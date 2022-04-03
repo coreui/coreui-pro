@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.1.0): date-picker.js
- * Licensed under MIT (https://coreui.io/license)
+ * CoreUI PRO (v4.2.0-beta.2): date-picker.js
+ * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
@@ -30,7 +30,8 @@ const Default = {
   ...DateRangePicker.Default,
   calendars: 1,
   placeholder: ['Select date'],
-  range: false
+  range: false,
+  separator: false
 }
 
 const DefaultType = {
