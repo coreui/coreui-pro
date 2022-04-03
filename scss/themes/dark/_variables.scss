@@ -514,7 +514,6 @@ $list-group-variants-dt: (
 
 // Modals
 
-// Dark theme
 // scss-docs-start modal-dark-theme
 $modal-content-color-dt:         null !default;
 $modal-content-bg-dt:            $bg-elevation-24 !default;
@@ -568,9 +567,24 @@ $nav-theme-map: (
   "nav-underline-link-active-border-color":  $nav-underline-link-active-border-color-dt
 ) !default;
 
-// Pagination
-// scss-docs-start pagination-variables
+// Offcanvas
 
+// scss-docs-start offcanvas-dark-theme
+$offcanvas-color-dt:         null !default;
+$offcanvas-bg-color-dt:      $bg-elevation-12 !default;
+$offcanvas-border-color-dt:  transparent !default;
+// scss-docs-end offcanvas-dark-theme
+
+$offcanvas-theme-map: (
+  "offcanvas-color":         $offcanvas-color-dt,
+  "offcanvas-bg-color":      $offcanvas-bg-color-dt,
+  "offcanvas-border-color":  $offcanvas-border-color-dt
+) !default;
+
+
+// Pagination
+
+// scss-docs-start pagination-variables
 $pagination-color-dt:                  $link-color-dt !default;
 $pagination-bg-dt:                     transparent !default;
 $pagination-border-color-dt:           $border-color-dt !default;
@@ -828,6 +842,7 @@ $theme-map: (
   "list-group":         $list-group-theme-map,
   "modal":              $modal-theme-map,
   "nav":                $nav-theme-map,
+  "offcanvas":          $offcanvas-theme-map,
   "pagination":         $pagination-theme-map,
   "picker":             $picker-theme-map,
   "popover":            $popover-theme-map,
