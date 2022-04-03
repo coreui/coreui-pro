@@ -22,7 +22,7 @@ npm install @coreui/coreui-pro@next
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
   </div>
   <div class="col-lg-4">
-    <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker" data-coreui-value="02:17:35 PM"></div>
+    <div class="time-picker" data-coreui-locale="en-US" data-coreui-time="02:17:35 PM" data-coreui-toggle="time-picker"></div>
   </div>
 </div>
 {{< /example >}}
@@ -33,7 +33,7 @@ Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and 
 
 {{< example >}}
 <div class="row mb-4">
-  <div class="col-lg-4">
+  <div class="col-lg-5">
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="time-picker"></div>
   </div>
 </div>
@@ -174,16 +174,34 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
   </thead>
   <tbody>
     <tr>
-      <td><code>cancelButtonText</code></td>
+      <td><code>cancelButtonLabel</code></td>
       <td>string</td>
       <td><code>'Cancel'</code></td>
-      <td>Cancel button text.</td>
+      <td>Cancel button inner HTML</td>
+    </tr>
+    <tr>
+      <td><code>cancelButtonClasses</code></td>
+      <td>array | string</td>
+      <td><code>['btn', 'btn-sm', 'btn-ghost-primary']</code></td>
+      <td>CSS class names that will be added to the cancel button</td>
     </tr>
     <tr>
       <td><code>cleaner</code></td>
       <td>boolean</td>
       <td><code>true</code></td>
       <td>Enables selection cleaner element.</td>
+    </tr>
+    <tr>
+      <td><code>confirmButtonLabel</code></td>
+      <td>string</td>
+      <td><code>'OK'</code></td>
+      <td>Confirm button inner HTML</td>
+    </tr>
+    <tr>
+      <td><code>confirmButtonClasses</code></td>
+      <td>array | string</td>
+      <td><code>['btn', 'btn-sm', 'btn-primary']</code></td>
+      <td>CSS class names that will be added to the confirm button</td>
     </tr>
     <tr>
       <td><code>container</code></td>
@@ -204,6 +222,12 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>Toggle the disabled state for the component.</td>
     </tr>
     <tr>
+      <td><code>indicator</code></td>
+      <td>boolean</td>
+      <td><code>true</code></td>
+      <td>Toggle visibility or set the content of the input indicator.</td>
+    </tr>
+    <tr>
       <td><code>inputReadOnly</code></td>
       <td>boolean</td>
       <td><code>false</code></td>
@@ -212,14 +236,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
     <tr>
       <td><code>locale</code></td>
       <td>string</td>
-      <td><code>navigator.language</code></td>
+      <td><code>'default'</code></td>
       <td>Sets the default locale for components. If not set, it is inherited from the navigator.language.</td>
-    </tr>
-    <tr>
-      <td><code>okButtonText</code></td>
-      <td>string</td>
-      <td><code>'OK'</code></td>
-      <td>Ok button text.</td>
     </tr>
     <tr>
       <td><code>placeholder</code></td>
@@ -234,7 +252,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>Size the component small or large.</td>
     </tr>
     <tr>
-      <td><code>value</code></td>
+      <td><code>time</code></td>
       <td>date | string | null</td>
       <td><code>null</code></td>
       <td>Default value of the component</td>
@@ -257,25 +275,25 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <th>Description</th>
     </tr>
   </thead>
-  <tbody>
+   <tbody>
     <tr>
       <td><code>clear</code></td>
-      <td></td>
+      <td>Clear selection of the time picker.</td>
     </tr>
     <tr>
       <td><code>reset</code></td>
-      <td></td>
+      <td>Reset selection of the time picker to the initial value.</td>
     </tr>
     <tr>
       <td><code>update</code></td>
       <td>
-        Updates the position of an element's dropdown.
+        Updates the configuration of the time picker.
       </td>
     </tr>
     <tr>
       <td><code>dispose</code></td>
       <td>
-        Destroys an element's dropdown. (Removes stored data on the DOM element)
+        Destroys a component. (Removes stored data on the DOM element)
       </td>
     </tr>
     <tr>
@@ -283,7 +301,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <code>getInstance</code>
       </td>
       <td>
-        Static method which allows you to get the dropdown instance associated to a DOM element, you can use it like this: <code>coreui.TimePicker.getInstance(element)</code>
+        Static method which allows you to get the time picker instance associated to a DOM element, you can use it like this: <code>coreui.TimePicker.getInstance(element)</code>
       </td>
     </tr>
     <tr>
@@ -291,7 +309,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <code>getOrCreateInstance</code>
       </td>
       <td>
-        Static method which returns a dropdown instance associated to a DOM element or create a new one in case it wasn't initialized.
+        Static method which returns a time picker instance associated to a DOM element or create a new one in case it wasn't initialized.
         You can use it like this: <code>coreui.TimePicker.getOrCreateInstance(element)</code>
       </td>
     </tr>
@@ -310,7 +328,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
   <tbody>
     <tr>
       <td>
-        <code>change.coreui.time-picker</code>
+        <code>timeChange.coreui.time-picker</code>
       </td>
       <td>
         Callback fired when the value changed.
@@ -321,7 +339,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 
 ```js
 var myTimePicker = document.getElementById('myTimePicker')
-myTimePicker.addEventListener('change.coreui.time-picker', function (timeString, localeTimeString, date) {
+myTimePicker.addEventListener('timeChange.coreui.time-picker', function (timeString, localeTimeString, date) {
   // do something...
 })
 ```

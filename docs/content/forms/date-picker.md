@@ -27,6 +27,19 @@ npm install @coreui/coreui-pro@next
   </div>
 {{< /example >}}
 
+### With footer
+
+{{< example >}}
+  <div class="row">
+    <div class="col-lg-4">
+      <div data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+    <div class="col-lg-4">
+      <div data-coreui-date="2023/03/15" data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>
+{{< /example >}}
+
 ### With timepicker
 
 {{< example >}}
@@ -46,7 +59,7 @@ Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and 
 
 {{< example >}}
 <div class="row mb-4">
-  <div class="col-lg-4">
+  <div class="col-lg-5">
     <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-picker"></div>
   </div>
 </div>
@@ -220,10 +233,16 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>Default date of the component.</td>
     </tr>
     <tr>
-      <td><code>cancelButtonText</code></td>
+      <td><code>cancelButtonLabel</code></td>
       <td>string</td>
       <td><code>'Cancel'</code></td>
-      <td>Cancel button text.</td>
+      <td>Cancel button inner HTML</td>
+    </tr>
+    <tr>
+      <td><code>cancelButtonClasses</code></td>
+      <td>array | string</td>
+      <td><code>['btn', 'btn-sm', 'btn-ghost-primary']</code></td>
+      <td>CSS class names that will be added to the cancel button</td>
     </tr>
     <tr>
       <td><code>cleaner</code></td>
@@ -236,6 +255,24 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>date | string | null</td>
       <td><code>null</code></td>
       <td>Initial selected date.</td>
+    </tr>
+    <tr>
+      <td><code>confirmButtonLabel</code></td>
+      <td>string</td>
+      <td><code>'OK'</code></td>
+      <td>Confirm button inner HTML</td>
+    </tr>
+    <tr>
+      <td><code>confirmButtonClasses</code></td>
+      <td>array | string</td>
+      <td><code>['btn', 'btn-sm', 'btn-primary']</code></td>
+      <td>CSS class names that will be added to the confirm button</td>
+    </tr>
+    <tr>
+      <td><code>date</code></td>
+      <td>date | string | null</td>
+      <td><code>null</code></td>
+      <td>Default value of the component</td>
     </tr>
     <tr>
       <td><code>disabled</code></td>
@@ -267,21 +304,27 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       </td>
     </tr>
     <tr>
-      <td><code>inputReadOnly</code></td>
-      <td>boolean</td>
-      <td><code>false</code></td>
-      <td>Toggle the readonly state for the component.</td>
-    </tr>
-    <tr>
       <td><code>footer</code></td>
       <td>boolean</td>
       <td><code>false</code></td>
       <td>Toggle visibility of footer element.</td>
     </tr>
     <tr>
+      <td><code>indicator</code></td>
+      <td>boolean</td>
+      <td><code>true</code></td>
+      <td>Toggle visibility or set the content of the input indicator.</td>
+    </tr>
+    <tr>
+      <td><code>inputReadOnly</code></td>
+      <td>boolean</td>
+      <td><code>false</code></td>
+      <td>Toggle the readonly state for the component.</td>
+    </tr>
+    <tr>
       <td><code>locale</code></td>
       <td>string</td>
-      <td><code>navigator.language</code></td>
+      <td><code>'default'</code></td>
       <td>Sets the default locale for components. If not set, it is inherited from the navigator.language.</td>
     </tr>
     <tr>
@@ -295,12 +338,6 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>date | string | null</td>
       <td><code>null</code></td>
       <td>Min selectable date.</td>
-    </tr>
-    <tr>
-      <td><code>okButtonText</code></td>
-      <td>string</td>
-      <td><code>'OK'</code></td>
-      <td>Ok button text.</td>
     </tr>
     <tr>
       <td><code>placeholder</code></td>
@@ -321,22 +358,10 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>Provide an additional time selection by adding select boxes to choose times.</td>
     </tr>
     <tr>
-      <td><code>value</code></td>
-      <td>date | string | null</td>
-      <td><code>null</code></td>
-      <td>Default value of the component</td>
-    </tr>
-    <tr>
-      <td><code>variant</code></td>
-      <td><code>'inline'</code> | <code>'roll'</code></td>
-      <td><code>'roll'</code></td>
-      <td>TODO: add description</td>
-    </tr>
-    <tr>
-      <td><code>weekdayLength</code></td>
-      <td>number</td>
+      <td><code>weekdayFormat</code></td>
+      <td>number | string</td>
       <td><code>2</code></td>
-      <td>Set length of day name.</td>
+      <td>Set length or format of day name.</td>
     </tr>
   </tbody>
 </table>
@@ -353,22 +378,22 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
   <tbody>
     <tr>
       <td><code>clear</code></td>
-      <td>...</td>
+      <td>Clear selection of the date picker.</td>
     </tr>
     <tr>
       <td><code>reset</code></td>
-      <td>...</td>
+      <td>Reset selection of the date picker to the initial value.</td>
     </tr>
     <tr>
       <td><code>update</code></td>
       <td>
-        Updates the position of an element's dropdown.
+        Updates the configuration of the date picker.
       </td>
     </tr>
     <tr>
       <td><code>dispose</code></td>
       <td>
-        Destroys an element's dropdown. (Removes stored data on the DOM element)
+        Destroys a component. (Removes stored data on the DOM element)
       </td>
     </tr>
     <tr>
@@ -376,7 +401,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <code>getInstance</code>
       </td>
       <td>
-        Static method which allows you to get the dropdown instance associated to a DOM element, you can use it like this: <code>coreui.DatePicker.getInstance(element)</code>
+        Static method which allows you to get the date picker instance associated to a DOM element, you can use it like this: <code>coreui.DatePicker.getInstance(element)</code>
       </td>
     </tr>
     <tr>
@@ -384,7 +409,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <code>getOrCreateInstance</code>
       </td>
       <td>
-        Static method which returns a dropdown instance associated to a DOM element or create a new one in case it wasn't initialized.
+        Static method which returns a date picker instance associated to a DOM element or create a new one in case it wasn't initialized.
         You can use it like this: <code>coreui.DatePicker.getOrCreateInstance(element)</code>
       </td>
     </tr>

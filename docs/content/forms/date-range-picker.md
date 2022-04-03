@@ -32,6 +32,31 @@ npm install @coreui/coreui-pro@next
   </div>
 {{< /example >}}
 
+### With footer
+
+{{< example >}}
+  <div class="row mb-4">
+    <div class="col-lg-7">
+      <div
+        data-coreui-footer="true"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-7">
+      <div
+        data-coreui-start-date="2022/08/03"
+        data-coreui-end-date="2022/09/17"
+        data-coreui-footer="true"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
 ### With timepicker
 
 {{< example >}}
@@ -63,7 +88,7 @@ Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and 
 
 {{< example >}}
 <div class="row mb-4">
-  <div class="col-lg-5">
+  <div class="col-lg-6">
     <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -285,16 +310,34 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <td>The number of calendars that render on desktop devices.</td>
       </tr>
       <tr>
-        <td><code>cancelButtonText</code></td>
+        <td><code>cancelButtonLabel</code></td>
         <td>string</td>
         <td><code>'Cancel'</code></td>
-        <td>Cancel button text.</td>
+        <td>Cancel button inner HTML</td>
+      </tr>
+      <tr>
+        <td><code>cancelButtonClasses</code></td>
+        <td>array | string</td>
+        <td><code>['btn', 'btn-sm', 'btn-ghost-primary']</code></td>
+        <td>CSS class names that will be added to the cancel button</td>
       </tr>
       <tr>
         <td><code>cleaner</code></td>
         <td>boolean</td>
         <td><code>true</code></td>
         <td>Enables selection cleaner element.</td>
+      </tr>
+      <tr>
+        <td><code>confirmButtonLabel</code></td>
+        <td>string</td>
+        <td><code>'OK'</code></td>
+        <td>Confirm button inner HTML</td>
+      </tr>
+      <tr>
+        <td><code>confirmButtonClasses</code></td>
+        <td>array | string</td>
+        <td><code>['btn', 'btn-sm', 'btn-primary']</code></td>
+        <td>CSS class names that will be added to the confirm button</td>
       </tr>
       <tr>
         <td><code>disabled</code></td>
@@ -332,21 +375,27 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         </td>
       </tr>
       <tr>
-        <td><code>inputReadOnly</code></td>
-        <td>boolean</td>
-        <td><code>false</code></td>
-        <td>Toggle the readonly state for the component.</td>
-      </tr>
-      <tr>
         <td><code>footer</code></td>
         <td>boolean</td>
         <td><code>false</code></td>
         <td>Toggle visibility of footer element.</td>
       </tr>
       <tr>
+        <td><code>indicator</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Toggle visibility or set the content of the input indicator.</td>
+      </tr>
+      <tr>
+        <td><code>inputReadOnly</code></td>
+        <td>boolean</td>
+        <td><code>false</code></td>
+        <td>Toggle the readonly state for the component.</td>
+      </tr>
+      <tr>
         <td><code>locale</code></td>
         <td>string</td>
-        <td><code>navigator.language</code></td>
+        <td><code>'default'</code></td>
         <td>Sets the default locale for components. If not set, it is inherited from the navigator.language.</td>
       </tr>
       <tr>
@@ -362,15 +411,9 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <td>Min selectable date.</td>
       </tr>
       <tr>
-        <td><code>okButtonText</code></td>
-        <td>string</td>
-        <td><code>'OK'</code></td>
-        <td>Ok button text.</td>
-      </tr>
-      <tr>
         <td><code>placeholder</code></td>
         <td>string</td>
-        <td><code>'Select time'</code></td>
+        <td><code>['Start date', 'End date']</code></td>
         <td>Specifies a short hint that is visible in the input.</td>
       </tr>
       <tr>
@@ -378,6 +421,18 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <td>object</td>
         <td><code>{}</code></td>
         <td>Predefined date ranges the user can select from.</td>
+      </tr>
+      <tr>
+        <td><code>rangesButtonsClasses</code></td>
+        <td>array | string</td>
+        <td><code>['btn', 'btn-ghost-secondary']</code></td>
+        <td>CSS class names that will be added to ranges buttons</td>
+      </tr>
+      <tr>
+        <td><code>separator</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Toggle visibility or set the content of the inputs separator.</td>
       </tr>
       <tr>
         <td><code>size</code></td>
@@ -398,22 +453,10 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
         <td>Provide an additional time selection by adding select boxes to choose times.</td>
       </tr>
       <tr>
-        <td><code>value</code></td>
-        <td>date | string | null</td>
-        <td><code>null</code></td>
-        <td>Default value of the component</td>
-      </tr>
-      <tr>
-        <td><code>variant</code></td>
-        <td><code>'inline'</code> | <code>'roll'</code></td>
-        <td><code>'roll'</code></td>
-        <td>TODO: add description</td>
-      </tr>
-      <tr>
-        <td><code>weekdayLength</code></td>
-        <td>number</td>
+        <td><code>weekdayFormat</code></td>
+        <td>number | string</td>
         <td><code>2</code></td>
-        <td>Set length of day name.</td>
+        <td>Set length or format of day name.</td>
       </tr>
     </tbody>
   </table>
@@ -432,22 +475,22 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
     <tbody>
       <tr>
         <td><code>clear</code></td>
-        <td>...</td>
+        <td>Clear selection of the date range picker.</td>
       </tr>
       <tr>
         <td><code>reset</code></td>
-        <td>...</td>
+        <td>Reset selection of the date range picker to the initial value.</td>
       </tr>
       <tr>
         <td><code>update</code></td>
         <td>
-          Updates the position of an element's dropdown.
+          Updates the configuration of the date range picker.
         </td>
       </tr>
       <tr>
         <td><code>dispose</code></td>
         <td>
-          Destroys an element's dropdown. (Removes stored data on the DOM element)
+          Destroys a component. (Removes stored data on the DOM element)
         </td>
       </tr>
       <tr>
@@ -455,7 +498,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
           <code>getInstance</code>
         </td>
         <td>
-          Static method which allows you to get the dropdown instance associated to a DOM element, you can use it like this: <code>coreui.DateRangePicker.getInstance(element)</code>
+          Static method which allows you to get the date range picker instance associated to a DOM element, you can use it like this: <code>coreui.DateRangePicker.getInstance(element)</code>
         </td>
       </tr>
       <tr>
@@ -463,13 +506,14 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
           <code>getOrCreateInstance</code>
         </td>
         <td>
-          Static method which returns a dropdown instance associated to a DOM element or create a new one in case it wasn't initialized.
+          Static method which returns a date range picker instance associated to a DOM element or create a new one in case it wasn't initialized.
           You can use it like this: <code>coreui.DateRangePicker.getOrCreateInstance(element)</code>
         </td>
       </tr>
     </tbody>
   </table>
 </div>
+
 ### Events
 
 <div class="table-responsive">
@@ -503,7 +547,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 
 ```js
 var myDateRangePicker = document.getElementById('myDateRangePicker')
-myDateRangePicker.addEventListener('dateChange.coreui.date-range-picker', function (date) {
+myDateRangePicker.addEventListener('endDateChange.coreui.date-range-picker', function (date) {
   // do something...
 })
 ```
