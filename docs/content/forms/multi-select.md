@@ -26,7 +26,7 @@ toc: true
 {{< /example >}}
 
 {{< example >}}
-<select class="form-multi-select" multiple data-coreui-search="true" data-coreui-placeholder="sass --style expanded --source-map --embed-sources --no-error-css --load-path=node_modules/ src/scss/:dist/css/">
+<select class="form-multi-select" multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1" disabled>Bootstrap</option>
   <option value="2">React.js</option>

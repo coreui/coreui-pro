@@ -175,7 +175,7 @@
     return elementIsVisible;
   };
 
-  const isDisabled$1 = element => {
+  const isDisabled = element => {
     if (!element || element.nodeType !== Node.ELEMENT_NODE) {
       return true;
     }
@@ -775,7 +775,7 @@
         event.preventDefault();
       }
 
-      if (isDisabled$1(this)) {
+      if (isDisabled(this)) {
         return;
       }
 
@@ -1030,10 +1030,9 @@
   };
 
   const createGroupsInArray = (arr, numberOfGroups) => {
-    const perGroup = Math.ceil(arr.length / numberOfGroups);
-    return Array.from({
-      length: numberOfGroups
-    }).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
+    const perGroup = Math.ceil(arr.length / numberOfGroups); // eslint-disable-next-line unicorn/no-new-array
+
+    return new Array(numberOfGroups).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
   };
   const getMonthsNames = locale => {
     const months = [];
@@ -1126,7 +1125,7 @@
     });
     return weeks;
   };
-  const isDisabled = (date, min, max, dates) => {
+  const isDateDisabled = (date, min, max, dates) => {
     let disabled;
 
     if (dates) {
@@ -1176,8 +1175,12 @@
     const today = new Date();
     return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
   };
+  const isValidDate = date => {
+    const d = new Date(date);
+    return d instanceof Date && d.getTime();
+  };
 
-  /* eslint-disable multiline-ternary */
+  /* eslint-disable indent, multiline-ternary */
   /**
   * ------------------------------------------------------------------------
   * Constants
@@ -1203,13 +1206,13 @@
     disabledDates: null,
     endDate: null,
     firstDayOfWeek: 1,
-    locale: navigator.language,
+    locale: 'default',
     maxDate: null,
     minDate: null,
     range: true,
     startDate: null,
     selectEndDate: false,
-    weekdayLength: 2
+    weekdayFormat: 2
   };
   const DefaultType$j = {
     calendarDate: '(date|string|null)',
@@ -1222,7 +1225,7 @@
     range: 'boolean',
     startDate: '(date|string|null)',
     selectEndDate: 'boolean',
-    weekdayLength: 'number'
+    weekdayFormat: '(number|string)'
   };
   /**
   * ------------------------------------------------------------------------
@@ -1307,7 +1310,7 @@
       EventHandler.on(this._element, 'click', '.btn-double-prev', event => {
         event.preventDefault();
 
-        this._modifyCalendarDate(-1);
+        this._modifyCalendarDate(this._view === 'years' ? -10 : -1);
       });
       EventHandler.on(this._element, 'click', '.btn-next', event => {
         event.preventDefault();
@@ -1317,7 +1320,7 @@
       EventHandler.on(this._element, 'click', '.btn-double-next', event => {
         event.preventDefault();
 
-        this._modifyCalendarDate(1);
+        this._modifyCalendarDate(this._view === 'years' ? 10 : 1);
       });
       EventHandler.on(this._element, 'click', '.btn-month', event => {
         event.preventDefault();
@@ -1358,9 +1361,12 @@
       }
 
       this._calendarDate = d;
-      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-        date: d
-      });
+
+      if (this._view === 'days') {
+        EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+          date: d
+        });
+      }
 
       this._updateCalendar();
     }
@@ -1382,7 +1388,7 @@
     }
 
     _selectDate(date) {
-      if (isDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
         return;
       }
 
@@ -1407,7 +1413,7 @@
       const {
         firstDayOfWeek,
         locale,
-        weekdayLength
+        weekdayFormat
       } = this._config;
 
       const year = this._calendarDate.getFullYear();
@@ -1422,9 +1428,9 @@
         <button class="btn btn-transparent btn-sm btn-double-prev">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        <button class="btn btn-transparent btn-sm btn-prev">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
-        </button>
+        </button>` : ''}
       </div>
       <div class="calendar-nav-date">
         <button class="btn btn-transparent btn-sm btn-month">
@@ -1439,9 +1445,9 @@
         </button>
       </div>
       <div class="calendar-nav-next">
-        <button class="btn btn-transparent btn-sm btn-next">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
-        </button>
+        </button>` : ''}
         <button class="btn btn-transparent btn-sm btn-double-next">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
@@ -1460,9 +1466,11 @@
       date
     }) => `<th class="calendar-cell">
               <div class="calendar-header-cell-inner">
-                ${date.toLocaleDateString(locale, {
+              ${typeof weekdayFormat === 'string' ? date.toLocaleDateString(locale, {
+      weekday: weekdayFormat
+    }) : date.toLocaleDateString(locale, {
       weekday: 'long'
-    }).slice(0, weekdayLength)}
+    }).slice(0, weekdayFormat)}
               </div>
             </th>`).join('')}
         </tr>
@@ -1472,12 +1480,11 @@
       date,
       month
     }) => `<td class="calendar-cell ${this._dayClassNames(date, month)}">
-              <div
-                class="calendar-cell-inner day"
-                data-coreui-date="${date}"
-              >${date.toLocaleDateString(locale, {
+              <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                ${date.toLocaleDateString(locale, {
       day: 'numeric'
-    })}</div>
+    })}
+              </div>
             </td>`).join('')}</tr>`).join('') : ''}
         ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>${row.map((month, idx) => `<td class="calendar-cell">
               <div class="calendar-cell-inner month" data-coreui-month="${index * 3 + idx}">
@@ -1504,7 +1511,7 @@
     }
 
     _dayClassNames(date, month) {
-      const classNames = [isToday(date) && 'today', isDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled', `${month}`, isLastDayOfMonth(date) && 'last', month === 'current' && isDateInRange(date, this._startDate, this._endDate) && 'range', isDateSelected(date, this._startDate, this._endDate) && 'selected', isStartDate(date, this._startDate, this._endDate) && 'start', isEndDate(date, this._startDate, this._endDate) && 'end'];
+      const classNames = [isToday(date) && 'today', isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled', `${month}`, isLastDayOfMonth(date) && 'last', month === 'current' && isDateInRange(date, this._startDate, this._endDate) && 'range', isDateSelected(date, this._startDate, this._endDate) && 'selected', isStartDate(date, this._startDate, this._endDate) && 'start', isEndDate(date, this._startDate, this._endDate) && 'end'];
       return classNames.join(' ');
     }
 
@@ -1636,7 +1643,7 @@
 
     focusableChildren(element) {
       const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(', ');
-      return this.find(focusables, element).filter(el => !isDisabled$1(el) && isVisible(el));
+      return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
     }
 
   };
@@ -4445,7 +4452,7 @@
     }
 
     show() {
-      if (isDisabled$1(this._element) || this._isShown(this._menu)) {
+      if (isDisabled(this._element) || this._isShown(this._menu)) {
         return;
       }
 
@@ -4486,7 +4493,7 @@
     }
 
     hide() {
-      if (isDisabled$1(this._element) || !this._isShown(this._menu)) {
+      if (isDisabled(this._element) || !this._isShown(this._menu)) {
         return;
       }
 
@@ -4759,7 +4766,7 @@
       event.preventDefault();
       event.stopPropagation();
 
-      if (isDisabled$1(this)) {
+      if (isDisabled(this)) {
         return;
       }
 
@@ -4813,8 +4820,8 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-alpha.0): picker.js
-   * Licensed under MIT (https://coreui.io/license)
+   * CoreUI PRO (v4.2.0-beta.2): picker.js
+   * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
   /**
@@ -4828,18 +4835,22 @@
   const EVENT_KEY$f = `.${DATA_KEY$f}`;
   const EVENT_CANCEL = `onCancelClick${EVENT_KEY$f}`;
   const Default$f = {
-    cancelButtonText: 'Cancel',
+    cancelButtonLabel: 'Cancel',
+    cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+    confirmButtonLabel: 'OK',
+    confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
     container: 'dropdown',
     disabled: false,
-    footer: false,
-    okButtonText: 'OK'
+    footer: false
   };
   const DefaultType$f = {
-    cancelButtonText: 'string',
+    cancelButtonLabel: 'string',
+    cancelButtonClasses: '(array|string)',
+    confirmButtonLabel: 'string',
+    confirmButtonClasses: '(array|string)',
     container: 'string',
     disabled: 'boolean',
-    footer: 'boolean',
-    okButtonText: 'string'
+    footer: 'boolean'
   };
   /**
   * ------------------------------------------------------------------------
@@ -4871,6 +4882,14 @@
 
     static get NAME() {
       return NAME$g;
+    }
+
+    _getButtonClasses(classes) {
+      if (typeof classes === 'string') {
+        return classes.split(' ');
+      }
+
+      return classes;
     } // Private
 
 
@@ -4901,18 +4920,18 @@
       const footerEl = document.createElement('div');
       footerEl.classList.add('picker-footer');
       const cancelButtonEl = document.createElement('button');
-      cancelButtonEl.classList.add('btn', 'btn-sm', 'btn-ghost-primary');
+      cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
       cancelButtonEl.type = 'button';
-      cancelButtonEl.innerHTML = this._config.cancelButtonText;
+      cancelButtonEl.innerHTML = this._config.cancelButtonLabel;
       cancelButtonEl.addEventListener('click', () => {
         this._dropdown.hide();
 
         EventHandler.trigger(this._element, EVENT_CANCEL);
       });
       const okButtonEl = document.createElement('button');
-      okButtonEl.classList.add('btn', 'btn-sm', 'btn-primary');
+      okButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
       okButtonEl.type = 'button';
-      okButtonEl.innerHTML = this._config.okButtonText;
+      okButtonEl.innerHTML = this._config.confirmButtonLabel;
       okButtonEl.addEventListener('click', () => {
         this._dropdown.hide();
       });
@@ -4969,7 +4988,27 @@
 
     return date.getHours() >= 12 ? 'pm' : 'am';
   };
+  const getListOfHours = locale => Array.from({
+    length: isAmPm(locale) ? 12 : 24
+  }, (_, i) => {
+    return {
+      value: isAmPm(locale) ? i + 1 : i,
+      label: (isAmPm(locale) ? i + 1 : i).toLocaleString(locale)
+    };
+  });
+  const getMinutesOrSeconds = locale => Array.from({
+    length: 60
+  }, (_, i) => {
+    return {
+      value: i,
+      label: i.toLocaleString(locale).padStart(2, 0 .toLocaleString(locale))
+    };
+  });
   const isAmPm = locale => ['am', 'AM', 'pm', 'PM'].some(el => new Date().toLocaleString(locale).includes(el));
+  const isValidTime = time => {
+    const d = new Date(`1970-01-01 ${time}`);
+    return d instanceof Date && d.getTime();
+  };
 
   /* eslint-disable indent */
   /**
@@ -4982,7 +5021,7 @@
   const DATA_KEY$e = 'coreui.time-picker';
   const EVENT_KEY$e = `.${DATA_KEY$e}`;
   const DATA_API_KEY$9 = '.data-api';
-  const EVENT_CHANGE = `change${EVENT_KEY$e}`;
+  const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$e}`;
   const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$e}${DATA_API_KEY$9}`;
   const SELECTOR_DATA_TOGGLE$6 = '[data-coreui-toggle="time-picker"]';
   const Default$e = { ...Picker.Default,
@@ -4990,22 +5029,22 @@
     container: 'dropdown',
     disabled: false,
     footer: true,
+    indicator: true,
     inputReadOnly: false,
-    locale: navigator.language,
+    locale: 'default',
     placeholder: 'Select time',
     size: null,
-    value: null,
+    time: null,
     variant: 'roll'
   };
   const DefaultType$e = { ...Picker.DefaultType,
     cleaner: 'boolean',
-    container: 'string',
-    disabled: 'boolean',
+    indicator: 'boolean',
     inputReadOnly: 'boolean',
     locale: 'string',
     placeholder: 'string',
     size: '(string|null)',
-    value: '(date|string|null)',
+    time: '(date|string|null)',
     variant: 'string'
   };
   /**
@@ -5056,7 +5095,7 @@
         }
 
         this._date = new Date(_date);
-        EventHandler.trigger(this._element, EVENT_CHANGE, {
+        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
           timeString: _date.toTimeString(),
           localeTimeString: _date.toLocaleTimeString(),
           date: _date
@@ -5064,15 +5103,11 @@
       };
 
       this._config = this._getConfig(config);
-      this._date = this._convertStringToDate(this._config.value);
-      this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am';
-      this._uid = Math.random().toString(36).slice(2); // subcomponents
+      this._date = this._convertStringToDate(this._config.time);
+      this._initialDate = null;
+      this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am'; // subcomponents
 
       this._input = null;
-      this._selectAmPm = null;
-      this._selectHours = null;
-      this._selectMinutes = null;
-      this._selectSeconds = null;
       this._timePickerBody = null;
 
       this._createTimePicker();
@@ -5081,11 +5116,7 @@
 
       this._addEventListeners();
 
-      const children = SelectorEngine.find('.selected', this._element);
-
-      if (children) {
-        children.forEach(child => this._scrollTop(child.parentNode, child));
-      }
+      this._setUpSelects();
     } // Getters
 
 
@@ -5102,6 +5133,14 @@
     } // Public
 
 
+    cancel() {
+      this._date = this._initialDate;
+      this._input.value = this._initialDate ? this._convertStringToDate(this._initialDate).toLocaleTimeString(this._config.locale) : '';
+      this._timePickerBody.innerHTML = '';
+
+      this._createTimePickerSelection();
+    }
+
     clear() {
       this._date = null;
       this._input.value = '';
@@ -5111,8 +5150,8 @@
     }
 
     reset() {
-      this._date = this._convertStringToDate(this._config.value);
-      this._input.value = this._convertStringToDate(this._config.value).toLocaleTimeString(this._config.locale);
+      this._date = this._convertStringToDate(this._config.time);
+      this._input.value = this._convertStringToDate(this._config.time).toLocaleTimeString(this._config.locale);
       this._timePickerBody.innerHTML = '';
 
       this._createTimePickerSelection();
@@ -5125,21 +5164,101 @@
       this._createTimePicker();
 
       this._createTimePickerSelection();
+    }
+
+    _getPartOfTime(part) {
+      if (this._date === null) {
+        return null;
+      }
+
+      if (part === 'hours') {
+        return isAmPm(this._config.locale) ? convert24hTo12h(this._date.getHours()) : this._date.getHours();
+      }
+
+      if (part === 'minutes') {
+        return this._date.getMinutes();
+      }
+
+      if (part === 'seconds') {
+        return this._date.getSeconds();
+      }
+
+      if (part === 'toggle') {
+        return getAmPm(new Date(this._date), this._config.locale);
+      }
+    }
+
+    _setUpRolls(initial = false) {
+      Array.from(['hours', 'minutes', 'seconds', 'toggle']).forEach(part => {
+        SelectorEngine.find(`[data-coreui-${part}]`, this._element).forEach(element => {
+          if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
+            element.classList.add('selected');
+
+            this._scrollTo(element.parentElement, element, initial);
+
+            for (const sibling of element.parentElement.children) {
+              if (sibling !== element) {
+                sibling.classList.remove('selected');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    _setUpSelects() {
+      Array.from(['hours', 'minutes', 'seconds', 'toggle']).forEach(part => {
+        SelectorEngine.find(`select.${part}`, this._element).forEach(element => {
+          if (this._getPartOfTime(part)) {
+            element.value = this._getPartOfTime(part);
+          }
+        });
+      });
     } // Private
 
 
     _addEventListeners() {
+      EventHandler.on(this._element, 'shown.coreui.dropdown', () => {
+        this._initialDate = new Date(this._date);
+
+        if (this._config.variant === 'roll') {
+          this._setUpRolls(true);
+        }
+
+        if (this._config.variant === 'select') {
+          this._setUpSelects();
+        }
+      });
+      EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
+        if (this._config.variant === 'roll') {
+          this._setUpRolls();
+        }
+
+        if (this._config.variant === 'select') {
+          this._setUpSelects();
+        }
+      });
       EventHandler.on(this._element, 'click', '.picker-input-group-cleaner', event => {
         event.stopPropagation();
         this.clear();
       });
       EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
-        this.reset();
+        this.cancel();
+      });
+      EventHandler.on(this._input, 'input', event => {
+        if (isValidTime(event.target.value)) {
+          this._date = this._convertStringToDate(event.target.value);
+          EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
+            timeString: this._date.toTimeString(),
+            localeTimeString: this._date.toLocaleTimeString(),
+            date: this._date
+          });
+        }
       });
     }
 
     _convertStringToDate(date) {
-      return date ? date instanceof Date ? date : new Date(`1970-01-01 ${this._config.value}`) : null;
+      return date ? date instanceof Date ? date : new Date(`1970-01-01 ${date}`) : null;
     }
 
     _createInputGroup() {
@@ -5157,12 +5276,16 @@
       inputEl.readOnly = this._config.inputReadOnly;
       inputEl.type = 'text';
       inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : '';
+      inputGroupEl.append(inputEl);
       const inputGroupTextEl = document.createElement('span');
       inputGroupTextEl.classList.add('input-group-text');
-      inputGroupTextEl.innerHTML = `
-      <span class="picker-input-group-indicator">
-        <span class="picker-input-group-icon time-picker-input-icon"></span>
-      </span>`;
+
+      if (this._config.indicator) {
+        inputGroupTextEl.innerHTML = `
+        <span class="picker-input-group-indicator">
+          <span class="picker-input-group-icon time-picker-input-icon"></span>
+        </span>`;
+      }
 
       if (this._config.cleaner) {
         inputGroupTextEl.innerHTML += `
@@ -5171,7 +5294,10 @@
         </span>`;
       }
 
-      inputGroupEl.append(inputEl, inputGroupTextEl);
+      if (this._config.indicator || this._config.cleaner) {
+        inputGroupEl.append(inputGroupTextEl);
+      }
+
       this._input = inputEl;
       return inputGroupEl;
     }
@@ -5216,7 +5342,7 @@
       }
     }
 
-    _createSelect(className, options, element, selected) {
+    _createSelect(className, options) {
       const selectEl = document.createElement('select');
       selectEl.classList.add('form-select', 'form-select-sm', className);
       selectEl.disabled = this._config.disabled;
@@ -5227,22 +5353,16 @@
         optionEl.innerHTML = option.label;
         selectEl.append(optionEl);
       });
-
-      if (selected) {
-        selectEl.value = selected.toString();
-      }
-
-      this[element] = selectEl;
       return selectEl;
     }
 
-    _createTimePickerSelect(selectedHour, selectedMinute, selectedSecond) {
+    _createTimePickerSelect() {
       const timeSeparatorEl = document.createElement('div');
       timeSeparatorEl.classList.add('time-separator');
       timeSeparatorEl.innerHTML = ':';
       this._timePickerBody.innerHTML = '<span class="time-picker-inline-icon"></span>';
 
-      this._timePickerBody.append(this._createSelect('hours', this._getHours(), '_selectHours', selectedHour), timeSeparatorEl.cloneNode(true), this._createSelect('minutes', this._getMinutesOrSeconds(), '_selectMinutes', selectedMinute), timeSeparatorEl, this._createSelect('seconds', this._getMinutesOrSeconds(), '_selectSeconds', selectedSecond));
+      this._timePickerBody.append(this._createSelect('hours', getListOfHours(this._config.locale)), timeSeparatorEl.cloneNode(true), this._createSelect('minutes', getMinutesOrSeconds()), timeSeparatorEl, this._createSelect('seconds', getMinutesOrSeconds()));
 
       if (isAmPm(this._config.locale)) {
         this._timePickerBody.append(this._createSelect('toggle', [{
@@ -5255,8 +5375,8 @@
       }
     }
 
-    _createTimePickerRoll(selectedHour, selectedMinute, selectedSecond) {
-      this._timePickerBody.append(this._createTimePickerRollCol(this._getHours(), 'hours', selectedHour), this._createTimePickerRollCol(this._getMinutesOrSeconds(), 'minutes', selectedMinute), this._createTimePickerRollCol(this._getMinutesOrSeconds(), 'seconds', selectedSecond));
+    _createTimePickerRoll() {
+      this._timePickerBody.append(this._createTimePickerRollCol(getListOfHours(this._config.locale), 'hours'), this._createTimePickerRollCol(getMinutesOrSeconds(), 'minutes'), this._createTimePickerRollCol(getMinutesOrSeconds(), 'seconds'));
 
       if (isAmPm(this._config.locale)) {
         this._timePickerBody.append(this._createTimePickerRollCol([{
@@ -5269,32 +5389,18 @@
       }
     }
 
-    _createTimePickerRollCol(options, part, selected) {
+    _createTimePickerRollCol(options, part) {
       const timePickerRollColEl = document.createElement('div');
       timePickerRollColEl.classList.add('time-picker-roll-col');
       options.forEach(option => {
         const timePickerRollCellEl = document.createElement('div');
         timePickerRollCellEl.classList.add('time-picker-roll-cell');
-
-        if (option.value === selected) {
-          timePickerRollCellEl.classList.add('selected');
-        }
-
         timePickerRollCellEl.setAttribute('role', 'button');
         timePickerRollCellEl.innerHTML = option.label;
         timePickerRollCellEl.addEventListener('click', () => {
-          timePickerRollCellEl.classList.add('selected');
-
-          this._scrollTo(timePickerRollColEl, timePickerRollCellEl);
-
-          for (const sibling of timePickerRollColEl.children) {
-            if (sibling !== timePickerRollCellEl) {
-              sibling.classList.remove('selected');
-            }
-          }
-
           this._handleTimeChange(part, option.value);
         });
+        Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
         timePickerRollColEl.append(timePickerRollCellEl);
       });
       return timePickerRollColEl;
@@ -5309,37 +5415,11 @@
       return config;
     }
 
-    _getHours(locale = this._config.locale) {
-      return Array.from({
-        length: isAmPm(locale) ? 12 : 24
-      }, (_, i) => {
-        return {
-          value: isAmPm(locale) ? i + 1 : i,
-          label: (isAmPm(locale) ? i + 1 : i).toLocaleString(locale)
-        };
-      });
-    }
-
-    _getMinutesOrSeconds(locale = this._config.locale) {
-      return Array.from({
-        length: 60
-      }, (_, i) => {
-        return {
-          value: i,
-          label: i.toLocaleString(locale).padStart(2, 0 .toLocaleString(locale))
-        };
-      });
-    }
-
-    _scrollTo(parent, children) {
+    _scrollTo(parent, children, initial = false) {
       parent.scrollTo({
         top: children.offsetTop,
-        behavior: 'smooth'
+        behavior: initial ? 'instant' : 'smooth'
       });
-    }
-
-    _scrollTop(parent, children) {
-      parent.scrollTop = children.offsetTop;
     }
 
     _updateTimePicker() {
@@ -5403,8 +5483,8 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-alpha.0): date-range-picker.js
-   * Licensed under MIT (https://coreui.io/license)
+   * CoreUI PRO (v4.2.0-beta.2): date-range-picker.js
+   * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
   /**
@@ -5430,12 +5510,15 @@
     disabledDates: null,
     endDate: null,
     firstDayOfWeek: 1,
-    locale: navigator.language,
+    indicator: true,
+    locale: 'default',
     maxDate: null,
     minDate: null,
     placeholder: ['Start date', 'End date'],
     range: true,
     ranges: {},
+    rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
+    separator: true,
     size: null,
     startDate: null,
     selectEndDate: false,
@@ -5450,12 +5533,15 @@
     disabled: 'boolean',
     endDate: '(date|string|null)',
     firstDayOfWeek: 'number',
+    indicator: 'boolean',
     locale: 'string',
     maxDate: '(date|string|null)',
     minDate: '(date|string|null)',
     placeholder: '(array|string)',
     range: 'boolean',
     ranges: 'object',
+    rangesButtonsClasses: '(array|string)',
+    separator: 'boolean',
     size: '(string|null)',
     startDate: '(date|string|null)',
     selectEndDate: 'boolean',
@@ -5474,6 +5560,8 @@
       this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date());
       this._startDate = this._convertStringToDate(this._config.date || this._config.startDate);
       this._endDate = this._convertStringToDate(this._config.endDate);
+      this._initialStartDate = null;
+      this._initialEndDate = null;
       this._mobile = window.innerWidth < 768;
       this._selectEndDate = this._config.selectEndDate; // nodes
 
@@ -5509,8 +5597,19 @@
     } // Public
 
 
+    cancel() {
+      this._endDate = this._initialEndDate;
+      this._endInput.value = this._setInputValue(this._initialEndDate);
+      this._startDate = this._initialStartDate;
+      this._startInput.value = this._setInputValue(this._initialStartDate);
+      this._calendars.innerHTML = '';
+
+      this._createCalendars();
+
+      this._addCalendarEventListeners();
+    }
+
     clear() {
-      this._date = null;
       this._endDate = null;
       this._endInput.value = '';
       this._startDate = null;
@@ -5523,7 +5622,6 @@
     }
 
     reset() {
-      this._date = null;
       this._endDate = this._config.endDate;
       this._endInput.value = this._setInputValue(this._config.endDate);
       this._startDate = this._config.startDate;
@@ -5550,18 +5648,46 @@
 
 
     _addEventListeners() {
+      EventHandler.on(this._element, 'shown.coreui.dropdown', () => {
+        this._initialStartDate = new Date(this._startDate);
+        this._initialEndDate = new Date(this._endDate);
+      });
       EventHandler.on(this._startInput, 'click', () => {
+        this._dropdown.show();
+
         this._selectEndDate = false;
+
+        this._updateCalendars();
+      });
+      EventHandler.on(this._startInput, 'input', event => {
+        if (isValidDate(event.target.value)) {
+          this._startDate = this._convertStringToDate(event.target.value);
+          this._calendarDate = this._startDate;
+
+          this._updateCalendars();
+        }
       });
       EventHandler.on(this._endInput, 'click', () => {
+        this._dropdown.show();
+
         this._selectEndDate = true;
+
+        this._updateCalendars();
+      });
+      EventHandler.on(this._endInput, 'input', event => {
+        if (isValidDate(event.target.value)) {
+          this._endDate = this._convertStringToDate(event.target.value);
+          this._calendarDate = this._endDate;
+
+          this._updateCalendars();
+        }
       });
       EventHandler.on(this._element, 'click', '.picker-input-group-cleaner', event => {
         event.stopPropagation();
         this.clear();
       });
       EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
-        this.reset();
+        this.cancel();
       });
       EventHandler.on(window, 'resize', () => {
         this._mobile = window.innerWidth < 768;
@@ -5570,17 +5696,16 @@
 
     _addCalendarEventListeners() {
       SelectorEngine.find('.calendar', this._element).forEach(calendar => {
-        EventHandler.on(calendar, 'calendarDateChange.coreui.calendar', event => {
-          this._calendarDate = event.date;
-
-          this._updateCalendars();
-        });
         EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._startDate = event.date;
           this._selectEndDate = event.selectEndDate;
           this._startInput.value = this._setInputValue(event.date);
 
           this._updateCalendars();
+
+          if (!this._config.range && !this._config.footer && !this._config.timepicker) {
+            this._dropdown.hide();
+          }
 
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
             date: event.date
@@ -5592,6 +5717,10 @@
           this._endInput.value = this._setInputValue(event.date);
 
           this._updateCalendars();
+
+          if (this._startDate && !this._config.footer && !this._config.timepicker) {
+            this._dropdown.hide();
+          }
 
           EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
             date: event.date
@@ -5640,10 +5769,13 @@
       inputGroupTextSeparatorEl.innerHTML = '<span class="picker-input-group-icon date-picker-arrow-icon"></span>';
       const inputGroupTextEl = document.createElement('span');
       inputGroupTextEl.classList.add('input-group-text');
-      inputGroupTextEl.innerHTML = `
-      <span class="picker-input-group-indicator">
-        <span class="picker-input-group-icon time-picker-input-icon"></span>
-      </span>`;
+
+      if (this._config.indicator) {
+        inputGroupTextEl.innerHTML = `
+        <span class="picker-input-group-indicator">
+          <span class="picker-input-group-icon time-picker-input-icon"></span>
+        </span>`;
+      }
 
       if (this._config.cleaner) {
         inputGroupTextEl.innerHTML += `
@@ -5654,19 +5786,24 @@
 
       this._startInput = startInputEl;
       this._endInput = endInputEl;
+      inputGroupEl.append(startInputEl);
+
+      if (this._config.separator) {
+        inputGroupEl.append(inputGroupTextSeparatorEl);
+      }
 
       if (this._config.range) {
-        inputGroupEl.append(startInputEl, inputGroupTextSeparatorEl, endInputEl, inputGroupTextEl);
-      } else {
-        inputGroupEl.append(startInputEl, inputGroupTextEl);
+        inputGroupEl.append(endInputEl);
+      }
+
+      if (this._config.indicator || this._config.cleaner) {
+        inputGroupEl.append(inputGroupTextEl);
       }
 
       return inputGroupEl;
     }
 
     _createCalendars() {
-      const calendarStartElement = document.createElement('div');
-      calendarStartElement.classList.add('date-picker-calendar');
       Array.from({
         length: this._mobile ? 1 : this._config.calendars
       }).forEach((_, index) => {
@@ -5688,6 +5825,11 @@
           selectEndDate: this._selectEndDate,
           startDate: this._startDate
         });
+        EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
+          this._calendarDate = new Date(event.date.getFullYear(), event.date.getMonth() - index, 1);
+
+          this._updateCalendars();
+        });
 
         if (this._config.timepicker) {
           if ((this._config.calendars === 1 || this._mobile) && this._config.range) {
@@ -5698,11 +5840,11 @@
               container: 'inline',
               disabled: !this._startDate,
               locale: this._config.locale,
-              value: this._startDate,
+              time: this._startDate,
               variant: 'select'
             });
             calendarEl.append(timePickerStartEl);
-            EventHandler.one(timePickerStartEl, 'change.coreui.timepicker', event => {
+            EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
               this._startDate = event.date;
               this._startInput.value = this._setInputValue(this._startDate);
 
@@ -5715,11 +5857,11 @@
               container: 'inline',
               disabled: !this._endDate,
               locale: this._config.locale,
-              value: this._endDate,
+              time: this._endDate,
               variant: 'select'
             });
             calendarEl.append(timePickerEndEl);
-            EventHandler.one(timePickerEndEl, 'change.coreui.time-picker', event => {
+            EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
               this._endDate = event.date;
               this._endInput.value = this._setInputValue(this._endDate);
 
@@ -5735,11 +5877,11 @@
               container: 'inline',
               disabled: index === 0 ? !this._startDate : !this._endDate,
               locale: this._config.locale,
-              value: index === 0 ? this._startDate : this._endDate,
+              time: index === 0 ? this._startDate : this._endDate,
               variant: 'select'
             });
             calendarEl.append(timePickerEl);
-            EventHandler.one(timePickerEl, 'change.coreui.time-picker', event => {
+            EventHandler.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
               if (index === 0) {
                 this._startDate = event.date;
                 this._startInput.value = this._setInputValue(this._startDate);
@@ -5774,7 +5916,7 @@
         dateRangePickerRangesEl.classList.add('date-picker-ranges');
         Object.keys(this._config.ranges).forEach(key => {
           const buttonEl = document.createElement('button');
-          buttonEl.classList.add('btn', 'btn-ghost-secondary');
+          buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses));
           buttonEl.role = 'button';
           buttonEl.addEventListener('click', () => {
             this._startDate = this._config.ranges[key][0];
@@ -5885,8 +6027,8 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.1.0): date-picker.js
-   * Licensed under MIT (https://coreui.io/license)
+   * CoreUI PRO (v4.2.0-beta.2): date-picker.js
+   * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
   /**
@@ -5905,7 +6047,8 @@
   const Default$c = { ...DateRangePicker.Default,
     calendars: 1,
     placeholder: ['Select date'],
-    range: false
+    range: false,
+    separator: false
   };
   const DefaultType$c = { ...DateRangePicker.DefaultType,
     date: '(date|string|null)'
@@ -6004,8 +6147,9 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.1): loading-button.js
-   * Licensed under MIT (https://coreui.io/license)
+   * CoreUI PRO (v4.2.0-beta.2): loading-button.js
+   * License (https://coreui.io/pro/license-new/)
+   * --------------------------------------------------------------------------
    */
   /**
    * ------------------------------------------------------------------------
@@ -6947,8 +7091,8 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-beta.1): multi-select.js
-   * License (https://coreui.io/pro/license)
+   * CoreUI PRO (v4.2.0-beta.2): multi-select.js
+   * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
   /**
@@ -7359,6 +7503,7 @@
       if (this._config.cleaner && this._config.multiple) {
         const cleaner = document.createElement('button');
         cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER);
+        cleaner.style.display = 'none';
 
         this._clone.append(cleaner);
 
@@ -8301,7 +8446,7 @@
       event.preventDefault();
     }
 
-    if (isDisabled$1(this)) {
+    if (isDisabled(this)) {
       return;
     }
 
@@ -10020,7 +10165,7 @@
       event.preventDefault();
     }
 
-    if (isDisabled$1(this)) {
+    if (isDisabled(this)) {
       return;
     }
 
@@ -10271,7 +10416,11 @@
 
   /**
    * --------------------------------------------------------------------------
+  <<<<<<< HEAD
    * CoreUI (v4.2.0-beta.1): index.esm.js
+  =======
+   * CoreUI (v4.1.4): index.esm.js
+  >>>>>>> main
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

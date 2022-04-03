@@ -562,10 +562,10 @@ You can activate individual tabs in several ways:
 
 ```js
 var triggerEl = document.querySelector('#myTab button[data-coreui-target="#profile"]')
-bootstrap.Tab.getInstance(triggerEl).show() // Select tab by name
+coreui.Tab.getInstance(triggerEl).show() // Select tab by name
 
 var triggerFirstTabEl = document.querySelector('#myTab li:first-child button')
-bootstrap.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
+coreui.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
 ```
 
 ### Fade effect
@@ -652,7 +652,7 @@ var tab = coreui.Tab.getInstance(triggerEl) // Returns a Bootstrap tab instance
 
 ```js
 var triggerEl = document.querySelector('#trigger')
-var tab = bootstrap.Tab.getOrCreateInstance(triggerEl) // Returns a Bootstrap tab instance
+var tab = coreui.Tab.getOrCreateInstance(triggerEl) // Returns a Bootstrap tab instance
 ```
 
 ### Events

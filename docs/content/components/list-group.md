@@ -478,7 +478,7 @@ var tab = coreui.Tab.getInstance(triggerEl) // Returns a Bootstrap tab instance
 
 ```js
 var triggerEl = document.querySelector('#trigger')
-var tab = bootstrap.Tab.getOrCreateInstance(triggerEl) // Returns a Bootstrap tab instance
+var tab = coreui.Tab.getOrCreateInstance(triggerEl) // Returns a Bootstrap tab instance
 ```
 
 ### Events

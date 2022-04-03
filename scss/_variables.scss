@@ -1195,7 +1195,7 @@ $form-multi-select-bg:                      $input-bg !default;
 $form-multi-select-bg-position:             right $form-multi-select-padding-x center !default;
 $form-multi-select-bg-size:                 16px 12px !default; // In pixels because image dimensions
 $form-multi-select-disabled-bg:             $gray-200 !default;
-$form-multi-select-indicator-padding:       1rem !default; // Extra padding to account for the presence of the background-image based indicator
+$form-multi-select-indicator-padding:       $form-multi-select-padding-x * 3 !default; // Extra padding to account for the presence of the background-image based indicator
 $form-multi-select-indicator-color:         $gray-800 !default;
 $form-multi-select-indicator:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-multi-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>") !default;
 
@@ -1228,8 +1228,8 @@ $form-multi-select-search-border-radius:  $border-radius !default;
 
 $form-multi-select-cleaner-width:         .75rem !default;
 $form-multi-select-cleaner-height:        .75rem !default;
-$form-multi-select-cleaner-padding-x:     .5rem !default;
-$form-multi-select-cleaner-padding-y:     $form-multi-select-cleaner-padding-x !default;
+$form-multi-select-cleaner-padding-x:     .75rem !default;
+$form-multi-select-cleaner-padding-y:     .5rem !default;
 $form-multi-select-cleaner-color:         $medium-emphasis !default;
 $form-multi-select-cleaner-bg:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-cleaner-hover-color:   $high-emphasis !default;
