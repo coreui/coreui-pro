@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.0-alpha.0): picker.js
- * Licensed under MIT (https://coreui.io/license)
+ * CoreUI PRO (v4.2.0-beta.2): picker.js
+ * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
@@ -24,19 +24,23 @@ const EVENT_KEY = `.${DATA_KEY}`
 const EVENT_CANCEL = `onCancelClick${EVENT_KEY}`
 
 const Default = {
-  cancelButtonText: 'Cancel',
+  cancelButtonLabel: 'Cancel',
+  cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+  confirmButtonLabel: 'OK',
+  confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
   container: 'dropdown',
   disabled: false,
-  footer: false,
-  okButtonText: 'OK'
+  footer: false
 }
 
 const DefaultType = {
-  cancelButtonText: 'string',
+  cancelButtonLabel: 'string',
+  cancelButtonClasses: '(array|string)',
+  confirmButtonLabel: 'string',
+  confirmButtonClasses: '(array|string)',
   container: 'string',
   disabled: 'boolean',
-  footer: 'boolean',
-  okButtonText: 'string'
+  footer: 'boolean'
 }
 
 /**
@@ -73,6 +77,14 @@ class Picker extends BaseComponent {
     return NAME
   }
 
+  _getButtonClasses(classes) {
+    if (typeof classes === 'string') {
+      return classes.split(' ')
+    }
+
+    return classes
+  }
+
   // Private
   _createDropdown() {
     const dropdownEl = document.createElement('div')
@@ -104,18 +116,18 @@ class Picker extends BaseComponent {
     footerEl.classList.add('picker-footer')
 
     const cancelButtonEl = document.createElement('button')
-    cancelButtonEl.classList.add('btn', 'btn-sm', 'btn-ghost-primary')
+    cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses))
     cancelButtonEl.type = 'button'
-    cancelButtonEl.innerHTML = this._config.cancelButtonText
+    cancelButtonEl.innerHTML = this._config.cancelButtonLabel
     cancelButtonEl.addEventListener('click', () => {
       this._dropdown.hide()
       EventHandler.trigger(this._element, EVENT_CANCEL)
     })
 
     const okButtonEl = document.createElement('button')
-    okButtonEl.classList.add('btn', 'btn-sm', 'btn-primary')
+    okButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses))
     okButtonEl.type = 'button'
-    okButtonEl.innerHTML = this._config.okButtonText
+    okButtonEl.innerHTML = this._config.confirmButtonLabel
     okButtonEl.addEventListener('click', () => {
       this._dropdown.hide()
     })
