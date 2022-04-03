@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
 <<<<<<< HEAD
- * CoreUI (v4.2.0-beta.1): index.esm.js
+ * CoreUI (v4.2.0-beta.2): index.esm.js
 =======
  * CoreUI (v4.1.4): index.esm.js
 >>>>>>> main
