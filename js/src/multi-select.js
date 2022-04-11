@@ -544,6 +544,12 @@ class MultiSelect extends BaseComponent {
     } else if (!this._config.multiple) {
       this._selectOption(value, text)
     }
+
+    if (!this._config.multiple) {
+      this.hide()
+      this.search('')
+      this._searchElement.value = null
+    }
   }
 
   _selectOption(value, text) {
