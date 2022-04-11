@@ -1,14 +1,14 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.2.0-beta.2
+ * @version v4.2.0-rc.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
 */
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.2.0-beta.2
+ * @version v4.2.0-rc.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -6718,6 +6718,8 @@ textarea.form-control-lg {
   --cui-calendar-cell-selected-color: #fff;
   --cui-calendar-cell-selected-bg: #321fdb;
   --cui-calendar-cell-range-bg: rgba(50, 31, 219, 0.125);
+  --cui-calendar-cell-range-hover-bg: rgba(50, 31, 219, 0.25);
+  --cui-calendar-cell-range-hover-border-color: #321fdb;
   --cui-calendar-cell-today-color: #e55353;
 }
 .calendar table {
@@ -6823,19 +6825,46 @@ textarea.form-control-lg {
   background: var(--cui-calendar-cell-range-bg);
   border-radius: 0;
 }
-.calendar-cell.range:not(.selected):first-child .calendar-cell-inner {
+.calendar-cell.range:not(.selected):hover .calendar-cell-inner {
+  position: relative;
+}
+.calendar-cell.range:not(.selected):hover .calendar-cell-inner::after {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  content: "";
+  background: var(--cui-calendar-cell-range-hover-bg);
+  border-radius: 0.25rem;
+}
+.calendar-cell.range:not(.selected):first-child .calendar-cell-inner, .calendar-cell:not(.range) + .range .calendar-cell-inner {
   border-top-right-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
 }
-.calendar-cell.range:not(.selected):last-child .calendar-cell-inner {
+.calendar-cell.range:not(.selected):last-child .calendar-cell-inner, .calendar-cell.range:not(.selected).last .calendar-cell-inner {
   border-top-left-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
 }
-.calendar-cell:not(.range) + .range .calendar-cell-inner {
+.calendar-cell.range-hover .calendar-cell-inner {
+  position: relative;
+}
+.calendar-cell.range-hover .calendar-cell-inner::before {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  content: "";
+}
+.calendar-cell.range-hover .calendar-cell-inner::before, .calendar-cell.range-hover.selected .calendar-cell-inner::before {
+  border-top: 1px solid var(--cui-calendar-cell-selected-bg);
+  border-bottom: 1px solid var(--cui-calendar-cell-selected-bg);
+  border-radius: 0;
+}
+.calendar-cell.range-hover:first-child .calendar-cell-inner::before, .calendar-cell:not(.range-hover) + .range-hover .calendar-cell-inner::before {
+  border-left: 1px solid var(--cui-calendar-cell-selected-bg);
   border-top-right-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
 }
-.calendar-cell.range:not(.selected).last .calendar-cell-inner {
+.calendar-cell.range-hover:last-child .calendar-cell-inner::before, .calendar-cell.range-hover.last .calendar-cell-inner::before, .calendar-cell.range-hover + .range-hover:hover .calendar-cell-inner::before {
+  border-right: 1px solid var(--cui-calendar-cell-selected-bg);
   border-top-left-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
 }

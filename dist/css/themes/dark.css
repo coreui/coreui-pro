@@ -94,6 +94,8 @@
   --cui-calendar-cell-disabled-color: rgba(255, 255, 255, 0.38);
   --cui-calendar-cell-selected-bg: #857dcc;
   --cui-calendar-cell-range-bg: #a49ed9;
+  --cui-calendar-cell-range-hover-bg: #948dd2;
+  --cui-calendar-cell-range-hover-border-color: #857dcc;
 }
 .dark-theme .card {
   --cui-card-bg: #24252f;

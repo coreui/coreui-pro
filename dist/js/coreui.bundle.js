@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.2.0-beta.2 (https://coreui.io)
+  * CoreUI v4.2.0-rc.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): alert.js
+   * CoreUI (v4.2.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -345,7 +345,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): dom/event-handler.js
+   * CoreUI (v4.2.0-rc.0): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -636,7 +636,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): dom/data.js
+   * CoreUI (v4.2.0-rc.0): dom/data.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dom/data.js
@@ -693,7 +693,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): alert.js
+   * CoreUI (v4.2.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -706,7 +706,7 @@
    * ------------------------------------------------------------------------
    */
 
-  const VERSION = '4.2.0-beta.2';
+  const VERSION = '4.2.0-rc.0';
 
   class BaseComponent {
     constructor(element) {
@@ -788,7 +788,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): alert.js
+   * CoreUI (v4.2.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's alert.js
@@ -880,7 +880,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): alert.js
+   * CoreUI (v4.2.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's button.js
@@ -954,7 +954,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): dom/manipulator.js
+   * CoreUI (v4.2.0-rc.0): dom/manipulator.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -1033,6 +1033,25 @@
     const perGroup = Math.ceil(arr.length / numberOfGroups); // eslint-disable-next-line unicorn/no-new-array
 
     return new Array(numberOfGroups).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
+  };
+  const getLocalDateFromString = (string, locale, time) => {
+    const date = new Date(2013, 11, 31, 17, 19, 22);
+    let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale);
+    regex = regex.replace('2013', '(?<year>[0-9]{2,4})').replace('12', '(?<month>[0-9]{1,2})').replace('31', '(?<day>[0-9]{1,2})');
+
+    if (time) {
+      regex = regex.replace('5', '(?<hour>[0-9]{1,2})').replace('17', '(?<hour>[0-9]{1,2})').replace('19', '(?<minute>[0-9]{1,2})').replace('22', '(?<second>[0-9]{1,2})').replace('PM', '(?<ampm>[A-Z]{2})');
+    }
+
+    const rgx = new RegExp(`${regex}`);
+    const partials = string.match(rgx);
+
+    if (partials === null) {
+      return;
+    }
+
+    const newDate = partials.groups && (time ? new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ? partials.groups.ampm === 'PM' ? Number(partials.groups.hour) + 12 : Number(partials.groups.hour) : Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) : new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)));
+    return newDate;
   };
   const getMonthsNames = locale => {
     const months = [];
@@ -1166,7 +1185,15 @@
     return test.getMonth() !== month;
   };
   const isSameDateAs = (date, date2) => {
-    return date.getDate() === date2.getDate() && date.getMonth() === date2.getMonth() && date.getFullYear() === date2.getFullYear();
+    if (date instanceof Date && date2 instanceof Date) {
+      return date.getDate() === date2.getDate() && date.getMonth() === date2.getMonth() && date.getFullYear() === date2.getFullYear();
+    }
+
+    if (date === null && date2 === null) {
+      return true;
+    }
+
+    return false;
   };
   const isStartDate = (date, start, end) => {
     return start && end && isSameDateAs(start, date) && start < end;
@@ -1174,10 +1201,6 @@
   const isToday = date => {
     const today = new Date();
     return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
-  };
-  const isValidDate = date => {
-    const d = new Date(date);
-    return d instanceof Date && d.getTime();
   };
 
   /* eslint-disable indent, multiline-ternary */
@@ -1263,7 +1286,6 @@
 
 
     _addEventListeners() {
-      // Cell interactions
       EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
 
@@ -1512,7 +1534,7 @@
 
     _dayClassNames(date, month) {
       const classNames = [isToday(date) && 'today', isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled', `${month}`, isLastDayOfMonth(date) && 'last', month === 'current' && isDateInRange(date, this._startDate, this._endDate) && 'range', isDateSelected(date, this._startDate, this._endDate) && 'selected', isStartDate(date, this._startDate, this._endDate) && 'start', isEndDate(date, this._startDate, this._endDate) && 'end'];
-      return classNames.join(' ');
+      return classNames.filter(Boolean).join(' ');
     }
 
     _getConfig(config) {
@@ -1577,7 +1599,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): dom/selector-engine.js
+   * CoreUI (v4.2.0-rc.0): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -1650,7 +1672,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): carousel.js
+   * CoreUI (v4.2.0-rc.0): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -2202,7 +2224,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): collapse.js
+   * CoreUI (v4.2.0-rc.0): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js
@@ -4355,7 +4377,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): dropdown.js
+   * CoreUI (v4.2.0-rc.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dropdown.js
@@ -4820,7 +4842,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-beta.2): picker.js
+   * CoreUI PRO (v4.2.0-rc.0): picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -5483,7 +5505,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-beta.2): date-range-picker.js
+   * CoreUI PRO (v4.2.0-rc.0): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -5660,9 +5682,11 @@
         this._updateCalendars();
       });
       EventHandler.on(this._startInput, 'input', event => {
-        if (isValidDate(event.target.value)) {
-          this._startDate = this._convertStringToDate(event.target.value);
-          this._calendarDate = this._startDate;
+        const date = getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+
+        if (date instanceof Date && date.getTime()) {
+          this._startDate = date;
+          this._calendarDate = date;
 
           this._updateCalendars();
         }
@@ -5675,9 +5699,11 @@
         this._updateCalendars();
       });
       EventHandler.on(this._endInput, 'input', event => {
-        if (isValidDate(event.target.value)) {
-          this._endDate = this._convertStringToDate(event.target.value);
-          this._calendarDate = this._endDate;
+        const date = getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+
+        if (date instanceof Date && date.getTime()) {
+          this._endDate = date;
+          this._calendarDate = date;
 
           this._updateCalendars();
         }
@@ -6027,7 +6053,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-beta.2): date-picker.js
+   * CoreUI PRO (v4.2.0-rc.0): date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -6147,7 +6173,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-beta.2): loading-button.js
+   * CoreUI PRO (v4.2.0-rc.0): loading-button.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -6659,7 +6685,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.2.0-beta.2): modal.js
+    * CoreUI (v4.2.0-rc.0): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js
@@ -7091,7 +7117,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-beta.2): multi-select.js
+   * CoreUI PRO (v4.2.0-rc.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -7624,6 +7650,12 @@
       } else if (!this._config.multiple) {
         this._selectOption(value, text);
       }
+
+      if (!this._config.multiple) {
+        this.hide();
+        this.search('');
+        this._searchElement.value = null;
+      }
     }
 
     _selectOption(value, text) {
@@ -7934,7 +7966,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): navigation.js
+   * CoreUI (v4.2.0-rc.0): navigation.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -8219,7 +8251,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): dropdown.js
+   * CoreUI (v4.2.0-rc.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js
@@ -8478,7 +8510,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): alert.js
+   * CoreUI (v4.2.0-rc.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -8593,7 +8625,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): tooltip.js
+   * CoreUI (v4.2.0-rc.0): tooltip.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tooltip.js
@@ -9306,7 +9338,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): popover.js
+   * CoreUI (v4.2.0-rc.0): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js
@@ -9419,7 +9451,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): scrollspy.js
+   * CoreUI (v4.2.0-rc.0): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js
@@ -9657,7 +9689,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): sidebar.js
+   * CoreUI (v4.2.0-rc.0): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -9982,7 +10014,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): tab.js
+   * CoreUI (v4.2.0-rc.0): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -10183,7 +10215,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-beta.2): toast.js
+   * CoreUI (v4.2.0-rc.0): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -10416,11 +10448,7 @@
 
   /**
    * --------------------------------------------------------------------------
-  <<<<<<< HEAD
-   * CoreUI (v4.2.0-beta.2): index.esm.js
-  =======
-   * CoreUI (v4.1.4): index.esm.js
-  >>>>>>> main
+   * CoreUI (v4.2.0-rc.0): index.esm.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
