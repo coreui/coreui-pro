@@ -783,24 +783,28 @@ $toast-theme-map: (
 
 // Calendar & Date & Time Pickers
 
-$calendar-nav-border-color-dt:         $border-color-dt !default;
-$calendar-nav-date-color-dt:           $body-color-dt !default;
-$calendar-nav-date-hover-color-dt:     $primary-dt !default;
-$calendar-cell-header-inner-color-dt:  $medium-emphasis-dt !default;
-$calendar-cell-hover-bg-dt:            rgba($black, .25) !default;
-$calendar-cell-disabled-color-dt:      $disabled-dt !default;
-$calendar-cell-selected-bg-dt:         $primary-dt !default;
-$calendar-cell-range-bg-dt:            tint-color($primary-dt, 25%) !default;
+$calendar-nav-border-color-dt:               $border-color-dt !default;
+$calendar-nav-date-color-dt:                 $body-color-dt !default;
+$calendar-nav-date-hover-color-dt:           $primary-dt !default;
+$calendar-cell-header-inner-color-dt:        $medium-emphasis-dt !default;
+$calendar-cell-hover-bg-dt:                  rgba($black, .25) !default;
+$calendar-cell-disabled-color-dt:            $disabled-dt !default;
+$calendar-cell-selected-bg-dt:               $primary-dt !default;
+$calendar-cell-range-bg-dt:                  tint-color($primary-dt, 25%) !default;
+$calendar-cell-range-hover-bg-dt:            tint-color($primary-dt, 12.5%) !default;
+$calendar-cell-range-hover-border-color-dt:  $primary-dt !default;
 
 $calendar-theme-map: (
-  "calendar-nav-border":               $calendar-nav-border-width solid $calendar-nav-border-color-dt,
-  "calendar-nav-date-color":           $calendar-nav-date-color-dt,
-  "calendar-nav-date-hover-color":     $calendar-nav-date-hover-color-dt,
-  "calendar-cell-header-inner-color":  $calendar-cell-header-inner-color-dt,
-  "calendar-cell-hover-bg":            $calendar-cell-hover-bg-dt,
-  "calendar-cell-disabled-color":      $calendar-cell-disabled-color-dt,
-  "calendar-cell-selected-bg":         $calendar-cell-selected-bg-dt,
-  "calendar-cell-range-bg":            $calendar-cell-range-bg-dt
+  "calendar-nav-border":                     $calendar-nav-border-width solid $calendar-nav-border-color-dt,
+  "calendar-nav-date-color":                 $calendar-nav-date-color-dt,
+  "calendar-nav-date-hover-color":           $calendar-nav-date-hover-color-dt,
+  "calendar-cell-header-inner-color":        $calendar-cell-header-inner-color-dt,
+  "calendar-cell-hover-bg":                  $calendar-cell-hover-bg-dt,
+  "calendar-cell-disabled-color":            $calendar-cell-disabled-color-dt,
+  "calendar-cell-selected-bg":               $calendar-cell-selected-bg-dt,
+  "calendar-cell-range-bg":                  $calendar-cell-range-bg-dt,
+  "calendar-cell-range-hover-bg":            $calendar-cell-range-hover-bg-dt,
+  "calendar-cell-range-hover-border-color":  $calendar-cell-range-hover-border-color-dt
 ) !default;
 
 $picker-footer-border-color-dt:  $border-color-dt !default;

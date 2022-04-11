@@ -1,5 +1,7 @@
 export const convertToLocalDate = (d, locale, options = {}) => d.toLocaleDateString(locale, options)
+
 export const convertToLocalTime = (d, locale, options = {}) => d.toLocaleTimeString(locale, options)
+
 export const createGroupsInArray = (arr, numberOfGroups) => {
   const perGroup = Math.ceil(arr.length / numberOfGroups)
   // eslint-disable-next-line unicorn/no-new-array
@@ -9,7 +11,42 @@ export const createGroupsInArray = (arr, numberOfGroups) => {
 }
 
 export const getCurrentYear = () => new Date().getFullYear()
+
 export const getCurrentMonth = () => new Date().getMonth()
+
+export const getLocalDateFromString = (string, locale, time) => {
+  const date = new Date(2013, 11, 31, 17, 19, 22)
+  let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale)
+  regex = regex
+        .replace('2013', '(?<year>[0-9]{2,4})')
+        .replace('12', '(?<month>[0-9]{1,2})')
+        .replace('31', '(?<day>[0-9]{1,2})')
+  if (time) {
+    regex = regex
+            .replace('5', '(?<hour>[0-9]{1,2})')
+            .replace('17', '(?<hour>[0-9]{1,2})')
+            .replace('19', '(?<minute>[0-9]{1,2})')
+            .replace('22', '(?<second>[0-9]{1,2})')
+            .replace('PM', '(?<ampm>[A-Z]{2})')
+  }
+
+  const rgx = new RegExp(`${regex}`)
+  const partials = string.match(rgx)
+  if (partials === null) {
+    return
+  }
+
+  const newDate = partials.groups &&
+        (time ?
+          new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ?
+            (partials.groups.ampm === 'PM' ?
+              Number(partials.groups.hour) + 12 :
+              Number(partials.groups.hour)) :
+            Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) :
+          new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)))
+  return newDate
+}
+
 export const getMonthName = (month, locale) => {
   const d = new Date()
   d.setDate(1)
@@ -103,6 +140,25 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   return weeks
 }
 
+export const isDisableDateInRange = (startDate, endDate, dates) => {
+  if (startDate && endDate) {
+    const date = new Date(startDate)
+    let disabled = false
+    // eslint-disable-next-line no-unmodified-loop-condition
+    while (date < endDate) {
+      date.setDate(date.getDate() + 1)
+      if (isDateDisabled(date, null, null, dates)) {
+        disabled = true
+        break
+      }
+    }
+
+    return disabled
+  }
+
+  return false
+}
+
 export const isDateDisabled = (date, min, max, dates) => {
   let disabled
   if (dates) {
@@ -148,9 +204,17 @@ export const isLastDayOfMonth = date => {
 }
 
 export const isSameDateAs = (date, date2) => {
-  return (date.getDate() === date2.getDate() &&
-        date.getMonth() === date2.getMonth() &&
-        date.getFullYear() === date2.getFullYear())
+  if (date instanceof Date && date2 instanceof Date) {
+    return (date.getDate() === date2.getDate() &&
+            date.getMonth() === date2.getMonth() &&
+            date.getFullYear() === date2.getFullYear())
+  }
+
+  if (date === null && date2 === null) {
+    return true
+  }
+
+  return false
 }
 
 export const isStartDate = (date, start, end) => {

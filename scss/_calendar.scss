@@ -14,6 +14,8 @@
   --#{$variable-prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
   --#{$variable-prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg};
   --#{$variable-prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg};
+  --#{$variable-prefix}calendar-cell-range-hover-bg: #{$calendar-cell-range-hover-bg};
+  --#{$variable-prefix}calendar-cell-range-hover-border-color: #{$calendar-cell-range-hover-border-color};
   --#{$variable-prefix}calendar-cell-today-color: #{$calendar-cell-today-color};
   // scss-docs-end calendar-css-vars
 
@@ -129,20 +131,62 @@
     @include border-radius(0);
   }
 
-  &.range:not(.selected):first-child .calendar-cell-inner {
-    @include border-start-radius($border-radius);
+  &.range:not(.selected):hover .calendar-cell-inner {
+    position: relative;
+    &::after {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      content: "";
+      background: var(--#{$variable-prefix}calendar-cell-range-hover-bg);
+      @include border-radius($border-radius);
+    }
   }
 
-  &.range:not(.selected):last-child .calendar-cell-inner {
-    @include border-end-radius($border-radius);
-  }
-
+  &.range:not(.selected):first-child .calendar-cell-inner,
   &:not(.range) + .range .calendar-cell-inner {
     @include border-start-radius($border-radius);
   }
 
+  &.range:not(.selected):last-child .calendar-cell-inner,
   &.range:not(.selected).last .calendar-cell-inner {
     @include border-end-radius($border-radius);
+  }
+
+  &.range-hover .calendar-cell-inner {
+    position: relative;
+    &::before {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      content: "";
+    }
+  }
+
+  &.range-hover .calendar-cell-inner,
+  &.range-hover.selected .calendar-cell-inner {
+    &::before {
+      border-top: 1px solid var(--#{$variable-prefix}calendar-cell-selected-bg);
+      border-bottom: 1px solid var(--#{$variable-prefix}calendar-cell-selected-bg);
+      @include border-radius(0);
+    }
+  }
+
+  &.range-hover:first-child .calendar-cell-inner,
+  &:not(.range-hover) + .range-hover .calendar-cell-inner {
+    &::before {
+      border-left: 1px solid var(--#{$variable-prefix}calendar-cell-selected-bg);
+      @include border-start-radius($border-radius);
+    }
+  }
+
+  &.range-hover:last-child .calendar-cell-inner,
+  &.range-hover.last .calendar-cell-inner,
+  &.range-hover + .range-hover:hover .calendar-cell-inner {
+    &::before {
+      border-right: 1px solid var(--#{$variable-prefix}calendar-cell-selected-bg);
+      @include border-end-radius($border-radius);
+    }
   }
 
   &.selected:not(.previous):not(.next) .calendar-cell-inner,

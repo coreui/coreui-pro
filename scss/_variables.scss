@@ -2263,6 +2263,8 @@ $calendar-cell-selected-color:              $white !default;
 $calendar-cell-selected-bg:                 $primary !default;
 
 $calendar-cell-range-bg:                    rgba($primary, .125) !default;
+$calendar-cell-range-hover-bg:              rgba($primary, .25) !default;
+$calendar-cell-range-hover-border-color:    $primary !default;
 
 $calendar-cell-today-color:                 $danger !default;
 // scss-docs-end calendar-variables
