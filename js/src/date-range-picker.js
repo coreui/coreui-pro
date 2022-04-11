@@ -9,7 +9,7 @@ import { defineJQueryPlugin, typeCheckConfig } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
-import { isValidDate } from './util/calendar'
+import { getLocalDateFromString } from './util/calendar'
 import Calendar from './calendar'
 import Picker from './picker'
 import TimePicker from './time-picker'
@@ -185,9 +185,10 @@ class DateRangePicker extends Picker {
     })
 
     EventHandler.on(this._startInput, 'input', event => {
-      if (isValidDate(event.target.value)) {
-        this._startDate = this._convertStringToDate(event.target.value)
-        this._calendarDate = this._startDate
+      const date = getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
+      if (date instanceof Date && date.getTime()) {
+        this._startDate = date
+        this._calendarDate = date
         this._updateCalendars()
       }
     })
@@ -199,9 +200,10 @@ class DateRangePicker extends Picker {
     })
 
     EventHandler.on(this._endInput, 'input', event => {
-      if (isValidDate(event.target.value)) {
-        this._endDate = this._convertStringToDate(event.target.value)
-        this._calendarDate = this._endDate
+      const date = getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
+      if (date instanceof Date && date.getTime()) {
+        this._endDate = date
+        this._calendarDate = date
         this._updateCalendars()
       }
     })

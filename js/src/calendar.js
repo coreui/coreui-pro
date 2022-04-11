@@ -110,7 +110,6 @@ class Calendar extends BaseComponent {
 
   // Private
   _addEventListeners() {
-    // Cell interactions
     EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
       event.preventDefault()
       if (event.target.classList.contains('day')) {
@@ -362,7 +361,7 @@ class Calendar extends BaseComponent {
       isStartDate(date, this._startDate, this._endDate) && 'start',
       isEndDate(date, this._startDate, this._endDate) && 'end'
     ]
-    return classNames.join(' ')
+    return classNames.filter(Boolean).join(' ')
   }
 
   _getConfig(config) {
