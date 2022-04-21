@@ -807,6 +807,12 @@ $calendar-theme-map: (
   "calendar-cell-range-hover-border-color":  $calendar-cell-range-hover-border-color-dt
 ) !default;
 
+$date-picker-timepicker-border-color-dt:  $border-color-dt !default;
+
+$date-picker-theme-map: (
+  "date-picker-timepicker-border-top":  $date-picker-timepicker-border-width solid $date-picker-timepicker-border-color-dt
+) !default;
+
 $picker-footer-border-color-dt:  $border-color-dt !default;
 
 $picker-theme-map: (
@@ -815,12 +821,10 @@ $picker-theme-map: (
   "picker-footer-border-top":        $picker-footer-border-width solid $picker-footer-border-color-dt
 ) !default;
 
-$time-picker-body-border-color-dt:  $border-color-dt !default;
 $time-picker-roll-col-color-dt:     $border-color-dt !default;
 
 $time-picker-theme-map: (
-  "time-picker-body-border-top":  $time-picker-body-border-width solid $time-picker-body-border-color-dt,
-  "time-picker-roll-col-border":  $time-picker-body-border-width solid $time-picker-roll-col-color-dt,
+  "time-picker-roll-col-border":  $time-picker-roll-col-border-width solid $time-picker-roll-col-color-dt
 ) !default;
 
 $theme-map: (
@@ -834,6 +838,7 @@ $theme-map: (
   "btn-close":          $close-theme-map,
   "btn-link":           $btn-link-theme-map,
   "calendar":           $calendar-theme-map,
+  "date-picker":        $date-picker-theme-map,
   "card":               $card-theme-map,
   "dropdown-menu":      $dropdown-theme-map,
   "footer":             $footer-theme-map,

@@ -3,11 +3,13 @@
   --#{$variable-prefix}date-picker-ranges-width: #{$date-picker-ranges-width};
   --#{$variable-prefix}date-picker-ranges-padding: #{$date-picker-ranges-padding};
   --#{$variable-prefix}date-picker-ranges-border: #{$date-picker-ranges-border-width} solid #{$date-picker-ranges-border-color};
+  --#{$variable-prefix}date-picker-timepicker-width: #{$date-picker-timepicker-width};
+  --#{$variable-prefix}date-picker-timepicker-border-top: #{$date-picker-timepicker-border-width} solid #{$date-picker-timepicker-border-color};
   // scss-docs-end date-picker-css-vars
-}
 
-.date-picker-body {
-  display: flex;
+  .dropdown-menu {
+    width: min-content;
+  }
 }
 
 .date-picker-ranges {
@@ -49,18 +51,39 @@
   background-image: escape-svg($date-picker-default-icon);
 }
 
-.date-picker .time-picker {
-  .form-select {
-    width: initial;
-    padding-right: .25rem;
-    padding-left: .25rem;
-    text-align: right;
-    background: none;
-    border: 0;
+.date-picker-timepickers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-top: var(--#{$variable-prefix}date-picker-timepicker-border-top);
 
-    &:disabled {
-      color: $text-disabled;
-      background-color: transparent;
+  .time-picker {
+    width: var(--#{$variable-prefix}date-picker-timepicker-width);
+
+    .form-select {
+      width: initial;
+      padding-right: .25rem;
+      padding-left: .25rem;
+      text-align: right;
+      background: none;
+      border: 0;
+
+      &:disabled {
+        color: $text-disabled;
+        background-color: transparent;
+      }
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    display: block;
+
+    .time-picker {
+      width: 100%;
+
+      + .time-picker {
+        border-top: var(--#{$variable-prefix}date-picker-timepicker-border-top);
+      }
     }
   }
 }

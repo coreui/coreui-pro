@@ -49,6 +49,7 @@ const SELECTOR_CALENDAR_CELL_INNER = '.calendar-cell-inner'
 
 const Default = {
   calendarDate: new Date(),
+  calendars: 1,
   disabledDates: null,
   endDate: null,
   firstDayOfWeek: 1,
@@ -63,6 +64,7 @@ const Default = {
 
 const DefaultType = {
   calendarDate: '(date|string|null)',
+  calendars: 'number',
   disabledDates: '(array|null)',
   endDate: '(date|string|null)',
   firstDayOfWeek: 'number',
@@ -89,8 +91,10 @@ class Calendar extends BaseComponent {
     this._calendarDate = this._config.calendarDate
     this._startDate = this._config.startDate
     this._endDate = this._config.endDate
+    this._hoverDate = null
     this._selectEndDate = this._config.selectEndDate
     this._view = 'days'
+
     this._createCalendar()
     this._addEventListeners()
   }
@@ -135,6 +139,8 @@ class Calendar extends BaseComponent {
         return
       }
 
+      this._hoverDate = new Date(Manipulator.getDataAttribute(event.target, 'date'))
+
       EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
         date: new Date(Manipulator.getDataAttribute(event.target, 'date'))
       })
@@ -142,6 +148,9 @@ class Calendar extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_CELL_INNER, event => {
       event.preventDefault()
+
+      this._hoverDate = null
+
       EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
         date: null
       })
@@ -172,14 +181,14 @@ class Calendar extends BaseComponent {
       event.preventDefault()
       this._view = 'months'
       this._element.innerHTML = ''
-      this._createCalendar()
+      this._createCalendarPanel()
     })
 
     EventHandler.on(this._element, 'click', '.btn-year', event => {
       event.preventDefault()
       this._view = 'years'
       this._element.innerHTML = ''
-      this._createCalendar()
+      this._createCalendarPanel()
     })
   }
 
@@ -252,10 +261,18 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _createCalendar() {
-    const { firstDayOfWeek, locale, weekdayFormat } = this._config
-    const year = this._calendarDate.getFullYear()
-    const month = this._calendarDate.getMonth()
+  _createCalendarPanel(addMonths) {
+    let date = this._calendarDate
+
+    if (addMonths !== 0) {
+      date = new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth() + addMonths, 1)
+    }
+
+    const year = date.getFullYear()
+    const month = date.getMonth()
+
+    const calendarPanelEl = document.createElement('div')
+    calendarPanelEl.classList.add('calendar-panel')
 
     // Create navigation
     const navigationElement = document.createElement('div')
@@ -271,10 +288,10 @@ class Calendar extends BaseComponent {
       </div>
       <div class="calendar-nav-date">
         <button class="btn btn-transparent btn-sm btn-month">
-          ${this._calendarDate.toLocaleDateString(locale, { month: 'long' })}
+          ${date.toLocaleDateString(this._config.locale, { month: 'long' })}
         </button>
         <button class="btn btn-transparent btn-sm btn-year">
-          ${this._calendarDate.toLocaleDateString(locale, { year: 'numeric' })}
+          ${date.toLocaleDateString(this._config.locale, { year: 'numeric' })}
         </button>
       </div>
       <div class="calendar-nav-next">
@@ -287,9 +304,9 @@ class Calendar extends BaseComponent {
       </div>
     `
 
-    const monthDetails = getMonthDetails(year, month, firstDayOfWeek)
-    const listOfMonths = createGroupsInArray(getMonthsNames(locale), 4)
-    const listOfYears = createGroupsInArray(getYears(this._calendarDate.getFullYear()), 4)
+    const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek)
+    const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4)
+    const listOfYears = createGroupsInArray(getYears(date.getFullYear()), 4)
     const weekDays = monthDetails[0]
 
     const calendarTable = document.createElement('table')
@@ -300,11 +317,11 @@ class Calendar extends BaseComponent {
           ${weekDays.map(({ date }) => (
             `<th class="calendar-cell">
               <div class="calendar-header-cell-inner">
-              ${typeof weekdayFormat === 'string' ?
-              date.toLocaleDateString(locale, { weekday: weekdayFormat }) :
+              ${typeof this._config.weekdayFormat === 'string' ?
+              date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
               date
-                  .toLocaleDateString(locale, { weekday: 'long' })
-                  .slice(0, weekdayFormat)}
+                  .toLocaleDateString(this._config.locale, { weekday: 'long' })
+                  .slice(0, this._config.weekdayFormat)}
               </div>
             </th>`
           )).join('')}
@@ -315,7 +332,7 @@ class Calendar extends BaseComponent {
           `<tr>${week.map(({ date, month }) => (
             `<td class="calendar-cell ${this._dayClassNames(date, month)}">
               <div class="calendar-cell-inner day" data-coreui-date="${date}">
-                ${date.toLocaleDateString(locale, { day: 'numeric' })}
+                ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
               </div>
             </td>`
           )).join('')}</tr>`
@@ -340,28 +357,50 @@ class Calendar extends BaseComponent {
         )).join('') : ''}
       </tbody>
     `
+    calendarPanelEl.append(navigationElement, calendarTable)
+
+    return calendarPanelEl
+  }
+
+  _createCalendar() {
+    const calendarsEl = document.createElement('div')
+    calendarsEl.classList.add('calendars')
+    Array.from({ length: this._config.calendars }).forEach((_, index) => (
+      calendarsEl.append(this._createCalendarPanel(index))
+    ))
 
     this._element.classList.add(CLASS_NAME_CALENDAR)
-    this._element.append(navigationElement, calendarTable)
+    this._element.append(calendarsEl)
   }
 
   _updateCalendar() {
     this._element.innerHTML = ''
-    this._createCalendar()
+    this._createCalendarPanel()
   }
 
   _dayClassNames(date, month) {
-    const classNames = [
-      isToday(date) && 'today',
-      isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled',
-      `${month}`,
-      isLastDayOfMonth(date) && 'last',
-      month === 'current' && isDateInRange(date, this._startDate, this._endDate) && 'range',
-      isDateSelected(date, this._startDate, this._endDate) && 'selected',
-      isStartDate(date, this._startDate, this._endDate) && 'start',
-      isEndDate(date, this._startDate, this._endDate) && 'end'
-    ]
-    return classNames.filter(Boolean).join(' ')
+    const classNames = {
+      today: isToday(date),
+      disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
+      [month]: true,
+      last: isLastDayOfMonth(date),
+      range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
+      'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ?
+        isDateInRange(date, this._startDate, this._hoverDate) :
+        isDateInRange(date, this._hoverDate, this._endDate)),
+      selected: isDateSelected(date, this._startDate, this._endDate),
+      start: isStartDate(date, this._startDate, this._endDate),
+      end: isEndDate(date, this._startDate, this._endDate)
+    }
+
+    // eslint-disable-next-line unicorn/no-array-reduce, unicorn/prefer-object-from-entries
+    const result = Object.keys(classNames).reduce((o, key) => {
+      // eslint-disable-next-line no-unused-expressions
+      classNames[key] === true && (o[key] = classNames[key])
+      return o
+    }, {})
+
+    return Object.keys(result).join(' ')
   }
 
   _getConfig(config) {

@@ -72,7 +72,8 @@ class DatePicker extends DateRangePicker {
         this._updateCalendars()
 
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-          date: event.date
+          date: event.date,
+          formatedDate: event.date ? this._formatDate(event.date) : undefined
         })
       })
     })

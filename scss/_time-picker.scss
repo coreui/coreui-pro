@@ -1,7 +1,6 @@
 .time-picker {
   // scss-docs-start time-picker-css-vars
   --#{$variable-prefix}time-picker-body-padding: #{$time-picker-body-padding};
-  --#{$variable-prefix}time-picker-body-border-top: #{$time-picker-body-border-width} solid #{$time-picker-body-border-color};
   --#{$variable-prefix}time-picker-roll-col-border: #{$time-picker-roll-col-border-width} solid #{$time-picker-roll-col-border-color};
   // scss-docs-end time-picker-css-vars
 }
@@ -10,7 +9,6 @@
   display: flex;
   align-items: center;
   padding: var(--#{$variable-prefix}time-picker-body-padding);
-  border-top: var(--#{$variable-prefix}time-picker-body-border-top);
 
   .form-select {
     padding-right: 1.25rem;
@@ -18,6 +16,13 @@
 
     + .form-select {
       margin-left: $spacer * .5;
+    }
+
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+
+    &::-webkit-scrollbar {
+      width: 10px;
     }
   }
 
@@ -53,6 +58,13 @@
   height: calc(8 * 32px); // stylelint-disable-line
   overflow: scroll;
   border-right: var(--#{$variable-prefix}time-picker-roll-col-border);
+
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
 }
 
 .time-picker-roll-cell {

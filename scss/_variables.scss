@@ -2292,6 +2292,10 @@ $date-picker-ranges-width:             10rem !default;
 $date-picker-ranges-padding:           $spacer * .5 !default;
 $date-picker-ranges-border-width:      1px !default;
 $date-picker-ranges-border-color:      $border-color !default;
+
+$date-picker-timepicker-width:         (7 * $calendar-table-cell-size) + (2 * $calendar-table-margin) !default;
+$date-picker-timepicker-border-width:  1px !default;
+$date-picker-timepicker-border-color:  $border-color !default;
 // scss-docs-end date-picker-variables
 
 // Time Picker
@@ -2305,8 +2309,6 @@ $time-picker-cleaner-icon-hover-color: $body-color !default;
 $time-picker-cleaner-icon-hover:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
 
 $time-picker-body-padding:             $spacer * .5 !default;
-$time-picker-body-border-width:        1px !default;
-$time-picker-body-border-color:        $border-color !default;
 $time-picker-roll-col-border-width:    1px !default;
 $time-picker-roll-col-border-color:    $border-color !default;
 // scss-docs-end time-picker-variables

@@ -24,9 +24,9 @@ const EVENT_KEY = `.${DATA_KEY}`
 const EVENT_CANCEL = `onCancelClick${EVENT_KEY}`
 
 const Default = {
-  cancelButtonLabel: 'Cancel',
+  cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
-  confirmButtonLabel: 'OK',
+  confirmButton: 'OK',
   confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
   container: 'dropdown',
   disabled: false,
@@ -34,9 +34,9 @@ const Default = {
 }
 
 const DefaultType = {
-  cancelButtonLabel: 'string',
+  cancelButton: '(boolean|string)',
   cancelButtonClasses: '(array|string)',
-  confirmButtonLabel: 'string',
+  confirmButton: '(boolean|string)',
   confirmButtonClasses: '(array|string)',
   container: 'string',
   disabled: 'boolean',
@@ -115,25 +115,38 @@ class Picker extends BaseComponent {
     const footerEl = document.createElement('div')
     footerEl.classList.add('picker-footer')
 
-    const cancelButtonEl = document.createElement('button')
-    cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses))
-    cancelButtonEl.type = 'button'
-    cancelButtonEl.innerHTML = this._config.cancelButtonLabel
-    cancelButtonEl.addEventListener('click', () => {
-      this._dropdown.hide()
-      EventHandler.trigger(this._element, EVENT_CANCEL)
-    })
+    footerEl.append(this._createFooterContent())
 
-    const okButtonEl = document.createElement('button')
-    okButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses))
-    okButtonEl.type = 'button'
-    okButtonEl.innerHTML = this._config.confirmButtonLabel
-    okButtonEl.addEventListener('click', () => {
-      this._dropdown.hide()
-    })
+    if (this._config.cancelButton) {
+      const cancelButtonEl = document.createElement('button')
+      cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses))
+      cancelButtonEl.type = 'button'
+      cancelButtonEl.innerHTML = this._config.cancelButton
+      cancelButtonEl.addEventListener('click', () => {
+        this._dropdown.hide()
+        EventHandler.trigger(this._element, EVENT_CANCEL)
+      })
 
-    footerEl.append(cancelButtonEl, okButtonEl)
+      footerEl.append(cancelButtonEl)
+    }
+
+    if (this._config.confirmButton) {
+      const confirmButtonEl = document.createElement('button')
+      confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses))
+      confirmButtonEl.type = 'button'
+      confirmButtonEl.innerHTML = this._config.confirmButton
+      confirmButtonEl.addEventListener('click', () => {
+        this._dropdown.hide()
+      })
+
+      footerEl.append(confirmButtonEl)
+    }
+
     this._dropdownMenuEl.append(footerEl)
+  }
+
+  _createFooterContent() {
+    return ''
   }
 
   _createPicker() {
