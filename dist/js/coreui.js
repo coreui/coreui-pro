@@ -1,13 +1,13 @@
 /*!
-  * CoreUI v4.2.0-rc.0 (https://coreui.io)
+  * CoreUI v4.2.0-rc.1 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.coreui = factory(global.Popper));
-})(this, (function (Popper) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('date-fns'), require('@popperjs/core')) :
+  typeof define === 'function' && define.amd ? define(['date-fns', '@popperjs/core'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.coreui = factory(global.dateFns, global.Popper));
+})(this, (function (dateFns, Popper) { 'use strict';
 
   function _interopNamespace(e) {
     if (e && e.__esModule) return e;
@@ -31,7 +31,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): alert.js
+   * CoreUI (v4.2.0-rc.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -365,7 +365,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): dom/event-handler.js
+   * CoreUI (v4.2.0-rc.1): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -656,7 +656,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): dom/data.js
+   * CoreUI (v4.2.0-rc.1): dom/data.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dom/data.js
@@ -713,7 +713,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): alert.js
+   * CoreUI (v4.2.0-rc.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -726,7 +726,7 @@
    * ------------------------------------------------------------------------
    */
 
-  const VERSION = '4.2.0-rc.0';
+  const VERSION = '4.2.0-rc.1';
 
   class BaseComponent {
     constructor(element) {
@@ -808,7 +808,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): alert.js
+   * CoreUI (v4.2.0-rc.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's alert.js
@@ -900,7 +900,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): alert.js
+   * CoreUI (v4.2.0-rc.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's button.js
@@ -974,7 +974,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): dom/manipulator.js
+   * CoreUI (v4.2.0-rc.1): dom/manipulator.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -1246,6 +1246,7 @@
   const SELECTOR_CALENDAR_CELL_INNER = '.calendar-cell-inner';
   const Default$j = {
     calendarDate: new Date(),
+    calendars: 1,
     disabledDates: null,
     endDate: null,
     firstDayOfWeek: 1,
@@ -1259,6 +1260,7 @@
   };
   const DefaultType$j = {
     calendarDate: '(date|string|null)',
+    calendars: 'number',
     disabledDates: '(array|null)',
     endDate: '(date|string|null)',
     firstDayOfWeek: 'number',
@@ -1283,6 +1285,7 @@
       this._calendarDate = this._config.calendarDate;
       this._startDate = this._config.startDate;
       this._endDate = this._config.endDate;
+      this._hoverDate = null;
       this._selectEndDate = this._config.selectEndDate;
       this._view = 'days';
 
@@ -1333,12 +1336,14 @@
           return;
         }
 
+        this._hoverDate = new Date(Manipulator.getDataAttribute(event.target, 'date'));
         EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
           date: new Date(Manipulator.getDataAttribute(event.target, 'date'))
         });
       });
       EventHandler.on(this._element, EVENT_MOUSELEAVE$1, SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
+        this._hoverDate = null;
         EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
           date: null
         });
@@ -1369,14 +1374,14 @@
         this._view = 'months';
         this._element.innerHTML = '';
 
-        this._createCalendar();
+        this._createCalendarPanel();
       });
       EventHandler.on(this._element, 'click', '.btn-year', event => {
         event.preventDefault();
         this._view = 'years';
         this._element.innerHTML = '';
 
-        this._createCalendar();
+        this._createCalendarPanel();
       });
     }
 
@@ -1451,17 +1456,17 @@
       }
     }
 
-    _createCalendar() {
-      const {
-        firstDayOfWeek,
-        locale,
-        weekdayFormat
-      } = this._config;
+    _createCalendarPanel(addMonths) {
+      let date = this._calendarDate;
 
-      const year = this._calendarDate.getFullYear();
+      if (addMonths !== 0) {
+        date = new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth() + addMonths, 1);
+      }
 
-      const month = this._calendarDate.getMonth(); // Create navigation
-
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const calendarPanelEl = document.createElement('div');
+      calendarPanelEl.classList.add('calendar-panel'); // Create navigation
 
       const navigationElement = document.createElement('div');
       navigationElement.classList.add('calendar-nav');
@@ -1476,12 +1481,12 @@
       </div>
       <div class="calendar-nav-date">
         <button class="btn btn-transparent btn-sm btn-month">
-          ${this._calendarDate.toLocaleDateString(locale, {
+          ${date.toLocaleDateString(this._config.locale, {
       month: 'long'
     })}
         </button>
         <button class="btn btn-transparent btn-sm btn-year">
-          ${this._calendarDate.toLocaleDateString(locale, {
+          ${date.toLocaleDateString(this._config.locale, {
       year: 'numeric'
     })}
         </button>
@@ -1495,9 +1500,9 @@
         </button>
       </div>
     `;
-      const monthDetails = getMonthDetails(year, month, firstDayOfWeek);
-      const listOfMonths = createGroupsInArray(getMonthsNames(locale), 4);
-      const listOfYears = createGroupsInArray(getYears(this._calendarDate.getFullYear()), 4);
+      const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek);
+      const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4);
+      const listOfYears = createGroupsInArray(getYears(date.getFullYear()), 4);
       const weekDays = monthDetails[0];
       const calendarTable = document.createElement('table');
       calendarTable.innerHTML = `
@@ -1508,11 +1513,11 @@
       date
     }) => `<th class="calendar-cell">
               <div class="calendar-header-cell-inner">
-              ${typeof weekdayFormat === 'string' ? date.toLocaleDateString(locale, {
-      weekday: weekdayFormat
-    }) : date.toLocaleDateString(locale, {
+              ${typeof this._config.weekdayFormat === 'string' ? date.toLocaleDateString(this._config.locale, {
+      weekday: this._config.weekdayFormat
+    }) : date.toLocaleDateString(this._config.locale, {
       weekday: 'long'
-    }).slice(0, weekdayFormat)}
+    }).slice(0, this._config.weekdayFormat)}
               </div>
             </th>`).join('')}
         </tr>
@@ -1523,7 +1528,7 @@
       month
     }) => `<td class="calendar-cell ${this._dayClassNames(date, month)}">
               <div class="calendar-cell-inner day" data-coreui-date="${date}">
-                ${date.toLocaleDateString(locale, {
+                ${date.toLocaleDateString(this._config.locale, {
       day: 'numeric'
     })}
               </div>
@@ -1540,21 +1545,47 @@
             </td>`).join('')}</tr>`).join('') : ''}
       </tbody>
     `;
+      calendarPanelEl.append(navigationElement, calendarTable);
+      return calendarPanelEl;
+    }
+
+    _createCalendar() {
+      const calendarsEl = document.createElement('div');
+      calendarsEl.classList.add('calendars');
+      Array.from({
+        length: this._config.calendars
+      }).forEach((_, index) => calendarsEl.append(this._createCalendarPanel(index)));
 
       this._element.classList.add(CLASS_NAME_CALENDAR);
 
-      this._element.append(navigationElement, calendarTable);
+      this._element.append(calendarsEl);
     }
 
     _updateCalendar() {
       this._element.innerHTML = '';
 
-      this._createCalendar();
+      this._createCalendarPanel();
     }
 
     _dayClassNames(date, month) {
-      const classNames = [isToday(date) && 'today', isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) && 'disabled', `${month}`, isLastDayOfMonth(date) && 'last', month === 'current' && isDateInRange(date, this._startDate, this._endDate) && 'range', isDateSelected(date, this._startDate, this._endDate) && 'selected', isStartDate(date, this._startDate, this._endDate) && 'start', isEndDate(date, this._startDate, this._endDate) && 'end'];
-      return classNames.filter(Boolean).join(' ');
+      const classNames = {
+        today: isToday(date),
+        disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
+        [month]: true,
+        last: isLastDayOfMonth(date),
+        range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
+        'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
+        selected: isDateSelected(date, this._startDate, this._endDate),
+        start: isStartDate(date, this._startDate, this._endDate),
+        end: isEndDate(date, this._startDate, this._endDate)
+      }; // eslint-disable-next-line unicorn/no-array-reduce, unicorn/prefer-object-from-entries
+
+      const result = Object.keys(classNames).reduce((o, key) => {
+        // eslint-disable-next-line no-unused-expressions
+        classNames[key] === true && (o[key] = classNames[key]);
+        return o;
+      }, {});
+      return Object.keys(result).join(' ');
     }
 
     _getConfig(config) {
@@ -1619,7 +1650,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): dom/selector-engine.js
+   * CoreUI (v4.2.0-rc.1): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -1692,7 +1723,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): carousel.js
+   * CoreUI (v4.2.0-rc.1): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -2244,7 +2275,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): collapse.js
+   * CoreUI (v4.2.0-rc.1): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js
@@ -2566,7 +2597,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): dropdown.js
+   * CoreUI (v4.2.0-rc.1): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dropdown.js
@@ -3031,7 +3062,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-rc.0): picker.js
+   * CoreUI PRO (v4.2.0-rc.1): picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -3046,18 +3077,18 @@
   const EVENT_KEY$f = `.${DATA_KEY$f}`;
   const EVENT_CANCEL = `onCancelClick${EVENT_KEY$f}`;
   const Default$f = {
-    cancelButtonLabel: 'Cancel',
+    cancelButton: 'Cancel',
     cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
-    confirmButtonLabel: 'OK',
+    confirmButton: 'OK',
     confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
     container: 'dropdown',
     disabled: false,
     footer: false
   };
   const DefaultType$f = {
-    cancelButtonLabel: 'string',
+    cancelButton: '(boolean|string)',
     cancelButtonClasses: '(array|string)',
-    confirmButtonLabel: 'string',
+    confirmButton: '(boolean|string)',
     confirmButtonClasses: '(array|string)',
     container: 'string',
     disabled: 'boolean',
@@ -3130,25 +3161,37 @@
     _createFooter() {
       const footerEl = document.createElement('div');
       footerEl.classList.add('picker-footer');
-      const cancelButtonEl = document.createElement('button');
-      cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
-      cancelButtonEl.type = 'button';
-      cancelButtonEl.innerHTML = this._config.cancelButtonLabel;
-      cancelButtonEl.addEventListener('click', () => {
-        this._dropdown.hide();
+      footerEl.append(this._createFooterContent());
 
-        EventHandler.trigger(this._element, EVENT_CANCEL);
-      });
-      const okButtonEl = document.createElement('button');
-      okButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
-      okButtonEl.type = 'button';
-      okButtonEl.innerHTML = this._config.confirmButtonLabel;
-      okButtonEl.addEventListener('click', () => {
-        this._dropdown.hide();
-      });
-      footerEl.append(cancelButtonEl, okButtonEl);
+      if (this._config.cancelButton) {
+        const cancelButtonEl = document.createElement('button');
+        cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
+        cancelButtonEl.type = 'button';
+        cancelButtonEl.innerHTML = this._config.cancelButton;
+        cancelButtonEl.addEventListener('click', () => {
+          this._dropdown.hide();
+
+          EventHandler.trigger(this._element, EVENT_CANCEL);
+        });
+        footerEl.append(cancelButtonEl);
+      }
+
+      if (this._config.confirmButton) {
+        const confirmButtonEl = document.createElement('button');
+        confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
+        confirmButtonEl.type = 'button';
+        confirmButtonEl.innerHTML = this._config.confirmButton;
+        confirmButtonEl.addEventListener('click', () => {
+          this._dropdown.hide();
+        });
+        footerEl.append(confirmButtonEl);
+      }
 
       this._dropdownMenuEl.append(footerEl);
+    }
+
+    _createFooterContent() {
+      return '';
     }
 
     _createPicker() {
@@ -3694,7 +3737,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-rc.0): date-range-picker.js
+   * CoreUI PRO (v4.2.0-rc.1): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -3721,6 +3764,7 @@
     disabledDates: null,
     endDate: null,
     firstDayOfWeek: 1,
+    format: null,
     indicator: true,
     locale: 'default',
     maxDate: null,
@@ -3733,7 +3777,9 @@
     size: null,
     startDate: null,
     selectEndDate: false,
-    timepicker: false
+    timepicker: false,
+    todayButton: 'Today',
+    todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto']
   };
   const DefaultType$d = { ...Picker.DefaultType,
     calendars: 'number',
@@ -3744,6 +3790,7 @@
     disabled: 'boolean',
     endDate: '(date|string|null)',
     firstDayOfWeek: 'number',
+    format: '(string|null)',
     indicator: 'boolean',
     locale: 'string',
     maxDate: '(date|string|null)',
@@ -3756,7 +3803,9 @@
     size: '(string|null)',
     startDate: '(date|string|null)',
     selectEndDate: 'boolean',
-    timepicker: 'boolean'
+    timepicker: 'boolean',
+    todayButton: '(boolean|string)',
+    todayButtonClasses: '(array|string)'
   };
   /**
   * ------------------------------------------------------------------------
@@ -3782,6 +3831,7 @@
       this._dateRangePicker = null;
       this._endInput = null;
       this._startInput = null;
+      this._timepickers = null;
       this._timePickerEnd = null;
       this._timePickerStart = null;
 
@@ -3815,6 +3865,10 @@
       this._startInput.value = this._setInputValue(this._initialStartDate);
       this._calendars.innerHTML = '';
 
+      if (this._config.timepicker) {
+        this._timepickers.innerHTML = '';
+      }
+
       this._createCalendars();
 
       this._addCalendarEventListeners();
@@ -3827,6 +3881,10 @@
       this._startInput.value = '';
       this._calendars.innerHTML = '';
 
+      if (this._config.timepicker) {
+        this._timepickers.innerHTML = '';
+      }
+
       this._createCalendars();
 
       this._addCalendarEventListeners();
@@ -3838,6 +3896,10 @@
       this._startDate = this._config.startDate;
       this._startInput.value = this._setInputValue(this._config.startDate);
       this._calendars.innerHTML = '';
+
+      if (this._config.timepicker) {
+        this._timepickers.innerHTML = '';
+      }
 
       this._createCalendars();
 
@@ -3871,7 +3933,9 @@
         this._updateCalendars();
       });
       EventHandler.on(this._startInput, 'input', event => {
-        const date = getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+        const date = this._config.format ? dateFns.parseISO(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker); // eslint-disable-next-line no-console
+
+        console.log(dateFns.parseISO(event.target.value));
 
         if (date instanceof Date && date.getTime()) {
           this._startDate = date;
@@ -3888,7 +3952,7 @@
         this._updateCalendars();
       });
       EventHandler.on(this._endInput, 'input', event => {
-        const date = getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+        const date = this._config.format ? dateFns.parseISO(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
 
         if (date instanceof Date && date.getTime()) {
           this._endDate = date;
@@ -3923,7 +3987,8 @@
           }
 
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date: event.date
+            date: event.date,
+            formatedDate: event.date ? this._formatDate(event.date) : undefined
           });
         });
         EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
@@ -3938,16 +4003,17 @@
           }
 
           EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date: event.date
+            date: event.date,
+            formatedDate: event.date ? this._formatDate(event.date) : undefined
           });
         });
         EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
           if (this._selectEndDate) {
-            this._endInput.value = event.date ? event.date.toLocaleDateString(this._config.locale) : this._endDate ? this._setInputValue(this._endDate) : '';
+            this._endInput.value = event.date ? this._formatDate(event.date) : '';
             return;
           }
 
-          this._startInput.value = event.date ? event.date.toLocaleDateString(this._config.locale) : this._startDate ? this._setInputValue(this._startDate) : '';
+          this._startInput.value = event.date ? this._formatDate(event.date) : '';
         });
       });
     }
@@ -3961,7 +4027,7 @@
       inputEl.classList.add('form-control');
       inputEl.disabled = this._config.disabled;
       inputEl.placeholder = placeholder;
-      inputEl.readOnly = this._config.inputReadOnly;
+      inputEl.readOnly = this._config.inputReadOnly || typeof this._config.format === 'string';
       inputEl.type = 'text';
       inputEl.value = value;
       return inputEl;
@@ -4019,72 +4085,73 @@
     }
 
     _createCalendars() {
-      Array.from({
-        length: this._mobile ? 1 : this._config.calendars
-      }).forEach((_, index) => {
-        const calendarEl = document.createElement('div');
-        calendarEl.classList.add('date-picker-calendar');
+      const calendarEl = document.createElement('div');
+      calendarEl.classList.add('date-picker-calendar');
 
-        this._calendars.append(calendarEl); // eslint-disable-next-line no-new
+      this._calendars.append(calendarEl); // eslint-disable-next-line no-new
 
 
-        new Calendar(calendarEl, {
-          calendarDate: new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth() + index, 1),
-          disabledDates: this._config.disabledDates,
-          endDate: this._endDate,
-          firstDayOfWeek: this._config.firstDayOfWeek,
-          locale: this._config.locale,
-          maxDate: this._config.maxDate,
-          minDate: this._config.minDate,
-          range: this._config.range,
-          selectEndDate: this._selectEndDate,
-          startDate: this._startDate
-        });
-        EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-          this._calendarDate = new Date(event.date.getFullYear(), event.date.getMonth() - index, 1);
+      new Calendar(calendarEl, {
+        calendarDate: new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth(), 1),
+        calendars: this._config.calendars,
+        disabledDates: this._config.disabledDates,
+        endDate: this._endDate,
+        firstDayOfWeek: this._config.firstDayOfWeek,
+        locale: this._config.locale,
+        maxDate: this._config.maxDate,
+        minDate: this._config.minDate,
+        range: this._config.range,
+        selectEndDate: this._selectEndDate,
+        startDate: this._startDate
+      });
+      EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
+        this._calendarDate = new Date(event.date.getFullYear(), event.date.getMonth(), 1);
 
-          this._updateCalendars();
-        });
+        this._updateCalendars();
+      });
 
-        if (this._config.timepicker) {
-          if ((this._config.calendars === 1 || this._mobile) && this._config.range) {
-            const timePickerStartEl = document.createElement('div');
-            timePickerStartEl.classList.add('time-picker'); // eslint-disable-next-line no-new
+      if (this._config.timepicker) {
+        if (this._mobile || this._range && this._config.calendars === 1) {
+          const timePickerStartEl = document.createElement('div');
+          timePickerStartEl.classList.add('time-picker'); // eslint-disable-next-line no-new
 
-            new TimePicker(timePickerStartEl, {
-              container: 'inline',
-              disabled: !this._startDate,
-              locale: this._config.locale,
-              time: this._startDate,
-              variant: 'select'
-            });
-            calendarEl.append(timePickerStartEl);
-            EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
-              this._startDate = event.date;
-              this._startInput.value = this._setInputValue(this._startDate);
+          new TimePicker(timePickerStartEl, {
+            container: 'inline',
+            disabled: !this._startDate,
+            locale: this._config.locale,
+            time: this._startDate,
+            variant: 'select'
+          });
+          calendarEl.append(timePickerStartEl);
+          EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
+            this._startDate = event.date;
+            this._startInput.value = this._setInputValue(this._startDate);
 
-              this._updateCalendars();
-            });
-            const timePickerEndEl = document.createElement('div');
-            timePickerEndEl.classList.add('time-picker'); // eslint-disable-next-line no-new
+            this._updateCalendars();
+          });
+          const timePickerEndEl = document.createElement('div');
+          timePickerEndEl.classList.add('time-picker'); // eslint-disable-next-line no-new
 
-            new TimePicker(timePickerEndEl, {
-              container: 'inline',
-              disabled: !this._endDate,
-              locale: this._config.locale,
-              time: this._endDate,
-              variant: 'select'
-            });
-            calendarEl.append(timePickerEndEl);
-            EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
-              this._endDate = event.date;
-              this._endInput.value = this._setInputValue(this._endDate);
+          new TimePicker(timePickerEndEl, {
+            container: 'inline',
+            disabled: !this._endDate,
+            locale: this._config.locale,
+            time: this._endDate,
+            variant: 'select'
+          });
 
-              this._updateCalendars();
-            });
-          }
+          this._timepickers.append(timePickerEndEl);
 
-          if (!this._mobile && (index === 0 || this._config.calendars - index === 1)) {
+          EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
+            this._endDate = event.date;
+            this._endInput.value = this._setInputValue(this._endDate);
+
+            this._updateCalendars();
+          });
+        } else {
+          Array.from({
+            length: this._config.calendars
+          }).forEach((_, index) => {
             const timePickerEl = document.createElement('div');
             timePickerEl.classList.add('time-picker'); // eslint-disable-next-line no-new
 
@@ -4095,7 +4162,9 @@
               time: index === 0 ? this._startDate : this._endDate,
               variant: 'select'
             });
-            calendarEl.append(timePickerEl);
+
+            this._timepickers.append(timePickerEl);
+
             EventHandler.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
               if (index === 0) {
                 this._startDate = event.date;
@@ -4107,11 +4176,9 @@
 
               this._updateCalendars();
             });
-          }
+          });
         }
-
-        this._calendars.append(calendarEl);
-      });
+      }
     }
 
     _createDateRangePicker() {
@@ -4151,15 +4218,63 @@
       calendarsEl.classList.add('date-picker-calendars');
       this._calendars = calendarsEl;
       dateRangePickerBodyEl.append(calendarsEl);
+
+      if (this._config.timepicker) {
+        const timepickersEl = document.createElement('div');
+        timepickersEl.classList.add('date-picker-timepickers');
+        this._timepickers = timepickersEl;
+        dateRangePickerBodyEl.append(timepickersEl);
+      }
+
       return dateRangePickerBodyEl;
     }
 
+    _createFooterContent() {
+      if (this._config.todayButton) {
+        const todayButtonEl = document.createElement('button');
+        todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses));
+        todayButtonEl.type = 'button';
+        todayButtonEl.innerHTML = this._config.todayButton;
+        todayButtonEl.addEventListener('click', () => {
+          const date = new Date();
+          this._calendarDate = date;
+          this._startDate = date;
+          this._endDate = date;
+          this._endInput.value = this._setInputValue(date);
+          this._startInput.value = this._setInputValue(date);
+
+          this._updateCalendars();
+        });
+        return todayButtonEl;
+      }
+    }
+
+    _formatDate(date) {
+      if (this._config.format) {
+        return dateFns.format(date, this._config.format);
+      }
+
+      if (this._config.timepicker) {
+        return date.toLocaleString(this._config.locale);
+      }
+
+      return date.toLocaleDateString(this._config.locale);
+    }
+
     _setInputValue(date) {
-      return date ? this._config.timepicker ? date.toLocaleString(this._config.locale) : date.toLocaleDateString(this._config.locale) : '';
+      if (date) {
+        return this._formatDate(date);
+      }
+
+      return '';
     }
 
     _updateCalendars() {
       this._calendars.innerHTML = '';
+
+      if (this._config.timepicker) {
+        this._timepickers.innerHTML = '';
+      }
 
       this._createCalendars();
 
@@ -4242,7 +4357,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-rc.0): date-picker.js
+   * CoreUI PRO (v4.2.0-rc.1): date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -4301,7 +4416,8 @@
           this._updateCalendars();
 
           EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-            date: event.date
+            date: event.date,
+            formatedDate: event.date ? this._formatDate(event.date) : undefined
           });
         });
       });
@@ -4362,7 +4478,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-rc.0): loading-button.js
+   * CoreUI PRO (v4.2.0-rc.1): loading-button.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -4874,7 +4990,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.2.0-rc.0): modal.js
+    * CoreUI (v4.2.0-rc.1): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js
@@ -5306,7 +5422,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.0-rc.0): multi-select.js
+   * CoreUI PRO (v4.2.0-rc.1): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -6155,7 +6271,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): navigation.js
+   * CoreUI (v4.2.0-rc.1): navigation.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -6440,7 +6556,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): dropdown.js
+   * CoreUI (v4.2.0-rc.1): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js
@@ -6699,7 +6815,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): alert.js
+   * CoreUI (v4.2.0-rc.1): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -6814,7 +6930,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): tooltip.js
+   * CoreUI (v4.2.0-rc.1): tooltip.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tooltip.js
@@ -7527,7 +7643,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): popover.js
+   * CoreUI (v4.2.0-rc.1): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js
@@ -7640,7 +7756,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): scrollspy.js
+   * CoreUI (v4.2.0-rc.1): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js
@@ -7878,7 +7994,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): sidebar.js
+   * CoreUI (v4.2.0-rc.1): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -8203,7 +8319,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): tab.js
+   * CoreUI (v4.2.0-rc.1): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -8404,7 +8520,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): toast.js
+   * CoreUI (v4.2.0-rc.1): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -8637,7 +8753,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.0-rc.0): index.esm.js
+   * CoreUI (v4.2.0-rc.1): index.esm.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

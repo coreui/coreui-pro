@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.2.0-rc.0
+ * @version v4.2.0-rc.1
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -7615,6 +7615,10 @@ html:not([dir=rtl]) .avatars-stack .avatar-xl {
   display: none;
 }
 
+.calendars {
+  display: flex;
+}
+
 .calendar-nav {
   display: flex;
   align-items: baseline;
@@ -8014,10 +8018,13 @@ html:not([dir=rtl]) .picker-footer .btn + .btn {
   --cui-date-picker-ranges-width: 10rem;
   --cui-date-picker-ranges-padding: 0.5rem;
   --cui-date-picker-ranges-border: 1px solid #d8dbe0;
+  --cui-date-picker-timepicker-width: 20.25rem;
+  --cui-date-picker-timepicker-border-top: 1px solid #d8dbe0;
 }
-
-.date-picker-body {
-  display: flex;
+.date-picker .dropdown-menu {
+  width: -webkit-min-content;
+  width: -moz-min-content;
+  width: min-content;
 }
 
 .date-picker-ranges {
@@ -8054,7 +8061,16 @@ html:not([dir=rtl]) .date-picker-arrow-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'%3e%3cpath fill='%238a93a2' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'%3e%3c/path%3e%3crect width='32' height='32' x='112' y='224' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='200' y='224' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='280' y='224' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='368' y='224' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='112' y='296' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='200' y='296' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='280' y='296' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='368' y='296' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='112' y='368' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='200' y='368' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='280' y='368' fill='%238a93a2'%3e%3c/rect%3e%3crect width='32' height='32' x='368' y='368' fill='%238a93a2'%3e%3c/rect%3e%3c/svg%3e");
 }
 
-.date-picker .time-picker .form-select {
+.date-picker-timepickers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border-top: var(--cui-date-picker-timepicker-border-top);
+}
+.date-picker-timepickers .time-picker {
+  width: var(--cui-date-picker-timepicker-width);
+}
+.date-picker-timepickers .time-picker .form-select {
   width: initial;
   padding-right: 0.25rem;
   padding-left: 0.25rem;
@@ -8062,14 +8078,24 @@ html:not([dir=rtl]) .date-picker-arrow-icon {
   background: none;
   border: 0;
 }
-.date-picker .time-picker .form-select:disabled {
+.date-picker-timepickers .time-picker .form-select:disabled {
   color: rgba(44, 56, 74, 0.38);
   background-color: transparent;
+}
+@media (max-width: 767.98px) {
+  .date-picker-timepickers {
+    display: block;
+  }
+  .date-picker-timepickers .time-picker {
+    width: 100%;
+  }
+  .date-picker-timepickers .time-picker + .time-picker {
+    border-top: var(--cui-date-picker-timepicker-border-top);
+  }
 }
 
 .time-picker {
   --cui-time-picker-body-padding: 0.5rem;
-  --cui-time-picker-body-border-top: 1px solid #d8dbe0;
   --cui-time-picker-roll-col-border: 1px solid #d8dbe0;
 }
 
@@ -8077,14 +8103,20 @@ html:not([dir=rtl]) .date-picker-arrow-icon {
   display: flex;
   align-items: center;
   padding: var(--cui-time-picker-body-padding);
-  border-top: var(--cui-time-picker-body-border-top);
 }
 .time-picker-body .form-select {
   padding-right: 1.25rem;
   background-position: right 0.5rem center;
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
 }
 .time-picker-body .form-select + .form-select {
   margin-left: 0.5rem;
+}
+.time-picker-body .form-select::-webkit-scrollbar {
+  width: 10px;
 }
 .time-picker-body .time-picker-inline-icon {
   display: block;
@@ -8116,6 +8148,14 @@ html:not([dir=rtl]) .date-picker-arrow-icon {
   height: 256px;
   overflow: scroll;
   border-right: var(--cui-time-picker-roll-col-border);
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+}
+.time-picker-roll-col::-webkit-scrollbar {
+  display: none;
+  /* Safari and Chrome */
 }
 
 .time-picker-roll-cell {

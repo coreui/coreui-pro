@@ -310,6 +310,12 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>Toggle visibility of footer element.</td>
     </tr>
     <tr>
+      <td><code>format</code></td>
+      <td>string</td>
+      <td></td>
+      <td>Set date format. We use date-fns to format dates. Visit <a href="https://date-fns.org/v2.28.0/docs/format" target="_blank" rel="nofollow">https://date-fns.org/v2.28.0/docs/format</a> to check accepted patterns.</td>
+    </tr>
+    <tr>
       <td><code>indicator</code></td>
       <td>boolean</td>
       <td><code>true</code></td>
@@ -358,8 +364,20 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>Provide an additional time selection by adding select boxes to choose times.</td>
     </tr>
     <tr>
+      <td><code>todayButton</code></td>
+      <td>string</td>
+      <td><code>'Today'</code></td>
+      <td>Today button inner HTML</td>
+    </tr>
+    <tr>
+      <td><code>todayButtonClasses</code></td>
+      <td>array | string</td>
+      <td><code>['btn', 'btn-sm', 'me-2']</code></td>
+      <td>CSS class names that will be added to the today button</td>
+    </tr>
+    <tr>
       <td><code>weekdayFormat</code></td>
-      <td>number | string</td>
+      <td>number | 'long' | 'narrow' | 'short'</td>
       <td><code>2</code></td>
       <td>Set length or format of day name.</td>
     </tr>

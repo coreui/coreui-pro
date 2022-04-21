@@ -97,6 +97,9 @@
   --cui-calendar-cell-range-hover-bg: #948dd2;
   --cui-calendar-cell-range-hover-border-color: #857dcc;
 }
+.dark-theme .date-picker {
+  --cui-date-picker-timepicker-border-top: 1px solid rgba(255, 255, 255, 0.075);
+}
 .dark-theme .card {
   --cui-card-bg: #24252f;
   --cui-card-border-color: rgba(255, 255, 255, 0.075);
@@ -409,7 +412,6 @@
 }
 
 .dark-theme .time-picker {
-  --cui-time-picker-body-border-top: 1px solid rgba(255, 255, 255, 0.075);
   --cui-time-picker-roll-col-border: 1px solid rgba(255, 255, 255, 0.075);
 }
 .dark-theme .toast {
