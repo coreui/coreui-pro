@@ -12,7 +12,18 @@
   }
 }
 
+.date-picker-body {
+  display: grid;
+  grid-template-areas:
+    "ranges calendars"
+    "ranges timepickers";
+  grid-template-rows: auto;
+  grid-template-columns: auto auto;
+
+}
+
 .date-picker-ranges {
+  grid-area: ranges;
   width: var(--#{$variable-prefix}date-picker-ranges-width);
   padding: var(--#{$variable-prefix}date-picker-ranges-padding);
   border-right: var(--#{$variable-prefix}date-picker-ranges-border);
@@ -20,6 +31,7 @@
 
 .date-picker-calendars {
   display: flex;
+  grid-area: calendars;
 
   .date-picker-calendar {
     &:not(:last-child) {
@@ -54,6 +66,7 @@
 .date-picker-timepickers {
   display: flex;
   flex-wrap: wrap;
+  grid-area: timepickers;
   justify-content: space-between;
   border-top: var(--#{$variable-prefix}date-picker-timepicker-border-top);
 
