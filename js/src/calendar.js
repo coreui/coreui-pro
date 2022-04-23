@@ -340,7 +340,7 @@ class Calendar extends BaseComponent {
         ${this._view === 'months' ? listOfMonths.map((row, index) => (
           `<tr>${row.map((month, idx) => (
             `<td class="calendar-cell">
-              <div class="calendar-cell-inner month" data-coreui-month="${(index * 3) + idx}">
+              <div class="calendar-cell-inner month" data-coreui-month="${(index * 3) + idx - addMonths}">
                 ${month}
               </div>
             </td>`
