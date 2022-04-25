@@ -186,7 +186,8 @@
 
   &.range-hover:last-child .calendar-cell-inner,
   &.range-hover.last .calendar-cell-inner,
-  &.range-hover + .range-hover:hover .calendar-cell-inner {
+  &.range-hover + .range-hover:hover .calendar-cell-inner,
+  &.range-hover:first-child:hover .calendar-cell-inner {
     &::before {
       border-right: 1px dashed var(--#{$variable-prefix}calendar-cell-selected-bg);
       @include border-end-radius($border-radius);
