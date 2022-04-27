@@ -16,7 +16,8 @@ import {
   convert24hTo12h,
   getAmPm,
   getListOfHours,
-  getMinutesOrSeconds,
+  getListOfMinutes,
+  getListOfSeconds,
   isAmPm,
   isValidTime
 } from './util/time'
@@ -347,9 +348,9 @@ class TimePicker extends Picker {
     this._timePickerBody.append(
       this._createSelect('hours', getListOfHours(this._config.locale)),
       timeSeparatorEl.cloneNode(true),
-      this._createSelect('minutes', getMinutesOrSeconds()),
+      this._createSelect('minutes', getListOfMinutes(this._config.locale, true)),
       timeSeparatorEl,
-      this._createSelect('seconds', getMinutesOrSeconds())
+      this._createSelect('seconds', getListOfSeconds(this._config.locale, true))
     )
 
     if (isAmPm(this._config.locale)) {
@@ -362,8 +363,8 @@ class TimePicker extends Picker {
   _createTimePickerRoll() {
     this._timePickerBody.append(
       this._createTimePickerRollCol(getListOfHours(this._config.locale), 'hours'),
-      this._createTimePickerRollCol(getMinutesOrSeconds(), 'minutes'),
-      this._createTimePickerRollCol(getMinutesOrSeconds(), 'seconds')
+      this._createTimePickerRollCol(getListOfMinutes(this._config.locale), 'minutes'),
+      this._createTimePickerRollCol(getListOfSeconds(this._config.locale), 'seconds')
     )
 
     if (isAmPm(this._config.locale)) {

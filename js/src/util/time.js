@@ -34,16 +34,47 @@ export const getListOfHours = locale => Array.from({ length: isAmPm(locale) ? 12
     label: (isAmPm(locale) ? i + 1 : i).toLocaleString(locale)
   }
 })
-export const getMinutesOrSeconds = locale => Array.from({ length: 60 }, (_, i) => {
+
+export const getListOfMinutes = (locale, valueAsString = false) => Array.from({ length: 60 }, (_, i) => {
+  const d = new Date()
+  d.setMinutes(i)
   return {
-    value: i,
-    label: i.toLocaleString(locale).padStart(2, (0).toLocaleString(locale))
+    value: valueAsString ? i.toString() : i,
+    label: d
+          .toLocaleTimeString(locale, {
+            hour: '2-digit',
+            hour12: false,
+            minute: '2-digit',
+            second: '2-digit'
+          })
+          .split(':')[1]
   }
 })
+
+export const getListOfSeconds = (locale, valueAsString = false) => Array.from({ length: 60 }, (_, i) => {
+  const d = new Date()
+  d.setSeconds(i)
+  return {
+    value: valueAsString ? i.toString() : i,
+    label: d
+          .toLocaleTimeString(locale, {
+            hour: '2-digit',
+            hour12: false,
+            minute: '2-digit',
+            second: '2-digit'
+          })
+          .split(':')[2]
+  }
+})
+
 export const getSelectedHour = (date, locale) => date ? (isAmPm(locale) ? convert24hTo12h(date.getHours()) : date.getHours()) : ''
+
 export const getSelectedMinutes = date => (date ? date.getMinutes() : '')
+
 export const getSelectedSeconds = date => (date ? date.getSeconds() : '')
+
 export const isAmPm = locale => ['am', 'AM', 'pm', 'PM'].some(el => new Date().toLocaleString(locale).includes(el))
+
 export const isValidTime = time => {
   const d = new Date(`1970-01-01 ${time}`)
   return d instanceof Date && d.getTime()
