@@ -72,9 +72,9 @@ params:
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
     css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.4/dist/css/coreui.min.css"
-    css_hash:        "sha384-aYtfkbRR/7XwX/BkN+0d/oeFRdHG1ukjSh1T0JuGsCCBri+LqJahmt4K3xVIfMEn"
+    css_hash:        "sha384-YUdsYsgRlkUONN8mdJ0FYda0kzlomX2TWturtRobleAB8py9rvyfGQzJdLRc9lFL"
     css_rtl:         "https://cdn.jsdelivr.net/npm/coreui@4.1.4/dist/css/coreui.rtl.min.css"
-    css_rtl_hash:    "sha384-vgYaE/EU62utWDjJ2fnqs6F6VYD6p4o5qBI/AkRlqUM+J0Lg/IEtBdcjzfqUOWw5"
+    css_rtl_hash:    "sha384-YeSzy9aA1BcnRI3OucT8Nern/ozx9Bp8FcNf13YrK8FtsppafuBmv4WznWYMyGml"
     js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.4/dist/js/coreui.min.js"
     js_hash:         "sha384-dGvJOX3jCDS34Y1pvugvoTyKfv0/evHukD3WKQnQklWozNmo5RpGLiHFaXxhgKAl"
     js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.1.4/dist/js/coreui.bundle.min.js"
