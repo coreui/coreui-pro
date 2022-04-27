@@ -68,16 +68,16 @@
       disabled: true
     - title: Date Picker
       badge:
-        color: success
-        text: LAB
+        color: danger
+        text: PRO
     - title: Date Range Picker
       badge:
-        color: success
-        text: LAB
+        color: danger
+        text: PRO
     - title: Time Picker
       badge:
-        color: success
-        text: LAB
+        color: danger
+        text: PRO
     - title: Layout
     - title: Validation
 

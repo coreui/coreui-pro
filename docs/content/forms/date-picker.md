@@ -6,14 +6,6 @@ group: forms
 toc: true
 ---
 
-## Installation
-
-This component is part of the CoreUI LAB. If you want to use Date Picker component you have to install **next** version of the `@coreui/coreui-pro@next` package. The LAB is the place where we release components that are actively developed and will be included in future releases of `@coreui/coreui-pro`.
-
-```sh
-npm install @coreui/coreui-pro@next
-```
-
 ## Example
 
 {{< example >}}

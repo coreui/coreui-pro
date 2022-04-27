@@ -6,14 +6,6 @@ group: forms
 toc: true
 ---
 
-## Installation
-
-This component is part of the CoreUI LAB. If you want to use Date Range Picker component you have to install **next** version of the `@coreui/coreui-pro@next` package. The LAB is the place where we release components that are actively developed and will be included in future releases of `@coreui/coreui-pro`.
-
-```sh
-npm install @coreui/coreui-pro@next
-```
-
 ## Example
 
 {{< example >}}
@@ -36,16 +28,14 @@ npm install @coreui/coreui-pro@next
 
 {{< example >}}
   <div class="row mb-4">
-    <div class="col-lg-7">
+    <div class="col-lg-5">
       <div
         data-coreui-footer="true"
         data-coreui-locale="en-US"
         data-coreui-toggle="date-range-picker">
       </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-lg-7">
+    </div>2
+    <div class="col-lg-5">
       <div
         data-coreui-start-date="2022/08/03"
         data-coreui-end-date="2022/09/17"
