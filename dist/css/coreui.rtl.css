@@ -1,14 +1,14 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.2.0-rc.1
+ * @version v4.2.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
 */
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.2.0-rc.1
+ * @version v4.2.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -6858,19 +6858,22 @@ textarea.form-control-lg {
   content: "";
 }
 .calendar-cell.range-hover .calendar-cell-inner::before, .calendar-cell.range-hover.selected .calendar-cell-inner::before {
-  border-top: 1px solid var(--cui-calendar-cell-selected-bg);
-  border-bottom: 1px solid var(--cui-calendar-cell-selected-bg);
+  border-top: 1px dashed var(--cui-calendar-cell-selected-bg);
+  border-bottom: 1px dashed var(--cui-calendar-cell-selected-bg);
   border-radius: 0;
 }
 .calendar-cell.range-hover:first-child .calendar-cell-inner::before, .calendar-cell:not(.range-hover) + .range-hover .calendar-cell-inner::before {
-  border-left: 1px solid var(--cui-calendar-cell-selected-bg);
+  border-left: 1px dashed var(--cui-calendar-cell-selected-bg);
   border-top-right-radius: 0.25rem;
   border-bottom-right-radius: 0.25rem;
 }
-.calendar-cell.range-hover:last-child .calendar-cell-inner::before, .calendar-cell.range-hover.last .calendar-cell-inner::before, .calendar-cell.range-hover + .range-hover:hover .calendar-cell-inner::before {
-  border-right: 1px solid var(--cui-calendar-cell-selected-bg);
+.calendar-cell.range-hover:last-child .calendar-cell-inner::before, .calendar-cell.range-hover.last .calendar-cell-inner::before, .calendar-cell.range-hover + .range-hover:hover .calendar-cell-inner::before, .calendar-cell.range-hover:first-child:hover .calendar-cell-inner::before {
+  border-right: 1px dashed var(--cui-calendar-cell-selected-bg);
   border-top-left-radius: 0.25rem;
   border-bottom-left-radius: 0.25rem;
+}
+.calendar-cell.range-hover.selected:hover .calendar-cell-inner::before {
+  border: 0;
 }
 .calendar-cell.selected:not(.previous):not(.next) .calendar-cell-inner, .calendar-cell.selected:not(.previous):not(.next).start .calendar-cell-inner, .calendar-cell.selected:not(.previous):not(.next).end .calendar-cell-inner {
   position: relative;
@@ -7043,7 +7046,15 @@ textarea.form-control-lg {
   width: min-content;
 }
 
+.date-picker-body {
+  display: grid;
+  grid-template-areas: "ranges calendars" "ranges timepickers";
+  grid-template-rows: auto;
+  grid-template-columns: auto auto;
+}
+
 .date-picker-ranges {
+  grid-area: ranges;
   width: var(--cui-date-picker-ranges-width);
   padding: var(--cui-date-picker-ranges-padding);
   border-right: var(--cui-date-picker-ranges-border);
@@ -7051,6 +7062,7 @@ textarea.form-control-lg {
 
 .date-picker-calendars {
   display: flex;
+  grid-area: calendars;
 }
 .date-picker-calendars .date-picker-calendar:not(:last-child) .calendar-navigation-next {
   visibility: hidden;
@@ -7077,6 +7089,7 @@ textarea.form-control-lg {
 .date-picker-timepickers {
   display: flex;
   flex-wrap: wrap;
+  grid-area: timepickers;
   justify-content: space-between;
   border-top: var(--cui-date-picker-timepicker-border-top);
 }
