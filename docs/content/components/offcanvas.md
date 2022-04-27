@@ -276,3 +276,6 @@ myOffcanvas.addEventListener('hidden.coreui.offcanvas', function () {
 #### Variables
 
 {{< scss-docs name="offcanvas-variables" file="scss/_variables.scss" >}}
+
+### CSS Vars
+{{< css-vars-docs file="scss/offcanvas.scss" >}}
