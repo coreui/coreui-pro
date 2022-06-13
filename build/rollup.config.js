@@ -10,7 +10,7 @@ const BUNDLE = process.env.BUNDLE === 'true'
 const ESM = process.env.ESM === 'true'
 
 let fileDest = `coreui${ESM ? '.esm' : ''}`
-const external = ['@popperjs/core']
+const external = ['@popperjs/core', 'date-fns']
 const plugins = [
   babel({
     // Only transpile our source code
@@ -20,7 +20,8 @@ const plugins = [
   })
 ]
 const globals = {
-  '@popperjs/core': 'Popper'
+  '@popperjs/core': 'Popper',
+  'date-fns': 'dateFns'
 }
 
 if (BUNDLE) {
@@ -28,6 +29,9 @@ if (BUNDLE) {
   // Remove last entry in external array to bundle Popper
   external.pop()
   delete globals['@popperjs/core']
+  // Remove last entry in external array to bundle dateFns
+  external.pop()
+  delete globals['date-fns']
   plugins.push(
     replace({
       'process.env.NODE_ENV': '"production"',
