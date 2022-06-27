@@ -124,7 +124,7 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 {{< /example >}}
 
 ```js
-var options = {
+const options = {
   locale: 'en-US',
   calendarDate: new Date(2022, 2, 1),
   disabledDates: [
@@ -137,7 +137,7 @@ var options = {
   minDate: new Date(2022, 1, 1)
 }
 
-var myDateRangePickerDisabledDates = new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), options)
+const myDateRangePickerDisabledDates = new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), options)
 ```
 
 ## Custom ranges
@@ -151,34 +151,34 @@ var myDateRangePickerDisabledDates = new coreui.DateRangePicker(document.getElem
 {{< /example >}}
 
 ```js
-var optionsCustomRanges = {
+const optionsCustomRanges = {
   locale: 'en-US',
   ranges: {
     Today: [new Date(), new Date()],
     Yesterday: [
       new Date(new Date().setDate(new Date().getDate() - 1)),
-      new Date(new Date().setDate(new Date().getDate() - 1)),
+      new Date(new Date().setDate(new Date().getDate() - 1))
     ],
     'Last 7 Days': [
       new Date(new Date().setDate(new Date().getDate() - 6)),
-      new Date(new Date()),
+      new Date(new Date())
     ],
     'Last 30 Days': [
       new Date(new Date().setDate(new Date().getDate() - 29)),
-      new Date(new Date()),
+      new Date(new Date())
     ],
     'This Month': [
       new Date(new Date().setDate(1)),
-      new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+      new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
     ],
     'Last Month': [
       new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-      new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+      new Date(new Date().getFullYear(), new Date().getMonth(), 0)
     ]
   }
 }
 
-var myDateRangePickerCustomRanges = new coreui.DateRangePicker(document.getElementById('myDateRangePickerCustomRanges'), optionsCustomRanges)
+const myDateRangePickerCustomRanges = new coreui.DateRangePicker(document.getElementById('myDateRangePickerCustomRanges'), optionsCustomRanges)
 ```
 
 ## Non-english locale
@@ -266,8 +266,8 @@ Call the time picker via JavaScript:
 ```
 
 ```js
-var dateRangePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.date-range-picker'))
-var dateRangePickerList = dateRangePickerElementList.map(function (dateRangePickerEl) {
+const dateRangePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.date-range-picker'))
+const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => {
   return new coreui.DateRangePicker(dateRangePickerEl)
 })
 ```
@@ -554,8 +554,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 </div>
 
 ```js
-var myDateRangePicker = document.getElementById('myDateRangePicker')
-myDateRangePicker.addEventListener('endDateChange.coreui.date-range-picker', function (date) {
+const myDateRangePicker = document.getElementById('myDateRangePicker')
+myDateRangePicker.addEventListener('endDateChange.coreui.date-range-picker', date => {
   // do something...
 })
 ```

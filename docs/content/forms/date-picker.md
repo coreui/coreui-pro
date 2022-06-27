@@ -97,7 +97,7 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 {{< /example >}}
 
 ```js
-var options = {
+const options = {
   locale: 'en-US',
   calendarDate: new Date(2022, 2, 1),
   disabledDates: [
@@ -110,7 +110,7 @@ var options = {
   minDate: new Date(2022, 1, 1)
 }
 
-var myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), options)
+const myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), options)
 ```
 
 ## Non-english locale
@@ -198,8 +198,8 @@ Call the time picker via JavaScript:
 ```
 
 ```js
-var datePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.date-picker'))
-var datePickerList = datePickerElementList.map(function (datePickerEl) {
+const datePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.date-picker'))
+const datePickerList = datePickerElementList.map(function (datePickerEl) {
   return new coreui.DatePicker(datePickerEl)
 })
 ```
@@ -448,7 +448,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 </table>
 
 ```js
-var myDatePicker = document.getElementById('myDatePicker')
+const myDatePicker = document.getElementById('myDatePicker')
 myDatePicker.addEventListener('dateChange.coreui.date-picker', function (date) {
   // do something...
 })

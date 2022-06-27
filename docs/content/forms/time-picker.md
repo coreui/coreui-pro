@@ -145,8 +145,8 @@ Call the time picker via JavaScript:
 ```
 
 ```js
-var timePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.time-picker'))
-var timePickerList = timePickerElementList.map(function (timePickerEl) {
+const timePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.time-picker'))
+const timePickerList = timePickerElementList.map(timePickerEl => {
   return new coreui.TimePicker(timePickerEl)
 })
 ```
@@ -330,8 +330,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 </table>
 
 ```js
-var myTimePicker = document.getElementById('myTimePicker')
-myTimePicker.addEventListener('timeChange.coreui.time-picker', function (timeString, localeTimeString, date) {
+const myTimePicker = document.getElementById('myTimePicker')
+myTimePicker.addEventListener('timeChange.coreui.time-picker', (timeString, localeTimeString, date) => {
   // do something...
 })
 ```

@@ -67,8 +67,8 @@ toc: true
 <select id="multiSelect"></select>
 
 <script type="text/javascript">
-  var myMultiSelect = document.querySelector('#multiSelect')
-  var cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
+  const myMultiSelect = document.querySelector('#multiSelect')
+  const cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
     options: [
       {
         value: 0,
@@ -429,10 +429,10 @@ Multi Select component exposes a few events for hooking into multi select functi
 </table>
 
 ```js
-var myMutliSelect = document.getElementById('myMutliSelect')
-myMutliSelect.addEventListener('changed.coreui.multi-select', function (event) {
+const myMutliSelect = document.getElementById('myMutliSelect')
+myMutliSelect.addEventListener('changed.coreui.multi-select', event => {
   // Get the list of selected options.
-  var selected = event.value
+  const selected = event.value
 })
 ```
 

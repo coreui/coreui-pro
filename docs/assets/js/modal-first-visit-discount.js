@@ -1,33 +1,37 @@
+/* eslint-disable strict */
 // Get Cookie
 
 const getCookie = cname => {
   const name = `${cname}=`
   const decodedCookie = decodeURIComponent(document.cookie)
   const ca = decodedCookie.split(';')
-  for(let i = 0; i <ca.length; i++) {
-    var c = ca[i]
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1)
+  for (let c of ca) {
+    while (c.charAt(0) === ' ') {
+      c = c.slice(1)
     }
+
     if (c.indexOf(name) == 0) {
+      // eslint-disable-next-line unicorn/prefer-string-slice
       return c.substring(name.length, c.length)
     }
   }
-  return '';
+
+  return ''
 }
 
 // Set Cookie
 const setCookie = (cname, cvalue, exdays) => {
   const d = new Date()
-  d.setTime(d.getTime() + (exdays*24*60*60*1000))
-  var expires = 'expires='+ d.toUTCString()
+  // eslint-disable-next-line no-mixed-operators
+  d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000)
+  const expires = `expires=${d.toUTCString()}`
+  // eslint-disable-next-line unicorn/no-document-cookie
   document.cookie = `${cname}=${cvalue};${expires};path=/`
 }
 
 const checkIfFirstVisit = () => {
   const modalContainerEl = document.createElement('div')
-  modalContainerEl.innerHTML =
-  `
+  modalContainerEl.innerHTML = `
   <div class="modal fade" id="modal-first-visit" tabindex="-1" role="dialog" aria-label="Downloads" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content">
@@ -101,17 +105,20 @@ const checkIfFirstVisit = () => {
     </div>
   </div>
   `
-  document.body.appendChild(modalContainerEl);
+  document.body.append(modalContainerEl)
 
   setTimeout(() => {
-    const myModalEl = new coreui.Modal(document.getElementById('modal-first-visit'))
+    // eslint-disable-next-line no-undef
+    const myModalEl = new coreui.Modal(
+      document.getElementById('modal-first-visit')
+    )
     myModalEl.toggle()
     setCookie('firstVisit', true, 365)
   }, 2500)
 }
 
-window.onload = function() {
+window.addEventListener('load', () => {
   if (getCookie('firstVisit') !== 'true') {
     checkIfFirstVisit()
   }
-};
+})

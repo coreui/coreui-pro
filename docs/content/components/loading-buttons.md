@@ -116,8 +116,8 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 </table>
 
 ```js
-var myBtnLoading = document.getElementById('btn-loading')
-var myBtn = new coreui.LoadingButton(myBtnLoading)
+const myBtnLoading = document.getElementById('btn-loading')
+const myBtn = new coreui.LoadingButton(myBtnLoading)
 myBtn.start()
 ```
 
@@ -153,8 +153,8 @@ Multi Select component exposes a few events for hooking into multi select functi
 </table>
 
 ```js
-var myBtnLoading = document.getElementById('myBtnLoading')
-myBtnLoading.addEventListener('stop.coreui.loading-button', function () {
+const myBtnLoading = document.getElementById('myBtnLoading')
+myBtnLoading.addEventListener('stop.coreui.loading-button', () => {
   // do something...
 })
 ```

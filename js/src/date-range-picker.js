@@ -251,7 +251,7 @@ class DateRangePicker extends Picker {
   }
 
   _addCalendarEventListeners() {
-    SelectorEngine.find('.calendar', this._element).forEach(calendar => {
+    for (const calendar of SelectorEngine.find('.calendar', this._element)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date
         this._selectEndDate = event.selectEndDate
@@ -292,7 +292,7 @@ class DateRangePicker extends Picker {
 
         this._startInput.value = event.date ? this._formatDate(event.date) : ''
       })
-    })
+    }
   }
 
   _convertStringToDate(date) {
@@ -436,7 +436,8 @@ class DateRangePicker extends Picker {
           this._updateCalendars()
         })
       } else {
-        Array.from({ length: this._config.calendars }).forEach((_, index) => {
+        // eslint-disable-next-line no-unused-vars
+        for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
           const timePickerEl = document.createElement('div')
           timePickerEl.classList.add('time-picker')
 
@@ -462,7 +463,7 @@ class DateRangePicker extends Picker {
 
             this._updateCalendars()
           })
-        })
+        }
       }
     }
   }
@@ -481,7 +482,7 @@ class DateRangePicker extends Picker {
       const dateRangePickerRangesEl = document.createElement('div')
       dateRangePickerRangesEl.classList.add('date-picker-ranges')
 
-      Object.keys(this._config.ranges).forEach(key => {
+      for (const key of Object.keys(this._config.ranges)) {
         const buttonEl = document.createElement('button')
         buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses))
         buttonEl.role = 'button'
@@ -495,7 +496,7 @@ class DateRangePicker extends Picker {
 
         buttonEl.innerHTML = key
         dateRangePickerRangesEl.append(buttonEl)
-      })
+      }
 
       dateRangePickerBodyEl.append(dateRangePickerRangesEl)
     }
