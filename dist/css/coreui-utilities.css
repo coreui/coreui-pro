@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.2.1
+ * @version v4.3.0-beta.0
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -2057,6 +2057,10 @@ html:not([dir=rtl]) .text-center {
 
 .bg-opacity-10 {
   --cui-bg-opacity: 0.1;
+}
+
+.bg-opacity-15 {
+  --cui-bg-opacity: 0.15;
 }
 
 .bg-opacity-25 {

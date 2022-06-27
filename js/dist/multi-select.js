@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v4.2.1 (https://coreui.io)
+  * CoreUI multi-select.js v4.3.0-beta.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -19,7 +19,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.1): multi-select.js
+   * CoreUI PRO (v4.3.0-beta.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -198,33 +198,33 @@
     }
 
     selectAll(options = this._options) {
-      options.forEach(option => {
+      for (const option of options) {
         if (option.disabled) {
-          return;
+          continue;
         }
 
         if (option.label) {
           this.selectAll(option.options);
-          return;
+          continue;
         }
 
         this._selectOption(option.value, option.text);
-      });
+      }
     }
 
     deselectAll(options = this._options) {
-      options.forEach(option => {
+      for (const option of options) {
         if (option.disabled) {
-          return;
+          continue;
         }
 
         if (option.label) {
           this.deselectAll(option.options);
-          return;
+          continue;
         }
 
         this._deselectOption(option.value);
-      });
+      }
     }
 
     getValue() {
@@ -292,7 +292,8 @@
 
       const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
       const options = [];
-      nodes.forEach(node => {
+
+      for (const node of nodes) {
         if (node.nodeName === 'OPTION') {
           options.push({
             value: node.value,
@@ -308,17 +309,19 @@
             options: this._getOptions(node)
           });
         }
-      });
+      }
+
       return options;
     }
 
     _getSelectedOptions(options) {
       const selected = [];
-      options.forEach(e => {
+
+      for (const e of options) {
         if (typeof e.value === 'undefined') {
           this._getSelectedOptions(e.options);
 
-          return;
+          continue;
         }
 
         if (e.selected) {
@@ -332,7 +335,8 @@
             text: e.text
           });
         }
-      });
+      }
+
       return selected;
     }
 
@@ -347,7 +351,7 @@
     }
 
     _createNativeOptions(parentElement, options) {
-      options.forEach(option => {
+      for (const option of options) {
         if (typeof option.options !== 'undefined') {
           const optgroup = document.createElement('optgroup');
           optgroup.label = option.label;
@@ -370,7 +374,7 @@
           opt.innerHTML = option.text;
           parentElement.append(opt);
         }
-      });
+      }
     }
 
     _hideNativeSelect() {
@@ -382,9 +386,9 @@
       const div = document.createElement('div');
       div.classList.add(CLASS_NAME_SELECT);
 
-      this._getClassNames().forEach(className => {
+      for (const className of this._getClassNames()) {
         div.classList.add(className);
-      });
+      }
 
       if (this._config.multiple) {
         div.classList.add(CLASS_NAME_SELECT_MULTIPLE);
@@ -482,7 +486,7 @@
     }
 
     _createOptions(parentElement, options) {
-      options.forEach(option => {
+      for (const option of options) {
         if (typeof option.value !== 'undefined') {
           const optionDiv = document.createElement('div');
           optionDiv.classList.add(CLASS_NAME_OPTION);
@@ -513,7 +517,7 @@
 
           parentElement.append(optgroup);
         }
-      });
+      }
     }
 
     _createTag(value, text) {
@@ -639,9 +643,9 @@
       if (this._config.multiple && this._config.selectionType === 'tags') {
         selection.innerHTML = '';
 
-        this._selection.forEach(e => {
+        for (const e of this._selection) {
           selection.append(this._createTag(e.value, e.text));
-        });
+        }
 
         return;
       }
@@ -726,17 +730,17 @@
     }
 
     _updateOptionsList(options = this._options) {
-      options.forEach(option => {
+      for (const option of options) {
         if (option.label) {
           this._updateOptionsList(option.options);
 
-          return;
+          continue;
         }
 
         if (option.selected) {
           this._selectOption(option.value, option.text);
         }
-      });
+      }
     }
 
     _isVisible(element) {
@@ -747,7 +751,8 @@
     _filterOptionsList() {
       const options = SelectorEngine__default.default.find(SELECTOR_OPTION, this._clone);
       let visibleOptions = 0;
-      options.forEach(option => {
+
+      for (const option of options) {
         // eslint-disable-next-line unicorn/prefer-includes
         if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
           option.style.display = 'none';
@@ -766,7 +771,7 @@
             optgroup.style.display = 'none';
           }
         }
-      });
+      }
 
       if (visibleOptions > 0) {
         if (SelectorEngine__default.default.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
@@ -848,11 +853,11 @@
 
 
   EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    SelectorEngine__default.default.find(SELECTOR_SELECT).forEach(ms => {
+    for (const ms of SelectorEngine__default.default.find(SELECTOR_SELECT)) {
       if (ms.tabIndex !== -1) {
         MultiSelect.multiSelectInterface(ms);
       }
-    });
+    }
   });
   EventHandler__default.default.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus);
   EventHandler__default.default.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus);

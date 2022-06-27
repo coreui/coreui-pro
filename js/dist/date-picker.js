@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-picker.js v4.2.1 (https://coreui.io)
+  * CoreUI date-picker.js v4.3.0-beta.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -17,7 +17,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.1): date-picker.js
+   * CoreUI PRO (v4.3.0-beta.0): date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.2.1 (https://coreui.io)
+  * CoreUI v4.3.0-beta.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -8,7 +8,7 @@ import * as Popper from '@popperjs/core';
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): alert.js
+ * CoreUI (v4.3.0-beta.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  util/index.js
@@ -326,7 +326,7 @@ const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): dom/event-handler.js
+ * CoreUI (v4.3.0-beta.0): dom/event-handler.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -588,7 +588,7 @@ function hydrateObj(obj, meta) {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): dom/data.js
+ * CoreUI (v4.3.0-beta.0): dom/data.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's dom/data.js
@@ -643,7 +643,7 @@ const Data = {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): dom/manipulator.js
+ * CoreUI (v4.3.0-beta.0): dom/manipulator.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -777,7 +777,7 @@ class Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): alert.js
+ * CoreUI (v4.3.0-beta.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's base-component.js
@@ -788,7 +788,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '4.2.1';
+const VERSION = '4.3.0-beta.0';
 /**
  * Class definition
  */
@@ -885,7 +885,7 @@ const enableDismissTrigger = (component, method = 'hide') => {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): alert.js
+ * CoreUI (v4.3.0-beta.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's alert.js
@@ -968,7 +968,7 @@ defineJQueryPlugin(Alert);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): alert.js
+ * CoreUI (v4.3.0-beta.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's button.js
@@ -1535,10 +1535,13 @@ class Calendar extends BaseComponent {
 
   _createCalendar() {
     const calendarsEl = document.createElement('div');
-    calendarsEl.classList.add('calendars');
-    Array.from({
+    calendarsEl.classList.add('calendars'); // eslint-disable-next-line no-unused-vars
+
+    for (const [index, _] of Array.from({
       length: this._config.calendars
-    }).forEach((_, index) => calendarsEl.append(this._createCalendarPanel(index)));
+    }).entries()) {
+      calendarsEl.append(this._createCalendarPanel(index));
+    }
 
     this._element.classList.add(CLASS_NAME_CALENDAR);
 
@@ -1562,7 +1565,7 @@ class Calendar extends BaseComponent {
       selected: isDateSelected(date, this._startDate, this._endDate),
       start: isStartDate(date, this._startDate, this._endDate),
       end: isEndDate(date, this._startDate, this._endDate)
-    }; // eslint-disable-next-line unicorn/no-array-reduce, unicorn/prefer-object-from-entries
+    }; // eslint-disable-next-line unicorn/no-array-reduce
 
     const result = Object.keys(classNames).reduce((o, key) => {
       // eslint-disable-next-line no-unused-expressions
@@ -1618,9 +1621,9 @@ class Calendar extends BaseComponent {
 
 
 EventHandler.on(window, EVENT_LOAD_DATA_API$a, () => {
-  Array.from(document.querySelectorAll(SELECTOR_CALENDAR)).forEach(element => {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_CALENDAR))) {
     Calendar.calendarInterface(element);
-  });
+  }
 });
 /**
 * ------------------------------------------------------------------------
@@ -1633,7 +1636,7 @@ defineJQueryPlugin(Calendar);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): dom/selector-engine.js
+ * CoreUI (v4.3.0-beta.0): dom/selector-engine.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -1843,7 +1846,7 @@ class Swipe extends Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): carousel.js
+ * CoreUI (v4.3.0-beta.0): carousel.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's carousel.js
@@ -2294,7 +2297,7 @@ defineJQueryPlugin(Carousel);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): collapse.js
+ * CoreUI (v4.3.0-beta.0): collapse.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's collapse.js
@@ -2587,7 +2590,7 @@ defineJQueryPlugin(Collapse);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): dropdown.js
+ * CoreUI (v4.3.0-beta.0): dropdown.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's dropdown.js
@@ -3020,7 +3023,7 @@ defineJQueryPlugin(Dropdown);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.2.1): picker.js
+ * CoreUI PRO (v4.3.0-beta.0): picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -3720,7 +3723,7 @@ defineJQueryPlugin(TimePicker);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.2.1): date-range-picker.js
+ * CoreUI PRO (v4.3.0-beta.0): date-range-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -3957,7 +3960,7 @@ class DateRangePicker extends Picker {
   }
 
   _addCalendarEventListeners() {
-    SelectorEngine.find('.calendar', this._element).forEach(calendar => {
+    for (const calendar of SelectorEngine.find('.calendar', this._element)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date;
         this._selectEndDate = event.selectEndDate;
@@ -3998,7 +4001,7 @@ class DateRangePicker extends Picker {
 
         this._startInput.value = event.date ? this._formatDate(event.date) : '';
       });
-    });
+    }
   }
 
   _convertStringToDate(date) {
@@ -4132,9 +4135,10 @@ class DateRangePicker extends Picker {
           this._updateCalendars();
         });
       } else {
-        Array.from({
+        // eslint-disable-next-line no-unused-vars
+        for (const [index, _] of Array.from({
           length: this._config.calendars
-        }).forEach((_, index) => {
+        }).entries()) {
           const timePickerEl = document.createElement('div');
           timePickerEl.classList.add('time-picker'); // eslint-disable-next-line no-new
 
@@ -4159,7 +4163,7 @@ class DateRangePicker extends Picker {
 
             this._updateCalendars();
           });
-        });
+        }
       }
     }
   }
@@ -4179,7 +4183,8 @@ class DateRangePicker extends Picker {
     if (Object.keys(this._config.ranges).length) {
       const dateRangePickerRangesEl = document.createElement('div');
       dateRangePickerRangesEl.classList.add('date-picker-ranges');
-      Object.keys(this._config.ranges).forEach(key => {
+
+      for (const key of Object.keys(this._config.ranges)) {
         const buttonEl = document.createElement('button');
         buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses));
         buttonEl.role = 'button';
@@ -4193,7 +4198,8 @@ class DateRangePicker extends Picker {
         });
         buttonEl.innerHTML = key;
         dateRangePickerRangesEl.append(buttonEl);
-      });
+      }
+
       dateRangePickerBodyEl.append(dateRangePickerRangesEl);
     }
 
@@ -4339,7 +4345,7 @@ defineJQueryPlugin(DateRangePicker);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.2.1): date-picker.js
+ * CoreUI PRO (v4.3.0-beta.0): date-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -4460,7 +4466,7 @@ defineJQueryPlugin(DatePicker);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.2.1): loading-button.js
+ * CoreUI PRO (v4.3.0-beta.0): loading-button.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -5014,7 +5020,7 @@ class FocusTrap extends Config {
 
 /**
  * --------------------------------------------------------------------------
-  * CoreUI (v4.2.1): modal.js
+  * CoreUI (v4.3.0-beta.0): modal.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's modal.js
@@ -5390,7 +5396,7 @@ defineJQueryPlugin(Modal);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.2.1): multi-select.js
+ * CoreUI PRO (v4.3.0-beta.0): multi-select.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -5569,33 +5575,33 @@ class MultiSelect extends BaseComponent {
   }
 
   selectAll(options = this._options) {
-    options.forEach(option => {
+    for (const option of options) {
       if (option.disabled) {
-        return;
+        continue;
       }
 
       if (option.label) {
         this.selectAll(option.options);
-        return;
+        continue;
       }
 
       this._selectOption(option.value, option.text);
-    });
+    }
   }
 
   deselectAll(options = this._options) {
-    options.forEach(option => {
+    for (const option of options) {
       if (option.disabled) {
-        return;
+        continue;
       }
 
       if (option.label) {
         this.deselectAll(option.options);
-        return;
+        continue;
       }
 
       this._deselectOption(option.value);
-    });
+    }
   }
 
   getValue() {
@@ -5663,7 +5669,8 @@ class MultiSelect extends BaseComponent {
 
     const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
     const options = [];
-    nodes.forEach(node => {
+
+    for (const node of nodes) {
       if (node.nodeName === 'OPTION') {
         options.push({
           value: node.value,
@@ -5679,17 +5686,19 @@ class MultiSelect extends BaseComponent {
           options: this._getOptions(node)
         });
       }
-    });
+    }
+
     return options;
   }
 
   _getSelectedOptions(options) {
     const selected = [];
-    options.forEach(e => {
+
+    for (const e of options) {
       if (typeof e.value === 'undefined') {
         this._getSelectedOptions(e.options);
 
-        return;
+        continue;
       }
 
       if (e.selected) {
@@ -5703,7 +5712,8 @@ class MultiSelect extends BaseComponent {
           text: e.text
         });
       }
-    });
+    }
+
     return selected;
   }
 
@@ -5718,7 +5728,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _createNativeOptions(parentElement, options) {
-    options.forEach(option => {
+    for (const option of options) {
       if (typeof option.options !== 'undefined') {
         const optgroup = document.createElement('optgroup');
         optgroup.label = option.label;
@@ -5741,7 +5751,7 @@ class MultiSelect extends BaseComponent {
         opt.innerHTML = option.text;
         parentElement.append(opt);
       }
-    });
+    }
   }
 
   _hideNativeSelect() {
@@ -5753,9 +5763,9 @@ class MultiSelect extends BaseComponent {
     const div = document.createElement('div');
     div.classList.add(CLASS_NAME_SELECT);
 
-    this._getClassNames().forEach(className => {
+    for (const className of this._getClassNames()) {
       div.classList.add(className);
-    });
+    }
 
     if (this._config.multiple) {
       div.classList.add(CLASS_NAME_SELECT_MULTIPLE);
@@ -5853,7 +5863,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _createOptions(parentElement, options) {
-    options.forEach(option => {
+    for (const option of options) {
       if (typeof option.value !== 'undefined') {
         const optionDiv = document.createElement('div');
         optionDiv.classList.add(CLASS_NAME_OPTION);
@@ -5884,7 +5894,7 @@ class MultiSelect extends BaseComponent {
 
         parentElement.append(optgroup);
       }
-    });
+    }
   }
 
   _createTag(value, text) {
@@ -6010,9 +6020,9 @@ class MultiSelect extends BaseComponent {
     if (this._config.multiple && this._config.selectionType === 'tags') {
       selection.innerHTML = '';
 
-      this._selection.forEach(e => {
+      for (const e of this._selection) {
         selection.append(this._createTag(e.value, e.text));
-      });
+      }
 
       return;
     }
@@ -6097,17 +6107,17 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateOptionsList(options = this._options) {
-    options.forEach(option => {
+    for (const option of options) {
       if (option.label) {
         this._updateOptionsList(option.options);
 
-        return;
+        continue;
       }
 
       if (option.selected) {
         this._selectOption(option.value, option.text);
       }
-    });
+    }
   }
 
   _isVisible(element) {
@@ -6118,7 +6128,8 @@ class MultiSelect extends BaseComponent {
   _filterOptionsList() {
     const options = SelectorEngine.find(SELECTOR_OPTION, this._clone);
     let visibleOptions = 0;
-    options.forEach(option => {
+
+    for (const option of options) {
       // eslint-disable-next-line unicorn/prefer-includes
       if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
         option.style.display = 'none';
@@ -6137,7 +6148,7 @@ class MultiSelect extends BaseComponent {
           optgroup.style.display = 'none';
         }
       }
-    });
+    }
 
     if (visibleOptions > 0) {
       if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
@@ -6219,11 +6230,11 @@ class MultiSelect extends BaseComponent {
 
 
 EventHandler.on(window, EVENT_LOAD_DATA_API$5, () => {
-  SelectorEngine.find(SELECTOR_SELECT).forEach(ms => {
+  for (const ms of SelectorEngine.find(SELECTOR_SELECT)) {
     if (ms.tabIndex !== -1) {
       MultiSelect.multiSelectInterface(ms);
     }
-  });
+  }
 });
 EventHandler.on(document, EVENT_CLICK_DATA_API$4, MultiSelect.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus);
@@ -6238,7 +6249,7 @@ defineJQueryPlugin(MultiSelect);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): navigation.js
+ * CoreUI (v4.3.0-beta.0): navigation.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -6524,7 +6535,7 @@ defineJQueryPlugin(Navigation);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): dropdown.js
+ * CoreUI (v4.3.0-beta.0): dropdown.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's offcanvas.js
@@ -6801,7 +6812,7 @@ defineJQueryPlugin(Offcanvas);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): alert.js
+ * CoreUI (v4.3.0-beta.0): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -7067,7 +7078,7 @@ class TemplateFactory extends Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): tooltip.js
+ * CoreUI (v4.3.0-beta.0): tooltip.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tooltip.js
@@ -7694,7 +7705,7 @@ defineJQueryPlugin(Tooltip);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): popover.js
+ * CoreUI (v4.3.0-beta.0): popover.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's popover.js
@@ -7780,7 +7791,7 @@ defineJQueryPlugin(Popover);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): scrollspy.js
+ * CoreUI (v4.3.0-beta.0): scrollspy.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's scrollspy.js
@@ -8070,7 +8081,7 @@ defineJQueryPlugin(ScrollSpy);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): sidebar.js
+ * CoreUI (v4.3.0-beta.0): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -8394,7 +8405,7 @@ defineJQueryPlugin(Sidebar);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): tab.js
+ * CoreUI (v4.3.0-beta.0): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tab.js
@@ -8722,7 +8733,7 @@ defineJQueryPlugin(Tab);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.1): toast.js
+ * CoreUI (v4.3.0-beta.0): toast.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's toast.js

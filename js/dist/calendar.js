@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v4.2.1 (https://coreui.io)
+  * CoreUI calendar.js v4.3.0-beta.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -343,10 +343,13 @@
 
     _createCalendar() {
       const calendarsEl = document.createElement('div');
-      calendarsEl.classList.add('calendars');
-      Array.from({
+      calendarsEl.classList.add('calendars'); // eslint-disable-next-line no-unused-vars
+
+      for (const [index, _] of Array.from({
         length: this._config.calendars
-      }).forEach((_, index) => calendarsEl.append(this._createCalendarPanel(index)));
+      }).entries()) {
+        calendarsEl.append(this._createCalendarPanel(index));
+      }
 
       this._element.classList.add(CLASS_NAME_CALENDAR);
 
@@ -370,7 +373,7 @@
         selected: calendar.isDateSelected(date, this._startDate, this._endDate),
         start: calendar.isStartDate(date, this._startDate, this._endDate),
         end: calendar.isEndDate(date, this._startDate, this._endDate)
-      }; // eslint-disable-next-line unicorn/no-array-reduce, unicorn/prefer-object-from-entries
+      }; // eslint-disable-next-line unicorn/no-array-reduce
 
       const result = Object.keys(classNames).reduce((o, key) => {
         // eslint-disable-next-line no-unused-expressions
@@ -426,9 +429,9 @@
 
 
   EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    Array.from(document.querySelectorAll(SELECTOR_CALENDAR)).forEach(element => {
+    for (const element of Array.from(document.querySelectorAll(SELECTOR_CALENDAR))) {
       Calendar.calendarInterface(element);
-    });
+    }
   });
   /**
   * ------------------------------------------------------------------------

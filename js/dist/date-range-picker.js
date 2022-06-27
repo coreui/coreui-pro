@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.2.1 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.3.0-beta.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -20,7 +20,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.2.1): date-range-picker.js
+   * CoreUI PRO (v4.3.0-beta.0): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -257,7 +257,7 @@
     }
 
     _addCalendarEventListeners() {
-      SelectorEngine__default.default.find('.calendar', this._element).forEach(calendar => {
+      for (const calendar of SelectorEngine__default.default.find('.calendar', this._element)) {
         EventHandler__default.default.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._startDate = event.date;
           this._selectEndDate = event.selectEndDate;
@@ -298,7 +298,7 @@
 
           this._startInput.value = event.date ? this._formatDate(event.date) : '';
         });
-      });
+      }
     }
 
     _convertStringToDate(date) {
@@ -432,9 +432,10 @@
             this._updateCalendars();
           });
         } else {
-          Array.from({
+          // eslint-disable-next-line no-unused-vars
+          for (const [index, _] of Array.from({
             length: this._config.calendars
-          }).forEach((_, index) => {
+          }).entries()) {
             const timePickerEl = document.createElement('div');
             timePickerEl.classList.add('time-picker'); // eslint-disable-next-line no-new
 
@@ -459,7 +460,7 @@
 
               this._updateCalendars();
             });
-          });
+          }
         }
       }
     }
@@ -479,7 +480,8 @@
       if (Object.keys(this._config.ranges).length) {
         const dateRangePickerRangesEl = document.createElement('div');
         dateRangePickerRangesEl.classList.add('date-picker-ranges');
-        Object.keys(this._config.ranges).forEach(key => {
+
+        for (const key of Object.keys(this._config.ranges)) {
           const buttonEl = document.createElement('button');
           buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses));
           buttonEl.role = 'button';
@@ -493,7 +495,8 @@
           });
           buttonEl.innerHTML = key;
           dateRangePickerRangesEl.append(buttonEl);
-        });
+        }
+
         dateRangePickerBodyEl.append(dateRangePickerRangesEl);
       }
 
