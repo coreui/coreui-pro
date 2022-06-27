@@ -61,12 +61,12 @@
 
       @if $is-css-var {
         #{if($theme-prefix, theme-prefix("#{$property-class + $infix + $property-class-modifier}"), ".#{$property-class + $infix + $property-class-modifier}")} {
-          --#{$variable-prefix}#{$css-variable-name}: #{$value};
+          --#{$prefix}#{$css-variable-name}: #{$value};
         }
 
         @each $pseudo in $state {
           .#{$property-class + $infix + $property-class-modifier}-#{$pseudo}:#{$pseudo} {
-            --#{$variable-prefix}#{$css-variable-name}: #{$value};
+            --#{$prefix}#{$css-variable-name}: #{$value};
           }
         }
       } @else {
@@ -74,7 +74,7 @@
           @each $property in $properties {
             @if $is-local-vars {
               @each $local-var, $variable in $is-local-vars {
-                --#{$variable-prefix}#{$local-var}: #{$variable};
+                --#{$prefix}#{$local-var}: #{$variable};
               }
             }
             @if $generate-rtl == true {
@@ -88,6 +88,11 @@
         @each $pseudo in $state {
           .#{$property-class + $infix + $property-class-modifier}-#{$pseudo}:#{$pseudo} {
             @each $property in $properties {
+              @if $is-local-vars {
+                @each $local-var, $variable in $is-local-vars {
+                  --#{$prefix}#{$local-var}: #{$variable};
+                }
+              }
               #{$property}: $value if($enable-important-utilities, !important, null);
             }
           }

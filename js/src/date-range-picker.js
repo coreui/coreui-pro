@@ -7,7 +7,7 @@
 
 import { format as dateFormat, parseISO } from 'date-fns'
 
-import { defineJQueryPlugin, typeCheckConfig } from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
@@ -575,7 +575,6 @@ class DateRangePicker extends Picker {
       ...(typeof config === 'object' ? config : {})
     }
 
-    typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 

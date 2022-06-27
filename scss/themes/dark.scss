@@ -1,6 +1,7 @@
 @import "./../functions";
-@import "./../mixins";
 @import "./../variables";
+@import "./../maps";
+@import "./../mixins";
 @import "./../utilities";
 
 $theme-name: "dark-theme" !default;
@@ -14,26 +15,43 @@ $theme-prefix: "dark" !default;
   @include theme($theme-map);
 
   // Alert variants
-  @each $state, $variant in $alert-variants-dt {
-    @include alert-variant($state, $variant, true);
+  @each $state, $value in $alert-variants-dt {
+    $alert-background: map-get($value, "alert-bg");
+    $alert-border: map-get($value, "alert-border");
+    $alert-color: map-get($value, "alert-color");
+
+    @if (contrast-ratio($alert-background, $alert-color) < $min-contrast-ratio) {
+      $alert-color: mix(map-get($value, "base-color"), color-contrast($alert-background), abs($alert-color-scale));
+    }
+    .alert-#{$state} {
+      @include alert-variant($alert-background, $alert-border, $alert-color);
+    }
   }
 
   // Button variants
   @each $state, $variant in $button-variants-dt {
-    @include button-variant($state, $variant, true);
+    .btn-#{$state} {
+      @include button-variant($variant);
+    }
   }
 
   @each $state, $variant in $button-outline-ghost-variants-dt {
-    @include button-outline-variant($state, $variant, true);
+    .btn-outline-#{$state} {
+      @include button-outline-variant($variant);
+    }
   }
 
   @each $state, $variant in $button-outline-ghost-variants-dt {
-    @include button-ghost-variant($state, $variant, true);
+    .btn-ghost-#{$state} {
+      @include button-ghost-variant($variant);
+    }
   }
 
   // List group variants
   @each $state, $variant in $list-group-variants-dt {
-    @include list-group-item-variant($state, $variant, true);
+    .list-group-item-#{$state} {
+      @include list-group-item-variant($state, $variant);
+    }
   }
 
   // Fix Firefox option color

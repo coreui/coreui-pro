@@ -9,7 +9,7 @@
           $name: "border-color";
         }
 
-        --#{$variable-prefix}#{$component}-#{$name}: #{$value};
+        --#{$prefix}#{$component}-#{$name}: #{$value};
       }
     }
   }
@@ -17,7 +17,7 @@
 
 @mixin theme-colors($map, $class) {
   @each $name, $value in $map {
-    --#{$variable-prefix}#{$class}-#{$name}: #{$value};
+    --#{$prefix}#{$class}-#{$name}: #{$value};
   }
 }
 
@@ -25,7 +25,7 @@
   @each $name, $value in $map {
     @if $value != null {
       @if type-of($value) != "map" {
-        --#{$variable-prefix}#{$name}: #{$value};
+        --#{$prefix}#{$name}: #{$value};
       }
       @else {
         @include theme-variants($value, $name, $component);

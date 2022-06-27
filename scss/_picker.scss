@@ -1,7 +1,7 @@
 .picker {
   // scss-docs-start picker-css-vars
-  --#{$variable-prefix}picker-footer-border-top: #{$picker-footer-border-width} solid #{$picker-footer-border-color};
-  --#{$variable-prefix}picker-footer-padding: #{$picker-footer-padding};
+  --#{$prefix}picker-footer-border-top: #{$picker-footer-border-width} solid #{$picker-footer-border-color};
+  --#{$prefix}picker-footer-padding: #{$picker-footer-padding};
   // scss-docs-end picker-css-vars
 
   .dropdown-menu {
@@ -10,9 +10,9 @@
 
   &.show {
     .input-group {
-      color: var(--#{$variable-prefix}input-focus-color, $input-focus-color);
-      background-color: var(--#{$variable-prefix}input-focus-bg, $input-focus-bg);
-      border-color: var(--#{$variable-prefix}input-focus-border-color, $input-focus-border-color);
+      color: var(--#{$prefix}input-focus-color, $input-focus-color);
+      background-color: var(--#{$prefix}input-focus-bg, $input-focus-bg);
+      border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
       outline: 0;
       @include border-radius($input-border-radius, 0);
       @if $enable-shadows {
@@ -43,7 +43,7 @@
     }
 
     &:focus {
-      border-color: var(--#{$variable-prefix}input-border-color, $input-border-color);
+      border-color: var(--#{$prefix}input-border-color, $input-border-color);
       outline: 0;
       box-shadow: none;
     }
@@ -57,11 +57,11 @@
     }
 
     &[readonly] {
-      background-color: var(--#{$variable-prefix}input-bg, $input-bg);
+      background-color: var(--#{$prefix}input-bg, $input-bg);
     }
 
     &.form-control:disabled + .input-group-text {
-      background-color: var(--#{$variable-prefix}input-disabled-bg, $input-disabled-bg);
+      background-color: var(--#{$prefix}input-disabled-bg, $input-disabled-bg);
     }
   }
 
@@ -83,7 +83,7 @@
 
   .input-group-text {
     color: var(--cui-gray-400);
-    background-color: var(--#{$variable-prefix}input-bg, $input-bg);
+    background-color: var(--#{$prefix}input-bg, $input-bg);
   }
 }
 
@@ -102,8 +102,8 @@
 .picker-footer {
   display: flex;
   justify-content: flex-end;
-  padding: var(--#{$variable-prefix}picker-footer-padding);
-  border-top: var(--#{$variable-prefix}picker-footer-border-top);
+  padding: var(--#{$prefix}picker-footer-padding);
+  border-top: var(--#{$prefix}picker-footer-border-top);
 
   .btn + .btn {
     @include ltr-rtl("margin-left", .5rem);

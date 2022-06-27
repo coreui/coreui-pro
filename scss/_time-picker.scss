@@ -1,14 +1,14 @@
 .time-picker {
   // scss-docs-start time-picker-css-vars
-  --#{$variable-prefix}time-picker-body-padding: #{$time-picker-body-padding};
-  --#{$variable-prefix}time-picker-roll-col-border: #{$time-picker-roll-col-border-width} solid #{$time-picker-roll-col-border-color};
+  --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
+  --#{$prefix}time-picker-roll-col-border: #{$time-picker-roll-col-border-width} solid #{$time-picker-roll-col-border-color};
   // scss-docs-end time-picker-css-vars
 }
 
 .time-picker-body {
   display: flex;
   align-items: center;
-  padding: var(--#{$variable-prefix}time-picker-body-padding);
+  padding: var(--#{$prefix}time-picker-body-padding);
 
   .form-select {
     padding-right: 1.25rem;
@@ -57,7 +57,7 @@
 .time-picker-roll-col {
   height: calc(8 * 32px); // stylelint-disable-line
   overflow: scroll;
-  border-right: var(--#{$variable-prefix}time-picker-roll-col-border);
+  border-right: var(--#{$prefix}time-picker-roll-col-border);
 
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
   scrollbar-width: none;  /* Firefox */

@@ -7,7 +7,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin, typeCheckConfig } from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import SelectorEngine from './dom/selector-engine'
@@ -159,30 +159,31 @@ class TimePicker extends Picker {
   }
 
   _setUpRolls(initial = false) {
-    Array.from(['hours', 'minutes', 'seconds', 'toggle']).forEach(part => {
-      SelectorEngine.find(`[data-coreui-${part}]`, this._element).forEach(element => {
+    for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
+      for (const element of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
         if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
           element.classList.add('selected')
           this._scrollTo(element.parentElement, element, initial)
 
           for (const sibling of element.parentElement.children) {
+            // eslint-disable-next-line max-depth
             if (sibling !== element) {
               sibling.classList.remove('selected')
             }
           }
         }
-      })
-    })
+      }
+    }
   }
 
   _setUpSelects() {
-    Array.from(['hours', 'minutes', 'seconds', 'toggle']).forEach(part => {
-      SelectorEngine.find(`select.${part}`, this._element).forEach(element => {
+    for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
+      for (const element of SelectorEngine.find(`select.${part}`, this._element)) {
         if (this._getPartOfTime(part)) {
           element.value = this._getPartOfTime(part)
         }
-      })
-    })
+      }
+    }
   }
 
   // Private
@@ -328,13 +329,13 @@ class TimePicker extends Picker {
     selectEl.disabled = this._config.disabled
     selectEl.addEventListener('change', event => this._handleTimeChange(className, event.target.value))
 
-    options.forEach(option => {
+    for (const option of options) {
       const optionEl = document.createElement('option')
       optionEl.value = option.value
       optionEl.innerHTML = option.label
 
       selectEl.append(optionEl)
-    })
+    }
 
     return selectEl
   }
@@ -378,7 +379,7 @@ class TimePicker extends Picker {
     const timePickerRollColEl = document.createElement('div')
     timePickerRollColEl.classList.add('time-picker-roll-col')
 
-    options.forEach(option => {
+    for (const option of options) {
       const timePickerRollCellEl = document.createElement('div')
       timePickerRollCellEl.classList.add('time-picker-roll-cell')
       timePickerRollCellEl.setAttribute('role', 'button')
@@ -390,7 +391,7 @@ class TimePicker extends Picker {
       Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value)
 
       timePickerRollColEl.append(timePickerRollCellEl)
-    })
+    }
 
     return timePickerRollColEl
   }
@@ -402,7 +403,6 @@ class TimePicker extends Picker {
       ...(typeof config === 'object' ? config : {})
     }
 
-    typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 

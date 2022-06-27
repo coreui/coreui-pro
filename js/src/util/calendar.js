@@ -130,13 +130,14 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   const daysNextMonth = getTrailingDays(year, month, daysPrevMonth, daysThisMonth)
   const days = [...daysPrevMonth, ...daysThisMonth, ...daysNextMonth]
   const weeks = []
-  days.forEach((day, index) => {
+  for (const [index, day] of days.entries()) {
     if (index % 7 === 0 || weeks.length === 0) {
       weeks.push([])
     }
 
     weeks[weeks.length - 1].push(day)
-  })
+  }
+
   return weeks
 }
 
@@ -162,7 +163,7 @@ export const isDisableDateInRange = (startDate, endDate, dates) => {
 export const isDateDisabled = (date, min, max, dates) => {
   let disabled
   if (dates) {
-    dates.forEach(_date => {
+    for (const _date of dates) {
       if (Array.isArray(_date) && isDateInRange(date, _date[0], _date[1])) {
         disabled = true
       }
@@ -170,7 +171,7 @@ export const isDateDisabled = (date, min, max, dates) => {
       if (_date instanceof Date && isSameDateAs(date, _date)) {
         disabled = true
       }
-    })
+    }
   }
 
   if (min && date < min) {

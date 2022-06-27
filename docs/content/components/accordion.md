@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Accordion
+title: Bootstrap accordion
 description: Build vertically collapsing accordions in combination with our Collapse JavaScript plugin.
 group: components
 aliases:
@@ -10,6 +10,7 @@ aliases:
   - "/4.0/components/accordion/"
   - "/4.1/components/accordion/"
 toc: true
+bootstrap: true
 ---
 
 ## How it works
@@ -155,10 +156,11 @@ Please read the [collapse accessibility section]({{< docsref "/components/collap
 
 ## Customizing
 
-### SASS
+### CSS variables
 
-#### Variables
+Accordions use local CSS variables on .accordion for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+
+{{< scss-docs name="accordion-css-vars" file="scss/_accordion.scss" >}}
+
+### SASS variables
 {{< scss-docs name="accordion-variables" file="scss/_variables.scss" >}}
-
-### CSS Vars
-{{< css-vars-docs file="scss/_accordion.scss" >}}

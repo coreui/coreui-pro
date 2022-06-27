@@ -64,7 +64,7 @@ class DatePicker extends DateRangePicker {
 
   _addCalendarEventListeners() {
     super._addCalendarEventListeners()
-    SelectorEngine.find('.calendar', this._element).forEach(calendar => {
+    for (const calendar of SelectorEngine.find('.calendar', this._element)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date
         this._selectEndDate = event.selectEndDate
@@ -76,7 +76,7 @@ class DatePicker extends DateRangePicker {
           formatedDate: event.date ? this._formatDate(event.date) : undefined
         })
       })
-    })
+    }
   }
 
   // Static

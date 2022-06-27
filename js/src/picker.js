@@ -5,7 +5,6 @@
  * --------------------------------------------------------------------------
  */
 
-import { typeCheckConfig } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import BaseComponent from './base-component'
@@ -166,7 +165,6 @@ class Picker extends BaseComponent {
       ...(typeof config === 'object' ? config : {})
     }
 
-    typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 }

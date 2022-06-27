@@ -6,7 +6,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin, typeCheckConfig } from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
 import {
@@ -410,7 +410,6 @@ class Calendar extends BaseComponent {
       ...config
     }
 
-    typeCheckConfig(NAME, config, DefaultType)
     return config
   }
 

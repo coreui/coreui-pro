@@ -5,10 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  defineJQueryPlugin,
-  typeCheckConfig
-} from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import ScrollBarHelper from './util/scrollbar'
 import EventHandler from './dom/event-handler'
 import BaseComponent from './base-component'
@@ -204,7 +201,7 @@ class Sidebar extends BaseComponent {
       ...Manipulator.getDataAttributes(this._element),
       ...(typeof config === 'object' ? config : {})
     }
-    typeCheckConfig(NAME, config, DefaultType)
+
     return config
   }
 
@@ -327,9 +324,9 @@ class Sidebar extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  Array.from(document.querySelectorAll(SELECTOR_SIDEBAR)).forEach(element => {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_SIDEBAR))) {
     Sidebar.sidebarInterface(element)
-  })
+  }
 })
 
 /**

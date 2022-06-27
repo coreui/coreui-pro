@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.1.6](https://github.com/coreui/coreui/compare/v4.1.5...v4.1.6)
+
+> 9 June 2022
+
+- fix(scss) Replace color-adjust to print-color-adjust in _form-check.scss
+
+## [v4.1.5](https://github.com/coreui/coreui/compare/v4.1.4...v4.1.5)
+
+> 5 May 2022
+
+- fix(forms): revert angular validation classes commit
+
 <!-- auto-changelog-above -->
 ## [v4.0.4-alpha.4](https://github.com/coreui/coreui/compare/v4.0.4-alpha.3...v4.0.4-alpha.4)
 

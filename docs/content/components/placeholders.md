@@ -1,12 +1,13 @@
 ---
 layout: docs
-title: Placeholders
+title: Bootstrap placeholders
 description: Use loading placeholders for your components or pages to indicate something may still be loading.
 group: components
 aliases:
   - "/4.0/components/placeholders/"
   - "/4.1/components/placeholders/"
 toc: true
+added: "5.1"
 ---
 
 ## About
@@ -140,8 +141,8 @@ Animate placeholders with `.placeholder-glow` or `.placeholder-wave` to better c
 </p>
 {{< /example >}}
 
-## Sass
+## Customization
 
-### Variables
+### SASS Variables
 
 {{< scss-docs name="placeholders" file="scss/_variables.scss" >}}

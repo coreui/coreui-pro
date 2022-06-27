@@ -78,6 +78,21 @@ Other than `.form-control`, floating labels are only available on `.form-select`
 </div>
 {{< /example >}}
 
+## Readonly plaintext
+
+Floating labels also support `.form-control-plaintext`, which can be helpful for toggling from an editable `<input>` to a plaintext value without affecting the page layout.
+
+{{< example >}}
+<div class="form-floating mb-3">
+  <input type="email" readonly class="form-control-plaintext" id="floatingEmptyPlaintextInput" placeholder="name@example.com">
+  <label for="floatingEmptyPlaintextInput">Empty input</label>
+</div>
+<div class="form-floating mb-3">
+  <input type="email" readonly class="form-control-plaintext" id="floatingPlaintextInput" placeholder="name@example.com" value="name@example.com">
+  <label for="floatingPlaintextInput">Input with value</label>
+</div>
+{{< /example >}}
+
 ## Layout
 
 When working with the CoreUI for Bootstrap grid system, be sure to place form elements within column classes.
@@ -92,7 +107,7 @@ When working with the CoreUI for Bootstrap grid system, be sure to place form el
   </div>
   <div class="col-md">
     <div class="form-floating">
-      <select class="form-select" id="floatingSelectGrid" aria-label="Floating label select example">
+      <select class="form-select" id="floatingSelectGrid">
         <option selected>Open this select menu</option>
         <option value="1">One</option>
         <option value="2">Two</option>

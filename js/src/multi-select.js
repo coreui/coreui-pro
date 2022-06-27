@@ -5,10 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  defineJQueryPlugin,
-  typeCheckConfig
-} from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
@@ -275,7 +272,7 @@ class MultiSelect extends BaseComponent {
       ...Manipulator.getDataAttributes(this._element),
       ...(typeof config === 'object' ? config : {})
     }
-    typeCheckConfig(NAME, config, DefaultType)
+
     return config
   }
 

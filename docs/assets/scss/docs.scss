@@ -1,8 +1,8 @@
 /*!
  * CoreUI Docs (https://coreui.io/docs/)
  * Copyright 2022 creativeLabs Łukasz Holeczek
- * Copyright 2011-2020 The Bootstrap Authors
- * Copyright 2011-2020 Twitter, Inc.
+ * Copyright 2011-2022 The Bootstrap Authors
+ * Copyright 2011-2022 Twitter, Inc.
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  * For details, see https://creativecommons.org/licenses/by/3.0/.
  */
@@ -40,7 +40,6 @@ $enable-cssgrid: true; // stylelint-disable-line scss/dollar-variable-default
 // Load docs components
 @import "variables";
 @import "ads";
-@import "subnav";
 @import "masthead";
 @import "content";
 @import "skippy";
@@ -71,7 +70,7 @@ div[dir="rtl"] .input-group > :not(:first-child) {
 }
 
 div[dir="rtl"] .picker .input-group .form-control:first-child {
-  border-right : $input-border-width solid var(--#{$variable-prefix}input-border-color, $input-border-color) !important;
+  border-right : $input-border-width solid var(--#{$prefix}input-border-color, $input-border-color) !important;
 }
 
 div[dir="rtl"] .picker .input-group > * + *:not(:last-child) {

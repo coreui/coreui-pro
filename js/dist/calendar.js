@@ -1,0 +1,445 @@
+/*!
+  * CoreUI calendar.js v4.2.1 (https://coreui.io)
+  * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Licensed under MIT (https://coreui.io)
+  */
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/manipulator'), require('./util/calendar'), require('./base-component')) :
+  typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './util/calendar', './base-component'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.Index, global.EventHandler, global.Manipulator, global.Calendar, global.BaseComponent));
+})(this, (function (index, EventHandler, Manipulator, calendar, BaseComponent) { 'use strict';
+
+  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
+
+  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
+  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
+  const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
+
+  /* eslint-disable indent, multiline-ternary */
+  /**
+  * ------------------------------------------------------------------------
+  * Constants
+  * ------------------------------------------------------------------------
+  */
+
+  const NAME = 'calendar';
+  const DATA_KEY = 'coreui.calendar';
+  const EVENT_KEY = `.${DATA_KEY}`;
+  const DATA_API_KEY = '.data-api';
+  const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`;
+  const EVENT_CELL_HOVER = `cellHover${EVENT_KEY}`;
+  const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`;
+  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
+  const EVENT_MOUSEENTER = `mouseenter${EVENT_KEY}`;
+  const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`;
+  const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`;
+  const CLASS_NAME_CALENDAR = 'calendar';
+  const SELECTOR_CALENDAR = '.calendar';
+  const SELECTOR_CALENDAR_CELL_INNER = '.calendar-cell-inner';
+  const Default = {
+    calendarDate: new Date(),
+    calendars: 1,
+    disabledDates: null,
+    endDate: null,
+    firstDayOfWeek: 1,
+    locale: 'default',
+    maxDate: null,
+    minDate: null,
+    range: true,
+    startDate: null,
+    selectEndDate: false,
+    weekdayFormat: 2
+  };
+  const DefaultType = {
+    calendarDate: '(date|string|null)',
+    calendars: 'number',
+    disabledDates: '(array|null)',
+    endDate: '(date|string|null)',
+    firstDayOfWeek: 'number',
+    locale: 'string',
+    maxDate: '(date|string|null)',
+    minDate: '(date|string|null)',
+    range: 'boolean',
+    startDate: '(date|string|null)',
+    selectEndDate: 'boolean',
+    weekdayFormat: '(number|string)'
+  };
+  /**
+  * ------------------------------------------------------------------------
+  * Class Definition
+  * ------------------------------------------------------------------------
+  */
+
+  class Calendar extends BaseComponent__default.default {
+    constructor(element, config) {
+      super(element);
+      this._config = this._getConfig(config);
+      this._calendarDate = this._config.calendarDate;
+      this._startDate = this._config.startDate;
+      this._endDate = this._config.endDate;
+      this._hoverDate = null;
+      this._selectEndDate = this._config.selectEndDate;
+      this._view = 'days';
+
+      this._createCalendar();
+
+      this._addEventListeners();
+    } // Getters
+
+
+    static get Default() {
+      return Default;
+    }
+
+    static get DefaultType() {
+      return DefaultType;
+    }
+
+    static get NAME() {
+      return NAME;
+    } // Private
+
+
+    _addEventListeners() {
+      EventHandler__default.default.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
+        event.preventDefault();
+
+        if (event.target.classList.contains('day')) {
+          this._selectDate(Manipulator__default.default.getDataAttribute(event.target, 'date'));
+        }
+
+        if (event.target.classList.contains('month')) {
+          this._setCalendarDate(new Date(this._calendarDate.getFullYear(), Manipulator__default.default.getDataAttribute(event.target, 'month'), 1));
+
+          this._view = 'days';
+        }
+
+        if (event.target.classList.contains('year')) {
+          this._calendarDate = new Date(Manipulator__default.default.getDataAttribute(event.target, 'year'), this._calendarDate.getMonth(), 1);
+          this._view = 'months';
+        }
+
+        this._updateCalendar();
+      });
+      EventHandler__default.default.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_INNER, event => {
+        event.preventDefault();
+
+        if (event.target.parentElement.classList.contains('disabled')) {
+          return;
+        }
+
+        this._hoverDate = new Date(Manipulator__default.default.getDataAttribute(event.target, 'date'));
+        EventHandler__default.default.trigger(this._element, EVENT_CELL_HOVER, {
+          date: new Date(Manipulator__default.default.getDataAttribute(event.target, 'date'))
+        });
+      });
+      EventHandler__default.default.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_CELL_INNER, event => {
+        event.preventDefault();
+        this._hoverDate = null;
+        EventHandler__default.default.trigger(this._element, EVENT_CELL_HOVER, {
+          date: null
+        });
+      }); // Navigation
+
+      EventHandler__default.default.on(this._element, 'click', '.btn-prev', event => {
+        event.preventDefault();
+
+        this._modifyCalendarDate(0, -1);
+      });
+      EventHandler__default.default.on(this._element, 'click', '.btn-double-prev', event => {
+        event.preventDefault();
+
+        this._modifyCalendarDate(this._view === 'years' ? -10 : -1);
+      });
+      EventHandler__default.default.on(this._element, 'click', '.btn-next', event => {
+        event.preventDefault();
+
+        this._modifyCalendarDate(0, 1);
+      });
+      EventHandler__default.default.on(this._element, 'click', '.btn-double-next', event => {
+        event.preventDefault();
+
+        this._modifyCalendarDate(this._view === 'years' ? 10 : 1);
+      });
+      EventHandler__default.default.on(this._element, 'click', '.btn-month', event => {
+        event.preventDefault();
+        this._view = 'months';
+        this._element.innerHTML = '';
+
+        this._createCalendarPanel();
+      });
+      EventHandler__default.default.on(this._element, 'click', '.btn-year', event => {
+        event.preventDefault();
+        this._view = 'years';
+        this._element.innerHTML = '';
+
+        this._createCalendarPanel();
+      });
+    }
+
+    _setCalendarDate(date) {
+      this._calendarDate = date;
+      EventHandler__default.default.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+        date
+      });
+    }
+
+    _modifyCalendarDate(years, months = 0) {
+      const year = this._calendarDate.getFullYear();
+
+      const month = this._calendarDate.getMonth();
+
+      const d = new Date(year, month, 1);
+
+      if (years) {
+        d.setFullYear(d.getFullYear() + years);
+      }
+
+      if (months) {
+        d.setMonth(d.getMonth() + months);
+      }
+
+      this._calendarDate = d;
+
+      if (this._view === 'days') {
+        EventHandler__default.default.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+          date: d
+        });
+      }
+
+      this._updateCalendar();
+    }
+
+    _setEndDate(date, selectEndDate = false) {
+      this._endDate = new Date(date);
+      EventHandler__default.default.trigger(this._element, EVENT_END_DATE_CHANGE, {
+        date: this._endDate,
+        selectEndDate
+      });
+    }
+
+    _setStartDate(date, selectEndDate = true) {
+      this._startDate = new Date(date);
+      EventHandler__default.default.trigger(this._element, EVENT_START_DATE_CHANGE, {
+        date: this._startDate,
+        selectEndDate
+      });
+    }
+
+    _selectDate(date) {
+      if (calendar.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+        return;
+      }
+
+      if (this._config.range) {
+        if (this._selectEndDate) {
+          if (this._startDate && this._startDate > new Date(date)) {
+            this._setEndDate(this._startDate);
+
+            this._setStartDate(date);
+          } else {
+            this._setEndDate(date);
+          }
+        } else {
+          this._setStartDate(date, true);
+        }
+      } else {
+        this._setStartDate(date);
+      }
+    }
+
+    _createCalendarPanel(addMonths) {
+      let date = this._calendarDate;
+
+      if (addMonths !== 0) {
+        date = new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth() + addMonths, 1);
+      }
+
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const calendarPanelEl = document.createElement('div');
+      calendarPanelEl.classList.add('calendar-panel'); // Create navigation
+
+      const navigationElement = document.createElement('div');
+      navigationElement.classList.add('calendar-nav');
+      navigationElement.innerHTML = `
+      <div class="calendar-nav-prev">
+        <button class="btn btn-transparent btn-sm btn-double-prev">
+          <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
+        </button>
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev">
+          <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
+        </button>` : ''}
+      </div>
+      <div class="calendar-nav-date">
+        <button class="btn btn-transparent btn-sm btn-month">
+          ${date.toLocaleDateString(this._config.locale, {
+      month: 'long'
+    })}
+        </button>
+        <button class="btn btn-transparent btn-sm btn-year">
+          ${date.toLocaleDateString(this._config.locale, {
+      year: 'numeric'
+    })}
+        </button>
+      </div>
+      <div class="calendar-nav-next">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next">
+          <span class="calendar-nav-icon calendar-nav-icon-next"></span>
+        </button>` : ''}
+        <button class="btn btn-transparent btn-sm btn-double-next">
+          <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
+        </button>
+      </div>
+    `;
+      const monthDetails = calendar.getMonthDetails(year, month, this._config.firstDayOfWeek);
+      const listOfMonths = calendar.createGroupsInArray(calendar.getMonthsNames(this._config.locale), 4);
+      const listOfYears = calendar.createGroupsInArray(calendar.getYears(date.getFullYear()), 4);
+      const weekDays = monthDetails[0];
+      const calendarTable = document.createElement('table');
+      calendarTable.innerHTML = `
+    ${this._view === 'days' ? `
+      <thead>
+        <tr>
+          ${weekDays.map(({
+      date
+    }) => `<th class="calendar-cell">
+              <div class="calendar-header-cell-inner">
+              ${typeof this._config.weekdayFormat === 'string' ? date.toLocaleDateString(this._config.locale, {
+      weekday: this._config.weekdayFormat
+    }) : date.toLocaleDateString(this._config.locale, {
+      weekday: 'long'
+    }).slice(0, this._config.weekdayFormat)}
+              </div>
+            </th>`).join('')}
+        </tr>
+      </thead>` : ''}
+      <tbody>
+        ${this._view === 'days' ? monthDetails.map(week => `<tr>${week.map(({
+      date,
+      month
+    }) => `<td class="calendar-cell ${this._dayClassNames(date, month)}">
+              <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                ${date.toLocaleDateString(this._config.locale, {
+      day: 'numeric'
+    })}
+              </div>
+            </td>`).join('')}</tr>`).join('') : ''}
+        ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>${row.map((month, idx) => `<td class="calendar-cell">
+              <div class="calendar-cell-inner month" data-coreui-month="${index * 3 + idx - addMonths}">
+                ${month}
+              </div>
+            </td>`).join('')}</tr>`).join('') : ''}
+        ${this._view === 'years' ? listOfYears.map(row => `<tr>${row.map(year => `<td class="calendar-cell">
+              <div class="calendar-cell-inner year" data-coreui-year="${year}">
+                ${year}
+              </div>
+            </td>`).join('')}</tr>`).join('') : ''}
+      </tbody>
+    `;
+      calendarPanelEl.append(navigationElement, calendarTable);
+      return calendarPanelEl;
+    }
+
+    _createCalendar() {
+      const calendarsEl = document.createElement('div');
+      calendarsEl.classList.add('calendars');
+      Array.from({
+        length: this._config.calendars
+      }).forEach((_, index) => calendarsEl.append(this._createCalendarPanel(index)));
+
+      this._element.classList.add(CLASS_NAME_CALENDAR);
+
+      this._element.append(calendarsEl);
+    }
+
+    _updateCalendar() {
+      this._element.innerHTML = '';
+
+      this._createCalendarPanel();
+    }
+
+    _dayClassNames(date, month) {
+      const classNames = {
+        today: calendar.isToday(date),
+        disabled: calendar.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
+        [month]: true,
+        last: calendar.isLastDayOfMonth(date),
+        range: month === 'current' && calendar.isDateInRange(date, this._startDate, this._endDate),
+        'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? calendar.isDateInRange(date, this._startDate, this._hoverDate) : calendar.isDateInRange(date, this._hoverDate, this._endDate)),
+        selected: calendar.isDateSelected(date, this._startDate, this._endDate),
+        start: calendar.isStartDate(date, this._startDate, this._endDate),
+        end: calendar.isEndDate(date, this._startDate, this._endDate)
+      }; // eslint-disable-next-line unicorn/no-array-reduce, unicorn/prefer-object-from-entries
+
+      const result = Object.keys(classNames).reduce((o, key) => {
+        // eslint-disable-next-line no-unused-expressions
+        classNames[key] === true && (o[key] = classNames[key]);
+        return o;
+      }, {});
+      return Object.keys(result).join(' ');
+    }
+
+    _getConfig(config) {
+      config = { ...this.constructor.Default,
+        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...config
+      };
+      return config;
+    } // Static
+
+
+    static calendarInterface(element, config) {
+      const data = Calendar.getOrCreateInstance(element, config);
+
+      if (typeof config === 'string') {
+        if (typeof data[config] === 'undefined') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+
+        data[config]();
+      }
+    }
+
+    static jQueryInterface(config) {
+      return this.each(function () {
+        const data = Calendar.getOrCreateInstance(this);
+
+        if (typeof config !== 'string') {
+          return;
+        }
+
+        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+
+        data[config](this);
+      });
+    }
+
+  }
+  /**
+  * ------------------------------------------------------------------------
+  * Data Api implementation
+  * ------------------------------------------------------------------------
+  */
+
+
+  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
+    Array.from(document.querySelectorAll(SELECTOR_CALENDAR)).forEach(element => {
+      Calendar.calendarInterface(element);
+    });
+  });
+  /**
+  * ------------------------------------------------------------------------
+  * jQuery
+  * ------------------------------------------------------------------------
+  * add .Calendar to jQuery only if jQuery is present
+  */
+
+  index.defineJQueryPlugin(Calendar);
+
+  return Calendar;
+
+}));
+//# sourceMappingURL=calendar.js.map

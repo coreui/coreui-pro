@@ -5,10 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  defineJQueryPlugin,
-  typeCheckConfig
-} from './util/index'
+import { defineJQueryPlugin } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
@@ -92,14 +89,14 @@ class Navigation extends BaseComponent {
       ...Manipulator.getDataAttributes(this._element),
       ...(typeof config === 'object' ? config : {})
     }
-    typeCheckConfig(NAME, config, DefaultType)
+
     return config
   }
 
   _setActiveLink() {
-    Array.from(this._element.querySelectorAll(SELECTOR_NAV_LINK)).forEach(element => {
+    for (const element of Array.from(this._element.querySelectorAll(SELECTOR_NAV_LINK))) {
       if (element.classList.contains(CLASS_NAME_NAV_GROUP_TOGGLE)) {
-        return
+        continue
       }
 
       let currentUrl = String(window.location)
@@ -118,6 +115,7 @@ class Navigation extends BaseComponent {
 
       if (this._config.activeLinksExact && element.href === currentUrl) {
         element.classList.add(CLASS_NAME_ACTIVE)
+        // eslint-disable-next-line unicorn/no-array-for-each
         Array.from(this._getParents(element, SELECTOR_NAV_GROUP)).forEach(element => {
           element.classList.add(CLASS_NAME_SHOW)
           element.setAttribute('aria-expanded', true)
@@ -126,12 +124,13 @@ class Navigation extends BaseComponent {
 
       if (!this._config.activeLinksExact && element.href.startsWith(currentUrl)) {
         element.classList.add(CLASS_NAME_ACTIVE)
+        // eslint-disable-next-line unicorn/no-array-for-each
         Array.from(this._getParents(element, SELECTOR_NAV_GROUP)).forEach(element => {
           element.classList.add(CLASS_NAME_SHOW)
           element.setAttribute('aria-expanded', true)
         })
       }
-    })
+    }
   }
 
   _getParents(element, selector) {
@@ -228,12 +227,12 @@ class Navigation extends BaseComponent {
 
     // Close other groups
     if (this._config.groupsAutoCollapse === true) {
-      this._getSiblings(toggler.parentNode, filter).forEach(element => {
+      for (const element of this._getSiblings(toggler.parentNode, filter)) {
         this._slideUp(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, element), () => {
           element.classList.remove(CLASS_NAME_SHOW)
           element.setAttribute('aria-expanded', false)
         })
-      })
+      }
     }
 
     if (toggler.parentNode.classList.contains(CLASS_NAME_SHOW)) {
@@ -283,9 +282,9 @@ class Navigation extends BaseComponent {
  * ------------------------------------------------------------------------
  */
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  Array.from(document.querySelectorAll(SELECTOR_DATA_NAVIGATION)).forEach(element => {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_NAVIGATION))) {
     Navigation.navigationInterface(element)
-  })
+  }
 })
 
 /**
