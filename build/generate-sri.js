@@ -27,19 +27,19 @@ const configFile = path.join(__dirname, '../config.yml')
 const files = [
   {
     file: 'dist/css/coreui.min.css',
-    configPropertyName: 'css_hash'
+    configPropertyName: 'css_pro_hash'
   },
   {
     file: 'dist/css/coreui.rtl.min.css',
-    configPropertyName: 'css_rtl_hash'
+    configPropertyName: 'css_pro_rtl_hash'
   },
   {
     file: 'dist/js/coreui.min.js',
-    configPropertyName: 'js_hash'
+    configPropertyName: 'js_pro_hash'
   },
   {
     file: 'dist/js/coreui.bundle.min.js',
-    configPropertyName: 'js_bundle_hash'
+    configPropertyName: 'js_pro_bundle_hash'
   },
   {
     file: 'node_modules/@popperjs/core/dist/umd/popper.min.js',
