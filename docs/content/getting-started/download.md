@@ -47,6 +47,18 @@ If you're using our compiled JavaScript and prefer to include Popper separately,
 <script src="{{< param "cdn.js" >}}" integrity="{{< param "cdn.js_hash" >}}" crossorigin="anonymous"></script>
 ```
 
+**If you use CoreUI PRO please use following links**
+
+```html
+<link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous">
+<script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+```
+
+```html
+<script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
+```
+
 ## Package managers
 
 Pull in CoreUI's **source files** into nearly any project with some of the most popular package managers. No matter the package manager, CoreUI for Bootstrap will **require a Sass compiler and [Autoprefixer](https://github.com/postcss/autoprefixer)** for a setup that matches our official compiled versions.
@@ -58,6 +70,13 @@ Install CoreUI for Bootstrap in your Node.js powered apps with [the npm package]
 ```sh
 npm install @coreui/coreui
 ```
+
+or
+
+```sh
+npm install @coreui/coreui-pro
+```
+
 
 `const coreui = require('@coreui/coreui')` or `import coreui from '@coreui/coreui'` will load all of CoreUI's plugins onto a `coreui` object.
 The `coreui` module itself exports all of our plugins. You can manually load CoreUI's plugins individually by loading the `/js/dist/*.js` files under the package's top-level directory.
@@ -74,6 +93,11 @@ Install CoreUI in your Node.js powered apps with [the yarn package](https://yarn
 ```sh
 yarn add @coreui/coreui
 ```
+
+```sh
+yarn add @coreui/coreui-pro
+```
+
 <!--
 ### RubyGems
 

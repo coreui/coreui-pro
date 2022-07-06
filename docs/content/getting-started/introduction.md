@@ -25,6 +25,12 @@ Copy-paste the stylesheet `<link>` into your `<head>` before all other styleshee
 <link href="{{< param "cdn.css" >}}" rel="stylesheet" integrity="{{< param "cdn.css_hash" >}}" crossorigin="anonymous">
 ```
 
+If you use CoreUI PRO version.
+
+```html
+<link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous">
+```
+
 ### JS
 
 Many of our components require the use of JavaScript to function. Specifically, they require our own JavaScript plugins and [Popper](https://popper.js.org/). Place **one of the following `<script>`s** near the end of your pages, right before the closing `</body>` tag, to enable them.
@@ -37,6 +43,12 @@ Include every CoreUI for Bootstrap JavaScript plugin and dependency with one of 
 <script src="{{< param "cdn.js_bundle" >}}" integrity="{{< param "cdn.js_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
 
+If you use CoreUI PRO version.
+
+```html
+<script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+```
+
 #### Separate
 
 If you decide to go with the separate scripts solution, Popper must come first (if you're using tooltips or popovers), and then our JavaScript plugins.
@@ -44,6 +56,13 @@ If you decide to go with the separate scripts solution, Popper must come first (
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
 <script src="{{< param "cdn.js" >}}" integrity="{{< param "cdn.js_hash" >}}" crossorigin="anonymous"></script>
+```
+
+If you use CoreUI PRO version.
+
+```html
+<script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
 ```
 
 #### Modules
@@ -83,8 +102,11 @@ Be sure to have your pages set up with the latest design and development standar
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CoreUI for Bootstrap CSS -->
+    <!-- Option 1: CoreUI for Bootstrap CSS -->
     <link href="{{< param "cdn.css" >}}" rel="stylesheet" integrity="{{< param "cdn.css_hash" >}}" crossorigin="anonymous">
+
+    <!-- Option 2: CoreUI PRO for Bootstrap CSS -->
+    <!-- <link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous"> -->
 
     <title>Hello, world!</title>
   </head>
@@ -96,10 +118,15 @@ Be sure to have your pages set up with the latest design and development standar
     <!-- Option 1: CoreUI for Bootstrap Bundle with Popper -->
     <script src="{{< param "cdn.js_bundle" >}}" integrity="{{< param "cdn.js_bundle_hash" >}}" crossorigin="anonymous"></script>
 
-    <!-- Option 2: Separate Popper and CoreUI for Bootstrap JS -->
+    <!-- Option 2: CoreUI PRO for Bootstrap Bundle with Popper -->
+    <script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+
+    <!-- Option 3: Separate Popper and CoreUI/CoreUI PRO  for Bootstrap JS -->
     <!--
     <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
     <script src="{{< param "cdn.js" >}}" integrity="{{< param "cdn.js_hash" >}}" crossorigin="anonymous"></script>
+    or
+    <script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
     -->
   </body>
 </html>

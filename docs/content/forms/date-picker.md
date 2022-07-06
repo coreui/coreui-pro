@@ -199,268 +199,86 @@ Call the time picker via JavaScript:
 
 ```js
 const datePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.date-picker'))
-const datePickerList = datePickerElementList.map(function (datePickerEl) {
+const datePickerList = datePickerElementList.map(datePickerEl => {
   return new coreui.DatePicker(datePickerEl)
 })
 ```
 
 ### Options
 
-Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-cleaner=""`. Make sure to change the case type of the option name from camelCase to kebab-case when passing the options via data attributes. For example, instead of using `data-coreui-inputReadOnly="false"`, use `data-coreui-input-read-only="false"`.
+{{< markdown >}}
+{{< partial "js-data-attributes.md" >}}
+{{< /markdown >}}
 
-<table class="table">
-  <thead>
-    <tr>
-      <th style="width: 100px;">Name</th>
-      <th style="width: 100px;">Type</th>
-      <th style="width: 50px;">Default</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>calendarDate</code></td>
-      <td>date | string | null</td>
-      <td><code>null</code></td>
-      <td>Default date of the component.</td>
-    </tr>
-    <tr>
-      <td><code>cancelButtonLabel</code></td>
-      <td>string</td>
-      <td><code>'Cancel'</code></td>
-      <td>Cancel button inner HTML</td>
-    </tr>
-    <tr>
-      <td><code>cancelButtonClasses</code></td>
-      <td>array | string</td>
-      <td><code>['btn', 'btn-sm', 'btn-ghost-primary']</code></td>
-      <td>CSS class names that will be added to the cancel button</td>
-    </tr>
-    <tr>
-      <td><code>cleaner</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Enables selection cleaner element.</td>
-    </tr>
-    <tr>
-      <td><code>date</code></td>
-      <td>date | string | null</td>
-      <td><code>null</code></td>
-      <td>Initial selected date.</td>
-    </tr>
-    <tr>
-      <td><code>confirmButtonLabel</code></td>
-      <td>string</td>
-      <td><code>'OK'</code></td>
-      <td>Confirm button inner HTML</td>
-    </tr>
-    <tr>
-      <td><code>confirmButtonClasses</code></td>
-      <td>array | string</td>
-      <td><code>['btn', 'btn-sm', 'btn-primary']</code></td>
-      <td>CSS class names that will be added to the confirm button</td>
-    </tr>
-    <tr>
-      <td><code>date</code></td>
-      <td>date | string | null</td>
-      <td><code>null</code></td>
-      <td>Default value of the component</td>
-    </tr>
-    <tr>
-      <td><code>disabled</code></td>
-      <td>boolean</td>
-      <td><code>false</code></td>
-      <td>Toggle the disabled state for the component.</td>
-    </tr>
-    <tr>
-      <td><code>disabledDates</code></td>
-      <td>array | null</td>
-      <td><code>null</code></td>
-      <td>Specify the list of dates that cannot be selected.</td>
-    </tr>
-    <tr>
-      <td><code>firstDayOfWeek</code></td>
-      <td>number</td>
-      <td><code>1</code></td>
-      <td>
-        <p>Sets the day of start week.</p>
-        <ul>
-          <li><code>0</code> - Sunday</li>
-          <li><code>1</code> - Monday</li>
-          <li><code>2</code> - Tuesday</li>
-          <li><code>3</code> - Wednesday</li>
-          <li><code>4</code> - Thursday</li>
-          <li><code>5</code> - Friday</li>
-          <li><code>6</code> - Saturday</li>
-        </ul>
-      </td>
-    </tr>
-    <tr>
-      <td><code>footer</code></td>
-      <td>boolean</td>
-      <td><code>false</code></td>
-      <td>Toggle visibility of footer element.</td>
-    </tr>
-    <tr>
-      <td><code>format</code></td>
-      <td>string</td>
-      <td></td>
-      <td>Set date format. We use date-fns to format dates. Visit <a href="https://date-fns.org/v2.28.0/docs/format" target="_blank" rel="nofollow">https://date-fns.org/v2.28.0/docs/format</a> to check accepted patterns.</td>
-    </tr>
-    <tr>
-      <td><code>indicator</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Toggle visibility or set the content of the input indicator.</td>
-    </tr>
-    <tr>
-      <td><code>inputReadOnly</code></td>
-      <td>boolean</td>
-      <td><code>false</code></td>
-      <td>Toggle the readonly state for the component.</td>
-    </tr>
-    <tr>
-      <td><code>locale</code></td>
-      <td>string</td>
-      <td><code>'default'</code></td>
-      <td>Sets the default locale for components. If not set, it is inherited from the navigator.language.</td>
-    </tr>
-    <tr>
-      <td><code>maxDate</code></td>
-      <td>date | string | null</td>
-      <td><code>null</code></td>
-      <td>Max selectable date.</td>
-    </tr>
-    <tr>
-      <td><code>minDate</code></td>
-      <td>date | string | null</td>
-      <td><code>null</code></td>
-      <td>Min selectable date.</td>
-    </tr>
-    <tr>
-      <td><code>placeholder</code></td>
-      <td>string</td>
-      <td><code>'Select time'</code></td>
-      <td>Specifies a short hint that is visible in the input.</td>
-    </tr>
-    <tr>
-      <td><code>size</code></td>
-      <td><code>'sm'</code> | <code>'lg'</code></td>
-      <td><code>null</code></td>
-      <td>Size the component small or large.</td>
-    </tr>
-    <tr>
-      <td><code>timepicker</code></td>
-      <td>boolean</td>
-      <td><code>false</code></td>
-      <td>Provide an additional time selection by adding select boxes to choose times.</td>
-    </tr>
-    <tr>
-      <td><code>todayButton</code></td>
-      <td>string</td>
-      <td><code>'Today'</code></td>
-      <td>Today button inner HTML</td>
-    </tr>
-    <tr>
-      <td><code>todayButtonClasses</code></td>
-      <td>array | string</td>
-      <td><code>['btn', 'btn-sm', 'me-2']</code></td>
-      <td>CSS class names that will be added to the today button</td>
-    </tr>
-    <tr>
-      <td><code>weekdayFormat</code></td>
-      <td>number | 'long' | 'narrow' | 'short'</td>
-      <td><code>2</code></td>
-      <td>Set length or format of day name.</td>
-    </tr>
-  </tbody>
-</table>
+{{< bs-table >}}
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `calendarDate` | date \| string \| null | `null` | Default date of the component. |
+| `cancelButtonLabel` | string | `'Cancel'` | Cancel button inner HTML |
+| `cancelButtonClasses` | array \| string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
+| `cleaner` | boolean | `true` | Enables selection cleaner element. |
+| `date` | date \| string \| null | `null` | Initial selected date. |
+| `confirmButtonLabel` | string | `'OK'` | Confirm button inner HTML |
+| `confirmButtonClasses` | array \| string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
+| `date` | date \| string \| null | `null` | Default value of the component |
+| `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `disabledDates` | array | null | `null` | Specify the list of dates that cannot be selected. |
+| `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p><ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
+| `footer` | boolean | `false` | Toggle visibility of footer element. |
+| `format` | string | | Set date format. We use date-fns to format dates. Visit <a href="https://date-fns.org/v2.28.0/docs/format" target="_blank" rel="nofollow">https://date-fns.org/v2.28.0/docs/format</a> to check accepted patterns. |
+| `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
+| `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
+| `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
+| `maxDate` | date \| string \| null | `null` | Max selectable date. |
+| `minDate` | date \| string \| null | `null` | Min selectable date. |
+| `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
+| `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
+| `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
+| `todayButton` | string | `'Today'` | Today button inner HTML |
+| `todayButtonClasses` | array \| string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
+| `weekdayFormat` | number \| 'long' \| 'narrow' \| 'short' | `2` | Set length or format of day name. |
+{{< /bs-table >}}
 
 ### Methods
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Method</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>clear</code></td>
-      <td>Clear selection of the date picker.</td>
-    </tr>
-    <tr>
-      <td><code>reset</code></td>
-      <td>Reset selection of the date picker to the initial value.</td>
-    </tr>
-    <tr>
-      <td><code>update</code></td>
-      <td>
-        Updates the configuration of the date picker.
-      </td>
-    </tr>
-    <tr>
-      <td><code>dispose</code></td>
-      <td>
-        Destroys a component. (Removes stored data on the DOM element)
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>getInstance</code>
-      </td>
-      <td>
-        Static method which allows you to get the date picker instance associated to a DOM element, you can use it like this: <code>coreui.DatePicker.getInstance(element)</code>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>getOrCreateInstance</code>
-      </td>
-      <td>
-        Static method which returns a date picker instance associated to a DOM element or create a new one in case it wasn't initialized.
-        You can use it like this: <code>coreui.DatePicker.getOrCreateInstance(element)</code>
-      </td>
-    </tr>
-  </tbody>
-</table>
+{{< bs-table >}}
+| Method | Description |
+| --- | --- |
+| `clear` | Clear selection of the date picker. |
+| `reset` | Reset selection of the date picker to the initial value. |
+| `update` | Updates the configuration of the date picker.|
+| `dispose` | Destroys a component. (Removes stored data on the DOM element)|
+| `getInstance` | Static method which allows you to get the date picker instance associated to a DOM element, you can use it like this: `coreui.DatePicker.getInstance(element)` |
+| `getOrCreateInstance` | Static method which returns a date picker instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.DatePicker.getOrCreateInstance(element)` |
+{{< /bs-table >}}
 
 ### Events
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Method</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <code>dateChange.coreui.date-picker</code>
-      </td>
-      <td>
-        Callback fired when the date changed.
-      </td>
-    </tr>
-  </tbody>
-</table>
+{{< bs-table >}}
+| Method | Description |
+| --- | --- |
+| `dateChange.coreui.date-picker` | Callback fired when the date changed. |
+{{< /bs-table >}}
 
 ```js
 const myDatePicker = document.getElementById('myDatePicker')
-myDatePicker.addEventListener('dateChange.coreui.date-picker', function (date) {
+myDatePicker.addEventListener('dateChange.coreui.date-picker', date => {
   // do something...
 })
 ```
 
 ## Customizing
 
-### SASS
+### CSS variables
 
-#### Variables
+DatePickers use local CSS variables on `.date-picker` and `.calendar` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+
+{{< scss-docs name="date-picker-css-vars" file="scss/_date-picker.scss" >}}
+
+{{< scss-docs name="calendar-css-vars" file="scss/_calendar.scss" >}}
+
+### SASS variables
 
 {{< scss-docs name="date-picker-variables" file="scss/_variables.scss" >}}
 
-### CSS Vars
-{{< css-vars-docs file="scss/_date-picker.scss" >}}
+{{< scss-docs name="calendar-variables" file="scss/_variables.scss" >}}

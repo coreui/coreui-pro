@@ -12,7 +12,7 @@ toc: true
 ## Basic example
 
 {{< example >}}
-<select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
+<select class="form-multi-select" id="ms1" multiple data-coreui-search="true"  data-coreui-disabled="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -176,6 +176,23 @@ toc: true
 </select>
 {{< /example >}}
 
+## Disabled
+Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
+
+{{< example >}}
+<select class="form-multi-select" id="ms1" multiple data-coreui-search="true"  data-coreui-disabled="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
 ## Sizing
 
 You may also choose from small and large multi selects to match our similarly sized text inputs.
@@ -237,196 +254,54 @@ You may also choose from small and large multi selects to match our similarly si
 
 ### Options
 
-Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-inline=""`.
+{{< markdown >}}
+{{< partial "js-data-attributes.md" >}}
+{{< /markdown >}}
 
-<table class="table">
-  <thead>
-    <tr>
-      <th style="width: 100px;">Name</th>
-      <th style="width: 100px;">Type</th>
-      <th style="width: 120px;">Default</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>cleaner</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>multiple</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>placeholder</code></td>
-      <td>string</td>
-      <td><code>'Select...'</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>options</code></td>
-      <td>(boolean|array)</td>
-      <td><code>false</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>optionsMaxHeight</code></td>
-      <td>(number|string)</td>
-      <td><code>'auto'</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>optionsStyle</code></td>
-      <td>string</td>
-      <td><code>'checkbox'</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>search</code></td>
-      <td>boolean</td>
-      <td><code>false</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>searchNoResultsLabel</code></td>
-      <td>string</td>
-      <td><code>'No results found'</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>selectAll</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>selectAllLabel</code></td>
-      <td>string</td>
-      <td><code>'Select all options'</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>selectionType</code></td>
-      <td>string</td>
-      <td><code>'tag'</code></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><code>selectionTypeCounterText</code></td>
-      <td>string</td>
-      <td><code>'item(s) selected'</code></td>
-      <td></td>
-    </tr>
-  </tbody>
-</table>
+{{< bs-table >}}
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `cleaner`| boolean| `true` | |
+| `disabled` | boolean| `false` | |
+| `multiple` | boolean| `true` | |
+| `placeholder` | string| `'Select...'` | |
+| `options` | (boolean\|array)| `false` | |
+| `optionsMaxHeight` | (number\|string)| `'auto'` | |
+| `optionsStyle` | string| `'checkbox'` | |
+| `search` | boolean| `false` | |
+| `searchNoResultsLabel` | string| `'No results found'` | |
+| `selectAll` | boolean| `true` | |
+| `selectAllLabel` | string| `'Select all options'` | |
+| `selectionType` | string| `'tag'` | |
+| `selectionTypeCounterText` | string| `'item(s) selected'` | |
+{{< /bs-table >}}
 
 ### Methods
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Method</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>show</code></td>
-      <td>
-        Shows the multi select's options.
-      </td>
-    </tr>
-    <tr>
-      <td><code>hide</code></td>
-      <td>
-        Hides the multi select's options.
-      </td>
-    </tr>
-    <tr>
-      <td><code>update</code></td>
-      <td>
-        Updates the configuration of multi select.
-      </td>
-    </tr>
-    <tr>
-      <td><code>dispose</code></td>
-      <td>
-        Destroys an element's multi select. (Removes stored data on the DOM element)
-      </td>
-    </tr>
-    <tr>
-      <td><code>getInstance</code></td>
-      <td>
-        Static method which allows you to get the multi select instance associated with a DOM element.
-      </td>
-    </tr>
-    <tr>
-      <td><code>getValue</code></td>
-      <td>
-        Returns the array with selected elements.
-      </td>
-    </tr>
-  </tbody>
-</table>
+{{< bs-table >}}
+| Method | Description |
+| --- | --- |
+| `show` | Shows the multi select's options. |
+| `hide` | Hides the multi select's options. |
+| `update` | Updates the configuration of multi select. |
+| `dispose` | Destroys an element's multi select. (Removes stored data on the DOM element) |
+| `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |
+| `getValue` | Returns the array with selected elements. |
+{{< /bs-table >}}
 
 ### Events
 
 Multi Select component exposes a few events for hooking into multi select functionality.
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Method</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>
-        <code>changed.coreui.multi-select</code>
-      </td>
-      <td>
-        Fires immediately when an option is selected or deselected.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>show.coreui.multi-select</code>
-      </td>
-      <td>
-        Fires immediately when the show instance method is called.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>shown.coreui.multi-select</code>
-      </td>
-      <td>
-        Fired when the multi select options have been made visible to the user and CSS transitions have completed.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>hide.coreui.multi-select</code>
-      </td>
-      <td>
-        Fires immediately when the hide instance method has been called.
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>hidden.coreui.multi-select</code>
-      </td>
-      <td>
-        Fired when the multi select options have finished being hidden from the user and CSS transitions have completed.
-      </td>
-    </tr>
-  </tbody>
-</table>
+{{< bs-table >}}
+| Method | Description |
+| --- | --- |
+| `changed.coreui.multi-select` | Fires immediately when an option is selected or deselected. |
+| `show.coreui.multi-select` | Fires immediately when the show instance method is called. |
+| `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
+| `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. |
+| `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
+{{< /bs-table >}}
 
 ```js
 const myMutliSelect = document.getElementById('myMutliSelect')
@@ -438,8 +313,12 @@ myMutliSelect.addEventListener('changed.coreui.multi-select', event => {
 
 ## Customizing
 
-### SASS
-{{< scss-docs name="form-multi-select-variables" file="scss/_variables.scss" >}}
+### CSS variables
 
-### CSS Vars
-{{< css-vars-docs file="scss/forms/_form-multi-select.scss" >}}
+MultiSelects use local CSS variables on `.multi-select` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+
+{{< scss-docs name="form-multi-select-css-vars" file="scss/forms/_form-multi-select.scss" >}}
+
+### SASS variables
+
+{{< scss-docs name="form-multi-select-variables" file="scss/_variables.scss" >}}

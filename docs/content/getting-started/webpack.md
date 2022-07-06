@@ -18,19 +18,37 @@ toc: true
 Import [CoreUI's JavaScript]({{< docsref "/getting-started/javascript" >}}) by adding this line to your app's entry point (usually `index.js` or `app.js`):
 
 ```js
-import '@coreui/coreui';
+import '@coreui/coreui'
 
 // or get all of the named exports for further usage
-import * as coreui from '@coreui/coreui';
+import * as coreui from '@coreui/coreui'
+```
+
+**For PRO users**
+
+```js
+import '@coreui/coreui-pro'
+
+// or get all of the named exports for further usage
+import * as coreui from '@coreui/coreui-pro'
 ```
 
 Alternatively, if you only need just a few of our plugins, you may **import plugins individually** as needed:
 
 ```js
-import Alert from '@coreui/coreui/js/dist/alert';
+import Alert from '@coreui/coreui/js/dist/alert'
 
 // or, specify which plugins you need:
-import { Tooltip, Toast, Popover } from '@coreui/coreui';
+import { Tooltip, Toast, Popover } from '@coreui/coreui'
+```
+
+**For PRO users**
+
+```js
+import Alert from '@coreui/coreui-pro/js/dist/alert'
+
+// or, specify which plugins you need:
+import { Tooltip, Toast, Popover } from '@coreui/coreui-pro'
 ```
 
 CoreUI for Bootstrap depends on [Popper](https://popper.js.org/), which is specified in the `peerDependencies` property.
@@ -49,8 +67,16 @@ First, create your own `_custom.scss` and use it to override the [built-in custo
 @import "~@coreui/coreui/scss/coreui";
 ```
 
+**For PRO users**
+
+```scss
+@import "custom";
+@import "~@coreui/coreui/scss/coreui";
+```
+
 For CoreUI for Bootstrap to compile, make sure you install and use the required loaders: [sass-loader](https://github.com/webpack-contrib/sass-loader), [postcss-loader](https://github.com/webpack-contrib/postcss-loader) with [Autoprefixer](https://github.com/postcss/autoprefixer#webpack). With minimal setup, your webpack config should include this rule or similar:
 
+<!-- eslint-skip -->
 ```js
 // ...
 {
@@ -89,7 +115,12 @@ For CoreUI for Bootstrap to compile, make sure you install and use the required 
 Alternatively, you may use CoreUI's ready-to-use CSS by simply adding this line to your project's entry point:
 
 ```js
-import '@coreui/coreui/dist/css/coreui.min.css';
+import '@coreui/coreui/dist/css/coreui.min.css'
+```
+**For PRO users**
+
+```js
+import '@coreui/coreui/dist/css/coreui.min.css'
 ```
 
 In this case you may use your existing rule for `css` without any special modifications to webpack config, except you don't need `sass-loader` just [style-loader](https://github.com/webpack-contrib/style-loader) and [css-loader](https://github.com/webpack-contrib/css-loader).

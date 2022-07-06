@@ -15,7 +15,7 @@ Check out the fully-featured, ready-to-use admin dashboard templates built using
   <div class="col-md-6">
     <div class="card mb-4">
       <div class="card-body">
-        <a class="text-decoration-none text-reset" href="https://coreui.io/product/free-bootstrap-admin-template/?theme=default-v3" target="_blank">
+        <a class="text-decoration-none text-reset" href="https://coreui.io/product/free-bootstrap-admin-template/" target="_blank">
           <h5 class="card-title">Free Bootstrap Admin Template</h5>
           <h6 class="card-subtitle mb-3 text-muted">Default Theme</h6>
           <img class="img-fluid rounded shadow-sm" src="https://coreui.io/images/templates/coreui_free_1440.webp" alt="">
