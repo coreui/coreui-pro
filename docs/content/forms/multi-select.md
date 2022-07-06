@@ -12,7 +12,7 @@ toc: true
 ## Basic example
 
 {{< example >}}
-<select class="form-multi-select" id="ms1" multiple data-coreui-search="true"  data-coreui-disabled="true">
+<select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>

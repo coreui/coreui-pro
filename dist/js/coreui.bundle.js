@@ -700,9 +700,9 @@
       }
 
       const attributes = {};
-      const bsKeys = Object.keys(element.dataset).filter(key => key.startsWith('bs') && !key.startsWith('bsConfig'));
+      const coreuiKeys = Object.keys(element.dataset).filter(key => key.startsWith('coreui') && !key.startsWith('coreuiConfig'));
 
-      for (const key of bsKeys) {
+      for (const key of coreuiKeys) {
         let pureKey = key.replace(/^coreui/, '');
         pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1, pureKey.length);
         attributes[pureKey] = normalizeData(element.dataset[key]);
@@ -10034,6 +10034,7 @@
   const CLASS_NAME_LABEL = 'label';
   const Default$8 = {
     cleaner: true,
+    disabled: false,
     multiple: true,
     placeholder: 'Select...',
     options: false,
@@ -10048,6 +10049,7 @@
   };
   const DefaultType$8 = {
     cleaner: 'boolean',
+    disabled: 'boolean',
     multiple: 'boolean',
     placeholder: 'string',
     options: '(boolean|array)',
@@ -10068,13 +10070,12 @@
 
   class MultiSelect extends BaseComponent {
     constructor(element, config) {
-      super(element);
+      super(element, config);
       this._selectAllElement = null;
       this._selectionElement = null;
       this._selectionCleanerElement = null;
       this._searchElement = null;
       this._optionsElement = null;
-      this._config = this._getConfig(config);
       this._clone = null;
       this._options = this._getOptions();
       this._search = '';
@@ -10190,7 +10191,9 @@
 
     _addEventListeners() {
       EventHandler.on(this._clone, EVENT_CLICK$2, () => {
-        this.show();
+        if (!this._config.disabled) {
+          this.show();
+        }
       });
       EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
         this._onSearchChange(this._searchElement);
@@ -10214,9 +10217,11 @@
         this._onOptionsClick(event.target);
       });
       EventHandler.on(this._selectionCleanerElement, EVENT_CLICK$2, event => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.deselectAll();
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.deselectAll();
+        }
       });
       EventHandler.on(this._optionsElement, EVENT_KEYDOWN$1, event => {
         const key = event.keyCode || event.charCode;
@@ -10342,6 +10347,10 @@
       const div = document.createElement('div');
       div.classList.add(CLASS_NAME_SELECT);
 
+      if (this._config.disabled) {
+        this._element.classList.add(CLASS_NAME_DISABLED);
+      }
+
       for (const className of this._getClassNames()) {
         div.classList.add(className);
       }
@@ -10405,6 +10414,11 @@
     _createSearchInput() {
       const input = document.createElement('input');
       input.classList.add(CLASS_NAME_SEARCH);
+
+      if (this._config.disabled) {
+        input.disabled = true;
+      }
+
       this._searchElement = input;
 
       this._updateSearchSize();
@@ -10487,11 +10501,13 @@
       closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
       tag.append(closeBtn);
       EventHandler.on(closeBtn, EVENT_CLICK$2, event => {
-        event.preventDefault();
-        event.stopPropagation();
-        tag.remove();
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          tag.remove();
 
-        this._deselectOption(value);
+          this._deselectOption(value);
+        }
       });
       return tag;
     }

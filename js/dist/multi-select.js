@@ -78,6 +78,7 @@
   const CLASS_NAME_LABEL = 'label';
   const Default = {
     cleaner: true,
+    disabled: false,
     multiple: true,
     placeholder: 'Select...',
     options: false,
@@ -92,6 +93,7 @@
   };
   const DefaultType = {
     cleaner: 'boolean',
+    disabled: 'boolean',
     multiple: 'boolean',
     placeholder: 'string',
     options: '(boolean|array)',
@@ -112,13 +114,12 @@
 
   class MultiSelect extends BaseComponent__default.default {
     constructor(element, config) {
-      super(element);
+      super(element, config);
       this._selectAllElement = null;
       this._selectionElement = null;
       this._selectionCleanerElement = null;
       this._searchElement = null;
       this._optionsElement = null;
-      this._config = this._getConfig(config);
       this._clone = null;
       this._options = this._getOptions();
       this._search = '';
@@ -234,7 +235,9 @@
 
     _addEventListeners() {
       EventHandler__default.default.on(this._clone, EVENT_CLICK, () => {
-        this.show();
+        if (!this._config.disabled) {
+          this.show();
+        }
       });
       EventHandler__default.default.on(this._searchElement, EVENT_KEYUP, () => {
         this._onSearchChange(this._searchElement);
@@ -258,9 +261,11 @@
         this._onOptionsClick(event.target);
       });
       EventHandler__default.default.on(this._selectionCleanerElement, EVENT_CLICK, event => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.deselectAll();
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.deselectAll();
+        }
       });
       EventHandler__default.default.on(this._optionsElement, EVENT_KEYDOWN, event => {
         const key = event.keyCode || event.charCode;
@@ -386,6 +391,10 @@
       const div = document.createElement('div');
       div.classList.add(CLASS_NAME_SELECT);
 
+      if (this._config.disabled) {
+        this._element.classList.add(CLASS_NAME_DISABLED);
+      }
+
       for (const className of this._getClassNames()) {
         div.classList.add(className);
       }
@@ -449,6 +458,11 @@
     _createSearchInput() {
       const input = document.createElement('input');
       input.classList.add(CLASS_NAME_SEARCH);
+
+      if (this._config.disabled) {
+        input.disabled = true;
+      }
+
       this._searchElement = input;
 
       this._updateSearchSize();
@@ -531,11 +545,13 @@
       closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
       tag.append(closeBtn);
       EventHandler__default.default.on(closeBtn, EVENT_CLICK, event => {
-        event.preventDefault();
-        event.stopPropagation();
-        tag.remove();
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          tag.remove();
 
-        this._deselectOption(value);
+          this._deselectOption(value);
+        }
       });
       return tag;
     }
