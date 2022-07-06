@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.3.0-beta.0): date-range-picker.js
+ * CoreUI PRO (v4.3.0-beta.1): date-range-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
