@@ -1240,6 +1240,7 @@ $form-multi-select-select-all-color:         $medium-emphasis !default;
 $form-multi-select-select-all-bg:            transparent !default;
 $form-multi-select-select-all-hover-color:   $high-emphasis !default;
 $form-multi-select-select-all-hover-bg:      transparent !default;
+$form-multi-select-select-all-border-width:  $input-border-width !default;
 $form-multi-select-select-all-border-color:  $input-border-color !default;
 
 $form-multi-select-options-padding-y:      .5rem !default;
@@ -1265,7 +1266,7 @@ $form-multi-select-option-hover-bg:        rgba($gray-100, .5) !default;
 $form-multi-select-option-indicator-width:          1em !default;
 $form-multi-select-option-indicator-bg:             $form-check-input-bg !default;
 $form-multi-select-option-indicator-border:         $form-check-input-border !default;
-$form-multi-select-option-indicator-border-radius:  $border-radius !default;
+$form-multi-select-option-indicator-border-radius:  .25em !default;
 
 $form-multi-select-option-selected-bg:                      $light !default;
 $form-multi-select-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;

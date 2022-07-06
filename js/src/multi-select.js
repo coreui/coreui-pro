@@ -73,6 +73,7 @@ const CLASS_NAME_LABEL = 'label'
 
 const Default = {
   cleaner: true,
+  disabled: false,
   multiple: true,
   placeholder: 'Select...',
   options: false,
@@ -88,6 +89,7 @@ const Default = {
 
 const DefaultType = {
   cleaner: 'boolean',
+  disabled: 'boolean',
   multiple: 'boolean',
   placeholder: 'string',
   options: '(boolean|array)',
@@ -109,14 +111,13 @@ const DefaultType = {
 
 class MultiSelect extends BaseComponent {
   constructor(element, config) {
-    super(element)
+    super(element, config)
 
     this._selectAllElement = null
     this._selectionElement = null
     this._selectionCleanerElement = null
     this._searchElement = null
     this._optionsElement = null
-    this._config = this._getConfig(config)
     this._clone = null
     this._options = this._getOptions()
     this._search = ''
@@ -223,7 +224,9 @@ class MultiSelect extends BaseComponent {
 
   _addEventListeners() {
     EventHandler.on(this._clone, EVENT_CLICK, () => {
-      this.show()
+      if (!this._config.disabled) {
+        this.show()
+      }
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
@@ -251,9 +254,11 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
-      event.preventDefault()
-      event.stopPropagation()
-      this.deselectAll()
+      if (!this._config.disabled) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.deselectAll()
+      }
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
@@ -378,6 +383,10 @@ class MultiSelect extends BaseComponent {
     const div = document.createElement('div')
     div.classList.add(CLASS_NAME_SELECT)
 
+    if (this._config.disabled) {
+      this._element.classList.add(CLASS_NAME_DISABLED)
+    }
+
     for (const className of this._getClassNames()) {
       div.classList.add(className)
     }
@@ -430,6 +439,10 @@ class MultiSelect extends BaseComponent {
   _createSearchInput() {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
+
+    if (this._config.disabled) {
+      input.disabled = true
+    }
 
     this._searchElement = input
     this._updateSearchSize()
@@ -516,11 +529,13 @@ class MultiSelect extends BaseComponent {
     tag.append(closeBtn)
 
     EventHandler.on(closeBtn, EVENT_CLICK, event => {
-      event.preventDefault()
-      event.stopPropagation()
+      if (!this._config.disabled) {
+        event.preventDefault()
+        event.stopPropagation()
 
-      tag.remove()
-      this._deselectOption(value)
+        tag.remove()
+        this._deselectOption(value)
+      }
     })
 
     return tag
