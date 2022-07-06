@@ -145,7 +145,7 @@
           @include ltr-rtl("border-left-width", 0);
 
           &.active {
-            @include ltr-rtl("margin-left", calc(var(--#{$prefix}list-group-border-width) * -1));  // stylelint-disable-line function-disallowed-list
+            @include ltr-rtl("margin-left", calc(var(--#{$prefix}list-group-border-width) * -1));
             @include ltr-rtl("border-left-width", var(--#{$prefix}list-group-border-width));
           }
         }
