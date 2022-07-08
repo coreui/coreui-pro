@@ -73,6 +73,9 @@ params:
     source_pro:         "https://github.com/coreui/coreui-pro/archive/v4.3.0-beta.1.zip"
     dist_pro:           "https://github.com/coreui/coreui-pro/releases/download/v4.3.0-beta.1/coreui-4.3.0-beta.1-dist.zip"
 
+  download_template:
+    website:            "https://coreui.io/product/free-bootstrap-admin-template/"
+
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
     css:                 "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.2.0/dist/css/coreui.min.css"
