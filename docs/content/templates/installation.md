@@ -13,7 +13,7 @@ CoreUI Bootstrap Admin Templates uses [npm scripts](https://docs.npmjs.com/misc/
 To use our build system and run our admin template locally, you'll need a copy of source files and Node. Follow these steps and you should be ready to rock:
 
 1. [Download and install Node.js](https://nodejs.org/en/download/), which we use to manage our dependencies.
-2. [Download CoreUI Admin Template]({{< docsref "/templates/download" >}}).
+2. [Download CoreUI Admin Template]({{< docsref "/templates/download" >}}) or [Download CoreUI PRO Admin Template](https://coreui.io/download/).
 3. Navigate to the root template directory and run `npm install` to install our local dependencies listed in `package.json`.
 
 When completed, you'll be able to run the various commands provided from the command line.
