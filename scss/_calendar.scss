@@ -19,6 +19,8 @@
   --#{$prefix}calendar-cell-today-color: #{$calendar-cell-today-color};
   // scss-docs-end calendar-css-vars
 
+  font-weight: initial;
+
   table {
     width: calc(var(--#{$prefix}calendar-table-cell-size) * 7); // stylelint-disable-line function-disallowed-list
     margin: var(--#{$prefix}calendar-table-margin);
