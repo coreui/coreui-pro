@@ -131,8 +131,8 @@ $component-active-bg-dt:     $primary-dt !default;
 $accordion-button-color-dt:               $body-color-dt !default;
 $accordion-button-bg-dt:                  transparent !default;
 $accordion-border-color-dt:               rgba($white, .125) !default;
+$accordion-color-dt:                      $high-emphasis-dt !default;
 $accordion-bg-dt:                         transparent !default;
-
 
 $accordion-button-color-dt:               $body-color-dt !default;
 $accordion-button-bg-dt:                  transparent !default;
@@ -154,6 +154,7 @@ $accordion-theme-map: (
   "accordion-button-color":               $accordion-button-color-dt,
   "accordion-button-bg":                  $accordion-button-bg-dt,
   "accordion-bg":                         $accordion-bg-dt,
+  "accordion-color":                      $accordion-color-dt,
   "accordion-border-color":               $accordion-border-color-dt,
   "accordion-button-active-bg":           $accordion-button-active-bg-dt,
   "accordion-button-active-color":        $accordion-button-active-color-dt,
@@ -288,7 +289,7 @@ $input-border-color-dt:              rgba($white, .09) !default;
 $input-focus-color-dt:               $body-color-dt !default;
 $input-focus-bg-dt:                  rgba($white, .05) !default;
 $input-focus-border-color-dt:        rgba($white, .2) !default;
-$input-disabled-bg-dt:               rgba($white, .1) !default;
+$input-disabled-bg-dt:               rgba($black, .1) !default;
 $input-placeholder-color-dt:         $medium-emphasis-dt !default;
 $input-plaintext-color-dt:           $body-color-dt !default;
 
@@ -427,6 +428,8 @@ $header-active-color-dt:           $white !default;
 $header-disabled-color-dt:         rgba($white, .25) !default;
 $header-brand-color-dt:            $header-active-color-dt !default;
 $header-brand-hover-color-dt:      $header-active-color-dt !default;
+$header-toggler-color-dt:          rgba($white, .75) !default;
+$header-toggler-hover-color-dt:    $white !default;
 $header-toggler-icon-bg-dt:        str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-color-dt}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
 $header-toggler-hover-icon-bg-dt:  str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-hover-color-dt}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") !default;
 $header-toggler-border-color-dt:   rgba($white, .1) !default;
@@ -441,10 +444,12 @@ $header-theme-map: (
   "header-disabled-color":         $header-disabled-color-dt,
   "header-brand-color":            $header-brand-color-dt,
   "header-brand-hover-color":      $header-brand-hover-color-dt,
+  "header-toggler-color":          $header-toggler-color-dt,
+  "header-toggler-hover-color":    $header-toggler-hover-color-dt,
   "header-toggler-icon-bg":        $header-toggler-icon-bg-dt,
   "header-toggler-hover-icon-bg":  $header-toggler-hover-icon-bg-dt,
   "header-toggler-border-color":   $header-toggler-border-color-dt,
-  "header-divider-border-color":    $header-divider-border-color-dt
+  "header-divider-border-color":   $header-divider-border-color-dt
 ) !default;
 
 // Links
@@ -515,19 +520,19 @@ $list-group-variants-dt: (
 // Modals
 
 // scss-docs-start modal-dark-theme
-$modal-content-color-dt:         null !default;
-$modal-content-bg-dt:            $bg-elevation-24 !default;
-$modal-content-border-color-dt:  rgba(0, 0, 0, .2) !default;
+$modal-color-dt:         null !default;
+$modal-bg-dt:            $bg-elevation-24 !default;
+$modal-border-color-dt:  rgba(0, 0, 0, .2) !default;
 $modal-header-border-color-dt:   rgba(0, 0, 0, .2) !default;
 $modal-footer-border-color-dt:   rgba(0, 0, 0, .2) !default;
 // scss-docs-end modal-dark-theme
 
 $modal-theme-map: (
-  "modal-content-color":         $modal-content-color-dt,
-  "modal-content-bg":            $modal-content-bg-dt,
-  "modal-content-border-color":  $modal-content-border-color-dt,
-  "modal-header-border-color":   $modal-header-border-color-dt,
-  "modal-footer-border-color":   $modal-footer-border-color-dt
+  "modal-color":                $modal-color-dt,
+  "modal-bg":                   $modal-bg-dt,
+  "modal-border-color":         $modal-border-color-dt,
+  "modal-header-border-color":  $modal-header-border-color-dt,
+  "modal-footer-border-color":  $modal-footer-border-color-dt
 ) !default;
 
 
@@ -764,21 +769,21 @@ $table-variants-dt: (
 
 // Toast
 
-$toast-background-color-dt:         $bg-elevation-16 !default;
-$toast-color-dt:                    $body-color-dt !default;
-$toast-border-color-dt:             transparent !default;
+$toast-bg-dt:                   $bg-elevation-16 !default;
+$toast-color-dt:                $body-color-dt !default;
+$toast-border-color-dt:         transparent !default;
 
-$toast-header-color-dt:             $body-color-dt !default;
-$toast-header-background-color-dt:  $bg-elevation-24 !default;
-$toast-header-border-color-dt:      rgba($black, .2) !default;
+$toast-header-color-dt:         $body-color-dt !default;
+$toast-header-bg-dt:            $bg-elevation-24 !default;
+$toast-header-border-color-dt:  rgba($black, .2) !default;
 
 $toast-theme-map: (
-  "toast-background-color":         $toast-background-color-dt,
-  "toast-color":                    $toast-color-dt,
-  "toast-border-color":             $toast-border-color-dt,
-  "toast-header-color":             $toast-header-color-dt,
-  "toast-header-background-color":  $toast-header-background-color-dt,
-  "toast-header-border-color":      $toast-header-border-color-dt
+  "toast-bg":                   $toast-bg-dt,
+  "toast-color":                $toast-color-dt,
+  "toast-border-color":         $toast-border-color-dt,
+  "toast-header-color":         $toast-header-color-dt,
+  "toast-header-bg":            $toast-header-bg-dt,
+  "toast-header-border-color":  $toast-header-border-color-dt
 ) !default;
 
 // Calendar & Date & Time Pickers
