@@ -14,7 +14,6 @@
       background-color: var(--#{$prefix}input-focus-bg, $input-focus-bg);
       border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
       outline: 0;
-      @include border-radius($input-border-radius, 0);
       @if $enable-shadows {
         @include box-shadow($input-box-shadow, $input-focus-box-shadow);
       } @else {
@@ -65,7 +64,13 @@
     }
   }
 
-  .input-group-lg {
+  &.input-group {
+    @include border-radius($input-border-radius, 0);
+  }
+
+  &.input-group-lg {
+    @include border-radius($input-border-radius-lg, 0);
+
     .picker-input-group-icon {
       width: 1.25rem;
       height: 1.25rem;
@@ -73,7 +78,9 @@
     }
   }
 
-  .input-group-sm {
+  &.input-group-sm {
+    @include border-radius($input-border-radius-sm, 0);
+
     .picker-input-group-icon {
       width: .875rem;
       height: .875rem;
