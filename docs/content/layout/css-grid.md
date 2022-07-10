@@ -10,7 +10,7 @@ toc: true
 added: "5.1"
 ---
 
-## Example
+CoreUI for Bootstrap's default grid system represents the culmination of over a decade of CSS layout techniques, tried and tested by millions of people. But, it was also created without many of the modern CSS features and techniques we're seeing in browsers like the new CSS Grid.
 
 CoreUI Bootstrap's grid system uses a series of containers, rows, and columns to layout and align content. It's built with [flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Basic_Concepts_of_Flexbox) and is fully responsive. Below is an example and an in-depth explanation for how the grid system comes together.
 
@@ -38,7 +38,7 @@ The above example creates three equal-width columns across all devices and viewp
 
 ## How it works
 
-With Bootstrap 5, we've added the option to enable a separate grid system that's built on CSS Grid, but with a Bootstrap twist. You still get classes you can apply on a whim to build responsive layouts, but with a different approach under the hood.
+With CoreUI 4, we've added the option to enable a separate grid system that's built on CSS Grid, but with a CoreUI twist. You still get classes you can apply on a whim to build responsive layouts, but with a different approach under the hood.
 
 - **CSS Grid is opt-in.** Disable the default grid system by setting `$enable-grid-classes: false` and enable the CSS Grid by setting `$enable-cssgrid: true`. Then, recompile your Sass.
 
