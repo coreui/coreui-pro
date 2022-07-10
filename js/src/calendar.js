@@ -1,7 +1,7 @@
 /* eslint-disable indent, multiline-ternary */
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.3.0-beta.1): calendar.js
+ * CoreUI PRO (v4.3.0): calendar.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
