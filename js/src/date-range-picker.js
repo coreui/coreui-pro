@@ -299,7 +299,7 @@ class DateRangePicker extends Picker {
     return date ? (date instanceof Date ? date : new Date(date)) : null
   }
 
-  _createInput(placeholder, value) {
+  _createInput(name, placeholder, value) {
     const inputEl = document.createElement('input')
     inputEl.classList.add('form-control')
     inputEl.disabled = this._config.disabled
@@ -307,6 +307,10 @@ class DateRangePicker extends Picker {
     inputEl.readOnly = this._config.inputReadOnly || typeof this._config.format === 'string'
     inputEl.type = 'text'
     inputEl.value = value
+
+    if (this._element.id) {
+      inputEl.name = `${name}-${this._element.id}`
+    }
 
     return inputEl
   }
@@ -319,8 +323,8 @@ class DateRangePicker extends Picker {
       inputGroupEl.classList.add(`input-group-${this._config.size}`)
     }
 
-    const startInputEl = this._createInput(this._getPlaceholder()[0], this._setInputValue(this._startDate))
-    const endInputEl = this._createInput(this._getPlaceholder()[1], this._setInputValue(this._endDate))
+    const startInputEl = this._createInput(this._config.range ? 'start-date' : 'date', this._getPlaceholder()[0], this._setInputValue(this._startDate))
+    const endInputEl = this._createInput('end-date', this._getPlaceholder()[1], this._setInputValue(this._endDate))
 
     const inputGroupTextSeparatorEl = document.createElement('span')
     inputGroupTextSeparatorEl.classList.add('input-group-text')
