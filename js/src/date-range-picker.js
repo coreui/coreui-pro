@@ -323,8 +323,8 @@ class DateRangePicker extends Picker {
       inputGroupEl.classList.add(`input-group-${this._config.size}`)
     }
 
-    const startInputEl = this._createInput(this._config.range ? 'start-date' : 'date', this._getPlaceholder()[0], this._setInputValue(this._startDate))
-    const endInputEl = this._createInput('end-date', this._getPlaceholder()[1], this._setInputValue(this._endDate))
+    const startInputEl = this._createInput(this._config.range ? 'date-range-picker-start-date' : 'date-picker', this._getPlaceholder()[0], this._setInputValue(this._startDate))
+    const endInputEl = this._createInput('date-range-picker-end-date', this._getPlaceholder()[1], this._setInputValue(this._endDate))
 
     const inputGroupTextSeparatorEl = document.createElement('span')
     inputGroupTextSeparatorEl.classList.add('input-group-text')
