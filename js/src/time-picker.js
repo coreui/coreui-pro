@@ -252,6 +252,10 @@ class TimePicker extends Picker {
     inputEl.type = 'text'
     inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : ''
 
+    if (this._element.id) {
+      inputEl.name = `time-picker-${this._element.id}`
+    }
+
     inputGroupEl.append(inputEl)
 
     const inputGroupTextEl = document.createElement('span')
