@@ -11,14 +11,15 @@ toc: true
 {{< example >}}
   <div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker" id="datePicker1"></div>
     </div>
     <div class="col-lg-5">
       <div
         data-coreui-start-date="2022/08/03"
         data-coreui-end-date="2022/08/17"
         data-coreui-locale="en-US"
-        data-coreui-toggle="date-range-picker">
+        data-coreui-toggle="date-range-picker"
+        id="datePicker2">
       </div>
     </div>
   </div>

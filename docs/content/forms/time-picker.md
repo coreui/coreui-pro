@@ -11,10 +11,10 @@ toc: true
 {{< example >}}
 <div class="row">
   <div class="col-lg-4">
-    <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
+    <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker" id="timePicker1"></div>
   </div>
   <div class="col-lg-4">
-    <div class="time-picker" data-coreui-locale="en-US" data-coreui-time="02:17:35 PM" data-coreui-toggle="time-picker"></div>
+    <div class="time-picker" data-coreui-locale="en-US" data-coreui-time="02:17:35 PM" data-coreui-toggle="time-picker" id="timePicker2"></div>
   </div>
 </div>
 {{< /example >}}
