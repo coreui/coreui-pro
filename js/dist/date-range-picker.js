@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.3.1 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.3.2 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -20,7 +20,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.1): date-range-picker.js
+   * CoreUI PRO (v4.3.2): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -305,7 +305,7 @@
       return date ? date instanceof Date ? date : new Date(date) : null;
     }
 
-    _createInput(placeholder, value) {
+    _createInput(name, placeholder, value) {
       const inputEl = document.createElement('input');
       inputEl.classList.add('form-control');
       inputEl.disabled = this._config.disabled;
@@ -313,6 +313,11 @@
       inputEl.readOnly = this._config.inputReadOnly || typeof this._config.format === 'string';
       inputEl.type = 'text';
       inputEl.value = value;
+
+      if (this._element.id) {
+        inputEl.name = `${name}-${this._element.id}`;
+      }
+
       return inputEl;
     }
 
@@ -324,9 +329,9 @@
         inputGroupEl.classList.add(`input-group-${this._config.size}`);
       }
 
-      const startInputEl = this._createInput(this._getPlaceholder()[0], this._setInputValue(this._startDate));
+      const startInputEl = this._createInput(this._config.range ? 'date-range-picker-start-date' : 'date-picker', this._getPlaceholder()[0], this._setInputValue(this._startDate));
 
-      const endInputEl = this._createInput(this._getPlaceholder()[1], this._setInputValue(this._endDate));
+      const endInputEl = this._createInput('date-range-picker-end-date', this._getPlaceholder()[1], this._setInputValue(this._endDate));
 
       const inputGroupTextSeparatorEl = document.createElement('span');
       inputGroupTextSeparatorEl.classList.add('input-group-text');

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v4.3.1 (https://coreui.io)
+  * CoreUI time-picker.js v4.3.2 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -283,6 +283,11 @@
       inputEl.readOnly = this._config.inputReadOnly;
       inputEl.type = 'text';
       inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : '';
+
+      if (this._element.id) {
+        inputEl.name = `time-picker-${this._element.id}`;
+      }
+
       inputGroupEl.append(inputEl);
       const inputGroupTextEl = document.createElement('span');
       inputGroupTextEl.classList.add('input-group-text');
