@@ -82,7 +82,7 @@
   "bugs": {
     "url": "https://github.com/coreui/coreui/issues"
   },
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "peerDependencies": {
     "@popperjs/core": "^2.11.5"
   },
