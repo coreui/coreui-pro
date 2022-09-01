@@ -10,6 +10,8 @@
   --#{$prefix}sidebar-brand-color: #{$sidebar-brand-color};
   --#{$prefix}sidebar-brand-height: #{$sidebar-brand-height};
   --#{$prefix}sidebar-brand-bg: #{$sidebar-brand-bg};
+  --#{$prefix}sidebar-close-button-width: #{$sidebar-close-button-width};
+  --#{$prefix}sidebar-close-button-height: #{$sidebar-close-button-height};
   --#{$prefix}sidebar-header-height: #{$sidebar-header-height};
   --#{$prefix}sidebar-header-bg: #{$sidebar-header-bg};
   --#{$prefix}sidebar-header-padding-x: #{$sidebar-header-padding-x};
@@ -214,8 +216,8 @@
   position: absolute;
   top: 0;
   @include ltr-rtl("right", 0);
-  width: var(--#{$prefix}sidebar-width);
-  height: var(--#{$prefix}sidebar-header-height);
+  width: var(--#{$prefix}sidebar-close-button-width);
+  height: var(--#{$prefix}sidebar-close-button-height);
   color: var(--#{$prefix}sidebar-color);
   background: transparent;
   border: 0;
