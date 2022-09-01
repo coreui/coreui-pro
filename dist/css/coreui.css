@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.3.3
+ * @version v4.3.4
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -8199,6 +8199,8 @@ textarea.form-control-lg {
   --cui-sidebar-brand-color: rgba(255, 255, 255, 0.87);
   --cui-sidebar-brand-height: 4rem;
   --cui-sidebar-brand-bg: rgba(0, 0, 21, 0.2);
+  --cui-sidebar-close-button-width: 2rem;
+  --cui-sidebar-close-button-height: 4rem;
   --cui-sidebar-header-height: 4rem;
   --cui-sidebar-header-bg: rgba(0, 0, 21, 0.2);
   --cui-sidebar-header-padding-x: 1rem;
@@ -8407,8 +8409,8 @@ textarea.form-control-lg {
   position: absolute;
   top: 0;
   right: 0;
-  width: var(--cui-sidebar-width);
-  height: var(--cui-sidebar-header-height);
+  width: var(--cui-sidebar-close-button-width);
+  height: var(--cui-sidebar-close-button-height);
   color: var(--cui-sidebar-color);
   background: transparent;
   border: 0;
@@ -8660,6 +8662,9 @@ textarea.form-control-lg {
 }
 .sidebar-nav .nav-icon:first-child {
   margin-left: calc(var(--cui-sidebar-nav-link-padding-x) * -1);
+}
+.sidebar-nav svg.nav-icon {
+  overflow: hidden;
 }
 .sidebar-nav .nav-group {
   position: relative;
