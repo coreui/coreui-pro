@@ -230,4 +230,5 @@ Thanks to all the backers and sponsors! Support this project by [becoming a back
 
 ## Copyright and license
 
-Copyright 2022 creativeLabs Łukasz Holeczek. Code released under the [MIT License](https://github.com/coreui/coreui/blob/main/LICENSE). Docs released under [Creative Commons](https://creativecommons.org/licenses/by/3.0/).
+Copyright 2022 creativeLabs Łukasz Holeczek. 
+This is commercial software. To use it, you have to own a commercial license. Docs released under [Creative Commons](https://creativecommons.org/licenses/by/3.0/).
