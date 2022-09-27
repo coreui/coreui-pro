@@ -109,7 +109,7 @@
     "glob": "^7.2.0",
     "globby": "^11.1.0",
     "hammer-simulator": "0.0.1",
-    "hugo-bin": "^0.88.2",
+    "hugo-bin": "^0.92.1",
     "ip": "^2.0.0",
     "jquery": "^3.6.0",
     "karma": "^6.4.0",
