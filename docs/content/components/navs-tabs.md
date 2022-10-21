@@ -10,6 +10,7 @@ aliases:
   - "/components/navs/"
   - "/components/bootstrap/navs/"
 toc: true
+other_frameworks: navs-tabs
 ---
 
 ## Base nav

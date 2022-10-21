@@ -9,6 +9,7 @@ aliases:
   - "/4.0/components/button-group/"
 toc: true
 bootstrap: true
+other_frameworks: button-group
 ---
 
 ## Basic example

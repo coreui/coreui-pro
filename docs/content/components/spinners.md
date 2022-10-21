@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/spinners/"
   - "/components/bootstrap/spinners/"
 toc: true
+other_frameworks: spinner
 ---
 
 ## About

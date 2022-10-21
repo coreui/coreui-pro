@@ -8,6 +8,7 @@ aliases:
   - "/4.1/forms/checks-radios/"
   - "/components/switches/"
 toc: true
+other_frameworks: checkbox, radio, switch
 ---
 
 ## Approach

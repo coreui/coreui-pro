@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/placeholders/"
 toc: true
 added: "5.1"
+other_frameworks: placeholder
 ---
 
 ## About

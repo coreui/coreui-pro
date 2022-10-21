@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/popovers/"
   - "/components/bootstrap/popovers/"
 toc: true
+other_frameworks: popover
 ---
 
 ## Overview

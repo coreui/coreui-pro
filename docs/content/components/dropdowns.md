@@ -10,6 +10,7 @@ aliases:
   - "/4.0/components/dropdowns/"
 toc: true
 bootstrap: true
+other_frameworks: dropdown
 ---
 
 ## Overview

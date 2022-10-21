@@ -10,6 +10,7 @@ aliases:
   - "/4.0/components/carousel/"
 toc: true
 bootstrap: true
+other_frameworks: carousel
 ---
 
 ## How it works

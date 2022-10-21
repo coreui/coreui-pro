@@ -7,6 +7,8 @@ aliases:
   - "/forms/multi-select/"
   - "/4.0/forms/multi-select/"
 toc: true
+pro_component: true
+other_frameworks: multi-select
 ---
 
 ## Basic example

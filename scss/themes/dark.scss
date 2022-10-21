@@ -56,7 +56,8 @@ $theme-prefix: "dark" !default;
 
   // Fix Firefox option color
   @-moz-document url-prefix("") {
-    select:not([multiple]) option, select optgroup {
+    select:not([multiple]) option,
+    select optgroup {
       color: initial;
     }
   }

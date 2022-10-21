@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/alerts/"
   - "/components/bootstrap/alerts/"
 toc: true
+other_frameworks: alert
 ---
 
 ## Examples

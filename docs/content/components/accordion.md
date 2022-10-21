@@ -11,6 +11,7 @@ aliases:
   - "/4.1/components/accordion/"
 toc: true
 bootstrap: true
+other_frameworks: accordion
 ---
 
 ## How it works

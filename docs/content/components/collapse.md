@@ -10,6 +10,7 @@ aliases:
   - "/4.0/components/collapse/"
 toc: true
 bootstrap: true
+other_frameworks: collapse
 ---
 
 ## How it works

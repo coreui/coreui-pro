@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/tooltips/"
   - "/components/bootstrap/tooltips/"
 toc: true
+other_frameworks: tooltip
 ---
 
 ## Overview

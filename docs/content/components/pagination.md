@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/pagination/"
   - "/components/bootstrap/pagination/"
 toc: true
+other_frameworks: pagination
 ---
 
 ## Overview

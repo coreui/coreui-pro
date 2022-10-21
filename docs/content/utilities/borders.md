@@ -80,7 +80,7 @@ Or modify the default `border-color` of a component:
 
 ## Opacity
 
-{{< added-in "4.2.0" >}}
+{{< added-in "4.2.2" >}}
 
 Bootstrap `border-{color}` utilities are generated with Sass using CSS variables. This allows for real-time color changes without compilation and dynamic alpha transparency changes.
 

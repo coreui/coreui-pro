@@ -9,6 +9,7 @@ aliases:
   - "/components/forms/"
   - "/components/bootstrap/forms/"
 toc: true
+other_frameworks: input, textarea
 ---
 
 ## Example

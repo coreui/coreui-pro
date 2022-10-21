@@ -7,6 +7,7 @@ aliases:
   - "/4.0/components/footer/"
   - "/4.1/components/footer/"
 toc: true
+other_frameworks: footer
 ---
 
 <style>

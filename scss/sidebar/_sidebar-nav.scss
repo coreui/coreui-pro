@@ -97,6 +97,7 @@
     }
   }
 
+  // stylelint-disable-next-line selector-no-qualifying-type
   svg.nav-icon {
     overflow: hidden; // fix chrome 105+ width issue
   }

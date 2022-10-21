@@ -7,6 +7,7 @@ aliases:
   - "/components/images/"
   - "/4.0/components/images/"
 toc: true
+other_frameworks: image
 ---
 
 ## Responsive images

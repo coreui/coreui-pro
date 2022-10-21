@@ -7,6 +7,7 @@ aliases:
   - "/4.0/components/callout/"
   - "/4.1/components/callout/"
 toc: true
+other_frameworks: callout
 ---
 
 ## Examples

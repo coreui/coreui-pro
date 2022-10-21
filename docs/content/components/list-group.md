@@ -10,6 +10,7 @@ aliases:
   - "/4.0/components/list-group/"
 toc: true
 bootstrap: true
+other_frameworks: list-group
 ---
 
 ## Basic example

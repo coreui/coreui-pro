@@ -10,6 +10,7 @@ aliases:
   - "/4.0/components/badge/"
 toc: true
 bootstrap: true
+other_frameworks: badge
 ---
 
 ## Examples

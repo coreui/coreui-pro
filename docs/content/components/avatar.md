@@ -7,6 +7,7 @@ aliases:
   - "/4.0/components/avatar/"
   - "/4.1/components/avatar/"
 toc: true
+other_frameworks: avatar
 ---
 
 ## Image avatars

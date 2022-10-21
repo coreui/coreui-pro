@@ -6,6 +6,8 @@ aliases:
   - "/components/loading-buttons/"
   - "/4.0/components/loading-buttons/"
 toc: true
+pro_component: true
+other_frameworks: loading-button
 ---
 
 ## Basic example

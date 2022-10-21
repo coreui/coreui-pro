@@ -4,6 +4,8 @@ title: Date Picker
 description: Create consistent cross-browser and cross-device time picker.
 group: forms
 toc: true
+pro_component: true
+other_frameworks: date-picker
 ---
 
 ## Example

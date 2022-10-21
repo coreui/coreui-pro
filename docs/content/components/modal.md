@@ -9,6 +9,7 @@ aliases:
   - "/components/bootstrap/modal/"
 toc: true
 bootstrap: true
+other_frameworks: modal
 ---
 
 ## How it works

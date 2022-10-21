@@ -7,6 +7,7 @@ aliases:
   - "/content/tables/"
   - "/4.0/content/tables/"
 toc: true
+other_frameworks: table
 ---
 
 ## Overview

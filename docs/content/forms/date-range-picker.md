@@ -4,6 +4,8 @@ title: Date Range Picker
 description: Create consistent cross-browser and cross-device date range picker.
 group: forms
 toc: true
+pro_component: true
+other_frameworks: date-range-picker
 ---
 
 ## Example

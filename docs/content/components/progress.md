@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/progress/"
   - "/components/bootstrap/progress/"
 toc: true
+other_frameworks: progress
 ---
 
 ## How it works
