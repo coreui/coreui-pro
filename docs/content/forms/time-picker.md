@@ -171,10 +171,12 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
+| `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
 | `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
 | `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
 | `time` | date \| string \| null | `null` | Default value of the component |
+| `valid` | boolean | `false` | Toggle the valid state for the component. |
 | `variant` | `'inline'` \| `'roll'` | `'roll'` | Set the time picker variant to a roll or select. |
 {{< /bs-table >}}
 ### Methods

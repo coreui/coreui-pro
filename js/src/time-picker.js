@@ -46,11 +46,13 @@ const Default = {
   disabled: false,
   footer: true,
   indicator: true,
+  invalid: false,
   inputReadOnly: false,
   locale: 'default',
   placeholder: 'Select time',
   size: null,
   time: null,
+  valid: false,
   variant: 'roll'
 }
 
@@ -59,10 +61,12 @@ const DefaultType = {
   cleaner: 'boolean',
   indicator: 'boolean',
   inputReadOnly: 'boolean',
+  invalid: 'boolean',
   locale: 'string',
   placeholder: 'string',
   size: '(string|null)',
   time: '(date|string|null)',
+  valid: 'boolean',
   variant: 'string'
 }
 
@@ -285,6 +289,8 @@ class TimePicker extends Picker {
 
   _createTimePicker() {
     this._element.classList.add('time-picker')
+    this._element.classList.toggle('is-invalid', this._config.invalid)
+    this._element.classList.toggle('is-valid', this._config.valid)
 
     if (this._config.container === 'dropdown') {
       this._dropdownToggleEl.append(this._createInputGroup())

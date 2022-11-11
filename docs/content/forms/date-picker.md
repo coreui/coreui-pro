@@ -230,6 +230,7 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `format` | string | | Set date format. We use date-fns to format dates. Visit <a href="https://date-fns.org/v2.28.0/docs/format" target="_blank" rel="nofollow">https://date-fns.org/v2.28.0/docs/format</a> to check accepted patterns. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
+| `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
 | `maxDate` | date \| string \| null | `null` | Max selectable date. |
 | `minDate` | date \| string \| null | `null` | Min selectable date. |
@@ -238,6 +239,7 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
 | `todayButton` | string | `'Today'` | Today button inner HTML |
 | `todayButtonClasses` | array \| string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
+| `valid` | boolean | `false` | Toggle the valid state for the component. |
 | `weekdayFormat` | number \| 'long' \| 'narrow' \| 'short' | `2` | Set length or format of day name. |
 {{< /bs-table >}}
 

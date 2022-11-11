@@ -44,6 +44,7 @@ const Default = {
   endDate: null,
   firstDayOfWeek: 1,
   format: null,
+  invalid: false,
   indicator: true,
   locale: 'default',
   maxDate: null,
@@ -58,7 +59,8 @@ const Default = {
   selectEndDate: false,
   timepicker: false,
   todayButton: 'Today',
-  todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto']
+  todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
+  valid: false
 }
 
 const DefaultType = {
@@ -73,6 +75,7 @@ const DefaultType = {
   firstDayOfWeek: 'number',
   format: '(string|null)',
   indicator: 'boolean',
+  invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
@@ -86,7 +89,8 @@ const DefaultType = {
   selectEndDate: 'boolean',
   timepicker: 'boolean',
   todayButton: '(boolean|string)',
-  todayButtonClasses: '(array|string)'
+  todayButtonClasses: '(array|string)',
+  valid: 'boolean'
 }
 
 /**
@@ -474,6 +478,8 @@ class DateRangePicker extends Picker {
 
   _createDateRangePicker() {
     this._element.classList.add('date-picker')
+    this._element.classList.toggle('is-invalid', this._config.invalid)
+    this._element.classList.toggle('is-valid', this._config.valid)
     this._dropdownToggleEl.append(this._createInputGroup())
     this._dropdownMenuEl.prepend(this._createDateRangePickerBody())
   }

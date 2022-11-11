@@ -10,6 +10,42 @@
   .dropdown-menu {
     width: min-content;
   }
+
+  &.is-invalid  {
+    .form-control {
+      --#{$prefix}input-border-color: #{$form-feedback-invalid-color};
+    }
+
+    .input-group-text {
+      --#{$prefix}input-group-addon-border-color: #{$form-feedback-invalid-color};
+    }
+
+    .picker-input-group-indicator {
+      --#{$prefix}input-group-addon-color: #{$form-feedback-invalid-color};
+    }
+
+    .date-picker-input-icon {
+      background-image: escape-svg($date-picker-invalid-icon);
+    }
+  }
+
+  &.is-valid  {
+    .form-control {
+      --#{$prefix}input-border-color: #{$form-feedback-valid-color};
+    }
+
+    .input-group-text {
+      --#{$prefix}input-group-addon-border-color: #{$form-feedback-valid-color};
+    }
+
+    .picker-input-group-indicator {
+      --#{$prefix}input-group-addon-color: #{$form-feedback-valid-color};
+    }
+
+    .date-picker-input-icon {
+      background-image: escape-svg($date-picker-valid-icon);
+    }
+  }
 }
 
 .date-picker-body {

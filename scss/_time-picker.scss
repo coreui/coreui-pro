@@ -3,6 +3,42 @@
   --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
   --#{$prefix}time-picker-roll-col-border: #{$time-picker-roll-col-border-width} solid #{$time-picker-roll-col-border-color};
   // scss-docs-end time-picker-css-vars
+
+  &.is-invalid  {
+    .form-control {
+      --#{$prefix}input-border-color: #{$form-feedback-invalid-color};
+    }
+
+    .input-group-text {
+      --#{$prefix}input-group-addon-border-color: #{$form-feedback-invalid-color};
+    }
+
+    .picker-input-group-indicator {
+      --#{$prefix}input-group-addon-color: #{$form-feedback-invalid-color};
+    }
+
+    .time-picker-input-icon {
+      background-image: escape-svg($time-picker-invalid-icon);
+    }
+  }
+
+  &.is-valid  {
+    .form-control {
+      --#{$prefix}input-border-color: #{$form-feedback-valid-color};
+    }
+
+    .input-group-text {
+      --#{$prefix}input-group-addon-border-color: #{$form-feedback-valid-color};
+    }
+
+    .picker-input-group-indicator {
+      --#{$prefix}input-group-addon-color: #{$form-feedback-valid-color};
+    }
+
+    .time-picker-input-icon {
+      background-image: escape-svg($time-picker-valid-icon);
+    }
+  }
 }
 
 .time-picker-body {

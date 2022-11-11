@@ -263,19 +263,20 @@ You may also choose from small and large multi selects to match our similarly si
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `cleaner`| boolean| `true` | |
-| `disabled` | boolean| `false` | |
-| `multiple` | boolean| `true` | |
-| `placeholder` | string| `'Select...'` | |
-| `options` | (boolean\|array)| `false` | |
-| `optionsMaxHeight` | (number\|string)| `'auto'` | |
-| `optionsStyle` | string| `'checkbox'` | |
-| `search` | boolean| `false` | |
-| `searchNoResultsLabel` | string| `'No results found'` | |
-| `selectAll` | boolean| `true` | |
-| `selectAllLabel` | string| `'Select all options'` | |
-| `selectionType` | string| `'tag'` | |
-| `selectionTypeCounterText` | string| `'item(s) selected'` | |
+| `cleaner`| boolean| `true` | Enables selection cleaner element. |
+| `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `invalid` | boolean | `false` | Toggle the invalid state for the component. |
+| `options` | (boolean\|array)| `false` | List of option elements. |
+| `optionsMaxHeight` | (number\|string)| `'auto'` | Sets `max-height` of options list.	 |
+| `optionsStyle` | string| `'checkbox'` | Sets option style. |
+| `placeholder` | string| `'Select...'` | Specifies a short hint that is visible in the input. |
+| `search` | boolean| `false` | Enables search input element.	 |
+| `searchNoResultsLabel` | string| `'No results found'` | Sets the label for no results when filtering.	|
+| `selectAll` | boolean| `true` | Enables select all button.|
+| `selectAllLabel` | string| `'Select all options'` | Sets the select all button label.	 |
+| `selectionType` | string| `'tag'` | Sets the selection style.	 |
+| `selectionTypeCounterText` | string| `'item(s) selected'` | Sets the counter selection label.	|
+| `valid` | boolean | `false` | Toggle the valid state for the component. |
 {{< /bs-table >}}
 
 ### Methods

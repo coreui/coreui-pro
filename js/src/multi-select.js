@@ -74,6 +74,7 @@ const CLASS_NAME_LABEL = 'label'
 const Default = {
   cleaner: true,
   disabled: false,
+  invalid: false,
   multiple: true,
   placeholder: 'Select...',
   options: false,
@@ -84,12 +85,14 @@ const Default = {
   selectAll: true,
   selectAllLabel: 'Select all options',
   selectionType: 'tags',
-  selectionTypeCounterText: 'item(s) selected'
+  selectionTypeCounterText: 'item(s) selected',
+  valid: false
 }
 
 const DefaultType = {
   cleaner: 'boolean',
   disabled: 'boolean',
+  invalid: 'boolean',
   multiple: 'boolean',
   placeholder: 'string',
   options: '(boolean|array)',
@@ -100,7 +103,8 @@ const DefaultType = {
   selectAll: 'boolean',
   selectAllLabel: 'string',
   selectionType: 'string',
-  selectionTypeCounterText: 'string'
+  selectionTypeCounterText: 'string',
+  valid: 'boolean'
 }
 
 /**
@@ -382,6 +386,8 @@ class MultiSelect extends BaseComponent {
   _createSelect() {
     const div = document.createElement('div')
     div.classList.add(CLASS_NAME_SELECT)
+    div.classList.toggle('is-invalid', this._config.invalid)
+    div.classList.toggle('is-valid', this._config.valid)
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
