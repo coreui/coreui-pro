@@ -1292,7 +1292,7 @@ $form-multi-select-selection-tags-padding-y-sm:  .0675rem !default;
 $form-multi-select-selection-tags-padding-x-sm:  .0675rem !default;
 $form-multi-select-tag-margin-y-sm:              .0675rem !default;
 $form-multi-select-tag-margin-x-sm:              .0675rem !default;
-$form-multi-select-tag-padding-y-sm:             subtract(($form-multi-select-padding-y-sm - $form-multi-select-selection-tags-padding-y-sm - $form-multi-select-tag-margin-y-sm), $form-multi-select-tag-border-width) !default;
+$form-multi-select-tag-padding-y-sm:             0 !default;
 $form-multi-select-tag-padding-x-sm:             .5rem !default;
 // scss-docs-end form-multi-select-variables
 
