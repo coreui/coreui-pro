@@ -1198,6 +1198,8 @@ $form-multi-select-indicator:               url("data:image/svg+xml,<svg xmlns='
 $form-multi-select-border-width:            $input-border-width !default;
 $form-multi-select-border-color:            $input-border-color !default;
 $form-multi-select-border-radius:           $border-radius !default;
+$form-multi-select-border-radius-sm:        $border-radius-sm !default;
+$form-multi-select-border-radius-lg:        $border-radius-lg !default;
 $form-multi-select-box-shadow:              inset 0 1px 2px rgba($black, .075) !default;
 
 $form-multi-select-focus-width:             $input-focus-width !default;
@@ -1209,14 +1211,16 @@ $form-multi-select-focus-box-shadow:        0 0 0 $form-multi-select-focus-width
 $form-multi-select-selection-tags-padding-y:  .125rem !default;
 $form-multi-select-selection-tags-padding-x:  .125rem !default;
 
-$form-multi-select-tag-bg:             $light !default;
-$form-multi-select-tag-border-width:   $border-width !default;
-$form-multi-select-tag-border-color:   $border-color !default;
-$form-multi-select-tag-border-radius:  $border-radius !default;
-$form-multi-select-tag-margin-y:       .125rem !default;
-$form-multi-select-tag-margin-x:       .125rem !default;
-$form-multi-select-tag-padding-y:      subtract(($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y - $form-multi-select-tag-margin-y), $form-multi-select-tag-border-width) !default;
-$form-multi-select-tag-padding-x:      .5rem !default;
+$form-multi-select-tag-bg:                $light !default;
+$form-multi-select-tag-border-width:      $border-width !default;
+$form-multi-select-tag-border-color:      $border-color !default;
+$form-multi-select-tag-border-radius:     .25rem !default;
+$form-multi-select-tag-border-radius-sm:  .125rem !default;
+$form-multi-select-tag-border-radius-lg:  .375rem !default;
+$form-multi-select-tag-margin-y:          .125rem !default;
+$form-multi-select-tag-margin-x:          .125rem !default;
+$form-multi-select-tag-padding-y:         subtract(($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y - $form-multi-select-tag-margin-y), $form-multi-select-tag-border-width) !default;
+$form-multi-select-tag-padding-x:         .5rem !default;
 
 $form-multi-select-search-color:          $input-color !default;
 $form-multi-select-search-bg:             $input-bg !default;
@@ -1289,7 +1293,7 @@ $form-multi-select-padding-y-sm:                 $input-padding-y-sm !default;
 $form-multi-select-padding-x-sm:                 $input-padding-x-sm !default;
 $form-multi-select-font-size-sm:                 $input-font-size-sm !default;
 $form-multi-select-selection-tags-padding-y-sm:  .0675rem !default;
-$form-multi-select-selection-tags-padding-x-sm:  .0675rem !default;
+$form-multi-select-selection-tags-padding-x-sm:  .125rem !default;
 $form-multi-select-tag-margin-y-sm:              .0675rem !default;
 $form-multi-select-tag-margin-x-sm:              .0675rem !default;
 $form-multi-select-tag-padding-y-sm:             0 !default;

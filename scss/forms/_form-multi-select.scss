@@ -338,11 +338,13 @@
   --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y-sm};
   --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x-sm};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size-sm};
+  --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius-sm};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-sm};
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-sm};
   --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x-sm};
   --#{$prefix}form-multi-select-tag-margin-y: #{$form-multi-select-tag-margin-y-sm};
   --#{$prefix}form-multi-select-tag-margin-x: #{$form-multi-select-tag-margin-x-sm};
+  --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-sm};
 
   &.form-multi-select-selection-tags {
     min-height: add(($form-multi-select-padding-y-sm * 2), ($form-multi-select-font-size-sm * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
@@ -357,11 +359,13 @@
   --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y-lg};
   --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x-lg};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size-lg};
+  --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius-lg};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-lg};
   --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x-lg};
   --#{$prefix}form-multi-select-tag-margin-y: #{$form-multi-select-tag-margin-y-lg};
   --#{$prefix}form-multi-select-tag-margin-x: #{$form-multi-select-tag-margin-x-lg};
+  --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-lg};
 
   &.form-multi-select-selection-tags {
     min-height: add(($form-multi-select-padding-y-lg * 2) + ($form-multi-select-font-size-lg * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
