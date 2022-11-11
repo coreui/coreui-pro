@@ -335,14 +335,14 @@ class DateRangePicker extends Picker {
     if (this._config.indicator) {
       inputGroupTextEl.innerHTML = `
         <span class="picker-input-group-indicator">
-          <span class="picker-input-group-icon time-picker-input-icon"></span>
+          <span class="picker-input-group-icon date-picker-input-icon"></span>
         </span>`
     }
 
     if (this._config.cleaner) {
       inputGroupTextEl.innerHTML += `
         <span class="picker-input-group-cleaner" role="button">
-          <span class="picker-input-group-icon time-picker-cleaner-icon"></span>
+          <span class="picker-input-group-icon date-picker-cleaner-icon"></span>
         </span>`
     }
 
