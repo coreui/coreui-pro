@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.3.4 (https://coreui.io)
+  * CoreUI v4.4.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -31,7 +31,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): alert.js
+   * CoreUI (v4.4.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/index.js
@@ -349,7 +349,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): dom/event-handler.js
+   * CoreUI (v4.4.0): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -611,7 +611,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): dom/data.js
+   * CoreUI (v4.4.0): dom/data.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dom/data.js
@@ -666,7 +666,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): dom/manipulator.js
+   * CoreUI (v4.4.0): dom/manipulator.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -800,7 +800,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): alert.js
+   * CoreUI (v4.4.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -811,7 +811,7 @@
    * Constants
    */
 
-  const VERSION = '4.3.4';
+  const VERSION = '4.4.0';
   /**
    * Class definition
    */
@@ -908,7 +908,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): alert.js
+   * CoreUI (v4.4.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's alert.js
@@ -991,7 +991,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): alert.js
+   * CoreUI (v4.4.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's button.js
@@ -1659,7 +1659,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): dom/selector-engine.js
+   * CoreUI (v4.4.0): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -1869,7 +1869,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): carousel.js
+   * CoreUI (v4.4.0): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -2320,7 +2320,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): collapse.js
+   * CoreUI (v4.4.0): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js
@@ -2613,7 +2613,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): dropdown.js
+   * CoreUI (v4.4.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dropdown.js
@@ -3046,7 +3046,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): picker.js
+   * CoreUI PRO (v4.4.0): picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -3289,21 +3289,25 @@
     disabled: false,
     footer: true,
     indicator: true,
+    invalid: false,
     inputReadOnly: false,
     locale: 'default',
     placeholder: 'Select time',
     size: null,
     time: null,
+    valid: false,
     variant: 'roll'
   };
   const DefaultType$f = { ...Picker.DefaultType,
     cleaner: 'boolean',
     indicator: 'boolean',
     inputReadOnly: 'boolean',
+    invalid: 'boolean',
     locale: 'string',
     placeholder: 'string',
     size: '(string|null)',
     time: '(date|string|null)',
+    valid: 'boolean',
     variant: 'string'
   };
   /**
@@ -3570,6 +3574,10 @@
     _createTimePicker() {
       this._element.classList.add('time-picker');
 
+      this._element.classList.toggle('is-invalid', this._config.invalid);
+
+      this._element.classList.toggle('is-valid', this._config.valid);
+
       if (this._config.container === 'dropdown') {
         this._dropdownToggleEl.append(this._createInputGroup());
 
@@ -3751,7 +3759,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): date-range-picker.js
+   * CoreUI PRO (v4.4.0): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -3779,6 +3787,7 @@
     endDate: null,
     firstDayOfWeek: 1,
     format: null,
+    invalid: false,
     indicator: true,
     locale: 'default',
     maxDate: null,
@@ -3793,7 +3802,8 @@
     selectEndDate: false,
     timepicker: false,
     todayButton: 'Today',
-    todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto']
+    todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
+    valid: false
   };
   const DefaultType$e = { ...Picker.DefaultType,
     calendars: 'number',
@@ -3806,6 +3816,7 @@
     firstDayOfWeek: 'number',
     format: '(string|null)',
     indicator: 'boolean',
+    invalid: 'boolean',
     locale: 'string',
     maxDate: '(date|string|null)',
     minDate: '(date|string|null)',
@@ -3819,7 +3830,8 @@
     selectEndDate: 'boolean',
     timepicker: 'boolean',
     todayButton: '(boolean|string)',
-    todayButtonClasses: '(array|string)'
+    todayButtonClasses: '(array|string)',
+    valid: 'boolean'
   };
   /**
   * ------------------------------------------------------------------------
@@ -4073,14 +4085,14 @@
       if (this._config.indicator) {
         inputGroupTextEl.innerHTML = `
         <span class="picker-input-group-indicator">
-          <span class="picker-input-group-icon time-picker-input-icon"></span>
+          <span class="picker-input-group-icon date-picker-input-icon"></span>
         </span>`;
       }
 
       if (this._config.cleaner) {
         inputGroupTextEl.innerHTML += `
         <span class="picker-input-group-cleaner" role="button">
-          <span class="picker-input-group-icon time-picker-cleaner-icon"></span>
+          <span class="picker-input-group-icon date-picker-cleaner-icon"></span>
         </span>`;
       }
 
@@ -4203,6 +4215,10 @@
 
     _createDateRangePicker() {
       this._element.classList.add('date-picker');
+
+      this._element.classList.toggle('is-invalid', this._config.invalid);
+
+      this._element.classList.toggle('is-valid', this._config.valid);
 
       this._dropdownToggleEl.append(this._createInputGroup());
 
@@ -4378,7 +4394,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): date-picker.js
+   * CoreUI PRO (v4.4.0): date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -4499,7 +4515,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): loading-button.js
+   * CoreUI PRO (v4.4.0): loading-button.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -5053,7 +5069,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.3.4): modal.js
+    * CoreUI (v4.4.0): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js
@@ -5429,7 +5445,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): multi-select.js
+   * CoreUI PRO (v4.4.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -5489,6 +5505,7 @@
   const Default$8 = {
     cleaner: true,
     disabled: false,
+    invalid: false,
     multiple: true,
     placeholder: 'Select...',
     options: false,
@@ -5499,11 +5516,13 @@
     selectAll: true,
     selectAllLabel: 'Select all options',
     selectionType: 'tags',
-    selectionTypeCounterText: 'item(s) selected'
+    selectionTypeCounterText: 'item(s) selected',
+    valid: false
   };
   const DefaultType$8 = {
     cleaner: 'boolean',
     disabled: 'boolean',
+    invalid: 'boolean',
     multiple: 'boolean',
     placeholder: 'string',
     options: '(boolean|array)',
@@ -5514,7 +5533,8 @@
     selectAll: 'boolean',
     selectAllLabel: 'string',
     selectionType: 'string',
-    selectionTypeCounterText: 'string'
+    selectionTypeCounterText: 'string',
+    valid: 'boolean'
   };
   /**
    * ------------------------------------------------------------------------
@@ -5800,6 +5820,8 @@
     _createSelect() {
       const div = document.createElement('div');
       div.classList.add(CLASS_NAME_SELECT);
+      div.classList.toggle('is-invalid', this._config.invalid);
+      div.classList.toggle('is-valid', this._config.valid);
 
       if (this._config.disabled) {
         this._element.classList.add(CLASS_NAME_DISABLED);
@@ -6302,7 +6324,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): navigation.js
+   * CoreUI (v4.4.0): navigation.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -6588,7 +6610,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): dropdown.js
+   * CoreUI (v4.4.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js
@@ -6865,7 +6887,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): alert.js
+   * CoreUI (v4.4.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -7131,7 +7153,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): tooltip.js
+   * CoreUI (v4.4.0): tooltip.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tooltip.js
@@ -7758,7 +7780,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): popover.js
+   * CoreUI (v4.4.0): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js
@@ -7844,7 +7866,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): scrollspy.js
+   * CoreUI (v4.4.0): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js
@@ -8134,7 +8156,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): sidebar.js
+   * CoreUI (v4.4.0): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -8458,7 +8480,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): tab.js
+   * CoreUI (v4.4.0): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -8786,7 +8808,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): toast.js
+   * CoreUI (v4.4.0): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -9006,7 +9028,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.3.4): index.esm.js
+   * CoreUI (v4.4.0): index.esm.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

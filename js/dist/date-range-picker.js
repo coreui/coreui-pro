@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.3.4 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.4.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -20,7 +20,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): date-range-picker.js
+   * CoreUI PRO (v4.4.0): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -48,6 +48,7 @@
     endDate: null,
     firstDayOfWeek: 1,
     format: null,
+    invalid: false,
     indicator: true,
     locale: 'default',
     maxDate: null,
@@ -62,7 +63,8 @@
     selectEndDate: false,
     timepicker: false,
     todayButton: 'Today',
-    todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto']
+    todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
+    valid: false
   };
   const DefaultType = { ...Picker__default.default.DefaultType,
     calendars: 'number',
@@ -75,6 +77,7 @@
     firstDayOfWeek: 'number',
     format: '(string|null)',
     indicator: 'boolean',
+    invalid: 'boolean',
     locale: 'string',
     maxDate: '(date|string|null)',
     minDate: '(date|string|null)',
@@ -88,7 +91,8 @@
     selectEndDate: 'boolean',
     timepicker: 'boolean',
     todayButton: '(boolean|string)',
-    todayButtonClasses: '(array|string)'
+    todayButtonClasses: '(array|string)',
+    valid: 'boolean'
   };
   /**
   * ------------------------------------------------------------------------
@@ -342,14 +346,14 @@
       if (this._config.indicator) {
         inputGroupTextEl.innerHTML = `
         <span class="picker-input-group-indicator">
-          <span class="picker-input-group-icon time-picker-input-icon"></span>
+          <span class="picker-input-group-icon date-picker-input-icon"></span>
         </span>`;
       }
 
       if (this._config.cleaner) {
         inputGroupTextEl.innerHTML += `
         <span class="picker-input-group-cleaner" role="button">
-          <span class="picker-input-group-icon time-picker-cleaner-icon"></span>
+          <span class="picker-input-group-icon date-picker-cleaner-icon"></span>
         </span>`;
       }
 
@@ -472,6 +476,10 @@
 
     _createDateRangePicker() {
       this._element.classList.add('date-picker');
+
+      this._element.classList.toggle('is-invalid', this._config.invalid);
+
+      this._element.classList.toggle('is-valid', this._config.valid);
 
       this._dropdownToggleEl.append(this._createInputGroup());
 

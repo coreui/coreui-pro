@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v4.3.4 (https://coreui.io)
+  * CoreUI multi-select.js v4.4.0 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -19,7 +19,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.3.4): multi-select.js
+   * CoreUI PRO (v4.4.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -79,6 +79,7 @@
   const Default = {
     cleaner: true,
     disabled: false,
+    invalid: false,
     multiple: true,
     placeholder: 'Select...',
     options: false,
@@ -89,11 +90,13 @@
     selectAll: true,
     selectAllLabel: 'Select all options',
     selectionType: 'tags',
-    selectionTypeCounterText: 'item(s) selected'
+    selectionTypeCounterText: 'item(s) selected',
+    valid: false
   };
   const DefaultType = {
     cleaner: 'boolean',
     disabled: 'boolean',
+    invalid: 'boolean',
     multiple: 'boolean',
     placeholder: 'string',
     options: '(boolean|array)',
@@ -104,7 +107,8 @@
     selectAll: 'boolean',
     selectAllLabel: 'string',
     selectionType: 'string',
-    selectionTypeCounterText: 'string'
+    selectionTypeCounterText: 'string',
+    valid: 'boolean'
   };
   /**
    * ------------------------------------------------------------------------
@@ -390,6 +394,8 @@
     _createSelect() {
       const div = document.createElement('div');
       div.classList.add(CLASS_NAME_SELECT);
+      div.classList.toggle('is-invalid', this._config.invalid);
+      div.classList.toggle('is-valid', this._config.valid);
 
       if (this._config.disabled) {
         this._element.classList.add(CLASS_NAME_DISABLED);
