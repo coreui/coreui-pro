@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.4.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.4.1 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -20,7 +20,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.0): date-range-picker.js
+   * CoreUI PRO (v4.4.1): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -195,7 +195,12 @@
 
     update(config) {
       this._config = this._getConfig(config);
-      this._element.innerHTML = '';
+      this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date());
+      this._startDate = this._convertStringToDate(this._config.date || this._config.startDate);
+      this._endDate = this._convertStringToDate(this._config.endDate);
+      this._selectEndDate = this._config.selectEndDate;
+      this._dropdownToggleEl.innerHTML = '';
+      this._dropdownMenuEl.innerHTML = '';
 
       this._createDateRangePicker();
 
@@ -220,9 +225,7 @@
         this._updateCalendars();
       });
       EventHandler__default.default.on(this._startInput, 'input', event => {
-        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker); // eslint-disable-next-line no-console
-
-        console.log(dateFns.parseISO(event.target.value));
+        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
 
         if (date instanceof Date && date.getTime()) {
           this._startDate = date;

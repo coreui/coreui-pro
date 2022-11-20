@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v4.4.0 (https://coreui.io)
+  * CoreUI time-picker.js v4.4.1 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -169,7 +169,10 @@
 
     update(config) {
       this._config = this._getConfig(config);
-      this._element.innerHTML = '';
+      this._date = this._convertStringToDate(this._config.time);
+      this._ampm = this._date ? time.getAmPm(new Date(this._date), this._config.locale) : 'am';
+      this._dropdownToggleEl.innerHTML = '';
+      this._dropdownMenuEl.innerHTML = '';
 
       this._createTimePicker();
 

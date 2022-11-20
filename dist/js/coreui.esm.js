@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.4.0 (https://coreui.io)
+  * CoreUI v4.4.1 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -8,7 +8,7 @@ import * as Popper from '@popperjs/core';
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): alert.js
+ * CoreUI (v4.4.1): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  util/index.js
@@ -326,7 +326,7 @@ const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): dom/event-handler.js
+ * CoreUI (v4.4.1): dom/event-handler.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  dom/event-handler.js
@@ -588,7 +588,7 @@ function hydrateObj(obj, meta) {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): dom/data.js
+ * CoreUI (v4.4.1): dom/data.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's dom/data.js
@@ -643,7 +643,7 @@ const Data = {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): dom/manipulator.js
+ * CoreUI (v4.4.1): dom/manipulator.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  dom/manipulator.js
@@ -777,7 +777,7 @@ class Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): alert.js
+ * CoreUI (v4.4.1): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's base-component.js
@@ -788,7 +788,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '4.4.0';
+const VERSION = '4.4.1';
 /**
  * Class definition
  */
@@ -885,7 +885,7 @@ const enableDismissTrigger = (component, method = 'hide') => {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): alert.js
+ * CoreUI (v4.4.1): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's alert.js
@@ -968,7 +968,7 @@ defineJQueryPlugin(Alert);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): alert.js
+ * CoreUI (v4.4.1): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's button.js
@@ -1636,7 +1636,7 @@ defineJQueryPlugin(Calendar);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): dom/selector-engine.js
+ * CoreUI (v4.4.1): dom/selector-engine.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  dom/selector-engine.js
@@ -1846,7 +1846,7 @@ class Swipe extends Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): carousel.js
+ * CoreUI (v4.4.1): carousel.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's carousel.js
@@ -2297,7 +2297,7 @@ defineJQueryPlugin(Carousel);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): collapse.js
+ * CoreUI (v4.4.1): collapse.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's collapse.js
@@ -2590,7 +2590,7 @@ defineJQueryPlugin(Collapse);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): dropdown.js
+ * CoreUI (v4.4.1): dropdown.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's dropdown.js
@@ -3023,7 +3023,7 @@ defineJQueryPlugin(Dropdown);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.4.0): picker.js
+ * CoreUI PRO (v4.4.1): picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -3399,7 +3399,10 @@ class TimePicker extends Picker {
 
   update(config) {
     this._config = this._getConfig(config);
-    this._element.innerHTML = '';
+    this._date = this._convertStringToDate(this._config.time);
+    this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am';
+    this._dropdownToggleEl.innerHTML = '';
+    this._dropdownMenuEl.innerHTML = '';
 
     this._createTimePicker();
 
@@ -3736,7 +3739,7 @@ defineJQueryPlugin(TimePicker);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.4.0): date-range-picker.js
+ * CoreUI PRO (v4.4.1): date-range-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -3911,7 +3914,12 @@ class DateRangePicker extends Picker {
 
   update(config) {
     this._config = this._getConfig(config);
-    this._element.innerHTML = '';
+    this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date());
+    this._startDate = this._convertStringToDate(this._config.date || this._config.startDate);
+    this._endDate = this._convertStringToDate(this._config.endDate);
+    this._selectEndDate = this._config.selectEndDate;
+    this._dropdownToggleEl.innerHTML = '';
+    this._dropdownMenuEl.innerHTML = '';
 
     this._createDateRangePicker();
 
@@ -3936,9 +3944,7 @@ class DateRangePicker extends Picker {
       this._updateCalendars();
     });
     EventHandler.on(this._startInput, 'input', event => {
-      const date = this._config.format ? parseISO(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker); // eslint-disable-next-line no-console
-
-      console.log(parseISO(event.target.value));
+      const date = this._config.format ? parseISO(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
 
       if (date instanceof Date && date.getTime()) {
         this._startDate = date;
@@ -4371,7 +4377,7 @@ defineJQueryPlugin(DateRangePicker);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.4.0): date-picker.js
+ * CoreUI PRO (v4.4.1): date-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -4492,7 +4498,7 @@ defineJQueryPlugin(DatePicker);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.4.0): loading-button.js
+ * CoreUI PRO (v4.4.1): loading-button.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -5046,7 +5052,7 @@ class FocusTrap extends Config {
 
 /**
  * --------------------------------------------------------------------------
-  * CoreUI (v4.4.0): modal.js
+  * CoreUI (v4.4.1): modal.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's modal.js
@@ -5422,7 +5428,7 @@ defineJQueryPlugin(Modal);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.4.0): multi-select.js
+ * CoreUI PRO (v4.4.1): multi-select.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
@@ -6301,7 +6307,7 @@ defineJQueryPlugin(MultiSelect);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): navigation.js
+ * CoreUI (v4.4.1): navigation.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -6587,7 +6593,7 @@ defineJQueryPlugin(Navigation);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): dropdown.js
+ * CoreUI (v4.4.1): dropdown.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's offcanvas.js
@@ -6864,7 +6870,7 @@ defineJQueryPlugin(Offcanvas);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): alert.js
+ * CoreUI (v4.4.1): alert.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's  util/sanitizer.js
@@ -7130,7 +7136,7 @@ class TemplateFactory extends Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): tooltip.js
+ * CoreUI (v4.4.1): tooltip.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tooltip.js
@@ -7757,7 +7763,7 @@ defineJQueryPlugin(Tooltip);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): popover.js
+ * CoreUI (v4.4.1): popover.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's popover.js
@@ -7843,7 +7849,7 @@ defineJQueryPlugin(Popover);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): scrollspy.js
+ * CoreUI (v4.4.1): scrollspy.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's scrollspy.js
@@ -8133,7 +8139,7 @@ defineJQueryPlugin(ScrollSpy);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): sidebar.js
+ * CoreUI (v4.4.1): sidebar.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -8457,7 +8463,7 @@ defineJQueryPlugin(Sidebar);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): tab.js
+ * CoreUI (v4.4.1): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tab.js
@@ -8785,7 +8791,7 @@ defineJQueryPlugin(Tab);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): toast.js
+ * CoreUI (v4.4.1): toast.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's toast.js
@@ -9003,5 +9009,5 @@ enableDismissTrigger(Toast);
 
 defineJQueryPlugin(Toast);
 
-export { Alert, Button, Calendar, Carousel, Collapse, DatePicker, DateRangePicker, Dropdown, LoadingButton, Modal, MultiSelect, Navigation, Offcanvas, Popover, ScrollSpy, Sidebar, Tab, TimePicker as Timepicker, Toast, Tooltip };
+export { Alert, Button, Calendar, Carousel, Collapse, DatePicker, DateRangePicker, Dropdown, LoadingButton, Modal, MultiSelect, Navigation, Offcanvas, Popover, ScrollSpy, Sidebar, Tab, TimePicker, Toast, Tooltip };
 //# sourceMappingURL=coreui.esm.js.map

@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.0): index.esm.js
+ * CoreUI (v4.4.1): index.esm.js
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -22,7 +22,7 @@ import Popover from './src/popover'
 import ScrollSpy from './src/scrollspy'
 import Sidebar from './src/sidebar'
 import Tab from './src/tab'
-import Timepicker from './src/time-picker'
+import TimePicker from './src/time-picker'
 import Toast from './src/toast'
 import Tooltip from './src/tooltip'
 
@@ -44,7 +44,7 @@ export default {
   ScrollSpy,
   Sidebar,
   Tab,
-  Timepicker,
+  TimePicker,
   Toast,
   Tooltip
 }
