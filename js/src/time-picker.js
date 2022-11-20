@@ -135,7 +135,12 @@ class TimePicker extends Picker {
 
   update(config) {
     this._config = this._getConfig(config)
-    this._element.innerHTML = ''
+    this._date = this._convertStringToDate(this._config.time)
+    this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am'
+
+    this._dropdownToggleEl.innerHTML = ''
+    this._dropdownMenuEl.innerHTML = ''
+
     this._createTimePicker()
     this._createTimePickerSelection()
   }
