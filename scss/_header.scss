@@ -180,6 +180,10 @@
   &:not(:disabled) {
     cursor: pointer;
   }
+
+  &.prevent-hide {
+    display: block !important; // stylelint-disable-line declaration-no-important
+  }
 }
 
 .header-toggler-icon {
