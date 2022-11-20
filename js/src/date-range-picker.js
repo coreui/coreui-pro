@@ -189,7 +189,14 @@ class DateRangePicker extends Picker {
 
   update(config) {
     this._config = this._getConfig(config)
-    this._element.innerHTML = ''
+    this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date())
+    this._startDate = this._convertStringToDate(this._config.date || this._config.startDate)
+    this._endDate = this._convertStringToDate(this._config.endDate)
+    this._selectEndDate = this._config.selectEndDate
+
+    this._dropdownToggleEl.innerHTML = ''
+    this._dropdownMenuEl.innerHTML = ''
+
     this._createDateRangePicker()
     this._createCalendars()
     this._addEventListeners()
@@ -214,8 +221,6 @@ class DateRangePicker extends Picker {
         parseISO(event.target.value) :
         getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
 
-      // eslint-disable-next-line no-console
-      console.log(parseISO(event.target.value))
       if (date instanceof Date && date.getTime()) {
         this._startDate = date
         this._calendarDate = date
