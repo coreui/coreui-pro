@@ -3,7 +3,22 @@
   <main class="docs-main order-1">
     <div class="docs-intro ps-lg-4">
       {{ partial "breadcrumb" . }}
-      {{ if .Page.Params.pro_component }}
+      <a class="black-friday-banner rounded" href="https://coreui.io/pricing/?framework=bootstrap&amp;docs=coreui-banner-black-friday">
+        <div class="row">
+          <div class="col-xl-7 align-self-center">
+            <div class="p-3 p-xl-5">
+              <h2>Black Friday? Black Week? <br> CoreUI makes it MONTH!</h2>
+              <div> With CoreUI you don't have to wait till Black Friday, cause we launched our Black Friday promo - right here, right now! Up to 70% discount for CoreUI PRO Admin Templates and PRO UI Components.</div>
+            </div>
+          </div>
+          <div class="col-xl-5">
+            <div class="p-2">
+              <img class="logo mx-auto" src="/assets/img/black-hexagon400h.webp" alt="CoreUI logo" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </a>
+      <!-- {{ if .Page.Params.pro_component }}
       <div class="bg-danger bg-opacity-10 border-start border-start-5 border-start-danger p-4 pb-3 mb-5">
         <h3 class="mb-4">CoreUI PRO Component</h3>
         <p>
@@ -25,7 +40,7 @@
           <li>Give us a star ⭐️ on <a href="https://github.com/coreui/coreui" target="_blank">Github</a>.</li>
         </ul>
       </div>
-      {{ end }}
+      {{ end }} -->
       <h1 class="docs-title" id="content">{{ .Title | markdownify }}</h1>
       <p class="docs-lead">{{ .Page.Params.Description | markdownify }}</p>
       {{ partial "ads" . }}
