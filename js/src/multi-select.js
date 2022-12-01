@@ -479,7 +479,7 @@ class MultiSelect extends BaseComponent {
 
     if (this._config.optionsMaxHeight !== 'auto') {
       optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
-      optionsDiv.style.overflow = 'scroll'
+      optionsDiv.style.overflow = 'auto'
     }
 
     dropdownDiv.append(optionsDiv)
