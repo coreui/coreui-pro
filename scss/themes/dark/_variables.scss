@@ -17,7 +17,7 @@ $high-emphasis-dt:    rgba($white, .87) !default;
 $medium-emphasis-dt:  rgba($white, .6) !default;
 $disabled-dt:         rgba($white, .38) !default;
 
-$primary-dt:    tint-color(desaturate($primary, 30%), 30) !default;
+$primary-dt:    tint-color(desaturate($primary, 30%), 30%) !default;
 $secondary-dt:  desaturate($secondary, 30%) !default;
 $success-dt:    desaturate($success, 30%) !default;
 $info-dt:       desaturate($info, 30%) !default;
@@ -454,8 +454,8 @@ $header-theme-map: (
 
 // Links
 
-$link-color-dt:                    shift-color($primary-dt, -12) !default;
-$link-hover-color-dt:              shift-color($link-color-dt, -20) !default;
+$link-color-dt:                    shift-color($primary-dt, -12%) !default;
+$link-hover-color-dt:              shift-color($link-color-dt, -20%) !default;
 
 $link-theme-map: (
   "link-color":        $link-color-dt,
