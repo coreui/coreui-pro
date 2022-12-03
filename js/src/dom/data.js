@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.1): dom/data.js
+ * CoreUI (v4.4.2): dom/data.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's dom/data.js
