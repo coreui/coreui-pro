@@ -6,7 +6,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/manipulator'), require('./util/calendar'), require('./base-component')) :
   typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './util/calendar', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.Index, global.EventHandler, global.Manipulator, global.Calendar, global.BaseComponent));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.index, global.EventHandler, global.Manipulator, global.calendar, global.BaseComponent));
 })(this, (function (index, EventHandler, Manipulator, calendar, BaseComponent) { 'use strict';
 
   const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
@@ -16,6 +16,7 @@
   const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
 
   /* eslint-disable indent, multiline-ternary */
+
   /**
   * ------------------------------------------------------------------------
   * Constants
@@ -64,6 +65,7 @@
     selectEndDate: 'boolean',
     weekdayFormat: '(number|string)'
   };
+
   /**
   * ------------------------------------------------------------------------
   * Class Definition
@@ -80,54 +82,43 @@
       this._hoverDate = null;
       this._selectEndDate = this._config.selectEndDate;
       this._view = 'days';
-
       this._createCalendar();
-
       this._addEventListeners();
-    } // Getters
-
+    }
+    // Getters
 
     static get Default() {
       return Default;
     }
-
     static get DefaultType() {
       return DefaultType;
     }
-
     static get NAME() {
       return NAME;
-    } // Private
+    }
 
-
+    // Private
     _addEventListeners() {
       EventHandler__default.default.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
-
         if (event.target.classList.contains('day')) {
           this._selectDate(Manipulator__default.default.getDataAttribute(event.target, 'date'));
         }
-
         if (event.target.classList.contains('month')) {
           this._setCalendarDate(new Date(this._calendarDate.getFullYear(), Manipulator__default.default.getDataAttribute(event.target, 'month'), 1));
-
           this._view = 'days';
         }
-
         if (event.target.classList.contains('year')) {
           this._calendarDate = new Date(Manipulator__default.default.getDataAttribute(event.target, 'year'), this._calendarDate.getMonth(), 1);
           this._view = 'months';
         }
-
         this._updateCalendar();
       });
       EventHandler__default.default.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
-
         if (event.target.parentElement.classList.contains('disabled')) {
           return;
         }
-
         this._hoverDate = new Date(Manipulator__default.default.getDataAttribute(event.target, 'date'));
         EventHandler__default.default.trigger(this._element, EVENT_CELL_HOVER, {
           date: new Date(Manipulator__default.default.getDataAttribute(event.target, 'date'))
@@ -139,77 +130,62 @@
         EventHandler__default.default.trigger(this._element, EVENT_CELL_HOVER, {
           date: null
         });
-      }); // Navigation
+      });
 
+      // Navigation
       EventHandler__default.default.on(this._element, 'click', '.btn-prev', event => {
         event.preventDefault();
-
         this._modifyCalendarDate(0, -1);
       });
       EventHandler__default.default.on(this._element, 'click', '.btn-double-prev', event => {
         event.preventDefault();
-
         this._modifyCalendarDate(this._view === 'years' ? -10 : -1);
       });
       EventHandler__default.default.on(this._element, 'click', '.btn-next', event => {
         event.preventDefault();
-
         this._modifyCalendarDate(0, 1);
       });
       EventHandler__default.default.on(this._element, 'click', '.btn-double-next', event => {
         event.preventDefault();
-
         this._modifyCalendarDate(this._view === 'years' ? 10 : 1);
       });
       EventHandler__default.default.on(this._element, 'click', '.btn-month', event => {
         event.preventDefault();
         this._view = 'months';
         this._element.innerHTML = '';
-
         this._createCalendarPanel();
       });
       EventHandler__default.default.on(this._element, 'click', '.btn-year', event => {
         event.preventDefault();
         this._view = 'years';
         this._element.innerHTML = '';
-
         this._createCalendarPanel();
       });
     }
-
     _setCalendarDate(date) {
       this._calendarDate = date;
       EventHandler__default.default.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
         date
       });
     }
-
     _modifyCalendarDate(years, months = 0) {
       const year = this._calendarDate.getFullYear();
-
       const month = this._calendarDate.getMonth();
-
       const d = new Date(year, month, 1);
-
       if (years) {
         d.setFullYear(d.getFullYear() + years);
       }
-
       if (months) {
         d.setMonth(d.getMonth() + months);
       }
-
       this._calendarDate = d;
-
       if (this._view === 'days') {
         EventHandler__default.default.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
           date: d
         });
       }
-
       this._updateCalendar();
     }
-
     _setEndDate(date, selectEndDate = false) {
       this._endDate = new Date(date);
       EventHandler__default.default.trigger(this._element, EVENT_END_DATE_CHANGE, {
@@ -217,7 +193,6 @@
         selectEndDate
       });
     }
-
     _setStartDate(date, selectEndDate = true) {
       this._startDate = new Date(date);
       EventHandler__default.default.trigger(this._element, EVENT_START_DATE_CHANGE, {
@@ -225,17 +200,14 @@
         selectEndDate
       });
     }
-
     _selectDate(date) {
       if (calendar.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
         return;
       }
-
       if (this._config.range) {
         if (this._selectEndDate) {
           if (this._startDate && this._startDate > new Date(date)) {
             this._setEndDate(this._startDate);
-
             this._setStartDate(date);
           } else {
             this._setEndDate(date);
@@ -247,19 +219,17 @@
         this._setStartDate(date);
       }
     }
-
     _createCalendarPanel(addMonths) {
       let date = this._calendarDate;
-
       if (addMonths !== 0) {
         date = new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth() + addMonths, 1);
       }
-
       const year = date.getFullYear();
       const month = date.getMonth();
       const calendarPanelEl = document.createElement('div');
-      calendarPanelEl.classList.add('calendar-panel'); // Create navigation
+      calendarPanelEl.classList.add('calendar-panel');
 
+      // Create navigation
       const navigationElement = document.createElement('div');
       navigationElement.classList.add('calendar-nav');
       navigationElement.innerHTML = `
@@ -340,28 +310,22 @@
       calendarPanelEl.append(navigationElement, calendarTable);
       return calendarPanelEl;
     }
-
     _createCalendar() {
       const calendarsEl = document.createElement('div');
-      calendarsEl.classList.add('calendars'); // eslint-disable-next-line no-unused-vars
-
+      calendarsEl.classList.add('calendars');
+      // eslint-disable-next-line no-unused-vars
       for (const [index, _] of Array.from({
         length: this._config.calendars
       }).entries()) {
         calendarsEl.append(this._createCalendarPanel(index));
       }
-
       this._element.classList.add(CLASS_NAME_CALENDAR);
-
       this._element.append(calendarsEl);
     }
-
     _updateCalendar() {
       this._element.innerHTML = '';
-
       this._createCalendarPanel();
     }
-
     _dayClassNames(date, month) {
       const classNames = {
         today: calendar.isToday(date),
@@ -373,8 +337,9 @@
         selected: calendar.isDateSelected(date, this._startDate, this._endDate),
         start: calendar.isStartDate(date, this._startDate, this._endDate),
         end: calendar.isEndDate(date, this._startDate, this._endDate)
-      }; // eslint-disable-next-line unicorn/no-array-reduce
+      };
 
+      // eslint-disable-next-line unicorn/no-array-reduce
       const result = Object.keys(classNames).reduce((o, key) => {
         // eslint-disable-next-line no-unused-expressions
         classNames[key] === true && (o[key] = classNames[key]);
@@ -382,57 +347,52 @@
       }, {});
       return Object.keys(result).join(' ');
     }
-
     _getConfig(config) {
-      config = { ...this.constructor.Default,
+      config = {
+        ...this.constructor.Default,
         ...Manipulator__default.default.getDataAttributes(this._element),
         ...config
       };
       return config;
-    } // Static
+    }
 
+    // Static
 
     static calendarInterface(element, config) {
       const data = Calendar.getOrCreateInstance(element, config);
-
       if (typeof config === 'string') {
         if (typeof data[config] === 'undefined') {
           throw new TypeError(`No method named "${config}"`);
         }
-
         data[config]();
       }
     }
-
     static jQueryInterface(config) {
       return this.each(function () {
         const data = Calendar.getOrCreateInstance(this);
-
         if (typeof config !== 'string') {
           return;
         }
-
         if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
           throw new TypeError(`No method named "${config}"`);
         }
-
         data[config](this);
       });
     }
-
   }
+
   /**
   * ------------------------------------------------------------------------
   * Data Api implementation
   * ------------------------------------------------------------------------
   */
 
-
   EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
     for (const element of Array.from(document.querySelectorAll(SELECTOR_CALENDAR))) {
       Calendar.calendarInterface(element);
     }
   });
+
   /**
   * ------------------------------------------------------------------------
   * jQuery

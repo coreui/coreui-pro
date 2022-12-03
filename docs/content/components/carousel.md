@@ -381,4 +381,10 @@ myCarousel.addEventListener('slide.coreui.carousel', event => {
 
 ### SASS Variables
 
+Variables for all carousels:
+
 {{< scss-docs name="carousel-variables" file="scss/_variables.scss" >}}
+
+Variables for the [dark carousel](#dark-variant):
+
+{{< scss-docs name="carousel-dark-variables" file="scss/_variables.scss" >}}

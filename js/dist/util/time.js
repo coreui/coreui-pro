@@ -13,15 +13,12 @@
     if (abbr === 'am' && hour === 12) {
       return 0;
     }
-
     if (abbr === 'am') {
       return hour;
     }
-
     if (abbr === 'pm' && hour === 12) {
       return 12;
     }
-
     return hour + 12;
   };
   const convert24hTo12h = hour => hour % 12 || 12;
@@ -30,11 +27,9 @@
     if (date.toLocaleTimeString(locale).includes('AM')) {
       return 'am';
     }
-
     if (date.toLocaleTimeString(locale).includes('PM')) {
       return 'pm';
     }
-
     return date.getHours() >= 12 ? 'pm' : 'am';
   };
   const getListOfHours = locale => Array.from({

@@ -22,6 +22,7 @@
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
+
   /**
   * ------------------------------------------------------------------------
   * Constants
@@ -50,6 +51,7 @@
     disabled: 'boolean',
     footer: 'boolean'
   };
+
   /**
   * ------------------------------------------------------------------------
   * Class Definition
@@ -60,65 +62,55 @@
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
-      this._dropdown = null; //
+      this._dropdown = null;
 
+      //
       this._dropdownEl = null;
       this._dropdownMenuEl = null;
       this._dropdownToggleEl = null;
-
       this._createPicker();
-    } // Getters
-
+    }
+    // Getters
 
     static get Default() {
       return Default;
     }
-
     static get DefaultType() {
       return DefaultType;
     }
-
     static get NAME() {
       return NAME;
     }
-
     _getButtonClasses(classes) {
       if (typeof classes === 'string') {
         return classes.split(' ');
       }
-
       return classes;
-    } // Private
+    }
 
-
+    // Private
     _createDropdown() {
       const dropdownEl = document.createElement('div');
       dropdownEl.classList.add('picker');
       this._dropdownEl = dropdownEl;
       const dropdownToggleEl = document.createElement('div');
       this._dropdownToggleEl = dropdownToggleEl;
-
       if (!this._config.disabled) {
         Manipulator__default.default.setDataAttribute(dropdownToggleEl, 'toggle', 'dropdown');
       }
-
       const dropdownMenuEl = document.createElement('div');
       dropdownMenuEl.classList.add('dropdown-menu');
       this._dropdownMenuEl = dropdownMenuEl;
       dropdownEl.append(dropdownToggleEl, dropdownMenuEl);
-
       this._element.append(dropdownEl);
-
       this._dropdown = new Dropdown__default.default(dropdownToggleEl, {
         autoClose: 'outside'
       });
     }
-
     _createFooter() {
       const footerEl = document.createElement('div');
       footerEl.classList.add('picker-footer');
       footerEl.append(this._createFooterContent());
-
       if (this._config.cancelButton) {
         const cancelButtonEl = document.createElement('button');
         cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
@@ -126,12 +118,10 @@
         cancelButtonEl.innerHTML = this._config.cancelButton;
         cancelButtonEl.addEventListener('click', () => {
           this._dropdown.hide();
-
           EventHandler__default.default.trigger(this._element, EVENT_CANCEL);
         });
         footerEl.append(cancelButtonEl);
       }
-
       if (this._config.confirmButton) {
         const confirmButtonEl = document.createElement('button');
         confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
@@ -142,32 +132,27 @@
         });
         footerEl.append(confirmButtonEl);
       }
-
       this._dropdownMenuEl.append(footerEl);
     }
-
     _createFooterContent() {
       return '';
     }
-
     _createPicker() {
       if (this._config.container === 'dropdown') {
         this._createDropdown();
       }
-
       if (this._config.footer || this._config.timepicker) {
         this._createFooter();
       }
     }
-
     _getConfig(config) {
-      config = { ...this.constructor.Default,
+      config = {
+        ...this.constructor.Default,
         ...Manipulator__default.default.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
       return config;
     }
-
   }
 
   return Picker;

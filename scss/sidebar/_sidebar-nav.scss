@@ -89,14 +89,14 @@
     font-size: var(--#{$prefix}sidebar-nav-icon-font-size);
     color: var(--#{$prefix}sidebar-nav-link-icon-color);
     text-align: center;
-    fill: currentColor;
+    pointer-events: none;
+    fill: currentcolor;
     @include transition(inherit);
 
     &:first-child {
       @include ltr-rtl("margin-left", calc(var(--#{$prefix}sidebar-nav-link-padding-x) * -1));
     }
   }
-
   // stylelint-disable-next-line selector-no-qualifying-type
   svg.nav-icon {
     overflow: hidden; // fix chrome 105+ width issue

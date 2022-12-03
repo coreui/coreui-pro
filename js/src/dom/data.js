@@ -3,7 +3,7 @@
  * CoreUI (v4.4.1): dom/data.js
  * Licensed under MIT (https://coreui.io/license)
  *
- * This component is a modified version of the Bootstrap's dom/data.js
+ * This is a modified version of the Bootstrap's dom/data.js
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
