@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI index.js v4.4.2 (https://coreui.io)
+=======
+  * CoreUI index.js v4.2.5 (https://coreui.io)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +15,11 @@
 
   /**
    * --------------------------------------------------------------------------
+<<<<<<< HEAD
    * CoreUI (v4.4.2): alert.js
+=======
+   * CoreUI (v4.2.5): tab.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/index.js
@@ -279,7 +287,7 @@
   exports.toType = toType;
   exports.triggerTransitionEnd = triggerTransitionEnd;
 
-  Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+  Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 }));
 //# sourceMappingURL=index.js.map

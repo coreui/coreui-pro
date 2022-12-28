@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI v4.4.2 (https://coreui.io)
+=======
+  * CoreUI [object Object] v4.2.5 (https://coreui.io)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -8,7 +12,11 @@ import * as Popper from '@popperjs/core';
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): alert.js
+=======
+ * CoreUI (v4.2.5): tab.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/index.js
@@ -258,7 +266,11 @@ const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): dom/event-handler.js
+=======
+ * CoreUI (v4.2.5): dom/selector-engine.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's dom/event-handler.js
@@ -483,7 +495,11 @@ function hydrateObj(obj, meta = {}) {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): dom/data.js
+=======
+ * CoreUI (v4.2.5): dom/selector-engine.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's dom/data.js
@@ -534,7 +550,11 @@ const Data = {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): dom/manipulator.js
+=======
+ * CoreUI (v4.2.5): dom/selector-engine.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's dom/manipulator.js
@@ -594,7 +614,7 @@ const Manipulator = {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.4): tab.js
+ * CoreUI (v4.2.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/config.js
@@ -649,7 +669,11 @@ class Config {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): alert.js
+=======
+ * CoreUI (v4.2.5): alert.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's base-component.js
@@ -661,7 +685,11 @@ class Config {
  * Constants
  */
 
+<<<<<<< HEAD
 const VERSION = '4.4.2';
+=======
+const VERSION = '4.2.5';
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
 
 /**
  * Class definition
@@ -720,7 +748,11 @@ class BaseComponent extends Config {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): dom/selector-engine.js
+=======
+ * CoreUI (v4.2.5): dom/selector-engine.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's dom/selector-engine.js
@@ -811,7 +843,7 @@ const SelectorEngine = {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.4): tab.js
+ * CoreUI (v4.2.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/component-functions.js
@@ -838,7 +870,11 @@ const enableDismissTrigger = (component, method = 'hide') => {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): alert.js
+=======
+ * CoreUI (v4.2.5): alert.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's alert.js
@@ -915,7 +951,11 @@ defineJQueryPlugin(Alert);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): alert.js
+=======
+ * CoreUI (v4.2.5): alert.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's button.js
@@ -1515,7 +1555,7 @@ defineJQueryPlugin(Calendar);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.4): tab.js
+ * CoreUI (v4.2.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/swipe.js
@@ -1637,7 +1677,11 @@ class Swipe extends Config {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): carousel.js
+=======
+ * CoreUI (v4.2.5): carousel.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's carousel.js
@@ -2012,7 +2056,11 @@ defineJQueryPlugin(Carousel);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): collapse.js
+=======
+ * CoreUI (v4.2.5): collapse.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's collapse.js
@@ -2248,7 +2296,11 @@ defineJQueryPlugin(Collapse);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): dropdown.js
+=======
+ * CoreUI (v4.2.5): dropdown.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's dropdown.js
@@ -2618,8 +2670,16 @@ defineJQueryPlugin(Dropdown);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI PRO (v4.4.2): picker.js
  * License (https://coreui.io/pro/license-new/)
+=======
+ * CoreUI (v4.2.5): tab.js
+ * Licensed under MIT (https://coreui.io/license)
+ *
+ * This is a modified version of the Bootstrap's util/scrollBar.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * --------------------------------------------------------------------------
  */
 
@@ -4167,7 +4227,7 @@ class ScrollBarHelper {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.4): tab.js
+ * CoreUI (v4.2.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/backdrop.js
@@ -4294,7 +4354,7 @@ class Backdrop extends Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.4): tab.js
+ * CoreUI (v4.2.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/focustrap.js
@@ -4395,7 +4455,11 @@ class FocusTrap extends Config {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
   * CoreUI (v4.4.2): modal.js
+=======
+ * CoreUI (v4.2.5): modal.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's modal.js
@@ -4704,6 +4768,7 @@ defineJQueryPlugin(Modal);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI PRO (v4.4.2): multi-select.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
@@ -5416,6 +5481,9 @@ defineJQueryPlugin(MultiSelect);
 /**
  * --------------------------------------------------------------------------
  * CoreUI (v4.4.2): navigation.js
+=======
+ * CoreUI (v4.2.5): navigation.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -5669,7 +5737,11 @@ defineJQueryPlugin(Navigation);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): dropdown.js
+=======
+ * CoreUI (v4.2.5): dropdown.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's offcanvas.js
@@ -5902,7 +5974,11 @@ defineJQueryPlugin(Offcanvas);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): alert.js
+=======
+ * CoreUI (v4.2.5): tab.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/sanitizer.js
@@ -6000,7 +6076,7 @@ function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.4): tab.js
+ * CoreUI (v4.2.5): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/template-factory.js
@@ -6138,7 +6214,11 @@ class TemplateFactory extends Config {
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): tooltip.js
+=======
+ * CoreUI (v4.2.5): tooltip.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tooltip.js
@@ -6652,7 +6732,11 @@ defineJQueryPlugin(Tooltip);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): popover.js
+=======
+ * CoreUI (v4.2.5): popover.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's popover.js
@@ -6735,7 +6819,11 @@ defineJQueryPlugin(Popover);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): scrollspy.js
+=======
+ * CoreUI (v4.2.5): scrollspy.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's scrollspy.js
@@ -6997,7 +7085,11 @@ defineJQueryPlugin(ScrollSpy);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): sidebar.js
+=======
+ * CoreUI (v4.2.5): sidebar.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  * --------------------------------------------------------------------------
  */
@@ -7277,7 +7369,11 @@ defineJQueryPlugin(Sidebar);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): tab.js
+=======
+ * CoreUI (v4.2.5): tab.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's tab.js
@@ -7541,7 +7637,11 @@ defineJQueryPlugin(Tab);
 
 /**
  * --------------------------------------------------------------------------
+<<<<<<< HEAD
  * CoreUI (v4.4.2): toast.js
+=======
+ * CoreUI (v4.2.5): toast.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  * Licensed under MIT (https://coreui.io/license)
  *
  * This component is a modified version of the Bootstrap's toast.js

@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI scrollbar.js v4.4.2 (https://coreui.io)
+=======
+  * CoreUI scrollbar.js v4.2.5 (https://coreui.io)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,14 +13,9 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Scrollbar = factory(global.SelectorEngine, global.Manipulator, global.Index));
 })(this, (function (SelectorEngine, Manipulator, index_js) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.4): tab.js
+   * CoreUI (v4.2.5): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/scrollBar.js
@@ -87,18 +86,18 @@
     _saveInitialAttribute(element, styleProperty) {
       const actualValue = element.style.getPropertyValue(styleProperty);
       if (actualValue) {
-        Manipulator__default.default.setDataAttribute(element, styleProperty, actualValue);
+        Manipulator.setDataAttribute(element, styleProperty, actualValue);
       }
     }
     _resetElementAttributes(selector, styleProperty) {
       const manipulationCallBack = element => {
-        const value = Manipulator__default.default.getDataAttribute(element, styleProperty);
+        const value = Manipulator.getDataAttribute(element, styleProperty);
         // We only want to remove the property if the value is `null`; the value can also be zero
         if (value === null) {
           element.style.removeProperty(styleProperty);
           return;
         }
-        Manipulator__default.default.removeDataAttribute(element, styleProperty);
+        Manipulator.removeDataAttribute(element, styleProperty);
         element.style.setProperty(styleProperty, value);
       };
       this._applyManipulationCallback(selector, manipulationCallBack);
@@ -108,7 +107,7 @@
         callBack(selector);
         return;
       }
-      for (const sel of SelectorEngine__default.default.find(selector, this._element)) {
+      for (const sel of SelectorEngine.find(selector, this._element)) {
         callBack(sel);
       }
     }

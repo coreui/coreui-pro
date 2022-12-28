@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI base-component.js v4.4.2 (https://coreui.io)
+=======
+  * CoreUI base-component.js v4.2.5 (https://coreui.io)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,15 +13,13 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.BaseComponent = factory(global.Data, global.Index, global.EventHandler, global.Config));
 })(this, (function (Data, index_js, EventHandler, Config) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const Data__default = /*#__PURE__*/_interopDefaultLegacy(Data);
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Config__default = /*#__PURE__*/_interopDefaultLegacy(Config);
-
   /**
    * --------------------------------------------------------------------------
+<<<<<<< HEAD
    * CoreUI (v4.4.2): alert.js
+=======
+   * CoreUI (v4.2.5): alert.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -29,13 +31,17 @@
    * Constants
    */
 
+<<<<<<< HEAD
   const VERSION = '4.4.2';
+=======
+  const VERSION = '4.2.5';
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
 
   /**
    * Class definition
    */
 
-  class BaseComponent extends Config__default.default {
+  class BaseComponent extends Config {
     constructor(element, config) {
       super();
       element = index_js.getElement(element);
@@ -44,13 +50,13 @@
       }
       this._element = element;
       this._config = this._getConfig(config);
-      Data__default.default.set(this._element, this.constructor.DATA_KEY, this);
+      Data.set(this._element, this.constructor.DATA_KEY, this);
     }
 
     // Public
     dispose() {
-      Data__default.default.remove(this._element, this.constructor.DATA_KEY);
-      EventHandler__default.default.off(this._element, this.constructor.EVENT_KEY);
+      Data.remove(this._element, this.constructor.DATA_KEY);
+      EventHandler.off(this._element, this.constructor.EVENT_KEY);
       for (const propertyName of Object.getOwnPropertyNames(this)) {
         this[propertyName] = null;
       }
@@ -67,7 +73,7 @@
 
     // Static
     static getInstance(element) {
-      return Data__default.default.get(index_js.getElement(element), this.DATA_KEY);
+      return Data.get(index_js.getElement(element), this.DATA_KEY);
     }
     static getOrCreateInstance(element, config = {}) {
       return this.getInstance(element) || new this(element, typeof config === 'object' ? config : null);

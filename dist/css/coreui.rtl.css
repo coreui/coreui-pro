@@ -1,5 +1,6 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
  * @version v4.4.2
  * @link https://coreui.io/pro/
@@ -12,6 +13,20 @@
  * @link https://coreui.io/pro/
  * Copyright (c) 2021 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
+=======
+ * CoreUI - HTML, CSS, and JavaScript UI Components Library
+ * @version v4.2.5
+ * @link https://coreui.io/
+ * Copyright (c) 2022 creativeLabs Łukasz Holeczek
+ * License MIT  (https://coreui.io/license/)
+*/
+/*!
+ * CoreUI - HTML, CSS, and JavaScript UI Components Library
+ * @version v4.2.5
+ * @link https://coreui.io/
+ * Copyright (c) 2022 creativeLabs Łukasz Holeczek
+ * License MIT  (https://coreui.io/license/)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
  */
 :root {
   --cui-blue: #0d6efd;
@@ -81,6 +96,13 @@
   --cui-link-hover-color: #2819af;
   --cui-code-color: #d63384;
   --cui-highlight-bg: #fff3cd;
+  --cui-breakpoint-xs: 0;
+  --cui-breakpoint-sm: 576px;
+  --cui-breakpoint-md: 768px;
+  --cui-breakpoint-lg: 992px;
+  --cui-breakpoint-xl: 1200px;
+  --cui-breakpoint-xxl: 1400px;
+  --cui--mobile-breakpoint: md;
 }
 
 *,

@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI tab.js v4.4.2 (https://coreui.io)
+=======
+  * CoreUI tab.js v4.2.5 (https://coreui.io)
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,15 +13,13 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Tab = factory(global.Index, global.EventHandler, global.SelectorEngine, global.BaseComponent));
 })(this, (function (index_js, EventHandler, SelectorEngine, BaseComponent) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
-
   /**
    * --------------------------------------------------------------------------
+<<<<<<< HEAD
    * CoreUI (v4.4.2): tab.js
+=======
+   * CoreUI (v4.2.5): tab.js
+>>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -61,7 +63,7 @@
    * Class definition
    */
 
-  class Tab extends BaseComponent__default.default {
+  class Tab extends BaseComponent {
     constructor(element) {
       super(element);
       this._parent = this._element.closest(SELECTOR_TAB_PANEL);
@@ -73,7 +75,7 @@
 
       // Set up initial aria attributes
       this._setInitialAttributes(this._parent, this._getChildren());
-      EventHandler__default.default.on(this._element, EVENT_KEYDOWN, event => this._keydown(event));
+      EventHandler.on(this._element, EVENT_KEYDOWN, event => this._keydown(event));
     }
 
     // Getters
@@ -91,10 +93,10 @@
 
       // Search for active tab on same parent to deactivate it
       const active = this._getActiveElem();
-      const hideEvent = active ? EventHandler__default.default.trigger(active, EVENT_HIDE, {
+      const hideEvent = active ? EventHandler.trigger(active, EVENT_HIDE, {
         relatedTarget: innerElem
       }) : null;
-      const showEvent = EventHandler__default.default.trigger(innerElem, EVENT_SHOW, {
+      const showEvent = EventHandler.trigger(innerElem, EVENT_SHOW, {
         relatedTarget: active
       });
       if (showEvent.defaultPrevented || hideEvent && hideEvent.defaultPrevented) {
@@ -110,7 +112,7 @@
         return;
       }
       element.classList.add(CLASS_NAME_ACTIVE);
-      this._activate(SelectorEngine__default.default.getElementFromSelector(element)); // Search and activate/show the proper section
+      this._activate(SelectorEngine.getElementFromSelector(element)); // Search and activate/show the proper section
 
       const complete = () => {
         if (element.getAttribute('role') !== 'tab') {
@@ -120,7 +122,7 @@
         element.removeAttribute('tabindex');
         element.setAttribute('aria-selected', true);
         this._toggleDropDown(element, true);
-        EventHandler__default.default.trigger(element, EVENT_SHOWN, {
+        EventHandler.trigger(element, EVENT_SHOWN, {
           relatedTarget: relatedElem
         });
       };
@@ -132,7 +134,7 @@
       }
       element.classList.remove(CLASS_NAME_ACTIVE);
       element.blur();
-      this._deactivate(SelectorEngine__default.default.getElementFromSelector(element)); // Search and deactivate the shown section too
+      this._deactivate(SelectorEngine.getElementFromSelector(element)); // Search and deactivate the shown section too
 
       const complete = () => {
         if (element.getAttribute('role') !== 'tab') {
@@ -142,7 +144,7 @@
         element.setAttribute('aria-selected', false);
         element.setAttribute('tabindex', '-1');
         this._toggleDropDown(element, false);
-        EventHandler__default.default.trigger(element, EVENT_HIDDEN, {
+        EventHandler.trigger(element, EVENT_HIDDEN, {
           relatedTarget: relatedElem
         });
       };
@@ -165,7 +167,7 @@
     }
     _getChildren() {
       // collection of inner elements
-      return SelectorEngine__default.default.find(SELECTOR_INNER_ELEM, this._parent);
+      return SelectorEngine.find(SELECTOR_INNER_ELEM, this._parent);
     }
     _getActiveElem() {
       return this._getChildren().find(child => this._elemIsActive(child)) || null;
@@ -193,7 +195,7 @@
       this._setInitialAttributesOnTargetPanel(child);
     }
     _setInitialAttributesOnTargetPanel(child) {
-      const target = SelectorEngine__default.default.getElementFromSelector(child);
+      const target = SelectorEngine.getElementFromSelector(child);
       if (!target) {
         return;
       }
@@ -208,7 +210,7 @@
         return;
       }
       const toggle = (selector, className) => {
-        const element = SelectorEngine__default.default.findOne(selector, outerElem);
+        const element = SelectorEngine.findOne(selector, outerElem);
         if (element) {
           element.classList.toggle(className, open);
         }
@@ -228,7 +230,7 @@
 
     // Try to get the inner element (usually the .nav-link)
     _getInnerElement(elem) {
-      return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine__default.default.findOne(SELECTOR_INNER_ELEM, elem);
+      return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine.findOne(SELECTOR_INNER_ELEM, elem);
     }
 
     // Try to get the outer element (usually the .nav-item)
@@ -255,7 +257,7 @@
    * Data API implementation
    */
 
-  EventHandler__default.default.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
+  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
     if (['A', 'AREA'].includes(this.tagName)) {
       event.preventDefault();
     }
@@ -268,8 +270,8 @@
   /**
    * Initialize on focus
    */
-  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    for (const element of SelectorEngine__default.default.find(SELECTOR_DATA_TOGGLE_ACTIVE)) {
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE_ACTIVE)) {
       Tab.getOrCreateInstance(element);
     }
   });
