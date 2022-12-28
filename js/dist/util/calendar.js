@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v4.4.2 (https://coreui.io)
+  * CoreUI calendar.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -209,7 +209,7 @@
   exports.isToday = isToday;
   exports.isValidDate = isValidDate;
 
-  Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+  Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
 }));
 //# sourceMappingURL=calendar.js.map

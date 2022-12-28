@@ -1,5 +1,5 @@
 /*!
-  * CoreUI loading-button.js v4.4.2 (https://coreui.io)
+  * CoreUI loading-button.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,16 +9,9 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.index, global.Data, global.EventHandler, global.Manipulator, global.BaseComponent));
 })(this, (function (index, Data, EventHandler, Manipulator, BaseComponent) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const Data__default = /*#__PURE__*/_interopDefaultLegacy(Data);
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-  const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.2): loading-button.js
+   * CoreUI PRO (v4.4.3): loading-button.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -55,7 +48,7 @@
    * ------------------------------------------------------------------------
    */
 
-  class LoadingButton extends BaseComponent__default.default {
+  class LoadingButton extends BaseComponent {
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
@@ -63,7 +56,7 @@
       this._spinner = null;
       this._state = 'idle';
       if (this._element) {
-        Data__default.default.set(element, DATA_KEY, this);
+        Data.set(element, DATA_KEY, this);
       }
     }
 
@@ -90,7 +83,7 @@
         this._state = 'loading';
         setTimeout(() => {
           this._element.classList.add(CLASS_NAME_IS_LOADING);
-          EventHandler__default.default.trigger(this._element, EVENT_START);
+          EventHandler.trigger(this._element, EVENT_START);
           if (this._config.disabledOnLoading) {
             this._element.setAttribute('disabled', true);
           }
@@ -110,7 +103,7 @@
         if (this._config.disabledOnLoading) {
           this._element.removeAttribute('disabled');
         }
-        EventHandler__default.default.trigger(this._element, EVENT_STOP);
+        EventHandler.trigger(this._element, EVENT_STOP);
       };
       if (this._spinner) {
         this._queueCallback(stoped, this._spinner, true);
@@ -119,13 +112,13 @@
       stoped();
     }
     dispose() {
-      Data__default.default.removeData(this._element, DATA_KEY);
+      Data.removeData(this._element, DATA_KEY);
       this._element = null;
     }
     _getConfig(config) {
       config = {
         ...Default,
-        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...Manipulator.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
       return config;

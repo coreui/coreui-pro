@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v4.4.2 (https://coreui.io)
+  * CoreUI calendar.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -8,12 +8,6 @@
   typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './util/calendar', './base-component'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.index, global.EventHandler, global.Manipulator, global.calendar, global.BaseComponent));
 })(this, (function (index, EventHandler, Manipulator, calendar, BaseComponent) { 'use strict';
-
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-  const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
 
   /* eslint-disable indent, multiline-ternary */
 
@@ -72,7 +66,7 @@
   * ------------------------------------------------------------------------
   */
 
-  class Calendar extends BaseComponent__default.default {
+  class Calendar extends BaseComponent {
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
@@ -99,63 +93,63 @@
 
     // Private
     _addEventListeners() {
-      EventHandler__default.default.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
+      EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
         if (event.target.classList.contains('day')) {
-          this._selectDate(Manipulator__default.default.getDataAttribute(event.target, 'date'));
+          this._selectDate(Manipulator.getDataAttribute(event.target, 'date'));
         }
         if (event.target.classList.contains('month')) {
-          this._setCalendarDate(new Date(this._calendarDate.getFullYear(), Manipulator__default.default.getDataAttribute(event.target, 'month'), 1));
+          this._setCalendarDate(new Date(this._calendarDate.getFullYear(), Manipulator.getDataAttribute(event.target, 'month'), 1));
           this._view = 'days';
         }
         if (event.target.classList.contains('year')) {
-          this._calendarDate = new Date(Manipulator__default.default.getDataAttribute(event.target, 'year'), this._calendarDate.getMonth(), 1);
+          this._calendarDate = new Date(Manipulator.getDataAttribute(event.target, 'year'), this._calendarDate.getMonth(), 1);
           this._view = 'months';
         }
         this._updateCalendar();
       });
-      EventHandler__default.default.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_INNER, event => {
+      EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
         if (event.target.parentElement.classList.contains('disabled')) {
           return;
         }
-        this._hoverDate = new Date(Manipulator__default.default.getDataAttribute(event.target, 'date'));
-        EventHandler__default.default.trigger(this._element, EVENT_CELL_HOVER, {
-          date: new Date(Manipulator__default.default.getDataAttribute(event.target, 'date'))
+        this._hoverDate = new Date(Manipulator.getDataAttribute(event.target, 'date'));
+        EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+          date: new Date(Manipulator.getDataAttribute(event.target, 'date'))
         });
       });
-      EventHandler__default.default.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_CELL_INNER, event => {
+      EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
         this._hoverDate = null;
-        EventHandler__default.default.trigger(this._element, EVENT_CELL_HOVER, {
+        EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
           date: null
         });
       });
 
       // Navigation
-      EventHandler__default.default.on(this._element, 'click', '.btn-prev', event => {
+      EventHandler.on(this._element, 'click', '.btn-prev', event => {
         event.preventDefault();
         this._modifyCalendarDate(0, -1);
       });
-      EventHandler__default.default.on(this._element, 'click', '.btn-double-prev', event => {
+      EventHandler.on(this._element, 'click', '.btn-double-prev', event => {
         event.preventDefault();
         this._modifyCalendarDate(this._view === 'years' ? -10 : -1);
       });
-      EventHandler__default.default.on(this._element, 'click', '.btn-next', event => {
+      EventHandler.on(this._element, 'click', '.btn-next', event => {
         event.preventDefault();
         this._modifyCalendarDate(0, 1);
       });
-      EventHandler__default.default.on(this._element, 'click', '.btn-double-next', event => {
+      EventHandler.on(this._element, 'click', '.btn-double-next', event => {
         event.preventDefault();
         this._modifyCalendarDate(this._view === 'years' ? 10 : 1);
       });
-      EventHandler__default.default.on(this._element, 'click', '.btn-month', event => {
+      EventHandler.on(this._element, 'click', '.btn-month', event => {
         event.preventDefault();
         this._view = 'months';
         this._element.innerHTML = '';
         this._createCalendarPanel();
       });
-      EventHandler__default.default.on(this._element, 'click', '.btn-year', event => {
+      EventHandler.on(this._element, 'click', '.btn-year', event => {
         event.preventDefault();
         this._view = 'years';
         this._element.innerHTML = '';
@@ -164,7 +158,7 @@
     }
     _setCalendarDate(date) {
       this._calendarDate = date;
-      EventHandler__default.default.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
         date
       });
     }
@@ -180,7 +174,7 @@
       }
       this._calendarDate = d;
       if (this._view === 'days') {
-        EventHandler__default.default.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+        EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
           date: d
         });
       }
@@ -188,14 +182,14 @@
     }
     _setEndDate(date, selectEndDate = false) {
       this._endDate = new Date(date);
-      EventHandler__default.default.trigger(this._element, EVENT_END_DATE_CHANGE, {
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
         date: this._endDate,
         selectEndDate
       });
     }
     _setStartDate(date, selectEndDate = true) {
       this._startDate = new Date(date);
-      EventHandler__default.default.trigger(this._element, EVENT_START_DATE_CHANGE, {
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
         date: this._startDate,
         selectEndDate
       });
@@ -350,7 +344,7 @@
     _getConfig(config) {
       config = {
         ...this.constructor.Default,
-        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...Manipulator.getDataAttributes(this._element),
         ...config
       };
       return config;
@@ -387,7 +381,7 @@
   * ------------------------------------------------------------------------
   */
 
-  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     for (const element of Array.from(document.querySelectorAll(SELECTOR_CALENDAR))) {
       Calendar.calendarInterface(element);
     }

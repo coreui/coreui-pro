@@ -1,9 +1,5 @@
 /*!
-<<<<<<< HEAD
-  * CoreUI backdrop.js v4.4.2 (https://coreui.io)
-=======
-  * CoreUI backdrop.js v4.2.5 (https://coreui.io)
->>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
+  * CoreUI backdrop.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */

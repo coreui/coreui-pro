@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.4.2 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,18 +9,9 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["date-fns"], global.index, global.EventHandler, global.Manipulator, global.SelectorEngine, global.calendar, global.Calendar, global.Picker, global.TimePicker));
 })(this, (function (dateFns, index, EventHandler, Manipulator, SelectorEngine, calendar, Calendar, Picker, TimePicker) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-  const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  const Calendar__default = /*#__PURE__*/_interopDefaultLegacy(Calendar);
-  const Picker__default = /*#__PURE__*/_interopDefaultLegacy(Picker);
-  const TimePicker__default = /*#__PURE__*/_interopDefaultLegacy(TimePicker);
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.2): date-range-picker.js
+   * CoreUI PRO (v4.4.3): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -40,7 +31,7 @@
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]';
   const Default = {
-    ...Picker__default.default.Default,
+    ...Picker.Default,
     calendars: 2,
     cleaner: true,
     calendarDate: null,
@@ -69,7 +60,7 @@
     valid: false
   };
   const DefaultType = {
-    ...Picker__default.default.DefaultType,
+    ...Picker.DefaultType,
     calendars: 'number',
     cleaner: 'boolean',
     calendarDate: '(date|string|null)',
@@ -104,7 +95,7 @@
   * ------------------------------------------------------------------------
   */
 
-  class DateRangePicker extends Picker__default.default {
+  class DateRangePicker extends Picker {
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
@@ -198,16 +189,16 @@
 
     // Private
     _addEventListeners() {
-      EventHandler__default.default.on(this._element, 'shown.coreui.dropdown', () => {
+      EventHandler.on(this._element, 'shown.coreui.dropdown', () => {
         this._initialStartDate = new Date(this._startDate);
         this._initialEndDate = new Date(this._endDate);
       });
-      EventHandler__default.default.on(this._startInput, 'click', () => {
+      EventHandler.on(this._startInput, 'click', () => {
         this._dropdown.show();
         this._selectEndDate = false;
         this._updateCalendars();
       });
-      EventHandler__default.default.on(this._startInput, 'input', event => {
+      EventHandler.on(this._startInput, 'input', event => {
         const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
         if (date instanceof Date && date.getTime()) {
           this._startDate = date;
@@ -215,12 +206,12 @@
           this._updateCalendars();
         }
       });
-      EventHandler__default.default.on(this._endInput, 'click', () => {
+      EventHandler.on(this._endInput, 'click', () => {
         this._dropdown.show();
         this._selectEndDate = true;
         this._updateCalendars();
       });
-      EventHandler__default.default.on(this._endInput, 'input', event => {
+      EventHandler.on(this._endInput, 'input', event => {
         const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
         if (date instanceof Date && date.getTime()) {
           this._endDate = date;
@@ -228,20 +219,20 @@
           this._updateCalendars();
         }
       });
-      EventHandler__default.default.on(this._element, 'click', '.picker-input-group-cleaner', event => {
+      EventHandler.on(this._element, 'click', '.picker-input-group-cleaner', event => {
         event.stopPropagation();
         this.clear();
       });
-      EventHandler__default.default.on(this._element, 'onCancelClick.coreui.picker', () => {
+      EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
         this.cancel();
       });
-      EventHandler__default.default.on(window, 'resize', () => {
+      EventHandler.on(window, 'resize', () => {
         this._mobile = window.innerWidth < 768;
       });
     }
     _addCalendarEventListeners() {
-      for (const calendar of SelectorEngine__default.default.find('.calendar', this._element)) {
-        EventHandler__default.default.on(calendar, 'startDateChange.coreui.calendar', event => {
+      for (const calendar of SelectorEngine.find('.calendar', this._element)) {
+        EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._startDate = event.date;
           this._selectEndDate = event.selectEndDate;
           this._startInput.value = this._setInputValue(event.date);
@@ -249,12 +240,12 @@
           if (!this._config.range && !this._config.footer && !this._config.timepicker) {
             this._dropdown.hide();
           }
-          EventHandler__default.default.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
             date: event.date,
             formatedDate: event.date ? this._formatDate(event.date) : undefined
           });
         });
-        EventHandler__default.default.on(calendar, 'endDateChange.coreui.calendar', event => {
+        EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
           this._endDate = event.date;
           this._selectEndDate = event.selectEndDate;
           this._endInput.value = this._setInputValue(event.date);
@@ -262,12 +253,12 @@
           if (this._startDate && !this._config.footer && !this._config.timepicker) {
             this._dropdown.hide();
           }
-          EventHandler__default.default.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
             date: event.date,
             formatedDate: event.date ? this._formatDate(event.date) : undefined
           });
         });
-        EventHandler__default.default.on(calendar, 'cellHover.coreui.calendar', event => {
+        EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
           if (this._selectEndDate) {
             this._endInput.value = event.date ? this._formatDate(event.date) : '';
             return;
@@ -337,7 +328,7 @@
       this._calendars.append(calendarEl);
 
       // eslint-disable-next-line no-new
-      new Calendar__default.default(calendarEl, {
+      new Calendar(calendarEl, {
         calendarDate: new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth(), 1),
         calendars: this._config.calendars,
         disabledDates: this._config.disabledDates,
@@ -350,7 +341,7 @@
         selectEndDate: this._selectEndDate,
         startDate: this._startDate
       });
-      EventHandler__default.default.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
+      EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
         this._calendarDate = new Date(event.date.getFullYear(), event.date.getMonth(), 1);
         this._updateCalendars();
       });
@@ -360,7 +351,7 @@
           timePickerStartEl.classList.add('time-picker');
 
           // eslint-disable-next-line no-new
-          new TimePicker__default.default(timePickerStartEl, {
+          new TimePicker(timePickerStartEl, {
             container: 'inline',
             disabled: !this._startDate,
             locale: this._config.locale,
@@ -368,7 +359,7 @@
             variant: 'select'
           });
           calendarEl.append(timePickerStartEl);
-          EventHandler__default.default.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
+          EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
             this._startDate = event.date;
             this._startInput.value = this._setInputValue(this._startDate);
             this._updateCalendars();
@@ -377,7 +368,7 @@
           timePickerEndEl.classList.add('time-picker');
 
           // eslint-disable-next-line no-new
-          new TimePicker__default.default(timePickerEndEl, {
+          new TimePicker(timePickerEndEl, {
             container: 'inline',
             disabled: !this._endDate,
             locale: this._config.locale,
@@ -385,7 +376,7 @@
             variant: 'select'
           });
           this._timepickers.append(timePickerEndEl);
-          EventHandler__default.default.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
+          EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
             this._endDate = event.date;
             this._endInput.value = this._setInputValue(this._endDate);
             this._updateCalendars();
@@ -399,7 +390,7 @@
             timePickerEl.classList.add('time-picker');
 
             // eslint-disable-next-line no-new
-            new TimePicker__default.default(timePickerEl, {
+            new TimePicker(timePickerEl, {
               container: 'inline',
               disabled: index === 0 ? !this._startDate : !this._endDate,
               locale: this._config.locale,
@@ -407,7 +398,7 @@
               variant: 'select'
             });
             this._timepickers.append(timePickerEl);
-            EventHandler__default.default.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
+            EventHandler.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
               if (index === 0) {
                 this._startDate = event.date;
                 this._startInput.value = this._setInputValue(this._startDate);
@@ -506,7 +497,7 @@
     _getConfig(config) {
       config = {
         ...this.constructor.Default,
-        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...Manipulator.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
       return config;
@@ -552,8 +543,8 @@
   * ------------------------------------------------------------------------
   */
 
-  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    const dateRangePickers = SelectorEngine__default.default.find(SELECTOR_DATA_TOGGLE);
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+    const dateRangePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
     for (let i = 0, len = dateRangePickers.length; i < len; i++) {
       DateRangePicker.dateRangePickerInterface(dateRangePickers[i]);
     }

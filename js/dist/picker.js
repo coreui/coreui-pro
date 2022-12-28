@@ -1,5 +1,5 @@
 /*!
-  * CoreUI picker.js v4.4.2 (https://coreui.io)
+  * CoreUI picker.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,16 +9,9 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Picker = factory(global.EventHandler, global.Manipulator, global.BaseComponent, global.Dropdown));
 })(this, (function (EventHandler, Manipulator, BaseComponent, Dropdown) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-  const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
-  const Dropdown__default = /*#__PURE__*/_interopDefaultLegacy(Dropdown);
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.2): picker.js
+   * CoreUI PRO (v4.4.3): picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -58,7 +51,7 @@
   * ------------------------------------------------------------------------
   */
 
-  class Picker extends BaseComponent__default.default {
+  class Picker extends BaseComponent {
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
@@ -96,14 +89,14 @@
       const dropdownToggleEl = document.createElement('div');
       this._dropdownToggleEl = dropdownToggleEl;
       if (!this._config.disabled) {
-        Manipulator__default.default.setDataAttribute(dropdownToggleEl, 'toggle', 'dropdown');
+        Manipulator.setDataAttribute(dropdownToggleEl, 'toggle', 'dropdown');
       }
       const dropdownMenuEl = document.createElement('div');
       dropdownMenuEl.classList.add('dropdown-menu');
       this._dropdownMenuEl = dropdownMenuEl;
       dropdownEl.append(dropdownToggleEl, dropdownMenuEl);
       this._element.append(dropdownEl);
-      this._dropdown = new Dropdown__default.default(dropdownToggleEl, {
+      this._dropdown = new Dropdown(dropdownToggleEl, {
         autoClose: 'outside'
       });
     }
@@ -118,7 +111,7 @@
         cancelButtonEl.innerHTML = this._config.cancelButton;
         cancelButtonEl.addEventListener('click', () => {
           this._dropdown.hide();
-          EventHandler__default.default.trigger(this._element, EVENT_CANCEL);
+          EventHandler.trigger(this._element, EVENT_CANCEL);
         });
         footerEl.append(cancelButtonEl);
       }
@@ -148,7 +141,7 @@
     _getConfig(config) {
       config = {
         ...this.constructor.Default,
-        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...Manipulator.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
       return config;

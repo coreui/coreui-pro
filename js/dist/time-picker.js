@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v4.4.2 (https://coreui.io)
+  * CoreUI time-picker.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -8,13 +8,6 @@
   typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/time', './picker'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global.index, global.EventHandler, global.Manipulator, global.SelectorEngine, global.time, global.Picker));
 })(this, (function (index, EventHandler, Manipulator, SelectorEngine, time, Picker) { 'use strict';
-
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-  const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  const Picker__default = /*#__PURE__*/_interopDefaultLegacy(Picker);
 
   /* eslint-disable indent */
 
@@ -32,7 +25,7 @@
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]';
   const Default = {
-    ...Picker__default.default.Default,
+    ...Picker.Default,
     cleaner: true,
     container: 'dropdown',
     disabled: false,
@@ -48,7 +41,7 @@
     variant: 'roll'
   };
   const DefaultType = {
-    ...Picker__default.default.DefaultType,
+    ...Picker.DefaultType,
     cleaner: 'boolean',
     indicator: 'boolean',
     inputReadOnly: 'boolean',
@@ -67,7 +60,7 @@
   * ------------------------------------------------------------------------
   */
 
-  class TimePicker extends Picker__default.default {
+  class TimePicker extends Picker {
     constructor(element, config) {
       super(element);
       this._handleTimeChange = (set, value) => {
@@ -99,7 +92,7 @@
           this._input.value = _date.toLocaleTimeString(this._config.locale);
         }
         this._date = new Date(_date);
-        EventHandler__default.default.trigger(this._element, EVENT_TIME_CHANGE, {
+        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
           timeString: _date.toTimeString(),
           localeTimeString: _date.toLocaleTimeString(),
           date: _date
@@ -179,8 +172,8 @@
     }
     _setUpRolls(initial = false) {
       for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-        for (const element of SelectorEngine__default.default.find(`[data-coreui-${part}]`, this._element)) {
-          if (this._getPartOfTime(part) === Manipulator__default.default.getDataAttribute(element, part)) {
+        for (const element of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
+          if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
             element.classList.add('selected');
             this._scrollTo(element.parentElement, element, initial);
             for (const sibling of element.parentElement.children) {
@@ -195,7 +188,7 @@
     }
     _setUpSelects() {
       for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-        for (const element of SelectorEngine__default.default.find(`select.${part}`, this._element)) {
+        for (const element of SelectorEngine.find(`select.${part}`, this._element)) {
           if (this._getPartOfTime(part)) {
             element.value = this._getPartOfTime(part);
           }
@@ -205,7 +198,7 @@
 
     // Private
     _addEventListeners() {
-      EventHandler__default.default.on(this._element, 'shown.coreui.dropdown', () => {
+      EventHandler.on(this._element, 'shown.coreui.dropdown', () => {
         this._initialDate = new Date(this._date);
         if (this._config.variant === 'roll') {
           this._setUpRolls(true);
@@ -214,7 +207,7 @@
           this._setUpSelects();
         }
       });
-      EventHandler__default.default.on(this._element, 'timeChange.coreui.time-picker', () => {
+      EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
         if (this._config.variant === 'roll') {
           this._setUpRolls();
         }
@@ -222,17 +215,17 @@
           this._setUpSelects();
         }
       });
-      EventHandler__default.default.on(this._element, 'click', '.picker-input-group-cleaner', event => {
+      EventHandler.on(this._element, 'click', '.picker-input-group-cleaner', event => {
         event.stopPropagation();
         this.clear();
       });
-      EventHandler__default.default.on(this._element, 'onCancelClick.coreui.picker', () => {
+      EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
         this.cancel();
       });
-      EventHandler__default.default.on(this._input, 'input', event => {
+      EventHandler.on(this._input, 'input', event => {
         if (time.isValidTime(event.target.value)) {
           this._date = this._convertStringToDate(event.target.value);
-          EventHandler__default.default.trigger(this._element, EVENT_TIME_CHANGE, {
+          EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
             timeString: this._date.toTimeString(),
             localeTimeString: this._date.toLocaleTimeString(),
             date: this._date
@@ -364,7 +357,7 @@
         timePickerRollCellEl.addEventListener('click', () => {
           this._handleTimeChange(part, option.value);
         });
-        Manipulator__default.default.setDataAttribute(timePickerRollCellEl, part, option.value);
+        Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
         timePickerRollColEl.append(timePickerRollCellEl);
       }
       return timePickerRollColEl;
@@ -372,7 +365,7 @@
     _getConfig(config) {
       config = {
         ...this.constructor.Default,
-        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...Manipulator.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
       return config;
@@ -419,8 +412,8 @@
   * ------------------------------------------------------------------------
   */
 
-  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    const timePickers = SelectorEngine__default.default.find(SELECTOR_DATA_TOGGLE);
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+    const timePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
     for (let i = 0, len = timePickers.length; i < len; i++) {
       TimePicker.timePickerInterface(timePickers[i]);
     }

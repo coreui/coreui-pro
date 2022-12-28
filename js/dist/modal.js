@@ -1,9 +1,5 @@
 /*!
-<<<<<<< HEAD
-  * CoreUI modal.js v4.4.2 (https://coreui.io)
-=======
-  * CoreUI modal.js v4.2.5 (https://coreui.io)
->>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
+  * CoreUI modal.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -15,11 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-<<<<<<< HEAD
-    * CoreUI (v4.4.2): modal.js
-=======
-   * CoreUI (v4.2.5): modal.js
->>>>>>> bf05e3beac6e087e153ec3355ba0f3fae72a2023
+    * CoreUI (v4.4.3): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js

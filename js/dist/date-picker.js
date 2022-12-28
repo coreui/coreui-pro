@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-picker.js v4.4.2 (https://coreui.io)
+  * CoreUI date-picker.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,15 +9,9 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DatePicker = factory(global.index, global.EventHandler, global.SelectorEngine, global.DateRangePicker));
 })(this, (function (index, EventHandler, SelectorEngine, DateRangePicker) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  const DateRangePicker__default = /*#__PURE__*/_interopDefaultLegacy(DateRangePicker);
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.2): date-picker.js
+   * CoreUI PRO (v4.4.3): date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -36,14 +30,14 @@
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]';
   const Default = {
-    ...DateRangePicker__default.default.Default,
+    ...DateRangePicker.Default,
     calendars: 1,
     placeholder: ['Select date'],
     range: false,
     separator: false
   };
   const DefaultType = {
-    ...DateRangePicker__default.default.DefaultType,
+    ...DateRangePicker.DefaultType,
     date: '(date|string|null)'
   };
 
@@ -53,7 +47,7 @@
   * ------------------------------------------------------------------------
   */
 
-  class DatePicker extends DateRangePicker__default.default {
+  class DatePicker extends DateRangePicker {
     // Getters
 
     static get Default() {
@@ -70,13 +64,13 @@
 
     _addCalendarEventListeners() {
       super._addCalendarEventListeners();
-      for (const calendar of SelectorEngine__default.default.find('.calendar', this._element)) {
-        EventHandler__default.default.on(calendar, 'startDateChange.coreui.calendar', event => {
+      for (const calendar of SelectorEngine.find('.calendar', this._element)) {
+        EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._startDate = event.date;
           this._selectEndDate = event.selectEndDate;
           this._startInput.value = this._setInputValue(event.date);
           this._updateCalendars();
-          EventHandler__default.default.trigger(this._element, EVENT_DATE_CHANGE, {
+          EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
             date: event.date,
             formatedDate: event.date ? this._formatDate(event.date) : undefined
           });
@@ -115,8 +109,8 @@
   * ------------------------------------------------------------------------
   */
 
-  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    const datePickers = SelectorEngine__default.default.find(SELECTOR_DATA_TOGGLE);
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+    const datePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
     for (let i = 0, len = datePickers.length; i < len; i++) {
       DatePicker.datePickerInterface(datePickers[i]);
     }

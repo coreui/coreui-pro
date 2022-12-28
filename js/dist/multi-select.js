@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v4.4.2 (https://coreui.io)
+  * CoreUI multi-select.js v4.4.3 (https://coreui.io)
   * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -9,17 +9,9 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global.index, global.Data, global.EventHandler, global.Manipulator, global.SelectorEngine, global.BaseComponent));
 })(this, (function (index, Data, EventHandler, Manipulator, SelectorEngine, BaseComponent) { 'use strict';
 
-  const _interopDefaultLegacy = e => e && typeof e === 'object' && 'default' in e ? e : { default: e };
-
-  const Data__default = /*#__PURE__*/_interopDefaultLegacy(Data);
-  const EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  const Manipulator__default = /*#__PURE__*/_interopDefaultLegacy(Manipulator);
-  const SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  const BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
-
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.2): multi-select.js
+   * CoreUI PRO (v4.4.3): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -118,7 +110,7 @@
    * ------------------------------------------------------------------------
    */
 
-  class MultiSelect extends BaseComponent__default.default {
+  class MultiSelect extends BaseComponent {
     constructor(element, config) {
       super(element, config);
       this._selectAllElement = null;
@@ -135,7 +127,7 @@
       }
       this._createSelect();
       this._addEventListeners();
-      Data__default.default.set(this._element, DATA_KEY, this);
+      Data.set(this._element, DATA_KEY, this);
     }
 
     // Getters
@@ -156,22 +148,22 @@
     // Public
 
     show() {
-      EventHandler__default.default.trigger(this._element, EVENT_SHOW);
+      EventHandler.trigger(this._element, EVENT_SHOW);
       this._clone.classList.add(CLASS_NAME_SHOW);
       if (this._config.search) {
-        SelectorEngine__default.default.findOne(SELECTOR_INPUT, this._clone).focus();
+        SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus();
       }
-      EventHandler__default.default.trigger(this._element, EVENT_SHOWN);
+      EventHandler.trigger(this._element, EVENT_SHOWN);
     }
     hide() {
-      EventHandler__default.default.trigger(this._element, EVENT_HIDE);
+      EventHandler.trigger(this._element, EVENT_HIDE);
       this._clone.classList.remove(CLASS_NAME_SHOW);
-      EventHandler__default.default.trigger(this._element, EVENT_HIDDEN);
+      EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     search(text) {
       this._search = text.length > 0 ? text.toLowerCase() : text;
       this._filterOptionsList();
-      EventHandler__default.default.trigger(this._element, EVENT_SEARCH);
+      EventHandler.trigger(this._element, EVENT_SEARCH);
     }
     update(config) {
       this._config = this._getConfig(config);
@@ -214,49 +206,49 @@
     // Private
 
     _addEventListeners() {
-      EventHandler__default.default.on(this._clone, EVENT_CLICK, () => {
+      EventHandler.on(this._clone, EVENT_CLICK, () => {
         if (!this._config.disabled) {
           this.show();
         }
       });
-      EventHandler__default.default.on(this._searchElement, EVENT_KEYUP, () => {
+      EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
         this._onSearchChange(this._searchElement);
       });
-      EventHandler__default.default.on(this._searchElement, EVENT_KEYDOWN, event => {
+      EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
         const key = event.keyCode || event.charCode;
         if ((key === 8 || key === 46) && event.target.value.length === 0) {
           this._deselectLastOption();
         }
       });
-      EventHandler__default.default.on(this._selectAllElement, EVENT_CLICK, event => {
+      EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
         event.preventDefault();
         event.stopPropagation();
         this.selectAll();
       });
-      EventHandler__default.default.on(this._optionsElement, EVENT_CLICK, event => {
+      EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
         event.preventDefault();
         event.stopPropagation();
         this._onOptionsClick(event.target);
       });
-      EventHandler__default.default.on(this._selectionCleanerElement, EVENT_CLICK, event => {
+      EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
         if (!this._config.disabled) {
           event.preventDefault();
           event.stopPropagation();
           this.deselectAll();
         }
       });
-      EventHandler__default.default.on(this._optionsElement, EVENT_KEYDOWN, event => {
+      EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
         const key = event.keyCode || event.charCode;
         if (key === 13) {
           this._onOptionsClick(event.target);
-          SelectorEngine__default.default.findOne(SELECTOR_INPUT, this._clone).focus();
+          SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus();
         }
       });
     }
     _getConfig(config) {
       config = {
         ...Default,
-        ...Manipulator__default.default.getDataAttributes(this._element),
+        ...Manipulator.getDataAttributes(this._element),
         ...(typeof config === 'object' ? config : {})
       };
       return config;
@@ -459,7 +451,7 @@
       closeBtn.setAttribute('aria-label', 'Close');
       closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>';
       tag.append(closeBtn);
-      EventHandler__default.default.on(closeBtn, EVENT_CLICK, event => {
+      EventHandler.on(closeBtn, EVENT_CLICK, event => {
         if (!this._config.disabled) {
           event.preventDefault();
           event.stopPropagation();
@@ -498,15 +490,15 @@
           text
         });
       }
-      const nativeOption = SelectorEngine__default.default.findOne(`option[value="${value}"]`, this._element);
+      const nativeOption = SelectorEngine.findOne(`option[value="${value}"]`, this._element);
       if (nativeOption) {
         nativeOption.selected = true;
       }
-      const option = SelectorEngine__default.default.findOne(`[data-value="${value}"]`, this._optionsElement);
+      const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
       if (option) {
         option.classList.add(CLASS_NAME_SELECTED);
       }
-      EventHandler__default.default.trigger(this._element, EVENT_CHANGED, {
+      EventHandler.trigger(this._element, EVENT_CHANGED, {
         value: this._selection
       });
       this._updateSelection();
@@ -517,12 +509,12 @@
     _deselectOption(value) {
       const selected = this._selection.filter(e => e.value !== value);
       this._selection = selected;
-      SelectorEngine__default.default.findOne(`option[value="${value}"]`, this._element).selected = false;
-      const option = SelectorEngine__default.default.findOne(`[data-value="${value}"]`, this._optionsElement);
+      SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false;
+      const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
       if (option) {
         option.classList.remove(CLASS_NAME_SELECTED);
       }
-      EventHandler__default.default.trigger(this._element, EVENT_CHANGED, {
+      EventHandler.trigger(this._element, EVENT_CHANGED, {
         value: this._selection
       });
       this._updateSelection();
@@ -537,7 +529,7 @@
       }
     }
     _updateSelection() {
-      const selection = SelectorEngine__default.default.findOne(SELECTOR_SELECTION, this._clone);
+      const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone);
       if (this._config.multiple && this._config.selectionType === 'counter') {
         selection.innerHTML = `${this._selection.length} ${this._config.selectionTypeCounterText}`;
         return;
@@ -561,7 +553,7 @@
       if (!this._config.cleaner || this._selectionCleanerElement === null) {
         return;
       }
-      const selectionCleaner = SelectorEngine__default.default.findOne(SELECTOR_SELECTION_CLEANER, this._clone);
+      const selectionCleaner = SelectorEngine.findOne(SELECTOR_SELECTION_CLEANER, this._clone);
       if (this._selection.length > 0) {
         selectionCleaner.style.removeProperty('display');
         return;
@@ -626,7 +618,7 @@
       return style.display !== 'none';
     }
     _filterOptionsList() {
-      const options = SelectorEngine__default.default.find(SELECTOR_OPTION, this._clone);
+      const options = SelectorEngine.find(SELECTOR_OPTION, this._clone);
       let visibleOptions = 0;
       for (const option of options) {
         // eslint-disable-next-line unicorn/prefer-includes
@@ -639,7 +631,7 @@
         const optgroup = option.closest(SELECTOR_OPTGROUP);
         if (optgroup) {
           // eslint-disable-next-line  unicorn/prefer-array-some
-          if (SelectorEngine__default.default.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
+          if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
             optgroup.style.removeProperty('display');
           } else {
             optgroup.style.display = 'none';
@@ -647,8 +639,8 @@
         }
       }
       if (visibleOptions > 0) {
-        if (SelectorEngine__default.default.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-          SelectorEngine__default.default.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove();
+        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove();
         }
         return;
       }
@@ -656,8 +648,8 @@
         const placeholder = document.createElement('div');
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY);
         placeholder.innerHTML = this._config.searchNoResultsLabel;
-        if (!SelectorEngine__default.default.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-          SelectorEngine__default.default.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder);
+        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder);
         }
       }
     }
@@ -682,9 +674,9 @@
       if (event && (event.button === RIGHT_MOUSE_BUTTON || event.type === 'keyup' && event.key !== TAB_KEY)) {
         return;
       }
-      const selects = SelectorEngine__default.default.find(SELECTOR_SELECT);
+      const selects = SelectorEngine.find(SELECTOR_SELECT);
       for (let i = 0, len = selects.length; i < len; i++) {
-        const context = Data__default.default.get(selects[i], DATA_KEY);
+        const context = Data.get(selects[i], DATA_KEY);
         ({
           relatedTarget: selects[i]
         });
@@ -699,7 +691,7 @@
           continue;
         }
         context._clone.classList.remove(CLASS_NAME_SHOW);
-        EventHandler__default.default.trigger(context._element, EVENT_HIDDEN);
+        EventHandler.trigger(context._element, EVENT_HIDDEN);
       }
     }
   }
@@ -709,15 +701,15 @@
    * Data Api implementation
    * ------------------------------------------------------------------------
    */
-  EventHandler__default.default.on(window, EVENT_LOAD_DATA_API, () => {
-    for (const ms of SelectorEngine__default.default.find(SELECTOR_SELECT)) {
+  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+    for (const ms of SelectorEngine.find(SELECTOR_SELECT)) {
       if (ms.tabIndex !== -1) {
         MultiSelect.multiSelectInterface(ms);
       }
     }
   });
-  EventHandler__default.default.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus);
-  EventHandler__default.default.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus);
+  EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus);
+  EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus);
 
   /**
    * ------------------------------------------------------------------------
