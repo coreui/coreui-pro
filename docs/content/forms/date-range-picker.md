@@ -336,6 +336,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | --- | --- |
 | `endDateChange.coreui.date-range-picker` | Callback fired when the end date changed. |
 | `startDateChange.coreui.date-range-picker` | Callback fired when the start date changed. |
+| `clearDate.coreui.date-range-picker` | Callback fired when the date range is cleared. |
 {{< /bs-table >}}
 
 ```js
