@@ -30,6 +30,7 @@ const DATA_API_KEY = '.data-api'
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_CLEAR_DATE = `clearDate${EVENT_KEY}`
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]'
 
@@ -171,6 +172,7 @@ class DateRangePicker extends Picker {
 
     this._createCalendars()
     this._addCalendarEventListeners()
+    EventHandler.trigger(this._element, EVENT_CLEAR_DATE)
   }
 
   reset() {
