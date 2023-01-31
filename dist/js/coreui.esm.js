@@ -1,6 +1,6 @@
 /*!
   * CoreUI [object Object] v4.4.3 (https://coreui.io)
-  * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
 import { parseISO, format } from 'date-fns';
@@ -594,7 +594,7 @@ const Manipulator = {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/config.js
@@ -811,7 +811,7 @@ const SelectorEngine = {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/component-functions.js
@@ -1515,7 +1515,7 @@ defineJQueryPlugin(Calendar);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/swipe.js
@@ -4067,7 +4067,7 @@ defineJQueryPlugin(LoadingButton);
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/scrollBar.js
@@ -4167,7 +4167,7 @@ class ScrollBarHelper {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/backdrop.js
@@ -4294,7 +4294,7 @@ class Backdrop extends Config {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/focustrap.js
@@ -6000,7 +6000,7 @@ function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.2.5): tab.js
+ * CoreUI (v4.2.6): tab.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's util/template-factory.js
