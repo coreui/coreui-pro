@@ -1,6 +1,6 @@
 /*!
   * CoreUI [object Object] v4.4.3 (https://coreui.io)
-  * Copyright 2022 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
 (function (global, factory) {
@@ -616,7 +616,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/config.js
@@ -833,7 +833,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/component-functions.js
@@ -1537,7 +1537,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/swipe.js
@@ -4089,7 +4089,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/scrollBar.js
@@ -4189,7 +4189,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/backdrop.js
@@ -4316,7 +4316,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/focustrap.js
@@ -6022,7 +6022,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.2.5): tab.js
+   * CoreUI (v4.2.6): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/template-factory.js
