@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v4.4.3 (https://coreui.io)
+  * CoreUI multi-select.js v4.4.4 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.3): multi-select.js
+   * CoreUI PRO (v4.4.4): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -406,7 +406,7 @@
       optionsDiv.classList.add(CLASS_NAME_OPTIONS);
       if (this._config.optionsMaxHeight !== 'auto') {
         optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`;
-        optionsDiv.style.overflow = 'scroll';
+        optionsDiv.style.overflow = 'auto';
       }
       dropdownDiv.append(optionsDiv);
       this._clone.append(dropdownDiv);
