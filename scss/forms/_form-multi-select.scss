@@ -120,6 +120,16 @@
   &.is-valid  {
     --#{$prefix}form-multi-select-border-color: #{$form-feedback-valid-color};
   }
+
+  // temporary fix for React.js & Vue.js versions
+  > div:not([class]):first-of-type::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+  }
 }
 
 .form-multi-select-selection-tags {
