@@ -56,7 +56,9 @@ const Default = {
   separator: true,
   size: null,
   startDate: null,
+  selectAdjacementDays: false,
   selectEndDate: false,
+  showAdjacementDays: true,
   timepicker: false,
   todayButton: 'Today',
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
@@ -86,7 +88,9 @@ const DefaultType = {
   separator: 'boolean',
   size: '(string|null)',
   startDate: '(date|string|null)',
+  selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
+  showAdjacementDays: 'boolean',
   timepicker: 'boolean',
   todayButton: '(boolean|string)',
   todayButtonClasses: '(array|string)',
@@ -396,7 +400,9 @@ class DateRangePicker extends Picker {
       maxDate: this._config.maxDate,
       minDate: this._config.minDate,
       range: this._config.range,
+      selectAdjacementDays: this._config.selectAdjacementDays,
       selectEndDate: this._selectEndDate,
+      showAdjacementDays: this._config.showAdjacementDays,
       startDate: this._startDate
     })
 

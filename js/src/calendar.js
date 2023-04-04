@@ -57,8 +57,10 @@ const Default = {
   maxDate: null,
   minDate: null,
   range: true,
-  startDate: null,
+  selectAdjacementDays: false,
   selectEndDate: false,
+  showAdjacementDays: true,
+  startDate: null,
   weekdayFormat: 2
 }
 
@@ -72,8 +74,10 @@ const DefaultType = {
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
   range: 'boolean',
-  startDate: '(date|string|null)',
+  selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
+  showAdjacementDays: 'boolean',
+  startDate: '(date|string|null)',
   weekdayFormat: '(number|string)'
 }
 
@@ -116,7 +120,23 @@ class Calendar extends BaseComponent {
   _addEventListeners() {
     EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
       event.preventDefault()
+      if (event.target.parentElement.classList.contains('disabled')) {
+        return
+      }
+
+      if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
+        return
+      }
+
       if (event.target.classList.contains('day')) {
+        const date = new Date(Manipulator.getDataAttribute(event.target, 'date'))
+        const calendarIndex = Manipulator.getDataAttribute(event.target.closest('.calendar-panel'), 'calendar-index')
+        if (calendarIndex) {
+          this._setCalendarDate(new Date(date.setMonth(date.getMonth() - calendarIndex)))
+        } else {
+          this._setCalendarDate(date)
+        }
+
         this._selectDate(Manipulator.getDataAttribute(event.target, 'date'))
       }
 
@@ -136,6 +156,10 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_INNER, event => {
       event.preventDefault()
       if (event.target.parentElement.classList.contains('disabled')) {
+        return
+      }
+
+      if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
         return
       }
 
@@ -274,6 +298,8 @@ class Calendar extends BaseComponent {
     const calendarPanelEl = document.createElement('div')
     calendarPanelEl.classList.add('calendar-panel')
 
+    Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', addMonths)
+
     // Create navigation
     const navigationElement = document.createElement('div')
     navigationElement.classList.add('calendar-nav')
@@ -330,11 +356,13 @@ class Calendar extends BaseComponent {
       <tbody>
         ${this._view === 'days' ? monthDetails.map(week => (
           `<tr>${week.map(({ date, month }) => (
-            `<td class="calendar-cell ${this._dayClassNames(date, month)}">
-              <div class="calendar-cell-inner day" data-coreui-date="${date}">
-                ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
-              </div>
-            </td>`
+            month === 'current' || this._config.showAdjacementDays ?
+              `<td class="calendar-cell ${this._dayClassNames(date, month)}">
+                <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                  ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
+                </div>
+              </td>` :
+              '<td></td>'
           )).join('')}</tr>`
         )).join('') : ''}
         ${this._view === 'months' ? listOfMonths.map((row, index) => (
@@ -386,6 +414,7 @@ class Calendar extends BaseComponent {
       today: isToday(date),
       disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
       [month]: true,
+      clickable: month !== 'current' && this._config.selectAdjacementDays,
       last: isLastDayOfMonth(date),
       range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
       'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ?
