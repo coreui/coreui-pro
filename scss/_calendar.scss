@@ -110,11 +110,9 @@
   padding: 1px 0;
   text-align: center;
 
-  &:not(.disabled) .calendar-cell-inner {
+  &:not(.disabled):not(.next):not(.previous):hover .calendar-cell-inner,
+  &.clickable:hover .calendar-cell-inner {
     cursor: pointer;
-  }
-
-  &:hover:not(.disabled) .calendar-cell-inner {
     background-color: var(--#{$prefix}calendar-cell-hover-bg);
   }
 
