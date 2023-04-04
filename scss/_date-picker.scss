@@ -111,10 +111,10 @@
 
     .form-select {
       width: initial;
-      padding-right: .25rem;
-      padding-left: .25rem;
+      padding-right: .25rem !important; // stylelint-disable-line declaration-no-important
+      padding-left: .25rem !important; // stylelint-disable-line declaration-no-important
       text-align: right;
-      background: none;
+      background-image: none !important; // stylelint-disable-line declaration-no-important
       border: 0;
 
       &:disabled {
