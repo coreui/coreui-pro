@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.4.4 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): date-range-picker.js
+   * CoreUI PRO (v4.5.0): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -53,7 +53,9 @@
     separator: true,
     size: null,
     startDate: null,
+    selectAdjacementDays: false,
     selectEndDate: false,
+    showAdjacementDays: true,
     timepicker: false,
     todayButton: 'Today',
     todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
@@ -82,7 +84,9 @@
     separator: 'boolean',
     size: '(string|null)',
     startDate: '(date|string|null)',
+    selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
+    showAdjacementDays: 'boolean',
     timepicker: 'boolean',
     todayButton: '(boolean|string)',
     todayButtonClasses: '(array|string)',
@@ -338,7 +342,9 @@
         maxDate: this._config.maxDate,
         minDate: this._config.minDate,
         range: this._config.range,
+        selectAdjacementDays: this._config.selectAdjacementDays,
         selectEndDate: this._selectEndDate,
+        showAdjacementDays: this._config.showAdjacementDays,
         startDate: this._startDate
       });
       EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {

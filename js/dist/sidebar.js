@@ -1,5 +1,5 @@
 /*!
-  * CoreUI sidebar.js v4.4.4 (https://coreui.io)
+  * CoreUI sidebar.js v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): sidebar.js
+   * CoreUI (v4.5.0): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

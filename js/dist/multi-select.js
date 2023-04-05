@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v4.4.4 (https://coreui.io)
+  * CoreUI multi-select.js v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): multi-select.js
+   * CoreUI PRO (v4.5.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -254,7 +254,7 @@
       return config;
     }
     _getClassNames() {
-      return [...this._element.classList.value.split(' ')];
+      return this._element.classList.value.split(' ');
     }
     _getOptions(node = this._element) {
       if (this._config.options) {
@@ -309,12 +309,7 @@
     }
     _createNativeOptions(parentElement, options) {
       for (const option of options) {
-        if (typeof option.options !== 'undefined') {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = option.label;
-          this._createNativeOptions(optgroup, option.options);
-          parentElement.append(optgroup);
-        } else {
+        if (typeof option.options === 'undefined') {
           const opt = document.createElement('OPTION');
           opt.value = option.value;
           if (option.disabled === true) {
@@ -325,6 +320,11 @@
           }
           opt.innerHTML = option.text;
           parentElement.append(opt);
+        } else {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = option.label;
+          this._createNativeOptions(optgroup, option.options);
+          parentElement.append(optgroup);
         }
       }
     }

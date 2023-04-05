@@ -1,5 +1,5 @@
 /*!
-  * CoreUI [object Object] v4.4.4 (https://coreui.io)
+  * CoreUI [object Object] v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): alert.js
+   * CoreUI (v4.5.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/index.js
@@ -261,7 +261,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): dom/event-handler.js
+   * CoreUI (v4.5.0): dom/event-handler.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's dom/event-handler.js
@@ -486,7 +486,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): dom/data.js
+   * CoreUI (v4.5.0): dom/data.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's dom/data.js
@@ -537,7 +537,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): dom/manipulator.js
+   * CoreUI (v4.5.0): dom/manipulator.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's dom/manipulator.js
@@ -652,7 +652,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): alert.js
+   * CoreUI (v4.5.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's base-component.js
@@ -664,7 +664,7 @@
    * Constants
    */
 
-  const VERSION = '4.4.4';
+  const VERSION = '4.5.0';
 
   /**
    * Class definition
@@ -723,7 +723,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): dom/selector-engine.js
+   * CoreUI (v4.5.0): dom/selector-engine.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's dom/selector-engine.js
@@ -841,7 +841,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): alert.js
+   * CoreUI (v4.5.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's alert.js
@@ -918,7 +918,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): alert.js
+   * CoreUI (v4.5.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's button.js
@@ -1161,8 +1161,10 @@
     maxDate: null,
     minDate: null,
     range: true,
-    startDate: null,
+    selectAdjacementDays: false,
     selectEndDate: false,
+    showAdjacementDays: true,
+    startDate: null,
     weekdayFormat: 2
   };
   const DefaultType$l = {
@@ -1175,8 +1177,10 @@
     maxDate: '(date|string|null)',
     minDate: '(date|string|null)',
     range: 'boolean',
-    startDate: '(date|string|null)',
+    selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
+    showAdjacementDays: 'boolean',
+    startDate: '(date|string|null)',
     weekdayFormat: '(number|string)'
   };
 
@@ -1215,7 +1219,20 @@
     _addEventListeners() {
       EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
+        if (event.target.parentElement.classList.contains('disabled')) {
+          return;
+        }
+        if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
+          return;
+        }
         if (event.target.classList.contains('day')) {
+          const date = new Date(Manipulator.getDataAttribute(event.target, 'date'));
+          const calendarIndex = Manipulator.getDataAttribute(event.target.closest('.calendar-panel'), 'calendar-index');
+          if (calendarIndex) {
+            this._setCalendarDate(new Date(date.setMonth(date.getMonth() - calendarIndex)));
+          } else {
+            this._setCalendarDate(date);
+          }
           this._selectDate(Manipulator.getDataAttribute(event.target, 'date'));
         }
         if (event.target.classList.contains('month')) {
@@ -1231,6 +1248,9 @@
       EventHandler.on(this._element, EVENT_MOUSEENTER$2, SELECTOR_CALENDAR_CELL_INNER, event => {
         event.preventDefault();
         if (event.target.parentElement.classList.contains('disabled')) {
+          return;
+        }
+        if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
           return;
         }
         this._hoverDate = new Date(Manipulator.getDataAttribute(event.target, 'date'));
@@ -1342,6 +1362,7 @@
       const month = date.getMonth();
       const calendarPanelEl = document.createElement('div');
       calendarPanelEl.classList.add('calendar-panel');
+      Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', addMonths);
 
       // Create navigation
       const navigationElement = document.createElement('div');
@@ -1402,13 +1423,13 @@
         ${this._view === 'days' ? monthDetails.map(week => `<tr>${week.map(({
       date,
       month
-    }) => `<td class="calendar-cell ${this._dayClassNames(date, month)}">
-              <div class="calendar-cell-inner day" data-coreui-date="${date}">
-                ${date.toLocaleDateString(this._config.locale, {
+    }) => month === 'current' || this._config.showAdjacementDays ? `<td class="calendar-cell ${this._dayClassNames(date, month)}">
+                <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                  ${date.toLocaleDateString(this._config.locale, {
       day: 'numeric'
     })}
-              </div>
-            </td>`).join('')}</tr>`).join('') : ''}
+                </div>
+              </td>` : '<td></td>').join('')}</tr>`).join('') : ''}
         ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>${row.map((month, idx) => `<td class="calendar-cell">
               <div class="calendar-cell-inner month" data-coreui-month="${index * 3 + idx - addMonths}">
                 ${month}
@@ -1445,6 +1466,7 @@
         today: isToday(date),
         disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
         [month]: true,
+        clickable: month !== 'current' && this._config.selectAdjacementDays,
         last: isLastDayOfMonth(date),
         range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
         'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
@@ -1640,7 +1662,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): carousel.js
+   * CoreUI (v4.5.0): carousel.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's carousel.js
@@ -2015,7 +2037,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): collapse.js
+   * CoreUI (v4.5.0): collapse.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's collapse.js
@@ -6745,7 +6767,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): dropdown.js
+   * CoreUI (v4.5.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's dropdown.js
@@ -7115,7 +7137,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): picker.js
+   * CoreUI PRO (v4.5.0): picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -7739,7 +7761,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): date-range-picker.js
+   * CoreUI PRO (v4.5.0): date-range-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -7781,7 +7803,9 @@
     separator: true,
     size: null,
     startDate: null,
+    selectAdjacementDays: false,
     selectEndDate: false,
+    showAdjacementDays: true,
     timepicker: false,
     todayButton: 'Today',
     todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
@@ -7810,7 +7834,9 @@
     separator: 'boolean',
     size: '(string|null)',
     startDate: '(date|string|null)',
+    selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
+    showAdjacementDays: 'boolean',
     timepicker: 'boolean',
     todayButton: '(boolean|string)',
     todayButtonClasses: '(array|string)',
@@ -8066,7 +8092,9 @@
         maxDate: this._config.maxDate,
         minDate: this._config.minDate,
         range: this._config.range,
+        selectAdjacementDays: this._config.selectAdjacementDays,
         selectEndDate: this._selectEndDate,
+        showAdjacementDays: this._config.showAdjacementDays,
         startDate: this._startDate
       });
       EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
@@ -8289,7 +8317,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): date-picker.js
+   * CoreUI PRO (v4.5.0): date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -8405,7 +8433,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): loading-button.js
+   * CoreUI PRO (v4.5.0): loading-button.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -8892,7 +8920,7 @@
 
   /**
    * --------------------------------------------------------------------------
-    * CoreUI (v4.4.4): modal.js
+    * CoreUI (v4.5.0): modal.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's modal.js
@@ -9201,7 +9229,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.4.4): multi-select.js
+   * CoreUI PRO (v4.5.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
@@ -9444,7 +9472,7 @@
       return config;
     }
     _getClassNames() {
-      return [...this._element.classList.value.split(' ')];
+      return this._element.classList.value.split(' ');
     }
     _getOptions(node = this._element) {
       if (this._config.options) {
@@ -9499,12 +9527,7 @@
     }
     _createNativeOptions(parentElement, options) {
       for (const option of options) {
-        if (typeof option.options !== 'undefined') {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = option.label;
-          this._createNativeOptions(optgroup, option.options);
-          parentElement.append(optgroup);
-        } else {
+        if (typeof option.options === 'undefined') {
           const opt = document.createElement('OPTION');
           opt.value = option.value;
           if (option.disabled === true) {
@@ -9515,6 +9538,11 @@
           }
           opt.innerHTML = option.text;
           parentElement.append(opt);
+        } else {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = option.label;
+          this._createNativeOptions(optgroup, option.options);
+          parentElement.append(optgroup);
         }
       }
     }
@@ -9912,7 +9940,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): navigation.js
+   * CoreUI (v4.5.0): navigation.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -10166,7 +10194,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): dropdown.js
+   * CoreUI (v4.5.0): dropdown.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's offcanvas.js
@@ -10399,7 +10427,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): alert.js
+   * CoreUI (v4.5.0): alert.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This is a modified version of the Bootstrap's util/sanitizer.js
@@ -10635,7 +10663,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): tooltip.js
+   * CoreUI (v4.5.0): tooltip.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tooltip.js
@@ -11149,7 +11177,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): popover.js
+   * CoreUI (v4.5.0): popover.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's popover.js
@@ -11232,7 +11260,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): scrollspy.js
+   * CoreUI (v4.5.0): scrollspy.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's scrollspy.js
@@ -11494,7 +11522,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): sidebar.js
+   * CoreUI (v4.5.0): sidebar.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */
@@ -11774,7 +11802,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): tab.js
+   * CoreUI (v4.5.0): tab.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's tab.js
@@ -12038,7 +12066,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): toast.js
+   * CoreUI (v4.5.0): toast.js
    * Licensed under MIT (https://coreui.io/license)
    *
    * This component is a modified version of the Bootstrap's toast.js
@@ -12224,7 +12252,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI (v4.4.4): index.esm.js
+   * CoreUI (v4.5.0): index.esm.js
    * Licensed under MIT (https://coreui.io/license)
    * --------------------------------------------------------------------------
    */

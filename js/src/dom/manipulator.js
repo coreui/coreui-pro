@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI (v4.4.4): dom/manipulator.js
+ * CoreUI (v4.5.0): dom/manipulator.js
  * Licensed under MIT (https://coreui.io/license)
  *
  * This is a modified version of the Bootstrap's dom/manipulator.js

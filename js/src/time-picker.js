@@ -2,7 +2,7 @@
 /* eslint-disable indent */
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.4.4): time-picker.js
+ * CoreUI PRO (v4.5.0): time-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
