@@ -235,6 +235,8 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `maxDate` | date \| string \| null | `null` | Max selectable date. |
 | `minDate` | date \| string \| null | `null` | Min selectable date. |
 | `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
+| `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
+| `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
 | `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
 | `todayButton` | string | `'Today'` | Today button inner HTML |

@@ -306,7 +306,9 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `placeholder` | string | `['Start date', 'End date']` | Specifies a short hint that is visible in the input. |
 | `ranges` | object | `{}` | Predefined date ranges the user can select from. |
 | `rangesButtonsClasses` | array \| string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
+| `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
 | `separator` | boolean | `true` | Toggle visibility or set the content of the inputs separator. |
+| `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
 | `startDate` | date \| string \| null | `null` | Initial selected date. |
 | `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
