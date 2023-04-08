@@ -1300,6 +1300,140 @@ $form-multi-select-tag-padding-y-sm:             0 !default;
 $form-multi-select-tag-padding-x-sm:             .5rem !default;
 // scss-docs-end form-multi-select-variables
 
+// scss-docs-start form-multi-select-new-variables
+$form-multi-select-new-padding-y:               $input-padding-y !default;
+$form-multi-select-new-padding-x:               $input-padding-x !default;
+$form-multi-select-new-font-family:             $input-font-family !default;
+$form-multi-select-new-font-size:               $input-font-size !default;
+$form-multi-select-new-font-weight:             $input-font-weight !default;
+$form-multi-select-new-line-height:             $input-line-height !default;
+$form-multi-select-new-color:                   $input-color !default;
+$form-multi-select-new-bg:                      $input-bg !default;
+$form-multi-select-new-box-shadow:              $box-shadow-inset !default;
+
+$form-multi-select-new-border-width:            $input-border-width !default;
+$form-multi-select-new-border-color:            $input-border-color !default;
+$form-multi-select-new-border-radius:           $border-radius !default;
+$form-multi-select-new-border-radius-sm:        $border-radius-sm !default;
+$form-multi-select-new-border-radius-lg:        $border-radius-lg !default;
+
+$form-multi-select-new-disabled-color:          $gray-600 !default;
+$form-multi-select-new-disabled-bg:             $gray-200 !default;
+$form-multi-select-new-disabled-border-color:   $gray-400 !default;
+
+$form-multi-select-new-focus-color:             $input-color !default;
+$form-multi-select-new-focus-bg:                $input-bg !default;
+$form-multi-select-new-focus-border-color:      shift-color($component-active-bg, -25%) !default;
+$form-multi-select-new-focus-box-shadow:        $input-btn-focus-box-shadow !default;
+
+$form-multi-select-new-selection-tags-gap:        .25rem !default;
+$form-multi-select-new-selection-tags-padding-y:  .25rem !default;
+$form-multi-select-new-selection-tags-padding-x:  .25rem !default;
+
+$form-multi-select-new-tag-bg:                $light !default;
+$form-multi-select-new-tag-border-width:      $border-width !default;
+$form-multi-select-new-tag-border-color:      $border-color !default;
+$form-multi-select-new-tag-border-radius:     .25rem !default;
+$form-multi-select-new-tag-border-radius-sm:  .125rem !default;
+$form-multi-select-new-tag-border-radius-lg:  .375rem !default;
+$form-multi-select-new-tag-padding-y:         .0625rem !default;
+$form-multi-select-new-tag-padding-x:         .5rem !default;
+
+$form-multi-select-new-cleaner-width:         .75rem !default;
+$form-multi-select-new-cleaner-height:        .75rem !default;
+$form-multi-select-new-cleaner-padding-x:     0 !default;
+$form-multi-select-new-cleaner-padding-y:     .5rem !default;
+$form-multi-select-new-cleaner-color:         $medium-emphasis !default;
+$form-multi-select-new-cleaner-bg:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-new-cleaner-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-new-cleaner-hover-color:   $high-emphasis !default;
+$form-multi-select-new-cleaner-hover-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-new-cleaner-hover-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-new-cleaner-focus-color:   $high-emphasis !default;
+$form-multi-select-new-cleaner-focus-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-new-cleaner-focus-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+// $form-multi-select-new-cleaner-border-color:  $input-border-color !default;
+
+$form-multi-select-new-indicator-width:         .75rem !default;
+$form-multi-select-new-indicator-height:        .75rem !default;
+$form-multi-select-new-indicator-padding-x:     .75rem !default;
+$form-multi-select-new-indicator-padding-y:     .5rem !default;
+$form-multi-select-new-indicator-color:         $medium-emphasis !default;
+$form-multi-select-new-indicator-bg:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-new-indicator-color}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-new-indicator-hover-color:   $high-emphasis !default;
+$form-multi-select-new-indicator-hover-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-new-indicator-hover-color}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-new-indicator-focus-color:   $high-emphasis !default;
+$form-multi-select-new-indicator-focus-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-new-indicator-focus-color}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+
+$form-multi-select-new-dropdown-min-width:      100% !default;
+$form-multi-select-new-dropdown-bg:             $white !default;
+$form-multi-select-new-dropdown-border-color:   $border-color !default;
+$form-multi-select-new-dropdown-border-width:   $border-width !default;
+$form-multi-select-new-dropdown-border-radius:  $border-radius !default;
+
+$form-multi-select-new-select-all-padding-y:     .5rem !default;
+$form-multi-select-new-select-all-padding-x:     .75rem !default;
+$form-multi-select-new-select-all-color:         $medium-emphasis !default;
+$form-multi-select-new-select-all-bg:            transparent !default;
+$form-multi-select-new-select-all-hover-color:   $high-emphasis !default;
+$form-multi-select-new-select-all-hover-bg:      transparent !default;
+$form-multi-select-new-select-all-border-width:  $input-border-width !default;
+$form-multi-select-new-select-all-border-color:  $input-border-color !default;
+
+$form-multi-select-new-options-padding-y:      .5rem !default;
+$form-multi-select-new-options-padding-x:      .75rem !default;
+$form-multi-select-new-options-font-size:      $font-size-base !default;
+$form-multi-select-new-options-color:          $body-color !default;
+
+$form-multi-select-new-optgroup-label-padding-y:       .5rem !default;
+$form-multi-select-new-optgroup-label-padding-x:       .625rem !default;
+$form-multi-select-new-optgroup-label-font-size:       80% !default;
+$form-multi-select-new-optgroup-label-font-weight:     $font-weight-bold !default;
+$form-multi-select-new-optgroup-label-color:           $disabled !default;
+$form-multi-select-new-optgroup-label-text-transform:  uppercase !default;
+
+$form-multi-select-new-option-padding-y:        .5rem !default;
+$form-multi-select-new-option-padding-x:        1.25rem !default;
+$form-multi-select-new-option-margin-y:       1px !default;
+$form-multi-select-new-option-margin-x:       0 !default;
+$form-multi-select-new-option-border-width:     $input-border-width !default;
+$form-multi-select-new-option-border-color:     transparent !default;
+$form-multi-select-new-option-border-radius:    $border-radius !default;
+$form-multi-select-new-option-box-shadow:       $box-shadow-inset !default;
+
+$form-multi-select-new-option-hover-color:      shift-color($gray-900, +5%) !default;
+$form-multi-select-new-option-hover-bg:         rgba($gray-100, .5) !default;
+
+$form-multi-select-new-option-focus-box-shadow: $input-btn-focus-box-shadow !default;
+
+$form-multi-select-new-option-indicator-width:          1em !default;
+$form-multi-select-new-option-indicator-bg:             $form-check-input-bg !default;
+$form-multi-select-new-option-indicator-border:         $form-check-input-border !default;
+$form-multi-select-new-option-indicator-border-radius:  .25em !default;
+
+$form-multi-select-new-option-selected-bg:                      $light !default;
+$form-multi-select-new-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
+$form-multi-select-new-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
+$form-multi-select-new-option-selected-indicator-border-color:  $form-multi-select-new-option-selected-indicator-bg !default;
+
+$form-multi-select-new-option-disabled-color:  $gray-600 !default;
+
+$form-multi-select-new-padding-y-lg:                 $input-padding-y-lg !default;
+$form-multi-select-new-padding-x-lg:                 $input-padding-x-lg !default;
+$form-multi-select-new-font-size-lg:                 $input-font-size-lg !default;
+$form-multi-select-new-selection-tags-gap-lg:        .25rem !default;
+$form-multi-select-new-selection-tags-padding-y-lg:  .25rem !default;
+$form-multi-select-new-selection-tags-padding-x-lg:  .25rem !default;
+$form-multi-select-new-tag-padding-y-lg:             .175rem !default;
+$form-multi-select-new-tag-padding-x-lg:             .5rem !default;
+
+$form-multi-select-new-padding-y-sm:                 $input-padding-y-sm !default;
+$form-multi-select-new-padding-x-sm:                 $input-padding-x-sm !default;
+$form-multi-select-new-font-size-sm:                 $input-font-size-sm !default;
+$form-multi-select-new-selection-tags-gap-sm:        .125rem !default;
+$form-multi-select-new-selection-tags-padding-y-sm:  .0625rem !default;
+$form-multi-select-new-selection-tags-padding-x-sm:  .125rem !default;
+$form-multi-select-new-tag-padding-y-sm:             .075rem !default;
+$form-multi-select-new-tag-padding-x-sm:             .5rem !default;
+// scss-docs-end form-multi-select-new-variables
+
 // scss-docs-start form-range-variables
 $form-range-track-width:          100% !default;
 $form-range-track-height:         .5rem !default;
@@ -1374,6 +1508,7 @@ $form-validation-states: (
 
 // scss-docs-start zindex-stack
 $zindex-dropdown:                   1000 !default;
+$zindex-form-multi-select-new:      1000 !default;
 $zindex-sticky:                     1020 !default;
 $zindex-fixed:                      1030 !default;
 $zindex-sidebar-backdrop:           1030 !default;

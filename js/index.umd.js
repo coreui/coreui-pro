@@ -16,6 +16,7 @@ import Dropdown from './src/dropdown'
 import LoadingButton from './src/loading-button'
 import Modal from './src/modal'
 import MultiSelect from './src/multi-select'
+import MultiSelectNew from './src/multi-select-new'
 import Navigation from './src/navigation'
 import OffCanvas from './src/offcanvas'
 import Popover from './src/popover'
@@ -38,6 +39,7 @@ export default {
   LoadingButton,
   Modal,
   MultiSelect,
+  MultiSelectNew,
   Navigation,
   OffCanvas,
   Popover,
