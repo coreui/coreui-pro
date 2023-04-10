@@ -5,7 +5,8 @@
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin } from './util/index'
+import * as Popper from '@popperjs/core'
+import { defineJQueryPlugin, isRTL } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import Manipulator from './dom/manipulator'
@@ -26,14 +27,14 @@ const DATA_API_KEY = '.data-api'
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2
 
-const SELECTOR_INPUT = '.form-multi-select-search'
+const SELECTOR_CLEANER = '.form-multi-select-cleaner'
 const SELECTOR_OPTGROUP = '.form-multi-select-optgroup'
 const SELECTOR_OPTION = '.form-multi-select-option'
 const SELECTOR_OPTIONS = '.form-multi-select-options'
 const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
+const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_SELECT = '.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
-const SELECTOR_SELECTION_CLEANER = '.form-multi-select-selection-cleaner'
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -43,16 +44,16 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
-const EVENT_SHOWN = `showN${EVENT_KEY}`
+const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
+const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_LABEL = 'label'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
-const CLASS_NAME_SELECT_MULTIPLE = 'form-multi-select-multiple'
-const CLASS_NAME_SELECT_WITH_CLEANER = 'form-multi-select-with-cleaner'
 const CLASS_NAME_SELECT_ALL = 'form-multi-select-all'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
@@ -63,13 +64,11 @@ const CLASS_NAME_OPTIONS_EMPTY = 'form-multi-select-options-empty'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'form-multi-selected'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
-const CLASS_NAME_SELECTION_CLEANER = 'form-multi-select-selection-cleaner'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TAG = 'form-multi-select-tag'
 const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
-
-const CLASS_NAME_LABEL = 'label'
+const CLASS_NAME_TOGGLER = 'form-multi-select-toggler'
 
 const Default = {
   cleaner: true,
@@ -77,6 +76,7 @@ const Default = {
   invalid: false,
   multiple: true,
   placeholder: 'Select...',
+  required: false,
   options: false,
   optionsMaxHeight: 'auto',
   optionsStyle: 'checkbox',
@@ -95,6 +95,7 @@ const DefaultType = {
   invalid: 'boolean',
   multiple: 'boolean',
   placeholder: 'string',
+  required: 'boolean',
   options: '(boolean|array)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
@@ -117,13 +118,18 @@ class MultiSelect extends BaseComponent {
   constructor(element, config) {
     super(element, config)
 
+    this._indicatorElement = null
     this._selectAllElement = null
     this._selectionElement = null
     this._selectionCleanerElement = null
     this._searchElement = null
+    this._togglerElement = null
     this._optionsElement = null
+
     this._clone = null
+    this._menu = null
     this._options = this._getOptions()
+    this._popper = null
     this._search = ''
     this._selection = this._getSelectedOptions(this._options)
 
@@ -146,31 +152,50 @@ class MultiSelect extends BaseComponent {
     return DefaultType
   }
 
-  static get DATA_KEY() {
-    return DATA_KEY
-  }
-
   static get NAME() {
     return NAME
   }
 
   // Public
+  toggle() {
+    return this._isShown() ? this.hide() : this.show()
+  }
 
   show() {
-    EventHandler.trigger(this._element, EVENT_SHOW)
-    this._clone.classList.add(CLASS_NAME_SHOW)
-
-    if (this._config.search) {
-      SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus()
+    if (this._config.disabled || this._isShown()) {
+      return
     }
 
+    EventHandler.trigger(this._element, EVENT_SHOW)
+    this._clone.classList.add(CLASS_NAME_SHOW)
+    this._clone.setAttribute('aria-expanded', true)
     EventHandler.trigger(this._element, EVENT_SHOWN)
+
+    this._createPopper()
+
+    if (this._config.search) {
+      SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus()
+    }
   }
 
   hide() {
     EventHandler.trigger(this._element, EVENT_HIDE)
+
+    if (this._popper) {
+      this._popper.destroy()
+    }
+
     this._clone.classList.remove(CLASS_NAME_SHOW)
+    this._clone.setAttribute('aria-expanded', 'false')
     EventHandler.trigger(this._element, EVENT_HIDDEN)
+  }
+
+  dispose() {
+    if (this._popper) {
+      this._popper.destroy()
+    }
+
+    super.dispose()
   }
 
   search(text) {
@@ -233,6 +258,12 @@ class MultiSelect extends BaseComponent {
       }
     })
 
+    EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
+      event.preventDefault()
+      event.stopPropagation()
+      this.toggle()
+    })
+
     EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
       this._onSearchChange(this._searchElement)
     })
@@ -243,6 +274,8 @@ class MultiSelect extends BaseComponent {
       if ((key === 8 || key === 46) && event.target.value.length === 0) {
         this._deselectLastOption()
       }
+
+      this._searchElement.focus()
     })
 
     EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
@@ -270,7 +303,9 @@ class MultiSelect extends BaseComponent {
 
       if (key === 13) {
         this._onOptionsClick(event.target)
-        SelectorEngine.findOne(SELECTOR_INPUT, this._clone).focus()
+        if (this._config.search) {
+          SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus()
+        }
       }
     })
   }
@@ -278,6 +313,7 @@ class MultiSelect extends BaseComponent {
   _getConfig(config) {
     config = {
       ...Default,
+      ...this._element.disabled && { disabled: true },
       ...Manipulator.getDataAttributes(this._element),
       ...(typeof config === 'object' ? config : {})
     }
@@ -298,7 +334,7 @@ class MultiSelect extends BaseComponent {
     const options = []
 
     for (const node of nodes) {
-      if (node.nodeName === 'OPTION') {
+      if (node.nodeName === 'OPTION' && node.value) {
         options.push({
           value: node.value,
           text: node.innerHTML,
@@ -321,21 +357,21 @@ class MultiSelect extends BaseComponent {
   _getSelectedOptions(options) {
     const selected = []
 
-    for (const e of options) {
-      if (typeof e.value === 'undefined') {
-        this._getSelectedOptions(e.options)
+    for (const option of options) {
+      if (typeof option.value === 'undefined') {
+        this._getSelectedOptions(option.options)
         continue
       }
 
-      if (e.selected) {
+      if (option.selected) {
         // Add only the last option if single select
         if (!this._config.multiple) {
           selected.length = 0
         }
 
         selected.push({
-          value: String(e.value),
-          text: e.text
+          value: String(option.value),
+          text: option.text
         })
       }
     }
@@ -348,6 +384,10 @@ class MultiSelect extends BaseComponent {
 
     if (this._config.multiple) {
       this._element.setAttribute('multiple', true)
+    }
+
+    if (this._config.required) {
+      this._element.setAttribute('required', true)
     }
 
     this._createNativeOptions(this._element, data)
@@ -388,6 +428,7 @@ class MultiSelect extends BaseComponent {
     div.classList.add(CLASS_NAME_SELECT)
     div.classList.toggle('is-invalid', this._config.invalid)
     div.classList.toggle('is-valid', this._config.valid)
+    div.setAttribute('aria-expanded', 'false')
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
@@ -397,10 +438,6 @@ class MultiSelect extends BaseComponent {
       div.classList.add(className)
     }
 
-    if (this._config.multiple) {
-      div.classList.add(CLASS_NAME_SELECT_MULTIPLE)
-    }
-
     if (this._config.multiple && this._config.selectionType === 'tags') {
       div.classList.add(CLASS_NAME_SELECTION_TAGS)
     }
@@ -408,7 +445,7 @@ class MultiSelect extends BaseComponent {
     this._clone = div
     this._element.parentNode.insertBefore(div, this._element.nextSibling)
     this._createSelection()
-    this._createSelectionCleaner()
+    this._createButtons()
 
     if (this._config.search) {
       this._createSearchInput()
@@ -425,25 +462,66 @@ class MultiSelect extends BaseComponent {
   }
 
   _createSelection() {
-    const span = document.createElement('span')
-    span.classList.add(CLASS_NAME_SELECTION)
-    this._clone.append(span)
+    const togglerEl = document.createElement('div')
+    togglerEl.classList.add(CLASS_NAME_TOGGLER)
+    this._togglerElement = togglerEl
+
+    const selectionEl = document.createElement('div')
+    selectionEl.classList.add(CLASS_NAME_SELECTION)
+
+    togglerEl.append(selectionEl)
+    this._clone.append(togglerEl)
 
     this._updateSelection()
-    this._selectionElement = span
+    this._selectionElement = selectionEl
   }
 
-  _createSelectionCleaner() {
+  _createButtons() {
+    const buttons = document.createElement('div')
+    buttons.classList.add('form-multi-select-buttons')
+
     if (this._config.cleaner && this._config.multiple) {
       const cleaner = document.createElement('button')
-      cleaner.classList.add(CLASS_NAME_SELECTION_CLEANER)
+      cleaner.type = 'button'
+      cleaner.classList.add(CLASS_NAME_CLEANER)
       cleaner.style.display = 'none'
-      this._clone.append(cleaner)
-      this._clone.classList.add(CLASS_NAME_SELECT_WITH_CLEANER)
 
-      this._updateSelectionCleaner()
+      buttons.append(cleaner)
       this._selectionCleanerElement = cleaner
     }
+
+    const indicator = document.createElement('button')
+    indicator.type = 'button'
+    indicator.classList.add('form-multi-select-indicator')
+
+    buttons.append(indicator)
+
+    this._indicatorElement = indicator
+    this._togglerElement.append(buttons)
+    this._updateSelectionCleaner()
+  }
+
+  _createPopper() {
+    if (typeof Popper === 'undefined') {
+      throw new TypeError('CoreUI\'s multi select require Popper (https://popper.js.org)')
+    }
+
+    const popperConfig = {
+      modifiers: [{
+        name: 'preventOverflow',
+        options: {
+          boundary: 'clippingParents'
+        }
+      },
+      {
+        name: 'offset',
+        options: {
+          offset: [0, 2]
+        }
+      }],
+      placement: isRTL() ? 'bottom-end' : 'bottom-start'
+    }
+    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
   }
 
   _createSearchInput() {
@@ -457,7 +535,7 @@ class MultiSelect extends BaseComponent {
     this._searchElement = input
     this._updateSearchSize()
 
-    this._clone.append(input)
+    this._selectionElement.append(input)
   }
 
   _createOptionsContainer() {
@@ -488,6 +566,7 @@ class MultiSelect extends BaseComponent {
 
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
+    this._menu = dropdownDiv
   }
 
   _createOptions(parentElement, options) {
@@ -526,7 +605,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _createTag(value, text) {
-    const tag = document.createElement('span')
+    const tag = document.createElement('div')
     tag.classList.add(CLASS_NAME_TAG)
     tag.dataset.value = value
     tag.innerHTML = text
@@ -637,28 +716,39 @@ class MultiSelect extends BaseComponent {
 
   _updateSelection() {
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
+    const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._clone)
 
-    if (this._config.multiple && this._config.selectionType === 'counter') {
-      selection.innerHTML = `${this._selection.length} ${this._config.selectionTypeCounterText}`
+    if (this._selection.length === 0 && !this._config.search) {
+      selection.innerHTML = `<span class="form-multi-select-text">${this._config.placeholder}</span>`
       return
+    }
+
+    if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
+      selection.innerHTML = `<span class="form-multi-select-text">${this._selection.length} ${this._config.selectionTypeCounterText}</span>`
     }
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
       selection.innerHTML = ''
+
       for (const e of this._selection) {
         selection.append(this._createTag(e.value, e.text))
       }
-
-      return
     }
 
     if (this._config.multiple && this._config.selectionType === 'text') {
-      selection.innerHTML = this._selection.map(e => e.text).join(', ')
-      return
+      selection.innerHTML = this._selection.map((option, index) => `<span>${option.text}${index === this._selection.length - 1 ? '' : ','}&nbsp;</span>`).join('')
     }
 
-    if (this._selection.length > 0) {
-      selection.innerHTML = this._selection[0].text
+    if (!this._config.multiple && this._selection.length > 0 && !this._config.search) {
+      selection.innerHTML = `<span class="form-multi-select-text">${this._selection[0].text}</span>`
+    }
+
+    if (search) {
+      selection.append(search)
+    }
+
+    if (this._popper) {
+      this._popper.update()
     }
   }
 
@@ -667,7 +757,7 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    const selectionCleaner = SelectorEngine.findOne(SELECTOR_SELECTION_CLEANER, this._clone)
+    const selectionCleaner = SelectorEngine.findOne(SELECTOR_CLEANER, this._clone)
 
     if (this._selection.length > 0) {
       selectionCleaner.style.removeProperty('display')
@@ -682,27 +772,32 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    if (this._selection.length > 0 && !this._config.multiple) {
+    // Select single
+
+    if (!this._config.multiple && this._selection.length > 0) {
       this._searchElement.placeholder = this._selection[0].text
-      this._selectionElement.style.display = 'none'
       return
     }
 
-    if (this._selection.length > 0 && this._config.multiple && this._config.selectionType !== 'counter') {
-      this._searchElement.removeAttribute('placeholder')
-      this._selectionElement.style.removeProperty('display')
-      return
-    }
-
-    if (this._selection.length === 0 && this._config.multiple) {
+    if (!this._config.multiple && this._selection.length === 0) {
       this._searchElement.placeholder = this._config.placeholder
-      this._selectionElement.style.display = 'none'
+      return
+    }
+
+    // Select multiple
+
+    if (this._config.multiple && this._selection.length > 0 && this._config.selectionType !== 'counter') {
+      this._searchElement.removeAttribute('placeholder')
+      return
+    }
+
+    if (this._config.multiple && this._selection.length === 0) {
+      this._searchElement.placeholder = this._config.placeholder
       return
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
       this._searchElement.placeholder = `${this._selection.length} item(s) selected`
-      this._selectionElement.style.display = 'none'
     }
   }
 
@@ -745,6 +840,10 @@ class MultiSelect extends BaseComponent {
   _isVisible(element) {
     const style = window.getComputedStyle(element)
     return (style.display !== 'none')
+  }
+
+  _isShown() {
+    return this._clone.classList.contains(CLASS_NAME_SHOW)
   }
 
   _filterOptionsList() {

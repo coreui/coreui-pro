@@ -1,5 +1,6 @@
 .form-multi-select {
   // scss-docs-start form-multi-select-css-vars
+  --#{$prefix}form-multi-select-zindex: #{$zindex-form-multi-select};
   --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y};
   --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x};
   --#{$prefix}form-multi-select-font-family: #{$form-multi-select-font-family};
@@ -8,21 +9,17 @@
   --#{$prefix}form-multi-select-line-height: #{$form-multi-select-line-height};
   --#{$prefix}form-multi-select-color: #{$form-multi-select-color};
   --#{$prefix}form-multi-select-bg: #{$form-multi-select-bg};
-  --#{$prefix}form-multi-select-bg-position: #{$form-multi-select-bg-position};
-  --#{$prefix}form-multi-select-bg-size: #{$form-multi-select-bg-size};
+  --#{$prefix}form-multi-select-box-shadow: #{$form-multi-select-box-shadow};
   --#{$prefix}form-multi-select-border-color: #{$form-multi-select-border-color};
   --#{$prefix}form-multi-select-border: #{$form-multi-select-border-width} solid var(--#{$prefix}form-multi-select-border-color);
   --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius};
   --#{$prefix}form-multi-select-disabled-color: #{$form-multi-select-disabled-color};
   --#{$prefix}form-multi-select-disabled-bg: #{$form-multi-select-disabled-bg};
+  --#{$prefix}form-multi-select-disabled-border-color: #{$form-multi-select-disabled-border-color};
   --#{$prefix}form-multi-select-focus-color: #{$form-multi-select-focus-color};
   --#{$prefix}form-multi-select-focus-bg: #{$form-multi-select-focus-bg};
   --#{$prefix}form-multi-select-focus-border-color: #{$form-multi-select-focus-border-color};
-  --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y};
-  --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x};
-
-  --#{$prefix}form-multi-select-indicator: #{escape-svg($form-multi-select-indicator)};
-  --#{$prefix}form-multi-select-indicator-padding: #{$form-multi-select-indicator-padding};
+  --#{$prefix}form-multi-select-focus-box-shadow: #{$form-multi-select-focus-box-shadow};
 
   --#{$prefix}form-multi-select-cleaner-width: #{$form-multi-select-cleaner-width};
   --#{$prefix}form-multi-select-cleaner-height: #{$form-multi-select-cleaner-height};
@@ -32,9 +29,13 @@
   --#{$prefix}form-multi-select-cleaner-hover-bg: #{escape-svg($form-multi-select-cleaner-hover-bg)};
   --#{$prefix}form-multi-select-cleaner-focus-bg: #{escape-svg($form-multi-select-cleaner-focus-bg)};
 
-  --#{$prefix}form-multi-select-search-color: #{$form-multi-select-search-color};
-  --#{$prefix}form-multi-select-search-bg: #{$form-multi-select-search-bg};
-  --#{$prefix}form-multi-select-search-border-radius: #{$form-multi-select-search-border-radius};
+  --#{$prefix}form-multi-select-indicator-width: #{$form-multi-select-indicator-width};
+  --#{$prefix}form-multi-select-indicator-height: #{$form-multi-select-indicator-height};
+  --#{$prefix}form-multi-select-indicator-padding-y: #{$form-multi-select-indicator-padding-y};
+  --#{$prefix}form-multi-select-indicator-padding-x: #{$form-multi-select-indicator-padding-x};
+  --#{$prefix}form-multi-select-indicator-bg: #{escape-svg($form-multi-select-indicator-bg)};
+  --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg)};
+  --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg)};
 
   --#{$prefix}form-multi-select-select-all-padding-y: #{$form-multi-select-select-all-padding-y};
   --#{$prefix}form-multi-select-select-all-padding-x: #{$form-multi-select-select-all-padding-x};
@@ -45,21 +46,36 @@
   --#{$prefix}form-multi-select-select-all-hover-color: #{$form-multi-select-select-all-hover-color};
   --#{$prefix}form-multi-select-select-all-hover-bg: #{$form-multi-select-select-all-hover-bg};
 
-  --#{$prefix}form-multi-select-options-margin-top: #{$form-multi-select-options-margin-top};
-  --#{$prefix}form-multi-select-options-bg: #{$form-multi-select-options-bg};
-  --#{$prefix}form-multi-select-options-border-color: #{$form-multi-select-options-border-color};
-  --#{$prefix}form-multi-select-options-border: #{$form-multi-select-options-border-width} solid var(--#{$prefix}form-multi-select-options-border-color);
-  --#{$prefix}form-multi-select-options-border-radius: #{$form-multi-select-options-border-radius};
+  --#{$prefix}form-multi-select-dropdown-min-width: #{$form-multi-select-dropdown-min-width};
+  --#{$prefix}form-multi-select-dropdown-bg: #{$form-multi-select-dropdown-bg};
+  --#{$prefix}form-multi-select-dropdown-border-color: #{$form-multi-select-dropdown-border-color};
+  --#{$prefix}form-multi-select-dropdown-border: #{$form-multi-select-dropdown-border-width} solid var(--#{$prefix}form-multi-select-dropdown-border-color);
+  --#{$prefix}form-multi-select-dropdown-border-radius: #{$form-multi-select-dropdown-border-radius};
 
   --#{$prefix}form-multi-select-options-padding-y: #{$form-multi-select-options-padding-y};
   --#{$prefix}form-multi-select-options-padding-x: #{$form-multi-select-options-padding-x};
+  --#{$prefix}form-multi-select-options-font-size: #{$form-multi-select-options-font-size};
+  --#{$prefix}form-multi-select-options-font-weight: #{$form-multi-select-options-font-weight};
   --#{$prefix}form-multi-select-options-color: #{$form-multi-select-options-color};
+
+  --#{$prefix}form-multi-select-optgroup-label-padding-y: #{$form-multi-select-optgroup-label-padding-y};
+  --#{$prefix}form-multi-select-optgroup-label-padding-x: #{$form-multi-select-optgroup-label-padding-x};
+  --#{$prefix}form-multi-select-optgroup-label-font-size: #{$form-multi-select-optgroup-label-font-size};
+  --#{$prefix}form-multi-select-optgroup-label-font-weight: #{$form-multi-select-optgroup-label-font-weight};
+  --#{$prefix}form-multi-select-optgroup-label-color: #{$form-multi-select-optgroup-label-color};
+  --#{$prefix}form-multi-select-optgroup-label-text-transform: #{$form-multi-select-optgroup-label-text-transform};
 
   --#{$prefix}form-multi-select-option-padding-y: #{$form-multi-select-option-padding-y};
   --#{$prefix}form-multi-select-option-padding-x: #{$form-multi-select-option-padding-x};
+  --#{$prefix}form-multi-select-option-margin-y: #{$form-multi-select-option-margin-y};
+  --#{$prefix}form-multi-select-option-margin-x: #{$form-multi-select-option-margin-x};
+  --#{$prefix}form-multi-select-option-border-color: #{$form-multi-select-option-border-color};
+  --#{$prefix}form-multi-select-option-border: #{$form-multi-select-option-border-width} solid var(--#{$prefix}form-multi-select-option-border-color);
   --#{$prefix}form-multi-select-option-border-radius: #{$form-multi-select-option-border-radius};
+  --#{$prefix}form-multi-select-option-box-shadow: #{$form-multi-select-option-box-shadow};
   --#{$prefix}form-multi-select-option-hover-color: #{$form-multi-select-option-hover-color};
   --#{$prefix}form-multi-select-option-hover-bg: #{$form-multi-select-option-hover-bg};
+  --#{$prefix}form-multi-select-option-focus-box-shadow: #{$form-multi-select-option-focus-box-shadow};
   --#{$prefix}form-multi-select-option-disabled-color: #{$form-multi-select-option-disabled-color};
   --#{$prefix}form-multi-select-option-indicator-width: #{$form-multi-select-option-indicator-width};
   --#{$prefix}form-multi-select-option-indicator-bg: #{$form-multi-select-option-indicator-bg};
@@ -72,98 +88,141 @@
 
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y};
   --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x};
-  --#{$prefix}form-multi-select-tag-margin-y: #{$form-multi-select-tag-margin-y};
-  --#{$prefix}form-multi-select-tag-margin-x: #{$form-multi-select-tag-margin-x};
   --#{$prefix}form-multi-select-tag-bg: #{$form-multi-select-tag-bg};
   --#{$prefix}form-multi-select-tag-border-color: #{$form-multi-select-tag-border-color};
   --#{$prefix}form-multi-select-tag-border: #{$form-multi-select-tag-border-width} solid var(--#{$prefix}form-multi-select-tag-border-color);
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius};
+
+  --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap};
+  --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y};
+  --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x};
   // scss-docs-end form-multi-select-css-vars
 
   position: relative;
-  display: block;
+
+  .was-validated .form-multi-select:invalid + &,
+  &.is-invalid {
+    --#{$prefix}form-multi-select-border-color: #{$form-feedback-invalid-color};
+  }
+
+  .was-validated .form-multi-select:valid + &,
+  &.is-valid {
+    --#{$prefix}form-multi-select-border-color: #{$form-feedback-valid-color};
+  }
+}
+
+// stylelint-disable-next-line selector-no-qualifying-type
+select.form-multi-select {
+  display: none;
+}
+
+.form-multi-select-toggler {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap; // For form validation feedback
+  align-items: stretch;
   width: 100%;
-  padding: var(--#{$prefix}form-multi-select-padding-y) var(--#{$prefix}form-multi-select-padding-x);
-  @include ltr-rtl("padding-right", (var(--#{$prefix}form-multi-select-indicator-padding)));
   font-family: var(--#{$prefix}form-multi-select-font-family);
   @include font-size(var(--#{$prefix}form-multi-select-font-size));
   font-weight: var(--#{$prefix}form-multi-select-font-weight);
   line-height: var(--#{$prefix}form-multi-select-line-height);
   color: var(--#{$prefix}form-multi-select-color);
   background-color: var(--#{$prefix}form-multi-select-bg);
-  background-image: var(--#{$prefix}form-multi-select-indicator);
-  background-repeat: no-repeat;
-  @include ltr-rtl-value-only("background-position", var(--#{$prefix}form-multi-select-bg-position));
-  background-size: var(--#{$prefix}form-multi-select-bg-size);
   border: var(--#{$prefix}form-multi-select-border);
   @include border-radius(var(--#{$prefix}form-multi-select-border-radius), 0);
-  appearance: none;
 
-  &:disabled,
-  &.disabled {
+  .form-multi-select.disabled & {
     color: var(--#{$prefix}form-multi-select-disabled-color);
     background-color: var(--#{$prefix}form-multi-select-disabled-bg);
+    border-color: var(--#{$prefix}form-multi-select-disabled-border-color);
+  }
 
-    .form-multi-select-search {
-      background: transparent;
+  .form-multi-select.show & {
+    color: var(--#{$prefix}form-multi-select-focus-color);
+    background-color: var(--#{$prefix}form-multi-select-focus-bg);
+    border-color: var(--#{$prefix}form-multi-select-focus-border-color);
+    outline: 0;
+    @if $enable-shadows {
+      box-shadow: var(--#{$prefix}form-multi-select-box-shadow), var(--#{$prefix}form-multi-select-focus-box-shadow);
+    } @else {
+      box-shadow: var(--#{$prefix}form-multi-select-focus-box-shadow);
     }
-  }
-
-  &.form-multi-select-with-cleaner {
-    @include ltr-rtl("padding-right", ($form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x));
-  }
-
-  &.is-invalid  {
-    --#{$prefix}form-multi-select-border-color: #{$form-feedback-invalid-color};
-  }
-
-  &.is-valid  {
-    --#{$prefix}form-multi-select-border-color: #{$form-feedback-valid-color};
-  }
-
-  // temporary fix for React.js & Vue.js versions
-  > div:not([class]):first-of-type::before {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 40px;
-    height: 100%;
-    content: "";
-  }
-}
-
-.form-multi-select-selection-tags {
-  min-height: add(($form-multi-select-padding-y * 2), ($form-multi-select-font-size * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-  padding: var(--#{$prefix}form-multi-select-selection-tags-padding-y) var(--#{$prefix}form-multi-select-selection-tags-padding-x);
-  @include ltr-rtl("padding-right", var(--#{$prefix}form-multi-select-indicator-padding));
-
-  .form-multi-select-search {
-    height: ($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y) * 2 + ($form-multi-select-font-size * $form-multi-select-line-height);
-    @include ltr-rtl("margin-left", var(--#{$prefix}form-multi-select-padding-x));
   }
 }
 
 .form-multi-select-selection {
-  display: inline;
-  padding: 0;
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  width: 1%;
+  min-width: 0;
+  padding: var(--#{$prefix}form-multi-select-padding-y) var(--#{$prefix}form-multi-select-padding-x);
+  padding-inline-end: 0;
+
+  .form-multi-select-selection-tags & {
+    gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
+    align-content: center;
+    padding: var(--#{$prefix}form-multi-select-selection-tags-padding-y) var(--#{$prefix}form-multi-select-selection-tags-padding-x);
+    padding-inline-end: 0;
+  }
 }
 
-.form-multi-select-selection-cleaner {
-  position: absolute;
-  top: 50%;
-  @include ltr-rtl("right", var(--#{$prefix}form-multi-select-indicator-padding));
+.form-multi-select-search {
+  display: none;
+  flex: 1 1 auto;
+  max-width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+
+  &:focus {
+    outline: 0;
+  }
+
+  .form-multi-select.show &,
+  &:placeholder-shown {
+    display: flex;
+  }
+
+  .form-multi-select-selection-tags & {
+    padding-inline-start: calc(var(--#{$prefix}form-multi-select-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
+  }
+}
+
+.form-multi-select-text {
+  .form-multi-select-selection-tags & {
+    padding: calc(var(--#{$prefix}form-multi-select-padding-y) - .25rem) calc(var(--#{$prefix}form-multi-select-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
+  }
+}
+
+.form-multi-select-buttons {
+  display: flex;
+  align-items: center;
+  min-height: calc(2 * var(--#{$prefix}form-multi-select-padding-y) + calc(var(--#{$prefix}form-multi-select-font-size) * var(--#{$prefix}form-multi-select-line-height)));  // stylelint-disable-line function-disallowed-list
+}
+
+.form-multi-select-cleaner,
+.form-multi-select-indicator {
+  position: relative;
+  z-index: 2;
   box-sizing: content-box;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 0;
+
+  &:focus {
+    z-index: 5;
+  }
+}
+
+.form-multi-select-cleaner {
   width: var(--#{$prefix}form-multi-select-cleaner-width);
   height: var(--#{$prefix}form-multi-select-cleaner-height);
   padding: var(--#{$prefix}form-multi-select-cleaner-padding-y) var(--#{$prefix}form-multi-select-cleaner-padding-x);
-  background-color: transparent;
   background-image: var(--#{$prefix}form-multi-select-cleaner-bg);
-  background-repeat: no-repeat;
-  background-position: center;
   background-size: var(--#{$prefix}form-multi-select-cleaner-width) auto;
-  border: 0; // for button elements
-  @include ltr-rtl("border-right", 1px solid var(--#{$prefix}form-multi-select-cleaner-border-color, $form-multi-select-cleaner-border-color));
-  transform: translateY(-50%);
 
   &:hover {
     background-image: var(--#{$prefix}form-multi-select-cleaner-hover-bg);
@@ -171,34 +230,57 @@
 
   &:focus {
     background-image: var(--#{$prefix}form-multi-select-cleaner-focus-bg);
-    outline: 0;
   }
 }
 
-.form-multi-select-search {
-  width: auto;
-  padding: 0;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
-  color: var(--#{$prefix}form-multi-select-search-color);
-  background-color: var(--#{$prefix}form-multi-select-search-bg);
-  border: 0;
-  appearance: none;
-  @include border-radius(var(--#{$prefix}form-multi-select-search-border-radius), 0);
+.form-multi-select-indicator {
+  width: var(--#{$prefix}form-multi-select-indicator-width);
+  height: var(--#{$prefix}form-multi-select-indicator-height);
+  padding: var(--#{$prefix}form-multi-select-indicator-padding-y) var(--#{$prefix}form-multi-select-indicator-padding-x);
+  background-image: var(--#{$prefix}form-multi-select-indicator-bg);
+  background-size: var(--#{$prefix}form-multi-select-indicator-width) auto;
+  @include transition(transform .15s ease-in-out);
+
+  &:hover {
+    background-image: var(--#{$prefix}form-multi-select-indicator-hover-bg);
+  }
 
   &:focus {
-    outline: 0;
+    background-image: var(--#{$prefix}form-multi-select-indicator-focus-bg);
   }
 
-  &[size] {
-    display: none;
-    @include ltr-rtl("margin-left", var(--#{$prefix}form-multi-select-padding-x));
+  .form-multi-select.show & {
+    transform: rotate(180deg);
   }
+}
 
-  &:placeholder-shown {
-    width: 100%;
+.form-multi-select-tag {
+  padding: var(--#{$prefix}form-multi-select-tag-padding-y) var(--#{$prefix}form-multi-select-tag-padding-x);
+  background-color: var(--#{$prefix}form-multi-select-tag-bg);
+  border: var(--#{$prefix}form-multi-select-tag-border);
+  @include border-radius(var(--#{$prefix}form-multi-select-tag-border-radius));
+}
+
+.form-multi-select-tag-delete {
+  padding: 0;
+  margin-inline-start: $spacer * .5;
+  background-color: transparent;
+  border: 0;
+}
+
+.form-multi-select-dropdown {
+  position: absolute;
+  z-index: var(--#{$prefix}form-multi-select-zindex);
+  display: none; // none by default, but block on "open" of the menu
+  min-width: var(--#{$prefix}form-multi-select-dropdown-min-width);
+  background-color: var(--#{$prefix}form-multi-select-dropdown-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}form-multi-select-dropdown-border);
+  @include border-radius(var(--#{$prefix}form-multi-select-dropdown-border-radius));
+  @include elevation(4);
+
+  .form-multi-select.show & {
+    display: block;
   }
 }
 
@@ -218,32 +300,20 @@
   }
 }
 
-.form-multi-select-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  display: none; // none by default, but block on "open" of the menu
-  width: 100%;
-  margin-top: var(--#{$prefix}form-multi-select-options-margin-top);
-  background-color: var(--#{$prefix}form-multi-select-options-bg);
-  background-clip: padding-box;
-  border: var(--#{$prefix}form-multi-select-options-border);
-  @include border-radius(var(--#{$prefix}form-multi-select-options-border-radius));
-  @include elevation(4);
-}
-
 .form-multi-select-options {
   padding: var(--#{$prefix}form-multi-select-options-padding-y) var(--#{$prefix}form-multi-select-options-padding-x);
-  font-size: $form-multi-select-options-font-size;
+  font-size: var(--#{$prefix}form-multi-select-options-font-size);
+  font-weight: var(--#{$prefix}form-multi-select-options-font-weight);
   color: var(--#{$prefix}form-multi-select-options-color);
 }
 
 .form-multi-select-option {
   position: relative;
+  z-index: 2;
   padding: var(--#{$prefix}form-multi-select-option-padding-y) var(--#{$prefix}form-multi-select-option-padding-x);
-  margin-bottom: 2px;
-  vertical-align: top;
+  margin: var(--#{$prefix}form-multi-select-option-margin-y) var(--#{$prefix}form-multi-select-option-margin-x);
   cursor: pointer;
+  border: var(--#{$prefix}form-multi-select-option-border);
   @include border-radius(var(--#{$prefix}form-multi-select-option-border-radius), 0);
 
   &:hover,
@@ -253,8 +323,18 @@
     background-color: var(--#{$prefix}form-multi-select-option-hover-bg);
   }
 
-  &.disabled,
-  &:disabled {
+  &:focus {
+    z-index: 5;
+    border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+    outline: 0;
+    @if $enable-shadows {
+      box-shadow: var(--#{$prefix}form-multi-select-box-shadow), var(--#{$prefix}form-multi-select-focus-box-shadow);
+    } @else {
+      box-shadow: var(--#{$prefix}form-multi-select-focus-box-shadow);
+    }
+  }
+
+  &.disabled {
     color: var(--#{$prefix}form-multi-select-option-disabled-color);
     pointer-events: none;
     background-color: transparent;
@@ -294,11 +374,11 @@
 }
 
 .form-multi-select-optgroup-label {
-  padding: ($form-multi-select-option-padding-y * 1.5) ($form-multi-select-option-padding-x * .5) $form-multi-select-option-padding-y ($form-multi-select-option-padding-x * .5);
-  font-size: 80%;
-  font-weight: $form-multi-select-optgroup-label-font-weight;
-  color: $form-multi-select-optgroup-label-color;
-  text-transform: uppercase;
+  padding: var(--#{$prefix}form-multi-select-options-padding-y) var(--#{$prefix}form-multi-select-options-padding-x);
+  font-size: var(--#{$prefix}form-multi-select-optgroup-label-font-size);
+  font-weight: var(--#{$prefix}form-multi-select-optgroup-label-font-weight);
+  color: var(--#{$prefix}form-multi-select-optgroup-label-color);
+  text-transform: var(--#{$prefix}form-multi-select-optgroup-label-text-transform);
 }
 
 .form-multi-select-options-empty {
@@ -306,63 +386,17 @@
 }
 
 
-.form-multi-select-tag {
-  display: inline-block;
-  padding: var(--#{$prefix}form-multi-select-tag-padding-y) var(--#{$prefix}form-multi-select-tag-padding-x);
-  margin: var(--#{$prefix}form-multi-select-tag-margin-y) var(--#{$prefix}form-multi-select-tag-margin-x);
-  background-color: var(--#{$prefix}form-multi-select-tag-bg);
-  border: var(--#{$prefix}form-multi-select-tag-border);
-  @include border-radius(var(--#{$prefix}form-multi-select-tag-border-radius));
-}
-
-.form-multi-select-tag-delete {
-  padding: 0;
-  @include ltr-rtl("margin-left", $spacer * .5);
-  background-color: transparent;
-  border: 0;
-}
-
-.form-multi-select.show {
-  color: var(--#{$prefix}form-multi-select-focus-color);
-  background-color: var(--#{$prefix}form-multi-select-focus-bg);
-  border-color: var(--#{$prefix}form-multi-select-focus-border-color);
-
-  @if $enable-shadows {
-    @include box-shadow($form-multi-select-box-shadow, $form-multi-select-focus-box-shadow);
-  } @else {
-    // Avoid using mixin so we can pass custom focus shadow properly
-    box-shadow: $form-multi-select-focus-box-shadow;
-  }
-
-  .form-multi-select-search[size] {
-    display: inline;
-  }
-
-  .form-multi-select-dropdown {
-    z-index: $zindex-dropdown;
-    display: initial;
-  }
-}
-
 .form-multi-select-sm {
   --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y-sm};
   --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x-sm};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size-sm};
   --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius-sm};
-  --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-sm};
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-sm};
   --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x-sm};
-  --#{$prefix}form-multi-select-tag-margin-y: #{$form-multi-select-tag-margin-y-sm};
-  --#{$prefix}form-multi-select-tag-margin-x: #{$form-multi-select-tag-margin-x-sm};
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-sm};
-
-  &.form-multi-select-selection-tags {
-    min-height: add(($form-multi-select-padding-y-sm * 2), ($form-multi-select-font-size-sm * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-
-    .form-multi-select-search {
-      height: subtract(($form-multi-select-padding-y-sm - $form-multi-select-selection-tags-padding-y-sm) * 2 + ($form-multi-select-font-size-sm * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-    }
-  }
+  --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-sm};
+  --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-sm};
+  --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-sm};
 }
 
 .form-multi-select-lg {
@@ -370,18 +404,10 @@
   --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x-lg};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size-lg};
   --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius-lg};
-  --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-lg};
   --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x-lg};
-  --#{$prefix}form-multi-select-tag-margin-y: #{$form-multi-select-tag-margin-y-lg};
-  --#{$prefix}form-multi-select-tag-margin-x: #{$form-multi-select-tag-margin-x-lg};
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-lg};
-
-  &.form-multi-select-selection-tags {
-    min-height: add(($form-multi-select-padding-y-lg * 2) + ($form-multi-select-font-size-lg * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
-
-    .form-multi-select-search {
-      height: ($form-multi-select-padding-y-lg - $form-multi-select-selection-tags-padding-y-lg) * 2 + ($form-multi-select-font-size-lg * $form-multi-select-line-height);
-    }
-  }
+  --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-lg};
+  --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-lg};
+  --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
 }
