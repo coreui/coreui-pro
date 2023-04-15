@@ -356,6 +356,13 @@ $form-multi-select-disabled-bg-dt:         $input-disabled-bg-dt !default;
 $form-multi-select-tag-bg-dt:               $light-dt !default;
 $form-multi-select-tag-border-color-dt:     $input-border-color-dt !default;
 
+$form-multi-select-tag-delete-color-dt:        $medium-emphasis-dt !default;
+$form-multi-select-tag-delete-bg-dt:           url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-color-dt}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-hover-color-dt:  $high-emphasis-dt !default;
+$form-multi-select-tag-delete-hover-bg-dt:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-hover-color-dt}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-focus-color-dt:  $high-emphasis-dt !default;
+$form-multi-select-tag-delete-focus-bg-dt:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-focus-color-dt}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+
 $form-multi-select-search-color-dt:         $input-color-dt !default;
 $form-multi-select-search-bg-dt:            transparent !default;
 $form-multi-select-search-border-color-dt:  $input-border-color-dt !default;
@@ -404,6 +411,9 @@ $form-multi-select-theme-map: (
   "form-multi-select-focus-border-color":       $form-multi-select-focus-border-color-dt,
   "form-multi-select-tag-bg":                   $form-multi-select-tag-bg-dt,
   "form-multi-select-tag-border-color":         $form-multi-select-tag-border-color-dt,
+  "form-multi-select-tag-delete-bg":            $form-multi-select-tag-delete-bg-dt,
+  "form-multi-select-tag-delete-hover-bg":      $form-multi-select-tag-delete-hover-bg-dt,
+  "form-multi-select-tag-delete-focus-bg":      $form-multi-select-tag-delete-focus-bg-dt,
   "form-multi-select-search-color":             $form-multi-select-search-color-dt,
   "form-multi-select-search-bg":                $form-multi-select-search-bg-dt,
   "form-multi-select-search-border-color":      $form-multi-select-search-border-color-dt,

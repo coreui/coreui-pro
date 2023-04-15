@@ -611,9 +611,8 @@ class MultiSelect extends BaseComponent {
     tag.innerHTML = text
 
     const closeBtn = document.createElement('button')
-    closeBtn.classList.add(CLASS_NAME_TAG_DELETE, 'text-medium-emphasis')
+    closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
     closeBtn.setAttribute('aria-label', 'Close')
-    closeBtn.innerHTML = '<span aria-hidden="true">&times;</span>'
 
     tag.append(closeBtn)
 

@@ -1218,6 +1218,16 @@ $form-multi-select-tag-border-radius-lg:  .375rem !default;
 $form-multi-select-tag-padding-y:         .0625rem !default;
 $form-multi-select-tag-padding-x:         .5rem !default;
 
+$form-multi-select-tag-delete-width:        .75rem !default;
+$form-multi-select-tag-delete-height:       .75rem !default;
+$form-multi-select-tag-delete-color:        $medium-emphasis !default;
+$form-multi-select-tag-delete-bg:           url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-hover-color:  $high-emphasis !default;
+$form-multi-select-tag-delete-hover-bg:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-hover-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-focus-color:  $high-emphasis !default;
+$form-multi-select-tag-delete-focus-bg:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-focus-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-bg-size:      .5rem !default;
+
 $form-multi-select-buttons-padding-y:     .375rem !default;
 $form-multi-select-buttons-padding-x:     .375rem !default;
 

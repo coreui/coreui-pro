@@ -100,6 +100,16 @@
   --#{$prefix}form-multi-select-tag-border: #{$form-multi-select-tag-border-width} solid var(--#{$prefix}form-multi-select-tag-border-color);
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius};
 
+  --#{$prefix}form-multi-select-tag-delete-width: #{$form-multi-select-tag-delete-width};
+  --#{$prefix}form-multi-select-tag-delete-height: #{$form-multi-select-tag-delete-height};
+  --#{$prefix}form-multi-select-tag-delete-color: #{$form-multi-select-tag-delete-color};
+  --#{$prefix}form-multi-select-tag-delete-bg: #{$form-multi-select-tag-delete-bg};
+  --#{$prefix}form-multi-select-tag-delete-hover-color: #{$form-multi-select-tag-delete-hover-color};
+  --#{$prefix}form-multi-select-tag-delete-hover-bg: #{$form-multi-select-tag-delete-hover-bg};
+  --#{$prefix}form-multi-select-tag-delete-focus-color: #{$form-multi-select-tag-delete-focus-color};
+  --#{$prefix}form-multi-select-tag-delete-focus-bg: #{$form-multi-select-tag-delete-focus-bg};
+  --#{$prefix}form-multi-select-tag-delete-bg-size: #{$form-multi-select-tag-delete-bg-size};
+
   --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap};
   --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x};
@@ -124,7 +134,6 @@ select.form-multi-select {
 }
 
 .form-multi-select-input-group {
-  // position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -268,6 +277,8 @@ select.form-multi-select {
 }
 
 .form-multi-select-tag {
+  display: flex;
+  align-items: center;
   padding: var(--#{$prefix}form-multi-select-tag-padding-y) var(--#{$prefix}form-multi-select-tag-padding-x);
   background-color: var(--#{$prefix}form-multi-select-tag-bg);
   border: var(--#{$prefix}form-multi-select-tag-border);
@@ -275,9 +286,18 @@ select.form-multi-select {
 }
 
 .form-multi-select-tag-delete {
-  padding: 0;
+  position: relative;
+  z-index: 2;
+  box-sizing: content-box;
+  width: var(--#{$prefix}form-multi-select-tag-delete-width);
+  height: var(--#{$prefix}form-multi-select-tag-delete-height);
+  padding: var(--#{$prefix}form-multi-select-tag-delete-padding-y) var(--#{$prefix}form-multi-select-tag-delete-padding-x);
   margin-inline-start: $spacer * .5;
   background-color: transparent;
+  background-image: var(--#{$prefix}form-multi-select-tag-delete-bg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: var(--#{$prefix}form-multi-select-tag-delete-bg-size);
   border: 0;
 }
 
