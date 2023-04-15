@@ -302,10 +302,8 @@ $input-group-addon-border-color-dt:  rgba($white, .09) !default;
 $form-select-color-dt:               $input-color-dt !default;
 $form-select-bg-dt:                  $input-bg-dt !default;
 $form-select-border-color-dt:        $input-border-color-dt !default;
-$form-select-focus-border-color-dt:        $input-focus-border-color-dt !default;
-// $form-select-disabled-color-dt:         $input-disabled-color-dt !default;
-$form-select-disabled-bg-dt:            $input-disabled-bg-dt !default;
-// $form-select-disabled-border-color-dt:  $input-disabled-border-color-dt !default;
+$form-select-focus-border-color-dt:  $input-focus-border-color-dt !default;
+$form-select-disabled-bg-dt:         $input-disabled-bg-dt !default;
 
 $form-check-input-checked-color-dt:          $component-active-color-dt !default;
 $form-check-input-checked-bg-color-dt:       $component-active-bg-dt !default;
@@ -341,9 +339,7 @@ $form-select-theme-map: (
   "form-select-bg":                     $form-select-bg-dt,
   "form-select-border-color":           $form-select-border-color-dt,
   "form-select-focus-border-color":     $form-select-focus-border-color-dt,
-  // "form-select-disabled-color":         $form-select-disabled-color-dt,
   "form-select-disabled-bg":            $form-select-disabled-bg-dt,
-  // "form-select-disabled-border-color":  $form-select-disabled-border-color-dt,
 ) !default;
 
 $form-multi-select-color-dt:               $input-color-dt !default;
@@ -370,13 +366,23 @@ $form-multi-select-cleaner-hover-color-dt:   $high-emphasis-dt !default;
 $form-multi-select-cleaner-hover-bg-dt:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-hover-color-dt}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-cleaner-focus-color-dt:   $high-emphasis-dt !default;
 $form-multi-select-cleaner-focus-bg-dt:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-focus-color-dt}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-cleaner-border-color-dt:  $input-border-color-dt !default;
+
+$form-multi-select-indicator-color-dt:       $medium-emphasis-dt !default;
+$form-multi-select-indicator-bg-dt:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-color-dt}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-indicator-hover-color-dt: $high-emphasis-dt !default;
+$form-multi-select-indicator-hover-bg-dt:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-hover-color-dt}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-indicator-focus-color-dt: $high-emphasis-dt !default;
+$form-multi-select-indicator-focus-bg-dt:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-focus-color-dt}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
 
 $form-multi-select-select-all-color-dt:         $medium-emphasis-dt !default;
 $form-multi-select-select-all-bg-dt:            transparent !default;
 $form-multi-select-select-all-hover-color-dt:   $high-emphasis-dt !default;
 $form-multi-select-select-all-hover-bg-dt:      transparent !default;
 $form-multi-select-select-all-border-color-dt:  $input-border-color-dt !default;
+
+$form-multi-select-dropdown-color-dt:         $body-color-dt !default;
+$form-multi-select-dropdown-bg-dt:            $bg-elevation-8 !default;
+$form-multi-select-dropdown-border-color-dt:  $border-color-dt !default;
 
 $form-multi-select-options-color-dt:         $body-color-dt !default;
 $form-multi-select-options-bg-dt:            $bg-elevation-8 !default;
@@ -404,7 +410,12 @@ $form-multi-select-theme-map: (
   "form-multi-select-cleaner-bg":               $form-multi-select-cleaner-bg-dt,
   "form-multi-select-cleaner-hover-bg":         $form-multi-select-cleaner-hover-bg-dt,
   "form-multi-select-cleaner-focus-bg":         $form-multi-select-cleaner-focus-bg-dt,
-  "form-multi-select-cleaner-border-color":     $form-multi-select-cleaner-border-color-dt,
+  "form-multi-select-indicator-bg":             $form-multi-select-indicator-bg-dt,
+  "form-multi-select-indicator-hover-bg":       $form-multi-select-indicator-hover-bg-dt,
+  "form-multi-select-indicator-focus-bg":       $form-multi-select-indicator-focus-bg-dt,
+  "form-multi-select-dropdown-color":           $form-multi-select-dropdown-color-dt,
+  "form-multi-select-dropdown-border-color":    $form-multi-select-dropdown-border-color-dt,
+  "form-multi-select-dropdown-bg":              $form-multi-select-dropdown-bg-dt,
   "form-multi-select-select-all-color":         $form-multi-select-select-all-color-dt,
   "form-multi-select-select-all-bg":            $form-multi-select-select-all-bg-dt,
   "form-multi-select-select-all-hover-color":   $form-multi-select-select-all-hover-color-dt,

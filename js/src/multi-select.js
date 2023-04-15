@@ -51,6 +51,7 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group'
 const CLASS_NAME_LABEL = 'label'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
@@ -68,7 +69,6 @@ const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TAG = 'form-multi-select-tag'
 const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
-const CLASS_NAME_TOGGLER = 'form-multi-select-toggler'
 
 const Default = {
   cleaner: true,
@@ -131,7 +131,7 @@ class MultiSelect extends BaseComponent {
     this._options = this._getOptions()
     this._popper = null
     this._search = ''
-    this._selection = this._getSelectedOptions(this._options)
+    this._selected = this._getSelectedOptions(this._options) // TODO : change to this._selected
 
     if (this._config.options.length > 0) {
       this._createNativeSelect(this._config.options)
@@ -207,7 +207,7 @@ class MultiSelect extends BaseComponent {
   update(config) {
     this._config = this._getConfig(config)
     this._options = this._getOptions()
-    this._selection = this._getSelectedOptions(this._options)
+    this._selected = this._getSelectedOptions(this._options)
     this._clone.remove()
     this._element.innerHTML = ''
     this._createNativeOptions(this._element, this._options)
@@ -246,7 +246,7 @@ class MultiSelect extends BaseComponent {
   }
 
   getValue() {
-    return this._selection
+    return this._selected
   }
 
   // Private
@@ -424,26 +424,22 @@ class MultiSelect extends BaseComponent {
   }
 
   _createSelect() {
-    const div = document.createElement('div')
-    div.classList.add(CLASS_NAME_SELECT)
-    div.classList.toggle('is-invalid', this._config.invalid)
-    div.classList.toggle('is-valid', this._config.valid)
-    div.setAttribute('aria-expanded', 'false')
+    const multiSelectEl = document.createElement('div')
+    multiSelectEl.classList.add(CLASS_NAME_SELECT)
+    multiSelectEl.classList.toggle('is-invalid', this._config.invalid)
+    multiSelectEl.classList.toggle('is-valid', this._config.valid)
+    multiSelectEl.setAttribute('aria-expanded', 'false')
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
     for (const className of this._getClassNames()) {
-      div.classList.add(className)
+      multiSelectEl.classList.add(className)
     }
 
-    if (this._config.multiple && this._config.selectionType === 'tags') {
-      div.classList.add(CLASS_NAME_SELECTION_TAGS)
-    }
-
-    this._clone = div
-    this._element.parentNode.insertBefore(div, this._element.nextSibling)
+    this._clone = multiSelectEl
+    this._element.parentNode.insertBefore(multiSelectEl, this._element.nextSibling)
     this._createSelection()
     this._createButtons()
 
@@ -463,11 +459,15 @@ class MultiSelect extends BaseComponent {
 
   _createSelection() {
     const togglerEl = document.createElement('div')
-    togglerEl.classList.add(CLASS_NAME_TOGGLER)
+    togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
+
+    if (this._config.multiple && this._config.selectionType === 'tags') {
+      selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS)
+    }
 
     togglerEl.append(selectionEl)
     this._clone.append(togglerEl)
@@ -658,8 +658,8 @@ class MultiSelect extends BaseComponent {
       this.deselectAll()
     }
 
-    if (this._selection.filter(e => e.value === value).length === 0) {
-      this._selection.push({
+    if (this._selected.filter(e => e.value === value).length === 0) {
+      this._selected.push({
         value,
         text
       })
@@ -677,7 +677,7 @@ class MultiSelect extends BaseComponent {
     }
 
     EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: this._selection
+      value: this._selected
     })
 
     this._updateSelection()
@@ -687,8 +687,8 @@ class MultiSelect extends BaseComponent {
   }
 
   _deselectOption(value) {
-    const selected = this._selection.filter(e => e.value !== value)
-    this._selection = selected
+    const selected = this._selected.filter(e => e.value !== value)
+    this._selected = selected
 
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
 
@@ -698,7 +698,7 @@ class MultiSelect extends BaseComponent {
     }
 
     EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: this._selection
+      value: this._selected
     })
 
     this._updateSelection()
@@ -708,8 +708,8 @@ class MultiSelect extends BaseComponent {
   }
 
   _deselectLastOption() {
-    if (this._selection.length > 0) {
-      const last = this._selection.pop()
+    if (this._selected.length > 0) {
+      const last = this._selected.pop()
       this._deselectOption(last.value)
     }
   }
@@ -718,29 +718,29 @@ class MultiSelect extends BaseComponent {
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._clone)
 
-    if (this._selection.length === 0 && !this._config.search) {
-      selection.innerHTML = `<span class="form-multi-select-text">${this._config.placeholder}</span>`
+    if (this._selected.length === 0 && !this._config.search) {
+      selection.innerHTML = `<span class="form-multi-select-placeholder">${this._config.placeholder}</span>`
       return
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-      selection.innerHTML = `<span class="form-multi-select-text">${this._selection.length} ${this._config.selectionTypeCounterText}</span>`
+      selection.innerHTML = `${this._selected.length} ${this._config.selectionTypeCounterText}`
     }
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
       selection.innerHTML = ''
 
-      for (const e of this._selection) {
-        selection.append(this._createTag(e.value, e.text))
+      for (const option of this._selected) {
+        selection.append(this._createTag(option.value, option.text))
       }
     }
 
     if (this._config.multiple && this._config.selectionType === 'text') {
-      selection.innerHTML = this._selection.map((option, index) => `<span>${option.text}${index === this._selection.length - 1 ? '' : ','}&nbsp;</span>`).join('')
+      selection.innerHTML = this._selected.map((option, index) => `<span>${option.text}${index === this._selected.length - 1 ? '' : ','}&nbsp;</span>`).join('')
     }
 
-    if (!this._config.multiple && this._selection.length > 0 && !this._config.search) {
-      selection.innerHTML = `<span class="form-multi-select-text">${this._selection[0].text}</span>`
+    if (!this._config.multiple && this._selected.length > 0 && !this._config.search) {
+      selection.innerHTML = this._selected[0].text
     }
 
     if (search) {
@@ -759,7 +759,7 @@ class MultiSelect extends BaseComponent {
 
     const selectionCleaner = SelectorEngine.findOne(SELECTOR_CLEANER, this._clone)
 
-    if (this._selection.length > 0) {
+    if (this._selected.length > 0) {
       selectionCleaner.style.removeProperty('display')
       return
     }
@@ -774,30 +774,30 @@ class MultiSelect extends BaseComponent {
 
     // Select single
 
-    if (!this._config.multiple && this._selection.length > 0) {
-      this._searchElement.placeholder = this._selection[0].text
+    if (!this._config.multiple && this._selected.length > 0) {
+      this._searchElement.placeholder = this._selected[0].text
       return
     }
 
-    if (!this._config.multiple && this._selection.length === 0) {
+    if (!this._config.multiple && this._selected.length === 0) {
       this._searchElement.placeholder = this._config.placeholder
       return
     }
 
     // Select multiple
 
-    if (this._config.multiple && this._selection.length > 0 && this._config.selectionType !== 'counter') {
+    if (this._config.multiple && this._selected.length > 0 && this._config.selectionType !== 'counter') {
       this._searchElement.removeAttribute('placeholder')
       return
     }
 
-    if (this._config.multiple && this._selection.length === 0) {
+    if (this._config.multiple && this._selected.length === 0) {
       this._searchElement.placeholder = this._config.placeholder
       return
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter') {
-      this._searchElement.placeholder = `${this._selection.length} item(s) selected`
+      this._searchElement.placeholder = `${this._selected.length} item(s) selected`
     }
   }
 
@@ -806,12 +806,12 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    if (this._selection.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+    if (this._selected.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
       this._searchElement.size = size
       return
     }
 
-    if (this._selection.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+    if (this._selected.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
       this._searchElement.removeAttribute('size')
     }
   }
@@ -939,7 +939,7 @@ class MultiSelect extends BaseComponent {
         continue
       }
 
-      context._clone.classList.remove(CLASS_NAME_SHOW)
+      context.hide()
 
       EventHandler.trigger(context._element, EVENT_HIDDEN)
     }
@@ -947,10 +947,9 @@ class MultiSelect extends BaseComponent {
 }
 
 /**
- * ------------------------------------------------------------------------
- * Data Api implementation
- * ------------------------------------------------------------------------
+ * Data API implementation
  */
+
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const ms of SelectorEngine.find(SELECTOR_SELECT)) {
     if (ms.tabIndex !== -1) {
@@ -963,10 +962,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 
 /**
- * ------------------------------------------------------------------------
  * jQuery
- * ------------------------------------------------------------------------
- * add .MultiSelect to jQuery only if jQuery is present
  */
 
 defineJQueryPlugin(MultiSelect)

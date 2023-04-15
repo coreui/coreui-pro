@@ -1178,8 +1178,6 @@ $form-select-transition:          $input-transition !default;
 // scss-docs-end form-select-variables
 
 // scss-docs-start form-multi-select-variables
-$form-multi-select-padding-y:               $input-padding-y !default;
-$form-multi-select-padding-x:               $input-padding-x !default;
 $form-multi-select-font-family:             $input-font-family !default;
 $form-multi-select-font-size:               $input-font-size !default;
 $form-multi-select-font-weight:             $input-font-weight !default;
@@ -1203,6 +1201,10 @@ $form-multi-select-focus-bg:                $input-bg !default;
 $form-multi-select-focus-border-color:      shift-color($component-active-bg, -25%) !default;
 $form-multi-select-focus-box-shadow:        $input-btn-focus-box-shadow !default;
 
+$form-multi-select-placeholder-color:       $gray-600 !default;
+
+$form-multi-select-selection-padding-y:       $input-padding-y !default;
+$form-multi-select-selection-padding-x:       $input-padding-x !default;
 $form-multi-select-selection-tags-gap:        .25rem !default;
 $form-multi-select-selection-tags-padding-y:  .25rem !default;
 $form-multi-select-selection-tags-padding-x:  .25rem !default;
@@ -1226,7 +1228,6 @@ $form-multi-select-cleaner-hover-color:   $high-emphasis !default;
 $form-multi-select-cleaner-hover-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-hover-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-cleaner-focus-color:   $high-emphasis !default;
 $form-multi-select-cleaner-focus-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-focus-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-// $form-multi-select-cleaner-border-color:  $input-border-color !default;
 
 $form-multi-select-indicator-width:         .75rem !default;
 $form-multi-select-indicator-height:        .75rem !default;
@@ -1293,18 +1294,18 @@ $form-multi-select-option-selected-indicator-border-color:  $form-multi-select-o
 
 $form-multi-select-option-disabled-color:  $gray-600 !default;
 
-$form-multi-select-padding-y-lg:                 $input-padding-y-lg !default;
-$form-multi-select-padding-x-lg:                 $input-padding-x-lg !default;
-$form-multi-select-font-size-lg:                 $input-font-size-lg !default;
+$form-multi-select-font-size-lg:     $input-font-size-lg !default;
+$form-multi-select-selection-padding-y-lg:       $input-padding-y-lg !default;
+$form-multi-select-selection-padding-x-lg:       $input-padding-x-lg !default;
 $form-multi-select-selection-tags-gap-lg:        .25rem !default;
 $form-multi-select-selection-tags-padding-y-lg:  .25rem !default;
 $form-multi-select-selection-tags-padding-x-lg:  .25rem !default;
 $form-multi-select-tag-padding-y-lg:             .175rem !default;
 $form-multi-select-tag-padding-x-lg:             .5rem !default;
 
-$form-multi-select-padding-y-sm:                 $input-padding-y-sm !default;
-$form-multi-select-padding-x-sm:                 $input-padding-x-sm !default;
-$form-multi-select-font-size-sm:                 $input-font-size-sm !default;
+$form-multi-select-font-size-sm:     $input-font-size-sm !default;
+$form-multi-select-selection-padding-y-sm:       $input-padding-y-sm !default;
+$form-multi-select-selection-padding-x-sm:       $input-padding-x-sm !default;
 $form-multi-select-selection-tags-gap-sm:        .125rem !default;
 $form-multi-select-selection-tags-padding-y-sm:  .0625rem !default;
 $form-multi-select-selection-tags-padding-x-sm:  .125rem !default;

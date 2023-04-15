@@ -1,8 +1,6 @@
 .form-multi-select {
   // scss-docs-start form-multi-select-css-vars
   --#{$prefix}form-multi-select-zindex: #{$zindex-form-multi-select};
-  --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y};
-  --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x};
   --#{$prefix}form-multi-select-font-family: #{$form-multi-select-font-family};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size};
   --#{$prefix}form-multi-select-font-weight: #{$form-multi-select-font-weight};
@@ -20,6 +18,10 @@
   --#{$prefix}form-multi-select-focus-bg: #{$form-multi-select-focus-bg};
   --#{$prefix}form-multi-select-focus-border-color: #{$form-multi-select-focus-border-color};
   --#{$prefix}form-multi-select-focus-box-shadow: #{$form-multi-select-focus-box-shadow};
+  --#{$prefix}form-multi-select-placeholder-color: #{$form-multi-select-placeholder-color};
+
+  --#{$prefix}form-multi-select-selection-padding-y: #{$form-multi-select-selection-padding-y};
+  --#{$prefix}form-multi-select-selection-padding-x: #{$form-multi-select-selection-padding-x};
 
   --#{$prefix}form-multi-select-cleaner-width: #{$form-multi-select-cleaner-width};
   --#{$prefix}form-multi-select-cleaner-height: #{$form-multi-select-cleaner-height};
@@ -116,10 +118,10 @@ select.form-multi-select {
   display: none;
 }
 
-.form-multi-select-toggler {
-  position: relative;
+.form-multi-select-input-group {
+  // position: relative;
   display: flex;
-  flex-wrap: wrap; // For form validation feedback
+  flex-wrap: wrap;
   align-items: stretch;
   width: 100%;
   font-family: var(--#{$prefix}form-multi-select-font-family);
@@ -157,15 +159,13 @@ select.form-multi-select {
   flex-wrap: wrap;
   width: 1%;
   min-width: 0;
-  padding: var(--#{$prefix}form-multi-select-padding-y) var(--#{$prefix}form-multi-select-padding-x);
-  padding-inline-end: 0;
+  padding: var(--#{$prefix}form-multi-select-selection-padding-y) var(--#{$prefix}form-multi-select-selection-padding-x);
+}
 
-  .form-multi-select-selection-tags & {
-    gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
-    align-content: center;
-    padding: var(--#{$prefix}form-multi-select-selection-tags-padding-y) var(--#{$prefix}form-multi-select-selection-tags-padding-x);
-    padding-inline-end: 0;
-  }
+.form-multi-select-selection-tags {
+  gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
+  align-content: center;
+  padding: var(--#{$prefix}form-multi-select-selection-tags-padding-y) var(--#{$prefix}form-multi-select-selection-tags-padding-x);
 }
 
 .form-multi-select-search {
@@ -180,26 +180,33 @@ select.form-multi-select {
     outline: 0;
   }
 
+  &::placeholder {
+    color: var(--#{$prefix}form-multi-select-placeholder-color);
+    opacity: 1;
+  }
+
   .form-multi-select.show &,
   &:placeholder-shown {
     display: flex;
   }
 
   .form-multi-select-selection-tags & {
-    padding-inline-start: calc(var(--#{$prefix}form-multi-select-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
+    padding-inline-start: calc(var(--#{$prefix}form-multi-select-selection-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
   }
 }
 
-.form-multi-select-text {
+.form-multi-select-placeholder {
+  color: var(--#{$prefix}form-multi-select-placeholder-color);
+
   .form-multi-select-selection-tags & {
-    padding: calc(var(--#{$prefix}form-multi-select-padding-y) - .25rem) calc(var(--#{$prefix}form-multi-select-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
+    padding: calc(var(--#{$prefix}form-multi-select-selection-padding-y) - .25rem) calc(var(--#{$prefix}form-multi-select-selection-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
   }
 }
 
 .form-multi-select-buttons {
   display: flex;
   align-items: center;
-  min-height: calc(2 * var(--#{$prefix}form-multi-select-padding-y) + calc(var(--#{$prefix}form-multi-select-font-size) * var(--#{$prefix}form-multi-select-line-height)));  // stylelint-disable-line function-disallowed-list
+  min-height: calc(2 * var(--#{$prefix}form-multi-select-selection-padding-y) + calc(var(--#{$prefix}form-multi-select-font-size) * var(--#{$prefix}form-multi-select-line-height)));  // stylelint-disable-line function-disallowed-list
 }
 
 .form-multi-select-cleaner,
@@ -387,8 +394,8 @@ select.form-multi-select {
 
 
 .form-multi-select-sm {
-  --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y-sm};
-  --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x-sm};
+  --#{$prefix}form-multi-select-selection-padding-y: #{$form-multi-select-selection-padding-y-sm};
+  --#{$prefix}form-multi-select-selection-padding-x: #{$form-multi-select-selection-padding-x-sm};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size-sm};
   --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius-sm};
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-sm};
@@ -400,8 +407,8 @@ select.form-multi-select {
 }
 
 .form-multi-select-lg {
-  --#{$prefix}form-multi-select-padding-y: #{$form-multi-select-padding-y-lg};
-  --#{$prefix}form-multi-select-padding-x: #{$form-multi-select-padding-x-lg};
+  --#{$prefix}form-multi-select-selection-padding-y: #{$form-multi-select-selection-padding-y-lg};
+  --#{$prefix}form-multi-select-selection-padding-x: #{$form-multi-select-selection-padding-x-lg};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size-lg};
   --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius-lg};
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-lg};
