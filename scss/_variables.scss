@@ -1218,27 +1218,32 @@ $form-multi-select-tag-border-radius-lg:  .375rem !default;
 $form-multi-select-tag-padding-y:         .0625rem !default;
 $form-multi-select-tag-padding-x:         .5rem !default;
 
-$form-multi-select-cleaner-width:         .75rem !default;
-$form-multi-select-cleaner-height:        .75rem !default;
+$form-multi-select-buttons-padding-y:     .375rem !default;
+$form-multi-select-buttons-padding-x:     .375rem !default;
+
+$form-multi-select-cleaner-width:         1.5rem !default;
+$form-multi-select-cleaner-height:        1.5rem !default;
 $form-multi-select-cleaner-padding-x:     0 !default;
-$form-multi-select-cleaner-padding-y:     .5rem !default;
+$form-multi-select-cleaner-padding-y:     0 !default;
 $form-multi-select-cleaner-color:         $medium-emphasis !default;
 $form-multi-select-cleaner-bg:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-cleaner-hover-color:   $high-emphasis !default;
 $form-multi-select-cleaner-hover-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-hover-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-cleaner-focus-color:   $high-emphasis !default;
 $form-multi-select-cleaner-focus-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-focus-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-cleaner-bg-size:       .625rem !default;
 
-$form-multi-select-indicator-width:         .75rem !default;
-$form-multi-select-indicator-height:        .75rem !default;
-$form-multi-select-indicator-padding-x:     .75rem !default;
-$form-multi-select-indicator-padding-y:     .5rem !default;
+$form-multi-select-indicator-width:         1.5rem !default;
+$form-multi-select-indicator-height:        1.5rem !default;
+$form-multi-select-indicator-padding-x:     0 !default;
+$form-multi-select-indicator-padding-y:     0 !default;
 $form-multi-select-indicator-color:         $medium-emphasis !default;
 $form-multi-select-indicator-bg:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-color}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
 $form-multi-select-indicator-hover-color:   $high-emphasis !default;
 $form-multi-select-indicator-hover-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-hover-color}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
 $form-multi-select-indicator-focus-color:   $high-emphasis !default;
 $form-multi-select-indicator-focus-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-focus-color}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-indicator-bg-size:       .75rem !default;
 
 $form-multi-select-dropdown-min-width:      100% !default;
 $form-multi-select-dropdown-bg:             $white !default;

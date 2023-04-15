@@ -23,11 +23,15 @@
   --#{$prefix}form-multi-select-selection-padding-y: #{$form-multi-select-selection-padding-y};
   --#{$prefix}form-multi-select-selection-padding-x: #{$form-multi-select-selection-padding-x};
 
+  --#{$prefix}form-multi-select-buttons-padding-y: #{$form-multi-select-buttons-padding-y};
+  --#{$prefix}form-multi-select-buttons-padding-x: #{$form-multi-select-buttons-padding-x};
+
   --#{$prefix}form-multi-select-cleaner-width: #{$form-multi-select-cleaner-width};
   --#{$prefix}form-multi-select-cleaner-height: #{$form-multi-select-cleaner-height};
   --#{$prefix}form-multi-select-cleaner-padding-y: #{$form-multi-select-cleaner-padding-y};
   --#{$prefix}form-multi-select-cleaner-padding-x: #{$form-multi-select-cleaner-padding-x};
   --#{$prefix}form-multi-select-cleaner-bg: #{escape-svg($form-multi-select-cleaner-bg)};
+  --#{$prefix}form-multi-select-cleaner-bg-size: #{$form-multi-select-cleaner-bg-size};
   --#{$prefix}form-multi-select-cleaner-hover-bg: #{escape-svg($form-multi-select-cleaner-hover-bg)};
   --#{$prefix}form-multi-select-cleaner-focus-bg: #{escape-svg($form-multi-select-cleaner-focus-bg)};
 
@@ -36,6 +40,7 @@
   --#{$prefix}form-multi-select-indicator-padding-y: #{$form-multi-select-indicator-padding-y};
   --#{$prefix}form-multi-select-indicator-padding-x: #{$form-multi-select-indicator-padding-x};
   --#{$prefix}form-multi-select-indicator-bg: #{escape-svg($form-multi-select-indicator-bg)};
+  --#{$prefix}form-multi-select-indicator-bg-size: #{$form-multi-select-indicator-bg-size};
   --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg)};
   --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg)};
 
@@ -207,6 +212,7 @@ select.form-multi-select {
   display: flex;
   align-items: center;
   min-height: calc(2 * var(--#{$prefix}form-multi-select-selection-padding-y) + calc(var(--#{$prefix}form-multi-select-font-size) * var(--#{$prefix}form-multi-select-line-height)));  // stylelint-disable-line function-disallowed-list
+  padding: var(--#{$prefix}form-multi-select-buttons-padding-y) var(--#{$prefix}form-multi-select-buttons-padding-x);
 }
 
 .form-multi-select-cleaner,
@@ -229,7 +235,7 @@ select.form-multi-select {
   height: var(--#{$prefix}form-multi-select-cleaner-height);
   padding: var(--#{$prefix}form-multi-select-cleaner-padding-y) var(--#{$prefix}form-multi-select-cleaner-padding-x);
   background-image: var(--#{$prefix}form-multi-select-cleaner-bg);
-  background-size: var(--#{$prefix}form-multi-select-cleaner-width) auto;
+  background-size: var(--#{$prefix}form-multi-select-cleaner-bg-size);
 
   &:hover {
     background-image: var(--#{$prefix}form-multi-select-cleaner-hover-bg);
@@ -245,7 +251,7 @@ select.form-multi-select {
   height: var(--#{$prefix}form-multi-select-indicator-height);
   padding: var(--#{$prefix}form-multi-select-indicator-padding-y) var(--#{$prefix}form-multi-select-indicator-padding-x);
   background-image: var(--#{$prefix}form-multi-select-indicator-bg);
-  background-size: var(--#{$prefix}form-multi-select-indicator-width) auto;
+  background-size: var(--#{$prefix}form-multi-select-indicator-bg-size);
   @include transition(transform .15s ease-in-out);
 
   &:hover {
