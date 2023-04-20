@@ -1,6 +1,6 @@
 .form-multi-select {
   // scss-docs-start form-multi-select-css-vars
-  --#{$prefix}form-multi-select-zindex: #{$zindex-form-multi-select};
+  --#{$prefix}form-multi-select-zindex: #{$form-multi-select-zindex};
   --#{$prefix}form-multi-select-font-family: #{$form-multi-select-font-family};
   --#{$prefix}form-multi-select-font-size: #{$form-multi-select-font-size};
   --#{$prefix}form-multi-select-font-weight: #{$form-multi-select-font-weight};
@@ -134,6 +134,7 @@ select.form-multi-select {
 }
 
 .form-multi-select-input-group {
+  // position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
