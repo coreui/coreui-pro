@@ -28,10 +28,10 @@ export const getAmPm = (date, locale) => {
   return date.getHours() >= 12 ? 'pm' : 'am'
 }
 
-export const getListOfHours = locale => Array.from({ length: isAmPm(locale) ? 12 : 24 }, (_, i) => {
+export const getListOfHours = (locale, ampm = 'auto') => Array.from({ length: (ampm === 'auto' && isAmPm(locale)) || ampm === true ? 12 : 24 }, (_, i) => {
   return {
-    value: isAmPm(locale) ? i + 1 : i,
-    label: (isAmPm(locale) ? i + 1 : i).toLocaleString(locale)
+    value: (ampm === 'auto' && isAmPm(locale)) || ampm === true ? i + 1 : i,
+    label: ((ampm === 'auto' && isAmPm(locale)) || ampm === true ? i + 1 : i).toLocaleString(locale)
   }
 })
 
@@ -41,13 +41,11 @@ export const getListOfMinutes = (locale, valueAsString = false) => Array.from({ 
   return {
     value: valueAsString ? i.toString() : i,
     label: d
-          .toLocaleTimeString(locale, {
-            hour: '2-digit',
-            hour12: false,
-            minute: '2-digit',
-            second: '2-digit'
-          })
-          .split(':')[1]
+      .toLocaleTimeString(locale, {
+        minute: '2-digit',
+        second: '2-digit'
+      })
+      .split(/[^\dA-Za-z\u06F0-\u06F9]/)[0]
   }
 })
 
@@ -57,13 +55,11 @@ export const getListOfSeconds = (locale, valueAsString = false) => Array.from({ 
   return {
     value: valueAsString ? i.toString() : i,
     label: d
-          .toLocaleTimeString(locale, {
-            hour: '2-digit',
-            hour12: false,
-            minute: '2-digit',
-            second: '2-digit'
-          })
-          .split(':')[2]
+      .toLocaleTimeString(locale, {
+        minute: '2-digit',
+        second: '2-digit'
+      })
+      .split(/[^\dA-Za-z\u06F0-\u06F9]/)[1]
   }
 })
 

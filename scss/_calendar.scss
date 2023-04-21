@@ -3,7 +3,8 @@
   --#{$prefix}calendar-table-margin: #{$calendar-table-margin};
   --#{$prefix}calendar-table-cell-size: #{$calendar-table-cell-size};
   --#{$prefix}calendar-nav-padding: #{$calendar-nav-padding};
-  --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid #{$calendar-nav-border-color};
+  --#{$prefix}calendar-nav-border-color: #{$calendar-nav-border-color};
+  --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid var(--#{$prefix}calendar-nav-border-color);
   --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color};
   --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
   --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};

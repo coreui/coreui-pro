@@ -1178,6 +1178,7 @@ $form-select-transition:          $input-transition !default;
 // scss-docs-end form-select-variables
 
 // scss-docs-start form-multi-select-variables
+$form-multi-select-zindex:                  1000 !default;
 $form-multi-select-font-family:             $input-font-family !default;
 $form-multi-select-font-size:               $input-font-size !default;
 $form-multi-select-font-weight:             $input-font-weight !default;
@@ -1309,7 +1310,7 @@ $form-multi-select-option-selected-indicator-border-color:  $form-multi-select-o
 
 $form-multi-select-option-disabled-color:  $gray-600 !default;
 
-$form-multi-select-font-size-lg:     $input-font-size-lg !default;
+$form-multi-select-font-size-lg:                 $input-font-size-lg !default;
 $form-multi-select-selection-padding-y-lg:       $input-padding-y-lg !default;
 $form-multi-select-selection-padding-x-lg:       $input-padding-x-lg !default;
 $form-multi-select-selection-tags-gap-lg:        .25rem !default;
@@ -1318,7 +1319,7 @@ $form-multi-select-selection-tags-padding-x-lg:  .25rem !default;
 $form-multi-select-tag-padding-y-lg:             .175rem !default;
 $form-multi-select-tag-padding-x-lg:             .5rem !default;
 
-$form-multi-select-font-size-sm:     $input-font-size-sm !default;
+$form-multi-select-font-size-sm:                 $input-font-size-sm !default;
 $form-multi-select-selection-padding-y-sm:       $input-padding-y-sm !default;
 $form-multi-select-selection-padding-x-sm:       $input-padding-x-sm !default;
 $form-multi-select-selection-tags-gap-sm:        .125rem !default;
@@ -1402,7 +1403,6 @@ $form-validation-states: (
 
 // scss-docs-start zindex-stack
 $zindex-dropdown:                   1000 !default;
-$zindex-form-multi-select:      1000 !default;
 $zindex-sticky:                     1020 !default;
 $zindex-fixed:                      1030 !default;
 $zindex-sidebar-backdrop:           1030 !default;
@@ -2329,26 +2329,68 @@ $calendar-cell-range-hover-border-color:    $primary !default;
 $calendar-cell-today-color:                 $danger !default;
 // scss-docs-end calendar-variables
 
-// Picker
-$picker-footer-border-width:  1px !default;
-$picker-footer-border-color:  $border-color !default;
-$picker-footer-padding:       .5rem !default;
-
 // Date Picker
 // scss-docs-start date-picker-variables
-$date-picker-default-icon-color:       $gray-600 !default;
-$date-picker-default-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$date-picker-default-icon-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$date-picker-default-icon-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$date-picker-default-icon-color}'></rect></svg>") !default;
-$date-picker-invalid-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$form-feedback-invalid-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$form-feedback-invalid-color}'></rect></svg>") !default;
-$date-picker-valid-icon:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$form-feedback-valid-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$form-feedback-valid-color}'></rect></svg>") !default;
+$date-picker-zindex:                   1000 !default;
+$date-picker-font-family:              $input-font-family !default;
+$date-picker-font-size:                $input-font-size !default;
+$date-picker-font-weight:              $input-font-weight !default;
+$date-picker-line-height:              $input-line-height !default;
+$date-picker-color:                    $input-color !default;
+$date-picker-bg:                       $input-bg !default;
+$date-picker-box-shadow:               $box-shadow-inset !default;
 
-$date-picker-cleaner-icon-color:       $gray-600 !default;
-$date-picker-cleaner-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-cleaner-icon-color}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$date-picker-cleaner-icon-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
-$date-picker-cleaner-icon-hover-color: $body-color !default;
-$date-picker-cleaner-icon-hover:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-cleaner-icon-hover-color}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$date-picker-cleaner-icon-hover-color})' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+$date-picker-border-width:             $input-border-width !default;
+$date-picker-border-color:             $input-border-color !default;
+$date-picker-border-radius:            $border-radius !default;
+$date-picker-border-radius-sm:         $border-radius-sm !default;
+$date-picker-border-radius-lg:         $border-radius-lg !default;
 
-$date-picker-separator-icon-color:     $gray-600 !default;
-$date-picker-separator-icon:           url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-separator-icon-color}' points='359.873 121.377 337.246 144.004 433.243 240.001 16 240.001 16 240.002 16 272.001 16 272.002 433.24 272.002 337.246 367.996 359.873 390.623 494.498 256 359.873 121.377'></polygon></svg>") !default;
-$date-picker-separator-icon-rtl:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-separator-icon-color}' points='497.333 239.999 80.092 239.999 176.087 144.004 153.46 121.377 18.837 256 153.46 390.623 176.087 367.996 80.09 271.999 497.333 271.999 497.333 239.999'></polygon></svg>") !default;
+$date-picker-disabled-color:           $gray-600 !default;
+$date-picker-disabled-bg:              $gray-200 !default;
+$date-picker-disabled-border-color:    $gray-400 !default;
+
+$date-picker-focus-color:              $input-color !default;
+$date-picker-focus-bg:                 $input-bg !default;
+$date-picker-focus-border-color:       shift-color($component-active-bg, -25%) !default;
+$date-picker-focus-box-shadow:         $input-btn-focus-box-shadow !default;
+
+$date-picker-placeholder-color:        $gray-600 !default;
+
+$date-picker-padding-y:                $input-padding-y !default;
+$date-picker-padding-x:                $input-padding-x !default;
+$date-picker-padding-y-sm:             $input-padding-y-sm !default;
+$date-picker-padding-x-sm:             $input-padding-x-sm !default;
+$date-picker-padding-y-lg:             $input-padding-y-lg !default;
+$date-picker-padding-x-lg:             $input-padding-x-lg !default;
+
+$date-picker-cleaner-icon-color:        $gray-600 !default;
+$date-picker-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-cleaner-icon-color}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$date-picker-cleaner-icon-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+$date-picker-cleaner-icon-hover-color:  $body-color !default;
+$date-picker-cleaner-icon-hover:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-cleaner-icon-hover-color}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$date-picker-cleaner-icon-hover-color})' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+$date-picker-cleaner-icon-bg-size:      1rem !default;
+$date-picker-cleaner-icon-bg-size-sm:   .875rem !default;
+$date-picker-cleaner-icon-bg-size-lg:   1.25rem !default;
+
+$date-picker-indicator-icon-color:       $gray-600 !default;
+$date-picker-indicator-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$date-picker-indicator-icon-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$date-picker-indicator-icon-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$date-picker-indicator-icon-color}'></rect></svg>") !default;
+$date-picker-indicator-invalid-icon:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$form-feedback-invalid-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$form-feedback-invalid-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$form-feedback-invalid-color}'></rect></svg>") !default;
+$date-picker-indicator-valid-icon:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$form-feedback-valid-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$form-feedback-valid-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$form-feedback-valid-color}'></rect></svg>") !default;
+$date-picker-indicator-icon-bg-size:     1rem !default;
+$date-picker-indicator-icon-bg-size-sm:  .875rem !default;
+$date-picker-indicator-icon-bg-size-lg:  1.25rem !default;
+
+$date-picker-separator-icon-color:       $gray-600 !default;
+$date-picker-separator-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-separator-icon-color}' points='359.873 121.377 337.246 144.004 433.243 240.001 16 240.001 16 240.002 16 272.001 16 272.002 433.24 272.002 337.246 367.996 359.873 390.623 494.498 256 359.873 121.377'></polygon></svg>") !default;
+$date-picker-separator-icon-rtl:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-separator-icon-color}' points='497.333 239.999 80.092 239.999 176.087 144.004 153.46 121.377 18.837 256 153.46 390.623 176.087 367.996 80.09 271.999 497.333 271.999 497.333 239.999'></polygon></svg>") !default;
+$date-picker-separator-icon-bg-size:     1rem !default;
+$date-picker-separator-icon-bg-size-sm:  .875rem !default;
+$date-picker-separator-icon-bg-size-lg:  1.25rem !default;
+
+$date-picker-dropdown-bg:             $white !default;
+$date-picker-dropdown-border-color:   $border-color !default;
+$date-picker-dropdown-border-width:   $border-width !default;
+$date-picker-dropdown-border-radius:  $border-radius !default;
 
 $date-picker-ranges-width:             10rem !default;
 $date-picker-ranges-padding:           $spacer * .5 !default;
@@ -2358,21 +2400,82 @@ $date-picker-ranges-border-color:      $border-color !default;
 $date-picker-timepicker-width:         (7 * $calendar-table-cell-size) + (2 * $calendar-table-margin) !default;
 $date-picker-timepicker-border-width:  1px !default;
 $date-picker-timepicker-border-color:  $border-color !default;
+
+$date-picker-footer-padding:           .5rem !default;
+$date-picker-footer-border-width:      1px !default;
+$date-picker-footer-border-color:      $border-color !default;
 // scss-docs-end date-picker-variables
 
 // Time Picker
 // scss-docs-start time-picker-variables
-$time-picker-default-icon-color:       $gray-600 !default;
-$time-picker-default-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-default-icon-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$time-picker-default-icon-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
-$time-picker-invalid-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-invalid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$form-feedback-invalid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
-$time-picker-valid-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-valid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$form-feedback-valid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
+$time-picker-zindex:                   1000 !default;
+$time-picker-font-family:              $input-font-family !default;
+$time-picker-font-size:                $input-font-size !default;
+$time-picker-font-weight:              $input-font-weight !default;
+$time-picker-line-height:              $input-line-height !default;
+$time-picker-color:                    $input-color !default;
+$time-picker-bg:                       $input-bg !default;
+$time-picker-box-shadow:               $box-shadow-inset !default;
 
-$time-picker-cleaner-icon-color:       $gray-600 !default;
-$time-picker-cleaner-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
-$time-picker-cleaner-icon-hover-color: $body-color !default;
-$time-picker-cleaner-icon-hover:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
+$time-picker-border-width:             $input-border-width !default;
+$time-picker-border-color:             $input-border-color !default;
+$time-picker-border-radius:            $border-radius !default;
+$time-picker-border-radius-sm:         $border-radius-sm !default;
+$time-picker-border-radius-lg:         $border-radius-lg !default;
+
+$time-picker-disabled-color:           $gray-600 !default;
+$time-picker-disabled-bg:              $gray-200 !default;
+$time-picker-disabled-border-color:    $gray-400 !default;
+
+$time-picker-focus-color:              $input-color !default;
+$time-picker-focus-bg:                 $input-bg !default;
+$time-picker-focus-border-color:       shift-color($component-active-bg, -25%) !default;
+$time-picker-focus-box-shadow:         $input-btn-focus-box-shadow !default;
+
+$time-picker-placeholder-color:        $gray-600 !default;
+
+$time-picker-padding-y:                $input-padding-y !default;
+$time-picker-padding-x:                $input-padding-x !default;
+$time-picker-padding-y-sm:             $input-padding-y-sm !default;
+$time-picker-padding-x-sm:             $input-padding-x-sm !default;
+$time-picker-padding-y-lg:             $input-padding-y-lg !default;
+$time-picker-padding-x-lg:             $input-padding-x-lg !default;
+
+$time-picker-cleaner-icon-color:        $gray-600 !default;
+$time-picker-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#{$time-picker-cleaner-icon-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
+$time-picker-cleaner-icon-hover-color:  $body-color !default;
+$time-picker-cleaner-icon-hover:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
+$time-picker-cleaner-icon-bg-size:      1rem !default;
+$time-picker-cleaner-icon-bg-size-sm:   .875rem !default;
+$time-picker-cleaner-icon-bg-size-lg:   1.25rem !default;
+
+$time-picker-indicator-icon-color:       $gray-600 !default;
+$time-picker-indicator-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-indicator-icon-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$time-picker-indicator-icon-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+$time-picker-indicator-invalid-icon:     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-invalid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-feedback-invalid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+$time-picker-indicator-valid-icon:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-valid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-feedback-valid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+$time-picker-indicator-icon-bg-size:     1rem !default;
+$time-picker-indicator-icon-bg-size-sm:  .875rem !default;
+$time-picker-indicator-icon-bg-size-lg:  1.25rem !default;
+
+$time-picker-dropdown-bg:             $white !default;
+$time-picker-dropdown-border-color:   $border-color !default;
+$time-picker-dropdown-border-width:   $border-width !default;
+$time-picker-dropdown-border-radius:  $border-radius !default;
 
 $time-picker-body-padding:             $spacer * .5 !default;
-$time-picker-roll-col-border-width:    1px !default;
-$time-picker-roll-col-border-color:    $border-color !default;
+
+$time-picker-footer-padding:           .5rem !default;
+$time-picker-footer-border-width:      1px !default;
+$time-picker-footer-border-color:      $border-color !default;
+
+$time-picker-roll-col-border-width:     1px !default;
+$time-picker-roll-col-border-color:     $border-color !default;
+$time-picker-roll-cell-selected-color:  var(--cui-white) !default;
+$time-picker-roll-cell-selected-bg:     var(--cui-primary) !default;
+
+$time-picker-inline-select-font-size:       $form-select-font-size-sm !default;
+$time-picker-inline-select-color:           $input-color !default;
+$time-picker-inline-select-padding-y:       $input-padding-y-sm !default;
+$time-picker-inline-select-padding-x:       $input-padding-x-sm !default;
+$time-picker-inline-select-disabled-color:  $gray-600 !default;
 // scss-docs-end time-picker-variables

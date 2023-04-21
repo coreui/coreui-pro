@@ -5,26 +5,33 @@
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin } from './util/index'
-import EventHandler from './dom/event-handler'
-import SelectorEngine from './dom/selector-engine'
-import DateRangePicker from './date-range-picker'
+import { defineJQueryPlugin } from './util/index.js'
+import EventHandler from './dom/event-handler.js'
+import SelectorEngine from './dom/selector-engine.js'
+import DateRangePicker from './date-range-picker.js'
 
 /**
-* ------------------------------------------------------------------------
-* Constants
-* ------------------------------------------------------------------------
-*/
+ * Constants
+ */
 
 const NAME = 'date-picker'
 const DATA_KEY = 'coreui.date-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const TAB_KEY = 'Tab'
+const RIGHT_MOUSE_BUTTON = 2
+
 const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`
+const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]'
+const CLASS_NAME_SHOW = 'show'
+
+const SELECTOR_CALENDAR = '.calendar'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)'
+const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
 
 const Default = {
   ...DateRangePicker.Default,
@@ -40,14 +47,11 @@ const DefaultType = {
 }
 
 /**
-* ------------------------------------------------------------------------
-* Class Definition
-* ------------------------------------------------------------------------
-*/
+ * Class definition
+ */
 
 class DatePicker extends DateRangePicker {
   // Getters
-
   static get Default() {
     return Default
   }
@@ -61,15 +65,14 @@ class DatePicker extends DateRangePicker {
   }
 
   // Overrides
-
   _addCalendarEventListeners() {
     super._addCalendarEventListeners()
-    for (const calendar of SelectorEngine.find('.calendar', this._element)) {
+    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date
         this._selectEndDate = event.selectEndDate
         this._startInput.value = this._setInputValue(event.date)
-        this._updateCalendars()
+        this._updateDateRangePickerCalendars()
 
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
           date: event.date,
@@ -108,13 +111,43 @@ class DatePicker extends DateRangePicker {
       data[config](this)
     })
   }
+
+  static clearMenus(event) {
+    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
+      return
+    }
+
+    const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)
+
+    for (const toggle of openToggles) {
+      const context = DatePicker.getInstance(toggle)
+
+      if (!context) {
+        continue
+      }
+
+      const composedPath = event.composedPath()
+
+      if (
+        composedPath.includes(context._element)
+      ) {
+        continue
+      }
+
+      const relatedTarget = { relatedTarget: context._element }
+
+      if (event.type === 'click') {
+        relatedTarget.clickEvent = event
+      }
+
+      context.hide()
+    }
+  }
 }
 
 /**
-* ------------------------------------------------------------------------
-* Data Api implementation
-* ------------------------------------------------------------------------
-*/
+ * Data API implementation
+ */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   const datePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
@@ -123,12 +156,12 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   }
 })
 
+EventHandler.on(document, EVENT_CLICK_DATA_API, DatePicker.clearMenus)
+EventHandler.on(document, EVENT_KEYUP_DATA_API, DatePicker.clearMenus)
+
 /**
-* ------------------------------------------------------------------------
-* jQuery
-* ------------------------------------------------------------------------
-* add .DatePicker to jQuery only if jQuery is present
-*/
+ * jQuery
+ */
 
 defineJQueryPlugin(DatePicker)
 
