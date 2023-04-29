@@ -190,6 +190,7 @@ class TimePicker extends BaseComponent {
   cancel() {
     this._date = this._initialDate
     this._input.value = this._initialDate ? this._convertStringToDate(this._initialDate).toLocaleTimeString(this._config.locale) : ''
+    this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this.hide()
     this._createTimePickerSelection()
@@ -198,6 +199,7 @@ class TimePicker extends BaseComponent {
   clear() {
     this._date = null
     this._input.value = ''
+    this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
   }
@@ -205,6 +207,7 @@ class TimePicker extends BaseComponent {
   reset() {
     this._date = this._convertStringToDate(this._config.time)
     this._input.value = this._convertStringToDate(this._config.time).toLocaleTimeString(this._config.locale)
+    this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
   }
@@ -256,9 +259,6 @@ class TimePicker extends BaseComponent {
       if (isValidTime(event.target.value)) {
         this._date = this._convertStringToDate(event.target.value)
 
-        // eslint-disable-next-line no-console
-        console.log(this._date)
-
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
           timeString: this._date ? this._date.toTimeString() : null,
           localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
@@ -267,23 +267,27 @@ class TimePicker extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
-      if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
-        if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
-          return this._element.classList.add(CLASS_NAME_IS_INVALID)
-        }
+    if (this._config.container === 'dropdown') {
+      EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
+        if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
+          if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
+            return this._element.classList.add(CLASS_NAME_IS_INVALID)
+          }
 
-        if (this._date instanceof Date) {
-          return this._element.classList.add(CLASS_NAME_IS_VALID)
-        }
+          if (this._date instanceof Date) {
+            return this._element.classList.add(CLASS_NAME_IS_VALID)
+          }
 
-        this._element.classList.add(CLASS_NAME_IS_INVALID)
-      }
-    })
+          this._element.classList.add(CLASS_NAME_IS_INVALID)
+        }
+      })
+    }
   }
 
   _createTimePicker() {
     this._element.classList.add(CLASS_NAME_TIME_PICKER)
+
+    Manipulator.setDataAttribute(this._element, 'toggle', CLASS_NAME_TIME_PICKER)
 
     if (this._config.size) {
       this._element.classList.add(`time-picker-${this._config.size}`)
@@ -640,11 +644,12 @@ class TimePicker extends BaseComponent {
       _date.setSeconds(Number.parseInt(value, 10))
     }
 
+    this._date = new Date(_date)
+
     if (this._input) {
       this._input.value = _date.toLocaleTimeString(this._config.locale)
+      this._input.dispatchEvent(new Event('change'))
     }
-
-    this._date = new Date(_date)
 
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
       timeString: _date.toTimeString(),
