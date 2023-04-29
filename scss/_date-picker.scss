@@ -8,8 +8,8 @@
   --#{$prefix}date-picker-color: #{$date-picker-color};
   --#{$prefix}date-picker-bg: #{$date-picker-bg};
   --#{$prefix}date-picker-box-shadow: #{$date-picker-box-shadow};
+  --#{$prefix}date-picker-border-width: #{$date-picker-border-width};
   --#{$prefix}date-picker-border-color: #{$date-picker-border-color};
-  --#{$prefix}date-picker-border: #{$date-picker-border-width} solid var(--#{$prefix}date-picker-border-color);
   --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius};
   --#{$prefix}date-picker-disabled-color: #{$date-picker-disabled-color};
   --#{$prefix}date-picker-disabled-bg: #{$date-picker-disabled-bg};
@@ -30,19 +30,19 @@
   --#{$prefix}date-picker-separator-icon-rtl: #{escape-svg($date-picker-separator-icon-rtl)};
   --#{$prefix}date-picker-separator-icon-bg-size: #{$date-picker-separator-icon-bg-size};
   --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg};
+  --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width};
   --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
-  --#{$prefix}date-picker-dropdown-border: #{$date-picker-dropdown-border-width} solid var(--#{$prefix}date-picker-dropdown-border-color);
   --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
   --#{$prefix}date-picker-ranges-width: #{$date-picker-ranges-width};
   --#{$prefix}date-picker-ranges-padding: #{$date-picker-ranges-padding};
+  --#{$prefix}date-picker-ranges-border-width: #{$date-picker-ranges-border-width};
   --#{$prefix}date-picker-ranges-border-color: #{$date-picker-ranges-border-color};
-  --#{$prefix}date-picker-ranges-border: #{$date-picker-ranges-border-width} solid var(--#{$prefix}date-picker-ranges-border-color);
   --#{$prefix}date-picker-timepicker-width: #{$date-picker-timepicker-width};
   --#{$prefix}date-picker-timepicker-border-color: #{$date-picker-timepicker-border-color};
   --#{$prefix}date-picker-timepicker-border-top: #{$date-picker-timepicker-border-width} solid var(--#{$prefix}date-picker-timepicker-border-color);
   --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding};
+  --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width};
   --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color};
-  --#{$prefix}date-picker-footer-border-top: #{$date-picker-footer-border-width} solid var(--#{$prefix}date-picker-footer-border-color);
   // scss-docs-end date-picker-css-vars
 
   &.is-invalid {
@@ -63,8 +63,9 @@
   align-items: stretch;
   width: 100%;
   background-color: var(--#{$prefix}date-picker-bg);
-  border: var(--#{$prefix}date-picker-border);
-  @include border-radius(var(--#{$prefix}date-picker-border-radius), 0);
+  background-clip: padding-box;
+  border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
+  @include border-radius(var(--#{$prefix}date-picker-border-radius));
 
   &:hover {
     .date-picker-input:not(:placeholder-shown) {
@@ -78,8 +79,8 @@
   }
 
   .date-picker.disabled & {
+    --#{$prefix}date-picker-border-color: var(--#{$prefix}date-picker-disabled-border-color);
     background-color: var(--#{$prefix}date-picker-disabled-bg);
-    border-color: var(--#{$prefix}date-picker-disabled-border-color);
   }
 
   .date-picker.show & {
@@ -167,7 +168,7 @@
   width: min-content;
   background-color: var(--#{$prefix}date-picker-dropdown-bg);
   background-clip: padding-box;
-  border: var(--#{$prefix}date-picker-dropdown-border);
+  border: var(--#{$prefix}$date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
   @include elevation(4);
 
@@ -189,7 +190,7 @@
   display: flex;
   justify-content: flex-end;
   padding: var(--#{$prefix}date-picker-footer-padding);
-  border-top: var(--#{$prefix}date-picker-footer-border-top);
+  border-top: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
 
   .btn + .btn {
     margin-inline-start: .5rem;
@@ -200,7 +201,7 @@
   grid-area: ranges;
   width: var(--#{$prefix}date-picker-ranges-width);
   padding: var(--#{$prefix}date-picker-ranges-padding);
-  border-right: var(--#{$prefix}date-picker-ranges-border);
+  border-right: var(--#{$prefix}date-picker-ranges-border-width) solid var(--#{$prefix}date-picker-ranges-border-color);
 }
 
 .date-picker-calendars {

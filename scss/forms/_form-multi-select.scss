@@ -8,8 +8,8 @@
   --#{$prefix}form-multi-select-color: #{$form-multi-select-color};
   --#{$prefix}form-multi-select-bg: #{$form-multi-select-bg};
   --#{$prefix}form-multi-select-box-shadow: #{$form-multi-select-box-shadow};
+  --#{$prefix}form-multi-select-border-width: #{$form-multi-select-border-width};
   --#{$prefix}form-multi-select-border-color: #{$form-multi-select-border-color};
-  --#{$prefix}form-multi-select-border: #{$form-multi-select-border-width} solid var(--#{$prefix}form-multi-select-border-color);
   --#{$prefix}form-multi-select-border-radius: #{$form-multi-select-border-radius};
   --#{$prefix}form-multi-select-disabled-color: #{$form-multi-select-disabled-color};
   --#{$prefix}form-multi-select-disabled-bg: #{$form-multi-select-disabled-bg};
@@ -19,13 +19,8 @@
   --#{$prefix}form-multi-select-focus-border-color: #{$form-multi-select-focus-border-color};
   --#{$prefix}form-multi-select-focus-box-shadow: #{$form-multi-select-focus-box-shadow};
   --#{$prefix}form-multi-select-placeholder-color: #{$form-multi-select-placeholder-color};
-
   --#{$prefix}form-multi-select-selection-padding-y: #{$form-multi-select-selection-padding-y};
   --#{$prefix}form-multi-select-selection-padding-x: #{$form-multi-select-selection-padding-x};
-
-  --#{$prefix}form-multi-select-buttons-padding-y: #{$form-multi-select-buttons-padding-y};
-  --#{$prefix}form-multi-select-buttons-padding-x: #{$form-multi-select-buttons-padding-x};
-
   --#{$prefix}form-multi-select-cleaner-width: #{$form-multi-select-cleaner-width};
   --#{$prefix}form-multi-select-cleaner-height: #{$form-multi-select-cleaner-height};
   --#{$prefix}form-multi-select-cleaner-padding-y: #{$form-multi-select-cleaner-padding-y};
@@ -34,7 +29,6 @@
   --#{$prefix}form-multi-select-cleaner-bg-size: #{$form-multi-select-cleaner-bg-size};
   --#{$prefix}form-multi-select-cleaner-hover-bg: #{escape-svg($form-multi-select-cleaner-hover-bg)};
   --#{$prefix}form-multi-select-cleaner-focus-bg: #{escape-svg($form-multi-select-cleaner-focus-bg)};
-
   --#{$prefix}form-multi-select-indicator-width: #{$form-multi-select-indicator-width};
   --#{$prefix}form-multi-select-indicator-height: #{$form-multi-select-indicator-height};
   --#{$prefix}form-multi-select-indicator-padding-y: #{$form-multi-select-indicator-padding-y};
@@ -43,41 +37,36 @@
   --#{$prefix}form-multi-select-indicator-bg-size: #{$form-multi-select-indicator-bg-size};
   --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg)};
   --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg)};
-
   --#{$prefix}form-multi-select-select-all-padding-y: #{$form-multi-select-select-all-padding-y};
   --#{$prefix}form-multi-select-select-all-padding-x: #{$form-multi-select-select-all-padding-x};
   --#{$prefix}form-multi-select-select-all-color: #{$form-multi-select-select-all-color};
   --#{$prefix}form-multi-select-select-all-bg: #{$form-multi-select-select-all-bg};
+  --#{$prefix}form-multi-select-select-all-border-width: #{$form-multi-select-select-all-border-width};
   --#{$prefix}form-multi-select-select-all-border-color: #{$form-multi-select-select-all-border-color};
-  --#{$prefix}form-multi-select-select-all-border: #{$form-multi-select-select-all-border-width} solid var(--#{$prefix}form-multi-select-select-all-border-color);
   --#{$prefix}form-multi-select-select-all-hover-color: #{$form-multi-select-select-all-hover-color};
   --#{$prefix}form-multi-select-select-all-hover-bg: #{$form-multi-select-select-all-hover-bg};
-
   --#{$prefix}form-multi-select-dropdown-min-width: #{$form-multi-select-dropdown-min-width};
   --#{$prefix}form-multi-select-dropdown-bg: #{$form-multi-select-dropdown-bg};
+  --#{$prefix}form-multi-select-dropdown-border-width: #{$form-multi-select-dropdown-border-width};
   --#{$prefix}form-multi-select-dropdown-border-color: #{$form-multi-select-dropdown-border-color};
-  --#{$prefix}form-multi-select-dropdown-border: #{$form-multi-select-dropdown-border-width} solid var(--#{$prefix}form-multi-select-dropdown-border-color);
   --#{$prefix}form-multi-select-dropdown-border-radius: #{$form-multi-select-dropdown-border-radius};
-
   --#{$prefix}form-multi-select-options-padding-y: #{$form-multi-select-options-padding-y};
   --#{$prefix}form-multi-select-options-padding-x: #{$form-multi-select-options-padding-x};
   --#{$prefix}form-multi-select-options-font-size: #{$form-multi-select-options-font-size};
   --#{$prefix}form-multi-select-options-font-weight: #{$form-multi-select-options-font-weight};
   --#{$prefix}form-multi-select-options-color: #{$form-multi-select-options-color};
-
   --#{$prefix}form-multi-select-optgroup-label-padding-y: #{$form-multi-select-optgroup-label-padding-y};
   --#{$prefix}form-multi-select-optgroup-label-padding-x: #{$form-multi-select-optgroup-label-padding-x};
   --#{$prefix}form-multi-select-optgroup-label-font-size: #{$form-multi-select-optgroup-label-font-size};
   --#{$prefix}form-multi-select-optgroup-label-font-weight: #{$form-multi-select-optgroup-label-font-weight};
   --#{$prefix}form-multi-select-optgroup-label-color: #{$form-multi-select-optgroup-label-color};
   --#{$prefix}form-multi-select-optgroup-label-text-transform: #{$form-multi-select-optgroup-label-text-transform};
-
   --#{$prefix}form-multi-select-option-padding-y: #{$form-multi-select-option-padding-y};
   --#{$prefix}form-multi-select-option-padding-x: #{$form-multi-select-option-padding-x};
   --#{$prefix}form-multi-select-option-margin-y: #{$form-multi-select-option-margin-y};
   --#{$prefix}form-multi-select-option-margin-x: #{$form-multi-select-option-margin-x};
+  --#{$prefix}form-multi-select-option-border-width: #{$form-multi-select-option-border-width};
   --#{$prefix}form-multi-select-option-border-color: #{$form-multi-select-option-border-color};
-  --#{$prefix}form-multi-select-option-border: #{$form-multi-select-option-border-width} solid var(--#{$prefix}form-multi-select-option-border-color);
   --#{$prefix}form-multi-select-option-border-radius: #{$form-multi-select-option-border-radius};
   --#{$prefix}form-multi-select-option-box-shadow: #{$form-multi-select-option-box-shadow};
   --#{$prefix}form-multi-select-option-hover-color: #{$form-multi-select-option-hover-color};
@@ -92,14 +81,12 @@
   --#{$prefix}form-multi-select-option-selected-indicator-bg: #{$form-multi-select-option-selected-indicator-bg};
   --#{$prefix}form-multi-select-option-selected-indicator-bg-image: #{escape-svg($form-multi-select-option-selected-indicator-bg-image)};
   --#{$prefix}form-multi-select-option-selected-indicator-border-color: #{$form-multi-select-option-selected-indicator-border-color};
-
   --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y};
   --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x};
   --#{$prefix}form-multi-select-tag-bg: #{$form-multi-select-tag-bg};
+  --#{$prefix}form-multi-select-tag-border-width: #{$form-multi-select-tag-border-width};
   --#{$prefix}form-multi-select-tag-border-color: #{$form-multi-select-tag-border-color};
-  --#{$prefix}form-multi-select-tag-border: #{$form-multi-select-tag-border-width} solid var(--#{$prefix}form-multi-select-tag-border-color);
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius};
-
   --#{$prefix}form-multi-select-tag-delete-width: #{$form-multi-select-tag-delete-width};
   --#{$prefix}form-multi-select-tag-delete-height: #{$form-multi-select-tag-delete-height};
   --#{$prefix}form-multi-select-tag-delete-color: #{$form-multi-select-tag-delete-color};
@@ -109,7 +96,6 @@
   --#{$prefix}form-multi-select-tag-delete-focus-color: #{$form-multi-select-tag-delete-focus-color};
   --#{$prefix}form-multi-select-tag-delete-focus-bg: #{$form-multi-select-tag-delete-focus-bg};
   --#{$prefix}form-multi-select-tag-delete-bg-size: #{$form-multi-select-tag-delete-bg-size};
-
   --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap};
   --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x};
@@ -134,7 +120,6 @@ select.form-multi-select {
 }
 
 .form-multi-select-input-group {
-  // position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -145,8 +130,9 @@ select.form-multi-select {
   line-height: var(--#{$prefix}form-multi-select-line-height);
   color: var(--#{$prefix}form-multi-select-color);
   background-color: var(--#{$prefix}form-multi-select-bg);
-  border: var(--#{$prefix}form-multi-select-border);
-  @include border-radius(var(--#{$prefix}form-multi-select-border-radius), 0);
+  background-clip: padding-box;
+  border: var(--#{$prefix}form-multi-select-border-width) solid var(--#{$prefix}form-multi-select-border-color);
+  @include border-radius(var(--#{$prefix}form-multi-select-border-radius));
 
   .form-multi-select.disabled & {
     color: var(--#{$prefix}form-multi-select-disabled-color);
@@ -222,7 +208,7 @@ select.form-multi-select {
   display: flex;
   align-items: center;
   min-height: calc(2 * var(--#{$prefix}form-multi-select-selection-padding-y) + calc(var(--#{$prefix}form-multi-select-font-size) * var(--#{$prefix}form-multi-select-line-height)));  // stylelint-disable-line function-disallowed-list
-  padding: var(--#{$prefix}form-multi-select-buttons-padding-y) var(--#{$prefix}form-multi-select-buttons-padding-x);
+  padding: 0 var(--#{$prefix}form-multi-select-selection-padding-y);
 }
 
 .form-multi-select-cleaner,
@@ -282,7 +268,7 @@ select.form-multi-select {
   align-items: center;
   padding: var(--#{$prefix}form-multi-select-tag-padding-y) var(--#{$prefix}form-multi-select-tag-padding-x);
   background-color: var(--#{$prefix}form-multi-select-tag-bg);
-  border: var(--#{$prefix}form-multi-select-tag-border);
+  border: var(--#{$prefix}form-multi-select-tag-border-width) solid var(--#{$prefix}form-multi-select-tag-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-tag-border-radius));
 }
 
@@ -309,7 +295,7 @@ select.form-multi-select {
   min-width: var(--#{$prefix}form-multi-select-dropdown-min-width);
   background-color: var(--#{$prefix}form-multi-select-dropdown-bg);
   background-clip: padding-box;
-  border: var(--#{$prefix}form-multi-select-dropdown-border);
+  border: var(--#{$prefix}form-multi-select-dropdown-border-width) solid var(--#{$prefix}form-multi-select-dropdown-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-dropdown-border-radius));
   @include elevation(4);
 
@@ -326,7 +312,7 @@ select.form-multi-select {
   text-align: start;
   background-color: var(--#{$prefix}form-multi-select-select-all-bg);
   border: 0;
-  border-bottom: var(--#{$prefix}form-multi-select-select-all-border);
+  border-bottom: var(--#{$prefix}form-multi-select-select-all-border-width) solid var(--#{$prefix}form-multi-select-select-all-border-color);
 
   &:hover {
     color: var(--#{$prefix}form-multi-select-select-all-hover-color);
@@ -347,7 +333,7 @@ select.form-multi-select {
   padding: var(--#{$prefix}form-multi-select-option-padding-y) var(--#{$prefix}form-multi-select-option-padding-x);
   margin: var(--#{$prefix}form-multi-select-option-margin-y) var(--#{$prefix}form-multi-select-option-margin-x);
   cursor: pointer;
-  border: var(--#{$prefix}form-multi-select-option-border);
+  border: var(--#{$prefix}form-multi-select-option-border-width) solid var(--#{$prefix}form-multi-select-option-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-option-border-radius), 0);
 
   &:hover,

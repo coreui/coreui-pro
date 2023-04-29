@@ -8,8 +8,8 @@
   --#{$prefix}time-picker-color: #{$time-picker-color};
   --#{$prefix}time-picker-bg: #{$time-picker-bg};
   --#{$prefix}time-picker-box-shadow: #{$time-picker-box-shadow};
+  --#{$prefix}time-picker-border-width: #{$time-picker-border-width};
   --#{$prefix}time-picker-border-color: #{$time-picker-border-color};
-  --#{$prefix}time-picker-border: #{$time-picker-border-width} solid var(--#{$prefix}time-picker-border-color);
   --#{$prefix}time-picker-border-radius: #{$time-picker-border-radius};
   --#{$prefix}time-picker-disabled-color: #{$time-picker-disabled-color};
   --#{$prefix}time-picker-disabled-bg: #{$time-picker-disabled-bg};
@@ -27,15 +27,15 @@
   --#{$prefix}time-picker-cleaner-icon-hover: #{escape-svg($time-picker-cleaner-icon-hover)};
   --#{$prefix}time-picker-cleaner-icon-bg-size: #{$time-picker-cleaner-icon-bg-size};
   --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
+  --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width};
   --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color};
-  --#{$prefix}time-picker-footer-border-top: #{$time-picker-footer-border-width} solid var(--#{$prefix}time-picker-footer-border-color);
   --#{$prefix}time-picker-footer-padding: #{$time-picker-footer-padding};
   --#{$prefix}time-picker-dropdown-bg: #{$time-picker-dropdown-bg};
+  --#{$prefix}time-picker-dropdown-border-width: #{$time-picker-dropdown-border-width};
   --#{$prefix}time-picker-dropdown-border-color: #{$time-picker-dropdown-border-color};
-  --#{$prefix}time-picker-dropdown-border: #{$time-picker-dropdown-border-width} solid var(--#{$prefix}time-picker-dropdown-border-color);
   --#{$prefix}time-picker-dropdown-border-radius: #{$time-picker-dropdown-border-radius};
+  --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
   --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
-  --#{$prefix}time-picker-roll-col-border: #{$time-picker-roll-col-border-width} solid var(--#{$prefix}time-picker-roll-col-border-color);
   --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
   --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
   --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
@@ -63,8 +63,9 @@
   align-items: stretch;
   width: 100%;
   background-color: var(--#{$prefix}time-picker-bg);
-  border: var(--#{$prefix}time-picker-border);
-  @include border-radius(var(--#{$prefix}time-picker-border-radius), 0);
+  background-clip: padding-box;
+  border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);
+  @include border-radius(var(--#{$prefix}time-picker-border-radius));
 
   &:hover {
     .time-picker-input:not(:placeholder-shown) {
@@ -161,7 +162,7 @@
   width: min-content;
   background-color: var(--#{$prefix}time-picker-dropdown-bg);
   background-clip: padding-box;
-  border: var(--#{$prefix}time-picker-dropdown-border);
+  border: var(--#{$prefix}time-picker-dropdown-border-width) solid var(--#{$prefix}time-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}time-picker-dropdown-border-radius));
   @include elevation(4);
 
@@ -216,7 +217,7 @@
   display: flex;
   justify-content: flex-end;
   padding: var(--#{$prefix}time-picker-footer-padding);
-  border-top: var(--#{$prefix}time-picker-footer-border-top);
+  border-top: var(--#{$prefix}time-picker-footer-border-width) solid var(--#{$prefix}time-picker-footer-border-color);
 
   .btn + .btn {
     margin-inline-start: .5rem;
@@ -226,13 +227,13 @@
 .time-picker-roll {
   padding: 0;
   overflow: hidden;
-  border-radius: inherit; // stylelint-disable-line
+  @include border-radius(inherit);
 }
 
 .time-picker-roll-col {
   height: calc(8 * 32px); // stylelint-disable-line
   overflow: scroll;
-  border-right: var(--#{$prefix}time-picker-roll-col-border);
+  border-right: var(--#{$prefix}time-picker-roll-col-border-width) solid var(--#{$prefix}time-picker-roll-col-border-color);
 
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
   scrollbar-width: none;  /* Firefox */
