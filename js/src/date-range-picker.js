@@ -47,6 +47,7 @@ const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_CLEANER = 'date-picker-cleaner'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
+const CLASS_NAME_DATE_RANGE_PICKER = 'date-range-picker'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_INDICATOR = 'date-picker-indicator'
@@ -232,8 +233,10 @@ class DateRangePicker extends BaseComponent {
   cancel() {
     this._endDate = this._initialEndDate
     this._endInput.value = this._setInputValue(this._initialEndDate)
+    this._endInput.dispatchEvent(new Event('change'))
     this._startDate = this._initialStartDate
     this._startInput.value = this._setInputValue(this._initialStartDate)
+    this._startInput.dispatchEvent(new Event('change'))
     this._calendars.innerHTML = ''
     if (this._config.timepicker) {
       this._timepickers.innerHTML = ''
@@ -247,8 +250,10 @@ class DateRangePicker extends BaseComponent {
   clear() {
     this._endDate = null
     this._endInput.value = ''
+    this._endInput.dispatchEvent(new Event('change'))
     this._startDate = null
     this._startInput.value = ''
+    this._startInput.dispatchEvent(new Event('change'))
     this._calendars.innerHTML = ''
     if (this._config.timepicker) {
       this._timepickers.innerHTML = ''
@@ -261,8 +266,10 @@ class DateRangePicker extends BaseComponent {
   reset() {
     this._endDate = this._config.endDate
     this._endInput.value = this._setInputValue(this._config.endDate)
+    this._endInput.dispatchEvent(new Event('change'))
     this._startDate = this._config.startDate
     this._startInput.value = this._setInputValue(this._config.startDate)
+    this._startInput.dispatchEvent(new Event('change'))
     this._calendars.innerHTML = ''
     if (this._config.timepicker) {
       this._timepickers.innerHTML = ''
@@ -408,6 +415,8 @@ class DateRangePicker extends BaseComponent {
   _createDateRangePicker() {
     this._element.classList.add(CLASS_NAME_DATE_PICKER)
 
+    Manipulator.setDataAttribute(this._element, 'toggle', this._config.range ? CLASS_NAME_DATE_RANGE_PICKER : CLASS_NAME_DATE_PICKER)
+
     if (this._config.size) {
       this._element.classList.add(`date-picker-${this._config.size}`)
     }
@@ -493,7 +502,9 @@ class DateRangePicker extends BaseComponent {
           this._startDate = this._config.ranges[key][0]
           this._endDate = this._config.ranges[key][1]
           this._startInput.value = this._setInputValue(this._startDate)
+          this._startInput.dispatchEvent(new Event('change'))
           this._endInput.value = this._setInputValue(this._endDate)
+          this._endInput.dispatchEvent(new Event('change'))
           this._updateDateRangePickerCalendars()
         })
 
@@ -645,7 +656,9 @@ class DateRangePicker extends BaseComponent {
         this._startDate = date
         this._endDate = date
         this._endInput.value = this._setInputValue(date)
+        this._endInput.dispatchEvent(new Event('change'))
         this._startInput.value = this._setInputValue(date)
+        this._startInput.dispatchEvent(new Event('change'))
         this._updateDateRangePickerCalendars()
       })
 
