@@ -79,7 +79,7 @@ Add any of the below-mentioned classes to modify the presentation of a badge. Pl
 {{< /example >}}
 
 {{< callout info >}}
-{{< partial "callout-warning-color-assistive-technologies.md" >}}
+{{< partial "callouts/warning-color-assistive-technologies.md" >}}
 {{< /callout >}}
 
 ## Pill badges
@@ -95,7 +95,7 @@ Apply the `.rounded-pill` modifier class to make badges rounded.
 
 ## Customizing
 
-### CSS Variables
+### CSS variables
 
 Badges use local CSS variables on `.badge` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 

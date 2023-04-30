@@ -24,7 +24,7 @@ Here's what you need to know before getting started with the navbar:
 - Navbars can be themed with CSS variables that are scoped to the `.navbar` base class. `.navbar-light` has been deprecated and `.navbar-dark` has been rewritten to override CSS variables instead of adding additional styles.
 
 {{< callout info >}}
-{{< partial "callout-info-prefersreducedmotion.md" >}}
+{{< partial "callouts/info-prefersreducedmotion.md" >}}
 {{< /callout >}}
 
 ## Supported content
@@ -42,7 +42,7 @@ Navbars come with built-in support for a handful of sub-components. Choose from 
 Here's an example of all the sub-components included in a responsive light-themed navbar that automatically collapses at the `lg` (large) breakpoint.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@ Here's an example of all the sub-components included in a responsive light-theme
 </nav>
 {{< /example >}}
 
-This example uses [background]({{< docsref "/utilities/background" >}}) (`bg-light`) and [spacing]({{< docsref "/utilities/spacing" >}}) (`me-auto`, `mb-2`, `mb-lg-0`, `me-2`) utility classes.
+This example uses [background]({{< docsref "/utilities/background" >}}) (`bg-body-tertiary"`) and [spacing]({{< docsref "/utilities/spacing" >}}) (`me-auto`, `mb-2`, `mb-lg-0`, `me-2`) utility classes.
 
 ### Brand
 
@@ -92,14 +92,14 @@ Add your text within an element with the `.navbar-brand` class.
 
 {{< example >}}
 <!-- As a link -->
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
   </div>
 </nav>
 
 <!-- As a heading -->
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <span class="navbar-brand mb-0 h1">Navbar</span>
   </div>
@@ -111,7 +111,7 @@ Add your text within an element with the `.navbar-brand` class.
 You can replace the text within the `.navbar-brand` with an `<img>`.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container">
     <a class="navbar-brand" href="#">
       <img src="/assets/brand/coreui-signet.svg" alt="" width="22" height="24">
@@ -125,7 +125,7 @@ You can replace the text within the `.navbar-brand` with an `<img>`.
 You can also make use of some additional utilities to add an image and text at the same time. Note the addition of `.d-inline-block` and `.align-text-top` on the `<img>`.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">
       <img src="/assets/brand/coreui-signet.svg" alt="" width="22" height="24" class="d-inline-block align-top">
@@ -144,7 +144,7 @@ Add the `.active` class on `.nav-link` to indicate the current page.
 Please note that you should also add the `aria-current` attribute on the active `.nav-link`.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -173,7 +173,7 @@ Please note that you should also add the `aria-current` attribute on the active 
 And because we use classes for our navs, you can avoid the list-based approach entirely if you like.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -194,7 +194,7 @@ And because we use classes for our navs, you can avoid the list-based approach e
 You can also use dropdowns in your navbar. Dropdown menus require a wrapping element for positioning, so be sure to use separate and nested elements for `.nav-item` and `.nav-link` as shown below.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
@@ -232,7 +232,7 @@ You can also use dropdowns in your navbar. Dropdown menus require a wrapping ele
 Place various form controls and components within a navbar:
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <form class="d-flex" role="search">
       <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
@@ -245,7 +245,7 @@ Place various form controls and components within a navbar:
 Immediate child elements of `.navbar` use flex layout and will default to `justify-content: space-between`. Use additional [flex utilities]({{< docsref "/utilities/flex" >}}) as needed to adjust this behavior.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand">Navbar</a>
     <form class="d-flex" role="search">
@@ -259,7 +259,7 @@ Immediate child elements of `.navbar` use flex layout and will default to `justi
 Input groups work, too. If your navbar is an entire form, or mostly a form, you can use the `<form>` element as the container and save some HTML.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <form class="container-fluid">
     <div class="input-group">
       <span class="input-group-text" id="basic-addon1">@</span>
@@ -272,7 +272,7 @@ Input groups work, too. If your navbar is an entire form, or mostly a form, you 
 Various buttons are supported as part of these navbar forms, too. This is also a great reminder that vertical alignment utilities can be used to align different sized elements.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <form class="container-fluid justify-content-start">
     <button class="btn btn-outline-success me-2" type="button">Main button</button>
     <button class="btn btn-sm btn-outline-secondary" type="button">Smaller button</button>
@@ -285,7 +285,7 @@ Various buttons are supported as part of these navbar forms, too. This is also a
 Navbars may contain bits of text with the help of `.navbar-text`. This class adjusts vertical alignment and horizontal spacing for strings of text.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <span class="navbar-text">
       Navbar text with an inline element
@@ -297,7 +297,7 @@ Navbars may contain bits of text with the help of `.navbar-text`. This class adj
 Mix and match with other components and utilities as needed.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar w/ text</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -390,7 +390,7 @@ Navbar themes are easier than ever thanks to CoreUI for Bootstrap's combination 
     </div>
   </nav>
 
-  <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;">
+  <nav class="navbar navbar-expand-lg" style="background-color: #e3f2fd;" data-coreui-theme="light">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
       <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
@@ -440,7 +440,7 @@ Although it's not required, you can wrap a navbar in a `.container` to center it
 
 {{< example >}}
 <div class="container">
-  <nav class="navbar navbar-expand-lg bg-light">
+  <nav class="navbar navbar-expand-lg bg-body-tertiary"">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Navbar</a>
     </div>
@@ -451,7 +451,7 @@ Although it's not required, you can wrap a navbar in a `.container` to center it
 Use any of the responsive containers to change how wide the content in your navbar is presented.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-md">
     <a class="navbar-brand" href="#">Navbar</a>
   </div>
@@ -465,7 +465,7 @@ Use our [position utilities]({{< docsref "/utilities/position" >}}) to place nav
 Fixed navbars use `position: fixed`, meaning they're pulled from the normal flow of the DOM and may require custom CSS (e.g., `padding-top` on the `<body>`) to prevent overlap with other elements.
 
 {{< example >}}
-<nav class="navbar bg-light">
+<nav class="navbar bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Default</a>
   </div>
@@ -473,7 +473,7 @@ Fixed navbars use `position: fixed`, meaning they're pulled from the normal flow
 {{< /example >}}
 
 {{< example >}}
-<nav class="navbar fixed-top bg-light">
+<nav class="navbar fixed-top bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Fixed top</a>
   </div>
@@ -481,7 +481,7 @@ Fixed navbars use `position: fixed`, meaning they're pulled from the normal flow
 {{< /example >}}
 
 {{< example >}}
-<nav class="navbar fixed-bottom bg-light">
+<nav class="navbar fixed-bottom bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Fixed bottom</a>
   </div>
@@ -489,7 +489,7 @@ Fixed navbars use `position: fixed`, meaning they're pulled from the normal flow
 {{< /example >}}
 
 {{< example >}}
-<nav class="navbar sticky-top bg-light">
+<nav class="navbar sticky-top bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Sticky top</a>
   </div>
@@ -497,7 +497,7 @@ Fixed navbars use `position: fixed`, meaning they're pulled from the normal flow
 {{< /example >}}
 
 {{< example >}}
-<nav class="navbar sticky-bottom bg-light">
+<nav class="navbar sticky-bottom bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Sticky bottom</a>
   </div>
@@ -513,7 +513,7 @@ Please note that this behavior comes with a potential drawback of `overflow`—w
 Here's an example navbar using `.navbar-nav-scroll` with `style="scroll-height: 100px;"`, with some extra margin utilities for optimum spacing.
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar scroll</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -564,7 +564,7 @@ Navbar togglers are left-aligned by default, but should they follow a sibling el
 With no `.navbar-brand` shown at the smallest breakpoint:
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -594,7 +594,7 @@ With no `.navbar-brand` shown at the smallest breakpoint:
 With a brand name shown on the left and toggler on the right:
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Navbar</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
@@ -624,7 +624,7 @@ With a brand name shown on the left and toggler on the right:
 With a toggler on the left and brand name on the right:
 
 {{< example >}}
-<nav class="navbar navbar-expand-lg bg-light">
+<nav class="navbar navbar-expand-lg bg-body-tertiary"">
   <div class="container-fluid">
     <button class="navbar-toggler" type="button" data-coreui-toggle="collapse" data-coreui-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -659,7 +659,7 @@ Sometimes you want to use the collapse plugin to trigger a container element for
 <div class="collapse" id="navbarToggleExternalContent">
   <div class="bg-dark p-4">
     <h5 class="text-white h4">Collapsed content</h5>
-    <span class="text-muted">Toggleable via the navbar brand.</span>
+    <span class="text-body-secondary">Toggleable via the navbar brand.</span>
   </div>
 </div>
 <nav class="navbar navbar-dark bg-dark">
@@ -680,7 +680,7 @@ Transform your expanding and collapsing navbar into an offcanvas drawer with the
 In the example below, to create an offcanvas navbar that is always collapsed across all breakpoints, omit the `.navbar-expand-*` class entirely.
 
 {{< example >}}
-<nav class="navbar bg-light fixed-top">
+<nav class="navbar bg-body-tertiary" fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Offcanvas navbar</a>
     <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
@@ -726,7 +726,7 @@ In the example below, to create an offcanvas navbar that is always collapsed acr
 To create an offcanvas navbar that expands into a normal navbar at a specific breakpoint like `lg`, use `.navbar-expand-lg`.
 
 ```html
-<nav class="navbar navbar-expand-lg bg-light fixed-top">
+<nav class="navbar navbar-expand-lg bg-body-tertiary" fixed-top">
   <a class="navbar-brand" href="#">Offcanvas navbar</a>
   <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#navbarOffcanvasLg" aria-controls="navbarOffcanvasLg">
     <span class="navbar-toggler-icon"></span>
@@ -785,7 +785,7 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
 
 ## Customizing
 
-### CSS Variables
+### CSS variables
 
 Navbars use local CSS variables on `.navbar` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 
@@ -799,7 +799,7 @@ Some additional CSS variables are also present on `.navbar-nav`:
 
 {{< scss-docs name="navbar-variables" file="scss/_variables.scss" >}}
 
-{{< scss-docs name="navbar-theme-variables" file="scss/_variables.scss" >}}
+{{< scss-docs name="navbar-dark-variables" file="scss/_variables.scss" >}}
 
 ### SASS loop
 

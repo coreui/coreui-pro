@@ -1,15 +1,11 @@
-/*!
- * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.5.0
- * @link https://coreui.io/pro/
- * Copyright (c) 2021 creativeLabs Łukasz Holeczek
- * License (https://coreui.io/pro/license/)
- */
+@import "mixins/banner";
+@include bsBanner("");
 
 // scss-docs-start import-stack
 // Configuration
 @import "functions";
 @import "variables";
+@import "variables-dark";
 @import "maps";
 @import "mixins";
 @import "utilities";

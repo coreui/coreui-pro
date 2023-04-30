@@ -621,7 +621,7 @@ To make tabs fade in, add `.fade` to each `.tab-pane`. The first tab pane must a
 ### Methods
 
 {{< callout danger >}}
-{{< partial "callout-danger-async-methods.md" >}}
+{{< partial "callouts/danger-async-methods.md" >}}
 {{< /callout >}}
 
 #### constructor
@@ -671,7 +671,7 @@ tabEl.addEventListener('shown.coreui.tab', event => {
 
 ## Customizing
 
-### CSS Variables
+### CSS variables
 
 Navs use local CSS variables on `.nav`, `.nav-tabs`, and `.nav-pills` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 

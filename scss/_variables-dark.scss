@@ -1,0 +1,241 @@
+// Dark color mode variables
+//
+// Custom variables for the `[data-coreui-theme="dark"]` theme. Use this as a starting point for your own custom color modes by creating a new theme-specific file like `_variables-dark.scss` and adding the variables you need.
+
+//
+// Global colors
+//
+
+// scss-docs-start sass-dark-mode-vars
+// scss-docs-start gray-color-dark-variables
+$gray-100-dark: #f3f4f7 !default;
+$gray-200-dark: #e7eaee !default;
+$gray-300-dark: #dbdfe6 !default;
+$gray-400-dark: #cfd4de !default;
+$gray-500-dark: #aab3c5 !default;
+$gray-600-dark: #6d7d9c !default;
+$gray-700-dark: #4a566d !default;
+$gray-800-dark: #323a49 !default;
+$gray-900-dark: #212631 !default;
+// scss-docs-end gray-color-dark-variables
+
+// fusv-disable
+// scss-docs-start gray-colors-dark-map
+$grays-dark: (
+  "100": $gray-100-dark,
+  "200": $gray-200-dark,
+  "300": $gray-300-dark,
+  "400": $gray-400-dark,
+  "500": $gray-500-dark,
+  "600": $gray-600-dark,
+  "700": $gray-700-dark,
+  "800": $gray-800-dark,
+  "900": $gray-900-dark
+) !default;
+// scss-docs-end gray-colors-dark-map
+// fusv-enable
+
+// scss-docs-start theme-color-dark-variables
+$primary-dark:       tint-color(desaturate($primary, 20%), 20%) !default;
+$secondary-dark:     desaturate($secondary, 10%) !default;
+$success-dark:       desaturate($success, 10%) !default;
+$info-dark:          desaturate($info, 10%) !default;
+$warning-dark:       desaturate($warning, 10%) !default;
+$danger-dark:        desaturate($danger, 10%) !default;
+$light-dark:         desaturate($light, 10%) !default;
+$dark-dark:          desaturate($dark, 10%) !default;
+// scss-docs-end theme-color-dark-variables
+
+// scss-docs-start theme-colors-dark-map
+$theme-colors-dark: (
+  "primary":    $primary-dark,
+  "secondary":  $secondary-dark,
+  "success":    $success-dark,
+  "info":       $info-dark,
+  "warning":    $warning-dark,
+  "danger":     $danger-dark,
+  "light":      $light-dark,
+  "dark":       $dark-dark
+) !default;
+// scss-docs-end theme-colors-dark-map
+
+// scss-docs-start theme-text-dark-variables
+$primary-text-emphasis-dark:        $primary-text-emphasis !default;
+$secondary-text-emphasis-dark:      $secondary-text-emphasis !default;
+$success-text-emphasis-dark:        $success-text-emphasis !default;
+$info-text-emphasis-dark:           $info-text-emphasis !default;
+$warning-text-emphasis-dark:        $warning-text-emphasis !default;
+$danger-text-emphasis-dark:         $danger-text-emphasis !default;
+$light-text-emphasis-dark:          $gray-100-dark !default;
+$dark-text-emphasis-dark:           $gray-300-dark !default;
+// scss-docs-end theme-text-dark-variables
+
+// scss-docs-start theme-bg-subtle-dark-variables
+$primary-bg-subtle-dark:            $primary-bg-subtle !default;
+$secondary-bg-subtle-dark:          $secondary-bg-subtle !default;
+$success-bg-subtle-dark:            $success-bg-subtle !default;
+$info-bg-subtle-dark:               $info-bg-subtle !default;
+$warning-bg-subtle-dark:            $warning-bg-subtle !default;
+$danger-bg-subtle-dark:             $danger-bg-subtle !default;
+$light-bg-subtle-dark:              $gray-800-dark !default;
+$dark-bg-subtle-dark:               mix($gray-800-dark, $black) !default;
+// scss-docs-end theme-bg-subtle-dark-variables
+
+// scss-docs-start theme-border-subtle-dark-variables
+$primary-border-subtle-dark:        $primary-border-subtle !default;
+$secondary-border-subtle-dark:      $secondary-border-subtle !default;
+$success-border-subtle-dark:        $success-border-subtle !default;
+$info-border-subtle-dark:           $info-border-subtle !default;
+$warning-border-subtle-dark:        $warning-border-subtle !default;
+$danger-border-subtle-dark:         $danger-border-subtle !default;
+$light-border-subtle-dark:          $gray-700-dark !default;
+$dark-border-subtle-dark:           $gray-800-dark !default;
+// scss-docs-end theme-border-subtle-dark-variables
+
+$body-color-dark:                   $gray-500-dark !default;
+$body-bg-dark:                      $gray-900-dark !default;
+$body-secondary-color-dark:         rgba($body-color-dark, .75) !default;
+$body-secondary-bg-dark:            $gray-800-dark !default;
+$body-tertiary-color-dark:          rgba($body-color-dark, .5) !default;
+$body-tertiary-bg-dark:             mix($gray-800-dark, #181924, 50%) !default;
+$body-emphasis-color-dark:          $white !default;
+$border-color-dark:                 $gray-700-dark !default;
+$border-color-translucent-dark:     rgba($white, .15) !default;
+$headings-color-dark:               inherit !default;
+$link-color-dark:                   tint-color($primary, 40%) !default;
+$link-hover-color-dark:             shift-color($link-color-dark, -$link-shade-percentage) !default;
+$code-color-dark:                   tint-color($code-color, 40%) !default;
+
+
+//
+// Forms
+//
+
+$form-select-indicator-color-dark:  $body-color-dark !default;
+$form-select-indicator-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+
+$form-switch-color-dark:            rgba($white, .25) !default;
+$form-switch-bg-image-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color-dark}'/></svg>") !default;
+
+// scss-docs-start form-validation-colors-dark
+$form-valid-color-dark:             $green-300 !default;
+$form-valid-border-color-dark:      $green-300 !default;
+$form-invalid-color-dark:           $red-300 !default;
+$form-invalid-border-color-dark:    $red-300 !default;
+// scss-docs-end form-validation-colors-dark
+
+
+//
+// Accordion
+//
+
+$accordion-icon-color-dark:         $body-color-dark !default;
+$accordion-icon-active-color-dark:  $primary-text-emphasis-dark !default;
+
+$accordion-button-icon-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
+$accordion-button-active-icon-dark:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
+
+
+//
+// Buttons
+//
+
+$button-variants-dark: (
+  "primary":    btn-color-map($primary-dark, $primary-dark),
+  "secondary":  btn-color-map($secondary-dark, $secondary-dark),
+  "success":    btn-color-map($success-dark, $success-dark),
+  "danger":     btn-color-map($danger-dark, $danger-dark),
+  "warning":    btn-color-map($warning-dark, $warning-dark),
+  "info":       btn-color-map($info-dark, $info-dark)
+) !default;
+
+$button-outline-ghost-variants-dark: (
+  "primary":    btn-outline-color-map($primary-dark),
+  "secondary":  btn-outline-color-map($secondary-dark),
+  "success":    btn-outline-color-map($success-dark),
+  "danger":     btn-outline-color-map($danger-dark),
+  "warning":    btn-outline-color-map($warning-dark),
+  "info":       btn-outline-color-map($info-dark)
+) !default;
+
+//
+// Calendar
+//
+
+$calendar-nav-icon-double-next-color-dark:        $body-tertiary-color-dark !default;
+$calendar-nav-icon-double-next-dark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-next-color-dark}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-next-color-dark}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
+$calendar-nav-icon-double-next-hover-color-dark:  $body-color-dark !default;
+$calendar-nav-icon-double-next-hover-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-next-hover-color-dark}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-next-hover-color-dark}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
+
+$calendar-nav-icon-double-prev-color-dark:        $body-tertiary-color-dark !default;
+$calendar-nav-icon-double-prev-dark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-prev-color-dark}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-prev-color-dark}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
+$calendar-nav-icon-double-prev-hover-color-dark:  $body-color-dark !default;
+$calendar-nav-icon-double-prev-hover-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-prev-hover-color-dark}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-prev-hover-color-dark}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
+
+$calendar-nav-icon-next-color-dark:               $body-tertiary-color-dark !default;
+$calendar-nav-icon-next-dark:                     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-next-color-dark}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
+$calendar-nav-icon-next-hover-color-dark:         $body-color-dark !default;
+$calendar-nav-icon-next-hover-dark:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-next-hover-color-dark}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
+
+$calendar-nav-icon-prev-color-dark:               $body-tertiary-color-dark !default;
+$calendar-nav-icon-prev-dark:                     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-color-dark}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
+$calendar-nav-icon-prev-hover-color-dark:         $body-color-dark !default;
+$calendar-nav-icon-prev-hover-dark:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-hover-color-dark}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
+
+//
+// Date Picker
+//
+
+$date-picker-cleaner-icon-color-dark:        $body-tertiary-color-dark !default;
+$date-picker-cleaner-icon-dark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-cleaner-icon-color-dark}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$date-picker-cleaner-icon-color-dark}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+$date-picker-cleaner-icon-hover-color-dark:  $body-color-dark !default;
+$date-picker-cleaner-icon-hover-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-cleaner-icon-hover-color-dark}' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#{$date-picker-cleaner-icon-hover-color-dark}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
+
+$date-picker-indicator-icon-color-dark:      $body-tertiary-color-dark !default;
+$date-picker-indicator-icon-dark:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$date-picker-indicator-icon-color-dark}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$date-picker-indicator-icon-color-dark}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$date-picker-indicator-icon-color-dark}'></rect></svg>") !default;
+$date-picker-indicator-invalid-icon-dark:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$form-invalid-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$form-invalid-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$form-invalid-color}'></rect></svg>") !default;
+$date-picker-indicator-valid-icon-dark:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#{$form-valid-color}' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='200' y='224' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='280' y='224' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='368' y='224' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='112' y='296' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='200' y='296' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='280' y='296' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='368' y='296' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='112' y='368' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='200' y='368' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='280' y='368' fill='#{$form-valid-color}'></rect><rect width='32' height='32' x='368' y='368' fill='#{$form-valid-color}'></rect></svg>") !default;
+
+$date-picker-separator-icon-color-dark:      $body-tertiary-color-dark !default;
+$date-picker-separator-icon-dark:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-separator-icon-color-dark}' points='359.873 121.377 337.246 144.004 433.243 240.001 16 240.001 16 240.002 16 272.001 16 272.002 433.24 272.002 337.246 367.996 359.873 390.623 494.498 256 359.873 121.377'></polygon></svg>") !default;
+$date-picker-separator-icon-rtl-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$date-picker-separator-icon-color-dark}' points='497.333 239.999 80.092 239.999 176.087 144.004 153.46 121.377 18.837 256 153.46 390.623 176.087 367.996 80.09 271.999 497.333 271.999 497.333 239.999'></polygon></svg>") !default;
+
+//
+// Multi Select
+//
+
+$form-multi-select-tag-delete-color-dark:          $body-tertiary-color-dark !default;
+$form-multi-select-tag-delete-bg-dark:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-color-dark}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-hover-color-dark:    $body-color-dark !default;
+$form-multi-select-tag-delete-hover-bg-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-hover-color-dark}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-tag-delete-focus-color-dark:    $body-color-dark !default;
+$form-multi-select-tag-delete-focus-bg-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-tag-delete-focus-color-dark}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+
+$form-multi-select-cleaner-color-dark:             $body-tertiary-color-dark !default;
+$form-multi-select-cleaner-bg-dark:                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-color-dark}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-cleaner-hover-color-dark:       $body-color-dark !default;
+$form-multi-select-cleaner-hover-bg-dark:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-hover-color-dark}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+$form-multi-select-cleaner-focus-color-dark:       $body-color-dark !default;
+$form-multi-select-cleaner-focus-bg-dark:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-focus-color-dark}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
+
+$form-multi-select-indicator-color-dark:           $body-tertiary-color-dark !default;
+$form-multi-select-indicator-bg-dark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-color-dark}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-indicator-hover-color-dark:     $body-color-dark !default;
+$form-multi-select-indicator-hover-bg-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-hover-color-dark}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+$form-multi-select-indicator-focus-color-dark:     $body-color-dark !default;
+$form-multi-select-indicator-focus-bg-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#{$form-multi-select-indicator-focus-color-dark}'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
+
+//
+// Time Picker
+//
+
+$time-picker-cleaner-icon-color-dark:        $body-tertiary-color-dark !default;
+$time-picker-cleaner-icon-dark:              url("data:image/svg+ xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color-dark}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#{$time-picker-cleaner-icon-color-dark}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
+$time-picker-cleaner-icon-hover-color-dark:  $body-color-dark !default;
+$time-picker-cleaner-icon-hover-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color-dark}  ts='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color-dark}  425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
+
+$time-picker-indicator-icon-color-dark:      $body-tertiary-color-dark !default;
+$time-picker-indicator-icon-dark:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-indicator-icon-color-dark}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$time-picker-indicator-icon-color-dark}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+$time-picker-indicator-invalid-icon-dark:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-invalid-color-dark}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-invalid-color-dark}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+$time-picker-indicator-valid-icon-dark:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-valid-color-dark}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-valid-color-dark}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+// scss-docs-end sass-dark-mode-vars

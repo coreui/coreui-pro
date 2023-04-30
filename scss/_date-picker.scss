@@ -264,3 +264,17 @@
   --#{$prefix}date-picker-indicator-icon-bg-size: #{$date-picker-indicator-icon-bg-size-lg};
   --#{$prefix}date-picker-separator-icon-bg-size: #{$date-picker-separator-icon-bg-size-lg};
 }
+
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+    .date-picker {
+      --#{$prefix}date-picker-cleaner-icon: #{escape-svg($date-picker-cleaner-icon-dark)};
+      --#{$prefix}date-picker-cleaner-icon-hover: #{escape-svg($date-picker-cleaner-icon-hover-dark)};
+      --#{$prefix}date-picker-indicator-icon: #{escape-svg($date-picker-indicator-icon-dark)};
+      --#{$prefix}date-picker-indicator-invalid-icon: #{escape-svg($date-picker-indicator-invalid-icon-dark)};
+      --#{$prefix}date-picker-indicator-valid-icon: #{escape-svg($date-picker-indicator-valid-icon-dark)};
+      --#{$prefix}date-picker-separator-icon: #{escape-svg($date-picker-separator-icon-dark)};
+      --#{$prefix}date-picker-separator-icon-rtl: #{escape-svg($date-picker-separator-icon-rtl-dark)};
+    }
+  }
+}

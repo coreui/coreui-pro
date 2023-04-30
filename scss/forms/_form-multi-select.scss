@@ -137,7 +137,7 @@ select.form-multi-select {
   .form-multi-select.disabled & {
     color: var(--#{$prefix}form-multi-select-disabled-color);
     background-color: var(--#{$prefix}form-multi-select-disabled-bg);
-    border-color: var(--#{$prefix}form-multi-select-disabled-border-color);
+    border-color: $input-disabled-border-color;
   }
 
   .form-multi-select.show & {
@@ -430,4 +430,20 @@ select.form-multi-select {
   --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-lg};
   --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-lg};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
+}
+
+@if $enable-dark-mode {
+  @include color-mode(dark) {
+    .form-multi-select {
+      --#{$prefix}form-multi-select-tag-delete-bg: #{escape-svg($form-multi-select-tag-delete-bg-dark)};
+      --#{$prefix}form-multi-select-tag-delete-hover-bg: #{escape-svg($form-multi-select-tag-delete-hover-bg-dark)};
+      --#{$prefix}form-multi-select-tag-delete-focus-bg: #{escape-svg($form-multi-select-tag-delete-focus-bg-dark)};
+      --#{$prefix}form-multi-select-cleaner-bg: #{escape-svg($form-multi-select-cleaner-bg-dark)};
+      --#{$prefix}form-multi-select-cleaner-hover-bg: #{escape-svg($form-multi-select-cleaner-hover-bg-dark)};
+      --#{$prefix}form-multi-select-cleaner-focus-bg: #{escape-svg($form-multi-select-cleaner-focus-bg-dark)};
+      --#{$prefix}form-multi-select-indicator-bg: #{escape-svg($form-multi-select-indicator-bg-dark)};
+      --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg-dark)};
+      --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg-dark)};
+    }
+  }
 }
