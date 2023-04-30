@@ -39,14 +39,12 @@
   @include gradient-bg(var(--#{$prefix}btn-bg));
   @include box-shadow(var(--#{$prefix}btn-box-shadow));
   @include transition($btn-transition);
-  @include elevation(1, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']", "[class*='close']"));
 
   &:hover {
     color: var(--#{$prefix}btn-hover-color);
     text-decoration: if($link-hover-decoration == underline, none, null);
     background-color: var(--#{$prefix}btn-hover-bg);
     border-color: var(--#{$prefix}btn-hover-border-color);
-    @include elevation(2, ("[class*='link']", "[class*='outline']", "[class*='ghost']", "[class*='transparent']", "[class*='close']"));
   }
 
   .btn-check + &:hover {
