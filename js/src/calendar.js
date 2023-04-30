@@ -1,14 +1,15 @@
 /* eslint-disable indent, multiline-ternary */
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): calendar.js
+ * CoreUI PRO calendar.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin } from './util/index'
-import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
+import BaseComponent from './base-component.js'
+import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
+import { defineJQueryPlugin } from './util/index.js'
 import {
   createGroupsInArray,
   getMonthDetails,
@@ -20,14 +21,12 @@ import {
   isLastDayOfMonth,
   isToday,
   isStartDate,
-  isEndDate } from './util/calendar'
-import BaseComponent from './base-component'
+  isEndDate
+} from './util/calendar.js'
 
 /**
-* ------------------------------------------------------------------------
-* Constants
-* ------------------------------------------------------------------------
-*/
+ * Constants
+ */
 
 const NAME = 'calendar'
 const DATA_KEY = 'coreui.calendar'
@@ -82,10 +81,8 @@ const DefaultType = {
 }
 
 /**
-* ------------------------------------------------------------------------
-* Class Definition
-* ------------------------------------------------------------------------
-*/
+ * Class definition
+ */
 
 class Calendar extends BaseComponent {
   constructor(element, config) {
@@ -477,10 +474,8 @@ class Calendar extends BaseComponent {
 }
 
 /**
-* ------------------------------------------------------------------------
-* Data Api implementation
-* ------------------------------------------------------------------------
-*/
+ * Data API implementation
+ */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const element of Array.from(document.querySelectorAll(SELECTOR_CALENDAR))) {
@@ -489,11 +484,8 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 })
 
 /**
-* ------------------------------------------------------------------------
-* jQuery
-* ------------------------------------------------------------------------
-* add .Calendar to jQuery only if jQuery is present
-*/
+ * jQuery
+ */
 
 defineJQueryPlugin(Calendar)
 

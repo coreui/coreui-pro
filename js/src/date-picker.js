@@ -1,14 +1,14 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): date-picker.js
+ * CoreUI PRO date-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin } from './util/index.js'
+import DateRangePicker from './date-range-picker.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import DateRangePicker from './date-range-picker.js'
+import { defineJQueryPlugin } from './util/index.js'
 
 /**
  * Constants

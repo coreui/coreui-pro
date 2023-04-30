@@ -1,16 +1,17 @@
 
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): time-picker.js
+ * CoreUI PRO time-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
 import * as Popper from '@popperjs/core'
-import { defineJQueryPlugin, isRTL } from './util/index.js'
+import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { defineJQueryPlugin, isRTL } from './util/index.js'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -21,7 +22,6 @@ import {
   isAmPm,
   isValidTime
 } from './util/time.js'
-import BaseComponent from './base-component.js'
 
 /**
  * Constants

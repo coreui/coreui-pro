@@ -1,20 +1,20 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): date-range-picker.js
+ * CoreUI PRO date-range-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
 import * as Popper from '@popperjs/core'
 import { format as dateFormat, parseISO } from 'date-fns'
-import { defineJQueryPlugin, isRTL } from './util/index.js'
-import { getLocalDateFromString } from './util/calendar.js'
-import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
-import SelectorEngine from './dom/selector-engine.js'
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
 import TimePicker from './time-picker.js'
+import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
+import SelectorEngine from './dom/selector-engine.js'
+import { defineJQueryPlugin, isRTL } from './util/index.js'
+import { getLocalDateFromString } from './util/calendar.js'
 
 /**
  * Constants
