@@ -1,7 +1,7 @@
 @mixin elevation($value, $exclude: null) {
   @if $enable-elevations {
     @if $exclude == null {
-      &:not([class*="border"]) {
+      &:not([class*="border"]):not([class*="elevation-0"]) {
         border: 0;
       }
       box-shadow: map-get($elevations, $value);
@@ -11,11 +11,10 @@
       @each $element in $exclude {
         $selector: selector-append($selector, ":not(#{$element})");
       }
-      @if ($selector != ":not(.aaa") {
-        &#{$selector} {
-          border-color: transparent;
-          box-shadow: map-get($elevations, $value);
-        }
+
+      &#{$selector} {
+        border-color: transparent;
+        box-shadow: map-get($elevations, $value);
       }
     }
   }

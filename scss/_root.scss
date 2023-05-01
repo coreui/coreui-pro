@@ -121,6 +121,8 @@
   --#{$prefix}box-shadow-lg: #{$box-shadow-lg};
   --#{$prefix}box-shadow-inset: #{$box-shadow-inset};
 
+  --#{$prefix}elevation-base-color: #{$elevation-base-color};
+
   // Focus styles
   // scss-docs-start root-focus-variables
   --#{$prefix}focus-ring-width: #{$focus-ring-width};
@@ -158,6 +160,8 @@
     --#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color-dark)};
     --#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
     --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
+
+    --#{$prefix}elevation-base-color: 0, 0, 0;
 
     @each $color, $value in $theme-colors-dark {
       --#{$prefix}#{$color}: #{$value};
