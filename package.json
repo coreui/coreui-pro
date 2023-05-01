@@ -84,8 +84,12 @@
     "url": "https://github.com/coreui/coreui/issues"
   },
   "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "postcss-combine-duplicated-selectors": "^10.0.3"
+  },
   "peerDependencies": {
-    "@popperjs/core": "^2.11.7"
+    "@popperjs/core": "^2.11.7",
+    "date-fns": "^2.30.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.5",
@@ -100,7 +104,7 @@
     "bundlewatch": "^0.3.3",
     "clean-css-cli": "^5.6.2",
     "cross-env": "^7.0.3",
-    "date-fns": "^2.28.0",
+    "date-fns": "^2.30.0",
     "eslint": "^8.39.0",
     "eslint-config-xo": "^0.43.1",
     "eslint-plugin-html": "^7.1.0",
@@ -159,16 +163,15 @@
     "shim": {
       "js/coreui": {
         "deps": [
-          "@popperjs/core"
+          "@popperjs/core",
+          "date-fns"
         ]
       }
     },
     "dependencies": {},
     "peerDependencies": {
-      "@popperjs/core": "^2.11.7"
+      "@popperjs/core": "^2.11.7",
+      "date-fns": "^2.30.0"
     }
-  },
-  "dependencies": {
-    "postcss-combine-duplicated-selectors": "^10.0.3"
   }
 }
