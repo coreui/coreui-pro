@@ -161,6 +161,10 @@
     --#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
     --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
 
+    --#{$prefix}high-emphasis: #{$body-color-dark};
+    --#{$prefix}medium-emphasis: #{$body-secondary-color-dark};
+    --#{$prefix}disabled: #{$body-tertiary-color-dark};
+
     --#{$prefix}elevation-base-color: 0, 0, 0;
 
     @each $color, $value in $theme-colors-dark {
