@@ -21,10 +21,12 @@
         }
       }
       @include expect() {
+        .dark-theme .element, // TODO: remove in v5
         [data-coreui-theme=dark] .element {
           color: var(--cui-primary-text-emphasis);
           background-color: var(--cui-primary-bg-subtle);
         }
+        .dark-theme, // TODO: remove in v5
         [data-coreui-theme=dark] {
           --custom-color: #3a3ff8;
         }

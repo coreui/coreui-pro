@@ -318,11 +318,6 @@ $_luminance-list: .0008 .001 .0011 .0013 .0015 .0017 .002 .0022 .0025 .0027 .003
   @return if($return-calc == true, calc(#{$value1} - #{$value2}), $value1 + unquote(" - ") + $value2);
 }
 
-// Generate selectors for theme variants
-@function theme-prefix($selector) {
-  @return #{"." + $theme-prefix + "\\:" + $selector + ", " + "." + $selector + ":not([class*='#{$theme-prefix}:'])"};
-}
-
 @function divide($dividend, $divisor, $precision: 10) {
   $sign: if($dividend > 0 and $divisor > 0 or $dividend < 0 and $divisor < 0, 1, -1);
   $dividend: abs($dividend);
@@ -367,5 +362,5 @@ $_luminance-list: .0008 .001 .0011 .0013 .0015 .0017 .002 .0022 .0025 .0027 .003
 
 // Generate selectors for theme variants
 @function theme-prefix($theme, $selector) {
-  @return #{"[data-coreui-theme="$theme + "] ." + $theme + "\\:" + $selector + ", [data-coreui-theme="$theme + "] ." + $theme + "\\:" + $selector + ":not([class*='#{$theme}:'])"};
+  @return #{"[data-coreui-theme="$theme + "] ." + $theme + "\\:" + $selector + ",[data-coreui-theme="$theme + "] ." + $theme + "\\:" + $selector + ":not([class*='#{$theme}:'])", "." + $theme + "-theme ." + $theme + "\\:" + $selector + ", ." + $theme + "-theme ." + $theme + "\\:" + $selector + ":not([class*='#{$theme}:'])"};
 }
