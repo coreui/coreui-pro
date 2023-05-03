@@ -18,12 +18,16 @@ import { defineJQueryPlugin } from './util/index.js'
 const NAME = 'loading-button'
 const DATA_KEY = 'coreui.loading-button'
 const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
 const EVENT_START = `start${EVENT_KEY}`
 const EVENT_STOP = `stop${EVENT_KEY}`
+const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_IS_LOADING = 'is-loading'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
+
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="loading-button"]'
 
 const Default = {
   disabledOnLoading: false,
@@ -170,6 +174,18 @@ class LoadingButton extends BaseComponent {
     })
   }
 }
+
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
+  event.preventDefault()
+  const button = event.target.closest(SELECTOR_DATA_TOGGLE)
+  const data = LoadingButton.getOrCreateInstance(button)
+
+  data.start()
+})
 
 /**
  * jQuery
