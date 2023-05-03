@@ -131,7 +131,7 @@ class MultiSelect extends BaseComponent {
     this._options = this._getOptions()
     this._popper = null
     this._search = ''
-    this._selected = this._getSelectedOptions(this._options) // TODO : change to this._selected
+    this._selected = this._getSelectedOptions(this._options)
 
     if (this._config.options.length > 0) {
       this._createNativeSelect(this._config.options)
@@ -657,9 +657,9 @@ class MultiSelect extends BaseComponent {
       this.deselectAll()
     }
 
-    if (this._selected.filter(e => e.value === value).length === 0) {
+    if (this._selected.filter(option => option.value === String(value)).length === 0) {
       this._selected.push({
-        value,
+        value: String(value),
         text
       })
     }
@@ -686,7 +686,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _deselectOption(value) {
-    const selected = this._selected.filter(e => e.value !== value)
+    const selected = this._selected.filter(option => option.value !== String(value))
     this._selected = selected
 
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
