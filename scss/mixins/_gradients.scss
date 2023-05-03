@@ -44,9 +44,4 @@
 @mixin gradient-striped($color: rgba($white, .15), $angle: 45deg) {
   background-image: linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent);
 }
-
-@mixin gradient($color, $value) {
-  background-color: var(--#{$prefix}#{$color}, map-get($value, "stop"));
-  background-image: linear-gradient(45deg, var(--#{$prefix}#{$color}-start, map-get($value, "start")) 0%, var(--#{$prefix}#{$color}-stop, map-get($value, "stop") 100%));
-}
 // scss-docs-end gradient-mixins

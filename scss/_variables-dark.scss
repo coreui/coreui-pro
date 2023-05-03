@@ -92,6 +92,61 @@ $light-border-subtle-dark:          $gray-700-dark !default;
 $dark-border-subtle-dark:           $gray-800-dark !default;
 // scss-docs-end theme-border-subtle-dark-variables
 
+// Gradients
+
+// scss-docs-start theme-gradients-dark-variables
+$primary-gradient-dark: (
+  "start":  desaturate(#321fdb, 20%),
+  "stop":   desaturate(#1f1498, 20%)
+) !default;
+
+$secondary-gradient-dark: (
+  "start":  desaturate(#c8d2dc, 20%),
+  "stop":   desaturate($white, 20%)
+) !default;
+
+$light-gradient-dark: (
+  "start":  desaturate(#e3e8ed, 20%),
+  "stop":   desaturate($white, 20%)
+) !default;
+
+$dark-gradient-dark: (
+  "start":  desaturate(#3c4b64, 20%),
+  "stop":   desaturate(#212333, 20%)
+) !default;
+
+$danger-gradient-dark: (
+  "start":  desaturate(#e55353, 20%),
+  "stop":   desaturate(#d93737, 20%)
+) !default;
+
+$warning-gradient-dark: (
+  "start":  desaturate(#f9b115, 20%),
+  "stop":   desaturate(#f6960b, 20%)
+) !default;
+
+$success-gradient-dark: (
+  "start":  desaturate(#2eb85c, 20%),
+  "stop":   desaturate(#1b9e3e, 20%)
+) !default;
+
+$info-gradient-dark: (
+  "start":  desaturate(#39f, 20%),
+  "stop":   desaturate(#2982cc, 20%)
+) !default;
+
+$theme-gradients-dark: (
+  "primary":    $primary-gradient-dark,
+  "secondary":  $secondary-gradient-dark,
+  "success":    $success-gradient-dark,
+  "info":       $info-gradient-dark,
+  "warning":    $warning-gradient-dark,
+  "danger":     $danger-gradient-dark,
+  "light":      $light-gradient-dark,
+  "dark":       $dark-gradient-dark
+) !default;
+// scss-docs-end theme-gradients-dark-variables
+
 $body-color-dark:                   $gray-500-dark !default;
 $body-bg-dark:                      $gray-900-dark !default;
 $body-secondary-color-dark:         rgba($body-color-dark, .75) !default;

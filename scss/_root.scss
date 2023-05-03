@@ -37,6 +37,11 @@
   --#{$prefix}white-rgb: #{to-rgb($white)};
   --#{$prefix}black-rgb: #{to-rgb($black)};
 
+  @each $color, $value in $theme-gradients {
+    --#{$prefix}#{$color}-start: #{map-get($value, "start")};
+    --#{$prefix}#{$color}-stop: #{map-get($value, "stop")};
+  }
+
   // Fonts
 
   // Note: Use `inspect` for lists so that quoted items keep the quotes.
@@ -189,6 +194,11 @@
 
     @each $color, $value in $theme-colors-border-subtle-dark {
       --#{$prefix}#{$color}-border-subtle: #{$value};
+    }
+
+    @each $color, $value in $theme-gradients-dark {
+      --#{$prefix}#{$color}-start: #{map-get($value, "start")};
+      --#{$prefix}#{$color}-stop: #{map-get($value, "stop")};
     }
 
     --#{$prefix}heading-color: #{$headings-color-dark};
