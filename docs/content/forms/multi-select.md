@@ -67,51 +67,11 @@ other_frameworks: multi-select
 
 ```html
 <select id="multiSelect"></select>
-
-<script type="text/javascript">
-  const myMultiSelect = document.querySelector('#multiSelect')
-  const cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
-    options: [
-      {
-        value: 0,
-        text: 'Angular'
-      },
-      {
-        value: 1,
-        text: 'Bootstrap',
-        selected: true
-      },
-      {
-        value: 2,
-        text: 'React.js',
-        selected: true
-      },
-      {
-        value: 3,
-        text: 'Vue.js'
-      },
-      {
-        label: 'backend',
-        options: [
-          {
-            value: 4,
-            text: 'Django'
-          },
-          {
-            value: 5,
-            text: 'Laravel'
-          },
-          {
-            value: 6,
-            text: 'Node.js',
-            selected: true
-          }
-        ]
-      }
-    ]
-  })
-</script>
 ```
+
+We use the following JavaScript to set up our multi-select:
+
+{{< js-docs name="multi-select-array-data" file="docs/assets/js/snippets.js" >}}
 
 ## Selection types
 ### Text

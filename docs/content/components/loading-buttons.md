@@ -13,9 +13,9 @@ other_frameworks: loading-button
 ## Basic example
 
 {{< example >}}
-<button type="button" class="btn btn-primary btn-loading" data-coreui-timeout="2000">Submit</button>
-<button type="button" class="btn btn-outline-primary btn-loading">Submit</button>
-<button type="button" class="btn btn-ghost-primary btn-loading">Submit</button>
+<button type="button" class="btn btn-primary btn-loading" data-coreui-timeout="2000" data-coreui-toggle="loading-button">Submit</button>
+<button type="button" class="btn btn-outline-primary btn-loading" data-coreui-toggle="loading-button">Submit</button>
+<button type="button" class="btn btn-ghost-primary btn-loading" data-coreui-toggle="loading-button">Submit</button>
 {{< /example >}}
 
 ## Spinners
@@ -23,17 +23,17 @@ other_frameworks: loading-button
 ### Border
 
 {{< example >}}
-<button type="button" class="btn btn-info btn-loading">Submit</button>
-<button type="button" class="btn btn-outline-success btn-loading">Submit</button>
-<button type="button" class="btn btn-ghost-warning btn-loading">Submit</button>
+<button type="button" class="btn btn-info btn-loading" data-coreui-toggle="loading-button">Submit</button>
+<button type="button" class="btn btn-outline-success btn-loading" data-coreui-toggle="loading-button">Submit</button>
+<button type="button" class="btn btn-ghost-warning btn-loading" data-coreui-toggle="loading-button">Submit</button>
 {{< /example >}}
 
 ### Grow
 
 {{< example >}}
-<button type="button" class="btn btn-info btn-loading" data-coreui-spinner-type="grow">Submit</button>
-<button type="button" class="btn btn-outline-success btn-loading" data-coreui-spinner-type="grow">Submit</button>
-<button type="button" class="btn btn-ghost-warning btn-loading" data-coreui-spinner-type="grow">Submit</button>
+<button type="button" class="btn btn-info btn-loading" data-coreui-spinner-type="grow" data-coreui-toggle="loading-button">Submit</button>
+<button type="button" class="btn btn-outline-success btn-loading" data-coreui-spinner-type="grow" data-coreui-toggle="loading-button">Submit</button>
+<button type="button" class="btn btn-ghost-warning btn-loading" data-coreui-spinner-type="grow" data-coreui-toggle="loading-button">Submit</button>
 {{< /example >}}
 
 

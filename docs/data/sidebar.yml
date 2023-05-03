@@ -63,11 +63,6 @@
     - title: Range
     - title: Input group
     - title: Floating labels
-    - title: Form Mask
-      badge:
-        color: warning
-        text: WIP
-      disabled: true
     - title: Date Picker
       badge:
         color: danger
