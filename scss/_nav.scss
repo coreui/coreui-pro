@@ -135,32 +135,41 @@
   }
 }
 
+
 //
 // Underline
 //
 
 .nav-underline {
-  border-bottom: $nav-underline-border-width solid var(--#{$prefix}nav-underline-border-color, $nav-underline-border-color);
+  // scss-docs-start nav-underline-css-vars
+  --#{$prefix}nav-underline-border-width: #{$nav-underline-border-width};
+  --#{$prefix}nav-underline-border-color: #{$nav-underline-border-color};
+  --#{$prefix}nav-underline-link-color: #{$nav-underline-link-color};
+  --#{$prefix}nav-underline-link-active-color: #{$nav-underline-link-active-color};
+  --#{$prefix}nav-underline-link-active-border-color: #{$nav-underline-link-active-border-color};
+  // scss-docs-end nav-underline-css-vars
+
+  border-bottom: var(--#{$prefix}nav-underline-border-width) solid var(--#{$prefix}nav-underline-border-color);
 
   .nav-item {
-    margin-bottom: $nav-underline-border-width * -1;
+    margin-bottom: calc(var(--#{$prefix}nav-underline-border-width) * -1); // stylelint-disable-line function-disallowed-list
   }
 
   .nav-link {
-    color: var(--#{$prefix}nav-underline-link-color, $nav-underline-link-color);
-    border-bottom: $nav-underline-border-width solid transparent;
+    color: var(--#{$prefix}nav-underline-link-color);
+    border-bottom: var(--#{$prefix}nav-underline-border-width) solid transparent;
 
     &:hover,
     &:focus {
-      border-color: var(--#{$prefix}nav-underline-link-active-border-color, $nav-underline-link-active-border-color);
+      border-color: var(--#{$prefix}nav-underline-link-active-border-color);
     }
   }
 
   .nav-link.active,
   .show > .nav-link {
-    color: var(--#{$prefix}nav-underline-link-active-color, $nav-underline-link-active-color);
+    color: var(--#{$prefix}nav-underline-link-active-color);
     background: transparent;
-    border-color: var(--#{$prefix}nav-underline-link-active-border-color, $nav-underline-link-active-border-color);
+    border-color: var(--#{$prefix}nav-underline-link-active-border-color);;
   }
 }
 

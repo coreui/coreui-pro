@@ -1457,11 +1457,11 @@ $nav-pills-border-radius:           var(--#{$prefix}border-radius) !default;
 $nav-pills-link-active-color:       $component-active-color !default;
 $nav-pills-link-active-bg:          $component-active-bg !default;
 
-$nav-underline-border-color:              $gray-300 !default;
-$nav-underline-border-width:              $border-width * 2 !default;
-$nav-underline-link-color:                $gray-700 !default;
-$nav-underline-link-active-color:         $primary !default;
-$nav-underline-link-active-border-color:  $primary !default;
+$nav-underline-border-color:              var(--#{$prefix}border-color) !default;
+$nav-underline-border-width:              calc(var(--#{$prefix}border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
+$nav-underline-link-color:                var(--#{$prefix}secondary-color) !default;
+$nav-underline-link-active-color:         var(--#{$prefix}primary) !default;
+$nav-underline-link-active-border-color:  var(--#{$prefix}primary) !default;
 // scss-docs-end nav-variables
 
 
@@ -2172,48 +2172,48 @@ $sidebar-toggler-hover-bg:                 rgba(0, 0, 0, .3) !default;
 $sidebar-toggler-indicator-hover-color:    $sidebar-nav-link-hover-color !default;
 $sidebar-toggler-indicator-hover-icon:     url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-toggler-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E") !default;
 
-$sidebar-light-color:                      var(--#{$prefix}body-color) !default;
-$sidebar-light-bg:                         var(--#{$prefix}body-bg) !default;
-$sidebar-light-border-width:               0 !default;
-$sidebar-light-border-color:               transparent !default;
+$sidebar-light-color:                            var(--#{$prefix}body-color) !default;
+$sidebar-light-bg:                               var(--#{$prefix}body-bg) !default;
+$sidebar-light-border-width:                     0 !default;
+$sidebar-light-border-color:                     transparent !default;
 
-$sidebar-light-brand-color:  $white !default;
-$sidebar-light-brand-bg:     $primary !default;
+$sidebar-light-brand-color:                      $white !default;
+$sidebar-light-brand-bg:                         var(--#{$prefix}primary) !default;
 
-$sidebar-light-header-bg: rgba($black, .2) !default;
+$sidebar-light-header-bg:                        rgba($black, .2) !default;
 
-$sidebar-light-nav-title-color:                  $medium-emphasis !default;
+$sidebar-light-nav-title-color:                  var(--#{$prefix}body-secondary-color) !default;
 
-$sidebar-light-nav-link-color:                   $medium-emphasis !default;
+$sidebar-light-nav-link-color:                   var(--#{$prefix}body-secondary-color) !default;
 $sidebar-light-nav-link-bg:                      transparent !default;
-$sidebar-light-nav-link-icon-color:              $medium-emphasis !default;
+$sidebar-light-nav-link-icon-color:              var(--#{$prefix}body-secondary-color) !default;
 
-$sidebar-light-nav-link-hover-color:             $high-emphasis !default;
-$sidebar-light-nav-link-hover-bg:                theme-color("primary") !default;
-$sidebar-light-nav-link-hover-icon-color:        $high-emphasis !default;
+$sidebar-light-nav-link-hover-color:             var(--#{$prefix}body-color) !default;
+$sidebar-light-nav-link-hover-bg:                var(--#{$prefix}primary) !default;
+$sidebar-light-nav-link-hover-icon-color:        var(--#{$prefix}body-color) !default;
 
-$sidebar-light-nav-link-active-color:            $high-emphasis !default;
+$sidebar-light-nav-link-active-color:            var(--#{$prefix}body-color) !default;
 $sidebar-light-nav-link-active-bg:               rgba($white, .05) !default;
-$sidebar-light-nav-link-active-icon-color:       $high-emphasis !default;
+$sidebar-light-nav-link-active-icon-color:       var(--#{$prefix}body-color) !default;
 
-$sidebar-light-nav-link-disabled-color:          $disabled !default;
-$sidebar-light-nav-link-disabled-icon-color:     $sidebar-light-nav-link-icon-color !default;
+$sidebar-light-nav-link-disabled-color:          var(--#{$prefix}body-secondary-color) !default;
+$sidebar-light-nav-link-disabled-icon-color:     var(--#{$prefix}body-color) !default;
 
 $sidebar-light-nav-group-bg:                     rgba(0, 0, 0, .05) !default;
 $sidebar-light-nav-group-toggle-show-color:      $sidebar-light-nav-link-color !default;
 
-$sidebar-light-nav-group-indicator-color:        $medium-emphasis !default;
+$sidebar-light-nav-group-indicator-color:        $body-secondary-color !default;
 $sidebar-light-nav-group-indicator-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$sidebar-light-nav-group-indicator-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
-$sidebar-light-nav-group-indicator-hover-color:  $sidebar-light-nav-link-hover-color !default;
+$sidebar-light-nav-group-indicator-hover-color:  $body-color !default;
 $sidebar-light-nav-group-indicator-hover-icon:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$sidebar-light-nav-group-indicator-hover-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>") !default;
 
 $sidebar-light-footer-bg:                        rgba($black, .1) !default;
 
 $sidebar-light-toggler-bg:                       rgba($black, .1) !default;
 $sidebar-light-toggler-hover-bg:                 rgba(0, 0, 0, .2) !default;
-$sidebar-light-toggler-indicator-color:          $medium-emphasis !default;
+$sidebar-light-toggler-indicator-color:          $body-secondary-color !default;
 $sidebar-light-toggler-indicator-icon:           url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-toggler-indicator-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E") !default;
-$sidebar-light-toggler-indicator-hover-color:    $sidebar-light-nav-link-hover-color !default;
+$sidebar-light-toggler-indicator-hover-color:    $body-color !default;
 $sidebar-light-toggler-indicator-hover-icon:     url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 14'%3E%3Cpath fill='#{$sidebar-light-toggler-indicator-hover-color}' d='M9.148 2.352l-4.148 4.148 4.148 4.148q0.148 0.148 0.148 0.352t-0.148 0.352l-1.297 1.297q-0.148 0.148-0.352 0.148t-0.352-0.148l-5.797-5.797q-0.148-0.148-0.148-0.352t0.148-0.352l5.797-5.797q0.148-0.148 0.352-0.148t0.352 0.148l1.297 1.297q0.148 0.148 0.148 0.352t-0.148 0.352z'/%3E%3C/svg%3E") !default;
 // scss-docs-end sidebar-variables
 
