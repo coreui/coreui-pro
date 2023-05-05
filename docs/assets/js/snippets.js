@@ -169,28 +169,15 @@
   }
 
   // -------------------------------
-  // Loading Buttons
-  // -------------------------------
-  // 'Loading Buttons components' example in docs only
-  const myLoadingButton = document.querySelectorAll('.docs-example .btn-loading')
-  if (myLoadingButton) {
-    myLoadingButton.forEach(button => {
-      new coreui.LoadingButton(button)
-      button.addEventListener('click', event => {
-        const myBtn = coreui.LoadingButton.getInstance(event.target)
-        myBtn.start()
-      })
-    })
-  }
-
-  // -------------------------------
   // Multi Selects
   // -------------------------------
   // 'Multi Selects components' example in docs only
+  // js-docs-start multi-select-array-data
   const myMultiSelect = document.getElementById('multiSelect')
 
   if (myMultiSelect) {
-    const cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
+    // eslint-disable-next-line no-unused-vars
+    const toastCoreUI = new coreui.MultiSelect(myMultiSelect, {
       name: 'multiSelect',
       options: [
         {
@@ -232,46 +219,7 @@
       ],
       search: true
     })
-    cuiMultiSelect.update({
-      options: [
-        {
-          value: 0,
-          text: 'Angular2'
-        },
-        {
-          value: 1,
-          text: 'Bootstrap2',
-          selected: true
-        },
-        {
-          value: 2,
-          text: 'React.js',
-          selected: true
-        },
-        {
-          value: 3,
-          text: 'Vue.js'
-        },
-        {
-          label: 'backend',
-          options: [
-            {
-              value: 4,
-              text: 'Django'
-            },
-            {
-              value: 5,
-              text: 'Laravel'
-            },
-            {
-              value: 6,
-              text: 'Node.js',
-              selected: true
-            }
-          ]
-        }
-      ]
-    })
+    // js-docs-end multi-select-array-data
   }
 
   // -------------------------------
