@@ -1,7 +1,7 @@
 /*!
   * CoreUI time.js v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -32,12 +32,12 @@
     }
     return date.getHours() >= 12 ? 'pm' : 'am';
   };
-  const getListOfHours = locale => Array.from({
-    length: isAmPm(locale) ? 12 : 24
+  const getListOfHours = (locale, ampm = 'auto') => Array.from({
+    length: ampm === 'auto' && isAmPm(locale) || ampm === true ? 12 : 24
   }, (_, i) => {
     return {
-      value: isAmPm(locale) ? i + 1 : i,
-      label: (isAmPm(locale) ? i + 1 : i).toLocaleString(locale)
+      value: ampm === 'auto' && isAmPm(locale) || ampm === true ? i + 1 : i,
+      label: (ampm === 'auto' && isAmPm(locale) || ampm === true ? i + 1 : i).toLocaleString(locale)
     };
   });
   const getListOfMinutes = (locale, valueAsString = false) => Array.from({
@@ -48,11 +48,9 @@
     return {
       value: valueAsString ? i.toString() : i,
       label: d.toLocaleTimeString(locale, {
-        hour: '2-digit',
-        hour12: false,
         minute: '2-digit',
         second: '2-digit'
-      }).split(':')[1]
+      }).split(/[^\dA-Za-z\u06F0-\u06F9]/)[0]
     };
   });
   const getListOfSeconds = (locale, valueAsString = false) => Array.from({
@@ -63,11 +61,9 @@
     return {
       value: valueAsString ? i.toString() : i,
       label: d.toLocaleTimeString(locale, {
-        hour: '2-digit',
-        hour12: false,
         minute: '2-digit',
         second: '2-digit'
-      }).split(':')[2]
+      }).split(/[^\dA-Za-z\u06F0-\u06F9]/)[1]
     };
   });
   const getSelectedHour = (date, locale) => date ? isAmPm(locale) ? convert24hTo12h(date.getHours()) : date.getHours() : '';

@@ -1,34 +1,40 @@
 /*!
   * CoreUI date-picker.js v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/selector-engine'), require('./date-range-picker')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/selector-engine', './date-range-picker'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DatePicker = factory(global.index, global.EventHandler, global.SelectorEngine, global.DateRangePicker));
-})(this, (function (index, EventHandler, SelectorEngine, DateRangePicker) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./date-range-picker.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['./date-range-picker', './dom/event-handler', './dom/selector-engine', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DatePicker = factory(global.DateRangePicker, global.EventHandler, global.SelectorEngine, global.Index));
+})(this, (function (DateRangePicker, EventHandler, SelectorEngine, index_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): date-picker.js
+   * CoreUI PRO date-picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
 
+
   /**
-  * ------------------------------------------------------------------------
-  * Constants
-  * ------------------------------------------------------------------------
-  */
+   * Constants
+   */
 
   const NAME = 'date-picker';
   const DATA_KEY = 'coreui.date-picker';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const TAB_KEY = 'Tab';
+  const RIGHT_MOUSE_BUTTON = 2;
   const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`;
+  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
+  const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`;
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
-  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]';
+  const CLASS_NAME_SHOW = 'show';
+  const SELECTOR_CALENDAR = '.calendar';
+  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`;
   const Default = {
     ...DateRangePicker.Default,
     calendars: 1,
@@ -42,14 +48,11 @@
   };
 
   /**
-  * ------------------------------------------------------------------------
-  * Class Definition
-  * ------------------------------------------------------------------------
-  */
+   * Class definition
+   */
 
   class DatePicker extends DateRangePicker {
     // Getters
-
     static get Default() {
       return Default;
     }
@@ -61,15 +64,14 @@
     }
 
     // Overrides
-
     _addCalendarEventListeners() {
       super._addCalendarEventListeners();
-      for (const calendar of SelectorEngine.find('.calendar', this._element)) {
+      for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
         EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._startDate = event.date;
           this._selectEndDate = event.selectEndDate;
           this._startInput.value = this._setInputValue(event.date);
-          this._updateCalendars();
+          this._updateDateRangePickerCalendars();
           EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
             date: event.date,
             formatedDate: event.date ? this._formatDate(event.date) : undefined
@@ -101,13 +103,32 @@
         data[config](this);
       });
     }
+    static clearMenus(event) {
+      if (event.button === RIGHT_MOUSE_BUTTON || event.type === 'keyup' && event.key !== TAB_KEY) {
+        return;
+      }
+      const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN);
+      for (const toggle of openToggles) {
+        const context = DatePicker.getInstance(toggle);
+        if (!context) {
+          continue;
+        }
+        const composedPath = event.composedPath();
+        if (composedPath.includes(context._element)) {
+          continue;
+        }
+        ({
+          relatedTarget: context._element
+        });
+        if (event.type === 'click') ;
+        context.hide();
+      }
+    }
   }
 
   /**
-  * ------------------------------------------------------------------------
-  * Data Api implementation
-  * ------------------------------------------------------------------------
-  */
+   * Data API implementation
+   */
 
   EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     const datePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE);
@@ -115,15 +136,14 @@
       DatePicker.datePickerInterface(datePickers[i]);
     }
   });
+  EventHandler.on(document, EVENT_CLICK_DATA_API, DatePicker.clearMenus);
+  EventHandler.on(document, EVENT_KEYUP_DATA_API, DatePicker.clearMenus);
 
   /**
-  * ------------------------------------------------------------------------
-  * jQuery
-  * ------------------------------------------------------------------------
-  * add .DatePicker to jQuery only if jQuery is present
-  */
+   * jQuery
+   */
 
-  index.defineJQueryPlugin(DatePicker);
+  index_js.defineJQueryPlugin(DatePicker);
 
   return DatePicker;
 

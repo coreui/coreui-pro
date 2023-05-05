@@ -1,34 +1,36 @@
 /*!
   * CoreUI loading-button.js v4.5.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/data'), require('./dom/event-handler'), require('./dom/manipulator'), require('./base-component')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/data', './dom/event-handler', './dom/manipulator', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.index, global.Data, global.EventHandler, global.Manipulator, global.BaseComponent));
-})(this, (function (index, Data, EventHandler, Manipulator, BaseComponent) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/data', './dom/event-handler', './dom/manipulator', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.BaseComponent, global.Data, global.EventHandler, global.Manipulator, global.Index));
+})(this, (function (BaseComponent, Data, EventHandler, Manipulator, index_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): loading-button.js
+   * CoreUI PRO loading-button.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
 
+
   /**
-   * ------------------------------------------------------------------------
    * Constants
-   * ------------------------------------------------------------------------
    */
 
   const NAME = 'loading-button';
   const DATA_KEY = 'coreui.loading-button';
   const EVENT_KEY = `.${DATA_KEY}`;
+  const DATA_API_KEY = '.data-api';
   const EVENT_START = `start${EVENT_KEY}`;
   const EVENT_STOP = `stop${EVENT_KEY}`;
+  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
   const CLASS_NAME_IS_LOADING = 'is-loading';
   const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner';
+  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="loading-button"]';
   const Default = {
     disabledOnLoading: false,
     spinner: true,
@@ -43,9 +45,7 @@
   };
 
   /**
-   * ------------------------------------------------------------------------
-   * Class Definition
-   * ------------------------------------------------------------------------
+   * Class definition
    */
 
   class LoadingButton extends BaseComponent {
@@ -67,9 +67,6 @@
     }
     static get DefaultType() {
       return DefaultType;
-    }
-    static get DATA_KEY() {
-      return DATA_KEY;
     }
     static get NAME() {
       return NAME;
@@ -160,13 +157,21 @@
   }
 
   /**
-   * ------------------------------------------------------------------------
-   * jQuery
-   * ------------------------------------------------------------------------
-   * add .LoadingButton to jQuery only if jQuery is present
+   * Data API implementation
    */
 
-  index.defineJQueryPlugin(LoadingButton);
+  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
+    event.preventDefault();
+    const button = event.target.closest(SELECTOR_DATA_TOGGLE);
+    const data = LoadingButton.getOrCreateInstance(button);
+    data.start();
+  });
+
+  /**
+   * jQuery
+   */
+
+  index_js.defineJQueryPlugin(LoadingButton);
 
   return LoadingButton;
 
