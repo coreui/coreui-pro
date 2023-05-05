@@ -96,3 +96,7 @@ params:
     js_pro_hash:         "sha384-sgL2dnscCq1mBD/ZiUhyxMZT41vg+M6a/XWTCJsjBTaqZ1uWGF+ZwD8YIWstvXeT"
     js_pro_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@4.5.0/dist/js/coreui.bundle.min.js"
     js_pro_bundle_hash:  "sha384-DIs4n/vvjSI9MoFe804AsdvYdssJcpUht3fJZ2a+lc5h5kY3dQVrgOOB3hSbAN3r"
+
+  anchors:
+    min: 2
+    max: 5
