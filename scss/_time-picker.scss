@@ -288,3 +288,11 @@
     }
   }
 }
+
+@if $enable-dark-mode and $enable-elevations {
+  @include color-mode(dark) {
+    .time-picker-dropdown {
+      background-color: color-mix(in srgb, var(--#{$prefix}time-picker-dropdown-bg) 96%, #fff);
+    }
+  }
+}

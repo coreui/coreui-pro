@@ -3,8 +3,8 @@
     @if $exclude == null {
       &:not([class*="border"]):not([class*="elevation-0"]) {
         border: 0;
+        box-shadow: map-get($elevations, $value);
       }
-      box-shadow: map-get($elevations, $value);
     }
     @else {
       $selector: ":not(.placeholder)";

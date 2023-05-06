@@ -238,3 +238,11 @@
     }
   }
 }
+
+@if $enable-dark-mode and $enable-elevations {
+  @include color-mode(dark) {
+    .card:not([class*="border"]):not([class*="elevation-0"]) {
+      background-color: color-mix(in srgb, var(--#{$prefix}card-bg) 98%, #fff);
+    }
+  }
+}

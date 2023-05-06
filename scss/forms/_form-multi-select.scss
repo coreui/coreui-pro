@@ -447,3 +447,15 @@ select.form-multi-select {
     }
   }
 }
+
+@if $enable-dark-mode and $enable-elevations {
+  @include color-mode(dark) {
+    .form-multi-select-dropdown {
+      background-color: color-mix(in srgb, var(--#{$prefix}form-multi-select-dropdown-bg) 96%, #fff);
+    }
+
+    .form-multi-select-option-with-checkbox::before {
+      background-color: color-mix(in srgb, var(--#{$prefix}form-multi-select-option-indicator-bg) 96%, #fff);
+    }
+  }
+}
