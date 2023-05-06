@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v4.5.0 (https://coreui.io)
+  * CoreUI v4.6.0-alpha.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -685,7 +685,7 @@
    * Constants
    */
 
-  const VERSION = '4.5.0';
+  const VERSION = '4.6.0-alpha.0';
 
   /**
    * Class definition
@@ -5036,7 +5036,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): multi-select.js
+   * CoreUI PRO multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */

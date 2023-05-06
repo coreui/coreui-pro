@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select-old.js v4.5.0 (https://coreui.io)
+  * CoreUI multi-select-old.js v4.6.0-alpha.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): multi-select.js
+   * CoreUI PRO (v4.6.0-alpha.0): multi-select.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
