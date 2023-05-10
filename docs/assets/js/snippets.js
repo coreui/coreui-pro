@@ -228,7 +228,8 @@
   // 'Date Pickers components' example in docs only
 
   if (document.getElementById('myDatePickerDisabledDates')) {
-    const optionsDatePickerDisabledDates = {
+    // eslint-disable-next-line no-unused-vars
+    const myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), {
       locale: 'en-US',
       calendarDate: new Date(2022, 2, 1),
       disabledDates: [
@@ -239,9 +240,7 @@
       ],
       maxDate: new Date(2022, 5, 0),
       minDate: new Date(2022, 1, 1)
-    }
-    // eslint-disable-next-line no-unused-vars
-    const myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), optionsDatePickerDisabledDates)
+    })
   }
 
   // -------------------------------
