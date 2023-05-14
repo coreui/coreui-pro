@@ -168,7 +168,7 @@
   width: min-content;
   background-color: var(--#{$prefix}date-picker-dropdown-bg);
   background-clip: padding-box;
-  border: var(--#{$prefix}$date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
+  border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
   @include elevation(4);
 
