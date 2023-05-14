@@ -164,9 +164,9 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 ### Hebrew
 
 {{< example >}}
-<div class="row">
+<div class="row" dir="rtl">
   <div class="col-lg-4">
-    <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="date-picker" dir="rtl"></div>
+    <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="date-picker"></div>
   </div>
 </div>
 {{< /example >}}
@@ -174,9 +174,9 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 ### Persian
 
 {{< example >}}
-<div class="row">
+<div class="row" dir="rtl">
   <div class="col-lg-4">
-    <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="date-picker" dir="rtl"></div>
+    <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="date-picker"></div>
   </div>
 </div>
 {{< /example >}}

@@ -1,0 +1,19 @@
+// fusv-disable
+$enable-ltr: false;
+$enable-rtl: true;
+// fusv-enable
+
+@import "../../../scss/functions";
+@import "../../../scss/variables";
+@import "../../../scss/variables-dark";
+@import "../../../scss/maps";
+@import "../../../scss/mixins";
+@import "../../../scss/utilities";
+
+// stylelint-disable selector-no-qualifying-type
+div[dir="rtl"] {
+  @import "../../../scss/calendar";
+  @import "../../../scss/date-picker";
+  @import "../../../scss/time-picker";
+}
+// stylelint-enable selector-no-qualifying-type

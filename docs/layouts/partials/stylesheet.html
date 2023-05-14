@@ -25,4 +25,8 @@
 {{- $style := resources.Get "scss/docs.scss" | toCSS $sassOptions | postCSS $postcssOptions }}
 
 <link href="{{ $style.Permalink | relURL }}" rel="stylesheet">
+
+{{- $stylePickers := resources.Get "scss/docs-pickers.scss" | toCSS }}
+
+<link href="{{ $stylePickers.Permalink | relURL }}" rel="stylesheet">
 {{- end }}
