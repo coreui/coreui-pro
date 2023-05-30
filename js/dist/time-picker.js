@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v4.6.0-alpha.1 (https://coreui.io)
+  * CoreUI time-picker.js v4.6.0-alpha.2 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -92,6 +92,7 @@
     inputReadOnly: false,
     invalid: false,
     locale: 'default',
+    name: null,
     placeholder: 'Select time',
     required: true,
     size: null,
@@ -112,6 +113,7 @@
     inputReadOnly: 'boolean',
     invalid: 'boolean',
     locale: 'string',
+    name: 'string',
     placeholder: 'string',
     required: 'boolean',
     size: '(string|null)',
@@ -335,8 +337,8 @@
       inputEl.required = this._config.required;
       inputEl.type = 'text';
       inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : '';
-      if (this._element.id) {
-        inputEl.name = `time-picker-${this._element.id}`;
+      if (this._config.name || this._element.id) {
+        inputEl.name = this._config.name || `time-picker-${this._element.id}`;
       }
       const events = ['change', 'keyup', 'paste'];
       for (const event of events) {
