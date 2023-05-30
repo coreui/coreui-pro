@@ -81,6 +81,7 @@ const Default = {
   disabled: false,
   disabledDates: null,
   endDate: null,
+  endName: null,
   firstDayOfWeek: 1,
   footer: false,
   format: null,
@@ -89,6 +90,7 @@ const Default = {
   locale: 'default',
   maxDate: null,
   minDate: null,
+  name: null,
   placeholder: ['Start date', 'End date'],
   range: true,
   ranges: {},
@@ -97,6 +99,7 @@ const Default = {
   separator: true,
   size: null,
   startDate: null,
+  startName: null,
   selectAdjacementDays: false,
   selectEndDate: false,
   showAdjacementDays: true,
@@ -118,6 +121,7 @@ const DefaultType = {
   disabledDates: '(array|null)',
   disabled: 'boolean',
   endDate: '(date|string|null)',
+  endName: 'string',
   firstDayOfWeek: 'number',
   footer: 'boolean',
   format: '(string|null)',
@@ -126,6 +130,7 @@ const DefaultType = {
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
+  name: 'string',
   placeholder: '(array|string)',
   range: 'boolean',
   ranges: 'object',
@@ -134,6 +139,7 @@ const DefaultType = {
   separator: 'boolean',
   size: '(string|null)',
   startDate: '(date|string|null)',
+  startName: 'string',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   showAdjacementDays: 'boolean',
@@ -445,8 +451,21 @@ class DateRangePicker extends BaseComponent {
     const inputGroupEl = document.createElement('div')
     inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP)
 
-    const startInputEl = this._createInput(this._config.range ? 'date-range-picker-start-date' : 'date-picker', this._getPlaceholder()[0], this._setInputValue(this._startDate))
-    const endInputEl = this._createInput('date-range-picker-end-date', this._getPlaceholder()[1], this._setInputValue(this._endDate))
+    let startInputName = null
+
+    if (this._config.name || this._config.startName || this._element.id) {
+      startInputName = this._config.name || this._config.startName || (this._config.range ? `date-range-picker-start-date-${this._element.id}` : `date-picker-${this._element.id}`)
+    }
+
+    const startInputEl = this._createInput(startInputName, this._getPlaceholder()[0], this._setInputValue(this._startDate))
+
+    let endInputName = null
+
+    if (this._config.endName || this._element.id) {
+      endInputName = this._config.endName || `date-range-picker-end-date-${this._element.id}`
+    }
+
+    const endInputEl = this._createInput(endInputName, this._getPlaceholder()[1], this._setInputValue(this._endDate))
 
     const inputGroupTextSeparatorEl = document.createElement('div')
     inputGroupTextSeparatorEl.classList.add(CLASS_NAME_SEPARATOR)
@@ -717,8 +736,8 @@ class DateRangePicker extends BaseComponent {
     inputEl.type = 'text'
     inputEl.value = value
 
-    if (this._element.id) {
-      inputEl.name = `${name}-${this._element.id}`
+    if (name) {
+      inputEl.name = name
     }
 
     const events = ['change', 'keyup', 'paste']

@@ -294,6 +294,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `disabledDates` | array \| null | `null` | Specify the list of dates that cannot be selected. |
 | `endDate` | date \| string \| null | `null` | Initial selected to date (range). |
+| `endName` | string | `null` | Set the name attribute for the end date input element. |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `footer` | boolean | `false` | Toggle visibility of footer element. |
 | `format` | string | | Set date format. We use date-fns to format dates. Visit <a href="https://date-fns.org/v2.28.0/docs/format" target="_blank" rel="nofollow">https://date-fns.org/v2.28.0/docs/format</a> to check accepted patterns. |
@@ -311,6 +312,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
 | `startDate` | date \| string \| null | `null` | Initial selected date. |
+| `startName` | string | `null` | Set the name attribute for the start date input element. |
 | `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
 | `todayButton` | string | `'Today'` | Today button inner HTML |
 | `todayButtonClasses` | array \| string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
