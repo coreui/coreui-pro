@@ -75,11 +75,12 @@ const Default = {
   disabled: false,
   invalid: false,
   multiple: true,
-  placeholder: 'Select...',
-  required: false,
+  name: null,
   options: false,
   optionsMaxHeight: 'auto',
   optionsStyle: 'checkbox',
+  placeholder: 'Select...',
+  required: false,
   search: false,
   searchNoResultsLabel: 'No results found',
   selectAll: true,
@@ -94,11 +95,12 @@ const DefaultType = {
   disabled: 'boolean',
   invalid: 'boolean',
   multiple: 'boolean',
-  placeholder: 'string',
-  required: 'boolean',
+  name: 'string',
   options: '(boolean|array)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
+  placeholder: 'string',
+  required: 'boolean',
   search: 'boolean',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
@@ -448,8 +450,8 @@ class MultiSelect extends BaseComponent {
       this._updateSearch()
     }
 
-    if (this._element.id) {
-      this._element.setAttribute('name', `multi-select-${this._element.id}`)
+    if (this._config.name || this._element.id || this._element.name) {
+      this._element.setAttribute('name', (this._config.name || this._element.name || `multi-select-${this._element.id}`))
     }
 
     this._createOptionsContainer()
