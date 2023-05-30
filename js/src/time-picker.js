@@ -84,6 +84,7 @@ const Default = {
   inputReadOnly: false,
   invalid: false,
   locale: 'default',
+  name: null,
   placeholder: 'Select time',
   required: true,
   size: null,
@@ -105,6 +106,7 @@ const DefaultType = {
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
+  name: 'string',
   placeholder: 'string',
   required: 'boolean',
   size: '(string|null)',
@@ -334,8 +336,8 @@ class TimePicker extends BaseComponent {
     inputEl.type = 'text'
     inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : ''
 
-    if (this._element.id) {
-      inputEl.name = `time-picker-${this._element.id}`
+    if (this._config.name || this._element.id) {
+      inputEl.name = this._config.name || `time-picker-${this._element.id}`
     }
 
     const events = ['change', 'keyup', 'paste']
