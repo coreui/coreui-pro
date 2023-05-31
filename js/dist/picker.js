@@ -1,5 +1,5 @@
 /*!
-  * CoreUI picker.js v4.6.0-alpha.2 (https://coreui.io)
+  * CoreUI picker.js v4.6.0-beta.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://coreui.io)
   */
@@ -11,7 +11,7 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.6.0-alpha.2): picker.js
+   * CoreUI PRO (v4.6.0-beta.0): picker.js
    * License (https://coreui.io/pro/license-new/)
    * --------------------------------------------------------------------------
    */
