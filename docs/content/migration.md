@@ -8,7 +8,7 @@ aliases: "/4.0/migration/"
 toc: true
 ---
 
-## v4.3.0
+## v4.3.0 (v4.6.0 PRO)
 
 ### CSS variables
 
