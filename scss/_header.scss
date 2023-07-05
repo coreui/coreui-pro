@@ -73,7 +73,6 @@
     position: sticky;
     top: 0;
     z-index: $zindex-fixed - 1;
-    @include elevation(2);
   }
 }
 

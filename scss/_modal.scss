@@ -107,7 +107,6 @@
   @include box-shadow(var(--#{$prefix}modal-box-shadow));
   // Remove focus outline from opened modal
   outline: 0;
-  @include elevation(24);
 }
 
 // Modal background

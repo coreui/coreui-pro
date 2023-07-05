@@ -170,7 +170,6 @@
   background-clip: padding-box;
   border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
-  @include elevation(4);
 
   .date-picker.show & {
     display: block;
@@ -275,14 +274,6 @@
       --#{$prefix}date-picker-indicator-valid-icon: #{escape-svg($date-picker-indicator-valid-icon-dark)};
       --#{$prefix}date-picker-separator-icon: #{escape-svg($date-picker-separator-icon-dark)};
       --#{$prefix}date-picker-separator-icon-rtl: #{escape-svg($date-picker-separator-icon-rtl-dark)};
-    }
-  }
-}
-
-@if $enable-dark-mode and $enable-elevations {
-  @include color-mode(dark) {
-    .date-picker-dropdown {
-      background-color: color-mix(in srgb, var(--#{$prefix}date-picker-dropdown-bg) 96%, #fff);
     }
   }
 }

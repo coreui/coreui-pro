@@ -297,7 +297,6 @@ select.form-multi-select {
   background-clip: padding-box;
   border: var(--#{$prefix}form-multi-select-dropdown-border-width) solid var(--#{$prefix}form-multi-select-dropdown-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-dropdown-border-radius));
-  @include elevation(4);
 
   .form-multi-select.show & {
     display: block;
@@ -444,18 +443,6 @@ select.form-multi-select {
       --#{$prefix}form-multi-select-indicator-bg: #{escape-svg($form-multi-select-indicator-bg-dark)};
       --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg-dark)};
       --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg-dark)};
-    }
-  }
-}
-
-@if $enable-dark-mode and $enable-elevations {
-  @include color-mode(dark) {
-    .form-multi-select-dropdown {
-      background-color: color-mix(in srgb, var(--#{$prefix}form-multi-select-dropdown-bg) 96%, #fff);
-    }
-
-    .form-multi-select-option-with-checkbox::before {
-      background-color: color-mix(in srgb, var(--#{$prefix}form-multi-select-option-indicator-bg) 96%, #fff);
     }
   }
 }

@@ -164,7 +164,6 @@
   background-clip: padding-box;
   border: var(--#{$prefix}time-picker-dropdown-border-width) solid var(--#{$prefix}time-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}time-picker-dropdown-border-radius));
-  @include elevation(4);
 
   .time-picker.show & {
     display: block;
@@ -285,14 +284,6 @@
       --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon-dark)};
       --#{$prefix}time-picker-indicator-invalid-icon: #{escape-svg($time-picker-indicator-invalid-icon-dark)};
       --#{$prefix}time-picker-indicator-valid-icon: #{escape-svg($time-picker-indicator-valid-icon-dark)};
-    }
-  }
-}
-
-@if $enable-dark-mode and $enable-elevations {
-  @include color-mode(dark) {
-    .time-picker-dropdown {
-      background-color: color-mix(in srgb, var(--#{$prefix}time-picker-dropdown-bg) 96%, #fff);
     }
   }
 }

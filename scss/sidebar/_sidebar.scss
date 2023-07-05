@@ -134,7 +134,6 @@
       top: 0;
       bottom: 0;
       z-index: $zindex-fixed;
-      @include elevation(2);
 
       &:not(.sidebar-end) {
         @include ltr-rtl("left", 0);
@@ -159,10 +158,6 @@
     top: 0;
     bottom: 0;
     z-index: $zindex-fixed + 2;
-
-    &:not(.hide) {
-      @include elevation(3);
-    }
 
     &:not(.sidebar-end) {
       @include ltr-rtl("left", 0);

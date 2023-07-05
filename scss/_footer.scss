@@ -24,5 +24,4 @@
   position: sticky;
   bottom: 0;
   z-index: $zindex-fixed;
-  @include elevation(2, "top");
 }
