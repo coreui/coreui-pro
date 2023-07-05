@@ -134,6 +134,10 @@ select.form-multi-select {
   border: var(--#{$prefix}form-multi-select-border-width) solid var(--#{$prefix}form-multi-select-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-border-radius));
 
+  .form-multi-select & {
+    @include transition($input-transition);
+  }
+
   .form-multi-select.disabled & {
     color: var(--#{$prefix}form-multi-select-disabled-color);
     background-color: var(--#{$prefix}form-multi-select-disabled-bg);

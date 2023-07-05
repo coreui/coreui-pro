@@ -78,6 +78,10 @@
     }
   }
 
+  .time-picker & {
+    @include transition($input-transition);
+  }
+
   .time-picker.disabled & {
     background-color: var(--#{$prefix}time-picker-disabled-bg);
     border-color: var(--#{$prefix}time-picker-disabled-border-color);

@@ -78,6 +78,10 @@
     }
   }
 
+  .date-picker & {
+    @include transition($input-transition);
+  }
+
   .date-picker.disabled & {
     --#{$prefix}date-picker-border-color: var(--#{$prefix}date-picker-disabled-border-color);
     background-color: var(--#{$prefix}date-picker-disabled-bg);
