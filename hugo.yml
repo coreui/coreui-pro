@@ -54,10 +54,10 @@ params:
   social_image_path:    /assets/brand/coreui-social.jpg
   social_logo_path:     /assets/brand/coreui-social-logo.png
 
-  current_version:      "4.3.0-beta.0"
-  current_version_pro:  "4.6.0-beta.0"
-  current_ruby_version: "4.3.0-beta.0"
-  docs_version:         "4.3"
+  current_version:      "5.0.0-alpha.1"
+  current_version_pro:  "5.0.0-alpha.1"
+  current_ruby_version: "5.0.0-alpha.1"
+  docs_version:         "5.0"
   rfs_version:          "9.0.3"
   github_org:           "https://github.com/coreui/coreui"
   repo:                 "https://github.com/coreui/coreui"
@@ -68,35 +68,35 @@ params:
   icons:                "https://icons.coreui.io/"
 
   download:
-    source:             "https://github.com/coreui/coreui/archive/v4.3.0-beta.0.zip"
-    dist:               "https://github.com/coreui/coreui/releases/download/v4.3.0-beta.0/coreui-4.3.0-beta.0-dist.zip"
-    source_pro:         "https://github.com/coreui/coreui-pro/archive/v4.6.0-beta.0.zip"
-    dist_pro:           "https://github.com/coreui/coreui-pro/releases/download/v4.6.0-beta.0/coreui-4.6.0-beta.0-dist.zip"
+    source:             "https://github.com/coreui/coreui/archive/v5.0.0-alpha.1.zip"
+    dist:               "https://github.com/coreui/coreui/releases/download/v5.0.0-alpha.1/coreui-5.0.0-alpha.1-dist.zip"
+    source_pro:         "https://github.com/coreui/coreui-pro/archive/v5.0.0-alpha.1.zip"
+    dist_pro:           "https://github.com/coreui/coreui-pro/releases/download/v5.0.0-alpha.1/coreui-5.0.0-alpha.1-dist.zip"
 
   download_template:
     website:            "https://coreui.io/product/free-bootstrap-admin-template/"
 
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
-    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.3.0-beta.0/dist/css/coreui.min.css"
-    css_hash:        "sha384-JoDlDuIandI5GlsGorCB+okvXmQJXwXYYaBK0cUKHYnkWaZF0R6hOudjvCYv4X+v"
-    css_rtl:         "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.3.0-beta.0/dist/css/coreui.rtl.min.css"
-    css_rtl_hash:    "sha384-U9gTp8UNnvSmqrm21uKq9ElFaqU9SxFb0kwuT8iq+B0G3wDVAN6sfvbrRbgqB6VG"
-    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.3.0-beta.0/dist/js/coreui.min.js"
-    js_hash:         "sha384-dAeLb9yp+QQxI8CsUc7dxsj/wq01Ycv2rD7enA5KHzEmi6XCk5kaRN5r+ZGHcu3S"
-    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@4.3.0-beta.0/dist/js/coreui.bundle.min.js"
-    js_bundle_hash:  "sha384-25Gj4gUo1xIKbP60OsawBrSv4q6PClfgFqOHn2N3wPp6M7RVXULjnr0dDDj3+Ud5"
+    css:             "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0-alpha.1/dist/css/coreui.min.css"
+    css_hash:        "sha384-kzZuZpWDubFVbc6rjWJo7yIstiGYZINkrUlJRa8qd1UcEy+7PRI/fUd1kAAACFAB"
+    css_rtl:         "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0-alpha.1/dist/css/coreui.rtl.min.css"
+    css_rtl_hash:    "sha384-Aw07+gdTm9XnU4fjteI9J2ikRwqicY6X/Ni0+Aa/UQDh7diaHgIs2ZBttuIQ2eTo"
+    js:              "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0-alpha.1/dist/js/coreui.min.js"
+    js_hash:         "sha384-ZL1+QgJAGCV2pS5NvCdwJ1dxWcA8hSq/bupJLEKqDJ9gCO1NXtJfO5VH2eBdexox"
+    js_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.0.0-alpha.1/dist/js/coreui.bundle.min.js"
+    js_bundle_hash:  "sha384-5NxMv75IP7CLKF29WBrmqLX5uQcA+32rVe4dAPsc2GY/4nT8JWZwDmWzJ+GnvRS+"
     popper:           "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     popper_hash:      "sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     popper_esm:       "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/esm/popper.min.js"
-    css_pro:             "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@4.6.0-beta.0/dist/css/coreui.min.css"
-    css_pro_hash:        "sha384-nU5P7HHFEuTIkjywl55i2or8RCWG+AcRHUhzyQS6XXRhfPA5bHzGzMInS7+pLNkb"
-    css_pro_rtl:         "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@4.6.0-beta.0/dist/css/coreui.rtl.min.css"
-    css_pro_rtl_hash:    "sha384-r2ZgMI0TiAtr8HZQlhUw40eCSWPppd3rutfUeCtCF/E6uwcw/EznwEVWGi4ktoeR"
-    js_pro:              "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@4.6.0-beta.0/dist/js/coreui.min.js"
-    js_pro_hash:         "sha384-/9k6UCmD39IplU6JrspPITjI+/QInafdU3IunUdT68HQ5FcAzJwCnHGSvKmIVPLz"
-    js_pro_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@4.6.0-beta.0/dist/js/coreui.bundle.min.js"
-    js_pro_bundle_hash:  "sha384-VCnexcCv2cE5Xt5MX3QcPCYdVl7U8RfeOWgMj4sf2xrwUSi+ZYWTpvPmS/KPSqLd"
+    css_pro:             "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-alpha.1/dist/css/coreui.min.css"
+    css_pro_hash:        "sha384-HIgf6Oxga84lBgS1HTN1CmDew7QcPuhPUnSGjB0/HP/WBZNM3E8G5csc1B/YyyGS"
+    css_pro_rtl:         "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-alpha.1/dist/css/coreui.rtl.min.css"
+    css_pro_rtl_hash:    "sha384-UppxI5hjEsDDTr5JaxuNL07y0bOf4eMDn/EXp3BctIF2BGs6cm86f78P/wd1boeL"
+    js_pro:              "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-alpha.1/dist/js/coreui.min.js"
+    js_pro_hash:         "sha384-Ab4do8bPcpXfc8tAfI+kgZ+gk6VSmMmothhvYpIF+5gOnXrfRapRdxFqBbEWIpQh"
+    js_pro_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-alpha.1/dist/js/coreui.bundle.min.js"
+    js_pro_bundle_hash:  "sha384-SXlrEEDJbAKvqMVhGcYd15uBplq3FQq3qj2xbBa35z2D++k25xK2/UNKhKIhGyjU"
 
   anchors:
     min: 2
