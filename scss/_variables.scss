@@ -790,6 +790,10 @@ $hr-border-color:             null !default; // Allows for inherited colors
 $hr-border-width:             var(--#{$prefix}border-width) !default;
 $hr-opacity:                  .25 !default;
 
+// scss-docs-start vr-variables
+$vr-border-width:             var(--#{$prefix}border-width) !default;
+// scss-docs-end vr-variables
+
 $legend-margin-bottom:        .5rem !default;
 $legend-font-size:            1.5rem !default;
 $legend-font-weight:          null !default;
@@ -1451,11 +1455,9 @@ $nav-pills-border-radius:           var(--#{$prefix}border-radius) !default;
 $nav-pills-link-active-color:       $component-active-color !default;
 $nav-pills-link-active-bg:          $component-active-bg !default;
 
-$nav-underline-border-color:              var(--#{$prefix}border-color) !default;
-$nav-underline-border-width:              calc(var(--#{$prefix}border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
-$nav-underline-link-color:                var(--#{$prefix}secondary-color) !default;
-$nav-underline-link-active-color:         var(--#{$prefix}primary) !default;
-$nav-underline-link-active-border-color:  var(--#{$prefix}primary) !default;
+$nav-underline-gap:                 1rem !default;
+$nav-underline-border-width:        .125rem !default;
+$nav-underline-link-active-color:   var(--#{$prefix}emphasis-color) !default;
 // scss-docs-end nav-variables
 
 
@@ -1497,8 +1499,9 @@ $navbar-dark-color:                 rgba($white, .55) !default;
 $navbar-dark-hover-color:           rgba($white, .75) !default;
 $navbar-dark-active-color:          $white !default;
 $navbar-dark-disabled-color:        rgba($white, .25) !default;
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
-$navbar-dark-toggler-border-color:  rgba($white, .1) !default;
+$navbar-dark-icon-color:            $navbar-dark-color !default;
+$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+$navbar-dark-toggler-border-color:  rgba($white, .1) !default;$navbar-dark-toggler-border-color:  rgba($white, .1) !default;
 $navbar-dark-brand-color:           $navbar-dark-active-color !default;
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
 // scss-docs-end navbar-dark-variables
@@ -1540,7 +1543,7 @@ $dropdown-header-color:             $gray-600 !default;
 $dropdown-header-padding-x:         $dropdown-item-padding-x !default;
 $dropdown-header-padding-y:         $dropdown-padding-y !default;
 // fusv-disable
-$dropdown-header-padding:           $dropdown-header-padding-y $dropdown-header-padding-x !default; // Deprecated in v5.2.0
+$dropdown-header-padding:           $dropdown-header-padding-y $dropdown-header-padding-x !default; // Deprecated in v4.2.6
 // fusv-enable
 // scss-docs-end dropdown-variables
 
@@ -1733,12 +1736,6 @@ $popover-arrow-color:               $popover-bg !default;
 $popover-arrow-outer-color:         var(--#{$prefix}border-color-translucent) !default;
 // fusv-enable
 
-// fusv-disable
-// Deprecated in 4.2.0 for CSS variables
-$popover-arrow-color:               $popover-bg !default;
-$popover-arrow-outer-color:         var(--#{$prefix}border-color-translucent) !default;
-// fusv-enable
-
 
 // Toasts
 
@@ -1848,9 +1845,6 @@ $alert-margin-bottom:           1rem !default;
 $alert-border-radius:           var(--#{$prefix}border-radius) !default;
 $alert-link-font-weight:        $font-weight-bold !default;
 $alert-border-width:            var(--#{$prefix}border-width) !default;
-$alert-bg-scale:                -80% !default;
-$alert-border-scale:            -70% !default;
-$alert-color-scale:             40% !default;
 $alert-dismissible-padding-r:   $alert-padding-x * 3 !default; // 3x covers width of x plus default padding on either side
 // scss-docs-end alert-variables
 
@@ -2283,7 +2277,7 @@ $kbd-padding-x:                     .375rem !default;
 $kbd-font-size:                     $code-font-size !default;
 $kbd-color:                         var(--#{$prefix}body-bg) !default;
 $kbd-bg:                            var(--#{$prefix}body-color) !default;
-$nested-kbd-font-weight:            null !default; // Deprecated in v5.2.0, removing in v6
+$nested-kbd-font-weight:            null !default; // Deprecated in v4.2.6, removing in v6
 
 $pre-color:                         unset !default;
 

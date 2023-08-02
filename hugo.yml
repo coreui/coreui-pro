@@ -9,6 +9,8 @@ security:
     getenv:
       - ^HUGO_
       - NETLIFY
+  gotemplates:
+    allowActionJSTmpl: true
 
 markup:
   goldmark:
@@ -65,7 +67,7 @@ params:
   opencollective:       "coreui"
   community:            "https://github.com/coreui/coreui/discussions"
   blog:                 "https://coreui.io/blog/"
-  icons:                "https://icons.coreui.io/"
+  icons:                "https://coreui.io/icons/"
 
   download:
     source:             "https://github.com/coreui/coreui/archive/v5.0.0-alpha.1.zip"

@@ -150,23 +150,23 @@
 .dark-theme,
 [data-coreui-theme=dark] {
   color-scheme: dark;
-  --cui-body-color: #aab3c5;
-  --cui-body-color-rgb: 170, 179, 197;
+  --cui-body-color: #dbdfe6;
+  --cui-body-color-rgb: 219, 223, 230;
   --cui-body-bg: #212631;
   --cui-body-bg-rgb: 33, 38, 49;
   --cui-emphasis-color: #fff;
   --cui-emphasis-color-rgb: 255, 255, 255;
-  --cui-secondary-color: rgba(170, 179, 197, 0.75);
-  --cui-secondary-color-rgb: 170, 179, 197;
+  --cui-secondary-color: rgba(219, 223, 230, 0.75);
+  --cui-secondary-color-rgb: 219, 223, 230;
   --cui-secondary-bg: #323a49;
   --cui-secondary-bg-rgb: 50, 58, 73;
-  --cui-tertiary-color: rgba(170, 179, 197, 0.5);
-  --cui-tertiary-color-rgb: 170, 179, 197;
+  --cui-tertiary-color: rgba(219, 223, 230, 0.5);
+  --cui-tertiary-color-rgb: 219, 223, 230;
   --cui-tertiary-bg: #252a37;
   --cui-tertiary-bg-rgb: 37, 42, 55;
-  --cui-high-emphasis: #aab3c5;
-  --cui-medium-emphasis: rgba(170, 179, 197, 0.75);
-  --cui-disabled: rgba(170, 179, 197, 0.5);
+  --cui-high-emphasis: #dbdfe6;
+  --cui-medium-emphasis: rgba(219, 223, 230, 0.75);
+  --cui-disabled: rgba(219, 223, 230, 0.5);
   --cui-elevation-base-color: 0, 0, 0;
   --cui-primary: #6b60ce;
   --cui-secondary: #a6a7a8;
@@ -605,8 +605,8 @@ legend + * {
 }
 
 [type=search] {
-  outline-offset: -2px;
   -webkit-appearance: textfield;
+  outline-offset: -2px;
 }
 
 *[dir=rtl] [type=tel],

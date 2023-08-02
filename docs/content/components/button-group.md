@@ -201,8 +201,6 @@ Create a set of buttons that appear vertically stacked rather than horizontally.
     <button type="button" class="btn btn-primary">Button</button>
     <button type="button" class="btn btn-primary">Button</button>
     <button type="button" class="btn btn-primary">Button</button>
-    <button type="button" class="btn btn-primary">Button</button>
-    <button type="button" class="btn btn-primary">Button</button>
   </div>
 </div>
 {{< /example >}}
@@ -221,9 +219,7 @@ Create a set of buttons that appear vertically stacked rather than horizontally.
         <li><a class="dropdown-item" href="#">Dropdown link</a></li>
       </ul>
     </div>
-    <button type="button" class="btn btn-primary">Button</button>
-    <button type="button" class="btn btn-primary">Button</button>
-    <div class="btn-group" role="group">
+    <div class="btn-group dropstart" role="group">
       <button id="btnGroupVerticalDrop2" type="button" class="btn btn-primary dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">
         Dropdown
       </button>
@@ -232,7 +228,7 @@ Create a set of buttons that appear vertically stacked rather than horizontally.
         <li><a class="dropdown-item" href="#">Dropdown link</a></li>
       </ul>
     </div>
-    <div class="btn-group" role="group">
+    <div class="btn-group dropend" role="group">
       <button id="btnGroupVerticalDrop3" type="button" class="btn btn-primary dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">
         Dropdown
       </button>
@@ -241,7 +237,7 @@ Create a set of buttons that appear vertically stacked rather than horizontally.
         <li><a class="dropdown-item" href="#">Dropdown link</a></li>
       </ul>
     </div>
-    <div class="btn-group" role="group">
+    <div class="btn-group dropup" role="group">
       <button id="btnGroupVerticalDrop4" type="button" class="btn btn-primary dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">
         Dropdown
       </button>

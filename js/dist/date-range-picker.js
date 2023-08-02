@@ -466,6 +466,14 @@
             this._endInput.value = this._setInputValue(this._endDate);
             this._endInput.dispatchEvent(new Event('change'));
             this._updateDateRangePickerCalendars();
+            EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+              date: this._startDate,
+              formatedDate: this._formatDate(this._startDate)
+            });
+            EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+              date: this._endDate,
+              formatedDate: this._formatDate(this._endDate)
+            });
           });
           buttonEl.innerHTML = key;
           dateRangePickerRangesEl.append(buttonEl);

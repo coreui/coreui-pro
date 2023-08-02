@@ -169,14 +169,12 @@
       EventHandler.on(this._element, 'click', '.btn-month', event => {
         event.preventDefault();
         this._view = 'months';
-        this._element.innerHTML = '';
-        this._createCalendarPanel();
+        this._updateCalendar();
       });
       EventHandler.on(this._element, 'click', '.btn-year', event => {
         event.preventDefault();
         this._view = 'years';
-        this._element.innerHTML = '';
-        this._createCalendarPanel();
+        this._updateCalendar();
       });
     }
     _setCalendarDate(date) {
@@ -342,7 +340,7 @@
     }
     _updateCalendar() {
       this._element.innerHTML = '';
-      this._createCalendarPanel();
+      this._createCalendar();
     }
     _dayClassNames(date, month) {
       const classNames = {

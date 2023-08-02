@@ -1,10 +1,5 @@
 @charset "UTF-8";
 /*!
- * CoreUI PRO  v5.0.0-alpha.1 (https://coreui.io)
- * Copyright (c) 2023 creativeLabs Łukasz Holeczek
- * License (https://coreui.io/pro/license/)
- */
-/*!
  * CoreUI PRO Utilities v5.0.0-alpha.1 (https://coreui.io)
  * Copyright (c) 2023 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
@@ -155,23 +150,23 @@
 .dark-theme,
 [data-coreui-theme=dark] {
   color-scheme: dark;
-  --cui-body-color: #aab3c5;
-  --cui-body-color-rgb: 170, 179, 197;
+  --cui-body-color: #dbdfe6;
+  --cui-body-color-rgb: 219, 223, 230;
   --cui-body-bg: #212631;
   --cui-body-bg-rgb: 33, 38, 49;
   --cui-emphasis-color: #fff;
   --cui-emphasis-color-rgb: 255, 255, 255;
-  --cui-secondary-color: rgba(170, 179, 197, 0.75);
-  --cui-secondary-color-rgb: 170, 179, 197;
+  --cui-secondary-color: rgba(219, 223, 230, 0.75);
+  --cui-secondary-color-rgb: 219, 223, 230;
   --cui-secondary-bg: #323a49;
   --cui-secondary-bg-rgb: 50, 58, 73;
-  --cui-tertiary-color: rgba(170, 179, 197, 0.5);
-  --cui-tertiary-color-rgb: 170, 179, 197;
+  --cui-tertiary-color: rgba(219, 223, 230, 0.5);
+  --cui-tertiary-color-rgb: 219, 223, 230;
   --cui-tertiary-bg: #252a37;
   --cui-tertiary-bg-rgb: 37, 42, 55;
-  --cui-high-emphasis: #aab3c5;
-  --cui-medium-emphasis: rgba(170, 179, 197, 0.75);
-  --cui-disabled: rgba(170, 179, 197, 0.5);
+  --cui-high-emphasis: #dbdfe6;
+  --cui-medium-emphasis: rgba(219, 223, 230, 0.75);
+  --cui-disabled: rgba(219, 223, 230, 0.5);
   --cui-elevation-base-color: 0, 0, 0;
   --cui-primary: #6b60ce;
   --cui-secondary: #a6a7a8;
@@ -260,42 +255,42 @@
 
 .text-bg-primary {
   color: rgba(255, 255, 255, 0.87) !important;
-  background-color: RGBA(50, 31, 219, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-primary-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-secondary {
   color: rgba(37, 43, 54, 0.95) !important;
-  background-color: RGBA(157, 165, 177, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-secondary-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-success {
   color: rgba(37, 43, 54, 0.95) !important;
-  background-color: RGBA(46, 184, 92, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-success-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-info {
   color: #080a0c !important;
-  background-color: RGBA(51, 153, 255, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-info-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-warning {
   color: rgba(37, 43, 54, 0.95) !important;
-  background-color: RGBA(249, 177, 21, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-warning-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-danger {
   color: #080a0c !important;
-  background-color: RGBA(229, 83, 83, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-danger-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-light {
   color: rgba(37, 43, 54, 0.95) !important;
-  background-color: RGBA(243, 244, 247, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-light-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .text-bg-dark {
   color: rgba(255, 255, 255, 0.87) !important;
-  background-color: RGBA(33, 38, 49, var(--cui-bg-opacity, 1)) !important;
+  background-color: RGBA(var(--cui-dark-rgb), var(--cui-bg-opacity, 1)) !important;
 }
 
 .dark-theme .text-bg-primary,
@@ -620,7 +615,7 @@
 .vr {
   display: inline-block;
   align-self: stretch;
-  width: 1px;
+  width: var(--cui-border-width);
   min-height: 1em;
   padding: 0;
   background-color: currentcolor;
