@@ -62,6 +62,24 @@ $theme-prefix: "dark" !default;
     }
   }
 
+  .form-control {
+    &:disabled {
+      background-color: var(--cui-input-disabled-bg);
+    }
+
+    &::file-selector-button {
+      @include gradient-bg($form-file-button-bg-dt);
+    }
+
+    &:hover:not(:disabled):not([readonly])::file-selector-button {
+      background-color: $form-file-button-hove-bg-dt;
+    }
+  }
+
+  .picker-input-group .form-control:disabled + .input-group-text {
+    background-color: var(--cui-input-disabled-bg);
+  }
+
   // Utilities
   @import "./../utilities/api";
 }

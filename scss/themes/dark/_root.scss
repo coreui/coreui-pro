@@ -11,6 +11,9 @@
   --#{$prefix}body-color-rgb: #{to-rgb($body-color-dt)};
   --#{$prefix}body-bg-rgb: #{to-rgb($body-bg-dt)};
 
+  --#{$prefix}link-color: #{$link-color-dt};
+  --#{$prefix}link-color-rgb: #{to-rgb($link-color-dt)};
+
   // Gradients
   @each $color, $map in $theme-gradients-dt {
     --#{$prefix}#{$color}-start: #{map-get($map, "start")};

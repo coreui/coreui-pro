@@ -26,6 +26,7 @@ $danger-dt:     desaturate($danger, 30%) !default;
 $light-dt:      rgba($white, .1) !default;
 $dark-dt:       rgba($black, .1) !default;
 
+
 // fusv-disable
 $theme-colors-dt: (
   "primary":    $primary-dt,
@@ -103,7 +104,7 @@ $theme-gradients-dt: (
 $body-bg-dt:                   $bg-elevation-0 !default;
 $body-color-dt:                $high-emphasis-dt !default;
 $elevation-base-color-dt:      0, 0, 0 !default;
-
+$link-color-dt:                $primary-dt !default;
 // Components
 //
 // Define common padding and border radius sizes and more.
@@ -302,14 +303,17 @@ $input-group-addon-border-color-dt:  rgba($white, .09) !default;
 $form-select-color-dt:               $input-color-dt !default;
 $form-select-bg-dt:                  $input-bg-dt !default;
 $form-select-border-color-dt:        $input-border-color-dt !default;
-$form-select-focus-border-color-dt:        $input-focus-border-color-dt !default;
+$form-select-focus-border-color-dt:  $input-focus-border-color-dt !default;
 // $form-select-disabled-color-dt:         $input-disabled-color-dt !default;
-$form-select-disabled-bg-dt:            $input-disabled-bg-dt !default;
+$form-select-disabled-bg-dt:         $input-disabled-bg-dt !default;
 // $form-select-disabled-border-color-dt:  $input-disabled-border-color-dt !default;
 
 $form-check-input-checked-color-dt:          $component-active-color-dt !default;
 $form-check-input-checked-bg-color-dt:       $component-active-bg-dt !default;
 $form-check-input-checked-border-color-dt:   $form-check-input-checked-bg-color-dt !default;
+
+$form-file-button-bg-dt:       rgba($black, .1) !default;
+$form-file-button-hove-bg-dt:  rgba($black, .2) !default;
 
 $form-control-theme-map: (
   "input-color":                            $input-color-dt,
