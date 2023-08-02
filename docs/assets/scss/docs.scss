@@ -61,7 +61,9 @@ $enable-cssgrid: true;
 /* stylelint-disable */
 div[dir="rtl"] .input-group > :not(:last-child),
 div[dir="rtl"] .input-group > .dropdown-toggle:nth-last-child(n+3) {
+  border-left: 0 !important;
   border-right: 0 !important;
+  @include border-start-radius(0 !important);
   @include border-end-radius($input-border-radius !important);
 }
 

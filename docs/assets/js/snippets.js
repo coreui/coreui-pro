@@ -187,10 +187,11 @@
   // Multi Selects
   // -------------------------------
   // 'Multi Selects components' example in docs only
+  // js-docs-start multi-select-array-data
   const myMultiSelect = document.getElementById('multiSelect')
 
   if (myMultiSelect) {
-    const cuiMultiSelect = new coreui.MultiSelect(myMultiSelect, {
+    new coreui.MultiSelect(myMultiSelect, {
       name: 'multiSelect',
       options: [
         {
@@ -232,54 +233,17 @@
       ],
       search: true
     })
-    cuiMultiSelect.update({
-      options: [
-        {
-          value: 0,
-          text: 'Angular2'
-        },
-        {
-          value: 1,
-          text: 'Bootstrap2',
-          selected: true
-        },
-        {
-          value: 2,
-          text: 'React.js',
-          selected: true
-        },
-        {
-          value: 3,
-          text: 'Vue.js'
-        },
-        {
-          label: 'backend',
-          options: [
-            {
-              value: 4,
-              text: 'Django'
-            },
-            {
-              value: 5,
-              text: 'Laravel'
-            },
-            {
-              value: 6,
-              text: 'Node.js',
-              selected: true
-            }
-          ]
-        }
-      ]
-    })
   }
+  // js-docs-end multi-select-array-data
 
   // -------------------------------
   // Date Pickers
   // -------------------------------
   // 'Date Pickers components' example in docs only
 
-  if (document.getElementById('myDatePickerDisabledDates')) {
+  // js-docs-start date-picker-disabled-dates
+  const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')
+  if (myDatePickerDisabledDates) {
     const optionsDatePickerDisabledDates = {
       locale: 'en-US',
       calendarDate: new Date(2022, 2, 1),
@@ -292,16 +256,19 @@
       maxDate: new Date(2022, 5, 0),
       minDate: new Date(2022, 1, 1)
     }
-    // eslint-disable-next-line no-unused-vars
-    const myDatePickerDisabledDates = new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), optionsDatePickerDisabledDates)
+
+    new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), optionsDatePickerDisabledDates)
   }
+  // js-docs-end date-picker-disabled-dates
 
   // -------------------------------
   // Date Range Pickers
   // -------------------------------
   // 'Date Range Pickers components' example in docs only
 
-  if (document.getElementById('myDateRangePickerDisabledDates')) {
+  // js-docs-start date-range-picker-disabled-dates
+  const myDateRangePickerDisabledDates = document.getElementById('myDateRangePickerDisabledDates')
+  if (myDateRangePickerDisabledDates) {
     const optionsDateRangePickerDisabledDates = {
       locale: 'en-US',
       calendarDate: new Date(2022, 2, 1),
@@ -314,11 +281,14 @@
       maxDate: new Date(2022, 5, 0),
       minDate: new Date(2022, 1, 1)
     }
-    // eslint-disable-next-line no-unused-vars
-    const myDateRangePickerDisabledDates = new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), optionsDateRangePickerDisabledDates)
-  }
 
-  if (document.getElementById('myDateRangePickerCustomRanges')) {
+    new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), optionsDateRangePickerDisabledDates)
+  }
+  // js-docs-end date-range-picker-disabled-dates
+
+  // js-docs-start date-range-picker-custom-ranges
+  const myDateRangePickerCustomRanges = document.getElementById('myDateRangePickerCustomRanges')
+  if (myDateRangePickerCustomRanges) {
     const optionsCustomRanges = {
       locale: 'en-US',
       ranges: {
@@ -345,7 +315,8 @@
         ]
       }
     }
-    // eslint-disable-next-line no-unused-vars
-    const myDateRangePickerCustomRanges = new coreui.DateRangePicker(document.getElementById('myDateRangePickerCustomRanges'), optionsCustomRanges)
+
+    new coreui.DateRangePicker(myDateRangePickerCustomRanges, optionsCustomRanges)
   }
+  // js-docs-end date-range-picker-custom-ranges
 })()
