@@ -1,15 +1,22 @@
 /*!
-  * CoreUI calendar.js v4.5.0 (https://coreui.io)
+  * CoreUI calendar.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/manipulator'), require('./util/calendar'), require('./base-component')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './util/calendar', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.index, global.EventHandler, global.Manipulator, global.calendar, global.BaseComponent));
-})(this, (function (index, EventHandler, Manipulator, calendar, BaseComponent) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./util/index.js'), require('./util/calendar.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './util/index', './util/calendar'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.Index, global.Calendar));
+})(this, (function (BaseComponent, EventHandler, Manipulator, index_js, calendar_js) { 'use strict';
 
   /* eslint-disable indent, multiline-ternary */
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI PRO calendar.js
+   * License (https://coreui.io/pro/license/)
+   * --------------------------------------------------------------------------
+   */
+
 
   /**
   * ------------------------------------------------------------------------
@@ -215,7 +222,7 @@
       });
     }
     _selectDate(date) {
-      if (calendar.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
         return;
       }
       if (this._config.range) {
@@ -277,9 +284,9 @@
         </button>
       </div>
     `;
-      const monthDetails = calendar.getMonthDetails(year, month, this._config.firstDayOfWeek);
-      const listOfMonths = calendar.createGroupsInArray(calendar.getMonthsNames(this._config.locale), 4);
-      const listOfYears = calendar.createGroupsInArray(calendar.getYears(date.getFullYear()), 4);
+      const monthDetails = calendar_js.getMonthDetails(year, month, this._config.firstDayOfWeek);
+      const listOfMonths = calendar_js.createGroupsInArray(calendar_js.getMonthsNames(this._config.locale), 4);
+      const listOfYears = calendar_js.createGroupsInArray(calendar_js.getYears(date.getFullYear()), 4);
       const weekDays = monthDetails[0];
       const calendarTable = document.createElement('table');
       calendarTable.innerHTML = `
@@ -343,16 +350,16 @@
     }
     _dayClassNames(date, month) {
       const classNames = {
-        today: calendar.isToday(date),
-        disabled: calendar.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
+        today: calendar_js.isToday(date),
+        disabled: calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
         [month]: true,
         clickable: month !== 'current' && this._config.selectAdjacementDays,
-        last: calendar.isLastDayOfMonth(date),
-        range: month === 'current' && calendar.isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? calendar.isDateInRange(date, this._startDate, this._hoverDate) : calendar.isDateInRange(date, this._hoverDate, this._endDate)),
-        selected: calendar.isDateSelected(date, this._startDate, this._endDate),
-        start: calendar.isStartDate(date, this._startDate, this._endDate),
-        end: calendar.isEndDate(date, this._startDate, this._endDate)
+        last: calendar_js.isLastDayOfMonth(date),
+        range: month === 'current' && calendar_js.isDateInRange(date, this._startDate, this._endDate),
+        'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? calendar_js.isDateInRange(date, this._startDate, this._hoverDate) : calendar_js.isDateInRange(date, this._hoverDate, this._endDate)),
+        selected: calendar_js.isDateSelected(date, this._startDate, this._endDate),
+        start: calendar_js.isStartDate(date, this._startDate, this._endDate),
+        end: calendar_js.isEndDate(date, this._startDate, this._endDate)
       };
 
       // eslint-disable-next-line unicorn/no-array-reduce
@@ -416,7 +423,7 @@
   * add .Calendar to jQuery only if jQuery is present
   */
 
-  index.defineJQueryPlugin(Calendar);
+  index_js.defineJQueryPlugin(Calendar);
 
   return Calendar;
 

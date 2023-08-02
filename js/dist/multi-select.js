@@ -1,20 +1,21 @@
 /*!
-  * CoreUI multi-select.js v4.5.0 (https://coreui.io)
+  * CoreUI multi-select.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/data'), require('./dom/event-handler'), require('./dom/manipulator'), require('./dom/selector-engine'), require('./base-component')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/data', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global.index, global.Data, global.EventHandler, global.Manipulator, global.SelectorEngine, global.BaseComponent));
-})(this, (function (index, Data, EventHandler, Manipulator, SelectorEngine, BaseComponent) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/data', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global.BaseComponent, global.Data, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index));
+})(this, (function (BaseComponent, Data, EventHandler, Manipulator, SelectorEngine, index_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): multi-select.js
-   * License (https://coreui.io/pro/license-new/)
+   * CoreUI PRO multi-select.js
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
+
 
   /**
    * ------------------------------------------------------------------------
@@ -718,7 +719,7 @@
    * add .MultiSelect to jQuery only if jQuery is present
    */
 
-  index.defineJQueryPlugin(MultiSelect);
+  index_js.defineJQueryPlugin(MultiSelect);
 
   return MultiSelect;
 

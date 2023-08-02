@@ -1,20 +1,21 @@
 /*!
-  * CoreUI loading-button.js v4.5.0 (https://coreui.io)
+  * CoreUI loading-button.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/data'), require('./dom/event-handler'), require('./dom/manipulator'), require('./base-component')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/data', './dom/event-handler', './dom/manipulator', './base-component'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.index, global.Data, global.EventHandler, global.Manipulator, global.BaseComponent));
-})(this, (function (index, Data, EventHandler, Manipulator, BaseComponent) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/data', './dom/event-handler', './dom/manipulator', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.BaseComponent, global.Data, global.EventHandler, global.Manipulator, global.Index));
+})(this, (function (BaseComponent, Data, EventHandler, Manipulator, index_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): loading-button.js
-   * License (https://coreui.io/pro/license-new/)
+   * CoreUI PRO loading-button.js
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
+
 
   /**
    * ------------------------------------------------------------------------
@@ -166,7 +167,7 @@
    * add .LoadingButton to jQuery only if jQuery is present
    */
 
-  index.defineJQueryPlugin(LoadingButton);
+  index_js.defineJQueryPlugin(LoadingButton);
 
   return LoadingButton;
 

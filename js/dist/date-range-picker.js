@@ -1,20 +1,21 @@
 /*!
-  * CoreUI date-range-picker.js v4.5.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('date-fns'), require('./util/index'), require('./dom/event-handler'), require('./dom/manipulator'), require('./dom/selector-engine'), require('./util/calendar'), require('./calendar'), require('./picker'), require('./time-picker')) :
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('date-fns'), require('./util/index.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/calendar.js'), require('./calendar.js'), require('./picker.js'), require('./time-picker.js')) :
   typeof define === 'function' && define.amd ? define(['date-fns', './util/index', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/calendar', './calendar', './picker', './time-picker'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["date-fns"], global.index, global.EventHandler, global.Manipulator, global.SelectorEngine, global.calendar, global.Calendar, global.Picker, global.TimePicker));
-})(this, (function (dateFns, index, EventHandler, Manipulator, SelectorEngine, calendar, Calendar, Picker, TimePicker) { 'use strict';
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["date-fns"], global.Index, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Calendar, global.Calendar, global.Picker, global.TimePicker));
+})(this, (function (dateFns, index_js, EventHandler, Manipulator, SelectorEngine, calendar_js, Calendar, Picker, TimePicker) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): date-range-picker.js
-   * License (https://coreui.io/pro/license-new/)
+   * CoreUI PRO date-range-picker.js
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
+
 
   /**
   * ------------------------------------------------------------------------
@@ -203,7 +204,7 @@
         this._updateCalendars();
       });
       EventHandler.on(this._startInput, 'input', event => {
-        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
         if (date instanceof Date && date.getTime()) {
           this._startDate = date;
           this._calendarDate = date;
@@ -216,7 +217,7 @@
         this._updateCalendars();
       });
       EventHandler.on(this._endInput, 'input', event => {
-        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
         if (date instanceof Date && date.getTime()) {
           this._endDate = date;
           this._calendarDate = date;
@@ -441,6 +442,14 @@
             this._startInput.value = this._setInputValue(this._startDate);
             this._endInput.value = this._setInputValue(this._endDate);
             this._updateCalendars();
+            EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+              date: this._startDate,
+              formatedDate: this._formatDate(this._startDate)
+            });
+            EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+              date: this._endDate,
+              formatedDate: this._formatDate(this._endDate)
+            });
           });
           buttonEl.innerHTML = key;
           dateRangePickerRangesEl.append(buttonEl);
@@ -563,7 +572,7 @@
   * add .DateRangePicker to jQuery only if jQuery is present
   */
 
-  index.defineJQueryPlugin(DateRangePicker);
+  index_js.defineJQueryPlugin(DateRangePicker);
 
   return DateRangePicker;
 

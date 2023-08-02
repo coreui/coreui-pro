@@ -1,15 +1,22 @@
 /*!
-  * CoreUI time-picker.js v4.5.0 (https://coreui.io)
+  * CoreUI time-picker.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/manipulator'), require('./dom/selector-engine'), require('./util/time'), require('./picker')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/time', './picker'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global.index, global.EventHandler, global.Manipulator, global.SelectorEngine, global.time, global.Picker));
-})(this, (function (index, EventHandler, Manipulator, SelectorEngine, time, Picker) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/time.js')) :
+  typeof define === 'function' && define.amd ? define(['./picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/time'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global.Picker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Time));
+})(this, (function (Picker, EventHandler, Manipulator, SelectorEngine, index_js, time_js) { 'use strict';
 
   /* eslint-disable indent */
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI PRO time-picker.js
+   * License (https://coreui.io/pro/license/)
+   * --------------------------------------------------------------------------
+   */
+
 
   /**
   * ------------------------------------------------------------------------
@@ -76,8 +83,8 @@
           }
         }
         if (set === 'hours') {
-          if (time.isAmPm(this._config.locale)) {
-            _date.setHours(time.convert12hTo24h(this._ampm, Number.parseInt(value, 10)));
+          if (time_js.isAmPm(this._config.locale)) {
+            _date.setHours(time_js.convert12hTo24h(this._ampm, Number.parseInt(value, 10)));
           } else {
             _date.setHours(Number.parseInt(value, 10));
           }
@@ -101,7 +108,7 @@
       this._config = this._getConfig(config);
       this._date = this._convertStringToDate(this._config.time);
       this._initialDate = null;
-      this._ampm = this._date ? time.getAmPm(new Date(this._date), this._config.locale) : 'am';
+      this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
 
       // subcomponents
       this._input = null;
@@ -147,7 +154,7 @@
     update(config) {
       this._config = this._getConfig(config);
       this._date = this._convertStringToDate(this._config.time);
-      this._ampm = this._date ? time.getAmPm(new Date(this._date), this._config.locale) : 'am';
+      this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
       this._dropdownToggleEl.innerHTML = '';
       this._dropdownMenuEl.innerHTML = '';
       this._createTimePicker();
@@ -158,7 +165,7 @@
         return null;
       }
       if (part === 'hours') {
-        return time.isAmPm(this._config.locale) ? time.convert24hTo12h(this._date.getHours()) : this._date.getHours();
+        return time_js.isAmPm(this._config.locale) ? time_js.convert24hTo12h(this._date.getHours()) : this._date.getHours();
       }
       if (part === 'minutes') {
         return this._date.getMinutes();
@@ -167,7 +174,7 @@
         return this._date.getSeconds();
       }
       if (part === 'toggle') {
-        return time.getAmPm(new Date(this._date), this._config.locale);
+        return time_js.getAmPm(new Date(this._date), this._config.locale);
       }
     }
     _setUpRolls(initial = false) {
@@ -223,7 +230,7 @@
         this.cancel();
       });
       EventHandler.on(this._input, 'input', event => {
-        if (time.isValidTime(event.target.value)) {
+        if (time_js.isValidTime(event.target.value)) {
           this._date = this._convertStringToDate(event.target.value);
           EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
             timeString: this._date.toTimeString(),
@@ -295,7 +302,7 @@
       return timePickerBodyEl;
     }
     _createTimePickerSelection() {
-      const selectedHour = this._date ? time.isAmPm(this._config.locale) ? time.convert24hTo12h(this._date.getHours()) : this._date.getHours() : null;
+      const selectedHour = this._date ? time_js.isAmPm(this._config.locale) ? time_js.convert24hTo12h(this._date.getHours()) : this._date.getHours() : null;
       const selectedMinute = this._date ? this._date.getMinutes() : null;
       const selectedSecond = this._date ? this._date.getSeconds() : null;
       if (this._config.variant === 'roll') {
@@ -323,8 +330,8 @@
       timeSeparatorEl.classList.add('time-separator');
       timeSeparatorEl.innerHTML = ':';
       this._timePickerBody.innerHTML = '<span class="time-picker-inline-icon"></span>';
-      this._timePickerBody.append(this._createSelect('hours', time.getListOfHours(this._config.locale)), timeSeparatorEl.cloneNode(true), this._createSelect('minutes', time.getListOfMinutes(this._config.locale, true)), timeSeparatorEl, this._createSelect('seconds', time.getListOfSeconds(this._config.locale, true)));
-      if (time.isAmPm(this._config.locale)) {
+      this._timePickerBody.append(this._createSelect('hours', time_js.getListOfHours(this._config.locale)), timeSeparatorEl.cloneNode(true), this._createSelect('minutes', time_js.getListOfMinutes(this._config.locale, true)), timeSeparatorEl, this._createSelect('seconds', time_js.getListOfSeconds(this._config.locale, true)));
+      if (time_js.isAmPm(this._config.locale)) {
         this._timePickerBody.append(this._createSelect('toggle', [{
           value: 'am',
           label: 'AM'
@@ -335,8 +342,8 @@
       }
     }
     _createTimePickerRoll() {
-      this._timePickerBody.append(this._createTimePickerRollCol(time.getListOfHours(this._config.locale), 'hours'), this._createTimePickerRollCol(time.getListOfMinutes(this._config.locale), 'minutes'), this._createTimePickerRollCol(time.getListOfSeconds(this._config.locale), 'seconds'));
-      if (time.isAmPm(this._config.locale)) {
+      this._timePickerBody.append(this._createTimePickerRollCol(time_js.getListOfHours(this._config.locale), 'hours'), this._createTimePickerRollCol(time_js.getListOfMinutes(this._config.locale), 'minutes'), this._createTimePickerRollCol(time_js.getListOfSeconds(this._config.locale), 'seconds'));
+      if (time_js.isAmPm(this._config.locale)) {
         this._timePickerBody.append(this._createTimePickerRollCol([{
           value: 'am',
           label: 'AM'
@@ -426,7 +433,7 @@
   * add .TimePicker to jQuery only if jQuery is present
   */
 
-  index.defineJQueryPlugin(TimePicker);
+  index_js.defineJQueryPlugin(TimePicker);
 
   return TimePicker;
 

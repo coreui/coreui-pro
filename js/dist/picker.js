@@ -1,20 +1,21 @@
 /*!
-  * CoreUI picker.js v4.5.0 (https://coreui.io)
+  * CoreUI picker.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./dom/event-handler'), require('./dom/manipulator'), require('./base-component'), require('./dropdown')) :
-  typeof define === 'function' && define.amd ? define(['./dom/event-handler', './dom/manipulator', './base-component', './dropdown'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Picker = factory(global.EventHandler, global.Manipulator, global.BaseComponent, global.Dropdown));
-})(this, (function (EventHandler, Manipulator, BaseComponent, Dropdown) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dropdown.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dropdown', './dom/event-handler', './dom/manipulator'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Picker = factory(global.BaseComponent, global.Dropdown, global.EventHandler, global.Manipulator));
+})(this, (function (BaseComponent, Dropdown, EventHandler, Manipulator) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): picker.js
-   * License (https://coreui.io/pro/license-new/)
+   * CoreUI PRO picker.js
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
+
 
   /**
   * ------------------------------------------------------------------------

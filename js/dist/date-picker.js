@@ -1,20 +1,21 @@
 /*!
-  * CoreUI date-picker.js v4.5.0 (https://coreui.io)
+  * CoreUI date-picker.js v4.6.0 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
-  * Licensed under MIT (https://coreui.io)
+  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./util/index'), require('./dom/event-handler'), require('./dom/selector-engine'), require('./date-range-picker')) :
-  typeof define === 'function' && define.amd ? define(['./util/index', './dom/event-handler', './dom/selector-engine', './date-range-picker'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DatePicker = factory(global.index, global.EventHandler, global.SelectorEngine, global.DateRangePicker));
-})(this, (function (index, EventHandler, SelectorEngine, DateRangePicker) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./date-range-picker.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['./date-range-picker', './dom/event-handler', './dom/selector-engine', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DatePicker = factory(global.DateRangePicker, global.EventHandler, global.SelectorEngine, global.Index));
+})(this, (function (DateRangePicker, EventHandler, SelectorEngine, index_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI PRO (v4.5.0): date-picker.js
-   * License (https://coreui.io/pro/license-new/)
+   * CoreUI PRO date-picker.js
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
+
 
   /**
   * ------------------------------------------------------------------------
@@ -123,7 +124,7 @@
   * add .DatePicker to jQuery only if jQuery is present
   */
 
-  index.defineJQueryPlugin(DatePicker);
+  index_js.defineJQueryPlugin(DatePicker);
 
   return DatePicker;
 
