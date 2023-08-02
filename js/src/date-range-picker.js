@@ -513,6 +513,16 @@ class DateRangePicker extends Picker {
           this._startInput.value = this._setInputValue(this._startDate)
           this._endInput.value = this._setInputValue(this._endDate)
           this._updateCalendars()
+
+          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+            date: this._startDate,
+            formatedDate: this._formatDate(this._startDate)
+          })
+
+          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+            date: this._endDate,
+            formatedDate: this._formatDate(this._endDate)
+          })
         })
 
         buttonEl.innerHTML = key
