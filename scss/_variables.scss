@@ -1223,21 +1223,21 @@ $form-multi-select-font-size:               $input-font-size !default;
 $form-multi-select-font-weight:             $input-font-weight !default;
 $form-multi-select-line-height:             $input-line-height !default;
 $form-multi-select-color:                   $input-color !default;
-$form-multi-select-disabled-color:          $gray-600 !default;
+$form-multi-select-disabled-color:          $input-disabled-color !default;
 $form-multi-select-bg:                      $input-bg !default;
 
 $form-multi-select-bg-position:             right $form-multi-select-padding-x center !default;
 $form-multi-select-bg-size:                 16px 12px !default; // In pixels because image dimensions
-$form-multi-select-disabled-bg:             $gray-200 !default;
+$form-multi-select-disabled-bg:             $input-disabled-bg !default;
 $form-multi-select-indicator-padding:       $form-multi-select-padding-x * 3 !default; // Extra padding to account for the presence of the background-image based indicator
-$form-multi-select-indicator-color:         $gray-800 !default;
+$form-multi-select-indicator-color:         $body-secondary-color !default;
 $form-multi-select-indicator:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-multi-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>") !default;
 
 $form-multi-select-border-width:            $input-border-width !default;
 $form-multi-select-border-color:            $input-border-color !default;
-$form-multi-select-border-radius:           $border-radius !default;
-$form-multi-select-border-radius-sm:        $border-radius-sm !default;
-$form-multi-select-border-radius-lg:        $border-radius-lg !default;
+$form-multi-select-border-radius:           $input-border-radius !default;
+$form-multi-select-border-radius-sm:        $input-border-radius-sm !default;
+$form-multi-select-border-radius-lg:        $input-border-radius-lg !default;
 $form-multi-select-box-shadow:              inset 0 1px 2px rgba($black, .075) !default;
 
 $form-multi-select-focus-width:             $input-focus-width !default;
@@ -1249,15 +1249,15 @@ $form-multi-select-focus-box-shadow:        0 0 0 $form-multi-select-focus-width
 $form-multi-select-selection-tags-padding-y:  .125rem !default;
 $form-multi-select-selection-tags-padding-x:  .125rem !default;
 
-$form-multi-select-tag-bg:                $light !default;
-$form-multi-select-tag-border-width:      $border-width !default;
-$form-multi-select-tag-border-color:      $border-color !default;
+$form-multi-select-tag-bg:                var(--#{$prefix}secondary-bg) !default;
+$form-multi-select-tag-border-width:      var(--#{$prefix}border-width) !default;
+$form-multi-select-tag-border-color:      var(--#{$prefix}border-color) !default;
 $form-multi-select-tag-border-radius:     .25rem !default;
 $form-multi-select-tag-border-radius-sm:  .125rem !default;
 $form-multi-select-tag-border-radius-lg:  .375rem !default;
 $form-multi-select-tag-margin-y:          .125rem !default;
 $form-multi-select-tag-margin-x:          .125rem !default;
-$form-multi-select-tag-padding-y:         subtract(($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y - $form-multi-select-tag-margin-y), $form-multi-select-tag-border-width) !default;
+$form-multi-select-tag-padding-y:         calc(($form-multi-select-padding-y - $form-multi-select-selection-tags-padding-y - $form-multi-select-tag-margin-y) - $form-multi-select-tag-border-width) !default; // stylelint-disable-line function-disallowed-list
 $form-multi-select-tag-padding-x:         .5rem !default;
 
 $form-multi-select-search-color:          $input-color !default;
@@ -1268,19 +1268,19 @@ $form-multi-select-cleaner-width:         .75rem !default;
 $form-multi-select-cleaner-height:        .75rem !default;
 $form-multi-select-cleaner-padding-x:     .75rem !default;
 $form-multi-select-cleaner-padding-y:     .5rem !default;
-$form-multi-select-cleaner-color:         $medium-emphasis !default;
+$form-multi-select-cleaner-color:         $body-secondary-color !default;
 $form-multi-select-cleaner-bg:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-cleaner-hover-color:   $high-emphasis !default;
+$form-multi-select-cleaner-hover-color:   $body-color !default;
 $form-multi-select-cleaner-hover-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-hover-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-cleaner-focus-color:   $high-emphasis !default;
+$form-multi-select-cleaner-focus-color:   $body-color !default;
 $form-multi-select-cleaner-focus-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$form-multi-select-cleaner-focus-color}'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-cleaner-border-color:  $input-border-color !default;
 
 $form-multi-select-select-all-padding-y:     .5rem !default;
 $form-multi-select-select-all-padding-x:     .75rem !default;
-$form-multi-select-select-all-color:         $medium-emphasis !default;
+$form-multi-select-select-all-color:         var(--#{$prefix}body-secondary-color) !default;
 $form-multi-select-select-all-bg:            transparent !default;
-$form-multi-select-select-all-hover-color:   $high-emphasis !default;
+$form-multi-select-select-all-hover-color:   var(--#{$prefix}body-color) !default;
 $form-multi-select-select-all-hover-bg:      transparent !default;
 $form-multi-select-select-all-border-width:  $input-border-width !default;
 $form-multi-select-select-all-border-color:  $input-border-color !default;
@@ -1289,14 +1289,14 @@ $form-multi-select-options-padding-y:      .5rem !default;
 $form-multi-select-options-padding-x:      .75rem !default;
 $form-multi-select-options-margin-top:     .625rem !default;
 $form-multi-select-options-font-size:      $font-size-base !default;
-$form-multi-select-options-color:          $body-color !default;
+$form-multi-select-options-color:          var(--#{$prefix}body-color) !default;
 $form-multi-select-options-bg:             $white !default;
 $form-multi-select-options-border-color:   $border-color !default;
 $form-multi-select-options-border-width:   $border-width !default;
 $form-multi-select-options-border-radius:  $border-radius !default;
 
 $form-multi-select-optgroup-label-font-weight:  $font-weight-bold !default;
-$form-multi-select-optgroup-label-color:        $disabled !default;
+$form-multi-select-optgroup-label-color:        var(--#{$prefix}tertiary-color) !default;
 
 $form-multi-select-option-padding-y:        .5rem !default;
 $form-multi-select-option-padding-x:        1.25rem !default;
@@ -2323,45 +2323,45 @@ $calendar-table-cell-size:                  2.75rem !default;
 
 $calendar-nav-padding:                      .5rem !default;
 $calendar-nav-border-width:                 1px !default;
-$calendar-nav-border-color:                 $border-color !default;
-$calendar-nav-date-color:                   $body-color !default;
-$calendar-nav-date-hover-color:             $primary !default;
+$calendar-nav-border-color:                 var(--#{$prefix}border-color) !default;
+$calendar-nav-date-color:                   var(--#{$prefix}body-color) !default;
+$calendar-nav-date-hover-color:             var(--#{$prefix}primary) !default;
 $calendar-nav-icon-width:                   1rem !default;
 $calendar-nav-icon-height:                  1rem !default;
 
-$calendar-nav-icon-double-next-color:       $gray-600 !default;
+$calendar-nav-icon-double-next-color:       $body-tertiary-color !default;
 $calendar-nav-icon-double-next:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-next-color}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-next-color}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
 $calendar-nav-icon-double-next-hover-color: $body-color !default;
 $calendar-nav-icon-double-next-hover:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-next-hover-color}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-next-hover-color}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
 
-$calendar-nav-icon-double-prev-color:       $gray-600 !default;
+$calendar-nav-icon-double-prev-color:       $body-tertiary-color !default;
 $calendar-nav-icon-double-prev:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-prev-color}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-prev-color}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
 $calendar-nav-icon-double-prev-hover-color: $body-color !default;
 $calendar-nav-icon-double-prev-hover:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-prev-hover-color}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-prev-hover-color}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
 
-$calendar-nav-icon-next-color:              $gray-600 !default;
+$calendar-nav-icon-next-color:              $body-tertiary-color !default;
 $calendar-nav-icon-next:                    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-next-color}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
 $calendar-nav-icon-next-hover-color:        $body-color !default;
 $calendar-nav-icon-next-hover:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-next-hover-color}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
 
-$calendar-nav-icon-prev-color:              $gray-600 !default;
+$calendar-nav-icon-prev-color:              $body-tertiary-color !default;
 $calendar-nav-icon-prev:                    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-color}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
 $calendar-nav-icon-prev-hover-color:        $body-color !default;
 $calendar-nav-icon-prev-hover:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-hover-color}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
 
-$calendar-cell-header-inner-color:          $text-medium-emphasis !default;
+$calendar-cell-header-inner-color:          var(--#{$prefix}secondary-color) !default;
 
-$calendar-cell-hover-bg:                    $gray-200 !default;
-$calendar-cell-disabled-color:              $text-disabled !default;
+$calendar-cell-hover-bg:                    var(--#{$prefix}tertiary-bg) !default;
+$calendar-cell-disabled-color:              var(--#{$prefix}tertiary-color) !default;
 
 $calendar-cell-selected-color:              $white !default;
-$calendar-cell-selected-bg:                 $primary !default;
+$calendar-cell-selected-bg:                 var(--#{$prefix}primary) !default;
 
-$calendar-cell-range-bg:                    rgba($primary, .125) !default;
-$calendar-cell-range-hover-bg:              rgba($primary, .25) !default;
-$calendar-cell-range-hover-border-color:    $primary !default;
+$calendar-cell-range-bg:                    rgba(var(--#{$prefix}primary-rgb), .125) !default;
+$calendar-cell-range-hover-bg:              rgba(var(--#{$prefix}primary-rgb), .25) !default;
+$calendar-cell-range-hover-border-color:    var(--#{$prefix}primary) !default;
 
-$calendar-cell-today-color:                 $danger !default;
+$calendar-cell-today-color:                 var(--#{$prefix}$danger) !default;
 // scss-docs-end calendar-variables
 
 // Picker
@@ -2388,11 +2388,11 @@ $date-picker-separator-icon-rtl:       url("data:image/svg+xml,<svg xmlns='http:
 $date-picker-ranges-width:             10rem !default;
 $date-picker-ranges-padding:           $spacer * .5 !default;
 $date-picker-ranges-border-width:      1px !default;
-$date-picker-ranges-border-color:      $border-color !default;
+$date-picker-ranges-border-color:      var(--#{$prefix}border-color) !default;
 
 $date-picker-timepicker-width:         (7 * $calendar-table-cell-size) + (2 * $calendar-table-margin) !default;
 $date-picker-timepicker-border-width:  1px !default;
-$date-picker-timepicker-border-color:  $border-color !default;
+$date-picker-timepicker-border-color:  var(--#{$prefix}border-color) !default;
 // scss-docs-end date-picker-variables
 
 // Time Picker
@@ -2400,7 +2400,7 @@ $date-picker-timepicker-border-color:  $border-color !default;
 $time-picker-default-icon-color:       $gray-600 !default;
 $time-picker-default-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-default-icon-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$time-picker-default-icon-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
 $time-picker-invalid-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-invalid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$form-feedback-invalid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
-$time-picker-valid-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-valid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$form-feedback-valid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
+$time-picker-valid-icon:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-valid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5' class='ci-primary'></polygon><path fill='#{$form-feedback-valid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z' class='ci-primary'></path></svg>") !default;
 
 $time-picker-cleaner-icon-color:       $gray-600 !default;
 $time-picker-cleaner-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302' class='ci-primary'></polygon><path fill='#{$time-picker-cleaner-icon-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z' class='ci-primary'></path></svg>") !default;
@@ -2409,5 +2409,5 @@ $time-picker-cleaner-icon-hover:       url("data:image/svg+xml,<svg xmlns='http:
 
 $time-picker-body-padding:             $spacer * .5 !default;
 $time-picker-roll-col-border-width:    1px !default;
-$time-picker-roll-col-border-color:    $border-color !default;
+$time-picker-roll-col-border-color:    var(--#{$prefix}border-color) !default;
 // scss-docs-end time-picker-variables

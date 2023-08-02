@@ -90,6 +90,7 @@
   font-weight: var(--#{$prefix}form-multi-select-font-weight);
   line-height: var(--#{$prefix}form-multi-select-line-height);
   color: var(--#{$prefix}form-multi-select-color);
+  appearance: none;
   background-color: var(--#{$prefix}form-multi-select-bg);
   background-image: var(--#{$prefix}form-multi-select-indicator);
   background-repeat: no-repeat;
@@ -97,7 +98,6 @@
   background-size: var(--#{$prefix}form-multi-select-bg-size);
   border: var(--#{$prefix}form-multi-select-border);
   @include border-radius(var(--#{$prefix}form-multi-select-border-radius), 0);
-  appearance: none;
 
   &:disabled,
   &.disabled {
@@ -133,7 +133,7 @@
 }
 
 .form-multi-select-selection-tags {
-  min-height: add(($form-multi-select-padding-y * 2), ($form-multi-select-font-size * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
+  min-height: calc((2 * $form-multi-select-padding-y) + ($form-multi-select-font-size * $form-multi-select-line-height) + ($form-multi-select-border-width * 2));  // stylelint-disable-line function-disallowed-list
   padding: var(--#{$prefix}form-multi-select-selection-tags-padding-y) var(--#{$prefix}form-multi-select-selection-tags-padding-x);
   @include ltr-rtl("padding-right", var(--#{$prefix}form-multi-select-indicator-padding));
 
@@ -183,9 +183,9 @@
   font-weight: inherit;
   line-height: inherit;
   color: var(--#{$prefix}form-multi-select-search-color);
+  appearance: none;
   background-color: var(--#{$prefix}form-multi-select-search-bg);
   border: 0;
-  appearance: none;
   @include border-radius(var(--#{$prefix}form-multi-select-search-border-radius), 0);
 
   &:focus {
@@ -357,10 +357,10 @@
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-sm};
 
   &.form-multi-select-selection-tags {
-    min-height: add(($form-multi-select-padding-y-sm * 2), ($form-multi-select-font-size-sm * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
+    min-height: calc((2 * $form-multi-select-padding-y-sm) + ($form-multi-select-font-size-sm * $form-multi-select-line-height) + ($form-multi-select-border-width * 2));  // stylelint-disable-line function-disallowed-list
 
     .form-multi-select-search {
-      height: subtract(($form-multi-select-padding-y-sm - $form-multi-select-selection-tags-padding-y-sm) * 2 + ($form-multi-select-font-size-sm * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
+      height: calc((($form-multi-select-padding-y-sm - $form-multi-select-selection-tags-padding-y-sm) * 2 + ($form-multi-select-font-size-sm * $form-multi-select-line-height)) - ($form-multi-select-border-width * 2)); // stylelint-disable-line function-disallowed-list
     }
   }
 }
@@ -378,7 +378,7 @@
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-lg};
 
   &.form-multi-select-selection-tags {
-    min-height: add(($form-multi-select-padding-y-lg * 2) + ($form-multi-select-font-size-lg * $form-multi-select-line-height), ($form-multi-select-border-width * 2));
+    min-height: calc((2 * $form-multi-select-padding-y-lg) + ($form-multi-select-font-size-lg * $form-multi-select-line-height) + ($form-multi-select-border-width * 2));  // stylelint-disable-line function-disallowed-list
 
     .form-multi-select-search {
       height: ($form-multi-select-padding-y-lg - $form-multi-select-selection-tags-padding-y-lg) * 2 + ($form-multi-select-font-size-lg * $form-multi-select-line-height);
