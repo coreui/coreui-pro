@@ -385,9 +385,9 @@ And putting it to use in a navbar:
     <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-coreui-toggle="dropdown" aria-expanded="false">
+          <button class="btn btn-dark dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">
             Dropdown
-          </a>
+          </button>
           <ul class="dropdown-menu dropdown-menu-dark">
             <li><a class="dropdown-item" href="#">Action</a></li>
             <li><a class="dropdown-item" href="#">Another action</a></li>
@@ -665,7 +665,7 @@ Add `.disabled` to items in the dropdown to **style them as disabled**.
 {{< example >}}
 <ul class="dropdown-menu">
   <li><a class="dropdown-item" href="#">Regular link</a></li>
-  <li><a class="dropdown-item disabled">Disabled link</a></li>
+  <li><a class="dropdown-item disabled" aria-disabled="true">Disabled link</a></li>
   <li><a class="dropdown-item" href="#">Another link</a></li>
 </ul>
 {{< /example >}}
@@ -843,7 +843,7 @@ Separate groups of related menu items with a divider.
 Place any freeform text within a dropdown menu with text and use [spacing utilities]({{< docsref "/utilities/spacing" >}}). Note that you'll likely need additional sizing styles to constrain the menu width.
 
 {{< example >}}
-<div class="dropdown-menu p-4 text-muted" style="max-width: 200px;">
+<div class="dropdown-menu p-4 text-body-secondary" style="max-width: 200px;">
   <p>
     Some example text that's free-flowing within the dropdown menu.
   </p>
@@ -961,7 +961,7 @@ By default, the dropdown menu is closed when clicking inside or outside the drop
 
 <div class="btn-group">
   <button class="btn btn-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" data-coreui-auto-close="inside" aria-expanded="false">
-    Clickable outside
+    Clickable inside
   </button>
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" href="#">Menu item</a></li>
@@ -972,7 +972,7 @@ By default, the dropdown menu is closed when clicking inside or outside the drop
 
 <div class="btn-group">
   <button class="btn btn-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" data-coreui-auto-close="outside" aria-expanded="false">
-    Clickable inside
+    Clickable outside
   </button>
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" href="#">Menu item</a></li>
@@ -1097,7 +1097,7 @@ myDropdown.addEventListener('show.coreui.dropdown', event => {
 
 ## Customizing
 
-### CSS Variables
+### CSS variables
 
 Dropdowns use local CSS variables on `.dropdown-menu` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 

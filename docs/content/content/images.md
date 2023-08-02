@@ -60,9 +60,7 @@ If you are using the `<picture>` element to specify multiple `<source>` elements
 
 ## Customization
 
-### SASS
-
-#### Variables
+### SASS variables
 
 Variables are available for image thumbnails.
 

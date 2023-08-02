@@ -1,10 +1,5 @@
-/*!
- * CoreUI PRO - HTML, CSS, and JavaScript UI Components Library
- * @version v4.5.0
- * @link https://coreui.io/pro/
- * Copyright (c) 2021 creativeLabs Łukasz Holeczek
- * License (https://coreui.io/pro/license/)
-*/
+@import "mixins/banner";
+@include bsBanner(Grid);
 
 $include-column-box-sizing: true !default;
 
@@ -13,15 +8,12 @@ $include-column-box-sizing: true !default;
 @import "maps";
 
 @import "mixins/ltr-rtl";
-@import "mixins/lists";
 @import "mixins/breakpoints";
 @import "mixins/container";
 @import "mixins/grid";
 @import "mixins/utilities";
 
 @import "vendor/rfs";
-
-@import "root";
 
 @import "containers";
 @import "grid";
