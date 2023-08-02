@@ -2,15 +2,16 @@
 /* eslint-disable indent */
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): time-picker.js
+ * CoreUI PRO time-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin } from './util/index'
-import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
-import SelectorEngine from './dom/selector-engine'
+import Picker from './picker.js'
+import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
+import SelectorEngine from './dom/selector-engine.js'
+import { defineJQueryPlugin } from './util/index.js'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -20,8 +21,7 @@ import {
   getListOfSeconds,
   isAmPm,
   isValidTime
-} from './util/time'
-import Picker from './picker'
+} from './util/time.js'
 
 /**
 * ------------------------------------------------------------------------

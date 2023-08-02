@@ -1,14 +1,14 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): picker.js
+ * CoreUI PRO picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
-import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
-import BaseComponent from './base-component'
-import Dropdown from './dropdown'
+import BaseComponent from './base-component.js'
+import Dropdown from './dropdown.js'
+import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
 
 /**
 * ------------------------------------------------------------------------

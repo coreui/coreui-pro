@@ -1,15 +1,15 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): loading-button.js
+ * CoreUI PRO loading-button.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
-import { defineJQueryPlugin } from './util/index'
-import Data from './dom/data'
-import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
-import BaseComponent from './base-component'
+import BaseComponent from './base-component.js'
+import Data from './dom/data.js'
+import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
+import { defineJQueryPlugin } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------

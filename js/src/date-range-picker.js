@@ -1,20 +1,20 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO (v4.5.0): date-range-picker.js
+ * CoreUI PRO date-range-picker.js
  * License (https://coreui.io/pro/license-new/)
  * --------------------------------------------------------------------------
  */
 
 import { format as dateFormat, parseISO } from 'date-fns'
 
-import { defineJQueryPlugin } from './util/index'
-import EventHandler from './dom/event-handler'
-import Manipulator from './dom/manipulator'
-import SelectorEngine from './dom/selector-engine'
-import { getLocalDateFromString } from './util/calendar'
-import Calendar from './calendar'
-import Picker from './picker'
-import TimePicker from './time-picker'
+import { defineJQueryPlugin } from './util/index.js'
+import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
+import SelectorEngine from './dom/selector-engine.js'
+import { getLocalDateFromString } from './util/calendar.js'
+import Calendar from './calendar.js'
+import Picker from './picker.js'
+import TimePicker from './time-picker.js'
 
 /**
 * ------------------------------------------------------------------------
