@@ -34,6 +34,7 @@ const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`
+const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY}`
 const EVENT_CELL_HOVER = `cellHover${EVENT_KEY}`
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -208,6 +209,10 @@ class Calendar extends BaseComponent {
       event.preventDefault()
       this._view = 'years'
       this._updateCalendar()
+    })
+
+    EventHandler.on(this._element, 'mouseleave', 'table', () => {
+      EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE)
     })
   }
 

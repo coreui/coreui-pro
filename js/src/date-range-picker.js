@@ -598,6 +598,16 @@ class DateRangePicker extends BaseComponent {
       this._updateDateRangePickerCalendars()
     })
 
+    EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
+      if (this._startDate) {
+        this._startInput.value = this._setInputValue(this._startDate)
+      }
+
+      if (this._endDate) {
+        this._endInput.value = this._setInputValue(this._endDate)
+      }
+    })
+
     if (this._config.timepicker) {
       if (this._mobile || (this._range && this._config.calendars === 1)) {
         const timePickerStartEl = document.createElement('div')
