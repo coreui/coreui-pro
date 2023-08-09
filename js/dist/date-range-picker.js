@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v4.6.1 (https://coreui.io)
+  * CoreUI date-range-picker.js v4.6.2 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -351,6 +351,14 @@
       EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
         this._calendarDate = new Date(event.date.getFullYear(), event.date.getMonth(), 1);
         this._updateCalendars();
+      });
+      EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
+        if (this._startDate) {
+          this._startInput.value = this._setInputValue(this._startDate);
+        }
+        if (this._endDate) {
+          this._endInput.value = this._setInputValue(this._endDate);
+        }
       });
       if (this._config.timepicker) {
         if (this._mobile || this._range && this._config.calendars === 1) {

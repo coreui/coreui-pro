@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v4.6.1 (https://coreui.io)
+  * CoreUI calendar.js v4.6.2 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -29,6 +29,7 @@
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
   const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`;
+  const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY}`;
   const EVENT_CELL_HOVER = `cellHover${EVENT_KEY}`;
   const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`;
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
@@ -179,6 +180,9 @@
         event.preventDefault();
         this._view = 'years';
         this._updateCalendar();
+      });
+      EventHandler.on(this._element, 'mouseleave', 'table', () => {
+        EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE);
       });
     }
     _setCalendarDate(date) {

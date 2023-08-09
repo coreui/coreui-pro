@@ -1,5 +1,5 @@
 /*!
-  * CoreUI loading-button.js v4.6.1 (https://coreui.io)
+  * CoreUI loading-button.js v4.6.2 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
