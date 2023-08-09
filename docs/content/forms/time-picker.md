@@ -198,6 +198,10 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 | Method | Description |
 | --- | --- |
 | `timeChange.coreui.time-picker` | Callback fired when the value changed. |
+| `show.coreui.dropdown` | Fires immediately when the show instance method is called. |
+| `shown.coreui.dropdown` | Fired when the dropdown has been made visible to the user and CSS transitions have completed. |
+| `hide.coreui.dropdown` | Fires immediately when the hide instance method has been called. |
+| `hidden.coreui.dropdown` | Fired when the dropdown has finished being hidden from the user and CSS transitions have completed. |
 {{< /bs-table >}}
 
 ```js

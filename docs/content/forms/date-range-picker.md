@@ -294,6 +294,10 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | --- | --- |
 | `endDateChange.coreui.date-range-picker` | Callback fired when the end date changed. |
 | `startDateChange.coreui.date-range-picker` | Callback fired when the start date changed. |
+| `show.coreui.dropdown` | Fires immediately when the show instance method is called. |
+| `shown.coreui.dropdown` | Fired when the calendar has been made visible to the user and CSS transitions have completed. |
+| `hide.coreui.dropdown` | Fires immediately when the hide instance method has been called. |
+| `hidden.coreui.dropdown` | Fired when the calendar has finished being hidden from the user and CSS transitions have completed. |
 {{< /bs-table >}}
 
 ```js
