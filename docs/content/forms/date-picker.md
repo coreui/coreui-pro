@@ -250,6 +250,10 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | Method | Description |
 | --- | --- |
 | `dateChange.coreui.date-picker` | Callback fired when the date changed. |
+| `show.coreui.date-picker` | Fires immediately when the show instance method is called. |
+| `shown.coreui.date-picker` | Fired when the calendar has been made visible to the user and CSS transitions have completed. |
+| `hide.coreui.date-picker` | Fires immediately when the hide instance method has been called. |
+| `hidden.coreui.date-picker` | Fired when the calendar has finished being hidden from the user and CSS transitions have completed. |
 {{< /bs-table >}}
 
 ```js
