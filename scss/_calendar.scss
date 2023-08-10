@@ -18,6 +18,7 @@
   --#{$prefix}calendar-nav-icon-prev: #{escape-svg($calendar-nav-icon-prev)};
   --#{$prefix}calendar-nav-icon-prev-hover: #{escape-svg($calendar-nav-icon-prev-hover)};
   --#{$prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color};
+  --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color};
   --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
   --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
   --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
@@ -121,6 +122,7 @@
 
   &:not(.disabled):not(.next):not(.previous):hover .calendar-cell-inner,
   &.clickable:hover .calendar-cell-inner {
+    color: var(--#{$prefix}calendar-cell-hover-color);
     cursor: pointer;
     background-color: var(--#{$prefix}calendar-cell-hover-bg);
   }

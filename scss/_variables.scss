@@ -2318,6 +2318,7 @@ $calendar-nav-icon-prev-hover:               url("data:image/svg+xml,<svg xmlns=
 
 $calendar-cell-header-inner-color:           var(--#{$prefix}secondary-color) !default;
 
+$calendar-cell-hover-color:                  var(--#{$prefix}body-color) !default;
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
 
