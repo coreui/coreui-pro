@@ -110,9 +110,9 @@
   font-weight: var(--#{$prefix}date-picker-font-weight);
   line-height: var(--#{$prefix}date-picker-line-height);
   color: var(--#{$prefix}date-picker-color);
+  appearance: none;
   background: transparent;
   border: 0;
-  appearance: none;
 
   .date-picker.show & {
     color: var(--#{$prefix}date-picker-focus-color);
