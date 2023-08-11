@@ -60,8 +60,10 @@ const Default = {
   selectAdjacementDays: false,
   selectEndDate: false,
   showAdjacementDays: true,
+  showWeekNumber: false,
   startDate: null,
-  weekdayFormat: 2
+  weekdayFormat: 2,
+  weekNumbersLabel: null
 }
 
 const DefaultType = {
@@ -77,8 +79,10 @@ const DefaultType = {
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   showAdjacementDays: 'boolean',
+  showWeekNumber: 'boolean',
   startDate: '(date|string|null)',
-  weekdayFormat: '(number|string)'
+  weekdayFormat: '(number|string)',
+  weekNumbersLabel: '(string|null)'
 }
 
 /**
@@ -333,19 +337,26 @@ class Calendar extends BaseComponent {
     const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek)
     const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4)
     const listOfYears = createGroupsInArray(getYears(date.getFullYear()), 4)
-    const weekDays = monthDetails[0]
+    const weekDays = monthDetails[0].days
 
     const calendarTable = document.createElement('table')
     calendarTable.innerHTML = `
     ${this._view === 'days' ? `
       <thead>
         <tr>
+          ${this._config.showWeekNumber ?
+            `<th class="calendar-cell">
+              <div class="calendar-header-cell-inner">
+               ${this._config.weekNumbersLabel ?? ''}
+              </div>
+            </th>` : ''
+          }
           ${weekDays.map(({ date }) => (
             `<th class="calendar-cell">
               <div class="calendar-header-cell-inner">
               ${typeof this._config.weekdayFormat === 'string' ?
-              date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
-              date
+                date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
+                date
                   .toLocaleDateString(this._config.locale, { weekday: 'long' })
                   .slice(0, this._config.weekdayFormat)}
               </div>
@@ -355,7 +366,13 @@ class Calendar extends BaseComponent {
       </thead>` : ''}
       <tbody>
         ${this._view === 'days' ? monthDetails.map(week => (
-          `<tr>${week.map(({ date, month }) => (
+          `<tr class="calendar-row">
+            ${this._config.showWeekNumber ?
+              `<td class="calendar-cell week-number">
+                <div class="calendar-cell-inner">${week.weekNumber}</div>
+              </td>` : ''
+            }
+            ${week.days.map(({ date, month }) => (
             month === 'current' || this._config.showAdjacementDays ?
               `<td class="calendar-cell ${this._dayClassNames(date, month)}">
                 <div class="calendar-cell-inner day" data-coreui-date="${date}">

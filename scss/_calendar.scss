@@ -27,6 +27,7 @@
   --#{$prefix}calendar-cell-range-hover-bg: #{$calendar-cell-range-hover-bg};
   --#{$prefix}calendar-cell-range-hover-border-color: #{$calendar-cell-range-hover-border-color};
   --#{$prefix}calendar-cell-today-color: #{$calendar-cell-today-color};
+  --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
   // scss-docs-end calendar-css-vars
 
   font-weight: initial;
@@ -120,11 +121,15 @@
   padding: 1px 0;
   text-align: center;
 
-  &:not(.disabled):not(.next):not(.previous):hover .calendar-cell-inner,
+  &:not(.disabled):not(.next):not(.previous):not(.week-number):hover .calendar-cell-inner,
   &.clickable:hover .calendar-cell-inner {
     color: var(--#{$prefix}calendar-cell-hover-color);
     cursor: pointer;
     background-color: var(--#{$prefix}calendar-cell-hover-bg);
+  }
+
+  &.week-number {
+    color: var(--#{$prefix}calendar-cell-disabled-color);
   }
 
   &.today .calendar-cell-inner {

@@ -124,6 +124,11 @@ const getTrailingDays = (year, month, leadingDays, monthDays) => {
   return dates
 }
 
+export const getDayNumber = date =>
+  Math.ceil((date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24)
+
+export const getWeekNumber = date => Math.ceil(getDayNumber(date) / 7)
+
 export const getMonthDetails = (year, month, firstDayOfWeek) => {
   const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek)
   const daysThisMonth = getMonthDays(year, month)
@@ -132,10 +137,16 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   const weeks = []
   for (const [index, day] of days.entries()) {
     if (index % 7 === 0 || weeks.length === 0) {
-      weeks.push([])
+      weeks.push({
+        days: []
+      })
     }
 
-    weeks[weeks.length - 1].push(day)
+    if ((index + 1) % 7 === 0) {
+      weeks[weeks.length - 1].weekNumber = Math.ceil(getDayNumber(day.date) / 7)
+    }
+
+    weeks[weeks.length - 1].days.push(day)
   }
 
   return weeks
