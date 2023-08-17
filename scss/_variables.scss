@@ -2317,6 +2317,7 @@ $calendar-nav-icon-prev-hover-color:         $body-color !default;
 $calendar-nav-icon-prev-hover:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-hover-color}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
 
 $calendar-cell-header-inner-color:           var(--#{$prefix}secondary-color) !default;
+$calendar-cell-week-number-color:            var(--#{$prefix}secondary-color) !default;
 
 $calendar-cell-hover-color:                  var(--#{$prefix}body-color) !default;
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;

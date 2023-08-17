@@ -11,6 +11,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import { defineJQueryPlugin } from './util/index.js'
 import {
+  convertToDateObject,
   createGroupsInArray,
   getMonthDetails,
   getMonthsNames,
@@ -59,6 +60,7 @@ const Default = {
   range: true,
   selectAdjacementDays: false,
   selectEndDate: false,
+  selectionType: 'day',
   showAdjacementDays: true,
   showWeekNumber: false,
   startDate: null,
@@ -78,6 +80,7 @@ const DefaultType = {
   range: 'boolean',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
+  selectionType: 'string',
   showAdjacementDays: 'boolean',
   showWeekNumber: 'boolean',
   startDate: '(date|string|null)',
@@ -94,12 +97,16 @@ class Calendar extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
-    this._calendarDate = this._config.calendarDate
-    this._startDate = this._config.startDate
-    this._endDate = this._config.endDate
+    this._calendarDate = convertToDateObject(this._config.calendarDate, this._config.selectionType)
+    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
+    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
     this._hoverDate = null
     this._selectEndDate = this._config.selectEndDate
     this._view = 'days'
+
+    if (this._config.selectionTyp === 'year') {
+      this._view = 'years'
+    }
 
     this._createCalendar()
     this._addEventListeners()
@@ -368,9 +375,7 @@ class Calendar extends BaseComponent {
         ${this._view === 'days' ? monthDetails.map(week => (
           `<tr class="calendar-row">
             ${this._config.showWeekNumber ?
-              `<td class="calendar-cell week-number">
-                <div class="calendar-cell-inner">${week.weekNumber}</div>
-              </td>` : ''
+              `<th class="calendar-cell-week-number">${week.weekNumber}</td>` : ''
             }
             ${week.days.map(({ date, month }) => (
             month === 'current' || this._config.showAdjacementDays ?

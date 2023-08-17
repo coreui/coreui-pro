@@ -18,6 +18,7 @@
   --#{$prefix}calendar-nav-icon-prev: #{escape-svg($calendar-nav-icon-prev)};
   --#{$prefix}calendar-nav-icon-prev-hover: #{escape-svg($calendar-nav-icon-prev-hover)};
   --#{$prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color};
+  --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
   --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color};
   --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
   --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
@@ -117,60 +118,39 @@
   color: var(--#{$prefix}calendar-cell-header-inner-color);
 }
 
+.calendar-cell-week-number {
+  font-weight: 600;
+  color: var(--#{$prefix}calendar-cell-week-number-color);
+}
+
+.calendar-cell-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--#{$prefix}calendar-table-cell-size);
+}
+
+.calendar-row,
 .calendar-cell {
-  padding: 1px 0;
   text-align: center;
 
-  &:not(.disabled):not(.next):not(.previous):not(.week-number):hover .calendar-cell-inner,
-  &.clickable:hover .calendar-cell-inner {
-    color: var(--#{$prefix}calendar-cell-hover-color);
-    cursor: pointer;
-    background-color: var(--#{$prefix}calendar-cell-hover-bg);
-  }
-
-  &.week-number {
-    color: var(--#{$prefix}calendar-cell-disabled-color);
-  }
-
-  &.today .calendar-cell-inner {
-    color: var(--#{$prefix}calendar-cell-today-color);
-  }
-
-  &.disabled,
-  &.next,
+  &.disabled .calendar-cell-inner,
+  &.next .calendar-cell-inner,
   &.previous .calendar-cell-inner {
     color: var(--#{$prefix}calendar-cell-disabled-color);
-  }
-
-  &.disabled .calendar-cell-inner {
     cursor: not-allowed;
   }
 
-  &.range:not(.selected) .calendar-cell-inner {
-    background: var(--#{$prefix}calendar-cell-range-bg);
-    @include border-radius(0);
-  }
-
-  &.range:not(.selected):hover .calendar-cell-inner {
+  &.range .calendar-cell-inner {
     position: relative;
+
     &::after {
       position: absolute;
       width: 100%;
       height: 100%;
       content: "";
-      background: var(--#{$prefix}calendar-cell-range-hover-bg);
-      @include border-radius($border-radius);
+      background: var(--#{$prefix}calendar-cell-range-bg);
     }
-  }
-
-  &.range:not(.selected):first-child .calendar-cell-inner,
-  &:not(.range) + .range .calendar-cell-inner {
-    @include border-start-radius($border-radius);
-  }
-
-  &.range:not(.selected):last-child .calendar-cell-inner,
-  &.range:not(.selected).last .calendar-cell-inner {
-    @include border-end-radius($border-radius);
   }
 
   &.range-hover .calendar-cell-inner {
@@ -180,82 +160,105 @@
       width: 100%;
       height: 100%;
       content: "";
-    }
-  }
-
-  &.range-hover .calendar-cell-inner,
-  &.range-hover.selected .calendar-cell-inner {
-    &::before {
       border-top: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
       border-bottom: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
       @include border-radius(0);
     }
   }
 
-  &.range-hover:first-child .calendar-cell-inner,
-  &:not(.range-hover) + .range-hover .calendar-cell-inner {
+  &.selected:not(th):not(.next):not(.previous) .calendar-cell-inner {
+    color: var(--#{$prefix}calendar-cell-selected-color);
+    background-color: var(--#{$prefix}calendar-cell-selected-bg);
+  }
+
+  &.today .calendar-cell-inner {
+    color: var(--#{$prefix}calendar-cell-today-color);
+  }
+}
+
+.calendar-cell {
+  padding: 1px 0;
+
+  .calendars:not(.select-week) &:not(.disabled):not(.next):not(.previous):hover .calendar-cell-inner,
+  .calendars:not(.select-week) &.clickable:hover .calendar-cell-inner {
+    color: var(--#{$prefix}calendar-cell-hover-color);
+    cursor: pointer;
+    background-color: var(--#{$prefix}calendar-cell-hover-bg);
+    @include border-radius($border-radius);
+  }
+
+  // stylelint-disable-next-line selector-max-class
+  .calendars:not(.select-week) &.previous + .current .calendar-cell-inner,
+  &.current:not(.range) + .selected .calendar-cell-inner,
+  &:first-of-type .calendar-cell-inner {
+    @include border-start-radius($border-radius);
+
+    // stylelint-disable-next-line selector-max-class
+    &::after {
+      @include border-start-radius($border-radius);
+    }
+  }
+
+  .calendars:not(.select-week) &:has(+ .next) .calendar-cell-inner,
+  &.range + .selected .calendar-cell-inner,
+  &:last-of-type .calendar-cell-inner {
+    @include border-end-radius($border-radius);
+
+    &::after {
+      @include border-end-radius($border-radius);
+    }
+  }
+
+  &:not(.range-hover) + .range-hover .calendar-cell-inner,
+  &.range-hover:first-of-type .calendar-cell-inner {
     &::before {
       border-left: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
       @include border-start-radius($border-radius);
     }
   }
 
-  &.range-hover:last-child .calendar-cell-inner,
-  &.range-hover.last .calendar-cell-inner,
-  &.range-hover + .range-hover:hover .calendar-cell-inner,
-  &.range-hover:first-child:hover .calendar-cell-inner {
+  &.range-hover:has(+ .next) .calendar-cell-inner,
+  &.range-hover:last-of-type .calendar-cell-inner,
+  &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner {
     &::before {
       border-right: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
       @include border-end-radius($border-radius);
     }
   }
 
-  &.range-hover.selected:hover .calendar-cell-inner {
+  &.selected:not(th) .calendar-cell-inner {
+    @include border-radius($border-radius);
+  }
+
+}
+
+.calendar-row {
+  // stylelint-disable-next-line selector-max-class
+  .calendars.select-week &:not(.disabled):hover .calendar-cell-inner,
+  .calendars.select-week &.clickable:hover .calendar-cell-inner {
+    color: var(--#{$prefix}calendar-cell-hover-color);
+    cursor: pointer;
+    background-color: var(--#{$prefix}calendar-cell-hover-bg);
+  }
+
+  .selected:not(th) .calendar-cell-inner {
+    @include border-radius($border-radius);
+  }
+
+  &.range-hover .calendar-cell:first-of-type .calendar-cell-inner {
     &::before {
-      border: 0;
+      border-left: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      @include border-start-radius($border-radius);
     }
   }
 
-  &.selected:not(.previous):not(.next) .calendar-cell-inner,
-  &.selected:not(.previous):not(.next).start .calendar-cell-inner,
-  &.selected:not(.previous):not(.next).end .calendar-cell-inner {
-    position: relative;
-    color: var(--#{$prefix}calendar-cell-selected-color);
-    background: var(--#{$prefix}calendar-cell-selected-bg);
-  }
-
-  &.selected:not(.previous):not(.next).start .calendar-cell-inner,
-  &.selected:not(.previous):not(.next).end .calendar-cell-inner {
+  &.range-hover .calendar-cell:last-of-type .calendar-cell-inner {
     &::before {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: -1;
-      content: "";
-      background: var(--#{$prefix}calendar-cell-range-bg);
+      border-right: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      @include border-end-radius($border-radius);
     }
   }
-
-  &.selected:not(.previous):not(.next).start .calendar-cell-inner::before {
-    @include border-start-radius($border-radius);
-    @include border-end-radius(0);
-  }
-  &.selected:not(.previous):not(.next).end .calendar-cell-inner::before {
-    @include border-start-radius(0);
-    @include border-end-radius($border-radius);
-  }
 }
-
-.calendar-cell-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--#{$prefix}calendar-table-cell-size);
-  @include border-radius($border-radius);
-}
-
 
 @if $enable-dark-mode {
   @include color-mode(dark) {
