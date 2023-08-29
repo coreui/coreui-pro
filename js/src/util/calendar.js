@@ -11,6 +11,10 @@ export const convertIsoWeekToDate = isoWeek => {
 }
 
 export const convertToDateObject = (date, selectionType) => {
+  if (date === null) {
+    return null
+  }
+
   if (date instanceof Date) {
     return date
   }
@@ -19,7 +23,7 @@ export const convertToDateObject = (date, selectionType) => {
     return convertIsoWeekToDate(date)
   }
 
-  return new Date(date)
+  return new Date(Date.parse(date))
 }
 
 export const convertToLocalDate = (d, locale, options = {}) =>
@@ -33,6 +37,22 @@ export const createGroupsInArray = (arr, numberOfGroups) => {
   return Array.from({ length: numberOfGroups })
     .fill('')
     .map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup))
+}
+
+export const getCalendarDate = (calendarDate, order, view) => {
+  if (order !== 0 && view === 'days') {
+    return new Date(Date.UTC(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1))
+  }
+
+  if (order !== 0 && view === 'months') {
+    return new Date(Date.UTC(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1))
+  }
+
+  if (order !== 0 && view === 'years') {
+    return new Date(Date.UTC(calendarDate.getFullYear() + (12 * order), calendarDate.getMonth(), 1))
+  }
+
+  return calendarDate
 }
 
 export const getCurrentYear = () => new Date().getFullYear()

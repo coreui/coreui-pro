@@ -10,24 +10,25 @@ other_frameworks: date-range-picker
 
 ## Example
 
+### Days
+
 {{< example >}}
   <div class="row">
     <div class="col-lg-5">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker" id="datePicker1"></div>
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
     </div>
     <div class="col-lg-5">
       <div
         data-coreui-start-date="2022/08/03"
         data-coreui-end-date="2022/08/17"
         data-coreui-locale="en-US"
-        data-coreui-toggle="date-range-picker"
-        id="datePicker2">
+        data-coreui-toggle="date-range-picker">
       </div>
     </div>
   </div>
 {{< /example >}}
 
-### With footer
+#### With footer
 
 {{< example >}}
   <div class="row mb-4">
@@ -50,7 +51,7 @@ other_frameworks: date-range-picker
   </div>
 {{< /example >}}
 
-### With timepicker
+#### With timepicker
 
 {{< example >}}
   <div class="row mb-4">
@@ -74,6 +75,78 @@ other_frameworks: date-range-picker
     </div>
   </div>
 {{< /example >}}
+
+### Weeks
+
+{{< example >}}
+  <div class="row">
+    <div class="col-lg-5">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-show-week-number="true"
+        data-coreui-selection-type="week">
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div
+        data-coreui-start-date="2025W07"
+        data-coreui-end-date="2025W12"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-show-week-number="true"
+        data-coreui-selection-type="week">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
+### Months
+
+{{< example >}}
+  <div class="row">
+    <div class="col-lg-5">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="month">
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div
+        data-coreui-start-date="2022-8"
+        data-coreui-end-date="2023-5"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="month">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
+### Years
+
+{{< example >}}
+  <div class="row">
+    <div class="col-lg-5">
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="year">
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div
+        data-coreui-start-date="2022"
+        data-coreui-end-date="2028"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="year">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
 
 ## Sizing
 
@@ -264,8 +337,10 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `ranges` | object | `{}` | Predefined date ranges the user can select from. |
 | `rangesButtonsClasses` | array \| string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
+| `selectionType` | `'day'` \| `'week'` \| `'month'` \| `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
 | `separator` | boolean | `true` | Toggle visibility or set the content of the inputs separator. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
+| `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
 | `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
 | `startDate` | date \| string \| null | `null` | Initial selected date. |
 | `startName` | string | `null` | Set the name attribute for the start date input element. |
@@ -274,6 +349,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `todayButtonClasses` | array \| string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
 | `weekdayFormat` | number \| 'long' \| 'narrow' \| 'short' | `2` | Set length or format of day name. |
+| `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
 {{< /bs-table >}}
 
 ### Methods

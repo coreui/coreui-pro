@@ -102,11 +102,14 @@ const Default = {
   startName: null,
   selectAdjacementDays: false,
   selectEndDate: false,
+  selectionType: 'day',
   showAdjacementDays: true,
+  showWeekNumber: false,
   timepicker: false,
   todayButton: 'Today',
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
-  valid: false
+  valid: false,
+  weekNumbersLabel: null
 }
 
 const DefaultType = {
@@ -142,11 +145,14 @@ const DefaultType = {
   startName: 'string',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
+  selectionType: 'string',
   showAdjacementDays: 'boolean',
+  showWeekNumber: 'boolean',
   timepicker: 'boolean',
   todayButton: '(boolean|string)',
   todayButtonClasses: '(array|string)',
-  valid: 'boolean'
+  valid: 'boolean',
+  weekNumbersLabel: '(string|null)'
 }
 
 /**
@@ -158,9 +164,9 @@ class DateRangePicker extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
-    this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date())
-    this._startDate = this._convertStringToDate(this._config.date || this._config.startDate)
-    this._endDate = this._convertStringToDate(this._config.endDate)
+    this._calendarDate = this._config.calendarDate
+    this._startDate = this._config.date || this._config.startDate
+    this._endDate = this._config.endDate
     this._initialStartDate = null
     this._initialEndDate = null
     this._mobile = window.innerWidth < 768
@@ -287,9 +293,9 @@ class DateRangePicker extends BaseComponent {
 
   update(config) {
     this._config = this._getConfig(config)
-    this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date())
-    this._startDate = this._convertStringToDate(this._config.date || this._config.startDate)
-    this._endDate = this._convertStringToDate(this._config.endDate)
+    this._calendarDate = this._config.calendarDate
+    this._startDate = this._config.date || this._config.startDate
+    this._endDate = this._config.endDate
     this._selectEndDate = this._config.selectEndDate
 
     this._dropdownToggleEl.innerHTML = ''
@@ -375,7 +381,6 @@ class DateRangePicker extends BaseComponent {
     for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date
-        this._selectEndDate = event.selectEndDate
         this._startInput.value = this._setInputValue(event.date)
         this._startInput.dispatchEvent(new Event('change'))
         this._updateDateRangePickerCalendars()
@@ -392,7 +397,6 @@ class DateRangePicker extends BaseComponent {
 
       EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
         this._endDate = event.date
-        this._selectEndDate = event.selectEndDate
         this._endInput.value = this._setInputValue(event.date)
         this._startInput.dispatchEvent(new Event('change'))
         this._updateDateRangePickerCalendars()
@@ -414,6 +418,10 @@ class DateRangePicker extends BaseComponent {
         }
 
         this._startInput.value = event.date ? this._formatDate(event.date) : ''
+      })
+
+      EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
+        this._selectEndDate = event.value
       })
     }
   }
@@ -570,11 +578,7 @@ class DateRangePicker extends BaseComponent {
 
     // eslint-disable-next-line no-new
     new Calendar(calendarEl, {
-      calendarDate: new Date(
-        this._calendarDate.getFullYear(),
-        this._calendarDate.getMonth(),
-        1
-      ),
+      calendarDate: this._config.calendarDate,
       calendars: this._config.calendars,
       disabledDates: this._config.disabledDates,
       endDate: this._endDate,
@@ -585,16 +589,20 @@ class DateRangePicker extends BaseComponent {
       range: this._config.range,
       selectAdjacementDays: this._config.selectAdjacementDays,
       selectEndDate: this._selectEndDate,
+      selectionType: this._config.selectionType,
       showAdjacementDays: this._config.showAdjacementDays,
-      startDate: this._startDate
+      showWeekNumber: this._config.showWeekNumber,
+      startDate: this._startDate,
+      weekNumbersLabel: this._config.weekNumbersLabel
     })
 
     EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-      this._calendarDate = new Date(
-        event.date.getFullYear(),
-        event.date.getMonth(),
-        1
-      )
+      // this._calendarDate = new Date(
+      //   event.date.getFullYear(),
+      //   event.date.getMonth(),
+      //   1
+      // )
+      this._calendarDate = event.date
       this._updateDateRangePickerCalendars()
     })
 
@@ -618,7 +626,7 @@ class DateRangePicker extends BaseComponent {
           container: 'inline',
           disabled: !this._startDate,
           locale: this._config.locale,
-          time: this._startDate,
+          time: this._startDate && new Date(this._startDate),
           variant: 'select'
         })
         calendarEl.append(timePickerStartEl)
@@ -637,7 +645,7 @@ class DateRangePicker extends BaseComponent {
           container: 'inline',
           disabled: !this._endDate,
           locale: this._config.locale,
-          time: this._endDate,
+          time: this._endDate && new Date(this._endDate),
           variant: 'select'
         })
         this._timepickers.append(timePickerEndEl)
@@ -658,7 +666,7 @@ class DateRangePicker extends BaseComponent {
             container: 'inline',
             disabled: index === 0 ? !this._startDate : !this._endDate,
             locale: this._config.locale,
-            time: index === 0 ? this._startDate : this._endDate,
+            time: index === 0 ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
             variant: 'select'
           })
 
@@ -741,10 +749,6 @@ class DateRangePicker extends BaseComponent {
     this._addCalendarEventListeners()
   }
 
-  _convertStringToDate(date) {
-    return date ? (date instanceof Date ? date : new Date(date)) : null
-  }
-
   _createInput(name, placeholder, value) {
     const inputEl = document.createElement('input')
     inputEl.classList.add(CLASS_NAME_INPUT)
@@ -821,15 +825,17 @@ class DateRangePicker extends BaseComponent {
   }
 
   _formatDate(date) {
-    if (this._config.format) {
-      return dateFormat(date, this._config.format)
+    if (this._config.selectionType !== 'day') {
+      return date
     }
 
-    if (this._config.timepicker) {
-      return date.toLocaleString(this._config.locale)
-    }
+    const _date = new Date(date)
 
-    return date.toLocaleDateString(this._config.locale)
+    return this._config.format ?
+      dateFormat(_date, this._config.format) :
+      (this._config.timepicker ?
+        _date.toLocaleString(this._config.locale) :
+        _date.toLocaleDateString(this._config.locale))
   }
 
   _getButtonClasses(classes) {

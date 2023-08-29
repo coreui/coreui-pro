@@ -15,7 +15,14 @@ export const convert12hTo24h = (abbr, hour) => {
 }
 
 export const convert24hTo12h = hour => hour % 12 || 12
-export const convertTimeToDate = time => time ? (time instanceof Date ? new Date(time) : new Date(`1970-01-01 ${time}`)) : null
+
+export const convertTimeToDate = time =>
+  time ?
+    (time instanceof Date ?
+      time :
+      new Date(`1970-01-01 ${time}`)) :
+    null
+
 export const getAmPm = (date, locale) => {
   if (date.toLocaleTimeString(locale).includes('AM')) {
     return 'am'

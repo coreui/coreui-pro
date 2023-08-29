@@ -222,6 +222,76 @@
   // js-docs-end multi-select-array-data
 
   // -------------------------------
+  // Calendars
+  // -------------------------------
+  // 'Calendars components' example in docs only
+
+  const myCalendar = document.getElementById('myCalendar')
+  if (myCalendar) {
+    new coreui.Calendar(myCalendar)
+
+    myCalendar.addEventListener('startDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+
+    myCalendar.addEventListener('endDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+  }
+
+  const myCalendarWeek = document.getElementById('myCalendarWeek')
+  if (myCalendarWeek) {
+    new coreui.Calendar(myCalendarWeek)
+
+    myCalendarWeek.addEventListener('startDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+
+    myCalendarWeek.addEventListener('endDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+
+    myCalendarWeek.addEventListener('cellHover.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+  }
+
+  const myCalendarMonth = document.getElementById('myCalendarMonth')
+  if (myCalendarMonth) {
+    new coreui.Calendar(myCalendarMonth)
+
+    myCalendarMonth.addEventListener('startDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+
+    myCalendarMonth.addEventListener('endDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+  }
+
+  const myCalendarYear = document.getElementById('myCalendarYear')
+  if (myCalendarYear) {
+    new coreui.Calendar(myCalendarYear)
+
+    myCalendarYear.addEventListener('startDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+
+    myCalendarYear.addEventListener('endDateChange.coreui.calendar', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
+  }
+
+  // -------------------------------
   // Date Pickers
   // -------------------------------
   // 'Date Pickers components' example in docs only
@@ -242,7 +312,7 @@
       minDate: new Date(2022, 1, 1)
     }
 
-    new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates'), optionsDatePickerDisabledDates)
+    new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)
   }
   // js-docs-end date-picker-disabled-dates
 

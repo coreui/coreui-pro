@@ -190,6 +190,7 @@
   // stylelint-disable-next-line selector-max-class
   .calendars:not(.select-week) &.previous + .current .calendar-cell-inner,
   &.current:not(.range) + .selected .calendar-cell-inner,
+  &:not(.range) + .selected .calendar-cell-inner,
   &:first-of-type .calendar-cell-inner {
     @include border-start-radius($border-radius);
 
