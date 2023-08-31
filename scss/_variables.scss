@@ -2323,6 +2323,8 @@ $calendar-cell-hover-color:                  var(--#{$prefix}body-color) !defaul
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
 
+$calendar-cell-focus-box-shadow:             $focus-ring-box-shadow !default;
+
 $calendar-cell-selected-color:               $white !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
 

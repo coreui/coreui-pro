@@ -21,6 +21,7 @@
   --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
   --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color};
   --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
+  --#{$prefix}calendar-cell-focus-box-shadow: #{$calendar-cell-focus-box-shadow};
   --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
   --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
   --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg};
@@ -231,6 +232,14 @@
     @include border-radius($border-radius);
   }
 
+  .calendars:not(.select-week) &:focus-visible {
+    outline: 0;
+
+    .calendar-cell-inner {
+      box-shadow: var(--#{$prefix}calendar-cell-focus-box-shadow);
+      @include border-radius($border-radius);
+    }
+  }
 }
 
 .calendar-row {
@@ -258,6 +267,12 @@
       border-right: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
       @include border-end-radius($border-radius);
     }
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: var(--#{$prefix}calendar-cell-focus-box-shadow);
+    @include border-radius($border-radius);
   }
 }
 
