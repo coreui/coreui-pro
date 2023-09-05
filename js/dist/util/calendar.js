@@ -9,29 +9,65 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.Calendar = {}));
 })(this, (function (exports) { 'use strict';
 
+  const convertIsoWeekToDate = isoWeek => {
+    const [year, week] = isoWeek.split(/w/i);
+    // Get date for 4th of January for year
+    const date = new Date(Number(year), 0, 4);
+    // Get previous Monday, add 7 days for each week after first
+    date.setDate(
+    // eslint-disable-next-line no-mixed-operators
+    date.getDate() - (date.getDay() || 7) + 1 + (Number(week) - 1) * 7);
+    return date;
+  };
+  const convertToDateObject = (date, selectionType) => {
+    if (date === null) {
+      return null;
+    }
+    if (date instanceof Date) {
+      return date;
+    }
+    if (selectionType === 'week') {
+      return convertIsoWeekToDate(date);
+    }
+    return new Date(Date.parse(date));
+  };
   const convertToLocalDate = (d, locale, options = {}) => d.toLocaleDateString(locale, options);
   const convertToLocalTime = (d, locale, options = {}) => d.toLocaleTimeString(locale, options);
   const createGroupsInArray = (arr, numberOfGroups) => {
     const perGroup = Math.ceil(arr.length / numberOfGroups);
-    // eslint-disable-next-line unicorn/no-new-array
-    return new Array(numberOfGroups).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
+    return Array.from({
+      length: numberOfGroups
+    }).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
+  };
+  const getCalendarDate = (calendarDate, order, view) => {
+    if (order !== 0 && view === 'days') {
+      return new Date(Date.UTC(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1));
+    }
+    if (order !== 0 && view === 'months') {
+      return new Date(Date.UTC(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1));
+    }
+    if (order !== 0 && view === 'years') {
+      return new Date(Date.UTC(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1));
+    }
+    return calendarDate;
   };
   const getCurrentYear = () => new Date().getFullYear();
   const getCurrentMonth = () => new Date().getMonth();
-  const getLocalDateFromString = (string, locale, time) => {
-    const date = new Date(2013, 11, 31, 17, 19, 22);
-    let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale);
-    regex = regex.replace('2013', '(?<year>[0-9]{2,4})').replace('12', '(?<month>[0-9]{1,2})').replace('31', '(?<day>[0-9]{1,2})');
-    if (time) {
-      regex = regex.replace('5', '(?<hour>[0-9]{1,2})').replace('17', '(?<hour>[0-9]{1,2})').replace('19', '(?<minute>[0-9]{1,2})').replace('22', '(?<second>[0-9]{1,2})').replace('PM', '(?<ampm>[A-Z]{2})');
+  const getDateBySelectionType = (date, selectionType) => {
+    if (date === null) {
+      return null;
     }
-    const rgx = new RegExp(`${regex}`);
-    const partials = string.match(rgx);
-    if (partials === null) {
-      return;
+    if (selectionType === 'week') {
+      return `${date.getFullYear()}W${getWeekNumber(date)}`;
     }
-    const newDate = partials.groups && (time ? new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ? partials.groups.ampm === 'PM' ? Number(partials.groups.hour) + 12 : Number(partials.groups.hour) : Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) : new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)));
-    return newDate;
+    if (selectionType === 'month') {
+      const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
+      return `${date.getFullYear()}-${monthNumber}`;
+    }
+    if (selectionType === 'year') {
+      return `${date.getFullYear()}`;
+    }
+    return date;
   };
   const getMonthName = (month, locale) => {
     const d = new Date();
@@ -102,6 +138,28 @@
     }
     return dates;
   };
+  const getDayNumber = date => Math.ceil((Number(date) - Number(new Date(date.getFullYear(), 0, 0))) / 1000 / 60 / 60 / 24);
+  const getLocalDateFromString = (string, locale, time) => {
+    const date = new Date(2013, 11, 31, 17, 19, 22);
+    let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale);
+    regex = regex.replace('2013', '(?<year>[0-9]{2,4})').replace('12', '(?<month>[0-9]{1,2})').replace('31', '(?<day>[0-9]{1,2})');
+    if (time) {
+      regex = regex.replace('5', '(?<hour>[0-9]{1,2})').replace('17', '(?<hour>[0-9]{1,2})').replace('19', '(?<minute>[0-9]{1,2})').replace('22', '(?<second>[0-9]{1,2})').replace('PM', '(?<ampm>[A-Z]{2})');
+    }
+    const rgx = new RegExp(`${regex}`);
+    const partials = string.match(rgx);
+    if (partials === null) {
+      return;
+    }
+    const newDate = partials.groups && (time ? new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ? partials.groups.ampm === 'PM' ? Number(partials.groups.hour) + 12 : Number(partials.groups.hour) : Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) : new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)));
+    return newDate;
+  };
+  const getWeekNumber = date => {
+    const week1 = new Date(date.getFullYear(), 0, 4);
+    return 1 + Math.round(
+    // eslint-disable-next-line no-mixed-operators
+    ((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  };
   const getMonthDetails = (year, month, firstDayOfWeek) => {
     const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek);
     const daysThisMonth = getMonthDays(year, month);
@@ -110,9 +168,14 @@
     const weeks = [];
     for (const [index, day] of days.entries()) {
       if (index % 7 === 0 || weeks.length === 0) {
-        weeks.push([]);
+        weeks.push({
+          days: []
+        });
       }
-      weeks[weeks.length - 1].push(day);
+      if ((index + 1) % 7 === 0) {
+        weeks[weeks.length - 1].weekNumber = getWeekNumber(day.date);
+      }
+      weeks[weeks.length - 1].days.push(day);
     }
     return weeks;
   };
@@ -120,6 +183,7 @@
     if (startDate && endDate) {
       const date = new Date(startDate);
       let disabled = false;
+
       // eslint-disable-next-line no-unmodified-loop-condition
       while (date < endDate) {
         date.setDate(date.getDate() + 1);
@@ -188,15 +252,21 @@
     return d instanceof Date && d.getTime();
   };
 
+  exports.convertIsoWeekToDate = convertIsoWeekToDate;
+  exports.convertToDateObject = convertToDateObject;
   exports.convertToLocalDate = convertToLocalDate;
   exports.convertToLocalTime = convertToLocalTime;
   exports.createGroupsInArray = createGroupsInArray;
+  exports.getCalendarDate = getCalendarDate;
   exports.getCurrentMonth = getCurrentMonth;
   exports.getCurrentYear = getCurrentYear;
+  exports.getDateBySelectionType = getDateBySelectionType;
+  exports.getDayNumber = getDayNumber;
   exports.getLocalDateFromString = getLocalDateFromString;
   exports.getMonthDetails = getMonthDetails;
   exports.getMonthName = getMonthName;
   exports.getMonthsNames = getMonthsNames;
+  exports.getWeekNumber = getWeekNumber;
   exports.getYears = getYears;
   exports.isDateDisabled = isDateDisabled;
   exports.isDateInRange = isDateInRange;

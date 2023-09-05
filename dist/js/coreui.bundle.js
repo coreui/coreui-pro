@@ -942,7 +942,7 @@
   const DATA_API_KEY$e = '.data-api';
   const CLASS_NAME_ACTIVE$4 = 'active';
   const SELECTOR_DATA_TOGGLE$a = '[data-coreui-toggle="button"]';
-  const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$i}${DATA_API_KEY$e}`;
+  const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$i}${DATA_API_KEY$e}`;
 
   /**
    * Class definition
@@ -975,7 +975,7 @@
    * Data API implementation
    */
 
-  EventHandler.on(document, EVENT_CLICK_DATA_API$d, SELECTOR_DATA_TOGGLE$a, event => {
+  EventHandler.on(document, EVENT_CLICK_DATA_API$e, SELECTOR_DATA_TOGGLE$a, event => {
     event.preventDefault();
     const button = event.target.closest(SELECTOR_DATA_TOGGLE$a);
     const data = Button.getOrCreateInstance(button);
@@ -988,25 +988,61 @@
 
   defineJQueryPlugin(Button);
 
+  const convertIsoWeekToDate = isoWeek => {
+    const [year, week] = isoWeek.split(/w/i);
+    // Get date for 4th of January for year
+    const date = new Date(Number(year), 0, 4);
+    // Get previous Monday, add 7 days for each week after first
+    date.setDate(
+    // eslint-disable-next-line no-mixed-operators
+    date.getDate() - (date.getDay() || 7) + 1 + (Number(week) - 1) * 7);
+    return date;
+  };
+  const convertToDateObject = (date, selectionType) => {
+    if (date === null) {
+      return null;
+    }
+    if (date instanceof Date) {
+      return date;
+    }
+    if (selectionType === 'week') {
+      return convertIsoWeekToDate(date);
+    }
+    return new Date(Date.parse(date));
+  };
   const createGroupsInArray = (arr, numberOfGroups) => {
     const perGroup = Math.ceil(arr.length / numberOfGroups);
-    // eslint-disable-next-line unicorn/no-new-array
-    return new Array(numberOfGroups).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
+    return Array.from({
+      length: numberOfGroups
+    }).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
   };
-  const getLocalDateFromString = (string, locale, time) => {
-    const date = new Date(2013, 11, 31, 17, 19, 22);
-    let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale);
-    regex = regex.replace('2013', '(?<year>[0-9]{2,4})').replace('12', '(?<month>[0-9]{1,2})').replace('31', '(?<day>[0-9]{1,2})');
-    if (time) {
-      regex = regex.replace('5', '(?<hour>[0-9]{1,2})').replace('17', '(?<hour>[0-9]{1,2})').replace('19', '(?<minute>[0-9]{1,2})').replace('22', '(?<second>[0-9]{1,2})').replace('PM', '(?<ampm>[A-Z]{2})');
+  const getCalendarDate = (calendarDate, order, view) => {
+    if (order !== 0 && view === 'days') {
+      return new Date(Date.UTC(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1));
     }
-    const rgx = new RegExp(`${regex}`);
-    const partials = string.match(rgx);
-    if (partials === null) {
-      return;
+    if (order !== 0 && view === 'months') {
+      return new Date(Date.UTC(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1));
     }
-    const newDate = partials.groups && (time ? new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ? partials.groups.ampm === 'PM' ? Number(partials.groups.hour) + 12 : Number(partials.groups.hour) : Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) : new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)));
-    return newDate;
+    if (order !== 0 && view === 'years') {
+      return new Date(Date.UTC(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1));
+    }
+    return calendarDate;
+  };
+  const getDateBySelectionType = (date, selectionType) => {
+    if (date === null) {
+      return null;
+    }
+    if (selectionType === 'week') {
+      return `${date.getFullYear()}W${getWeekNumber(date)}`;
+    }
+    if (selectionType === 'month') {
+      const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
+      return `${date.getFullYear()}-${monthNumber}`;
+    }
+    if (selectionType === 'year') {
+      return `${date.getFullYear()}`;
+    }
+    return date;
   };
   const getMonthsNames = locale => {
     const months = [];
@@ -1069,6 +1105,27 @@
     }
     return dates;
   };
+  const getLocalDateFromString = (string, locale, time) => {
+    const date = new Date(2013, 11, 31, 17, 19, 22);
+    let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale);
+    regex = regex.replace('2013', '(?<year>[0-9]{2,4})').replace('12', '(?<month>[0-9]{1,2})').replace('31', '(?<day>[0-9]{1,2})');
+    if (time) {
+      regex = regex.replace('5', '(?<hour>[0-9]{1,2})').replace('17', '(?<hour>[0-9]{1,2})').replace('19', '(?<minute>[0-9]{1,2})').replace('22', '(?<second>[0-9]{1,2})').replace('PM', '(?<ampm>[A-Z]{2})');
+    }
+    const rgx = new RegExp(`${regex}`);
+    const partials = string.match(rgx);
+    if (partials === null) {
+      return;
+    }
+    const newDate = partials.groups && (time ? new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ? partials.groups.ampm === 'PM' ? Number(partials.groups.hour) + 12 : Number(partials.groups.hour) : Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) : new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)));
+    return newDate;
+  };
+  const getWeekNumber = date => {
+    const week1 = new Date(date.getFullYear(), 0, 4);
+    return 1 + Math.round(
+    // eslint-disable-next-line no-mixed-operators
+    ((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  };
   const getMonthDetails = (year, month, firstDayOfWeek) => {
     const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek);
     const daysThisMonth = getMonthDays(year, month);
@@ -1077,11 +1134,33 @@
     const weeks = [];
     for (const [index, day] of days.entries()) {
       if (index % 7 === 0 || weeks.length === 0) {
-        weeks.push([]);
+        weeks.push({
+          days: []
+        });
       }
-      weeks[weeks.length - 1].push(day);
+      if ((index + 1) % 7 === 0) {
+        weeks[weeks.length - 1].weekNumber = getWeekNumber(day.date);
+      }
+      weeks[weeks.length - 1].days.push(day);
     }
     return weeks;
+  };
+  const isDisableDateInRange = (startDate, endDate, dates) => {
+    if (startDate && endDate) {
+      const date = new Date(startDate);
+      let disabled = false;
+
+      // eslint-disable-next-line no-unmodified-loop-condition
+      while (date < endDate) {
+        date.setDate(date.getDate() + 1);
+        if (isDateDisabled(date, null, null, dates)) {
+          disabled = true;
+          break;
+        }
+      }
+      return disabled;
+    }
+    return false;
   };
   const isDateDisabled = (date, min, max, dates) => {
     let disabled;
@@ -1109,15 +1188,6 @@
   const isDateSelected = (date, start, end) => {
     return start && isSameDateAs(start, date) || end && isSameDateAs(end, date);
   };
-  const isEndDate = (date, start, end) => {
-    return start && end && isSameDateAs(end, date) && start < end;
-  };
-  const isLastDayOfMonth = date => {
-    const test = new Date(date.getTime());
-    const month = test.getMonth();
-    test.setDate(test.getDate() + 1);
-    return test.getMonth() !== month;
-  };
   const isSameDateAs = (date, date2) => {
     if (date instanceof Date && date2 instanceof Date) {
       return date.getDate() === date2.getDate() && date.getMonth() === date2.getMonth() && date.getFullYear() === date2.getFullYear();
@@ -1126,9 +1196,6 @@
       return true;
     }
     return false;
-  };
-  const isStartDate = (date, start, end) => {
-    return start && end && isSameDateAs(start, date) && start < end;
   };
   const isToday = date => {
     const today = new Date();
@@ -1153,17 +1220,21 @@
   const EVENT_KEY$h = `.${DATA_KEY$g}`;
   const DATA_API_KEY$d = '.data-api';
   const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$h}`;
+  const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$h}`;
   const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$h}`;
   const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$h}`;
-  const EVENT_LOAD_DATA_API$a = `load${EVENT_KEY$h}${DATA_API_KEY$d}`;
+  const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$h}`;
+  const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$h}`;
   const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$h}`;
   const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$h}`;
-  const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$h}`;
+  const EVENT_LOAD_DATA_API$a = `load${EVENT_KEY$h}${DATA_API_KEY$d}`;
+  const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$h}${DATA_API_KEY$d}`;
   const CLASS_NAME_CALENDAR$1 = 'calendar';
   const SELECTOR_CALENDAR$2 = '.calendar';
   const SELECTOR_CALENDAR_CELL_INNER = '.calendar-cell-inner';
+  const SELECTOR_CALENDAR_ROW = '.calendar-row';
   const Default$k = {
-    calendarDate: new Date(),
+    calendarDate: null,
     calendars: 1,
     disabledDates: null,
     endDate: null,
@@ -1174,9 +1245,12 @@
     range: true,
     selectAdjacementDays: false,
     selectEndDate: false,
+    selectionType: 'day',
     showAdjacementDays: true,
+    showWeekNumber: false,
     startDate: null,
-    weekdayFormat: 2
+    weekdayFormat: 2,
+    weekNumbersLabel: null
   };
   const DefaultType$k = {
     calendarDate: '(date|string|null)',
@@ -1190,9 +1264,12 @@
     range: 'boolean',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
+    selectionType: 'string',
     showAdjacementDays: 'boolean',
+    showWeekNumber: 'boolean',
     startDate: '(date|string|null)',
-    weekdayFormat: '(number|string)'
+    weekdayFormat: '(number|string)',
+    weekNumbersLabel: '(string|null)'
   };
 
   /**
@@ -1203,12 +1280,20 @@
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
-      this._calendarDate = this._config.calendarDate;
-      this._startDate = this._config.startDate;
-      this._endDate = this._config.endDate;
+      this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType);
+      this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
+      this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
       this._hoverDate = null;
       this._selectEndDate = this._config.selectEndDate;
-      this._view = 'days';
+      if (this._config.selectionType === 'day' || this._config.selectionType === 'week') {
+        this._view = 'days';
+      }
+      if (this._config.selectionType === 'month') {
+        this._view = 'months';
+      }
+      if (this._config.selectionType === 'year') {
+        this._view = 'years';
+      }
       this._createCalendar();
       this._addEventListeners();
     }
@@ -1226,49 +1311,87 @@
 
     // Private
     _addEventListeners() {
-      EventHandler.on(this._element, 'click', SELECTOR_CALENDAR_CELL_INNER, event => {
-        event.preventDefault();
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_CALENDAR_CELL_INNER, event => {
+        if (this._config.selectionType === 'week' && this._view === 'days') {
+          return;
+        }
         if (event.target.parentElement.classList.contains('disabled')) {
           return;
         }
         if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
           return;
         }
-        if (event.target.classList.contains('day')) {
-          const date = new Date(Manipulator.getDataAttribute(event.target, 'date'));
-          const calendarIndex = Manipulator.getDataAttribute(event.target.closest('.calendar-panel'), 'calendar-index');
-          if (calendarIndex) {
-            this._setCalendarDate(new Date(date.setMonth(date.getMonth() - calendarIndex)));
-          } else {
-            this._setCalendarDate(date);
-          }
-          this._selectDate(Manipulator.getDataAttribute(event.target, 'date'));
+        const date = new Date(Manipulator.getDataAttribute(event.target, 'date'));
+        const cloneDate = new Date(date);
+        const index = Manipulator.getDataAttribute(event.target.closest('.calendar-panel'), 'calendar-index');
+        this._selectDate(date);
+        if (this._view === 'days') {
+          this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
         }
-        if (event.target.classList.contains('month')) {
-          this._setCalendarDate(new Date(this._calendarDate.getFullYear(), Manipulator.getDataAttribute(event.target, 'month'), 1));
+        if (this._view === 'months' && this._config.selectionType !== 'month') {
+          this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
           this._view = 'days';
         }
-        if (event.target.classList.contains('year')) {
-          this._calendarDate = new Date(Manipulator.getDataAttribute(event.target, 'year'), this._calendarDate.getMonth(), 1);
+        if (this._view === 'years' && this._config.selectionType !== 'year') {
+          this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
           this._view = 'months';
         }
         this._updateCalendar();
       });
       EventHandler.on(this._element, EVENT_MOUSEENTER$2, SELECTOR_CALENDAR_CELL_INNER, event => {
-        event.preventDefault();
+        if (this._config.selectionType === 'week' && this._view === 'days') {
+          return;
+        }
         if (event.target.parentElement.classList.contains('disabled')) {
           return;
         }
         if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
           return;
         }
-        this._hoverDate = new Date(Manipulator.getDataAttribute(event.target, 'date'));
+        const date = new Date(Manipulator.getDataAttribute(event.target, 'date'));
+        this._hoverDate = date;
         EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-          date: new Date(Manipulator.getDataAttribute(event.target, 'date'))
+          date: getDateBySelectionType(date, this._config.selectionType)
         });
       });
-      EventHandler.on(this._element, EVENT_MOUSELEAVE$2, SELECTOR_CALENDAR_CELL_INNER, event => {
-        event.preventDefault();
+      EventHandler.on(this._element, EVENT_MOUSELEAVE$2, SELECTOR_CALENDAR_CELL_INNER, () => {
+        if (this._config.selectionType === 'week' && this._view === 'days') {
+          return;
+        }
+        this._hoverDate = null;
+        EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+          date: null
+        });
+      });
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_CALENDAR_ROW, event => {
+        if (this._config.selectionType !== 'week') {
+          return;
+        }
+        if (event.target.parentElement.classList.contains('disabled')) {
+          return;
+        }
+        const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_INNER, event.target.closest(SELECTOR_CALENDAR_ROW));
+        const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
+        this._selectDate(date);
+        this._updateCalendar();
+      });
+      EventHandler.on(this._element, EVENT_MOUSEENTER$2, SELECTOR_CALENDAR_ROW, event => {
+        if (this._config.selectionType !== 'week') {
+          return;
+        }
+        if (event.target.parentElement.classList.contains('disabled')) {
+          return;
+        }
+        const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_INNER, event.target.closest(SELECTOR_CALENDAR_ROW));
+        const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
+        EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+          date: getDateBySelectionType(date, this._config.selectionType)
+        });
+      });
+      EventHandler.on(this._element, EVENT_MOUSELEAVE$2, SELECTOR_CALENDAR_ROW, () => {
+        if (this._config.selectionType !== 'week') {
+          return;
+        }
         this._hoverDate = null;
         EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
           date: null
@@ -1276,31 +1399,34 @@
       });
 
       // Navigation
-      EventHandler.on(this._element, 'click', '.btn-prev', event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-prev', event => {
         event.preventDefault();
         this._modifyCalendarDate(0, -1);
       });
-      EventHandler.on(this._element, 'click', '.btn-double-prev', event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-double-prev', event => {
         event.preventDefault();
         this._modifyCalendarDate(this._view === 'years' ? -10 : -1);
       });
-      EventHandler.on(this._element, 'click', '.btn-next', event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-next', event => {
         event.preventDefault();
         this._modifyCalendarDate(0, 1);
       });
-      EventHandler.on(this._element, 'click', '.btn-double-next', event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-double-next', event => {
         event.preventDefault();
         this._modifyCalendarDate(this._view === 'years' ? 10 : 1);
       });
-      EventHandler.on(this._element, 'click', '.btn-month', event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-month', event => {
         event.preventDefault();
         this._view = 'months';
         this._updateCalendar();
       });
-      EventHandler.on(this._element, 'click', '.btn-year', event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-year', event => {
         event.preventDefault();
         this._view = 'years';
         this._updateCalendar();
+      });
+      EventHandler.on(this._element, EVENT_MOUSELEAVE$2, 'table', () => {
+        EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE);
       });
     }
     _setCalendarDate(date) {
@@ -1327,18 +1453,22 @@
       }
       this._updateCalendar();
     }
-    _setEndDate(date, selectEndDate = false) {
-      this._endDate = new Date(date);
+    _setEndDate(date) {
+      this._endDate = date;
       EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE$1, {
-        date: this._endDate,
-        selectEndDate
+        date: getDateBySelectionType(this._endDate, this._config.selectionType)
       });
     }
-    _setStartDate(date, selectEndDate = true) {
-      this._startDate = new Date(date);
+    _setStartDate(date) {
+      this._startDate = date;
       EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE$1, {
-        date: this._startDate,
-        selectEndDate
+        date: getDateBySelectionType(this._startDate, this._config.selectionType)
+      });
+    }
+    _setSelectEndDate(value) {
+      this._selectEndDate = value;
+      EventHandler.trigger(this._element, EVENT_SELECT_END_CHANGE, {
+        value
       });
     }
     _selectDate(date) {
@@ -1347,29 +1477,44 @@
       }
       if (this._config.range) {
         if (this._selectEndDate) {
-          if (this._startDate && this._startDate > new Date(date)) {
-            this._setEndDate(this._startDate);
-            this._setStartDate(date);
-          } else {
-            this._setEndDate(date);
+          this._setSelectEndDate(false);
+          if (this._startDate && this._startDate > date) {
+            this._setStartDate(null);
+            this._setEndDate(null);
+            return;
           }
-        } else {
-          this._setStartDate(date, true);
+          if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
+            this._setStartDate(null);
+            this._setEndDate(null);
+            return;
+          }
+          this._setEndDate(date);
+          return;
         }
-      } else {
+        if (this._endDate && this._endDate < date) {
+          this._setStartDate(null);
+          this._setEndDate(null);
+          return;
+        }
+        if (isDisableDateInRange(date, this._endDate, this._config.disabledDates)) {
+          this._setStartDate(null);
+          this._setEndDate(null);
+          return;
+        }
+        this._setSelectEndDate(true);
         this._setStartDate(date);
+        return;
       }
+      this._setStartDate(date);
     }
-    _createCalendarPanel(addMonths) {
-      let date = this._calendarDate;
-      if (addMonths !== 0) {
-        date = new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth() + addMonths, 1);
-      }
-      const year = date.getFullYear();
-      const month = date.getMonth();
+    _createCalendarPanel(order) {
+      var _this$_config$weekNum;
+      const calendarDate = getCalendarDate(this._calendarDate, order, this._view);
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
       const calendarPanelEl = document.createElement('div');
       calendarPanelEl.classList.add('calendar-panel');
-      Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', addMonths);
+      Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order);
 
       // Create navigation
       const navigationElement = document.createElement('div');
@@ -1384,13 +1529,13 @@
         </button>` : ''}
       </div>
       <div class="calendar-nav-date">
-        <button class="btn btn-transparent btn-sm btn-month">
-          ${date.toLocaleDateString(this._config.locale, {
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
+          ${calendarDate.toLocaleDateString(this._config.locale, {
       month: 'long'
     })}
-        </button>
+        </button>` : ''}
         <button class="btn btn-transparent btn-sm btn-year">
-          ${date.toLocaleDateString(this._config.locale, {
+          ${calendarDate.toLocaleDateString(this._config.locale, {
       year: 'numeric'
     })}
         </button>
@@ -1406,13 +1551,18 @@
     `;
       const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek);
       const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4);
-      const listOfYears = createGroupsInArray(getYears(date.getFullYear()), 4);
-      const weekDays = monthDetails[0];
+      const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4);
+      const weekDays = monthDetails[0].days;
       const calendarTable = document.createElement('table');
       calendarTable.innerHTML = `
     ${this._view === 'days' ? `
       <thead>
         <tr>
+          ${this._config.showWeekNumber ? `<th class="calendar-cell">
+              <div class="calendar-header-cell-inner">
+               ${(_this$_config$weekNum = this._config.weekNumbersLabel) != null ? _this$_config$weekNum : ''}
+              </div>
+            </th>` : ''}
           ${weekDays.map(({
       date
     }) => `<th class="calendar-cell">
@@ -1427,26 +1577,44 @@
         </tr>
       </thead>` : ''}
       <tbody>
-        ${this._view === 'days' ? monthDetails.map(week => `<tr>${week.map(({
-      date,
-      month
-    }) => month === 'current' || this._config.showAdjacementDays ? `<td class="calendar-cell ${this._dayClassNames(date, month)}">
-                <div class="calendar-cell-inner day" data-coreui-date="${date}">
-                  ${date.toLocaleDateString(this._config.locale, {
-      day: 'numeric'
-    })}
-                </div>
-              </td>` : '<td></td>').join('')}</tr>`).join('') : ''}
-        ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>${row.map((month, idx) => `<td class="calendar-cell">
-              <div class="calendar-cell-inner month" data-coreui-month="${index * 3 + idx - addMonths}">
-                ${month}
-              </div>
-            </td>`).join('')}</tr>`).join('') : ''}
-        ${this._view === 'years' ? listOfYears.map(row => `<tr>${row.map(year => `<td class="calendar-cell">
-              <div class="calendar-cell-inner year" data-coreui-year="${year}">
-                ${year}
-              </div>
-            </td>`).join('')}</tr>`).join('') : ''}
+        ${this._view === 'days' ? monthDetails.map(week => {
+      const date = convertToDateObject(week.weekNumber === 0 ? `${calendarDate.getFullYear()}W53` : `${calendarDate.getFullYear()}W${week.weekNumber}`, this._config.selectionType);
+      return `<tr class="calendar-row ${this._config.selectionType === 'week' && this._sharedClassNames(date)}">
+              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''}
+              ${week.days.map(({
+        date,
+        month
+      }) => month === 'current' || this._config.showAdjacementDays ? `<td 
+                  class="calendar-cell ${this._dayClassNames(date, month)}"
+                  tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
+                  >
+                  <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                    ${date.toLocaleDateString(this._config.locale, {
+        day: 'numeric'
+      })}
+                  </div>
+                </td>` : '<td></td>').join('')}</tr>`;
+    }).join('') : ''}
+        ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>
+            ${row.map((month, idx) => {
+      const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
+      return `<td class="calendar-cell ${this._sharedClassNames(date)}">
+                  <div class="calendar-cell-inner month" data-coreui-date="${date.toDateString()}">
+                    ${month}
+                  </div>
+                </td>`;
+    }).join('')}
+          </tr>`).join('') : ''}
+        ${this._view === 'years' ? listOfYears.map(row => `<tr>
+            ${row.map(year => {
+      const date = new Date(year, 0, 1);
+      return `<td class="calendar-cell ${this._sharedClassNames(date)}">
+                  <div class="calendar-cell-inner year" data-coreui-date="${date.toDateString()}">
+                    ${year}
+                  </div>
+                </td>`;
+    }).join('')}
+          </tr>`).join('') : ''}
       </tbody>
     `;
       calendarPanelEl.append(navigationElement, calendarTable);
@@ -1455,6 +1623,10 @@
     _createCalendar() {
       const calendarsEl = document.createElement('div');
       calendarsEl.classList.add('calendars');
+      if (this._config.selectionType && this._view === 'days') {
+        calendarsEl.classList.add(`select-${this._config.selectionType}`);
+      }
+
       // eslint-disable-next-line no-unused-vars
       for (const [index, _] of Array.from({
         length: this._config.calendars
@@ -1470,16 +1642,29 @@
     }
     _dayClassNames(date, month) {
       const classNames = {
+        ...(this._config.selectionType === 'day' && {
+          clickable: month !== 'current' && this._config.selectAdjacementDays,
+          disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
+          range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
+          selected: isDateSelected(date, this._startDate, this._endDate)
+        }),
         today: isToday(date),
+        [month]: true
+      };
+
+      // eslint-disable-next-line unicorn/no-array-reduce
+      const result = Object.keys(classNames).reduce((o, key) => {
+        // eslint-disable-next-line no-unused-expressions
+        classNames[key] === true && (o[key] = classNames[key]);
+        return o;
+      }, {});
+      return Object.keys(result).join(' ');
+    }
+    _sharedClassNames(date) {
+      const classNames = {
         disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
-        [month]: true,
-        clickable: month !== 'current' && this._config.selectAdjacementDays,
-        last: isLastDayOfMonth(date),
-        range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
-        selected: isDateSelected(date, this._startDate, this._endDate),
-        start: isStartDate(date, this._startDate, this._endDate),
-        end: isEndDate(date, this._startDate, this._endDate)
+        range: isDateInRange(date, this._startDate, this._endDate),
+        selected: isDateSelected(date, this._startDate, this._endDate)
       };
 
       // eslint-disable-next-line unicorn/no-array-reduce
@@ -7325,11 +7510,14 @@
     startName: null,
     selectAdjacementDays: false,
     selectEndDate: false,
+    selectionType: 'day',
     showAdjacementDays: true,
+    showWeekNumber: false,
     timepicker: false,
     todayButton: 'Today',
     todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
-    valid: false
+    valid: false,
+    weekNumbersLabel: null
   };
   const DefaultType$f = {
     calendars: 'number',
@@ -7364,11 +7552,14 @@
     startName: 'string',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
+    selectionType: 'string',
     showAdjacementDays: 'boolean',
+    showWeekNumber: 'boolean',
     timepicker: 'boolean',
     todayButton: '(boolean|string)',
     todayButtonClasses: '(array|string)',
-    valid: 'boolean'
+    valid: 'boolean',
+    weekNumbersLabel: '(string|null)'
   };
 
   /**
@@ -7379,9 +7570,9 @@
     constructor(element, config) {
       super(element);
       this._config = this._getConfig(config);
-      this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date());
-      this._startDate = this._convertStringToDate(this._config.date || this._config.startDate);
-      this._endDate = this._convertStringToDate(this._config.endDate);
+      this._calendarDate = this._config.calendarDate;
+      this._startDate = this._config.date || this._config.startDate;
+      this._endDate = this._config.endDate;
       this._initialStartDate = null;
       this._initialEndDate = null;
       this._mobile = window.innerWidth < 768;
@@ -7489,9 +7680,9 @@
     }
     update(config) {
       this._config = this._getConfig(config);
-      this._calendarDate = this._convertStringToDate(this._config.calendarDate || this._config.date || this._config.startDate || new Date());
-      this._startDate = this._convertStringToDate(this._config.date || this._config.startDate);
-      this._endDate = this._convertStringToDate(this._config.endDate);
+      this._calendarDate = this._config.calendarDate;
+      this._startDate = this._config.date || this._config.startDate;
+      this._endDate = this._config.endDate;
       this._selectEndDate = this._config.selectEndDate;
       this._dropdownToggleEl.innerHTML = '';
       this._dropdownMenuEl.innerHTML = '';
@@ -7559,7 +7750,6 @@
       for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR$1, this._element)) {
         EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._startDate = event.date;
-          this._selectEndDate = event.selectEndDate;
           this._startInput.value = this._setInputValue(event.date);
           this._startInput.dispatchEvent(new Event('change'));
           this._updateDateRangePickerCalendars();
@@ -7573,7 +7763,6 @@
         });
         EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
           this._endDate = event.date;
-          this._selectEndDate = event.selectEndDate;
           this._endInput.value = this._setInputValue(event.date);
           this._startInput.dispatchEvent(new Event('change'));
           this._updateDateRangePickerCalendars();
@@ -7591,6 +7780,9 @@
             return;
           }
           this._startInput.value = event.date ? this._formatDate(event.date) : '';
+        });
+        EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
+          this._selectEndDate = event.value;
         });
       }
     }
@@ -7707,7 +7899,7 @@
 
       // eslint-disable-next-line no-new
       new Calendar(calendarEl, {
-        calendarDate: new Date(this._calendarDate.getFullYear(), this._calendarDate.getMonth(), 1),
+        calendarDate: this._config.calendarDate,
         calendars: this._config.calendars,
         disabledDates: this._config.disabledDates,
         endDate: this._endDate,
@@ -7718,12 +7910,28 @@
         range: this._config.range,
         selectAdjacementDays: this._config.selectAdjacementDays,
         selectEndDate: this._selectEndDate,
+        selectionType: this._config.selectionType,
         showAdjacementDays: this._config.showAdjacementDays,
-        startDate: this._startDate
+        showWeekNumber: this._config.showWeekNumber,
+        startDate: this._startDate,
+        weekNumbersLabel: this._config.weekNumbersLabel
       });
       EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-        this._calendarDate = new Date(event.date.getFullYear(), event.date.getMonth(), 1);
+        // this._calendarDate = new Date(
+        //   event.date.getFullYear(),
+        //   event.date.getMonth(),
+        //   1
+        // )
+        this._calendarDate = event.date;
         this._updateDateRangePickerCalendars();
+      });
+      EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
+        if (this._startDate) {
+          this._startInput.value = this._setInputValue(this._startDate);
+        }
+        if (this._endDate) {
+          this._endInput.value = this._setInputValue(this._endDate);
+        }
       });
       if (this._config.timepicker) {
         if (this._mobile || this._range && this._config.calendars === 1) {
@@ -7735,7 +7943,7 @@
             container: 'inline',
             disabled: !this._startDate,
             locale: this._config.locale,
-            time: this._startDate,
+            time: this._startDate && new Date(this._startDate),
             variant: 'select'
           });
           calendarEl.append(timePickerStartEl);
@@ -7752,7 +7960,7 @@
             container: 'inline',
             disabled: !this._endDate,
             locale: this._config.locale,
-            time: this._endDate,
+            time: this._endDate && new Date(this._endDate),
             variant: 'select'
           });
           this._timepickers.append(timePickerEndEl);
@@ -7774,7 +7982,7 @@
               container: 'inline',
               disabled: index === 0 ? !this._startDate : !this._endDate,
               locale: this._config.locale,
-              time: index === 0 ? this._startDate : this._endDate,
+              time: index === 0 ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
               variant: 'select'
             });
             this._timepickers.append(timePickerEl);
@@ -7843,9 +8051,6 @@
       this._createDateRangePickerCalendars();
       this._addCalendarEventListeners();
     }
-    _convertStringToDate(date) {
-      return date ? date instanceof Date ? date : new Date(date) : null;
-    }
     _createInput(name, placeholder, value) {
       const inputEl = document.createElement('input');
       inputEl.classList.add(CLASS_NAME_INPUT);
@@ -7911,13 +8116,11 @@
       this._popper = createPopper(this._togglerElement, this._menu, popperConfig);
     }
     _formatDate(date) {
-      if (this._config.format) {
-        return format(date, this._config.format);
+      if (this._config.selectionType !== 'day') {
+        return date;
       }
-      if (this._config.timepicker) {
-        return date.toLocaleString(this._config.locale);
-      }
-      return date.toLocaleDateString(this._config.locale);
+      const _date = new Date(date);
+      return this._config.format ? format(_date, this._config.format) : this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
     }
     _getButtonClasses(classes) {
       if (typeof classes === 'string') {

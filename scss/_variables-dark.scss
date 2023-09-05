@@ -36,7 +36,7 @@ $grays-dark: (
 // fusv-enable
 
 // scss-docs-start theme-color-dark-variables
-$primary-dark:       tint-color(desaturate($primary, 20%), 20%) !default;
+$primary-dark:       desaturate($primary, 10%) !default;
 $secondary-dark:     desaturate($secondary, 10%) !default;
 $success-dark:       desaturate($success, 10%) !default;
 $info-dark:          desaturate($info, 10%) !default;
@@ -152,12 +152,12 @@ $body-bg-dark:                      $gray-900-dark !default;
 $body-secondary-color-dark:         rgba($body-color-dark, .75) !default;
 $body-secondary-bg-dark:            $gray-800-dark !default;
 $body-tertiary-color-dark:          rgba($body-color-dark, .5) !default;
-$body-tertiary-bg-dark:             mix($gray-800-dark, #181924, 50%) !default;
+$body-tertiary-bg-dark:             mix($gray-800-dark, #212631, 50%) !default;
 $body-emphasis-color-dark:          $white !default;
-$border-color-dark:                 $gray-700-dark !default;
-$border-color-translucent-dark:     rgba($white, .15) !default;
+$border-color-dark:                 $gray-800-dark !default;
+$border-color-translucent-dark:     rgba($white, .1) !default;
 $headings-color-dark:               inherit !default;
-$link-color-dark:                   tint-color($primary, 40%) !default;
+$link-color-dark:                   $primary-dark !default;
 $link-hover-color-dark:             shift-color($link-color-dark, -$link-shade-percentage) !default;
 $code-color-dark:                   tint-color($code-color, 40%) !default;
 
@@ -293,12 +293,4 @@ $time-picker-indicator-icon-color-dark:      $body-tertiary-color-dark !default;
 $time-picker-indicator-icon-dark:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-indicator-icon-color-dark}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$time-picker-indicator-icon-color-dark}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
 $time-picker-indicator-invalid-icon-dark:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-invalid-color-dark}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-invalid-color-dark}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
 $time-picker-indicator-valid-icon-dark:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-valid-color-dark}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-valid-color-dark}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
-
-//
-// Sidebar
-//
-
-$sidebar-bg-dark:            $body-bg-dark !default;
-$sidebar-border-width-dark:  var(--#{$prefix}border-width) !default;
-$sidebar-border-color-dark:  var(--#{$prefix}border-color) !default;
 // scss-docs-end sass-dark-mode-vars
