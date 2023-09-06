@@ -2357,6 +2357,9 @@ $time-picker-border-radius:                 $input-border-radius !default;
 $time-picker-border-radius-sm:              $input-border-radius-sm !default;
 $time-picker-border-radius-lg:              $input-border-radius-lg !default;
 
+$time-picker-invalid-border-color:          var(--#{$prefix}form-invalid-border-color) !default;
+$time-picker-valid-border-color:            var(--#{$prefix}form-valid-border-color) !default;
+
 $time-picker-disabled-color:                $input-disabled-color !default;
 $time-picker-disabled-bg:                   $input-disabled-bg !default;
 $time-picker-disabled-border-color:         $input-disabled-border-color !default;
@@ -2375,21 +2378,22 @@ $time-picker-padding-x-sm:                  $input-padding-x-sm !default;
 $time-picker-padding-y-lg:                  $input-padding-y-lg !default;
 $time-picker-padding-x-lg:                  $input-padding-x-lg !default;
 
-$time-picker-cleaner-icon-color:            $body-tertiary-color !default;
-$time-picker-cleaner-icon:                  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#{$time-picker-cleaner-icon-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
-$time-picker-cleaner-icon-hover-color:      $body-color !default;
-$time-picker-cleaner-icon-hover:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-cleaner-icon-hover-color}' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#{$time-picker-cleaner-icon-hover-color}' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
-$time-picker-cleaner-icon-bg-size:          1rem !default;
-$time-picker-cleaner-icon-bg-size-sm:       .875rem !default;
-$time-picker-cleaner-icon-bg-size-lg:       1.25rem !default;
+$time-picker-cleaner-icon-color:            var(--#{$prefix}tertiary-color) !default;
+$time-picker-cleaner-icon:                  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='348.071 141.302 260.308 229.065 172.545 141.302 149.917 163.929 237.681 251.692 149.917 339.456 172.545 362.083 260.308 274.32 348.071 362.083 370.699 339.456 282.935 251.692 370.699 163.929 348.071 141.302'></polygon><path fill='#000' d='M425.706,86.294A240,240,0,0,0,86.294,425.706,240,240,0,0,0,425.706,86.294ZM256,464C141.309,464,48,370.691,48,256S141.309,48,256,48s208,93.309,208,208S370.691,464,256,464Z'></path></svg>") !default;
+$time-picker-cleaner-icon-hover-color:      var(--#{$prefix}body-color) !default;
+$time-picker-cleaner-icon-size:             1rem !default;
+$time-picker-cleaner-icon-size-sm:          .875rem !default;
+$time-picker-cleaner-icon-size-lg:          1.25rem !default;
 
-$time-picker-indicator-icon-color:          $body-tertiary-color !default;
-$time-picker-indicator-icon:                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$time-picker-indicator-icon-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$time-picker-indicator-icon-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
-$time-picker-indicator-invalid-icon:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-invalid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-feedback-invalid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
-$time-picker-indicator-valid-icon:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$form-feedback-valid-color}' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#{$form-feedback-valid-color}' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
-$time-picker-indicator-icon-bg-size:        1rem !default;
-$time-picker-indicator-icon-bg-size-sm:     .875rem !default;
-$time-picker-indicator-icon-bg-size-lg:     1.25rem !default;
+$time-picker-indicator-icon-color:          var(--#{$prefix}tertiary-color) !default;
+$time-picker-indicator-icon:                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='271.514 95.5 239.514 95.5 239.514 273.611 355.127 328.559 368.864 299.657 271.514 253.389 271.514 95.5'></polygon><path fill='#000' d='M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16Zm0,448C141.125,464,48,370.875,48,256S141.125,48,256,48s208,93.125,208,208S370.875,464,256,464Z'></path></svg>") !default;
+$time-picker-indicator-invalid-icon-color:  var(--#{$prefix}form-invalid-color) !default;
+$time-picker-indicator-invalid-icon:        $time-picker-indicator-icon !default;
+$time-picker-indicator-valid-icon-color:    var(--#{$prefix}form-valid-color) !default;
+$time-picker-indicator-valid-icon:          $time-picker-indicator-icon !default;
+$time-picker-indicator-icon-size:           1rem !default;
+$time-picker-indicator-icon-size-sm:        .875rem !default;
+$time-picker-indicator-icon-size-lg:        1.25rem !default;
 
 $time-picker-dropdown-bg:                   var(--#{$prefix}body-bg) !default;
 $time-picker-dropdown-border-color:         var(--#{$prefix}border-color) !default;

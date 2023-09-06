@@ -22,10 +22,12 @@
   --#{$prefix}time-picker-padding-y: #{$time-picker-padding-y};
   --#{$prefix}time-picker-padding-x: #{$time-picker-padding-x};
   --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon)};
-  --#{$prefix}time-picker-indicator-icon-bg-size: #{$time-picker-indicator-icon-bg-size};
+  --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-icon-color};
+  --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size};
   --#{$prefix}time-picker-cleaner-icon: #{escape-svg($time-picker-cleaner-icon)};
-  --#{$prefix}time-picker-cleaner-icon-hover: #{escape-svg($time-picker-cleaner-icon-hover)};
-  --#{$prefix}time-picker-cleaner-icon-bg-size: #{$time-picker-cleaner-icon-bg-size};
+  --#{$prefix}time-picker-cleaner-icon-color: #{$time-picker-cleaner-icon-color};
+  --#{$prefix}time-picker-cleaner-icon-hover-color: #{$time-picker-cleaner-icon-hover-color};
+  --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size};
   --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
   --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width};
   --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color};
@@ -46,12 +48,14 @@
   // scss-docs-end time-picker-css-vars
 
   &.is-invalid {
-    --#{$prefix}time-picker-border-color: #{$form-feedback-invalid-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}time-picker-border-color: #{$time-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-invalid-icon)} !important; // stylelint-disable-line declaration-no-important
   }
 
   &.is-valid {
-    --#{$prefix}time-picker-border-color: #{$form-feedback-valid-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}time-picker-border-color: #{$time-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-valid-icon)} !important; // stylelint-disable-line declaration-no-important
   }
 }
@@ -139,24 +143,37 @@
 
 .time-picker-cleaner,
 .time-picker-indicator {
+  position: relative;
   width: 2.5rem;
   background-repeat: no-repeat;
   background-position: center;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+  }
 }
 
 .time-picker-cleaner {
   display: none;
-  background-image: var(--#{$prefix}time-picker-cleaner-icon);
-  background-size: var(--#{$prefix}time-picker-cleaner-icon-bg-size);
 
-  &:hover {
-    background-image: var(--#{$prefix}time-picker-cleaner-icon-hover);
+  &::before {
+    background-color: var(--#{$prefix}time-picker-cleaner-icon-color);
+    mask: var(--#{$prefix}time-picker-cleaner-icon) center / var(--#{$prefix}time-picker-cleaner-icon-size) no-repeat;
+  }
+
+  &:hover::before {
+    background-color: var(--#{$prefix}time-picker-cleaner-icon-hover-color);
   }
 }
 
 .time-picker-indicator {
-  background-image: var(--#{$prefix}time-picker-indicator-icon);
-  background-size: var(--#{$prefix}time-picker-indicator-icon-bg-size);
+  background-color: var(--#{$prefix}time-picker-indicator-icon-color);
+  mask: var(--#{$prefix}time-picker-indicator-icon) center / var(--#{$prefix}time-picker-indicator-icon-size) no-repeat;
 }
 
 .time-picker-dropdown {
@@ -271,26 +288,14 @@
   --#{$prefix}time-picker-border-radius: #{$time-picker-border-radius-sm};
   --#{$prefix}time-picker-padding-y: #{$time-picker-padding-y-sm};
   --#{$prefix}time-picker-padding-x: #{$time-picker-padding-x-sm};
-  --#{$prefix}time-picker-cleaner-icon-bg-size: #{$time-picker-cleaner-icon-bg-size-sm};
-  --#{$prefix}time-picker-indicator-icon-bg-size: #{$time-picker-indicator-icon-bg-size-sm};
+  --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size-sm};
+  --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size-sm};
 }
 
 .time-picker-lg {
   --#{$prefix}time-picker-border-radius: #{$time-picker-border-radius-lg};
   --#{$prefix}time-picker-padding-y: #{$time-picker-padding-y-lg};
   --#{$prefix}time-picker-padding-x: #{$time-picker-padding-x-lg};
-  --#{$prefix}time-picker-cleaner-icon-bg-size: #{$time-picker-cleaner-icon-bg-size-lg};
-  --#{$prefix}time-picker-indicator-icon-bg-size: #{$time-picker-indicator-icon-bg-size-lg};
-}
-
-@if $enable-dark-mode {
-  @include color-mode(dark) {
-    .time-picker {
-      --#{$prefix}time-picker-cleaner-icon: #{escape-svg($time-picker-cleaner-icon-dark)};
-      --#{$prefix}time-picker-cleaner-icon-hover: #{escape-svg($time-picker-cleaner-icon-hover-dark)};
-      --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon-dark)};
-      --#{$prefix}time-picker-indicator-invalid-icon: #{escape-svg($time-picker-indicator-invalid-icon-dark)};
-      --#{$prefix}time-picker-indicator-valid-icon: #{escape-svg($time-picker-indicator-valid-icon-dark)};
-    }
-  }
+  --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size-lg};
+  --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size-lg};
 }
