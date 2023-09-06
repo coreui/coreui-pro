@@ -25,18 +25,18 @@
   --#{$prefix}form-multi-select-cleaner-height: #{$form-multi-select-cleaner-height};
   --#{$prefix}form-multi-select-cleaner-padding-y: #{$form-multi-select-cleaner-padding-y};
   --#{$prefix}form-multi-select-cleaner-padding-x: #{$form-multi-select-cleaner-padding-x};
-  --#{$prefix}form-multi-select-cleaner-bg: #{escape-svg($form-multi-select-cleaner-bg)};
-  --#{$prefix}form-multi-select-cleaner-bg-size: #{$form-multi-select-cleaner-bg-size};
-  --#{$prefix}form-multi-select-cleaner-hover-bg: #{escape-svg($form-multi-select-cleaner-hover-bg)};
-  --#{$prefix}form-multi-select-cleaner-focus-bg: #{escape-svg($form-multi-select-cleaner-focus-bg)};
+  --#{$prefix}form-multi-select-cleaner-icon: #{escape-svg($form-multi-select-cleaner-icon)};
+  --#{$prefix}form-multi-select-cleaner-icon-color: #{$form-multi-select-cleaner-icon-color};
+  --#{$prefix}form-multi-select-cleaner-icon-hover-color: #{$form-multi-select-cleaner-icon-hover-color};
+  --#{$prefix}form-multi-select-cleaner-icon-size: #{$form-multi-select-cleaner-icon-size};
   --#{$prefix}form-multi-select-indicator-width: #{$form-multi-select-indicator-width};
   --#{$prefix}form-multi-select-indicator-height: #{$form-multi-select-indicator-height};
   --#{$prefix}form-multi-select-indicator-padding-y: #{$form-multi-select-indicator-padding-y};
   --#{$prefix}form-multi-select-indicator-padding-x: #{$form-multi-select-indicator-padding-x};
-  --#{$prefix}form-multi-select-indicator-bg: #{escape-svg($form-multi-select-indicator-bg)};
-  --#{$prefix}form-multi-select-indicator-bg-size: #{$form-multi-select-indicator-bg-size};
-  --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg)};
-  --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg)};
+  --#{$prefix}form-multi-select-indicator-icon: #{escape-svg($form-multi-select-indicator-icon)};
+  --#{$prefix}form-multi-select-indicator-icon-color: #{$form-multi-select-indicator-icon-color};
+  --#{$prefix}form-multi-select-indicator-icon-hover-color: #{$form-multi-select-indicator-icon-hover-color};
+  --#{$prefix}form-multi-select-indicator-icon-size: #{$form-multi-select-indicator-icon-size};
   --#{$prefix}form-multi-select-select-all-padding-y: #{$form-multi-select-select-all-padding-y};
   --#{$prefix}form-multi-select-select-all-padding-x: #{$form-multi-select-select-all-padding-x};
   --#{$prefix}form-multi-select-select-all-color: #{$form-multi-select-select-all-color};
@@ -89,13 +89,10 @@
   --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius};
   --#{$prefix}form-multi-select-tag-delete-width: #{$form-multi-select-tag-delete-width};
   --#{$prefix}form-multi-select-tag-delete-height: #{$form-multi-select-tag-delete-height};
-  --#{$prefix}form-multi-select-tag-delete-color: #{$form-multi-select-tag-delete-color};
-  --#{$prefix}form-multi-select-tag-delete-bg: #{$form-multi-select-tag-delete-bg};
-  --#{$prefix}form-multi-select-tag-delete-hover-color: #{$form-multi-select-tag-delete-hover-color};
-  --#{$prefix}form-multi-select-tag-delete-hover-bg: #{$form-multi-select-tag-delete-hover-bg};
-  --#{$prefix}form-multi-select-tag-delete-focus-color: #{$form-multi-select-tag-delete-focus-color};
-  --#{$prefix}form-multi-select-tag-delete-focus-bg: #{$form-multi-select-tag-delete-focus-bg};
-  --#{$prefix}form-multi-select-tag-delete-bg-size: #{$form-multi-select-tag-delete-bg-size};
+  --#{$prefix}form-multi-select-tag-delete-icon: #{escape-svg($form-multi-select-tag-delete-icon)};
+  --#{$prefix}form-multi-select-tag-delete-icon-color: #{$form-multi-select-tag-delete-icon-color};
+  --#{$prefix}form-multi-select-tag-delete-icon-hover-color: #{$form-multi-select-tag-delete-icon-hover-color};
+  --#{$prefix}form-multi-select-tag-delete-icon-size: #{$form-multi-select-tag-delete-icon-size};
   --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap};
   --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x};
@@ -105,12 +102,12 @@
 
   .was-validated .form-multi-select:invalid + &,
   &.is-invalid {
-    --#{$prefix}form-multi-select-border-color: #{$form-feedback-invalid-color};
+    --#{$prefix}form-multi-select-border-color: #{$form-multi-select-invalid-border-color};
   }
 
   .was-validated .form-multi-select:valid + &,
   &.is-valid {
-    --#{$prefix}form-multi-select-border-color: #{$form-feedback-valid-color};
+    --#{$prefix}form-multi-select-border-color: #{$form-multi-select-valid-border-color};
   }
 }
 
@@ -227,39 +224,49 @@ select.form-multi-select {
 
   &:focus {
     z-index: 5;
+    outline: 0;
+    box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+    @include border-radius($border-radius);
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
   }
 }
 
 .form-multi-select-cleaner {
   width: var(--#{$prefix}form-multi-select-cleaner-width);
   height: var(--#{$prefix}form-multi-select-cleaner-height);
-  padding: var(--#{$prefix}form-multi-select-cleaner-padding-y) var(--#{$prefix}form-multi-select-cleaner-padding-x);
-  background-image: var(--#{$prefix}form-multi-select-cleaner-bg);
-  background-size: var(--#{$prefix}form-multi-select-cleaner-bg-size);
 
-  &:hover {
-    background-image: var(--#{$prefix}form-multi-select-cleaner-hover-bg);
+  &::before {
+    background-color: var(--#{$prefix}form-multi-select-cleaner-icon-color);
+    mask: var(--#{$prefix}form-multi-select-cleaner-icon) center / var(--#{$prefix}form-multi-select-cleaner-icon-size) no-repeat;
   }
 
-  &:focus {
-    background-image: var(--#{$prefix}form-multi-select-cleaner-focus-bg);
+  &:focus::before,
+  &:hover::before {
+    background-color: var(--#{$prefix}form-multi-select-cleaner-icon-hover-color);
   }
 }
 
 .form-multi-select-indicator {
   width: var(--#{$prefix}form-multi-select-indicator-width);
   height: var(--#{$prefix}form-multi-select-indicator-height);
-  padding: var(--#{$prefix}form-multi-select-indicator-padding-y) var(--#{$prefix}form-multi-select-indicator-padding-x);
-  background-image: var(--#{$prefix}form-multi-select-indicator-bg);
-  background-size: var(--#{$prefix}form-multi-select-indicator-bg-size);
   @include transition(transform .15s ease-in-out);
 
-  &:hover {
-    background-image: var(--#{$prefix}form-multi-select-indicator-hover-bg);
+  &::before {
+    background-color: var(--#{$prefix}form-multi-select-indicator-icon-color);
+    mask: var(--#{$prefix}form-multi-select-indicator-icon) center / var(--#{$prefix}form-multi-select-indicator-icon-size) no-repeat;
   }
 
-  &:focus {
-    background-image: var(--#{$prefix}form-multi-select-indicator-focus-bg);
+  &:focus::before,
+  &:hover::before {
+    background-color: var(--#{$prefix}form-multi-select-indicator-icon-hover-color);
   }
 
   .form-multi-select.show & {
@@ -285,11 +292,23 @@ select.form-multi-select {
   padding: var(--#{$prefix}form-multi-select-tag-delete-padding-y) var(--#{$prefix}form-multi-select-tag-delete-padding-x);
   margin-inline-start: $spacer * .5;
   background-color: transparent;
-  background-image: var(--#{$prefix}form-multi-select-tag-delete-bg);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: var(--#{$prefix}form-multi-select-tag-delete-bg-size);
   border: 0;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    background-color: var(--#{$prefix}form-multi-select-tag-delete-icon-color);
+    mask: var(--#{$prefix}form-multi-select-tag-delete-icon) center / var(--#{$prefix}form-multi-select-tag-delete-icon-size) no-repeat;
+  }
+
+  &:focus::before,
+  &:hover::before {
+    background-color: var(--#{$prefix}form-multi-select-tag-delete-icon-hover-color);
+  }
 }
 
 .form-multi-select-dropdown {
@@ -433,20 +452,4 @@ select.form-multi-select {
   --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-lg};
   --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-lg};
   --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
-}
-
-@if $enable-dark-mode {
-  @include color-mode(dark) {
-    .form-multi-select {
-      --#{$prefix}form-multi-select-tag-delete-bg: #{escape-svg($form-multi-select-tag-delete-bg-dark)};
-      --#{$prefix}form-multi-select-tag-delete-hover-bg: #{escape-svg($form-multi-select-tag-delete-hover-bg-dark)};
-      --#{$prefix}form-multi-select-tag-delete-focus-bg: #{escape-svg($form-multi-select-tag-delete-focus-bg-dark)};
-      --#{$prefix}form-multi-select-cleaner-bg: #{escape-svg($form-multi-select-cleaner-bg-dark)};
-      --#{$prefix}form-multi-select-cleaner-hover-bg: #{escape-svg($form-multi-select-cleaner-hover-bg-dark)};
-      --#{$prefix}form-multi-select-cleaner-focus-bg: #{escape-svg($form-multi-select-cleaner-focus-bg-dark)};
-      --#{$prefix}form-multi-select-indicator-bg: #{escape-svg($form-multi-select-indicator-bg-dark)};
-      --#{$prefix}form-multi-select-indicator-hover-bg: #{escape-svg($form-multi-select-indicator-hover-bg-dark)};
-      --#{$prefix}form-multi-select-indicator-focus-bg: #{escape-svg($form-multi-select-indicator-focus-bg-dark)};
-    }
-  }
 }
