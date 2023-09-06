@@ -48,12 +48,14 @@
   // scss-docs-end date-picker-css-vars
 
   &.is-invalid {
-    --#{$prefix}date-picker-border-color: #{$form-feedback-invalid-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-border-color: #{$date-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-indicator-icon-color: #{$date-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}date-picker-indicator-icon: #{escape-svg($date-picker-indicator-invalid-icon)} !important; // stylelint-disable-line declaration-no-important
   }
 
   &.is-valid {
-    --#{$prefix}date-picker-border-color: #{$form-feedback-valid-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-border-color: #{$date-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-indicator-icon-color: #{$date-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}date-picker-indicator-icon: #{escape-svg($date-picker-indicator-valid-icon)} !important; // stylelint-disable-line declaration-no-important
   }
 }
@@ -285,13 +287,4 @@
   --#{$prefix}date-picker-cleaner-icon-size: #{$date-picker-cleaner-icon-size-lg};
   --#{$prefix}date-picker-indicator-icon-size: #{$date-picker-indicator-icon-size-lg};
   --#{$prefix}date-picker-separator-icon-size: #{$date-picker-separator-icon-size-lg};
-}
-
-@if $enable-dark-mode {
-  @include color-mode(dark) {
-    .date-picker {
-      --#{$prefix}date-picker-indicator-invalid-icon: #{escape-svg($date-picker-indicator-invalid-icon-dark)};
-      --#{$prefix}date-picker-indicator-valid-icon: #{escape-svg($date-picker-indicator-valid-icon-dark)};
-    }
-  }
 }
