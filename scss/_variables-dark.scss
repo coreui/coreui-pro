@@ -214,30 +214,6 @@ $button-outline-ghost-variants-dark: (
 ) !default;
 
 //
-// Calendar
-//
-
-$calendar-nav-icon-double-next-color-dark:        $body-tertiary-color-dark !default;
-$calendar-nav-icon-double-next-dark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-next-color-dark}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-next-color-dark}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
-$calendar-nav-icon-double-next-hover-color-dark:  $body-color-dark !default;
-$calendar-nav-icon-double-next-hover-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-next-hover-color-dark}' points='95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-next-hover-color-dark}' points='255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313'></polygon></svg>") !default;
-
-$calendar-nav-icon-double-prev-color-dark:        $body-tertiary-color-dark !default;
-$calendar-nav-icon-double-prev-dark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-prev-color-dark}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-prev-color-dark}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
-$calendar-nav-icon-double-prev-hover-color-dark:  $body-color-dark !default;
-$calendar-nav-icon-double-prev-hover-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-double-prev-hover-color-dark}' points='416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313'></polygon><polygon fill='#{$calendar-nav-icon-double-prev-hover-color-dark}' points='256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313'></polygon></svg>") !default;
-
-$calendar-nav-icon-next-color-dark:               $body-tertiary-color-dark !default;
-$calendar-nav-icon-next-dark:                     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-next-color-dark}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
-$calendar-nav-icon-next-hover-color-dark:         $body-color-dark !default;
-$calendar-nav-icon-next-hover-dark:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-next-hover-color-dark}' points='179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313'></polygon></svg>") !default;
-
-$calendar-nav-icon-prev-color-dark:               $body-tertiary-color-dark !default;
-$calendar-nav-icon-prev-dark:                     url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-color-dark}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
-$calendar-nav-icon-prev-hover-color-dark:         $body-color-dark !default;
-$calendar-nav-icon-prev-hover-dark:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#{$calendar-nav-icon-prev-hover-color-dark}' points='324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313'></polygon></svg>") !default;
-
-//
 // Date Picker
 //
 
