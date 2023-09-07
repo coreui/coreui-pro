@@ -96,43 +96,43 @@ $dark-border-subtle-dark:           $gray-800-dark !default;
 
 // scss-docs-start theme-gradients-dark-variables
 $primary-gradient-dark: (
-  "start":  desaturate(#321fdb, 20%),
-  "stop":   desaturate(#1f1498, 20%)
+  "start":  desaturate(#5856d6, 10%),
+  "stop":   desaturate(#6f67db, 10%)
 ) !default;
 
 $secondary-gradient-dark: (
-  "start":  desaturate(#c8d2dc, 20%),
-  "stop":   desaturate($white, 20%)
+  "start":  desaturate(#c8d2dc, 10%),
+  "stop":   desaturate($white, 10%)
 ) !default;
 
 $light-gradient-dark: (
-  "start":  desaturate(#e3e8ed, 20%),
-  "stop":   desaturate($white, 20%)
+  "start":  desaturate(#e3e8ed, 10%),
+  "stop":   desaturate($white, 10%)
 ) !default;
 
 $dark-gradient-dark: (
-  "start":  desaturate(#3c4b64, 20%),
-  "stop":   desaturate(#212333, 20%)
+  "start":  desaturate(#3c4b64, 10%),
+  "stop":   desaturate(#212333, 10%)
 ) !default;
 
 $danger-gradient-dark: (
-  "start":  desaturate(#e55353, 20%),
-  "stop":   desaturate(#d93737, 20%)
+  "start":  desaturate(#e55353, 10%),
+  "stop":   desaturate(#d93737, 10%)
 ) !default;
 
 $warning-gradient-dark: (
-  "start":  desaturate(#f9b115, 20%),
-  "stop":   desaturate(#f6960b, 20%)
+  "start":  desaturate(#f9b115, 10%),
+  "stop":   desaturate(#f6960b, 10%)
 ) !default;
 
 $success-gradient-dark: (
-  "start":  desaturate(#2eb85c, 20%),
-  "stop":   desaturate(#1b9e3e, 20%)
+  "start":  desaturate(#2eb85c, 10%),
+  "stop":   desaturate(#1b9e3e, 10%)
 ) !default;
 
 $info-gradient-dark: (
-  "start":  desaturate(#39f, 20%),
-  "stop":   desaturate(#2982cc, 20%)
+  "start":  desaturate(#39f, 10%),
+  "stop":   desaturate(#2982cc, 10%)
 ) !default;
 
 $theme-gradients-dark: (
