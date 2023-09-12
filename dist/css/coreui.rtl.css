@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*!
- * CoreUI PRO  v4.6.2 (https://coreui.io)
+ * CoreUI PRO  v4.6.3 (https://coreui.io)
  * Copyright (c) 2023 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -2340,10 +2340,10 @@ textarea.form-control-lg {
 .form-multi-select.form-multi-select-with-cleaner {
   padding-left: 4.5rem;
 }
-.form-multi-select.is-invalid {
+.was-validated .form-multi-select:invalid + .form-multi-select, .form-multi-select.is-invalid {
   --cui-form-multi-select-border-color: #e55353;
 }
-.form-multi-select.is-valid {
+.was-validated .form-multi-select:valid + .form-multi-select, .form-multi-select.is-valid {
   --cui-form-multi-select-border-color: #2eb85c;
 }
 .form-multi-select > div:not([class]):first-of-type::before {
