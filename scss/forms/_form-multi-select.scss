@@ -113,10 +113,12 @@
     @include ltr-rtl("padding-right", ($form-multi-select-indicator-padding + $form-multi-select-cleaner-width + 2 * $form-multi-select-cleaner-padding-x));
   }
 
+  .was-validated .form-multi-select:invalid + &,
   &.is-invalid  {
     --#{$prefix}form-multi-select-border-color: #{$form-feedback-invalid-color};
   }
 
+  .was-validated .form-multi-select:valid + &,
   &.is-valid  {
     --#{$prefix}form-multi-select-border-color: #{$form-feedback-valid-color};
   }
