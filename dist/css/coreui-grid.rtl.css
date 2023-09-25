@@ -1,8 +1,14 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO Grid v5.0.0-alpha.2 (https://coreui.io)
  * Copyright (c) 2023 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
+=======
+ * CoreUI Grid v5.0.0-alpha.2 (https://coreui.io)
+ * Copyright (c) 2023 creativeLabs Łukasz Holeczek
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+>>>>>>> ecfa4178db0e840fe079c7d47e85610fe70aa5af
  */
 .container,
 .container-fluid,

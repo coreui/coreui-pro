@@ -1,8 +1,14 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO  v5.0.0-alpha.2 (https://coreui.io)
  * Copyright (c) 2023 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
+=======
+ * CoreUI  v5.0.0-alpha.2 (https://coreui.io)
+ * Copyright (c) 2023 creativeLabs Łukasz Holeczek
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+>>>>>>> ecfa4178db0e840fe079c7d47e85610fe70aa5af
  */
 :root,
 [data-coreui-theme=light] {
@@ -172,7 +178,10 @@
   --cui-tertiary-color-rgb: 255, 255, 255;
   --cui-tertiary-bg: #2a303d;
   --cui-tertiary-bg-rgb: 42, 48, 61;
+<<<<<<< HEAD
   --cui-elevation-base-color: 0, 0, 0;
+=======
+>>>>>>> ecfa4178db0e840fe079c7d47e85610fe70aa5af
   --cui-primary: #6261cc;
   --cui-secondary: #a6a7a8;
   --cui-success: #3aad60;
@@ -2383,6 +2392,7 @@ textarea.form-control-lg {
 .dark-theme .form-select,
 [data-coreui-theme=dark] .form-select {
   --cui-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgba%28255, 255, 255, 0.87%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+<<<<<<< HEAD
 }
 
 .form-multi-select {
@@ -2803,6 +2813,8 @@ select.form-multi-select {
   --cui-form-multi-select-selection-tags-gap: 0.25rem;
   --cui-form-multi-select-selection-tags-padding-y: 0.25rem;
   --cui-form-multi-select-selection-tags-padding-x: 0.25rem;
+=======
+>>>>>>> ecfa4178db0e840fe079c7d47e85610fe70aa5af
 }
 
 .form-check {

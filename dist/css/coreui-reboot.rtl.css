@@ -1,8 +1,14 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO Reboot v5.0.0-alpha.2 (https://coreui.io)
  * Copyright (c) 2023 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
+=======
+ * CoreUI Reboot v5.0.0-alpha.2 (https://coreui.io)
+ * Copyright (c) 2023 creativeLabs Łukasz Holeczek
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+>>>>>>> ecfa4178db0e840fe079c7d47e85610fe70aa5af
  */
 :root,
 [data-coreui-theme=light] {
@@ -172,7 +178,10 @@
   --cui-tertiary-color-rgb: 255, 255, 255;
   --cui-tertiary-bg: #2a303d;
   --cui-tertiary-bg-rgb: 42, 48, 61;
+<<<<<<< HEAD
   --cui-elevation-base-color: 0, 0, 0;
+=======
+>>>>>>> ecfa4178db0e840fe079c7d47e85610fe70aa5af
   --cui-primary: #6261cc;
   --cui-secondary: #a6a7a8;
   --cui-success: #3aad60;
