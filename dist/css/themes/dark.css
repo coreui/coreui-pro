@@ -323,7 +323,7 @@
 .dark-theme .dark\:table-primary, .dark-theme .table-primary:not([class*="dark:"]) {
   --cui-table-bg: #e7e5f5;
   --cui-table-color: rgba(44, 56, 74, 0.95);
-  --cui-table-border-color: rgba(214, 213, 229, 0.995);
+  --cui-table-border-color: rgba(197, 197, 213, 0.99);
   --cui-table-striped-bg: rgba(223, 221, 237, 0.9975);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(214, 213, 229, 0.995);
@@ -335,7 +335,7 @@
 .dark-theme .dark\:table-secondary, .dark-theme .table-secondary:not([class*="dark:"]) {
   --cui-table-bg: #ededed;
   --cui-table-color: rgba(44, 56, 74, 0.95);
-  --cui-table-border-color: rgba(219, 220, 222, 0.995);
+  --cui-table-border-color: rgba(201, 204, 207, 0.99);
   --cui-table-striped-bg: rgba(228, 229, 230, 0.9975);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(219, 220, 222, 0.995);
@@ -347,7 +347,7 @@
 .dark-theme .dark\:table-success, .dark-theme .table-success:not([class*="dark:"]) {
   --cui-table-bg: #dceae1;
   --cui-table-color: rgba(44, 56, 74, 0.95);
-  --cui-table-border-color: rgba(204, 218, 211, 0.995);
+  --cui-table-border-color: rgba(188, 201, 197, 0.99);
   --cui-table-striped-bg: rgba(212, 226, 218, 0.9975);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(204, 218, 211, 0.995);
@@ -359,7 +359,7 @@
 .dark-theme .dark\:table-info, .dark-theme .table-info:not([class*="dark:"]) {
   --cui-table-bg: #dcebf9;
   --cui-table-color: rgba(44, 56, 74, 0.95);
-  --cui-table-border-color: rgba(204, 219, 233, 0.995);
+  --cui-table-border-color: rgba(188, 202, 217, 0.99);
   --cui-table-striped-bg: rgba(212, 227, 241, 0.9975);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(204, 219, 233, 0.995);
@@ -371,7 +371,7 @@
 .dark-theme .dark\:table-warning, .dark-theme .table-warning:not([class*="dark:"]) {
   --cui-table-bg: #f7edd7;
   --cui-table-color: rgba(44, 56, 74, 0.95);
-  --cui-table-border-color: rgba(228, 220, 202, 0.995);
+  --cui-table-border-color: rgba(210, 204, 189, 0.99);
   --cui-table-striped-bg: rgba(238, 229, 209, 0.9975);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(228, 220, 202, 0.995);
@@ -383,7 +383,7 @@
 .dark-theme .dark\:table-danger, .dark-theme .table-danger:not([class*="dark:"]) {
   --cui-table-bg: #f4e3e3;
   --cui-table-color: rgba(44, 56, 74, 0.95);
-  --cui-table-border-color: rgba(226, 211, 213, 0.995);
+  --cui-table-border-color: rgba(207, 195, 199, 0.99);
   --cui-table-striped-bg: rgba(235, 219, 220, 0.9975);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(226, 211, 213, 0.995);
@@ -395,7 +395,7 @@
 .dark-theme .dark\:table-light, .dark-theme .table-light:not([class*="dark:"]) {
   --cui-table-bg: rgba(255, 255, 255, 0.1);
   --cui-table-color: rgba(255, 255, 255, 0.87);
-  --cui-table-border-color: rgba(255, 255, 255, 0.177);
+  --cui-table-border-color: rgba(255, 255, 255, 0.254);
   --cui-table-striped-bg: rgba(255, 255, 255, 0.1385);
   --cui-table-striped-color: rgba(44, 56, 74, 0.95);
   --cui-table-active-bg: rgba(255, 255, 255, 0.177);
@@ -407,7 +407,7 @@
 .dark-theme .dark\:table-dark, .dark-theme .table-dark:not([class*="dark:"]) {
   --cui-table-bg: rgba(0, 0, 21, 0.1);
   --cui-table-color: rgba(255, 255, 255, 0.87);
-  --cui-table-border-color: rgba(118, 118, 129, 0.177);
+  --cui-table-border-color: rgba(168, 168, 175, 0.254);
   --cui-table-striped-bg: rgba(74, 74, 88, 0.1385);
   --cui-table-striped-color: rgba(255, 255, 255, 0.87);
   --cui-table-active-bg: rgba(118, 118, 129, 0.177);

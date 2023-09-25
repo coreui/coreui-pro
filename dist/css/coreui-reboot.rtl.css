@@ -82,6 +82,7 @@
   --cui-link-hover-color: #2819af;
   --cui-link-hover-color-rgb: 40, 25, 175;
   --cui-code-color: #d63384;
+  --cui-highlight-color: rgba(44, 56, 74, 0.95);
   --cui-highlight-bg: #fff3cd;
   --cui-border-width: 1px;
   --cui-border-style: solid;
@@ -247,6 +248,7 @@ small {
 
 mark {
   padding: 0.1875em;
+  color: var(--cui-highlight-color);
   background-color: var(--cui-highlight-bg);
 }
 

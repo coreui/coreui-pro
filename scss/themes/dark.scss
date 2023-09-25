@@ -21,7 +21,7 @@ $theme-prefix: "dark" !default;
     $alert-color: map-get($value, "alert-color");
 
     @if (contrast-ratio($alert-background, $alert-color) < $min-contrast-ratio) {
-      $alert-color: mix(map-get($value, "base-color"), color-contrast($alert-background), abs($alert-color-scale));
+      $alert-color: mix(map-get($value, "base-color"), color-contrast($alert-background), $alert-color-scale);
     }
     .alert-#{$state} {
       @include alert-variant($alert-background, $alert-border, $alert-color);
