@@ -1,7 +1,7 @@
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO date-range-picker.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
