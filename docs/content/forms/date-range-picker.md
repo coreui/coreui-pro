@@ -6,6 +6,7 @@ group: forms
 toc: true
 pro_component: true
 other_frameworks: date-range-picker
+dayjs: true
 ---
 
 ## Example
@@ -279,6 +280,48 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 </div>
 {{< /example >}}
 
+## Custom formats
+
+As of v5.0.0, the `format` property is removed in Date Range Picker. Instead, utilize the `inputDateFormat` to format dates into custom strings and `inputDateParse` to parse custom strings into Date objects.
+
+The provided code demonstrates how to use the `inputDateFormat` and `inputDateParse` properties. In this example, we use the `dayjs` library to format and parse dates.
+
+The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
+
+
+{{< example >}}
+<div class="row">
+  <div class="col-lg-7">
+    <div id="myDateRangePickerCustomFormats1"></div>
+  </div>
+</div>
+{{< /example >}}
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+```
+
+{{< js-docs name="date-range-picker-custom-formats1" file="docs/assets/js/snippets.js" >}}
+
+To use localized dates, we need to additionally add locale files, in this case, Spanish:
+
+{{< example >}}
+<div class="row">
+  <div class="col-lg-7">
+    <div id="myDateRangePickerCustomFormats2"></div>
+  </div>
+</div>
+{{< /example >}}
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
+```
+
+{{< js-docs name="date-range-picker-custom-formats2" file="docs/assets/js/snippets.js" >}}
+
 ## Usage
 
 ### Via data attributes
@@ -326,8 +369,9 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `endName` | string | `null` | Set the name attribute for the end date input element. |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `footer` | boolean | `false` | Toggle visibility of footer element. |
-| `format` | string | | Set date format. We use date-fns to format dates. Visit <a href="https://date-fns.org/v2.28.0/docs/format" target="_blank" rel="nofollow">https://date-fns.org/v2.28.0/docs/format</a> to check accepted patterns. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
+| `inputDateFormat` | function | `null` | Custom function to format the selected date into a string according to a custom format. |
+| `inputDateParse` | function | `null` | Custom function to parse the input value into a valid Date object. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |

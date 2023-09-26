@@ -11,8 +11,7 @@
  * For details, see https://creativecommons.org/licenses/by/3.0/.
  */
 
-/* global coreui: false */
-
+/* global coreui: false, dayjs: false */
 (() => {
   'use strict'
 
@@ -316,6 +315,37 @@
   }
   // js-docs-end date-picker-disabled-dates
 
+  // js-docs-start date-picker-custom-formats1
+  const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')
+  if (myDatePickerCustomFormats1) {
+    dayjs.extend(window.dayjs_plugin_customParseFormat)
+    const optionsDatePickerCustomFormats1 = {
+      locale: 'en-US',
+      date: new Date(2022, 8, 3),
+      inputDateFormat: date => dayjs(date).format('MMMM DD, YYYY'),
+      inputDateParse: date => dayjs(date, 'MMMM DD, YYYY').toDate()
+    }
+
+    new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)
+  }
+  // js-docs-end date-picker-custom-formats1
+
+  // js-docs-start date-picker-custom-formats2
+  const myDatePickerCustomFormats2 = document.getElementById('myDatePickerCustomFormats2')
+  if (myDatePickerCustomFormats2) {
+    dayjs.extend(window.dayjs_plugin_customParseFormat)
+    dayjs.locale('es')
+    const optionsDatePickerCustomFormats2 = {
+      locale: 'es-ES',
+      date: new Date(2022, 8, 3),
+      inputDateFormat: date => dayjs(date).format('YYYY MMMM DD'),
+      inputDateParse: date => dayjs(date, 'YYYY MMMM DD').toDate()
+    }
+
+    new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)
+  }
+  // js-docs-end date-picker-custom-formats2
+
   // -------------------------------
   // Date Range Pickers
   // -------------------------------
@@ -340,6 +370,39 @@
     new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), optionsDateRangePickerDisabledDates)
   }
   // js-docs-end date-range-picker-disabled-dates
+
+  // js-docs-start date-range-picker-custom-formats1
+  const myDateRangePickerCustomFormats1 = document.getElementById('myDateRangePickerCustomFormats1')
+  if (myDateRangePickerCustomFormats1) {
+    dayjs.extend(window.dayjs_plugin_customParseFormat)
+    const optionsDateRangePickerCustomFormats1 = {
+      locale: 'en-US',
+      startDate: new Date(2022, 8, 3),
+      endDate: new Date(2022, 8, 17),
+      inputDateFormat: date => dayjs(date).format('MMMM DD, YYYY'),
+      inputDateParse: date => dayjs(date, 'MMMM DD, YYYY').toDate()
+    }
+
+    new coreui.DateRangePicker(myDateRangePickerCustomFormats1, optionsDateRangePickerCustomFormats1)
+  }
+  // js-docs-end date-range-picker-custom-formats1
+
+  // js-docs-start date-range-picker-custom-formats2
+  const myDateRangePickerCustomFormats2 = document.getElementById('myDateRangePickerCustomFormats2')
+  if (myDateRangePickerCustomFormats2) {
+    dayjs.extend(window.dayjs_plugin_customParseFormat)
+    dayjs.locale('es')
+    const optionsDateRangePickerCustomFormats2 = {
+      locale: 'es-ES',
+      startDate: new Date(2022, 8, 3),
+      endDate: new Date(2022, 8, 17),
+      inputDateFormat: date => dayjs(date).format('YYYY MMMM DD'),
+      inputDateParse: date => dayjs(date, 'YYYY MMMM DD').toDate()
+    }
+
+    new coreui.DateRangePicker(myDateRangePickerCustomFormats2, optionsDateRangePickerCustomFormats2)
+  }
+  // js-docs-end date-range-picker-custom-formats2
 
   // js-docs-start date-range-picker-custom-ranges
   const myDateRangePickerCustomRanges = document.getElementById('myDateRangePickerCustomRanges')

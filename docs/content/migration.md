@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Migrating to v5
-description: Track and review changes to the CoreUI for Bootstrap source files, documentation, and components to help you migrate from v3 to v4.
+description: Track and review changes to the CoreUI for Bootstrap source files, documentation, and components to help you migrate from v4 to v5.
 group: migration
 aliases: "/migration/"
 toc: true
@@ -88,6 +88,16 @@ Learn more by reading the new [color modes documentation]({{< docsref "/customiz
 #### Close button
 
 - <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> The `.btn-close-white` class has been deprecated and replaced with `data-coreui-theme="dark"` on the close button or any parent element. [See the docs for an example.]({{< docsref "/components/close-button#dark-variant" >}})
+
+#### Date Picker
+
+- <span class="badge bg-danger">Breaking</span> Removed option `format`, use `inputDateFormat` instead of. [See the docs for an example.]({{< docsref "/forms/date-picker#custom-formats" >}})
+- <span class="badge bg-danger">Breaking</span> `dateChange.coreui.date-picker` event return only the date object, instead of the date object and formatted string.
+
+#### Date Range Picker
+
+- <span class="badge bg-danger">Breaking</span> Removed option `format`, use `inputDateFormat` instead of. [See the docs for an example.]({{< docsref "/forms/date-range-picker#custom-formats" >}})
+- <span class="badge bg-danger">Breaking</span> `startDateChange.coreui.date-range-picker` and `endDateChange.coreui.date-range-picker` events return only the date object, instead of the date object and formatted string.
 
 #### Dropdowns
 

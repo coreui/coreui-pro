@@ -6,7 +6,6 @@
  */
 
 import * as Popper from '@popperjs/core'
-import { format as dateFormat, parseISO } from 'date-fns'
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
 import TimePicker from './time-picker.js'
@@ -84,7 +83,8 @@ const Default = {
   endName: null,
   firstDayOfWeek: 1,
   footer: false,
-  format: null,
+  inputDateFormat: null,
+  inputDateParse: null,
   invalid: false,
   indicator: true,
   locale: 'default',
@@ -127,8 +127,9 @@ const DefaultType = {
   endName: 'string',
   firstDayOfWeek: 'number',
   footer: 'boolean',
-  format: '(string|null)',
   indicator: 'boolean',
+  inputDateFormat: 'function',
+  inputDateParse: 'function',
   invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
@@ -323,8 +324,8 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.on(this._startInput, EVENT_INPUT, event => {
-      const date = this._config.format ?
-        parseISO(event.target.value) :
+      const date = this._config.inputDateParse ?
+        this._config.inputDateParse(event.target.value) :
         getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
 
       if (date instanceof Date && date.getTime()) {
@@ -362,8 +363,8 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.on(this._endInput, EVENT_INPUT, event => {
-      const date = this._config.format ?
-        parseISO(event.target.value) :
+      const date = this._config.inputDateParse ?
+        this._config.inputDateParse(event.target.value) :
         getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
       if (date instanceof Date && date.getTime()) {
         this._endDate = date
@@ -390,8 +391,7 @@ class DateRangePicker extends BaseComponent {
         }
 
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date: event.date,
-          formatedDate: event.date ? this._formatDate(event.date) : undefined
+          date: event.date
         })
       })
 
@@ -406,8 +406,7 @@ class DateRangePicker extends BaseComponent {
         }
 
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date: event.date,
-          formatedDate: event.date ? this._formatDate(event.date) : undefined
+          date: event.date
         })
       })
 
@@ -597,11 +596,6 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-      // this._calendarDate = new Date(
-      //   event.date.getFullYear(),
-      //   event.date.getMonth(),
-      //   1
-      // )
       this._calendarDate = event.date
       this._updateDateRangePickerCalendars()
     })
@@ -755,7 +749,7 @@ class DateRangePicker extends BaseComponent {
     inputEl.autocomplete = 'off'
     inputEl.disabled = this._config.disabled
     inputEl.placeholder = placeholder
-    inputEl.readOnly = this._config.inputReadOnly || typeof this._config.format === 'string'
+    inputEl.readOnly = this._config.inputReadOnly
     inputEl.required = this._config.required
     inputEl.type = 'text'
     inputEl.value = value
@@ -831,8 +825,8 @@ class DateRangePicker extends BaseComponent {
 
     const _date = new Date(date)
 
-    return this._config.format ?
-      dateFormat(_date, this._config.format) :
+    return this._config.inputDateFormat ?
+      this._config.inputDateFormat(_date) :
       (this._config.timepicker ?
         _date.toLocaleString(this._config.locale) :
         _date.toLocaleDateString(this._config.locale))
