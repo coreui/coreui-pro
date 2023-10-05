@@ -2411,3 +2411,16 @@ $time-picker-inline-select-padding-y:       $input-padding-y-sm !default;
 $time-picker-inline-select-padding-x:       $input-padding-x-sm !default;
 $time-picker-inline-select-disabled-color:  $input-disabled-color !default;
 // scss-docs-end time-picker-variables
+
+// Rating
+// scss-docs-start rating-variables
+$rating-gap:                   .0625rem !default;
+$rating-transition:            color .15s ease-out, transform .15s ease-out !default;
+$rating-item-height-sm:        1rem !default;
+$rating-item-height:           1.25rem !default;
+$rating-item-height-lg:        1.5rem !default;
+$rating-item-color:            var(--#{$prefix}tertiary-color) !default;
+$rating-item-scale-transform:  scale(1.2) !default;
+$rating-item-in-range-color:   var(--#{$prefix}warning) !default;
+$rating-item-selected-color:   var(--#{$prefix}warning) !default;
+// scss-docs-end rating-variables

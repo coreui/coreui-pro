@@ -1,0 +1,64 @@
+.rating {
+  // scss-docs-start rating-css-vars
+  --#{$prefix}rating-gap: #{$rating-gap};
+  --#{$prefix}rating-transition: #{$rating-transition};
+  --#{$prefix}rating-item-height: #{$rating-item-height};
+  --#{$prefix}rating-item-color: #{$rating-item-color};
+  --#{$prefix}rating-item-scale-transform: #{$rating-item-scale-transform};
+  --#{$prefix}rating-item-in-range-color: #{$rating-item-in-range-color};
+  --#{$prefix}rating-item-selected-color: #{$rating-item-selected-color};
+  // scss-docs-end rating-css-vars
+
+  display: flex;
+  gap: var(--#{$prefix}rating-gap);
+
+  &.disabled {
+    opacity: 50%;
+  }
+
+  &:not(.disabled):not(.readonly) {
+    .rating-item {
+      cursor: pointer;
+
+      &:hover {
+        transform: var(--#{$prefix}rating-item-scale-transform);
+      }
+    }
+  }
+}
+
+.rating-item {
+  line-height: 0;
+  @include transition(var(--#{$prefix}rating-transition));
+
+  svg {
+    height: var(--#{$prefix}rating-item-height);
+    cursor: pointer;
+  }
+}
+
+.rating-item-input {
+  display: none;
+}
+
+.rating-item-label {
+  line-height: 0;
+  color: var(--#{$prefix}rating-item-color);
+
+  &:hover,
+  &.checked.in-range {
+    opacity: 1 !important; // stylelint-disable-line declaration-no-important
+  }
+
+  &.in-range {
+    color: var(--#{$prefix}rating-item-in-range-color);
+  }
+}
+
+.rating-sm {
+  --#{$prefix}rating-item-height: #{$rating-item-height-sm};
+}
+
+.rating-lg {
+  --#{$prefix}rating-item-height: #{$rating-item-height-lg};
+}
