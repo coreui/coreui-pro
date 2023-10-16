@@ -4,7 +4,6 @@
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 import * as Popper from '@popperjs/core';
-import { parseISO, format } from 'date-fns';
 
 /**
  * --------------------------------------------------------------------------
@@ -747,9 +746,9 @@ const getSelector = element => {
     if (hrefAttribute.includes('#') && !hrefAttribute.startsWith('#')) {
       hrefAttribute = `#${hrefAttribute.split('#')[1]}`;
     }
-    selector = hrefAttribute && hrefAttribute !== '#' ? hrefAttribute.trim() : null;
+    selector = hrefAttribute && hrefAttribute !== '#' ? parseSelector(hrefAttribute.trim()) : null;
   }
-  return parseSelector(selector);
+  return selector;
 };
 const SelectorEngine = {
   find(selector, element = document.documentElement) {
@@ -1203,7 +1202,7 @@ const isToday = date => {
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO calendar.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -2523,7 +2522,7 @@ const isValidTime = time => {
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO time-picker.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -3131,7 +3130,7 @@ defineJQueryPlugin(TimePicker);
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO date-range-picker.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -3199,7 +3198,8 @@ const Default$f = {
   endName: null,
   firstDayOfWeek: 1,
   footer: false,
-  format: null,
+  inputDateFormat: null,
+  inputDateParse: null,
   invalid: false,
   indicator: true,
   locale: 'default',
@@ -3241,8 +3241,9 @@ const DefaultType$f = {
   endName: 'string',
   firstDayOfWeek: 'number',
   footer: 'boolean',
-  format: '(string|null)',
   indicator: 'boolean',
+  inputDateFormat: 'function',
+  inputDateParse: 'function',
   invalid: 'boolean',
   locale: 'string',
   maxDate: '(date|string|null)',
@@ -3413,7 +3414,7 @@ class DateRangePicker extends BaseComponent {
       this._updateDateRangePickerCalendars();
     });
     EventHandler.on(this._startInput, EVENT_INPUT, event => {
-      const date = this._config.format ? parseISO(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+      const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
       if (date instanceof Date && date.getTime()) {
         this._startDate = date;
         this._calendarDate = date;
@@ -3442,7 +3443,7 @@ class DateRangePicker extends BaseComponent {
       this._updateDateRangePickerCalendars();
     });
     EventHandler.on(this._endInput, EVENT_INPUT, event => {
-      const date = this._config.format ? parseISO(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+      const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
       if (date instanceof Date && date.getTime()) {
         this._endDate = date;
         this._calendarDate = date;
@@ -3464,8 +3465,7 @@ class DateRangePicker extends BaseComponent {
           this.hide();
         }
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date: event.date,
-          formatedDate: event.date ? this._formatDate(event.date) : undefined
+          date: event.date
         });
       });
       EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
@@ -3477,8 +3477,7 @@ class DateRangePicker extends BaseComponent {
           this.hide();
         }
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date: event.date,
-          formatedDate: event.date ? this._formatDate(event.date) : undefined
+          date: event.date
         });
       });
       EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
@@ -3624,11 +3623,6 @@ class DateRangePicker extends BaseComponent {
       weekNumbersLabel: this._config.weekNumbersLabel
     });
     EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-      // this._calendarDate = new Date(
-      //   event.date.getFullYear(),
-      //   event.date.getMonth(),
-      //   1
-      // )
       this._calendarDate = event.date;
       this._updateDateRangePickerCalendars();
     });
@@ -3764,7 +3758,7 @@ class DateRangePicker extends BaseComponent {
     inputEl.autocomplete = 'off';
     inputEl.disabled = this._config.disabled;
     inputEl.placeholder = placeholder;
-    inputEl.readOnly = this._config.inputReadOnly || typeof this._config.format === 'string';
+    inputEl.readOnly = this._config.inputReadOnly;
     inputEl.required = this._config.required;
     inputEl.type = 'text';
     inputEl.value = value;
@@ -3827,7 +3821,7 @@ class DateRangePicker extends BaseComponent {
       return date;
     }
     const _date = new Date(date);
-    return this._config.format ? format(_date, this._config.format) : this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
+    return this._config.inputDateFormat ? this._config.inputDateFormat(_date) : this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
   }
   _getButtonClasses(classes) {
     if (typeof classes === 'string') {
@@ -3930,7 +3924,7 @@ defineJQueryPlugin(DateRangePicker);
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO date-picker.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -3991,8 +3985,7 @@ class DatePicker extends DateRangePicker {
         this._startInput.value = this._setInputValue(event.date);
         this._updateDateRangePickerCalendars();
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-          date: event.date,
-          formatedDate: event.date ? this._formatDate(event.date) : undefined
+          date: event.date
         });
       });
     }
@@ -4437,7 +4430,7 @@ defineJQueryPlugin(Dropdown);
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO loading-button.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -5240,7 +5233,7 @@ defineJQueryPlugin(Modal);
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO multi-select.js
- * License (https://coreui.io/pro/license-new/)
+ * License (https://coreui.io/pro/license/)
  * --------------------------------------------------------------------------
  */
 
@@ -7931,7 +7924,7 @@ const CLASS_NAME_SHOW$1 = 'show';
 const CLASS_DROPDOWN = 'dropdown';
 const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
 const SELECTOR_DROPDOWN_MENU = '.dropdown-menu';
-const NOT_SELECTOR_DROPDOWN_TOGGLE = ':not(.dropdown-toggle)';
+const NOT_SELECTOR_DROPDOWN_TOGGLE = `:not(${SELECTOR_DROPDOWN_TOGGLE})`;
 const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
 const SELECTOR_OUTER = '.nav-item, .list-group-item';
 const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;

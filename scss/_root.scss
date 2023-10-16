@@ -98,6 +98,14 @@
   --#{$prefix}tertiary-color-rgb-dark: #{to-rgb($body-tertiary-color-dark)};
   --#{$prefix}tertiary-bg-dark: #{$body-tertiary-bg-dark};
   --#{$prefix}tertiary-bg-rgb-dark: #{to-rgb($body-tertiary-bg-dark)};
+
+  --#{$prefix}high-emphasis: #{$high-emphasis}; // Deprecated in v5.0.0
+  --#{$prefix}medium-emphasis: #{$medium-emphasis}; // Deprecated in v5.0.0
+  --#{$prefix}disabled: #{$disabled}; // Deprecated in v5.0.0
+
+  --#{$prefix}high-emphasis-inverse: #{$high-emphasis-inverse}; // Deprecated in v5.0.0
+  --#{$prefix}medium-emphasis-inverse: #{$medium-emphasis-inverse}; // Deprecated in v5.0.0
+  --#{$prefix}disabled-inverse: #{$disabled-inverse}; // Deprecated in v5.0.0
   // scss-docs-end root-body-variables
 
   --#{$prefix}heading-color: #{$headings-color};
@@ -137,7 +145,7 @@
   --#{$prefix}box-shadow-lg: #{$box-shadow-lg};
   --#{$prefix}box-shadow-inset: #{$box-shadow-inset};
 
-  --#{$prefix}elevation-base-color: #{$elevation-base-color};
+  --#{$prefix}elevation-base-color: #{$elevation-base-color}; // Deprecated in v5.0.0 for consistency
 
   // Focus styles
   // scss-docs-start root-focus-variables
@@ -177,7 +185,10 @@
     --#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
     --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
 
-    --#{$prefix}elevation-base-color: 0, 0, 0;
+    --#{$prefix}elevation-base-color: #{$elevation-base-color-dark}; // Deprecated in v5.0.0
+    --#{$prefix}high-emphasis: #{$high-emphasis-dark}; // Deprecated in v5.0.0
+    --#{$prefix}medium-emphasis: #{$medium-emphasis-dark}; // Deprecated in v5.0.0
+    --#{$prefix}disabled: #{$disabled-dark}; // Deprecated in v5.0.0
 
     @each $color, $value in $theme-colors-dark {
       --#{$prefix}#{$color}: #{$value};

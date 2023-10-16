@@ -4,10 +4,10 @@
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('date-fns'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', 'date-fns', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global["date-fns"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar));
-})(this, (function (Popper, dateFns, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar));
+})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -31,7 +31,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO date-range-picker.js
-   * License (https://coreui.io/pro/license-new/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -99,7 +99,8 @@
     endName: null,
     firstDayOfWeek: 1,
     footer: false,
-    format: null,
+    inputDateFormat: null,
+    inputDateParse: null,
     invalid: false,
     indicator: true,
     locale: 'default',
@@ -141,8 +142,9 @@
     endName: 'string',
     firstDayOfWeek: 'number',
     footer: 'boolean',
-    format: '(string|null)',
     indicator: 'boolean',
+    inputDateFormat: 'function',
+    inputDateParse: 'function',
     invalid: 'boolean',
     locale: 'string',
     maxDate: '(date|string|null)',
@@ -313,7 +315,7 @@
         this._updateDateRangePickerCalendars();
       });
       EventHandler.on(this._startInput, EVENT_INPUT, event => {
-        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+        const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
         if (date instanceof Date && date.getTime()) {
           this._startDate = date;
           this._calendarDate = date;
@@ -342,7 +344,7 @@
         this._updateDateRangePickerCalendars();
       });
       EventHandler.on(this._endInput, EVENT_INPUT, event => {
-        const date = this._config.format ? dateFns.parseISO(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
+        const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
         if (date instanceof Date && date.getTime()) {
           this._endDate = date;
           this._calendarDate = date;
@@ -364,8 +366,7 @@
             this.hide();
           }
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date: event.date,
-            formatedDate: event.date ? this._formatDate(event.date) : undefined
+            date: event.date
           });
         });
         EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
@@ -377,8 +378,7 @@
             this.hide();
           }
           EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date: event.date,
-            formatedDate: event.date ? this._formatDate(event.date) : undefined
+            date: event.date
           });
         });
         EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
@@ -524,11 +524,6 @@
         weekNumbersLabel: this._config.weekNumbersLabel
       });
       EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-        // this._calendarDate = new Date(
-        //   event.date.getFullYear(),
-        //   event.date.getMonth(),
-        //   1
-        // )
         this._calendarDate = event.date;
         this._updateDateRangePickerCalendars();
       });
@@ -664,7 +659,7 @@
       inputEl.autocomplete = 'off';
       inputEl.disabled = this._config.disabled;
       inputEl.placeholder = placeholder;
-      inputEl.readOnly = this._config.inputReadOnly || typeof this._config.format === 'string';
+      inputEl.readOnly = this._config.inputReadOnly;
       inputEl.required = this._config.required;
       inputEl.type = 'text';
       inputEl.value = value;
@@ -727,7 +722,7 @@
         return date;
       }
       const _date = new Date(date);
-      return this._config.format ? dateFns.format(_date, this._config.format) : this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
+      return this._config.inputDateFormat ? this._config.inputDateFormat(_date) : this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
     }
     _getButtonClasses(classes) {
       if (typeof classes === 'string') {

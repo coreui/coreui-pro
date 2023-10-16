@@ -210,5 +210,16 @@ Subheader component has been removed.
 
 - <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-muted` utility and `$text-muted` Sass variable. It's been replaced by `.text-body-secondary` and `$body-secondary-color`.
 
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-high-emphasis` utility and `$high-emphasis` Sass variable.
+
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-medium-emphasis` utility and `$medium-emphasis` Sass variable.
+
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-disabled` utility and `$disabled` Sass variable.
+
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-high-emphasis-inverse` utility and `$high-emphasis-inverse` Sass variable.
+
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-medium-emphasis-inverse` utility and `$medium-emphasis-inverse` Sass variable.
+
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span> Deprecated the `.text-disabled-inverse` utility and `$disabled-inverse` Sass variable.
 
 - Added new `.d-inline-grid` [display utility]({{< docsref "/utilities/display" >}}).

@@ -31,7 +31,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO multi-select.js
-   * License (https://coreui.io/pro/license-new/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 

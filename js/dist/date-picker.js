@@ -12,7 +12,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO date-picker.js
-   * License (https://coreui.io/pro/license-new/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -73,8 +73,7 @@
           this._startInput.value = this._setInputValue(event.date);
           this._updateDateRangePickerCalendars();
           EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-            date: event.date,
-            formatedDate: event.date ? this._formatDate(event.date) : undefined
+            date: event.date
           });
         });
       }

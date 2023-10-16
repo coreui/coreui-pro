@@ -12,7 +12,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO loading-button.js
-   * License (https://coreui.io/pro/license-new/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
