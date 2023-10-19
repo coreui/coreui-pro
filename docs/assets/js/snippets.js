@@ -322,8 +322,8 @@
     const optionsDatePickerCustomFormats1 = {
       locale: 'en-US',
       date: new Date(2022, 8, 3),
-      inputDateFormat: date => dayjs(date).format('MMMM DD, YYYY'),
-      inputDateParse: date => dayjs(date, 'MMMM DD, YYYY').toDate()
+      inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),
+      inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()
     }
 
     new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)
@@ -338,8 +338,8 @@
     const optionsDatePickerCustomFormats2 = {
       locale: 'es-ES',
       date: new Date(2022, 8, 3),
-      inputDateFormat: date => dayjs(date).format('YYYY MMMM DD'),
-      inputDateParse: date => dayjs(date, 'YYYY MMMM DD').toDate()
+      inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),
+      inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()
     }
 
     new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)
@@ -379,8 +379,8 @@
       locale: 'en-US',
       startDate: new Date(2022, 8, 3),
       endDate: new Date(2022, 8, 17),
-      inputDateFormat: date => dayjs(date).format('MMMM DD, YYYY'),
-      inputDateParse: date => dayjs(date, 'MMMM DD, YYYY').toDate()
+      inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),
+      inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()
     }
 
     new coreui.DateRangePicker(myDateRangePickerCustomFormats1, optionsDateRangePickerCustomFormats1)
@@ -396,8 +396,8 @@
       locale: 'es-ES',
       startDate: new Date(2022, 8, 3),
       endDate: new Date(2022, 8, 17),
-      inputDateFormat: date => dayjs(date).format('YYYY MMMM DD'),
-      inputDateParse: date => dayjs(date, 'YYYY MMMM DD').toDate()
+      inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),
+      inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()
     }
 
     new coreui.DateRangePicker(myDateRangePickerCustomFormats2, optionsDateRangePickerCustomFormats2)

@@ -174,10 +174,8 @@ class DateRangePicker extends BaseComponent {
     this._popper = null
     this._selectEndDate = this._config.selectEndDate
 
+    this._calendar = null
     this._calendars = null
-    this._calendarStart = null
-    this._calendarEnd = null
-    this._dateRangePicker = null
     this._endInput = null
     this._menu = null
     this._startInput = null
@@ -250,14 +248,18 @@ class DateRangePicker extends BaseComponent {
     this._startDate = this._initialStartDate
     this._startInput.value = this._setInputValue(this._initialStartDate)
     this._startInput.dispatchEvent(new Event('change'))
-    this._calendars.innerHTML = ''
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = ''
-    }
 
     this.hide()
-    this._createDateRangePickerCalendars()
-    this._addCalendarEventListeners()
+
+    this._calendar.update(this._getCalendarConfig)
+
+    if (this._timePickerStart) {
+      this._timePickerStart.update(this._getTimePickerConfig(true))
+    }
+
+    if (this._timePickerEnd) {
+      this._timePickerEnd.update(this._getTimePickerConfig(false))
+    }
   }
 
   clear() {
@@ -267,13 +269,16 @@ class DateRangePicker extends BaseComponent {
     this._startDate = null
     this._startInput.value = ''
     this._startInput.dispatchEvent(new Event('change'))
-    this._calendars.innerHTML = ''
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = ''
+
+    this._calendar.update(this._getCalendarConfig())
+
+    if (this._timePickerStart) {
+      this._timePickerStart.update(this._getTimePickerConfig(true))
     }
 
-    this._createDateRangePickerCalendars()
-    this._addCalendarEventListeners()
+    if (this._timePickerEnd) {
+      this._timePickerEnd.update(this._getTimePickerConfig(false))
+    }
   }
 
   reset() {
@@ -283,13 +288,16 @@ class DateRangePicker extends BaseComponent {
     this._startDate = this._config.startDate
     this._startInput.value = this._setInputValue(this._config.startDate)
     this._startInput.dispatchEvent(new Event('change'))
-    this._calendars.innerHTML = ''
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = ''
+
+    this._calendar.update(this._getCalendarConfig())
+
+    if (this._timePickerStart) {
+      this._timePickerStart.update(this._getTimePickerConfig(true))
     }
 
-    this._createDateRangePickerCalendars()
-    this._addCalendarEventListeners()
+    if (this._timePickerEnd) {
+      this._timePickerEnd.update(this._getTimePickerConfig(false))
+    }
   }
 
   update(config) {
@@ -298,9 +306,6 @@ class DateRangePicker extends BaseComponent {
     this._startDate = this._config.date || this._config.startDate
     this._endDate = this._config.endDate
     this._selectEndDate = this._config.selectEndDate
-
-    this._dropdownToggleEl.innerHTML = ''
-    this._dropdownMenuEl.innerHTML = ''
 
     this._createDateRangePicker()
     this._createDateRangePickerCalendars()
@@ -320,7 +325,7 @@ class DateRangePicker extends BaseComponent {
 
     EventHandler.on(this._startInput, EVENT_CLICK, () => {
       this._selectEndDate = false
-      this._updateDateRangePickerCalendars()
+      this._calendar.update(this._getCalendarConfig())
     })
 
     EventHandler.on(this._startInput, EVENT_INPUT, event => {
@@ -331,7 +336,7 @@ class DateRangePicker extends BaseComponent {
       if (date instanceof Date && date.getTime()) {
         this._startDate = date
         this._calendarDate = date
-        this._updateDateRangePickerCalendars()
+        this._calendar.update(this._getCalendarConfig())
       }
     })
 
@@ -359,7 +364,7 @@ class DateRangePicker extends BaseComponent {
 
     EventHandler.on(this._endInput, EVENT_CLICK, () => {
       this._selectEndDate = true
-      this._updateDateRangePickerCalendars()
+      this._calendar.update(this._getCalendarConfig())
     })
 
     EventHandler.on(this._endInput, EVENT_INPUT, event => {
@@ -369,7 +374,7 @@ class DateRangePicker extends BaseComponent {
       if (date instanceof Date && date.getTime()) {
         this._endDate = date
         this._calendarDate = date
-        this._updateDateRangePickerCalendars()
+        this._calendar.update(this._getCalendarConfig())
       }
     })
 
@@ -384,7 +389,10 @@ class DateRangePicker extends BaseComponent {
         this._startDate = event.date
         this._startInput.value = this._setInputValue(event.date)
         this._startInput.dispatchEvent(new Event('change'))
-        this._updateDateRangePickerCalendars()
+
+        if (this._timePickerStart) {
+          this._timePickerStart.update(this._getTimePickerConfig(true))
+        }
 
         if (!this._config.range && (!this._config.footer && !this._config.timepicker)) {
           this.hide()
@@ -399,7 +407,10 @@ class DateRangePicker extends BaseComponent {
         this._endDate = event.date
         this._endInput.value = this._setInputValue(event.date)
         this._startInput.dispatchEvent(new Event('change'))
-        this._updateDateRangePickerCalendars()
+
+        if (this._timePickerEnd) {
+          this._timePickerEnd.update(this._getTimePickerConfig(false))
+        }
 
         if (this._startDate && (!this._config.footer && !this._config.timepicker)) {
           this.hide()
@@ -412,16 +423,47 @@ class DateRangePicker extends BaseComponent {
 
       EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
         if (this._selectEndDate) {
-          this._endInput.value = event.date ? this._formatDate(event.date) : ''
+          this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate)
           return
         }
 
-        this._startInput.value = event.date ? this._formatDate(event.date) : ''
+        this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate)
       })
 
       EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
         this._selectEndDate = event.value
       })
+    }
+  }
+
+  _getCalendarConfig() {
+    return {
+      calendarDate: this._calendarDate,
+      calendars: this._config.calendars,
+      disabledDates: this._config.disabledDates,
+      endDate: this._endDate,
+      firstDayOfWeek: this._config.firstDayOfWeek,
+      locale: this._config.locale,
+      maxDate: this._config.maxDate,
+      minDate: this._config.minDate,
+      range: this._config.range,
+      selectAdjacementDays: this._config.selectAdjacementDays,
+      selectEndDate: this._selectEndDate,
+      selectionType: this._config.selectionType,
+      showAdjacementDays: this._config.showAdjacementDays,
+      showWeekNumber: this._config.showWeekNumber,
+      startDate: this._startDate,
+      weekNumbersLabel: this._config.weekNumbersLabel
+    }
+  }
+
+  _getTimePickerConfig(start) {
+    return {
+      container: 'inline',
+      disabled: start ? !this._startDate : !this._endDate,
+      locale: this._config.locale,
+      time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
+      variant: 'select'
     }
   }
 
@@ -531,7 +573,8 @@ class DateRangePicker extends BaseComponent {
           this._startInput.dispatchEvent(new Event('change'))
           this._endInput.value = this._setInputValue(this._endDate)
           this._endInput.dispatchEvent(new Event('change'))
-          this._updateDateRangePickerCalendars()
+
+          this._calendar.update(this._getCalendarConfig())
 
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
             date: this._startDate,
@@ -575,29 +618,10 @@ class DateRangePicker extends BaseComponent {
 
     this._calendars.append(calendarEl)
 
-    // eslint-disable-next-line no-new
-    new Calendar(calendarEl, {
-      calendarDate: this._config.calendarDate,
-      calendars: this._config.calendars,
-      disabledDates: this._config.disabledDates,
-      endDate: this._endDate,
-      firstDayOfWeek: this._config.firstDayOfWeek,
-      locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
-      range: this._config.range,
-      selectAdjacementDays: this._config.selectAdjacementDays,
-      selectEndDate: this._selectEndDate,
-      selectionType: this._config.selectionType,
-      showAdjacementDays: this._config.showAdjacementDays,
-      showWeekNumber: this._config.showWeekNumber,
-      startDate: this._startDate,
-      weekNumbersLabel: this._config.weekNumbersLabel
-    })
+    this._calendar = new Calendar(calendarEl, this._getCalendarConfig())
 
     EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
       this._calendarDate = event.date
-      this._updateDateRangePickerCalendars()
     })
 
     EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
@@ -614,40 +638,26 @@ class DateRangePicker extends BaseComponent {
       if (this._mobile || (this._range && this._config.calendars === 1)) {
         const timePickerStartEl = document.createElement('div')
         timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER)
+        this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true))
 
-        // eslint-disable-next-line no-new
-        new TimePicker(timePickerStartEl, {
-          container: 'inline',
-          disabled: !this._startDate,
-          locale: this._config.locale,
-          time: this._startDate && new Date(this._startDate),
-          variant: 'select'
-        })
         calendarEl.append(timePickerStartEl)
 
         EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
           this._startDate = event.date
           this._startInput.value = this._setInputValue(this._startDate)
-          this._updateDateRangePickerCalendars()
+          this._calendar.update(this._getCalendarConfig())
         })
 
         const timePickerEndEl = document.createElement('div')
         timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER)
+        this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false))
 
-        // eslint-disable-next-line no-new
-        new TimePicker(timePickerEndEl, {
-          container: 'inline',
-          disabled: !this._endDate,
-          locale: this._config.locale,
-          time: this._endDate && new Date(this._endDate),
-          variant: 'select'
-        })
         this._timepickers.append(timePickerEndEl)
 
         EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
           this._endDate = event.date
           this._endInput.value = this._setInputValue(this._endDate)
-          this._updateDateRangePickerCalendars()
+          this._calendar.update(this._getCalendarConfig())
         })
       } else {
         // eslint-disable-next-line no-unused-vars
@@ -655,14 +665,13 @@ class DateRangePicker extends BaseComponent {
           const timePickerEl = document.createElement('div')
           timePickerEl.classList.add(CLASS_NAME_TIME_PICKER)
 
-          // eslint-disable-next-line no-new
-          new TimePicker(timePickerEl, {
-            container: 'inline',
-            disabled: index === 0 ? !this._startDate : !this._endDate,
-            locale: this._config.locale,
-            time: index === 0 ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
-            variant: 'select'
-          })
+          const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0))
+
+          if (index === 0) {
+            this._timePickerStart = _timepicker
+          } else {
+            this._timePickerEnd = _timepicker
+          }
 
           this._timepickers.append(timePickerEl)
 
@@ -675,7 +684,7 @@ class DateRangePicker extends BaseComponent {
               this._endInput.value = this._setInputValue(this._endDate)
             }
 
-            this._updateDateRangePickerCalendars()
+            this._calendar.update(this._getCalendarConfig())
           })
         }
       }
@@ -700,7 +709,8 @@ class DateRangePicker extends BaseComponent {
         this._endInput.dispatchEvent(new Event('change'))
         this._startInput.value = this._setInputValue(date)
         this._startInput.dispatchEvent(new Event('change'))
-        this._updateDateRangePickerCalendars()
+
+        this._calendar.update(this._getCalendarConfig())
       })
 
       footerEl.append(todayButtonEl)
@@ -731,16 +741,6 @@ class DateRangePicker extends BaseComponent {
     }
 
     return footerEl
-  }
-
-  _updateDateRangePickerCalendars() {
-    this._calendars.innerHTML = ''
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = ''
-    }
-
-    this._createDateRangePickerCalendars()
-    this._addCalendarEventListeners()
   }
 
   _createInput(name, placeholder, value) {

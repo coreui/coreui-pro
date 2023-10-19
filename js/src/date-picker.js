@@ -72,7 +72,7 @@ class DatePicker extends DateRangePicker {
         this._startDate = event.date
         this._selectEndDate = event.selectEndDate
         this._startInput.value = this._setInputValue(event.date)
-        this._updateDateRangePickerCalendars()
+        this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
           date: event.date

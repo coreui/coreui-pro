@@ -257,6 +257,7 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/en.js"></script>
 ```
 
 {{< js-docs name="date-picker-custom-formats1" file="docs/assets/js/snippets.js" >}}

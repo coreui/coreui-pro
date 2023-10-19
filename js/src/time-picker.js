@@ -32,6 +32,8 @@ const DATA_KEY = 'coreui.time-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const ENTER_KEY = 'Enter'
+const SPACE_KEY = 'Space'
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2
 
@@ -218,11 +220,7 @@ class TimePicker extends BaseComponent {
     this._config = this._getConfig(config)
     this._date = this._convertStringToDate(this._config.time)
     this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am'
-
-    this._dropdownToggleEl.innerHTML = ''
-    this._dropdownMenuEl.innerHTML = ''
-
-    this._createTimePicker()
+    this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
   }
 
@@ -470,9 +468,16 @@ class TimePicker extends BaseComponent {
       const timePickerRollCellEl = document.createElement('div')
       timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL)
       timePickerRollCellEl.setAttribute('role', 'button')
+      timePickerRollCellEl.tabIndex = 0
       timePickerRollCellEl.innerHTML = option.label
       timePickerRollCellEl.addEventListener('click', () => {
         this._handleTimeChange(part, option.value)
+      })
+      timePickerRollCellEl.addEventListener('keydown', event => {
+        if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
+          event.preventDefault()
+          this._handleTimeChange(part, option.value)
+        }
       })
 
       Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value)
