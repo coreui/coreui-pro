@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.0.0-alpha.2 (https://coreui.io)
+  * CoreUI v5.0.0-alpha.3 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -662,7 +662,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.0.0-alpha.2';
+const VERSION = '5.0.0-alpha.3';
 
 /**
  * Class definition
@@ -1198,7 +1198,7 @@ const isToday = date => {
   return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
 };
 
-/* eslint-disable indent, multiline-ternary */
+/* eslint-disable complexity, indent, multiline-ternary */
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO calendar.js
@@ -1215,10 +1215,19 @@ const NAME$l = 'calendar';
 const DATA_KEY$g = 'coreui.calendar';
 const EVENT_KEY$h = `.${DATA_KEY$g}`;
 const DATA_API_KEY$d = '.data-api';
+const ARROW_UP_KEY$2 = 'ArrowUp';
+const ARROW_RIGHT_KEY$2 = 'ArrowRight';
+const ARROW_DOWN_KEY$2 = 'ArrowDown';
+const ARROW_LEFT_KEY$2 = 'ArrowLeft';
+const ENTER_KEY$1 = 'Enter';
+const SPACE_KEY$1 = 'Space';
+const EVENT_BLUR = `blur${EVENT_KEY$h}`;
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$h}`;
 const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$h}`;
 const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$h}`;
 const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$h}`;
+const EVENT_FOCUS = `focus${EVENT_KEY$h}`;
+const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$h}`;
 const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$h}`;
 const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$h}`;
 const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$h}`;
@@ -1226,8 +1235,18 @@ const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$h}`;
 const EVENT_LOAD_DATA_API$a = `load${EVENT_KEY$h}${DATA_API_KEY$d}`;
 const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$h}${DATA_API_KEY$d}`;
 const CLASS_NAME_CALENDAR$1 = 'calendar';
+const CLASS_NAME_CALENDAR_CELL = 'calendar-cell';
+const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner';
+const CLASS_NAME_CALENDAR_ROW = 'calendar-row';
+const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next';
+const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev';
+const SELECTOR_BTN_MONTH = '.btn-month';
+const SELECTOR_BTN_NEXT = '.btn-next';
+const SELECTOR_BTN_PREV = '.btn-prev';
+const SELECTOR_BTN_YEAR = '.btn-year';
 const SELECTOR_CALENDAR$2 = '.calendar';
-const SELECTOR_CALENDAR_CELL_INNER = '.calendar-cell-inner';
+const SELECTOR_CALENDAR_CELL = '.calendar-cell';
+const SELECTOR_CALENDAR_PANEL = '.calendar-panel';
 const SELECTOR_CALENDAR_ROW = '.calendar-row';
 const Default$k = {
   calendarDate: null,
@@ -1293,8 +1312,8 @@ class Calendar extends BaseComponent {
     this._createCalendar();
     this._addEventListeners();
   }
-  // Getters
 
+  // Getters
   static get Default() {
     return Default$k;
   }
@@ -1305,118 +1324,215 @@ class Calendar extends BaseComponent {
     return NAME$l;
   }
 
+  // Public
+  update(config) {
+    this._config = this._getConfig(config);
+    this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType);
+    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
+    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
+    this._hoverDate = null;
+    this._selectEndDate = this._config.selectEndDate;
+    if (this._config.selectionType === 'day' || this._config.selectionType === 'week') {
+      this._view = 'days';
+    }
+    if (this._config.selectionType === 'month') {
+      this._view = 'months';
+    }
+    if (this._config.selectionType === 'year') {
+      this._view = 'years';
+    }
+    this._element.innerHTML = '';
+    this._createCalendar();
+  }
+
   // Private
+  _getDate(target) {
+    if (this._config.selectionType === 'week') {
+      const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW));
+      return new Date(Manipulator.getDataAttribute(firstCell, 'date'));
+    }
+    return new Date(Manipulator.getDataAttribute(target, 'date'));
+  }
+  _handleCalendarClick(event) {
+    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+    const date = this._getDate(target);
+    const cloneDate = new Date(date);
+    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR_PANEL), 'calendar-index');
+    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      return;
+    }
+    if (this._view === 'days') {
+      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
+    }
+    if (this._view === 'months' && this._config.selectionType !== 'month') {
+      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
+      this._view = 'days';
+      this._updateCalendar();
+      return;
+    }
+    if (this._view === 'years' && this._config.selectionType !== 'year') {
+      this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
+      this._view = 'months';
+      this._updateCalendar();
+      return;
+    }
+    this._hoverDate = null;
+    this._selectDate(date);
+    this._updateClassNames();
+  }
+  _handleCalendarKeydown(event) {
+    const date = this._getDate(event.target);
+    if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$1) {
+      event.preventDefault();
+      this._handleCalendarClick(event);
+    }
+    if (event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_UP_KEY$2 || event.key === ARROW_DOWN_KEY$2) {
+      event.preventDefault();
+      if (this._config.maxDate && date >= convertToDateObject(this._config.maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2)) {
+        return;
+      }
+      if (this._config.minDate && date <= convertToDateObject(this._config.minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_UP_KEY$2)) {
+        return;
+      }
+      let element = event.target;
+      if (this._config.selectionType === 'week' && element.tabIndex === -1) {
+        element = element.closest('tr[tabindex="0"]');
+      }
+      const list = SelectorEngine.find(this._config.selectionType === 'week' ? 'tr[tabindex="0"]' : 'td[tabindex="0"]', this._element);
+      const index = list.indexOf(element);
+      const first = index === 0;
+      const last = index === list.length - 1;
+      const toBoundary = {
+        start: index,
+        end: list.length - (index + 1)
+      };
+      const gap = {
+        ArrowRight: 1,
+        ArrowLeft: -1,
+        ArrowUp: this._config.selectionType === 'week' && this._view === 'days' ? -1 : this._view === 'days' ? -7 : -3,
+        ArrowDown: this._config.selectionType === 'week' && this._view === 'days' ? 1 : this._view === 'days' ? 7 : 3
+      };
+      if (event.key === ARROW_RIGHT_KEY$2 && last || event.key === ARROW_DOWN_KEY$2 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$2 && first || event.key === ARROW_UP_KEY$2 && toBoundary.start < Math.abs(gap.ArrowUp)) {
+        const callback = key => {
+          setTimeout(() => {
+            const _list = SelectorEngine.find('td[tabindex="0"], tr[tabindex="0"]', SelectorEngine.find('.calendar-panel', this._element).pop());
+            if (_list.length && key === ARROW_RIGHT_KEY$2) {
+              _list[0].focus();
+            }
+            if (_list.length && key === ARROW_LEFT_KEY$2) {
+              _list[_list.length - 1].focus();
+            }
+            if (_list.length && key === ARROW_DOWN_KEY$2) {
+              _list[gap.ArrowDown - (list.length - index)].focus();
+            }
+            if (_list.length && key === ARROW_UP_KEY$2) {
+              _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
+            }
+          }, 0);
+        };
+        if (this._view === 'days') {
+          this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? 1 : -1, callback(event.key));
+        }
+        if (this._view === 'months') {
+          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? 1 : -1, callback(event.key));
+        }
+        if (this._view === 'years') {
+          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? 10 : -10, callback(event.key));
+        }
+        return;
+      }
+      if (list[index + gap[event.key]].tabIndex === 0) {
+        list[index + gap[event.key]].focus();
+        return;
+      }
+      for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? i++ : i--) {
+        if (list[i + gap[event.key]].tabIndex === 0) {
+          list[i + gap[event.key]].focus();
+          break;
+        }
+      }
+    }
+  }
+  _handleCalendarMouseEnter(event) {
+    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+    const date = this._getDate(target);
+    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      return;
+    }
+    this._hoverDate = date;
+    EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+      date: getDateBySelectionType(date, this._config.selectionType)
+    });
+    this._updateClassNames();
+  }
+  _handleCalendarMouseLeave() {
+    this._hoverDate = null;
+    EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+      date: null
+    });
+    this._updateClassNames();
+  }
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_CALENDAR_CELL_INNER, event => {
-      if (this._config.selectionType === 'week' && this._view === 'days') {
-        return;
-      }
-      if (event.target.parentElement.classList.contains('disabled')) {
-        return;
-      }
-      if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
-        return;
-      }
-      const date = new Date(Manipulator.getDataAttribute(event.target, 'date'));
-      const cloneDate = new Date(date);
-      const index = Manipulator.getDataAttribute(event.target.closest('.calendar-panel'), 'calendar-index');
-      this._selectDate(date);
-      if (this._view === 'days') {
-        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
-      }
-      if (this._view === 'months' && this._config.selectionType !== 'month') {
-        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
-        this._view = 'days';
-      }
-      if (this._view === 'years' && this._config.selectionType !== 'year') {
-        this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
-        this._view = 'months';
-      }
-      this._updateCalendar();
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+      this._handleCalendarClick(event);
     });
-    EventHandler.on(this._element, EVENT_MOUSEENTER$2, SELECTOR_CALENDAR_CELL_INNER, event => {
-      if (this._config.selectionType === 'week' && this._view === 'days') {
-        return;
-      }
-      if (event.target.parentElement.classList.contains('disabled')) {
-        return;
-      }
-      if ((event.target.parentElement.classList.contains('next') || event.target.parentElement.classList.contains('previous')) && !this._config.selectAdjacementDays) {
-        return;
-      }
-      const date = new Date(Manipulator.getDataAttribute(event.target, 'date'));
-      this._hoverDate = date;
-      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-        date: getDateBySelectionType(date, this._config.selectionType)
-      });
+    EventHandler.on(this._element, EVENT_KEYDOWN$3, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+      this._handleCalendarKeydown(event);
     });
-    EventHandler.on(this._element, EVENT_MOUSELEAVE$2, SELECTOR_CALENDAR_CELL_INNER, () => {
-      if (this._config.selectionType === 'week' && this._view === 'days') {
-        return;
-      }
-      this._hoverDate = null;
-      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-        date: null
-      });
+    EventHandler.on(this._element, EVENT_MOUSEENTER$2, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+      this._handleCalendarMouseEnter(event);
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_CALENDAR_ROW, event => {
-      if (this._config.selectionType !== 'week') {
-        return;
-      }
-      if (event.target.parentElement.classList.contains('disabled')) {
-        return;
-      }
-      const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_INNER, event.target.closest(SELECTOR_CALENDAR_ROW));
-      const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
-      this._selectDate(date);
-      this._updateCalendar();
+    EventHandler.on(this._element, EVENT_MOUSELEAVE$2, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, () => {
+      this._handleCalendarMouseLeave();
     });
-    EventHandler.on(this._element, EVENT_MOUSEENTER$2, SELECTOR_CALENDAR_ROW, event => {
-      if (this._config.selectionType !== 'week') {
-        return;
-      }
-      if (event.target.parentElement.classList.contains('disabled')) {
-        return;
-      }
-      const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_INNER, event.target.closest(SELECTOR_CALENDAR_ROW));
-      const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
-      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-        date: getDateBySelectionType(date, this._config.selectionType)
-      });
+    EventHandler.on(this._element, EVENT_FOCUS, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+      this._handleCalendarMouseEnter(event);
     });
-    EventHandler.on(this._element, EVENT_MOUSELEAVE$2, SELECTOR_CALENDAR_ROW, () => {
-      if (this._config.selectionType !== 'week') {
-        return;
-      }
-      this._hoverDate = null;
-      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-        date: null
-      });
+    EventHandler.on(this._element, EVENT_BLUR, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, () => {
+      this._handleCalendarMouseLeave();
+    });
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+      this._handleCalendarClick(event);
+    });
+    EventHandler.on(this._element, EVENT_KEYDOWN$3, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+      this._handleCalendarKeydown(event);
+    });
+    EventHandler.on(this._element, EVENT_MOUSEENTER$2, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+      this._handleCalendarMouseEnter(event);
+    });
+    EventHandler.on(this._element, EVENT_MOUSELEAVE$2, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, () => {
+      this._handleCalendarMouseLeave();
+    });
+    EventHandler.on(this._element, EVENT_FOCUS, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+      this._handleCalendarMouseEnter(event);
+    });
+    EventHandler.on(this._element, EVENT_BLUR, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, () => {
+      this._handleCalendarMouseLeave();
     });
 
     // Navigation
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-prev', event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_BTN_PREV, event => {
       event.preventDefault();
       this._modifyCalendarDate(0, -1);
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-double-prev', event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_BTN_DOUBLE_PREV, event => {
       event.preventDefault();
       this._modifyCalendarDate(this._view === 'years' ? -10 : -1);
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-next', event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_BTN_NEXT, event => {
       event.preventDefault();
       this._modifyCalendarDate(0, 1);
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-double-next', event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_BTN_DOUBLE_NEXT, event => {
       event.preventDefault();
       this._modifyCalendarDate(this._view === 'years' ? 10 : 1);
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-month', event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_BTN_MONTH, event => {
       event.preventDefault();
       this._view = 'months';
       this._updateCalendar();
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, '.btn-year', event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_BTN_YEAR, event => {
       event.preventDefault();
       this._view = 'years';
       this._updateCalendar();
@@ -1431,7 +1547,7 @@ class Calendar extends BaseComponent {
       date
     });
   }
-  _modifyCalendarDate(years, months = 0) {
+  _modifyCalendarDate(years, months = 0, callback) {
     const year = this._calendarDate.getFullYear();
     const month = this._calendarDate.getMonth();
     const d = new Date(year, month, 1);
@@ -1447,7 +1563,7 @@ class Calendar extends BaseComponent {
         date: d
       });
     }
-    this._updateCalendar();
+    this._updateCalendar(callback);
   }
   _setEndDate(date) {
     this._endDate = date;
@@ -1575,16 +1691,20 @@ class Calendar extends BaseComponent {
       <tbody>
         ${this._view === 'days' ? monthDetails.map(week => {
       const date = convertToDateObject(week.weekNumber === 0 ? `${calendarDate.getFullYear()}W53` : `${calendarDate.getFullYear()}W${week.weekNumber}`, this._config.selectionType);
-      return `<tr class="calendar-row ${this._config.selectionType === 'week' && this._sharedClassNames(date)}">
+      return `<tr 
+              class="calendar-row ${this._config.selectionType === 'week' && this._sharedClassNames(date)}"
+              tabindex="${this._config.selectionType === 'week' && week.days.some(day => day.month === 'current') && !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1}"
+            >
               ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''}
               ${week.days.map(({
         date,
         month
       }) => month === 'current' || this._config.showAdjacementDays ? `<td 
                   class="calendar-cell ${this._dayClassNames(date, month)}"
-                  tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
-                  >
-                  <div class="calendar-cell-inner day" data-coreui-date="${date}">
+                  tabindex="${this._config.selectionType === 'day' && (month === 'current' || this._config.selectAdjacementDays) && !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1}"
+                  data-coreui-date="${date}"
+                >
+                  <div class="calendar-cell-inner day">
                     ${date.toLocaleDateString(this._config.locale, {
         day: 'numeric'
       })}
@@ -1594,8 +1714,12 @@ class Calendar extends BaseComponent {
         ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>
             ${row.map((month, idx) => {
       const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
-      return `<td class="calendar-cell ${this._sharedClassNames(date)}">
-                  <div class="calendar-cell-inner month" data-coreui-date="${date.toDateString()}">
+      return `<td
+                  class="calendar-cell ${this._sharedClassNames(date)}"
+                  data-coreui-date="${date.toDateString()}"
+                  tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
+                >
+                  <div class="calendar-cell-inner month">
                     ${month}
                   </div>
                 </td>`;
@@ -1604,8 +1728,12 @@ class Calendar extends BaseComponent {
         ${this._view === 'years' ? listOfYears.map(row => `<tr>
             ${row.map(year => {
       const date = new Date(year, 0, 1);
-      return `<td class="calendar-cell ${this._sharedClassNames(date)}">
-                  <div class="calendar-cell-inner year" data-coreui-date="${date.toDateString()}">
+      return `<td
+                  class="calendar-cell ${this._sharedClassNames(date)}"
+                  data-coreui-date="${date.toDateString()}"
+                  tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
+                >
+                  <div class="calendar-cell-inner year">
                     ${year}
                   </div>
                 </td>`;
@@ -1622,6 +1750,9 @@ class Calendar extends BaseComponent {
     if (this._config.selectionType && this._view === 'days') {
       calendarsEl.classList.add(`select-${this._config.selectionType}`);
     }
+    if (this._config.showWeekNumber) {
+      calendarsEl.classList.add('show-week-numbers');
+    }
 
     // eslint-disable-next-line no-unused-vars
     for (const [index, _] of Array.from({
@@ -1632,16 +1763,38 @@ class Calendar extends BaseComponent {
     this._element.classList.add(CLASS_NAME_CALENDAR$1);
     this._element.append(calendarsEl);
   }
-  _updateCalendar() {
+  _updateCalendar(callback) {
     this._element.innerHTML = '';
     this._createCalendar();
+    if (callback) {
+      callback();
+    }
+  }
+  _updateClassNames() {
+    if (this._config.selectionType === 'week') {
+      const rows = SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element);
+      for (const row of rows) {
+        const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row);
+        const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
+        const classNames = this._sharedClassNames(date);
+        row.className = `${CLASS_NAME_CALENDAR_ROW} ${classNames}`;
+      }
+      return;
+    }
+    const cells = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, this._element);
+    for (const cell of cells) {
+      const date = new Date(Manipulator.getDataAttribute(cell, 'date'));
+      const classNames = this._config.selectionType === 'day' ? this._dayClassNames(date, 'current') : this._sharedClassNames(date);
+      cell.className = `${CLASS_NAME_CALENDAR_CELL} ${classNames}`;
+    }
   }
   _dayClassNames(date, month) {
     const classNames = {
-      ...(this._config.selectionType === 'day' && {
+      ...(this._config.selectionType === 'day' && this._view === 'days' && {
         clickable: month !== 'current' && this._config.selectAdjacementDays,
         disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
         range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
+        'range-hover': month === 'current' && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
         selected: isDateSelected(date, this._startDate, this._endDate)
       }),
       today: isToday(date),
@@ -1660,6 +1813,7 @@ class Calendar extends BaseComponent {
     const classNames = {
       disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
       range: isDateInRange(date, this._startDate, this._endDate),
+      'range-hover': (this._config.selectionType === 'week' && this._view === 'days' || this._config.selectionType === 'month' && this._view === 'months' || this._config.selectionType === 'year' && this._view === 'years') && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
       selected: isDateSelected(date, this._startDate, this._endDate)
     };
 
@@ -2535,6 +2689,8 @@ const NAME$h = 'time-picker';
 const DATA_KEY$d = 'coreui.time-picker';
 const EVENT_KEY$d = `.${DATA_KEY$d}`;
 const DATA_API_KEY$a = '.data-api';
+const ENTER_KEY = 'Enter';
+const SPACE_KEY = 'Space';
 const TAB_KEY$5 = 'Tab';
 const RIGHT_MOUSE_BUTTON$4 = 2;
 const EVENT_CLICK$4 = `click${EVENT_KEY$d}`;
@@ -2735,9 +2891,7 @@ class TimePicker extends BaseComponent {
     this._config = this._getConfig(config);
     this._date = this._convertStringToDate(this._config.time);
     this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am';
-    this._dropdownToggleEl.innerHTML = '';
-    this._dropdownMenuEl.innerHTML = '';
-    this._createTimePicker();
+    this._timePickerBody.innerHTML = '';
     this._createTimePickerSelection();
   }
 
@@ -2935,9 +3089,16 @@ class TimePicker extends BaseComponent {
       const timePickerRollCellEl = document.createElement('div');
       timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL);
       timePickerRollCellEl.setAttribute('role', 'button');
+      timePickerRollCellEl.tabIndex = 0;
       timePickerRollCellEl.innerHTML = option.label;
       timePickerRollCellEl.addEventListener('click', () => {
         this._handleTimeChange(part, option.value);
+      });
+      timePickerRollCellEl.addEventListener('keydown', event => {
+        if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
+          event.preventDefault();
+          this._handleTimeChange(part, option.value);
+        }
       });
       Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
       timePickerRollColEl.append(timePickerRollCellEl);
@@ -3286,10 +3447,8 @@ class DateRangePicker extends BaseComponent {
     this._mobile = window.innerWidth < 768;
     this._popper = null;
     this._selectEndDate = this._config.selectEndDate;
+    this._calendar = null;
     this._calendars = null;
-    this._calendarStart = null;
-    this._calendarEnd = null;
-    this._dateRangePicker = null;
     this._endInput = null;
     this._menu = null;
     this._startInput = null;
@@ -3350,13 +3509,14 @@ class DateRangePicker extends BaseComponent {
     this._startDate = this._initialStartDate;
     this._startInput.value = this._setInputValue(this._initialStartDate);
     this._startInput.dispatchEvent(new Event('change'));
-    this._calendars.innerHTML = '';
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = '';
-    }
     this.hide();
-    this._createDateRangePickerCalendars();
-    this._addCalendarEventListeners();
+    this._calendar.update(this._getCalendarConfig);
+    if (this._timePickerStart) {
+      this._timePickerStart.update(this._getTimePickerConfig(true));
+    }
+    if (this._timePickerEnd) {
+      this._timePickerEnd.update(this._getTimePickerConfig(false));
+    }
   }
   clear() {
     this._endDate = null;
@@ -3365,12 +3525,13 @@ class DateRangePicker extends BaseComponent {
     this._startDate = null;
     this._startInput.value = '';
     this._startInput.dispatchEvent(new Event('change'));
-    this._calendars.innerHTML = '';
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = '';
+    this._calendar.update(this._getCalendarConfig());
+    if (this._timePickerStart) {
+      this._timePickerStart.update(this._getTimePickerConfig(true));
     }
-    this._createDateRangePickerCalendars();
-    this._addCalendarEventListeners();
+    if (this._timePickerEnd) {
+      this._timePickerEnd.update(this._getTimePickerConfig(false));
+    }
   }
   reset() {
     this._endDate = this._config.endDate;
@@ -3379,12 +3540,13 @@ class DateRangePicker extends BaseComponent {
     this._startDate = this._config.startDate;
     this._startInput.value = this._setInputValue(this._config.startDate);
     this._startInput.dispatchEvent(new Event('change'));
-    this._calendars.innerHTML = '';
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = '';
+    this._calendar.update(this._getCalendarConfig());
+    if (this._timePickerStart) {
+      this._timePickerStart.update(this._getTimePickerConfig(true));
     }
-    this._createDateRangePickerCalendars();
-    this._addCalendarEventListeners();
+    if (this._timePickerEnd) {
+      this._timePickerEnd.update(this._getTimePickerConfig(false));
+    }
   }
   update(config) {
     this._config = this._getConfig(config);
@@ -3392,8 +3554,6 @@ class DateRangePicker extends BaseComponent {
     this._startDate = this._config.date || this._config.startDate;
     this._endDate = this._config.endDate;
     this._selectEndDate = this._config.selectEndDate;
-    this._dropdownToggleEl.innerHTML = '';
-    this._dropdownMenuEl.innerHTML = '';
     this._createDateRangePicker();
     this._createDateRangePickerCalendars();
     this._addEventListeners();
@@ -3411,14 +3571,14 @@ class DateRangePicker extends BaseComponent {
     });
     EventHandler.on(this._startInput, EVENT_CLICK$3, () => {
       this._selectEndDate = false;
-      this._updateDateRangePickerCalendars();
+      this._calendar.update(this._getCalendarConfig());
     });
     EventHandler.on(this._startInput, EVENT_INPUT, event => {
       const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
       if (date instanceof Date && date.getTime()) {
         this._startDate = date;
         this._calendarDate = date;
-        this._updateDateRangePickerCalendars();
+        this._calendar.update(this._getCalendarConfig());
       }
     });
     EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
@@ -3440,14 +3600,14 @@ class DateRangePicker extends BaseComponent {
     });
     EventHandler.on(this._endInput, EVENT_CLICK$3, () => {
       this._selectEndDate = true;
-      this._updateDateRangePickerCalendars();
+      this._calendar.update(this._getCalendarConfig());
     });
     EventHandler.on(this._endInput, EVENT_INPUT, event => {
       const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
       if (date instanceof Date && date.getTime()) {
         this._endDate = date;
         this._calendarDate = date;
-        this._updateDateRangePickerCalendars();
+        this._calendar.update(this._getCalendarConfig());
       }
     });
     EventHandler.on(window, EVENT_RESIZE$3, () => {
@@ -3460,7 +3620,9 @@ class DateRangePicker extends BaseComponent {
         this._startDate = event.date;
         this._startInput.value = this._setInputValue(event.date);
         this._startInput.dispatchEvent(new Event('change'));
-        this._updateDateRangePickerCalendars();
+        if (this._timePickerStart) {
+          this._timePickerStart.update(this._getTimePickerConfig(true));
+        }
         if (!this._config.range && !this._config.footer && !this._config.timepicker) {
           this.hide();
         }
@@ -3472,7 +3634,9 @@ class DateRangePicker extends BaseComponent {
         this._endDate = event.date;
         this._endInput.value = this._setInputValue(event.date);
         this._startInput.dispatchEvent(new Event('change'));
-        this._updateDateRangePickerCalendars();
+        if (this._timePickerEnd) {
+          this._timePickerEnd.update(this._getTimePickerConfig(false));
+        }
         if (this._startDate && !this._config.footer && !this._config.timepicker) {
           this.hide();
         }
@@ -3482,15 +3646,44 @@ class DateRangePicker extends BaseComponent {
       });
       EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
         if (this._selectEndDate) {
-          this._endInput.value = event.date ? this._formatDate(event.date) : '';
+          this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
           return;
         }
-        this._startInput.value = event.date ? this._formatDate(event.date) : '';
+        this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
       });
       EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
         this._selectEndDate = event.value;
       });
     }
+  }
+  _getCalendarConfig() {
+    return {
+      calendarDate: this._calendarDate,
+      calendars: this._config.calendars,
+      disabledDates: this._config.disabledDates,
+      endDate: this._endDate,
+      firstDayOfWeek: this._config.firstDayOfWeek,
+      locale: this._config.locale,
+      maxDate: this._config.maxDate,
+      minDate: this._config.minDate,
+      range: this._config.range,
+      selectAdjacementDays: this._config.selectAdjacementDays,
+      selectEndDate: this._selectEndDate,
+      selectionType: this._config.selectionType,
+      showAdjacementDays: this._config.showAdjacementDays,
+      showWeekNumber: this._config.showWeekNumber,
+      startDate: this._startDate,
+      weekNumbersLabel: this._config.weekNumbersLabel
+    };
+  }
+  _getTimePickerConfig(start) {
+    return {
+      container: 'inline',
+      disabled: start ? !this._startDate : !this._endDate,
+      locale: this._config.locale,
+      time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
+      variant: 'select'
+    };
   }
   _createDateRangePicker() {
     this._element.classList.add(CLASS_NAME_DATE_PICKER);
@@ -3571,7 +3764,7 @@ class DateRangePicker extends BaseComponent {
           this._startInput.dispatchEvent(new Event('change'));
           this._endInput.value = this._setInputValue(this._endDate);
           this._endInput.dispatchEvent(new Event('change'));
-          this._updateDateRangePickerCalendars();
+          this._calendar.update(this._getCalendarConfig());
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
             date: this._startDate,
             formatedDate: this._formatDate(this._startDate)
@@ -3602,29 +3795,9 @@ class DateRangePicker extends BaseComponent {
     const calendarEl = document.createElement('div');
     calendarEl.classList.add(CLASS_NAME_CALENDAR);
     this._calendars.append(calendarEl);
-
-    // eslint-disable-next-line no-new
-    new Calendar(calendarEl, {
-      calendarDate: this._config.calendarDate,
-      calendars: this._config.calendars,
-      disabledDates: this._config.disabledDates,
-      endDate: this._endDate,
-      firstDayOfWeek: this._config.firstDayOfWeek,
-      locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
-      range: this._config.range,
-      selectAdjacementDays: this._config.selectAdjacementDays,
-      selectEndDate: this._selectEndDate,
-      selectionType: this._config.selectionType,
-      showAdjacementDays: this._config.showAdjacementDays,
-      showWeekNumber: this._config.showWeekNumber,
-      startDate: this._startDate,
-      weekNumbersLabel: this._config.weekNumbersLabel
-    });
+    this._calendar = new Calendar(calendarEl, this._getCalendarConfig());
     EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
       this._calendarDate = event.date;
-      this._updateDateRangePickerCalendars();
     });
     EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
       if (this._startDate) {
@@ -3638,37 +3811,21 @@ class DateRangePicker extends BaseComponent {
       if (this._mobile || this._range && this._config.calendars === 1) {
         const timePickerStartEl = document.createElement('div');
         timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
-
-        // eslint-disable-next-line no-new
-        new TimePicker(timePickerStartEl, {
-          container: 'inline',
-          disabled: !this._startDate,
-          locale: this._config.locale,
-          time: this._startDate && new Date(this._startDate),
-          variant: 'select'
-        });
+        this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
         calendarEl.append(timePickerStartEl);
         EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
           this._startDate = event.date;
           this._startInput.value = this._setInputValue(this._startDate);
-          this._updateDateRangePickerCalendars();
+          this._calendar.update(this._getCalendarConfig());
         });
         const timePickerEndEl = document.createElement('div');
         timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER);
-
-        // eslint-disable-next-line no-new
-        new TimePicker(timePickerEndEl, {
-          container: 'inline',
-          disabled: !this._endDate,
-          locale: this._config.locale,
-          time: this._endDate && new Date(this._endDate),
-          variant: 'select'
-        });
+        this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false));
         this._timepickers.append(timePickerEndEl);
         EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
           this._endDate = event.date;
           this._endInput.value = this._setInputValue(this._endDate);
-          this._updateDateRangePickerCalendars();
+          this._calendar.update(this._getCalendarConfig());
         });
       } else {
         // eslint-disable-next-line no-unused-vars
@@ -3677,15 +3834,12 @@ class DateRangePicker extends BaseComponent {
         }).entries()) {
           const timePickerEl = document.createElement('div');
           timePickerEl.classList.add(CLASS_NAME_TIME_PICKER);
-
-          // eslint-disable-next-line no-new
-          new TimePicker(timePickerEl, {
-            container: 'inline',
-            disabled: index === 0 ? !this._startDate : !this._endDate,
-            locale: this._config.locale,
-            time: index === 0 ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
-            variant: 'select'
-          });
+          const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0));
+          if (index === 0) {
+            this._timePickerStart = _timepicker;
+          } else {
+            this._timePickerEnd = _timepicker;
+          }
           this._timepickers.append(timePickerEl);
           EventHandler.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
             if (index === 0) {
@@ -3695,7 +3849,7 @@ class DateRangePicker extends BaseComponent {
               this._endDate = event.date;
               this._endInput.value = this._setInputValue(this._endDate);
             }
-            this._updateDateRangePickerCalendars();
+            this._calendar.update(this._getCalendarConfig());
           });
         }
       }
@@ -3718,7 +3872,7 @@ class DateRangePicker extends BaseComponent {
         this._endInput.dispatchEvent(new Event('change'));
         this._startInput.value = this._setInputValue(date);
         this._startInput.dispatchEvent(new Event('change'));
-        this._updateDateRangePickerCalendars();
+        this._calendar.update(this._getCalendarConfig());
       });
       footerEl.append(todayButtonEl);
     }
@@ -3743,14 +3897,6 @@ class DateRangePicker extends BaseComponent {
       footerEl.append(confirmButtonEl);
     }
     return footerEl;
-  }
-  _updateDateRangePickerCalendars() {
-    this._calendars.innerHTML = '';
-    if (this._config.timepicker) {
-      this._timepickers.innerHTML = '';
-    }
-    this._createDateRangePickerCalendars();
-    this._addCalendarEventListeners();
   }
   _createInput(name, placeholder, value) {
     const inputEl = document.createElement('input');
@@ -3983,7 +4129,7 @@ class DatePicker extends DateRangePicker {
         this._startDate = event.date;
         this._selectEndDate = event.selectEndDate;
         this._startInput.value = this._setInputValue(event.date);
-        this._updateDateRangePickerCalendars();
+        this._calendar.update(this._getCalendarConfig());
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
           date: event.date
         });

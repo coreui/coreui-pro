@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v5.0.0-alpha.2 (https://coreui.io)
+  * CoreUI time-picker.js v5.0.0-alpha.3 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -44,6 +44,8 @@
   const DATA_KEY = 'coreui.time-picker';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const ENTER_KEY = 'Enter';
+  const SPACE_KEY = 'Space';
   const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2;
   const EVENT_CLICK = `click${EVENT_KEY}`;
@@ -244,9 +246,7 @@
       this._config = this._getConfig(config);
       this._date = this._convertStringToDate(this._config.time);
       this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
-      this._dropdownToggleEl.innerHTML = '';
-      this._dropdownMenuEl.innerHTML = '';
-      this._createTimePicker();
+      this._timePickerBody.innerHTML = '';
       this._createTimePickerSelection();
     }
 
@@ -444,9 +444,16 @@
         const timePickerRollCellEl = document.createElement('div');
         timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL);
         timePickerRollCellEl.setAttribute('role', 'button');
+        timePickerRollCellEl.tabIndex = 0;
         timePickerRollCellEl.innerHTML = option.label;
         timePickerRollCellEl.addEventListener('click', () => {
           this._handleTimeChange(part, option.value);
+        });
+        timePickerRollCellEl.addEventListener('keydown', event => {
+          if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
+            event.preventDefault();
+            this._handleTimeChange(part, option.value);
+          }
         });
         Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
         timePickerRollColEl.append(timePickerRollCellEl);

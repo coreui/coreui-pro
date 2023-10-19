@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-picker.js v5.0.0-alpha.2 (https://coreui.io)
+  * CoreUI date-picker.js v5.0.0-alpha.3 (https://coreui.io)
   * Copyright 2023 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -71,7 +71,7 @@
           this._startDate = event.date;
           this._selectEndDate = event.selectEndDate;
           this._startInput.value = this._setInputValue(event.date);
-          this._updateDateRangePickerCalendars();
+          this._calendar.update(this._getCalendarConfig());
           EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
             date: event.date
           });
