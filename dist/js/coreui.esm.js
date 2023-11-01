@@ -7805,6 +7805,8 @@ class Sidebar extends BaseComponent {
     this._narrow = this._isNarrow();
     this._unfoldable = this._isUnfoldable();
     this._backdrop = this._initializeBackDrop();
+    // this._hasHideClassOnInit = this._element.classList.contains(CLASS_NAME_HIDE)
+    // this._hasShowClassOnInit = this._element.classList.contains(CLASS_NAME_SHOW)
     this._addEventListeners();
   }
 
@@ -7826,6 +7828,9 @@ class Sidebar extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SHOW$2);
     if (this._element.classList.contains(CLASS_NAME_HIDE$1)) {
       this._element.classList.remove(CLASS_NAME_HIDE$1);
+    }
+    if (this._overlaid) {
+      this._element.classList.add(CLASS_NAME_SHOW$2);
     }
     if (this._isMobile()) {
       this._element.classList.add(CLASS_NAME_SHOW$2);
@@ -7851,7 +7856,8 @@ class Sidebar extends BaseComponent {
     if (this._isMobile()) {
       this._backdrop.hide();
       new ScrollBarHelper().reset();
-    } else {
+    }
+    if (!this._isMobile() && !this._overlaid) {
       this._element.classList.add(CLASS_NAME_HIDE$1);
     }
     const complete = () => {

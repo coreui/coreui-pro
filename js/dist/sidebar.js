@@ -62,6 +62,8 @@
       this._narrow = this._isNarrow();
       this._unfoldable = this._isUnfoldable();
       this._backdrop = this._initializeBackDrop();
+      // this._hasHideClassOnInit = this._element.classList.contains(CLASS_NAME_HIDE)
+      // this._hasShowClassOnInit = this._element.classList.contains(CLASS_NAME_SHOW)
       this._addEventListeners();
     }
 
@@ -83,6 +85,9 @@
       EventHandler.trigger(this._element, EVENT_SHOW);
       if (this._element.classList.contains(CLASS_NAME_HIDE)) {
         this._element.classList.remove(CLASS_NAME_HIDE);
+      }
+      if (this._overlaid) {
+        this._element.classList.add(CLASS_NAME_SHOW);
       }
       if (this._isMobile()) {
         this._element.classList.add(CLASS_NAME_SHOW);
@@ -108,7 +113,8 @@
       if (this._isMobile()) {
         this._backdrop.hide();
         new ScrollBarHelper().reset();
-      } else {
+      }
+      if (!this._isMobile() && !this._overlaid) {
         this._element.classList.add(CLASS_NAME_HIDE);
       }
       const complete = () => {
