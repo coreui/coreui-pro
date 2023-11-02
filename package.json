@@ -1,7 +1,13 @@
 {
+<<<<<<< HEAD
   "name": "@coreui/coreui-pro",
   "description": "The most popular front-end framework for developing responsive, mobile-first projects on the web rewritten by the CoreUI Team",
   "version": "5.0.0-beta.0",
+=======
+  "name": "@coreui/coreui",
+  "description": "The most popular front-end framework for developing responsive, mobile-first projects on the web rewritten and maintained by the CoreUI Team",
+  "version": "5.0.0-beta.1",
+>>>>>>> 84b479c2210e49ae04a1e14ef5b0a509d23ffdf9
   "config": {
     "version_short": "5.0"
   },

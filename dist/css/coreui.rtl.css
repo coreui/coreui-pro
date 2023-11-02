@@ -1,6 +1,10 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO  v5.0.0-beta.0 (https://coreui.io)
+=======
+ * CoreUI  v5.0.0-beta.1 (https://coreui.io)
+>>>>>>> 84b479c2210e49ae04a1e14ef5b0a509d23ffdf9
  * Copyright (c) 2023 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -9084,7 +9088,11 @@ select.form-multi-select {
 .sidebar.sidebar-overlaid.show.sidebar-end {
   margin-left: 0;
 }
+<<<<<<< HEAD
 @media (max-width: 991.98px) {
+=======
+@media (max-width: 767.98px) {
+>>>>>>> 84b479c2210e49ae04a1e14ef5b0a509d23ffdf9
   .sidebar {
     --cui-is-mobile: true;
     position: fixed;
