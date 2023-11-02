@@ -7805,8 +7805,6 @@ class Sidebar extends BaseComponent {
     this._narrow = this._isNarrow();
     this._unfoldable = this._isUnfoldable();
     this._backdrop = this._initializeBackDrop();
-    // this._hasHideClassOnInit = this._element.classList.contains(CLASS_NAME_HIDE)
-    // this._hasShowClassOnInit = this._element.classList.contains(CLASS_NAME_SHOW)
     this._addEventListeners();
   }
 
