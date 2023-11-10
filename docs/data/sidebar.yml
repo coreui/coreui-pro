@@ -172,3 +172,9 @@
     - title: Installation
     - title: Customize
     - title: Contents
+
+- title: Migration
+  icon: update
+  pages:
+    - title: v4
+    - title: v5
