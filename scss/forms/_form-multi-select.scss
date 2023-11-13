@@ -242,6 +242,7 @@ select.form-multi-select {
 .form-multi-select-cleaner {
   width: var(--#{$prefix}form-multi-select-cleaner-width);
   height: var(--#{$prefix}form-multi-select-cleaner-height);
+  padding: var(--#{$prefix}form-multi-select-cleaner-padding-y) var(--#{$prefix}form-multi-select-cleaner-padding-x);
 
   &::before {
     background-color: var(--#{$prefix}form-multi-select-cleaner-icon-color);
@@ -257,6 +258,7 @@ select.form-multi-select {
 .form-multi-select-indicator {
   width: var(--#{$prefix}form-multi-select-indicator-width);
   height: var(--#{$prefix}form-multi-select-indicator-height);
+  padding: var(--#{$prefix}form-multi-select-indicator-padding-y) var(--#{$prefix}form-multi-select-indicator-padding-x);
   @include transition(transform .15s ease-in-out);
 
   &::before {

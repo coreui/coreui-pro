@@ -2687,6 +2687,7 @@ select.form-multi-select {
 .form-multi-select-cleaner {
   width: var(--cui-form-multi-select-cleaner-width);
   height: var(--cui-form-multi-select-cleaner-height);
+  padding: var(--cui-form-multi-select-cleaner-padding-y) var(--cui-form-multi-select-cleaner-padding-x);
 }
 .form-multi-select-cleaner::before {
   background-color: var(--cui-form-multi-select-cleaner-icon-color);
@@ -2700,6 +2701,7 @@ select.form-multi-select {
 .form-multi-select-indicator {
   width: var(--cui-form-multi-select-indicator-width);
   height: var(--cui-form-multi-select-indicator-height);
+  padding: var(--cui-form-multi-select-indicator-padding-y) var(--cui-form-multi-select-indicator-padding-x);
   transition: transform 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
