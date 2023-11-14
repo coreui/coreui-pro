@@ -61,6 +61,7 @@
   border: var(--#{$prefix}dropdown-border-width) solid var(--#{$prefix}dropdown-border-color);
   @include border-radius(var(--#{$prefix}dropdown-border-radius));
   @include box-shadow(var(--#{$prefix}dropdown-box-shadow));
+  @include elevation(4);
 
   &[data-coreui-popper] {
     top: 100%;

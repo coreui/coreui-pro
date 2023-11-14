@@ -85,11 +85,13 @@ $utilities: map-merge(
       )
     ),
     // scss-docs-end utils-shadow
+    // scss-docs-start utils-elevation
     "elevation": (
       property: box-shadow,
       class: elevation,
       values: $elevations
     ),
+    // scss-docs-end utils-elevation
     // scss-docs-start utils-focus-ring
     "focus-ring": (
       css-var: true,

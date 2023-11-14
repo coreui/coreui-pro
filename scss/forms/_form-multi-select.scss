@@ -322,6 +322,7 @@ select.form-multi-select {
   background-clip: padding-box;
   border: var(--#{$prefix}form-multi-select-dropdown-border-width) solid var(--#{$prefix}form-multi-select-dropdown-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-dropdown-border-radius));
+  @include elevation(4);
 
   .form-multi-select.show & {
     display: block;

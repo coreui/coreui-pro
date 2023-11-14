@@ -1,0 +1,13 @@
+@mixin elevation($value, $exclude: null) {
+  @if $enable-elevations {
+    box-shadow: map-get($elevations, $value);
+
+    @if $enable-dark-mode {
+      [data-coreui-theme]:not([data-coreui-theme="dark"]) & {
+        &:not([class*="border"]) {
+          border: 0;
+        }
+      }
+    }
+  }
+}

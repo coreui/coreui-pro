@@ -195,6 +195,7 @@
   background-clip: padding-box;
   border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
+  @include elevation(4);
 
   .date-picker.show & {
     display: block;

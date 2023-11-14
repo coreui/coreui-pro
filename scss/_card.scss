@@ -37,6 +37,7 @@
   border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
   @include border-radius(var(--#{$prefix}card-border-radius));
   @include box-shadow(var(--#{$prefix}card-box-shadow));
+  @include elevation(1);
 
   > hr {
     margin-right: 0;

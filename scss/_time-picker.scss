@@ -185,6 +185,7 @@
   background-clip: padding-box;
   border: var(--#{$prefix}time-picker-dropdown-border-width) solid var(--#{$prefix}time-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}time-picker-dropdown-border-radius));
+  @include elevation(4);
 
   .time-picker.show & {
     display: block;

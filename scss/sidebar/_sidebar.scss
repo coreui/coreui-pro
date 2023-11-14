@@ -86,6 +86,7 @@
       position: fixed;
       top: 0;
       bottom: 0;
+      @include elevation(2);
 
       &:not(.sidebar-end) {
         @include ltr-rtl("left", 0);
@@ -132,6 +133,7 @@
 
     &.show {
       box-shadow: var(--#{$prefix}sidebar-overlaid-box-shadow);
+      @include elevation(3);
 
       &:not(.sidebar-end) {
         @include ltr-rtl("margin-left", 0);
