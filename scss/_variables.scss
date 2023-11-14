@@ -1247,6 +1247,7 @@ $form-multi-select-dropdown-bg:               var(--#{$prefix}body-bg) !default;
 $form-multi-select-dropdown-border-color:     var(--#{$prefix}border-color) !default;
 $form-multi-select-dropdown-border-width:     var(--#{$prefix}border-width) !default;
 $form-multi-select-dropdown-border-radius:    var(--#{$prefix}border-radius) !default;
+$form-multi-select-dropdown-box-shadow:       var(--#{$prefix}box-shadow) !default;
 
 $form-multi-select-select-all-padding-y:      .5rem !default;
 $form-multi-select-select-all-padding-x:      .75rem !default;
@@ -2343,6 +2344,7 @@ $date-picker-dropdown-bg:                var(--#{$prefix}body-bg) !default;
 $date-picker-dropdown-border-color:      var(--#{$prefix}border-color) !default;
 $date-picker-dropdown-border-width:      var(--#{$prefix}border-width) !default;
 $date-picker-dropdown-border-radius:     var(--#{$prefix}border-radius) !default;
+$date-picker-dropdown-box-shadow:        var(--#{$prefix}box-shadow) !default;
 
 $date-picker-ranges-width:             10rem !default;
 $date-picker-ranges-padding:           $spacer * .5 !default;
@@ -2417,6 +2419,7 @@ $time-picker-dropdown-bg:                   var(--#{$prefix}body-bg) !default;
 $time-picker-dropdown-border-color:         var(--#{$prefix}border-color) !default;
 $time-picker-dropdown-border-width:         var(--#{$prefix}border-width) !default;
 $time-picker-dropdown-border-radius:        var(--#{$prefix}border-radius) !default;
+$time-picker-dropdown-box-shadow:        var(--#{$prefix}box-shadow) !default;
 
 $time-picker-body-padding:                  $spacer * .5 !default;
 

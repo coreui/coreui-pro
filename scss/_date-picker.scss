@@ -35,6 +35,7 @@
   --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width};
   --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
   --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
+  --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow};
   --#{$prefix}date-picker-ranges-width: #{$date-picker-ranges-width};
   --#{$prefix}date-picker-ranges-padding: #{$date-picker-ranges-padding};
   --#{$prefix}date-picker-ranges-border-width: #{$date-picker-ranges-border-width};
@@ -195,6 +196,7 @@
   background-clip: padding-box;
   border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
+  @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
   @include elevation(4);
 
   .date-picker.show & {

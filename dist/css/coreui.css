@@ -2502,6 +2502,7 @@ textarea.form-control-lg {
   --cui-form-multi-select-dropdown-border-width: var(--cui-border-width);
   --cui-form-multi-select-dropdown-border-color: var(--cui-border-color);
   --cui-form-multi-select-dropdown-border-radius: var(--cui-border-radius);
+  --cui-form-multi-select-dropdown-box-shadow: var(--cui-box-shadow);
   --cui-form-multi-select-options-padding-y: 0.5rem;
   --cui-form-multi-select-options-padding-x: 0.75rem;
   --cui-form-multi-select-options-font-size: 1rem;
@@ -8311,6 +8312,7 @@ select.form-multi-select {
   --cui-date-picker-dropdown-border-width: var(--cui-border-width);
   --cui-date-picker-dropdown-border-color: var(--cui-border-color);
   --cui-date-picker-dropdown-border-radius: var(--cui-border-radius);
+  --cui-date-picker-dropdown-box-shadow: var(--cui-box-shadow);
   --cui-date-picker-ranges-width: 10rem;
   --cui-date-picker-ranges-padding: 0.5rem;
   --cui-date-picker-ranges-border-width: 1px;
@@ -8587,6 +8589,7 @@ select.form-multi-select {
   --cui-time-picker-dropdown-border-width: var(--cui-border-width);
   --cui-time-picker-dropdown-border-color: var(--cui-border-color);
   --cui-time-picker-dropdown-border-radius: var(--cui-border-radius);
+  --cui-time-picker-dropdown-box-shadow: var(--cui-box-shadow);
   --cui-time-picker-roll-col-border-width: var(--cui-border-width);
   --cui-time-picker-roll-col-border-color: var(--cui-border-color);
   --cui-time-picker-roll-cell-selected-color: var(--cui-white);

@@ -36,6 +36,7 @@
   --#{$prefix}time-picker-dropdown-border-width: #{$time-picker-dropdown-border-width};
   --#{$prefix}time-picker-dropdown-border-color: #{$time-picker-dropdown-border-color};
   --#{$prefix}time-picker-dropdown-border-radius: #{$time-picker-dropdown-border-radius};
+  --#{$prefix}time-picker-dropdown-box-shadow: #{$time-picker-dropdown-box-shadow};
   --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
   --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
   --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
@@ -185,6 +186,7 @@
   background-clip: padding-box;
   border: var(--#{$prefix}time-picker-dropdown-border-width) solid var(--#{$prefix}time-picker-dropdown-border-color);
   @include border-radius(var(--#{$prefix}time-picker-dropdown-border-radius));
+  @include box-shadow(var(--#{$prefix}time-picker-dropdown-box-shadow));
   @include elevation(4);
 
   .time-picker.show & {

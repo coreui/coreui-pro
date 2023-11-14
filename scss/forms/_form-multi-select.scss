@@ -50,6 +50,7 @@
   --#{$prefix}form-multi-select-dropdown-border-width: #{$form-multi-select-dropdown-border-width};
   --#{$prefix}form-multi-select-dropdown-border-color: #{$form-multi-select-dropdown-border-color};
   --#{$prefix}form-multi-select-dropdown-border-radius: #{$form-multi-select-dropdown-border-radius};
+  --#{$prefix}form-multi-select-dropdown-box-shadow: #{$form-multi-select-dropdown-box-shadow};
   --#{$prefix}form-multi-select-options-padding-y: #{$form-multi-select-options-padding-y};
   --#{$prefix}form-multi-select-options-padding-x: #{$form-multi-select-options-padding-x};
   --#{$prefix}form-multi-select-options-font-size: #{$form-multi-select-options-font-size};
@@ -322,6 +323,7 @@ select.form-multi-select {
   background-clip: padding-box;
   border: var(--#{$prefix}form-multi-select-dropdown-border-width) solid var(--#{$prefix}form-multi-select-dropdown-border-color);
   @include border-radius(var(--#{$prefix}form-multi-select-dropdown-border-radius));
+  @include box-shadow(var(--#{$prefix}form-multi-select-dropdown-box-shadow));
   @include elevation(4);
 
   .form-multi-select.show & {
