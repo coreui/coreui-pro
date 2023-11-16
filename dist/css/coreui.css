@@ -7995,7 +7995,7 @@ select.form-multi-select {
   --cui-calendar-cell-range-bg: rgba(var(--cui-primary-rgb), 0.125);
   --cui-calendar-cell-range-hover-bg: rgba(var(--cui-primary-rgb), 0.25);
   --cui-calendar-cell-range-hover-border-color: var(--cui-primary);
-  --cui-calendar-cell-today-color: var(--cui- #e55353);
+  --cui-calendar-cell-today-color: var(--cui-danger);
   --cui-calendar-cell-week-number-color: var(--cui-secondary-color);
   font-weight: initial;
 }

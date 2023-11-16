@@ -2272,7 +2272,7 @@ $calendar-cell-range-bg:                     rgba(var(--#{$prefix}primary-rgb), 
 $calendar-cell-range-hover-bg:               rgba(var(--#{$prefix}primary-rgb), .25) !default;
 $calendar-cell-range-hover-border-color:     var(--#{$prefix}primary) !default;
 
-$calendar-cell-today-color:                  var(--#{$prefix}$danger) !default;
+$calendar-cell-today-color:                  var(--#{$prefix}danger) !default;
 
 $calendar-cell-week-number-color:            var(--#{$prefix}tertiary-color) !default;
 // scss-docs-end calendar-variables
