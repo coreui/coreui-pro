@@ -2091,7 +2091,7 @@ $sidebar-nav-link-bg:                         transparent !default;
 $sidebar-nav-link-border-width:               0 !default;
 $sidebar-nav-link-border-color:               transparent !default;
 $sidebar-nav-link-border-radius:              var(--#{$prefix}border-radius) !default;
-$sidebar-nav-link-transition:                 background .15s ease, color .15s ease, gap .15s ease !default;
+$sidebar-nav-link-transition:                 background .15s ease, color .15s ease, padding .15s ease !default;
 
 $sidebar-compact-nav-link-padding-y:          .5625rem !default;
 
