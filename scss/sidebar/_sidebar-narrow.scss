@@ -49,7 +49,7 @@
       opacity: 0;
     }
 
-    .sidebar-toggler {
+    .sidebar-toggler::before {
       @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
     }
 
@@ -90,11 +90,11 @@
   &:hover {
     box-shadow: $box-shadow;
 
-    .sidebar-toggler {
+    .sidebar-toggler::before {
       @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
     }
 
-    &.sidebar-end .sidebar-toggler {
+    &.sidebar-end .sidebar-toggler::before {
       transform: rotate(0deg);
     }
   }

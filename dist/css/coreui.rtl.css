@@ -498,7 +498,7 @@ caption {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   color: var(--cui-table-caption-color, var(--cui-secondary-color));
-  text-align: left;
+  text-align: right;
 }
 
 th {
@@ -4292,7 +4292,7 @@ select.form-multi-select {
   margin: 0;
   font-size: var(--cui-dropdown-font-size);
   color: var(--cui-dropdown-color);
-  text-align: left;
+  text-align: right;
   list-style: none;
   background-color: var(--cui-dropdown-bg);
   background-clip: padding-box;
@@ -5466,7 +5466,7 @@ select.form-multi-select {
   padding: var(--cui-accordion-btn-padding-y) var(--cui-accordion-btn-padding-x);
   font-size: 1rem;
   color: var(--cui-accordion-btn-color);
-  text-align: left;
+  text-align: right;
   background-color: var(--cui-accordion-btn-bg);
   border: 0;
   border-radius: 0;
@@ -6698,7 +6698,7 @@ select.form-multi-select {
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
-  text-align: left;
+  text-align: right;
   text-align: start;
   text-decoration: none;
   text-shadow: none;
@@ -6808,7 +6808,7 @@ select.form-multi-select {
   font-style: normal;
   font-weight: 400;
   line-height: 1.5;
-  text-align: left;
+  text-align: right;
   text-align: start;
   text-decoration: none;
   text-shadow: none;
@@ -9166,12 +9166,6 @@ select.form-multi-select {
   background-color: transparent;
   border: 0;
   border-radius: 0.375rem;
-  transition: var(--cui-sidebar-toggler-transition);
-}
-@media (prefers-reduced-motion: reduce) {
-  .sidebar-toggler {
-    transition: none;
-  }
 }
 .sidebar-toggler::before {
   position: absolute;
@@ -9182,6 +9176,15 @@ select.form-multi-select {
   content: "";
   background-color: var(--cui-sidebar-toggler-color);
   mask: var(--cui-sidebar-toggler-bg) no-repeat center;
+  transition: var(--cui-sidebar-toggler-transition);
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-toggler::before {
+    transition: none;
+  }
+}
+*[dir=rtl] .sidebar-toggler::before {
+  transform: rotate(-180deg);
 }
 .sidebar-toggler:hover {
   text-decoration: none;
@@ -9537,7 +9540,7 @@ select.form-multi-select {
     visibility: hidden;
     opacity: 0;
   }
-  .sidebar-narrow-unfoldable:not(:hover) .sidebar-toggler, .sidebar-narrow .sidebar-toggler {
+  .sidebar-narrow-unfoldable:not(:hover) .sidebar-toggler::before, .sidebar-narrow .sidebar-toggler::before {
     transform: rotate(0deg);
   }
   .sidebar-end.sidebar-narrow-unfoldable:not(:hover) .sidebar-toggler::before, .sidebar-end.sidebar-narrow .sidebar-toggler::before {
@@ -9567,10 +9570,10 @@ select.form-multi-select {
 .sidebar-narrow-unfoldable:hover {
   box-shadow: 0 0.5rem 1rem rgba(8, 10, 12, 0.15);
 }
-.sidebar-narrow-unfoldable:hover .sidebar-toggler {
+.sidebar-narrow-unfoldable:hover .sidebar-toggler::before {
   transform: rotate(0deg);
 }
-.sidebar-narrow-unfoldable:hover.sidebar-end .sidebar-toggler {
+.sidebar-narrow-unfoldable:hover.sidebar-end .sidebar-toggler::before {
   transform: rotate(0deg);
 }
 .sidebar-narrow-unfoldable .nav-link {
@@ -10284,35 +10287,35 @@ select.form-multi-select {
 }
 
 .start-0 {
-  left: 0 !important;
-}
-
-.start-50 {
-  left: 50% !important;
-}
-
-.start-100 {
-  left: 100% !important;
-}
-
-.end-0 {
   right: 0 !important;
 }
 
-.end-50 {
+.start-50 {
   right: 50% !important;
 }
 
-.end-100 {
+.start-100 {
   right: 100% !important;
 }
 
+.end-0 {
+  left: 0 !important;
+}
+
+.end-50 {
+  left: 50% !important;
+}
+
+.end-100 {
+  left: 100% !important;
+}
+
 .translate-middle {
-  transform: translate(-50%, -50%) !important;
+  transform: translate(50%, -50%) !important;
 }
 
 .translate-middle-x {
-  transform: translateX(-50%) !important;
+  transform: translateX(50%) !important;
 }
 
 .translate-middle-y {
