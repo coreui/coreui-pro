@@ -249,6 +249,8 @@ You may also choose from small and large multi selects to match our similarly si
 | `show` | Shows the multi select's options. |
 | `hide` | Hides the multi select's options. |
 | `update` | Updates the configuration of multi select. |
+| `selectAll` | Select all options. |
+| `deselectAll` | Deselect all options. |
 | `dispose` | Destroys an element's multi select. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |
 | `getValue` | Returns the array with selected elements. |
