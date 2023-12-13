@@ -3526,12 +3526,14 @@
       super.dispose();
     }
     cancel() {
-      this._endDate = this._initialEndDate;
-      this._endInput.value = this._setInputValue(this._initialEndDate);
-      this._endInput.dispatchEvent(new Event('change'));
       this._startDate = this._initialStartDate;
       this._startInput.value = this._setInputValue(this._initialStartDate);
       this._startInput.dispatchEvent(new Event('change'));
+      if (this._config.range) {
+        this._endDate = this._initialEndDate;
+        this._endInput.value = this._setInputValue(this._initialEndDate);
+        this._endInput.dispatchEvent(new Event('change'));
+      }
       this.hide();
       this._calendar.update(this._getCalendarConfig);
       if (this._timePickerStart) {
@@ -3890,11 +3892,13 @@
           const date = new Date();
           this._calendarDate = date;
           this._startDate = date;
-          this._endDate = date;
-          this._endInput.value = this._setInputValue(date);
-          this._endInput.dispatchEvent(new Event('change'));
           this._startInput.value = this._setInputValue(date);
           this._startInput.dispatchEvent(new Event('change'));
+          if (this._config.range) {
+            this._endDate = date;
+            this._endInput.value = this._setInputValue(date);
+            this._endInput.dispatchEvent(new Event('change'));
+          }
           this._calendar.update(this._getCalendarConfig());
         });
         footerEl.append(todayButtonEl);
