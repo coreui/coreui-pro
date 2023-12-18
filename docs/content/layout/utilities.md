@@ -7,6 +7,7 @@ aliases:
   - "/layout/utilities/"
   - "/4.0/layout/utilities/"
 toc: true
+bootstrap: true
 ---
 
 ## Changing `display`

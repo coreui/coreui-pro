@@ -7,6 +7,7 @@ aliases:
   - "/forms/select/"
   - "/4.0/forms/select/"
 toc: true
+bootstrap: true
 other_frameworks: select
 ---
 

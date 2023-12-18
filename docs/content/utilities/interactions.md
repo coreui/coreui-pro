@@ -7,6 +7,7 @@ aliases:
   - "/utilities/interactions/"
   - "/4.0/utilities/interactions/"
 toc: false
+bootstrap: true
 ---
 
 ## Text selection

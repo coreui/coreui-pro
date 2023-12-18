@@ -9,6 +9,7 @@ aliases:
   - "/4.0/layout/"
   - "/4.1/layout/"
 toc: true
+bootstrap: true
 ---
 
 ## Core concepts

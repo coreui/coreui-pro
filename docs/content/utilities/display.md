@@ -7,6 +7,7 @@ aliases:
   - "/utilities/display/"
   - "/4.0/utilities/display/"
 toc: true
+bootstrap: true
 ---
 
 ## How it works

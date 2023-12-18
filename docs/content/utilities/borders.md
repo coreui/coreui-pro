@@ -7,6 +7,7 @@ aliases:
   - "/utilities/borders/"
   - "/4.0/utilities/borders/"
 toc: true
+bootstrap: true
 ---
 
 ## Border

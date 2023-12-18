@@ -7,6 +7,7 @@ aliases:
   - "/helpers/ratio/"
   - "/4.0/helpers/ratio/"
 toc: true
+bootstrap: true
 ---
 
 ## About

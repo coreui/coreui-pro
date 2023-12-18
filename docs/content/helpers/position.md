@@ -7,6 +7,7 @@ aliases:
   - "/helpers/position/"
   - "/4.0/helpers/position/"
 toc: true
+bootstrap: true
 ---
 
 ## Fixed top

@@ -7,6 +7,7 @@ aliases:
   - "/helpers/text-truncation/"
   - "/4.0/helpers/text-truncation/"
 toc: false
+bootstrap: true
 ---
 
 For longer content, you can add a `.text-truncate` class to truncate the text with an ellipsis. **Requires `display: inline-block` or `display: block`.**

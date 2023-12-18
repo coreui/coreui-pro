@@ -8,6 +8,7 @@ aliases:
   - "/4.1/content/figures/"
   - "/components/figures/"
 toc: true
+bootstrap: true
 ---
 
 Anytime you need to display a piece of content—like an image with an optional caption, consider using a `<figure>`.

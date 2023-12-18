@@ -4,6 +4,7 @@ title: Time Picker
 description: Create consistent cross-browser and cross-device time picker.
 group: forms
 toc: true
+bootstrap: true
 pro_component: true
 other_frameworks: time-picker
 ---

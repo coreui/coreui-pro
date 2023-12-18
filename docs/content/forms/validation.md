@@ -7,6 +7,7 @@ aliases:
   - "/forms/validation/"
   - "/4.0/forms/validation/"
 toc: true
+bootstrap: true
 extra_js:
   - src: "/assets/js/validate-forms.js"
     async: true

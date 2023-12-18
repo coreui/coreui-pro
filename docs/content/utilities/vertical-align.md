@@ -3,6 +3,7 @@ layout: docs
 title: Vertical alignment
 description: Easily change the vertical alignment of inline, inline-block, inline-table, and table cell elements.
 group: utilities
+bootstrap: true
 aliases:
   - "/utilities/vertical-align/"
   - "/4.0/utilities/vertical-align/"

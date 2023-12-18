@@ -3,6 +3,7 @@ layout: docs
 title: Visibility
 description: Control the visibility of elements, without modifying their display, with visibility utilities.
 group: utilities
+bootstrap: true
 aliases:
   - "/utilities/visibility/"
   - "/4.0/utilities/visibility/"

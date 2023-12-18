@@ -7,6 +7,7 @@ aliases:
   - "/layout/columns/"
   - "/4.0/layout/columns/"
 toc: true
+bootstrap: true
 ---
 
 {{< callout info >}}

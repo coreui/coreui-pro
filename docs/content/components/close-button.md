@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/close-button/"
   - "/utilities/close-icon/"
 toc: true
+bootstrap: true
 other_frameworks: close-button
 ---
 

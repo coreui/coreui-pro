@@ -7,6 +7,7 @@ aliases:
   - "/4.0/components/header/"
   - "/4.1/components/header/"
 toc: true
+bootstrap: true
 other_frameworks: header
 ---
 

@@ -7,6 +7,7 @@ aliases:
   - "/forms/layout/"
   - "/4.0/forms/layout/"
 toc: true
+bootstrap: true
 ---
 
 ## Forms

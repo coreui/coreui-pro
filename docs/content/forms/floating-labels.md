@@ -7,6 +7,7 @@ aliases:
   - "/forms/floating-labels/"
   - "/4.0/forms/floating-labels/"
 toc: true
+bootstrap: true
 other_frameworks: floating-labels
 ---
 
