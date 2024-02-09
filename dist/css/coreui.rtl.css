@@ -5491,7 +5491,7 @@ select.form-multi-select {
   flex-shrink: 0;
   width: var(--cui-accordion-btn-icon-width);
   height: var(--cui-accordion-btn-icon-width);
-  margin-left: auto;
+  margin-right: auto;
   content: "";
   background-image: var(--cui-accordion-btn-icon);
   background-repeat: no-repeat;
