@@ -103,10 +103,18 @@ params:
     css_pro_hash:        "sha384-styrHw5ARomA8xPUVXJSXXchmA9xX4sqIeUqZtGkcT2zBp/DidIW1GYUNVO5FbmJ"
     css_pro_rtl:         "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/css/coreui.rtl.min.css"
     css_pro_rtl_hash:    "sha384-xoitnQeZCVl39uuq0t/cGqyY+p9btu0/oE9qRRQb/t4IXs4Zl9szbhxQxRIL+Q2n"
+    css_bs_pro:             "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/css/themes/bootstrap/bootstrap.min.css"
+    css_bs_pro_hash:        "sha384-styrHw5ARomA8xPUVXJSXXchmA9xX4sqIeUqZtGkcT2zBp/DidIW1GYUNVO5FbmJ"
+    css_bs_pro_rtl:         "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/css/themes/bootstrap/bootstrap.rtl.min.css"
+    css_bs_pro_rtl_hash:    "sha384-xoitnQeZCVl39uuq0t/cGqyY+p9btu0/oE9qRRQb/t4IXs4Zl9szbhxQxRIL+Q2n"
     js_pro:              "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/js/coreui.min.js"
     js_pro_hash:         "sha384-rMzcWhQyg0HyrahJIZKq4ajsGpFLe/9V3sZ9E9PN6PX35KFLMlZh8bB2tYSkRx6u"
     js_pro_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/js/coreui.bundle.min.js"
     js_pro_bundle_hash:  "sha384-KW7wTEji2ZsXsIoA4O34wfu6+kd/92iZmHLLSbrfj3D5JlgAJNWobqk0VRB2UvIK"
+    js_bs_pro:              "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/js/bootstrap.min.js"
+    js_bs_pro_hash:         "sha384-rMzcWhQyg0HyrahJIZKq4ajsGpFLe/9V3sZ9E9PN6PX35KFLMlZh8bB2tYSkRx6u"
+    js_bs_pro_bundle:       "https://cdn.jsdelivr.net/npm/@coreui/coreui-pro@5.0.0-rc.1/dist/js/bootstrap.bundle.min.js"
+    js_bs_pro_bundle_hash:  "sha384-KW7wTEji2ZsXsIoA4O34wfu6+kd/92iZmHLLSbrfj3D5JlgAJNWobqk0VRB2UvIK"
   
   anchors:
     min: 2
