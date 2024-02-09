@@ -137,6 +137,8 @@ For disabled popover triggers, you may also prefer `data-coreui-trigger="hover f
 
 ## Usage
 
+{{< bootstrap-compatibility >}}
+
 Enable popovers via JavaScript:
 
 ```js
