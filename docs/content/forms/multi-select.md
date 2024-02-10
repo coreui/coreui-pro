@@ -214,6 +214,8 @@ You may also choose from small and large multi selects to match our similarly si
 
 ## Usage
 
+{{< bootstrap-compatibility >}}
+
 ### Options
 
 {{< markdown >}}

@@ -39,6 +39,8 @@ other_frameworks: loading-button
 
 ## Usage
 
+{{< bootstrap-compatibility >}}
+
 ### Options
 
 {{< markdown >}}

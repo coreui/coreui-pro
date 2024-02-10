@@ -130,6 +130,8 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ## Usage
 
+{{< bootstrap-compatibility >}}
+
 ### Via data attributes
 
 Add `data-coreui-toggle="time-picker"` to a `div` element.

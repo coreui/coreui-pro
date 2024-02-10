@@ -17,66 +17,70 @@ toc: true
 
 Looking to quickly add CoreUI for Bootstrap to your project? Use jsDelivr, a free open source CDN. Using a package manager or need to download the source files? [Head to the downloads page]({{< docsref "/getting-started/download" >}}).
 
-
 CoreUI was created as an extension to Bootstrap, allowing it to be used both as a standalone library and as a replacement for the currently utilized Bootstrap in your project.
 
-### Standalone Library
-
-CoreUI serves as an independent library, perfect for creating web UIs without Bootstrap. It provides a broad range of customizable components, enabling unique designs with high performance. Ideal for projects seeking a versatile UI toolkit.
-
-#### CSS
+### CSS
 
 Copy-paste the stylesheet `<link>` into your `<head>` before all other stylesheets to load our CSS.
 
+{{< tabs groupId="standalone-css" >}}
+{{% tab name="CoreUI" %}}
 ```html
 <link href="{{< param "cdn.css" >}}" rel="stylesheet" integrity="{{< param "cdn.css_hash" >}}" crossorigin="anonymous">
 ```
-
-If you use CoreUI PRO version.
-
+{{% /tab %}}
+{{% tab name="CoreUI PRO" %}}
 ```html
 <link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous">
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
-#### JS
+### JS
 
 Many of our components require the use of JavaScript to function. Specifically, they require our own JavaScript plugins and [Popper](https://popper.js.org/). Place **one of the following `<script>`s** near the end of your pages, right before the closing `</body>` tag, to enable them.
 
-##### Bundle
+#### Bundle
 
 Include every CoreUI for Bootstrap JavaScript plugin and dependency with one of our two bundles. Both `coreui.bundle.js` and `coreui.bundle.min.js` include [Popper](https://popper.js.org/) for our tooltips and popovers. For more information about what's included in CoreUI, please see our [contents]({{< docsref "/getting-started/contents#precompiled-coreui" >}}) section.
 
+{{< tabs groupId="standalone-js-bundle" >}}
+{{% tab name="CoreUI" %}}
 ```html
 <script src="{{< param "cdn.js_bundle" >}}" integrity="{{< param "cdn.js_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
-
-If you use CoreUI PRO version.
-
+{{% /tab %}}
+{{% tab name="CoreUI PRO" %}}
 ```html
 <script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
-##### Separate
+#### Separate
 
 If you decide to go with the separate scripts solution, Popper must come first (if you're using tooltips or popovers), and then our JavaScript plugins.
 
+{{< tabs groupId="standalone-js-separate" >}}
+{{% tab name="CoreUI" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
 <script src="{{< param "cdn.js" >}}" integrity="{{< param "cdn.js_hash" >}}" crossorigin="anonymous"></script>
 ```
-
-If you use CoreUI PRO version.
-
+{{% /tab %}}
+{{% tab name="CoreUI PRO" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
 <script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
-##### Modules
+#### Modules
 
 If you use `<script type="module">`, please refer to our [using CoreUI for Bootstrap as a module]({{< docsref "/getting-started/javascript#using-coreui-as-a-module" >}}) section.
 
-##### Components
+#### Components
 
 Curious which components explicitly require our JavaScript and Popper? Click the show components link below. If you're at all unsure about the general page structure, keep reading for an example page template.
 
@@ -97,61 +101,71 @@ Curious which components explicitly require our JavaScript and Popper? Click the
 {{< /markdown >}}
 </details>
 
-### Bootstrap Replacement
+## Bootstrap Replacement
 
-CoreUI enhances Bootstrap projects by adding advanced components and features, offering a smooth upgrade with minimal adjustments. It retains Bootstrap's familiar structure while introducing new possibilities for UI development.
+{{< added-in "5.0.0-rc.2" >}}
+
+If you're currently using Bootstrap in your project or want to maintain full compatibility with Bootstrap, check out how you can add CoreUI for Bootstrap to your project. CoreUI enhances Bootstrap projects by adding advanced components and features, offering a smooth upgrade with minimal adjustments. It retains Bootstrap's familiar structure while introducing new possibilities for UI development.
 
 {{< bootstrap-compatibility >}}
 
-#### CSS
+### CSS
 
 Copy-paste the stylesheet `<link>` into your `<head>` before all other stylesheets to load our CSS.
 
+{{< tabs groupId="bootstrap-css" >}}
+{{% tab name="CoreUI for Bootstrap" %}}
 ```html
 <link href="{{< param "cdn.css_bs" >}}" rel="stylesheet" integrity="{{< param "cdn.css_bs_hash" >}}" crossorigin="anonymous">
 ```
-
-If you use CoreUI PRO version.
-
+{{% /tab %}}
+{{% tab name="CoreUI PRO for Bootstrap" %}}
 ```html
 <link href="{{< param "cdn.css_bs_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_bs_pro_hash" >}}" crossorigin="anonymous">
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
 
-#### JS
+### JS
 
 Many of our components require the use of JavaScript to function. Specifically, they require our own JavaScript plugins and [Popper](https://popper.js.org/). Place **one of the following `<script>`s** near the end of your pages, right before the closing `</body>` tag, to enable them.
 
-##### Bundle
+#### Bundle
 
-Include every CoreUI for Bootstrap JavaScript plugin and dependency with one of our two bundles. Both `coreui.bundle.js` and `coreui.bundle.min.js` include [Popper](https://popper.js.org/) for our tooltips and popovers. For more information about what's included in CoreUI, please see our [contents]({{< docsref "/getting-started/contents#precompiled-coreui" >}}) section.
+Include every CoreUI for Bootstrap JavaScript plugin and dependency with one of our two bundles. Both `bootstrap.bundle.js` and `bootstrap.bundle.min.js` include [Popper](https://popper.js.org/) for our tooltips and popovers.
 
+{{< tabs groupId="bootstrap-js-bundle" >}}
+{{% tab name="CoreUI for Bootstrap" %}}
 ```html
 <script src="{{< param "cdn.js_bs_bundle" >}}" integrity="{{< param "cdn.js_bs_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
-
-
-If you use CoreUI PRO version.
-
+{{% /tab %}}
+{{% tab name="CoreUI PRO for Bootstrap" %}}
 ```html
 <script src="{{< param "cdn.js_bs_pro_bundle" >}}" integrity="{{< param "cdn.js_bs_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
-##### Separate
+#### Separate
 
 If you decide to go with the separate scripts solution, Popper must come first (if you're using tooltips or popovers), and then our JavaScript plugins.
 
+{{< tabs groupId="bootstrap-js-separate" >}}
+{{% tab name="CoreUI for Bootstrap" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
 <script src="{{< param "cdn.js_bs" >}}" integrity="{{< param "cdn.js_bs_hash" >}}" crossorigin="anonymous"></script>
 ```
-
-If you use CoreUI PRO version.
-
+{{% /tab %}}
+{{% tab name="CoreUI PRO for Bootstrap" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
 <script src="{{< param "cdn.js_bs_pro" >}}" integrity="{{< param "cdn.js_bs_pro_hash" >}}" crossorigin="anonymous"></script>
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
 ## Starter template
 

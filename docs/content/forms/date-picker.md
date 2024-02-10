@@ -282,6 +282,8 @@ To use localized dates, we need to additionally add locale files, in this case, 
 
 ## Usage
 
+{{< bootstrap-compatibility >}}
+
 ### Via data attributes
 
 Add `data-coreui-toggle="date-picker"` to a `div` element.
