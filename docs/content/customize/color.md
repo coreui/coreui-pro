@@ -4,7 +4,7 @@ title: Color
 description: CoreUI for Bootstrap is supported by an extensive color system that themes our styles and components. This enables more comprehensive customization and extension for any project.
 group: customize
 aliases:
-  - "/customize/color/"
+  - "/customize/"
   - "/4.0/customize/color/"
 toc: true
 ---

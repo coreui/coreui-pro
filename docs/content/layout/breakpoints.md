@@ -4,7 +4,7 @@ title: Breakpoints
 description: Breakpoints are the triggers in CoreUI for Bootstrap for how your layout responsive changes across device or viewport sizes.
 group: layout
 aliases:
-  - "/layout/breakpoints/"
+  - "/layout/"
   - "/4.0/layout/breakpoints/"
   - "/4.0/layout/"
   - "/4.1/layout/"
