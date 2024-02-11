@@ -4,7 +4,7 @@ title: Utility API
 description: The utility API is a Sass-based tool to generate utility classes.
 group: utilities
 aliases:
-  - "/utilities/api/"
+  - "/utilities/"
   - "/4.0/utilities/api/"
   - "/4.0/utilities/"
   - "/4.1/utilities/"

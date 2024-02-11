@@ -6,7 +6,7 @@ group: forms
 toc: true
 bootstrap: true
 aliases:
-  - "/forms/overview/"
+  - "/forms/"
   - "/4.0/forms/overview/"
   - "/4.1/forms/"
 sections:
