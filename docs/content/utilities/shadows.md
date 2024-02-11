@@ -7,6 +7,7 @@ aliases:
   - "/utilities/shadows/"
   - "/4.0/utilities/shadows/"
 toc: true
+bootstrap: true
 ---
 
 ## Examples

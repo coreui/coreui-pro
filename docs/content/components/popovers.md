@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Bootstrap popovers
+title: Popovers
 description: Documentation and examples for adding Bootstrap popovers, like those found in iOS, to any element on your site.
 group: components
 aliases:
@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/popovers/"
   - "/components/bootstrap/popovers/"
 toc: true
+bootstrap: true
 other_frameworks: popover
 ---
 

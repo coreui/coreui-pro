@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Bootstrap toasts
+title: Toasts
 description: Push notifications to your visitors with a toast, a lightweight and easily customizable alert message.
 group: components
 aliases:
@@ -9,6 +9,7 @@ aliases:
   - "/components/toast/"
   - "/components/bootstrap/toasts/"
 toc: true
+bootstrap: true
 other_frameworks: toast
 ---
 

@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Bootstrap spinners
+title: Spinners
 description: Indicate the loading state of a component or page with Bootstrap spinners, built entirely with HTML, CSS, and no JavaScript.
 group: components
 aliases:
@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/spinners/"
   - "/components/bootstrap/spinners/"
 toc: true
+bootstrap: true
 other_frameworks: spinner
 ---
 

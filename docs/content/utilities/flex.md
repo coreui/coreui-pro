@@ -7,6 +7,7 @@ aliases:
   - "/utilities/flex/"
   - "/4.0/utilities/flex/"
 toc: true
+bootstrap: true
 ---
 
 ## Enable flex behaviors

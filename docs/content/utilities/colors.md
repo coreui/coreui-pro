@@ -7,6 +7,7 @@ aliases:
   - "/utilities/colors/"
   - "/4.0/utilities/colors/"
 toc: true
+bootstrap: true
 ---
 
 ## Colors

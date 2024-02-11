@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Bootstrap alerts
+title: Alerts
 description: Bootstrap alerts give contextual feedback information for common user operations. The alert component is delivered with a bunch of usable and adjustable alert messages.
 group: components
 aliases:
@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/alerts/"
   - "/components/bootstrap/alerts/"
 toc: true
+bootstrap: true
 other_frameworks: alert
 ---
 

@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Bootstrap scrollspy
+title: Scrollspy
 description: Automatically update Bootstrap navigation or list group components based on scroll position to indicate which link is currently active in the viewport.
 group: components
 aliases:
@@ -8,6 +8,7 @@ aliases:
   - "/4.1/components/scrollspy/"
   - "/components/bootstrap/scrollspy/"
 toc: true
+bootstrap: true
 ---
 
 ## How it works

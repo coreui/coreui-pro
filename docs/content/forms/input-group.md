@@ -9,6 +9,7 @@ aliases:
   - "/components/input-group/"
   - "/components/bootstrap/input-group/"
 toc: true
+bootstrap: true
 other_frameworks: input-group
 ---
 

@@ -4,7 +4,14 @@
     <div class="docs-intro ps-lg-4">
       {{ partial "breadcrumb" . }}
       {{ partial "banner" . }}
+      {{ if .Page.Params.bootstrap }}
+      <div class="d-flex flex-column">
+        <h1 class="order-2 h5 mb-4 text-body-secondary" id="content">Bootstrap 5 {{ .Title | markdownify | title }}</h1>
+        <h2 class="docs-title order-1 h1">{{ .Title | markdownify }}</h2>
+      </div>
+      {{ else }}
       <h1 class="docs-title" id="content">{{ .Title | markdownify }}</h1>
+      {{ end }}
       <p class="docs-lead">{{ .Page.Params.Description | markdownify }}</p>
       {{ partial "ads" . }}
       {{ if .Page.Params.other_frameworks }}

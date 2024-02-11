@@ -12,6 +12,7 @@ aliases:
   - "/content/code/"
   - "/components/reebot/"
 toc: true
+bootstrap: true
 ---
 
 ## Approach

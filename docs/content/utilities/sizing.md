@@ -7,6 +7,7 @@ aliases:
   - "/utilities/sizing/"
   - "/4.0/utilities/sizing/"
 toc: true
+bootstrap: true
 ---
 
 ## Relative to the parent

@@ -126,7 +126,6 @@ Copy-paste the stylesheet `<link>` into your `<head>` before all other styleshee
 {{% /tab %}}
 {{< /tabs >}}
 
-
 ### JS
 
 Many of our components require the use of JavaScript to function. Specifically, they require our own JavaScript plugins and [Popper](https://popper.js.org/). Place **one of the following `<script>`s** near the end of your pages, right before the closing `</body>` tag, to enable them.

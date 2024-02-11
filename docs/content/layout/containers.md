@@ -7,6 +7,7 @@ aliases:
   - "/layout/containers/"
   - "/4.0/layout/containers/"
 toc: true
+bootstrap: true
 ---
 
 ## How they work

@@ -7,6 +7,7 @@ aliases:
   - "/layout/gutters/"
   - "/4.0/layout/gutters/"
 toc: true
+bootstrap: true
 ---
 
 ## How they work

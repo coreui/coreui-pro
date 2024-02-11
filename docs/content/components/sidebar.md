@@ -9,6 +9,7 @@ aliases:
   - "/components/sidebar/"
   - "/4.0/components/sidebar/"
 toc: true
+bootstrap: true
 other_frameworks: sidebar
 ---
 

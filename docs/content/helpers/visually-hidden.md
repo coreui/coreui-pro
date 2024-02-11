@@ -3,6 +3,7 @@ layout: docs
 title: Visually hidden
 description: Use these helpers to visually hide elements but keep them accessible to assistive technologies.
 group: helpers
+bootstrap: true
 aliases:
   - "/helpers/text-truncation/"
   - "/4.0/helpers/screen-readers/"

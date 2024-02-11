@@ -7,6 +7,7 @@ aliases:
   - "/utilities/spacing/"
   - "/4.0/utilities/spacing/"
 toc: true
+bootstrap: true
 ---
 
 ## Margin and padding

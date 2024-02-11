@@ -3,6 +3,7 @@ layout: docs
 title: Stretched link
 description: Make any HTML element or CoreUI for Bootstrap component clickable by "stretching" a nested link via CSS.
 group: helpers
+bootstrap: true
 aliases:
   - "/4.0/helpers/stretched-link/"
   - "/4.1/helpers/stretched-link/"

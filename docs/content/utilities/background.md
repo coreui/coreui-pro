@@ -7,6 +7,7 @@ aliases:
   - "/utilities/background/"
   - "/4.0/utilities/background/"
 toc: true
+bootstrap: true
 ---
 
 ## Background color

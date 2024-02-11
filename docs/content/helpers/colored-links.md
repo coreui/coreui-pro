@@ -7,6 +7,7 @@ aliases:
   - "/helpers/colored-links/"
   - "/4.0/helpers/colored-links/"
 toc: false
+bootstrap: true
 ---
 
 You can use the `.link-*` classes to colorize links. Unlike the [`.text-*` classes]({{< docsref "/utilities/colors" >}}), these classes have a `:hover` and `:focus` state.

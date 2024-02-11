@@ -7,6 +7,7 @@ aliases:
   - "/forms/range/"
   - "/4.0/forms/range/"
 toc: true
+bootstrap: true
 other_frameworks: range
 ---
 

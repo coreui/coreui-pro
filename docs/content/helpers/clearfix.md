@@ -3,6 +3,7 @@ layout: docs
 title: Clearfix
 description: Quickly and easily clear floated content within a container by adding a clearfix utility.
 group: helpers
+bootstrap: true
 aliases:
   - "/4.0/helpers/"
   - "/4.0/helpers/clearfix/"

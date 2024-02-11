@@ -7,6 +7,7 @@ aliases:
   - "/layout/grid/"
   - "/4.0/layout/grid/"
 toc: true
+bootstrap: true
 ---
 
 ## Example

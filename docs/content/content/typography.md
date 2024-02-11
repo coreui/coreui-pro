@@ -7,6 +7,7 @@ aliases:
   - "/content/typography/"
   - "/4.0/content/typography/"
 toc: true
+bootstrap: true
 ---
 
 ## Global settings

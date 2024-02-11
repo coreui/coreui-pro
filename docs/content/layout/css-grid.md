@@ -7,6 +7,7 @@ aliases:
   - "/layout/css-grid/"
   - "/4.0/layout/css-grid/"
 toc: true
+bootstrap: true
 added: "5.1"
 ---
 

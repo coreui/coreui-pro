@@ -7,6 +7,7 @@ aliases:
   - "/utilities/text/"
   - "/4.0/utilities/text/"
 toc: true
+bootstrap: true
 ---
 
 ## Text alignment
