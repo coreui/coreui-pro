@@ -77,10 +77,10 @@ With dependencies installed and our project folder ready for us to start coding,
 
    <!-- eslint-skip -->
    ```js
-   const path = require('path')
+   import { resolve } from 'path'
 
    export default {
-     root: path.resolve(__dirname, 'src'),
+     root: resolve(__dirname, 'src'),
      server: {
        port: 8080
      }
@@ -136,15 +136,15 @@ In the next and final section to this guide, we’ll import all of CoreUI’s CS
 
    <!-- eslint-skip -->
    ```js
-   const path = require('path')
+   import { resolve } from 'path'
 
    export default {
      root: path.resolve(__dirname, 'src'),
      resolve: {
        alias: {
-         '~coreui': path.resolve(__dirname, 'node_modules/@coreui/coreui'),
+         '~coreui': resolve(__dirname, 'node_modules/@coreui/coreui'),
          // for CoreUI PRO users
-         // '~coreui': path.resolve(__dirname, 'node_modules/@coreui/coreui-pro'),
+         // '~coreui': resolve(__dirname, 'node_modules/@coreui/coreui-pro'),
        }
      },
      server: {

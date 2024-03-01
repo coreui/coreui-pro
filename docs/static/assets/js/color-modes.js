@@ -1,6 +1,6 @@
 /*!
  * Color mode toggler for CoreUI's docs (https://coreui.io/)
- * Copyright (c) 2023 creativeLabs Łukasz Holeczek
+ * Copyright (c) 2024 creativeLabs Łukasz Holeczek
  * Licensed under the Creative Commons Attribution 3.0 Unported License.
  */
 
@@ -22,9 +22,9 @@
   }
 
   const setTheme = theme => {
-    if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.documentElement.setAttribute('data-coreui-theme', 'dark')
-      document.documentElement.setAttribute('data-bs-theme', 'dark')
+    if (theme === 'auto') {
+      document.documentElement.setAttribute('data-coreui-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+      document.documentElement.setAttribute('data-bs-theme', (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
     } else {
       document.documentElement.setAttribute('data-coreui-theme', theme)
       document.documentElement.setAttribute('data-bs-theme', theme)
