@@ -723,7 +723,6 @@ class Calendar extends BaseComponent {
       calendarsEl.classList.add('show-week-numbers')
     }
 
-    // eslint-disable-next-line no-unused-vars
     for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
       calendarsEl.append(this._createCalendarPanel(index))
     }

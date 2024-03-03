@@ -663,7 +663,6 @@ class DateRangePicker extends BaseComponent {
           this._calendar.update(this._getCalendarConfig())
         })
       } else {
-        // eslint-disable-next-line no-unused-vars
         for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
           const timePickerEl = document.createElement('div')
           timePickerEl.classList.add(CLASS_NAME_TIME_PICKER)
