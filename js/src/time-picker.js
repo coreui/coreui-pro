@@ -1,4 +1,3 @@
-
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO time-picker.js
@@ -16,9 +15,7 @@ import {
   convert12hTo24h,
   convert24hTo12h,
   getAmPm,
-  getListOfHours,
-  getListOfMinutes,
-  getListOfSeconds,
+  getLocalizedTimePartials,
   isAmPm,
   isValidTime
 } from './util/time.js'
@@ -69,7 +66,8 @@ const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
 const CLASS_NAME_WAS_VALIDATED = 'was-validated'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)'
+const SELECTOR_DATA_TOGGLE =
+  '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
 const SELECTOR_WAS_VALIDATED = 'form.was-validated'
 
@@ -82,13 +80,16 @@ const Default = {
   container: 'dropdown',
   disabled: false,
   footer: true,
+  hours: null,
   indicator: true,
   inputReadOnly: false,
   invalid: false,
   locale: 'default',
+  minutes: true,
   name: null,
   placeholder: 'Select time',
   required: true,
+  seconds: true,
   size: null,
   time: null,
   valid: false,
@@ -104,13 +105,16 @@ const DefaultType = {
   container: 'string',
   disabled: 'boolean',
   footer: 'boolean',
+  hours: '(array|function)',
   indicator: 'boolean',
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
+  minutes: '(array|boolean|function)',
   name: 'string',
   placeholder: 'string',
   required: 'boolean',
+  seconds: '(array|boolean|function)',
   size: '(string|null)',
   time: '(date|string|null)',
   valid: 'boolean',
@@ -128,11 +132,21 @@ class TimePicker extends BaseComponent {
     this._config = this._getConfig(config)
     this._date = this._convertStringToDate(this._config.time)
     this._initialDate = null
-    this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am'
+    this._ampm = this._date ?
+      getAmPm(new Date(this._date), this._config.locale) :
+      'am'
     this._popper = null
 
     this._input = null
     this._timePickerBody = null
+
+    this._localizedTimePartials = getLocalizedTimePartials(
+      this._config.locale,
+      this.ampm,
+      this._config.hours,
+      this._config.minutes,
+      this._config.seconds
+    )
 
     this._createTimePicker()
     this._createTimePickerSelection()
@@ -193,7 +207,7 @@ class TimePicker extends BaseComponent {
 
   cancel() {
     this._date = this._initialDate
-    this._input.value = this._initialDate ? this._convertStringToDate(this._initialDate).toLocaleTimeString(this._config.locale) : ''
+    this._setInputValue(this._initialDate || '')
     this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this.hide()
@@ -202,7 +216,7 @@ class TimePicker extends BaseComponent {
 
   clear() {
     this._date = null
-    this._input.value = ''
+    this._setInputValue('')
     this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
@@ -210,7 +224,7 @@ class TimePicker extends BaseComponent {
 
   reset() {
     this._date = this._convertStringToDate(this._config.time)
-    this._input.value = this._convertStringToDate(this._config.time).toLocaleTimeString(this._config.locale)
+    this._setInputValue(this._config.time)
     this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
@@ -219,7 +233,9 @@ class TimePicker extends BaseComponent {
   update(config) {
     this._config = this._getConfig(config)
     this._date = this._convertStringToDate(this._config.time)
-    this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am'
+    this._ampm = this._date ?
+      getAmPm(new Date(this._date), this._config.locale) :
+      'am'
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
   }
@@ -287,7 +303,11 @@ class TimePicker extends BaseComponent {
   _createTimePicker() {
     this._element.classList.add(CLASS_NAME_TIME_PICKER)
 
-    Manipulator.setDataAttribute(this._element, 'toggle', CLASS_NAME_TIME_PICKER)
+    Manipulator.setDataAttribute(
+      this._element,
+      'toggle',
+      CLASS_NAME_TIME_PICKER
+    )
 
     if (this._config.size) {
       this._element.classList.add(`time-picker-${this._config.size}`)
@@ -332,7 +352,8 @@ class TimePicker extends BaseComponent {
     inputEl.readOnly = this._config.inputReadOnly
     inputEl.required = this._config.required
     inputEl.type = 'text'
-    inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : ''
+
+    this._setInputValue(this._date || '', inputEl)
 
     if (this._config.name || this._element.id) {
       inputEl.name = this._config.name || `time-picker-${this._element.id}`
@@ -413,7 +434,9 @@ class TimePicker extends BaseComponent {
     const selectEl = document.createElement('select')
     selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className)
     selectEl.disabled = this._config.disabled
-    selectEl.addEventListener('change', event => this._handleTimeChange(className, event.target.value))
+    selectEl.addEventListener('change', event =>
+      this._handleTimeChange(className, event.target.value)
+    )
 
     for (const option of options) {
       const optionEl = document.createElement('option')
@@ -432,30 +455,83 @@ class TimePicker extends BaseComponent {
 
     this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`
     this._timePickerBody.append(
-      this._createTimePickerInlineSelect('hours', getListOfHours(this._config.locale)),
-      timeSeparatorEl.cloneNode(true),
-      this._createTimePickerInlineSelect('minutes', getListOfMinutes(this._config.locale, true)),
-      timeSeparatorEl,
-      this._createTimePickerInlineSelect('seconds', getListOfSeconds(this._config.locale, true))
+      this._createTimePickerInlineSelect(
+        'hours',
+        this._localizedTimePartials.listOfHours
+      )
     )
 
-    if (isAmPm(this._config.locale)) {
+    if (this._config.minutes) {
       this._timePickerBody.append(
-        this._createTimePickerInlineSelect('toggle', [{ value: 'am', label: 'AM' }, { value: 'pm', label: 'PM' }], '_selectAmPm', this._ampm)
+        timeSeparatorEl.cloneNode(true),
+        this._createTimePickerInlineSelect(
+          'minutes',
+          this._localizedTimePartials.listOfMinutes
+        )
+      )
+    }
+
+    if (this._config.seconds) {
+      this._timePickerBody.append(
+        timeSeparatorEl,
+        this._createTimePickerInlineSelect(
+          'seconds',
+          this._localizedTimePartials.listOfSeconds
+        )
+      )
+    }
+
+    if (this._localizedTimePartials.hour12) {
+      this._timePickerBody.append(
+        this._createTimePickerInlineSelect(
+          'toggle',
+          [
+            { value: 'am', label: 'AM' },
+            { value: 'pm', label: 'PM' }
+          ],
+          '_selectAmPm',
+          this._ampm
+        )
       )
     }
   }
 
   _createTimePickerRoll() {
     this._timePickerBody.append(
-      this._createTimePickerRollCol(getListOfHours(this._config.locale), 'hours'),
-      this._createTimePickerRollCol(getListOfMinutes(this._config.locale), 'minutes'),
-      this._createTimePickerRollCol(getListOfSeconds(this._config.locale), 'seconds')
+      this._createTimePickerRollCol(
+        this._localizedTimePartials.listOfHours,
+        'hours'
+      )
     )
 
-    if (isAmPm(this._config.locale)) {
+    if (this._config.minutes) {
       this._timePickerBody.append(
-        this._createTimePickerRollCol([{ value: 'am', label: 'AM' }, { value: 'pm', label: 'PM' }], 'toggle', this._ampm)
+        this._createTimePickerRollCol(
+          this._localizedTimePartials.listOfMinutes,
+          'minutes'
+        )
+      )
+    }
+
+    if (this._config.seconds) {
+      this._timePickerBody.append(
+        this._createTimePickerRollCol(
+          this._localizedTimePartials.listOfSeconds,
+          'seconds'
+        )
+      )
+    }
+
+    if (this._localizedTimePartials.hour12) {
+      this._timePickerBody.append(
+        this._createTimePickerRollCol(
+          [
+            { value: 'am', label: 'AM' },
+            { value: 'pm', label: 'PM' }
+          ],
+          'toggle',
+          this._ampm
+        )
       )
     }
   }
@@ -494,7 +570,9 @@ class TimePicker extends BaseComponent {
 
     if (this._config.cancelButton) {
       const cancelButtonEl = document.createElement('button')
-      cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses))
+      cancelButtonEl.classList.add(
+        ...this._getButtonClasses(this._config.cancelButtonClasses)
+      )
       cancelButtonEl.type = 'button'
       cancelButtonEl.innerHTML = this._config.cancelButton
       cancelButtonEl.addEventListener('click', () => {
@@ -506,7 +584,9 @@ class TimePicker extends BaseComponent {
 
     if (this._config.confirmButton) {
       const confirmButtonEl = document.createElement('button')
-      confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses))
+      confirmButtonEl.classList.add(
+        ...this._getButtonClasses(this._config.confirmButtonClasses)
+      )
       confirmButtonEl.type = 'button'
       confirmButtonEl.innerHTML = this._config.confirmButton
       confirmButtonEl.addEventListener('click', () => {
@@ -521,8 +601,14 @@ class TimePicker extends BaseComponent {
 
   _setUpRolls(initial = false) {
     for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-      for (const element of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
-        if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
+      for (const element of SelectorEngine.find(
+        `[data-coreui-${part}]`,
+        this._element
+      )) {
+        if (
+          this._getPartOfTime(part) ===
+          Manipulator.getDataAttribute(element, part)
+        ) {
           element.classList.add(CLASS_NAME_SELECTED)
           this._scrollTo(element.parentElement, element, initial)
 
@@ -537,9 +623,23 @@ class TimePicker extends BaseComponent {
     }
   }
 
+  _setInputValue(date, input = this._input) {
+    input.value = date instanceof Date ?
+      date.toLocaleTimeString(this._config.locale, {
+        hour12: this._localizedTimePartials.hour12,
+        hour: 'numeric',
+        ...(this._config.minutes && { minute: 'numeric' }),
+        ...(this._config.seconds && { second: 'numeric' })
+      }) :
+      date
+  }
+
   _setUpSelects() {
     for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-      for (const element of SelectorEngine.find(`select.${part}`, this._element)) {
+      for (const element of SelectorEngine.find(
+        `select.${part}`,
+        this._element
+      )) {
         if (this._getPartOfTime(part)) {
           element.value = this._getPartOfTime(part)
         }
@@ -553,31 +653,43 @@ class TimePicker extends BaseComponent {
   }
 
   _convertStringToDate(date) {
-    return date ? (date instanceof Date ? date : new Date(`1970-01-01 ${date}`)) : null
+    return date ?
+      (date instanceof Date ?
+        date :
+        new Date(`1970-01-01 ${date}`)) :
+      null
   }
 
   _createPopper() {
     if (typeof Popper === 'undefined') {
-      throw new TypeError('CoreUI\'s time picker require Popper (https://popper.js.org)')
+      throw new TypeError(
+        'CoreUI\'s time picker require Popper (https://popper.js.org)'
+      )
     }
 
     const popperConfig = {
-      modifiers: [{
-        name: 'preventOverflow',
-        options: {
-          boundary: 'clippingParents'
+      modifiers: [
+        {
+          name: 'preventOverflow',
+          options: {
+            boundary: 'clippingParents'
+          }
+        },
+        {
+          name: 'offset',
+          options: {
+            offset: [0, 2]
+          }
         }
-      },
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 2]
-        }
-      }],
+      ],
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
     }
 
-    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
+    this._popper = Popper.createPopper(
+      this._togglerElement,
+      this._menu,
+      popperConfig
+    )
   }
 
   _getButtonClasses(classes) {
@@ -604,7 +716,9 @@ class TimePicker extends BaseComponent {
     }
 
     if (part === 'hours') {
-      return isAmPm(this._config.locale) ? convert24hTo12h(this._date.getHours()) : this._date.getHours()
+      return isAmPm(this._config.locale) ?
+        convert24hTo12h(this._date.getHours()) :
+        this._date.getHours()
     }
 
     if (part === 'minutes') {
@@ -654,7 +768,7 @@ class TimePicker extends BaseComponent {
     this._date = new Date(_date)
 
     if (this._input) {
-      this._input.value = _date.toLocaleTimeString(this._config.locale)
+      this._setInputValue(_date)
       this._input.dispatchEvent(new Event('change'))
     }
 
@@ -670,7 +784,10 @@ class TimePicker extends BaseComponent {
   }
 
   _scrollTo(parent, children, initial = false) {
-    parent.scrollTo({ top: children.offsetTop, behavior: initial ? 'instant' : 'smooth' })
+    parent.scrollTo({
+      top: children.offsetTop,
+      behavior: initial ? 'instant' : 'smooth'
+    })
   }
 
   // Static
@@ -695,7 +812,11 @@ class TimePicker extends BaseComponent {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (
+        data[config] === undefined ||
+        config.startsWith('_') ||
+        config === 'constructor'
+      ) {
         throw new TypeError(`No method named "${config}"`)
       }
 
@@ -704,7 +825,10 @@ class TimePicker extends BaseComponent {
   }
 
   static clearMenus(event) {
-    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
+    if (
+      event.button === RIGHT_MOUSE_BUTTON ||
+      (event.type === 'keyup' && event.key !== TAB_KEY)
+    ) {
       return
     }
 
@@ -719,9 +843,7 @@ class TimePicker extends BaseComponent {
 
       const composedPath = event.composedPath()
 
-      if (
-        composedPath.includes(context._element)
-      ) {
+      if (composedPath.includes(context._element)) {
         continue
       }
 
