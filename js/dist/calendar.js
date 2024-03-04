@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v5.0.0-rc.1 (https://coreui.io)
+  * CoreUI calendar.js v5.0.0-rc.2 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -564,8 +564,6 @@
       if (this._config.showWeekNumber) {
         calendarsEl.classList.add('show-week-numbers');
       }
-
-      // eslint-disable-next-line no-unused-vars
       for (const [index, _] of Array.from({
         length: this._config.calendars
       }).entries()) {

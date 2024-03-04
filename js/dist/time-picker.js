@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v5.0.0-rc.1 (https://coreui.io)
+  * CoreUI time-picker.js v5.0.0-rc.2 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -90,13 +90,16 @@
     container: 'dropdown',
     disabled: false,
     footer: true,
+    hours: null,
     indicator: true,
     inputReadOnly: false,
     invalid: false,
     locale: 'default',
+    minutes: true,
     name: null,
     placeholder: 'Select time',
     required: true,
+    seconds: true,
     size: null,
     time: null,
     valid: false,
@@ -111,13 +114,16 @@
     container: 'string',
     disabled: 'boolean',
     footer: 'boolean',
+    hours: '(array|function)',
     indicator: 'boolean',
     inputReadOnly: 'boolean',
     invalid: 'boolean',
     locale: 'string',
+    minutes: '(array|boolean|function)',
     name: 'string',
     placeholder: 'string',
     required: 'boolean',
+    seconds: '(array|boolean|function)',
     size: '(string|null)',
     time: '(date|string|null)',
     valid: 'boolean',
@@ -158,7 +164,7 @@
         }
         this._date = new Date(_date);
         if (this._input) {
-          this._input.value = _date.toLocaleTimeString(this._config.locale);
+          this._setInputValue(_date);
           this._input.dispatchEvent(new Event('change'));
         }
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
@@ -174,6 +180,7 @@
       this._popper = null;
       this._input = null;
       this._timePickerBody = null;
+      this._localizedTimePartials = time_js.getLocalizedTimePartials(this._config.locale, this.ampm, this._config.hours, this._config.minutes, this._config.seconds);
       this._createTimePicker();
       this._createTimePickerSelection();
       this._addEventListeners();
@@ -222,7 +229,7 @@
     }
     cancel() {
       this._date = this._initialDate;
-      this._input.value = this._initialDate ? this._convertStringToDate(this._initialDate).toLocaleTimeString(this._config.locale) : '';
+      this._setInputValue(this._initialDate || '');
       this._input.dispatchEvent(new Event('change'));
       this._timePickerBody.innerHTML = '';
       this.hide();
@@ -230,14 +237,14 @@
     }
     clear() {
       this._date = null;
-      this._input.value = '';
+      this._setInputValue('');
       this._input.dispatchEvent(new Event('change'));
       this._timePickerBody.innerHTML = '';
       this._createTimePickerSelection();
     }
     reset() {
       this._date = this._convertStringToDate(this._config.time);
-      this._input.value = this._convertStringToDate(this._config.time).toLocaleTimeString(this._config.locale);
+      this._setInputValue(this._config.time);
       this._input.dispatchEvent(new Event('change'));
       this._timePickerBody.innerHTML = '';
       this._createTimePickerSelection();
@@ -336,7 +343,7 @@
       inputEl.readOnly = this._config.inputReadOnly;
       inputEl.required = this._config.required;
       inputEl.type = 'text';
-      inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : '';
+      this._setInputValue(this._date || '', inputEl);
       if (this._config.name || this._element.id) {
         inputEl.name = this._config.name || `time-picker-${this._element.id}`;
       }
@@ -414,8 +421,14 @@
       const timeSeparatorEl = document.createElement('div');
       timeSeparatorEl.innerHTML = ':';
       this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`;
-      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', time_js.getListOfHours(this._config.locale)), timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', time_js.getListOfMinutes(this._config.locale, true)), timeSeparatorEl, this._createTimePickerInlineSelect('seconds', time_js.getListOfSeconds(this._config.locale, true)));
-      if (time_js.isAmPm(this._config.locale)) {
+      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours));
+      if (this._config.minutes) {
+        this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes));
+      }
+      if (this._config.seconds) {
+        this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds));
+      }
+      if (this._localizedTimePartials.hour12) {
         this._timePickerBody.append(this._createTimePickerInlineSelect('toggle', [{
           value: 'am',
           label: 'AM'
@@ -426,8 +439,14 @@
       }
     }
     _createTimePickerRoll() {
-      this._timePickerBody.append(this._createTimePickerRollCol(time_js.getListOfHours(this._config.locale), 'hours'), this._createTimePickerRollCol(time_js.getListOfMinutes(this._config.locale), 'minutes'), this._createTimePickerRollCol(time_js.getListOfSeconds(this._config.locale), 'seconds'));
-      if (time_js.isAmPm(this._config.locale)) {
+      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours'));
+      if (this._config.minutes) {
+        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes'));
+      }
+      if (this._config.seconds) {
+        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds'));
+      }
+      if (this._localizedTimePartials.hour12) {
         this._timePickerBody.append(this._createTimePickerRollCol([{
           value: 'am',
           label: 'AM'
@@ -500,6 +519,18 @@
           }
         }
       }
+    }
+    _setInputValue(date, input = this._input) {
+      input.value = date instanceof Date ? date.toLocaleTimeString(this._config.locale, {
+        hour12: this._localizedTimePartials.hour12,
+        hour: 'numeric',
+        ...(this._config.minutes && {
+          minute: 'numeric'
+        }),
+        ...(this._config.seconds && {
+          second: 'numeric'
+        })
+      }) : date;
     }
     _setUpSelects() {
       for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {

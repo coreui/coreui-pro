@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.0.0-rc.1 (https://coreui.io)
+  * CoreUI v5.0.0-rc.2 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -212,7 +212,6 @@ const noop = () => {};
 const reflow = element => {
   element.offsetHeight; // eslint-disable-line no-unused-expressions
 };
-
 const getjQuery = () => {
   if (window.jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
     return window.jQuery;
@@ -662,7 +661,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.0.0-rc.1';
+const VERSION = '5.0.0-rc-2';
 
 /**
  * Class definition
@@ -746,9 +745,9 @@ const getSelector = element => {
     if (hrefAttribute.includes('#') && !hrefAttribute.startsWith('#')) {
       hrefAttribute = `#${hrefAttribute.split('#')[1]}`;
     }
-    selector = hrefAttribute && hrefAttribute !== '#' ? parseSelector(hrefAttribute.trim()) : null;
+    selector = hrefAttribute && hrefAttribute !== '#' ? hrefAttribute.trim() : null;
   }
-  return selector;
+  return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null;
 };
 const SelectorEngine = {
   find(selector, element = document.documentElement) {
@@ -1753,8 +1752,6 @@ class Calendar extends BaseComponent {
     if (this._config.showWeekNumber) {
       calendarsEl.classList.add('show-week-numbers');
     }
-
-    // eslint-disable-next-line no-unused-vars
     for (const [index, _] of Array.from({
       length: this._config.calendars
     }).entries()) {
@@ -2611,6 +2608,12 @@ EventHandler.on(document, EVENT_CLICK_DATA_API$b, SELECTOR_DATA_TOGGLE$9, functi
 
 defineJQueryPlugin(Collapse);
 
+/**
+ * Converts a 12-hour time format to a 24-hour time format.
+ * @param {('am' | 'pm')} abbr The abbreviation indicating AM or PM.
+ * @param {number} hour The hour to be converted.
+ * @returns {number} The hour in 24-hour format.
+ */
 const convert12hTo24h = (abbr, hour) => {
   if (abbr === 'am' && hour === 12) {
     return 0;
@@ -2623,7 +2626,20 @@ const convert12hTo24h = (abbr, hour) => {
   }
   return hour + 12;
 };
+
+/**
+ * Converts a 24-hour time format to a 12-hour format.
+ * @param {number} hour The hour to be converted.
+ * @returns {number} The hour in 12-hour format.
+ */
 const convert24hTo12h = hour => hour % 12 || 12;
+
+/**
+ * Retrieves the AM/PM part of the specified date according to the given locale.
+ * @param {Date} date The date from which to extract the AM/PM part.
+ * @param {string} locale The locale to use for formatting.
+ * @returns {string} 'am' or 'pm' based on the given date and locale.
+ */
 const getAmPm = (date, locale) => {
   if (date.toLocaleTimeString(locale).includes('AM')) {
     return 'am';
@@ -2633,45 +2649,174 @@ const getAmPm = (date, locale) => {
   }
   return date.getHours() >= 12 ? 'pm' : 'am';
 };
-const getListOfHours = (locale, ampm = 'auto') => Array.from({
-  length: ampm === 'auto' && isAmPm(locale) || ampm === true ? 12 : 24
-}, (_, i) => {
+
+/**
+ * Formats an array of time values (hours, minutes, or seconds) according to the specified locale and partial.
+ * @param {number[]} values An array of time values to format.
+ * @param {string} locale The locale to use for formatting.
+ * @param {('hour' | 'minute' | 'second')} partial The type of time value to format.
+ * @returns {Array} An array of objects with the original value and its localized label.
+ */
+const formatTimePartials = (values, locale, partial) => {
+  const date = new Date();
+  const formatter = new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  return values.map(value => {
+    var _formatter$formatToPa;
+    if (partial === 'hour') {
+      date.setHours(value);
+    }
+    if (partial === 'minute') {
+      date.setMinutes(value);
+    }
+    if (partial === 'second') {
+      date.setSeconds(value);
+    }
+    return {
+      value,
+      label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? void 0 : _formatter$formatToPa.value) || ''
+    };
+  });
+};
+
+/**
+ * Generates localized time partials (hours, minutes, seconds) based on the given parameters.
+ * @param {string} locale The locale to use for generating localized time partials.
+ * @param {'auto' | boolean} ampm Determines whether to use 12-hour or 24-hour format. 'auto' decides based on locale.
+ * @param {boolean | number[] | Function} hours An array of hours, a boolean, or a function to generate hours.
+ * @param {boolean | number[] | Function} minutes An array of minutes, a boolean, or a function to generate minutes.
+ * @param {boolean | number[] | Function} seconds An array of seconds, a boolean, or a function to generate seconds.
+ * @returns {LocalizedTimePartials} An object containing arrays of localized time partials and a boolean indicating if 12-hour format is used.
+ */
+const getLocalizedTimePartials = (locale, ampm = 'auto', hours = [], minutes = [], seconds = []) => {
+  const hour12 = ampm === 'auto' && isAmPm(locale) || ampm === true;
+  const listOfHours = Array.isArray(hours) && hours.length > 0 ? hours : typeof hours === 'function' ? Array.from({
+    length: hour12 ? 12 : 24
+  }, (_, i) => hour12 ? i + 1 : i).filter(hour => hours(hour)) : Array.from({
+    length: hour12 ? 12 : 24
+  }, (_, i) => hour12 ? i + 1 : i);
+  const listOfMinutes = Array.isArray(minutes) && minutes.length > 0 ? minutes : typeof minutes === 'function' ? Array.from({
+    length: 60
+  }, (_, i) => i).filter(minute => minutes(minute)) : Array.from({
+    length: 60
+  }, (_, i) => i);
+  const listOfSeconds = Array.isArray(seconds) && seconds.length > 0 ? seconds : typeof seconds === 'function' ? Array.from({
+    length: 60
+  }, (_, i) => i).filter(second => seconds(second)) : Array.from({
+    length: 60
+  }, (_, i) => i);
   return {
-    value: ampm === 'auto' && isAmPm(locale) || ampm === true ? i + 1 : i,
-    label: (ampm === 'auto' && isAmPm(locale) || ampm === true ? i + 1 : i).toLocaleString(locale)
+    listOfHours: formatTimePartials(listOfHours, locale, 'hour'),
+    listOfMinutes: formatTimePartials(listOfMinutes, locale, 'minute'),
+    listOfSeconds: formatTimePartials(listOfSeconds, locale, 'second'),
+    hour12
   };
-});
-const getListOfMinutes = (locale, valueAsString = false) => Array.from({
-  length: 60
-}, (_, i) => {
-  const d = new Date();
-  d.setMinutes(i);
-  return {
-    value: valueAsString ? i.toString() : i,
-    label: d.toLocaleTimeString(locale, {
-      minute: '2-digit',
-      second: '2-digit'
-    }).split(/[^\dA-Za-z\u06F0-\u06F9]/)[0]
-  };
-});
-const getListOfSeconds = (locale, valueAsString = false) => Array.from({
-  length: 60
-}, (_, i) => {
-  const d = new Date();
-  d.setSeconds(i);
-  return {
-    value: valueAsString ? i.toString() : i,
-    label: d.toLocaleTimeString(locale, {
-      minute: '2-digit',
-      second: '2-digit'
-    }).split(/[^\dA-Za-z\u06F0-\u06F9]/)[1]
-  };
-});
+};
+
+/**
+ * Determines if the given locale uses AM/PM format.
+ * @param {string} locale The locale to check.
+ * @returns {boolean} True if the locale uses AM/PM format, otherwise false.
+ */
 const isAmPm = locale => ['am', 'AM', 'pm', 'PM'].some(el => new Date().toLocaleString(locale).includes(el));
+
+/**
+ * Validates if the given string represents a valid time.
+ * @param {string} time The time string to validate.
+ * @returns {boolean} True if the string is a valid time, otherwise false.
+ */
 const isValidTime = time => {
   const d = new Date(`1970-01-01 ${time}`);
   return d instanceof Date && d.getTime();
 };
+
+// export const convert12hTo24h = (abbr, hour) => {
+//   if (abbr === 'am' && hour === 12) {
+//     return 0
+//   }
+
+//   if (abbr === 'am') {
+//     return hour
+//   }
+
+//   if (abbr === 'pm' && hour === 12) {
+//     return 12
+//   }
+
+//   return hour + 12
+// }
+
+// export const convert24hTo12h = hour => hour % 12 || 12
+
+// export const convertTimeToDate = time =>
+//   time ?
+//     (time instanceof Date ?
+//       time :
+//       new Date(`1970-01-01 ${time}`)) :
+//     null
+
+// export const getAmPm = (date, locale) => {
+//   if (date.toLocaleTimeString(locale).includes('AM')) {
+//     return 'am'
+//   }
+
+//   if (date.toLocaleTimeString(locale).includes('PM')) {
+//     return 'pm'
+//   }
+
+//   return date.getHours() >= 12 ? 'pm' : 'am'
+// }
+
+// export const getListOfHours = (locale, ampm = 'auto') => Array.from({ length: (ampm === 'auto' && isAmPm(locale)) || ampm === true ? 12 : 24 }, (_, i) => {
+//   return {
+//     value: (ampm === 'auto' && isAmPm(locale)) || ampm === true ? i + 1 : i,
+//     label: ((ampm === 'auto' && isAmPm(locale)) || ampm === true ? i + 1 : i).toLocaleString(locale)
+//   }
+// })
+
+// export const getListOfMinutes = (locale, valueAsString = false) => Array.from({ length: 60 }, (_, i) => {
+//   const d = new Date()
+//   d.setMinutes(i)
+//   return {
+//     value: valueAsString ? i.toString() : i,
+//     label: d
+//       .toLocaleTimeString(locale, {
+//         minute: '2-digit',
+//         second: '2-digit'
+//       })
+//       .split(/[^\dA-Za-z\u06F0-\u06F9]/)[0]
+//   }
+// })
+
+// export const getListOfSeconds = (locale, valueAsString = false) => Array.from({ length: 60 }, (_, i) => {
+//   const d = new Date()
+//   d.setSeconds(i)
+//   return {
+//     value: valueAsString ? i.toString() : i,
+//     label: d
+//       .toLocaleTimeString(locale, {
+//         minute: '2-digit',
+//         second: '2-digit'
+//       })
+//       .split(/[^\dA-Za-z\u06F0-\u06F9]/)[1]
+//   }
+// })
+
+// export const getSelectedHour = (date, locale) => date ? (isAmPm(locale) ? convert24hTo12h(date.getHours()) : date.getHours()) : ''
+
+// export const getSelectedMinutes = date => (date ? date.getMinutes() : '')
+
+// export const getSelectedSeconds = date => (date ? date.getSeconds() : '')
+
+// export const isAmPm = locale => ['am', 'AM', 'pm', 'PM'].some(el => new Date().toLocaleString(locale).includes(el))
+
+// export const isValidTime = time => {
+//   const d = new Date(`1970-01-01 ${time}`)
+//   return d instanceof Date && d.getTime()
+// }
 
 /**
  * --------------------------------------------------------------------------
@@ -2735,13 +2880,16 @@ const Default$g = {
   container: 'dropdown',
   disabled: false,
   footer: true,
+  hours: null,
   indicator: true,
   inputReadOnly: false,
   invalid: false,
   locale: 'default',
+  minutes: true,
   name: null,
   placeholder: 'Select time',
   required: true,
+  seconds: true,
   size: null,
   time: null,
   valid: false,
@@ -2756,13 +2904,16 @@ const DefaultType$g = {
   container: 'string',
   disabled: 'boolean',
   footer: 'boolean',
+  hours: '(array|function)',
   indicator: 'boolean',
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
+  minutes: '(array|boolean|function)',
   name: 'string',
   placeholder: 'string',
   required: 'boolean',
+  seconds: '(array|boolean|function)',
   size: '(string|null)',
   time: '(date|string|null)',
   valid: 'boolean',
@@ -2803,7 +2954,7 @@ class TimePicker extends BaseComponent {
       }
       this._date = new Date(_date);
       if (this._input) {
-        this._input.value = _date.toLocaleTimeString(this._config.locale);
+        this._setInputValue(_date);
         this._input.dispatchEvent(new Event('change'));
       }
       EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
@@ -2819,6 +2970,7 @@ class TimePicker extends BaseComponent {
     this._popper = null;
     this._input = null;
     this._timePickerBody = null;
+    this._localizedTimePartials = getLocalizedTimePartials(this._config.locale, this.ampm, this._config.hours, this._config.minutes, this._config.seconds);
     this._createTimePicker();
     this._createTimePickerSelection();
     this._addEventListeners();
@@ -2867,7 +3019,7 @@ class TimePicker extends BaseComponent {
   }
   cancel() {
     this._date = this._initialDate;
-    this._input.value = this._initialDate ? this._convertStringToDate(this._initialDate).toLocaleTimeString(this._config.locale) : '';
+    this._setInputValue(this._initialDate || '');
     this._input.dispatchEvent(new Event('change'));
     this._timePickerBody.innerHTML = '';
     this.hide();
@@ -2875,14 +3027,14 @@ class TimePicker extends BaseComponent {
   }
   clear() {
     this._date = null;
-    this._input.value = '';
+    this._setInputValue('');
     this._input.dispatchEvent(new Event('change'));
     this._timePickerBody.innerHTML = '';
     this._createTimePickerSelection();
   }
   reset() {
     this._date = this._convertStringToDate(this._config.time);
-    this._input.value = this._convertStringToDate(this._config.time).toLocaleTimeString(this._config.locale);
+    this._setInputValue(this._config.time);
     this._input.dispatchEvent(new Event('change'));
     this._timePickerBody.innerHTML = '';
     this._createTimePickerSelection();
@@ -2981,7 +3133,7 @@ class TimePicker extends BaseComponent {
     inputEl.readOnly = this._config.inputReadOnly;
     inputEl.required = this._config.required;
     inputEl.type = 'text';
-    inputEl.value = this._date ? this._date.toLocaleTimeString(this._config.locale) : '';
+    this._setInputValue(this._date || '', inputEl);
     if (this._config.name || this._element.id) {
       inputEl.name = this._config.name || `time-picker-${this._element.id}`;
     }
@@ -3059,8 +3211,14 @@ class TimePicker extends BaseComponent {
     const timeSeparatorEl = document.createElement('div');
     timeSeparatorEl.innerHTML = ':';
     this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`;
-    this._timePickerBody.append(this._createTimePickerInlineSelect('hours', getListOfHours(this._config.locale)), timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', getListOfMinutes(this._config.locale, true)), timeSeparatorEl, this._createTimePickerInlineSelect('seconds', getListOfSeconds(this._config.locale, true)));
-    if (isAmPm(this._config.locale)) {
+    this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours));
+    if (this._config.minutes) {
+      this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes));
+    }
+    if (this._config.seconds) {
+      this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds));
+    }
+    if (this._localizedTimePartials.hour12) {
       this._timePickerBody.append(this._createTimePickerInlineSelect('toggle', [{
         value: 'am',
         label: 'AM'
@@ -3071,8 +3229,14 @@ class TimePicker extends BaseComponent {
     }
   }
   _createTimePickerRoll() {
-    this._timePickerBody.append(this._createTimePickerRollCol(getListOfHours(this._config.locale), 'hours'), this._createTimePickerRollCol(getListOfMinutes(this._config.locale), 'minutes'), this._createTimePickerRollCol(getListOfSeconds(this._config.locale), 'seconds'));
-    if (isAmPm(this._config.locale)) {
+    this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours'));
+    if (this._config.minutes) {
+      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes'));
+    }
+    if (this._config.seconds) {
+      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds'));
+    }
+    if (this._localizedTimePartials.hour12) {
       this._timePickerBody.append(this._createTimePickerRollCol([{
         value: 'am',
         label: 'AM'
@@ -3145,6 +3309,18 @@ class TimePicker extends BaseComponent {
         }
       }
     }
+  }
+  _setInputValue(date, input = this._input) {
+    input.value = date instanceof Date ? date.toLocaleTimeString(this._config.locale, {
+      hour12: this._localizedTimePartials.hour12,
+      hour: 'numeric',
+      ...(this._config.minutes && {
+        minute: 'numeric'
+      }),
+      ...(this._config.seconds && {
+        second: 'numeric'
+      })
+    }) : date;
   }
   _setUpSelects() {
     for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
@@ -3830,7 +4006,6 @@ class DateRangePicker extends BaseComponent {
           this._calendar.update(this._getCalendarConfig());
         });
       } else {
-        // eslint-disable-next-line no-unused-vars
         for (const [index, _] of Array.from({
           length: this._config.calendars
         }).entries()) {
@@ -4768,7 +4943,6 @@ const Default$b = {
   // if false, we use the backdrop helper without adding any element to the dom
   rootElement: 'body' // give the choice to place backdrop under different elements
 };
-
 const DefaultType$b = {
   className: 'string',
   clickCallback: '(function|null)',
@@ -4896,7 +5070,6 @@ const Default$a = {
   autofocus: true,
   trapElement: null // The element to trap focus inside of
 };
-
 const DefaultType$a = {
   autofocus: 'boolean',
   trapElement: 'element'
@@ -6304,11 +6477,9 @@ class Navigation extends BaseComponent {
       if (element.nodeType === 3) {
         continue; // text node
       }
-
       if (element.nodeType === 8) {
         continue; // comment node
       }
-
       if (!filter || filter(element)) {
         siblings.push(element);
       }
@@ -6680,7 +6851,10 @@ const DefaultAllowlist = {
   br: [],
   col: [],
   code: [],
+  dd: [],
   div: [],
+  dl: [],
+  dt: [],
   em: [],
   hr: [],
   h1: [],
