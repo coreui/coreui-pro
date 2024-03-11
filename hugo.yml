@@ -1,6 +1,6 @@
 languageCode:           "en"
 title:                  "CoreUI"
-baseURL:                "https://coreui.io/bootstrap/docs/"
+baseURL:                "https://coreui.io/bootstrap/docs/4.x/"
 canonifyURLs:           true
 
 security:
