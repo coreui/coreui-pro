@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.0.0-rc-2';
+  const VERSION = '5.0.0-rc.3';
 
   /**
    * Class definition
