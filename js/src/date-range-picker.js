@@ -310,6 +310,7 @@ class DateRangePicker extends BaseComponent {
     this._endDate = this._config.endDate
     this._selectEndDate = this._config.selectEndDate
 
+    this._element.innerHTML = ''
     this._createDateRangePicker()
     this._createDateRangePickerCalendars()
     this._addEventListeners()
