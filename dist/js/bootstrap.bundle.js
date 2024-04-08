@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.0.0 (https://bs.io)
+  * CoreUI v5.0.1 (https://bs.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.0.0';
+  const VERSION = '5.0.1';
 
   /**
    * Class definition
@@ -5575,6 +5575,7 @@
       this._startDate = this._config.date || this._config.startDate;
       this._endDate = this._config.endDate;
       this._selectEndDate = this._config.selectEndDate;
+      this._element.innerHTML = '';
       this._createDateRangePicker();
       this._createDateRangePickerCalendars();
       this._addEventListeners();

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.0.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.0.1 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -296,6 +296,7 @@
       this._startDate = this._config.date || this._config.startDate;
       this._endDate = this._config.endDate;
       this._selectEndDate = this._config.selectEndDate;
+      this._element.innerHTML = '';
       this._createDateRangePicker();
       this._createDateRangePickerCalendars();
       this._addEventListeners();
