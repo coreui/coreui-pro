@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 // NOTICE!!! Initially embedded in our docs this JavaScript
 // file contains elements that can help you create reproducible
 // use cases in StackBlitz for instance.
@@ -13,8 +14,6 @@
 
 /* global coreui: false, dayjs: false */
 (() => {
-  'use strict'
-
   // --------
   // Tooltips
   // --------
@@ -437,4 +436,54 @@
     new coreui.DateRangePicker(myDateRangePickerCustomRanges, optionsCustomRanges)
   }
   // js-docs-end date-range-picker-custom-ranges
+
+  // js-docs-start range-custom-icons1
+  const myRatingCustomIcons1 = document.getElementById('myRatingCustomIcons1')
+  if (myRatingCustomIcons1) {
+    const optionsCustomIcons1 = {
+      activeIcon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M470.935,194.043,333.8,171.757,270.227,48.22a16,16,0,0,0-28.454,0L178.2,171.757,41.065,194.043A16,16,0,0,0,32.273,221.1l97.845,98.636L108.936,457.051a16,16,0,0,0,23.02,16.724L256,411.2l124.044,62.576a16,16,0,0,0,23.02-16.724L381.882,319.74,479.727,221.1A16,16,0,0,0,470.935,194.043Z"/></svg>',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M494,198.671a40.536,40.536,0,0,0-32.174-27.592L345.917,152.242,292.185,47.828a40.7,40.7,0,0,0-72.37,0L166.083,152.242,50.176,171.079a40.7,40.7,0,0,0-22.364,68.827l82.7,83.368-17.9,116.055a40.672,40.672,0,0,0,58.548,42.538L256,428.977l104.843,52.89a40.69,40.69,0,0,0,58.548-42.538l-17.9-116.055,82.7-83.368A40.538,40.538,0,0,0,494,198.671Zm-32.53,18.7L367.4,312.2l20.364,132.01a8.671,8.671,0,0,1-12.509,9.088L256,393.136,136.744,453.3a8.671,8.671,0,0,1-12.509-9.088L144.6,312.2,50.531,217.37a8.7,8.7,0,0,1,4.778-14.706L187.15,181.238,248.269,62.471a8.694,8.694,0,0,1,15.462,0L324.85,181.238l131.841,21.426A8.7,8.7,0,0,1,461.469,217.37Z"/></svg>',
+      value: 3
+    }
+    new coreui.Rating(myRatingCustomIcons1, optionsCustomIcons1)
+  }
+  // js-docs-end range-custom-icons1
+
+  // js-docs-start range-custom-icons2
+  const myRatingCustomIcons2 = document.getElementById('myRatingCustomIcons2')
+  if (myRatingCustomIcons2) {
+    const optionsCustomIcons2 = {
+      activeIcon: '<i class="cil-heart text-danger"></i>',
+      icon: '<i class="cil-heart"></i>',
+      value: 3
+    }
+    new coreui.Rating(myRatingCustomIcons2, optionsCustomIcons2)
+  }
+  // js-docs-end range-custom-icons2
+
+  // js-docs-start range-custom-icons3
+  const myRatingCustomIcons3 = document.getElementById('myRatingCustomIcons3')
+  if (myRatingCustomIcons3) {
+    const optionsCustomIcons3 = {
+      activeIcon: {
+        1: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-danger-emphasis" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><path fill="var(--ci-primary-color, currentColor)" d="M256,280A104,104,0,0,0,152,384H360A104,104,0,0,0,256,280Z" class="ci-primary"></path><rect width="32.001" height="96.333" x="148" y="159.834" fill="var(--ci-primary-color, currentColor)" class="ci-primary" transform="rotate(-48.366 164.002 208.001)"></rect><rect width="96.333" height="32" x="291.834" y="192" fill="var(--ci-primary-color, currentColor)" class="ci-primary" transform="rotate(-48.366 340.002 208)"></rect></svg>',
+        2: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-danger" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><rect width="40" height="40" x="152" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="40" height="40" x="320" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><path fill="var(--ci-primary-color, currentColor)" d="M256,280A104,104,0,0,0,152,384H360A104,104,0,0,0,256,280Z" class="ci-primary"></path></svg>',
+        3: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-warning" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><rect width="40" height="40" x="152" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="40" height="40" x="320" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="176" height="32" x="168" y="320" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect></svg>',
+        4: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-success" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><rect width="40" height="40" x="152" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="40" height="40" x="320" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><path fill="var(--ci-primary-color, currentColor)" d="M256,384A104,104,0,0,0,360,280H152A104,104,0,0,0,256,384Z" class="ci-primary"></path></svg>',
+        5: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="text-success-emphasis" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><path fill="var(--ci-primary-color, currentColor)" d="M256,384A104,104,0,0,0,360,280H152A104,104,0,0,0,256,384Z" class="ci-primary"></path><polygon fill="var(--ci-primary-color, currentColor)" points="205.757 228.292 226.243 203.708 168 155.173 109.757 203.708 130.243 228.292 168 196.827 205.757 228.292" class="ci-primary"></polygon><polygon fill="var(--ci-primary-color, currentColor)" points="285.757 203.708 306.243 228.292 344 196.827 381.757 228.292 402.243 203.708 344 155.173 285.757 203.708" class="ci-primary"></polygon></svg>'
+      },
+      icon: {
+        1: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><path fill="var(--ci-primary-color, currentColor)" d="M256,280A104,104,0,0,0,152,384H360A104,104,0,0,0,256,280Z" class="ci-primary"></path><rect width="32.001" height="96.333" x="148" y="159.834" fill="var(--ci-primary-color, currentColor)" class="ci-primary" transform="rotate(-48.366 164.002 208.001)"></rect><rect width="96.333" height="32" x="291.834" y="192" fill="var(--ci-primary-color, currentColor)" class="ci-primary" transform="rotate(-48.366 340.002 208)"></rect></svg>',
+        2: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><rect width="40" height="40" x="152" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="40" height="40" x="320" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><path fill="var(--ci-primary-color, currentColor)" d="M256,280A104,104,0,0,0,152,384H360A104,104,0,0,0,256,280Z" class="ci-primary"></path></svg>',
+        3: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><rect width="40" height="40" x="152" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="40" height="40" x="320" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="176" height="32" x="168" y="320" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect></svg>',
+        4: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><rect width="40" height="40" x="152" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><rect width="40" height="40" x="320" y="200" fill="var(--ci-primary-color, currentColor)" class="ci-primary"></rect><path fill="var(--ci-primary-color, currentColor)" d="M256,384A104,104,0,0,0,360,280H152A104,104,0,0,0,256,384Z" class="ci-primary"></path></svg>',
+        5: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-hidden="true"><path fill="var(--ci-primary-color, currentColor)" d="M256,16C123.452,16,16,123.452,16,256S123.452,496,256,496,496,388.548,496,256,388.548,16,256,16ZM403.078,403.078a207.253,207.253,0,1,1,44.589-66.125A207.332,207.332,0,0,1,403.078,403.078Z" class="ci-primary"></path><path fill="var(--ci-primary-color, currentColor)" d="M256,384A104,104,0,0,0,360,280H152A104,104,0,0,0,256,384Z" class="ci-primary"></path><polygon fill="var(--ci-primary-color, currentColor)" points="205.757 228.292 226.243 203.708 168 155.173 109.757 203.708 130.243 228.292 168 196.827 205.757 228.292" class="ci-primary"></polygon><polygon fill="var(--ci-primary-color, currentColor)" points="285.757 203.708 306.243 228.292 344 196.827 381.757 228.292 402.243 203.708 344 155.173 285.757 203.708" class="ci-primary"></polygon></svg>'
+      },
+      highlightOnlySelected: true,
+      tooltips: ['Very bad', 'Bad', 'Meh', 'Good', 'Very good'],
+      value: 3
+    }
+    new coreui.Rating(myRatingCustomIcons3, optionsCustomIcons3)
+  }
+  // js-docs-end range-custom-icons3
 })()

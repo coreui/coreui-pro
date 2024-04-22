@@ -76,6 +76,10 @@
       badge:
         color: danger
         text: PRO
+    - title: Rating
+      badge:
+        color: danger
+        text: PRO
     - title: Time Picker
       badge:
         color: danger
