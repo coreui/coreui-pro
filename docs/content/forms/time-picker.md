@@ -166,22 +166,26 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `cancelButtonLabel` | string | `'Cancel'` | Cancel button inner HTML |
-| `cancelButtonClasses` | array \| string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
+| `cancelButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |
 | `confirmButtonLabel` | string | `'OK'` | Confirm button inner HTML |
-| `confirmButtonClasses` | array \| string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
+| `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `container` | string | `'dropdown'` | <p>Set container type for the component.</p><ul><li>`'dropdown'`</li><li>`'inline'`</li></ul>|
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `footer` | boolean | `true` | Toggle visibility of footer element. |
+| `hours` | array, function, null | `null` | Specify a list of available hours using an array, or customize the filtering of hours through a function. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
+| `minutes` | array, boolean, function | `true` | Toggle the display of minutes, specify a list of available minutes using an array, or customize the filtering of minutes through a function. |
 | `name` | string | `null` | Set the name attribute for the input element. |
 | `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
-| `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
-| `time` | date \| string \| null | `null` | Default value of the component |
+| `seconds` | array, boolean, function | `true` | Toggle the display of seconds, specify a list of available seconds using an array, or customize the filtering of seconds through a function. |
+| `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
+| `time` | date, string, null | `null` | Default value of the component |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `variant` | `'inline'` \| `'roll'` | `'roll'` | Set the time picker variant to a roll or select. |
+| `variant` | `'inline'`, `'roll'` | `'roll'` | Set the time picker variant to a roll or select. |
 {{< /bs-table >}}
 ### Methods
 
