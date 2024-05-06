@@ -4,10 +4,10 @@
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./util/index.js')) :
-  typeof define === 'function' && define.amd ? define(['./base-component', './dom/data', './dom/event-handler', './dom/manipulator', './util/index'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.BaseComponent, global.Data, global.EventHandler, global.Manipulator, global.Index));
-})(this, (function (BaseComponent, Data, EventHandler, Manipulator, index_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/data', './dom/event-handler', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.LoadingButton = factory(global.BaseComponent, global.Data, global.EventHandler, global.Index));
+})(this, (function (BaseComponent, Data, EventHandler, index_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
@@ -111,14 +111,6 @@
     dispose() {
       Data.removeData(this._element, DATA_KEY);
       this._element = null;
-    }
-    _getConfig(config) {
-      config = {
-        ...Default,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
     }
     _createSpinner() {
       if (this._config.spinner) {

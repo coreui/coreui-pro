@@ -8,7 +8,6 @@
 import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -123,16 +122,6 @@ class LoadingButton extends BaseComponent {
   dispose() {
     Data.removeData(this._element, DATA_KEY)
     this._element = null
-  }
-
-  _getConfig(config) {
-    config = {
-      ...Default,
-      ...Manipulator.getDataAttributes(this._element),
-      ...(typeof config === 'object' ? config : {})
-    }
-
-    return config
   }
 
   _createSpinner() {
