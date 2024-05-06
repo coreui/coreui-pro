@@ -105,13 +105,13 @@ const DefaultType = {
   container: 'string',
   disabled: 'boolean',
   footer: 'boolean',
-  hours: '(array|function)',
+  hours: '(array|function|null)',
   indicator: 'boolean',
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
   minutes: '(array|boolean|function)',
-  name: 'string',
+  name: '(string|null)',
   placeholder: 'string',
   required: 'boolean',
   seconds: '(array|boolean|function)',
@@ -698,16 +698,6 @@ class TimePicker extends BaseComponent {
     }
 
     return classes
-  }
-
-  _getConfig(config) {
-    config = {
-      ...this.constructor.Default,
-      ...Manipulator.getDataAttributes(this._element),
-      ...(typeof config === 'object' ? config : {})
-    }
-
-    return config
   }
 
   _getPartOfTime(part) {
