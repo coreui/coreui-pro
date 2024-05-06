@@ -1,0 +1,101 @@
+.rating {
+  // scss-docs-start rating-css-vars
+  --#{$prefix}rating-gap: #{$rating-gap};
+  --#{$prefix}rating-transition: #{$rating-transition};
+  --#{$prefix}rating-item-height: #{$rating-item-height};
+  --#{$prefix}rating-item-color: #{$rating-item-color};
+  --#{$prefix}rating-item-scale-transform: #{$rating-item-scale-transform};
+  --#{$prefix}rating-item-active-color: #{$rating-item-active-color};
+  --#{$prefix}rating-item-icon: #{escape-svg($rating-item-icon)};
+  // scss-docs-end rating-css-vars
+
+  display: flex;
+  gap: var(--#{$prefix}rating-gap);
+
+  &.disabled {
+    opacity: 50%;
+  }
+
+  &:not(.disabled):not(.readonly) {
+    .rating-item {
+      cursor: pointer;
+
+      &:hover {
+        transform: var(--#{$prefix}rating-item-scale-transform);
+      }
+    }
+  }
+}
+
+.rating-item {
+  position: relative;
+  line-height: 0;
+  @include transition(var(--#{$prefix}rating-transition));
+}
+
+.rating-item-input {
+  position: absolute;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  appearance: none;
+
+}
+
+.rating-item-label {
+  font-size: var(--#{$prefix}rating-item-height);
+  line-height: 0;
+  color: var(--#{$prefix}rating-item-color);
+  cursor: pointer;
+
+  * {
+    pointer-events: none;
+  }
+
+  svg {
+    height: var(--#{$prefix}rating-item-height);
+    pointer-events: none;
+
+    * {
+      pointer-events: none;
+    }
+  }
+
+  &.active {
+    color: var(--#{$prefix}rating-item-active-color);
+    opacity: 1 !important; // stylelint-disable-line declaration-no-important
+
+    .rating-item-icon {
+      background-color: var(--#{$prefix}rating-item-active-color);
+    }
+
+    .rating-item-custom-icon:has(+ .rating-item-custom-icon-active) {
+      display: none;
+    }
+
+    .rating-item-custom-icon-active {
+      display: initial;
+    }
+  }
+}
+
+.rating-item-icon {
+  width: var(--#{$prefix}rating-item-height);
+  height: var(--#{$prefix}rating-item-height);
+  cursor: pointer;
+  background-color: var(--#{$prefix}rating-item-color);
+  mask: var(--#{$prefix}rating-item-icon) center / var(--#{$prefix}rating-item-height) no-repeat;
+}
+
+.rating-item-custom-icon-active {
+  display: none;
+}
+
+.rating-sm {
+  --#{$prefix}rating-item-height: #{$rating-item-height-sm};
+}
+
+.rating-lg {
+  --#{$prefix}rating-item-height: #{$rating-item-height-lg};
+}
