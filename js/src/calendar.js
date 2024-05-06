@@ -93,21 +93,21 @@ const Default = {
 }
 
 const DefaultType = {
-  calendarDate: '(date|string|null)',
+  calendarDate: '(date|number|string|null)',
   calendars: 'number',
   disabledDates: '(array|null)',
-  endDate: '(date|string|null)',
+  endDate: '(date|number|string|null)',
   firstDayOfWeek: 'number',
   locale: 'string',
-  maxDate: '(date|string|null)',
-  minDate: '(date|string|null)',
+  maxDate: '(date|number|string|null)',
+  minDate: '(date|number|string|null)',
   range: 'boolean',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
   showAdjacementDays: 'boolean',
   showWeekNumber: 'boolean',
-  startDate: '(date|string|null)',
+  startDate: '(date|number|string|null)',
   weekdayFormat: '(number|string)',
   weekNumbersLabel: '(string|null)'
 }
@@ -813,16 +813,6 @@ class Calendar extends BaseComponent {
     }, {})
 
     return Object.keys(result).join(' ')
-  }
-
-  _getConfig(config) {
-    config = {
-      ...this.constructor.Default,
-      ...Manipulator.getDataAttributes(this._element),
-      ...config
-    }
-
-    return config
   }
 
   // Static
