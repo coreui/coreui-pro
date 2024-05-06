@@ -13,8 +13,6 @@
 
 /* global coreui: false, dayjs: false */
 (() => {
-  'use strict'
-
   // --------
   // Tooltips
   // --------
