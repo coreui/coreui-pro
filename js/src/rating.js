@@ -7,7 +7,9 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
+import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -19,6 +21,7 @@ const NAME = 'rating'
 const DATA_KEY = 'coreui.rating'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -43,9 +46,39 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label'
 
+// js-docs-start svg-allow-list
+export const svgAllowList = {
+  ...DefaultAllowlist,
+  svg: ['xmlns', 'version', 'baseprofile', 'width', 'height', 'viewbox', 'preserveaspectratio', 'aria-hidden', 'role', 'focusable'],
+  g: ['id', 'class', 'transform', 'style'],
+  path: ['id', 'class', 'd', 'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-opacity'],
+  circle: ['id', 'class', 'cx', 'cy', 'r', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  rect: ['id', 'class', 'x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  ellipse: ['id', 'class', 'cx', 'cy', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  line: ['id', 'class', 'x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'stroke-opacity'],
+  polygon: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  polyline: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  text: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  tspan: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  defs: [],
+  symbol: ['id', 'class', 'viewbox', 'preserveaspectratio'],
+  use: ['id', 'class', 'x', 'y', 'width', 'height', 'href'],
+  image: ['id', 'class', 'x', 'y', 'width', 'height', 'href', 'preserveaspectratio', 'xlink:href'],
+  pattern: ['id', 'class', 'x', 'y', 'width', 'height', 'patternunits', 'patterncontentunits', 'patterntransform', 'preserveaspectratio'],
+  lineargradient: ['id', 'class', 'gradientunits', 'x1', 'y1', 'x2', 'y2', 'spreadmethod', 'gradienttransform'],
+  radialgradient: ['id', 'class', 'gradientunits', 'cx', 'cy', 'r', 'fx', 'fy', 'spreadmethod', 'gradienttransform'],
+  mask: ['id', 'class', 'x', 'y', 'width', 'height', 'maskunits', 'maskcontentunits', 'masktransform'],
+  clippath: ['id', 'class', 'clippathunits'],
+  marker: ['id', 'class', 'markerunits', 'markerwidth', 'markerheight', 'orient', 'preserveaspectratio', 'viewbox', 'refx', 'refy'],
+  title: [],
+  desc: []
+}
+// js-docs-end svg-allow-list
+
 const Default = {
   activeIcon: null,
   allowClear: false,
+  allowList: svgAllowList,
   disabled: false,
   highlightOnlySelected: false,
   icon: null,
@@ -53,6 +86,7 @@ const Default = {
   name: null,
   precision: 1,
   readOnly: false,
+  sanitizeFn: null,
   size: null,
   tooltips: false,
   value: null
@@ -61,6 +95,7 @@ const Default = {
 const DefaultType = {
   activeIcon: '(object|string|null)',
   allowClear: 'boolean',
+  allowList: 'object',
   disabled: 'boolean',
   highlightOnlySelected: 'boolean',
   icon: '(object|string|null)',
@@ -68,6 +103,7 @@ const DefaultType = {
   name: '(string|null)',
   precision: 'number',
   readOnly: 'boolean',
+  sanitizeFn: '(null|function)',
   size: '(string|null)',
   tooltips: '(array|boolean|object)',
   value: '(number|null)'
@@ -360,7 +396,7 @@ class Rating extends BaseComponent {
       if (this._config.icon) {
         const ratingItemIconElement = document.createElement('div')
         ratingItemIconElement.classList.add(CLASS_NAME_RATING_ITEM_CUSTOM_ICON)
-        ratingItemIconElement.innerHTML = typeof this._config.icon === 'object' ? this._config.icon[index + 1] : this._config.icon
+        ratingItemIconElement.innerHTML = this._sanitizeIcon(typeof this._config.icon === 'object' ? this._config.icon[index + 1] : this._config.icon)
 
         ratingItemLabelElement.append(ratingItemIconElement)
       } else {
@@ -373,7 +409,7 @@ class Rating extends BaseComponent {
       if (this._config.icon && this._config.activeIcon) {
         const ratingItemIconActiveElement = document.createElement('div')
         ratingItemIconActiveElement.classList.add(CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE)
-        ratingItemIconActiveElement.innerHTML = typeof this._config.activeIcon === 'object' ? this._config.activeIcon[index + 1] : this._config.activeIcon
+        ratingItemIconActiveElement.innerHTML = this._sanitizeIcon(typeof this._config.activeIcon === 'object' ? this._config.activeIcon[index + 1] : this._config.activeIcon)
 
         ratingItemLabelElement.append(ratingItemIconActiveElement)
       }
@@ -408,6 +444,29 @@ class Rating extends BaseComponent {
     })
 
     this._element.append(ratingItemElement)
+  }
+
+  _sanitizeIcon(icon) {
+    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
+  }
+
+  _getConfig(config) {
+    const dataAttributes = Manipulator.getDataAttributes(this._element)
+
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute]
+      }
+    }
+
+    config = {
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    }
+    config = this._mergeConfigObj(config)
+    config = this._configAfterMerge(config)
+    this._typeCheckConfig(config)
+    return config
   }
 
   // Static

@@ -4,7 +4,6 @@ title: JavaScript
 description: Bring CoreUI for Bootstrap to life with our optional JavaScript plugins. Learn about each plugin, our data and programmatic API options, and more.
 group: getting-started
 aliases:
-  - "/getting-started/javascript/"
   - "/4.0/getting-started/javascript/"
 toc: true
 ---
@@ -223,11 +222,15 @@ Every CoreUI for Bootstrap plugin exposes the following methods and static prope
 
 ## Sanitizer
 
-Tooltips and Popovers use our built-in sanitizer to sanitize options which accept HTML.
+Tooltips, Popovers, and Ratings use our built-in sanitizer to sanitize options which accept HTML.
 
 The default `allowList` value is the following:
 
 {{< js-docs name="allow-list" file="js/src/util/sanitizer.js" >}}
+
+The default `svgAllowList` value for Ratings is:
+
+{{< js-docs name="svg-allow-list" file="js/src/rating.js" >}}
 
 If you want to add new values to this default `allowList` you can do the following:
 

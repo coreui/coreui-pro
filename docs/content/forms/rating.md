@@ -6,7 +6,6 @@ group: forms
 toc: true
 bootstrap: true
 pro_component: true
-preview_component: v5.1.0-alpha.0
 ---
 
 ## How to use Rating Component.
@@ -175,21 +174,28 @@ const ratingList = ratingElementList.map(ratingEl => {
 {{< partial "js-data-attributes.md" >}}
 {{< /markdown >}}
 
+{{< callout warning >}}
+Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied using data attributes.
+{{< /callout >}}
+
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `activeIcon` | object \| string \| null | `null` | The default icon to display when the item is selected. |
+| `activeIcon` | object, string, null | `null` | The default icon to display when the item is selected. |
 | `allowClear` | boolean | `false` | Enables the clearing upon clicking the selected item again. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `highlightOnlySelected` | boolean | `false` | If enabled, only the currently selected icon will be visibly highlighted. |
-| `icon` | object \| string \| null | `null` | The default icon to display when the item is not selected. |
+| `icon` | object, string, null | `null` | The default icon to display when the item is not selected. |
 | `itemCount` | number | `5` | The maximum value the user can select. |
 | `name` | string | `null` | The name attribute of the radio input elements. |
 | `precision` | number | `1` | Minimum increment value change allowed. |
 | `readOnly` | boolean | `false` | Toggle the readonly state for the component. |
-| `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
-| `tooltips` | array \| boolean \| object | `false` | Enable tooltips with default values or set specific labels for each icon. |
-| `value` | number \| null | `null` |  The default `value` of component. |
+| `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
+| `tooltips` | array, boolean, object | `false` | Enable tooltips with default values or set specific labels for each icon. |
+| `value` | number, null | `null` |  The default `value` of component. |
+| `sanitize` | boolean | `true` |  Enable or disable the sanitization. If activated `activeIcon`, and `icon` options will be sanitized. |
+| `allowList` | object | [Default value]({{< docsref "/getting-started/javascript#sanitizer" >}}) |  Object which contains allowed attributes and tags. |
+| `sanitizeFn` | null, function | `null` |  Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 {{< /bs-table >}}
 
 ### Methods
@@ -198,6 +204,7 @@ const ratingList = ratingElementList.map(ratingEl => {
 | Method | Description |
 | --- | --- |
 | `update` | Updates the configuration of the rating. |
+| `reset` | Reset the value to `null` or to provided value. |
 | `dispose` | Destroys a component. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the rating instance associated to a DOM element, you can use it like this: `coreui.Rating.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a rating instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
