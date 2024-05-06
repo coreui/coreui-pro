@@ -359,43 +359,43 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `calendarDate` | date \| string \| null | `null` | Default date of the component. |
+| `calendarDate` | date, number, string, null | `null` | Default date of the component. |
 | `calendars` | number | `2` | The number of calendars that render on desktop devices. |
 | `cancelButton` | string | `'Cancel'` | Cancel button inner HTML |
-| `cancelButtonClasses` | array \| string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
+| `cancelButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |
 | `confirmButton` | string | `'OK'` | Confirm button inner HTML |
-| `confirmButtonClasses` | array \| string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
+| `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
-| `disabledDates` | array \| null | `null` | Specify the list of dates that cannot be selected. |
-| `endDate` | date \| string \| null | `null` | Initial selected to date (range). |
-| `endName` | string | `null` | Set the name attribute for the end date input element. |
+| `disabledDates` | array, null | `null` | Specify the list of dates that cannot be selected. |
+| `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
+| `endName` | string, null | `null` | Set the name attribute for the end date input element. |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `footer` | boolean | `false` | Toggle visibility of footer element. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
-| `inputDateFormat` | function | `null` | Custom function to format the selected date into a string according to a custom format. |
-| `inputDateParse` | function | `null` | Custom function to parse the input value into a valid Date object. |
+| `inputDateFormat` | function, null | `null` | Custom function to format the selected date into a string according to a custom format. |
+| `inputDateParse` | function, null | `null` | Custom function to parse the input value into a valid Date object. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
-| `maxDate` | date \| string \| null | `null` | Max selectable date. |
-| `minDate` | date \| string \| null | `null` | Min selectable date. |
+| `maxDate` | date, number, string, null | `null` | Max selectable date. |
+| `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `placeholder` | string | `['Start date', 'End date']` | Specifies a short hint that is visible in the input. |
 | `ranges` | object | `{}` | Predefined date ranges the user can select from. |
-| `rangesButtonsClasses` | array \| string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
+| `rangesButtonsClasses` | array, string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
-| `selectionType` | `'day'` \| `'week'` \| `'month'` \| `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
+| `selectionType` | `'day'`, `'week'`, `'month'`, `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
 | `separator` | boolean | `true` | Toggle visibility or set the content of the inputs separator. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
-| `size` | `'sm'` \| `'lg'` | `null` | Size the component small or large. |
-| `startDate` | date \| string \| null | `null` | Initial selected date. |
-| `startName` | string | `null` | Set the name attribute for the start date input element. |
+| `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
+| `startDate` | date, number, string, null | `null` | Initial selected date. |
+| `startName` | string, null | `null` | Set the name attribute for the start date input element. |
 | `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
 | `todayButton` | string | `'Today'` | Today button inner HTML |
-| `todayButtonClasses` | array \| string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
+| `todayButtonClasses` | array, string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `weekdayFormat` | number \| 'long' \| 'narrow' \| 'short' | `2` | Set length or format of day name. |
+| `weekdayFormat` | number, 'long', 'narrow', 'short' | `2` | Set length or format of day name. |
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
 {{< /bs-table >}}
 

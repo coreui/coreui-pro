@@ -134,22 +134,22 @@
     confirmButton: '(boolean|string)',
     confirmButtonClasses: '(array|string)',
     cleaner: 'boolean',
-    calendarDate: '(date|string|null)',
-    date: '(date|string|null)',
+    calendarDate: '(date|number|string|null)',
+    date: '(date|number|string|null)',
     disabledDates: '(array|null)',
     disabled: 'boolean',
-    endDate: '(date|string|null)',
-    endName: 'string',
+    endDate: '(date|number|string|null)',
+    endName: '(string|null)',
     firstDayOfWeek: 'number',
     footer: 'boolean',
     indicator: 'boolean',
-    inputDateFormat: 'function',
-    inputDateParse: 'function',
+    inputDateFormat: '(function|null)',
+    inputDateParse: '(function|null)',
     invalid: 'boolean',
     locale: 'string',
-    maxDate: '(date|string|null)',
-    minDate: '(date|string|null)',
-    name: 'string',
+    maxDate: '(date|number|string|null)',
+    minDate: '(date|number|string|null)',
+    name: '(string|null)',
     placeholder: '(array|string)',
     range: 'boolean',
     ranges: 'object',
@@ -157,8 +157,8 @@
     required: 'boolean',
     separator: 'boolean',
     size: '(string|null)',
-    startDate: '(date|string|null)',
-    startName: 'string',
+    startDate: '(date|number|string|null)',
+    startName: '(string|null)',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
     selectionType: 'string',
@@ -718,14 +718,6 @@
         return classes.split(' ');
       }
       return classes;
-    }
-    _getConfig(config) {
-      config = {
-        ...this.constructor.Default,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
     }
     _getPlaceholder() {
       const {

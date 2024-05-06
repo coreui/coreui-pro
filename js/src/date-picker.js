@@ -43,7 +43,7 @@ const Default = {
 
 const DefaultType = {
   ...DateRangePicker.DefaultType,
-  date: '(date|string|null)'
+  date: '(date|number|string|null)'
 }
 
 /**
