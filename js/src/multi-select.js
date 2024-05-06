@@ -9,7 +9,6 @@ import * as Popper from '@popperjs/core'
 import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, isRTL } from './util/index.js'
 
@@ -95,7 +94,7 @@ const DefaultType = {
   disabled: 'boolean',
   invalid: 'boolean',
   multiple: 'boolean',
-  name: 'string',
+  name: '(string|null)',
   options: '(boolean|array)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
@@ -310,17 +309,6 @@ class MultiSelect extends BaseComponent {
         }
       }
     })
-  }
-
-  _getConfig(config) {
-    config = {
-      ...Default,
-      ...this._element.disabled && { disabled: true },
-      ...Manipulator.getDataAttributes(this._element),
-      ...(typeof config === 'object' ? config : {})
-    }
-
-    return config
   }
 
   _getClassNames() {

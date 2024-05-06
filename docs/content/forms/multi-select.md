@@ -230,9 +230,9 @@ You may also choose from small and large multi selects to match our similarly si
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
-| `name` | string | `null` | Set the name attribute for the native select element. |
-| `options` | (boolean\|array) | `false` | List of option elements. |
-| `optionsMaxHeight` | (number\|string) | `'auto'` | Sets `max-height` of options list.	 |
+| `name` | string, null | `null` | Set the name attribute for the native select element. |
+| `options` | boolean, array | `false` | List of option elements. |
+| `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
 | `optionsStyle` | string | `'checkbox'` | Sets option style. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
 | `search` | boolean | `false` | Enables search input element.	 |

@@ -4,10 +4,10 @@
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/data', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global["@popperjs/core"], global.BaseComponent, global.Data, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index));
-})(this, (function (Popper, BaseComponent, Data, EventHandler, Manipulator, SelectorEngine, index_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/data', './dom/event-handler', './dom/selector-engine', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global["@popperjs/core"], global.BaseComponent, global.Data, global.EventHandler, global.SelectorEngine, global.Index));
+})(this, (function (Popper, BaseComponent, Data, EventHandler, SelectorEngine, index_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -112,7 +112,7 @@
     disabled: 'boolean',
     invalid: 'boolean',
     multiple: 'boolean',
-    name: 'string',
+    name: '(string|null)',
     options: '(boolean|array)',
     optionsMaxHeight: '(number|string)',
     optionsStyle: 'string',
@@ -293,17 +293,6 @@
           }
         }
       });
-    }
-    _getConfig(config) {
-      config = {
-        ...Default,
-        ...(this._element.disabled && {
-          disabled: true
-        }),
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
     }
     _getClassNames() {
       return this._element.classList.value.split(' ');
