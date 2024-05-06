@@ -2421,7 +2421,7 @@ $time-picker-dropdown-bg:                   var(--#{$prefix}body-bg) !default;
 $time-picker-dropdown-border-color:         var(--#{$prefix}border-color) !default;
 $time-picker-dropdown-border-width:         var(--#{$prefix}border-width) !default;
 $time-picker-dropdown-border-radius:        var(--#{$prefix}border-radius) !default;
-$time-picker-dropdown-box-shadow:        var(--#{$prefix}box-shadow) !default;
+$time-picker-dropdown-box-shadow:           var(--#{$prefix}box-shadow) !default;
 
 $time-picker-body-padding:                  $spacer * .5 !default;
 
@@ -2440,5 +2440,18 @@ $time-picker-inline-select-padding-y:       $input-padding-y-sm !default;
 $time-picker-inline-select-padding-x:       $input-padding-x-sm !default;
 $time-picker-inline-select-disabled-color:  $input-disabled-color !default;
 // scss-docs-end time-picker-variables
+
+// Rating
+// scss-docs-start rating-variables
+$rating-gap:                   .0625rem !default;
+$rating-transition:            color .15s ease-out, transform .15s ease-out !default;
+$rating-item-height-sm:        1rem !default;
+$rating-item-height:           1.25rem !default;
+$rating-item-height-lg:        1.5rem !default;
+$rating-item-color:            var(--#{$prefix}tertiary-color) !default;
+$rating-item-scale-transform:  scale(1.2) !default;
+$rating-item-active-color:     var(--#{$prefix}warning) !default;
+$rating-item-icon:             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='currentColor' d='M470.935,194.043,333.8,171.757,270.227,48.22a16,16,0,0,0-28.454,0L178.2,171.757,41.065,194.043A16,16,0,0,0,32.273,221.1l97.845,98.636L108.936,457.051a16,16,0,0,0,23.02,16.724L256,411.2l124.044,62.576a16,16,0,0,0,23.02-16.724L381.882,319.74,479.727,221.1A16,16,0,0,0,470.935,194.043Z'%3E%3C/path%3E%3C/svg%3E") !default;
+// scss-docs-end rating-variables
 
 @import "variables-dark"; // TODO: can be removed safely in v6, only here to avoid breaking changes in v5
