@@ -7,7 +7,6 @@ aliases:
   - "/4.0/components/badge/"
   - "/4.1/components/badge/"
   - "/components/bootstrap/badge/"
-  - "/4.0/components/badge/"
 toc: true
 bootstrap: true
 other_frameworks: badge

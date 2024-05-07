@@ -6,7 +6,6 @@ aliases:
   - "/4.0/components/button-group/"
   - "/4.1/components/button-group/"
   - "/components/bootstrap/button-group/"
-  - "/4.0/components/button-group/"
 toc: true
 bootstrap: true
 other_frameworks: button-group

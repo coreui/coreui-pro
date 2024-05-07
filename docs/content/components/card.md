@@ -8,7 +8,6 @@ aliases:
   - "/4.1/components/card/"
   - "/components/cards/"
   - "/components/bootstrap/card/"
-  - "/4.0/components/card/"
 toc: true
 bootstrap: true
 other_frameworks: card

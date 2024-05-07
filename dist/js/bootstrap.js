@@ -1290,21 +1290,21 @@
     weekNumbersLabel: null
   };
   const DefaultType$l = {
-    calendarDate: '(date|string|null)',
+    calendarDate: '(date|number|string|null)',
     calendars: 'number',
     disabledDates: '(array|null)',
-    endDate: '(date|string|null)',
+    endDate: '(date|number|string|null)',
     firstDayOfWeek: 'number',
     locale: 'string',
-    maxDate: '(date|string|null)',
-    minDate: '(date|string|null)',
+    maxDate: '(date|number|string|null)',
+    minDate: '(date|number|string|null)',
     range: 'boolean',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
     selectionType: 'string',
     showAdjacementDays: 'boolean',
     showWeekNumber: 'boolean',
-    startDate: '(date|string|null)',
+    startDate: '(date|number|string|null)',
     weekdayFormat: '(number|string)',
     weekNumbersLabel: '(string|null)'
   };
@@ -1844,14 +1844,6 @@
         return o;
       }, {});
       return Object.keys(result).join(' ');
-    }
-    _getConfig(config) {
-      config = {
-        ...this.constructor.Default,
-        ...Manipulator.getDataAttributes(this._element),
-        ...config
-      };
-      return config;
     }
 
     // Static
@@ -2842,13 +2834,13 @@
     container: 'string',
     disabled: 'boolean',
     footer: 'boolean',
-    hours: '(array|function)',
+    hours: '(array|function|null)',
     indicator: 'boolean',
     inputReadOnly: 'boolean',
     invalid: 'boolean',
     locale: 'string',
     minutes: '(array|boolean|function)',
-    name: 'string',
+    name: '(string|null)',
     placeholder: 'string',
     required: 'boolean',
     seconds: '(array|boolean|function)',
@@ -3302,14 +3294,6 @@
       }
       return classes;
     }
-    _getConfig(config) {
-      config = {
-        ...this.constructor.Default,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
-    }
     _getPartOfTime(part) {
       if (this._date === null) {
         return null;
@@ -3508,22 +3492,22 @@
     confirmButton: '(boolean|string)',
     confirmButtonClasses: '(array|string)',
     cleaner: 'boolean',
-    calendarDate: '(date|string|null)',
-    date: '(date|string|null)',
+    calendarDate: '(date|number|string|null)',
+    date: '(date|number|string|null)',
     disabledDates: '(array|null)',
     disabled: 'boolean',
-    endDate: '(date|string|null)',
-    endName: 'string',
+    endDate: '(date|number|string|null)',
+    endName: '(string|null)',
     firstDayOfWeek: 'number',
     footer: 'boolean',
     indicator: 'boolean',
-    inputDateFormat: 'function',
-    inputDateParse: 'function',
+    inputDateFormat: '(function|null)',
+    inputDateParse: '(function|null)',
     invalid: 'boolean',
     locale: 'string',
-    maxDate: '(date|string|null)',
-    minDate: '(date|string|null)',
-    name: 'string',
+    maxDate: '(date|number|string|null)',
+    minDate: '(date|number|string|null)',
+    name: '(string|null)',
     placeholder: '(array|string)',
     range: 'boolean',
     ranges: 'object',
@@ -3531,8 +3515,8 @@
     required: 'boolean',
     separator: 'boolean',
     size: '(string|null)',
-    startDate: '(date|string|null)',
-    startName: 'string',
+    startDate: '(date|number|string|null)',
+    startName: '(string|null)',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
     selectionType: 'string',
@@ -4093,14 +4077,6 @@
       }
       return classes;
     }
-    _getConfig(config) {
-      config = {
-        ...this.constructor.Default,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
-    }
     _getPlaceholder() {
       const {
         placeholder
@@ -4220,7 +4196,7 @@
   };
   const DefaultType$f = {
     ...DateRangePicker.DefaultType,
-    date: '(date|string|null)'
+    date: '(date|number|string|null)'
   };
 
   /**
@@ -4793,14 +4769,6 @@
     dispose() {
       Data.removeData(this._element, DATA_KEY$a);
       this._element = null;
-    }
-    _getConfig(config) {
-      config = {
-        ...Default$d,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
     }
     _createSpinner() {
       if (this._config.spinner) {
@@ -5576,7 +5544,7 @@
     disabled: 'boolean',
     invalid: 'boolean',
     multiple: 'boolean',
-    name: 'string',
+    name: '(string|null)',
     options: '(boolean|array)',
     optionsMaxHeight: '(number|string)',
     optionsStyle: 'string',
@@ -5757,17 +5725,6 @@
           }
         }
       });
-    }
-    _getConfig(config) {
-      config = {
-        ...Default$9,
-        ...(this._element.disabled && {
-          disabled: true
-        }),
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
     }
     _getClassNames() {
       return this._element.classList.value.split(' ');
@@ -6351,14 +6308,6 @@
 
     // Private
 
-    _getConfig(config) {
-      config = {
-        ...Default$8,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
-    }
     _setActiveLink() {
       for (const element of Array.from(this._element.querySelectorAll(SELECTOR_NAV_LINK))) {
         if (element.classList.contains(CLASS_NAME_NAV_GROUP_TOGGLE)) {
@@ -8477,14 +8426,6 @@
 
     // Private
 
-    _getConfig(config) {
-      config = {
-        ...Default$1,
-        ...Manipulator.getDataAttributes(this._element),
-        ...(typeof config === 'object' ? config : {})
-      };
-      return config;
-    }
     _initializeBackDrop() {
       return new Backdrop({
         className: CLASS_NAME_BACKDROP,
