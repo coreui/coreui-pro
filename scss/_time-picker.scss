@@ -202,11 +202,10 @@
 
 .time-picker-inline-icon {
   display: block;
-  width: 40px;
+  width: 2.5rem;
   height: 1.25rem;
-  background-image: var(--#{$prefix}time-picker-indicator-icon);
-  background-repeat: no-repeat;
-  background-position: center;
+  background-color: var(--#{$prefix}time-picker-indicator-icon-color);
+  mask: var(--#{$prefix}time-picker-indicator-icon) center / var(--#{$prefix}time-picker-indicator-icon-size) no-repeat;
 }
 
 .time-picker-inline-select {
