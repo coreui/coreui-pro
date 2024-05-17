@@ -23,7 +23,10 @@ export const convertToDateObject = (date, selectionType) => {
     return convertIsoWeekToDate(date)
   }
 
-  return new Date(Date.parse(date))
+  const _date = new Date(Date.parse(date))
+  const userTimezoneOffset = _date.getTimezoneOffset() * 60_000
+
+  return new Date(_date.getTime() + userTimezoneOffset)
 }
 
 export const convertToLocalDate = (d, locale, options = {}) =>
@@ -41,15 +44,15 @@ export const createGroupsInArray = (arr, numberOfGroups) => {
 
 export const getCalendarDate = (calendarDate, order, view) => {
   if (order !== 0 && view === 'days') {
-    return new Date(Date.UTC(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1))
+    return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1)
   }
 
   if (order !== 0 && view === 'months') {
-    return new Date(Date.UTC(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1))
+    return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1)
   }
 
   if (order !== 0 && view === 'years') {
-    return new Date(Date.UTC(calendarDate.getFullYear() + (12 * order), calendarDate.getMonth(), 1))
+    return new Date(calendarDate.getFullYear() + (12 * order), calendarDate.getMonth(), 1)
   }
 
   return calendarDate
@@ -201,10 +204,7 @@ export const getWeekNumber = date => {
     1 +
     Math.round(
       // eslint-disable-next-line no-mixed-operators
-      ((date.getTime() - week1.getTime()) / 86400000 -
-        3 +
-        ((week1.getDay() + 6) % 7)) /
-        7
+      ((date.getTime() - week1.getTime()) / 86_400_000 - 3 + ((week1.getDay() + 6) % 7)) / 7
     )
   )
 }
@@ -284,7 +284,11 @@ export const isDateDisabled = (date, min, max, dates) => {
 }
 
 export const isDateInRange = (date, start, end) => {
-  return start && end && start <= date && date <= end
+  const _date = removeTimeFromDate(date)
+  const _start = start ? removeTimeFromDate(start) : null
+  const _end = end ? removeTimeFromDate(end) : null
+
+  return _start && _end && _start <= _date && _date <= _end
 }
 
 export const isDateSelected = (date, start, end) => {
@@ -338,3 +342,6 @@ export const isValidDate = date => {
   const d = new Date(date)
   return d instanceof Date && d.getTime()
 }
+
+export const removeTimeFromDate = date =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate())
