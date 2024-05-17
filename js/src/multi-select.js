@@ -601,6 +601,7 @@ class MultiSelect extends BaseComponent {
     tag.innerHTML = text
 
     const closeBtn = document.createElement('button')
+    closeBtn.type = 'button'
     closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
     closeBtn.setAttribute('aria-label', 'Close')
 
