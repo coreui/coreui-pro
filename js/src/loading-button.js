@@ -24,6 +24,7 @@ const EVENT_STOP = `stop${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_IS_LOADING = 'is-loading'
+const CLASS_NAME_LOADING_BUTTON = 'btn-loading'
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="loading-button"]'
@@ -58,6 +59,8 @@ class LoadingButton extends BaseComponent {
     if (this._element) {
       Data.set(element, DATA_KEY, this)
     }
+
+    this._createButton()
   }
 
   // Getters
@@ -122,6 +125,10 @@ class LoadingButton extends BaseComponent {
   dispose() {
     Data.removeData(this._element, DATA_KEY)
     this._element = null
+  }
+
+  _createButton() {
+    this._element.classList.add(CLASS_NAME_LOADING_BUTTON)
   }
 
   _createSpinner() {
