@@ -517,4 +517,23 @@
     })
   }
   // js-docs-end rating-custom-feedback
+
+  // -------------------------------
+  // Time Pickers
+  // -------------------------------
+  // 'Time Pickers components' example in docs only
+
+  // js-docs-start time-picker-custom
+  const myTimePickerCustom = document.getElementById('myTimePickerCustom')
+  if (myTimePickerCustom) {
+    const options = {
+      locale: 'en-US',
+      hours: [1, 3, 5, 7],
+      minutes: [0, 15, 30, 45],
+      seconds: s => s < 20
+    }
+
+    new coreui.TimePicker(document.getElementById('myTimePickerCustom'), options)
+  }
+  // js-docs-end time-picker-custom
 })()

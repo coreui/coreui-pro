@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Time Picker
-description: Create consistent cross-browser and cross-device time picker.
+description: Bootstrap Time Picker is a customizable and user-friendly tool for selecting times in forms. It supports various locales, sizes, and states to enhance the user experience.
 group: forms
 toc: true
 bootstrap: true
@@ -11,12 +11,14 @@ other_frameworks: time-picker
 
 ## Example
 
+To create a basic Bootstrap Time Picker, use:
+
 {{< example >}}
 <div class="row">
-  <div class="col-lg-4">
+  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker" id="timePicker1"></div>
   </div>
-  <div class="col-lg-4">
+  <div class="col-sm-6 col-lg-5">
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-time="02:17:35 PM" data-coreui-toggle="time-picker" id="timePicker2"></div>
   </div>
 </div>
@@ -27,8 +29,8 @@ other_frameworks: time-picker
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
 
 {{< example >}}
-<div class="row mb-4">
-  <div class="col-lg-5">
+<div class="row">
+  <div class="col-lg-5 mb-3">
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="time-picker"></div>
   </div>
 </div>
@@ -63,9 +65,49 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 </div>
 {{< /example >}}
 
+## Custom formats
+
+### Disable minutes and seconds
+
+Customize Bootstrap Time Picker to display only hours, or hours and minutes by disabling minutes/seconds.
+
+{{< example >}}
+<div class="row">
+  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+    <label class="form-label">Only hours and minutes</label>
+    <div class="time-picker" data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-toggle="time-picker"></div>
+  </div>
+  <div class="col-sm-6 col-lg-5">
+  <label class="form-label">Only hours</label>
+    <div class="time-picker" data-coreui-locale="en-US" data-coreui-minutes="false" data-coreui-seconds="false" data-coreui-toggle="time-picker"></div>
+  </div>
+</div>
+{{< /example >}}
+
+### Custom hours, minutes and seconds
+
+Tailor the Bootstrap Time Picker to your needs by specifying custom values for hours, minutes, and seconds. Use arrays to define selectable options or functions for dynamic filtering. The example below demonstrates setting specific hour options, minute intervals, and a condition for seconds only to include values less than 20.
+
+{{< example >}}
+<div class="row">
+  <div class="col-lg-4">
+    <div id="myTimePickerCustom"></div>
+  </div>
+</div>
+{{< /example >}}
+
+{{< js-docs name="time-picker-custom" file="docs/assets/js/snippets.js" >}}
+
+In this configuration, the Bootstrap TimePicker restricts hours to a predefined set, minutes to quarter intervals, and seconds to values under 20, offering a high degree of customization for precise time selection scenarios.
+
+
 ## Non-english locale
 
+CoreUI Time Picker allows you to display times in a non-English locale, ideal for international users or multilingual applications.
+
 ### Auto
+
+By default, the Time Picker uses the browser’s locale. To set a different locale, use the `data-coreui-locale` attribute.
 
 {{< example >}}
 <div class="row">
@@ -77,6 +119,8 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ### Chinese
 
+To configure the Time Picker for Chinese users, set the locale to `zh-CN` and provide a placeholder text:
+
 {{< example >}}
 <div class="row">
   <div class="col-lg-4">
@@ -87,6 +131,8 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ### Japanese
 
+To localize the Time Picker for Japanese, set the locale to `ja` and use an appropriate placeholder:
+
 {{< example >}}
 <div class="row">
   <div class="col-lg-4">
@@ -96,6 +142,8 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 {{< /example >}}
 
 ### Korean
+
+For Korean localization, set the locale to `ko` and include placeholder text:
 
 {{< example >}}
 <div class="row">

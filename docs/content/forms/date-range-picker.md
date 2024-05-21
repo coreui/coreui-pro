@@ -1,8 +1,7 @@
 ---
 layout: docs
 title: Date Range Picker
-description: Create consistent cross-browser and cross-device date range picker.
-group: forms
+description: Bootstrap Date Range Picker is a customizable, user-friendly calendar tool for Bootstrap forms, supporting date ranges, localization, and validation for accurate date selection.
 toc: true
 bootstrap: true
 pro_component: true
@@ -12,14 +11,18 @@ dayjs: true
 
 ## Example
 
+Below is an example of a basic Bootstrap DateRangePicker.
+
 ### Days
+
+The following examples demonstrating how to pick dates using the Bootstrap Date Range Picker Component.
 
 {{< example >}}
   <div class="row">
-    <div class="col-lg-5">
+    <div class="col-sm-6 mb-3 mb-sm-0">
       <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-sm-6">
       <div
         data-coreui-start-date="2022/08/03"
         data-coreui-end-date="2022/08/17"
@@ -30,34 +33,13 @@ dayjs: true
   </div>
 {{< /example >}}
 
-#### With footer
-
-{{< example >}}
-  <div class="row mb-4">
-    <div class="col-lg-5">
-      <div
-        data-coreui-footer="true"
-        data-coreui-locale="en-US"
-        data-coreui-toggle="date-range-picker">
-      </div>
-    </div>
-    <div class="col-lg-5">
-      <div
-        data-coreui-start-date="2022/08/03"
-        data-coreui-end-date="2022/09/17"
-        data-coreui-footer="true"
-        data-coreui-locale="en-US"
-        data-coreui-toggle="date-range-picker">
-      </div>
-    </div>
-  </div>
-{{< /example >}}
-
 #### With timepicker
 
+In addition to supporting date selection, our Bootstrap Date Range Picker component also includes a Time Picker feature, allowing users to select a specific time of day. Bootstrap Time Picker can be enabled by adding `data-coreui-timepicker="true"`.
+
 {{< example >}}
-  <div class="row mb-4">
-    <div class="col-lg-7">
+  <div class="row">
+    <div class="col-lg-7 mb-3">
       <div
         data-coreui-locale="en-US"
         data-coreui-timepicker="true"
@@ -78,11 +60,38 @@ dayjs: true
   </div>
 {{< /example >}}
 
-### Weeks
+#### With footer
+
+To add a footer, use `data-coreui-footer="true"`. The footer can display extra information or actions related to the selected date, such as buttons for "Today" or "Clear".
 
 {{< example >}}
   <div class="row">
-    <div class="col-lg-5">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+      <div
+        data-coreui-footer="true"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker">
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div
+        data-coreui-start-date="2022/08/03"
+        data-coreui-end-date="2022/09/17"
+        data-coreui-footer="true"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
+### Weeks
+
+If you want to select the weeks, add the `data-coreui-selection-type="week"` attribute. You can also use `data-coreui-show-week-number="true"` to show week numbers.
+
+{{< example >}}
+  <div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
       <div 
         data-coreui-locale="en-US"
         data-coreui-toggle="date-range-picker"
@@ -90,7 +99,7 @@ dayjs: true
         data-coreui-selection-type="week">
       </div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-sm-6">
       <div
         data-coreui-start-date="2025W07"
         data-coreui-end-date="2025W12"
@@ -105,16 +114,18 @@ dayjs: true
 
 ### Months
 
+Select range of months by adding the `data-coreui-selection-type="month"` attribute.
+
 {{< example >}}
   <div class="row">
-    <div class="col-lg-5">
+    <div class="col-sm-6 mb-3 mb-sm-0">
       <div 
         data-coreui-locale="en-US"
         data-coreui-toggle="date-range-picker"
         data-coreui-selection-type="month">
       </div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-sm-6">
       <div
         data-coreui-start-date="2022-8"
         data-coreui-end-date="2023-5"
@@ -128,16 +139,18 @@ dayjs: true
 
 ### Years
 
+Add the `data-coreui-selection-type="year"` attribute to allow a pick range of years.
+
 {{< example >}}
   <div class="row">
-    <div class="col-lg-5">
+    <div class="col-sm-6 mb-3 mb-sm-0">
       <div
         data-coreui-locale="en-US"
         data-coreui-toggle="date-range-picker"
         data-coreui-selection-type="year">
       </div>
     </div>
-    <div class="col-lg-5">
+    <div class="col-sm-6">
       <div
         data-coreui-start-date="2022"
         data-coreui-end-date="2028"
@@ -155,13 +168,13 @@ dayjs: true
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
 
 {{< example >}}
-<div class="row mb-4">
-  <div class="col-lg-6">
+<div class="row">
+  <div class="col-lg-6 mb-3">
     <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -173,7 +186,7 @@ Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed 
 
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -185,7 +198,7 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -193,9 +206,11 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ## Disabled dates
 
+The CoreUI Bootstrap DateRangePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
+
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div id="myDateRangePickerDisabledDates"></div>
   </div>
 </div>
@@ -205,9 +220,12 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ## Custom ranges
 
+In order to configure custom date ranges in the Date Range component, you must use the `ranges` option to define a set of predefined ranges. These ranges can include predefined options such as "Today", "Yesterday", "Last 7 Days", etc.
+
+
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div id="myDateRangePickerCustomRanges"></div>
   </div>
 </div>
@@ -217,11 +235,15 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ## Non-english locale
 
+CoreUI Date Range Picker allows users to display dates and times in a non-English locale. This is useful for applications with international users or that need to support multiple languages. 
+
 ### Auto
+
+By default, the DateRangePicker component uses the default browser locale, but it can be easily configured to use a different locale supported by the JavaScript Internationalization API. To set the locale, you can pass the desired language code as a prop to the DatePicker component. This feature enables the creation of more inclusive and accessible applications that cater to a diverse audience.
 
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -229,9 +251,11 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ### Chinese
 
+Here is an example of a simple Bootstrap Date Range Picker with Chinese locales.
+
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期,退房日期" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -239,9 +263,11 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ### Japanese
 
+Here is a basic Date Range Picker with Japanese locales.
+
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-locale="ja" data-coreui-placeholder="日付を選択,終了日" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -249,9 +275,11 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 ### Korean
 
+Take a look at the following example, which demonstrates a simple date picker designed to work with Korean locales.
+
 {{< example >}}
 <div class="row">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-locale="ko" data-coreui-placeholder="날짜 선택,종료일" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -265,7 +293,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 {{< example >}}
 <div class="row" dir="rtl">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך,תאריך סיום" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>
@@ -275,7 +303,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 {{< example >}}
 <div class="row" dir="rtl">
-  <div class="col-lg-5">
+  <div class="col-sm-6">
     <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع,تاریخ پایان" data-coreui-toggle="date-range-picker"></div>
   </div>
 </div>

@@ -1,10 +1,9 @@
 ---
 layout: docs
 title: Multi Select
-description: Customize the native `<select>`s with a powerful Multi-Select component that changes the element's initial appearance and brings some new functionalities.
+description: Customize the native `<select>`s with a powerful Bootstrap Multi-Select component that changes the element's initial appearance and brings some new functionalities.
 group: forms
 aliases:
-  - "/forms/multi-select/"
   - "/4.0/forms/multi-select/"
 toc: true
 bootstrap: true
@@ -13,6 +12,8 @@ other_frameworks: multi-select
 ---
 
 ## Basic example
+
+A straightforward demonstration of how to implement a basic Bootstrap Multi Select dropdown, highlighting essential attributes and configurations.
 
 {{< example >}}
 <select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
@@ -44,7 +45,11 @@ other_frameworks: multi-select
 
 ## Data source
 
+Learn how to populate the multi-select component with data from various sources, including arrays and objects, for dynamic content integration.
+
 ### Option elements
+
+If you want to create a multi-select dropdown with predefined options, use the `<option>` elements inside the `<select>` tag.
 
 {{< example >}}
 <select class="form-multi-select" multiple data-coreui-search="true">
@@ -62,20 +67,23 @@ other_frameworks: multi-select
 
 ### Array data
 
-<div class="docs-example">
-  <select id="multiSelect" name="multiSelect"></select>
-</div>
+To dynamically populate a multi-select dropdown with options from an array, start with an empty `<select>` element. Use JavaScript to add options programmatically. This allows for more flexible and dynamic content management.
 
-```html
-<select id="multiSelect"></select>
-```
+{{< example >}}
+<select id="multiSelect" name="multiSelect"></select>
+{{< /example >}}
 
 We use the following JavaScript to set up our multi-select:
 
 {{< js-docs name="multi-select-array-data" file="docs/assets/js/snippets.js" >}}
 
 ## Selection types
+
+Explore different selection modes, including single and multiple selections, allowing customization based on user requirements.
+
 ### Text
+
+If you want to enable users to select multiple options as text entries, add the `data-coreui-selection-type="text"`. This configuration includes search functionality, making it easier to filter options by typing.
 
 {{< example >}}
 <select class="form-multi-select" id="multiple-select-text" multiple data-coreui-selection-type="text" data-coreui-search="true">
@@ -93,6 +101,8 @@ We use the following JavaScript to set up our multi-select:
 
 ### Tag
 
+If you want to display selected options as tags, add the `data-coreui-selection-type="tags"`. This mode is useful for visually grouping selected items. The search functionality is also enabled for better user experience.
+
 {{< example >}}
 <select class="form-multi-select" id="multiple-select-tag" multiple data-coreui-selection-type="tags" data-coreui-search="true">
   <option value="0">Angular</option>
@@ -108,6 +118,8 @@ We use the following JavaScript to set up our multi-select:
 {{< /example >}}
 
 ### Counter
+
+If you prefer to show a counter indicating the number of selected options, add the `data-coreui-selection-type="tags"`. This helps users keep track of their selections and includes search functionality for filtering options.
 
 {{< example >}}
 <select class="form-multi-select" id="multiple-select-counter" multiple data-coreui-selection-type="counter" data-coreui-search="true">
@@ -125,6 +137,8 @@ We use the following JavaScript to set up our multi-select:
 
 ## Single Select
 
+Add the `data-coreui-multiple="false"` boolean attribute to implement single-selection mode, enabling users to select only one option from the dropdown at a time.
+
 {{< example >}}
 <select class="form-multi-select" id="single-select" data-coreui-multiple="false">
   <option value="0">Angular</option>
@@ -140,6 +154,7 @@ We use the following JavaScript to set up our multi-select:
 {{< /example >}}
 
 ## Disabled
+
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
 {{< example >}}
@@ -216,6 +231,41 @@ You may also choose from small and large multi selects to match our similarly si
 ## Usage
 
 {{< bootstrap-compatibility >}}
+
+### Via data attributes
+
+Add `form-multi-select` class to a `select` element.
+
+```html
+<select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+```
+
+### Via JavaScript
+
+Call the time picker via JavaScript:
+
+```html
+<select class="form-multi-select"></select>
+```
+
+```js
+const mulitSelectElementList = Array.prototype.slice.call(document.querySelectorAll('.form-multi-select'))
+const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
+  return new coreui.DatePicker(mulitSelectEl, {
+    // options
+  })
+})
+```
 
 ### Options
 
