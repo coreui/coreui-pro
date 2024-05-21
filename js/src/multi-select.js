@@ -186,6 +186,8 @@ class MultiSelect extends BaseComponent {
       this._popper.destroy()
     }
 
+    this._searchElement.value = ''
+    this._onSearchChange(this._searchElement)
     this._clone.classList.remove(CLASS_NAME_SHOW)
     this._clone.setAttribute('aria-expanded', 'false')
     EventHandler.trigger(this._element, EVENT_HIDDEN)
