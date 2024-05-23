@@ -7,7 +7,6 @@ toc: true
 bootstrap: true
 aliases:
   - "/forms/"
-  - "/4.0/forms/overview/"
   - "/4.1/forms/"
 sections:
   - title: Form control

@@ -4,13 +4,8 @@ title: Reboot
 description: Reboot, a collection of element-specific CSS changes in a single file, kickstart CoreUI for Bootstrap to provide an elegant, consistent, and simple baseline to build upon.
 group: content
 aliases:
-  - "/4.0/content/reebot/"
-  - "/4.0/content/"
-  - "/4.1/content/reebot/"
-  - "/4.1/content/"
   - "/content/"
-  - "/content/code/"
-  - "/components/reebot/"
+  - "/4.1/content/"
 toc: true
 bootstrap: true
 ---

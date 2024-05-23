@@ -5,12 +5,8 @@ description: Quickly and easily clear floated content within a container by addi
 group: helpers
 bootstrap: true
 aliases:
-  - "/4.0/helpers/"
-  - "/4.0/helpers/clearfix/"
-  - "/4.1/helpers/"
-  - "/4.1/helpers/clearfix/"
   - "/helpers/"
-  - "/utilities/clearfix/"
+  - "/4.1/helpers/"
 ---
 
 Easily clear `float`s by adding `.clearfix` **to the parent element**. Can also be used as a mixin.
