@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v5.1.0 (https://coreui.io)
+  * CoreUI time-picker.js v5.2.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -45,6 +45,7 @@
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
   const ENTER_KEY = 'Enter';
+  const ESCAPE_KEY = 'Escape';
   const SPACE_KEY = 'Space';
   const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2;
@@ -52,6 +53,7 @@
   const EVENT_HIDE = `hide${EVENT_KEY}`;
   const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
   const EVENT_INPUT = 'input';
+  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
   const EVENT_SHOW = `show${EVENT_KEY}`;
   const EVENT_SHOWN = `shown${EVENT_KEY}`;
   const EVENT_SUBMIT = 'submit';
@@ -269,6 +271,11 @@
           if (this._config.variant === 'select') {
             this._setUpSelects();
           }
+        }
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+        if (event.key === ESCAPE_KEY) {
+          this.hide();
         }
       });
       EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {

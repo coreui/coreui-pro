@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.1.0 (https://coreui.io)
+  * CoreUI v5.2.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -684,7 +684,7 @@
    * Constants
    */
 
-  const VERSION = '5.1.0';
+  const VERSION = '5.2.0';
 
   /**
    * Class definition
@@ -1243,9 +1243,9 @@
   const DATA_KEY$h = 'coreui.calendar';
   const EVENT_KEY$i = `.${DATA_KEY$h}`;
   const DATA_API_KEY$e = '.data-api';
-  const ARROW_UP_KEY$2 = 'ArrowUp';
+  const ARROW_UP_KEY$3 = 'ArrowUp';
   const ARROW_RIGHT_KEY$2 = 'ArrowRight';
-  const ARROW_DOWN_KEY$2 = 'ArrowDown';
+  const ARROW_DOWN_KEY$3 = 'ArrowDown';
   const ARROW_LEFT_KEY$2 = 'ArrowLeft';
   const ENTER_KEY$1 = 'Enter';
   const SPACE_KEY$1 = 'Space';
@@ -1255,7 +1255,7 @@
   const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$i}`;
   const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$i}`;
   const EVENT_FOCUS = `focus${EVENT_KEY$i}`;
-  const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$i}`;
+  const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$i}`;
   const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$i}`;
   const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$i}`;
   const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$i}`;
@@ -1414,12 +1414,12 @@
         event.preventDefault();
         this._handleCalendarClick(event);
       }
-      if (event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_UP_KEY$2 || event.key === ARROW_DOWN_KEY$2) {
+      if (event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_UP_KEY$3 || event.key === ARROW_DOWN_KEY$3) {
         event.preventDefault();
-        if (this._config.maxDate && date >= convertToDateObject(this._config.maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2)) {
+        if (this._config.maxDate && date >= convertToDateObject(this._config.maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$3)) {
           return;
         }
-        if (this._config.minDate && date <= convertToDateObject(this._config.minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_UP_KEY$2)) {
+        if (this._config.minDate && date <= convertToDateObject(this._config.minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_UP_KEY$3)) {
           return;
         }
         let element = event.target;
@@ -1440,7 +1440,7 @@
           ArrowUp: this._config.selectionType === 'week' && this._view === 'days' ? -1 : this._view === 'days' ? -7 : -3,
           ArrowDown: this._config.selectionType === 'week' && this._view === 'days' ? 1 : this._view === 'days' ? 7 : 3
         };
-        if (event.key === ARROW_RIGHT_KEY$2 && last || event.key === ARROW_DOWN_KEY$2 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$2 && first || event.key === ARROW_UP_KEY$2 && toBoundary.start < Math.abs(gap.ArrowUp)) {
+        if (event.key === ARROW_RIGHT_KEY$2 && last || event.key === ARROW_DOWN_KEY$3 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$2 && first || event.key === ARROW_UP_KEY$3 && toBoundary.start < Math.abs(gap.ArrowUp)) {
           const callback = key => {
             setTimeout(() => {
               const _list = SelectorEngine.find('td[tabindex="0"], tr[tabindex="0"]', SelectorEngine.find('.calendar-panel', this._element).pop());
@@ -1450,22 +1450,22 @@
               if (_list.length && key === ARROW_LEFT_KEY$2) {
                 _list[_list.length - 1].focus();
               }
-              if (_list.length && key === ARROW_DOWN_KEY$2) {
+              if (_list.length && key === ARROW_DOWN_KEY$3) {
                 _list[gap.ArrowDown - (list.length - index)].focus();
               }
-              if (_list.length && key === ARROW_UP_KEY$2) {
+              if (_list.length && key === ARROW_UP_KEY$3) {
                 _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
               }
             }, 0);
           };
           if (this._view === 'days') {
-            this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? 1 : -1, callback(event.key));
+            this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$3 ? 1 : -1, callback(event.key));
           }
           if (this._view === 'months') {
-            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? 1 : -1, callback(event.key));
+            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$3 ? 1 : -1, callback(event.key));
           }
           if (this._view === 'years') {
-            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? 10 : -10, callback(event.key));
+            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$3 ? 10 : -10, callback(event.key));
           }
           return;
         }
@@ -1473,7 +1473,7 @@
           list[index + gap[event.key]].focus();
           return;
         }
-        for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$2 ? i++ : i--) {
+        for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$2 || event.key === ARROW_DOWN_KEY$3 ? i++ : i--) {
           if (list[i + gap[event.key]].tabIndex === 0) {
             list[i + gap[event.key]].focus();
             break;
@@ -1504,7 +1504,7 @@
       EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
         this._handleCalendarClick(event);
       });
-      EventHandler.on(this._element, EVENT_KEYDOWN$3, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+      EventHandler.on(this._element, EVENT_KEYDOWN$5, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
         this._handleCalendarKeydown(event);
       });
       EventHandler.on(this._element, EVENT_MOUSEENTER$3, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
@@ -1522,7 +1522,7 @@
       EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
         this._handleCalendarClick(event);
       });
-      EventHandler.on(this._element, EVENT_KEYDOWN$3, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+      EventHandler.on(this._element, EVENT_KEYDOWN$5, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
         this._handleCalendarKeydown(event);
       });
       EventHandler.on(this._element, EVENT_MOUSEENTER$3, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
@@ -2045,7 +2045,7 @@
   const DIRECTION_RIGHT = 'right';
   const EVENT_SLIDE = `slide${EVENT_KEY$g}`;
   const EVENT_SLID = `slid${EVENT_KEY$g}`;
-  const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$g}`;
+  const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$g}`;
   const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$g}`;
   const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$g}`;
   const EVENT_DRAG_START = `dragstart${EVENT_KEY$g}`;
@@ -2183,7 +2183,7 @@
     }
     _addEventListeners() {
       if (this._config.keyboard) {
-        EventHandler.on(this._element, EVENT_KEYDOWN$2, event => this._keydown(event));
+        EventHandler.on(this._element, EVENT_KEYDOWN$4, event => this._keydown(event));
       }
       if (this._config.pause === 'hover') {
         EventHandler.on(this._element, EVENT_MOUSEENTER$2, () => this.pause());
@@ -2771,6 +2771,7 @@
   const EVENT_KEY$e = `.${DATA_KEY$e}`;
   const DATA_API_KEY$b = '.data-api';
   const ENTER_KEY = 'Enter';
+  const ESCAPE_KEY$5 = 'Escape';
   const SPACE_KEY = 'Space';
   const TAB_KEY$5 = 'Tab';
   const RIGHT_MOUSE_BUTTON$4 = 2;
@@ -2778,6 +2779,7 @@
   const EVENT_HIDE$9 = `hide${EVENT_KEY$e}`;
   const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$e}`;
   const EVENT_INPUT$1 = 'input';
+  const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$e}`;
   const EVENT_SHOW$9 = `show${EVENT_KEY$e}`;
   const EVENT_SHOWN$9 = `shown${EVENT_KEY$e}`;
   const EVENT_SUBMIT$1 = 'submit';
@@ -2995,6 +2997,11 @@
           if (this._config.variant === 'select') {
             this._setUpSelects();
           }
+        }
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN$3, event => {
+        if (event.key === ESCAPE_KEY$5) {
+          this.hide();
         }
       });
       EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
@@ -3408,6 +3415,7 @@
   const DATA_KEY$d = 'coreui.date-range-picker';
   const EVENT_KEY$d = `.${DATA_KEY$d}`;
   const DATA_API_KEY$a = '.data-api';
+  const ESCAPE_KEY$4 = 'Escape';
   const TAB_KEY$4 = 'Tab';
   const RIGHT_MOUSE_BUTTON$3 = 2;
   const EVENT_CLICK$4 = `click${EVENT_KEY$d}`;
@@ -3415,6 +3423,7 @@
   const EVENT_HIDE$8 = `hide${EVENT_KEY$d}`;
   const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$d}`;
   const EVENT_INPUT = 'input';
+  const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$d}`;
   const EVENT_RESIZE$3 = 'resize';
   const EVENT_SHOW$8 = `show${EVENT_KEY$d}`;
   const EVENT_SHOWN$8 = `shown${EVENT_KEY$d}`;
@@ -3674,6 +3683,11 @@
           this.show();
           this._initialStartDate = new Date(this._startDate);
           this._initialEndDate = new Date(this._endDate);
+        }
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN$2, event => {
+        if (event.key === ESCAPE_KEY$4) {
+          this.hide();
         }
       });
       EventHandler.on(this._startInput, EVENT_CLICK$4, () => {
@@ -4321,10 +4335,10 @@
   const DATA_KEY$b = 'coreui.dropdown';
   const EVENT_KEY$b = `.${DATA_KEY$b}`;
   const DATA_API_KEY$8 = '.data-api';
-  const ESCAPE_KEY$2 = 'Escape';
+  const ESCAPE_KEY$3 = 'Escape';
   const TAB_KEY$2 = 'Tab';
-  const ARROW_UP_KEY$1 = 'ArrowUp';
-  const ARROW_DOWN_KEY$1 = 'ArrowDown';
+  const ARROW_UP_KEY$2 = 'ArrowUp';
+  const ARROW_DOWN_KEY$2 = 'ArrowDown';
   const RIGHT_MOUSE_BUTTON$1 = 2; // MouseEvent.button value for the secondary button, usually the right button
 
   const EVENT_HIDE$7 = `hide${EVENT_KEY$b}`;
@@ -4345,7 +4359,7 @@
   const SELECTOR_MENU = '.dropdown-menu';
   const SELECTOR_NAVBAR = '.navbar';
   const SELECTOR_NAVBAR_NAV = '.navbar-nav';
-  const SELECTOR_VISIBLE_ITEMS = '.dropdown-menu .dropdown-item:not(.disabled):not(:disabled)';
+  const SELECTOR_VISIBLE_ITEMS$1 = '.dropdown-menu .dropdown-item:not(.disabled):not(:disabled)';
   const PLACEMENT_TOP = isRTL() ? 'top-end' : 'top-start';
   const PLACEMENT_TOPEND = isRTL() ? 'top-start' : 'top-end';
   const PLACEMENT_BOTTOM = isRTL() ? 'bottom-end' : 'bottom-start';
@@ -4569,14 +4583,14 @@
       key,
       target
     }) {
-      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element));
+      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS$1, this._menu).filter(element => isVisible(element));
       if (!items.length) {
         return;
       }
 
       // if target isn't included in items (e.g. when expanding the dropdown)
       // allow cycling to get the last item in case key equals ARROW_UP_KEY
-      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$1, !items.includes(target)).focus();
+      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$2, !items.includes(target)).focus();
     }
 
     // Static
@@ -4626,8 +4640,8 @@
       // If input/textarea && if key is other than ESCAPE => not a dropdown command
 
       const isInput = /input|textarea/i.test(event.target.tagName);
-      const isEscapeEvent = event.key === ESCAPE_KEY$2;
-      const isUpOrDownEvent = [ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event.key);
+      const isEscapeEvent = event.key === ESCAPE_KEY$3;
+      const isUpOrDownEvent = [ARROW_UP_KEY$2, ARROW_DOWN_KEY$2].includes(event.key);
       if (!isUpOrDownEvent && !isEscapeEvent) {
         return;
       }
@@ -5182,7 +5196,7 @@
   const DATA_KEY$8 = 'coreui.modal';
   const EVENT_KEY$8 = `.${DATA_KEY$8}`;
   const DATA_API_KEY$6 = '.data-api';
-  const ESCAPE_KEY$1 = 'Escape';
+  const ESCAPE_KEY$2 = 'Escape';
   const EVENT_HIDE$6 = `hide${EVENT_KEY$8}`;
   const EVENT_HIDE_PREVENTED$1 = `hidePrevented${EVENT_KEY$8}`;
   const EVENT_HIDDEN$6 = `hidden${EVENT_KEY$8}`;
@@ -5327,7 +5341,7 @@
     }
     _addEventListeners() {
       EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS$1, event => {
-        if (event.key !== ESCAPE_KEY$1) {
+        if (event.key !== ESCAPE_KEY$2) {
           return;
         }
         if (this._config.keyboard) {
@@ -5489,8 +5503,12 @@
   const DATA_KEY$7 = 'coreui.multi-select';
   const EVENT_KEY$7 = `.${DATA_KEY$7}`;
   const DATA_API_KEY$5 = '.data-api';
+  const ESCAPE_KEY$1 = 'Escape';
   const TAB_KEY = 'Tab';
-  const RIGHT_MOUSE_BUTTON = 2;
+  const ARROW_UP_KEY$1 = 'ArrowUp';
+  const ARROW_DOWN_KEY$1 = 'ArrowDown';
+  const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
+
   const SELECTOR_CLEANER = '.form-multi-select-cleaner';
   const SELECTOR_OPTGROUP = '.form-multi-select-optgroup';
   const SELECTOR_OPTION = '.form-multi-select-option';
@@ -5499,6 +5517,7 @@
   const SELECTOR_SEARCH = '.form-multi-select-search';
   const SELECTOR_SELECT = '.form-multi-select';
   const SELECTOR_SELECTION = '.form-multi-select-selection';
+  const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)';
   const EVENT_CHANGED = `changed${EVENT_KEY$7}`;
   const EVENT_CLICK$3 = `click${EVENT_KEY$7}`;
   const EVENT_HIDE$5 = `hide${EVENT_KEY$7}`;
@@ -5697,6 +5716,11 @@
           this.show();
         }
       });
+      EventHandler.on(this._clone, EVENT_KEYDOWN$1, event => {
+        if (event.key === ESCAPE_KEY$1) {
+          this.hide();
+        }
+      });
       EventHandler.on(this._indicatorElement, EVENT_CLICK$3, event => {
         event.preventDefault();
         event.stopPropagation();
@@ -5733,9 +5757,10 @@
         const key = event.keyCode || event.charCode;
         if (key === 13) {
           this._onOptionsClick(event.target);
-          if (this._config.search) {
-            SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus();
-          }
+        }
+        if ([ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event.key)) {
+          event.preventDefault();
+          this._selectMenuItem(event);
         }
       });
     }
@@ -6189,6 +6214,19 @@
           SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder);
         }
       }
+    }
+    _selectMenuItem({
+      key,
+      target
+    }) {
+      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element));
+      if (!items.length) {
+        return;
+      }
+
+      // if target isn't included in items (e.g. when expanding the dropdown)
+      // allow cycling to get the last item in case key equals ARROW_UP_KEY
+      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$1, !items.includes(target)).focus();
     }
 
     // Static

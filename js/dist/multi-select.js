@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v5.1.0 (https://coreui.io)
+  * CoreUI multi-select.js v5.2.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -46,8 +46,12 @@
   const DATA_KEY = 'coreui.multi-select';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const ESCAPE_KEY = 'Escape';
   const TAB_KEY = 'Tab';
-  const RIGHT_MOUSE_BUTTON = 2;
+  const ARROW_UP_KEY = 'ArrowUp';
+  const ARROW_DOWN_KEY = 'ArrowDown';
+  const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
+
   const SELECTOR_CLEANER = '.form-multi-select-cleaner';
   const SELECTOR_OPTGROUP = '.form-multi-select-optgroup';
   const SELECTOR_OPTION = '.form-multi-select-option';
@@ -56,6 +60,7 @@
   const SELECTOR_SEARCH = '.form-multi-select-search';
   const SELECTOR_SELECT = '.form-multi-select';
   const SELECTOR_SELECTION = '.form-multi-select-selection';
+  const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)';
   const EVENT_CHANGED = `changed${EVENT_KEY}`;
   const EVENT_CLICK = `click${EVENT_KEY}`;
   const EVENT_HIDE = `hide${EVENT_KEY}`;
@@ -254,6 +259,11 @@
           this.show();
         }
       });
+      EventHandler.on(this._clone, EVENT_KEYDOWN, event => {
+        if (event.key === ESCAPE_KEY) {
+          this.hide();
+        }
+      });
       EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
         event.preventDefault();
         event.stopPropagation();
@@ -290,9 +300,10 @@
         const key = event.keyCode || event.charCode;
         if (key === 13) {
           this._onOptionsClick(event.target);
-          if (this._config.search) {
-            SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus();
-          }
+        }
+        if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
+          event.preventDefault();
+          this._selectMenuItem(event);
         }
       });
     }
@@ -746,6 +757,19 @@
           SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder);
         }
       }
+    }
+    _selectMenuItem({
+      key,
+      target
+    }) {
+      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => index_js.isVisible(element));
+      if (!items.length) {
+        return;
+      }
+
+      // if target isn't included in items (e.g. when expanding the dropdown)
+      // allow cycling to get the last item in case key equals ARROW_UP_KEY
+      index_js.getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus();
     }
 
     // Static
