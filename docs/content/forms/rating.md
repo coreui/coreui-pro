@@ -6,6 +6,7 @@ group: forms
 toc: true
 bootstrap: true
 pro_component: true
+other_frameworks: rating
 ---
 
 ## How to use Rating Component.
