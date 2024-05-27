@@ -1026,7 +1026,9 @@
     if (selectionType === 'week') {
       return convertIsoWeekToDate(date);
     }
-    return new Date(Date.parse(date));
+    const _date = new Date(Date.parse(date));
+    const userTimezoneOffset = _date.getTimezoneOffset() * 60000;
+    return new Date(_date.getTime() + userTimezoneOffset);
   };
   const createGroupsInArray = (arr, numberOfGroups) => {
     const perGroup = Math.ceil(arr.length / numberOfGroups);
@@ -1036,13 +1038,13 @@
   };
   const getCalendarDate = (calendarDate, order, view) => {
     if (order !== 0 && view === 'days') {
-      return new Date(Date.UTC(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1));
+      return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
     }
     if (order !== 0 && view === 'months') {
-      return new Date(Date.UTC(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1));
+      return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
     }
     if (order !== 0 && view === 'years') {
-      return new Date(Date.UTC(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1));
+      return new Date(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
     }
     return calendarDate;
   };
@@ -1201,7 +1203,10 @@
     return disabled;
   };
   const isDateInRange = (date, start, end) => {
-    return start && end && start <= date && date <= end;
+    const _date = removeTimeFromDate(date);
+    const _start = start ? removeTimeFromDate(start) : null;
+    const _end = end ? removeTimeFromDate(end) : null;
+    return _start && _end && _start <= _date && _date <= _end;
   };
   const isDateSelected = (date, start, end) => {
     return start && isSameDateAs(start, date) || end && isSameDateAs(end, date);
@@ -1219,6 +1224,7 @@
     const today = new Date();
     return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
   };
+  const removeTimeFromDate = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
   /* eslint-disable complexity, indent, multiline-ternary */
   /**
@@ -4687,6 +4693,7 @@
   const EVENT_STOP = `stop${EVENT_KEY$a}`;
   const EVENT_CLICK_DATA_API$6 = `click${EVENT_KEY$a}${DATA_API_KEY$7}`;
   const CLASS_NAME_IS_LOADING = 'is-loading';
+  const CLASS_NAME_LOADING_BUTTON = 'btn-loading';
   const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner';
   const SELECTOR_DATA_TOGGLE$5 = '[data-coreui-toggle="loading-button"]';
   const Default$d = {
@@ -4716,6 +4723,7 @@
       if (this._element) {
         Data.set(element, DATA_KEY$a, this);
       }
+      this._createButton();
     }
 
     // Getters
@@ -4769,6 +4777,9 @@
     dispose() {
       Data.removeData(this._element, DATA_KEY$a);
       this._element = null;
+    }
+    _createButton() {
+      this._element.classList.add(CLASS_NAME_LOADING_BUTTON);
     }
     _createSpinner() {
       if (this._config.spinner) {
@@ -5623,6 +5634,8 @@
       if (this._popper) {
         this._popper.destroy();
       }
+      this._searchElement.value = '';
+      this._onSearchChange(this._searchElement);
       this._clone.classList.remove(CLASS_NAME_SHOW$6);
       this._clone.setAttribute('aria-expanded', 'false');
       EventHandler.trigger(this._element, EVENT_HIDDEN$5);
@@ -5954,6 +5967,7 @@
       tag.dataset.value = value;
       tag.innerHTML = text;
       const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
       closeBtn.setAttribute('aria-label', 'Close');
       tag.append(closeBtn);

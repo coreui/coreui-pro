@@ -29,7 +29,9 @@
     if (selectionType === 'week') {
       return convertIsoWeekToDate(date);
     }
-    return new Date(Date.parse(date));
+    const _date = new Date(Date.parse(date));
+    const userTimezoneOffset = _date.getTimezoneOffset() * 60000;
+    return new Date(_date.getTime() + userTimezoneOffset);
   };
   const convertToLocalDate = (d, locale, options = {}) => d.toLocaleDateString(locale, options);
   const convertToLocalTime = (d, locale, options = {}) => d.toLocaleTimeString(locale, options);
@@ -41,13 +43,13 @@
   };
   const getCalendarDate = (calendarDate, order, view) => {
     if (order !== 0 && view === 'days') {
-      return new Date(Date.UTC(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1));
+      return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
     }
     if (order !== 0 && view === 'months') {
-      return new Date(Date.UTC(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1));
+      return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
     }
     if (order !== 0 && view === 'years') {
-      return new Date(Date.UTC(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1));
+      return new Date(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
     }
     return calendarDate;
   };
@@ -217,7 +219,10 @@
     return disabled;
   };
   const isDateInRange = (date, start, end) => {
-    return start && end && start <= date && date <= end;
+    const _date = removeTimeFromDate(date);
+    const _start = start ? removeTimeFromDate(start) : null;
+    const _end = end ? removeTimeFromDate(end) : null;
+    return _start && _end && _start <= _date && _date <= _end;
   };
   const isDateSelected = (date, start, end) => {
     return start && isSameDateAs(start, date) || end && isSameDateAs(end, date);
@@ -251,6 +256,7 @@
     const d = new Date(date);
     return d instanceof Date && d.getTime();
   };
+  const removeTimeFromDate = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
   exports.convertIsoWeekToDate = convertIsoWeekToDate;
   exports.convertToDateObject = convertToDateObject;
@@ -278,6 +284,7 @@
   exports.isStartDate = isStartDate;
   exports.isToday = isToday;
   exports.isValidDate = isValidDate;
+  exports.removeTimeFromDate = removeTimeFromDate;
 
   Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 

@@ -191,6 +191,8 @@
       if (this._popper) {
         this._popper.destroy();
       }
+      this._searchElement.value = '';
+      this._onSearchChange(this._searchElement);
       this._clone.classList.remove(CLASS_NAME_SHOW);
       this._clone.setAttribute('aria-expanded', 'false');
       EventHandler.trigger(this._element, EVENT_HIDDEN);
@@ -522,6 +524,7 @@
       tag.dataset.value = value;
       tag.innerHTML = text;
       const closeBtn = document.createElement('button');
+      closeBtn.type = 'button';
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
       closeBtn.setAttribute('aria-label', 'Close');
       tag.append(closeBtn);
