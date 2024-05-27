@@ -24,6 +24,7 @@ const DATA_KEY = 'coreui.date-range-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const ESCAPE_KEY = 'Escape'
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2
 
@@ -32,6 +33,7 @@ const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = 'input'
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_RESIZE = 'resize'
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
@@ -324,6 +326,12 @@ class DateRangePicker extends BaseComponent {
         this.show()
         this._initialStartDate = new Date(this._startDate)
         this._initialEndDate = new Date(this._endDate)
+      }
+    })
+
+    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+      if (event.key === ESCAPE_KEY) {
+        this.hide()
       }
     })
 

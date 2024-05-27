@@ -10,7 +10,12 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, isRTL } from './util/index.js'
+import {
+  defineJQueryPlugin,
+  getNextActiveElement,
+  isVisible,
+  isRTL
+} from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -23,8 +28,11 @@ const DATA_KEY = 'coreui.multi-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const ESCAPE_KEY = 'Escape'
 const TAB_KEY = 'Tab'
-const RIGHT_MOUSE_BUTTON = 2
+const ARROW_UP_KEY = 'ArrowUp'
+const ARROW_DOWN_KEY = 'ArrowDown'
+const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const SELECTOR_CLEANER = '.form-multi-select-cleaner'
 const SELECTOR_OPTGROUP = '.form-multi-select-optgroup'
@@ -34,6 +42,7 @@ const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
 const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_SELECT = '.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
+const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -261,6 +270,12 @@ class MultiSelect extends BaseComponent {
       }
     })
 
+    EventHandler.on(this._clone, EVENT_KEYDOWN, event => {
+      if (event.key === ESCAPE_KEY) {
+        this.hide()
+      }
+    })
+
     EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
       event.preventDefault()
       event.stopPropagation()
@@ -306,9 +321,11 @@ class MultiSelect extends BaseComponent {
 
       if (key === 13) {
         this._onOptionsClick(event.target)
-        if (this._config.search) {
-          SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus()
-        }
+      }
+
+      if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
+        event.preventDefault()
+        this._selectMenuItem(event)
       }
     })
   }
@@ -881,6 +898,18 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _selectMenuItem({ key, target }) {
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
+
+    if (!items.length) {
+      return
+    }
+
+    // if target isn't included in items (e.g. when expanding the dropdown)
+    // allow cycling to get the last item in case key equals ARROW_UP_KEY
+    getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
+  }
+
   // Static
 
   static multiSelectInterface(element, config) {
@@ -949,7 +978,6 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
     }
   }
 })
-
 EventHandler.on(document, EVENT_CLICK_DATA_API, MultiSelect.clearMenus)
 EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus)
 
