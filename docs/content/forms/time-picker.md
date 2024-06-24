@@ -262,7 +262,7 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 
 ```js
 const myTimePicker = document.getElementById('myTimePicker')
-myTimePicker.addEventListener('timeChange.coreui.time-picker', (timeString, localeTimeString, date) => {
+myTimePicker.addEventListener('timeChange.coreui.time-picker', ({ timeString, localeTimeString, date }) => {
   // do something...
 })
 ```

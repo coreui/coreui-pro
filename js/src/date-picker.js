@@ -70,8 +70,8 @@ class DatePicker extends DateRangePicker {
     for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._startDate = event.date
-        this._selectEndDate = event.selectEndDate
         this._startInput.value = this._setInputValue(event.date)
+        this._selectEndDate = false
         this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
@@ -82,7 +82,6 @@ class DatePicker extends DateRangePicker {
   }
 
   // Static
-
   static datePickerInterface(element, config) {
     const data = DatePicker.getOrCreateInstance(element, config)
 

@@ -210,26 +210,26 @@ class TimePicker extends BaseComponent {
   cancel() {
     this._date = this._initialDate
     this._setInputValue(this._initialDate || '')
-    this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this.hide()
     this._createTimePickerSelection()
+    this._emitChangeEvent(this._date)
   }
 
   clear() {
     this._date = null
     this._setInputValue('')
-    this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
+    this._emitChangeEvent(this._date)
   }
 
   reset() {
     this._date = this._convertStringToDate(this._config.time)
     this._setInputValue(this._config.time)
-    this._input.dispatchEvent(new Event('change'))
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
+    this._emitChangeEvent(this._date)
   }
 
   update(config) {
@@ -605,6 +605,15 @@ class TimePicker extends BaseComponent {
     }
 
     return footerEl
+  }
+
+  _emitChangeEvent(date) {
+    this._input.dispatchEvent(new Event('change'))
+    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
+      timeString: date === null ? null : date.toTimeString(),
+      localeTimeString: date === null ? null : date.toLocaleTimeString(),
+      date
+    })
   }
 
   _setUpRolls(initial = false) {
