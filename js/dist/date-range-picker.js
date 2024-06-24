@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.2.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.2.1 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -245,52 +245,22 @@
       super.dispose();
     }
     cancel() {
-      this._startDate = this._initialStartDate;
-      this._startInput.value = this._setInputValue(this._initialStartDate);
-      this._startInput.dispatchEvent(new Event('change'));
+      this._changeStartDate(this._initialStartDate);
       if (this._config.range) {
-        this._endDate = this._initialEndDate;
-        this._endInput.value = this._setInputValue(this._initialEndDate);
-        this._endInput.dispatchEvent(new Event('change'));
+        this._changeEndDate(this._initialEndDate);
       }
       this.hide();
       this._calendar.update(this._getCalendarConfig);
-      if (this._timePickerStart) {
-        this._timePickerStart.update(this._getTimePickerConfig(true));
-      }
-      if (this._timePickerEnd) {
-        this._timePickerEnd.update(this._getTimePickerConfig(false));
-      }
     }
     clear() {
-      this._endDate = null;
-      this._endInput.value = '';
-      this._endInput.dispatchEvent(new Event('change'));
-      this._startDate = null;
-      this._startInput.value = '';
-      this._startInput.dispatchEvent(new Event('change'));
+      this._changeStartDate(null);
+      this._changeEndDate(null);
       this._calendar.update(this._getCalendarConfig());
-      if (this._timePickerStart) {
-        this._timePickerStart.update(this._getTimePickerConfig(true));
-      }
-      if (this._timePickerEnd) {
-        this._timePickerEnd.update(this._getTimePickerConfig(false));
-      }
     }
     reset() {
-      this._endDate = this._config.endDate;
-      this._endInput.value = this._setInputValue(this._config.endDate);
-      this._endInput.dispatchEvent(new Event('change'));
-      this._startDate = this._config.startDate;
-      this._startInput.value = this._setInputValue(this._config.startDate);
-      this._startInput.dispatchEvent(new Event('change'));
+      this._changeStartDate(this._config.startDate);
+      this._changeEndDate(this._config.endDate);
       this._calendar.update(this._getCalendarConfig());
-      if (this._timePickerStart) {
-        this._timePickerStart.update(this._getTimePickerConfig(true));
-      }
-      if (this._timePickerEnd) {
-        this._timePickerEnd.update(this._getTimePickerConfig(false));
-      }
     }
     update(config) {
       this._config = this._getConfig(config);
@@ -367,32 +337,16 @@
     _addCalendarEventListeners() {
       for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
         EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
-          this._startDate = event.date;
-          this._startInput.value = this._setInputValue(event.date);
-          this._startInput.dispatchEvent(new Event('change'));
-          if (this._timePickerStart) {
-            this._timePickerStart.update(this._getTimePickerConfig(true));
-          }
+          this._changeStartDate(event.date);
           if (!this._config.range && !this._config.footer && !this._config.timepicker) {
             this.hide();
           }
-          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date: event.date
-          });
         });
         EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
-          this._endDate = event.date;
-          this._endInput.value = this._setInputValue(event.date);
-          this._startInput.dispatchEvent(new Event('change'));
-          if (this._timePickerEnd) {
-            this._timePickerEnd.update(this._getTimePickerConfig(false));
-          }
+          this._changeEndDate(event.date);
           if (this._startDate && !this._config.footer && !this._config.timepicker) {
             this.hide();
           }
-          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date: event.date
-          });
         });
         EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
           if (this._selectEndDate) {
@@ -404,6 +358,28 @@
         EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
           this._selectEndDate = event.value;
         });
+      }
+    }
+    _changeStartDate(value, skipTimePickerUpdate = false) {
+      this._startDate = value;
+      this._startInput.value = this._setInputValue(value);
+      this._startInput.dispatchEvent(new Event('change'));
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+        date: value
+      });
+      if (this._timePickerStart && !skipTimePickerUpdate) {
+        this._timePickerStart.update(this._getTimePickerConfig(true));
+      }
+    }
+    _changeEndDate(value, skipTimePickerUpdate = false) {
+      this._endDate = value;
+      this._endInput.value = this._setInputValue(value);
+      this._endInput.dispatchEvent(new Event('change'));
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+        date: value
+      });
+      if (this._timePickerEnd && !skipTimePickerUpdate) {
+        this._timePickerEnd.update(this._getTimePickerConfig(false));
       }
     }
     _getCalendarConfig() {
@@ -508,21 +484,9 @@
           buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses));
           buttonEl.role = 'button';
           buttonEl.addEventListener('click', () => {
-            this._startDate = this._config.ranges[key][0];
-            this._endDate = this._config.ranges[key][1];
-            this._startInput.value = this._setInputValue(this._startDate);
-            this._startInput.dispatchEvent(new Event('change'));
-            this._endInput.value = this._setInputValue(this._endDate);
-            this._endInput.dispatchEvent(new Event('change'));
+            this._changeStartDate(this._config.ranges[key][0]);
+            this._changeEndDate(this._config.ranges[key][1]);
             this._calendar.update(this._getCalendarConfig());
-            EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-              date: this._startDate,
-              formatedDate: this._formatDate(this._startDate)
-            });
-            EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-              date: this._endDate,
-              formatedDate: this._formatDate(this._endDate)
-            });
           });
           buttonEl.innerHTML = key;
           dateRangePickerRangesEl.append(buttonEl);
@@ -546,7 +510,7 @@
       calendarEl.classList.add(CLASS_NAME_CALENDAR);
       this._calendars.append(calendarEl);
       this._calendar = new Calendar(calendarEl, this._getCalendarConfig());
-      EventHandler.one(calendarEl, 'calendarDateChange.coreui.calendar', event => {
+      EventHandler.on(calendarEl, 'calendarDateChange.coreui.calendar', event => {
         this._calendarDate = event.date;
       });
       EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
@@ -563,18 +527,20 @@
           timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
           calendarEl.append(timePickerStartEl);
-          EventHandler.one(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
-            this._startDate = event.date;
-            this._startInput.value = this._setInputValue(this._startDate);
+          EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
+            this._changeStartDate(event.date, true);
+            // this._startDate = event.date
+            // this._startInput.value = this._setInputValue(this._startDate)
             this._calendar.update(this._getCalendarConfig());
           });
           const timePickerEndEl = document.createElement('div');
           timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false));
           this._timepickers.append(timePickerEndEl);
-          EventHandler.one(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
-            this._endDate = event.date;
-            this._endInput.value = this._setInputValue(this._endDate);
+          EventHandler.on(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
+            this._changeEndDate(event.date, true);
+            // this._endDate = event.date
+            // this._endInput.value = this._setInputValue(this._endDate)
             this._calendar.update(this._getCalendarConfig());
           });
         } else {
@@ -590,13 +556,15 @@
               this._timePickerEnd = _timepicker;
             }
             this._timepickers.append(timePickerEl);
-            EventHandler.one(timePickerEl, 'timeChange.coreui.time-picker', event => {
+            EventHandler.on(timePickerEl, 'timeChange.coreui.time-picker', event => {
               if (index === 0) {
-                this._startDate = event.date;
-                this._startInput.value = this._setInputValue(this._startDate);
+                this._changeStartDate(event.date, true);
+                // this._startDate = event.date
+                // this._startInput.value = this._setInputValue(this._startDate)
               } else {
-                this._endDate = event.date;
-                this._endInput.value = this._setInputValue(this._endDate);
+                this._changeEndDate(event.date, true);
+                // this._endDate = event.date
+                // this._endInput.value = this._setInputValue(this._endDate)
               }
               this._calendar.update(this._getCalendarConfig());
             });
@@ -615,13 +583,9 @@
         todayButtonEl.addEventListener('click', () => {
           const date = new Date();
           this._calendarDate = date;
-          this._startDate = date;
-          this._startInput.value = this._setInputValue(date);
-          this._startInput.dispatchEvent(new Event('change'));
+          this._changeStartDate(date);
           if (this._config.range) {
-            this._endDate = date;
-            this._endInput.value = this._setInputValue(date);
-            this._endInput.dispatchEvent(new Event('change'));
+            this._changeEndDate(date);
           }
           this._calendar.update(this._getCalendarConfig());
         });
@@ -746,7 +710,6 @@
     }
 
     // Static
-
     static dateRangePickerInterface(element, config) {
       const data = DateRangePicker.getOrCreateInstance(element, config);
       if (typeof config === 'string') {

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v5.2.0 (https://coreui.io)
+  * CoreUI time-picker.js v5.2.1 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -232,24 +232,24 @@
     cancel() {
       this._date = this._initialDate;
       this._setInputValue(this._initialDate || '');
-      this._input.dispatchEvent(new Event('change'));
       this._timePickerBody.innerHTML = '';
       this.hide();
       this._createTimePickerSelection();
+      this._emitChangeEvent(this._date);
     }
     clear() {
       this._date = null;
       this._setInputValue('');
-      this._input.dispatchEvent(new Event('change'));
       this._timePickerBody.innerHTML = '';
       this._createTimePickerSelection();
+      this._emitChangeEvent(this._date);
     }
     reset() {
       this._date = this._convertStringToDate(this._config.time);
       this._setInputValue(this._config.time);
-      this._input.dispatchEvent(new Event('change'));
       this._timePickerBody.innerHTML = '';
       this._createTimePickerSelection();
+      this._emitChangeEvent(this._date);
     }
     update(config) {
       this._config = this._getConfig(config);
@@ -510,6 +510,14 @@
         footerEl.append(confirmButtonEl);
       }
       return footerEl;
+    }
+    _emitChangeEvent(date) {
+      this._input.dispatchEvent(new Event('change'));
+      EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
+        timeString: date === null ? null : date.toTimeString(),
+        localeTimeString: date === null ? null : date.toLocaleTimeString(),
+        date
+      });
     }
     _setUpRolls(initial = false) {
       for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
