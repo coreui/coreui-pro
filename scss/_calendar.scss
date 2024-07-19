@@ -209,6 +209,7 @@
     @include border-end-radius($border-radius);
   }
 
+  // stylelint-disable-next-line at-rule-no-vendor-prefix
   @-moz-document url-prefix() {
     .calendars:not(.select-week) &:nth-last-child(1 of .range),
     .calendars:not(.select-week) &:nth-last-child(1 of .available) {
