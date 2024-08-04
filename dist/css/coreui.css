@@ -9481,10 +9481,10 @@ select.form-multi-select {
 }
 
 .sidebar-narrow:not(.sidebar-end) ~ * {
-  --cui-sidebar-occupy-start: 4rem;
+  --cui-sidebar-occupy-start: 4rem !important;
 }
 .sidebar-narrow.sidebar-end ~ * {
-  --cui-sidebar-occupy-end: 4rem;
+  --cui-sidebar-occupy-end: 4rem !important;
 }
 .sidebar-narrow .nav-link {
   overflow: hidden;
@@ -9494,10 +9494,10 @@ select.form-multi-select {
   position: fixed;
 }
 .sidebar-narrow-unfoldable:not(.sidebar-end) ~ * {
-  --cui-sidebar-occupy-start: 4rem;
+  --cui-sidebar-occupy-start: 4rem !important;
 }
 .sidebar-narrow-unfoldable.sidebar-end ~ * {
-  --cui-sidebar-occupy-end: 4rem;
+  --cui-sidebar-occupy-end: 4rem !important;
 }
 .sidebar-narrow-unfoldable:hover {
   box-shadow: 0 0.5rem 1rem rgba(8, 10, 12, 0.15);
