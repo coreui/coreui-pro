@@ -18,7 +18,12 @@ Select specific days using the Bootstrap Calendar component. The example below s
 
 {{< example >}}
 <div class="d-flex justify-content-center">
-  <div class="border rounded" data-coreui-locale="en-US" data-coreui-toggle="calendar"></div>
+  <div
+    class="border rounded"
+    data-coreui-locale="en-US"
+    data-coreui-start-date="2024/02/13"
+    data-coreui-toggle="calendar"
+  ></div>
 </div>
 {{< /example >}}
 
@@ -49,8 +54,9 @@ Set the `data-coreui-selection-type` to `month` to enable selection of entire mo
     class="border rounded"
     data-coreui-locale="en-US"
     data-coreui-selection-type="month"
-    data-coreui-toggle="calendar">
-  </div>
+    data-coreui-start-date="2024-2"
+    data-coreui-toggle="calendar"
+  ></div>
 </div>
 {{< /example >}}
 
@@ -64,8 +70,9 @@ Set the `data-coreui-selection-type` to `year` to enable years range selection.
     class="border rounded"
     data-coreui-locale="en-US"
     data-coreui-selection-type="year"
-    data-coreui-toggle="calendar">
-  </div>
+    data-coreui-start-date="2024"
+    data-coreui-toggle="calendar"
+  ></div>
 </div>
 {{< /example >}}
 
@@ -79,8 +86,8 @@ Display multiple calendar panels side by side by setting the `data-coreui-calend
     class="border rounded"
     data-coreui-calendars="2"
     data-coreui-locale="en-US"
-    data-coreui-toggle="calendar">
-  </div>
+    data-coreui-toggle="calendar"
+  ></div>
 </div>
 {{< /example >}}
 
@@ -97,8 +104,8 @@ Enable range selection by adding `data-coreui-range="true"` to allow users to pi
     data-coreui-range="true"
     data-coreui-start-date="2022/08/23"
     data-coreui-end-date="2022/09/08"
-    data-coreui-toggle="calendar">
-  </div>
+    data-coreui-toggle="calendar"
+  ></div>
 </div>
 {{< /example >}}
 
