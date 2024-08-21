@@ -32,6 +32,7 @@
   --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
   // scss-docs-end calendar-css-vars
 
+  flex-basis: 0;
   font-weight: initial;
 
   table {
@@ -56,6 +57,10 @@
 
 .calendars {
   display: flex;
+
+  @include media-breakpoint-down(sm) {
+    flex-wrap: wrap;
+  }
 }
 
 .calendar-nav {
