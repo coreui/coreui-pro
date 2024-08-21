@@ -71,6 +71,10 @@ const SELECTOR_INPUT = '.date-picker-input'
 const SELECTOR_WAS_VALIDATED = 'form.was-validated'
 
 const Default = {
+  ariaNavNextMonthLabel: 'Next month',
+  ariaNavNextYearLabel: 'Next year',
+  ariaNavPrevMonthLabel: 'Previous month',
+  ariaNavPrevYearLabel: 'Previous year',
   calendars: 2,
   cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
@@ -116,6 +120,10 @@ const Default = {
 }
 
 const DefaultType = {
+  ariaNavNextMonthLabel: 'string',
+  ariaNavNextYearLabel: 'string',
+  ariaNavPrevMonthLabel: 'string',
+  ariaNavPrevYearLabel: 'string',
   calendars: 'number',
   cancelButton: '(boolean|string)',
   cancelButtonClasses: '(array|string)',
@@ -422,6 +430,10 @@ class DateRangePicker extends BaseComponent {
 
   _getCalendarConfig() {
     return {
+      ariaNavNextMonthLabel: this._config.ariaNavNextMonthLabel,
+      ariaNavNextYearLabel: this._config.ariaNavNextYearLabel,
+      ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
+      ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
       calendarDate: this._calendarDate,
       calendars: this._config.calendars,
       disabledDates: this._config.disabledDates,

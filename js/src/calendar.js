@@ -67,12 +67,16 @@ const SELECTOR_BTN_MONTH = '.btn-month'
 const SELECTOR_BTN_NEXT = '.btn-next'
 const SELECTOR_BTN_PREV = '.btn-prev'
 const SELECTOR_BTN_YEAR = '.btn-year'
-const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_CALENDAR_CELL = '.calendar-cell'
 const SELECTOR_CALENDAR_PANEL = '.calendar-panel'
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 
 const Default = {
+  ariaNavNextMonthLabel: 'Next month',
+  ariaNavNextYearLabel: 'Next year',
+  ariaNavPrevMonthLabel: 'Previous month',
+  ariaNavPrevYearLabel: 'Previous year',
   calendarDate: null,
   calendars: 1,
   disabledDates: null,
@@ -81,7 +85,7 @@ const Default = {
   locale: 'default',
   maxDate: null,
   minDate: null,
-  range: true,
+  range: false,
   selectAdjacementDays: false,
   selectEndDate: false,
   selectionType: 'day',
@@ -93,6 +97,10 @@ const Default = {
 }
 
 const DefaultType = {
+  ariaNavNextMonthLabel: 'string',
+  ariaNavNextYearLabel: 'string',
+  ariaNavPrevMonthLabel: 'string',
+  ariaNavPrevYearLabel: 'string',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
   disabledDates: '(array|null)',
@@ -225,7 +233,7 @@ class Calendar extends BaseComponent {
 
     this._hoverDate = null
     this._selectDate(date)
-    this._updateClassNames()
+    this._updateClassNamesAndAriaLabels()
   }
 
   _handleCalendarKeydown(event) {
@@ -361,7 +369,7 @@ class Calendar extends BaseComponent {
       date: getDateBySelectionType(date, this._config.selectionType)
     })
 
-    this._updateClassNames()
+    this._updateClassNamesAndAriaLabels()
   }
 
   _handleCalendarMouseLeave() {
@@ -371,7 +379,7 @@ class Calendar extends BaseComponent {
       date: null
     })
 
-    this._updateClassNames()
+    this._updateClassNamesAndAriaLabels()
   }
 
   _addEventListeners() {
@@ -574,14 +582,14 @@ class Calendar extends BaseComponent {
     navigationElement.classList.add('calendar-nav')
     navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button class="btn btn-transparent btn-sm btn-double-prev">
+        <button class="btn btn-transparent btn-sm btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
-      <div class="calendar-nav-date">
+      <div class="calendar-nav-date" aria-live="polite">
         ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
           ${calendarDate.toLocaleDateString(this._config.locale, { month: 'long' })}
         </button>` : ''}
@@ -590,10 +598,10 @@ class Calendar extends BaseComponent {
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-double-next">
+        <button class="btn btn-transparent btn-sm btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -617,7 +625,7 @@ class Calendar extends BaseComponent {
             </th>` : ''
           }
           ${weekDays.map(({ date }) => (
-            `<th class="calendar-cell">
+            `<th class="calendar-cell" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
               <div class="calendar-header-cell-inner">
               ${typeof this._config.weekdayFormat === 'string' ?
                 date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
@@ -645,6 +653,7 @@ class Calendar extends BaseComponent {
                 week.days.some(day => day.month === 'current') &&
                 !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1
               }"
+              ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
             >
               ${this._config.showWeekNumber ?
                 `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''
@@ -658,6 +667,7 @@ class Calendar extends BaseComponent {
                     (month === 'current' || this._config.selectAdjacementDays) &&
                     !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1
                   }"
+                  ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date}"
                 >
                   <div class="calendar-cell-inner day">
@@ -677,6 +687,7 @@ class Calendar extends BaseComponent {
                   class="calendar-cell ${this._sharedClassNames(date)}"
                   data-coreui-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
+                  ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
                   <div class="calendar-cell-inner month">
                     ${month}
@@ -695,6 +706,7 @@ class Calendar extends BaseComponent {
                   class="calendar-cell ${this._sharedClassNames(date)}"
                   data-coreui-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
+                  ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
                   <div class="calendar-cell-inner year">
                     ${year}
@@ -740,7 +752,7 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _updateClassNames() {
+  _updateClassNamesAndAriaLabels() {
     if (this._config.selectionType === 'week') {
       const rows = SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element)
 
@@ -750,6 +762,12 @@ class Calendar extends BaseComponent {
         const classNames = this._sharedClassNames(date)
 
         row.className = `${CLASS_NAME_CALENDAR_ROW} ${classNames}`
+
+        if (isDateSelected(date, this._startDate, this._endDate)) {
+          row.setAttribute('aria-selected', true)
+        } else {
+          row.removeAttribute('aria-selected')
+        }
       }
 
       return
@@ -762,6 +780,12 @@ class Calendar extends BaseComponent {
       const classNames = this._config.selectionType === 'day' ? this._dayClassNames(date, 'current') : this._sharedClassNames(date)
 
       cell.className = `${CLASS_NAME_CALENDAR_CELL} ${classNames}`
+
+      if (isDateSelected(date, this._startDate, this._endDate)) {
+        cell.setAttribute('aria-selected', true)
+      } else {
+        cell.removeAttribute('aria-selected')
+      }
     }
   }
 
@@ -781,12 +805,13 @@ class Calendar extends BaseComponent {
       [month]: true
     }
 
-    // eslint-disable-next-line unicorn/no-array-reduce
-    const result = Object.keys(classNames).reduce((o, key) => {
-      // eslint-disable-next-line no-unused-expressions
-      classNames[key] === true && (o[key] = classNames[key])
-      return o
-    }, {})
+    const result = {}
+
+    for (const key in classNames) {
+      if (classNames[key] === true) {
+        result[key] = true
+      }
+    }
 
     return Object.keys(result).join(' ')
   }
@@ -805,12 +830,13 @@ class Calendar extends BaseComponent {
       selected: isDateSelected(date, this._startDate, this._endDate)
     }
 
-    // eslint-disable-next-line unicorn/no-array-reduce
-    const result = Object.keys(classNames).reduce((o, key) => {
-      // eslint-disable-next-line no-unused-expressions
-      classNames[key] === true && (o[key] = classNames[key])
-      return o
-    }, {})
+    const result = {}
+
+    for (const key in classNames) {
+      if (classNames[key] === true) {
+        result[key] = true
+      }
+    }
 
     return Object.keys(result).join(' ')
   }
@@ -851,7 +877,7 @@ class Calendar extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const element of Array.from(document.querySelectorAll(SELECTOR_CALENDAR))) {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE))) {
     Calendar.calendarInterface(element)
   }
 })
