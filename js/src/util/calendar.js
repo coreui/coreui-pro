@@ -23,10 +23,7 @@ export const convertToDateObject = (date, selectionType) => {
     return convertIsoWeekToDate(date)
   }
 
-  const _date = new Date(Date.parse(date))
-  const userTimezoneOffset = _date.getTimezoneOffset() * 60_000
-
-  return new Date(_date.getTime() + userTimezoneOffset)
+  return new Date(Date.parse(date))
 }
 
 export const convertToLocalDate = (d, locale, options = {}) =>
