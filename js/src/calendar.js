@@ -56,10 +56,10 @@ const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_CALENDAR = 'calendar'
 const CLASS_NAME_CALENDAR_CELL = 'calendar-cell'
 const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner'
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row'
+const CLASS_NAME_CALENDARS = 'calendars'
 
 const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next'
 const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev'
@@ -67,8 +67,8 @@ const SELECTOR_BTN_MONTH = '.btn-month'
 const SELECTOR_BTN_NEXT = '.btn-next'
 const SELECTOR_BTN_PREV = '.btn-prev'
 const SELECTOR_BTN_YEAR = '.btn-year'
+const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_CALENDAR_CELL = '.calendar-cell'
-const SELECTOR_CALENDAR_PANEL = '.calendar-panel'
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 
@@ -207,7 +207,7 @@ class Calendar extends BaseComponent {
     const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target
     const date = this._getDate(target)
     const cloneDate = new Date(date)
-    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR_PANEL), 'calendar-index')
+    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index')
 
     if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
       return
@@ -305,7 +305,7 @@ class Calendar extends BaseComponent {
           setTimeout(() => {
             const _list = SelectorEngine.find(
               'td[tabindex="0"], tr[tabindex="0"]',
-              SelectorEngine.find('.calendar-panel', this._element).pop()
+              SelectorEngine.find('.calendar', this._element).pop()
             )
 
             if (_list.length && key === ARROW_RIGHT_KEY) {
@@ -573,7 +573,7 @@ class Calendar extends BaseComponent {
     const month = calendarDate.getMonth()
 
     const calendarPanelEl = document.createElement('div')
-    calendarPanelEl.classList.add('calendar-panel')
+    calendarPanelEl.classList.add('calendar')
 
     Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order)
 
@@ -724,23 +724,19 @@ class Calendar extends BaseComponent {
   }
 
   _createCalendar() {
-    const calendarsEl = document.createElement('div')
-    calendarsEl.classList.add('calendars')
-
     if (this._config.selectionType && this._view === 'days') {
-      calendarsEl.classList.add(`select-${this._config.selectionType}`)
+      this._element.classList.add(`select-${this._config.selectionType}`)
     }
 
     if (this._config.showWeekNumber) {
-      calendarsEl.classList.add('show-week-numbers')
+      this._element.classList.add('show-week-numbers')
     }
 
     for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
-      calendarsEl.append(this._createCalendarPanel(index))
+      this._element.append(this._createCalendarPanel(index))
     }
 
-    this._element.classList.add(CLASS_NAME_CALENDAR)
-    this._element.append(calendarsEl)
+    this._element.classList.add(CLASS_NAME_CALENDARS)
   }
 
   _updateCalendar(callback) {

@@ -32,7 +32,6 @@
   --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
   // scss-docs-end calendar-css-vars
 
-  flex-basis: 0;
   font-weight: initial;
 
   table {
@@ -49,6 +48,12 @@
   &.years ~ .time-picker {
     display: none;
   }
+
+  @include media-breakpoint-down(sm) {
+    &:not(:first-child) .calendar-nav {
+      border-top: var(--#{$prefix}calendar-nav-border);
+    }
+  }
 }
 
 .show-week-numbers table {
@@ -57,6 +62,7 @@
 
 .calendars {
   display: flex;
+  flex-basis: min-content;
 
   @include media-breakpoint-down(sm) {
     flex-wrap: wrap;
