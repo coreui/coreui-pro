@@ -97,6 +97,10 @@
     - title: Breadcrumb
     - title: Buttons
     - title: Button group
+    - title: Calendar
+      badge:
+        color: danger
+        text: PRO
     - title: Callout
     - title: Card
     - title: Carousel
