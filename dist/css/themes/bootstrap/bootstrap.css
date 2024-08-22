@@ -12185,6 +12185,11 @@ textarea.form-control-lg {
 .calendar.months ~ .time-picker, .calendar.years ~ .time-picker {
   display: none;
 }
+@media (max-width: 575.98px) {
+  .calendar:not(:first-child) .calendar-nav {
+    border-top: var(--cui-calendar-nav-border);
+  }
+}
 
 .show-week-numbers table {
   width: calc(var(--cui-calendar-table-cell-size) * 8);
@@ -12192,6 +12197,12 @@ textarea.form-control-lg {
 
 .calendars {
   display: flex;
+  flex-basis: min-content;
+}
+@media (max-width: 575.98px) {
+  .calendars {
+    flex-wrap: wrap;
+  }
 }
 
 .calendar-nav {
@@ -13431,9 +13442,9 @@ textarea.form-control-lg {
   --cui-sidebar-nav-group-items-padding-y: 0;
   --cui-sidebar-nav-group-items-padding-x: 0;
   --cui-sidebar-nav-group-indicator-color: var(--cui-tertiary-color);
-  --cui-sidebar-nav-group-indicator-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  --cui-sidebar-nav-group-indicator-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3e%3c/svg%3e");
   --cui-sidebar-nav-group-indicator-hover-color: var(--cui-emphasis-color);
-  --cui-sidebar-nav-group-indicator-hover-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+  --cui-sidebar-nav-group-indicator-hover-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3e%3c/svg%3e");
   --cui-sidebar-nav-group-toggle-show-color: var(--cui-body-color);
   position: relative;
   display: flex;
@@ -13986,11 +13997,11 @@ textarea.form-control-lg {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  scrollbar-width: none; /* Firefox */
   background-color: transparent;
   border: 0;
   font-size: var(--cui-time-picker-inline-select-font-size);
   -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
 }
 .time-picker-inline-select::-webkit-scrollbar {
   width: 10px;
