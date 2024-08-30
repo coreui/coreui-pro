@@ -64,7 +64,7 @@ const CLASS_NAME_TIME_PICKER = 'time-picker'
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 const CLASS_NAME_WAS_VALIDATED = 'was-validated'
 
-const SELECTOR_CALENDAR = '.calendar'
+const SELECTOR_CALENDAR = '.calendars'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
 const SELECTOR_INPUT = '.date-picker-input'
