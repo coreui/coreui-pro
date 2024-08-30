@@ -6,7 +6,7 @@
 {{- end }}
 
 {{ if hugo.IsProduction -}}
-  <script defer src="/dist/js/coreui.bundle.min.js" {{ printf "integrity=%q" .Site.Params.cdn.js_bundle_hash | safeHTMLAttr }}></script>
+  <script defer src="/dist/js/coreui.bundle.min.js" {{ printf "integrity=%q" .Site.Params.cdn.js_pro_bundle_hash | safeHTMLAttr }}></script>
 {{ else -}}
   <script defer src="/dist/js/coreui.bundle.js"></script>
 {{- end }}

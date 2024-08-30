@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.4.0 (https://coreui.io)
+  * CoreUI v5.4.1 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.4.0';
+  const VERSION = '5.4.1';
 
   /**
    * Class definition
@@ -5297,7 +5297,7 @@
   const CLASS_NAME_TIME_PICKER = 'time-picker';
   const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers';
   const CLASS_NAME_WAS_VALIDATED = 'was-validated';
-  const SELECTOR_CALENDAR$1 = '.calendar';
+  const SELECTOR_CALENDAR$1 = '.calendars';
   const SELECTOR_DATA_TOGGLE$8 = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$8}.${CLASS_NAME_SHOW$b}`;
   const SELECTOR_INPUT = '.date-picker-input';
