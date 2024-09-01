@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.4.1 (https://coreui.io)
+  * CoreUI v5.4.2 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -684,7 +684,7 @@
    * Constants
    */
 
-  const VERSION = '5.4.1';
+  const VERSION = '5.4.2';
 
   /**
    * Class definition
@@ -3528,6 +3528,7 @@
     todayButton: 'Today',
     todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
     valid: false,
+    weekdayFormat: 2,
     weekNumbersLabel: null
   };
   const DefaultType$g = {
@@ -3576,6 +3577,7 @@
     todayButton: '(boolean|string)',
     todayButtonClasses: '(array|string)',
     valid: 'boolean',
+    weekdayFormat: '(number|string)',
     weekNumbersLabel: '(string|null)'
   };
 
@@ -3809,6 +3811,7 @@
         showAdjacementDays: this._config.showAdjacementDays,
         showWeekNumber: this._config.showWeekNumber,
         startDate: this._startDate,
+        weekdayFormat: this._config.weekdayFormat,
         weekNumbersLabel: this._config.weekNumbersLabel
       };
     }

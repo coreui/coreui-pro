@@ -43,11 +43,11 @@
 
 Several quick start options are available:
 
-- [Download the latest release](https://github.com/coreui/coreui-pro/archive/v5.4.1.zip)
+- [Download the latest release](https://github.com/coreui/coreui-pro/archive/v5.4.2.zip)
 - Clone the repo: `git clone https://github.com/coreui/coreui-pro.git`
 - Install with [npm](https://www.npmjs.com/): `npm install @coreui/coreui-pro`
 - Install with [yarn](https://yarnpkg.com/): `yarn add @coreui/coreui-pro`
-- Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui-pro:5.4.1`
+- Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui-pro:5.4.2`
 
 Read the [Getting started page](https://coreui.io/docs/getting-started/introduction/) for information on the framework contents, templates and examples, and more.
 

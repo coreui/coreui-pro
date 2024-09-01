@@ -21,7 +21,7 @@ The following examples demonstrating how to pick dates using the Bootstrap Date 
 {{< example >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
-    <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    <div data-coreui-locale="ar-AE" data-coreui-toggle="date-picker" data-coreui-weekday-format="narrow"></div>
   </div>
   <div class="col-sm-6 col-lg-5">
     <div data-coreui-date="2023/03/15" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
