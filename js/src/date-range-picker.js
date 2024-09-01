@@ -116,6 +116,7 @@ const Default = {
   todayButton: 'Today',
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
   valid: false,
+  weekdayFormat: 2,
   weekNumbersLabel: null
 }
 
@@ -165,6 +166,7 @@ const DefaultType = {
   todayButton: '(boolean|string)',
   todayButtonClasses: '(array|string)',
   valid: 'boolean',
+  weekdayFormat: '(number|string)',
   weekNumbersLabel: '(string|null)'
 }
 
@@ -449,6 +451,7 @@ class DateRangePicker extends BaseComponent {
       showAdjacementDays: this._config.showAdjacementDays,
       showWeekNumber: this._config.showWeekNumber,
       startDate: this._startDate,
+      weekdayFormat: this._config.weekdayFormat,
       weekNumbersLabel: this._config.weekNumbersLabel
     }
   }
