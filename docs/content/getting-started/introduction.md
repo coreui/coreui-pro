@@ -195,7 +195,9 @@ Be sure to have your pages set up with the latest design and development standar
     <script src="{{< param "cdn.js_bundle" >}}" integrity="{{< param "cdn.js_bundle_hash" >}}" crossorigin="anonymous"></script>
 
     <!-- Option 2: CoreUI PRO for Bootstrap Bundle with Popper -->
+    <!--
     <script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+    -->
 
     <!-- Option 3: Separate Popper and CoreUI/CoreUI PRO  for Bootstrap JS -->
     <!--

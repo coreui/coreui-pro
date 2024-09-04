@@ -24,9 +24,18 @@ There are two strict requirements for enabling RTL in Bootstrap-powered pages.
 
 From there, you'll need to include an RTL version of our CSS. For example, here's the stylesheet for our compiled and minified CSS with RTL enabled:
 
+{{< tabs groupId="rtl-css" >}}
+{{% tab name="CoreUI" %}}
 ```html
 <link rel="stylesheet" href="{{< param "cdn.css_rtl" >}}" integrity="{{< param "cdn.css_rtl_hash" >}}" crossorigin="anonymous">
 ```
+{{% /tab %}}
+{{% tab name="CoreUI PRO" %}}
+```html
+<link rel="stylesheet" href="{{< param "cdn.css_pro_rtl" >}}" integrity="{{< param "cdn.css_pro_rtl_hash" >}}" crossorigin="anonymous">
+```
+{{% /tab %}}
+{{< /tabs >}}
 
 ### Starter template
 
@@ -40,8 +49,11 @@ You can see the above requirements reflected in this modified RTL starter templa
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- CoreUI for Bootstrap CSS -->
+    <!-- Option 1: CoreUI for Bootstrap CSS -->
     <link rel="stylesheet" href="{{< param "cdn.css_rtl" >}}" integrity="{{< param "cdn.css_rtl_hash" >}}" crossorigin="anonymous">
+
+    <!-- Option 2: CoreUI PRO for Bootstrap CSS -->
+    <link rel="stylesheet" href="{{< param "cdn.css_pro_rtl" >}}" integrity="{{< param "cdn.css_pro_rtl_hash" >}}" crossorigin="anonymous">
 
     <title>مرحبا بالعالم!</title>
   </head>
@@ -53,7 +65,12 @@ You can see the above requirements reflected in this modified RTL starter templa
     <!-- Option 1: CoreUI for Bootstrap Bundle with Popper -->
     <script src="{{< param "cdn.js_bundle" >}}" integrity="{{< param "cdn.js_bundle_hash" >}}" crossorigin="anonymous"></script>
 
-    <!-- Option 2: Separate Popper and CoreUI for Bootstrap JS -->
+    <!-- Option 2: CoreUI PRO for Bootstrap Bundle with Popper -->
+    <!--
+    <script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+    -->
+
+    <!-- Option 3: Separate Popper and CoreUI for Bootstrap JS -->
     <!--
     <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
     <script src="{{< param "cdn.js" >}}" integrity="{{< param "cdn.js_hash" >}}" crossorigin="anonymous"></script>
