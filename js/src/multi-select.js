@@ -489,7 +489,7 @@ class MultiSelect extends BaseComponent {
     const buttons = document.createElement('div')
     buttons.classList.add('form-multi-select-buttons')
 
-    if (this._config.cleaner && this._config.multiple) {
+    if (!this._config.disabled && this._config.cleaner && this._config.multiple) {
       const cleaner = document.createElement('button')
       cleaner.type = 'button'
       cleaner.classList.add(CLASS_NAME_CLEANER)
@@ -502,6 +502,10 @@ class MultiSelect extends BaseComponent {
     const indicator = document.createElement('button')
     indicator.type = 'button'
     indicator.classList.add('form-multi-select-indicator')
+
+    if (this._config.disabled) {
+      indicator.tabIndex = -1
+    }
 
     buttons.append(indicator)
 
@@ -619,22 +623,22 @@ class MultiSelect extends BaseComponent {
     tag.dataset.value = value
     tag.innerHTML = text
 
-    const closeBtn = document.createElement('button')
-    closeBtn.type = 'button'
-    closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
-    closeBtn.setAttribute('aria-label', 'Close')
+    if (!this._config.disabled) {
+      const closeBtn = document.createElement('button')
+      closeBtn.type = 'button'
+      closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
+      closeBtn.setAttribute('aria-label', 'Close')
 
-    tag.append(closeBtn)
-
-    EventHandler.on(closeBtn, EVENT_CLICK, event => {
-      if (!this._config.disabled) {
+      EventHandler.on(closeBtn, EVENT_CLICK, event => {
         event.preventDefault()
         event.stopPropagation()
 
         tag.remove()
         this._deselectOption(value)
-      }
-    })
+      })
+
+      tag.append(closeBtn)
+    }
 
     return tag
   }
