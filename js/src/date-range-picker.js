@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, isRTL } from './util/index.js'
-import { getLocalDateFromString } from './util/calendar.js'
+import { convertToDateObject, getLocalDateFromString } from './util/calendar.js'
 
 /**
  * Constants
@@ -806,17 +806,19 @@ class DateRangePicker extends BaseComponent {
   }
 
   _formatDate(date) {
+    if (this._config.inputDateFormat) {
+      return this._config.inputDateFormat(
+        date instanceof Date ? new Date(date) : convertToDateObject(date, this._config.selectionType)
+      )
+    }
+
     if (this._config.selectionType !== 'day') {
       return date
     }
 
     const _date = new Date(date)
 
-    return this._config.inputDateFormat ?
-      this._config.inputDateFormat(_date) :
-      (this._config.timepicker ?
-        _date.toLocaleString(this._config.locale) :
-        _date.toLocaleDateString(this._config.locale))
+    return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale)
   }
 
   _getButtonClasses(classes) {
