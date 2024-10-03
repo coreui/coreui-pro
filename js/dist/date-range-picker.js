@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.4.2 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.5.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -695,11 +695,14 @@
       this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
     }
     _formatDate(date) {
+      if (this._config.inputDateFormat) {
+        return this._config.inputDateFormat(date instanceof Date ? new Date(date) : calendar_js.convertToDateObject(date, this._config.selectionType));
+      }
       if (this._config.selectionType !== 'day') {
         return date;
       }
       const _date = new Date(date);
-      return this._config.inputDateFormat ? this._config.inputDateFormat(_date) : this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
+      return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale);
     }
     _getButtonClasses(classes) {
       if (typeof classes === 'string') {

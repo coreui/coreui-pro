@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v5.4.2 (https://coreui.io)
+  * CoreUI multi-select.js v5.5.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -433,7 +433,7 @@
     _createButtons() {
       const buttons = document.createElement('div');
       buttons.classList.add('form-multi-select-buttons');
-      if (this._config.cleaner && this._config.multiple) {
+      if (!this._config.disabled && this._config.cleaner && this._config.multiple) {
         const cleaner = document.createElement('button');
         cleaner.type = 'button';
         cleaner.classList.add(CLASS_NAME_CLEANER);
@@ -444,6 +444,9 @@
       const indicator = document.createElement('button');
       indicator.type = 'button';
       indicator.classList.add('form-multi-select-indicator');
+      if (this._config.disabled) {
+        indicator.tabIndex = -1;
+      }
       buttons.append(indicator);
       this._indicatorElement = indicator;
       this._togglerElement.append(buttons);
@@ -534,19 +537,19 @@
       tag.classList.add(CLASS_NAME_TAG);
       tag.dataset.value = value;
       tag.innerHTML = text;
-      const closeBtn = document.createElement('button');
-      closeBtn.type = 'button';
-      closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
-      closeBtn.setAttribute('aria-label', 'Close');
-      tag.append(closeBtn);
-      EventHandler.on(closeBtn, EVENT_CLICK, event => {
-        if (!this._config.disabled) {
+      if (!this._config.disabled) {
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
+        closeBtn.setAttribute('aria-label', 'Close');
+        EventHandler.on(closeBtn, EVENT_CLICK, event => {
           event.preventDefault();
           event.stopPropagation();
           tag.remove();
           this._deselectOption(value);
-        }
-      });
+        });
+        tag.append(closeBtn);
+      }
       return tag;
     }
     _onOptionsClick(element) {
@@ -554,7 +557,9 @@
         return;
       }
       const value = String(element.dataset.value);
-      const text = element.textContent;
+      const {
+        text
+      } = this._options.find(option => option.value === value);
       if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
         this._deselectOption(value);
       } else if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
