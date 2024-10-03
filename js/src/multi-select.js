@@ -649,7 +649,7 @@ class MultiSelect extends BaseComponent {
     }
 
     const value = String(element.dataset.value)
-    const text = element.textContent
+    const { text } = this._options.find(option => option.value === value)
 
     if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
       this._deselectOption(value)
