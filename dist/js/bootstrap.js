@@ -236,7 +236,7 @@
     element.offsetHeight; // eslint-disable-line no-unused-expressions
   };
   const getjQuery = () => {
-    if (window.jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
+    if (window.jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
       return window.jQuery;
     }
     return null;
@@ -463,7 +463,7 @@
     }
   }
   function getTypeEvent(event) {
-    // allow to get the native events from namespaced events ('click.coreui.button' --> 'click')
+    // allow to get the native events from namespaced events ('click.bs.button' --> 'click')
     event = event.replace(stripNameRegex, '');
     return customEvents[event] || event;
   }
@@ -590,26 +590,26 @@
   }
   const Manipulator = {
     setDataAttribute(element, key, value) {
-      element.setAttribute(`data-coreui-${normalizeDataKey(key)}`, value);
+      element.setAttribute(`data-bs-${normalizeDataKey(key)}`, value);
     },
     removeDataAttribute(element, key) {
-      element.removeAttribute(`data-coreui-${normalizeDataKey(key)}`);
+      element.removeAttribute(`data-bs-${normalizeDataKey(key)}`);
     },
     getDataAttributes(element) {
       if (!element) {
         return {};
       }
       const attributes = {};
-      const coreuiKeys = Object.keys(element.dataset).filter(key => key.startsWith('coreui') && !key.startsWith('coreuiConfig'));
-      for (const key of coreuiKeys) {
-        let pureKey = key.replace(/^coreui/, '');
+      const bsKeys = Object.keys(element.dataset).filter(key => key.startsWith('bs') && !key.startsWith('bsConfig'));
+      for (const key of bsKeys) {
+        let pureKey = key.replace(/^bs/, '');
         pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1);
         attributes[pureKey] = normalizeData(element.dataset[key]);
       }
       return attributes;
     },
     getDataAttribute(element, key) {
-      return normalizeData(element.getAttribute(`data-coreui-${normalizeDataKey(key)}`));
+      return normalizeData(element.getAttribute(`data-bs-${normalizeDataKey(key)}`));
     }
   };
 
@@ -731,7 +731,7 @@
       return VERSION;
     }
     static get DATA_KEY() {
-      return `coreui.${this.NAME}`;
+      return `bs.${this.NAME}`;
     }
     static get EVENT_KEY() {
       return `.${this.DATA_KEY}`;
@@ -752,7 +752,7 @@
    */
 
   const getSelector = element => {
-    let selector = element.getAttribute('data-coreui-target');
+    let selector = element.getAttribute('data-bs-target');
     if (!selector || selector === '#') {
       let hrefAttribute = element.getAttribute('href');
 
@@ -846,7 +846,7 @@
   const enableDismissTrigger = (component, method = 'hide') => {
     const clickEvent = `click.dismiss${component.EVENT_KEY}`;
     const name = component.NAME;
-    EventHandler.on(document, clickEvent, `[data-coreui-dismiss="${name}"]`, function (event) {
+    EventHandler.on(document, clickEvent, `[data-bs-dismiss="${name}"]`, function (event) {
       if (['A', 'AREA'].includes(this.tagName)) {
         event.preventDefault();
       }
@@ -877,7 +877,7 @@
    */
 
   const NAME$o = 'alert';
-  const DATA_KEY$j = 'coreui.alert';
+  const DATA_KEY$j = 'bs.alert';
   const EVENT_KEY$k = `.${DATA_KEY$j}`;
   const EVENT_CLOSE = `close${EVENT_KEY$k}`;
   const EVENT_CLOSED = `closed${EVENT_KEY$k}`;
@@ -955,11 +955,11 @@
    */
 
   const NAME$n = 'button';
-  const DATA_KEY$i = 'coreui.button';
+  const DATA_KEY$i = 'bs.button';
   const EVENT_KEY$j = `.${DATA_KEY$i}`;
   const DATA_API_KEY$f = '.data-api';
   const CLASS_NAME_ACTIVE$5 = 'active';
-  const SELECTOR_DATA_TOGGLE$c = '[data-coreui-toggle="button"]';
+  const SELECTOR_DATA_TOGGLE$c = '[data-bs-toggle="button"]';
   const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$j}${DATA_API_KEY$f}`;
 
   /**
@@ -1238,7 +1238,7 @@
    */
 
   const NAME$m = 'calendar';
-  const DATA_KEY$h = 'coreui.calendar';
+  const DATA_KEY$h = 'bs.calendar';
   const EVENT_KEY$i = `.${DATA_KEY$h}`;
   const DATA_API_KEY$e = '.data-api';
   const ARROW_UP_KEY$3 = 'ArrowUp';
@@ -1273,7 +1273,7 @@
   const SELECTOR_CALENDAR$2 = '.calendar';
   const SELECTOR_CALENDAR_CELL = '.calendar-cell';
   const SELECTOR_CALENDAR_ROW = '.calendar-row';
-  const SELECTOR_DATA_TOGGLE$b = '[data-coreui-toggle="calendar"]';
+  const SELECTOR_DATA_TOGGLE$b = '[data-bs-toggle="calendar"]';
   const Default$l = {
     ariaNavNextMonthLabel: 'Next month',
     ariaNavNextYearLabel: 'Next year',
@@ -1740,7 +1740,7 @@
                   class="calendar-cell ${this._dayClassNames(date, month)}"
                   tabindex="${this._config.selectionType === 'day' && (month === 'current' || this._config.selectAdjacementDays) && !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
-                  data-coreui-date="${date}"
+                  data-bs-date="${date}"
                 >
                   <div class="calendar-cell-inner day">
                     ${date.toLocaleDateString(this._config.locale, {
@@ -1754,7 +1754,7 @@
       const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
       return `<td
                   class="calendar-cell ${this._sharedClassNames(date)}"
-                  data-coreui-date="${date.toDateString()}"
+                  data-bs-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
@@ -1769,7 +1769,7 @@
       const date = new Date(year, 0, 1);
       return `<td
                   class="calendar-cell ${this._sharedClassNames(date)}"
-                  data-coreui-date="${date.toDateString()}"
+                  data-bs-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
@@ -1926,7 +1926,7 @@
    */
 
   const NAME$l = 'swipe';
-  const EVENT_KEY$h = '.coreui.swipe';
+  const EVENT_KEY$h = '.bs.swipe';
   const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$h}`;
   const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$h}`;
   const EVENT_TOUCHEND = `touchend${EVENT_KEY$h}`;
@@ -2049,7 +2049,7 @@
    */
 
   const NAME$k = 'carousel';
-  const DATA_KEY$g = 'coreui.carousel';
+  const DATA_KEY$g = 'bs.carousel';
   const EVENT_KEY$g = `.${DATA_KEY$g}`;
   const DATA_API_KEY$d = '.data-api';
   const ARROW_LEFT_KEY$1 = 'ArrowLeft';
@@ -2080,8 +2080,8 @@
   const SELECTOR_ACTIVE_ITEM = SELECTOR_ACTIVE + SELECTOR_ITEM;
   const SELECTOR_ITEM_IMG = '.carousel-item img';
   const SELECTOR_INDICATORS = '.carousel-indicators';
-  const SELECTOR_DATA_SLIDE = '[data-coreui-slide], [data-coreui-slide-to]';
-  const SELECTOR_DATA_RIDE = '[data-coreui-ride="carousel"]';
+  const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]';
+  const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]';
   const KEY_TO_DIRECTION = {
     [ARROW_LEFT_KEY$1]: DIRECTION_RIGHT,
     [ARROW_RIGHT_KEY$1]: DIRECTION_LEFT
@@ -2260,7 +2260,7 @@
       const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
       activeIndicator.classList.remove(CLASS_NAME_ACTIVE$4);
       activeIndicator.removeAttribute('aria-current');
-      const newActiveIndicator = SelectorEngine.findOne(`[data-coreui-slide-to="${index}"]`, this._indicatorsElement);
+      const newActiveIndicator = SelectorEngine.findOne(`[data-bs-slide-to="${index}"]`, this._indicatorsElement);
       if (newActiveIndicator) {
         newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$4);
         newActiveIndicator.setAttribute('aria-current', 'true');
@@ -2271,7 +2271,7 @@
       if (!element) {
         return;
       }
-      const elementInterval = Number.parseInt(element.getAttribute('data-coreui-interval'), 10);
+      const elementInterval = Number.parseInt(element.getAttribute('data-bs-interval'), 10);
       this._config.interval = elementInterval || this._config.defaultInterval;
     }
     _slide(order, element = null) {
@@ -2382,7 +2382,7 @@
     }
     event.preventDefault();
     const carousel = Carousel.getOrCreateInstance(target);
-    const slideIndex = this.getAttribute('data-coreui-slide-to');
+    const slideIndex = this.getAttribute('data-bs-slide-to');
     if (slideIndex) {
       carousel.to(slideIndex);
       carousel._maybeEnableCycle();
@@ -2425,7 +2425,7 @@
    */
 
   const NAME$j = 'collapse';
-  const DATA_KEY$f = 'coreui.collapse';
+  const DATA_KEY$f = 'bs.collapse';
   const EVENT_KEY$f = `.${DATA_KEY$f}`;
   const DATA_API_KEY$c = '.data-api';
   const EVENT_SHOW$a = `show${EVENT_KEY$f}`;
@@ -2442,7 +2442,7 @@
   const WIDTH = 'width';
   const HEIGHT = 'height';
   const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing';
-  const SELECTOR_DATA_TOGGLE$a = '[data-coreui-toggle="collapse"]';
+  const SELECTOR_DATA_TOGGLE$a = '[data-bs-toggle="collapse"]';
   const Default$i = {
     parent: null,
     toggle: true
@@ -2784,7 +2784,7 @@
    */
 
   const NAME$i = 'time-picker';
-  const DATA_KEY$e = 'coreui.time-picker';
+  const DATA_KEY$e = 'bs.time-picker';
   const EVENT_KEY$e = `.${DATA_KEY$e}`;
   const DATA_API_KEY$b = '.data-api';
   const ENTER_KEY = 'Enter';
@@ -2823,7 +2823,7 @@
   const CLASS_NAME_SHOW$c = 'show';
   const CLASS_NAME_TIME_PICKER$1 = 'time-picker';
   const CLASS_NAME_WAS_VALIDATED$1 = 'was-validated';
-  const SELECTOR_DATA_TOGGLE$9 = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$9 = '[data-bs-toggle="time-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$3 = `${SELECTOR_DATA_TOGGLE$9}.${CLASS_NAME_SHOW$c}`;
   const SELECTOR_WAS_VALIDATED$1 = 'form.was-validated';
   const Default$h = {
@@ -3021,7 +3021,7 @@
           this.hide();
         }
       });
-      EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
+      EventHandler.on(this._element, 'timeChange.bs.time-picker', () => {
         if (this._config.variant === 'roll') {
           this._setUpRolls();
         }
@@ -3029,7 +3029,7 @@
           this._setUpSelects();
         }
       });
-      EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
+      EventHandler.on(this._element, 'onCancelClick.bs.picker', () => {
         this.cancel();
       });
       EventHandler.on(this._input, EVENT_INPUT$1, event => {
@@ -3264,7 +3264,7 @@
     }
     _setUpRolls(initial = false) {
       for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-        for (const element of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
+        for (const element of SelectorEngine.find(`[data-bs-${part}]`, this._element)) {
           if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
             element.classList.add(CLASS_NAME_SELECTED$1);
             this._scrollTo(element.parentElement, element, initial);
@@ -3437,7 +3437,7 @@
    */
 
   const NAME$h = 'date-range-picker';
-  const DATA_KEY$d = 'coreui.date-range-picker';
+  const DATA_KEY$d = 'bs.date-range-picker';
   const EVENT_KEY$d = `.${DATA_KEY$d}`;
   const DATA_API_KEY$a = '.data-api';
   const ESCAPE_KEY$4 = 'Escape';
@@ -3478,7 +3478,7 @@
   const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers';
   const CLASS_NAME_WAS_VALIDATED = 'was-validated';
   const SELECTOR_CALENDAR$1 = '.calendars';
-  const SELECTOR_DATA_TOGGLE$8 = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$8 = '[data-bs-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$8}.${CLASS_NAME_SHOW$b}`;
   const SELECTOR_INPUT = '.date-picker-input';
   const SELECTOR_WAS_VALIDATED = 'form.was-validated';
@@ -3744,26 +3744,26 @@
     }
     _addCalendarEventListeners() {
       for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR$1, this._element)) {
-        EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
+        EventHandler.on(calendar, 'startDateChange.bs.calendar', event => {
           this._changeStartDate(event.date);
           if (!this._config.range && !this._config.footer && !this._config.timepicker) {
             this.hide();
           }
         });
-        EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
+        EventHandler.on(calendar, 'endDateChange.bs.calendar', event => {
           this._changeEndDate(event.date);
           if (this._startDate && !this._config.footer && !this._config.timepicker) {
             this.hide();
           }
         });
-        EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
+        EventHandler.on(calendar, 'cellHover.bs.calendar', event => {
           if (this._selectEndDate) {
             this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
             return;
           }
           this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
         });
-        EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
+        EventHandler.on(calendar, 'selectEndChange.bs.calendar', event => {
           this._selectEndDate = event.value;
         });
       }
@@ -3923,10 +3923,10 @@
       calendarEl.classList.add(CLASS_NAME_CALENDAR);
       this._calendars.append(calendarEl);
       this._calendar = new Calendar(calendarEl, this._getCalendarConfig());
-      EventHandler.on(calendarEl, 'calendarDateChange.coreui.calendar', event => {
+      EventHandler.on(calendarEl, 'calendarDateChange.bs.calendar', event => {
         this._calendarDate = event.date;
       });
-      EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
+      EventHandler.on(calendarEl, 'calendarMouseleave.bs.calendar', () => {
         if (this._startDate) {
           this._startInput.value = this._setInputValue(this._startDate);
         }
@@ -3940,7 +3940,7 @@
           timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
           calendarEl.append(timePickerStartEl);
-          EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
+          EventHandler.on(timePickerStartEl, 'timeChange.bs.time-picker', event => {
             this._changeStartDate(event.date, true);
             // this._startDate = event.date
             // this._startInput.value = this._setInputValue(this._startDate)
@@ -3950,7 +3950,7 @@
           timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false));
           this._timepickers.append(timePickerEndEl);
-          EventHandler.on(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
+          EventHandler.on(timePickerEndEl, 'timeChange.bs.time-picker', event => {
             this._changeEndDate(event.date, true);
             // this._endDate = event.date
             // this._endInput.value = this._setInputValue(this._endDate)
@@ -3969,7 +3969,7 @@
               this._timePickerEnd = _timepicker;
             }
             this._timepickers.append(timePickerEl);
-            EventHandler.on(timePickerEl, 'timeChange.coreui.time-picker', event => {
+            EventHandler.on(timePickerEl, 'timeChange.bs.time-picker', event => {
               if (index === 0) {
                 this._changeStartDate(event.date, true);
                 // this._startDate = event.date
@@ -4202,7 +4202,7 @@
    */
 
   const NAME$g = 'date-picker';
-  const DATA_KEY$c = 'coreui.date-picker';
+  const DATA_KEY$c = 'bs.date-picker';
   const EVENT_KEY$c = `.${DATA_KEY$c}`;
   const DATA_API_KEY$9 = '.data-api';
   const TAB_KEY$3 = 'Tab';
@@ -4213,7 +4213,7 @@
   const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$c}${DATA_API_KEY$9}`;
   const CLASS_NAME_SHOW$a = 'show';
   const SELECTOR_CALENDAR = '.calendar';
-  const SELECTOR_DATA_TOGGLE$7 = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$7 = '[data-bs-toggle="date-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$1 = `${SELECTOR_DATA_TOGGLE$7}.${CLASS_NAME_SHOW$a}`;
   const Default$f = {
     ...DateRangePicker.Default,
@@ -4247,7 +4247,7 @@
     _addCalendarEventListeners() {
       super._addCalendarEventListeners();
       for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
-        EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
+        EventHandler.on(calendar, 'startDateChange.bs.calendar', event => {
           this._startDate = event.date;
           this._startInput.value = this._setInputValue(event.date);
           this._selectEndDate = false;
@@ -4339,7 +4339,7 @@
    */
 
   const NAME$f = 'dropdown';
-  const DATA_KEY$b = 'coreui.dropdown';
+  const DATA_KEY$b = 'bs.dropdown';
   const EVENT_KEY$b = `.${DATA_KEY$b}`;
   const DATA_API_KEY$8 = '.data-api';
   const ESCAPE_KEY$3 = 'Escape';
@@ -4361,7 +4361,7 @@
   const CLASS_NAME_DROPSTART = 'dropstart';
   const CLASS_NAME_DROPUP_CENTER = 'dropup-center';
   const CLASS_NAME_DROPDOWN_CENTER = 'dropdown-center';
-  const SELECTOR_DATA_TOGGLE$6 = '[data-coreui-toggle="dropdown"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$6 = '[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$6}.${CLASS_NAME_SHOW$9}`;
   const SELECTOR_MENU = '.dropdown-menu';
   const SELECTOR_NAVBAR = '.navbar';
@@ -4707,7 +4707,7 @@
    */
 
   const NAME$e = 'loading-button';
-  const DATA_KEY$a = 'coreui.loading-button';
+  const DATA_KEY$a = 'bs.loading-button';
   const EVENT_KEY$a = `.${DATA_KEY$a}`;
   const DATA_API_KEY$7 = '.data-api';
   const EVENT_START = `start${EVENT_KEY$a}`;
@@ -4716,7 +4716,7 @@
   const CLASS_NAME_IS_LOADING = 'is-loading';
   const CLASS_NAME_LOADING_BUTTON = 'btn-loading';
   const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner';
-  const SELECTOR_DATA_TOGGLE$5 = '[data-coreui-toggle="loading-button"]';
+  const SELECTOR_DATA_TOGGLE$5 = '[data-bs-toggle="loading-button"]';
   const Default$d = {
     disabledOnLoading: false,
     spinner: true,
@@ -4873,7 +4873,7 @@
   const NAME$d = 'backdrop';
   const CLASS_NAME_FADE$4 = 'fade';
   const CLASS_NAME_SHOW$8 = 'show';
-  const EVENT_MOUSEDOWN = `mousedown.coreui.${NAME$d}`;
+  const EVENT_MOUSEDOWN = `mousedown.bs.${NAME$d}`;
   const Default$c = {
     className: 'modal-backdrop',
     clickCallback: null,
@@ -4998,7 +4998,7 @@
    */
 
   const NAME$c = 'focustrap';
-  const DATA_KEY$9 = 'coreui.focustrap';
+  const DATA_KEY$9 = 'bs.focustrap';
   const EVENT_KEY$9 = `.${DATA_KEY$9}`;
   const EVENT_FOCUSIN$3 = `focusin${EVENT_KEY$9}`;
   const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$9}`;
@@ -5200,7 +5200,7 @@
    */
 
   const NAME$b = 'modal';
-  const DATA_KEY$8 = 'coreui.modal';
+  const DATA_KEY$8 = 'bs.modal';
   const EVENT_KEY$8 = `.${DATA_KEY$8}`;
   const DATA_API_KEY$6 = '.data-api';
   const ESCAPE_KEY$2 = 'Escape';
@@ -5221,7 +5221,7 @@
   const OPEN_SELECTOR$1 = '.modal.show';
   const SELECTOR_DIALOG = '.modal-dialog';
   const SELECTOR_MODAL_BODY = '.modal-body';
-  const SELECTOR_DATA_TOGGLE$4 = '[data-coreui-toggle="modal"]';
+  const SELECTOR_DATA_TOGGLE$4 = '[data-bs-toggle="modal"]';
   const Default$a = {
     backdrop: true,
     focus: true,
@@ -5507,7 +5507,7 @@
    */
 
   const NAME$a = 'multi-select';
-  const DATA_KEY$7 = 'coreui.multi-select';
+  const DATA_KEY$7 = 'bs.multi-select';
   const EVENT_KEY$7 = `.${DATA_KEY$7}`;
   const DATA_API_KEY$5 = '.data-api';
   const ESCAPE_KEY$1 = 'Escape';
@@ -6318,7 +6318,7 @@
    */
 
   const NAME$9 = 'navigation';
-  const DATA_KEY$6 = 'coreui.navigation';
+  const DATA_KEY$6 = 'bs.navigation';
   const EVENT_KEY$6 = `.${DATA_KEY$6}`;
   const DATA_API_KEY$4 = '.data-api';
   const Default$8 = {
@@ -6339,7 +6339,7 @@
   const SELECTOR_NAV_GROUP_ITEMS = '.nav-group-items';
   const SELECTOR_NAV_GROUP_TOGGLE = '.nav-group-toggle';
   const SELECTOR_NAV_LINK = '.nav-link';
-  const SELECTOR_DATA_NAVIGATION = '[data-coreui="navigation"]';
+  const SELECTOR_DATA_NAVIGATION = '[data-bs="navigation"]';
 
   /**
    * ------------------------------------------------------------------------
@@ -6564,7 +6564,7 @@
    */
 
   const NAME$8 = 'offcanvas';
-  const DATA_KEY$5 = 'coreui.offcanvas';
+  const DATA_KEY$5 = 'bs.offcanvas';
   const EVENT_KEY$5 = `.${DATA_KEY$5}`;
   const DATA_API_KEY$3 = '.data-api';
   const EVENT_LOAD_DATA_API$4 = `load${EVENT_KEY$5}${DATA_API_KEY$3}`;
@@ -6582,7 +6582,7 @@
   const EVENT_RESIZE$1 = `resize${EVENT_KEY$5}`;
   const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$5}${DATA_API_KEY$3}`;
   const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY$5}`;
-  const SELECTOR_DATA_TOGGLE$3 = '[data-coreui-toggle="offcanvas"]';
+  const SELECTOR_DATA_TOGGLE$3 = '[data-bs-toggle="offcanvas"]';
   const Default$7 = {
     backdrop: true,
     keyboard: true,
@@ -7042,7 +7042,7 @@
   const CLASS_NAME_SHOW$3 = 'show';
   const SELECTOR_TOOLTIP_INNER = '.tooltip-inner';
   const SELECTOR_MODAL = `.${CLASS_NAME_MODAL}`;
-  const EVENT_MODAL_HIDE = 'hide.coreui.modal';
+  const EVENT_MODAL_HIDE = 'hide.bs.modal';
   const TRIGGER_HOVER = 'hover';
   const TRIGGER_FOCUS = 'focus';
   const TRIGGER_CLICK = 'click';
@@ -7166,8 +7166,8 @@
     dispose() {
       clearTimeout(this._timeout);
       EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
-      if (this._element.getAttribute('data-coreui-original-title')) {
-        this._element.setAttribute('title', this._element.getAttribute('data-coreui-original-title'));
+      if (this._element.getAttribute('data-bs-original-title')) {
+        this._element.setAttribute('title', this._element.getAttribute('data-bs-original-title'));
       }
       this._disposePopper();
       super.dispose();
@@ -7313,7 +7313,7 @@
       };
     }
     _getTitle() {
-      return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute('data-coreui-original-title');
+      return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute('data-bs-original-title');
     }
 
     // Private
@@ -7423,7 +7423,7 @@
       if (!this._element.getAttribute('aria-label') && !this._element.textContent.trim()) {
         this._element.setAttribute('aria-label', title);
       }
-      this._element.setAttribute('data-coreui-original-title', title); // DO NOT USE IT. Is only for backwards compatibility
+      this._element.setAttribute('data-bs-original-title', title); // DO NOT USE IT. Is only for backwards compatibility
       this._element.removeAttribute('title');
     }
     _enter() {
@@ -7632,7 +7632,7 @@
    */
 
   const NAME$4 = 'rating';
-  const DATA_KEY$4 = 'coreui.rating';
+  const DATA_KEY$4 = 'bs.rating';
   const EVENT_KEY$4 = `.${DATA_KEY$4}`;
   const DATA_API_KEY$2 = '.data-api';
   const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn']);
@@ -7653,7 +7653,7 @@
   const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = 'rating-item-custom-icon-active';
   const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input';
   const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label';
-  const SELECTOR_DATA_TOGGLE$2 = '[data-coreui-toggle="rating"]';
+  const SELECTOR_DATA_TOGGLE$2 = '[data-bs-toggle="rating"]';
   const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
   const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
 
@@ -8078,7 +8078,7 @@
    */
 
   const NAME$3 = 'scrollspy';
-  const DATA_KEY$3 = 'coreui.scrollspy';
+  const DATA_KEY$3 = 'bs.scrollspy';
   const EVENT_KEY$3 = `.${DATA_KEY$3}`;
   const DATA_API_KEY$1 = '.data-api';
   const EVENT_ACTIVATE = `activate${EVENT_KEY$3}`;
@@ -8086,7 +8086,7 @@
   const EVENT_LOAD_DATA_API$2 = `load${EVENT_KEY$3}${DATA_API_KEY$1}`;
   const CLASS_NAME_DROPDOWN_ITEM = 'dropdown-item';
   const CLASS_NAME_ACTIVE$1 = 'active';
-  const SELECTOR_DATA_SPY = '[data-coreui-spy="scroll"]';
+  const SELECTOR_DATA_SPY = '[data-bs-spy="scroll"]';
   const SELECTOR_TARGET_LINKS = '[href]';
   const SELECTOR_NAV_LIST_GROUP = '.nav, .list-group';
   const SELECTOR_NAV_LINKS = '.nav-link';
@@ -8340,7 +8340,7 @@
    */
 
   const NAME$2 = 'sidebar';
-  const DATA_KEY$2 = 'coreui.sidebar';
+  const DATA_KEY$2 = 'bs.sidebar';
   const EVENT_KEY$2 = `.${DATA_KEY$2}`;
   const DATA_API_KEY = '.data-api';
   const Default$1 = {};
@@ -8358,8 +8358,8 @@
   const EVENT_SHOWN$2 = `shown${EVENT_KEY$2}`;
   const EVENT_CLICK_DATA_API$1 = `click${EVENT_KEY$2}${DATA_API_KEY}`;
   const EVENT_LOAD_DATA_API$1 = `load${EVENT_KEY$2}${DATA_API_KEY}`;
-  const SELECTOR_DATA_CLOSE = '[data-coreui-close="sidebar"]';
-  const SELECTOR_DATA_TOGGLE$1 = '[data-coreui-toggle]';
+  const SELECTOR_DATA_CLOSE = '[data-bs-close="sidebar"]';
+  const SELECTOR_DATA_TOGGLE$1 = '[data-bs-toggle]';
   const SELECTOR_SIDEBAR = '.sidebar';
 
   /**
@@ -8618,7 +8618,7 @@
    */
 
   const NAME$1 = 'tab';
-  const DATA_KEY$1 = 'coreui.tab';
+  const DATA_KEY$1 = 'bs.tab';
   const EVENT_KEY$1 = `.${DATA_KEY$1}`;
   const EVENT_HIDE$1 = `hide${EVENT_KEY$1}`;
   const EVENT_HIDDEN$1 = `hidden${EVENT_KEY$1}`;
@@ -8643,9 +8643,9 @@
   const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
   const SELECTOR_OUTER = '.nav-item, .list-group-item';
   const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;
-  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="tab"], [data-coreui-toggle="pill"], [data-coreui-toggle="list"]'; // TODO: could only be `tab` in v6
+  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]'; // TODO: could only be `tab` in v6
   const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
-  const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-coreui-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="list"]`;
+  const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-bs-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="list"]`;
 
   /**
    * Class definition
@@ -8891,7 +8891,7 @@
    */
 
   const NAME = 'toast';
-  const DATA_KEY = 'coreui.toast';
+  const DATA_KEY = 'bs.toast';
   const EVENT_KEY = `.${DATA_KEY}`;
   const EVENT_MOUSEOVER = `mouseover${EVENT_KEY}`;
   const EVENT_MOUSEOUT = `mouseout${EVENT_KEY}`;
