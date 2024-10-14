@@ -1863,7 +1863,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Calendar.getOrCreateInstance(this);
+        const data = Calendar.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -5192,7 +5192,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = TimePicker.getOrCreateInstance(this);
+        const data = TimePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -5957,7 +5957,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DateRangePicker.getOrCreateInstance(this);
+        const data = DateRangePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -6091,7 +6091,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DatePicker.getOrCreateInstance(this);
+        const data = DatePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -9853,7 +9853,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Rating.getOrCreateInstance(this);
+        const data = Rating.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
