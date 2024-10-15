@@ -96,7 +96,7 @@ class DatePicker extends DateRangePicker {
 
   static jQueryInterface(config) {
     return this.each(function () {
-      const data = DatePicker.getOrCreateInstance(this)
+      const data = DatePicker.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
