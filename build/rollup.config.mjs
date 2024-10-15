@@ -23,8 +23,7 @@ const plugins = [
   })
 ]
 const globals = {
-  '@popperjs/core': 'Popper',
-  'date-fns': 'dateFns'
+  '@popperjs/core': 'Popper'
 }
 
 if (BUNDLE) {
@@ -32,29 +31,27 @@ if (BUNDLE) {
   // Remove last entry in external array to bundle Popper
   external.pop()
   delete globals['@popperjs/core']
-  // Remove last entry in external array to bundle dateFns
-  external.pop()
-  delete globals['date-fns']
-  plugins.push(
-    replace({
-      'process.env.NODE_ENV': '"production"',
-      preventAssignment: true,
-      ...BOOTSTRAP && {
-        delimiters: ['', ''], // disable word boundaries
-        '/coreui': '/coreui', // prevents https://coreui.io being replaced with https://bs.io
-        'coreui.': 'bs.',
-        '.coreui': '.bs',
-        'coreui-': 'bs-',
-        '-coreui': '-bs',
-        "'coreui'": "'bs'",         // key.startsWith('coreui') => key.startsWith('bs')
-        'coreuiConfig': 'bsConfig', // key.startsWith('coreuiConfig')) => key.startsWith('bsConfig'))
-        '^coreui': '^bs',           // key.replace(/^coreui/, ''); => key.replace(/^bs/, '');
-        'coreui=': 'bs=',           // [data-coreui="navigation"] => [data-bs="navigation"] (workaround for preventAssignment being true)
-      }
-    }),
-    nodeResolve()
-  )
+  plugins.push(nodeResolve())
 }
+
+plugins.push(
+  replace({
+    'process.env.NODE_ENV': '"production"',
+    preventAssignment: true,
+    ...BOOTSTRAP && {
+      delimiters: ['', ''], // disable word boundaries
+      '/coreui': '/coreui', // prevents https://coreui.io being replaced with https://bs.io
+      'coreui.': 'bs.',
+      '.coreui': '.bs',
+      'coreui-': 'bs-',
+      '-coreui': '-bs',
+      "'coreui'": "'bs'",         // key.startsWith('coreui') => key.startsWith('bs')
+      'coreuiConfig': 'bsConfig', // key.startsWith('coreuiConfig')) => key.startsWith('bsConfig'))
+      '^coreui': '^bs',           // key.replace(/^coreui/, ''); => key.replace(/^bs/, '');
+      'coreui=': 'bs=',           // [data-coreui="navigation"] => [data-bs="navigation"] (workaround for preventAssignment being true)
+    }
+  })
+)
 
 const rollupConfig = {
   input: path.resolve(__dirname, `../js/index.${ESM ? 'esm' : 'umd'}.js`),
