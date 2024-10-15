@@ -46,10 +46,10 @@ if (BUNDLE) {
         '.coreui': '.bs',
         'coreui-': 'bs-',
         '-coreui': '-bs',
-        "'coreui'": "'bs'",
-        'coreuiConfig': 'bsConfig',
-        '^coreui': '^bs',
-        'coreui=': 'bs=',
+        "'coreui'": "'bs'",         // key.startsWith('coreui') => key.startsWith('bs')
+        'coreuiConfig': 'bsConfig', // key.startsWith('coreuiConfig')) => key.startsWith('bsConfig'))
+        '^coreui': '^bs',           // key.replace(/^coreui/, ''); => key.replace(/^bs/, '');
+        'coreui=': 'bs=',           // [data-coreui="navigation"] => [data-bs="navigation"] (workaround for preventAssignment being true)
       }
     }),
     nodeResolve()
