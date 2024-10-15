@@ -40,7 +40,16 @@ if (BUNDLE) {
       'process.env.NODE_ENV': '"production"',
       preventAssignment: true,
       ...BOOTSTRAP && {
-        'coreui.': 'bs.'
+        delimiters: ['', ''], // disable word boundaries
+        '/coreui': '/coreui', // prevents https://coreui.io being replaced with https://bs.io
+        'coreui.': 'bs.',
+        '.coreui': '.bs',
+        'coreui-': 'bs-',
+        '-coreui': '-bs',
+        "'coreui'": "'bs'",
+        'coreuiConfig': 'bsConfig',
+        '^coreui': '^bs',
+        'coreui=': 'bs=',
       }
     }),
     nodeResolve()
