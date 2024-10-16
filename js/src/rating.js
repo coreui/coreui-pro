@@ -34,7 +34,6 @@ const EVENT_MOUSELEAVE = `mouseleave${EVENT_KEY}`
 
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_READONLY = 'readonly'
 const CLASS_NAME_RATING = 'rating'
 const CLASS_NAME_RATING_ITEM = 'rating-item'
 const CLASS_NAME_RATING_ITEM_ICON = 'rating-item-icon'
@@ -42,6 +41,7 @@ const CLASS_NAME_RATING_ITEM_CUSTOM_ICON = 'rating-item-custom-icon'
 const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = 'rating-item-custom-icon-active'
 const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input'
 const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label'
+const CLASS_NAME_READONLY = 'readonly'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
