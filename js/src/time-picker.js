@@ -813,7 +813,7 @@ class TimePicker extends BaseComponent {
 
   static jQueryInterface(config) {
     return this.each(function () {
-      const data = TimePicker.getOrCreateInstance(this)
+      const data = TimePicker.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
