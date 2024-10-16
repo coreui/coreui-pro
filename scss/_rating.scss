@@ -17,14 +17,13 @@
   }
 
   &:not(.disabled):not(.readonly) {
-    .rating-item {
-      .rating-item-label {
-        cursor: pointer;
-      }
+    .rating-item:hover {
+      transform: var(--#{$prefix}rating-item-scale-transform);
+    }
 
-      &:hover {
-        transform: var(--#{$prefix}rating-item-scale-transform);
-      }
+    .rating-item-icon,
+    .rating-item-label {
+      cursor: pointer;
     }
   }
 }
@@ -49,7 +48,6 @@
   font-size: var(--#{$prefix}rating-item-height);
   line-height: 0;
   color: var(--#{$prefix}rating-item-color);
-  cursor: default;  // has cursor pointer only if the rating is not disabled or readonly (see above)
 
   * {
     pointer-events: none;
@@ -85,7 +83,6 @@
 .rating-item-icon {
   width: var(--#{$prefix}rating-item-height);
   height: var(--#{$prefix}rating-item-height);
-  //cursor: pointer;  // has the cursor of rating-item-label (parent)
   background-color: var(--#{$prefix}rating-item-color);
   mask: var(--#{$prefix}rating-item-icon) center / var(--#{$prefix}rating-item-height) no-repeat;
 }
