@@ -29,7 +29,6 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_SHOW = 'show'
 
-const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
 
@@ -65,20 +64,14 @@ class DatePicker extends DateRangePicker {
   }
 
   // Overrides
-  _addCalendarEventListeners() {
-    super._addCalendarEventListeners()
-    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
-      EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
-        this._startDate = event.date
-        this._startInput.value = this._setInputValue(event.date)
-        this._selectEndDate = false
-        this._calendar.update(this._getCalendarConfig())
+  _addEventListeners() {
+    super._addEventListeners()
 
+    EventHandler.on(this._element, 'startDateChange.coreui.date-range-picker', event => {
         EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
           date: event.date
         })
-      })
-    }
+    })
   }
 
   // Static
