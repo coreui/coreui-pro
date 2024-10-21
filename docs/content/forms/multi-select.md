@@ -277,6 +277,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `cleaner`| boolean| `true` | Enables selection cleaner element. |
+| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |

@@ -1,4 +1,5 @@
-.form-multi-select {
+.form-multi-select,
+*:not(.form-multi-select) > .form-multi-select-dropdown {
   // scss-docs-start form-multi-select-css-vars
   --#{$prefix}form-multi-select-zindex: #{$form-multi-select-zindex};
   --#{$prefix}form-multi-select-font-family: #{$form-multi-select-font-family};
@@ -326,7 +327,8 @@ select.form-multi-select {
   @include box-shadow(var(--#{$prefix}form-multi-select-dropdown-box-shadow));
   @include elevation(4);
 
-  .form-multi-select.show & {
+  .form-multi-select.show &,
+  &.show {
     display: block;
   }
 }

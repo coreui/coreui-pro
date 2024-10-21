@@ -13,6 +13,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
+  getElement,
   isVisible,
   isRTL
 } from './util/index.js'
@@ -80,6 +81,7 @@ const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 
 const Default = {
   cleaner: true,
+  container: false,
   disabled: false,
   invalid: false,
   multiple: true,
@@ -100,6 +102,7 @@ const Default = {
 
 const DefaultType = {
   cleaner: 'boolean',
+  container: '(string|element|boolean)',
   disabled: 'boolean',
   invalid: 'boolean',
   multiple: 'boolean',
@@ -179,6 +182,12 @@ class MultiSelect extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._clone.classList.add(CLASS_NAME_SHOW)
     this._clone.setAttribute('aria-expanded', true)
+
+    if (this._config.container) {
+      this._menu.style.minWidth = `${this._clone.offsetWidth}px`
+      this._menu.classList.add(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
     this._createPopper()
@@ -199,6 +208,11 @@ class MultiSelect extends BaseComponent {
     this._onSearchChange(this._searchElement)
     this._clone.classList.remove(CLASS_NAME_SHOW)
     this._clone.setAttribute('aria-expanded', 'false')
+
+    if (this._config.container) {
+      this._menu.classList.remove(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -220,6 +234,7 @@ class MultiSelect extends BaseComponent {
     this._config = this._getConfig(config)
     this._options = this._getOptions()
     this._selected = this._getSelectedOptions(this._options)
+    this._menu.remove()
     this._clone.remove()
     this._element.innerHTML = ''
     this._createNativeOptions(this._element, this._options)
@@ -534,6 +549,7 @@ class MultiSelect extends BaseComponent {
       }],
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
     }
+
     this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
   }
 
@@ -575,7 +591,13 @@ class MultiSelect extends BaseComponent {
 
     dropdownDiv.append(optionsDiv)
 
-    this._clone.append(dropdownDiv)
+    const { container } = this._config
+    if (container) {
+      // this._clone.parentNode.insertBefore(dropdownDiv, this._clone.nextSibling)
+      getElement(container).append(dropdownDiv)
+    } else {
+      this._clone.append(dropdownDiv)
+    }
 
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
@@ -649,7 +671,7 @@ class MultiSelect extends BaseComponent {
     }
 
     const value = String(element.dataset.value)
-    const { text } = this._options.find(option => option.value === value)
+    const { text } = this._findOptionByValue(value)
 
     if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
       this._deselectOption(value)
@@ -664,6 +686,23 @@ class MultiSelect extends BaseComponent {
       this.search('')
       this._searchElement.value = null
     }
+  }
+
+  _findOptionByValue(value, options = this._options) {
+    for (const option of options) {
+      if (option.value === value) {
+        return option
+      }
+
+      if (option.options && Array.isArray(option.options)) {
+        const found = this._findOptionByValue(value, option.options)
+        if (found) {
+          return found
+        }
+      }
+    }
+
+    return null
   }
 
   _selectOption(value, text) {
@@ -860,7 +899,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _filterOptionsList() {
-    const options = SelectorEngine.find(SELECTOR_OPTION, this._clone)
+    const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
     let visibleOptions = 0
 
     for (const option of options) {
@@ -884,8 +923,8 @@ class MultiSelect extends BaseComponent {
     }
 
     if (visibleOptions > 0) {
-      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove()
+      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove()
       }
 
       return
@@ -896,8 +935,8 @@ class MultiSelect extends BaseComponent {
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
       placeholder.innerHTML = this._config.searchNoResultsLabel
 
-      if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder)
+      if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+        SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
       }
     }
   }
