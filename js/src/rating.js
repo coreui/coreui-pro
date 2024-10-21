@@ -41,6 +41,7 @@ const CLASS_NAME_RATING_ITEM_CUSTOM_ICON = 'rating-item-custom-icon'
 const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = 'rating-item-custom-icon-active'
 const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input'
 const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label'
+const CLASS_NAME_READONLY = 'readonly'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
@@ -353,6 +354,10 @@ class Rating extends BaseComponent {
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
+    }
+
+    if (this._config.readOnly) {
+      this._element.classList.add(CLASS_NAME_READONLY)
     }
 
     this._element.setAttribute('role', 'radiogroup')
