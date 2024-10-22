@@ -100,7 +100,7 @@ Selecting whole month by adding the `data-coreui-selection-type="month"` attribu
   </div>
   <div class="col-sm-6 col-lg-5">
     <div
-      data-coreui-date="2022-8"
+      data-coreui-date="2022-08"
       data-coreui-locale="en-US"
       data-coreui-toggle="date-picker"
       data-coreui-selection-type="month">

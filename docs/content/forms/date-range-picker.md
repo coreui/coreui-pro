@@ -127,8 +127,8 @@ Select range of months by adding the `data-coreui-selection-type="month"` attrib
     </div>
     <div class="col-sm-6">
       <div
-        data-coreui-start-date="2022-8"
-        data-coreui-end-date="2023-5"
+        data-coreui-start-date="2022-08"
+        data-coreui-end-date="2023-05"
         data-coreui-locale="en-US"
         data-coreui-toggle="date-range-picker"
         data-coreui-selection-type="month">
