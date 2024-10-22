@@ -23,6 +23,12 @@ export const convertToDateObject = (date, selectionType) => {
     return convertIsoWeekToDate(date)
   }
 
+  if (selectionType === 'month' || selectionType === 'year') {
+    const _date = new Date(Date.parse(date))
+    const userTimezoneOffset = _date.getTimezoneOffset() * 60_000
+    return new Date(_date.getTime() + userTimezoneOffset)
+  }
+
   return new Date(Date.parse(date))
 }
 
