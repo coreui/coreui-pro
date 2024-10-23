@@ -143,7 +143,9 @@ select.form-multi-select {
     border-color: $input-disabled-border-color;
   }
 
-  .form-multi-select.show & {
+  .form-multi-select.show &,
+  &:has(*:focus),
+  &:focus {
     color: var(--#{$prefix}form-multi-select-focus-color);
     background-color: var(--#{$prefix}form-multi-select-focus-bg);
     border-color: var(--#{$prefix}form-multi-select-focus-border-color);
@@ -173,8 +175,8 @@ select.form-multi-select {
 }
 
 .form-multi-select-search {
-  display: none;
-  flex: 1 1 auto;
+  display: flex;
+  flex: 0 1 0px;
   max-width: 100%;
   padding: 0;
   background: transparent;
@@ -191,7 +193,8 @@ select.form-multi-select {
 
   .form-multi-select.show &,
   &:placeholder-shown {
-    display: flex;
+    flex: 1 1 auto;
+    // display: flex;
   }
 
   .form-multi-select-selection-tags & {
