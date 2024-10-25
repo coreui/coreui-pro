@@ -69,13 +69,13 @@
       &:not(.sidebar-end){
         @include ltr-rtl("margin-left", calc(-1 * var(--#{$prefix}sidebar-width)));
         ~ * {
-          --#{$prefix}sidebar-occupy-start: 0;
+          --#{$prefix}sidebar-occupy-start: 0 !important; // stylelint-disable-line declaration-no-important
         }
       }
       &.sidebar-end {
         @include ltr-rtl("margin-right", calc(-1 * var(--#{$prefix}sidebar-width)));
         ~ * {
-          --#{$prefix}sidebar-occupy-end: 0;
+          --#{$prefix}sidebar-occupy-end: 0 !important; // stylelint-disable-line declaration-no-important
         }
       }
     }
@@ -119,7 +119,7 @@
       @include ltr-rtl("left", 0);
       @include ltr-rtl("margin-left", calc(-1 * var(--#{$prefix}sidebar-width)));
       ~ * {
-        --#{$prefix}sidebar-occupy-start: 0 !important;  // stylelint-disable-line
+        --#{$prefix}sidebar-occupy-start: 0 !important; // stylelint-disable-line declaration-no-important
       }
     }
 
@@ -127,7 +127,7 @@
       @include ltr-rtl("right", 0);
       @include ltr-rtl("margin-right", calc(-1 * var(--#{$prefix}sidebar-width)));
       ~ * {
-        --#{$prefix}sidebar-occupy-end: 0 !important;  // stylelint-disable-line
+        --#{$prefix}sidebar-occupy-end: 0 !important; // stylelint-disable-line declaration-no-important
       }
     }
 
@@ -157,7 +157,7 @@
     &:not(.sidebar-end) {
       @include ltr-rtl("left", 0);
       ~ * {
-        --#{$prefix}sidebar-occupy-start: 0 !important; // stylelint-disable-line
+        --#{$prefix}sidebar-occupy-start: 0 !important; // stylelint-disable-line declaration-no-important
       }
 
       &:not(.show) {
@@ -167,7 +167,7 @@
     &.sidebar-end {
       @include ltr-rtl("right", 0);
       ~ * {
-        --#{$prefix}sidebar-occupy-end: 0 !important; // stylelint-disable-line
+        --#{$prefix}sidebar-occupy-end: 0 !important; // stylelint-disable-line declaration-no-important
       }
 
       &:not(.show) {
