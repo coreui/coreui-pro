@@ -59,14 +59,20 @@
   }
 }
 
+.sidebar-narrow,
+.sidebar-narrow-unfoldable {
+  @include media-breakpoint-up($mobile-breakpoint) {
+    &:not(.sidebar-end):not(.hide) ~ * {
+      --#{$prefix}sidebar-occupy-start: #{$sidebar-narrow-width} !important; // stylelint-disable-line declaration-no-important
+    }
+    &.sidebar-end:not(.hide) ~ * {
+      --#{$prefix}sidebar-occupy-end: #{$sidebar-narrow-width} !important; // stylelint-disable-line declaration-no-important
+    }
+  }
+}
+
 .sidebar-narrow {
   @extend %sidebar-narrow;
-  &:not(.sidebar-end) ~ * {
-    --#{$prefix}sidebar-occupy-start: #{$sidebar-narrow-width} !important; // stylelint-disable-line declaration-no-important
-  }
-  &.sidebar-end ~ * {
-    --#{$prefix}sidebar-occupy-end: #{$sidebar-narrow-width} !important; // stylelint-disable-line declaration-no-important
-  }
 
   .nav-link {
     overflow: hidden;
@@ -75,13 +81,6 @@
 
 .sidebar-narrow-unfoldable {
   position: fixed;
-
-  &:not(.sidebar-end) ~ * {
-    --#{$prefix}sidebar-occupy-start: #{$sidebar-narrow-width} !important; // stylelint-disable-line declaration-no-important
-  }
-  &.sidebar-end ~ * {
-    --#{$prefix}sidebar-occupy-end: #{$sidebar-narrow-width} !important; // stylelint-disable-line declaration-no-important
-  }
 
   &:not(:hover) {
     @extend %sidebar-narrow;
