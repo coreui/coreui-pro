@@ -13,6 +13,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
+  getElement,
   isVisible,
   isRTL
 } from './util/index.js'
@@ -28,10 +29,13 @@ const DATA_KEY = 'coreui.multi-select'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ESCAPE_KEY = 'Escape'
-const TAB_KEY = 'Tab'
 const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
+const BACKSPACE_KEY = 'Backspace'
+const DELETE_KEY = 'Delete'
+const ENTER_KEY = 'Enter'
+const ESCAPE_KEY = 'Escape'
+const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const SELECTOR_CLEANER = '.form-multi-select-cleaner'
@@ -79,7 +83,9 @@ const CLASS_NAME_TAG = 'form-multi-select-tag'
 const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 
 const Default = {
+  ariaCleanerLabel: 'Clear all selections',
   cleaner: true,
+  container: false,
   disabled: false,
   invalid: false,
   multiple: true,
@@ -99,7 +105,9 @@ const Default = {
 }
 
 const DefaultType = {
+  ariaCleanerLabel: 'string',
   cleaner: 'boolean',
+  container: '(string|element|boolean)',
   disabled: 'boolean',
   invalid: 'boolean',
   multiple: 'boolean',
@@ -109,7 +117,7 @@ const DefaultType = {
   optionsStyle: 'string',
   placeholder: 'string',
   required: 'boolean',
-  search: 'boolean',
+  search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
   selectAllLabel: 'string',
@@ -179,6 +187,12 @@ class MultiSelect extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._clone.classList.add(CLASS_NAME_SHOW)
     this._clone.setAttribute('aria-expanded', true)
+
+    if (this._config.container) {
+      this._menu.style.minWidth = `${this._clone.offsetWidth}px`
+      this._menu.classList.add(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
     this._createPopper()
@@ -195,10 +209,18 @@ class MultiSelect extends BaseComponent {
       this._popper.destroy()
     }
 
-    this._searchElement.value = ''
+    if (this._config.search) {
+      this._searchElement.value = ''
+    }
+
     this._onSearchChange(this._searchElement)
     this._clone.classList.remove(CLASS_NAME_SHOW)
     this._clone.setAttribute('aria-expanded', 'false')
+
+    if (this._config.container) {
+      this._menu.classList.remove(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -220,6 +242,7 @@ class MultiSelect extends BaseComponent {
     this._config = this._getConfig(config)
     this._options = this._getOptions()
     this._selected = this._getSelectedOptions(this._options)
+    this._menu.remove()
     this._clone.remove()
     this._element.innerHTML = ''
     this._createNativeOptions(this._element, this._options)
@@ -273,6 +296,30 @@ class MultiSelect extends BaseComponent {
     EventHandler.on(this._clone, EVENT_KEYDOWN, event => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
+        return
+      }
+
+      if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+        this._searchElement.focus()
+      }
+    })
+
+    EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+      if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+        this._searchElement.focus()
+      }
+    })
+
+    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, event => {
+      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
+        event.preventDefault()
+        this.show()
+        return
+      }
+
+      if (this._isShown() && event.key === ARROW_DOWN_KEY) {
+        event.preventDefault()
+        this._selectMenuItem(event)
       }
     })
 
@@ -287,9 +334,16 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
-      const key = event.keyCode || event.charCode
+      if (!this._isShown()) {
+        this.show()
+      }
 
-      if ((key === 8 || key === 46) && event.target.value.length === 0) {
+      if (event.key === ARROW_DOWN_KEY && this._searchElement.value.length === this._searchElement.selectionStart) {
+        this._selectMenuItem(event)
+        return
+      }
+
+      if ((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && event.target.value.length === 0) {
         this._deselectLastOption()
       }
 
@@ -317,9 +371,7 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
-      const key = event.keyCode || event.charCode
-
-      if (key === 13) {
+      if (event.key === ENTER_KEY) {
         this._onOptionsClick(event.target)
       }
 
@@ -471,6 +523,10 @@ class MultiSelect extends BaseComponent {
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
+    if (!this._config.search && !this._config.disabled) {
+      togglerEl.tabIndex = 0
+    }
+
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
 
@@ -494,6 +550,7 @@ class MultiSelect extends BaseComponent {
       cleaner.type = 'button'
       cleaner.classList.add(CLASS_NAME_CLEANER)
       cleaner.style.display = 'none'
+      cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
 
       buttons.append(cleaner)
       this._selectionCleanerElement = cleaner
@@ -534,6 +591,7 @@ class MultiSelect extends BaseComponent {
       }],
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
     }
+
     this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
   }
 
@@ -575,7 +633,13 @@ class MultiSelect extends BaseComponent {
 
     dropdownDiv.append(optionsDiv)
 
-    this._clone.append(dropdownDiv)
+    const { container } = this._config
+    if (container) {
+      // this._clone.parentNode.insertBefore(dropdownDiv, this._clone.nextSibling)
+      getElement(container).append(dropdownDiv)
+    } else {
+      this._clone.append(dropdownDiv)
+    }
 
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
@@ -649,7 +713,7 @@ class MultiSelect extends BaseComponent {
     }
 
     const value = String(element.dataset.value)
-    const { text } = this._options.find(option => option.value === value)
+    const { text } = this._findOptionByValue(value)
 
     if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
       this._deselectOption(value)
@@ -664,6 +728,23 @@ class MultiSelect extends BaseComponent {
       this.search('')
       this._searchElement.value = null
     }
+  }
+
+  _findOptionByValue(value, options = this._options) {
+    for (const option of options) {
+      if (option.value === value) {
+        return option
+      }
+
+      if (option.options && Array.isArray(option.options)) {
+        const found = this._findOptionByValue(value, option.options)
+        if (found) {
+          return found
+        }
+      }
+    }
+
+    return null
   }
 
   _selectOption(value, text) {
@@ -860,7 +941,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _filterOptionsList() {
-    const options = SelectorEngine.find(SELECTOR_OPTION, this._clone)
+    const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
     let visibleOptions = 0
 
     for (const option of options) {
@@ -884,8 +965,8 @@ class MultiSelect extends BaseComponent {
     }
 
     if (visibleOptions > 0) {
-      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove()
+      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove()
       }
 
       return
@@ -896,8 +977,8 @@ class MultiSelect extends BaseComponent {
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
       placeholder.innerHTML = this._config.searchNoResultsLabel
 
-      if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder)
+      if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+        SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
       }
     }
   }

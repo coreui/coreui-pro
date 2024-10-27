@@ -16,7 +16,7 @@ other_frameworks: multi-select
 A straightforward demonstration of how to implement a basic Bootstrap Multi Select dropdown, highlighting essential attributes and configurations.
 
 {{< example >}}
-<select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
+<select class="form-multi-select" id="ms1" multiple data-coreui-search="global">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -76,6 +76,63 @@ To dynamically populate a multi-select dropdown with options from an array, star
 We use the following JavaScript to set up our multi-select:
 
 {{< js-docs name="multi-select-array-data" file="docs/assets/js/snippets.js" >}}
+
+## Search
+
+You can configure the search functionality within the component. The `data-coreui-search` option determines how the search input element is enabled and behaves. It accepts multiple types to provide flexibility in configuring search behavior. By default is set to `false`.
+
+{{< example >}}
+<select class="form-multi-select" multiple>
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+### Standard search
+
+To enable the default search input element with standard behavior, please add `data-coreui-search="true"` like in the example below:
+
+{{< example >}}
+<select class="form-multi-select" multiple data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+### Global search
+
+{{< added-in "5.6.0" >}}
+
+To enable the global search functionality within the Multi Select component, please add `data-coreui-search="global"`. When `data-coreui-search` is set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. This allows for a more flexible and intuitive search experience, ensuring the search input is recognized from any point within the component.
+
+{{< example >}}
+<select class="form-multi-select" multiple data-coreui-search="global">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
 
 ## Selection types
 
@@ -276,7 +333,9 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `cleaner`| boolean| `true` | Enables selection cleaner element. |
+| `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
+| `cleaner`| boolean | `true` | Enables selection cleaner element. |
+| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
@@ -285,7 +344,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
 | `optionsStyle` | string | `'checkbox'` | Sets option style. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
-| `search` | boolean | `false` | Enables search input element.	 |
+| `search` | boolean, string | `false` | Enables search input element. When set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. |
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all options'` | Sets the select all button label.	 |
