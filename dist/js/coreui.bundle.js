@@ -1007,6 +1007,11 @@
     if (selectionType === 'week') {
       return convertIsoWeekToDate(date);
     }
+    if (selectionType === 'month' || selectionType === 'year') {
+      const _date = new Date(Date.parse(date));
+      const userTimezoneOffset = _date.getTimezoneOffset() * 60000;
+      return new Date(_date.getTime() + userTimezoneOffset);
+    }
     return new Date(Date.parse(date));
   };
   const createGroupsInArray = (arr, numberOfGroups) => {
@@ -1226,7 +1231,7 @@
   const ARROW_RIGHT_KEY$2 = 'ArrowRight';
   const ARROW_DOWN_KEY$3 = 'ArrowDown';
   const ARROW_LEFT_KEY$2 = 'ArrowLeft';
-  const ENTER_KEY$1 = 'Enter';
+  const ENTER_KEY$2 = 'Enter';
   const SPACE_KEY$1 = 'Space';
   const EVENT_BLUR = `blur${EVENT_KEY$i}`;
   const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$i}`;
@@ -1397,7 +1402,7 @@
     }
     _handleCalendarKeydown(event) {
       const date = this._getDate(event.target);
-      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$1) {
+      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$2) {
         event.preventDefault();
         this._handleCalendarClick(event);
       }
@@ -1863,7 +1868,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Calendar.getOrCreateInstance(this);
+        const data = Calendar.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -4607,7 +4612,7 @@
   const DATA_KEY$e = 'coreui.time-picker';
   const EVENT_KEY$e = `.${DATA_KEY$e}`;
   const DATA_API_KEY$b = '.data-api';
-  const ENTER_KEY = 'Enter';
+  const ENTER_KEY$1 = 'Enter';
   const ESCAPE_KEY$5 = 'Escape';
   const SPACE_KEY = 'Space';
   const TAB_KEY$5 = 'Tab';
@@ -5039,7 +5044,7 @@
           this._handleTimeChange(part, option.value);
         });
         timePickerRollCellEl.addEventListener('keydown', event => {
-          if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
+          if (event.code === SPACE_KEY || event.key === ENTER_KEY$1) {
             event.preventDefault();
             this._handleTimeChange(part, option.value);
           }
@@ -5192,7 +5197,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = TimePicker.getOrCreateInstance(this);
+        const data = TimePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -5957,7 +5962,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DateRangePicker.getOrCreateInstance(this);
+        const data = DateRangePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -6091,7 +6096,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DatePicker.getOrCreateInstance(this);
+        const data = DatePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -7330,10 +7335,13 @@
   const DATA_KEY$7 = 'coreui.multi-select';
   const EVENT_KEY$7 = `.${DATA_KEY$7}`;
   const DATA_API_KEY$5 = '.data-api';
-  const ESCAPE_KEY$1 = 'Escape';
-  const TAB_KEY = 'Tab';
   const ARROW_UP_KEY$1 = 'ArrowUp';
   const ARROW_DOWN_KEY$1 = 'ArrowDown';
+  const BACKSPACE_KEY = 'Backspace';
+  const DELETE_KEY = 'Delete';
+  const ENTER_KEY = 'Enter';
+  const ESCAPE_KEY$1 = 'Escape';
+  const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
 
   const SELECTOR_CLEANER = '.form-multi-select-cleaner';
@@ -7378,7 +7386,9 @@
   const CLASS_NAME_TAG = 'form-multi-select-tag';
   const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete';
   const Default$9 = {
+    ariaCleanerLabel: 'Clear all selections',
     cleaner: true,
+    container: false,
     disabled: false,
     invalid: false,
     multiple: true,
@@ -7397,7 +7407,9 @@
     valid: false
   };
   const DefaultType$9 = {
+    ariaCleanerLabel: 'string',
     cleaner: 'boolean',
+    container: '(string|element|boolean)',
     disabled: 'boolean',
     invalid: 'boolean',
     multiple: 'boolean',
@@ -7407,7 +7419,7 @@
     optionsStyle: 'string',
     placeholder: 'string',
     required: 'boolean',
-    search: 'boolean',
+    search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
     selectAllLabel: 'string',
@@ -7469,6 +7481,10 @@
       EventHandler.trigger(this._element, EVENT_SHOW$5);
       this._clone.classList.add(CLASS_NAME_SHOW$6);
       this._clone.setAttribute('aria-expanded', true);
+      if (this._config.container) {
+        this._menu.style.minWidth = `${this._clone.offsetWidth}px`;
+        this._menu.classList.add(CLASS_NAME_SHOW$6);
+      }
       EventHandler.trigger(this._element, EVENT_SHOWN$5);
       this._createPopper();
       if (this._config.search) {
@@ -7480,10 +7496,15 @@
       if (this._popper) {
         this._popper.destroy();
       }
-      this._searchElement.value = '';
+      if (this._config.search) {
+        this._searchElement.value = '';
+      }
       this._onSearchChange(this._searchElement);
       this._clone.classList.remove(CLASS_NAME_SHOW$6);
       this._clone.setAttribute('aria-expanded', 'false');
+      if (this._config.container) {
+        this._menu.classList.remove(CLASS_NAME_SHOW$6);
+      }
       EventHandler.trigger(this._element, EVENT_HIDDEN$5);
     }
     dispose() {
@@ -7501,6 +7522,7 @@
       this._config = this._getConfig(config);
       this._options = this._getOptions();
       this._selected = this._getSelectedOptions(this._options);
+      this._menu.remove();
       this._clone.remove();
       this._element.innerHTML = '';
       this._createNativeOptions(this._element, this._options);
@@ -7546,6 +7568,26 @@
       EventHandler.on(this._clone, EVENT_KEYDOWN$1, event => {
         if (event.key === ESCAPE_KEY$1) {
           this.hide();
+          return;
+        }
+        if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+          this._searchElement.focus();
+        }
+      });
+      EventHandler.on(this._menu, EVENT_KEYDOWN$1, event => {
+        if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+          this._searchElement.focus();
+        }
+      });
+      EventHandler.on(this._togglerElement, EVENT_KEYDOWN$1, event => {
+        if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY$1)) {
+          event.preventDefault();
+          this.show();
+          return;
+        }
+        if (this._isShown() && event.key === ARROW_DOWN_KEY$1) {
+          event.preventDefault();
+          this._selectMenuItem(event);
         }
       });
       EventHandler.on(this._indicatorElement, EVENT_CLICK$3, event => {
@@ -7557,8 +7599,14 @@
         this._onSearchChange(this._searchElement);
       });
       EventHandler.on(this._searchElement, EVENT_KEYDOWN$1, event => {
-        const key = event.keyCode || event.charCode;
-        if ((key === 8 || key === 46) && event.target.value.length === 0) {
+        if (!this._isShown()) {
+          this.show();
+        }
+        if (event.key === ARROW_DOWN_KEY$1 && this._searchElement.value.length === this._searchElement.selectionStart) {
+          this._selectMenuItem(event);
+          return;
+        }
+        if ((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && event.target.value.length === 0) {
           this._deselectLastOption();
         }
         this._searchElement.focus();
@@ -7581,8 +7629,7 @@
         }
       });
       EventHandler.on(this._optionsElement, EVENT_KEYDOWN$1, event => {
-        const key = event.keyCode || event.charCode;
-        if (key === 13) {
+        if (event.key === ENTER_KEY) {
           this._onOptionsClick(event.target);
         }
         if ([ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event.key)) {
@@ -7704,6 +7751,9 @@
       const togglerEl = document.createElement('div');
       togglerEl.classList.add(CLASS_NAME_INPUT_GROUP);
       this._togglerElement = togglerEl;
+      if (!this._config.search && !this._config.disabled) {
+        togglerEl.tabIndex = 0;
+      }
       const selectionEl = document.createElement('div');
       selectionEl.classList.add(CLASS_NAME_SELECTION);
       if (this._config.multiple && this._config.selectionType === 'tags') {
@@ -7722,6 +7772,7 @@
         cleaner.type = 'button';
         cleaner.classList.add(CLASS_NAME_CLEANER);
         cleaner.style.display = 'none';
+        cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel);
         buttons.append(cleaner);
         this._selectionCleanerElement = cleaner;
       }
@@ -7783,7 +7834,15 @@
         optionsDiv.style.overflow = 'auto';
       }
       dropdownDiv.append(optionsDiv);
-      this._clone.append(dropdownDiv);
+      const {
+        container
+      } = this._config;
+      if (container) {
+        // this._clone.parentNode.insertBefore(dropdownDiv, this._clone.nextSibling)
+        getElement(container).append(dropdownDiv);
+      } else {
+        this._clone.append(dropdownDiv);
+      }
       this._createOptions(optionsDiv, this._options);
       this._optionsElement = optionsDiv;
       this._menu = dropdownDiv;
@@ -7843,7 +7902,7 @@
       const value = String(element.dataset.value);
       const {
         text
-      } = this._options.find(option => option.value === value);
+      } = this._findOptionByValue(value);
       if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
         this._deselectOption(value);
       } else if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
@@ -7856,6 +7915,20 @@
         this.search('');
         this._searchElement.value = null;
       }
+    }
+    _findOptionByValue(value, options = this._options) {
+      for (const option of options) {
+        if (option.value === value) {
+          return option;
+        }
+        if (option.options && Array.isArray(option.options)) {
+          const found = this._findOptionByValue(value, option.options);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
     }
     _selectOption(value, text) {
       if (!this._config.multiple) {
@@ -8012,7 +8085,7 @@
       return this._clone.classList.contains(CLASS_NAME_SHOW$6);
     }
     _filterOptionsList() {
-      const options = SelectorEngine.find(SELECTOR_OPTION, this._clone);
+      const options = SelectorEngine.find(SELECTOR_OPTION, this._menu);
       let visibleOptions = 0;
       for (const option of options) {
         // eslint-disable-next-line unicorn/prefer-includes
@@ -8033,8 +8106,8 @@
         }
       }
       if (visibleOptions > 0) {
-        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove();
+        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove();
         }
         return;
       }
@@ -8042,8 +8115,8 @@
         const placeholder = document.createElement('div');
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY);
         placeholder.innerHTML = this._config.searchNoResultsLabel;
-        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder);
+        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
         }
       }
     }
@@ -9473,6 +9546,7 @@
   const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = 'rating-item-custom-icon-active';
   const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input';
   const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label';
+  const CLASS_NAME_READONLY = 'readonly';
   const SELECTOR_DATA_TOGGLE$2 = '[data-coreui-toggle="rating"]';
   const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
   const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
@@ -9739,6 +9813,9 @@
       if (this._config.disabled) {
         this._element.classList.add(CLASS_NAME_DISABLED);
       }
+      if (this._config.readOnly) {
+        this._element.classList.add(CLASS_NAME_READONLY);
+      }
       this._element.setAttribute('role', 'radiogroup');
       Array.from({
         length: this._config.itemCount
@@ -9853,7 +9930,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Rating.getOrCreateInstance(this);
+        const data = Rating.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }

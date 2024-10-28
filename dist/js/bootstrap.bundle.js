@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.5.0 (https://bs.io)
+  * CoreUI v5.5.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -217,7 +217,7 @@
     element.offsetHeight; // eslint-disable-line no-unused-expressions
   };
   const getjQuery = () => {
-    if (window.jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
+    if (window.jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
       return window.jQuery;
     }
     return null;
@@ -571,26 +571,26 @@
   }
   const Manipulator = {
     setDataAttribute(element, key, value) {
-      element.setAttribute(`data-coreui-${normalizeDataKey(key)}`, value);
+      element.setAttribute(`data-bs-${normalizeDataKey(key)}`, value);
     },
     removeDataAttribute(element, key) {
-      element.removeAttribute(`data-coreui-${normalizeDataKey(key)}`);
+      element.removeAttribute(`data-bs-${normalizeDataKey(key)}`);
     },
     getDataAttributes(element) {
       if (!element) {
         return {};
       }
       const attributes = {};
-      const coreuiKeys = Object.keys(element.dataset).filter(key => key.startsWith('coreui') && !key.startsWith('coreuiConfig'));
-      for (const key of coreuiKeys) {
-        let pureKey = key.replace(/^coreui/, '');
+      Object.keys(element.dataset).filter(key => key.startsWith('bs') && !key.startsWith('bsConfig'));
+      for (const key of bsKeys) {
+        let pureKey = key.replace(/^bs/, '');
         pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1);
         attributes[pureKey] = normalizeData(element.dataset[key]);
       }
       return attributes;
     },
     getDataAttribute(element, key) {
-      return normalizeData(element.getAttribute(`data-coreui-${normalizeDataKey(key)}`));
+      return normalizeData(element.getAttribute(`data-bs-${normalizeDataKey(key)}`));
     }
   };
 
@@ -712,7 +712,7 @@
       return VERSION;
     }
     static get DATA_KEY() {
-      return `coreui.${this.NAME}`;
+      return `bs.${this.NAME}`;
     }
     static get EVENT_KEY() {
       return `.${this.DATA_KEY}`;
@@ -733,7 +733,7 @@
    */
 
   const getSelector = element => {
-    let selector = element.getAttribute('data-coreui-target');
+    let selector = element.getAttribute('data-bs-target');
     if (!selector || selector === '#') {
       let hrefAttribute = element.getAttribute('href');
 
@@ -827,7 +827,7 @@
   const enableDismissTrigger = (component, method = 'hide') => {
     const clickEvent = `click.dismiss${component.EVENT_KEY}`;
     const name = component.NAME;
-    EventHandler.on(document, clickEvent, `[data-coreui-dismiss="${name}"]`, function (event) {
+    EventHandler.on(document, clickEvent, `[data-bs-dismiss="${name}"]`, function (event) {
       if (['A', 'AREA'].includes(this.tagName)) {
         event.preventDefault();
       }
@@ -940,7 +940,7 @@
   const EVENT_KEY$j = `.${DATA_KEY$i}`;
   const DATA_API_KEY$f = '.data-api';
   const CLASS_NAME_ACTIVE$5 = 'active';
-  const SELECTOR_DATA_TOGGLE$c = '[data-coreui-toggle="button"]';
+  const SELECTOR_DATA_TOGGLE$c = '[data-bs-toggle="button"]';
   const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$j}${DATA_API_KEY$f}`;
 
   /**
@@ -1006,6 +1006,11 @@
     }
     if (selectionType === 'week') {
       return convertIsoWeekToDate(date);
+    }
+    if (selectionType === 'month' || selectionType === 'year') {
+      const _date = new Date(Date.parse(date));
+      const userTimezoneOffset = _date.getTimezoneOffset() * 60000;
+      return new Date(_date.getTime() + userTimezoneOffset);
     }
     return new Date(Date.parse(date));
   };
@@ -1209,7 +1214,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO calendar.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -1226,7 +1231,7 @@
   const ARROW_RIGHT_KEY$2 = 'ArrowRight';
   const ARROW_DOWN_KEY$3 = 'ArrowDown';
   const ARROW_LEFT_KEY$2 = 'ArrowLeft';
-  const ENTER_KEY$1 = 'Enter';
+  const ENTER_KEY$2 = 'Enter';
   const SPACE_KEY$1 = 'Space';
   const EVENT_BLUR = `blur${EVENT_KEY$i}`;
   const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$i}`;
@@ -1254,7 +1259,7 @@
   const SELECTOR_CALENDAR$2 = '.calendar';
   const SELECTOR_CALENDAR_CELL = '.calendar-cell';
   const SELECTOR_CALENDAR_ROW = '.calendar-row';
-  const SELECTOR_DATA_TOGGLE$b = '[data-coreui-toggle="calendar"]';
+  const SELECTOR_DATA_TOGGLE$b = '[data-bs-toggle="calendar"]';
   const Default$l = {
     ariaNavNextMonthLabel: 'Next month',
     ariaNavNextYearLabel: 'Next year',
@@ -1397,7 +1402,7 @@
     }
     _handleCalendarKeydown(event) {
       const date = this._getDate(event.target);
-      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$1) {
+      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$2) {
         event.preventDefault();
         this._handleCalendarClick(event);
       }
@@ -1721,7 +1726,7 @@
                   class="calendar-cell ${this._dayClassNames(date, month)}"
                   tabindex="${this._config.selectionType === 'day' && (month === 'current' || this._config.selectAdjacementDays) && !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
-                  data-coreui-date="${date}"
+                  data-bs-date="${date}"
                 >
                   <div class="calendar-cell-inner day">
                     ${date.toLocaleDateString(this._config.locale, {
@@ -1735,7 +1740,7 @@
       const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
       return `<td
                   class="calendar-cell ${this._sharedClassNames(date)}"
-                  data-coreui-date="${date.toDateString()}"
+                  data-bs-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
@@ -1750,7 +1755,7 @@
       const date = new Date(year, 0, 1);
       return `<td
                   class="calendar-cell ${this._sharedClassNames(date)}"
-                  data-coreui-date="${date.toDateString()}"
+                  data-bs-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
@@ -1863,7 +1868,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Calendar.getOrCreateInstance(this);
+        const data = Calendar.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -2061,8 +2066,8 @@
   const SELECTOR_ACTIVE_ITEM = SELECTOR_ACTIVE + SELECTOR_ITEM;
   const SELECTOR_ITEM_IMG = '.carousel-item img';
   const SELECTOR_INDICATORS = '.carousel-indicators';
-  const SELECTOR_DATA_SLIDE = '[data-coreui-slide], [data-coreui-slide-to]';
-  const SELECTOR_DATA_RIDE = '[data-coreui-ride="carousel"]';
+  const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]';
+  const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]';
   const KEY_TO_DIRECTION = {
     [ARROW_LEFT_KEY$1]: DIRECTION_RIGHT,
     [ARROW_RIGHT_KEY$1]: DIRECTION_LEFT
@@ -2241,7 +2246,7 @@
       const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
       activeIndicator.classList.remove(CLASS_NAME_ACTIVE$4);
       activeIndicator.removeAttribute('aria-current');
-      const newActiveIndicator = SelectorEngine.findOne(`[data-coreui-slide-to="${index}"]`, this._indicatorsElement);
+      const newActiveIndicator = SelectorEngine.findOne(`[data-bs-slide-to="${index}"]`, this._indicatorsElement);
       if (newActiveIndicator) {
         newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$4);
         newActiveIndicator.setAttribute('aria-current', 'true');
@@ -2252,7 +2257,7 @@
       if (!element) {
         return;
       }
-      const elementInterval = Number.parseInt(element.getAttribute('data-coreui-interval'), 10);
+      const elementInterval = Number.parseInt(element.getAttribute('data-bs-interval'), 10);
       this._config.interval = elementInterval || this._config.defaultInterval;
     }
     _slide(order, element = null) {
@@ -2363,7 +2368,7 @@
     }
     event.preventDefault();
     const carousel = Carousel.getOrCreateInstance(target);
-    const slideIndex = this.getAttribute('data-coreui-slide-to');
+    const slideIndex = this.getAttribute('data-bs-slide-to');
     if (slideIndex) {
       carousel.to(slideIndex);
       carousel._maybeEnableCycle();
@@ -2423,7 +2428,7 @@
   const WIDTH = 'width';
   const HEIGHT = 'height';
   const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing';
-  const SELECTOR_DATA_TOGGLE$a = '[data-coreui-toggle="collapse"]';
+  const SELECTOR_DATA_TOGGLE$a = '[data-bs-toggle="collapse"]';
   const Default$i = {
     parent: null,
     toggle: true
@@ -4594,7 +4599,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO time-picker.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -4607,7 +4612,7 @@
   const DATA_KEY$e = 'bs.time-picker';
   const EVENT_KEY$e = `.${DATA_KEY$e}`;
   const DATA_API_KEY$b = '.data-api';
-  const ENTER_KEY = 'Enter';
+  const ENTER_KEY$1 = 'Enter';
   const ESCAPE_KEY$5 = 'Escape';
   const SPACE_KEY = 'Space';
   const TAB_KEY$5 = 'Tab';
@@ -4643,7 +4648,7 @@
   const CLASS_NAME_SHOW$c = 'show';
   const CLASS_NAME_TIME_PICKER$1 = 'time-picker';
   const CLASS_NAME_WAS_VALIDATED$1 = 'was-validated';
-  const SELECTOR_DATA_TOGGLE$9 = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$9 = '[data-bs-toggle="time-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$3 = `${SELECTOR_DATA_TOGGLE$9}.${CLASS_NAME_SHOW$c}`;
   const SELECTOR_WAS_VALIDATED$1 = 'form.was-validated';
   const Default$h = {
@@ -5039,7 +5044,7 @@
           this._handleTimeChange(part, option.value);
         });
         timePickerRollCellEl.addEventListener('keydown', event => {
-          if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
+          if (event.code === SPACE_KEY || event.key === ENTER_KEY$1) {
             event.preventDefault();
             this._handleTimeChange(part, option.value);
           }
@@ -5084,7 +5089,7 @@
     }
     _setUpRolls(initial = false) {
       for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-        for (const element of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
+        for (const element of SelectorEngine.find(`[data-bs-${part}]`, this._element)) {
           if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
             element.classList.add(CLASS_NAME_SELECTED$1);
             this._scrollTo(element.parentElement, element, initial);
@@ -5192,7 +5197,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = TimePicker.getOrCreateInstance(this);
+        const data = TimePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -5247,7 +5252,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO date-range-picker.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -5298,7 +5303,7 @@
   const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers';
   const CLASS_NAME_WAS_VALIDATED = 'was-validated';
   const SELECTOR_CALENDAR$1 = '.calendars';
-  const SELECTOR_DATA_TOGGLE$8 = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$8 = '[data-bs-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$8}.${CLASS_NAME_SHOW$b}`;
   const SELECTOR_INPUT = '.date-picker-input';
   const SELECTOR_WAS_VALIDATED = 'form.was-validated';
@@ -5957,7 +5962,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DateRangePicker.getOrCreateInstance(this);
+        const data = DateRangePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -6012,7 +6017,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO date-picker.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -6033,7 +6038,7 @@
   const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$c}${DATA_API_KEY$9}`;
   const CLASS_NAME_SHOW$a = 'show';
   const SELECTOR_CALENDAR = '.calendar';
-  const SELECTOR_DATA_TOGGLE$7 = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$7 = '[data-bs-toggle="date-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$1 = `${SELECTOR_DATA_TOGGLE$7}.${CLASS_NAME_SHOW$a}`;
   const Default$f = {
     ...DateRangePicker.Default,
@@ -6091,7 +6096,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DatePicker.getOrCreateInstance(this);
+        const data = DatePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -6181,7 +6186,7 @@
   const CLASS_NAME_DROPSTART = 'dropstart';
   const CLASS_NAME_DROPUP_CENTER = 'dropup-center';
   const CLASS_NAME_DROPDOWN_CENTER = 'dropdown-center';
-  const SELECTOR_DATA_TOGGLE$6 = '[data-coreui-toggle="dropdown"]:not(.disabled):not(:disabled)';
+  const SELECTOR_DATA_TOGGLE$6 = '[data-bs-toggle="dropdown"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$6}.${CLASS_NAME_SHOW$9}`;
   const SELECTOR_MENU = '.dropdown-menu';
   const SELECTOR_NAVBAR = '.navbar';
@@ -6356,7 +6361,7 @@
       }
 
       // We need to trim the value because custom properties can also include spaces
-      const isEnd = getComputedStyle(this._menu).getPropertyValue('--cui-position').trim() === 'end';
+      const isEnd = getComputedStyle(this._menu).getPropertyValue('--bs-position').trim() === 'end';
       if (parentDropdown.classList.contains(CLASS_NAME_DROPUP)) {
         return isEnd ? PLACEMENT_TOPEND : PLACEMENT_TOP;
       }
@@ -6517,7 +6522,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO loading-button.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -6536,7 +6541,7 @@
   const CLASS_NAME_IS_LOADING = 'is-loading';
   const CLASS_NAME_LOADING_BUTTON = 'btn-loading';
   const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner';
-  const SELECTOR_DATA_TOGGLE$5 = '[data-coreui-toggle="loading-button"]';
+  const SELECTOR_DATA_TOGGLE$5 = '[data-bs-toggle="loading-button"]';
   const Default$d = {
     disabledOnLoading: false,
     spinner: true,
@@ -6693,7 +6698,7 @@
   const NAME$d = 'backdrop';
   const CLASS_NAME_FADE$4 = 'fade';
   const CLASS_NAME_SHOW$8 = 'show';
-  const EVENT_MOUSEDOWN = `mousedown.coreui.${NAME$d}`;
+  const EVENT_MOUSEDOWN = `mousedown.bs.${NAME$d}`;
   const Default$c = {
     className: 'modal-backdrop',
     clickCallback: null,
@@ -7041,7 +7046,7 @@
   const OPEN_SELECTOR$1 = '.modal.show';
   const SELECTOR_DIALOG = '.modal-dialog';
   const SELECTOR_MODAL_BODY = '.modal-body';
-  const SELECTOR_DATA_TOGGLE$4 = '[data-coreui-toggle="modal"]';
+  const SELECTOR_DATA_TOGGLE$4 = '[data-bs-toggle="modal"]';
   const Default$a = {
     backdrop: true,
     focus: true,
@@ -7315,7 +7320,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO multi-select.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -7330,10 +7335,13 @@
   const DATA_KEY$7 = 'bs.multi-select';
   const EVENT_KEY$7 = `.${DATA_KEY$7}`;
   const DATA_API_KEY$5 = '.data-api';
-  const ESCAPE_KEY$1 = 'Escape';
-  const TAB_KEY = 'Tab';
   const ARROW_UP_KEY$1 = 'ArrowUp';
   const ARROW_DOWN_KEY$1 = 'ArrowDown';
+  const BACKSPACE_KEY = 'Backspace';
+  const DELETE_KEY = 'Delete';
+  const ENTER_KEY = 'Enter';
+  const ESCAPE_KEY$1 = 'Escape';
+  const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
 
   const SELECTOR_CLEANER = '.form-multi-select-cleaner';
@@ -7378,7 +7386,9 @@
   const CLASS_NAME_TAG = 'form-multi-select-tag';
   const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete';
   const Default$9 = {
+    ariaCleanerLabel: 'Clear all selections',
     cleaner: true,
+    container: false,
     disabled: false,
     invalid: false,
     multiple: true,
@@ -7397,7 +7407,9 @@
     valid: false
   };
   const DefaultType$9 = {
+    ariaCleanerLabel: 'string',
     cleaner: 'boolean',
+    container: '(string|element|boolean)',
     disabled: 'boolean',
     invalid: 'boolean',
     multiple: 'boolean',
@@ -7407,7 +7419,7 @@
     optionsStyle: 'string',
     placeholder: 'string',
     required: 'boolean',
-    search: 'boolean',
+    search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
     selectAllLabel: 'string',
@@ -7469,6 +7481,10 @@
       EventHandler.trigger(this._element, EVENT_SHOW$5);
       this._clone.classList.add(CLASS_NAME_SHOW$6);
       this._clone.setAttribute('aria-expanded', true);
+      if (this._config.container) {
+        this._menu.style.minWidth = `${this._clone.offsetWidth}px`;
+        this._menu.classList.add(CLASS_NAME_SHOW$6);
+      }
       EventHandler.trigger(this._element, EVENT_SHOWN$5);
       this._createPopper();
       if (this._config.search) {
@@ -7480,10 +7496,15 @@
       if (this._popper) {
         this._popper.destroy();
       }
-      this._searchElement.value = '';
+      if (this._config.search) {
+        this._searchElement.value = '';
+      }
       this._onSearchChange(this._searchElement);
       this._clone.classList.remove(CLASS_NAME_SHOW$6);
       this._clone.setAttribute('aria-expanded', 'false');
+      if (this._config.container) {
+        this._menu.classList.remove(CLASS_NAME_SHOW$6);
+      }
       EventHandler.trigger(this._element, EVENT_HIDDEN$5);
     }
     dispose() {
@@ -7501,6 +7522,7 @@
       this._config = this._getConfig(config);
       this._options = this._getOptions();
       this._selected = this._getSelectedOptions(this._options);
+      this._menu.remove();
       this._clone.remove();
       this._element.innerHTML = '';
       this._createNativeOptions(this._element, this._options);
@@ -7546,6 +7568,26 @@
       EventHandler.on(this._clone, EVENT_KEYDOWN$1, event => {
         if (event.key === ESCAPE_KEY$1) {
           this.hide();
+          return;
+        }
+        if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+          this._searchElement.focus();
+        }
+      });
+      EventHandler.on(this._menu, EVENT_KEYDOWN$1, event => {
+        if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
+          this._searchElement.focus();
+        }
+      });
+      EventHandler.on(this._togglerElement, EVENT_KEYDOWN$1, event => {
+        if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY$1)) {
+          event.preventDefault();
+          this.show();
+          return;
+        }
+        if (this._isShown() && event.key === ARROW_DOWN_KEY$1) {
+          event.preventDefault();
+          this._selectMenuItem(event);
         }
       });
       EventHandler.on(this._indicatorElement, EVENT_CLICK$3, event => {
@@ -7557,8 +7599,14 @@
         this._onSearchChange(this._searchElement);
       });
       EventHandler.on(this._searchElement, EVENT_KEYDOWN$1, event => {
-        const key = event.keyCode || event.charCode;
-        if ((key === 8 || key === 46) && event.target.value.length === 0) {
+        if (!this._isShown()) {
+          this.show();
+        }
+        if (event.key === ARROW_DOWN_KEY$1 && this._searchElement.value.length === this._searchElement.selectionStart) {
+          this._selectMenuItem(event);
+          return;
+        }
+        if ((event.key === BACKSPACE_KEY || event.key === DELETE_KEY) && event.target.value.length === 0) {
           this._deselectLastOption();
         }
         this._searchElement.focus();
@@ -7581,8 +7629,7 @@
         }
       });
       EventHandler.on(this._optionsElement, EVENT_KEYDOWN$1, event => {
-        const key = event.keyCode || event.charCode;
-        if (key === 13) {
+        if (event.key === ENTER_KEY) {
           this._onOptionsClick(event.target);
         }
         if ([ARROW_UP_KEY$1, ARROW_DOWN_KEY$1].includes(event.key)) {
@@ -7704,6 +7751,9 @@
       const togglerEl = document.createElement('div');
       togglerEl.classList.add(CLASS_NAME_INPUT_GROUP);
       this._togglerElement = togglerEl;
+      if (!this._config.search && !this._config.disabled) {
+        togglerEl.tabIndex = 0;
+      }
       const selectionEl = document.createElement('div');
       selectionEl.classList.add(CLASS_NAME_SELECTION);
       if (this._config.multiple && this._config.selectionType === 'tags') {
@@ -7722,6 +7772,7 @@
         cleaner.type = 'button';
         cleaner.classList.add(CLASS_NAME_CLEANER);
         cleaner.style.display = 'none';
+        cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel);
         buttons.append(cleaner);
         this._selectionCleanerElement = cleaner;
       }
@@ -7783,7 +7834,15 @@
         optionsDiv.style.overflow = 'auto';
       }
       dropdownDiv.append(optionsDiv);
-      this._clone.append(dropdownDiv);
+      const {
+        container
+      } = this._config;
+      if (container) {
+        // this._clone.parentNode.insertBefore(dropdownDiv, this._clone.nextSibling)
+        getElement(container).append(dropdownDiv);
+      } else {
+        this._clone.append(dropdownDiv);
+      }
       this._createOptions(optionsDiv, this._options);
       this._optionsElement = optionsDiv;
       this._menu = dropdownDiv;
@@ -7843,7 +7902,7 @@
       const value = String(element.dataset.value);
       const {
         text
-      } = this._options.find(option => option.value === value);
+      } = this._findOptionByValue(value);
       if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
         this._deselectOption(value);
       } else if (this._config.multiple && !element.classList.contains(CLASS_NAME_SELECTED)) {
@@ -7856,6 +7915,20 @@
         this.search('');
         this._searchElement.value = null;
       }
+    }
+    _findOptionByValue(value, options = this._options) {
+      for (const option of options) {
+        if (option.value === value) {
+          return option;
+        }
+        if (option.options && Array.isArray(option.options)) {
+          const found = this._findOptionByValue(value, option.options);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
     }
     _selectOption(value, text) {
       if (!this._config.multiple) {
@@ -8012,7 +8085,7 @@
       return this._clone.classList.contains(CLASS_NAME_SHOW$6);
     }
     _filterOptionsList() {
-      const options = SelectorEngine.find(SELECTOR_OPTION, this._clone);
+      const options = SelectorEngine.find(SELECTOR_OPTION, this._menu);
       let visibleOptions = 0;
       for (const option of options) {
         // eslint-disable-next-line unicorn/prefer-includes
@@ -8033,8 +8106,8 @@
         }
       }
       if (visibleOptions > 0) {
-        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone).remove();
+        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove();
         }
         return;
       }
@@ -8042,8 +8115,8 @@
         const placeholder = document.createElement('div');
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY);
         placeholder.innerHTML = this._config.searchNoResultsLabel;
-        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._clone)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS, this._clone).append(placeholder);
+        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
         }
       }
     }
@@ -8159,7 +8232,7 @@
   const SELECTOR_NAV_GROUP_ITEMS = '.nav-group-items';
   const SELECTOR_NAV_GROUP_TOGGLE = '.nav-group-toggle';
   const SELECTOR_NAV_LINK = '.nav-link';
-  const SELECTOR_DATA_NAVIGATION = '[data-coreui="navigation"]';
+  const SELECTOR_DATA_NAVIGATION = '[data-bs="navigation"]';
 
   /**
    * ------------------------------------------------------------------------
@@ -8402,7 +8475,7 @@
   const EVENT_RESIZE$1 = `resize${EVENT_KEY$5}`;
   const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$5}${DATA_API_KEY$3}`;
   const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY$5}`;
-  const SELECTOR_DATA_TOGGLE$3 = '[data-coreui-toggle="offcanvas"]';
+  const SELECTOR_DATA_TOGGLE$3 = '[data-bs-toggle="offcanvas"]';
   const Default$7 = {
     backdrop: true,
     keyboard: true,
@@ -8986,8 +9059,8 @@
     dispose() {
       clearTimeout(this._timeout);
       EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
-      if (this._element.getAttribute('data-coreui-original-title')) {
-        this._element.setAttribute('title', this._element.getAttribute('data-coreui-original-title'));
+      if (this._element.getAttribute('data-bs-original-title')) {
+        this._element.setAttribute('title', this._element.getAttribute('data-bs-original-title'));
       }
       this._disposePopper();
       super.dispose();
@@ -9133,7 +9206,7 @@
       };
     }
     _getTitle() {
-      return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute('data-coreui-original-title');
+      return this._resolvePossibleFunction(this._config.title) || this._element.getAttribute('data-bs-original-title');
     }
 
     // Private
@@ -9243,7 +9316,7 @@
       if (!this._element.getAttribute('aria-label') && !this._element.textContent.trim()) {
         this._element.setAttribute('aria-label', title);
       }
-      this._element.setAttribute('data-coreui-original-title', title); // DO NOT USE IT. Is only for backwards compatibility
+      this._element.setAttribute('data-bs-original-title', title); // DO NOT USE IT. Is only for backwards compatibility
       this._element.removeAttribute('title');
     }
     _enter() {
@@ -9442,7 +9515,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO rating.js
-   * License (https://bs.io/pro/license/)
+   * License (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 
@@ -9473,7 +9546,8 @@
   const CLASS_NAME_RATING_ITEM_CUSTOM_ICON_ACTIVE = 'rating-item-custom-icon-active';
   const CLASS_NAME_RATING_ITEM_INPUT = 'rating-item-input';
   const CLASS_NAME_RATING_ITEM_LABEL = 'rating-item-label';
-  const SELECTOR_DATA_TOGGLE$2 = '[data-coreui-toggle="rating"]';
+  const CLASS_NAME_READONLY = 'readonly';
+  const SELECTOR_DATA_TOGGLE$2 = '[data-bs-toggle="rating"]';
   const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
   const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
 
@@ -9739,6 +9813,9 @@
       if (this._config.disabled) {
         this._element.classList.add(CLASS_NAME_DISABLED);
       }
+      if (this._config.readOnly) {
+        this._element.classList.add(CLASS_NAME_READONLY);
+      }
       this._element.setAttribute('role', 'radiogroup');
       Array.from({
         length: this._config.itemCount
@@ -9853,7 +9930,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Rating.getOrCreateInstance(this);
+        const data = Rating.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
@@ -9906,7 +9983,7 @@
   const EVENT_LOAD_DATA_API$2 = `load${EVENT_KEY$3}${DATA_API_KEY$1}`;
   const CLASS_NAME_DROPDOWN_ITEM = 'dropdown-item';
   const CLASS_NAME_ACTIVE$1 = 'active';
-  const SELECTOR_DATA_SPY = '[data-coreui-spy="scroll"]';
+  const SELECTOR_DATA_SPY = '[data-bs-spy="scroll"]';
   const SELECTOR_TARGET_LINKS = '[href]';
   const SELECTOR_NAV_LIST_GROUP = '.nav, .list-group';
   const SELECTOR_NAV_LINKS = '.nav-link';
@@ -10178,8 +10255,8 @@
   const EVENT_SHOWN$2 = `shown${EVENT_KEY$2}`;
   const EVENT_CLICK_DATA_API$1 = `click${EVENT_KEY$2}${DATA_API_KEY}`;
   const EVENT_LOAD_DATA_API$1 = `load${EVENT_KEY$2}${DATA_API_KEY}`;
-  const SELECTOR_DATA_CLOSE = '[data-coreui-close="sidebar"]';
-  const SELECTOR_DATA_TOGGLE$1 = '[data-coreui-toggle]';
+  const SELECTOR_DATA_CLOSE = '[data-bs-close="sidebar"]';
+  const SELECTOR_DATA_TOGGLE$1 = '[data-bs-toggle]';
   const SELECTOR_SIDEBAR = '.sidebar';
 
   /**
@@ -10320,7 +10397,7 @@
       });
     }
     _isMobile() {
-      return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--cui-is-mobile'));
+      return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--bs-is-mobile'));
     }
     _isNarrow() {
       return this._element.classList.contains(CLASS_NAME_SIDEBAR_NARROW);
@@ -10463,9 +10540,9 @@
   const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
   const SELECTOR_OUTER = '.nav-item, .list-group-item';
   const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;
-  const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="tab"], [data-coreui-toggle="pill"], [data-coreui-toggle="list"]'; // TODO: could only be `tab` in v6
+  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]'; // TODO: could only be `tab` in v6
   const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
-  const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-coreui-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-coreui-toggle="list"]`;
+  const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-bs-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="list"]`;
 
   /**
    * Class definition
@@ -10885,7 +10962,7 @@
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO index.esm.js
-   * Licensed under MIT (Licensed under MIT (https://bs.io/pro/license/)
+   * Licensed under MIT (Licensed under MIT (https://coreui.io/pro/license/)
    * --------------------------------------------------------------------------
    */
 

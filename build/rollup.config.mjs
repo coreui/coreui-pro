@@ -32,8 +32,7 @@ const plugins = [
   })
 ]
 const globals = {
-  '@popperjs/core': 'Popper',
-  'date-fns': 'dateFns'
+  '@popperjs/core': 'Popper'
 }
 
 if (BUNDLE) {
@@ -41,9 +40,6 @@ if (BUNDLE) {
   // Remove last entry in external array to bundle Popper
   external.pop()
   delete globals['@popperjs/core']
-  // Remove last entry in external array to bundle dateFns
-  external.pop()
-  delete globals['date-fns']
   plugins.push(
     replace({
       'process.env.NODE_ENV': '"production"',

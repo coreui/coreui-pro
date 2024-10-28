@@ -667,7 +667,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = Calendar.getOrCreateInstance(this);
+        const data = Calendar.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }

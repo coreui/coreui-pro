@@ -741,7 +741,7 @@
     }
     static jQueryInterface(config) {
       return this.each(function () {
-        const data = DateRangePicker.getOrCreateInstance(this);
+        const data = DateRangePicker.getOrCreateInstance(this, config);
         if (typeof config !== 'string') {
           return;
         }
