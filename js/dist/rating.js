@@ -1,5 +1,5 @@
 /*!
-  * CoreUI rating.js v5.5.0 (https://coreui.io)
+  * CoreUI rating.js v5.6.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
