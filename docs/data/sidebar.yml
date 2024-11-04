@@ -66,6 +66,10 @@
         text: PRO
     - title: Checks & radios
     - title: Range
+    - title: Range Slider
+      badge:
+        color: danger
+        text: PRO
     - title: Input group
     - title: Floating labels
     - title: Date Picker
