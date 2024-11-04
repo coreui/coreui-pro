@@ -226,7 +226,7 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
 
 ### CSS variables
 
-Calendar use local CSS variables on `.range-slider` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+Bootstap Range Sliders use local CSS variables on `.range-slider` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 
 {{< scss-docs name="range-slider-css-vars" file="scss/_range-slider.scss" >}}
 
