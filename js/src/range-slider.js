@@ -560,7 +560,7 @@ class RangeSlider extends BaseComponent {
   }
 
   // Static
-  static ratingInterface(element, config) {
+  static rangeSliderInterface(element, config) {
     const data = RangeSlider.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
@@ -596,7 +596,7 @@ class RangeSlider extends BaseComponent {
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   const ratings = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
   for (let i = 0, len = ratings.length; i < len; i++) {
-    RangeSlider.ratingInterface(ratings[i])
+    RangeSlider.rangeSliderInterface(ratings[i])
   }
 })
 
