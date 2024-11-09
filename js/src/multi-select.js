@@ -635,7 +635,6 @@ class MultiSelect extends BaseComponent {
 
     const { container } = this._config
     if (container) {
-      // this._clone.parentNode.insertBefore(dropdownDiv, this._clone.nextSibling)
       getElement(container).append(dropdownDiv)
     } else {
       this._clone.append(dropdownDiv)
