@@ -1,4 +1,5 @@
-.date-picker {
+.date-picker,
+*:not(.date-picker) > .date-picker-dropdown {
   // scss-docs-start date-picker-css-vars
   --#{$prefix}date-picker-zindex: #{$date-picker-zindex};
   --#{$prefix}date-picker-font-family: #{$date-picker-font-family};
@@ -199,7 +200,8 @@
   @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
   @include elevation(4);
 
-  .date-picker.show & {
+  .date-picker.show &,
+  &.show {
     display: block;
   }
 }

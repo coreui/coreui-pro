@@ -12,7 +12,7 @@ import TimePicker from './time-picker.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, isRTL } from './util/index.js'
+import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
 import { convertToDateObject, getLocalDateFromString } from './util/calendar.js'
 
 /**
@@ -75,13 +75,14 @@ const Default = {
   ariaNavNextYearLabel: 'Next year',
   ariaNavPrevMonthLabel: 'Previous month',
   ariaNavPrevYearLabel: 'Previous year',
+  calendarDate: null,
   calendars: 2,
   cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
   confirmButton: 'OK',
   confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
   cleaner: true,
-  calendarDate: null,
+  container: false,
   date: null,
   disabled: false,
   disabledDates: null,
@@ -125,13 +126,14 @@ const DefaultType = {
   ariaNavNextYearLabel: 'string',
   ariaNavPrevMonthLabel: 'string',
   ariaNavPrevYearLabel: 'string',
+  calendarDate: '(date|number|string|null)',
   calendars: 'number',
   cancelButton: '(boolean|string)',
   cancelButtonClasses: '(array|string)',
+  cleaner: 'boolean',
   confirmButton: '(boolean|string)',
   confirmButtonClasses: '(array|string)',
-  cleaner: 'boolean',
-  calendarDate: '(date|number|string|null)',
+  container: '(string|element|boolean)',
   date: '(date|number|string|null)',
   disabledDates: '(array|null)',
   disabled: 'boolean',
@@ -230,6 +232,11 @@ class DateRangePicker extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._element.classList.add(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', true)
+
+    if (this._config.container) {
+      this._menu.classList.add(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
     this._createPopper()
@@ -244,6 +251,11 @@ class DateRangePicker extends BaseComponent {
 
     this._element.classList.remove(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', 'false')
+
+    if (this._config.container) {
+      this._menu.classList.remove(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -491,7 +503,13 @@ class DateRangePicker extends BaseComponent {
       dropdownEl.append(this._createDateRangeFooter())
     }
 
-    this._element.append(dropdownEl)
+    const { container } = this._config
+    if (container) {
+      container.append(dropdownEl)
+    } else {
+      this._element.append(dropdownEl)
+    }
+
     this._menu = dropdownEl
   }
 
@@ -629,8 +647,6 @@ class DateRangePicker extends BaseComponent {
 
         EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
           this._changeStartDate(event.date, true)
-          // this._startDate = event.date
-          // this._startInput.value = this._setInputValue(this._startDate)
           this._calendar.update(this._getCalendarConfig())
         })
 
@@ -642,8 +658,6 @@ class DateRangePicker extends BaseComponent {
 
         EventHandler.on(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
           this._changeEndDate(event.date, true)
-          // this._endDate = event.date
-          // this._endInput.value = this._setInputValue(this._endDate)
           this._calendar.update(this._getCalendarConfig())
         })
       } else {
@@ -664,12 +678,8 @@ class DateRangePicker extends BaseComponent {
           EventHandler.on(timePickerEl, 'timeChange.coreui.time-picker', event => {
             if (index === 0) {
               this._changeStartDate(event.date, true)
-              // this._startDate = event.date
-              // this._startInput.value = this._setInputValue(this._startDate)
             } else {
               this._changeEndDate(event.date, true)
-              // this._endDate = event.date
-              // this._endInput.value = this._setInputValue(this._endDate)
             }
 
             this._calendar.update(this._getCalendarConfig())
@@ -849,6 +859,18 @@ class DateRangePicker extends BaseComponent {
     }
 
     return ''
+  }
+
+  _configAfterMerge(config) {
+    if (config.container === true) {
+      config.container = document.body
+    }
+
+    if (typeof config.container === 'object' || typeof config.container === 'string') {
+      config.container = getElement(config.container)
+    }
+
+    return config
   }
 
   // Static
