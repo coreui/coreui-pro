@@ -230,7 +230,7 @@
 .time-picker-inline-select {
   padding: var(--#{$prefix}time-picker-inline-select-padding-y) var(--#{$prefix}time-picker-inline-select-padding-x);
   color: var(--#{$prefix}time-picker-inline-select-color);
-  text-align: right;
+  text-align: end;
   appearance: none;
   scrollbar-width: none;  /* Firefox */
   background-color: transparent;
@@ -283,14 +283,14 @@
   }
 
   &:not(:last-child) {
-    border-right: var(--#{$prefix}time-picker-roll-col-border-width) solid var(--#{$prefix}time-picker-roll-col-border-color);
+    border-inline-end: var(--#{$prefix}time-picker-roll-col-border-width) solid var(--#{$prefix}time-picker-roll-col-border-color);
   }
 }
 
 .time-picker-roll-cell {
   width: 50px;
   height: 32px;
-  padding: 0 $spacer 0 $spacer * .5;
+  padding-inline: $spacer * .5 $spacer;
   line-height: 32px;
 
   &.selected {

@@ -13,7 +13,5 @@ $enable-rtl: true;
 // stylelint-disable selector-no-qualifying-type
 div[dir="rtl"] {
   @import "../../../scss/calendar";
-  @import "../../../scss/date-picker";
-  @import "../../../scss/time-picker";
 }
 // stylelint-enable selector-no-qualifying-type

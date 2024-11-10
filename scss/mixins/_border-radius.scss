@@ -75,4 +75,18 @@
     @include ltr-rtl("border-bottom-left-radius", valid-radius($radius));
   }
 }
+
+@mixin border-start-radius-flex($radius: $border-radius) {
+  @if $enable-rounded {
+    border-start-start-radius: valid-radius($radius);
+    border-end-start-radius: valid-radius($radius);
+  }
+}
+
+@mixin border-end-radius-flex($radius: $border-radius) {
+  @if $enable-rounded {
+    border-start-end-radius: valid-radius($radius);
+    border-end-end-radius: valid-radius($radius);
+  }
+}
 // scss-docs-end border-radius-mixins

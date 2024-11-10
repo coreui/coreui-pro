@@ -167,11 +167,6 @@
   }
 }
 
-// .date-picker-cleaner,
-// .date-picker-indicator {
-//   margin-inline-start: var(--#{$prefix}date-picker-padding-x);
-// }
-
 .date-picker-cleaner {
   display: none;
   width: var(--#{$prefix}date-picker-cleaner-width);
@@ -257,7 +252,7 @@
   grid-area: ranges;
   width: var(--#{$prefix}date-picker-ranges-width);
   padding: var(--#{$prefix}date-picker-ranges-padding);
-  border-right: var(--#{$prefix}date-picker-ranges-border-width) solid var(--#{$prefix}date-picker-ranges-border-color);
+  border-inline-end: var(--#{$prefix}date-picker-ranges-border-width) solid var(--#{$prefix}date-picker-ranges-border-color);
 }
 
 .date-picker-calendars {

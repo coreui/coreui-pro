@@ -9,6 +9,7 @@ $enable-rtl: true !default;
 
 /* rtl:begin:ignore */
 @import "../../mixins/avatar";
+@import "../../mixins/border-radius";
 @import "../../mixins/elevation";
 @import "../../mixins/icon";
 @import "../../mixins/ltr-rtl";
