@@ -481,10 +481,10 @@ class DateRangePicker extends BaseComponent {
 
   _getTimePickerConfig(start) {
     return {
-      container: 'inline',
       disabled: start ? !this._startDate : !this._endDate,
       locale: this._config.locale,
       time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
+      type: 'inline',
       variant: 'select'
     }
   }

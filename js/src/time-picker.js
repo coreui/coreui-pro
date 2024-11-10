@@ -10,7 +10,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, isRTL } from './util/index.js'
+import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -76,10 +76,10 @@ const SELECTOR_WAS_VALIDATED = 'form.was-validated'
 const Default = {
   cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+  cleaner: true,
   confirmButton: 'OK',
   confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-  cleaner: true,
-  container: 'dropdown',
+  container: false,
   disabled: false,
   footer: true,
   hours: null,
@@ -94,6 +94,7 @@ const Default = {
   seconds: true,
   size: null,
   time: null,
+  type: 'dropdown',
   valid: false,
   variant: 'roll'
 }
@@ -101,10 +102,10 @@ const Default = {
 const DefaultType = {
   cancelButton: '(boolean|string)',
   cancelButtonClasses: '(array|string)',
+  cleaner: 'boolean',
   confirmButton: '(boolean|string)',
   confirmButtonClasses: '(array|string)',
-  cleaner: 'boolean',
-  container: 'string',
+  container: '(string|element|boolean)',
   disabled: 'boolean',
   footer: 'boolean',
   hours: '(array|function|null)',
@@ -119,6 +120,7 @@ const DefaultType = {
   seconds: '(array|boolean|function)',
   size: '(string|null)',
   time: '(date|string|null)',
+  type: 'string',
   valid: 'boolean',
   variant: 'string'
 }
@@ -140,6 +142,7 @@ class TimePicker extends BaseComponent {
     this._popper = null
 
     this._input = null
+    this._menu = null
     this._timePickerBody = null
 
     this._localizedTimePartials = getLocalizedTimePartials(
@@ -182,6 +185,11 @@ class TimePicker extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._element.classList.add(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', true)
+
+    if (this._config.container) {
+      this._menu.classList.add(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
     this._createPopper()
@@ -196,6 +204,11 @@ class TimePicker extends BaseComponent {
 
     this._element.classList.remove(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', 'false')
+
+    if (this._config.container) {
+      this._menu.classList.remove(CLASS_NAME_SHOW)
+    }
+
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -291,7 +304,7 @@ class TimePicker extends BaseComponent {
       }
     })
 
-    if (this._config.container === 'dropdown') {
+    if (this._config.type === 'dropdown') {
       EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
         if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
           if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
@@ -328,7 +341,7 @@ class TimePicker extends BaseComponent {
 
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
 
-    if (this._config.container === 'dropdown') {
+    if (this._config.type === 'dropdown') {
       this._element.append(this._createTimePickerInputGroup())
 
       const dropdownEl = document.createElement('div')
@@ -339,11 +352,17 @@ class TimePicker extends BaseComponent {
         dropdownEl.append(this._createTimePickerFooter())
       }
 
-      this._element.append(dropdownEl)
+      const { container } = this._config
+      if (container) {
+        container.append(dropdownEl)
+      } else {
+        this._element.append(dropdownEl)
+      }
+
       this._menu = dropdownEl
     }
 
-    if (this._config.container === 'inline') {
+    if (this._config.type === 'inline') {
       this._element.append(this._createTimePickerBody())
     }
   }
@@ -797,8 +816,28 @@ class TimePicker extends BaseComponent {
     })
   }
 
-  // Static
+  _configAfterMerge(config) {
+    if (config.container === 'dropdown' || config.container === 'inline') {
+      config.type = config.container
+    }
 
+    if (config.container === true) {
+      config.container = document.body
+    }
+
+    if (
+      typeof config.container === 'object' ||
+      (typeof config.container === 'string' &&
+        config.container === 'dropdown' &&
+        config.container === 'inline')
+    ) {
+      config.container = getElement(config.container)
+    }
+
+    return config
+  }
+
+  // Static
   static timePickerInterface(element, config) {
     const data = TimePicker.getOrCreateInstance(element, config)
 

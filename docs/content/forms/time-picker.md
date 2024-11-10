@@ -218,7 +218,7 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |
 | `confirmButtonLabel` | string | `'OK'` | Confirm button inner HTML |
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
-| `container` | string | `'dropdown'` | <p>Set container type for the component.</p><ul><li>`'dropdown'`</li><li>`'inline'`</li></ul>|
+| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `footer` | boolean | `true` | Toggle visibility of footer element. |
 | `hours` | array, function, null | `null` | Specify a list of available hours using an array, or customize the filtering of hours through a function. |
@@ -233,7 +233,7 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
 | `time` | date, string, null | `null` | Default value of the component |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `variant` | `'inline'`, `'roll'` | `'roll'` | Set the time picker variant to a roll or select. |
+| `variant` | `'roll'`, `'select'` | `'roll'` | Set the time picker variant to a roll or select. |
 {{< /bs-table >}}
 ### Methods
 

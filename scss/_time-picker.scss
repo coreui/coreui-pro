@@ -1,4 +1,5 @@
-.time-picker {
+.time-picker,
+*:not(.time-picker) > .time-picker-dropdown {
   // scss-docs-start time-picker-css-vars
   --#{$prefix}time-picker-zindex: #{$time-picker-zindex};
   --#{$prefix}time-picker-font-family: #{$time-picker-font-family};
@@ -189,7 +190,8 @@
   @include box-shadow(var(--#{$prefix}time-picker-dropdown-box-shadow));
   @include elevation(4);
 
-  .time-picker.show & {
+  .time-picker.show &,
+  &.show {
     display: block;
   }
 }
