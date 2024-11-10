@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import EventHandler from '../../src/dom/event-handler.js'
 import RangeSlider from '../../src/range-slider.js'
 import {
