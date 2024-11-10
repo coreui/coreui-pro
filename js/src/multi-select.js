@@ -635,7 +635,7 @@ class MultiSelect extends BaseComponent {
 
     const { container } = this._config
     if (container) {
-      getElement(container).append(dropdownDiv)
+      container.append(dropdownDiv)
     } else {
       this._clone.append(dropdownDiv)
     }
@@ -992,6 +992,18 @@ class MultiSelect extends BaseComponent {
     // if target isn't included in items (e.g. when expanding the dropdown)
     // allow cycling to get the last item in case key equals ARROW_UP_KEY
     getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
+  }
+
+  _configAfterMerge(config) {
+    if (config.container === true) {
+      config.container = document.body
+    }
+
+    if (typeof config.container === 'object' || typeof config.container === 'string') {
+      config.container = getElement(config.container)
+    }
+
+    return config
   }
 
   // Static
