@@ -2325,6 +2325,9 @@ $calendar-cell-week-number-color:            var(--#{$prefix}tertiary-color) !de
 $date-picker-zindex:                   1000 !default;
 $date-picker-font-family:              $input-font-family !default;
 $date-picker-font-size:                $input-font-size !default;
+$date-picker-font-size:                $input-font-size !default;
+$date-picker-font-size-sm:             $input-font-size-sm !default;
+$date-picker-font-size-lg:             $input-font-size-lg !default;
 $date-picker-font-weight:              $input-font-weight !default;
 $date-picker-line-height:              $input-line-height !default;
 $date-picker-color:                    $input-color !default;
@@ -2353,18 +2356,29 @@ $date-picker-placeholder-color:        var(--#{$prefix}secondary-color) !default
 
 $date-picker-padding-y:                $input-padding-y !default;
 $date-picker-padding-x:                $input-padding-x !default;
+$date-picker-gap:                      $input-padding-x !default;
+
 $date-picker-padding-y-sm:             $input-padding-y-sm !default;
 $date-picker-padding-x-sm:             $input-padding-x-sm !default;
+$date-picker-gap-sm:                   $input-padding-x-sm !default;
+
 $date-picker-padding-y-lg:             $input-padding-y-lg !default;
 $date-picker-padding-x-lg:             $input-padding-x-lg !default;
+$date-picker-gap-lg:                   $input-padding-x-lg !default;
 
+$date-picker-cleaner-width:             1.25rem !default;
+$date-picker-cleaner-icon-size:         1rem !default;
 $date-picker-cleaner-icon-color:        var(--#{$prefix}tertiary-color) !default;
 $date-picker-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#000' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
 $date-picker-cleaner-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$date-picker-cleaner-icon-size:         1rem !default;
+
+$date-picker-cleaner-width-sm:          1rem !default;
+$date-picker-cleaner-width-lg:          1.5rem !default;
 $date-picker-cleaner-icon-size-sm:      .875rem !default;
 $date-picker-cleaner-icon-size-lg:      1.25rem !default;
 
+$date-picker-indicator-width:               1.25rem !default;
+$date-picker-indicator-icon-size:           1rem !default;
 $date-picker-indicator-icon-color:          var(--#{$prefix}tertiary-color) !default;
 $date-picker-indicator-icon:                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#000' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#000'></rect><rect width='32' height='32' x='200' y='224' fill='#000'></rect><rect width='32' height='32' x='280' y='224' fill='#000'></rect><rect width='32' height='32' x='368' y='224' fill='#000'></rect><rect width='32' height='32' x='112' y='296' fill='#000'></rect><rect width='32' height='32' x='200' y='296' fill='#000'></rect><rect width='32' height='32' x='280' y='296' fill='#000'></rect><rect width='32' height='32' x='368' y='296' fill='#000'></rect><rect width='32' height='32' x='112' y='368' fill='#000'></rect><rect width='32' height='32' x='200' y='368' fill='#000'></rect><rect width='32' height='32' x='280' y='368' fill='#000'></rect><rect width='32' height='32' x='368' y='368' fill='#000'></rect></svg>") !default;
 $date-picker-indicator-invalid-icon:        $date-picker-indicator-icon !default;
@@ -2372,14 +2386,19 @@ $date-picker-indicator-invalid-icon-color:  var(--#{$prefix}form-invalid-color) 
 $date-picker-indicator-valid-icon:          $date-picker-indicator-icon !default;
 $date-picker-indicator-valid-icon-color:    var(--#{$prefix}form-valid-color) !default;
 
-$date-picker-indicator-icon-size:        1rem !default;
-$date-picker-indicator-icon-size-sm:     .875rem !default;
-$date-picker-indicator-icon-size-lg:     1.25rem !default;
+$date-picker-indicator-width-sm:            1rem !default;
+$date-picker-indicator-width-lg:            1.5rem !default;
+$date-picker-indicator-icon-size-sm:        .875rem !default;
+$date-picker-indicator-icon-size-lg:        1.25rem !default;
 
+$date-picker-separator-width:            1.25rem !default;
+$date-picker-separator-icon-size:        1rem !default;
 $date-picker-separator-icon-color:       var(--#{$prefix}tertiary-color) !default;
 $date-picker-separator-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='359.873 121.377 337.246 144.004 433.243 240.001 16 240.001 16 240.002 16 272.001 16 272.002 433.24 272.002 337.246 367.996 359.873 390.623 494.498 256 359.873 121.377'></polygon></svg>") !default;
 $date-picker-separator-icon-rtl:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='497.333 239.999 80.092 239.999 176.087 144.004 153.46 121.377 18.837 256 153.46 390.623 176.087 367.996 80.09 271.999 497.333 271.999 497.333 239.999'></polygon></svg>") !default;
-$date-picker-separator-icon-size:        1rem !default;
+
+$date-picker-separator-width-sm:         1rem !default;
+$date-picker-separator-width-lg:         1.55rem !default;
 $date-picker-separator-icon-size-sm:     .875rem !default;
 $date-picker-separator-icon-size-lg:     1.25rem !default;
 
