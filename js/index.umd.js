@@ -19,6 +19,7 @@ import MultiSelect from './src/multi-select.js'
 import Navigation from './src/navigation.js'
 import OffCanvas from './src/offcanvas.js'
 import Popover from './src/popover.js'
+import RangeSlider from './src/range-slider.js'
 import Rating from './src/rating.js'
 import ScrollSpy from './src/scrollspy.js'
 import Sidebar from './src/sidebar.js'
@@ -42,6 +43,7 @@ export default {
   Navigation,
   OffCanvas,
   Popover,
+  RangeSlider,
   Rating,
   ScrollSpy,
   Sidebar,
