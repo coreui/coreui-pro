@@ -398,6 +398,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |
 | `confirmButton` | string | `'OK'` | Confirm button inner HTML |
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
+| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `disabledDates` | array, null | `null` | Specify the list of dates that cannot be selected. |
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
