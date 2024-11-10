@@ -135,12 +135,13 @@ class TimePicker extends BaseComponent {
 
     this._config = this._getConfig(config)
     this._date = this._convertStringToDate(this._config.time)
-    this._initialDate = null
+    this._initialDate = new Date(this._date)
     this._ampm = this._date ?
       getAmPm(new Date(this._date), this._config.locale) :
       'am'
     this._popper = null
 
+    this._indicatorElement = null
     this._input = null
     this._menu = null
     this._timePickerBody = null
@@ -257,10 +258,21 @@ class TimePicker extends BaseComponent {
 
   // Private
   _addEventListeners() {
-    EventHandler.on(this._togglerElement, EVENT_CLICK, () => {
+    EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
+        this.toggle()
+      }
+    })
+
+    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, () => {
+      if (!this._config.disabled) {
+        this.toggle()
+      }
+    })
+
+    EventHandler.on(this._togglerElement, EVENT_CLICK, event => {
+      if (!this._config.disabled && event.target !== this._indicatorElement) {
         this.show()
-        this._initialDate = new Date(this._date)
 
         if (this._config.variant === 'roll') {
           this._setUpRolls(true)
@@ -414,7 +426,14 @@ class TimePicker extends BaseComponent {
     if (this._config.indicator) {
       const inputGroupIndicatorEl = document.createElement('div')
       inputGroupIndicatorEl.classList.add(CLASS_NAME_INDICATOR)
+
+      if (!this._config.disabled) {
+        inputGroupIndicatorEl.tabIndex = 0
+      }
+
       inputGroupEl.append(inputGroupIndicatorEl)
+
+      this._indicatorElement = inputGroupIndicatorEl
     }
 
     if (this._config.cleaner) {
