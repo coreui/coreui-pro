@@ -200,24 +200,24 @@
   }
 
   .calendars:not(.select-week) &.range:not(.range ~ *) .calendar-cell-inner::after {
-    @include border-start-radius($border-radius);
+    @include border-start-radius-flex($border-radius);
   }
 
   .calendars:not(.select-week) &.range:not(:has(~ .range)) .calendar-cell-inner::after {
-    @include border-end-radius($border-radius);
+    @include border-end-radius-flex($border-radius);
   }
 
   &.range-hover:first-of-type,
   &:not(.range-hover) + &.range-hover {
     .calendar-cell-inner::before {
-      border-left: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-      @include border-start-radius($border-radius);
+      border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      @include border-start-radius-flex($border-radius);
     }
   }
 
   &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner::before {
-    border-right: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-    @include border-end-radius($border-radius);
+    border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+    @include border-end-radius-flex($border-radius);
   }
 
   // stylelint-disable-next-line at-rule-no-vendor-prefix
@@ -225,13 +225,13 @@
     .calendars:not(.select-week) &:nth-last-child(1 of .range),
     .calendars:not(.select-week) &:nth-last-child(1 of .available) {
       .calendar-cell-inner::after {
-        @include border-end-radius($border-radius);
+        @include border-end-radius-flex($border-radius);
       }
     }
 
     &:nth-last-child(1 of .range-hover) .calendar-cell-inner::before {
-      border-right: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-      @include border-end-radius($border-radius);
+      border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      @include border-end-radius-flex($border-radius);
     }
   }
 
@@ -264,27 +264,27 @@
   }
 
   .calendar-cell:first-of-type .calendar-cell-inner {
-    @include border-start-radius($border-radius);
+    @include border-start-radius-flex($border-radius);
     &::before,
     &::after {
-      @include border-start-radius($border-radius);
+      @include border-start-radius-flex($border-radius);
     }
   }
 
   .calendar-cell:last-of-type .calendar-cell-inner {
-    @include border-end-radius($border-radius);
+    @include border-end-radius-flex($border-radius);
     &::before,
     &::after {
-      @include border-end-radius($border-radius);
+      @include border-end-radius-flex($border-radius);
     }
   }
 
   &.range-hover .calendar-cell:first-of-type .calendar-cell-inner::before {
-    border-left: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+    border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
   }
 
   &.range-hover .calendar-cell:last-of-type .calendar-cell-inner::before {
-    border-right: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+    border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
   }
 
   &:focus-visible {
