@@ -235,9 +235,9 @@ describe('RangeSlider', () => {
 
       // Check if inputs are disabled
       const inputs = element.querySelectorAll('.range-slider-input')
-      inputs.forEach(input => {
+      for (const input of inputs) {
         expect(input.disabled).toBeTrue()
-      })
+      }
     })
 
     it('should handle vertical orientation correctly', () => {
