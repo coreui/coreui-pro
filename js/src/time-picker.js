@@ -135,7 +135,7 @@ class TimePicker extends BaseComponent {
 
     this._config = this._getConfig(config)
     this._date = this._convertStringToDate(this._config.time)
-    this._initialDate = new Date(this._date)
+    this._initialDate = null
     this._ampm = this._date ?
       getAmPm(new Date(this._date), this._config.locale) :
       'am'
@@ -182,6 +182,8 @@ class TimePicker extends BaseComponent {
     if (this._config.disabled || this._isShown()) {
       return
     }
+
+    this._initialDate = new Date(this._date)
 
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._element.classList.add(CLASS_NAME_SHOW)
@@ -264,8 +266,8 @@ class TimePicker extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, () => {
-      if (!this._config.disabled) {
+    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, event => {
+      if (!this._config.disabled && event.key === ENTER_KEY) {
         this.toggle()
       }
     })
