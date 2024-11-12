@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time-picker.js v5.6.0 (https://coreui.io)
+  * CoreUI time-picker.js v5.7.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -86,10 +86,10 @@
   const Default = {
     cancelButton: 'Cancel',
     cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+    cleaner: true,
     confirmButton: 'OK',
     confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
-    cleaner: true,
-    container: 'dropdown',
+    container: false,
     disabled: false,
     footer: true,
     hours: null,
@@ -104,16 +104,17 @@
     seconds: true,
     size: null,
     time: null,
+    type: 'dropdown',
     valid: false,
     variant: 'roll'
   };
   const DefaultType = {
     cancelButton: '(boolean|string)',
     cancelButtonClasses: '(array|string)',
+    cleaner: 'boolean',
     confirmButton: '(boolean|string)',
     confirmButtonClasses: '(array|string)',
-    cleaner: 'boolean',
-    container: 'string',
+    container: '(string|element|boolean)',
     disabled: 'boolean',
     footer: 'boolean',
     hours: '(array|function|null)',
@@ -128,6 +129,7 @@
     seconds: '(array|boolean|function)',
     size: '(string|null)',
     time: '(date|string|null)',
+    type: 'string',
     valid: 'boolean',
     variant: 'string'
   };
@@ -180,7 +182,9 @@
       this._initialDate = null;
       this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
       this._popper = null;
+      this._indicatorElement = null;
       this._input = null;
+      this._menu = null;
       this._timePickerBody = null;
       this._localizedTimePartials = time_js.getLocalizedTimePartials(this._config.locale, this.ampm, this._config.hours, this._config.minutes, this._config.seconds);
       this._createTimePicker();
@@ -208,9 +212,13 @@
       if (this._config.disabled || this._isShown()) {
         return;
       }
+      this._initialDate = new Date(this._date);
       EventHandler.trigger(this._element, EVENT_SHOW);
       this._element.classList.add(CLASS_NAME_SHOW);
       this._element.setAttribute('aria-expanded', true);
+      if (this._config.container) {
+        this._menu.classList.add(CLASS_NAME_SHOW);
+      }
       EventHandler.trigger(this._element, EVENT_SHOWN);
       this._createPopper();
     }
@@ -221,6 +229,9 @@
       }
       this._element.classList.remove(CLASS_NAME_SHOW);
       this._element.setAttribute('aria-expanded', 'false');
+      if (this._config.container) {
+        this._menu.classList.remove(CLASS_NAME_SHOW);
+      }
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
@@ -261,10 +272,19 @@
 
     // Private
     _addEventListeners() {
-      EventHandler.on(this._togglerElement, EVENT_CLICK, () => {
+      EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
         if (!this._config.disabled) {
+          this.toggle();
+        }
+      });
+      EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, event => {
+        if (!this._config.disabled && event.key === ENTER_KEY) {
+          this.toggle();
+        }
+      });
+      EventHandler.on(this._togglerElement, EVENT_CLICK, event => {
+        if (!this._config.disabled && event.target !== this._indicatorElement) {
           this.show();
-          this._initialDate = new Date(this._date);
           if (this._config.variant === 'roll') {
             this._setUpRolls(true);
           }
@@ -299,7 +319,7 @@
           });
         }
       });
-      if (this._config.container === 'dropdown') {
+      if (this._config.type === 'dropdown') {
         EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
           if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
             if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
@@ -324,7 +344,7 @@
         this._element.classList.add(CLASS_NAME_DISABLED);
       }
       this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid);
-      if (this._config.container === 'dropdown') {
+      if (this._config.type === 'dropdown') {
         this._element.append(this._createTimePickerInputGroup());
         const dropdownEl = document.createElement('div');
         dropdownEl.classList.add(CLASS_NAME_DROPDOWN);
@@ -332,10 +352,17 @@
         if (this._config.footer || this._config.timepicker) {
           dropdownEl.append(this._createTimePickerFooter());
         }
-        this._element.append(dropdownEl);
+        const {
+          container
+        } = this._config;
+        if (container) {
+          container.append(dropdownEl);
+        } else {
+          this._element.append(dropdownEl);
+        }
         this._menu = dropdownEl;
       }
-      if (this._config.container === 'inline') {
+      if (this._config.type === 'inline') {
         this._element.append(this._createTimePickerBody());
       }
     }
@@ -379,7 +406,11 @@
       if (this._config.indicator) {
         const inputGroupIndicatorEl = document.createElement('div');
         inputGroupIndicatorEl.classList.add(CLASS_NAME_INDICATOR);
+        if (!this._config.disabled) {
+          inputGroupIndicatorEl.tabIndex = 0;
+        }
         inputGroupEl.append(inputGroupIndicatorEl);
+        this._indicatorElement = inputGroupIndicatorEl;
       }
       if (this._config.cleaner) {
         const inputGroupCleanerEl = document.createElement('div');
@@ -615,9 +646,20 @@
         behavior: initial ? 'instant' : 'smooth'
       });
     }
+    _configAfterMerge(config) {
+      if (config.container === 'dropdown' || config.container === 'inline') {
+        config.type = config.container;
+      }
+      if (config.container === true) {
+        config.container = document.body;
+      }
+      if (typeof config.container === 'object' || typeof config.container === 'string' && config.container === 'dropdown' && config.container === 'inline') {
+        config.container = index_js.getElement(config.container);
+      }
+      return config;
+    }
 
     // Static
-
     static timePickerInterface(element, config) {
       const data = TimePicker.getOrCreateInstance(element, config);
       if (typeof config === 'string') {

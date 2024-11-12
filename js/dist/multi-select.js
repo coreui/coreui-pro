@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v5.6.0 (https://coreui.io)
+  * CoreUI multi-select.js v5.7.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -549,8 +549,7 @@
         container
       } = this._config;
       if (container) {
-        // this._clone.parentNode.insertBefore(dropdownDiv, this._clone.nextSibling)
-        index_js.getElement(container).append(dropdownDiv);
+        container.append(dropdownDiv);
       } else {
         this._clone.append(dropdownDiv);
       }
@@ -843,6 +842,15 @@
       // if target isn't included in items (e.g. when expanding the dropdown)
       // allow cycling to get the last item in case key equals ARROW_UP_KEY
       index_js.getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus();
+    }
+    _configAfterMerge(config) {
+      if (config.container === true) {
+        config.container = document.body;
+      }
+      if (typeof config.container === 'object' || typeof config.container === 'string') {
+        config.container = index_js.getElement(config.container);
+      }
+      return config;
     }
 
     // Static
