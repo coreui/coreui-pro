@@ -2547,6 +2547,8 @@ $range-slider-thumb-transition:            background-color .15s ease-in-out, bo
 
 $range-slider-tooltip-padding-y:           $spacer * .25 !default;
 $range-slider-tooltip-padding-x:           $spacer * .5 !default;
+$range-slider-tooltip-margin-end:          .25rem !default;
+$range-slider-tooltip-margin-bottom:       .25rem !default;
 $range-slider-tooltip-font-size:           $font-size-sm !default;
 $range-slider-tooltip-color:               var(--#{$prefix}body-color) !default;
 $range-slider-tooltip-bg:                  var(--#{$prefix}secondary-bg) !default;

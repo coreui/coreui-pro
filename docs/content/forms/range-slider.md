@@ -40,8 +40,8 @@ Create a simple range slider with default settings.
 Enable multiple handles to allow the selection of a range or/and multiple values.
 
 {{< example >}}
-<div data-coreui-toggle="range-slider" data-coreui-value="20,40"></div>
-<div data-coreui-toggle="range-slider" data-coreui-value="20,40,60"></div>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="20,40"></div>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="20,40,60"></div>
 <div data-coreui-toggle="range-slider" data-coreui-value="20,40,60,80"></div>
 {{< /example >}}
 
@@ -51,8 +51,9 @@ Rotate the slider to a vertical orientation.
 
 {{< example >}}
 <div class="d-flex">
-  <div data-coreui-toggle="range-slider" data-coreui-value="20" data-coreui-vertical="true"></div>
-  <div data-coreui-toggle="range-slider" data-coreui-value="20,80" data-coreui-vertical="true"></div>
+  <div class="me-3" data-coreui-toggle="range-slider" data-coreui-value="20" data-coreui-vertical="true"></div>
+  <div class="me-3" data-coreui-toggle="range-slider" data-coreui-value="20,80" data-coreui-vertical="true"></div>
+  <div data-coreui-toggle="range-slider" data-coreui-value="20,80,100" data-coreui-vertical="true"></div>
 </div>
 {{< /example >}}
 
@@ -61,7 +62,7 @@ Rotate the slider to a vertical orientation.
 Disable the slider to prevent user interaction.
 
 {{< example >}}
-<div data-coreui-toggle="range-slider" data-coreui-value="50" data-coreui-disabled="true"></div>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="50" data-coreui-disabled="true"></div>
 <div data-coreui-toggle="range-slider" data-coreui-value="50, 75" data-coreui-disabled="true"></div>
 {{< /example >}}
 
@@ -70,7 +71,7 @@ Disable the slider to prevent user interaction.
 Range Slider has implicit values for `min` and `max`—`0` and `100`, respectively. You may specify new values for those using the `min` and `max` attributes.
 
 {{< example >}}
-<div data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50"></div>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50"></div>
 <div data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50, 75"></div>
 {{< /example >}}
 
@@ -79,7 +80,7 @@ Range Slider has implicit values for `min` and `max`—`0` and `100`, respective
 Range Slider inputs automatically "snap" to whole numbers. To modify this behavior, set a `step` value. In the example below, we increase the number of steps by specifying `step="0.25"`.
 
 {{< example >}}
-<div data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50" ></div>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50" ></div>
 <div data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50, 75"></div>
 {{< /example >}}
 
@@ -134,6 +135,20 @@ Customize the content of tooltips using the `tooltipsFormat` option. This can be
 {{< /example >}}
 
 {{< js-docs name="range-slider-custom-tooltips" file="docs/assets/js/snippets.js" >}}
+
+## Track
+
+The `data-coreui-track` option allows you to customize how the slider's track is displayed. By default, the `data-coreui-track` option is set to `'fill'` enabling dynamic filling of the track based on the slider's current value(s). This means the filled portion of the track will adjust automatically as the slider handle(s) move, offering a responsive visual representation of the selected range.
+
+### Disable filling
+
+If you set `data-coreui-track` to `false`, the slider's track will not display any fill. Only the default track background will be visible, which can be useful for minimalist designs or when you use more then two handles.
+
+{{< example >}}
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50" ></div>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50, 75"></div>
+<div data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="25, 50, 75"></div>
+{{< /example >}}
 
 ## Usage
 
@@ -191,6 +206,7 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
 | `step` | number, string | `1` | Specifies the increment step for slider values. |
 | `tooltips` | boolean | `true` | Enables or disables tooltips that display current slider values. |
 | `tooltipsFormat` | function, null | `null` | Provides a custom formatting function for tooltip values. |
+| `track` | boolean, 'fill' | `'fill'` | Controls the visual representation of the slider's track. When set to `'fill'`, the track is dynamically filled based on the slider's value(s). Setting it to `false` disables the filled track. |
 | `value` | array, number | `0` | Sets the initial value(s) of the slider. |
 | `vertical` | boolean | `false` | Rotates the slider to a vertical orientation. |
 {{< /bs-table >}}
@@ -221,6 +237,18 @@ myRangeSlider.addEventListener('change.coreui.range-slider', event => {
   // do something...
 })
 ```
+
+## Accessibility
+
+The Range Slider component is built with accessibility in mind. Each slider handle includes the following ARIA attributes:
+
+- `role="slider"`
+- `aria-valuemin`: Minimum value
+- `aria-valuemax`: Maximum value
+- `aria-valuenow`: Current value
+- `aria-orientation`: horizontal or vertical
+
+Additionally, ensure that labels and tooltips are clear and descriptive to provide the best experience for all users.
 
 ## Customizing
 

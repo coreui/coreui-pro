@@ -58,6 +58,7 @@ const Default = {
   step: 1,
   tooltips: true,
   tooltipsFormat: null,
+  track: 'fill',
   value: 0,
   vertical: false
 }
@@ -73,6 +74,7 @@ const DefaultType = {
   step: '(number|string)',
   tooltips: 'boolean',
   tooltipsFormat: '(function|null)',
+  track: '(boolean|string)',
   value: '(array|number)',
   vertical: 'boolean'
 }
@@ -86,12 +88,14 @@ class RangeSlider extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
+
     this._currentValue = this._config.value
-    this._inputs = []
-    this._sliderTrack = null
-    this._tooltips = []
-    this._isDragging = false
     this._dragIndex = 0
+    this._inputs = []
+    this._isDragging = false
+    this._sliderTrack = null
+    this._thumbSize = null
+    this._tooltips = []
 
     this._initializeRangeSlider()
   }
@@ -312,6 +316,7 @@ class RangeSlider extends BaseComponent {
     }
 
     const inputs = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)
+    this._thumbSize = this._getThumbSize()
 
     for (const input of inputs) {
       const tooltipElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
@@ -327,9 +332,32 @@ class RangeSlider extends BaseComponent {
     }
   }
 
+  _getThumbSize() {
+    const value = window
+    .getComputedStyle(this._element, null)
+    .getPropertyValue(
+      this._config.vertical ? '--cui-range-slider-thumb-height' : '--cui-range-slider-thumb-width'
+    )
+
+    const regex = /^(\d+\.?\d*)([%a-z]*)$/i
+    const match = value.match(regex)
+
+    if (match) {
+      return {
+        value: Number.parseFloat(match[1]),
+        unit: match[2] || null
+      }
+    }
+
+    return null
+  }
+
   _positionTooltip(tooltip, input) {
+    const thumbSize = this._thumbSize
     const percent = (input.value - this._config.min) / (this._config.max - this._config.min)
-    const margin = percent > 0.5 ? `-${percent - 0.5}rem` : `${0.5 - percent}rem`
+    const margin = percent > 0.5 ?
+      `-${(percent - 0.5) * thumbSize.value}${thumbSize.unit}` :
+      `${(0.5 - percent) * thumbSize.value}${thumbSize.unit}`
 
     if (this._config.vertical) {
       Object.assign(tooltip.style, {
@@ -442,6 +470,10 @@ class RangeSlider extends BaseComponent {
   }
 
   _updateGradient() {
+    if (!this._config.track) {
+      return
+    }
+
     const [min, max] = [Math.min(...this._currentValue), Math.max(...this._currentValue)]
     const from = ((min - this._config.min) / (this._config.max - this._config.min)) * 100
     const to = ((max - this._config.min) / (this._config.max - this._config.min)) * 100
