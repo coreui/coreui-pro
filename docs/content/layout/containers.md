@@ -4,7 +4,6 @@ title: Containers
 description: Containers are a fundamental building block of CoreUI for Bootstrap that contain, pad, and align your content within a given device or viewport.
 group: layout
 aliases:
-  - "/layout/containers/"
   - "/4.0/layout/containers/"
 toc: true
 bootstrap: true

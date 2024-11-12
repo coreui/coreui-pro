@@ -5,7 +5,6 @@ description: Control the visibility of elements, without modifying their display
 group: utilities
 bootstrap: true
 aliases:
-  - "/utilities/visibility/"
   - "/4.0/utilities/visibility/"
 ---
 

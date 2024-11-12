@@ -5,7 +5,6 @@ description: Easily change the vertical alignment of inline, inline-block, inlin
 group: utilities
 bootstrap: true
 aliases:
-  - "/utilities/vertical-align/"
   - "/4.0/utilities/vertical-align/"
 ---
 

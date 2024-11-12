@@ -5,7 +5,6 @@ description: While not a part of CoreUI for Bootstrap's grid system, z-indexes p
 group: layout
 bootstrap: true
 aliases:
-  - "/layout/z-index/"
   - "/4.0/layout/z-index/"
 ---
 

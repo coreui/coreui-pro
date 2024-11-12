@@ -4,7 +4,6 @@ title: RFS
 description: CoreUI's resizing engine responsively scales common CSS properties to better utilize available space across viewports and devices.
 group: getting-started
 aliases:
-  - "/getting-started/rfs/"
   - "/4.0/getting-started/rfs/"
 toc: true
 ---

@@ -4,7 +4,6 @@ title: Text truncation
 description: Truncate long strings of text with an ellipsis.
 group: helpers
 aliases:
-  - "/helpers/text-truncation/"
   - "/4.0/helpers/text-truncation/"
 toc: false
 bootstrap: true

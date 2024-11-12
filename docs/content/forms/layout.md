@@ -4,7 +4,6 @@ title: Layout
 description: Give your forms some structure—from inline to horizontal to custom grid implementations—with our form layout options.
 group: forms
 aliases:
-  - "/forms/layout/"
   - "/4.0/forms/layout/"
 toc: true
 bootstrap: true

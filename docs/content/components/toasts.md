@@ -6,7 +6,6 @@ group: components
 aliases:
   - "/4.0/components/toasts/"
   - "/4.1/components/toasts/"
-  - "/components/toast/"
   - "/components/bootstrap/toasts/"
 toc: true
 bootstrap: true

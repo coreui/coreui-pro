@@ -4,7 +4,6 @@ title: Gutters
 description: Gutters are the padding between your columns, used to responsively space and align content in the CoreUI for Bootstrap grid system.
 group: layout
 aliases:
-  - "/layout/gutters/"
   - "/4.0/layout/gutters/"
 toc: true
 bootstrap: true

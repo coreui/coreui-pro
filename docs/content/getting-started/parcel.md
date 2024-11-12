@@ -4,7 +4,6 @@ title: "CoreUI & Parcel"
 description: The official guide for how to include and bundle CoreUI's CSS and JavaScript in your project using Parcel.
 group: getting-started
 aliases:
-  - "/getting-started/parcel/"
   - "/4.0/getting-started/parcel/"
 toc: true
 ---

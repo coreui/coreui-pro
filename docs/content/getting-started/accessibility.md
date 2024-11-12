@@ -4,7 +4,6 @@ title: Accessibility
 description: A brief overview of CoreUI for Bootstrap features and limitations for the creation of accessible content.
 group: getting-started
 aliases:
-  - "/getting-started/accessibility/"
   - "/4.0/getting-started/accessibility/"
 toc: true
 ---

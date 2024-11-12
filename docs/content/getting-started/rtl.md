@@ -4,7 +4,6 @@ title: RTL
 description: Learn how to enable support for right-to-left text in CoreUI for Bootstrap across our layout, components, and utilities.
 group: getting-started
 aliases:
-  - "/getting-started/rtl/"
   - "/4.0/getting-started/rtl/"
 toc: true
 ---

@@ -4,7 +4,6 @@ title: Position
 description: Use these shorthand utilities for quickly configuring the position of an element.
 group: utilities
 aliases:
-  - "/utilities/position/"
   - "/4.0/utilities/position/"
 toc: true
 bootstrap: true

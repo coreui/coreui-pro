@@ -4,7 +4,6 @@ title: Flex
 description: Quickly manage the layout, alignment, and sizing of grid columns, navigation, components, and more with a full suite of responsive flexbox utilities. For more complex implementations, custom CSS may be necessary.
 group: utilities
 aliases:
-  - "/utilities/flex/"
   - "/4.0/utilities/flex/"
 toc: true
 bootstrap: true

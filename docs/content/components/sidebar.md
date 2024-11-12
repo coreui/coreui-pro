@@ -6,7 +6,7 @@ group: components
 aliases:
   - "/4.0/components/sidebar/"
   - "/4.1/components/sidebar/"
-  - "/components/sidebar/"
+  - "/components/bootstrap/sidebar/"
 toc: true
 bootstrap: true
 other_frameworks: sidebar

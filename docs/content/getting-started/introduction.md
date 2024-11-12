@@ -5,10 +5,10 @@ description: CoreUI is the fastest way to build a modern dashboard for any platf
 group: getting-started
 aliases:
   - "/getting-started/"
-  - "/4.1/getting-started/"
   - "/4.0/getting-started/"
   - "/4.0/getting-started/introduction/"
   - "/4.1/getting-started/"
+  - "/4.1/getting-started/introduction/"
 toc: true
 ---
 

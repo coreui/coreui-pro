@@ -4,7 +4,6 @@ title: "CoreUI & Webpack"
 description: The official guide for how to include and bundle CoreUI's CSS and JavaScript in your project using Webpack.
 group: getting-started
 aliases:
-  - "/getting-started/webpack/"
   - "/4.0/getting-started/webpack/"
 toc: true
 ---

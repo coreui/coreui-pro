@@ -4,7 +4,6 @@ title: Options
 description: Quickly customize CoreUI for Bootstrap with built-in variables to easily toggle global CSS preferences for controlling style and behavior.
 group: customize
 aliases:
-  - "/customize/options/"
   - "/4.0/customize/options/"
 ---
 

@@ -4,7 +4,6 @@ title: Position
 description: Use these helpers for quickly configuring the position of an element.
 group: helpers
 aliases:
-  - "/helpers/position/"
   - "/4.0/helpers/position/"
 toc: true
 bootstrap: true

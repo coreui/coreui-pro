@@ -4,7 +4,6 @@ title: Build tools
 description: Learn how to use CoreUI for Bootstrap included npm scripts to build our documentation, compile source code, run tests, and more.
 group: getting-started
 aliases:
-  - "/getting-started/build-tools/"
   - "/4.0/getting-started/build-tools/"
   - "/4.1/getting-started/build-tools/"
 toc: true

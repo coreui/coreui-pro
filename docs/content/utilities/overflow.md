@@ -5,7 +5,6 @@ description: Use these shorthand utilities for quickly configuring how content o
 group: utilities
 bootstrap: true
 aliases:
-  - "/utilities/overflow/"
   - "/4.0/utilities/overflow/"
 ---
 

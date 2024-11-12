@@ -6,7 +6,6 @@ group: forms
 aliases:
   - "/4.0/forms/input-group/"
   - "/4.1/forms/input-group/"
-  - "/components/input-group/"
   - "/components/bootstrap/input-group/"
 toc: true
 bootstrap: true

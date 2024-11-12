@@ -4,7 +4,6 @@ title: Range
 description: Use our custom range inputs for consistent cross-browser styling and built-in customization.
 group: forms
 aliases:
-  - "/forms/range/"
   - "/4.0/forms/range/"
 toc: true
 bootstrap: true

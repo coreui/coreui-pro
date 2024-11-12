@@ -4,7 +4,6 @@ title: Typography
 description: Documentation and examples for Bootstrap typography, including global settings, headings, body text, lists, and more.
 group: content
 aliases:
-  - "/content/typography/"
   - "/4.0/content/typography/"
 toc: true
 bootstrap: true

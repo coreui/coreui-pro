@@ -4,7 +4,6 @@ title: Opacity
 description: Control the opacity of elements.
 group: utilities
 aliases:
-  - "/utilities/opacity/"
   - "/4.0/utilities/opacity/"
 added: "5.1"
 bootstrap: true

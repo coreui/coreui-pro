@@ -6,7 +6,6 @@ group: content
 aliases:
   - "/4.0/content/figures/"
   - "/4.1/content/figures/"
-  - "/components/figures/"
 toc: true
 bootstrap: true
 ---
