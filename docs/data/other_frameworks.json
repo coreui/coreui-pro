@@ -47,6 +47,12 @@
     "react": "https://coreui.io/react/docs/components/callout/",
     "vue": "https://coreui.io/vue/docs/components/callout.html"
   },
+  "calendar": {
+    "angular": "https://coreui.io/angular/docs/components/calendar/",
+    "bootstrap": "https://coreui.io/bootstrap/docs/components/calendar/",
+    "react": "https://coreui.io/react/docs/components/calendar/",
+    "vue": "https://coreui.io/vue/docs/components/calendar.html"
+  },
   "card": {
     "angular": "https://coreui.io/angular/docs/components/card/",
     "bootstrap": "https://coreui.io/bootstrap/docs/components/card/",
@@ -214,6 +220,11 @@
     "react": "https://coreui.io/react/docs/forms/range/",
     "vue": "https://coreui.io/vue/docs/forms/range.html"
   },
+  "range-slider": {
+    "bootstrap": "https://coreui.io/bootstrap/docs/forms/range-slider/",
+    "react": "https://coreui.io/react/docs/forms/range-slider/",
+    "vue": "https://coreui.io/vue/docs/forms/range-slider.html"
+  },
   "rating": {
     "angular": "https://coreui.io/angular/docs/forms/rating/",
     "bootstrap": "https://coreui.io/bootstrap/docs/forms/rating/",
@@ -232,6 +243,16 @@
     "react": "https://coreui.io/react/docs/components/sidebar/",
     "vue": "https://coreui.io/vue/docs/components/sidebar.html"
   },
+  "smart-pagination": {
+    "angular": "https://coreui.io/angular/docs/components/smart-pagination/",
+    "react": "https://coreui.io/react/docs/components/smart-pagination/",
+    "vue": "https://coreui.io/vue/docs/components/smart-pagination.html"
+  },
+  "smart-table": {
+    "angular": "https://coreui.io/angular/docs/components/smart-table/",
+    "react": "https://coreui.io/react/docs/components/smart-table/",
+    "vue": "https://coreui.io/vue/docs/components/smart-table.html"
+  },
   "spinner": {
     "angular": "https://coreui.io/angular/docs/components/spinner/",
     "bootstrap": "https://coreui.io/bootstrap/docs/components/spinners/",
@@ -249,6 +270,11 @@
     "bootstrap": "https://coreui.io/bootstrap/docs/content/tables/",
     "react": "https://coreui.io/react/docs/components/table/",
     "vue": "https://coreui.io/vue/docs/components/table.html"
+  },
+  "tabs": {
+    "angular": "https://coreui.io/angular/docs/components/tabs/",
+    "react": "https://coreui.io/react/docs/components/tabs/",
+    "vue": "https://coreui.io/vue/docs/components/tabs.html"
   },
   "textarea": {
     "angular": "https://coreui.io/angular/docs/forms/form-control/",

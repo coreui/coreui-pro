@@ -5,6 +5,8 @@ description: Enhance your forms with our customizable Bootstrap 5 Range Slider c
 group: forms
 toc: true
 bootstrap: true
+pro_component: true
+other_frameworks: range-slider
 ---
 
 ## Overview

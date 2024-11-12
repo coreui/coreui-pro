@@ -6,6 +6,7 @@ group: components
 toc: true
 bootstrap: true
 pro_component: true
+other_frameworks: calendar
 ---
 
 ## Example
