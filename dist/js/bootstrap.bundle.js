@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.7.0 (https://coreui.io)
+  * CoreUI v5.7.1 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.7.0';
+  const VERSION = '5.7.1';
 
   /**
    * Class definition
@@ -9717,13 +9717,16 @@
         this._updateValue(target.value, index);
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_LABEL, event => {
-        if (!this._config.clickableLabels) {
+        if (!this._config.clickableLabels || event.button !== 0) {
           return;
         }
         const value = Manipulator.getDataAttribute(event.target, 'value');
         this._updateNearestValue(value);
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, event => {
+        if (event.button !== 0) {
+          return;
+        }
         this._isDragging = true;
         const clickValue = this._calculateClickValue(event);
         this._dragIndex = this._getNearestValueIndex(clickValue);
