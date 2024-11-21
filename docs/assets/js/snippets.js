@@ -228,7 +228,6 @@
   const myCalendarDisabledDates = document.getElementById('myCalendarDisabledDates')
   if (myCalendarDisabledDates) {
     const optionsCalendarDisabledDates = {
-      locale: 'en-US',
       calendarDate: new Date(2022, 2, 1),
       calendars: 2,
       disabledDates: [
@@ -237,6 +236,7 @@
         new Date(2022, 3, 16),
         [new Date(2022, 4, 2), new Date(2022, 4, 8)]
       ],
+      locale: 'en-US',
       maxDate: new Date(2022, 5, 0),
       minDate: new Date(2022, 1, 1)
     }
@@ -244,6 +244,49 @@
     new coreui.Calendar(myCalendarDisabledDates, optionsCalendarDisabledDates)
   }
   // js-docs-end calendar-disabled-dates
+
+  // js-docs-start calendar-disabled-dates2
+  const myCalendarDisabledDates2 = document.getElementById('myCalendarDisabledDates2')
+  if (myCalendarDisabledDates2) {
+    const disableWeekends = date => {
+      const day = date.getDay()
+      return day === 0 || day === 6
+    }
+
+    const optionsCalendarDisabledDates2 = {
+      calendars: 2,
+      disabledDates: disableWeekends,
+      locale: 'en-US'
+    }
+
+    new coreui.Calendar(myCalendarDisabledDates2, optionsCalendarDisabledDates2)
+  }
+  // js-docs-end calendar-disabled-dates2
+
+  // js-docs-start calendar-disabled-dates3
+  const myCalendarDisabledDates3 = document.getElementById('myCalendarDisabledDates3')
+  if (myCalendarDisabledDates3) {
+    const disableWeekends = date => {
+      const day = date.getDay()
+      return day === 0 || day === 6
+    }
+
+    const specificDates = [
+      new Date(2024, 10, 25),
+      new Date(2024, 11, 4),
+      new Date(2024, 11, 12)
+    ]
+
+    const optionsCalendarDisabledDates3 = {
+      calendarDate: new Date(2024, 10, 1),
+      calendars: 2,
+      disabledDates: [disableWeekends, ...specificDates],
+      locale: 'en-US'
+    }
+
+    new coreui.Calendar(myCalendarDisabledDates3, optionsCalendarDisabledDates3)
+  }
+  // js-docs-end calendar-disabled-dates3
 
   // -------------------------------
   // Date Pickers
@@ -269,6 +312,23 @@
     new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)
   }
   // js-docs-end date-picker-disabled-dates
+
+  // js-docs-start date-picker-disabled-dates2
+  const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')
+  if (myDatePickerDisabledDates2) {
+    const disableWeekends = date => {
+      const day = date.getDay()
+      return day === 0 || day === 6
+    }
+
+    const optionsDatePickerDisabledDates2 = {
+      disabledDates: disableWeekends,
+      locale: 'en-US'
+    }
+
+    new coreui.DateRangePicker(document.getElementById('myDatePickerDisabledDates2'), optionsDatePickerDisabledDates2)
+  }
+  // js-docs-end date-picker-disabled-dates2
 
   // js-docs-start date-picker-custom-formats1
   const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')
@@ -325,6 +385,23 @@
     new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates'), optionsDateRangePickerDisabledDates)
   }
   // js-docs-end date-range-picker-disabled-dates
+
+  // js-docs-start date-range-picker-disabled-dates2
+  const myDateRangePickerDisabledDates2 = document.getElementById('myDateRangePickerDisabledDates2')
+  if (myDateRangePickerDisabledDates2) {
+    const disableWeekends = date => {
+      const day = date.getDay()
+      return day === 0 || day === 6
+    }
+
+    const optionsDateRangePickerDisabledDates2 = {
+      disabledDates: disableWeekends,
+      locale: 'en-US'
+    }
+
+    new coreui.DateRangePicker(document.getElementById('myDateRangePickerDisabledDates2'), optionsDateRangePickerDisabledDates2)
+  }
+  // js-docs-end date-range-picker-disabled-dates2
 
   // js-docs-start date-range-picker-custom-formats1
   const myDateRangePickerCustomFormats1 = document.getElementById('myDateRangePickerCustomFormats1')

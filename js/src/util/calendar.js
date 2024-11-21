@@ -241,7 +241,7 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   return weeks
 }
 
-export const isDisableDateInRange = (startDate, endDate, dates) => {
+export const isDisableDateInRange = (startDate, endDate, disabledDates) => {
   if (startDate && endDate) {
     const date = new Date(startDate)
     let disabled = false
@@ -249,7 +249,7 @@ export const isDisableDateInRange = (startDate, endDate, dates) => {
     // eslint-disable-next-line no-unmodified-loop-condition
     while (date < endDate) {
       date.setDate(date.getDate() + 1)
-      if (isDateDisabled(date, null, null, dates)) {
+      if (isDateDisabled(date, null, null, disabledDates)) {
         disabled = true
         break
       }
@@ -261,29 +261,40 @@ export const isDisableDateInRange = (startDate, endDate, dates) => {
   return false
 }
 
-export const isDateDisabled = (date, min, max, dates) => {
-  let disabled
-  if (dates) {
-    for (const _date of dates) {
+export const isDateDisabled = (date, min, max, disabledDates) => {
+  if (min && date < min) {
+    return true
+  }
+
+  if (max && date > max) {
+    return true
+  }
+
+  if (typeof disabledDates === 'function') {
+    return disabledDates(date)
+  }
+
+  if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) {
+    return true
+  }
+
+  if (Array.isArray(disabledDates) && disabledDates) {
+    for (const _date of disabledDates) {
+      if (typeof _date === 'function' && _date(date)) {
+        return true
+      }
+
       if (Array.isArray(_date) && isDateInRange(date, _date[0], _date[1])) {
-        disabled = true
+        return true
       }
 
       if (_date instanceof Date && isSameDateAs(date, _date)) {
-        disabled = true
+        return true
       }
     }
   }
 
-  if (min && date < min) {
-    disabled = true
-  }
-
-  if (max && date > max) {
-    disabled = true
-  }
-
-  return disabled
+  return false
 }
 
 export const isDateInRange = (date, start, end) => {

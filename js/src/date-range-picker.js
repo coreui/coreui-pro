@@ -136,7 +136,7 @@ const DefaultType = {
   confirmButtonClasses: '(array|string)',
   container: '(string|element|boolean)',
   date: '(date|number|string|null)',
-  disabledDates: '(array|null)',
+  disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
   endDate: '(date|number|string|null)',
   endName: '(string|null)',

@@ -9,7 +9,7 @@ toc: true
 
 ## Bootstrap Admin & Dashboard Templates
 
-Check out the fully-featured, ready-to-use admin dashboard templates built using CoreUI for React.js, and CoreUI PRO for React.js
+Check out the fully-featured, ready-to-use admin dashboard templates built using CoreUI, and CoreUI PRO.
 
 <div class="row">
   <div class="col-md-6">

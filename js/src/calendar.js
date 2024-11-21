@@ -103,7 +103,7 @@ const DefaultType = {
   ariaNavPrevYearLabel: 'string',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
-  disabledDates: '(array|null)',
+  disabledDates: '(array|date|function|null)',
   endDate: '(date|number|string|null)',
   firstDayOfWeek: 'number',
   locale: 'string',

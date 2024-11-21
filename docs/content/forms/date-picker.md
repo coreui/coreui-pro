@@ -188,6 +188,20 @@ The CoreUI Bootstrap DatePicker component allows you to disable certain dates, s
 
 {{< js-docs name="date-picker-disabled-dates" file="docs/assets/js/snippets.js" >}}
 
+### Disabling weekends
+
+You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
+
+{{< example >}}
+<div class="row">
+  <div class="col-lg-5">
+    <div id="myDatePickerDisabledDates2"></div>
+  </div>
+</div>
+{{< /example >}}
+
+{{< js-docs name="date-picker-disabled-dates2" file="docs/assets/js/snippets.js" >}}
+
 ## Non-english locale
 
 CoreUI Date Picker allows users to display dates and times in a non-English locale. This is useful for applications with international users or that need to support multiple languages. 
@@ -356,7 +370,7 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `date` | date, number, string, null | `null` | Default value of the component |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
-| `disabledDates` | array | null | `null` | Specify the list of dates that cannot be selected. |
+| `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p><ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `footer` | boolean | `false` | Toggle visibility of footer element. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |

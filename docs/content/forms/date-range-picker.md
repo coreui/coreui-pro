@@ -218,6 +218,20 @@ The CoreUI Bootstrap DateRangePicker component allows you to disable certain dat
 
 {{< js-docs name="date-range-picker-disabled-dates" file="docs/assets/js/snippets.js" >}}
 
+### Disabling weekends
+
+You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
+
+{{< example >}}
+<div class="row">
+  <div class="col-lg-5">
+    <div id="myDateRangePickerDisabledDates2"></div>
+  </div>
+</div>
+{{< /example >}}
+
+{{< js-docs name="date-range-picker-disabled-dates2" file="docs/assets/js/snippets.js" >}}
+
 ## Custom ranges
 
 In order to configure custom date ranges in the Date Range component, you must use the `ranges` option to define a set of predefined ranges. These ranges can include predefined options such as "Today", "Yesterday", "Last 7 Days", etc.
@@ -400,7 +414,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
-| `disabledDates` | array, null | `null` | Specify the list of dates that cannot be selected. |
+| `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
 | `endName` | string, null | `null` | Set the name attribute for the end date input element. |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |

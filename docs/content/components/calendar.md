@@ -112,7 +112,13 @@ Enable range selection by adding `data-coreui-range="true"` to allow users to pi
 
 ## Disabled dates
 
-The Bootstrap Calendar component includes functionality to disable specific dates, such as weekends or holidays, using the `disabledDates` option. This option takes an array and applies custom logic to determine which dates should be disabled.
+The Bootstrap Calendar component includes functionality to disable specific dates, such as weekends or holidays, using the `disabledDates` option. It accepts:
+
+- A single `Date` or an array of `Date` objects.
+- A function or an array of functions that take a `Date` object as an argument and return a boolean indicating whether the date should be disabled.
+- A mixed array of `Date` objects and functions.
+
+To disable certain dates, you can provide them in an array. For date ranges, use nested arrays, where each inner array indicates a start date and an end date for that range:
 
 {{< example >}}
 <div class="d-flex justify-content-center">
@@ -122,9 +128,44 @@ The Bootstrap Calendar component includes functionality to disable specific date
 
 {{< js-docs name="calendar-disabled-dates" file="docs/assets/js/snippets.js" >}}
 
+### Disabling weekends
+
+To disable weekends, provide a function for the `disabledDates` option. Here's the method:
+
+{{< example >}}
+<div class="d-flex justify-content-center">
+  <div id="myCalendarDisabledDates2" class="border rounded"></div>
+</div>
+{{< /example >}}
+
+{{< js-docs name="calendar-disabled-dates2" file="docs/assets/js/snippets.js" >}}
+
+In the example above:
+
+- `disableWeekends` is a function that checks if a date falls on a Saturday (`6`) or a Sunday (`0`).
+- The `disabledDates` option utilizes the `disableWeekends` function to disable all weekends in the calendar.
+
+### Combining functions and specific dates
+
+You can also combine specific dates and functions in the `disabledDates` array. For instance:
+
+{{< example >}}
+<div class="d-flex justify-content-center">
+  <div id="myCalendarDisabledDates3" class="border rounded"></div>
+</div>
+{{< /example >}}
+
+{{< js-docs name="calendar-disabled-dates3" file="docs/assets/js/snippets.js" >}}
+
+In this example:
+
+- `disableWeekends` disables weekends as before.
+- `specificDates` is an array of specific dates to disable.
+- The `disabledDates` option combines both, allowing you to disable weekends and specific dates simultaneously.
+
 ## Non-english locale
 
-The CoreUI React Calendar allows users to display dates in non-English locales, making it suitable for international applications.
+The CoreUI Bootstrap Calendar allows users to display dates in non-English locales, making it suitable for international applications.
 
 ### Auto
 
@@ -138,7 +179,7 @@ By default, the Calendar component uses the browser's default locale. However, y
 
 ### Chinese
 
-Here is an example of the React Calendar component with Chinese locale settings.
+Here is an example of the Bootstrap Calendar component with Chinese locale settings.
 
 {{< example >}}
 <div class="d-flex justify-content-center">
@@ -182,7 +223,7 @@ Example of the Calendar component with RTL support, using the Hebrew locale.
 
 ### Persian
 
-Example of the React Calendar component with Persian locale settings.
+Example of the Bootstrap Calendar component with Persian locale settings.
 
 {{< example >}}
 <div class="d-flex justify-content-center">
@@ -232,7 +273,7 @@ const calendarList = calendarElementList.map(calendarEl => {
 | `ariaNavPrevYearLabel` | string | `'Previous year'` | A string that provides an accessible label for the button that navigates to the previous year in the calendar. This label helps screen reader users understand the button's function. |
 | `calendarDate` | date, number, string, null | `null` | Default date of the component. |
 | `calendars` | number | `2` | The number of calendars that render on desktop devices. |
-| `disabledDates` | array, null | `null` | Specify the list of dates that cannot be selected. |
+| `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p>  <ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
