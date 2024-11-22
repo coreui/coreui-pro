@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v5.7.1 (https://coreui.io)
+  * CoreUI calendar.js v5.8.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -89,7 +89,7 @@
     ariaNavPrevYearLabel: 'string',
     calendarDate: '(date|number|string|null)',
     calendars: 'number',
-    disabledDates: '(array|null)',
+    disabledDates: '(array|date|function|null)',
     endDate: '(date|number|string|null)',
     firstDayOfWeek: 'number',
     locale: 'string',

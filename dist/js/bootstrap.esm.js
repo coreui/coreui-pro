@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.7.1 (https://coreui.io)
+  * CoreUI v5.8.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -661,7 +661,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.7.1';
+const VERSION = '5.8.0';
 
 /**
  * Class definition
@@ -1145,7 +1145,7 @@ const getMonthDetails = (year, month, firstDayOfWeek) => {
   }
   return weeks;
 };
-const isDisableDateInRange = (startDate, endDate, dates) => {
+const isDisableDateInRange = (startDate, endDate, disabledDates) => {
   if (startDate && endDate) {
     const date = new Date(startDate);
     let disabled = false;
@@ -1153,7 +1153,7 @@ const isDisableDateInRange = (startDate, endDate, dates) => {
     // eslint-disable-next-line no-unmodified-loop-condition
     while (date < endDate) {
       date.setDate(date.getDate() + 1);
-      if (isDateDisabled(date, null, null, dates)) {
+      if (isDateDisabled(date, null, null, disabledDates)) {
         disabled = true;
         break;
       }
@@ -1162,25 +1162,33 @@ const isDisableDateInRange = (startDate, endDate, dates) => {
   }
   return false;
 };
-const isDateDisabled = (date, min, max, dates) => {
-  let disabled;
-  if (dates) {
-    for (const _date of dates) {
+const isDateDisabled = (date, min, max, disabledDates) => {
+  if (min && date < min) {
+    return true;
+  }
+  if (max && date > max) {
+    return true;
+  }
+  if (typeof disabledDates === 'function') {
+    return disabledDates(date);
+  }
+  if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) {
+    return true;
+  }
+  if (Array.isArray(disabledDates) && disabledDates) {
+    for (const _date of disabledDates) {
+      if (typeof _date === 'function' && _date(date)) {
+        return true;
+      }
       if (Array.isArray(_date) && isDateInRange(date, _date[0], _date[1])) {
-        disabled = true;
+        return true;
       }
       if (_date instanceof Date && isSameDateAs(date, _date)) {
-        disabled = true;
+        return true;
       }
     }
   }
-  if (min && date < min) {
-    disabled = true;
-  }
-  if (max && date > max) {
-    disabled = true;
-  }
-  return disabled;
+  return false;
 };
 const isDateInRange = (date, start, end) => {
   const _date = removeTimeFromDate(date);
@@ -1252,7 +1260,7 @@ const SELECTOR_BTN_MONTH = '.btn-month';
 const SELECTOR_BTN_NEXT = '.btn-next';
 const SELECTOR_BTN_PREV = '.btn-prev';
 const SELECTOR_BTN_YEAR = '.btn-year';
-const SELECTOR_CALENDAR$2 = '.calendar';
+const SELECTOR_CALENDAR$1 = '.calendar';
 const SELECTOR_CALENDAR_CELL = '.calendar-cell';
 const SELECTOR_CALENDAR_ROW = '.calendar-row';
 const SELECTOR_DATA_TOGGLE$c = '[data-bs-toggle="calendar"]';
@@ -1286,7 +1294,7 @@ const DefaultType$m = {
   ariaNavPrevYearLabel: 'string',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
-  disabledDates: '(array|null)',
+  disabledDates: '(array|date|function|null)',
   endDate: '(date|number|string|null)',
   firstDayOfWeek: 'number',
   locale: 'string',
@@ -1373,7 +1381,7 @@ class Calendar extends BaseComponent {
     const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
     const date = this._getDate(target);
     const cloneDate = new Date(date);
-    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR$2), 'calendar-index');
+    const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR$1), 'calendar-index');
     if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
       return;
     }
@@ -2410,10 +2418,10 @@ const NAME$k = 'collapse';
 const DATA_KEY$g = 'bs.collapse';
 const EVENT_KEY$g = `.${DATA_KEY$g}`;
 const DATA_API_KEY$d = '.data-api';
-const EVENT_SHOW$a = `show${EVENT_KEY$g}`;
-const EVENT_SHOWN$a = `shown${EVENT_KEY$g}`;
-const EVENT_HIDE$a = `hide${EVENT_KEY$g}`;
-const EVENT_HIDDEN$a = `hidden${EVENT_KEY$g}`;
+const EVENT_SHOW$b = `show${EVENT_KEY$g}`;
+const EVENT_SHOWN$b = `shown${EVENT_KEY$g}`;
+const EVENT_HIDE$b = `hide${EVENT_KEY$g}`;
+const EVENT_HIDDEN$b = `hidden${EVENT_KEY$g}`;
 const EVENT_CLICK_DATA_API$b = `click${EVENT_KEY$g}${DATA_API_KEY$d}`;
 const CLASS_NAME_SHOW$d = 'show';
 const CLASS_NAME_COLLAPSE = 'collapse';
@@ -2494,7 +2502,7 @@ class Collapse extends BaseComponent {
     if (activeChildren.length && activeChildren[0]._isTransitioning) {
       return;
     }
-    const startEvent = EventHandler.trigger(this._element, EVENT_SHOW$a);
+    const startEvent = EventHandler.trigger(this._element, EVENT_SHOW$b);
     if (startEvent.defaultPrevented) {
       return;
     }
@@ -2512,7 +2520,7 @@ class Collapse extends BaseComponent {
       this._element.classList.remove(CLASS_NAME_COLLAPSING);
       this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$d);
       this._element.style[dimension] = '';
-      EventHandler.trigger(this._element, EVENT_SHOWN$a);
+      EventHandler.trigger(this._element, EVENT_SHOWN$b);
     };
     const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1);
     const scrollSize = `scroll${capitalizedDimension}`;
@@ -2523,7 +2531,7 @@ class Collapse extends BaseComponent {
     if (this._isTransitioning || !this._isShown()) {
       return;
     }
-    const startEvent = EventHandler.trigger(this._element, EVENT_HIDE$a);
+    const startEvent = EventHandler.trigger(this._element, EVENT_HIDE$b);
     if (startEvent.defaultPrevented) {
       return;
     }
@@ -2543,7 +2551,7 @@ class Collapse extends BaseComponent {
       this._isTransitioning = false;
       this._element.classList.remove(CLASS_NAME_COLLAPSING);
       this._element.classList.add(CLASS_NAME_COLLAPSE);
-      EventHandler.trigger(this._element, EVENT_HIDDEN$a);
+      EventHandler.trigger(this._element, EVENT_HIDDEN$b);
     };
     this._element.style[dimension] = '';
     this._queueCallback(complete, this._element, true);
@@ -2775,12 +2783,12 @@ const SPACE_KEY = 'Space';
 const TAB_KEY$5 = 'Tab';
 const RIGHT_MOUSE_BUTTON$4 = 2;
 const EVENT_CLICK$5 = `click${EVENT_KEY$f}`;
-const EVENT_HIDE$9 = `hide${EVENT_KEY$f}`;
-const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$f}`;
+const EVENT_HIDE$a = `hide${EVENT_KEY$f}`;
+const EVENT_HIDDEN$a = `hidden${EVENT_KEY$f}`;
 const EVENT_INPUT$2 = 'input';
 const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$f}`;
-const EVENT_SHOW$9 = `show${EVENT_KEY$f}`;
-const EVENT_SHOWN$9 = `shown${EVENT_KEY$f}`;
+const EVENT_SHOW$a = `show${EVENT_KEY$f}`;
+const EVENT_SHOWN$a = `shown${EVENT_KEY$f}`;
 const EVENT_SUBMIT$1 = 'submit';
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$f}`;
 const EVENT_CLICK_DATA_API$a = `click${EVENT_KEY$f}${DATA_API_KEY$c}`;
@@ -2938,17 +2946,17 @@ class TimePicker extends BaseComponent {
       return;
     }
     this._initialDate = new Date(this._date);
-    EventHandler.trigger(this._element, EVENT_SHOW$9);
+    EventHandler.trigger(this._element, EVENT_SHOW$a);
     this._element.classList.add(CLASS_NAME_SHOW$c);
     this._element.setAttribute('aria-expanded', true);
     if (this._config.container) {
       this._menu.classList.add(CLASS_NAME_SHOW$c);
     }
-    EventHandler.trigger(this._element, EVENT_SHOWN$9);
+    EventHandler.trigger(this._element, EVENT_SHOWN$a);
     this._createPopper();
   }
   hide() {
-    EventHandler.trigger(this._element, EVENT_HIDE$9);
+    EventHandler.trigger(this._element, EVENT_HIDE$a);
     if (this._popper) {
       this._popper.destroy();
     }
@@ -2957,7 +2965,7 @@ class TimePicker extends BaseComponent {
     if (this._config.container) {
       this._menu.classList.remove(CLASS_NAME_SHOW$c);
     }
-    EventHandler.trigger(this._element, EVENT_HIDDEN$9);
+    EventHandler.trigger(this._element, EVENT_HIDDEN$a);
   }
   dispose() {
     if (this._popper) {
@@ -3470,13 +3478,13 @@ const TAB_KEY$4 = 'Tab';
 const RIGHT_MOUSE_BUTTON$3 = 2;
 const EVENT_CLICK$4 = `click${EVENT_KEY$e}`;
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY$e}`;
-const EVENT_HIDE$8 = `hide${EVENT_KEY$e}`;
-const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$e}`;
+const EVENT_HIDE$9 = `hide${EVENT_KEY$e}`;
+const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$e}`;
 const EVENT_INPUT$1 = 'input';
 const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$e}`;
 const EVENT_RESIZE$4 = 'resize';
-const EVENT_SHOW$8 = `show${EVENT_KEY$e}`;
-const EVENT_SHOWN$8 = `shown${EVENT_KEY$e}`;
+const EVENT_SHOW$9 = `show${EVENT_KEY$e}`;
+const EVENT_SHOWN$9 = `shown${EVENT_KEY$e}`;
 const EVENT_SUBMIT = 'submit';
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY$e}`;
 const EVENT_CLICK_DATA_API$9 = `click${EVENT_KEY$e}${DATA_API_KEY$b}`;
@@ -3502,7 +3510,7 @@ const CLASS_NAME_SHOW$b = 'show';
 const CLASS_NAME_TIME_PICKER = 'time-picker';
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers';
 const CLASS_NAME_WAS_VALIDATED = 'was-validated';
-const SELECTOR_CALENDAR$1 = '.calendars';
+const SELECTOR_CALENDAR = '.calendars';
 const SELECTOR_DATA_TOGGLE$9 = '[data-bs-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
 const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$9}.${CLASS_NAME_SHOW$b}`;
 const SELECTOR_INPUT = '.date-picker-input';
@@ -3571,7 +3579,7 @@ const DefaultType$h = {
   confirmButtonClasses: '(array|string)',
   container: '(string|element|boolean)',
   date: '(date|number|string|null)',
-  disabledDates: '(array|null)',
+  disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
   endDate: '(date|number|string|null)',
   endName: '(string|null)',
@@ -3661,17 +3669,17 @@ class DateRangePicker extends BaseComponent {
     }
     this._initialStartDate = new Date(this._startDate);
     this._initialEndDate = new Date(this._endDate);
-    EventHandler.trigger(this._element, EVENT_SHOW$8);
+    EventHandler.trigger(this._element, EVENT_SHOW$9);
     this._element.classList.add(CLASS_NAME_SHOW$b);
     this._element.setAttribute('aria-expanded', true);
     if (this._config.container) {
       this._menu.classList.add(CLASS_NAME_SHOW$b);
     }
-    EventHandler.trigger(this._element, EVENT_SHOWN$8);
+    EventHandler.trigger(this._element, EVENT_SHOWN$9);
     this._createPopper();
   }
   hide() {
-    EventHandler.trigger(this._element, EVENT_HIDE$8);
+    EventHandler.trigger(this._element, EVENT_HIDE$9);
     if (this._popper) {
       this._popper.destroy();
     }
@@ -3680,7 +3688,7 @@ class DateRangePicker extends BaseComponent {
     if (this._config.container) {
       this._menu.classList.remove(CLASS_NAME_SHOW$b);
     }
-    EventHandler.trigger(this._element, EVENT_HIDDEN$8);
+    EventHandler.trigger(this._element, EVENT_HIDDEN$9);
   }
   dispose() {
     if (this._popper) {
@@ -3746,11 +3754,16 @@ class DateRangePicker extends BaseComponent {
       this._calendar.update(this._getCalendarConfig());
     });
     EventHandler.on(this._startInput, EVENT_INPUT$1, event => {
-      const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
-      if (date instanceof Date && date.getTime()) {
+      const date = this._parseDate(event.target.value);
+
+      // valid date or empty date
+      if (date instanceof Date && !Number.isNaN(date) || date === null) {
         this._startDate = date;
         this._calendarDate = date;
         this._calendar.update(this._getCalendarConfig());
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          date
+        });
       }
     });
     EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
@@ -3775,11 +3788,16 @@ class DateRangePicker extends BaseComponent {
       this._calendar.update(this._getCalendarConfig());
     });
     EventHandler.on(this._endInput, EVENT_INPUT$1, event => {
-      const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
-      if (date instanceof Date && date.getTime()) {
+      const date = this._parseDate(event.target.value);
+
+      // valid date or empty date
+      if (date instanceof Date && !Number.isNaN(date) || date === null) {
         this._endDate = date;
         this._calendarDate = date;
         this._calendar.update(this._getCalendarConfig());
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          date
+        });
       }
     });
     EventHandler.on(window, EVENT_RESIZE$4, () => {
@@ -3787,7 +3805,7 @@ class DateRangePicker extends BaseComponent {
     });
   }
   _addCalendarEventListeners() {
-    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR$1, this._element)) {
+    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
       EventHandler.on(calendar, 'startDateChange.bs.calendar', event => {
         this._changeStartDate(event.date);
         if (!this._config.range && !this._config.footer && !this._config.timepicker) {
@@ -4137,7 +4155,16 @@ class DateRangePicker extends BaseComponent {
     };
     this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig);
   }
+  _parseDate(str) {
+    if (!str) {
+      return null;
+    }
+    return this._config.inputDateParse ? this._config.inputDateParse(str) : getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+  }
   _formatDate(date) {
+    if (!date) {
+      return '';
+    }
     if (this._config.inputDateFormat) {
       return this._config.inputDateFormat(date instanceof Date ? new Date(date) : convertToDateObject(date, this._config.selectionType));
     }
@@ -4264,11 +4291,14 @@ const DATA_API_KEY$a = '.data-api';
 const TAB_KEY$3 = 'Tab';
 const RIGHT_MOUSE_BUTTON$2 = 2;
 const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY$d}`;
+const EVENT_HIDE$8 = `hide${EVENT_KEY$d}`;
+const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$d}`;
+const EVENT_SHOW$8 = `show${EVENT_KEY$d}`;
+const EVENT_SHOWN$8 = `shown${EVENT_KEY$d}`;
 const EVENT_CLICK_DATA_API$8 = `click${EVENT_KEY$d}${DATA_API_KEY$a}`;
 const EVENT_KEYUP_DATA_API$2 = `keyup${EVENT_KEY$d}${DATA_API_KEY$a}`;
 const EVENT_LOAD_DATA_API$8 = `load${EVENT_KEY$d}${DATA_API_KEY$a}`;
 const CLASS_NAME_SHOW$a = 'show';
-const SELECTOR_CALENDAR = '.calendar';
 const SELECTOR_DATA_TOGGLE$8 = '[data-bs-toggle="date-picker"]:not(.disabled):not(:disabled)';
 const SELECTOR_DATA_TOGGLE_SHOWN$1 = `${SELECTOR_DATA_TOGGLE$8}.${CLASS_NAME_SHOW$a}`;
 const Default$g = {
@@ -4300,19 +4330,25 @@ class DatePicker extends DateRangePicker {
   }
 
   // Overrides
-  _addCalendarEventListeners() {
-    super._addCalendarEventListeners();
-    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
-      EventHandler.on(calendar, 'startDateChange.bs.calendar', event => {
-        this._startDate = event.date;
-        this._startInput.value = this._setInputValue(event.date);
-        this._selectEndDate = false;
-        this._calendar.update(this._getCalendarConfig());
-        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-          date: event.date
-        });
+  _addEventListeners() {
+    super._addEventListeners();
+    EventHandler.on(this._element, 'startDateChange.bs.date-range-picker', event => {
+      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
+        date: event.date
       });
-    }
+    });
+    EventHandler.on(this._element, 'show.bs.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_SHOW$8);
+    });
+    EventHandler.on(this._element, 'shown.bs.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_SHOWN$8);
+    });
+    EventHandler.on(this._element, 'hide.bs.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_HIDE$8);
+    });
+    EventHandler.on(this._element, 'hidden.bs.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_HIDDEN$8);
+    });
   }
 
   // Static

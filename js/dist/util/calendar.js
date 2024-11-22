@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v5.7.1 (https://coreui.io)
+  * CoreUI calendar.js v5.8.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -184,7 +184,7 @@
     }
     return weeks;
   };
-  const isDisableDateInRange = (startDate, endDate, dates) => {
+  const isDisableDateInRange = (startDate, endDate, disabledDates) => {
     if (startDate && endDate) {
       const date = new Date(startDate);
       let disabled = false;
@@ -192,7 +192,7 @@
       // eslint-disable-next-line no-unmodified-loop-condition
       while (date < endDate) {
         date.setDate(date.getDate() + 1);
-        if (isDateDisabled(date, null, null, dates)) {
+        if (isDateDisabled(date, null, null, disabledDates)) {
           disabled = true;
           break;
         }
@@ -201,25 +201,33 @@
     }
     return false;
   };
-  const isDateDisabled = (date, min, max, dates) => {
-    let disabled;
-    if (dates) {
-      for (const _date of dates) {
+  const isDateDisabled = (date, min, max, disabledDates) => {
+    if (min && date < min) {
+      return true;
+    }
+    if (max && date > max) {
+      return true;
+    }
+    if (typeof disabledDates === 'function') {
+      return disabledDates(date);
+    }
+    if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) {
+      return true;
+    }
+    if (Array.isArray(disabledDates) && disabledDates) {
+      for (const _date of disabledDates) {
+        if (typeof _date === 'function' && _date(date)) {
+          return true;
+        }
         if (Array.isArray(_date) && isDateInRange(date, _date[0], _date[1])) {
-          disabled = true;
+          return true;
         }
         if (_date instanceof Date && isSameDateAs(date, _date)) {
-          disabled = true;
+          return true;
         }
       }
     }
-    if (min && date < min) {
-      disabled = true;
-    }
-    if (max && date > max) {
-      disabled = true;
-    }
-    return disabled;
+    return false;
   };
   const isDateInRange = (date, start, end) => {
     const _date = removeTimeFromDate(date);

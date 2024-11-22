@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.7.1 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.8.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -151,7 +151,7 @@
     confirmButtonClasses: '(array|string)',
     container: '(string|element|boolean)',
     date: '(date|number|string|null)',
-    disabledDates: '(array|null)',
+    disabledDates: '(array|date|function|null)',
     disabled: 'boolean',
     endDate: '(date|number|string|null)',
     endName: '(string|null)',
@@ -326,11 +326,16 @@
         this._calendar.update(this._getCalendarConfig());
       });
       EventHandler.on(this._startInput, EVENT_INPUT, event => {
-        const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
-        if (date instanceof Date && date.getTime()) {
+        const date = this._parseDate(event.target.value);
+
+        // valid date or empty date
+        if (date instanceof Date && !Number.isNaN(date) || date === null) {
           this._startDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
+          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+            date
+          });
         }
       });
       EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
@@ -355,11 +360,16 @@
         this._calendar.update(this._getCalendarConfig());
       });
       EventHandler.on(this._endInput, EVENT_INPUT, event => {
-        const date = this._config.inputDateParse ? this._config.inputDateParse(event.target.value) : calendar_js.getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker);
-        if (date instanceof Date && date.getTime()) {
+        const date = this._parseDate(event.target.value);
+
+        // valid date or empty date
+        if (date instanceof Date && !Number.isNaN(date) || date === null) {
           this._endDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
+          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+            date
+          });
         }
       });
       EventHandler.on(window, EVENT_RESIZE, () => {
@@ -717,7 +727,16 @@
       };
       this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
     }
+    _parseDate(str) {
+      if (!str) {
+        return null;
+      }
+      return this._config.inputDateParse ? this._config.inputDateParse(str) : calendar_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+    }
     _formatDate(date) {
+      if (!date) {
+        return '';
+      }
       if (this._config.inputDateFormat) {
         return this._config.inputDateFormat(date instanceof Date ? new Date(date) : calendar_js.convertToDateObject(date, this._config.selectionType));
       }

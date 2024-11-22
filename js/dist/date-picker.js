@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-picker.js v5.7.1 (https://coreui.io)
+  * CoreUI date-picker.js v5.8.0 (https://coreui.io)
   * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -28,11 +28,14 @@
   const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2;
   const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`;
+  const EVENT_HIDE = `hide${EVENT_KEY}`;
+  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
+  const EVENT_SHOW = `show${EVENT_KEY}`;
+  const EVENT_SHOWN = `shown${EVENT_KEY}`;
   const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
   const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`;
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const CLASS_NAME_SHOW = 'show';
-  const SELECTOR_CALENDAR = '.calendar';
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`;
   const Default = {
@@ -64,19 +67,25 @@
     }
 
     // Overrides
-    _addCalendarEventListeners() {
-      super._addCalendarEventListeners();
-      for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
-        EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
-          this._startDate = event.date;
-          this._startInput.value = this._setInputValue(event.date);
-          this._selectEndDate = false;
-          this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-            date: event.date
-          });
+    _addEventListeners() {
+      super._addEventListeners();
+      EventHandler.on(this._element, 'startDateChange.coreui.date-range-picker', event => {
+        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
+          date: event.date
         });
-      }
+      });
+      EventHandler.on(this._element, 'show.coreui.date-range-picker', () => {
+        EventHandler.trigger(this._element, EVENT_SHOW);
+      });
+      EventHandler.on(this._element, 'shown.coreui.date-range-picker', () => {
+        EventHandler.trigger(this._element, EVENT_SHOWN);
+      });
+      EventHandler.on(this._element, 'hide.coreui.date-range-picker', () => {
+        EventHandler.trigger(this._element, EVENT_HIDE);
+      });
+      EventHandler.on(this._element, 'hidden.coreui.date-range-picker', () => {
+        EventHandler.trigger(this._element, EVENT_HIDDEN);
+      });
     }
 
     // Static
