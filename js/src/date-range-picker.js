@@ -342,14 +342,17 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.on(this._startInput, EVENT_INPUT, event => {
-      const date = this._config.inputDateParse ?
-        this._config.inputDateParse(event.target.value) :
-        getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
+      const date = this._parseDate(event.target.value)
 
-      if (date instanceof Date && date.getTime()) {
+      // valid date or empty date
+      if ((date instanceof Date && !isNaN(date)) || (date === null)) {
         this._startDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
+
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          date: date
+        })
       }
     })
 
@@ -381,13 +384,17 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.on(this._endInput, EVENT_INPUT, event => {
-      const date = this._config.inputDateParse ?
-        this._config.inputDateParse(event.target.value) :
-        getLocalDateFromString(event.target.value, this._config.locale, this._config.timepicker)
-      if (date instanceof Date && date.getTime()) {
+      const date = this._parseDate(event.target.value)
+
+      // valid date or empty date
+      if ((date instanceof Date && !isNaN(date)) || (date === null)) {
         this._endDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
+
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          date: date
+        })
       }
     })
 
@@ -837,7 +844,19 @@ class DateRangePicker extends BaseComponent {
     this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
   }
 
+  _parseDate(str) {
+    if (!str)
+      return null;
+
+    return this._config.inputDateParse ?
+      this._config.inputDateParse(str) :
+      getLocalDateFromString(str, this._config.locale, this._config.timepicker)
+  }
+
   _formatDate(date) {
+    if (!date)
+      return '';
+
     if (this._config.inputDateFormat) {
       return this._config.inputDateFormat(
         date instanceof Date ? new Date(date) : convertToDateObject(date, this._config.selectionType)
