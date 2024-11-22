@@ -345,13 +345,13 @@ class DateRangePicker extends BaseComponent {
       const date = this._parseDate(event.target.value)
 
       // valid date or empty date
-      if ((date instanceof Date && !isNaN(date)) || (date === null)) {
+      if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
         this._startDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date: date
+          date
         })
       }
     })
@@ -387,13 +387,13 @@ class DateRangePicker extends BaseComponent {
       const date = this._parseDate(event.target.value)
 
       // valid date or empty date
-      if ((date instanceof Date && !isNaN(date)) || (date === null)) {
+      if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
         this._endDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date: date
+          date
         })
       }
     })
@@ -845,8 +845,9 @@ class DateRangePicker extends BaseComponent {
   }
 
   _parseDate(str) {
-    if (!str)
-      return null;
+    if (!str) {
+      return null
+    }
 
     return this._config.inputDateParse ?
       this._config.inputDateParse(str) :
@@ -854,8 +855,9 @@ class DateRangePicker extends BaseComponent {
   }
 
   _formatDate(date) {
-    if (!date)
-      return '';
+    if (!date) {
+      return ''
+    }
 
     if (this._config.inputDateFormat) {
       return this._config.inputDateFormat(

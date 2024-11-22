@@ -23,6 +23,10 @@ const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2
 
 const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`
+const EVENT_HIDE = `hide${EVENT_KEY}`
+const EVENT_HIDDEN = `hidden${EVENT_KEY}`
+const EVENT_SHOW = `show${EVENT_KEY}`
+const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -68,9 +72,25 @@ class DatePicker extends DateRangePicker {
     super._addEventListeners()
 
     EventHandler.on(this._element, 'startDateChange.coreui.date-range-picker', event => {
-        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
-          date: event.date
-        })
+      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
+        date: event.date
+      })
+    })
+
+    EventHandler.on(this._element, 'show.coreui.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_SHOW)
+    })
+
+    EventHandler.on(this._element, 'shown.coreui.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_SHOWN)
+    })
+
+    EventHandler.on(this._element, 'hide.coreui.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_HIDE)
+    })
+
+    EventHandler.on(this._element, 'hidden.coreui.date-range-picker', () => {
+      EventHandler.trigger(this._element, EVENT_HIDDEN)
     })
   }
 
