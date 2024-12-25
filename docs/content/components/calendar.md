@@ -17,7 +17,7 @@ Explore the Bootstrap 5 Calendar component's basic usage through sample code sni
 
 Select specific days using the Bootstrap Calendar component. The example below shows basic usage.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div
     class="border rounded"
@@ -32,7 +32,7 @@ Select specific days using the Bootstrap Calendar component. The example below s
 
 Set the `data-coreui-selection-type` to `week` to enable selection of entire week. You can also use `data-coreui-show-week-number="true"` to show week numbers.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div
     class="border rounded"
@@ -49,7 +49,7 @@ Set the `data-coreui-selection-type` to `week` to enable selection of entire wee
 
 Set the `data-coreui-selection-type` to `month` to enable selection of entire months.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div 
     class="border rounded"
@@ -65,7 +65,7 @@ Set the `data-coreui-selection-type` to `month` to enable selection of entire mo
 
 Set the `data-coreui-selection-type` to `year` to enable years range selection.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div 
     class="border rounded"
@@ -81,7 +81,7 @@ Set the `data-coreui-selection-type` to `year` to enable years range selection.
 
 Display multiple calendar panels side by side by setting the `data-coreui-calendars` attribute. This can be useful for selecting ranges or comparing dates across different months.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div 
     class="border rounded"
@@ -96,7 +96,7 @@ Display multiple calendar panels side by side by setting the `data-coreui-calend
 
 Enable range selection by adding `data-coreui-range="true"` to allow users to pick a start and end date. This example demonstrates how to configure the Bootstrap 5 Calendar component to handle date ranges.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div 
     class="border rounded"
@@ -120,7 +120,7 @@ The Bootstrap Calendar component includes functionality to disable specific date
 
 To disable certain dates, you can provide them in an array. For date ranges, use nested arrays, where each inner array indicates a start date and an end date for that range:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarDisabledDates" class="border rounded"></div>
 </div>
@@ -132,7 +132,7 @@ To disable certain dates, you can provide them in an array. For date ranges, use
 
 To disable weekends, provide a function for the `disabledDates` option. Here's the method:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarDisabledDates2" class="border rounded"></div>
 </div>
@@ -149,7 +149,7 @@ In the example above:
 
 You can also combine specific dates and functions in the `disabledDates` array. For instance:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarDisabledDates3" class="border rounded"></div>
 </div>
@@ -171,7 +171,7 @@ The CoreUI Bootstrap Calendar allows users to display dates in non-English local
 
 By default, the Calendar component uses the browser's default locale. However, you can easily configure it to use a different locale supported by the JavaScript Internationalization API. This feature helps create inclusive and accessible applications for a diverse audience.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div class="border rounded" data-coreui-toggle="calendar"></div>
 </div>
@@ -181,7 +181,7 @@ By default, the Calendar component uses the browser's default locale. However, y
 
 Here is an example of the Bootstrap Calendar component with Chinese locale settings.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div class="border rounded" data-coreui-locale="zh-CN" data-coreui-toggle="calendar"></div>
 </div>
@@ -191,7 +191,7 @@ Here is an example of the Bootstrap Calendar component with Chinese locale setti
 
 Below is an example of the Calendar component with Japanese locale settings.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div class="border rounded" data-coreui-locale="ja" data-coreui-toggle="calendar"></div>
 </div>
@@ -201,7 +201,7 @@ Below is an example of the Calendar component with Japanese locale settings.
 
 Here is an example of the Calendar component with Korean locale settings.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center" dir="rtl">
   <div class="border rounded" data-coreui-locale="ko" data-coreui-toggle="calendar"></div>
 </div>
@@ -215,7 +215,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 Example of the Calendar component with RTL support, using the Hebrew locale.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center" dir="rtl">
   <div class="border rounded" data-coreui-locale="he-IL" data-coreui-toggle="calendar"></div>
 </div>
@@ -225,7 +225,7 @@ Example of the Calendar component with RTL support, using the Hebrew locale.
 
 Example of the Bootstrap Calendar component with Persian locale settings.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex justify-content-center">
   <div class="border rounded" data-coreui-locale="fa-IR" data-coreui-toggle="calendar"></div>
 </div>

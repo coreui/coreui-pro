@@ -14,7 +14,7 @@
 import sdk from '@stackblitz/sdk'
 // https://gohugo.io/hugo-pipes/js/#options
 import {
-  cssCdn, jsBundleCdn, jsSnippetFile
+  cssCdn, cssProCdn, jsBundleCdn, jsProBundleCdn, jsSnippetFile
 } from '@params' // eslint-disable-line import/no-unresolved
 
 // Open in StackBlitz logic
@@ -23,25 +23,33 @@ document.querySelectorAll('.btn-edit').forEach(btn => {
     const codeSnippet = event.target.closest('.docs-code-snippet')
     const exampleEl = codeSnippet.querySelector('.docs-example')
     const title = document.querySelector('.docs-title')
+    const highlight = event.target.closest('.docs-code-snippet').querySelector('.highlight').textContent.trimEnd()
+    const isPro = codeSnippet.querySelector('.btn-edit').getAttribute('data-sb-pro')
+    const addDayJs = codeSnippet.querySelector('.btn-edit').getAttribute('data-sb-dayjs')
 
-    const htmlSnippet = exampleEl.innerHTML
+    const htmlSnippet = isPro ? highlight : exampleEl.innerHTML
     const jsSnippet = codeSnippet.querySelector('.btn-edit').getAttribute('data-sb-js-snippet')
     // Get extra classes for this example
     const classes = Array.from(exampleEl.classList).join(' ')
 
-    openCoreUISnippet(htmlSnippet, jsSnippet, classes, title)
+    openCoreUISnippet(htmlSnippet, jsSnippet, classes, title, isPro, addDayJs)
   })
 })
 
-const openCoreUISnippet = (htmlSnippet, jsSnippet, classes, title) => {
+const openCoreUISnippet = (htmlSnippet, jsSnippet, classes, title, pro, addDayJs) => {
   const indexHtml = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="${cssCdn}" rel="stylesheet">
+    <link href="${pro ? cssProCdn : cssCdn}" rel="stylesheet">
     <title>CoreUI ${title.innerHTML} Example</title>
-    <${'script'} defer src="${jsBundleCdn}"></${'script'}>
+    <${'script'} defer src="${pro ? jsProBundleCdn : jsBundleCdn}"></${'script'}>
+    ${addDayJs ?
+    `<script defer src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>` :
+    ''}
   </head>
   <body class="p-3 m-0 border-0 ${classes}">
     <!-- Example Code Start-->

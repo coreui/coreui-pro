@@ -13,7 +13,7 @@ other_frameworks: range-slider
 
 The **Bootstrap 5 Range Slider** component allows users to select a value or range of values within a predefined range. Unlike the standard `<input type="range">`, the Range Slider offers enhanced customization options, including multiple handles, labels, tooltips, and vertical orientation. It ensures consistent styling across browsers and provides a rich set of features for advanced use cases.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="range-slider"
      data-coreui-value="25,75"
      data-coreui-labels="Low, Medium, High">
@@ -33,7 +33,7 @@ The **Bootstrap 5 Range Slider** component allows users to select a value or ran
 
 Create a simple range slider with default settings.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="range-slider" data-coreui-value="50"></div>
 {{< /example >}}
 
@@ -41,7 +41,7 @@ Create a simple range slider with default settings.
 
 Enable multiple handles to allow the selection of a range or/and multiple values.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="20,40"></div>
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="20,40,60"></div>
 <div data-coreui-toggle="range-slider" data-coreui-value="20,40,60,80"></div>
@@ -51,7 +51,7 @@ Enable multiple handles to allow the selection of a range or/and multiple values
 
 Rotate the slider to a vertical orientation.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex">
   <div class="me-3" data-coreui-toggle="range-slider" data-coreui-value="20" data-coreui-vertical="true"></div>
   <div class="me-3" data-coreui-toggle="range-slider" data-coreui-value="20,80" data-coreui-vertical="true"></div>
@@ -63,7 +63,7 @@ Rotate the slider to a vertical orientation.
 
 Disable the slider to prevent user interaction.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-value="50" data-coreui-disabled="true"></div>
 <div data-coreui-toggle="range-slider" data-coreui-value="50, 75" data-coreui-disabled="true"></div>
 {{< /example >}}
@@ -72,7 +72,7 @@ Disable the slider to prevent user interaction.
 
 Range Slider has implicit values for `min` and `max`—`0` and `100`, respectively. You may specify new values for those using the `min` and `max` attributes.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50"></div>
 <div data-coreui-toggle="range-slider" data-coreui-min="-50" data-coreui-max="150" data-coreui-value="50, 75"></div>
 {{< /example >}}
@@ -81,7 +81,7 @@ Range Slider has implicit values for `min` and `max`—`0` and `100`, respective
 
 Range Slider inputs automatically "snap" to whole numbers. To modify this behavior, set a `step` value. In the example below, we increase the number of steps by specifying `step="0.25"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50" ></div>
 <div data-coreui-toggle="range-slider" data-coreui-step="0.25" data-coreui-value="50, 75"></div>
 {{< /example >}}
@@ -90,7 +90,7 @@ Range Slider inputs automatically "snap" to whole numbers. To modify this behavi
 
 Sets the minimum distance between multiple slider handles by setting `distance` and ensures that the handles do not overlap or get too close.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="range-slider" data-coreui-distance="10" data-coreui-value="50, 75"></div>
 {{< /example >}}
 
@@ -98,7 +98,7 @@ Sets the minimum distance between multiple slider handles by setting `distance` 
 
 Add labels to specific points on the slider for better context. If you provide an array of strings, as in the example below, then labels will be spaced at equal distances from the beginning to the end of the slider.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="range-slider" data-coreui-value="30,70" data-coreui-labels="Start, Middle, End"></div>
 {{< /example >}}
 
@@ -106,7 +106,7 @@ Add labels to specific points on the slider for better context. If you provide a
 
 Labels can be configured as an array of strings or objects. When using objects, you can specify additional properties like `value`, `label`, `class`, and `style`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div id="myRangeSliderCustomLabels"></div>
 {{< /example >}}
 
@@ -116,7 +116,7 @@ Labels can be configured as an array of strings or objects. When using objects, 
 
 By default, users can click on labels to set the slider to specific values. You can disable this feature by setting `clickableLabels` to `false`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="range-slider" data-coreui-clickable-labels="false" data-coreui-value="20,80" data-coreui-labels="Low,Medium,High"></div>
 {{< /example >}}
 
@@ -124,7 +124,7 @@ By default, users can click on labels to set the slider to specific values. You 
 
 By default, tooltips display the current value of each handle. You can disable tooltips by setting `tooltips` to `false`
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="range-slider" data-coreui-value="40,60" data-coreui-tooltips="false"></div>
 {{< /example >}}
 
@@ -132,7 +132,7 @@ By default, tooltips display the current value of each handle. You can disable t
 
 Customize the content of tooltips using the `tooltipsFormat` option. This can be a function that formats the tooltip text based on the current value.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div id="myRangeSliderCustomTooltips"></div>
 {{< /example >}}
 
@@ -146,7 +146,7 @@ The `data-coreui-track` option allows you to customize how the slider's track is
 
 If you set `data-coreui-track` to `false`, the slider's track will not display any fill. Only the default track background will be visible, which can be useful for minimalist designs or when you use more then two handles.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50" ></div>
 <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50, 75"></div>
 <div data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="25, 50, 75"></div>

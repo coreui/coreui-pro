@@ -13,7 +13,7 @@ other_frameworks: rating
 
 Embed the Rating component in your HTML by using a `div` with `data-coreui-toggle="rating"`. Set the initial value with `data-coreui-value`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="rating" data-coreui-value="3"></div>
 {{< /example >}}
 
@@ -21,7 +21,7 @@ Embed the Rating component in your HTML by using a `div` with `data-coreui-toggl
 
 Enable users to clear their selected rating by clicking on the current rating again. This functionality is activated by setting `data-coreui-allow-clear="true"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-allow-clear="true" data-coreui-toggle="rating" data-coreui-value="3"></div>
 {{< /example >}}
 
@@ -31,7 +31,7 @@ This allows the selected rating to be deselected, effectively resetting the rati
 
 Our Bootstrap Rating component allows users to assign and reset a star rating within a user interface. In the example below, we use the `button` to clear the selected value.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="d-flex align-items-center">
   <div id="myRatingResettable" data-coreui-toggle="rating" data-coreui-value="3"></div>
   <button class="btn btn-primary ms-3" type="button" onclick="coreui.Rating.getInstance('#myRatingResettable').reset()">reset</button>
@@ -42,7 +42,7 @@ Our Bootstrap Rating component allows users to assign and reset a star rating wi
 
 Set the Rating component to read-only by adding `data-coreui-read-only="true"`. This disables interaction, preventing users from changing the displayed rating value.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-read-only="true" data-coreui-toggle="rating" data-coreui-value="3"></div>
 {{< /example >}}
 
@@ -50,7 +50,7 @@ Set the Rating component to read-only by adding `data-coreui-read-only="true"`. 
 
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-disabled="true" data-coreui-toggle="rating" data-coreui-value="3"></div>
 {{< /example >}}
 
@@ -58,7 +58,7 @@ Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out 
 
 Adjust the granularity of the Rating component by setting `data-coreui-precision`. This attribute allows for fractional ratings, such as quarter values, to provide more precise feedback.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-precision="0.25" data-coreui-toggle="rating" data-coreui-value="1.5"></div>
 {{< /example >}}
 
@@ -66,11 +66,11 @@ Adjust the granularity of the Rating component by setting `data-coreui-precision
 
 Control the total number of rating items displayed by using `data-coreui-item-count`. You can create a Rating component with a custom scale, be it larger for detailed assessments or smaller for simplicity.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-item-count="20" data-coreui-toggle="rating" data-coreui-value="5"></div>
 {{< /example >}}
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-item-count="3" data-coreui-toggle="rating" data-coreui-value="1"></div>
 {{< /example >}}
 
@@ -78,13 +78,13 @@ Control the total number of rating items displayed by using `data-coreui-item-co
 
 Enable descriptive text on hover by setting `data-coreui-tooltips` to `true`. This provides immediate feedback or guidance as the user interacts with the rating items.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="rating" data-coreui-tooltips="true" data-coreui-value="3"></div>
 {{< /example >}}
 
 For custom messages, provide a comma-separated list of tooltips corresponding to each rating value to enhance the user's understanding of each rating level.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-toggle="rating" data-coreui-tooltips="Very bad, Bad, Meh, Good, Very good" data-coreui-value="3"></div>
 {{< /example >}}
 
@@ -92,7 +92,7 @@ For custom messages, provide a comma-separated list of tooltips corresponding to
 
 Larger or smaller rating component? Add `data-coreui-size="lg"` or `data-coreui-size="sm"` for additional sizes.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div data-coreui-size="sm" data-coreui-toggle="rating" data-coreui-value="3"></div>
 <div data-coreui-toggle="rating" data-coreui-value="3"></div>
 <div data-coreui-size="lg" data-coreui-toggle="rating" data-coreui-value="3"></div>
@@ -106,7 +106,7 @@ The Rating component can be customized with either SVG or font icons, allowing f
 
 In the example below, we demonstrate how to set custom icons using SVG, allowing for detailed customization of the visual elements within the Rating component.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div id="myRatingCustomIcons1"></div>
 {{< /example >}}
 
@@ -114,7 +114,7 @@ In the example below, we demonstrate how to set custom icons using SVG, allowing
 
 In the example below, we use font icons from the CoreUI Icons set. In the `activeIcon` configuration, we also apply the utility class `text-danger` to change the icon's color to red when it is active.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div id="myRatingCustomIcons2"></div>
 {{< /example >}}
 
@@ -122,7 +122,7 @@ In the example below, we use font icons from the CoreUI Icons set. In the `activ
 
 For a more dynamic experience, define different icons for each rating value, enhancing the visual feedback:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div id="myRatingCustomIcons3"></div>
 {{< /example >}}
 
@@ -132,7 +132,7 @@ For a more dynamic experience, define different icons for each rating value, enh
 
 The Bootstrap Rating component integrates interactive star ratings with dynamic textual feedback using other components from CoreUI. It enables users to select a rating that updates the display and label in real-time, enhancing the interactive experience. Hover effects provide immediate feedback on potential ratings before selection, ensuring an intuitive user interface.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="d-flex align-items-center">
   <div id="myRatingCustomFeedbackStart" class="text-body-secondary me-3">3 / 5</div>
   <div id="myRatingCustomFeedback"></div>

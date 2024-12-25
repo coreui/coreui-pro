@@ -17,7 +17,7 @@ Below is an example of a basic Bootstrap DateRangePicker.
 
 The following examples demonstrating how to pick dates using the Bootstrap Date Range Picker Component.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
   <div class="row">
     <div class="col-sm-6 mb-3 mb-sm-0">
       <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
@@ -37,7 +37,7 @@ The following examples demonstrating how to pick dates using the Bootstrap Date 
 
 In addition to supporting date selection, our Bootstrap Date Range Picker component also includes a Time Picker feature, allowing users to select a specific time of day. Bootstrap Time Picker can be enabled by adding `data-coreui-timepicker="true"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
   <div class="row">
     <div class="col-lg-7 mb-3">
       <div
@@ -64,7 +64,7 @@ In addition to supporting date selection, our Bootstrap Date Range Picker compon
 
 To add a footer, use `data-coreui-footer="true"`. The footer can display extra information or actions related to the selected date, such as buttons for "Today" or "Clear".
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
   <div class="row">
     <div class="col-sm-6 mb-3 mb-sm-0">
       <div
@@ -89,7 +89,7 @@ To add a footer, use `data-coreui-footer="true"`. The footer can display extra i
 
 If you want to select the weeks, add the `data-coreui-selection-type="week"` attribute. You can also use `data-coreui-show-week-number="true"` to show week numbers.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
   <div class="row">
     <div class="col-sm-6 mb-3 mb-sm-0">
       <div 
@@ -116,7 +116,7 @@ If you want to select the weeks, add the `data-coreui-selection-type="week"` att
 
 Select range of months by adding the `data-coreui-selection-type="month"` attribute.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
   <div class="row">
     <div class="col-sm-6 mb-3 mb-sm-0">
       <div 
@@ -141,7 +141,7 @@ Select range of months by adding the `data-coreui-selection-type="month"` attrib
 
 Add the `data-coreui-selection-type="year"` attribute to allow a pick range of years.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
   <div class="row">
     <div class="col-sm-6 mb-3 mb-sm-0">
       <div
@@ -167,7 +167,7 @@ Add the `data-coreui-selection-type="year"` attribute to allow a pick range of y
 
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-6 mb-3">
     <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-range-picker"></div>
@@ -184,7 +184,7 @@ Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and 
 
 Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed out appearance and remove pointer events.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6">
     <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
@@ -196,7 +196,7 @@ Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed 
 
 Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modification of the input's value.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6">
     <div data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
@@ -208,7 +208,7 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 The CoreUI Bootstrap DateRangePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
 
-{{< example >}}
+{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-sm-6">
     <div id="myDateRangePickerDisabledDates"></div>
@@ -222,7 +222,7 @@ The CoreUI Bootstrap DateRangePicker component allows you to disable certain dat
 
 You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
 
-{{< example >}}
+{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDateRangePickerDisabledDates2"></div>
@@ -237,7 +237,7 @@ You can disable weekends by passing a function to the `disabledDates` option. He
 In order to configure custom date ranges in the Date Range component, you must use the `ranges` option to define a set of predefined ranges. These ranges can include predefined options such as "Today", "Yesterday", "Last 7 Days", etc.
 
 
-{{< example >}}
+{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-sm-6">
     <div id="myDateRangePickerCustomRanges"></div>
@@ -255,7 +255,7 @@ CoreUI Date Range Picker allows users to display dates and times in a non-Englis
 
 By default, the DateRangePicker component uses the default browser locale, but it can be easily configured to use a different locale supported by the JavaScript Internationalization API. To set the locale, you can pass the desired language code as a prop to the DatePicker component. This feature enables the creation of more inclusive and accessible applications that cater to a diverse audience.
 
-{{< example >}}
+{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-sm-6">
     <div data-coreui-toggle="date-range-picker"></div>
@@ -267,7 +267,7 @@ By default, the DateRangePicker component uses the default browser locale, but i
 
 Here is an example of a simple Bootstrap Date Range Picker with Chinese locales.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6">
     <div data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期,退房日期" data-coreui-toggle="date-range-picker"></div>
@@ -279,7 +279,7 @@ Here is an example of a simple Bootstrap Date Range Picker with Chinese locales.
 
 Here is a basic Date Range Picker with Japanese locales.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6">
     <div data-coreui-locale="ja" data-coreui-placeholder="日付を選択,終了日" data-coreui-toggle="date-range-picker"></div>
@@ -291,7 +291,7 @@ Here is a basic Date Range Picker with Japanese locales.
 
 Take a look at the following example, which demonstrates a simple date picker designed to work with Korean locales.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6">
     <div data-coreui-locale="ko" data-coreui-placeholder="날짜 선택,종료일" data-coreui-toggle="date-range-picker"></div>
@@ -305,7 +305,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Hebrew
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row" dir="rtl">
   <div class="col-sm-6">
     <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך,תאריך סיום" data-coreui-toggle="date-range-picker"></div>
@@ -315,7 +315,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Persian
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row" dir="rtl">
   <div class="col-sm-6">
     <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع,تاریخ پایان" data-coreui-toggle="date-range-picker"></div>
@@ -332,7 +332,7 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-7">
     <div id="myDateRangePickerCustomFormats1"></div>
@@ -349,7 +349,7 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-7">
     <div id="myDateRangePickerCustomFormats2"></div>

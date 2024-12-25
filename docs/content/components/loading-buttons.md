@@ -14,7 +14,7 @@ other_frameworks: loading-button
 
 Create basic Bootstrap Loading Buttons with different styles: primary, outline, and ghost. These buttons show a loading state when clicked.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <button type="button" class="btn btn-primary" data-coreui-timeout="2000" data-coreui-toggle="loading-button">Submit</button>
 <button type="button" class="btn btn-outline-primary" data-coreui-toggle="loading-button">Submit</button>
 <button type="button" class="btn btn-ghost-primary" data-coreui-toggle="loading-button">Submit</button>
@@ -26,7 +26,7 @@ Create basic Bootstrap Loading Buttons with different styles: primary, outline, 
 
 The default option. Use loading buttons with a border spinner to indicate loading status.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <button type="button" class="btn btn-info" data-coreui-toggle="loading-button">Submit</button>
 <button type="button" class="btn btn-outline-success" data-coreui-toggle="loading-button">Submit</button>
 <button type="button" class="btn btn-ghost-warning" data-coreui-toggle="loading-button">Submit</button>
@@ -36,7 +36,7 @@ The default option. Use loading buttons with a border spinner to indicate loadin
 
 Switch to a grow spinner for Bootstrap loading buttons by adding `data-coreui-spinner-type="grow"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <button type="button" class="btn btn-info" data-coreui-spinner-type="grow" data-coreui-toggle="loading-button">Submit</button>
 <button type="button" class="btn btn-outline-success" data-coreui-spinner-type="grow" data-coreui-toggle="loading-button">Submit</button>
 <button type="button" class="btn btn-ghost-warning" data-coreui-spinner-type="grow" data-coreui-toggle="loading-button">Submit</button>

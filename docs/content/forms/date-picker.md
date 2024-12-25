@@ -18,7 +18,7 @@ Below is an example of a basic Bootstrap DatePicker.
 
 The following examples demonstrating how to pick dates using the Bootstrap Date Picker Component.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
@@ -33,7 +33,7 @@ The following examples demonstrating how to pick dates using the Bootstrap Date 
 
 In addition to supporting date selection, our Bootstrap Date Picker component also includes a Time Picker feature, allowing users to select a specific time of day. Bootstrap Time Picker can be enabled by adding `data-coreui-timepicker="true"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>
@@ -48,7 +48,7 @@ In addition to supporting date selection, our Bootstrap Date Picker component al
 
 To add a footer, use `data-coreui-footer="true"`. The footer can display extra information or actions related to the selected date, such as buttons for "Today" or "Clear".
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
@@ -63,7 +63,7 @@ To add a footer, use `data-coreui-footer="true"`. The footer can display extra i
 
 If you want to select the week number, add the `data-coreui-selection-type="week"` attribute. You can also use `data-coreui-show-week-number="true"` to show week numbers.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div 
@@ -89,7 +89,7 @@ If you want to select the week number, add the `data-coreui-selection-type="week
 
 Selecting whole month by adding the `data-coreui-selection-type="month"` attribute.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div 
@@ -113,7 +113,7 @@ Selecting whole month by adding the `data-coreui-selection-type="month"` attribu
 
 Add the `data-coreui-selection-type="year"` attribute to allow pick years.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div
@@ -137,7 +137,7 @@ Add the `data-coreui-selection-type="year"` attribute to allow pick years.
 
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row mb-3">
   <div class="col-lg-5">
     <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-picker"></div>
@@ -154,7 +154,7 @@ Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and 
 
 Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed out appearance and remove pointer events.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5">
     <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
@@ -166,7 +166,7 @@ Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed 
 
 Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modification of the input's value.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5">
     <div data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
@@ -178,7 +178,7 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 The CoreUI Bootstrap DatePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerDisabledDates"></div>
@@ -192,7 +192,7 @@ The CoreUI Bootstrap DatePicker component allows you to disable certain dates, s
 
 You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerDisabledDates2"></div>
@@ -210,7 +210,7 @@ CoreUI Date Picker allows users to display dates and times in a non-English loca
 
 By default, the DatePicker component uses the default browser locale, but it can be easily configured to use a different locale supported by the JavaScript Internationalization API. To set the locale, you can pass the desired language code as a prop to the DatePicker component. This feature enables the creation of more inclusive and accessible applications that cater to a diverse audience.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5">
     <div data-coreui-toggle="date-picker"></div>
@@ -222,7 +222,7 @@ By default, the DatePicker component uses the default browser locale, but it can
 
 Here is an example of a simple Bootstrap Date Picker with Chinese locales.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5">
     <div data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期" data-coreui-toggle="date-picker"></div>
@@ -234,7 +234,7 @@ Here is an example of a simple Bootstrap Date Picker with Chinese locales.
 
 Here is a basic Date Picker with Japanese locales.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5">
     <div data-coreui-locale="ja" data-coreui-placeholder="日付を選択" data-coreui-toggle="date-picker"></div>
@@ -246,7 +246,7 @@ Here is a basic Date Picker with Japanese locales.
 
 Take a look at the following example, which demonstrates a simple date picker designed to work with Korean locales.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5">
     <div data-coreui-locale="ko" data-coreui-placeholder="날짜 선택" data-coreui-toggle="date-picker"></div>
@@ -260,7 +260,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Hebrew
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row" dir="rtl">
   <div class="col-lg-5">
     <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="date-picker"></div>
@@ -270,7 +270,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Persian
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row" dir="rtl">
   <div class="col-lg-5">
     <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="date-picker"></div>
@@ -287,7 +287,7 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerCustomFormats1"></div>
@@ -305,7 +305,7 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerCustomFormats2"></div>

@@ -13,7 +13,7 @@ other_frameworks: time-picker
 
 To create a basic Bootstrap Time Picker, use:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker" id="timePicker1"></div>
@@ -28,7 +28,7 @@ To create a basic Bootstrap Time Picker, use:
 
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-5 mb-3">
     <div class="time-picker" data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="time-picker"></div>
@@ -45,7 +45,7 @@ Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and 
 
 Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed out appearance and remove pointer events.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
@@ -57,7 +57,7 @@ Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed 
 
 Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modification of the input's value.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
@@ -71,7 +71,7 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 
 Customize Bootstrap Time Picker to display only hours, or hours and minutes by disabling minutes/seconds.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
     <label class="form-label">Only hours and minutes</label>
@@ -88,7 +88,7 @@ Customize Bootstrap Time Picker to display only hours, or hours and minutes by d
 
 Tailor the Bootstrap Time Picker to your needs by specifying custom values for hours, minutes, and seconds. Use arrays to define selectable options or functions for dynamic filtering. The example below demonstrates setting specific hour options, minute intervals, and a condition for seconds only to include values less than 20.
 
-{{< example >}}
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
 <div class="row">
   <div class="col-lg-4">
     <div id="myTimePickerCustom"></div>
@@ -109,7 +109,7 @@ CoreUI Time Picker allows you to display times in a non-English locale, ideal fo
 
 By default, the Time Picker uses the browser’s locale. To set a different locale, use the `data-coreui-locale` attribute.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div data-coreui-toggle="time-picker"></div>
@@ -121,7 +121,7 @@ By default, the Time Picker uses the browser’s locale. To set a different loca
 
 To configure the Time Picker for Chinese users, set the locale to `zh-CN` and provide a placeholder text:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期" data-coreui-toggle="time-picker"></div>
@@ -133,7 +133,7 @@ To configure the Time Picker for Chinese users, set the locale to `zh-CN` and pr
 
 To localize the Time Picker for Japanese, set the locale to `ja` and use an appropriate placeholder:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-locale="ja" data-coreui-placeholder="日付を選択" data-coreui-toggle="time-picker"></div>
@@ -145,7 +145,7 @@ To localize the Time Picker for Japanese, set the locale to `ja` and use an appr
 
 For Korean localization, set the locale to `ko` and include placeholder text:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-locale="ko" data-coreui-placeholder="날짜 선택" data-coreui-toggle="time-picker"></div>
@@ -159,7 +159,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Hebrew
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="time-picker" dir="rtl"></div>
@@ -169,7 +169,7 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Persian
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-lg-4">
     <div class="time-picker" data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="time-picker" dir="rtl"></div>
