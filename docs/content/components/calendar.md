@@ -126,7 +126,7 @@ To disable certain dates, you can provide them in an array. For date ranges, use
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-disabled-dates" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="calendar-disabled-dates" file="docs/assets/js/partials/snippets.js" >}}
 
 ### Disabling weekends
 
@@ -138,7 +138,7 @@ To disable weekends, provide a function for the `disabledDates` option. Here's t
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-disabled-dates2" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="calendar-disabled-dates2" file="docs/assets/js/partials/snippets.js" >}}
 
 In the example above:
 
@@ -155,7 +155,7 @@ You can also combine specific dates and functions in the `disabledDates` array. 
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-disabled-dates3" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="calendar-disabled-dates3" file="docs/assets/js/partials/snippets.js" >}}
 
 In this example:
 

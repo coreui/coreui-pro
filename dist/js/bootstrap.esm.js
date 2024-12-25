@@ -6311,7 +6311,7 @@ class MultiSelect extends BaseComponent {
       return;
     }
     if (this._config.multiple && this._config.selectionType === 'counter') {
-      this._searchElement.placeholder = `${this._selected.length} item(s) selected`;
+      this._searchElement.placeholder = `${this._selected.length} ${this._config.selectionTypeCounterText}`;
     }
   }
   _updateSearchSize(size = 2) {

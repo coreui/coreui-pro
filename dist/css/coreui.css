@@ -7805,8 +7805,8 @@ select.form-multi-select {
 }
 .offcanvas-header .btn-close {
   padding: calc(var(--cui-offcanvas-padding-y) * 0.5) calc(var(--cui-offcanvas-padding-x) * 0.5);
+  margin-inline: auto calc(-0.5 * var(--cui-offcanvas-padding-x));
   margin-top: calc(-0.5 * var(--cui-offcanvas-padding-y));
-  margin-right: calc(-0.5 * var(--cui-offcanvas-padding-x));
   margin-bottom: calc(-0.5 * var(--cui-offcanvas-padding-y));
 }
 

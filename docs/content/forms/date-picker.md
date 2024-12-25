@@ -186,7 +186,7 @@ The CoreUI Bootstrap DatePicker component allows you to disable certain dates, s
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-picker-disabled-dates" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="date-picker-disabled-dates" file="docs/assets/js/partials/snippets.js" >}}
 
 ### Disabling weekends
 
@@ -200,7 +200,7 @@ You can disable weekends by passing a function to the `disabledDates` option. He
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-picker-disabled-dates2" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="date-picker-disabled-dates2" file="docs/assets/js/partials/snippets.js" >}}
 
 ## Non-english locale
 
@@ -301,7 +301,7 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/en.js"></script>
 ```
 
-{{< js-docs name="date-picker-custom-formats1" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="date-picker-custom-formats1" file="docs/assets/js/partials/snippets.js" >}}
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
@@ -319,7 +319,7 @@ To use localized dates, we need to additionally add locale files, in this case, 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
 ```
 
-{{< js-docs name="date-picker-custom-formats2" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="date-picker-custom-formats2" file="docs/assets/js/partials/snippets.js" >}}
 
 ## Usage
 

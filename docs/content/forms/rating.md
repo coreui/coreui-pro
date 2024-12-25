@@ -110,7 +110,7 @@ In the example below, we demonstrate how to set custom icons using SVG, allowing
 <div id="myRatingCustomIcons1"></div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-icons1" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="rating-custom-icons1" file="docs/assets/js/partials/snippets.js" >}}
 
 In the example below, we use font icons from the CoreUI Icons set. In the `activeIcon` configuration, we also apply the utility class `text-danger` to change the icon's color to red when it is active.
 
@@ -118,7 +118,7 @@ In the example below, we use font icons from the CoreUI Icons set. In the `activ
 <div id="myRatingCustomIcons2"></div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-icons2" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="rating-custom-icons2" file="docs/assets/js/partials/snippets.js" >}}
 
 For a more dynamic experience, define different icons for each rating value, enhancing the visual feedback:
 
@@ -126,7 +126,7 @@ For a more dynamic experience, define different icons for each rating value, enh
 <div id="myRatingCustomIcons3"></div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-icons3" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="rating-custom-icons3" file="docs/assets/js/partials/snippets.js" >}}
 
 ## Custom feedback
 
@@ -140,7 +140,7 @@ The Bootstrap Rating component integrates interactive star ratings with dynamic 
 </div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-feedback" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="rating-custom-feedback" file="docs/assets/js/partials/snippets.js" >}}
 
 ## Usage
 

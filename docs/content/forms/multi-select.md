@@ -75,7 +75,7 @@ To dynamically populate a multi-select dropdown with options from an array, star
 
 We use the following JavaScript to set up our multi-select:
 
-{{< js-docs name="multi-select-array-data" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="multi-select-array-data" file="docs/assets/js/partials/snippets.js" >}}
 
 ## Search
 

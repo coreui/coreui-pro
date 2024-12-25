@@ -110,7 +110,7 @@ Labels can be configured as an array of strings or objects. When using objects, 
 <div id="myRangeSliderCustomLabels"></div>
 {{< /example >}}
 
-{{< js-docs name="range-slider-custom-labels" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="range-slider-custom-labels" file="docs/assets/js/partials/snippets.js" >}}
 
 ### Clickable labels
 
@@ -136,7 +136,7 @@ Customize the content of tooltips using the `tooltipsFormat` option. This can be
 <div id="myRangeSliderCustomTooltips"></div>
 {{< /example >}}
 
-{{< js-docs name="range-slider-custom-tooltips" file="docs/assets/js/snippets.js" >}}
+{{< js-docs name="range-slider-custom-tooltips" file="docs/assets/js/partials/snippets.js" >}}
 
 ## Track
 
