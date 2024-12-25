@@ -149,6 +149,10 @@ class RangeSlider extends BaseComponent {
         return
       }
 
+      if (!(event.target instanceof HTMLInputElement) && !event.target.className.includes(CLASS_NAME_RANGE_SLIDER_TRACK)) {
+        return
+      }
+
       this._isDragging = true
       const clickValue = this._calculateClickValue(event)
       this._dragIndex = this._getNearestValueIndex(clickValue)
