@@ -30,3 +30,6 @@
 {{- $esbuildOptions = merge $esbuildOptions (dict "params" $esbuildParams) -}}
 {{- $searchJs := resources.Get "js/search.js" | js.Build $esbuildOptions | resources.Copy "/assets/js/search.js" }}
 <script defer src="{{ $searchJs.Permalink }}"></script>
+
+{{- $snowflakesJs := resources.Get "js/snowflakes.js" | js.Build $esbuildOptions | resources.Copy "/assets/js/snowflakes.js" }}
+<script defer src="{{ $snowflakesJs.Permalink }}"></script>
