@@ -57,7 +57,6 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_CALENDAR_CELL = 'calendar-cell'
-const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner'
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row'
 const CLASS_NAME_CALENDARS = 'calendars'
 
@@ -204,7 +203,7 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarClick(event) {
-    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target
+    const { target } = event
     const date = this._getDate(target)
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index')
@@ -271,11 +270,11 @@ class Calendar extends BaseComponent {
       let element = event.target
 
       if (this._config.selectionType === 'week' && element.tabIndex === -1) {
-        element = element.closest('tr[tabindex="0"]')
+        element = element.closest(`${SELECTOR_CALENDAR_ROW}[tabindex="0"]`)
       }
 
       const list = SelectorEngine.find(
-        this._config.selectionType === 'week' ? 'tr[tabindex="0"]' : 'td[tabindex="0"]',
+        this._config.selectionType === 'week' ? `${SELECTOR_CALENDAR_ROW}[tabindex="0"]` : `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`,
         this._element
       )
 
@@ -304,7 +303,7 @@ class Calendar extends BaseComponent {
         const callback = key => {
           setTimeout(() => {
             const _list = SelectorEngine.find(
-              'td[tabindex="0"], tr[tabindex="0"]',
+              `${SELECTOR_CALENDAR_CELL}[tabindex="0"], ${SELECTOR_CALENDAR_ROW}[tabindex="0"]`,
               SelectorEngine.find('.calendar', this._element).pop()
             )
 
@@ -356,7 +355,7 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarMouseEnter(event) {
-    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target
+    const { target } = event
     const date = this._getDate(target)
 
     if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
@@ -612,32 +611,31 @@ class Calendar extends BaseComponent {
     const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4)
     const weekDays = monthDetails[0].days
 
-    const calendarTable = document.createElement('table')
+    const calendarTable = document.createElement('div')
+    calendarTable.classList.add('calendar-table')
+    calendarTable.role = 'table'
+
     calendarTable.innerHTML = `
     ${this._view === 'days' ? `
-      <thead>
-        <tr>
+      <div class="calendar-row-group" role="rowgroup">
+        <div class="calendar-header-row" role="row">
           ${this._config.showWeekNumber ?
-            `<th class="calendar-cell">
-              <div class="calendar-header-cell-inner">
-               ${this._config.weekNumbersLabel ?? ''}
-              </div>
-            </th>` : ''
+            `<div class="calendar-cell-week-number" role="cell">
+              ${this._config.weekNumbersLabel ?? ''}
+            </div>` : ''
           }
           ${weekDays.map(({ date }) => (
-            `<th class="calendar-cell" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
-              <div class="calendar-header-cell-inner">
+            `<div class="calendar-cell-header" role="cell" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
               ${typeof this._config.weekdayFormat === 'string' ?
                 date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
                 date
                   .toLocaleDateString(this._config.locale, { weekday: 'long' })
                   .slice(0, this._config.weekdayFormat)}
-              </div>
-            </th>`
+            </div>`
           )).join('')}
-        </tr>
-      </thead>` : ''}
-      <tbody>
+        </div>
+      </div>` : ''}
+      <div class="calendar-row-group" role="rowgroup">
         ${this._view === 'days' ? monthDetails.map(week => {
           const date = convertToDateObject(
             week.weekNumber === 0 ?
@@ -646,8 +644,9 @@ class Calendar extends BaseComponent {
             this._config.selectionType
           )
           return (
-            `<tr 
-              class="calendar-row ${this._config.selectionType === 'week' && this._sharedClassNames(date)}"
+            `<div 
+              class="${CLASS_NAME_CALENDAR_ROW} ${this._config.selectionType === 'week' && this._sharedClassNames(date)}"
+              role="row"
               tabindex="${
                 this._config.selectionType === 'week' &&
                 week.days.some(day => day.month === 'current') &&
@@ -656,12 +655,13 @@ class Calendar extends BaseComponent {
               ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
             >
               ${this._config.showWeekNumber ?
-                `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''
+                `<div class="calendar-cell-week-number" role="cell">${week.weekNumber === 0 ? 53 : week.weekNumber}</div>` : ''
               }
               ${week.days.map(({ date, month }) => (
               month === 'current' || this._config.showAdjacementDays ?
-                `<td 
-                  class="calendar-cell ${this._dayClassNames(date, month)}"
+                `<div
+                  role="cell" 
+                  class="${CLASS_NAME_CALENDAR_CELL} ${this._dayClassNames(date, month)}"
                   tabindex="${
                     this._config.selectionType === 'day' &&
                     (month === 'current' || this._config.selectAdjacementDays) &&
@@ -670,53 +670,49 @@ class Calendar extends BaseComponent {
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date}"
                 >
-                  <div class="calendar-cell-inner day">
-                    ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
-                  </div>
-                </td>` :
-                '<td></td>'
-            )).join('')}</tr>`
+                  ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
+                </div>` :
+                '<div></div>'
+            )).join('')}</div>`
           )
         }).join('') : ''}
         ${this._view === 'months' ? listOfMonths.map((row, index) => (
-          `<tr>
+          `<div class="${CLASS_NAME_CALENDAR_ROW}" role="row">
             ${row.map((month, idx) => {
               const date = new Date(calendarDate.getFullYear(), (index * 3) + idx, 1)
               return (
-                `<td
-                  class="calendar-cell ${this._sharedClassNames(date)}"
+                `<div
+                  class="${CLASS_NAME_CALENDAR_CELL} ${this._sharedClassNames(date)}"
                   data-coreui-date="${date.toDateString()}"
+                  role="cell" 
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
-                  <div class="calendar-cell-inner month">
-                    ${month}
-                  </div>
-                </td>`
+                  ${month}
+                </div>`
               )
             }).join('')}
-          </tr>`
+          </div>`
         )).join('') : ''}
         ${this._view === 'years' ? listOfYears.map(row => (
-          `<tr>
+          `<div class="${CLASS_NAME_CALENDAR_ROW}" role="row">
             ${row.map(year => {
               const date = new Date(year, 0, 1)
               return (
-                `<td
-                  class="calendar-cell ${this._sharedClassNames(date)}"
+                `<div
+                  class="${CLASS_NAME_CALENDAR_CELL} ${this._sharedClassNames(date)}"
                   data-coreui-date="${date.toDateString()}"
+                  role="cell" 
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
-                  <div class="calendar-cell-inner year">
-                    ${year}
-                  </div>
-                </td>`
+                  ${year}
+                </div>`
               )
             }).join('')}
-          </tr>`
+          </div>`
         )).join('') : ''}
-      </tbody>
+      </div>
     `
     calendarPanelEl.append(navigationElement, calendarTable)
 
