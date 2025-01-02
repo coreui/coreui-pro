@@ -1,6 +1,6 @@
 /*!
-  * CoreUI date-range-picker.js v5.8.0 (https://coreui.io)
-  * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * CoreUI date-range-picker.js v5.8.1 (https://coreui.io)
+  * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {

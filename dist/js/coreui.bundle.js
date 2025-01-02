@@ -1,6 +1,6 @@
 /*!
-  * CoreUI v5.8.0 (https://coreui.io)
-  * Copyright 2024 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * CoreUI v5.8.1 (https://coreui.io)
+  * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.8.0';
+  const VERSION = '5.8.1';
 
   /**
    * Class definition
@@ -9761,6 +9761,9 @@
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, event => {
         if (event.button !== 0) {
+          return;
+        }
+        if (!(event.target instanceof HTMLInputElement) && !event.target.className.includes(CLASS_NAME_RANGE_SLIDER_TRACK)) {
           return;
         }
         this._isDragging = true;
