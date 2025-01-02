@@ -122,6 +122,6 @@ const snowflakes = (target, count = 200) => {
   container.append(canvas)
 }
 
-if (document.querySelector('.banner-xmas')) {
-  snowflakes('.banner-xmas', 200)
+if (document.querySelector('.snowfall')) {
+  snowflakes('.snowfall', 100)
 }

@@ -250,5 +250,5 @@ CoreUI is an MIT-licensed open source project and is completely free to use. How
 
 ## Copyright and license
 
-Copyright 2024 creativeLabs Łukasz Holeczek.
+Copyright 2025 creativeLabs Łukasz Holeczek.
 This is commercial software. To use it, you have to own a commercial license. Docs released under [Creative Commons](https://creativecommons.org/licenses/by/3.0/).
