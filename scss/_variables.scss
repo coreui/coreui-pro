@@ -2312,6 +2312,7 @@ $calendar-cell-week-number-font-weight:      600 !default;
 $calendar-cell-hover-color:                  var(--#{$prefix}body-color) !default;
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
+$calendar-cell-disabled-selected-color:      rgba($white, .5) !default;
 
 $calendar-cell-focus-box-shadow:             $focus-ring-box-shadow !default;
 

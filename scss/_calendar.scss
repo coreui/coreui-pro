@@ -26,6 +26,7 @@
   --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
   --#{$prefix}calendar-cell-focus-box-shadow: #{$calendar-cell-focus-box-shadow};
   --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
+  --#{$prefix}calendar-cell-disabled-selected-color: #{$calendar-cell-disabled-selected-color};
   --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
   --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg};
   --#{$prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg};
@@ -122,7 +123,7 @@
   gap: var(--#{$prefix}calendar-rows-gap);
 }
 
-.calendar-header-row,
+.calendar-row-header,
 .calendar-row {
   display: flex;
 }
@@ -270,7 +271,14 @@
     }
   }
 
-  &.selected:not(:hover) .calendar-cell-week-number {
-    color: var(--#{$prefix}calendar-cell-header-selected-color);
+  &.selected:not(:hover) {
+    .calendar-cell-week-number {
+      color: var(--#{$prefix}calendar-cell-header-selected-color);
+    }
+
+    .calendar-cell.next,
+    .calendar-cell.previous {
+      color: var(--#{$prefix}calendar-cell-disabled-selected-color);
+    }
   }
 }
