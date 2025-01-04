@@ -60,6 +60,7 @@ const CLASS_NAME_CALENDAR_CELL = 'calendar-cell'
 const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner'
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row'
 const CLASS_NAME_CALENDARS = 'calendars'
+const CLASS_NAME_SHOW_WEEK_NUMBERS = 'show-week-numbers'
 
 const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next'
 const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev'
@@ -69,7 +70,9 @@ const SELECTOR_BTN_PREV = '.btn-prev'
 const SELECTOR_BTN_YEAR = '.btn-year'
 const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_CALENDAR_CELL = '.calendar-cell'
+const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
+const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 
 const Default = {
@@ -259,11 +262,11 @@ class Calendar extends BaseComponent {
       let element = event.target
 
       if (this._config.selectionType === 'week' && element.tabIndex === -1) {
-        element = element.closest('tr[tabindex="0"]')
+        element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE)
       }
 
       const list = SelectorEngine.find(
-        this._config.selectionType === 'week' ? 'tr[tabindex="0"]' : 'td[tabindex="0"]',
+        this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE,
         this._element
       )
 
@@ -292,7 +295,7 @@ class Calendar extends BaseComponent {
         const callback = key => {
           setTimeout(() => {
             const _list = SelectorEngine.find(
-              'td[tabindex="0"], tr[tabindex="0"]',
+              `${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`,
               SelectorEngine.find('.calendar', this._element).pop()
             )
 
@@ -371,51 +374,51 @@ class Calendar extends BaseComponent {
   }
 
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarClick(event)
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarKeydown(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEENTER, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSELEAVE, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_FOCUS, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_BLUR, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarClick(event)
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarKeydown(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEENTER, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSELEAVE, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_FOCUS, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_BLUR, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
@@ -600,14 +603,14 @@ class Calendar extends BaseComponent {
       <thead>
         <tr>
           ${this._config.showWeekNumber ?
-            `<th class="calendar-cell">
+            `<th class="${CLASS_NAME_CALENDAR_CELL}">
               <div class="calendar-header-cell-inner">
                ${this._config.weekNumbersLabel ?? ''}
               </div>
             </th>` : ''
           }
           ${weekDays.map(({ date }) => (
-            `<th class="calendar-cell" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
+            `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
               <div class="calendar-header-cell-inner">
               ${typeof this._config.weekdayFormat === 'string' ?
                 date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
@@ -629,7 +632,7 @@ class Calendar extends BaseComponent {
           )
           return (
             `<tr 
-              class="calendar-row ${this._config.selectionType === 'week' && this._sharedClassNames(date)}"
+              class="${CLASS_NAME_CALENDAR_ROW} ${this._config.selectionType === 'week' && this._sharedClassNames(date)}"
               tabindex="${
                 this._config.selectionType === 'week' &&
                 week.days.some(day => day.month === 'current') &&
@@ -643,7 +646,7 @@ class Calendar extends BaseComponent {
               ${week.days.map(({ date, month }) => (
               month === 'current' || this._config.showAdjacementDays ?
                 `<td 
-                  class="calendar-cell ${this._dayClassNames(date, month)}"
+                  class="${CLASS_NAME_CALENDAR_CELL} ${this._dayClassNames(date, month)}"
                   tabindex="${
                     this._config.selectionType === 'day' &&
                     (month === 'current' || this._config.selectAdjacementDays) &&
@@ -666,7 +669,7 @@ class Calendar extends BaseComponent {
               const date = new Date(calendarDate.getFullYear(), (index * 3) + idx, 1)
               return (
                 `<td
-                  class="calendar-cell ${this._sharedClassNames(date)}"
+                  class="${CLASS_NAME_CALENDAR_CELL} ${this._sharedClassNames(date)}"
                   data-coreui-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
@@ -685,7 +688,7 @@ class Calendar extends BaseComponent {
               const date = new Date(year, 0, 1)
               return (
                 `<td
-                  class="calendar-cell ${this._sharedClassNames(date)}"
+                  class="${CLASS_NAME_CALENDAR_CELL} ${this._sharedClassNames(date)}"
                   data-coreui-date="${date.toDateString()}"
                   tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
                   ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
@@ -711,7 +714,7 @@ class Calendar extends BaseComponent {
     }
 
     if (this._config.showWeekNumber) {
-      this._element.classList.add('show-week-numbers')
+      this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS)
     }
 
     for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
@@ -751,7 +754,7 @@ class Calendar extends BaseComponent {
       return
     }
 
-    const cells = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, this._element)
+    const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element)
 
     for (const cell of cells) {
       const date = new Date(Manipulator.getDataAttribute(cell, 'date'))
