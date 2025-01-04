@@ -169,33 +169,12 @@ class Calendar extends BaseComponent {
   }
 
   // Private
-  _initializeDates() {
-    // Convert dates to date objects based on the selection type
-    this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
-    )
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
-    this._hoverDate = null
-    this._selectEndDate = this._config.selectEndDate
-  }
+  _focusOnFirstAvailableCell() {
+    const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element)
 
-  _initializeView() {
-    const viewMap = {
-      day: 'days',
-      week: 'days',
-      month: 'months',
-      year: 'years'
+    if (cell) {
+      cell.focus()
     }
-
-    this._view = viewMap[this._config.selectionType] || 'days'
-  }
-
-  _classNames(classNames) {
-    return Object.entries(classNames)
-      .filter(([_, value]) => Boolean(value))
-      .map(([key]) => key)
-      .join(' ')
   }
 
   _getDate(target) {
@@ -220,14 +199,14 @@ class Calendar extends BaseComponent {
     if (this._view === 'months' && this._config.selectionType !== 'month') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
       this._view = 'days'
-      this._updateCalendar()
+      this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
       return
     }
 
     if (this._view === 'years' && this._config.selectionType !== 'year') {
       this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date)
       this._view = 'months'
-      this._updateCalendar()
+      this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
       return
     }
 
@@ -307,40 +286,35 @@ class Calendar extends BaseComponent {
         (event.key === ARROW_UP_KEY && toBoundary.start < Math.abs(gap.ArrowUp))
       ) {
         const callback = key => {
-          setTimeout(() => {
-            const _list = SelectorEngine.find(
-              `${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`,
-              SelectorEngine.find('.calendar', this._element).pop()
-            )
+          const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element)
 
-            if (_list.length && key === ARROW_RIGHT_KEY) {
-              _list[0].focus()
-            }
+          if (_list.length && key === ARROW_RIGHT_KEY) {
+            _list[0].focus()
+          }
 
-            if (_list.length && key === ARROW_LEFT_KEY) {
-              _list[_list.length - 1].focus()
-            }
+          if (_list.length && key === ARROW_LEFT_KEY) {
+            _list[_list.length - 1].focus()
+          }
 
-            if (_list.length && key === ARROW_DOWN_KEY) {
-              _list[gap.ArrowDown - (list.length - index)].focus()
-            }
+          if (_list.length && key === ARROW_DOWN_KEY) {
+            _list[gap.ArrowDown - (list.length - index)].focus()
+          }
 
-            if (_list.length && key === ARROW_UP_KEY) {
-              _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus()
-            }
-          }, 0)
+          if (_list.length && key === ARROW_UP_KEY) {
+            _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus()
+          }
         }
 
         if (this._view === 'days') {
-          this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback(event.key))
+          this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback.bind(this, event.key))
         }
 
         if (this._view === 'months') {
-          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback(event.key))
+          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, 0, callback.bind(this, event.key))
         }
 
         if (this._view === 'years') {
-          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 10 : -10, callback(event.key))
+          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 10 : -10, 0, callback.bind(this, event.key))
         }
 
         return
@@ -463,7 +437,15 @@ class Calendar extends BaseComponent {
     for (const [selector, handler] of Object.entries(navigationSelectors)) {
       EventHandler.on(this._element, EVENT_CLICK_DATA_API, selector, event => {
         event.preventDefault()
+        const selectors = SelectorEngine.find(selector, this._element)
+        const selectorIndex = selectors.indexOf(event.target.closest(selector))
         handler()
+
+        // Retrieve focus to the navigation element
+        const _selectors = SelectorEngine.find(selector, this._element)
+        if (_selectors && _selectors[selectorIndex]) {
+          _selectors[selectorIndex].focus()
+        }
       })
     }
   }
@@ -735,12 +717,34 @@ class Calendar extends BaseComponent {
     this._element.classList.add(CLASS_NAME_CALENDARS)
   }
 
+  _initializeDates() {
+    // Convert dates to date objects based on the selection type
+    this._calendarDate = convertToDateObject(
+      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
+    )
+    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
+    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
+    this._hoverDate = null
+    this._selectEndDate = this._config.selectEndDate
+  }
+
+  _initializeView() {
+    const viewMap = {
+      day: 'days',
+      week: 'days',
+      month: 'months',
+      year: 'years'
+    }
+
+    this._view = viewMap[this._config.selectionType] || 'days'
+  }
+
   _updateCalendar(callback) {
     this._element.innerHTML = ''
     this._createCalendar()
 
     if (callback) {
-      callback()
+      setTimeout(callback, 1)
     }
   }
 
@@ -789,6 +793,13 @@ class Calendar extends BaseComponent {
         cell.removeAttribute('aria-selected')
       }
     }
+  }
+
+  _classNames(classNames) {
+    return Object.entries(classNames)
+      .filter(([_, value]) => Boolean(value))
+      .map(([key]) => key)
+      .join(' ')
   }
 
   _cellDayAttributes(date, month) {
