@@ -129,26 +129,8 @@ class Calendar extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
-    this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
-    )
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
-    this._hoverDate = null
-    this._selectEndDate = this._config.selectEndDate
-
-    if (this._config.selectionType === 'day' || this._config.selectionType === 'week') {
-      this._view = 'days'
-    }
-
-    if (this._config.selectionType === 'month') {
-      this._view = 'months'
-    }
-
-    if (this._config.selectionType === 'year') {
-      this._view = 'years'
-    }
-
+    this._initializeDates()
+    this._initializeView()
     this._createCalendar()
     this._addEventListeners()
   }
@@ -169,6 +151,17 @@ class Calendar extends BaseComponent {
   // Public
   update(config) {
     this._config = this._getConfig(config)
+    this._initializeDates()
+    this._initializeView()
+
+    // Clear the current calendar content
+    this._element.innerHTML = ''
+    this._createCalendar()
+  }
+
+  // Private
+  _initializeDates() {
+    // Convert dates to date objects based on the selection type
     this._calendarDate = convertToDateObject(
       this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
     )
@@ -176,24 +169,19 @@ class Calendar extends BaseComponent {
     this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
     this._hoverDate = null
     this._selectEndDate = this._config.selectEndDate
-
-    if (this._config.selectionType === 'day' || this._config.selectionType === 'week') {
-      this._view = 'days'
-    }
-
-    if (this._config.selectionType === 'month') {
-      this._view = 'months'
-    }
-
-    if (this._config.selectionType === 'year') {
-      this._view = 'years'
-    }
-
-    this._element.innerHTML = ''
-    this._createCalendar()
   }
 
-  // Private
+  _initializeView() {
+    const viewMap = {
+      day: 'days',
+      week: 'days',
+      month: 'months',
+      year: 'years'
+    }
+
+    this._view = viewMap[this._config.selectionType] || 'days'
+  }
+
   _getDate(target) {
     if (this._config.selectionType === 'week') {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW))
@@ -432,41 +420,35 @@ class Calendar extends BaseComponent {
     })
 
     // Navigation
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_PREV, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(0, -1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_DOUBLE_PREV, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(this._view === 'years' ? -10 : -1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_NEXT, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(0, 1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_DOUBLE_NEXT, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(this._view === 'years' ? 10 : 1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_MONTH, event => {
-      event.preventDefault()
-      this._view = 'months'
-      this._updateCalendar()
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_YEAR, event => {
-      event.preventDefault()
-      this._view = 'years'
-      this._updateCalendar()
-    })
+    this._addNavigationEventListeners()
 
     EventHandler.on(this._element, EVENT_MOUSELEAVE, 'table', () => {
       EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE)
     })
+  }
+
+  _addNavigationEventListeners() {
+    const navigationSelectors = {
+      [SELECTOR_BTN_PREV]: () => this._modifyCalendarDate(0, -1),
+      [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -10 : -1),
+      [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
+      [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
+      [SELECTOR_BTN_MONTH]: () => {
+        this._view = 'months'
+        this._updateCalendar()
+      },
+      [SELECTOR_BTN_YEAR]: () => {
+        this._view = 'years'
+        this._updateCalendar()
+      }
+    }
+
+    for (const [selector, handler] of Object.entries(navigationSelectors)) {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API, selector, event => {
+        event.preventDefault()
+        handler()
+      })
+    }
   }
 
   _setCalendarDate(date) {
