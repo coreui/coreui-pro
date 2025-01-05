@@ -357,7 +357,7 @@ class RangeSlider extends BaseComponent {
       }
     }
 
-    return null
+    return '1rem'
   }
 
   _positionTooltip(tooltip, input) {
