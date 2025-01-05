@@ -176,8 +176,6 @@ class LoadingButton extends BaseComponent {
  */
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
-  // commented because otherwise this won't trigger submit: <button type="submit" data-coreui-toggle="loading-button">Save</button>
-  //event.preventDefault()
   const button = event.target.closest(SELECTOR_DATA_TOGGLE)
   const data = LoadingButton.getOrCreateInstance(button)
 
