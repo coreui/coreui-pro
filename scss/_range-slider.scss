@@ -59,7 +59,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height));
+  height: unquote("max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height))");
 }
 
 .range-slider-track {
@@ -235,7 +235,7 @@
 
   .range-slider-inputs-container {
     justify-content: center;
-    width: max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width));
+    width: unquote("max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
     height: 100%;
   }
 
