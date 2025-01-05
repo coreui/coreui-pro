@@ -23,7 +23,13 @@ import {
   isDateInRange,
   isDateSelected,
   isDisableDateInRange,
-  isToday
+  isMonthDisabled,
+  isMonthInRange,
+  isMonthSelected,
+  isToday,
+  isYearDisabled,
+  isYearInRange,
+  isYearSelected
 } from './util/calendar.js'
 
 /**
@@ -60,6 +66,7 @@ const CLASS_NAME_CALENDAR_CELL = 'calendar-cell'
 const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner'
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row'
 const CLASS_NAME_CALENDARS = 'calendars'
+const CLASS_NAME_SHOW_WEEK_NUMBERS = 'show-week-numbers'
 
 const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next'
 const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev'
@@ -69,7 +76,9 @@ const SELECTOR_BTN_PREV = '.btn-prev'
 const SELECTOR_BTN_YEAR = '.btn-year'
 const SELECTOR_CALENDAR = '.calendar'
 const SELECTOR_CALENDAR_CELL = '.calendar-cell'
+const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`
 const SELECTOR_CALENDAR_ROW = '.calendar-row'
+const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 
 const Default = {
@@ -129,26 +138,8 @@ class Calendar extends BaseComponent {
     super(element)
 
     this._config = this._getConfig(config)
-    this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
-    )
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
-    this._hoverDate = null
-    this._selectEndDate = this._config.selectEndDate
-
-    if (this._config.selectionType === 'day' || this._config.selectionType === 'week') {
-      this._view = 'days'
-    }
-
-    if (this._config.selectionType === 'month') {
-      this._view = 'months'
-    }
-
-    if (this._config.selectionType === 'year') {
-      this._view = 'years'
-    }
-
+    this._initializeDates()
+    this._initializeView()
     this._createCalendar()
     this._addEventListeners()
   }
@@ -169,31 +160,23 @@ class Calendar extends BaseComponent {
   // Public
   update(config) {
     this._config = this._getConfig(config)
-    this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
-    )
-    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
-    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
-    this._hoverDate = null
-    this._selectEndDate = this._config.selectEndDate
+    this._initializeDates()
+    this._initializeView()
 
-    if (this._config.selectionType === 'day' || this._config.selectionType === 'week') {
-      this._view = 'days'
-    }
-
-    if (this._config.selectionType === 'month') {
-      this._view = 'months'
-    }
-
-    if (this._config.selectionType === 'year') {
-      this._view = 'years'
-    }
-
+    // Clear the current calendar content
     this._element.innerHTML = ''
     this._createCalendar()
   }
 
   // Private
+  _focusOnFirstAvailableCell() {
+    const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element)
+
+    if (cell) {
+      cell.focus()
+    }
+  }
+
   _getDate(target) {
     if (this._config.selectionType === 'week') {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW))
@@ -209,10 +192,6 @@ class Calendar extends BaseComponent {
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index')
 
-    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-      return
-    }
-
     if (this._view === 'days') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
     }
@@ -220,14 +199,19 @@ class Calendar extends BaseComponent {
     if (this._view === 'months' && this._config.selectionType !== 'month') {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
       this._view = 'days'
-      this._updateCalendar()
+      this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
       return
     }
 
     if (this._view === 'years' && this._config.selectionType !== 'year') {
       this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date)
       this._view = 'months'
-      this._updateCalendar()
+      this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
+      return
+    }
+
+    // Allow to change the calendarDate but not startDate or endDate
+    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -271,11 +255,11 @@ class Calendar extends BaseComponent {
       let element = event.target
 
       if (this._config.selectionType === 'week' && element.tabIndex === -1) {
-        element = element.closest('tr[tabindex="0"]')
+        element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE)
       }
 
       const list = SelectorEngine.find(
-        this._config.selectionType === 'week' ? 'tr[tabindex="0"]' : 'td[tabindex="0"]',
+        this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE,
         this._element
       )
 
@@ -302,40 +286,35 @@ class Calendar extends BaseComponent {
         (event.key === ARROW_UP_KEY && toBoundary.start < Math.abs(gap.ArrowUp))
       ) {
         const callback = key => {
-          setTimeout(() => {
-            const _list = SelectorEngine.find(
-              'td[tabindex="0"], tr[tabindex="0"]',
-              SelectorEngine.find('.calendar', this._element).pop()
-            )
+          const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element)
 
-            if (_list.length && key === ARROW_RIGHT_KEY) {
-              _list[0].focus()
-            }
+          if (_list.length && key === ARROW_RIGHT_KEY) {
+            _list[0].focus()
+          }
 
-            if (_list.length && key === ARROW_LEFT_KEY) {
-              _list[_list.length - 1].focus()
-            }
+          if (_list.length && key === ARROW_LEFT_KEY) {
+            _list[_list.length - 1].focus()
+          }
 
-            if (_list.length && key === ARROW_DOWN_KEY) {
-              _list[gap.ArrowDown - (list.length - index)].focus()
-            }
+          if (_list.length && key === ARROW_DOWN_KEY) {
+            _list[gap.ArrowDown - (list.length - index)].focus()
+          }
 
-            if (_list.length && key === ARROW_UP_KEY) {
-              _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus()
-            }
-          }, 0)
+          if (_list.length && key === ARROW_UP_KEY) {
+            _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus()
+          }
         }
 
         if (this._view === 'days') {
-          this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback(event.key))
+          this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback.bind(this, event.key))
         }
 
         if (this._view === 'months') {
-          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback(event.key))
+          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, 0, callback.bind(this, event.key))
         }
 
         if (this._view === 'years') {
-          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 10 : -10, callback(event.key))
+          this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 10 : -10, 0, callback.bind(this, event.key))
         }
 
         return
@@ -383,90 +362,92 @@ class Calendar extends BaseComponent {
   }
 
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarClick(event)
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarKeydown(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEENTER, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSELEAVE, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_FOCUS, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_BLUR, `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarClick(event)
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarKeydown(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEENTER, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_MOUSEENTER, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSELEAVE, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_MOUSELEAVE, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
-    EventHandler.on(this._element, EVENT_FOCUS, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, event => {
+    EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarMouseEnter(event)
     })
 
-    EventHandler.on(this._element, EVENT_BLUR, `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`, () => {
+    EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
       this._handleCalendarMouseLeave()
     })
 
     // Navigation
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_PREV, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(0, -1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_DOUBLE_PREV, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(this._view === 'years' ? -10 : -1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_NEXT, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(0, 1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_DOUBLE_NEXT, event => {
-      event.preventDefault()
-      this._modifyCalendarDate(this._view === 'years' ? 10 : 1)
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_MONTH, event => {
-      event.preventDefault()
-      this._view = 'months'
-      this._updateCalendar()
-    })
-
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_BTN_YEAR, event => {
-      event.preventDefault()
-      this._view = 'years'
-      this._updateCalendar()
-    })
+    this._addNavigationEventListeners()
 
     EventHandler.on(this._element, EVENT_MOUSELEAVE, 'table', () => {
       EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE)
     })
+  }
+
+  _addNavigationEventListeners() {
+    const navigationSelectors = {
+      [SELECTOR_BTN_PREV]: () => this._modifyCalendarDate(0, -1),
+      [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -10 : -1),
+      [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
+      [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
+      [SELECTOR_BTN_MONTH]: () => {
+        this._view = 'months'
+        this._updateCalendar()
+      },
+      [SELECTOR_BTN_YEAR]: () => {
+        this._view = 'years'
+        this._updateCalendar()
+      }
+    }
+
+    for (const [selector, handler] of Object.entries(navigationSelectors)) {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API, selector, event => {
+        event.preventDefault()
+        const selectors = SelectorEngine.find(selector, this._element)
+        const selectorIndex = selectors.indexOf(event.target.closest(selector))
+        handler()
+
+        // Retrieve focus to the navigation element
+        const _selectors = SelectorEngine.find(selector, this._element)
+        if (_selectors && _selectors[selectorIndex]) {
+          _selectors[selectorIndex].focus()
+        }
+      })
+    }
   }
 
   _setCalendarDate(date) {
@@ -618,14 +599,14 @@ class Calendar extends BaseComponent {
       <thead>
         <tr>
           ${this._config.showWeekNumber ?
-            `<th class="calendar-cell">
+            `<th class="${CLASS_NAME_CALENDAR_CELL}">
               <div class="calendar-header-cell-inner">
                ${this._config.weekNumbersLabel ?? ''}
               </div>
             </th>` : ''
           }
           ${weekDays.map(({ date }) => (
-            `<th class="calendar-cell" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
+            `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${date.toLocaleDateString(this._config.locale, { weekday: 'long' })}">
               <div class="calendar-header-cell-inner">
               ${typeof this._config.weekdayFormat === 'string' ?
                 date.toLocaleDateString(this._config.locale, { weekday: this._config.weekdayFormat }) :
@@ -645,49 +626,45 @@ class Calendar extends BaseComponent {
               `${calendarDate.getFullYear()}W${week.weekNumber}`,
             this._config.selectionType
           )
+          const rowAttributes = this._rowWeekAttributes(date)
           return (
             `<tr 
-              class="calendar-row ${this._config.selectionType === 'week' && this._sharedClassNames(date)}"
-              tabindex="${
-                this._config.selectionType === 'week' &&
-                week.days.some(day => day.month === 'current') &&
-                !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1
-              }"
-              ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
+              class="${rowAttributes.className}"
+              tabindex="${rowAttributes.tabIndex}"
+              ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
             >
               ${this._config.showWeekNumber ?
                 `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''
               }
-              ${week.days.map(({ date, month }) => (
-              month === 'current' || this._config.showAdjacementDays ?
-                `<td 
-                  class="calendar-cell ${this._dayClassNames(date, month)}"
-                  tabindex="${
-                    this._config.selectionType === 'day' &&
-                    (month === 'current' || this._config.selectAdjacementDays) &&
-                    !isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? 0 : -1
-                  }"
-                  ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
-                  data-coreui-date="${date}"
-                >
-                  <div class="calendar-cell-inner day">
-                    ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
-                  </div>
-                </td>` :
-                '<td></td>'
-            )).join('')}</tr>`
+              ${week.days.map(({ date, month }) => {
+                const cellAttributes = this._cellDayAttributes(date, month)
+                return month === 'current' || this._config.showAdjacementDays ?
+                  `<td 
+                    class="${cellAttributes.className}"
+                    tabindex="${cellAttributes.tabIndex}"
+                    ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                    data-coreui-date="${date}"
+                  >
+                    <div class="calendar-cell-inner day">
+                      ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
+                    </div>
+                  </td>` :
+                  '<td></td>'
+              }
+            ).join('')}</tr>`
           )
         }).join('') : ''}
         ${this._view === 'months' ? listOfMonths.map((row, index) => (
           `<tr>
             ${row.map((month, idx) => {
               const date = new Date(calendarDate.getFullYear(), (index * 3) + idx, 1)
+              const cellAttributes = this._cellMonthAttributes(date)
               return (
                 `<td
-                  class="calendar-cell ${this._sharedClassNames(date)}"
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
-                  tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
-                  ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
                   <div class="calendar-cell-inner month">
                     ${month}
@@ -701,12 +678,13 @@ class Calendar extends BaseComponent {
           `<tr>
             ${row.map(year => {
               const date = new Date(year, 0, 1)
+              const cellAttributes = this._cellYearAttributes(date)
               return (
                 `<td
-                  class="calendar-cell ${this._sharedClassNames(date)}"
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
-                  tabindex="${isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates) ? -1 : 0}"
-                  ${isDateSelected(date, this._startDate, this._endDate) ? 'aria-selected="true"' : ''}
                 >
                   <div class="calendar-cell-inner year">
                     ${year}
@@ -729,7 +707,7 @@ class Calendar extends BaseComponent {
     }
 
     if (this._config.showWeekNumber) {
-      this._element.classList.add('show-week-numbers')
+      this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS)
     }
 
     for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
@@ -739,12 +717,34 @@ class Calendar extends BaseComponent {
     this._element.classList.add(CLASS_NAME_CALENDARS)
   }
 
+  _initializeDates() {
+    // Convert dates to date objects based on the selection type
+    this._calendarDate = convertToDateObject(
+      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
+    )
+    this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
+    this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
+    this._hoverDate = null
+    this._selectEndDate = this._config.selectEndDate
+  }
+
+  _initializeView() {
+    const viewMap = {
+      day: 'days',
+      week: 'days',
+      month: 'months',
+      year: 'years'
+    }
+
+    this._view = viewMap[this._config.selectionType] || 'days'
+  }
+
   _updateCalendar(callback) {
     this._element.innerHTML = ''
     this._createCalendar()
 
     if (callback) {
-      callback()
+      setTimeout(callback, 1)
     }
   }
 
@@ -755,11 +755,12 @@ class Calendar extends BaseComponent {
       for (const row of rows) {
         const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row)
         const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'))
-        const classNames = this._sharedClassNames(date)
+        const rowAttributes = this._rowWeekAttributes(date)
 
-        row.className = `${CLASS_NAME_CALENDAR_ROW} ${classNames}`
+        row.className = rowAttributes.className
+        row.tabIndex = rowAttributes.tabIndex
 
-        if (isDateSelected(date, this._startDate, this._endDate)) {
+        if (rowAttributes.ariaSelected) {
           row.setAttribute('aria-selected', true)
         } else {
           row.removeAttribute('aria-selected')
@@ -769,15 +770,24 @@ class Calendar extends BaseComponent {
       return
     }
 
-    const cells = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL}[tabindex="0"]`, this._element)
+    const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element)
 
     for (const cell of cells) {
       const date = new Date(Manipulator.getDataAttribute(cell, 'date'))
-      const classNames = this._config.selectionType === 'day' ? this._dayClassNames(date, 'current') : this._sharedClassNames(date)
+      let cellAttributes
 
-      cell.className = `${CLASS_NAME_CALENDAR_CELL} ${classNames}`
+      if (this._view === 'days') {
+        cellAttributes = this._cellDayAttributes(date, 'current')
+      } else if (this._view === 'months') {
+        cellAttributes = this._cellMonthAttributes(date)
+      } else {
+        cellAttributes = this._cellYearAttributes(date)
+      }
 
-      if (isDateSelected(date, this._startDate, this._endDate)) {
+      cell.className = cellAttributes.className
+      cell.tabIndex = cellAttributes.tabIndex
+
+      if (cellAttributes.ariaSelected) {
         cell.setAttribute('aria-selected', true)
       } else {
         cell.removeAttribute('aria-selected')
@@ -785,56 +795,107 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _dayClassNames(date, month) {
-    const classNames = {
+  _classNames(classNames) {
+    return Object.entries(classNames)
+      .filter(([_, value]) => Boolean(value))
+      .map(([key]) => key)
+      .join(' ')
+  }
+
+  _cellDayAttributes(date, month) {
+    const isCurrentMonth = month === 'current'
+    const isDisabled = isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isSelected = isDateSelected(date, this._startDate, this._endDate)
+
+    const classNames = this._classNames({
+      [CLASS_NAME_CALENDAR_CELL]: true,
       ...(this._config.selectionType === 'day' && this._view === 'days' && {
-        clickable: month !== 'current' && this._config.selectAdjacementDays,
-        disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
-        range: month === 'current' && isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': month === 'current' &&
+        clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+        disabled: isDisabled,
+        range: isCurrentMonth && isDateInRange(date, this._startDate, this._endDate),
+        'range-hover': isCurrentMonth &&
           (this._hoverDate && this._selectEndDate ?
             isDateInRange(date, this._startDate, this._hoverDate) :
             isDateInRange(date, this._hoverDate, this._endDate)),
-        selected: isDateSelected(date, this._startDate, this._endDate)
+        selected: isSelected
       }),
       today: isToday(date),
       [month]: true
+    })
+
+    return {
+      className: classNames,
+      tabIndex: this._config.selectionType === 'day' &&
+        (isCurrentMonth || this._config.selectAdjacementDays) &&
+        !isDisabled ? 0 : -1,
+      ariaSelected: isSelected
     }
-
-    const result = {}
-
-    for (const key in classNames) {
-      if (classNames[key] === true) {
-        result[key] = true
-      }
-    }
-
-    return Object.keys(result).join(' ')
   }
 
-  _sharedClassNames(date) {
-    const classNames = {
-      disabled: isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates),
-      range: isDateInRange(date, this._startDate, this._endDate),
-      'range-hover': (
-          (this._config.selectionType === 'week' && this._view === 'days') ||
-          (this._config.selectionType === 'month' && this._view === 'months') ||
-          (this._config.selectionType === 'year' && this._view === 'years')
-        ) && (this._hoverDate && this._selectEndDate ?
-          isDateInRange(date, this._startDate, this._hoverDate) :
-          isDateInRange(date, this._hoverDate, this._endDate)),
-      selected: isDateSelected(date, this._startDate, this._endDate)
+  _cellMonthAttributes(date) {
+    const isDisabled = isMonthDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isSelected = isMonthSelected(date, this._startDate, this._endDate)
+
+    const classNames = this._classNames({
+      [CLASS_NAME_CALENDAR_CELL]: true,
+      disabled: isDisabled,
+      'range-hover': this._config.selectionType === 'month' &&
+        (this._hoverDate && this._selectEndDate ?
+          isMonthInRange(date, this._startDate, this._hoverDate) :
+          isMonthInRange(date, this._hoverDate, this._endDate)),
+      range: isMonthInRange(date, this._startDate, this._endDate),
+      selected: isSelected
+    })
+
+    return {
+      className: classNames,
+      tabIndex: isDisabled ? -1 : 0,
+      ariaSelected: isSelected
     }
+  }
 
-    const result = {}
+  _cellYearAttributes(date) {
+    const isDisabled = isYearDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isSelected = isYearSelected(date, this._startDate, this._endDate)
 
-    for (const key in classNames) {
-      if (classNames[key] === true) {
-        result[key] = true
-      }
+    const classNames = this._classNames({
+      [CLASS_NAME_CALENDAR_CELL]: true,
+      disabled: isDisabled,
+      'range-hover': this._config.selectionType === 'year' &&
+        (this._hoverDate && this._selectEndDate ?
+          isYearInRange(date, this._startDate, this._hoverDate) :
+          isYearInRange(date, this._hoverDate, this._endDate)),
+      range: isYearInRange(date, this._startDate, this._endDate),
+      selected: isSelected
+    })
+
+    return {
+      className: classNames,
+      tabIndex: isDisabled ? -1 : 0,
+      ariaSelected: isSelected
     }
+  }
 
-    return Object.keys(result).join(' ')
+  _rowWeekAttributes(date) {
+    const isDisabled = isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isSelected = isDateSelected(date, this._startDate, this._endDate)
+
+    const classNames = this._classNames({
+      [CLASS_NAME_CALENDAR_ROW]: true,
+      disabled: isDisabled,
+      range: this._config.selectionType === 'week' && isDateInRange(date, this._startDate, this._endDate),
+      'range-hover': this._config.selectionType === 'week' &&
+        (this._hoverDate && this._selectEndDate ?
+          isYearInRange(date, this._startDate, this._hoverDate) :
+          isYearInRange(date, this._hoverDate, this._endDate)),
+      selected: isSelected
+    })
+
+    return {
+      className: classNames,
+      tabIndex: this._config.selectionType === 'week' && !isDisabled ? 0 : -1,
+      ariaSelected: isSelected
+    }
   }
 
   // Static
