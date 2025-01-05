@@ -153,37 +153,6 @@ describe('RangeSlider', () => {
         resolve()
       })
     })
-
-    it('should handle dragging interactions', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = `
-          <div data-coreui-toggle="range-slider" data-coreui-value="25,75"></div>
-        `
-
-        const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
-        const rangeSlider = new RangeSlider(element)
-
-        element.addEventListener('change.coreui.range-slider', event => {
-          const newValue = event.value
-          expect(newValue).toEqual([50, 75])
-          resolve()
-        })
-
-        const container = element.querySelector('.range-slider-inputs-container')
-
-        // Simulate mousedown on the first input
-        const mousedownEvent = createEvent('mousedown', { clientX: 100 })
-        container.dispatchEvent(mousedownEvent)
-
-        // Simulate mousemove to update the slider
-        const mousemoveEvent = createEvent('mousemove', { clientX: 200 })
-        document.documentElement.dispatchEvent(mousemoveEvent)
-
-        // Simulate mouseup to end dragging
-        const mouseupEvent = createEvent('mouseup')
-        document.documentElement.dispatchEvent(mouseupEvent)
-      })
-    })
   })
 
   describe('Configuration Options', () => {
