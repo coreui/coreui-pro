@@ -1,7 +1,9 @@
 /* eslint-env jasmine */
 
 import Calendar from '../../src/calendar.js'
-import { getFixture, clearFixture, createEvent, jQueryMock } from '../helpers/fixture.js'
+import {
+  getFixture, clearFixture, createEvent, jQueryMock
+} from '../helpers/fixture.js'
 import EventHandler from '../../src/dom/event-handler.js'
 
 describe('Calendar', () => {
@@ -114,8 +116,8 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       const calendar = new Calendar(div)
 
-      calendar.update({ 
-        showWeekNumber: true 
+      calendar.update({
+        showWeekNumber: true
       })
 
       expect(calendar._config.showWeekNumber).toBeTrue()
