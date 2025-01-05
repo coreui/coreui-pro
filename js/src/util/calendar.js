@@ -1,15 +1,23 @@
+/**
+ * Converts an ISO week string to a Date object representing the Monday of that week.
+ * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
+ * @returns The Date object for the Monday of the specified week, or null if invalid.
+ */
 export const convertIsoWeekToDate = isoWeek => {
-  const [year, week] = isoWeek.split(/w/i)
-  // Get date for 4th of January for year
-  const date = new Date(Number(year), 0, 4)
-  // Get previous Monday, add 7 days for each week after first
+  const [year, week] = isoWeek.split(/[Ww]/)
+  const date = new Date(Number(year), 0, 4) // 4th Jan is always in week 1
   date.setDate(
-    // eslint-disable-next-line no-mixed-operators
-    date.getDate() - (date.getDay() || 7) + 1 + (Number(week) - 1) * 7
+    date.getDate() - (date.getDay() || 7) + 1 + ((Number(week) - 1) * 7)
   )
   return date
 }
 
+/**
+ * Converts a date string or Date object to a Date object based on selection type.
+ * @param date - The date to convert.
+ * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
+ * @returns The corresponding Date object or null if invalid.
+ */
 export const convertToDateObject = (date, selectionType) => {
   if (date === null) {
     return null
@@ -32,12 +40,12 @@ export const convertToDateObject = (date, selectionType) => {
   return new Date(Date.parse(date))
 }
 
-export const convertToLocalDate = (d, locale, options = {}) =>
-  d.toLocaleDateString(locale, options)
-
-export const convertToLocalTime = (d, locale, options = {}) =>
-  d.toLocaleTimeString(locale, options)
-
+/**
+ * Creates groups from an array.
+ * @param arr - The array to group.
+ * @param numberOfGroups - Number of groups to create.
+ * @returns An array of grouped arrays.
+ */
 export const createGroupsInArray = (arr, numberOfGroups) => {
   const perGroup = Math.ceil(arr.length / numberOfGroups)
   return Array.from({ length: numberOfGroups })
@@ -45,26 +53,47 @@ export const createGroupsInArray = (arr, numberOfGroups) => {
     .map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup))
 }
 
+/**
+ * Adjusts the calendar date based on order and view type.
+ * @param calendarDate - The current calendar date.
+ * @param order - The order to adjust by.
+ * @param view - The current view type.
+ * @returns The adjusted Date object.
+ */
 export const getCalendarDate = (calendarDate, order, view) => {
   if (order !== 0 && view === 'days') {
-    return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1)
+    return new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth() + order,
+      1
+    )
   }
 
   if (order !== 0 && view === 'months') {
-    return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1)
+    return new Date(
+      calendarDate.getFullYear() + order,
+      calendarDate.getMonth(),
+      1
+    )
   }
 
   if (order !== 0 && view === 'years') {
-    return new Date(calendarDate.getFullYear() + (12 * order), calendarDate.getMonth(), 1)
+    return new Date(
+      calendarDate.getFullYear() + (12 * order),
+      calendarDate.getMonth(),
+      1
+    )
   }
 
   return calendarDate
 }
 
-export const getCurrentYear = () => new Date().getFullYear()
-
-export const getCurrentMonth = () => new Date().getMonth()
-
+/**
+ * Formats a date based on the selection type.
+ * @param date - The date to format.
+ * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
+ * @returns A formatted date string or the original Date object.
+ */
 export const getDateBySelectionType = (date, selectionType) => {
   if (date === null) {
     return null
@@ -86,35 +115,89 @@ export const getDateBySelectionType = (date, selectionType) => {
   return date
 }
 
-export const getMonthName = (month, locale) => {
-  const d = new Date()
-  d.setDate(1)
-  d.setMonth(month)
-  return d.toLocaleString(locale, { month: 'long' })
-}
+/**
+ * Retrieves the first available date within a range that is not disabled.
+ * @param startDate - Start date of the range.
+ * @param endDate - End date of the range.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns The first available Date object or null if none found.
+ */
+export const getFirstAvailableDateInRange = (
+  startDate,
+  endDate,
+  min,
+  max,
+  disabledDates
+) => {
+  const _min = min ?
+    new Date(Math.max(startDate.getTime(), min.getTime())) :
+    startDate
+  const _max = max ?
+    new Date(Math.min(endDate.getTime(), max.getTime())) :
+    endDate
 
-export const getMonthsNames = locale => {
-  const months = []
-  const d = new Date()
-  d.setDate(1)
-
-  for (let i = 0; i < 12; i++) {
-    d.setMonth(i)
-    months.push(d.toLocaleString(locale, { month: 'short' }))
+  if (disabledDates === undefined) {
+    return _min
   }
 
-  return months
-}
-
-export const getYears = year => {
-  const years = []
-  for (let _year = year - 6; _year < year + 6; _year++) {
-    years.push(_year)
+  for (
+    const currentDate = new Date(_min);
+    // eslint-disable-next-line no-unmodified-loop-condition
+    currentDate <= _max;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return currentDate
+    }
   }
 
-  return years
+  return null
 }
 
+/**
+ * Retrieves an array of month names based on locale and format.
+ * @param locale - The locale string (e.g., 'en-US').
+ * @param format - The format of the month names ('short' or 'long').
+ * @returns An array of month names.
+ */
+export const getMonthsNames = (locale, format = 'short') => {
+  return Array.from({ length: 12 }, (_, i) => {
+    return new Date(2000, i, 1).toLocaleString(locale, { month: format })
+  })
+}
+
+/**
+ * Retrieves an array of selectable dates from the given element.
+ * @param element - The HTML element to search for selectable dates.
+ * @param selector - The CSS selector used to identify selectable dates. Defaults to 'tr[tabindex="0"], td[tabindex="0"]'.
+ * @returns An array of HTMLElements representing the selectable dates.
+ */
+export const getSelectableDates = (
+  element,
+  selector = 'tr[tabindex="0"], td[tabindex="0"]'
+) => {
+  return [...Element.prototype.querySelectorAll.call(element, selector)]
+}
+
+/**
+ * Generates an array of years centered around a given year.
+ * @param year - The central year.
+ * @param range - The number of years before and after the central year.
+ * @returns An array of years.
+ */
+export const getYears = (year, range = 6) => {
+  return Array.from({ length: range * 2 }, (_, i) => year - range + i)
+}
+
+/**
+ * Retrieves leading days (from the previous month) for a calendar view.
+ * @param year - The year.
+ * @param month - The month (0-11).
+ * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
+ * @returns An array of leading day objects.
+ */
 const getLeadingDays = (year, month, firstDayOfWeek) => {
   // 0: sunday
   // 1: monday
@@ -139,6 +222,12 @@ const getLeadingDays = (year, month, firstDayOfWeek) => {
   return dates
 }
 
+/**
+ * Retrieves all days within a specific month.
+ * @param year - The year.
+ * @param month - The month (0-11).
+ * @returns An array of day objects.
+ */
 const getMonthDays = (year, month) => {
   const dates = []
   const lastDay = new Date(year, month + 1, 0).getDate()
@@ -152,6 +241,14 @@ const getMonthDays = (year, month) => {
   return dates
 }
 
+/**
+ * Retrieves trailing days (from the next month) for a calendar view.
+ * @param year - The year.
+ * @param month - The month (0-11).
+ * @param leadingDays - Array of leading day objects.
+ * @param monthDays - Array of current month day objects.
+ * @returns An array of trailing day objects.
+ */
 const getTrailingDays = (year, month, leadingDays, monthDays) => {
   const dates = []
   const days = 42 - (leadingDays.length + monthDays.length)
@@ -165,53 +262,34 @@ const getTrailingDays = (year, month, leadingDays, monthDays) => {
   return dates
 }
 
-export const getDayNumber = date =>
-  Math.ceil((Number(date) - Number(new Date(date.getFullYear(), 0, 0))) / 1000 / 60 / 60 / 24)
-
-export const getLocalDateFromString = (string, locale, time) => {
-  const date = new Date(2013, 11, 31, 17, 19, 22)
-  let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale)
-  regex = regex
-        .replace('2013', '(?<year>[0-9]{2,4})')
-        .replace('12', '(?<month>[0-9]{1,2})')
-        .replace('31', '(?<day>[0-9]{1,2})')
-  if (time) {
-    regex = regex
-            .replace('5', '(?<hour>[0-9]{1,2})')
-            .replace('17', '(?<hour>[0-9]{1,2})')
-            .replace('19', '(?<minute>[0-9]{1,2})')
-            .replace('22', '(?<second>[0-9]{1,2})')
-            .replace('PM', '(?<ampm>[A-Z]{2})')
-  }
-
-  const rgx = new RegExp(`${regex}`)
-  const partials = string.match(rgx)
-  if (partials === null) {
-    return
-  }
-
-  const newDate = partials.groups &&
-        (time ?
-          new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ?
-            (partials.groups.ampm === 'PM' ?
-              Number(partials.groups.hour) + 12 :
-              Number(partials.groups.hour)) :
-            Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) :
-          new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)))
-  return newDate
-}
-
+/**
+ * Calculates the ISO week number for a given date.
+ * @param date - The date to calculate the week number for.
+ * @returns The ISO week number.
+ */
 export const getWeekNumber = date => {
-  const week1 = new Date(date.getFullYear(), 0, 4)
-  return (
-    1 +
-    Math.round(
-      // eslint-disable-next-line no-mixed-operators
-      ((date.getTime() - week1.getTime()) / 86_400_000 - 3 + ((week1.getDay() + 6) % 7)) / 7
-    )
-  )
+  const tempDate = new Date(date.getTime())
+  tempDate.setHours(0, 0, 0, 0)
+
+  // Thursday in current week decides the year
+  tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7))
+
+  const week1 = new Date(tempDate.getFullYear(), 0, 4)
+
+  // Calculate full weeks to the date
+  const weekNumber =
+    1 + Math.round((tempDate.getTime() - week1.getTime()) / 86_400_000 / 7)
+
+  return weekNumber
 }
 
+/**
+ * Retrieves detailed information about each week in a month for calendar rendering.
+ * @param year - The year.
+ * @param month - The month (0-11).
+ * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
+ * @returns An array of week objects containing week numbers and day details.
+ */
 export const getMonthDetails = (year, month, firstDayOfWeek) => {
   const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek)
   const daysThisMonth = getMonthDays(year, month)
@@ -241,26 +319,14 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   return weeks
 }
 
-export const isDisableDateInRange = (startDate, endDate, disabledDates) => {
-  if (startDate && endDate) {
-    const date = new Date(startDate)
-    let disabled = false
-
-    // eslint-disable-next-line no-unmodified-loop-condition
-    while (date < endDate) {
-      date.setDate(date.getDate() + 1)
-      if (isDateDisabled(date, null, null, disabledDates)) {
-        disabled = true
-        break
-      }
-    }
-
-    return disabled
-  }
-
-  return false
-}
-
+/**
+ * Checks if a date is disabled based on the 'date' period type.
+ * @param date - The date to check.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if the date is disabled, false otherwise.
+ */
 export const isDateDisabled = (date, min, max, disabledDates) => {
   if (min && date < min) {
     return true
@@ -268,6 +334,10 @@ export const isDateDisabled = (date, min, max, disabledDates) => {
 
   if (max && date > max) {
     return true
+  }
+
+  if (disabledDates === undefined) {
+    return false
   }
 
   if (typeof disabledDates === 'function') {
@@ -297,32 +367,160 @@ export const isDateDisabled = (date, min, max, disabledDates) => {
   return false
 }
 
+/**
+ * Checks if a date is within a specified range.
+ * @param date - The date to check.
+ * @param start - Start date of the range.
+ * @param end - End date of the range.
+ * @returns True if the date is within the range, false otherwise.
+ */
 export const isDateInRange = (date, start, end) => {
   const _date = removeTimeFromDate(date)
   const _start = start ? removeTimeFromDate(start) : null
   const _end = end ? removeTimeFromDate(end) : null
 
-  return _start && _end && _start <= _date && _date <= _end
+  return Boolean(_start && _end && _start <= _date && _date <= _end)
 }
 
+/**
+ * Checks if a date is selected based on start and end dates.
+ * @param date - The date to check.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the date is selected, false otherwise.
+ */
 export const isDateSelected = (date, start, end) => {
-  return (
-    (start && isSameDateAs(start, date)) || (end && isSameDateAs(end, date))
-  )
+  if (start !== null && isSameDateAs(start, date)) {
+    return true
+  }
+
+  if (end !== null && isSameDateAs(end, date)) {
+    return true
+  }
+
+  return false
 }
 
-export const isEndDate = (date, start, end) => {
-  return start && end && isSameDateAs(end, date) && start < end
+/**
+ * Determines if any date within a range is disabled.
+ * @param startDate - Start date of the range.
+ * @param endDate - End date of the range.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if any date in the range is disabled, false otherwise.
+ */
+export const isDisableDateInRange = (startDate, endDate, disabledDates) => {
+  if (startDate && endDate) {
+    const date = new Date(startDate)
+    let disabled = false
+
+    // eslint-disable-next-line no-unmodified-loop-condition
+    while (date < endDate) {
+      date.setDate(date.getDate() + 1)
+      if (isDateDisabled(date, null, null, disabledDates)) {
+        disabled = true
+        break
+      }
+    }
+
+    return disabled
+  }
+
+  return false
 }
 
-export const isLastDayOfMonth = date => {
-  const test = new Date(date.getTime())
-  const month = test.getMonth()
+/**
+ * Checks if a month is disabled based on the 'month' period type.
+ * @param date - The date representing the month to check.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if the month is disabled, false otherwise.
+ */
+export const isMonthDisabled = (date, min, max, disabledDates) => {
+  const current = (date.getFullYear() * 12) + date.getMonth()
+  const _min = min ? (min.getFullYear() * 12) + min.getMonth() : null
+  const _max = max ? (max.getFullYear() * 12) + max.getMonth() : null
 
-  test.setDate(test.getDate() + 1)
-  return test.getMonth() !== month
+  if (_min && current < _min) {
+    return true
+  }
+
+  if (_max && current > _max) {
+    return true
+  }
+
+  if (disabledDates === undefined) {
+    return false
+  }
+
+  const start = min ? Math.max(date.getTime(), min.getTime()) : date
+  const end = max ?
+    Math.min(date.getTime(), max.getTime()) :
+    new Date(new Date().getFullYear(), 11, 31)
+
+  for (
+    const currentDate = new Date(start);
+    // eslint-disable-next-line no-unmodified-loop-condition
+    currentDate <= end;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false
+    }
+  }
+
+  return false
 }
 
+/**
+ * Checks if a month is selected based on start and end dates.
+ * @param date - The date representing the month.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the month is selected, false otherwise.
+ */
+export const isMonthSelected = (date, start, end) => {
+  const year = date.getFullYear()
+  const month = date.getMonth()
+
+  if (
+    start !== null &&
+    year === start.getFullYear() &&
+    month === start.getMonth()
+  ) {
+    return true
+  }
+
+  if (end !== null && year === end.getFullYear() && month === end.getMonth()) {
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Checks if a month is within a specified range.
+ * @param date - The date representing the month.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the month is within the range, false otherwise.
+ */
+export const isMonthInRange = (date, start, end) => {
+  const year = date.getFullYear()
+  const month = date.getMonth()
+  const _start = start ? (start.getFullYear() * 12) + start.getMonth() : null
+  const _end = end ? (end.getFullYear() * 12) + end.getMonth() : null
+  const _date = (year * 12) + month
+
+  return Boolean(_start && _end && _start <= _date && _date <= _end)
+}
+
+/**
+ * Checks if two dates are the same calendar date.
+ * @param date - First date.
+ * @param date2 - Second date.
+ * @returns True if both dates are the same, false otherwise.
+ */
 export const isSameDateAs = (date, date2) => {
   if (date instanceof Date && date2 instanceof Date) {
     return (
@@ -339,23 +537,103 @@ export const isSameDateAs = (date, date2) => {
   return false
 }
 
-export const isStartDate = (date, start, end) => {
-  return start && end && isSameDateAs(start, date) && start < end
-}
-
+/**
+ * Checks if a date is today.
+ * @param date - The date to check.
+ * @returns True if the date is today, false otherwise.
+ */
 export const isToday = date => {
   const today = new Date()
-  return (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  )
+  return isSameDateAs(date, today)
 }
 
-export const isValidDate = date => {
-  const d = new Date(date)
-  return d instanceof Date && d.getTime()
+/**
+ * Checks if a year is disabled based on the 'year' period type.
+ * @param date - The date representing the year to check.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if the year is disabled, false otherwise.
+ */
+export const isYearDisabled = (date, min, max, disabledDates) => {
+  const year = date.getFullYear()
+  const minYear = min ? min.getFullYear() : null
+  const maxYear = max ? max.getFullYear() : null
+
+  if (minYear && year < minYear) {
+    return true
+  }
+
+  if (maxYear && year > maxYear) {
+    return true
+  }
+
+  if (disabledDates === undefined) {
+    return false
+  }
+
+  const start = min ? Math.max(date.getTime(), min.getTime()) : date
+  const end = max ?
+    Math.min(date.getTime(), max.getTime()) :
+    new Date(new Date().getFullYear(), 11, 31)
+
+  for (
+    const currentDate = new Date(start);
+    // eslint-disable-next-line no-unmodified-loop-condition
+    currentDate <= end;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false
+    }
+  }
+
+  return false
 }
 
-export const removeTimeFromDate = date =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate())
+/**
+ * Checks if a year is selected based on start and end dates.
+ * @param date - The date representing the year.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the year matches the start's or end's year, false otherwise.
+ */
+export const isYearSelected = (date, start, end) => {
+  const year = date.getFullYear()
+
+  if (start !== null && year === start.getFullYear()) {
+    return true
+  }
+
+  if (end !== null && year === end.getFullYear()) {
+    return true
+  }
+
+  return false
+}
+
+/**
+ * Checks if a year is within a specified range.
+ * @param date - The date representing the year.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the year's value lies between start's year and end's year, false otherwise.
+ */
+export const isYearInRange = (date, start, end) => {
+  const year = date.getFullYear()
+  const _start = start ? start.getFullYear() : null
+  const _end = end ? end.getFullYear() : null
+
+  return Boolean(_start && _end && _start <= year && year <= _end)
+}
+
+/**
+ * Removes the time component from a Date object.
+ * @param date - The original date.
+ * @returns A new Date object with the time set to 00:00:00.
+ */
+export const removeTimeFromDate = date => {
+  const clearedDate = new Date(date)
+  clearedDate.setHours(0, 0, 0, 0)
+  return clearedDate
+}

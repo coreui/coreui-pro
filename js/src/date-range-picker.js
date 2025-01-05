@@ -13,7 +13,8 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
-import { convertToDateObject, getLocalDateFromString } from './util/calendar.js'
+import { convertToDateObject } from './util/calendar.js'
+import { getLocalDateFromString } from './util/date-range-picker.js'
 
 /**
  * Constants
