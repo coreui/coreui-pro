@@ -920,11 +920,11 @@ class Calendar extends BaseComponent {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (typeof data[config] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](this)
+      data[config]()
     })
   }
 }
