@@ -189,5 +189,5 @@ export const isAmPm = locale =>
  */
 export const isValidTime = time => {
   const d = new Date(`1970-01-01 ${time}`)
-  return d instanceof Date && d.getTime()
+  return d instanceof Date && !Number.isNaN(d.getTime())
 }
