@@ -2,7 +2,7 @@
 import EventHandler from '../../src/dom/event-handler.js'
 import RangeSlider from '../../src/range-slider.js'
 import {
-  clearFixture, createEvent, getFixture, jQueryMock
+  clearFixture, getFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('RangeSlider', () => {
