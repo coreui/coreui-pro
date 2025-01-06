@@ -1,5 +1,5 @@
 /*!
-  * CoreUI range-slider.js v5.8.1 (https://coreui.io)
+  * CoreUI range-slider.js v5.9.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -309,7 +309,7 @@
           unit: match[2] || null
         };
       }
-      return null;
+      return '1rem';
     }
     _positionTooltip(tooltip, input) {
       const thumbSize = this._thumbSize;

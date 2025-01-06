@@ -1,13 +1,13 @@
 /*!
-  * CoreUI date-range-picker.js v5.8.1 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.9.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar));
-})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/date-range-picker.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar', './util/date-range-picker'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar, global.DateRangePicker));
+})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js, dateRangePicker_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -731,7 +731,7 @@
       if (!str) {
         return null;
       }
-      return this._config.inputDateParse ? this._config.inputDateParse(str) : calendar_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+      return this._config.inputDateParse ? this._config.inputDateParse(str) : dateRangePicker_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
     }
     _formatDate(date) {
       if (!date) {

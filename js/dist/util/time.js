@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time.js v5.8.1 (https://coreui.io)
+  * CoreUI time.js v5.9.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -161,7 +161,7 @@
    */
   const isValidTime = time => {
     const d = new Date(`1970-01-01 ${time}`);
-    return d instanceof Date && d.getTime();
+    return d instanceof Date && !Number.isNaN(d.getTime());
   };
 
   exports.convert12hTo24h = convert12hTo24h;
