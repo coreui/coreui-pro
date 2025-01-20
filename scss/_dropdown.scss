@@ -91,7 +91,7 @@
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
     .dropdown-menu#{$infix}-start {
-      --cui-position: start;
+      --#{$prefix}position: start;
 
       &[data-coreui-popper] {
         @include ltr-rtl("right", auto);
@@ -100,7 +100,7 @@
     }
 
     .dropdown-menu#{$infix}-end {
-      --cui-position: end;
+      --#{$prefix}position: end;
 
       &[data-coreui-popper] {
         @include ltr-rtl("right", 0);

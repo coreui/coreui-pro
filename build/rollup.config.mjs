@@ -22,12 +22,10 @@ const plugins = [
     babelHelpers: 'bundled'
   }),
   BOOTSTRAP && replace({
-    preventAssignment: true,
+    preventAssignment: false,
     delimiters: ['', ''],
     '/coreui': '/coreui', // prevents changes in URLs
-    coreui: 'bs',
-    '-coreui': '-bs',
-    'coreui=': 'bs=', // [data-coreui="navigation"] => [data-bs="navigation"] (workaround for `preventAssignment` being true),
+    'coreui': 'bs',
     '--cui-': '--bs-'
   })
 ]
