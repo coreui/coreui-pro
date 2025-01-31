@@ -1,3 +1,13 @@
+@use "sass:map";
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/breakpoints" as *;
+@use "mixins/caret" as *;
+@use "mixins/gradients" as *;
+@use "mixins/ltr-rtl" as *;
+@use "vendor/rfs" as *;
+@use "variables" as *;
+
 // The dropdown wrapper (`<div>`)
 .dropup,
 .dropend,
@@ -63,7 +73,7 @@
   @include box-shadow(var(--#{$prefix}dropdown-box-shadow));
   @include elevation(4);
 
-  &[data-coreui-popper] {
+  &[data#{$data-infix}popper] {
     top: 100%;
     @include ltr-rtl("left", 0);
     margin-top: var(--#{$prefix}dropdown-spacer);
@@ -86,23 +96,23 @@
 // We deliberately hardcode the `cui-` prefix because we check
 // this custom property in JS to determine Popper's positioning
 
-@each $breakpoint in map-keys($grid-breakpoints) {
+@each $breakpoint in map.keys($grid-breakpoints) {
   @include media-breakpoint-up($breakpoint) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
     .dropdown-menu#{$infix}-start {
-      --cui-position: start;
+      --#{$prefix}position: start;
 
-      &[data-coreui-popper] {
+      &[data#{$data-infix}popper] {
         @include ltr-rtl("right", auto);
         @include ltr-rtl("left", 0);
       }
     }
 
     .dropdown-menu#{$infix}-end {
-      --cui-position: end;
+      --#{$prefix}position: end;
 
-      &[data-coreui-popper] {
+      &[data#{$data-infix}popper] {
         @include ltr-rtl("right", 0);
         @include ltr-rtl("left", auto);
       }
@@ -114,7 +124,7 @@
 // Allow for dropdowns to go bottom up (aka, dropup-menu)
 // Just add .dropup after the standard .dropdown class and you're set.
 .dropup {
-  .dropdown-menu[data-coreui-popper] {
+  .dropdown-menu[data#{$data-infix}popper] {
     top: auto;
     bottom: 100%;
     margin-top: 0;
@@ -127,7 +137,7 @@
 }
 
 .dropend {
-  .dropdown-menu[data-coreui-popper] {
+  .dropdown-menu[data#{$data-infix}popper] {
     top: 0;
     @include ltr-rtl("right", auto);
     @include ltr-rtl("left", 100%);
@@ -144,7 +154,7 @@
 }
 
 .dropstart {
-  .dropdown-menu[data-coreui-popper] {
+  .dropdown-menu[data#{$data-infix}popper] {
     top: 0;
     @include ltr-rtl("right", 100%);
     @include ltr-rtl("left", auto);
