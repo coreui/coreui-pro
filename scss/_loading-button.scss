@@ -1,3 +1,7 @@
+@use "mixins/ltr-rtl" as *;
+@use "mixins/transition" as *;
+@use "variables" as *;
+
 //
 // Loading button
 //

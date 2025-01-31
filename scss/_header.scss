@@ -1,6 +1,7 @@
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/breakpoints" as *;
+@use "mixins/elevation" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
 @use "vendor/rfs" as *;

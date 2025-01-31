@@ -1,4 +1,10 @@
 // stylelint-disable selector-max-class
+@use "functions/escape-svg" as *;
+@use "mixins/breakpoints" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/ltr-rtl" as *;
+@use "mixins/transition" as *;
+@use "variables" as *;
 
 .calendar {
   // scss-docs-start calendar-css-vars

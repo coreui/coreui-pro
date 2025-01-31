@@ -1,3 +1,5 @@
+@use "../variables" as *;
+
 @mixin elevation($value, $exclude: null) {
   @if $enable-elevations {
     box-shadow: map-get($elevations, $value);

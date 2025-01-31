@@ -1,3 +1,11 @@
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/gradients" as *;
+@use "mixins/ltr-rtl" as *;
+@use "mixins/transition" as *;
+@use "vendor/rfs" as *;
+@use "variables" as *;
+
 .range-slider {
   // scss-docs-start range-slider-css-vars
   --#{$prefix}range-slider-track-width: #{$range-slider-track-width};
