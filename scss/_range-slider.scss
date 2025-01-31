@@ -1,3 +1,4 @@
+@use "sass:string";
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/gradients" as *;
@@ -67,7 +68,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: unquote("max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height))");
+  height: string.unquote("max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height))");
 }
 
 .range-slider-track {
@@ -243,7 +244,7 @@
 
   .range-slider-inputs-container {
     justify-content: center;
-    width: unquote("max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
+    width: string.unquote("max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
     height: 100%;
   }
 

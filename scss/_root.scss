@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "sass:meta";
 @use "functions/color" as *;
 @use "functions/to-rgb" as *;
@@ -47,8 +48,8 @@
   --#{$prefix}black-rgb: #{to-rgb($black)};
 
   @each $color, $value in $theme-gradients {
-    --#{$prefix}#{$color}-start: #{map-get($value, "start")};
-    --#{$prefix}#{$color}-stop: #{map-get($value, "stop")};
+    --#{$prefix}#{$color}-start: #{map.get($value, "start")};
+    --#{$prefix}#{$color}-stop: #{map.get($value, "stop")};
   }
 
   // Fonts
@@ -224,8 +225,8 @@
     }
 
     @each $color, $value in $theme-gradients-dark {
-      --#{$prefix}#{$color}-start: #{map-get($value, "start")};
-      --#{$prefix}#{$color}-stop: #{map-get($value, "stop")};
+      --#{$prefix}#{$color}-start: #{map.get($value, "start")};
+      --#{$prefix}#{$color}-stop: #{map.get($value, "stop")};
     }
 
     --#{$prefix}heading-color: #{$headings-color-dark};
