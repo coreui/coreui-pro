@@ -1,4 +1,4 @@
-/* eslint-disable complexity, indent, multiline-ternary */
+/* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO calendar.js
