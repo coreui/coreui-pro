@@ -21,11 +21,10 @@ $utilities: map.merge(
       responsive: true,
       property: float,
       values: (
-        start: left,
-        end: right,
+        start: inline-start,
+        end: inline-end,
         none: none,
       ),
-      rtl: true
     ),
     // scss-docs-end utils-float
     // Object Fit utilities
@@ -119,16 +118,14 @@ $utilities: map.merge(
       values: $position-values
     ),
     "start": (
-      property: left,
+      property: inset-inline-start,
       class: start,
-      values: $position-values,
-      rtl: true
+      values: $position-values
     ),
     "end": (
-      property: right,
+      property: inset-inline-end,
       class: end,
-      values: $position-values,
-      rtl: true
+      values: $position-values
     ),
     "translate-middle": (
       property: transform,
@@ -157,13 +154,12 @@ $utilities: map.merge(
       )
     ),
     "border-end": (
-      property: border-right,
+      property: border-inline-end,
       class: border-end,
       values: (
         null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
         0: 0,
       ),
-      rtl: true
     ),
     "border-bottom": (
       property: border-bottom,
@@ -173,13 +169,12 @@ $utilities: map.merge(
       )
     ),
     "border-start": (
-      property: border-left,
+      property: border-inline-start,
       class: border-start,
       values: (
         null: var(--#{$prefix}border-width) var(--#{$prefix}border-style) var(--#{$prefix}border-color),
         0: 0,
       ),
-      rtl: true
     ),
     "border-color": (
       property: border-color,
@@ -196,11 +191,10 @@ $utilities: map.merge(
       vars: true
     ),
     "border-end-color": (
-      property: border-right-color,
+      property: border-inline-end-color,
       class: border-end,
       values: map.merge($theme-colors, ("white": $white)),
       vars: true,
-      rtl: true
     ),
     "border-bottom-color": (
       property: border-bottom-color,
@@ -209,11 +203,10 @@ $utilities: map.merge(
       vars: true
     ),
     "border-start-color": (
-      property: border-left-color,
+      property: border-inline-start-color,
       class: border-start,
       values: map.merge($theme-colors, ("white": $white)),
       vars: true,
-      rtl: true
     ),
     "border-width": (
       property: border-width,
@@ -226,10 +219,9 @@ $utilities: map.merge(
       values: $border-widths
     ),
     "border-end-width": (
-      property: border-right-width,
+      property: border-inline-end-width,
       class: border-end,
       values: $border-widths,
-      rtl: true
     ),
     "border-bottom-width": (
       property: border-bottom-width,
@@ -237,10 +229,9 @@ $utilities: map.merge(
       values: $border-widths
     ),
     "border-start-width": (
-      property: border-left-width,
+      property: border-inline-start-width,
       class: border-start,
       values: $border-widths,
-      rtl: true
     ),
     "subtle-border-color": (
       property: border-color,
@@ -441,10 +432,9 @@ $utilities: map.merge(
     ),
     "margin-end": (
       responsive: true,
-      property: margin-right,
+      property: margin-inline-end,
       class: me,
       values: map.merge($spacers, (auto: auto)),
-      rtl: true
     ),
     "margin-bottom": (
       responsive: true,
@@ -454,10 +444,9 @@ $utilities: map.merge(
     ),
     "margin-start": (
       responsive: true,
-      property: margin-left,
+      property: margin-inline-start,
       class: ms,
       values: map.merge($spacers, (auto: auto)),
-      rtl: true
     ),
     // Negative margin utilities
     "negative-margin": (
@@ -486,10 +475,9 @@ $utilities: map.merge(
     ),
     "negative-margin-end": (
       responsive: true,
-      property: margin-right,
+      property: margin-inline-end,
       class: me,
-      values: $negative-spacers,
-      rtl: true
+      values: $negative-spacers
     ),
     "negative-margin-bottom": (
       responsive: true,
@@ -499,10 +487,9 @@ $utilities: map.merge(
     ),
     "negative-margin-start": (
       responsive: true,
-      property: margin-left,
+      property: margin-inline-start,
       class: ms,
-      values: $negative-spacers,
-      rtl: true
+      values: $negative-spacers
     ),
     // Padding utilities
     "padding": (
@@ -531,10 +518,9 @@ $utilities: map.merge(
     ),
     "padding-end": (
       responsive: true,
-      property: padding-right,
+      property: padding-inline-end,
       class: pe,
-      values: $spacers,
-      rtl: true
+      values: $spacers
     ),
     "padding-bottom": (
       responsive: true,
@@ -544,10 +530,9 @@ $utilities: map.merge(
     ),
     "padding-start": (
       responsive: true,
-      property: padding-left,
+      property: padding-inline-start,
       class: ps,
-      values: $spacers,
-      rtl: true
+      values: $spacers
     ),
     // Gap utility
     "gap": (
@@ -615,11 +600,10 @@ $utilities: map.merge(
       property: text-align,
       class: text,
       values: (
-        start: left,
-        end: right,
+        start: start,
+        end: end,
         center: center,
-      ),
-      rtl: true
+      )
     ),
     "text-decoration": (
       property: text-decoration,
@@ -822,7 +806,7 @@ $utilities: map.merge(
       )
     ),
     "rounded-end": (
-      property: border-top-right-radius border-bottom-right-radius,
+      property: border-start-end-radius border-end-end-radius,
       class: rounded-end,
       values: (
         null: var(--#{$prefix}border-radius),
@@ -834,8 +818,7 @@ $utilities: map.merge(
         5: var(--#{$prefix}border-radius-xxl),
         circle: 50%,
         pill: var(--#{$prefix}border-radius-pill)
-      ),
-      rtl: true
+      )
     ),
     "rounded-bottom": (
       property: border-bottom-right-radius border-bottom-left-radius,
@@ -853,7 +836,7 @@ $utilities: map.merge(
       )
     ),
     "rounded-start": (
-      property: border-bottom-left-radius border-top-left-radius,
+      property: border-end-start-radius border-start-start-radius,
       class: rounded-start,
       values: (
         null: var(--#{$prefix}border-radius),
@@ -865,8 +848,7 @@ $utilities: map.merge(
         5: var(--#{$prefix}border-radius-xxl),
         circle: 50%,
         pill: var(--#{$prefix}border-radius-pill)
-      ),
-      rtl: true
+      )
     ),
     // scss-docs-end utils-border-radius
     // scss-docs-start utils-visibility

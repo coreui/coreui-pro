@@ -85,7 +85,7 @@
       }
       return {
         value,
-        label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? void 0 : _formatter$formatToPa.value) || ''
+        label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? undefined : _formatter$formatToPa.value) || ''
       };
     });
   };

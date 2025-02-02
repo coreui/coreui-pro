@@ -5,7 +5,6 @@
 @use "mixins/caret" as *;
 @use "mixins/elevation" as *;
 @use "mixins/gradients" as *;
-@use "mixins/ltr-rtl" as *;
 @use "vendor/rfs" as *;
 @use "variables" as *;
 
@@ -65,7 +64,7 @@
   margin: 0; // Override default margin of ul
   @include font-size(var(--#{$prefix}dropdown-font-size));
   color: var(--#{$prefix}dropdown-color);
-  @include ltr-rtl("text-align", left); // Ensures proper alignment if parent has it changed (e.g., modal footer)
+  text-align: start; // Ensures proper alignment if parent has it changed (e.g., modal footer)
   list-style: none;
   background-color: var(--#{$prefix}dropdown-bg);
   background-clip: padding-box;
@@ -75,8 +74,8 @@
   @include elevation(4);
 
   &[data#{$data-infix}popper] {
+    inset-inline-start: 0;
     top: 100%;
-    @include ltr-rtl("left", 0);
     margin-top: var(--#{$prefix}dropdown-spacer);
   }
 
@@ -105,8 +104,8 @@
       --#{$prefix}position: start;
 
       &[data#{$data-infix}popper] {
-        @include ltr-rtl("right", auto);
-        @include ltr-rtl("left", 0);
+        inset-inline-start: 0;
+        inset-inline-end: auto;
       }
     }
 
@@ -114,8 +113,8 @@
       --#{$prefix}position: end;
 
       &[data#{$data-infix}popper] {
-        @include ltr-rtl("right", 0);
-        @include ltr-rtl("left", auto);
+        inset-inline-start: auto;
+        inset-inline-end: 0;
       }
     }
   }
@@ -139,11 +138,11 @@
 
 .dropend {
   .dropdown-menu[data#{$data-infix}popper] {
+    inset-inline-start: 100%;
+    inset-inline-end: auto;
     top: 0;
-    @include ltr-rtl("right", auto);
-    @include ltr-rtl("left", 100%);
+    margin-inline-start: var(--#{$prefix}dropdown-spacer);
     margin-top: 0;
-    @include ltr-rtl("margin-left", var(--#{$prefix}dropdown-spacer));
   }
 
   .dropdown-toggle {
@@ -156,11 +155,11 @@
 
 .dropstart {
   .dropdown-menu[data#{$data-infix}popper] {
+    inset-inline-start: auto;
+    inset-inline-end: 100%;
     top: 0;
-    @include ltr-rtl("right", 100%);
-    @include ltr-rtl("left", auto);
+    margin-inline-end: var(--#{$prefix}dropdown-spacer);
     margin-top: 0;
-    @include ltr-rtl("margin-right", var(--#{$prefix}dropdown-spacer));
   }
 
   .dropdown-toggle {

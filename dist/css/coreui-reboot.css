@@ -231,22 +231,22 @@
   --cui-danger-border-subtle: #f2a9a9;
   --cui-light-border-subtle: #4a566d;
   --cui-dark-border-subtle: #323a49;
-  --cui-primary-start: rgb(98.171875, 96.5, 203.5);
-  --cui-primary-stop: rgb(119.1034482759, 112.4, 209.6);
-  --cui-secondary-start: rgb(204.5, 210, 215.5);
+  --cui-primary-start: rgb(94.2, 92.4, 207.6);
+  --cui-primary-stop: rgb(116, 108.8, 213.2);
+  --cui-secondary-start: #c9d2db;
   --cui-secondary-stop: white;
-  --cui-success-start: rgb(57.5, 172.5, 95.8333333333);
-  --cui-success-stop: rgb(36.25, 148.75, 66.3072519084);
+  --cui-success-start: rgb(52.9, 177.1, 94.3);
+  --cui-success-stop: rgb(33.55, 151.45, 65.05);
   --cui-info-start: rgb(61.2, 153, 244.8);
-  --cui-info-stop: rgb(53.25, 128.8726993865, 191.75);
-  --cui-warning-start: rgb(237, 172.5789473684, 33);
-  --cui-warning-stop: rgb(233.35, 147.6853191489, 23.65);
-  --cui-danger-start: rgb(219.1, 92.9, 92.9);
-  --cui-danger-stop: rgb(205.1, 66.9, 66.9);
-  --cui-light-start: rgb(229.3, 232, 234.7);
+  --cui-info-stop: rgb(49.15, 129.25, 195.85);
+  --cui-warning-start: rgb(237.6, 172.8, 32.4);
+  --cui-warning-stop: rgb(234.25, 147.85, 22.75);
+  --cui-danger-start: rgb(221.7, 90.3, 90.3);
+  --cui-danger-stop: rgb(208.9, 63.1, 63.1);
+  --cui-light-start: rgb(227.5, 232, 236.5);
   --cui-light-stop: white;
-  --cui-dark-start: #444d5c;
-  --cui-dark-stop: rgb(37.2, 38.2666666667, 46.8);
+  --cui-dark-start: rgb(62, 75.5, 98);
+  --cui-dark-stop: rgb(33.9, 35.7, 50.1);
   --cui-heading-color: inherit;
   --cui-link-color: rgb(94.2, 92.4, 207.6);
   --cui-link-hover-color: rgb(126.36, 124.92, 217.08);
@@ -354,8 +354,10 @@ p {
 }
 
 abbr[title] {
+  -webkit-text-decoration: underline dotted;
   text-decoration: underline dotted;
   cursor: help;
+  -webkit-text-decoration-skip-ink: none;
   text-decoration-skip-ink: none;
 }
 
@@ -637,6 +639,11 @@ legend + * {
 
 ::-webkit-color-swatch-wrapper {
   padding: 0;
+}
+
+::-webkit-file-upload-button {
+  font: inherit;
+  -webkit-appearance: button;
 }
 
 ::file-selector-button {

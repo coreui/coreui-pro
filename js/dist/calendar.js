@@ -9,7 +9,7 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar));
 })(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js) { 'use strict';
 
-  /* eslint-disable complexity, indent, multiline-ternary */
+  /* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO calendar.js
