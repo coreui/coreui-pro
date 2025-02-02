@@ -260,7 +260,7 @@
   }
 
   .range-slider-tooltip {
-    @include ltr-rtl("right", calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width)));
+    inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width)); // stylelint-disable-line function-disallowed-list
     flex-direction: row;
     transform: translateY(50%);
   }
@@ -270,8 +270,10 @@
     height: var(--#{$prefix}range-slider-tooltip-arrow-width);
 
     &::before {
-      @include ltr-rtl("border-width", calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0 calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) var(--#{$prefix}range-slider-tooltip-arrow-height), null, calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) var(--#{$prefix}range-slider-tooltip-arrow-height) calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0);
-      @include ltr-rtl("border-left-color", var(--#{$prefix}range-slider-tooltip-bg));
+      border-inline-start-color: var(--#{$prefix}range-slider-tooltip-bg);
+      border-inline-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+      border-top-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5); // stylelint-disable-line function-disallowed-list
+      border-bottom-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5); // stylelint-disable-line function-disallowed-list
     }
   }
 

@@ -2,7 +2,6 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/elevation" as *;
-@use "../mixins/ltr-rtl" as *;
 @use "../mixins/transition" as *;
 @use "../vendor/rfs" as *;
 @use "../variables" as *;
@@ -402,11 +401,11 @@ select.form-multi-select {
 
   &.form-multi-select-option-with-checkbox {
     padding: $form-multi-select-option-padding-y $form-multi-select-option-padding-x;
-    @include ltr-rtl("padding-left", calc(var(--#{$prefix}form-multi-select-option-padding-x) + var(--#{$prefix}form-multi-select-option-indicator-width)));
+    padding-inline-start: calc(var(--#{$prefix}form-multi-select-option-padding-x) + var(--#{$prefix}form-multi-select-option-indicator-width)); // stylelint-disable-line function-disallowed-list
     &::before {
       position: absolute;
+      inset-inline-start: calc(var(--#{$prefix}form-multi-select-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
       top: .7rem;
-      @include ltr-rtl("left",  calc(var(--#{$prefix}form-multi-select-option-padding-x) * .5));
       display: block;
       width: var(--#{$prefix}form-multi-select-option-indicator-width);
       height: var(--#{$prefix}form-multi-select-option-indicator-width);

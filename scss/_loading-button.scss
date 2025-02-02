@@ -1,4 +1,3 @@
-@use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
 
@@ -12,8 +11,7 @@
 }
 
 .btn-loading-spinner {
-  @include ltr-rtl("margin-right", $spacer);
-  @include ltr-rtl("margin-left", ($spacer * -2));
+  margin-inline: ($spacer * -2) $spacer;
   opacity: 0;
   @include transition(margin .15s, opacity .15s, border .15s);
 }
@@ -21,7 +19,7 @@
 .btn-loading.is-loading {
   .btn-loading-spinner {
     width: 1rem;
-    @include ltr-rtl("margin-left", 0);
+    margin-inline-start: 0;
     opacity: 1;
   }
 }
