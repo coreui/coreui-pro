@@ -1,6 +1,6 @@
 {{ if hugo.IsProduction -}}
 {{ if eq .Page.Params.direction "rtl" -}}
-<link href="/dist/css/coreui.rtl.min.css" rel="stylesheet" {{ printf "integrity=%q" .Site.Params.cdn.css_pro_rtl_hash | safeHTMLAttr }}>
+<link href="/dist/css/coreui.rtl.min.css" rel="stylesheet" {{ printf "integrity=%q" .Site.Params.cdn_pro.css_pro_rtl_hash | safeHTMLAttr }}>
 {{- else -}}
 <link href="/dist/css/coreui.min.css" rel="stylesheet" {{ printf "integrity=%q" .Site.Params.cdn.css_pro_hash | safeHTMLAttr }}>
 {{- end -}}

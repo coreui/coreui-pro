@@ -29,7 +29,7 @@ From there, you'll need to include an RTL version of our CSS. For example, here'
 {{% /tab %}}
 {{% tab name="CoreUI PRO" %}}
 ```html
-<link rel="stylesheet" href="{{< param "cdn.css_pro_rtl" >}}" integrity="{{< param "cdn.css_pro_rtl_hash" >}}" crossorigin="anonymous">
+<link rel="stylesheet" href="{{< param "cdn_pro.css_pro_rtl" >}}" integrity="{{< param "cdn_pro.css_pro_rtl_hash" >}}" crossorigin="anonymous">
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -50,7 +50,7 @@ You can see the above requirements reflected in this modified RTL starter templa
     <link rel="stylesheet" href="{{< param "cdn.css_rtl" >}}" integrity="{{< param "cdn.css_rtl_hash" >}}" crossorigin="anonymous">
 
     <!-- Option 2: CoreUI PRO for Bootstrap CSS -->
-    <link rel="stylesheet" href="{{< param "cdn.css_pro_rtl" >}}" integrity="{{< param "cdn.css_pro_rtl_hash" >}}" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{< param "cdn_pro.css_pro_rtl" >}}" integrity="{{< param "cdn_pro.css_pro_rtl_hash" >}}" crossorigin="anonymous">
 
     <title>مرحبا بالعالم!</title>
   </head>
@@ -64,7 +64,7 @@ You can see the above requirements reflected in this modified RTL starter templa
 
     <!-- Option 2: CoreUI PRO for Bootstrap Bundle with Popper -->
     <!--
-    <script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+    <script src="{{< param "cdn_pro.js_pro_bundle" >}}" integrity="{{< param "cdn_pro.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
     -->
 
     <!-- Option 3: Separate Popper and CoreUI for Bootstrap JS -->
@@ -124,9 +124,22 @@ $font-family-sans-serif:
 
 Need both LTR and RTL on the same page? All you have to do is set following variables:
 
+{{< callout-dart-sass-modules >}}
+
+```scss
+@use "@coreui/coreui/scss/coreui" with (
+  $enable-ltr: true,
+  $enable-rtl: true
+);
+```
+
+{{< callout-dart-sass-deprecations >}}
+
 ```scss
 $enable-ltr: true;
 $enable-rtl: true;
+
+@import "../node_modules/@coreui/coreui/scss/coreui";
 ```
 
 
@@ -136,9 +149,22 @@ After running Sass, each selector in your CSS files will be prepended by `html:n
 
 By default LTR is enable and RTL is disable, but you can easily change it and use only RTL.
 
+{{< callout-dart-sass-modules >}}
+
+```scss
+@use "@coreui/coreui/scss/coreui" with (
+  $enable-ltr: false,
+  $enable-rtl: true
+);
+```
+
+{{< callout-dart-sass-deprecations >}}
+
 ```scss
 $enable-ltr: false;
 $enable-rtl: true;
+
+@import "../node_modules/@coreui/coreui/scss/coreui";
 ```
 
 ## Additional resources

@@ -6,7 +6,7 @@
 {{- end }}
 
 {{ if hugo.IsProduction -}}
-  <script defer src="/dist/js/coreui.bundle.min.js" {{ printf "integrity=%q" .Site.Params.cdn.js_pro_bundle_hash | safeHTMLAttr }}></script>
+  <script defer src="/dist/js/coreui.bundle.min.js" {{ printf "integrity=%q" .Site.Params.cdn_pro.js_pro_bundle_hash | safeHTMLAttr }}></script>
 {{ else -}}
   <script defer src="/dist/js/coreui.bundle.js"></script>
 {{- end }}
@@ -35,7 +35,7 @@
   "cssCdn" .Site.Params.cdn.css
   "cssProCdn" .Site.Params.cdn.css_pro
   "jsBundleCdn" .Site.Params.cdn.js_bundle
-  "jsProBundleCdn" .Site.Params.cdn.js_pro_bundle
+  "jsProBundleCdn" .Site.Params.cdn_pro.js_pro_bundle
   "docsVersion" .Site.Params.docs_version
   "jsSnippetFile" $snippetsFile.Content
 -}}

@@ -30,7 +30,7 @@ Copy-paste the stylesheet `<link>` into your `<head>` before all other styleshee
 {{% /tab %}}
 {{% tab name="CoreUI PRO" %}}
 ```html
-<link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous">
+<link href="{{< param "cdn_pro.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn_pro.css_pro_hash" >}}" crossorigin="anonymous">
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -51,7 +51,7 @@ Include every CoreUI for Bootstrap JavaScript plugin and dependency with one of 
 {{% /tab %}}
 {{% tab name="CoreUI PRO" %}}
 ```html
-<script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_pro.js_pro_bundle" >}}" integrity="{{< param "cdn_pro.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -70,7 +70,7 @@ If you decide to go with the separate scripts solution, Popper must come first (
 {{% tab name="CoreUI PRO" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
-<script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_pro.js_pro" >}}" integrity="{{< param "cdn_pro.js_pro_hash" >}}" crossorigin="anonymous"></script>
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -116,12 +116,12 @@ Copy-paste the stylesheet `<link>` into your `<head>` before all other styleshee
 {{< tabs groupId="bootstrap-css" >}}
 {{% tab name="CoreUI for Bootstrap" %}}
 ```html
-<link href="{{< param "cdn.css_bs" >}}" rel="stylesheet" integrity="{{< param "cdn.css_bs_hash" >}}" crossorigin="anonymous">
+<link href="{{< param "cdn_themes.css_bs" >}}" rel="stylesheet" integrity="{{< param "cdn_themes.css_bs_hash" >}}" crossorigin="anonymous">
 ```
 {{% /tab %}}
 {{% tab name="CoreUI PRO for Bootstrap" %}}
 ```html
-<link href="{{< param "cdn.css_bs_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_bs_pro_hash" >}}" crossorigin="anonymous">
+<link href="{{< param "cdn_pro_themes.css_bs_pro" >}}" rel="stylesheet" integrity="{{< param "cdn_pro_themes.css_bs_pro_hash" >}}" crossorigin="anonymous">
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -137,12 +137,12 @@ Include every CoreUI for Bootstrap JavaScript plugin and dependency with one of 
 {{< tabs groupId="bootstrap-js-bundle" >}}
 {{% tab name="CoreUI for Bootstrap" %}}
 ```html
-<script src="{{< param "cdn.js_bs_bundle" >}}" integrity="{{< param "cdn.js_bs_bundle_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_themes.js_bs_bundle" >}}" integrity="{{< param "cdn_themes.js_bs_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
 {{% /tab %}}
 {{% tab name="CoreUI PRO for Bootstrap" %}}
 ```html
-<script src="{{< param "cdn.js_bs_pro_bundle" >}}" integrity="{{< param "cdn.js_bs_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_pro_themes.js_bs_pro_bundle" >}}" integrity="{{< param "cdn_pro_themes.js_bs_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -155,13 +155,13 @@ If you decide to go with the separate scripts solution, Popper must come first (
 {{% tab name="CoreUI for Bootstrap" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
-<script src="{{< param "cdn.js_bs" >}}" integrity="{{< param "cdn.js_bs_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_themes.js_bs" >}}" integrity="{{< param "cdn_themes.js_bs_hash" >}}" crossorigin="anonymous"></script>
 ```
 {{% /tab %}}
 {{% tab name="CoreUI PRO for Bootstrap" %}}
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
-<script src="{{< param "cdn.js_bs_pro" >}}" integrity="{{< param "cdn.js_bs_pro_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_pro_themes.js_bs_pro" >}}" integrity="{{< param "cdn_pro_themes.js_bs_pro_hash" >}}" crossorigin="anonymous"></script>
 ```
 {{% /tab %}}
 {{< /tabs >}}
@@ -182,7 +182,7 @@ Be sure to have your pages set up with the latest design and development standar
     <link href="{{< param "cdn.css" >}}" rel="stylesheet" integrity="{{< param "cdn.css_hash" >}}" crossorigin="anonymous">
 
     <!-- Option 2: CoreUI PRO for Bootstrap CSS -->
-    <!-- <link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous"> -->
+    <!-- <link href="{{< param "cdn_pro.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn_pro.css_pro_hash" >}}" crossorigin="anonymous"> -->
 
     <title>Hello, world!</title>
   </head>
@@ -196,7 +196,7 @@ Be sure to have your pages set up with the latest design and development standar
 
     <!-- Option 2: CoreUI PRO for Bootstrap Bundle with Popper -->
     <!--
-    <script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+    <script src="{{< param "cdn_pro.js_pro_bundle" >}}" integrity="{{< param "cdn_pro.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
     -->
 
     <!-- Option 3: Separate Popper and CoreUI/CoreUI PRO  for Bootstrap JS -->
@@ -204,7 +204,7 @@ Be sure to have your pages set up with the latest design and development standar
     <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
     <script src="{{< param "cdn.js" >}}" integrity="{{< param "cdn.js_hash" >}}" crossorigin="anonymous"></script>
     or
-    <script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
+    <script src="{{< param "cdn_pro.js_pro" >}}" integrity="{{< param "cdn_pro.js_pro_hash" >}}" crossorigin="anonymous"></script>
     -->
   </body>
 </html>

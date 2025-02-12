@@ -157,3 +157,64 @@
     }
   }
 }
+
+@mixin make-c-grid-columns($columns: $grid-columns, $gutter: $grid-gutter-width, $breakpoints: $grid-breakpoints) {
+  @each $breakpoint in map.keys($breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $breakpoints);
+
+    @include container-breakpoint-up($breakpoint, $breakpoints) {
+      // Provide basic `.cq-col-{bp}` classes for equal-width flexbox columns
+      .cq-col#{$infix} {
+        flex: 1 0 0;
+      }
+
+      .cq-row-cols#{$infix}-auto > * {
+        @include make-col-auto();
+      }
+
+      @if $grid-row-columns > 0 {
+        @for $i from 1 through $grid-row-columns {
+          .cq-row-cols#{$infix}-#{$i} {
+            @include row-cols($i);
+          }
+        }
+      }
+
+      .cq-col#{$infix}-auto {
+        @include make-col-auto();
+      }
+
+      @if $columns > 0 {
+        @for $i from 1 through $columns {
+          .cq-col#{$infix}-#{$i} {
+            @include make-col($i, $columns);
+          }
+        }
+
+        // `$columns - 1` because offsetting by the width of an entire row isn't possible
+        @for $i from 0 through ($columns - 1) {
+          @if not ($infix == "" and $i == 0) { // Avoid emitting useless .offset-0
+            .cq-offset#{$infix}-#{$i} {
+              @include make-col-offset($i, $columns);
+            }
+          }
+        }
+      }
+
+      // Gutters
+      //
+      // Make use of `.cq-g-*`, `.cq-gx-*` or `.cq-gy-*` utilities to change spacing between the columns.
+      @each $key, $value in $gutters {
+        .cq-g#{$infix}-#{$key},
+        .cq-gx#{$infix}-#{$key} {
+          --#{$prefix}gutter-x: #{$value};
+        }
+
+        .cq-g#{$infix}-#{$key},
+        .cq-gy#{$infix}-#{$key} {
+          --#{$prefix}gutter-y: #{$value};
+        }
+      }
+    }
+  }
+}

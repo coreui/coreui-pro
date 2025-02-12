@@ -366,6 +366,11 @@ address {
 }
 
 ol,
+ul {
+  padding-inline-start: 2rem;
+}
+
+ol,
 ul,
 dl {
   margin-top: 0;
@@ -384,8 +389,8 @@ dt {
 }
 
 dd {
+  margin-inline-start: 0;
   margin-bottom: 0.5rem;
-  margin-right: 0;
 }
 
 blockquote {
@@ -497,7 +502,7 @@ caption {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   color: var(--cui-table-caption-color, var(--cui-secondary-color));
-  text-align: right;
+  text-align: start;
 }
 
 th {
@@ -589,7 +594,7 @@ fieldset {
 }
 
 legend {
-  float: right;
+  float: inline-start;
   width: 100%;
   padding: 0;
   margin-bottom: 0.5rem;
