@@ -19,8 +19,7 @@ const FILES = [
   'hugo.yml',
   'js/src/base-component.js',
   'package.js',
-  'scss/mixins/_banner.scss',
-  'scss/themes/bootstrap/mixins/_banner.scss'
+  'scss/_banner.scss'
 ]
 
 // Blame TC39... https://github.com/benjamingr/RegExp.escape/issues/37

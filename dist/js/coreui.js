@@ -3056,7 +3056,7 @@
       }
       return {
         value,
-        label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? undefined : _formatter$formatToPa.value) || ''
+        label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? void 0 : _formatter$formatToPa.value) || ''
       };
     });
   };
@@ -6930,7 +6930,7 @@
             element.setAttribute('aria-expanded', true);
           });
         }
-        if (!this._config.activeLinksExact && element.href.startsWith(currentUrl)) {
+        if (!this._config.activeLinksExact && currentUrl.startsWith(element.href)) {
           element.classList.add(CLASS_NAME_ACTIVE$3);
           // eslint-disable-next-line unicorn/no-array-for-each
           Array.from(this._getParents(element, SELECTOR_NAV_GROUP)).forEach(element => {
