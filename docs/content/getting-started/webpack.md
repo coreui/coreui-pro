@@ -195,13 +195,17 @@ Importing CoreUI into Webpack requires the loaders we installed in the first sec
   {{< callout-dart-sass-modules >}}
 
    ```scss
-   // Import all of CoreUI's CSS
+   // Use all of CoreUI's CSS
    @use "~@coreui/coreui/scss/coreui";
+
+   // Or use all of CoreUI PRO's CSS
+   @use "~@coreui/coreui-pro/scss/coreui";
    ```
 
    {{< callout-dart-sass-deprecations >}}
   
    ```scss
+   // Import all of CoreUI's CSS
    @import "~@coreui/coreui/scss/coreui";
 
    // Or import all of CoreUI PRO's CSS

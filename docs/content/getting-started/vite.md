@@ -159,8 +159,11 @@ In the next and final section to this guide, we’ll import all of CoreUI’s CS
   {{< callout-dart-sass-modules >}}
 
    ```scss
-   // Import all of CoreUI's CSS
+   // Use all of CoreUI's CSS
    @use "~@coreui/coreui/scss/coreui";
+
+   // Or use all of CoreUI PRO's CSS
+   @use "~@coreui/coreui-pro/scss/coreui";
    ```
 
    {{< callout-dart-sass-deprecations >}}
