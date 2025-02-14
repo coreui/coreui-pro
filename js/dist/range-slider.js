@@ -322,12 +322,9 @@
         });
         return;
       }
-      Object.assign(tooltip.style, index_js.isRTL() ? {
-        right: `${percent * 100}%`,
-        marginRight: margin
-      } : {
-        left: `${percent * 100}%`,
-        marginLeft: margin
+      Object.assign(tooltip.style, {
+        insetInlineStart: `${percent * 100}%`,
+        marginInlineStart: margin
       });
     }
     _updateTooltip(index, value) {

@@ -49,13 +49,13 @@ If you're using our compiled JavaScript and prefer to include Popper separately,
 **If you use CoreUI PRO please use following links**
 
 ```html
-<link href="{{< param "cdn.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn.css_pro_hash" >}}" crossorigin="anonymous">
-<script src="{{< param "cdn.js_pro_bundle" >}}" integrity="{{< param "cdn.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
+<link href="{{< param "cdn_pro.css_pro" >}}" rel="stylesheet" integrity="{{< param "cdn_pro.css_pro_hash" >}}" crossorigin="anonymous">
+<script src="{{< param "cdn_pro.js_pro_bundle" >}}" integrity="{{< param "cdn_pro.js_pro_bundle_hash" >}}" crossorigin="anonymous"></script>
 ```
 
 ```html
 <script src="{{< param "cdn.popper" >}}" integrity="{{< param "cdn.popper_hash" >}}" crossorigin="anonymous"></script>
-<script src="{{< param "cdn.js_pro" >}}" integrity="{{< param "cdn.js_pro_hash" >}}" crossorigin="anonymous"></script>
+<script src="{{< param "cdn_pro.js_pro" >}}" integrity="{{< param "cdn_pro.js_pro_hash" >}}" crossorigin="anonymous"></script>
 ```
 
 ## Package managers

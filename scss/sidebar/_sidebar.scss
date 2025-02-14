@@ -1,4 +1,14 @@
 // stylelint-disable function-disallowed-list
+@use "../functions/escape-svg" as *;
+@use "../mixins/backdrop" as *;
+@use "../mixins/border-radius" as *;
+@use "../mixins/breakpoints" as *;
+@use "../mixins/elevation" as *;
+@use "../mixins/ltr-rtl" as *;
+@use "../mixins/transition" as *;
+@use "../variables" as *;
+@use "../variables-dark" as *;
+
 .sidebar {
   // scss-docs-start sidebar-css-vars
   --#{$prefix}sidebar-zindex: #{$zindex-sidebar};
@@ -24,12 +34,12 @@
   @include transition($sidebar-transition);
 
   &:not(.sidebar-end){
-    @include ltr-rtl("margin-left", 0);
+    margin-inline-start: 0;
   }
 
   &.sidebar-end {
     order: 99;
-    @include ltr-rtl("margin-right", 0);
+    margin-inline-end: 0;
   }
 
   @include media-breakpoint-up($mobile-breakpoint) {
@@ -44,10 +54,10 @@
 
     &.hide {
       &:not(.sidebar-end) {
-        @include ltr-rtl("margin-left", calc(-1 * var(--#{$prefix}sidebar-width)));
+        margin-inline-start: calc(-1 * var(--#{$prefix}sidebar-width));
       }
       &.sidebar-end {
-        @include ltr-rtl("margin-right", calc(-1 * var(--#{$prefix}sidebar-width)));
+        margin-inline-end: calc(-1 * var(--#{$prefix}sidebar-width));
 
       }
     }
@@ -63,18 +73,18 @@
     z-index: var(--#{$prefix}sidebar-zindex);
 
     &:not(.sidebar-end) {
-      @include ltr-rtl("left", 0);
+      inset-inline-start: 0;
 
       &:not(.show) {
-        @include ltr-rtl("margin-left", calc(-1 * var(--#{$prefix}sidebar-width)));
+        margin-inline-start: calc(-1 * var(--#{$prefix}sidebar-width));
       }
     }
 
     &.sidebar-end {
-      @include ltr-rtl("right", 0);
+      inset-inline-end: 0;
 
       &:not(.show) {
-        @include ltr-rtl("margin-right", calc(-1 * var(--#{$prefix}sidebar-width)));
+        margin-inline-end: calc(-1 * var(--#{$prefix}sidebar-width));
       }
     }
   }
@@ -88,11 +98,11 @@
   @include elevation(2);
 
   &:not(.sidebar-end) {
-    @include ltr-rtl("left", 0);
+    inset-inline-start: 0;
   }
 
   &.sidebar-end {
-    @include ltr-rtl("right", 0);
+    inset-inline-end: 0;
   }
 }
 
@@ -104,11 +114,11 @@
   @extend .sidebar-fixed;
 
   &:not(.sidebar-end){
-    @include ltr-rtl("margin-left", calc(-1 * var(--#{$prefix}sidebar-width)));
+    margin-inline-start: calc(-1 * var(--#{$prefix}sidebar-width));
   }
 
   &.sidebar-end {
-    @include ltr-rtl("margin-right", calc(-1 * var(--#{$prefix}sidebar-width)));
+    margin-inline-end: calc(-1 * var(--#{$prefix}sidebar-width));
   }
 
   &.show {
@@ -116,11 +126,11 @@
     @include elevation(3);
 
     &:not(.sidebar-end) {
-      @include ltr-rtl("margin-left", 0);
+      margin-inline-start: 0;
     }
 
     &.sidebar-end {
-      @include ltr-rtl("margin-right", 0);
+      margin-inline-end: 0;
     }
   }
 }
@@ -159,8 +169,8 @@
 
   .btn-close {
     padding: calc(var(--#{$prefix}sidebar-padding-y) * .5) calc(var(--#{$prefix}sidebar-padding-x) * .5);
+    margin-inline-end: calc(-.5 * var(--#{$prefix}sidebar-padding-x));
     margin-top: calc(-.5 * var(--#{$prefix}sidebar-padding-y));
-    @include ltr-rtl("margin-right", calc(-.5 * var(--#{$prefix}sidebar-padding-x)));
     margin-bottom: calc(-.5 * var(--#{$prefix}sidebar-padding-y));
   }
 }

@@ -1,3 +1,7 @@
+@use "functions/escape-svg" as *;
+@use "mixins/transition" as *;
+@use "variables" as *;
+
 .rating {
   // scss-docs-start rating-css-vars
   --#{$prefix}rating-gap: #{$rating-gap};

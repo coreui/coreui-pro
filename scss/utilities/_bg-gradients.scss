@@ -1,3 +1,5 @@
+@use "../variables" as *;
+
 @each $color, $value in $theme-gradients {
   .bg-#{$color}-gradient {
     background-color: var(--#{$prefix}#{$color});

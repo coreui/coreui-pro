@@ -1503,7 +1503,7 @@
     return clearedDate;
   };
 
-  /* eslint-disable complexity, indent, multiline-ternary */
+  /* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
   /**
    * --------------------------------------------------------------------------
    * CoreUI PRO calendar.js
@@ -3056,7 +3056,7 @@
       }
       return {
         value,
-        label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? void 0 : _formatter$formatToPa.value) || ''
+        label: ((_formatter$formatToPa = formatter.formatToParts(date).find(part => part.type === partial)) == null ? undefined : _formatter$formatToPa.value) || ''
       };
     });
   };
@@ -7375,7 +7375,6 @@
    *
    * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
    */
-  // eslint-disable-next-line unicorn/better-regex
   const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
   const allowedAttribute = (attribute, allowedAttributeList) => {
     const attributeName = attribute.nodeName.toLowerCase();
@@ -8467,12 +8466,9 @@
         });
         return;
       }
-      Object.assign(tooltip.style, isRTL() ? {
-        right: `${percent * 100}%`,
-        marginRight: margin
-      } : {
-        left: `${percent * 100}%`,
-        marginLeft: margin
+      Object.assign(tooltip.style, {
+        insetInlineStart: `${percent * 100}%`,
+        marginInlineStart: margin
       });
     }
     _updateTooltip(index, value) {

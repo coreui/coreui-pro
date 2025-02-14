@@ -1,3 +1,11 @@
+@use "functions/escape-svg" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/elevation" as *;
+@use "mixins/transition" as *;
+@use "vendor/rfs" as *;
+@use "variables" as *;
+
 .time-picker,
 *:not(.time-picker) > .time-picker-dropdown {
   // scss-docs-start time-picker-css-vars

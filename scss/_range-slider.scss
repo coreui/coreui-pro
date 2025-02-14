@@ -1,3 +1,12 @@
+@use "sass:string";
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/gradients" as *;
+@use "mixins/ltr-rtl" as *;
+@use "mixins/transition" as *;
+@use "vendor/rfs" as *;
+@use "variables" as *;
+
 .range-slider {
   // scss-docs-start range-slider-css-vars
   --#{$prefix}range-slider-track-width: #{$range-slider-track-width};
@@ -59,7 +68,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: unquote("max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height))");
+  height: string.unquote("max(var(--#{$prefix}range-slider-thumb-height), var(--#{$prefix}range-slider-track-height))");
 }
 
 .range-slider-track {
@@ -235,7 +244,7 @@
 
   .range-slider-inputs-container {
     justify-content: center;
-    width: unquote("max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
+    width: string.unquote("max(var(--#{$prefix}range-slider-thumb-width), var(--#{$prefix}range-slider-vertical-track-width))");
     height: 100%;
   }
 
@@ -251,7 +260,7 @@
   }
 
   .range-slider-tooltip {
-    @include ltr-rtl("right", calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width)));
+    inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width)); // stylelint-disable-line function-disallowed-list
     flex-direction: row;
     transform: translateY(50%);
   }
@@ -261,8 +270,10 @@
     height: var(--#{$prefix}range-slider-tooltip-arrow-width);
 
     &::before {
-      @include ltr-rtl("border-width", calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0 calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) var(--#{$prefix}range-slider-tooltip-arrow-height), null, calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) var(--#{$prefix}range-slider-tooltip-arrow-height) calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0);
-      @include ltr-rtl("border-left-color", var(--#{$prefix}range-slider-tooltip-bg));
+      border-inline-start-color: var(--#{$prefix}range-slider-tooltip-bg);
+      border-inline-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+      border-top-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5); // stylelint-disable-line function-disallowed-list
+      border-bottom-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5); // stylelint-disable-line function-disallowed-list
     }
   }
 
