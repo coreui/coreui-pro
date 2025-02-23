@@ -362,10 +362,10 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `ariaNavPrevMonthLabel` | string | `'Previous month'` | A string that provides an accessible label for the button that navigates to the previous month in the calendar. Screen readers will use this label to explain the purpose of the button. |
 | `ariaNavPrevYearLabel` | string | `'Previous year'` | A string that provides an accessible label for the button that navigates to the previous year in the calendar. This label helps screen reader users understand the button's function. |
 | `calendarDate` | date, number, string, null | `null` | Default date of the component. |
-| `cancelButtonLabel` | string | `'Cancel'` | Cancel button inner HTML |
+| `cancelButton` | boolean, string | `'Cancel'` | Cancel button inner HTML |
 | `cancelButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |
-| `confirmButtonLabel` | string | `'OK'` | Confirm button inner HTML |
+| `confirmButton` | boolean, string | `'OK'` | Confirm button inner HTML |
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `date` | date, number, string, null | `null` | Default value of the component |

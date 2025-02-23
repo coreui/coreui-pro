@@ -213,10 +213,10 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `cancelButtonLabel` | string | `'Cancel'` | Cancel button inner HTML |
+| `cancelButton` | boolean, string | `'Cancel'` | Cancel button inner HTML |
 | `cancelButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |
-| `confirmButtonLabel` | string | `'OK'` | Confirm button inner HTML |
+| `confirmButton` | boolean, string | `'OK'` | Confirm button inner HTML |
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
