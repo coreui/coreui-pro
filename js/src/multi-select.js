@@ -614,13 +614,14 @@ class MultiSelect extends BaseComponent {
     dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
 
     if (this._config.selectAll && this._config.multiple) {
-      const selectAll = document.createElement('button')
-      selectAll.classList.add(CLASS_NAME_SELECT_ALL)
-      selectAll.innerHTML = this._config.selectAllLabel
+      const selectAllButton = document.createElement('button')
+      selectAllButton.type = 'button'
+      selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
+      selectAllButton.innerHTML = this._config.selectAllLabel
 
-      this._selectAllElement = selectAll
+      this._selectAllElement = selectAllButton
 
-      dropdownDiv.append(selectAll)
+      dropdownDiv.append(selectAllButton)
     }
 
     const optionsDiv = document.createElement('div')
