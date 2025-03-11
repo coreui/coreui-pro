@@ -346,7 +346,7 @@ class DateRangePicker extends BaseComponent {
       const date = this._parseDate(event.target.value)
 
       // valid date or empty date
-      if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
+      if ((date instanceof Date && !isNaN(date)) || (date === null)) {
         this._startDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
@@ -388,7 +388,7 @@ class DateRangePicker extends BaseComponent {
       const date = this._parseDate(event.target.value)
 
       // valid date or empty date
-      if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
+      if ((date instanceof Date && !isNaN(date)) || (date === null)) {
         this._endDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
