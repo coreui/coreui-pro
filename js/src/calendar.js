@@ -211,7 +211,7 @@ class Calendar extends BaseComponent {
     }
 
     // Allow to change the calendarDate but not startDate or endDate
-    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+    if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -237,16 +237,16 @@ class Calendar extends BaseComponent {
       event.preventDefault()
 
       if (
-        this._config.maxDate &&
-        date >= convertToDateObject(this._config.maxDate, this._config.selectionType) &&
+        this._maxDate &&
+        date >= convertToDateObject(this._maxDate, this._config.selectionType) &&
         (event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY)
       ) {
         return
       }
 
       if (
-        this._config.minDate &&
-        date <= convertToDateObject(this._config.minDate, this._config.selectionType) &&
+        this._minDate &&
+        date <= convertToDateObject(this._minDate, this._config.selectionType) &&
         (event.key === ARROW_LEFT_KEY || event.key === ARROW_UP_KEY)
       ) {
         return
@@ -338,7 +338,7 @@ class Calendar extends BaseComponent {
     const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target
     const date = this._getDate(target)
 
-    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+    if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -504,7 +504,7 @@ class Calendar extends BaseComponent {
   }
 
   _selectDate(date) {
-    if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+    if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
       return
     }
 
@@ -724,6 +724,8 @@ class Calendar extends BaseComponent {
     )
     this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
     this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
+    this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)
+    this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType)
     this._hoverDate = null
     this._selectEndDate = this._config.selectEndDate
   }
@@ -804,7 +806,7 @@ class Calendar extends BaseComponent {
 
   _cellDayAttributes(date, month) {
     const isCurrentMonth = month === 'current'
-    const isDisabled = isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
 
     const classNames = this._classNames({
@@ -833,7 +835,7 @@ class Calendar extends BaseComponent {
   }
 
   _cellMonthAttributes(date) {
-    const isDisabled = isMonthDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isDisabled = isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isMonthSelected(date, this._startDate, this._endDate)
 
     const classNames = this._classNames({
@@ -855,7 +857,7 @@ class Calendar extends BaseComponent {
   }
 
   _cellYearAttributes(date) {
-    const isDisabled = isYearDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isDisabled = isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isYearSelected(date, this._startDate, this._endDate)
 
     const classNames = this._classNames({
@@ -877,7 +879,7 @@ class Calendar extends BaseComponent {
   }
 
   _rowWeekAttributes(date) {
-    const isDisabled = isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)
+    const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
 
     const classNames = this._classNames({
