@@ -101,7 +101,8 @@ const Default = {
   selectAllLabel: 'Select all options',
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
-  valid: false
+  valid: false,
+  value: null
 }
 
 const DefaultType = {
@@ -123,7 +124,8 @@ const DefaultType = {
   selectAllLabel: 'string',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
-  valid: 'boolean'
+  valid: 'boolean',
+  value: '(string|array|null)'
 }
 
 /**
@@ -136,6 +138,7 @@ class MultiSelect extends BaseComponent {
   constructor(element, config) {
     super(element, config)
 
+    this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
     this._selectionElement = null
@@ -146,13 +149,13 @@ class MultiSelect extends BaseComponent {
 
     this._clone = null
     this._menu = null
+    this._selected = []
     this._options = this._getOptions()
     this._popper = null
     this._search = ''
-    this._selected = this._getSelectedOptions(this._options)
 
     if (this._config.options.length > 0) {
-      this._createNativeSelect(this._config.options)
+      this._createNativeOptions(this._element, this._config.options)
     }
 
     this._createSelect()
@@ -240,8 +243,8 @@ class MultiSelect extends BaseComponent {
 
   update(config) {
     this._config = this._getConfig(config)
+    this._selected = []
     this._options = this._getOptions()
-    this._selected = this._getSelectedOptions(this._options)
     this._menu.remove()
     this._clone.remove()
     this._element.innerHTML = ''
@@ -386,28 +389,73 @@ class MultiSelect extends BaseComponent {
     return this._element.classList.value.split(' ')
   }
 
-  _getOptions(node = this._element) {
+  _getOptions() {
     if (this._config.options) {
-      return this._config.options
+      return this._getOptionsFromConfig()
     }
 
+    return this._getOptionsFromElement()
+  }
+
+  _getOptionsFromConfig(options = this._config.options) {
+    const _options = []
+    for (const option of options) {
+      if (option.options && Array.isArray(option.options)) {
+        _options.push({
+          label: option.label,
+          options: this._getOptionsFromConfig(option.options)
+        })
+        continue
+      }
+
+      const value = String(option.value)
+      const isSelected = option.selected || (this._config.value && this._config.value.includes(value))
+
+      _options.push({
+        ...option,
+        value,
+        ...isSelected && { selected: true },
+        ...option.disabled && { disabled: true }
+      })
+
+      if (isSelected) {
+        this._selected.push({
+          value: String(option.value),
+          text: option.text
+        })
+      }
+    }
+
+    return _options
+  }
+
+  _getOptionsFromElement(node = this._element) {
     const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP')
     const options = []
 
     for (const node of nodes) {
       if (node.nodeName === 'OPTION' && node.value) {
+        const isSelected = node.selected || (this._config.value && this._config.value.includes(node.value))
         options.push({
           value: node.value,
           text: node.innerHTML,
-          selected: node.selected,
+          selected: isSelected,
           disabled: node.disabled
         })
+
+        if (node.selected || isSelected) {
+          this._selected.push({
+            value: node.value,
+            text: node.innerHTML,
+            ...node.disabled && { disabled: true }
+          })
+        }
       }
 
       if (node.nodeName === 'OPTGROUP') {
         options.push({
           label: node.label,
-          options: this._getOptions(node)
+          options: this._getOptionsFromElement(node)
         })
       }
     }
@@ -415,32 +463,7 @@ class MultiSelect extends BaseComponent {
     return options
   }
 
-  _getSelectedOptions(options) {
-    const selected = []
-
-    for (const option of options) {
-      if (typeof option.value === 'undefined') {
-        this._getSelectedOptions(option.options)
-        continue
-      }
-
-      if (option.selected) {
-        // Add only the last option if single select
-        if (!this._config.multiple) {
-          selected.length = 0
-        }
-
-        selected.push({
-          value: String(option.value),
-          text: option.text
-        })
-      }
-    }
-
-    return selected
-  }
-
-  _createNativeSelect(data) {
+  _configureNativeSelect() {
     this._element.classList.add(CLASS_NAME_SELECT)
 
     if (this._config.multiple) {
@@ -450,8 +473,6 @@ class MultiSelect extends BaseComponent {
     if (this._config.required) {
       this._element.setAttribute('required', true)
     }
-
-    this._createNativeOptions(this._element, data)
   }
 
   _createNativeOptions(parentElement, options) {
@@ -681,13 +702,13 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _createTag(value, text) {
+  _createTag(value, text, disabled) {
     const tag = document.createElement('div')
     tag.classList.add(CLASS_NAME_TAG)
     tag.dataset.value = value
     tag.innerHTML = text
 
-    if (!this._config.disabled) {
+    if (!this._config.disabled && disabled !== true) {
       const closeBtn = document.createElement('button')
       closeBtn.type = 'button'
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
@@ -732,7 +753,7 @@ class MultiSelect extends BaseComponent {
 
   _findOptionByValue(value, options = this._options) {
     for (const option of options) {
-      if (option.value === value) {
+      if (String(option.value) === value) {
         return option
       }
 
@@ -781,8 +802,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _deselectOption(value) {
-    const selected = this._selected.filter(option => option.value !== String(value))
-    this._selected = selected
+    this._selected = this._selected.filter(option => option.value !== String(value))
 
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
 
@@ -803,8 +823,10 @@ class MultiSelect extends BaseComponent {
 
   _deselectLastOption() {
     if (this._selected.length > 0) {
-      const last = this._selected.pop()
-      this._deselectOption(last.value)
+      const last = this._selected.findLast(option => option.disabled !== true)
+      if (last) {
+        this._deselectOption(last.value)
+      }
     }
   }
 
@@ -825,7 +847,7 @@ class MultiSelect extends BaseComponent {
       selection.innerHTML = ''
 
       for (const option of this._selected) {
-        selection.append(this._createTag(option.value, option.text))
+        selection.append(this._createTag(option.value, option.text, option.disabled))
       }
     }
 
@@ -1002,6 +1024,14 @@ class MultiSelect extends BaseComponent {
 
     if (typeof config.container === 'object' || typeof config.container === 'string') {
       config.container = getElement(config.container)
+    }
+
+    if (typeof config.value === 'number') {
+      config.value = [String(config.value)]
+    }
+
+    if (typeof config.value === 'string') {
+      config.value = config.value.split(/,\s*/).map(String)
     }
 
     return config
