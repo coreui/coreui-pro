@@ -98,6 +98,20 @@ or
 ```sh
 yarn add @coreui/coreui-pro
 ```
+### Bun
+ 
+Install CoreUI in your Bun or Node.js powered apps with [the Bun CLI](https://bun.sh/):
+ 
+```sh
+bun add @coreui/coreui
+```
+
+or
+
+```sh
+bun add @coreui/coreui-pro
+```
+
 ### Composer
 
 You can also install and manage CoreUI's Sass and JavaScript using [Composer](https://getcomposer.org/):

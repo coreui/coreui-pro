@@ -532,11 +532,12 @@
       const dropdownDiv = document.createElement('div');
       dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN);
       if (this._config.selectAll && this._config.multiple) {
-        const selectAll = document.createElement('button');
-        selectAll.classList.add(CLASS_NAME_SELECT_ALL);
-        selectAll.innerHTML = this._config.selectAllLabel;
-        this._selectAllElement = selectAll;
-        dropdownDiv.append(selectAll);
+        const selectAllButton = document.createElement('button');
+        selectAllButton.type = 'button';
+        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL);
+        selectAllButton.innerHTML = this._config.selectAllLabel;
+        this._selectAllElement = selectAllButton;
+        dropdownDiv.append(selectAllButton);
       }
       const optionsDiv = document.createElement('div');
       optionsDiv.classList.add(CLASS_NAME_OPTIONS);

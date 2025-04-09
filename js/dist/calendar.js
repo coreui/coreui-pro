@@ -181,7 +181,7 @@
       }
 
       // Allow to change the calendarDate but not startDate or endDate
-      if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      if (calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
         return;
       }
       this._hoverDate = null;
@@ -196,10 +196,10 @@
       }
       if (event.key === ARROW_RIGHT_KEY || event.key === ARROW_LEFT_KEY || event.key === ARROW_UP_KEY || event.key === ARROW_DOWN_KEY) {
         event.preventDefault();
-        if (this._config.maxDate && date >= calendar_js.convertToDateObject(this._config.maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY)) {
+        if (this._maxDate && date >= calendar_js.convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY)) {
           return;
         }
-        if (this._config.minDate && date <= calendar_js.convertToDateObject(this._config.minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY || event.key === ARROW_UP_KEY)) {
+        if (this._minDate && date <= calendar_js.convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY || event.key === ARROW_UP_KEY)) {
           return;
         }
         let element = event.target;
@@ -262,7 +262,7 @@
     _handleCalendarMouseEnter(event) {
       const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
       const date = this._getDate(target);
-      if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      if (calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
         return;
       }
       this._hoverDate = date;
@@ -395,7 +395,7 @@
       });
     }
     _selectDate(date) {
-      if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      if (calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
         return;
       }
       if (this._config.range) {
@@ -586,6 +586,8 @@
       this._calendarDate = calendar_js.convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType);
       this._startDate = calendar_js.convertToDateObject(this._config.startDate, this._config.selectionType);
       this._endDate = calendar_js.convertToDateObject(this._config.endDate, this._config.selectionType);
+      this._minDate = calendar_js.convertToDateObject(this._config.minDate, this._config.selectionType);
+      this._maxDate = calendar_js.convertToDateObject(this._config.maxDate, this._config.selectionType);
       this._hoverDate = null;
       this._selectEndDate = this._config.selectEndDate;
     }
@@ -647,7 +649,7 @@
     }
     _cellDayAttributes(date, month) {
       const isCurrentMonth = month === 'current';
-      const isDisabled = calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates);
+      const isDisabled = calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isDateSelected(date, this._startDate, this._endDate);
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_CELL]: true,
@@ -668,7 +670,7 @@
       };
     }
     _cellMonthAttributes(date) {
-      const isDisabled = calendar_js.isMonthDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates);
+      const isDisabled = calendar_js.isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isMonthSelected(date, this._startDate, this._endDate);
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_CELL]: true,
@@ -684,7 +686,7 @@
       };
     }
     _cellYearAttributes(date) {
-      const isDisabled = calendar_js.isYearDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates);
+      const isDisabled = calendar_js.isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isYearSelected(date, this._startDate, this._endDate);
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_CELL]: true,
@@ -700,7 +702,7 @@
       };
     }
     _rowWeekAttributes(date) {
-      const isDisabled = calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates);
+      const isDisabled = calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isDateSelected(date, this._startDate, this._endDate);
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_ROW]: true,

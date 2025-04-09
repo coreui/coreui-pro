@@ -1,5 +1,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "buttons" as *;
 @use "variables" as *;
 
 // Make the div behave like a button
@@ -43,7 +44,7 @@
   // Prevent double borders when buttons are next to each other
   > :not(.btn-check:first-child) + .btn,
   > .btn-group:not(:first-child) {
-    margin-inline-start: calc(#{$btn-border-width} * -1); // stylelint-disable-line function-disallowed-list
+    margin-inline-start: calc(-1 * #{$btn-border-width}); // stylelint-disable-line function-disallowed-list
   }
 
   // Reset rounded corners
@@ -130,7 +131,7 @@
 
   > .btn:not(:first-child),
   > .btn-group:not(:first-child) {
-    margin-top: calc(#{$btn-border-width} * -1); // stylelint-disable-line function-disallowed-list
+    margin-top: calc(-1 * #{$btn-border-width}); // stylelint-disable-line function-disallowed-list
   }
 
   // Reset rounded corners
