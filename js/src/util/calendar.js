@@ -268,7 +268,7 @@ const getTrailingDays = (year, month, leadingDays, monthDays) => {
  * @returns The ISO week number.
  */
 export const getWeekNumber = date => {
-  const tempDate = new Date(date.getTime())
+  const tempDate = new Date(date)
   tempDate.setHours(0, 0, 0, 0)
 
   // Thursday in current week decides the year
