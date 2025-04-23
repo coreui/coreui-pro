@@ -637,3 +637,26 @@ export const removeTimeFromDate = date => {
   clearedDate.setHours(0, 0, 0, 0)
   return clearedDate
 }
+
+/**
+ * Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
+ *
+ * @param {Date} target - The date whose time will be updated.
+ * @param {Date} source - The date to copy the time from.
+ * @returns {Date} A new Date instance with the date from `target` and time from `source`.
+ */
+export const setTimeFromDate = (target, source) => {
+  if (!(source instanceof Date)) {
+    return target
+  }
+
+  const result = new Date(target) // create a copy to avoid mutation
+  result.setHours(
+    source.getHours(),
+    source.getMinutes(),
+    source.getSeconds(),
+    source.getMilliseconds()
+  )
+
+  return result
+}

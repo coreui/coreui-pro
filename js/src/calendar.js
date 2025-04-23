@@ -29,7 +29,8 @@ import {
   isToday,
   isYearDisabled,
   isYearInRange,
-  isYearSelected
+  isYearSelected,
+  setTimeFromDate
 } from './util/calendar.js'
 
 /**
@@ -342,10 +343,10 @@ class Calendar extends BaseComponent {
       return
     }
 
-    this._hoverDate = date
+    this._hoverDate = setTimeFromDate(date, this._selectEndDate ? this._endDate : this._startDate)
 
     EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-      date: getDateBySelectionType(date, this._config.selectionType)
+      date: getDateBySelectionType(this._hoverDate, this._config.selectionType)
     })
 
     this._updateClassNamesAndAriaLabels()
@@ -483,14 +484,14 @@ class Calendar extends BaseComponent {
   }
 
   _setEndDate(date) {
-    this._endDate = date
+    this._endDate = setTimeFromDate(date, this._endDate)
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
       date: getDateBySelectionType(this._endDate, this._config.selectionType)
     })
   }
 
   _setStartDate(date) {
-    this._startDate = date
+    this._startDate = setTimeFromDate(date, this._startDate)
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
       date: getDateBySelectionType(this._startDate, this._config.selectionType)
     })

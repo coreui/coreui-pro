@@ -256,6 +256,7 @@ class TimePicker extends BaseComponent {
       'am'
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
+    this._setUpSelects()
   }
 
   // Private
