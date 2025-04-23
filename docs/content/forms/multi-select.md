@@ -351,7 +351,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `selectionType` | string | `'tag'` | Sets the selection style.	 |
 | `selectionTypeCounterText` | string | `'item(s) selected'` | Sets the counter selection label.	|
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `value` | boolean | `null` | Sets the initial value for the multi-select component. |
+| `value` | boolean | `null` | Sets the initially selected values for the multi-select component. |
 {{< /bs-table >}}
 
 ### Methods
