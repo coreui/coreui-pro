@@ -25,12 +25,13 @@
   }
 
   // Bring the "active" form control to the top of surrounding elements
-  > .date-picker.show,
-  > .time-picker.show,
-  > .form-multi-select.show,
+  > .date-picker:focus-within,
+  > .time-picker:focus-within,
+  > .form-multi-select:focus-within,
   > .form-control:focus,
   > .form-select:focus,
-  > .form-floating:focus-within {
+  > .form-floating:focus-within,
+  > .form-password:focus-within {
     z-index: 5;
   }
 
@@ -107,13 +108,14 @@
 // stylelint-disable-next-line no-duplicate-selectors
 .input-group {
   &:not(.has-validation) {
-    > .date-picker > .date-picker-input-group,
-    > .time-picker > .time-picker-input-group,
-    > .form-multi-select > .form-multi-select-input-group,
+    > .date-picker:not(:last-child) > .date-picker-input-group,
+    > .time-picker:not(:last-child) > .time-picker-input-group,
+    > .form-multi-select:not(:last-child) > .form-multi-select-input-group,
     > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
     > .dropdown-toggle:nth-last-child(n + 3),
     > .form-floating:not(:last-child) > .form-control,
-    > .form-floating:not(:last-child) > .form-select {
+    > .form-floating:not(:last-child) > .form-select,
+    > .form-password:not(:last-child) > .form-control {
       @include border-end-radius(0);
     }
   }
@@ -125,7 +127,8 @@
     > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
     > .dropdown-toggle:nth-last-child(n + 4),
     > .form-floating:nth-last-child(n + 3) > .form-control,
-    > .form-floating:nth-last-child(n + 3) > .form-select {
+    > .form-floating:nth-last-child(n + 3) > .form-select,
+    > .form-password:nth-last-child(n + 3) > .form-control {
       @include border-end-radius(0);
     }
   }
@@ -140,11 +143,12 @@
     @include border-start-radius(0);
   }
 
-  > .date-picker > .date-picker-input-group,
-  > .time-picker > .time-picker-input-group,
-  > .form-multi-select > .form-multi-select-input-group,
+  > .date-picker:not(:first-child) > .date-picker-input-group,
+  > .time-picker:not(:first-child) > .time-picker-input-group,
+  > .form-multi-select:not(:first-child) > .form-multi-select-input-group,
   > .form-floating:not(:first-child) > .form-control,
-  > .form-floating:not(:first-child) > .form-select {
+  > .form-floating:not(:first-child) > .form-select,
+  > .form-password:not(:first-child) > .form-control {
     @include border-start-radius(0);
   }
 }

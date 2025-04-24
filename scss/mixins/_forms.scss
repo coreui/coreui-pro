@@ -86,6 +86,19 @@
     }
   }
 
+  .form-password .form-control {
+    @include form-validation-state-selector($state) {
+
+      @if $enable-validation-icons {
+        background-image: none;
+      }
+
+      ~ .form-password-action .form-password-action-icon {
+        background-color: $border-color;
+      }
+    }
+  }
+
   // stylelint-disable-next-line selector-no-qualifying-type
   textarea.form-control {
     @include form-validation-state-selector($state) {
@@ -154,9 +167,13 @@
   }
 
   .input-group {
-    > .form-control:not(:focus),
-    > .form-select:not(:focus),
-    > .form-floating:not(:focus-within) {
+    > .date-picker:focus-within,
+    > .time-picker:focus-within,
+    > .form-multi-select:focus-within,
+    > .form-control:focus,
+    > .form-select:focus,
+    > .form-floating:focus-within,
+    > .form-password:focus-within {
       @include form-validation-state-selector($state) {
         @if $state == "valid" {
           z-index: 3;
