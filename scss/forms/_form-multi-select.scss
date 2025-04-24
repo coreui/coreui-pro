@@ -112,12 +112,21 @@
 
   .was-validated .form-multi-select:invalid + &,
   &.is-invalid {
+    $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($form-multi-select-invalid-border-color, $input-btn-focus-color-opacity);
+
     --#{$prefix}form-multi-select-border-color: #{$form-multi-select-invalid-border-color};
+    --#{$prefix}form-multi-select-focus-border-color: #{$form-multi-select-invalid-border-color};
+    --#{$prefix}form-multi-select-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+
   }
 
   .was-validated .form-multi-select:valid + &,
   &.is-valid {
+    $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($form-multi-select-valid-border-color, $input-btn-focus-color-opacity);
+
     --#{$prefix}form-multi-select-border-color: #{$form-multi-select-valid-border-color};
+    --#{$prefix}form-multi-select-focus-border-color: #{$form-multi-select-valid-border-color};
+    --#{$prefix}form-multi-select-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
   }
 }
 

@@ -64,15 +64,23 @@
   // scss-docs-end date-picker-css-vars
 
   &.is-invalid {
+    $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($date-picker-invalid-border-color, $input-btn-focus-color-opacity);
+
     --#{$prefix}date-picker-border-color: #{$date-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}date-picker-indicator-icon-color: #{$date-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}date-picker-indicator-icon: #{escape-svg($date-picker-indicator-invalid-icon)} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-focus-border-color: #{$date-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
   }
 
   &.is-valid {
+    $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($date-picker-valid-border-color, $input-btn-focus-color-opacity);
+
     --#{$prefix}date-picker-border-color: #{$date-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}date-picker-indicator-icon-color: #{$date-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important
     --#{$prefix}date-picker-indicator-icon: #{escape-svg($date-picker-indicator-valid-icon)} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-focus-border-color: #{$date-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
+    --#{$prefix}date-picker-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
   }
 }
 
