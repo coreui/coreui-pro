@@ -61,10 +61,6 @@
     - title: Overview
     - title: Form control
     - title: Select
-    - title: Multi Select
-      badge:
-        color: danger
-        text: PRO
     - title: Checks & radios
     - title: Range
     - title: Range Slider
@@ -81,7 +77,15 @@
       badge:
         color: danger
         text: PRO
+    - title: Multi Select
+      badge:
+        color: danger
+        text: PRO
     - title: Rating
+      badge:
+        color: danger
+        text: PRO
+    - title: Password Input
       badge:
         color: danger
         text: PRO

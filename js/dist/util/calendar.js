@@ -236,7 +236,7 @@
    * @returns The ISO week number.
    */
   const getWeekNumber = date => {
-    const tempDate = new Date(date.getTime());
+    const tempDate = new Date(date);
     tempDate.setHours(0, 0, 0, 0);
 
     // Thursday in current week decides the year
@@ -541,6 +541,22 @@
     return clearedDate;
   };
 
+  /**
+   * Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
+   *
+   * @param {Date} target - The date whose time will be updated.
+   * @param {Date} source - The date to copy the time from.
+   * @returns {Date} A new Date instance with the date from `target` and time from `source`.
+   */
+  const setTimeFromDate = (target, source) => {
+    if (!(source instanceof Date)) {
+      return target;
+    }
+    const result = new Date(target); // create a copy to avoid mutation
+    result.setHours(source.getHours(), source.getMinutes(), source.getSeconds(), source.getMilliseconds());
+    return result;
+  };
+
   exports.convertIsoWeekToDate = convertIsoWeekToDate;
   exports.convertToDateObject = convertToDateObject;
   exports.createGroupsInArray = createGroupsInArray;
@@ -565,6 +581,7 @@
   exports.isYearInRange = isYearInRange;
   exports.isYearSelected = isYearSelected;
   exports.removeTimeFromDate = removeTimeFromDate;
+  exports.setTimeFromDate = setTimeFromDate;
 
   Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 

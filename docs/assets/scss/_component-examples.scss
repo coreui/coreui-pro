@@ -74,6 +74,12 @@
     }
   }
 
+  > .form-password {
+    + .form-password {
+      margin-top: .5rem;
+    }
+  }
+
   > .nav + .nav,
   > .alert + .alert,
   > .navbar + .navbar,

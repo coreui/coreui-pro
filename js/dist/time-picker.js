@@ -268,6 +268,7 @@
       this._ampm = this._date ? time_js.getAmPm(new Date(this._date), this._config.locale) : 'am';
       this._timePickerBody.innerHTML = '';
       this._createTimePickerSelection();
+      this._setUpSelects();
     }
 
     // Private

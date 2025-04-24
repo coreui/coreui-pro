@@ -115,7 +115,8 @@
     selectAllLabel: 'Select all options',
     selectionType: 'tags',
     selectionTypeCounterText: 'item(s) selected',
-    valid: false
+    valid: false,
+    value: null
   };
   const DefaultType = {
     ariaCleanerLabel: 'string',
@@ -136,7 +137,8 @@
     selectAllLabel: 'string',
     selectionType: 'string',
     selectionTypeCounterText: 'string',
-    valid: 'boolean'
+    valid: 'boolean',
+    value: '(string|array|null)'
   };
 
   /**
@@ -148,6 +150,7 @@
   class MultiSelect extends BaseComponent {
     constructor(element, config) {
       super(element, config);
+      this._configureNativeSelect();
       this._indicatorElement = null;
       this._selectAllElement = null;
       this._selectionElement = null;
@@ -157,12 +160,12 @@
       this._optionsElement = null;
       this._clone = null;
       this._menu = null;
+      this._selected = [];
       this._options = this._getOptions();
       this._popper = null;
       this._search = '';
-      this._selected = this._getSelectedOptions(this._options);
       if (this._config.options.length > 0) {
-        this._createNativeSelect(this._config.options);
+        this._createNativeOptions(this._element, this._config.options);
       }
       this._createSelect();
       this._addEventListeners();
@@ -231,8 +234,8 @@
     }
     update(config) {
       this._config = this._getConfig(config);
+      this._selected = [];
       this._options = this._getOptions();
-      this._selected = this._getSelectedOptions(this._options);
       this._menu.remove();
       this._clone.remove();
       this._element.innerHTML = '';
@@ -352,51 +355,75 @@
     _getClassNames() {
       return this._element.classList.value.split(' ');
     }
-    _getOptions(node = this._element) {
+    _getOptions() {
       if (this._config.options) {
-        return this._config.options;
+        return this._getOptionsFromConfig();
       }
-      const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
-      const options = [];
-      for (const node of nodes) {
-        if (node.nodeName === 'OPTION' && node.value) {
-          options.push({
-            value: node.value,
-            text: node.innerHTML,
-            selected: node.selected,
-            disabled: node.disabled
-          });
-        }
-        if (node.nodeName === 'OPTGROUP') {
-          options.push({
-            label: node.label,
-            options: this._getOptions(node)
-          });
-        }
-      }
-      return options;
+      return this._getOptionsFromElement();
     }
-    _getSelectedOptions(options) {
-      const selected = [];
+    _getOptionsFromConfig(options = this._config.options) {
+      const _options = [];
       for (const option of options) {
-        if (typeof option.value === 'undefined') {
-          this._getSelectedOptions(option.options);
+        if (option.options && Array.isArray(option.options)) {
+          _options.push({
+            label: option.label,
+            options: this._getOptionsFromConfig(option.options)
+          });
           continue;
         }
-        if (option.selected) {
-          // Add only the last option if single select
-          if (!this._config.multiple) {
-            selected.length = 0;
-          }
-          selected.push({
+        const value = String(option.value);
+        const isSelected = option.selected || this._config.value && this._config.value.includes(value);
+        _options.push({
+          ...option,
+          value,
+          ...(isSelected && {
+            selected: true
+          }),
+          ...(option.disabled && {
+            disabled: true
+          })
+        });
+        if (isSelected) {
+          this._selected.push({
             value: String(option.value),
             text: option.text
           });
         }
       }
-      return selected;
+      return _options;
     }
-    _createNativeSelect(data) {
+    _getOptionsFromElement(node = this._element) {
+      const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
+      const options = [];
+      for (const node of nodes) {
+        if (node.nodeName === 'OPTION' && node.value) {
+          const isSelected = node.selected || this._config.value && this._config.value.includes(node.value);
+          options.push({
+            value: node.value,
+            text: node.innerHTML,
+            selected: isSelected,
+            disabled: node.disabled
+          });
+          if (node.selected || isSelected) {
+            this._selected.push({
+              value: node.value,
+              text: node.innerHTML,
+              ...(node.disabled && {
+                disabled: true
+              })
+            });
+          }
+        }
+        if (node.nodeName === 'OPTGROUP') {
+          options.push({
+            label: node.label,
+            options: this._getOptionsFromElement(node)
+          });
+        }
+      }
+      return options;
+    }
+    _configureNativeSelect() {
       this._element.classList.add(CLASS_NAME_SELECT);
       if (this._config.multiple) {
         this._element.setAttribute('multiple', true);
@@ -404,7 +431,6 @@
       if (this._config.required) {
         this._element.setAttribute('required', true);
       }
-      this._createNativeOptions(this._element, data);
     }
     _createNativeOptions(parentElement, options) {
       for (const option of options) {
@@ -586,12 +612,12 @@
         }
       }
     }
-    _createTag(value, text) {
+    _createTag(value, text, disabled) {
       const tag = document.createElement('div');
       tag.classList.add(CLASS_NAME_TAG);
       tag.dataset.value = value;
       tag.innerHTML = text;
-      if (!this._config.disabled) {
+      if (!this._config.disabled && disabled !== true) {
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
@@ -629,7 +655,7 @@
     }
     _findOptionByValue(value, options = this._options) {
       for (const option of options) {
-        if (option.value === value) {
+        if (String(option.value) === value) {
           return option;
         }
         if (option.options && Array.isArray(option.options)) {
@@ -668,8 +694,7 @@
       this._updateSearchSize();
     }
     _deselectOption(value) {
-      const selected = this._selected.filter(option => option.value !== String(value));
-      this._selected = selected;
+      this._selected = this._selected.filter(option => option.value !== String(value));
       SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false;
       const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
       if (option) {
@@ -685,8 +710,10 @@
     }
     _deselectLastOption() {
       if (this._selected.length > 0) {
-        const last = this._selected.pop();
-        this._deselectOption(last.value);
+        const last = this._selected.findLast(option => option.disabled !== true);
+        if (last) {
+          this._deselectOption(last.value);
+        }
       }
     }
     _updateSelection() {
@@ -702,7 +729,7 @@
       if (this._config.multiple && this._config.selectionType === 'tags') {
         selection.innerHTML = '';
         for (const option of this._selected) {
-          selection.append(this._createTag(option.value, option.text));
+          selection.append(this._createTag(option.value, option.text, option.disabled));
         }
       }
       if (this._config.multiple && this._config.selectionType === 'text') {
@@ -850,6 +877,12 @@
       }
       if (typeof config.container === 'object' || typeof config.container === 'string') {
         config.container = index_js.getElement(config.container);
+      }
+      if (typeof config.value === 'number') {
+        config.value = [String(config.value)];
+      }
+      if (typeof config.value === 'string') {
+        config.value = config.value.split(/,\s*/).map(String);
       }
       return config;
     }

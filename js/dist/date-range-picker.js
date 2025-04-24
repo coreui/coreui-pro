@@ -239,8 +239,8 @@
       if (this._config.disabled || this._isShown()) {
         return;
       }
-      this._initialStartDate = new Date(this._startDate);
-      this._initialEndDate = new Date(this._endDate);
+      this._initialStartDate = this._startDate ? new Date(this._startDate) : null;
+      this._initialEndDate = this._endDate ? new Date(this._endDate) : null;
       EventHandler.trigger(this._element, EVENT_SHOW);
       this._element.classList.add(CLASS_NAME_SHOW);
       this._element.setAttribute('aria-expanded', true);
@@ -269,12 +269,16 @@
       super.dispose();
     }
     cancel() {
-      this._changeStartDate(this._initialStartDate);
-      if (this._config.range) {
+      this.hide();
+      if (this._initialStartDate) {
+        this._changeStartDate(this._initialStartDate);
+      }
+      if (this._config.range && this._initialEndDate) {
         this._changeEndDate(this._initialEndDate);
       }
-      this.hide();
-      this._calendar.update(this._getCalendarConfig);
+      if (this._initialStartDate || this._initialEndDate) {
+        this._calendar.update(this._getCalendarConfig);
+      }
     }
     clear() {
       this._changeStartDate(null);

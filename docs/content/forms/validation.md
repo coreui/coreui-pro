@@ -39,12 +39,6 @@ Custom feedback styles apply custom colors, borders, focus styles, and backgroun
 
 {{< example >}}
 <form class="row g-3 needs-validation" novalidate>
-  <div class="col-lg-5">
-    <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker"></div>
-  </div>
-  <div class="col-lg-4">
-    <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
-  </div>
   <div class="col-md-4">
     <label for="validationCustom01" class="form-label">First name</label>
     <input type="text" class="form-control" id="validationCustom01" value="Mark" required>

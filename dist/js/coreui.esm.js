@@ -853,11 +853,11 @@ const enableDismissTrigger = (component, method = 'hide') => {
  * Constants
  */
 
-const NAME$p = 'alert';
-const DATA_KEY$k = 'coreui.alert';
-const EVENT_KEY$l = `.${DATA_KEY$k}`;
-const EVENT_CLOSE = `close${EVENT_KEY$l}`;
-const EVENT_CLOSED = `closed${EVENT_KEY$l}`;
+const NAME$q = 'alert';
+const DATA_KEY$l = 'coreui.alert';
+const EVENT_KEY$m = `.${DATA_KEY$l}`;
+const EVENT_CLOSE = `close${EVENT_KEY$m}`;
+const EVENT_CLOSED = `closed${EVENT_KEY$m}`;
 const CLASS_NAME_FADE$5 = 'fade';
 const CLASS_NAME_SHOW$e = 'show';
 
@@ -868,7 +868,7 @@ const CLASS_NAME_SHOW$e = 'show';
 class Alert extends BaseComponent {
   // Getters
   static get NAME() {
-    return NAME$p;
+    return NAME$q;
   }
 
   // Public
@@ -931,13 +931,13 @@ defineJQueryPlugin(Alert);
  * Constants
  */
 
-const NAME$o = 'button';
-const DATA_KEY$j = 'coreui.button';
-const EVENT_KEY$k = `.${DATA_KEY$j}`;
-const DATA_API_KEY$g = '.data-api';
+const NAME$p = 'button';
+const DATA_KEY$k = 'coreui.button';
+const EVENT_KEY$l = `.${DATA_KEY$k}`;
+const DATA_API_KEY$h = '.data-api';
 const CLASS_NAME_ACTIVE$5 = 'active';
-const SELECTOR_DATA_TOGGLE$d = '[data-coreui-toggle="button"]';
-const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$k}${DATA_API_KEY$g}`;
+const SELECTOR_DATA_TOGGLE$e = '[data-coreui-toggle="button"]';
+const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$l}${DATA_API_KEY$h}`;
 
 /**
  * Class definition
@@ -946,7 +946,7 @@ const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$k}${DATA_API_KEY$g}`;
 class Button extends BaseComponent {
   // Getters
   static get NAME() {
-    return NAME$o;
+    return NAME$p;
   }
 
   // Public
@@ -970,9 +970,9 @@ class Button extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API$e, SELECTOR_DATA_TOGGLE$d, event => {
+EventHandler.on(document, EVENT_CLICK_DATA_API$f, SELECTOR_DATA_TOGGLE$e, event => {
   event.preventDefault();
-  const button = event.target.closest(SELECTOR_DATA_TOGGLE$d);
+  const button = event.target.closest(SELECTOR_DATA_TOGGLE$e);
   const data = Button.getOrCreateInstance(button);
   data.toggle();
 });
@@ -1175,7 +1175,7 @@ const getTrailingDays = (year, month, leadingDays, monthDays) => {
  * @returns The ISO week number.
  */
 const getWeekNumber = date => {
-  const tempDate = new Date(date.getTime());
+  const tempDate = new Date(date);
   tempDate.setHours(0, 0, 0, 0);
 
   // Thursday in current week decides the year
@@ -1480,6 +1480,22 @@ const removeTimeFromDate = date => {
   return clearedDate;
 };
 
+/**
+ * Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
+ *
+ * @param {Date} target - The date whose time will be updated.
+ * @param {Date} source - The date to copy the time from.
+ * @returns {Date} A new Date instance with the date from `target` and time from `source`.
+ */
+const setTimeFromDate = (target, source) => {
+  if (!(source instanceof Date)) {
+    return target;
+  }
+  const result = new Date(target); // create a copy to avoid mutation
+  result.setHours(source.getHours(), source.getMinutes(), source.getSeconds(), source.getMilliseconds());
+  return result;
+};
+
 /* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
 /**
  * --------------------------------------------------------------------------
@@ -1493,29 +1509,29 @@ const removeTimeFromDate = date => {
  * Constants
  */
 
-const NAME$n = 'calendar';
-const DATA_KEY$i = 'coreui.calendar';
-const EVENT_KEY$j = `.${DATA_KEY$i}`;
-const DATA_API_KEY$f = '.data-api';
+const NAME$o = 'calendar';
+const DATA_KEY$j = 'coreui.calendar';
+const EVENT_KEY$k = `.${DATA_KEY$j}`;
+const DATA_API_KEY$g = '.data-api';
 const ARROW_UP_KEY$3 = 'ArrowUp';
 const ARROW_RIGHT_KEY$2 = 'ArrowRight';
 const ARROW_DOWN_KEY$3 = 'ArrowDown';
 const ARROW_LEFT_KEY$2 = 'ArrowLeft';
 const ENTER_KEY$3 = 'Enter';
 const SPACE_KEY$1 = 'Space';
-const EVENT_BLUR = `blur${EVENT_KEY$j}`;
-const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$j}`;
-const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$j}`;
-const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$j}`;
-const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$j}`;
-const EVENT_FOCUS = `focus${EVENT_KEY$j}`;
-const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$j}`;
-const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$j}`;
-const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$j}`;
-const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$j}`;
-const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$j}`;
-const EVENT_LOAD_DATA_API$c = `load${EVENT_KEY$j}${DATA_API_KEY$f}`;
-const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$j}${DATA_API_KEY$f}`;
+const EVENT_BLUR = `blur${EVENT_KEY$k}`;
+const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$k}`;
+const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$k}`;
+const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$k}`;
+const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$k}`;
+const EVENT_FOCUS = `focus${EVENT_KEY$k}`;
+const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$k}`;
+const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$k}`;
+const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$k}`;
+const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$k}`;
+const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$k}`;
+const EVENT_LOAD_DATA_API$c = `load${EVENT_KEY$k}${DATA_API_KEY$g}`;
+const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$k}${DATA_API_KEY$g}`;
 const CLASS_NAME_CALENDAR_CELL = 'calendar-cell';
 const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner';
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row';
@@ -1532,7 +1548,7 @@ const SELECTOR_CALENDAR_CELL = '.calendar-cell';
 const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`;
 const SELECTOR_CALENDAR_ROW = '.calendar-row';
 const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
-const SELECTOR_DATA_TOGGLE$c = '[data-coreui-toggle="calendar"]';
+const SELECTOR_DATA_TOGGLE$d = '[data-coreui-toggle="calendar"]';
 const Default$m = {
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
@@ -1602,7 +1618,7 @@ class Calendar extends BaseComponent {
     return DefaultType$m;
   }
   static get NAME() {
-    return NAME$n;
+    return NAME$o;
   }
 
   // Public
@@ -1736,9 +1752,9 @@ class Calendar extends BaseComponent {
     if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
       return;
     }
-    this._hoverDate = date;
+    this._hoverDate = setTimeFromDate(date, this._selectEndDate ? this._endDate : this._startDate);
     EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-      date: getDateBySelectionType(date, this._config.selectionType)
+      date: getDateBySelectionType(this._hoverDate, this._config.selectionType)
     });
     this._updateClassNamesAndAriaLabels();
   }
@@ -1750,7 +1766,7 @@ class Calendar extends BaseComponent {
     this._updateClassNamesAndAriaLabels();
   }
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$e, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarClick(event);
     });
     EventHandler.on(this._element, EVENT_KEYDOWN$5, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
@@ -1768,7 +1784,7 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
       this._handleCalendarMouseLeave();
     });
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$e, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarClick(event);
     });
     EventHandler.on(this._element, EVENT_KEYDOWN$5, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
@@ -1809,7 +1825,7 @@ class Calendar extends BaseComponent {
       }
     };
     for (const [selector, handler] of Object.entries(navigationSelectors)) {
-      EventHandler.on(this._element, EVENT_CLICK_DATA_API$d, selector, event => {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$e, selector, event => {
         event.preventDefault();
         const selectors = SelectorEngine.find(selector, this._element);
         const selectorIndex = selectors.indexOf(event.target.closest(selector));
@@ -1848,13 +1864,13 @@ class Calendar extends BaseComponent {
     this._updateCalendar(callback);
   }
   _setEndDate(date) {
-    this._endDate = date;
+    this._endDate = setTimeFromDate(date, this._endDate);
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE$1, {
       date: getDateBySelectionType(this._endDate, this._config.selectionType)
     });
   }
   _setStartDate(date) {
-    this._startDate = date;
+    this._startDate = setTimeFromDate(date, this._startDate);
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE$1, {
       date: getDateBySelectionType(this._startDate, this._config.selectionType)
     });
@@ -2219,7 +2235,7 @@ class Calendar extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API$c, () => {
-  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE$c))) {
+  for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE$d))) {
     Calendar.calendarInterface(element);
   }
 });
@@ -2245,13 +2261,13 @@ defineJQueryPlugin(Calendar);
  * Constants
  */
 
-const NAME$m = 'swipe';
-const EVENT_KEY$i = '.coreui.swipe';
-const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$i}`;
-const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$i}`;
-const EVENT_TOUCHEND = `touchend${EVENT_KEY$i}`;
-const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$i}`;
-const EVENT_POINTERUP = `pointerup${EVENT_KEY$i}`;
+const NAME$n = 'swipe';
+const EVENT_KEY$j = '.coreui.swipe';
+const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$j}`;
+const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$j}`;
+const EVENT_TOUCHEND = `touchend${EVENT_KEY$j}`;
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$j}`;
+const EVENT_POINTERUP = `pointerup${EVENT_KEY$j}`;
 const POINTER_TYPE_TOUCH = 'touch';
 const POINTER_TYPE_PEN = 'pen';
 const CLASS_NAME_POINTER_EVENT = 'pointer-event';
@@ -2292,12 +2308,12 @@ class Swipe extends Config {
     return DefaultType$l;
   }
   static get NAME() {
-    return NAME$m;
+    return NAME$n;
   }
 
   // Public
   dispose() {
-    EventHandler.off(this._element, EVENT_KEY$i);
+    EventHandler.off(this._element, EVENT_KEY$j);
   }
 
   // Private
@@ -2368,10 +2384,10 @@ class Swipe extends Config {
  * Constants
  */
 
-const NAME$l = 'carousel';
-const DATA_KEY$h = 'coreui.carousel';
-const EVENT_KEY$h = `.${DATA_KEY$h}`;
-const DATA_API_KEY$e = '.data-api';
+const NAME$m = 'carousel';
+const DATA_KEY$i = 'coreui.carousel';
+const EVENT_KEY$i = `.${DATA_KEY$i}`;
+const DATA_API_KEY$f = '.data-api';
 const ARROW_LEFT_KEY$1 = 'ArrowLeft';
 const ARROW_RIGHT_KEY$1 = 'ArrowRight';
 const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
@@ -2380,14 +2396,14 @@ const ORDER_NEXT = 'next';
 const ORDER_PREV = 'prev';
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
-const EVENT_SLIDE = `slide${EVENT_KEY$h}`;
-const EVENT_SLID = `slid${EVENT_KEY$h}`;
-const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$h}`;
-const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$h}`;
-const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$h}`;
-const EVENT_DRAG_START = `dragstart${EVENT_KEY$h}`;
-const EVENT_LOAD_DATA_API$b = `load${EVENT_KEY$h}${DATA_API_KEY$e}`;
-const EVENT_CLICK_DATA_API$c = `click${EVENT_KEY$h}${DATA_API_KEY$e}`;
+const EVENT_SLIDE = `slide${EVENT_KEY$i}`;
+const EVENT_SLID = `slid${EVENT_KEY$i}`;
+const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$i}`;
+const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$i}`;
+const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$i}`;
+const EVENT_DRAG_START = `dragstart${EVENT_KEY$i}`;
+const EVENT_LOAD_DATA_API$b = `load${EVENT_KEY$i}${DATA_API_KEY$f}`;
+const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$i}${DATA_API_KEY$f}`;
 const CLASS_NAME_CAROUSEL = 'carousel';
 const CLASS_NAME_ACTIVE$4 = 'active';
 const CLASS_NAME_SLIDE = 'slide';
@@ -2451,7 +2467,7 @@ class Carousel extends BaseComponent {
     return DefaultType$k;
   }
   static get NAME() {
-    return NAME$l;
+    return NAME$m;
   }
 
   // Public
@@ -2695,7 +2711,7 @@ class Carousel extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API$c, SELECTOR_DATA_SLIDE, function (event) {
+EventHandler.on(document, EVENT_CLICK_DATA_API$d, SELECTOR_DATA_SLIDE, function (event) {
   const target = SelectorEngine.getElementFromSelector(this);
   if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
     return;
@@ -2744,15 +2760,15 @@ defineJQueryPlugin(Carousel);
  * Constants
  */
 
-const NAME$k = 'collapse';
-const DATA_KEY$g = 'coreui.collapse';
-const EVENT_KEY$g = `.${DATA_KEY$g}`;
-const DATA_API_KEY$d = '.data-api';
-const EVENT_SHOW$b = `show${EVENT_KEY$g}`;
-const EVENT_SHOWN$b = `shown${EVENT_KEY$g}`;
-const EVENT_HIDE$b = `hide${EVENT_KEY$g}`;
-const EVENT_HIDDEN$b = `hidden${EVENT_KEY$g}`;
-const EVENT_CLICK_DATA_API$b = `click${EVENT_KEY$g}${DATA_API_KEY$d}`;
+const NAME$l = 'collapse';
+const DATA_KEY$h = 'coreui.collapse';
+const EVENT_KEY$h = `.${DATA_KEY$h}`;
+const DATA_API_KEY$e = '.data-api';
+const EVENT_SHOW$b = `show${EVENT_KEY$h}`;
+const EVENT_SHOWN$b = `shown${EVENT_KEY$h}`;
+const EVENT_HIDE$b = `hide${EVENT_KEY$h}`;
+const EVENT_HIDDEN$b = `hidden${EVENT_KEY$h}`;
+const EVENT_CLICK_DATA_API$c = `click${EVENT_KEY$h}${DATA_API_KEY$e}`;
 const CLASS_NAME_SHOW$d = 'show';
 const CLASS_NAME_COLLAPSE = 'collapse';
 const CLASS_NAME_COLLAPSING = 'collapsing';
@@ -2762,7 +2778,7 @@ const CLASS_NAME_HORIZONTAL = 'collapse-horizontal';
 const WIDTH = 'width';
 const HEIGHT = 'height';
 const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing';
-const SELECTOR_DATA_TOGGLE$b = '[data-coreui-toggle="collapse"]';
+const SELECTOR_DATA_TOGGLE$c = '[data-coreui-toggle="collapse"]';
 const Default$j = {
   parent: null,
   toggle: true
@@ -2781,7 +2797,7 @@ class Collapse extends BaseComponent {
     super(element, config);
     this._isTransitioning = false;
     this._triggerArray = [];
-    const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE$b);
+    const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE$c);
     for (const elem of toggleList) {
       const selector = SelectorEngine.getSelectorFromElement(elem);
       const filterElement = SelectorEngine.find(selector).filter(foundElement => foundElement === this._element);
@@ -2806,7 +2822,7 @@ class Collapse extends BaseComponent {
     return DefaultType$j;
   }
   static get NAME() {
-    return NAME$k;
+    return NAME$l;
   }
 
   // Public
@@ -2903,7 +2919,7 @@ class Collapse extends BaseComponent {
     if (!this._config.parent) {
       return;
     }
-    const children = this._getFirstLevelChildren(SELECTOR_DATA_TOGGLE$b);
+    const children = this._getFirstLevelChildren(SELECTOR_DATA_TOGGLE$c);
     for (const element of children) {
       const selected = SelectorEngine.getElementFromSelector(element);
       if (selected) {
@@ -2948,7 +2964,7 @@ class Collapse extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API$b, SELECTOR_DATA_TOGGLE$b, function (event) {
+EventHandler.on(document, EVENT_CLICK_DATA_API$c, SELECTOR_DATA_TOGGLE$c, function (event) {
   // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
   if (event.target.tagName === 'A' || event.delegateTarget && event.delegateTarget.tagName === 'A') {
     event.preventDefault();
@@ -3017,8 +3033,9 @@ const getAmPm = (date, locale) => {
  */
 const formatTimePartials = (values, locale, partial) => {
   const date = new Date();
+  const forceTwoDigit = shouldUseTwoDigitHour(locale);
   const formatter = new Intl.DateTimeFormat(locale, {
-    hour: 'numeric',
+    hour: forceTwoDigit ? '2-digit' : 'numeric',
     minute: '2-digit',
     second: '2-digit'
   });
@@ -3092,6 +3109,21 @@ const isValidTime = time => {
 };
 
 /**
+ * Checks whether the given locale formats the hour "9" with a leading zero ("09")
+ * when using `hour: 'numeric'` in `toLocaleTimeString`.
+ *
+ * This helps determine if you should force `hour: '2-digit'` for consistent formatting.
+ *
+ * @param {string} locale - The locale code (e.g., "en-US", "pl-PL").
+ * @returns {boolean} `true` if the formatted hour starts with a leading zero, otherwise `false`.
+ */
+const shouldUseTwoDigitHour = locale => {
+  const d = new Date(2020, 0, 1, 7, 5, 7); // 7:05:07
+  const formatted = d.toLocaleTimeString(locale);
+  return formatted.startsWith('0'); // check if the hour starts with "0"
+};
+
+/**
  * --------------------------------------------------------------------------
  * CoreUI PRO time-picker.js
  * License (https://coreui.io/pro/license/)
@@ -3103,27 +3135,27 @@ const isValidTime = time => {
  * Constants
  */
 
-const NAME$j = 'time-picker';
-const DATA_KEY$f = 'coreui.time-picker';
-const EVENT_KEY$f = `.${DATA_KEY$f}`;
-const DATA_API_KEY$c = '.data-api';
+const NAME$k = 'time-picker';
+const DATA_KEY$g = 'coreui.time-picker';
+const EVENT_KEY$g = `.${DATA_KEY$g}`;
+const DATA_API_KEY$d = '.data-api';
 const ENTER_KEY$2 = 'Enter';
 const ESCAPE_KEY$5 = 'Escape';
 const SPACE_KEY = 'Space';
 const TAB_KEY$5 = 'Tab';
 const RIGHT_MOUSE_BUTTON$4 = 2;
-const EVENT_CLICK$5 = `click${EVENT_KEY$f}`;
-const EVENT_HIDE$a = `hide${EVENT_KEY$f}`;
-const EVENT_HIDDEN$a = `hidden${EVENT_KEY$f}`;
+const EVENT_CLICK$5 = `click${EVENT_KEY$g}`;
+const EVENT_HIDE$a = `hide${EVENT_KEY$g}`;
+const EVENT_HIDDEN$a = `hidden${EVENT_KEY$g}`;
 const EVENT_INPUT$2 = 'input';
-const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$f}`;
-const EVENT_SHOW$a = `show${EVENT_KEY$f}`;
-const EVENT_SHOWN$a = `shown${EVENT_KEY$f}`;
+const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$g}`;
+const EVENT_SHOW$a = `show${EVENT_KEY$g}`;
+const EVENT_SHOWN$a = `shown${EVENT_KEY$g}`;
 const EVENT_SUBMIT$1 = 'submit';
-const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$f}`;
-const EVENT_CLICK_DATA_API$a = `click${EVENT_KEY$f}${DATA_API_KEY$c}`;
-const EVENT_KEYUP_DATA_API$4 = `keyup${EVENT_KEY$f}${DATA_API_KEY$c}`;
-const EVENT_LOAD_DATA_API$a = `load${EVENT_KEY$f}${DATA_API_KEY$c}`;
+const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$g}`;
+const EVENT_CLICK_DATA_API$b = `click${EVENT_KEY$g}${DATA_API_KEY$d}`;
+const EVENT_KEYUP_DATA_API$4 = `keyup${EVENT_KEY$g}${DATA_API_KEY$d}`;
+const EVENT_LOAD_DATA_API$a = `load${EVENT_KEY$g}${DATA_API_KEY$d}`;
 const CLASS_NAME_BODY$1 = 'time-picker-body';
 const CLASS_NAME_CLEANER$2 = 'time-picker-cleaner';
 const CLASS_NAME_DISABLED$4 = 'disabled';
@@ -3143,8 +3175,8 @@ const CLASS_NAME_SELECTED$1 = 'selected';
 const CLASS_NAME_SHOW$c = 'show';
 const CLASS_NAME_TIME_PICKER$1 = 'time-picker';
 const CLASS_NAME_WAS_VALIDATED$1 = 'was-validated';
-const SELECTOR_DATA_TOGGLE$a = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)';
-const SELECTOR_DATA_TOGGLE_SHOWN$3 = `${SELECTOR_DATA_TOGGLE$a}.${CLASS_NAME_SHOW$c}`;
+const SELECTOR_DATA_TOGGLE$b = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)';
+const SELECTOR_DATA_TOGGLE_SHOWN$3 = `${SELECTOR_DATA_TOGGLE$b}.${CLASS_NAME_SHOW$c}`;
 const SELECTOR_WAS_VALIDATED$1 = 'form.was-validated';
 const Default$i = {
   cancelButton: 'Cancel',
@@ -3264,7 +3296,7 @@ class TimePicker extends BaseComponent {
     return DefaultType$i;
   }
   static get NAME() {
-    return NAME$j;
+    return NAME$k;
   }
 
   // Public
@@ -3331,6 +3363,7 @@ class TimePicker extends BaseComponent {
     this._ampm = this._date ? getAmPm(new Date(this._date), this._config.locale) : 'am';
     this._timePickerBody.innerHTML = '';
     this._createTimePickerSelection();
+    this._setUpSelects();
   }
 
   // Private
@@ -3772,12 +3805,12 @@ class TimePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API$a, () => {
-  const timePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE$a);
+  const timePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE$b);
   for (let i = 0, len = timePickers.length; i < len; i++) {
     TimePicker.timePickerInterface(timePickers[i]);
   }
 });
-EventHandler.on(document, EVENT_CLICK_DATA_API$a, TimePicker.clearMenus);
+EventHandler.on(document, EVENT_CLICK_DATA_API$b, TimePicker.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$4, TimePicker.clearMenus);
 
 /**
@@ -3814,28 +3847,28 @@ const getLocalDateFromString = (string, locale, time) => {
  * Constants
  */
 
-const NAME$i = 'date-range-picker';
-const DATA_KEY$e = 'coreui.date-range-picker';
-const EVENT_KEY$e = `.${DATA_KEY$e}`;
-const DATA_API_KEY$b = '.data-api';
+const NAME$j = 'date-range-picker';
+const DATA_KEY$f = 'coreui.date-range-picker';
+const EVENT_KEY$f = `.${DATA_KEY$f}`;
+const DATA_API_KEY$c = '.data-api';
 const ENTER_KEY$1 = 'Enter';
 const ESCAPE_KEY$4 = 'Escape';
 const TAB_KEY$4 = 'Tab';
 const RIGHT_MOUSE_BUTTON$3 = 2;
-const EVENT_CLICK$4 = `click${EVENT_KEY$e}`;
-const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY$e}`;
-const EVENT_HIDE$9 = `hide${EVENT_KEY$e}`;
-const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$e}`;
+const EVENT_CLICK$4 = `click${EVENT_KEY$f}`;
+const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY$f}`;
+const EVENT_HIDE$9 = `hide${EVENT_KEY$f}`;
+const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$f}`;
 const EVENT_INPUT$1 = 'input';
-const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$e}`;
+const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$f}`;
 const EVENT_RESIZE$4 = 'resize';
-const EVENT_SHOW$9 = `show${EVENT_KEY$e}`;
-const EVENT_SHOWN$9 = `shown${EVENT_KEY$e}`;
+const EVENT_SHOW$9 = `show${EVENT_KEY$f}`;
+const EVENT_SHOWN$9 = `shown${EVENT_KEY$f}`;
 const EVENT_SUBMIT = 'submit';
-const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY$e}`;
-const EVENT_CLICK_DATA_API$9 = `click${EVENT_KEY$e}${DATA_API_KEY$b}`;
-const EVENT_KEYUP_DATA_API$3 = `keyup${EVENT_KEY$e}${DATA_API_KEY$b}`;
-const EVENT_LOAD_DATA_API$9 = `load${EVENT_KEY$e}${DATA_API_KEY$b}`;
+const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY$f}`;
+const EVENT_CLICK_DATA_API$a = `click${EVENT_KEY$f}${DATA_API_KEY$c}`;
+const EVENT_KEYUP_DATA_API$3 = `keyup${EVENT_KEY$f}${DATA_API_KEY$c}`;
+const EVENT_LOAD_DATA_API$9 = `load${EVENT_KEY$f}${DATA_API_KEY$c}`;
 const CLASS_NAME_BODY = 'date-picker-body';
 const CLASS_NAME_CALENDAR = 'date-picker-calendar';
 const CLASS_NAME_CALENDARS = 'date-picker-calendars';
@@ -3857,8 +3890,8 @@ const CLASS_NAME_TIME_PICKER = 'time-picker';
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers';
 const CLASS_NAME_WAS_VALIDATED = 'was-validated';
 const SELECTOR_CALENDAR = '.calendars';
-const SELECTOR_DATA_TOGGLE$9 = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
-const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$9}.${CLASS_NAME_SHOW$b}`;
+const SELECTOR_DATA_TOGGLE$a = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)';
+const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$a}.${CLASS_NAME_SHOW$b}`;
 const SELECTOR_INPUT = '.date-picker-input';
 const SELECTOR_WAS_VALIDATED = 'form.was-validated';
 const Default$h = {
@@ -4002,7 +4035,7 @@ class DateRangePicker extends BaseComponent {
     return DefaultType$h;
   }
   static get NAME() {
-    return NAME$i;
+    return NAME$j;
   }
 
   // Public
@@ -4013,8 +4046,8 @@ class DateRangePicker extends BaseComponent {
     if (this._config.disabled || this._isShown()) {
       return;
     }
-    this._initialStartDate = new Date(this._startDate);
-    this._initialEndDate = new Date(this._endDate);
+    this._initialStartDate = this._startDate ? new Date(this._startDate) : null;
+    this._initialEndDate = this._endDate ? new Date(this._endDate) : null;
     EventHandler.trigger(this._element, EVENT_SHOW$9);
     this._element.classList.add(CLASS_NAME_SHOW$b);
     this._element.setAttribute('aria-expanded', true);
@@ -4043,12 +4076,16 @@ class DateRangePicker extends BaseComponent {
     super.dispose();
   }
   cancel() {
-    this._changeStartDate(this._initialStartDate);
-    if (this._config.range) {
+    this.hide();
+    if (this._initialStartDate) {
+      this._changeStartDate(this._initialStartDate);
+    }
+    if (this._config.range && this._initialEndDate) {
       this._changeEndDate(this._initialEndDate);
     }
-    this.hide();
-    this._calendar.update(this._getCalendarConfig);
+    if (this._initialStartDate || this._initialEndDate) {
+      this._calendar.update(this._getCalendarConfig);
+    }
   }
   clear() {
     this._changeStartDate(null);
@@ -4604,12 +4641,12 @@ class DateRangePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API$9, () => {
-  const dateRangePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE$9);
+  const dateRangePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE$a);
   for (let i = 0, len = dateRangePickers.length; i < len; i++) {
     DateRangePicker.dateRangePickerInterface(dateRangePickers[i]);
   }
 });
-EventHandler.on(document, EVENT_CLICK_DATA_API$9, DateRangePicker.clearMenus);
+EventHandler.on(document, EVENT_CLICK_DATA_API$a, DateRangePicker.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$3, DateRangePicker.clearMenus);
 
 /**
@@ -4630,23 +4667,23 @@ defineJQueryPlugin(DateRangePicker);
  * Constants
  */
 
-const NAME$h = 'date-picker';
-const DATA_KEY$d = 'coreui.date-picker';
-const EVENT_KEY$d = `.${DATA_KEY$d}`;
-const DATA_API_KEY$a = '.data-api';
+const NAME$i = 'date-picker';
+const DATA_KEY$e = 'coreui.date-picker';
+const EVENT_KEY$e = `.${DATA_KEY$e}`;
+const DATA_API_KEY$b = '.data-api';
 const TAB_KEY$3 = 'Tab';
 const RIGHT_MOUSE_BUTTON$2 = 2;
-const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY$d}`;
-const EVENT_HIDE$8 = `hide${EVENT_KEY$d}`;
-const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$d}`;
-const EVENT_SHOW$8 = `show${EVENT_KEY$d}`;
-const EVENT_SHOWN$8 = `shown${EVENT_KEY$d}`;
-const EVENT_CLICK_DATA_API$8 = `click${EVENT_KEY$d}${DATA_API_KEY$a}`;
-const EVENT_KEYUP_DATA_API$2 = `keyup${EVENT_KEY$d}${DATA_API_KEY$a}`;
-const EVENT_LOAD_DATA_API$8 = `load${EVENT_KEY$d}${DATA_API_KEY$a}`;
+const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY$e}`;
+const EVENT_HIDE$8 = `hide${EVENT_KEY$e}`;
+const EVENT_HIDDEN$8 = `hidden${EVENT_KEY$e}`;
+const EVENT_SHOW$8 = `show${EVENT_KEY$e}`;
+const EVENT_SHOWN$8 = `shown${EVENT_KEY$e}`;
+const EVENT_CLICK_DATA_API$9 = `click${EVENT_KEY$e}${DATA_API_KEY$b}`;
+const EVENT_KEYUP_DATA_API$2 = `keyup${EVENT_KEY$e}${DATA_API_KEY$b}`;
+const EVENT_LOAD_DATA_API$8 = `load${EVENT_KEY$e}${DATA_API_KEY$b}`;
 const CLASS_NAME_SHOW$a = 'show';
-const SELECTOR_DATA_TOGGLE$8 = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)';
-const SELECTOR_DATA_TOGGLE_SHOWN$1 = `${SELECTOR_DATA_TOGGLE$8}.${CLASS_NAME_SHOW$a}`;
+const SELECTOR_DATA_TOGGLE$9 = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)';
+const SELECTOR_DATA_TOGGLE_SHOWN$1 = `${SELECTOR_DATA_TOGGLE$9}.${CLASS_NAME_SHOW$a}`;
 const Default$g = {
   ...DateRangePicker.Default,
   calendars: 1,
@@ -4672,7 +4709,7 @@ class DatePicker extends DateRangePicker {
     return DefaultType$g;
   }
   static get NAME() {
-    return NAME$h;
+    return NAME$i;
   }
 
   // Overrides
@@ -4747,12 +4784,12 @@ class DatePicker extends DateRangePicker {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API$8, () => {
-  const datePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE$8);
+  const datePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE$9);
   for (let i = 0, len = datePickers.length; i < len; i++) {
     DatePicker.datePickerInterface(datePickers[i]);
   }
 });
-EventHandler.on(document, EVENT_CLICK_DATA_API$8, DatePicker.clearMenus);
+EventHandler.on(document, EVENT_CLICK_DATA_API$9, DatePicker.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$2, DatePicker.clearMenus);
 
 /**
@@ -4776,31 +4813,31 @@ defineJQueryPlugin(DatePicker);
  * Constants
  */
 
-const NAME$g = 'dropdown';
-const DATA_KEY$c = 'coreui.dropdown';
-const EVENT_KEY$c = `.${DATA_KEY$c}`;
-const DATA_API_KEY$9 = '.data-api';
+const NAME$h = 'dropdown';
+const DATA_KEY$d = 'coreui.dropdown';
+const EVENT_KEY$d = `.${DATA_KEY$d}`;
+const DATA_API_KEY$a = '.data-api';
 const ESCAPE_KEY$3 = 'Escape';
 const TAB_KEY$2 = 'Tab';
 const ARROW_UP_KEY$2 = 'ArrowUp';
 const ARROW_DOWN_KEY$2 = 'ArrowDown';
 const RIGHT_MOUSE_BUTTON$1 = 2; // MouseEvent.button value for the secondary button, usually the right button
 
-const EVENT_HIDE$7 = `hide${EVENT_KEY$c}`;
-const EVENT_HIDDEN$7 = `hidden${EVENT_KEY$c}`;
-const EVENT_SHOW$7 = `show${EVENT_KEY$c}`;
-const EVENT_SHOWN$7 = `shown${EVENT_KEY$c}`;
-const EVENT_CLICK_DATA_API$7 = `click${EVENT_KEY$c}${DATA_API_KEY$9}`;
-const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY$c}${DATA_API_KEY$9}`;
-const EVENT_KEYUP_DATA_API$1 = `keyup${EVENT_KEY$c}${DATA_API_KEY$9}`;
+const EVENT_HIDE$7 = `hide${EVENT_KEY$d}`;
+const EVENT_HIDDEN$7 = `hidden${EVENT_KEY$d}`;
+const EVENT_SHOW$7 = `show${EVENT_KEY$d}`;
+const EVENT_SHOWN$7 = `shown${EVENT_KEY$d}`;
+const EVENT_CLICK_DATA_API$8 = `click${EVENT_KEY$d}${DATA_API_KEY$a}`;
+const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY$d}${DATA_API_KEY$a}`;
+const EVENT_KEYUP_DATA_API$1 = `keyup${EVENT_KEY$d}${DATA_API_KEY$a}`;
 const CLASS_NAME_SHOW$9 = 'show';
 const CLASS_NAME_DROPUP = 'dropup';
 const CLASS_NAME_DROPEND = 'dropend';
 const CLASS_NAME_DROPSTART = 'dropstart';
 const CLASS_NAME_DROPUP_CENTER = 'dropup-center';
 const CLASS_NAME_DROPDOWN_CENTER = 'dropdown-center';
-const SELECTOR_DATA_TOGGLE$7 = '[data-coreui-toggle="dropdown"]:not(.disabled):not(:disabled)';
-const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$7}.${CLASS_NAME_SHOW$9}`;
+const SELECTOR_DATA_TOGGLE$8 = '[data-coreui-toggle="dropdown"]:not(.disabled):not(:disabled)';
+const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE$8}.${CLASS_NAME_SHOW$9}`;
 const SELECTOR_MENU = '.dropdown-menu';
 const SELECTOR_NAVBAR = '.navbar';
 const SELECTOR_NAVBAR_NAV = '.navbar-nav';
@@ -4852,7 +4889,7 @@ class Dropdown extends BaseComponent {
     return DefaultType$f;
   }
   static get NAME() {
-    return NAME$g;
+    return NAME$h;
   }
 
   // Public
@@ -4936,13 +4973,13 @@ class Dropdown extends BaseComponent {
     config = super._getConfig(config);
     if (typeof config.reference === 'object' && !isElement(config.reference) && typeof config.reference.getBoundingClientRect !== 'function') {
       // Popper virtual elements require a getBoundingClientRect method
-      throw new TypeError(`${NAME$g.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
+      throw new TypeError(`${NAME$h.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
     }
     return config;
   }
   _createPopper() {
     if (typeof Popper === 'undefined') {
-      throw new TypeError('Bootstrap\'s dropdowns require Popper (https://popper.js.org)');
+      throw new TypeError('CoreUI\'s dropdowns require Popper (https://popper.js.org/docs/v2/)');
     }
     let referenceElement = this._element;
     if (this._config.reference === 'parent') {
@@ -5096,7 +5133,7 @@ class Dropdown extends BaseComponent {
     event.preventDefault();
 
     // TODO: v6 revert #37011 & change markup https://getbootstrap.com/docs/5.3/forms/input-group/
-    const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$7) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$7)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$7)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$7, event.delegateTarget.parentNode);
+    const getToggleButton = this.matches(SELECTOR_DATA_TOGGLE$8) ? this : SelectorEngine.prev(this, SELECTOR_DATA_TOGGLE$8)[0] || SelectorEngine.next(this, SELECTOR_DATA_TOGGLE$8)[0] || SelectorEngine.findOne(SELECTOR_DATA_TOGGLE$8, event.delegateTarget.parentNode);
     const instance = Dropdown.getOrCreateInstance(getToggleButton);
     if (isUpOrDownEvent) {
       event.stopPropagation();
@@ -5117,11 +5154,11 @@ class Dropdown extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE$7, Dropdown.dataApiKeydownHandler);
+EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_DATA_TOGGLE$8, Dropdown.dataApiKeydownHandler);
 EventHandler.on(document, EVENT_KEYDOWN_DATA_API, SELECTOR_MENU, Dropdown.dataApiKeydownHandler);
-EventHandler.on(document, EVENT_CLICK_DATA_API$7, Dropdown.clearMenus);
+EventHandler.on(document, EVENT_CLICK_DATA_API$8, Dropdown.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API$1, Dropdown.clearMenus);
-EventHandler.on(document, EVENT_CLICK_DATA_API$7, SELECTOR_DATA_TOGGLE$7, function (event) {
+EventHandler.on(document, EVENT_CLICK_DATA_API$8, SELECTOR_DATA_TOGGLE$8, function (event) {
   event.preventDefault();
   Dropdown.getOrCreateInstance(this).toggle();
 });
@@ -5144,17 +5181,17 @@ defineJQueryPlugin(Dropdown);
  * Constants
  */
 
-const NAME$f = 'loading-button';
-const DATA_KEY$b = 'coreui.loading-button';
-const EVENT_KEY$b = `.${DATA_KEY$b}`;
-const DATA_API_KEY$8 = '.data-api';
-const EVENT_START = `start${EVENT_KEY$b}`;
-const EVENT_STOP = `stop${EVENT_KEY$b}`;
-const EVENT_CLICK_DATA_API$6 = `click${EVENT_KEY$b}${DATA_API_KEY$8}`;
+const NAME$g = 'loading-button';
+const DATA_KEY$c = 'coreui.loading-button';
+const EVENT_KEY$c = `.${DATA_KEY$c}`;
+const DATA_API_KEY$9 = '.data-api';
+const EVENT_START = `start${EVENT_KEY$c}`;
+const EVENT_STOP = `stop${EVENT_KEY$c}`;
+const EVENT_CLICK_DATA_API$7 = `click${EVENT_KEY$c}${DATA_API_KEY$9}`;
 const CLASS_NAME_IS_LOADING = 'is-loading';
 const CLASS_NAME_LOADING_BUTTON = 'btn-loading';
 const CLASS_NAME_LOADING_BUTTON_SPINNER = 'btn-loading-spinner';
-const SELECTOR_DATA_TOGGLE$6 = '[data-coreui-toggle="loading-button"]';
+const SELECTOR_DATA_TOGGLE$7 = '[data-coreui-toggle="loading-button"]';
 const Default$e = {
   disabledOnLoading: false,
   spinner: true,
@@ -5180,7 +5217,7 @@ class LoadingButton extends BaseComponent {
     this._spinner = null;
     this._state = 'idle';
     if (this._element) {
-      Data.set(element, DATA_KEY$b, this);
+      Data.set(element, DATA_KEY$c, this);
     }
     this._createButton();
   }
@@ -5194,7 +5231,7 @@ class LoadingButton extends BaseComponent {
     return DefaultType$e;
   }
   static get NAME() {
-    return NAME$f;
+    return NAME$g;
   }
 
   // Public
@@ -5234,7 +5271,7 @@ class LoadingButton extends BaseComponent {
     stoped();
   }
   dispose() {
-    Data.removeData(this._element, DATA_KEY$b);
+    Data.removeData(this._element, DATA_KEY$c);
     this._element = null;
   }
   _createButton() {
@@ -5280,9 +5317,9 @@ class LoadingButton extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API$6, SELECTOR_DATA_TOGGLE$6, event => {
+EventHandler.on(document, EVENT_CLICK_DATA_API$7, SELECTOR_DATA_TOGGLE$7, event => {
   event.preventDefault();
-  const button = event.target.closest(SELECTOR_DATA_TOGGLE$6);
+  const button = event.target.closest(SELECTOR_DATA_TOGGLE$7);
   const data = LoadingButton.getOrCreateInstance(button);
   data.start();
 });
@@ -5308,10 +5345,10 @@ defineJQueryPlugin(LoadingButton);
  * Constants
  */
 
-const NAME$e = 'backdrop';
+const NAME$f = 'backdrop';
 const CLASS_NAME_FADE$4 = 'fade';
 const CLASS_NAME_SHOW$8 = 'show';
-const EVENT_MOUSEDOWN$1 = `mousedown.coreui.${NAME$e}`;
+const EVENT_MOUSEDOWN$1 = `mousedown.coreui.${NAME$f}`;
 const Default$d = {
   className: 'modal-backdrop',
   clickCallback: null,
@@ -5348,7 +5385,7 @@ class Backdrop extends Config {
     return DefaultType$d;
   }
   static get NAME() {
-    return NAME$e;
+    return NAME$f;
   }
 
   // Public
@@ -5435,11 +5472,11 @@ class Backdrop extends Config {
  * Constants
  */
 
-const NAME$d = 'focustrap';
-const DATA_KEY$a = 'coreui.focustrap';
-const EVENT_KEY$a = `.${DATA_KEY$a}`;
-const EVENT_FOCUSIN$3 = `focusin${EVENT_KEY$a}`;
-const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$a}`;
+const NAME$e = 'focustrap';
+const DATA_KEY$b = 'coreui.focustrap';
+const EVENT_KEY$b = `.${DATA_KEY$b}`;
+const EVENT_FOCUSIN$3 = `focusin${EVENT_KEY$b}`;
+const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$b}`;
 const TAB_KEY$1 = 'Tab';
 const TAB_NAV_FORWARD = 'forward';
 const TAB_NAV_BACKWARD = 'backward';
@@ -5472,7 +5509,7 @@ class FocusTrap extends Config {
     return DefaultType$c;
   }
   static get NAME() {
-    return NAME$d;
+    return NAME$e;
   }
 
   // Public
@@ -5483,7 +5520,7 @@ class FocusTrap extends Config {
     if (this._config.autofocus) {
       this._config.trapElement.focus();
     }
-    EventHandler.off(document, EVENT_KEY$a); // guard against infinite focus loop
+    EventHandler.off(document, EVENT_KEY$b); // guard against infinite focus loop
     EventHandler.on(document, EVENT_FOCUSIN$3, event => this._handleFocusin(event));
     EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event));
     this._isActive = true;
@@ -5493,7 +5530,7 @@ class FocusTrap extends Config {
       return;
     }
     this._isActive = false;
-    EventHandler.off(document, EVENT_KEY$a);
+    EventHandler.off(document, EVENT_KEY$b);
   }
 
   // Private
@@ -5637,21 +5674,21 @@ class ScrollBarHelper {
  * Constants
  */
 
-const NAME$c = 'modal';
-const DATA_KEY$9 = 'coreui.modal';
-const EVENT_KEY$9 = `.${DATA_KEY$9}`;
-const DATA_API_KEY$7 = '.data-api';
+const NAME$d = 'modal';
+const DATA_KEY$a = 'coreui.modal';
+const EVENT_KEY$a = `.${DATA_KEY$a}`;
+const DATA_API_KEY$8 = '.data-api';
 const ESCAPE_KEY$2 = 'Escape';
-const EVENT_HIDE$6 = `hide${EVENT_KEY$9}`;
-const EVENT_HIDE_PREVENTED$1 = `hidePrevented${EVENT_KEY$9}`;
-const EVENT_HIDDEN$6 = `hidden${EVENT_KEY$9}`;
-const EVENT_SHOW$6 = `show${EVENT_KEY$9}`;
-const EVENT_SHOWN$6 = `shown${EVENT_KEY$9}`;
-const EVENT_RESIZE$3 = `resize${EVENT_KEY$9}`;
-const EVENT_CLICK_DISMISS = `click.dismiss${EVENT_KEY$9}`;
-const EVENT_MOUSEDOWN_DISMISS = `mousedown.dismiss${EVENT_KEY$9}`;
-const EVENT_KEYDOWN_DISMISS$1 = `keydown.dismiss${EVENT_KEY$9}`;
-const EVENT_CLICK_DATA_API$5 = `click${EVENT_KEY$9}${DATA_API_KEY$7}`;
+const EVENT_HIDE$6 = `hide${EVENT_KEY$a}`;
+const EVENT_HIDE_PREVENTED$1 = `hidePrevented${EVENT_KEY$a}`;
+const EVENT_HIDDEN$6 = `hidden${EVENT_KEY$a}`;
+const EVENT_SHOW$6 = `show${EVENT_KEY$a}`;
+const EVENT_SHOWN$6 = `shown${EVENT_KEY$a}`;
+const EVENT_RESIZE$3 = `resize${EVENT_KEY$a}`;
+const EVENT_CLICK_DISMISS = `click.dismiss${EVENT_KEY$a}`;
+const EVENT_MOUSEDOWN_DISMISS = `mousedown.dismiss${EVENT_KEY$a}`;
+const EVENT_KEYDOWN_DISMISS$1 = `keydown.dismiss${EVENT_KEY$a}`;
+const EVENT_CLICK_DATA_API$6 = `click${EVENT_KEY$a}${DATA_API_KEY$8}`;
 const CLASS_NAME_OPEN = 'modal-open';
 const CLASS_NAME_FADE$3 = 'fade';
 const CLASS_NAME_SHOW$7 = 'show';
@@ -5659,7 +5696,7 @@ const CLASS_NAME_STATIC = 'modal-static';
 const OPEN_SELECTOR$1 = '.modal.show';
 const SELECTOR_DIALOG = '.modal-dialog';
 const SELECTOR_MODAL_BODY = '.modal-body';
-const SELECTOR_DATA_TOGGLE$5 = '[data-coreui-toggle="modal"]';
+const SELECTOR_DATA_TOGGLE$6 = '[data-coreui-toggle="modal"]';
 const Default$b = {
   backdrop: true,
   focus: true,
@@ -5695,7 +5732,7 @@ class Modal extends BaseComponent {
     return DefaultType$b;
   }
   static get NAME() {
-    return NAME$c;
+    return NAME$d;
   }
 
   // Public
@@ -5734,8 +5771,8 @@ class Modal extends BaseComponent {
     this._queueCallback(() => this._hideModal(), this._element, this._isAnimated());
   }
   dispose() {
-    EventHandler.off(window, EVENT_KEY$9);
-    EventHandler.off(this._dialog, EVENT_KEY$9);
+    EventHandler.off(window, EVENT_KEY$a);
+    EventHandler.off(this._dialog, EVENT_KEY$a);
     this._backdrop.dispose();
     this._focustrap.deactivate();
     super.dispose();
@@ -5897,7 +5934,7 @@ class Modal extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API$5, SELECTOR_DATA_TOGGLE$5, function (event) {
+EventHandler.on(document, EVENT_CLICK_DATA_API$6, SELECTOR_DATA_TOGGLE$6, function (event) {
   const target = SelectorEngine.getElementFromSelector(this);
   if (['A', 'AREA'].includes(this.tagName)) {
     event.preventDefault();
@@ -5944,10 +5981,10 @@ defineJQueryPlugin(Modal);
  * ------------------------------------------------------------------------
  */
 
-const NAME$b = 'multi-select';
-const DATA_KEY$8 = 'coreui.multi-select';
-const EVENT_KEY$8 = `.${DATA_KEY$8}`;
-const DATA_API_KEY$6 = '.data-api';
+const NAME$c = 'multi-select';
+const DATA_KEY$9 = 'coreui.multi-select';
+const EVENT_KEY$9 = `.${DATA_KEY$9}`;
+const DATA_API_KEY$7 = '.data-api';
 const ARROW_UP_KEY$1 = 'ArrowUp';
 const ARROW_DOWN_KEY$1 = 'ArrowDown';
 const BACKSPACE_KEY = 'Backspace';
@@ -5966,18 +6003,18 @@ const SELECTOR_SEARCH = '.form-multi-select-search';
 const SELECTOR_SELECT = '.form-multi-select';
 const SELECTOR_SELECTION = '.form-multi-select-selection';
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)';
-const EVENT_CHANGED = `changed${EVENT_KEY$8}`;
-const EVENT_CLICK$3 = `click${EVENT_KEY$8}`;
-const EVENT_HIDE$5 = `hide${EVENT_KEY$8}`;
-const EVENT_HIDDEN$5 = `hidden${EVENT_KEY$8}`;
-const EVENT_KEYDOWN$1 = `keydown${EVENT_KEY$8}`;
-const EVENT_KEYUP = `keyup${EVENT_KEY$8}`;
-const EVENT_SEARCH = `search${EVENT_KEY$8}`;
-const EVENT_SHOW$5 = `show${EVENT_KEY$8}`;
-const EVENT_SHOWN$5 = `shown${EVENT_KEY$8}`;
-const EVENT_CLICK_DATA_API$4 = `click${EVENT_KEY$8}${DATA_API_KEY$6}`;
-const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY$8}${DATA_API_KEY$6}`;
-const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$8}${DATA_API_KEY$6}`;
+const EVENT_CHANGED = `changed${EVENT_KEY$9}`;
+const EVENT_CLICK$3 = `click${EVENT_KEY$9}`;
+const EVENT_HIDE$5 = `hide${EVENT_KEY$9}`;
+const EVENT_HIDDEN$5 = `hidden${EVENT_KEY$9}`;
+const EVENT_KEYDOWN$1 = `keydown${EVENT_KEY$9}`;
+const EVENT_KEYUP = `keyup${EVENT_KEY$9}`;
+const EVENT_SEARCH = `search${EVENT_KEY$9}`;
+const EVENT_SHOW$5 = `show${EVENT_KEY$9}`;
+const EVENT_SHOWN$5 = `shown${EVENT_KEY$9}`;
+const EVENT_CLICK_DATA_API$5 = `click${EVENT_KEY$9}${DATA_API_KEY$7}`;
+const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY$9}${DATA_API_KEY$7}`;
+const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$9}${DATA_API_KEY$7}`;
 const CLASS_NAME_CLEANER = 'form-multi-select-cleaner';
 const CLASS_NAME_DISABLED$2 = 'disabled';
 const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group';
@@ -6017,7 +6054,8 @@ const Default$a = {
   selectAllLabel: 'Select all options',
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
-  valid: false
+  valid: false,
+  value: null
 };
 const DefaultType$a = {
   ariaCleanerLabel: 'string',
@@ -6038,7 +6076,8 @@ const DefaultType$a = {
   selectAllLabel: 'string',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
-  valid: 'boolean'
+  valid: 'boolean',
+  value: '(string|array|null)'
 };
 
 /**
@@ -6050,6 +6089,7 @@ const DefaultType$a = {
 class MultiSelect extends BaseComponent {
   constructor(element, config) {
     super(element, config);
+    this._configureNativeSelect();
     this._indicatorElement = null;
     this._selectAllElement = null;
     this._selectionElement = null;
@@ -6059,16 +6099,16 @@ class MultiSelect extends BaseComponent {
     this._optionsElement = null;
     this._clone = null;
     this._menu = null;
+    this._selected = [];
     this._options = this._getOptions();
     this._popper = null;
     this._search = '';
-    this._selected = this._getSelectedOptions(this._options);
     if (this._config.options.length > 0) {
-      this._createNativeSelect(this._config.options);
+      this._createNativeOptions(this._element, this._config.options);
     }
     this._createSelect();
     this._addEventListeners();
-    Data.set(this._element, DATA_KEY$8, this);
+    Data.set(this._element, DATA_KEY$9, this);
   }
 
   // Getters
@@ -6080,7 +6120,7 @@ class MultiSelect extends BaseComponent {
     return DefaultType$a;
   }
   static get NAME() {
-    return NAME$b;
+    return NAME$c;
   }
 
   // Public
@@ -6133,8 +6173,8 @@ class MultiSelect extends BaseComponent {
   }
   update(config) {
     this._config = this._getConfig(config);
+    this._selected = [];
     this._options = this._getOptions();
-    this._selected = this._getSelectedOptions(this._options);
     this._menu.remove();
     this._clone.remove();
     this._element.innerHTML = '';
@@ -6254,51 +6294,75 @@ class MultiSelect extends BaseComponent {
   _getClassNames() {
     return this._element.classList.value.split(' ');
   }
-  _getOptions(node = this._element) {
+  _getOptions() {
     if (this._config.options) {
-      return this._config.options;
+      return this._getOptionsFromConfig();
     }
-    const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
-    const options = [];
-    for (const node of nodes) {
-      if (node.nodeName === 'OPTION' && node.value) {
-        options.push({
-          value: node.value,
-          text: node.innerHTML,
-          selected: node.selected,
-          disabled: node.disabled
-        });
-      }
-      if (node.nodeName === 'OPTGROUP') {
-        options.push({
-          label: node.label,
-          options: this._getOptions(node)
-        });
-      }
-    }
-    return options;
+    return this._getOptionsFromElement();
   }
-  _getSelectedOptions(options) {
-    const selected = [];
+  _getOptionsFromConfig(options = this._config.options) {
+    const _options = [];
     for (const option of options) {
-      if (typeof option.value === 'undefined') {
-        this._getSelectedOptions(option.options);
+      if (option.options && Array.isArray(option.options)) {
+        _options.push({
+          label: option.label,
+          options: this._getOptionsFromConfig(option.options)
+        });
         continue;
       }
-      if (option.selected) {
-        // Add only the last option if single select
-        if (!this._config.multiple) {
-          selected.length = 0;
-        }
-        selected.push({
+      const value = String(option.value);
+      const isSelected = option.selected || this._config.value && this._config.value.includes(value);
+      _options.push({
+        ...option,
+        value,
+        ...(isSelected && {
+          selected: true
+        }),
+        ...(option.disabled && {
+          disabled: true
+        })
+      });
+      if (isSelected) {
+        this._selected.push({
           value: String(option.value),
           text: option.text
         });
       }
     }
-    return selected;
+    return _options;
   }
-  _createNativeSelect(data) {
+  _getOptionsFromElement(node = this._element) {
+    const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP');
+    const options = [];
+    for (const node of nodes) {
+      if (node.nodeName === 'OPTION' && node.value) {
+        const isSelected = node.selected || this._config.value && this._config.value.includes(node.value);
+        options.push({
+          value: node.value,
+          text: node.innerHTML,
+          selected: isSelected,
+          disabled: node.disabled
+        });
+        if (node.selected || isSelected) {
+          this._selected.push({
+            value: node.value,
+            text: node.innerHTML,
+            ...(node.disabled && {
+              disabled: true
+            })
+          });
+        }
+      }
+      if (node.nodeName === 'OPTGROUP') {
+        options.push({
+          label: node.label,
+          options: this._getOptionsFromElement(node)
+        });
+      }
+    }
+    return options;
+  }
+  _configureNativeSelect() {
     this._element.classList.add(CLASS_NAME_SELECT);
     if (this._config.multiple) {
       this._element.setAttribute('multiple', true);
@@ -6306,7 +6370,6 @@ class MultiSelect extends BaseComponent {
     if (this._config.required) {
       this._element.setAttribute('required', true);
     }
-    this._createNativeOptions(this._element, data);
   }
   _createNativeOptions(parentElement, options) {
     for (const option of options) {
@@ -6488,12 +6551,12 @@ class MultiSelect extends BaseComponent {
       }
     }
   }
-  _createTag(value, text) {
+  _createTag(value, text, disabled) {
     const tag = document.createElement('div');
     tag.classList.add(CLASS_NAME_TAG);
     tag.dataset.value = value;
     tag.innerHTML = text;
-    if (!this._config.disabled) {
+    if (!this._config.disabled && disabled !== true) {
       const closeBtn = document.createElement('button');
       closeBtn.type = 'button';
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
@@ -6531,7 +6594,7 @@ class MultiSelect extends BaseComponent {
   }
   _findOptionByValue(value, options = this._options) {
     for (const option of options) {
-      if (option.value === value) {
+      if (String(option.value) === value) {
         return option;
       }
       if (option.options && Array.isArray(option.options)) {
@@ -6570,8 +6633,7 @@ class MultiSelect extends BaseComponent {
     this._updateSearchSize();
   }
   _deselectOption(value) {
-    const selected = this._selected.filter(option => option.value !== String(value));
-    this._selected = selected;
+    this._selected = this._selected.filter(option => option.value !== String(value));
     SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false;
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
     if (option) {
@@ -6587,8 +6649,10 @@ class MultiSelect extends BaseComponent {
   }
   _deselectLastOption() {
     if (this._selected.length > 0) {
-      const last = this._selected.pop();
-      this._deselectOption(last.value);
+      const last = this._selected.findLast(option => option.disabled !== true);
+      if (last) {
+        this._deselectOption(last.value);
+      }
     }
   }
   _updateSelection() {
@@ -6604,7 +6668,7 @@ class MultiSelect extends BaseComponent {
     if (this._config.multiple && this._config.selectionType === 'tags') {
       selection.innerHTML = '';
       for (const option of this._selected) {
-        selection.append(this._createTag(option.value, option.text));
+        selection.append(this._createTag(option.value, option.text, option.disabled));
       }
     }
     if (this._config.multiple && this._config.selectionType === 'text') {
@@ -6753,6 +6817,12 @@ class MultiSelect extends BaseComponent {
     if (typeof config.container === 'object' || typeof config.container === 'string') {
       config.container = getElement(config.container);
     }
+    if (typeof config.value === 'number') {
+      config.value = [String(config.value)];
+    }
+    if (typeof config.value === 'string') {
+      config.value = config.value.split(/,\s*/).map(String);
+    }
     return config;
   }
 
@@ -6778,7 +6848,7 @@ class MultiSelect extends BaseComponent {
     }
     const selects = SelectorEngine.find(SELECTOR_SELECT);
     for (let i = 0, len = selects.length; i < len; i++) {
-      const context = Data.get(selects[i], DATA_KEY$8);
+      const context = Data.get(selects[i], DATA_KEY$9);
       ({
         relatedTarget: selects[i]
       });
@@ -6809,7 +6879,7 @@ EventHandler.on(window, EVENT_LOAD_DATA_API$7, () => {
     }
   }
 });
-EventHandler.on(document, EVENT_CLICK_DATA_API$4, MultiSelect.clearMenus);
+EventHandler.on(document, EVENT_CLICK_DATA_API$5, MultiSelect.clearMenus);
 EventHandler.on(document, EVENT_KEYUP_DATA_API, MultiSelect.clearMenus);
 
 /**
@@ -6832,10 +6902,10 @@ defineJQueryPlugin(MultiSelect);
  * ------------------------------------------------------------------------
  */
 
-const NAME$a = 'navigation';
-const DATA_KEY$7 = 'coreui.navigation';
-const EVENT_KEY$7 = `.${DATA_KEY$7}`;
-const DATA_API_KEY$5 = '.data-api';
+const NAME$b = 'navigation';
+const DATA_KEY$8 = 'coreui.navigation';
+const EVENT_KEY$8 = `.${DATA_KEY$8}`;
+const DATA_API_KEY$6 = '.data-api';
 const Default$9 = {
   activeLinksExact: true,
   groupsAutoCollapse: true
@@ -6848,8 +6918,8 @@ const CLASS_NAME_ACTIVE$3 = 'active';
 const CLASS_NAME_SHOW$5 = 'show';
 const CLASS_NAME_NAV_GROUP = 'nav-group';
 const CLASS_NAME_NAV_GROUP_TOGGLE = 'nav-group-toggle';
-const EVENT_CLICK_DATA_API$3 = `click${EVENT_KEY$7}${DATA_API_KEY$5}`;
-const EVENT_LOAD_DATA_API$6 = `load${EVENT_KEY$7}${DATA_API_KEY$5}`;
+const EVENT_CLICK_DATA_API$4 = `click${EVENT_KEY$8}${DATA_API_KEY$6}`;
+const EVENT_LOAD_DATA_API$6 = `load${EVENT_KEY$8}${DATA_API_KEY$6}`;
 const SELECTOR_NAV_GROUP = '.nav-group';
 const SELECTOR_NAV_GROUP_ITEMS = '.nav-group-items';
 const SELECTOR_NAV_GROUP_TOGGLE = '.nav-group-toggle';
@@ -6868,7 +6938,7 @@ class Navigation extends BaseComponent {
     this._config = this._getConfig(config);
     this._setActiveLink();
     this._addEventListeners();
-    Data.set(element, DATA_KEY$7, this);
+    Data.set(element, DATA_KEY$8, this);
   }
   // Getters
 
@@ -6876,13 +6946,13 @@ class Navigation extends BaseComponent {
     return Default$9;
   }
   static get DATA_KEY() {
-    return DATA_KEY$7;
+    return DATA_KEY$8;
   }
   static get DefaultType() {
     return DefaultType$9;
   }
   static get NAME() {
-    return NAME$a;
+    return NAME$b;
   }
 
   // Private
@@ -7019,7 +7089,7 @@ class Navigation extends BaseComponent {
     this._slideDown(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, toggler.parentNode));
   }
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK_DATA_API$3, SELECTOR_NAV_GROUP_TOGGLE, event => {
+    EventHandler.on(this._element, EVENT_CLICK_DATA_API$4, SELECTOR_NAV_GROUP_TOGGLE, event => {
       event.preventDefault();
       this._toggleGroupItems(event, this);
     });
@@ -7078,26 +7148,26 @@ defineJQueryPlugin(Navigation);
  * Constants
  */
 
-const NAME$9 = 'offcanvas';
-const DATA_KEY$6 = 'coreui.offcanvas';
-const EVENT_KEY$6 = `.${DATA_KEY$6}`;
-const DATA_API_KEY$4 = '.data-api';
-const EVENT_LOAD_DATA_API$5 = `load${EVENT_KEY$6}${DATA_API_KEY$4}`;
+const NAME$a = 'offcanvas';
+const DATA_KEY$7 = 'coreui.offcanvas';
+const EVENT_KEY$7 = `.${DATA_KEY$7}`;
+const DATA_API_KEY$5 = '.data-api';
+const EVENT_LOAD_DATA_API$5 = `load${EVENT_KEY$7}${DATA_API_KEY$5}`;
 const ESCAPE_KEY = 'Escape';
 const CLASS_NAME_SHOW$4 = 'show';
 const CLASS_NAME_SHOWING$1 = 'showing';
 const CLASS_NAME_HIDING = 'hiding';
 const CLASS_NAME_BACKDROP$1 = 'offcanvas-backdrop';
 const OPEN_SELECTOR = '.offcanvas.show';
-const EVENT_SHOW$4 = `show${EVENT_KEY$6}`;
-const EVENT_SHOWN$4 = `shown${EVENT_KEY$6}`;
-const EVENT_HIDE$4 = `hide${EVENT_KEY$6}`;
-const EVENT_HIDE_PREVENTED = `hidePrevented${EVENT_KEY$6}`;
-const EVENT_HIDDEN$4 = `hidden${EVENT_KEY$6}`;
-const EVENT_RESIZE$2 = `resize${EVENT_KEY$6}`;
-const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$6}${DATA_API_KEY$4}`;
-const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY$6}`;
-const SELECTOR_DATA_TOGGLE$4 = '[data-coreui-toggle="offcanvas"]';
+const EVENT_SHOW$4 = `show${EVENT_KEY$7}`;
+const EVENT_SHOWN$4 = `shown${EVENT_KEY$7}`;
+const EVENT_HIDE$4 = `hide${EVENT_KEY$7}`;
+const EVENT_HIDE_PREVENTED = `hidePrevented${EVENT_KEY$7}`;
+const EVENT_HIDDEN$4 = `hidden${EVENT_KEY$7}`;
+const EVENT_RESIZE$2 = `resize${EVENT_KEY$7}`;
+const EVENT_CLICK_DATA_API$3 = `click${EVENT_KEY$7}${DATA_API_KEY$5}`;
+const EVENT_KEYDOWN_DISMISS = `keydown.dismiss${EVENT_KEY$7}`;
+const SELECTOR_DATA_TOGGLE$5 = '[data-coreui-toggle="offcanvas"]';
 const Default$8 = {
   backdrop: true,
   keyboard: true,
@@ -7130,7 +7200,7 @@ class Offcanvas extends BaseComponent {
     return DefaultType$8;
   }
   static get NAME() {
-    return NAME$9;
+    return NAME$a;
   }
 
   // Public
@@ -7254,7 +7324,7 @@ class Offcanvas extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$4, function (event) {
+EventHandler.on(document, EVENT_CLICK_DATA_API$3, SELECTOR_DATA_TOGGLE$5, function (event) {
   const target = SelectorEngine.getElementFromSelector(this);
   if (['A', 'AREA'].includes(this.tagName)) {
     event.preventDefault();
@@ -7296,6 +7366,66 @@ enableDismissTrigger(Offcanvas);
  */
 
 defineJQueryPlugin(Offcanvas);
+
+/**
+ * --------------------------------------------------------------------------
+ * CoreUI PRO password-input.js
+ * License (https://coreui.io/pro/license/)
+ * --------------------------------------------------------------------------
+ */
+
+
+/**
+ * Constants
+ */
+
+const NAME$9 = 'password-input';
+const DATA_KEY$6 = 'coreui.password-input';
+const EVENT_KEY$6 = `.${DATA_KEY$6}`;
+const DATA_API_KEY$4 = '.data-api';
+const EVENT_CLICK_DATA_API$2 = `click${EVENT_KEY$6}${DATA_API_KEY$4}`;
+const SELECTOR_FORM_CONTROL = '.form-control';
+const SELECTOR_DATA_TOGGLE$4 = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ [data-coreui-toggle="password"]`;
+
+/**
+ * Class definition
+ */
+
+class PasswordInput extends BaseComponent {
+  // Getters
+  static get NAME() {
+    return NAME$9;
+  }
+
+  // Public
+  toggle() {
+    this._element.type = this._element.type === 'password' ? 'text' : 'password';
+  }
+
+  // Static
+  static jQueryInterface(config) {
+    return this.each(function () {
+      const data = PasswordInput.getOrCreateInstance(this);
+      data[config](this);
+    });
+  }
+}
+
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(document, EVENT_CLICK_DATA_API$2, SELECTOR_DATA_TOGGLE$4, event => {
+  event.preventDefault();
+  const toggler = event.target.closest(SELECTOR_DATA_TOGGLE$4);
+  PasswordInput.getOrCreateInstance(SelectorEngine.findOne(SELECTOR_FORM_CONTROL, toggler.parentNode)).toggle();
+});
+
+/**
+ * jQuery
+ */
+
+defineJQueryPlugin(PasswordInput);
 
 /**
  * --------------------------------------------------------------------------
@@ -7624,7 +7754,7 @@ const DefaultType$6 = {
 class Tooltip extends BaseComponent {
   constructor(element, config) {
     if (typeof Popper === 'undefined') {
-      throw new TypeError('Bootstrap\'s tooltips require Popper (https://popper.js.org)');
+      throw new TypeError('CoreUI\'s dropdowns require Popper (https://popper.js.org/docs/v2/)');
     }
     super(element, config);
 
@@ -7670,7 +7800,6 @@ class Tooltip extends BaseComponent {
     if (!this._isEnabled) {
       return;
     }
-    this._activeTrigger.click = !this._activeTrigger.click;
     if (this._isShown()) {
       this._leave();
       return;
@@ -10121,5 +10250,5 @@ enableDismissTrigger(Toast);
 
 defineJQueryPlugin(Toast);
 
-export { Alert, Button, Calendar, Carousel, Collapse, DatePicker, DateRangePicker, Dropdown, LoadingButton, Modal, MultiSelect, Navigation, Offcanvas, Popover, RangeSlider, Rating, ScrollSpy, Sidebar, Tab, TimePicker, Toast, Tooltip };
+export { Alert, Button, Calendar, Carousel, Collapse, DatePicker, DateRangePicker, Dropdown, LoadingButton, Modal, MultiSelect, Navigation, Offcanvas, PasswordInput, Popover, RangeSlider, Rating, ScrollSpy, Sidebar, Tab, TimePicker, Toast, Tooltip };
 //# sourceMappingURL=coreui.esm.js.map

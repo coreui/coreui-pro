@@ -18,6 +18,7 @@ import Modal from './src/modal.js'
 import MultiSelect from './src/multi-select.js'
 import Navigation from './src/navigation.js'
 import OffCanvas from './src/offcanvas.js'
+import PasswordInput from './src/password-input.js'
 import Popover from './src/popover.js'
 import RangeSlider from './src/range-slider.js'
 import Rating from './src/rating.js'
@@ -42,6 +43,7 @@ export default {
   MultiSelect,
   Navigation,
   OffCanvas,
+  PasswordInput,
   Popover,
   RangeSlider,
   Rating,

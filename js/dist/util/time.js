@@ -67,8 +67,9 @@
    */
   const formatTimePartials = (values, locale, partial) => {
     const date = new Date();
+    const forceTwoDigit = shouldUseTwoDigitHour(locale);
     const formatter = new Intl.DateTimeFormat(locale, {
-      hour: 'numeric',
+      hour: forceTwoDigit ? '2-digit' : 'numeric',
       minute: '2-digit',
       second: '2-digit'
     });
@@ -164,6 +165,21 @@
     return d instanceof Date && !Number.isNaN(d.getTime());
   };
 
+  /**
+   * Checks whether the given locale formats the hour "9" with a leading zero ("09")
+   * when using `hour: 'numeric'` in `toLocaleTimeString`.
+   *
+   * This helps determine if you should force `hour: '2-digit'` for consistent formatting.
+   *
+   * @param {string} locale - The locale code (e.g., "en-US", "pl-PL").
+   * @returns {boolean} `true` if the formatted hour starts with a leading zero, otherwise `false`.
+   */
+  const shouldUseTwoDigitHour = locale => {
+    const d = new Date(2020, 0, 1, 7, 5, 7); // 7:05:07
+    const formatted = d.toLocaleTimeString(locale);
+    return formatted.startsWith('0'); // check if the hour starts with "0"
+  };
+
   exports.convert12hTo24h = convert12hTo24h;
   exports.convert24hTo12h = convert24hTo12h;
   exports.convertTimeToDate = convertTimeToDate;
@@ -175,6 +191,7 @@
   exports.getSelectedSeconds = getSelectedSeconds;
   exports.isAmPm = isAmPm;
   exports.isValidTime = isValidTime;
+  exports.shouldUseTwoDigitHour = shouldUseTwoDigitHour;
 
   Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 
