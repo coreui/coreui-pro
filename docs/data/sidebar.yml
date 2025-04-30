@@ -78,6 +78,10 @@
         color: danger
         text: PRO
     - title: Multi Select
+    - title: Password Input
+      badge:
+        color: danger
+        text: PRO
       badge:
         color: danger
         text: PRO
@@ -85,7 +89,7 @@
       badge:
         color: danger
         text: PRO
-    - title: Password Input
+    - title: Stepper
       badge:
         color: danger
         text: PRO
