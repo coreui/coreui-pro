@@ -24,6 +24,9 @@
   --#{$prefix}stepper-step-indicator-complete-color: #{$stepper-step-indicator-complete-color};
   --#{$prefix}stepper-step-indicator-complete-bg: #{$stepper-step-indicator-complete-bg};
   --#{$prefix}stepper-step-indicator-complete-border-color: #{$stepper-step-indicator-complete-border-color};
+  --#{$prefix}stepper-step-indicator-disabled-color: #{$stepper-step-indicator-disabled-color};
+  --#{$prefix}stepper-step-indicator-disabled-bg: #{$stepper-step-indicator-disabled-bg};
+  --#{$prefix}stepper-step-indicator-disabled-border-color: #{$stepper-step-indicator-disabled-border-color};
   --#{$prefix}stepper-step-indicator-focus-box-shadow: #{$stepper-step-indicator-focus-box-shadow};
   --#{$prefix}stepper-step-indicator-icon: #{$stepper-step-indicator-icon};
   --#{$prefix}stepper-step-indicator-icon-color: #{$stepper-step-indicator-icon-color};
@@ -96,6 +99,13 @@
     --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}stepper-step-indicator-active-border-color);
   }
 
+  &:disabled {
+    --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-disabled-color);
+    --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}stepper-step-indicator-disabled-color);
+    --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}stepper-step-indicator-disabled-bg);
+    --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}stepper-step-indicator-disabled-border-color);
+  }
+
   &.complete {
     --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-complete-color);
     --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}stepper-step-indicator-complete-color);
@@ -109,10 +119,6 @@
     ~ .stepper-step-connector {
       --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}stepper-step-connector-complete-bg);
     }
-  }
-
-  &.disabled {
-    --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-disabled-color);
   }
 
   &:not(.complete) .stepper-step-indicator-icon{

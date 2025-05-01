@@ -2617,6 +2617,9 @@ $stepper-step-indicator-active-border-color:    var(--#{$prefix}primary) !defaul
 $stepper-step-indicator-complete-color:         var(--#{$prefix}white) !default;
 $stepper-step-indicator-complete-bg:            var(--#{$prefix}primary) !default;
 $stepper-step-indicator-complete-border-color:  var(--#{$prefix}primary) !default;
+$stepper-step-indicator-disabled-color:         var(--#{$prefix}secondary) !default;
+$stepper-step-indicator-disabled-bg:            transparent !default;
+$stepper-step-indicator-disabled-border-color:  var(--#{$prefix}border-color) !default;
 $stepper-step-indicator-focus-box-shadow:       $focus-ring-box-shadow !default;
 $stepper-step-indicator-icon:                   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpolygon fill='var(--ci-primary-color, currentColor)' points='200.359 382.269 61.057 251.673 82.943 228.327 199.641 337.731 428.686 108.687 451.314 131.313 200.359 382.269' class='ci-primary'/%3E%3C/svg%3E") !default;
 $stepper-step-indicator-icon-color:             var(--#{$prefix}white) !default;
