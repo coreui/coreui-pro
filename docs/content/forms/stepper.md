@@ -310,8 +310,6 @@ Use a Linear Bootstrap Stepper when you need a guided and controlled experience,
 
 This ensures data integrity and improves the user experience by keeping the flow focused.
 
----
-
 ## Non-linear Stepper (Optional Steps)
 
 You can configure the Stepper Component to behave as non-linear, allowing users to jump freely between steps without validation restrictions. Add `data-coreui-linear="false"` or set `linear: false` to allow non-sequential navigation.
@@ -373,12 +371,21 @@ The CoreUI Stepper Component is built with accessibility in mind:
 - Each step button is assigned proper ARIA roles (`role="tab"`) and attributes like `aria-selected`, `aria-controls`, and `tabindex`.
 - Step contents (`stepper-pane`) use `role="tabpanel"` and are properly linked to their trigger buttons.
 - Live updates are announced to screen readers with `aria-live="polite"`.
-- Keyboard navigation is fully supported:
-  - `ArrowLeft` / `ArrowUp`: move focus to previous step
-  - `ArrowRight` / `ArrowDown`: move focus to next step
-  - `Home` / `End`: jump focus to first or last step
+- Keyboard navigation is fully supported
 
 Thanks to these features, your form wizard will be fully compliant with WCAG and modern accessibility standards without additional work.
+
+### Keyboard Support
+
+The Stepper component supports comprehensive keyboard navigation out of the box:
+
+{{< bs-table >}}
+| Key | Function |
+| --- | --- |
+| <kbd>ArrowLeft</kbd> / <kbd>ArrowUp</kbd> | Moves focus to previous step. |
+| <kbd>ArrowRight</kbd> / <kbd>ArrowDown</kbd> | Moves focus to next step. |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jumps focus to first or last step |
+{{< /bs-table >}}
 
 ## Usage
 
