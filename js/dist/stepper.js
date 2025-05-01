@@ -1,5 +1,5 @@
 /*!
-  * CoreUI stepper.js v5.11.0 (https://coreui.io)
+  * CoreUI stepper.js v5.12.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -194,11 +194,11 @@
       }
       for (const pane of SelectorEngine.find(SELECTOR_STEPPER_PANE, this._element)) {
         pane.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW);
-        pane.hidden = true;
+        pane.setAttribute('aria-hidden', 'true');
       }
       for (const content of SelectorEngine.find(SELECTOR_STEPPER_STEP_CONTENT, this._element)) {
         content.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW);
-        content.hidden = true;
+        content.setAttribute('aria-hidden', 'true');
       }
       for (const btn of steps) {
         btn.classList.remove(CLASS_NAME_ACTIVE, CLASS_NAME_COMPLETE);
@@ -213,12 +213,12 @@
       const pane = this._getTargetPane(firstStep);
       if (pane) {
         pane.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW);
-        pane.hidden = false;
+        pane.setAttribute('aria-hidden', 'false');
       } else {
         const stepContent = firstStep.parentNode.querySelector(SELECTOR_STEPPER_STEP_CONTENT);
         if (stepContent) {
           stepContent.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW);
-          stepContent.hidden = false;
+          stepContent.setAttribute('aria-hidden', 'false');
         }
       }
       this._updateCompleteStates(this._stepButtons.indexOf(firstStep));
@@ -275,7 +275,7 @@
       const pane = this._getTargetPane(element);
       if (pane) {
         pane.classList.add(CLASS_NAME_ACTIVE, CLASS_NAME_SHOW);
-        pane.hidden = false;
+        pane.setAttribute('aria-hidden', 'false');
       }
       const stepContentElement = SelectorEngine.findOne(SELECTOR_STEPPER_STEP_CONTENT, element.parentNode);
       if (stepContentElement) {
@@ -392,7 +392,7 @@
         const isActive = pane === activePane;
         pane.classList.toggle(CLASS_NAME_ACTIVE, isActive);
         pane.classList.toggle(CLASS_NAME_SHOW, isActive);
-        pane.hidden = !isActive;
+        pane.setAttribute('aria-hidden', !isActive);
       }
     }
     _addStepperConnector() {
@@ -450,7 +450,7 @@
           pane.setAttribute('role', 'tabpanel');
           pane.setAttribute('aria-labelledby', stepButton.id);
           pane.setAttribute('aria-live', 'polite');
-          pane.hidden = !this._elemIsActive(stepButton);
+          pane.setAttribute('aria-hidden', !this._elemIsActive(stepButton));
         }
         if (this._elemIsActive(stepButton)) {
           stepButton.setAttribute('aria-selected', 'true');

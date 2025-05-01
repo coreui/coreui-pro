@@ -9717,6 +9717,203 @@ select.form-multi-select {
   }
 }
 
+.stepper {
+  --bs-stepper-steps-gap: 0.5rem;
+  --bs-stepper-step-gap: 0.5rem;
+  --bs-stepper-step-button-width: 8rem;
+  --bs-stepper-step-button-color: var(--bs-secondary-color);
+  --bs-stepper-step-button-active-color: var(--bs-secondary-color);
+  --bs-stepper-step-button-complete-color: var(--bs-secondary-color);
+  --bs-stepper-step-button-disabled-color: var(--bs-secondary-color);
+  --bs-stepper-step-indicator-width: 2rem;
+  --bs-stepper-step-indicator-height: 2rem;
+  --bs-stepper-step-indicator-bg: transparent;
+  --bs-stepper-step-indicator-color: var(--bs-secondary);
+  --bs-stepper-step-indicator-border-width: var(--bs-border-width);
+  --bs-stepper-step-indicator-border-color: var(--bs-border-color);
+  --bs-stepper-step-indicator-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  --bs-stepper-step-indicator-active-color: var(--bs-primary);
+  --bs-stepper-step-indicator-active-bg: rgba(var(--bs-primary-rgb), 0.05);
+  --bs-stepper-step-indicator-active-border-color: var(--bs-primary);
+  --bs-stepper-step-indicator-complete-color: var(--bs-white);
+  --bs-stepper-step-indicator-complete-bg: var(--bs-primary);
+  --bs-stepper-step-indicator-complete-border-color: var(--bs-primary);
+  --bs-stepper-step-indicator-disabled-color: var(--bs-secondary);
+  --bs-stepper-step-indicator-disabled-bg: transparent;
+  --bs-stepper-step-indicator-disabled-border-color: var(--bs-border-color);
+  --bs-stepper-step-indicator-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  --bs-stepper-step-indicator-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpolygon fill='var(--ci-primary-color, currentColor)' points='200.359 382.269 61.057 251.673 82.943 228.327 199.641 337.731 428.686 108.687 451.314 131.313 200.359 382.269' class='ci-primary'/%3E%3C/svg%3E");
+  --bs-stepper-step-indicator-icon-color: var(--bs-white);
+  --bs-stepper-step-indicator-icon-size: 1rem;
+  --bs-stepper-step-connector-height: 0.125rem;
+  --bs-stepper-step-connector-gap: 1rem;
+  --bs-stepper-step-connector-bg: var(--bs-secondary-bg);
+  --bs-stepper-step-connector-complete-bg: var(--bs-primary);
+  --bs-stepper-step-connector-transition: background-color 0.15s ease-in-out;
+  --bs-stepper-step-content-transition: height 0.3s ease-in-out;
+}
+
+.stepper-steps {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--bs-stepper-steps-gap);
+  justify-content: space-between;
+  padding: 0;
+}
+
+.stepper-step {
+  position: relative;
+  display: flex;
+  gap: var(--bs-stepper-step-gap);
+  align-items: center;
+}
+.stepper-step:not(:last-child) {
+  flex: 1;
+}
+.stepper-step:not(:last-child).vertical {
+  flex: 1 1 0;
+}
+.stepper-step.vertical {
+  position: relative;
+  flex: 0 0 auto;
+  align-items: start;
+}
+.stepper-step.vertical .stepper-step-button {
+  flex-direction: column;
+  align-items: center;
+  width: var(--bs-stepper-step-button-width);
+}
+.stepper-step.vertical .stepper-step-connector {
+  position: absolute;
+  inset-inline-start: calc(var(--bs-stepper-step-button-width) / 2 + var(--bs-stepper-step-indicator-width) / 2 + var(--bs-stepper-steps-gap));
+  top: calc(var(--bs-stepper-step-indicator-height) / 2);
+  width: calc(100% - var(--bs-stepper-step-indicator-width) + var(--bs-stepper-steps-gap) - var(--bs-stepper-steps-gap) * 2);
+  transform: translateY(-50%);
+}
+
+.stepper-step-button {
+  display: flex;
+  gap: var(--bs-stepper-step-gap);
+  align-items: center;
+  padding: 0;
+  color: var(--bs-stepper-step-button-color);
+  background: transparent;
+  border: 0;
+}
+.stepper-step-button.active {
+  --bs-stepper-step-button-color: var(--bs-stepper-step-button-active-color);
+  --bs-stepper-step-indicator-color: var(--bs-stepper-step-indicator-active-color);
+  --bs-stepper-step-indicator-bg: var(--bs-stepper-step-indicator-active-bg);
+  --bs-stepper-step-indicator-border-color: var(--bs-stepper-step-indicator-active-border-color);
+}
+.stepper-step-button:disabled {
+  --bs-stepper-step-button-color: var(--bs-stepper-step-button-disabled-color);
+  --bs-stepper-step-indicator-color: var(--bs-stepper-step-indicator-disabled-color);
+  --bs-stepper-step-indicator-bg: var(--bs-stepper-step-indicator-disabled-bg);
+  --bs-stepper-step-indicator-border-color: var(--bs-stepper-step-indicator-disabled-border-color);
+}
+.stepper-step-button.complete {
+  --bs-stepper-step-button-color: var(--bs-stepper-step-button-complete-color);
+  --bs-stepper-step-indicator-color: var(--bs-stepper-step-indicator-complete-color);
+  --bs-stepper-step-indicator-bg: var(--bs-stepper-step-indicator-complete-bg);
+  --bs-stepper-step-indicator-border-color: var(--bs-stepper-step-indicator-complete-border-color);
+}
+.stepper-step-button.complete .stepper-step-indicator-text {
+  display: none;
+}
+.stepper-step-button.complete ~ .stepper-step-connector {
+  --bs-stepper-step-connector-bg: var(--bs-stepper-step-connector-complete-bg);
+}
+.stepper-step-button:not(.complete) .stepper-step-indicator-icon {
+  display: none;
+}
+.stepper-step-button:focus {
+  outline: 0;
+}
+.stepper-step-button:focus .stepper-step-indicator {
+  box-shadow: var(--bs-stepper-step-indicator-focus-box-shadow);
+}
+
+.stepper-step-indicator {
+  display: flex;
+  flex: 0 0 var(--bs-stepper-step-indicator-width);
+  align-items: center;
+  justify-content: center;
+  width: var(--bs-stepper-step-indicator-width);
+  height: var(--bs-stepper-step-indicator-height);
+  color: var(--bs-stepper-step-indicator-color);
+  background: var(--bs-stepper-step-indicator-bg);
+  border: var(--bs-stepper-step-indicator-border-width) solid var(--bs-stepper-step-indicator-border-color);
+  border-radius: 50em;
+  transition: var(--bs-stepper-step-indicator-transition);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stepper-step-indicator {
+    transition: none;
+  }
+}
+
+.stepper-step-indicator-icon {
+  display: block;
+  width: var(--bs-stepper-step-indicator-icon-size);
+  height: var(--bs-stepper-step-indicator-icon-size);
+  background-color: var(--bs-stepper-step-indicator-icon-color);
+  -webkit-mask: var(--bs-stepper-step-indicator-icon) center/var(--bs-stepper-step-indicator-icon-size) no-repeat;
+  mask: var(--bs-stepper-step-indicator-icon) center/var(--bs-stepper-step-indicator-icon-size) no-repeat;
+}
+
+.stepper-step-connector {
+  flex: 1;
+  height: var(--bs-stepper-step-connector-height);
+  background: var(--bs-stepper-step-connector-bg);
+  transition: var(--bs-stepper-step-connector-transition);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stepper-step-connector {
+    transition: none;
+  }
+}
+
+.stepper-pane:not(.show) {
+  display: none;
+}
+
+.stepper-vertical {
+  display: flex;
+  flex-direction: column;
+}
+.stepper-vertical .stepper-steps {
+  display: block;
+}
+.stepper-vertical .stepper-step {
+  position: relative;
+  display: block;
+}
+.stepper-vertical .stepper-step:not(:last-child) {
+  min-height: calc(var(--bs-stepper-step-indicator-height) * 2);
+}
+.stepper-vertical .stepper-step-connector {
+  position: absolute;
+  inset-inline-start: calc(var(--bs-stepper-step-indicator-width) / 2);
+  top: calc(var(--bs-stepper-step-indicator-height) + var(--bs-stepper-steps-gap));
+  width: var(--bs-stepper-step-connector-height);
+  height: calc(100% - var(--bs-stepper-step-indicator-height) - var(--bs-stepper-step-connector-gap));
+  transform: translateX(-50%);
+}
+.stepper-vertical .stepper-step-content {
+  -webkit-padding-start: calc(var(--bs-stepper-step-indicator-width) + var(--bs-stepper-step-connector-gap) / 2);
+  padding-inline-start: calc(var(--bs-stepper-step-indicator-width) + var(--bs-stepper-step-connector-gap) / 2);
+  transition: var(--bs-stepper-step-content-transition);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stepper-vertical .stepper-step-content {
+    transition: none;
+  }
+}
+.stepper-vertical .stepper-step .stepper-step-button:not(.active) ~ .stepper-step-content:not(.collapsing):not(.collapse) {
+  display: none;
+}
+
 .time-picker,
 *:not(.time-picker) > .time-picker-dropdown {
   --bs-time-picker-zindex: 1000;
