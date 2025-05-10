@@ -90,14 +90,14 @@ params:
 
   cdn:
   # See https://www.srihash.org for info on how to generate the hashes
-    css:               "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.1/dist/css/coreui.min.css"
-    css_hash:          "sha384-PDUiPu3vDllMfrUHnurV430Qg8chPZTNhY8RUpq89lq22R3PzypXQifBpcpE1eoB"
-    css_rtl:           "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.1/dist/css/coreui.rtl.min.css"
-    css_rtl_hash:      "sha384-d5k5ugS1fgFvXtecTvJKHpoyLSBbWEhcpLDZ8bXkPpbmpBYx9fBQHSF5JysxTTu5"
-    js:                "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.1/dist/js/coreui.min.js"
-    js_hash:           "sha384-Rj9po7KQz8y0hVoeRgl1LRoQcxYkHxszkpKUdatY+9b5o35FsiENOwOWwxzWfAfF"
-    js_bundle:         "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.1/dist/js/coreui.bundle.min.js"
-    js_bundle_hash:    "sha384-8QmUFX1sl4cMveCP2+H1tyZlShMi1LeZCJJxTZeXDxOwQexlDdRLQ3O9L78gwBbe"
+    css:               "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.2/dist/css/coreui.min.css"
+    css_hash:          "sha384-64w6MPgOuCH+fKUzpWVby+dVoEPHCm8wvlj8X55EoN3aqpCzfitZGUs1TqpSdAnu"
+    css_rtl:           "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.2/dist/css/coreui.rtl.min.css"
+    css_rtl_hash:      "sha384-Macl71kM7sbfSfpCHrYiD5MApWh8bKTFw7GUqBzaJH+vuBCQJNmXcfXNGDp5T2/t"
+    js:                "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.2/dist/js/coreui.min.js"
+    js_hash:           "sha384-atR2KI2eVD144qVAxM4VfyiDIqEH6PbBBuWg9UYFfbLJWRhF7qI0M1CGU9UNUNeL"
+    js_bundle:         "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.2/dist/js/coreui.bundle.min.js"
+    js_bundle_hash:    "sha384-CahxJ3L4r+RdYNq3R5ryNwJqQH643Gjr8IAHaiH3eLJYEShIV1Ma8ktUZ+Xziuba"
     popper:            "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     popper_hash:       "sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     popper_esm:        "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/esm/popper.min.js"

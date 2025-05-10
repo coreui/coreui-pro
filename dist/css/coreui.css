@@ -1,8 +1,8 @@
 @charset "UTF-8";
 /*!
- * CoreUI  v5.3.1 (https://coreui.io)
+ * CoreUI PRO  v5.12.0 (https://coreui.io)
  * Copyright (c) 2025 creativeLabs Łukasz Holeczek
- * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+ * License (https://coreui.io/pro/license/)
  */
 :root,
 [data-coreui-theme=light] {
@@ -3810,6 +3810,34 @@ select.form-multi-select {
   opacity: var(--cui-btn-disabled-opacity);
 }
 
+.btn-ghost {
+  --cui-btn-color: var(--cui-secondary-color);
+  --cui-btn-border-color: transparent;
+  --cui-btn-active-color: var(--cui-body-color);
+  --cui-btn-active-bg: var(--cui-tertiary-bg);
+  --cui-btn-active-border-color: var(--cui-tertiary-bg);
+  --cui-btn-disabled-color: var(--cui-secondary-color);
+  --cui-btn-disabled-border-color: transparent;
+  --cui-btn-hover-color: var(--cui-body-color);
+  --cui-btn-hover-bg: var(--cui-tertiary-bg);
+  --cui-btn-hover-border-color: var(--cui-tertiary-bg);
+  --cui-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--cui-tertiary-bg-rgb), .5);
+}
+
+.btn-outline {
+  --cui-btn-color: var(--cui-secondary-color);
+  --cui-btn-border-color: var(--cui-border-color);
+  --cui-btn-active-color: var(--cui-body-color);
+  --cui-btn-active-bg: var(--cui-tertiary-bg);
+  --cui-btn-active-border-color: var(--cui-border-color);
+  --cui-btn-disabled-color: var(--cui-secondary-color);
+  --cui-btn-disabled-border-color: var(--cui-border-color);
+  --cui-btn-hover-color: var(--cui-body-color);
+  --cui-btn-hover-bg: var(--cui-tertiary-bg);
+  --cui-btn-hover-border-color: var(--cui-border-color);
+  --cui-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--cui-tertiary-bg-rgb), .5);
+}
+
 .btn-transparent {
   --cui-btn-active-border-color: transparent;
   --cui-btn-disabled-border-color: transparent;
@@ -5194,6 +5222,44 @@ select.form-multi-select {
   font-weight: 700;
   color: var(--cui-nav-underline-border-link-active-color);
   border-bottom-color: currentcolor;
+}
+
+.nav-enclosed {
+  --cui-nav-enclosed-padding: 0.25rem;
+  --cui-nav-enclosed-bg: var(--cui-tertiary-bg);
+  --cui-nav-enclosed-border-radius: 0.5rem;
+  --cui-nav-enclosed-link-color: var(--cui-body-color);
+  --cui-nav-enclosed-link-active-color: var(--cui-body-color);
+  --cui-nav-enclosed-link-active-bg: var(--cui-body-bg);
+  --cui-nav-enclosed-link-active-border-color: var(--cui-border-color);
+  --cui-nav-enclosed-link-hover-box-shadow: var(--cui-box-shadow-sm);
+  --cui-nav-enclosed-link-disabled-color: var(--cui-secondary-color);
+  display: inline-flex;
+  padding: var(--cui-nav-enclosed-padding);
+  background-color: var(--cui-nav-enclosed-bg);
+  border-radius: var(--cui-nav-enclosed-border-radius);
+}
+.nav-enclosed .nav-link {
+  color: var(--cui-nav-enclosed-link-color);
+  border: 1px solid transparent;
+  border-radius: calc(var(--cui-nav-enclosed-border-radius) - var(--cui-nav-enclosed-padding));
+}
+.nav-enclosed .nav-link.disabled {
+  color: var(--cui-nav-enclosed-link-disabled-color);
+}
+.nav-enclosed .nav-link.active,
+.nav-enclosed .show > .nav-link {
+  color: var(--cui-nav-enclosed-link-active-color);
+  background-color: var(--cui-nav-enclosed-link-active-bg);
+  border: 1px solid var(--cui-nav-enclosed-link-active-border-color);
+}
+.nav-enclosed .nav-link.active:not(:focus-visible),
+.nav-enclosed .show > .nav-link:not(:focus-visible) {
+  box-shadow: var(--cui-nav-enclosed-link-hover-box-shadow);
+}
+
+.nav-enclosed-pills {
+  --cui-nav-enclosed-border-radius: 50rem;
 }
 
 .nav-fill > .nav-link,
