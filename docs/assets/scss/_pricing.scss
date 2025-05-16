@@ -1,0 +1,40 @@
+.pricing-table {
+  th {
+    padding: 0 .75rem !important; // stylelint-disable-line declaration-no-important
+    vertical-align: top;
+    border: 0;
+  }
+
+  td:nth-child(n+2):nth-child(-n+4),
+  th:nth-child(n+2):nth-child(-n+4) {
+    text-align: center;
+  }
+
+  tbody {
+    font-size: .875rem;
+  }
+
+  td:first-child:not([colspan]) {
+    color: var(--cui-secondary-color);
+    white-space: nowrap;
+  }
+
+  // stylelint-disable-next-line selector-max-universal
+  > :not(caption) > * > * {
+    padding: .75rem;
+  }
+}
+
+.pricing-customers-grid {
+  svg {
+    max-width: 100%;
+    max-height: 32px;
+    fill: var(--cui-tertiary-color);
+  }
+
+  svg [class*="-"],
+  svg g,
+  svg path {
+    fill: var(--cui-tertiary-color);
+  }
+}

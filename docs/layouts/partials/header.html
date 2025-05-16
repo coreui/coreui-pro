@@ -3,9 +3,22 @@
     <button class="header-toggler d-lg-none" type="button" aria-controls="bdNavbar" aria-expanded="false" aria-label="Toggle navigation" onclick="coreui.Sidebar.getInstance(document.querySelector('#sidebar')).toggle()">
       {{ partial "icons/hamburger.svg" (dict "class" "bi" "width" "32" "height" "32") }}
     </button>
-    <div class="docs-search" id="docsearch"></div>
+    
 
-    <ul class="header-nav ms-auto">
+    <ul class="header-nav me-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/getting-started/introduction/">
+          Get Started
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/pricing/">
+          Pricing
+        </a>
+      </li>
+    </ul>
+    <div class="docs-search" id="docsearch"></div>
+    <ul class="header-nav ms-3">
       <li class="nav-item">
         <a class="nav-link" href="{{ .Site.Params.github_org }}" target="_blank" rel="noopener">
           {{ partial "icons/github.svg" (dict "class" "icon icon-xl") }}
@@ -52,10 +65,10 @@
         <hr class="d-lg-none my-2 text-white-50">
       </li>
     </ul>
-    <a class="btn btn-outline-primary d-lg-inline-block my-2 my-md-0 ms-md-3" href="/getting-started/download/">
+    <!-- <a class="btn btn-outline-primary d-lg-inline-block my-2 my-md-0 ms-md-3" href="/getting-started/download/">
       {{ partial "icons/cloud-download.svg" (dict "class" "icon me-lg-2") }}
       <span class="d-none d-lg-inline-block">Download</span>
-    </a>
+    </a> -->
     <a class="btn btn-outline-primary d-lg-inline-block my-2 my-md-0 ms-md-3" href="https://coreui.io/about/services/?docs=coreui-header-button">
       {{ partial "icons/handshake.svg" (dict "class" "icon me-2") }}
       Hire Us
