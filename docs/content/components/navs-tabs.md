@@ -153,29 +153,6 @@ Takes the basic nav from above and adds the `.nav-tabs` class to generate a tabb
 </ul>
 {{< /example >}}
 
-### Underline
-
-<span class="badge bg-danger">Available in CoreUI PRO</span>
-
-Takes the basic nav from above and adds the `.nav-underline` class to generate links with an underline. Use them to create tabbable regions with our [tab JavaScript plugin](#javascript-behavior).
-
-{{< example >}}
-<ul class="nav nav-underline">
-  <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="#">Active</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="#">Link</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-  </li>
-</ul>
-{{< /example >}}
-
 ### Pills
 
 Take that same HTML, but use `.nav-pills` instead:
