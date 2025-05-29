@@ -62,7 +62,7 @@ A simple multi-step form built with the Bootstrap Stepper. Each step displays fo
           <label for="horizontalStepperUsername" class="form-label">Username</label>
           <div class="input-group has-validation">
             <span class="input-group-text" id="inputGroupPrepend">@</span>
-            <input type="text" class="form-control" id="horizontalStepperUsername" aria-describedby="inputGroupPrepend">
+            <input type="text" class="form-control" id="horizontalStepperUsername" aria-describedby="inputGroupPrepend" required>
             <div class="invalid-feedback">
               Please choose a username.
             </div>
@@ -353,14 +353,197 @@ The Stepper Component includes native HTML5 validation for each step. Before all
 
 If a form is invalid, the stepper blocks navigation and displays validation messages.
 
-To disable native browser validation UI, add the `novalidate` attribute to your `<form>` elements.
+### Browser default validation
 
-```html
-<form novalidate>
-  <input required>
-  <button type="submit">Submit</button>
-</form>
-```
+This example shows a stepper with native browser validation enabled:
+
+{{< example >}}
+<div class="stepper" data-coreui-toggle="stepper" id="validationStepper">
+  <ol class="stepper-steps">
+    <li class="stepper-step">
+      <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#validation-step-1">
+        <span class="stepper-step-indicator">1</span>
+        <span class="stepper-step-label">Account</span>
+      </button>
+    </li>
+    <li class="stepper-step">
+      <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#validation-step-2">
+        <span class="stepper-step-indicator">2</span>
+        <span class="stepper-step-label">Profile</span>
+      </button>
+    </li>
+  </ol>
+  <div class="stepper-content">
+    <div class="stepper-pane active show" id="validation-step-1">
+      <form class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="validationEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="validationEmail" required>
+          <div class="invalid-feedback">
+            Please provide a valid email.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="validationPassword" class="form-label">Password</label>
+          <input type="password" class="form-control" id="validationPassword" required minlength="8">
+          <div class="invalid-feedback">
+            Password must be at least 8 characters long.
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-primary" data-coreui-stepper-action="next">Next</button>
+    </div>
+    <div class="stepper-pane" id="validation-step-2">
+      <form class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="validationName" class="form-label">First name</label>
+          <input type="text" class="form-control" id="validationName" required>
+          <div class="invalid-feedback">
+            Please provide your first name.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="validationLastName" class="form-label">Last name</label>
+          <input type="text" class="form-control" id="validationLastName" required>
+          <div class="invalid-feedback">
+            Please provide your last name.
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-secondary" data-coreui-stepper-action="prev">Previous</button>
+      <button class="btn btn-success" data-coreui-stepper-action="finish">Finish</button>
+    </div>
+  </div>
+</div>
+{{< /example >}}
+
+### Custom styles
+
+To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms:
+
+{{< example >}}
+<div class="stepper" data-coreui-toggle="stepper" id="novalidateStepper">
+  <ol class="stepper-steps">
+    <li class="stepper-step">
+      <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#novalidate-step-1">
+        <span class="stepper-step-indicator">1</span>
+        <span class="stepper-step-label">Account</span>
+      </button>
+    </li>
+    <li class="stepper-step">
+      <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#novalidate-step-2">
+        <span class="stepper-step-indicator">2</span>
+        <span class="stepper-step-label">Profile</span>
+      </button>
+    </li>
+  </ol>
+  <div class="stepper-content">
+    <div class="stepper-pane active show" id="novalidate-step-1">
+      <form class="row g-3 mb-4" novalidate>
+        <div class="col-md-6">
+          <label for="customEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="customEmail" required>
+          <div class="invalid-feedback">
+            Please provide a valid email.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="customPassword" class="form-label">Password</label>
+          <input type="password" class="form-control" id="customPassword" required minlength="8">
+          <div class="invalid-feedback">
+            Password must be at least 8 characters long.
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-primary" data-coreui-stepper-action="next">Next</button>
+    </div>
+    <div class="stepper-pane" id="novalidate-step-2">
+      <form class="row g-3 mb-4" novalidate>
+        <div class="col-md-6">
+          <label for="customName" class="form-label">First name</label>
+          <input type="text" class="form-control" id="customName" required>
+          <div class="invalid-feedback">
+            Please provide your first name.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="customLastName" class="form-label">Last name</label>
+          <input type="text" class="form-control" id="customLastName" required>
+          <div class="invalid-feedback">
+            Please provide your last name.
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-secondary" data-coreui-stepper-action="prev">Previous</button>
+      <button class="btn btn-success" data-coreui-stepper-action="finish">Finish</button>
+    </div>
+  </div>
+</div>
+{{< /example >}}
+
+### Skip validation
+
+To completely skip form validation and allow free navigation between steps, add `data-coreui-skip-validation="true"` to the stepper:
+
+{{< example >}}
+<div class="stepper" data-coreui-toggle="stepper" data-coreui-skip-validation="true" id="skipValidationStepper">
+  <ol class="stepper-steps">
+    <li class="stepper-step">
+      <button type="button" class="stepper-step-button active" data-coreui-toggle="step" data-coreui-target="#skip-step-1">
+        <span class="stepper-step-indicator">1</span>
+        <span class="stepper-step-label">Account</span>
+      </button>
+    </li>
+    <li class="stepper-step">
+      <button type="button" class="stepper-step-button" data-coreui-toggle="step" data-coreui-target="#skip-step-2">
+        <span class="stepper-step-indicator">2</span>
+        <span class="stepper-step-label">Profile</span>
+      </button>
+    </li>
+  </ol>
+  <div class="stepper-content">
+    <div class="stepper-pane active show" id="skip-step-1">
+      <form class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="skipEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="skipEmail" required>
+          <div class="invalid-feedback">
+            Please provide a valid email.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="skipPassword" class="form-label">Password</label>
+          <input type="password" class="form-control" id="skipPassword" required minlength="8">
+          <div class="invalid-feedback">
+            Password must be at least 8 characters long.
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-primary" data-coreui-stepper-action="next">Next</button>
+    </div>
+    <div class="stepper-pane" id="skip-step-2">
+      <form class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="skipName" class="form-label">First name</label>
+          <input type="text" class="form-control" id="skipName" required>
+          <div class="invalid-feedback">
+            Please provide your first name.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="skipLastName" class="form-label">Last name</label>
+          <input type="text" class="form-control" id="skipLastName" required>
+          <div class="invalid-feedback">
+            Please provide your last name.
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-secondary" data-coreui-stepper-action="prev">Previous</button>
+      <button class="btn btn-success" data-coreui-stepper-action="finish">Finish</button>
+    </div>
+  </div>
+</div>
+{{< /example >}}
 
 Validation is fully automatic, no extra JavaScript is needed.
 
@@ -422,6 +605,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `linear` | boolean | `true` | Forces steps to be completed in order (sequential navigation). Set `false` for free navigation. |
+| `skipValidation` | boolean | `false` | When set to `true`, disables form validation completely, allowing users to navigate between steps regardless of form state. |
 {{< /bs-table >}}
 
 ### Methods

@@ -55,11 +55,13 @@ const HOME_KEY = 'Home'
 const END_KEY = 'End'
 
 const Default = {
-  linear: true
+  linear: true,
+  skipValidation: false
 }
 
 const DefaultType = {
-  linear: 'boolean'
+  linear: 'boolean',
+  skipValidation: 'boolean'
 }
 
 /**
@@ -288,6 +290,10 @@ class Stepper extends BaseComponent {
   }
 
   _isCurrentStepValid(element) {
+    if (this._config.skipValidation) {
+      return true
+    }
+
     const pane = this._getTargetPane(element)
     const target = pane ?? element.parentNode.querySelector(SELECTOR_STEPPER_STEP_CONTENT)
 
@@ -295,7 +301,7 @@ class Stepper extends BaseComponent {
       return true
     }
 
-    const form = target.querySelector('form:not([novalidate])')
+    const form = target.querySelector('form')
     if (!form) {
       return true
     }
@@ -308,7 +314,12 @@ class Stepper extends BaseComponent {
     })
 
     if (!isValid) {
-      form.reportValidity()
+      if (form.noValidate) {
+        form.classList.add('was-validated')
+      } else {
+        form.reportValidity()
+      }
+
       return false
     }
 
