@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.13.0 (https://coreui.io)
+  * CoreUI v5.14.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -684,7 +684,7 @@
    * Constants
    */
 
-  const VERSION = '5.13.0';
+  const VERSION = '5.14.0';
 
   /**
    * Class definition
@@ -9860,10 +9860,12 @@
   const HOME_KEY$1 = 'Home';
   const END_KEY$1 = 'End';
   const Default$1 = {
-    linear: true
+    linear: true,
+    skipValidation: false
   };
   const DefaultType$1 = {
-    linear: 'boolean'
+    linear: 'boolean',
+    skipValidation: 'boolean'
   };
 
   /**
@@ -10051,12 +10053,15 @@
       return elem.classList.contains(CLASS_NAME_ACTIVE$1);
     }
     _isCurrentStepValid(element) {
+      if (this._config.skipValidation) {
+        return true;
+      }
       const pane = this._getTargetPane(element);
       const target = pane != null ? pane : element.parentNode.querySelector(SELECTOR_STEPPER_STEP_CONTENT);
       if (!target) {
         return true;
       }
-      const form = target.querySelector('form:not([novalidate])');
+      const form = target.querySelector('form');
       if (!form) {
         return true;
       }
@@ -10066,7 +10071,11 @@
         isValid
       });
       if (!isValid) {
-        form.reportValidity();
+        if (form.noValidate) {
+          form.classList.add('was-validated');
+        } else {
+          form.reportValidity();
+        }
         return false;
       }
       return true;
