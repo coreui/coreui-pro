@@ -12,7 +12,7 @@ pro_component: true
 
 Use the `form-password` wrapper to add a visibility toggle button to standard Bootstrap password input fields.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="mb-3">
   <label for="examplePasswordInput1" class="form-label">Password</label>
   <div class="form-password">
@@ -37,7 +37,7 @@ Use the `form-password` wrapper to add a visibility toggle button to standard Bo
 
 Bootstrap Password Input supports different sizes using Bootstrap's sizing utilities like `.form-control-lg` and `.form-control-sm`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="form-password">
   <input type="password" class="form-control form-control-lg" placeholder="Large password input">
     <button type="button" class="form-password-action" data-coreui-toggle="password" aria-label="Toggle password visibility">
@@ -62,7 +62,7 @@ Bootstrap Password Input supports different sizes using Bootstrap's sizing utili
 
 To make a Bootstrap Password Input non-interactive, add the `disabled` attribute to the `<input>` and the toggle `<button>`.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="form-password">
   <input type="password" class="form-control" placeholder="Disabled password input" disabled>
   <button type="button" class="form-password-action" data-coreui-toggle="password" disabled aria-label="Toggle password visibility">
@@ -81,7 +81,7 @@ To make a Bootstrap Password Input non-interactive, add the `disabled` attribute
 
 Use the `readonly` attribute to make the input non-editable but still selectable. This is useful for displaying values without allowing user changes.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="form-password">
   <input type="password" class="form-control" placeholder="Readonly password input" value="Readonly input here..." readonly>
     <button type="button" class="form-password-action" data-coreui-toggle="password" aria-label="Toggle password visibility">

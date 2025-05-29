@@ -33,7 +33,7 @@
 {{- $snippetsFile := resources.Get "js/snippets.js" | js.Build (merge $esbuildOptions (dict "minify" "false")) -}}
 {{- $esbuildParams := dict
   "cssCdn" .Site.Params.cdn.css
-  "cssProCdn" .Site.Params.cdn.css_pro
+  "cssProCdn" .Site.Params.cdn_pro.css_pro
   "jsBundleCdn" .Site.Params.cdn.js_bundle
   "jsProBundleCdn" .Site.Params.cdn_pro.js_pro_bundle
   "docsVersion" .Site.Params.docs_version

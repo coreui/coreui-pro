@@ -19,7 +19,7 @@ If you're looking for a Form Wizard in Bootstrap 5 or a flexible Stepper Compone
 
 A simple multi-step form built with the Bootstrap Stepper. Each step displays form content and controls navigation through buttons (`next`, `prev`, `finish`).
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-toggle="stepper" id="myStepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
@@ -131,7 +131,7 @@ A simple multi-step form built with the Bootstrap Stepper. Each step displays fo
 
 Display step indicators vertically above labels using the `.vertical` modifier. This provides a compact and stylish layout for narrower screens or vertical designs.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-toggle="stepper">
   <ol class="stepper-steps">
     <li class="stepper-step vertical">
@@ -160,7 +160,7 @@ Display step indicators vertically above labels using the `.vertical` modifier. 
 
 Use the `.stepper-vertical` class to build a full vertical stepper, where both indicators and step content stack vertically. Ideal for mobile-first designs or top-to-bottom flows.
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper stepper-vertical" data-coreui-toggle="stepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
@@ -283,7 +283,7 @@ Use a Linear Bootstrap Stepper when you need a guided and controlled experience,
 - Registration wizards
 - Multistep forms with required validation
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-toggle="stepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
@@ -320,7 +320,7 @@ Use a Non-linear Bootstrap Stepper when users should have full control over navi
 - Onboarding flows where some steps are optional
 - Complex multi-section forms where order doesn't matter
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-linear="false" data-coreui-toggle="stepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
@@ -357,7 +357,7 @@ If a form is invalid, the stepper blocks navigation and displays validation mess
 
 This example shows a stepper with native browser validation enabled:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-toggle="stepper" id="validationStepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
@@ -421,7 +421,7 @@ This example shows a stepper with native browser validation enabled:
 
 To disable native browser styles validation and turn on custom styles, add the `novalidate` attribute to your forms:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-toggle="stepper" id="novalidateStepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
@@ -485,7 +485,7 @@ To disable native browser styles validation and turn on custom styles, add the `
 
 To completely skip form validation and allow free navigation between steps, add `data-coreui-skip-validation="true"` to the stepper:
 
-{{< example >}}
+{{< example stackblitz_pro="true" >}}
 <div class="stepper" data-coreui-toggle="stepper" data-coreui-skip-validation="true" id="skipValidationStepper">
   <ol class="stepper-steps">
     <li class="stepper-step">
