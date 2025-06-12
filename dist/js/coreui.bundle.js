@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.14.0 (https://coreui.io)
+  * CoreUI v5.14.1 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.14.0';
+  const VERSION = '5.14.1';
 
   /**
    * Class definition
@@ -8015,7 +8015,13 @@
       EventHandler.trigger(this._element, EVENT_SEARCH);
     }
     update(config) {
-      this._config = this._getConfig(config);
+      if (config.value) {
+        this.deselectAll();
+      }
+      this._config = {
+        ...this._config,
+        ...this._configAfterMerge(config)
+      };
       this._selected = [];
       this._options = this._getOptions();
       this._menu.remove();
@@ -8179,16 +8185,18 @@
       const options = [];
       for (const node of nodes) {
         if (node.nodeName === 'OPTION' && node.value) {
+          const value = String(node.value);
+          const text = node.innerHTML;
           const isSelected = node.selected || this._config.value && this._config.value.includes(node.value);
           options.push({
-            value: node.value,
-            text: node.innerHTML,
+            value,
+            text,
             selected: isSelected,
             disabled: node.disabled
           });
           if (node.selected || isSelected) {
             this._selected.push({
-              value: node.value,
+              value,
               text: node.innerHTML,
               ...(node.disabled && {
                 disabled: true
