@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.14.1 (https://coreui.io)
+  * CoreUI v5.14.2 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -661,7 +661,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.14.1';
+const VERSION = '5.14.2';
 
 /**
  * Class definition
@@ -1490,6 +1490,9 @@ const removeTimeFromDate = date => {
  * @returns {Date} A new Date instance with the date from `target` and time from `source`.
  */
 const setTimeFromDate = (target, source) => {
+  if (target === null) {
+    return null;
+  }
   if (!(source instanceof Date)) {
     return target;
   }
