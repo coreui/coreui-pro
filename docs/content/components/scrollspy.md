@@ -321,3 +321,7 @@ firstScrollSpyEl.addEventListener('activate.coreui.scrollspy', () => {
   // do something...
 })
 ```
+
+{{< markdown >}}
+{{< coreui-vs-bootstrap component="Scrollspy" >}}
+{{< /markdown >}}

@@ -148,3 +148,7 @@ Animate placeholders with `.placeholder-glow` or `.placeholder-wave` to better c
 ### SASS variables
 
 {{< scss-docs name="placeholders" file="scss/_variables.scss" >}}
+
+{{< markdown >}}
+{{< coreui-vs-bootstrap component="Placeholder" >}}
+{{< /markdown >}}

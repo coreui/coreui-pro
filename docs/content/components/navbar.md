@@ -816,3 +816,6 @@ Variables for the [dark navbar](#color-schemes):
 
 {{< scss-docs name="navbar-expand-loop" file="scss/_navbar.scss" >}}
 
+{{< markdown >}}
+{{< coreui-vs-bootstrap component="Navbar" >}}
+{{< /markdown >}}

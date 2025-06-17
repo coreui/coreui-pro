@@ -193,3 +193,7 @@ Learn more about [support for datalist elements](https://caniuse.com/datalist).
 `$form-file-*` are for file input.
 
 {{< scss-docs name="form-file-variables" file="scss/_variables.scss" >}}
+
+{{< markdown >}}
+{{< coreui-vs-bootstrap component="Form Control" >}}
+{{< /markdown >}}

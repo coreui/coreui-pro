@@ -179,3 +179,7 @@ Pagination now uses local CSS variables on `.pagination` for enhanced real-time 
 ### SASS mixins
 
 {{< scss-docs name="pagination-mixin" file="scss/mixins/_pagination.scss" >}}
+
+{{< markdown >}}
+{{< coreui-vs-bootstrap component="Pagination" >}}
+{{< /markdown >}}
