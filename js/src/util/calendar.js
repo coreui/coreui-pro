@@ -646,6 +646,10 @@ export const removeTimeFromDate = date => {
  * @returns {Date} A new Date instance with the date from `target` and time from `source`.
  */
 export const setTimeFromDate = (target, source) => {
+  if (target === null) {
+    return null
+  }
+
   if (!(source instanceof Date)) {
     return target
   }
