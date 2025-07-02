@@ -6043,6 +6043,7 @@ const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete';
 const Default$b = {
   ariaCleanerLabel: 'Clear all selections',
   cleaner: true,
+  clearSearchOnSelect: false,
   container: false,
   disabled: false,
   invalid: false,
@@ -6065,6 +6066,7 @@ const Default$b = {
 const DefaultType$b = {
   ariaCleanerLabel: 'string',
   cleaner: 'boolean',
+  clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
   disabled: 'boolean',
   invalid: 'boolean',
@@ -6603,6 +6605,11 @@ class MultiSelect extends BaseComponent {
       this.hide();
       this.search('');
       this._searchElement.value = null;
+    }
+    if (this._config.clearSearchOnSelect && this._config.search) {
+      this.search('');
+      this._searchElement.value = null;
+      this._searchElement.focus();
     }
   }
   _findOptionByValue(value, options = this._options) {

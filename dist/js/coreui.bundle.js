@@ -7884,6 +7884,7 @@
   const Default$b = {
     ariaCleanerLabel: 'Clear all selections',
     cleaner: true,
+    clearSearchOnSelect: false,
     container: false,
     disabled: false,
     invalid: false,
@@ -7906,6 +7907,7 @@
   const DefaultType$b = {
     ariaCleanerLabel: 'string',
     cleaner: 'boolean',
+    clearSearchOnSelect: 'boolean',
     container: '(string|element|boolean)',
     disabled: 'boolean',
     invalid: 'boolean',
@@ -8444,6 +8446,11 @@
         this.hide();
         this.search('');
         this._searchElement.value = null;
+      }
+      if (this._config.clearSearchOnSelect && this._config.search) {
+        this.search('');
+        this._searchElement.value = null;
+        this._searchElement.focus();
       }
     }
     _findOptionByValue(value, options = this._options) {
