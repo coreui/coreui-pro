@@ -476,7 +476,7 @@ class DateRangePicker extends BaseComponent {
       ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
       ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
       calendarDate: this._calendarDate,
-      calendars: this._config.calendars,
+      calendars: this._mobile ? 1 : this._config.calendars,
       disabledDates: this._config.disabledDates,
       endDate: this._endDate,
       firstDayOfWeek: this._config.firstDayOfWeek,
@@ -672,12 +672,12 @@ class DateRangePicker extends BaseComponent {
     })
 
     if (this._config.timepicker) {
-      if (this._mobile || (this._range && this._config.calendars === 1)) {
+      if ((this._mobile && this._config.range) || (this._config.range && this._config.calendars === 1)) {
         const timePickerStartEl = document.createElement('div')
         timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER)
         this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true))
 
-        calendarEl.append(timePickerStartEl)
+        this._timepickers.append(timePickerStartEl)
 
         EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
           this._changeStartDate(event.date, true)
