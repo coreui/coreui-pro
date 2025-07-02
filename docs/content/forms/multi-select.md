@@ -335,6 +335,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | --- | --- | --- | --- |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
+| `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
