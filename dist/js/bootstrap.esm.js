@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.14.2 (https://coreui.io)
+  * CoreUI v5.15.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -661,7 +661,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.14.2';
+const VERSION = '5.15.0';
 
 /**
  * Class definition
@@ -4247,7 +4247,7 @@ class DateRangePicker extends BaseComponent {
       ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
       ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
       calendarDate: this._calendarDate,
-      calendars: this._config.calendars,
+      calendars: this._mobile ? 1 : this._config.calendars,
       disabledDates: this._config.disabledDates,
       endDate: this._endDate,
       firstDayOfWeek: this._config.firstDayOfWeek,
@@ -4396,11 +4396,11 @@ class DateRangePicker extends BaseComponent {
       }
     });
     if (this._config.timepicker) {
-      if (this._mobile || this._range && this._config.calendars === 1) {
+      if (this._mobile && this._config.range || this._config.range && this._config.calendars === 1) {
         const timePickerStartEl = document.createElement('div');
         timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
         this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
-        calendarEl.append(timePickerStartEl);
+        this._timepickers.append(timePickerStartEl);
         EventHandler.on(timePickerStartEl, 'timeChange.bs.time-picker', event => {
           this._changeStartDate(event.date, true);
           this._calendar.update(this._getCalendarConfig());

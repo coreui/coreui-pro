@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.14.2 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.15.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -435,7 +435,7 @@
         ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
         ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
         calendarDate: this._calendarDate,
-        calendars: this._config.calendars,
+        calendars: this._mobile ? 1 : this._config.calendars,
         disabledDates: this._config.disabledDates,
         endDate: this._endDate,
         firstDayOfWeek: this._config.firstDayOfWeek,
@@ -584,11 +584,11 @@
         }
       });
       if (this._config.timepicker) {
-        if (this._mobile || this._range && this._config.calendars === 1) {
+        if (this._mobile && this._config.range || this._config.range && this._config.calendars === 1) {
           const timePickerStartEl = document.createElement('div');
           timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER);
           this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true));
-          calendarEl.append(timePickerStartEl);
+          this._timepickers.append(timePickerStartEl);
           EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
             this._changeStartDate(event.date, true);
             this._calendar.update(this._getCalendarConfig());
