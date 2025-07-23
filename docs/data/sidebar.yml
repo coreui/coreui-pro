@@ -69,6 +69,10 @@
         text: PRO
     - title: Input group
     - title: Floating labels
+    - title: Autocomplete
+      badge:
+        color: danger
+        text: PRO
     - title: Date Picker
       badge:
         color: danger

@@ -21,7 +21,7 @@
 
 {{- $docsCss := resources.Get "scss/docs.scss" | toCSS (merge (dict "targetPath" $targetDocsCssPath) $sassOptions) | postCSS $postcssOptions -}}
 {{- $searchCss := resources.Get "scss/search.scss" | toCSS (merge (dict "targetPath" $targetSearchCssPath) $sassOptions) | postCSS $postcssOptions -}}
-{{- $stylePickers := resources.Get "scss/docs-pickers.scss" | toCSS | postCSS $postcssOptions }}
+{{- $stylePickers := resources.Get "scss/docs-pickers.scss" | toCSS (merge (dict "targetPath" $targetSearchCssPath) $sassOptions) | postCSS $postcssOptions -}}
 
 <link href="{{ $docsCss.Permalink | relURL }}" rel="stylesheet">
 <link href="{{ $searchCss.Permalink | relURL }}" rel="stylesheet">
