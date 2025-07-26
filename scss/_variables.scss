@@ -2196,6 +2196,8 @@ $autocomplete-font-family:               $input-font-family !default;
 $autocomplete-font-size:                 $input-font-size !default;
 $autocomplete-font-weight:               $input-font-weight !default;
 $autocomplete-line-height:               $input-line-height !default;
+$autocomplete-padding-y:                 $input-padding-y !default;
+$autocomplete-padding-x:                 $input-padding-x !default;
 $autocomplete-color:                     $input-color !default;
 $autocomplete-bg:                        $input-bg !default;
 $autocomplete-box-shadow:                $box-shadow-inset !default;
@@ -2215,11 +2217,10 @@ $autocomplete-focus-bg:                  $input-focus-bg !default;
 $autocomplete-focus-border-color:        $input-focus-border-color !default;
 $autocomplete-focus-box-shadow:          $input-btn-focus-box-shadow !default;
 
+$autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !default;
+
 $autocomplete-invalid-border-color:      $form-invalid-border-color !default;
 $autocomplete-valid-border-color:        $form-valid-border-color !default;
-
-$autocomplete-selection-padding-y:       $input-padding-y !default;
-$autocomplete-selection-padding-x:       $input-padding-x !default;
 
 $autocomplete-cleaner-width:             1.5rem !default;
 $autocomplete-cleaner-height:            1.5rem !default;
@@ -2286,12 +2287,12 @@ $autocomplete-option-selected-indicator-border-color:  $autocomplete-option-sele
 $autocomplete-option-disabled-color:        var(--#{$prefix}secondary-color) !default;
 
 $autocomplete-font-size-lg:                 $input-font-size-lg !default;
-$autocomplete-selection-padding-y-lg:       $input-padding-y-lg !default;
-$autocomplete-selection-padding-x-lg:       $input-padding-x-lg !default;
+$autocomplete-padding-y-lg:                 $input-padding-y-lg !default;
+$autocomplete-padding-x-lg:                 $input-padding-x-lg !default;
 
 $autocomplete-font-size-sm:                 $input-font-size-sm !default;
-$autocomplete-selection-padding-y-sm:       $input-padding-y-sm !default;
-$autocomplete-selection-padding-x-sm:       $input-padding-x-sm !default;
+$autocomplete-padding-y-sm:                 $input-padding-y-sm !default;
+$autocomplete-padding-x-sm:                 $input-padding-x-sm !default;
 // scss-docs-end autocomplete-variables
 
 

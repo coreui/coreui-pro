@@ -180,31 +180,36 @@ You may also choose from small and large auto completes to match our similarly s
 
 {{< example class="d-flex flex-column gap-3" stackblitz_pro="true" >}}
 <div 
-  class="autocomplete autocomplete-lg"
+  class="autocomplete-lg"
   data-coreui-cleaner="true"
   data-coreui-highlight-options-on-search="true"
+  data-coreui-indicator="true"
   data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
   data-coreui-placeholder="Large autocomplete..."
   data-coreui-search="global"
   data-coreui-show-hints="true"
+  data-coreui-toggle="autocomplete"
 ></div>
 <div 
-  data-coreui-toggle="autocomplete"
   data-coreui-cleaner="true"
   data-coreui-highlight-options-on-search="true"
+  data-coreui-indicator="true"
   data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
   data-coreui-placeholder="Normal autocomplete..."
   data-coreui-search="global"
   data-coreui-show-hints="true"
+  data-coreui-toggle="autocomplete"
 ></div>
 <div 
-  class="autocomplete autocomplete-sm"
+  class="autocomplete-sm"
   data-coreui-cleaner="true"
   data-coreui-highlight-options-on-search="true"
+  data-coreui-indicator="true"
   data-coreui-options="Angular, Bootstrap, React.js, Vue.js"
   data-coreui-placeholder="Small autocomplete..."
   data-coreui-search="global"
   data-coreui-show-hints="true"
+  data-coreui-toggle="autocomplete"
 ></div>
 {{< /example >}}
 

@@ -25,6 +25,7 @@
   }
 
   // Bring the "active" form control to the top of surrounding elements
+  > .autocomplete:focus-within,
   > .date-picker:focus-within,
   > .time-picker:focus-within,
   > .form-multi-select:focus-within,
@@ -108,6 +109,7 @@
 // stylelint-disable-next-line no-duplicate-selectors
 .input-group {
   &:not(.has-validation) {
+    > .autocomplete:not(:last-child) > .autocomplete-input-group,
     > .date-picker:not(:last-child) > .date-picker-input-group,
     > .time-picker:not(:last-child) > .time-picker-input-group,
     > .form-multi-select:not(:last-child) > .form-multi-select-input-group,
@@ -121,6 +123,7 @@
   }
 
   &.has-validation {
+    > .autocomplete > .autocomplete-input-group,
     > .date-picker > .date-picker-input-group,
     > .time-picker > .time-picker-input-group,
     > .form-multi-select > .form-multi-select-input-group,
@@ -143,6 +146,7 @@
     @include border-start-radius(0);
   }
 
+  > .autocomplete:not(:first-child) > .autocomplete-input-group,
   > .date-picker:not(:first-child) > .date-picker-input-group,
   > .time-picker:not(:first-child) > .time-picker-input-group,
   > .form-multi-select:not(:first-child) > .form-multi-select .form-multi-select-input-group,

@@ -168,6 +168,7 @@
   }
 
   .input-group {
+    > .autocomplete:focus-within,
     > .date-picker:focus-within,
     > .time-picker:focus-within,
     > .form-multi-select:focus-within,

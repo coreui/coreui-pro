@@ -55,9 +55,13 @@ const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
-const CLASS_NAME_AUTOCOMPLETE_DROPDOWN = 'autocomplete-dropdown'
+const CLASS_NAME_BUTTONS = 'autocomplete-buttons'
 const CLASS_NAME_CLEANER = 'autocomplete-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_DROPDOWN = 'autocomplete-dropdown'
+const CLASS_NAME_INDICATOR = 'autocomplete-indicator'
+const CLASS_NAME_INPUT = 'autocomplete-input'
+const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'autocomplete-input-group'
 const CLASS_NAME_LABEL = 'label'
 const CLASS_NAME_OPTGROUP = 'autocomplete-optgroup'
@@ -69,7 +73,8 @@ const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="autocomplete"]:not(.disabled)'
-const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
+const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
+const SELECTOR_INDICATOR = '.autocomplete-indicator'
 const SELECTOR_OPTGROUP = '.autocomplete-optgroup'
 const SELECTOR_OPTION = '.autocomplete-option'
 const SELECTOR_OPTIONS = '.autocomplete-options'
@@ -196,7 +201,7 @@ class Autocomplete extends BaseComponent {
 
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._element.classList.add(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', true)
+    this._inputElement.setAttribute('aria-expanded', true)
 
     if (this._config.container) {
       this._menu.style.minWidth = `${this._element.offsetWidth}px`
@@ -216,7 +221,7 @@ class Autocomplete extends BaseComponent {
     }
 
     this._element.classList.remove(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', 'false')
+    this._inputElement.setAttribute('aria-expanded', 'false')
 
     if (this._config.container) {
       this._menu.classList.remove(CLASS_NAME_SHOW)
@@ -278,7 +283,7 @@ class Autocomplete extends BaseComponent {
       }
 
       this._deselectOption(option.value)
-      this._updateSelectionCleaner()
+      this._updateCleaner()
     }
   }
 
@@ -326,8 +331,8 @@ class Autocomplete extends BaseComponent {
   // Private
 
   _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK, () => {
-      if (!this._config.disabled) {
+    EventHandler.on(this._element, EVENT_CLICK, event => {
+      if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
         this.show()
       }
     })
@@ -369,7 +374,7 @@ class Autocomplete extends BaseComponent {
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
       event.preventDefault()
-      event.stopPropagation()
+      // event.stopPropagation()
       this.toggle()
     })
 
@@ -451,7 +456,7 @@ class Autocomplete extends BaseComponent {
       this._onOptionsClick(event.target)
     })
 
-    EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
+    EventHandler.on(this._cleanerElement, EVENT_CLICK, event => {
       if (!this._config.disabled) {
         event.preventDefault()
         event.stopPropagation()
@@ -536,13 +541,13 @@ class Autocomplete extends BaseComponent {
       this._element.classList.add(className)
     }
 
-    this._createSelection()
+    this._createInputGroup()
     this._createButtons()
     this._createOptionsContainer()
     this._updateOptionsList()
   }
 
-  _createSelection() {
+  _createInputGroup() {
     const togglerEl = document.createElement('div')
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
@@ -553,7 +558,7 @@ class Autocomplete extends BaseComponent {
 
     if (!this._config.disabled && this._config.showHints) {
       const inputHintEl = document.createElement('input')
-      inputHintEl.classList.add('form-control', 'autocomplete-selection', 'autocomplete-selection-hint')
+      inputHintEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_HINT)
       inputHintEl.setAttribute('name', (this._config.name || `${this._uniqueId}-hint`).toString())
       inputHintEl.autocomplete = 'off'
       inputHintEl.readOnly = true
@@ -565,7 +570,7 @@ class Autocomplete extends BaseComponent {
     }
 
     const inputEl = document.createElement('input')
-    inputEl.classList.add('form-control', 'autocomplete-selection')
+    inputEl.classList.add(CLASS_NAME_INPUT)
     inputEl.id = this._uniqueId
     inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString())
     inputEl.autocomplete = 'off'
@@ -596,7 +601,7 @@ class Autocomplete extends BaseComponent {
     }
 
     const buttons = document.createElement('div')
-    buttons.classList.add('autocomplete-buttons')
+    buttons.classList.add(CLASS_NAME_BUTTONS)
 
     if (!this._config.disabled && this._config.cleaner) {
       const cleaner = document.createElement('button')
@@ -606,13 +611,13 @@ class Autocomplete extends BaseComponent {
       cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
 
       buttons.append(cleaner)
-      this._selectionCleanerElement = cleaner
+      this._cleanerElement = cleaner
     }
 
     if (this._config.indicator) {
       const indicator = document.createElement('button')
       indicator.type = 'button'
-      indicator.classList.add('autocomplete-indicator')
+      indicator.classList.add(CLASS_NAME_INDICATOR)
       indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
 
       if (this._config.disabled) {
@@ -625,7 +630,7 @@ class Autocomplete extends BaseComponent {
     }
 
     this._togglerElement.append(buttons)
-    this._updateSelectionCleaner()
+    this._updateCleaner()
   }
 
   _createPopper() {
@@ -654,7 +659,7 @@ class Autocomplete extends BaseComponent {
 
   _createOptionsContainer() {
     const dropdownDiv = document.createElement('div')
-    dropdownDiv.classList.add(CLASS_NAME_AUTOCOMPLETE_DROPDOWN)
+    dropdownDiv.classList.add(CLASS_NAME_DROPDOWN)
     dropdownDiv.role = 'listbox'
     dropdownDiv.setAttribute('aria-labelledby', this._uniqueId)
 
@@ -797,7 +802,7 @@ class Autocomplete extends BaseComponent {
     }
 
     this._inputElement.focus()
-    this._updateSelectionCleaner()
+    this._updateCleaner()
   }
 
   _deselectOption(value) {
@@ -814,17 +819,17 @@ class Autocomplete extends BaseComponent {
     })
   }
 
-  _updateSelectionCleaner() {
-    if (!this._config.cleaner || this._selectionCleanerElement === null) {
+  _updateCleaner() {
+    if (!this._config.cleaner || this._cleanerElement === null) {
       return
     }
 
     if (this._selected.length > 0) {
-      this._selectionCleanerElement.style.removeProperty('display')
+      this._cleanerElement.style.removeProperty('display')
       return
     }
 
-    this._selectionCleanerElement.style.display = 'none'
+    this._cleanerElement.style.display = 'none'
   }
 
   _updateOptionsList(options = this._options) {
@@ -946,33 +951,31 @@ class Autocomplete extends BaseComponent {
   }
 
   static clearMenus(event) {
-    if (event && (event.button === RIGHT_MOUSE_BUTTON ||
-      (event.type === 'keyup' && event.key !== TAB_KEY))) {
+    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
       return
     }
 
-    const autocompletes = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)
+    const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)
 
-    for (let i = 0, len = autocompletes.length; i < len; i++) {
-      const context = Data.get(autocompletes[i], DATA_KEY)
-      const relatedTarget = {
-        relatedTarget: autocompletes[i]
-      }
-
-      if (event && event.type === 'click') {
-        relatedTarget.clickEvent = event
-      }
+    for (const toggle of openToggles) {
+      const context = Autocomplete.getInstance(toggle)
 
       if (!context) {
         continue
       }
 
-      if (!context._element.classList.contains(CLASS_NAME_SHOW)) {
+      const composedPath = event.composedPath()
+
+      if (
+        composedPath.includes(context._element)
+      ) {
         continue
       }
 
-      if (context._element.contains(event.target)) {
-        continue
+      const relatedTarget = { relatedTarget: context._element }
+
+      if (event.type === 'click') {
+        relatedTarget.clickEvent = event
       }
 
       context.hide()
@@ -980,8 +983,6 @@ class Autocomplete extends BaseComponent {
       if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) {
         context._inputElement.value = ''
       }
-
-      EventHandler.trigger(context._element, EVENT_HIDDEN)
     }
   }
 }

@@ -28,8 +28,9 @@
   --#{$prefix}autocomplete-focus-bg: #{$autocomplete-focus-bg};
   --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-focus-border-color};
   --#{$prefix}autocomplete-focus-box-shadow: #{$autocomplete-focus-box-shadow};
-  --#{$prefix}autocomplete-selection-padding-y: #{$autocomplete-selection-padding-y};
-  --#{$prefix}autocomplete-selection-padding-x: #{$autocomplete-selection-padding-x};
+  --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color};
+  --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y};
+  --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x};
   --#{$prefix}autocomplete-cleaner-width: #{$autocomplete-cleaner-width};
   --#{$prefix}autocomplete-cleaner-height: #{$autocomplete-cleaner-height};
   --#{$prefix}autocomplete-cleaner-padding-y: #{$autocomplete-cleaner-padding-y};
@@ -113,11 +114,6 @@
   flex-wrap: wrap;
   align-items: stretch;
   width: 100%;
-  font-family: var(--#{$prefix}autocomplete-font-family);
-  @include font-size(var(--#{$prefix}autocomplete-font-size));
-  font-weight: var(--#{$prefix}autocomplete-font-weight);
-  line-height: var(--#{$prefix}autocomplete-line-height);
-  color: var(--#{$prefix}autocomplete-color);
   background-color: var(--#{$prefix}autocomplete-bg);
   background-clip: padding-box;
   border: var(--#{$prefix}autocomplete-border-width) solid var(--#{$prefix}autocomplete-border-color);
@@ -128,7 +124,6 @@
   }
 
   .autocomplete.disabled & {
-    color: var(--#{$prefix}autocomplete-disabled-color);
     background-color: var(--#{$prefix}autocomplete-disabled-bg);
     border-color: $input-disabled-border-color;
   }
@@ -136,10 +131,8 @@
   .autocomplete.show &,
   &:has(*:focus),
   &:focus {
-    color: var(--#{$prefix}autocomplete-focus-color);
     background-color: var(--#{$prefix}autocomplete-focus-bg);
     border-color: var(--#{$prefix}autocomplete-focus-border-color);
-    outline: 0;
     @if $enable-shadows {
       box-shadow: var(--#{$prefix}autocomplete-box-shadow), var(--#{$prefix}autocomplete-focus-box-shadow);
     } @else {
@@ -148,24 +141,41 @@
   }
 }
 
-.autocomplete-selection {
+.autocomplete-input {
   position: relative;
-  display: flex;
   flex: 1 1 auto;
-  flex-wrap: wrap;
   width: 1%;
   min-width: 0;
-  padding: var(--#{$prefix}autocomplete-selection-padding-y) var(--#{$prefix}autocomplete-selection-padding-x);
+  padding: var(--#{$prefix}autocomplete-padding-y) var(--#{$prefix}autocomplete-padding-x);
+  font-family: var(--#{$prefix}autocomplete-font-family);
+  @include font-size(var(--#{$prefix}autocomplete-font-size));
+  font-weight: var(--#{$prefix}autocomplete-font-weight);
+  line-height: var(--#{$prefix}autocomplete-line-height);
+  color: var(--#{$prefix}autocomplete-color);
+  appearance: none;
   background-color: transparent;
   border: 0;
 
+  .autocomplete.show & {
+    color: var(--#{$prefix}autocomplete-focus-color);
+  }
+
+  &:disabled {
+    color: var(--#{$prefix}autocomplete-disabled-color);
+  }
+
   &:focus {
-    background-color: transparent;
-    box-shadow: none;
+    color: var(--#{$prefix}autocomplete-focus-color);
+    outline: 0;
+  }
+
+  &::placeholder {
+    color: var(--#{$prefix}autocomplete-placeholder-color);
+    opacity: 1;
   }
 }
 
-.autocomplete-selection-hint {
+.autocomplete-input-hint {
   position: absolute;
   top: 0;
   left: 0;
@@ -178,8 +188,8 @@
 .autocomplete-buttons {
   display: flex;
   align-items: center;
-  min-height: calc(2 * var(--#{$prefix}autocomplete-selection-padding-y) + calc(var(--#{$prefix}autocomplete-font-size) * var(--#{$prefix}autocomplete-line-height)));  // stylelint-disable-line function-disallowed-list
-  padding: 0 var(--#{$prefix}autocomplete-selection-padding-y);
+  min-height: calc(2 * var(--#{$prefix}autocomplete-padding-y) + calc(var(--#{$prefix}autocomplete-font-size) * var(--#{$prefix}autocomplete-line-height)));  // stylelint-disable-line function-disallowed-list
+  padding: 0 var(--#{$prefix}autocomplete-padding-y);
 }
 
 .autocomplete-cleaner,
@@ -329,15 +339,15 @@
 
 
 .autocomplete-sm {
-  --#{$prefix}autocomplete-selection-padding-y: #{$autocomplete-selection-padding-y-sm};
-  --#{$prefix}autocomplete-selection-padding-x: #{$autocomplete-selection-padding-x-sm};
+  --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y-sm};
+  --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x-sm};
   --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size-sm};
   --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius-sm};
 }
 
 .autocomplete-lg {
-  --#{$prefix}autocomplete-selection-padding-y: #{$autocomplete-selection-padding-y-lg};
-  --#{$prefix}autocomplete-selection-padding-x: #{$autocomplete-selection-padding-x-lg};
+  --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y-lg};
+  --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x-lg};
   --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size-lg};
   --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius-lg};
 }
