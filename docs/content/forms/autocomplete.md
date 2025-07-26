@@ -216,6 +216,26 @@ Enable a cleaner button to quickly clear input element:
 <div data-coreui-toggle="autocomplete" data-coreui-cleaner="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="With cleaner button..."></div>
 {{< /example >}}
 
+## Custom templates
+
+The CoreUI Bootstrap Autocomplete Component provides the flexibility to personalize options and group labels by utilizing custom templates. You can easily customize the options using the `optionsTemplate`, and for groups, you can use `optionsGroupsTemplate`, as demonstrated in the examples below:
+
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+<div class="row">
+  <div class="col-md-6">
+    <div id="myAutocompleteCountries"></div>
+  </div>
+  <div class="col-md-6">
+    <div id="myAutocompleteCountriesAndCities"></div>
+  </div>
+</div>
+{{< /example >}}
+
+We use the following JavaScript to set up our autocomplete:
+
+{{< js-docs name="autocomplete-custom-options" file="docs/assets/js/partials/snippets.js" >}}
+
+
 ## Usage
 
 {{< bootstrap-compatibility >}}
@@ -261,6 +281,7 @@ const autoCompleteList = autoCompleteElementList.map(autoCompleteEl => {
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `allowOnlyDefinedOptions` | boolean | `false` | Restricts selection to only predefined options when set to `true`. |
 | `ariaCleanerLabel` | string | `'Clear selection'` | Accessible label for the cleaner button, read by screen readers. |
 | `ariaIndicatorLabel` | string | `'Toggle visibility of options menu'` | Accessible label for the indicator button, read by screen readers. |
@@ -268,14 +289,19 @@ const autoCompleteList = autoCompleteElementList.map(autoCompleteEl => {
 | `clearSearchOnSelect` | boolean | `true` | Clears the search input when an option is selected. |
 | `container` | string, element, boolean | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `disabled` | boolean | `false` | Disables the component when set to `true`. |
-| `highlightOptionsOnSearch` | boolean | `true` | Highlights matching text in options during search. |
+| `highlightOptionsOnSearch` | boolean | `false` | Highlights matching text in options during search. |
+| `id` | string, null | `null` | Sets a custom ID for the component. If not provided, a unique ID is auto-generated. |
 | `indicator` | boolean | `false` | Enables the selection indicator button. |
 | `invalid` | boolean | `false` | Applies invalid styling to the component. |
 | `name` | string, null | `null` | Sets the name attribute for the input element. |
 | `options` | boolean, array | `false` | Array of options or option objects to populate the dropdown. |
+| `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets the maximum height of the options dropdown. |
+| `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
 | `placeholder` | string, null | `null` | Placeholder text displayed in the input field. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |
+| `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
+| `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
 | `search` | array, string, null | `null` | Enables search functionality. Use `'global'` for global search across the component and `'external'` when options are provided from external sources. |
 | `searchNoResultsLabel` | string | `false` | Text displayed when no search results are found. |
 | `showHints` | boolean | `false` | Shows completion hints as users type. |
