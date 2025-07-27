@@ -100,7 +100,8 @@ export const getDateBySelectionType = (date, selectionType) => {
   }
 
   if (selectionType === 'week') {
-    return `${date.getFullYear()}W${getWeekNumber(date)}`
+    const { year, weekNumber } = getISOWeekNumberAndYear(date)
+    return `${year}W${weekNumber.toString().padStart(2, '0')}`
   }
 
   if (selectionType === 'month') {
@@ -263,11 +264,19 @@ const getTrailingDays = (year, month, leadingDays, monthDays) => {
 }
 
 /**
- * Calculates the ISO week number for a given date.
- * @param date - The date to calculate the week number for.
- * @returns The ISO week number.
+ * Calculates the ISO 8601 week number and year for a given date.
+ *
+ * In the ISO 8601 standard:
+ * - Weeks start on Monday.
+ * - The first week of the year is the one that contains January 4th.
+ * - The year of the week may differ from the calendar year (e.g., Dec 29, 2025 is in ISO year 2026).
+ *
+ * @param {Date} date - The date for which to calculate the ISO week number and year.
+ * @returns {{ weekNumber: number, year: number }} An object containing:
+ *   - `weekNumber`: the ISO week number (1–53),
+ *   - `year`: the ISO year (may differ from the calendar year of the date).
  */
-export const getWeekNumber = date => {
+export const getISOWeekNumberAndYear = date => {
   const tempDate = new Date(date)
   tempDate.setHours(0, 0, 0, 0)
 
@@ -277,10 +286,9 @@ export const getWeekNumber = date => {
   const week1 = new Date(tempDate.getFullYear(), 0, 4)
 
   // Calculate full weeks to the date
-  const weekNumber =
-    1 + Math.round((tempDate.getTime() - week1.getTime()) / 86_400_000 / 7)
+  const weekNumber = 1 + Math.round((tempDate.getTime() - week1.getTime()) / 86_400_000 / 7)
 
-  return weekNumber
+  return { weekNumber, year: tempDate.getFullYear() }
 }
 
 /**
@@ -305,12 +313,14 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
   for (const [index, day] of days.entries()) {
     if (index % 7 === 0 || weeks.length === 0) {
       weeks.push({
+        week: { number: 0, year: 0 },
         days: []
       })
     }
 
     if ((index + 1) % 7 === 0) {
-      weeks[weeks.length - 1].weekNumber = getWeekNumber(day.date)
+      const { weekNumber, year } = getISOWeekNumberAndYear(day.date)
+      weeks[weeks.length - 1].week = { number: weekNumber, year }
     }
 
     weeks[weeks.length - 1].days.push(day)

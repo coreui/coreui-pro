@@ -620,13 +620,8 @@ class Calendar extends BaseComponent {
         </tr>
       </thead>` : ''}
       <tbody>
-        ${this._view === 'days' ? monthDetails.map(week => {
-          const date = convertToDateObject(
-            week.weekNumber === 0 ?
-              `${calendarDate.getFullYear()}W53` :
-              `${calendarDate.getFullYear()}W${week.weekNumber}`,
-            this._config.selectionType
-          )
+        ${this._view === 'days' ? monthDetails.map(({ week, days }) => {
+          const { date } = days[0]
           const rowAttributes = this._rowWeekAttributes(date)
           return (
             `<tr 
@@ -635,9 +630,9 @@ class Calendar extends BaseComponent {
               ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
             >
               ${this._config.showWeekNumber ?
-                `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''
+                `<th class="calendar-cell-week-number">${week.number}</td>` : ''
               }
-              ${week.days.map(({ date, month }) => {
+              ${days.map(({ date, month }) => {
                 const cellAttributes = this._cellDayAttributes(date, month)
                 return month === 'current' || this._config.showAdjacementDays ?
                   `<td 
