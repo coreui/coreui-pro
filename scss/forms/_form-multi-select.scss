@@ -414,7 +414,7 @@ select.form-multi-select {
     &::before {
       position: absolute;
       inset-inline-start: calc(var(--#{$prefix}form-multi-select-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
-      top: .7rem;
+      top: 50%;
       display: block;
       width: var(--#{$prefix}form-multi-select-option-indicator-width);
       height: var(--#{$prefix}form-multi-select-option-indicator-width);
@@ -425,6 +425,7 @@ select.form-multi-select {
       background-position: center;
       background-size: contain;
       border: var(--#{$prefix}form-multi-select-option-indicator-border);
+      transform: translateY(-50%);
       @include border-radius(var(--#{$prefix}form-multi-select-option-indicator-border-radius));
     }
   }

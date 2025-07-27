@@ -228,6 +228,25 @@ Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out 
 </select>
 {{< /example >}}
 
+## Custom templates
+
+The CoreUI Bootstrap Multi Select Component provides the flexibility to personalize options and group labels by utilizing custom templates. You can easily customize the options using the `optionsTemplate`, and for groups, you can use `optionsGroupsTemplate`, as demonstrated in the examples below:
+
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+<div class="row">
+  <div class="col-md-6">
+    <select id="myMultiSelectCountries" class="form-multi-select"></select>
+  </div>
+  <div class="col-md-6">
+    <select id="myMultiSelectCountriesAndCities" class="form-multi-select"></select>
+  </div>
+</div>
+{{< /example >}}
+
+We use the following JavaScript to set up our multi-select:
+
+{{< js-docs name="multi-select-custom-options" file="docs/assets/js/partials/snippets.js" >}}
+
 ## Sizing
 
 You may also choose from small and large multi selects to match our similarly sized text inputs.
@@ -333,6 +352,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
 | `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
@@ -342,9 +362,14 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Set the name attribute for the native select element. |
 | `options` | boolean, array | `false` | List of option elements. |
+| `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
 | `optionsStyle` | string | `'checkbox'` | Sets option style. |
+| `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
+| `required` | boolean | `false` | Makes the input field required for form validation. |
+| `sanitize` | boolean | `true` | Enables HTML sanitization for custom templates to prevent XSS attacks. |
+| `sanitizeFn` | function, null | `null` | Custom sanitization function. If provided, it will be used instead of the built-in sanitizer. |
 | `search` | boolean, string | `false` | Enables search input element. When set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. |
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|

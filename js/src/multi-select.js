@@ -10,6 +10,7 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
@@ -83,6 +84,7 @@ const CLASS_NAME_TAG = 'form-multi-select-tag'
 const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 
 const Default = {
+  allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   cleaner: true,
   clearSearchOnSelect: false,
@@ -92,10 +94,14 @@ const Default = {
   multiple: true,
   name: null,
   options: false,
+  optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
   optionsStyle: 'checkbox',
+  optionsTemplate: null,
   placeholder: 'Select...',
   required: false,
+  sanitize: true,
+  sanitizeFn: null,
   search: false,
   searchNoResultsLabel: 'No results found',
   selectAll: true,
@@ -107,6 +113,7 @@ const Default = {
 }
 
 const DefaultType = {
+  allowList: 'object',
   ariaCleanerLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
@@ -116,10 +123,14 @@ const DefaultType = {
   multiple: 'boolean',
   name: '(string|null)',
   options: '(boolean|array)',
+  optionsGroupsTemplate: '(function|null)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
+  optionsTemplate: '(function|null)',
   placeholder: 'string',
   required: 'boolean',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
@@ -407,18 +418,31 @@ class MultiSelect extends BaseComponent {
     const _options = []
     for (const option of options) {
       if (option.options && Array.isArray(option.options)) {
+        const customGroupProperties = { ...option }
+
+        delete customGroupProperties.label
+        delete customGroupProperties.options
+
         _options.push({
+          ...customGroupProperties,
           label: option.label,
           options: this._getOptionsFromConfig(option.options)
         })
+
         continue
       }
 
       const value = String(option.value)
       const isSelected = option.selected || (this._config.value && this._config.value.includes(value))
 
+      const customProperties = typeof option === 'object' ? { ...option } : {}
+
+      delete customProperties.value
+      delete customProperties.selected
+      delete customProperties.disabled
+
       _options.push({
-        ...option,
+        ...customProperties,
         value,
         ...isSelected && { selected: true },
         ...option.disabled && { disabled: true }
@@ -691,7 +715,15 @@ class MultiSelect extends BaseComponent {
 
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
-        optionDiv.innerHTML = option.text
+
+        if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+          optionDiv.innerHTML = this._config.sanitize ?
+            sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
+            this._config.optionsTemplate(option)
+        } else {
+          optionDiv.textContent = option.text
+        }
+
         parentElement.append(optionDiv)
       }
 
@@ -700,7 +732,15 @@ class MultiSelect extends BaseComponent {
         optgroup.classList.add(CLASS_NAME_OPTGROUP)
 
         const optgrouplabel = document.createElement('div')
-        optgrouplabel.innerHTML = option.label
+
+        if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
+          optgrouplabel.innerHTML = this._config.sanitize ?
+            sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
+            this._config.optionsGroupsTemplate(option)
+        } else {
+          optgrouplabel.textContent = option.label
+        }
+
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
         optgroup.append(optgrouplabel)
 
@@ -737,8 +777,16 @@ class MultiSelect extends BaseComponent {
   }
 
   _onOptionsClick(element) {
-    if (!element.classList.contains(CLASS_NAME_OPTION) || element.classList.contains(CLASS_NAME_LABEL)) {
+    if (element.classList.contains(CLASS_NAME_LABEL)) {
       return
+    }
+
+    if (!element.classList.contains(CLASS_NAME_OPTION)) {
+      element = element.closest(SELECTOR_OPTION)
+
+      if (!element) {
+        return
+      }
     }
 
     const value = String(element.dataset.value)
