@@ -1,5 +1,5 @@
 /*!
-  * CoreUI time.js v5.15.0 (https://coreui.io)
+  * CoreUI time.js v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */

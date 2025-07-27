@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v5.15.0 (https://coreui.io)
+  * CoreUI calendar.js v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -502,16 +502,21 @@
         </tr>
       </thead>` : ''}
       <tbody>
-        ${this._view === 'days' ? monthDetails.map(week => {
-      const date = calendar_js.convertToDateObject(week.weekNumber === 0 ? `${calendarDate.getFullYear()}W53` : `${calendarDate.getFullYear()}W${week.weekNumber}`, this._config.selectionType);
+        ${this._view === 'days' ? monthDetails.map(({
+      week,
+      days
+    }) => {
+      const {
+        date
+      } = days[0];
       const rowAttributes = this._rowWeekAttributes(date);
       return `<tr 
               class="${rowAttributes.className}"
               tabindex="${rowAttributes.tabIndex}"
               ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
             >
-              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''}
-              ${week.days.map(({
+              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</td>` : ''}
+              ${days.map(({
         date,
         month
       }) => {

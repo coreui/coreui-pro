@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.15.0 (https://coreui.io)
+  * CoreUI v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -684,7 +684,7 @@
    * Constants
    */
 
-  const VERSION = '5.15.0';
+  const VERSION = '5.16.0';
 
   /**
    * Class definition
@@ -878,13 +878,13 @@
    * Constants
    */
 
-  const NAME$r = 'alert';
-  const DATA_KEY$m = 'bs.alert';
-  const EVENT_KEY$n = `.${DATA_KEY$m}`;
-  const EVENT_CLOSE = `close${EVENT_KEY$n}`;
-  const EVENT_CLOSED = `closed${EVENT_KEY$n}`;
+  const NAME$s = 'alert';
+  const DATA_KEY$n = 'bs.alert';
+  const EVENT_KEY$o = `.${DATA_KEY$n}`;
+  const EVENT_CLOSE = `close${EVENT_KEY$o}`;
+  const EVENT_CLOSED = `closed${EVENT_KEY$o}`;
   const CLASS_NAME_FADE$5 = 'fade';
-  const CLASS_NAME_SHOW$f = 'show';
+  const CLASS_NAME_SHOW$g = 'show';
 
   /**
    * Class definition
@@ -893,7 +893,7 @@
   class Alert extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$r;
+      return NAME$s;
     }
 
     // Public
@@ -902,7 +902,7 @@
       if (closeEvent.defaultPrevented) {
         return;
       }
-      this._element.classList.remove(CLASS_NAME_SHOW$f);
+      this._element.classList.remove(CLASS_NAME_SHOW$g);
       const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$5);
       this._queueCallback(() => this._destroyElement(), this._element, isAnimated);
     }
@@ -940,6 +940,936 @@
    */
 
   defineJQueryPlugin(Alert);
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI util/sanitizer.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This is a modified version of the Bootstrap's util/sanitizer.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+  // js-docs-start allow-list
+  const ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i;
+  const DefaultAllowlist = {
+    // Global attributes allowed on any supplied element below.
+    '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
+    a: ['target', 'href', 'title', 'rel'],
+    area: [],
+    b: [],
+    br: [],
+    col: [],
+    code: [],
+    dd: [],
+    div: [],
+    dl: [],
+    dt: [],
+    em: [],
+    hr: [],
+    h1: [],
+    h2: [],
+    h3: [],
+    h4: [],
+    h5: [],
+    h6: [],
+    i: [],
+    img: ['src', 'srcset', 'alt', 'title', 'width', 'height'],
+    li: [],
+    ol: [],
+    p: [],
+    pre: [],
+    s: [],
+    small: [],
+    span: [],
+    sub: [],
+    sup: [],
+    strong: [],
+    u: [],
+    ul: []
+  };
+  // js-docs-end allow-list
+
+  const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longdesc', 'poster', 'src', 'xlink:href']);
+
+  /**
+   * A pattern that recognizes URLs that are safe wrt. XSS in URL navigation
+   * contexts.
+   *
+   * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
+   */
+  const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
+  const allowedAttribute = (attribute, allowedAttributeList) => {
+    const attributeName = attribute.nodeName.toLowerCase();
+    if (allowedAttributeList.includes(attributeName)) {
+      if (uriAttributes.has(attributeName)) {
+        return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue));
+      }
+      return true;
+    }
+
+    // Check if a regular expression validates the attribute.
+    return allowedAttributeList.filter(attributeRegex => attributeRegex instanceof RegExp).some(regex => regex.test(attributeName));
+  };
+  function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
+    if (!unsafeHtml.length) {
+      return unsafeHtml;
+    }
+    if (sanitizeFunction && typeof sanitizeFunction === 'function') {
+      return sanitizeFunction(unsafeHtml);
+    }
+    const domParser = new window.DOMParser();
+    const createdDocument = domParser.parseFromString(unsafeHtml, 'text/html');
+    const elements = [].concat(...createdDocument.body.querySelectorAll('*'));
+    for (const element of elements) {
+      const elementName = element.nodeName.toLowerCase();
+      if (!Object.keys(allowList).includes(elementName)) {
+        element.remove();
+        continue;
+      }
+      const attributeList = [].concat(...element.attributes);
+      const allowedAttributes = [].concat(allowList['*'] || [], allowList[elementName] || []);
+      for (const attribute of attributeList) {
+        if (!allowedAttribute(attribute, allowedAttributes)) {
+          element.removeAttribute(attribute.nodeName);
+        }
+      }
+    }
+    return createdDocument.body.innerHTML;
+  }
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI PRO autocomplete.js
+   * License (https://coreui.io/pro/license/)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * ------------------------------------------------------------------------
+   * Constants
+   * ------------------------------------------------------------------------
+   */
+
+  const NAME$r = 'autocomplete';
+  const DATA_KEY$m = 'bs.autocomplete';
+  const EVENT_KEY$n = `.${DATA_KEY$m}`;
+  const DATA_API_KEY$i = '.data-api';
+  const ARROW_UP_KEY$5 = 'ArrowUp';
+  const ARROW_DOWN_KEY$5 = 'ArrowDown';
+  const BACKSPACE_KEY$1 = 'Backspace';
+  const DELETE_KEY$1 = 'Delete';
+  const ENTER_KEY$4 = 'Enter';
+  const ESCAPE_KEY$6 = 'Escape';
+  const TAB_KEY$6 = 'Tab';
+  const RIGHT_MOUSE_BUTTON$5 = 2; // MouseEvent.button value for the secondary button, usually the right button
+
+  const EVENT_BLUR$1 = `blur${EVENT_KEY$n}`;
+  const EVENT_CHANGED$1 = `changed${EVENT_KEY$n}`;
+  const EVENT_CLICK$6 = `click${EVENT_KEY$n}`;
+  const EVENT_HIDE$c = `hide${EVENT_KEY$n}`;
+  const EVENT_HIDDEN$c = `hidden${EVENT_KEY$n}`;
+  const EVENT_INPUT$3 = `input${EVENT_KEY$n}`;
+  const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$n}`;
+  const EVENT_KEYUP$1 = `keyup${EVENT_KEY$n}`;
+  const EVENT_SHOW$c = `show${EVENT_KEY$n}`;
+  const EVENT_SHOWN$c = `shown${EVENT_KEY$n}`;
+  const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$n}${DATA_API_KEY$i}`;
+  const EVENT_KEYUP_DATA_API$5 = `keyup${EVENT_KEY$n}${DATA_API_KEY$i}`;
+  const EVENT_LOAD_DATA_API$e = `load${EVENT_KEY$n}${DATA_API_KEY$i}`;
+  const CLASS_NAME_AUTOCOMPLETE = 'autocomplete';
+  const CLASS_NAME_BUTTONS = 'autocomplete-buttons';
+  const CLASS_NAME_CLEANER$3 = 'autocomplete-cleaner';
+  const CLASS_NAME_DISABLED$5 = 'disabled';
+  const CLASS_NAME_DROPDOWN$2 = 'autocomplete-dropdown';
+  const CLASS_NAME_INDICATOR$2 = 'autocomplete-indicator';
+  const CLASS_NAME_INPUT$2 = 'autocomplete-input';
+  const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint';
+  const CLASS_NAME_INPUT_GROUP$3 = 'autocomplete-input-group';
+  const CLASS_NAME_LABEL$1 = 'label';
+  const CLASS_NAME_OPTGROUP$1 = 'autocomplete-optgroup';
+  const CLASS_NAME_OPTGROUP_LABEL$1 = 'autocomplete-optgroup-label';
+  const CLASS_NAME_OPTION$1 = 'autocomplete-option';
+  const CLASS_NAME_OPTIONS$1 = 'autocomplete-options';
+  const CLASS_NAME_OPTIONS_EMPTY$1 = 'autocomplete-options-empty';
+  const CLASS_NAME_SELECTED$2 = 'selected';
+  const CLASS_NAME_SHOW$f = 'show';
+  const SELECTOR_DATA_TOGGLE$g = '[data-bs-toggle="autocomplete"]:not(.disabled)';
+  const SELECTOR_DATA_TOGGLE_SHOWN$4 = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW$f}`;
+  const SELECTOR_INDICATOR = '.autocomplete-indicator';
+  const SELECTOR_OPTGROUP$1 = '.autocomplete-optgroup';
+  const SELECTOR_OPTION$1 = '.autocomplete-option';
+  const SELECTOR_OPTIONS$1 = '.autocomplete-options';
+  const SELECTOR_OPTIONS_EMPTY$1 = '.autocomplete-options-empty';
+  const SELECTOR_VISIBLE_ITEMS$2 = '.autocomplete-options .autocomplete-option:not(.disabled):not(:disabled)';
+  const Default$o = {
+    allowList: DefaultAllowlist,
+    allowOnlyDefinedOptions: false,
+    ariaCleanerLabel: 'Clear selection',
+    ariaIndicatorLabel: 'Toggle visibility of options menu',
+    cleaner: false,
+    clearSearchOnSelect: true,
+    container: false,
+    disabled: false,
+    highlightOptionsOnSearch: false,
+    id: null,
+    indicator: false,
+    invalid: false,
+    name: null,
+    options: false,
+    optionsGroupsTemplate: null,
+    optionsMaxHeight: 'auto',
+    optionsTemplate: null,
+    placeholder: null,
+    required: false,
+    sanitize: true,
+    sanitizeFn: null,
+    search: null,
+    searchNoResultsLabel: false,
+    showHints: false,
+    valid: false,
+    value: null
+  };
+  const DefaultType$o = {
+    allowList: 'object',
+    allowOnlyDefinedOptions: 'boolean',
+    ariaCleanerLabel: 'string',
+    ariaIndicatorLabel: 'string',
+    cleaner: 'boolean',
+    clearSearchOnSelect: 'boolean',
+    container: '(string|element|boolean)',
+    disabled: 'boolean',
+    highlightOptionsOnSearch: 'boolean',
+    id: '(string|null)',
+    indicator: 'boolean',
+    invalid: 'boolean',
+    name: '(string|null)',
+    options: '(array|null)',
+    optionsGroupsTemplate: '(function|null)',
+    optionsMaxHeight: '(number|string)',
+    optionsTemplate: '(function|null)',
+    placeholder: '(string|null)',
+    required: 'boolean',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
+    search: '(array|string|null)',
+    searchNoResultsLabel: 'boolean|string',
+    showHints: 'boolean',
+    valid: 'boolean',
+    value: '(number|string|null)'
+  };
+
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
+
+  class Autocomplete extends BaseComponent {
+    constructor(element, config) {
+      var _this$_config$id;
+      super(element, config);
+      this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : getUID(`${this.constructor.NAME}`);
+      this._indicatorElement = null;
+      this._inputElement = null;
+      this._inputHintElement = null;
+      this._togglerElement = null;
+      this._optionsElement = null;
+      this._menu = null;
+      this._selected = [];
+      this._options = this._getOptionsFromConfig();
+      this._popper = null;
+      this._search = '';
+      this._createAutocomplete();
+      this._addEventListeners();
+      Data.set(this._element, DATA_KEY$m, this);
+    }
+
+    // Getters
+
+    static get Default() {
+      return Default$o;
+    }
+    static get DefaultType() {
+      return DefaultType$o;
+    }
+    static get NAME() {
+      return NAME$r;
+    }
+
+    // Public
+
+    toggle() {
+      return this._isShown() ? this.hide() : this.show();
+    }
+    show() {
+      if (this._config.disabled || this._isShown()) {
+        return;
+      }
+      if (!this._config.searchNoResultsLabel && this._flattenOptions().filter(option => option.label.toLowerCase().includes(this._search.toLowerCase())).length === 0) {
+        return;
+      }
+      EventHandler.trigger(this._element, EVENT_SHOW$c);
+      this._element.classList.add(CLASS_NAME_SHOW$f);
+      this._inputElement.setAttribute('aria-expanded', 'true');
+      if (this._config.container) {
+        this._menu.style.minWidth = `${this._element.offsetWidth}px`;
+        this._menu.classList.add(CLASS_NAME_SHOW$f);
+      }
+      EventHandler.trigger(this._element, EVENT_SHOWN$c);
+      this._createPopper();
+    }
+    hide() {
+      EventHandler.trigger(this._element, EVENT_HIDE$c);
+      if (this._popper) {
+        this._popper.destroy();
+      }
+      this._element.classList.remove(CLASS_NAME_SHOW$f);
+      this._inputElement.setAttribute('aria-expanded', 'false');
+      if (this._config.container) {
+        this._menu.classList.remove(CLASS_NAME_SHOW$f);
+      }
+      if (this._inputHintElement) {
+        this._inputHintElement.value = '';
+      }
+      EventHandler.trigger(this._element, EVENT_HIDDEN$c);
+    }
+    dispose() {
+      if (this._popper) {
+        this._popper.destroy();
+      }
+      super.dispose();
+    }
+    clear() {
+      this.deselectAll();
+      this.search('');
+      this._filterOptionsList();
+      this._inputElement.value = '';
+    }
+    search(label) {
+      this._search = label.length > 0 ? label.toLowerCase() : '';
+      if (!this._isExternalSearch()) {
+        this._filterOptionsList();
+      }
+      EventHandler.trigger(this._element, EVENT_INPUT$3, {
+        value: label
+      });
+    }
+    update(config) {
+      if (config.value) {
+        this.deselectAll();
+      }
+      this._config = {
+        ...this._config,
+        ...this._configAfterMerge(config)
+      };
+      this._options = this._getOptionsFromConfig();
+      this._optionsElement.innerHTML = '';
+      this._createOptions(this._optionsElement, this._options);
+    }
+    deselectAll(options = this._selected) {
+      for (const option of options) {
+        if (option.disabled) {
+          continue;
+        }
+        if (Array.isArray(option.options)) {
+          this.deselectAll(option.options);
+          continue;
+        }
+        this._deselectOption(option.value);
+        this._updateCleaner();
+      }
+    }
+
+    // Helpers
+
+    _flattenOptions(options = this._options, flat = []) {
+      for (const opt of options) {
+        if (opt && Array.isArray(opt.options)) {
+          this._flattenOptions(opt.options, flat);
+          continue;
+        }
+        flat.push(opt);
+      }
+      return flat;
+    }
+    _getClassNames() {
+      return this._element.classList.value.split(' ');
+    }
+    _highlightOption(label) {
+      const regex = new RegExp(this._search, 'gi');
+      return label.replace(regex, string => `<strong>${string}</strong>`);
+    }
+    _isExternalSearch() {
+      return Array.isArray(this._config.search) && this._config.search.includes('external');
+    }
+    _isGlobalSearch() {
+      return Array.isArray(this._config.search) && this._config.search.includes('global');
+    }
+    _isVisible(element) {
+      const style = window.getComputedStyle(element);
+      return style.display !== 'none';
+    }
+    _isShown() {
+      return this._element.classList.contains(CLASS_NAME_SHOW$f);
+    }
+
+    // Private
+
+    _addEventListeners() {
+      EventHandler.on(this._element, EVENT_CLICK$6, event => {
+        if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
+          this.show();
+        }
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN$7, event => {
+        if (event.key === ESCAPE_KEY$6) {
+          this.hide();
+          if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
+            this.search('');
+            this._inputElement.value = '';
+          }
+          return;
+        }
+        if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY$1)) {
+          this._inputElement.focus();
+        }
+      });
+      EventHandler.on(this._menu, EVENT_KEYDOWN$7, event => {
+        if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY$1)) {
+          this._inputElement.focus();
+        }
+      });
+      EventHandler.on(this._togglerElement, EVENT_KEYDOWN$7, event => {
+        if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$5)) {
+          event.preventDefault();
+          this.show();
+          return;
+        }
+        if (this._isShown() && event.key === ARROW_DOWN_KEY$5) {
+          event.preventDefault();
+          this._selectMenuItem(event);
+        }
+      });
+      EventHandler.on(this._indicatorElement, EVENT_CLICK$6, event => {
+        event.preventDefault();
+        this.toggle();
+      });
+      EventHandler.on(this._inputElement, EVENT_BLUR$1, () => {
+        const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
+        if (this._config.allowOnlyDefinedOptions && this._selected.length === 0 && options.length === 0) {
+          this.clear();
+        }
+      });
+      EventHandler.on(this._inputElement, EVENT_KEYDOWN$7, event => {
+        if (!this._isShown() && event.key !== TAB_KEY$6) {
+          this.show();
+        }
+        if (event.key === ARROW_DOWN_KEY$5 && this._inputElement.value.length === this._inputElement.selectionStart) {
+          this._selectMenuItem(event);
+          return;
+        }
+        if (event.key === TAB_KEY$6 && this._config.showHints && this._inputElement.value.length > 0) {
+          if (this._inputHintElement.value) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
+          if (options.length > 0) {
+            this._selectOption(options[0]);
+          }
+        }
+        if (event.key === ENTER_KEY$4) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (this._inputElement.value.length === 0) {
+            return;
+          }
+          const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
+          if (options.length > 0) {
+            this._selectOption(options[0]);
+          }
+          if (options.length === 0 && !this._config.allowOnlyDefinedOptions) {
+            EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+              value: this._inputElement.value
+            });
+            this.hide();
+            if (this._config.clearSearchOnSelect) {
+              this.search('');
+            }
+          }
+        }
+      });
+      EventHandler.on(this._inputElement, EVENT_KEYUP$1, event => {
+        if (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY$1) {
+          const {
+            value
+          } = event.target;
+          this.deselectAll();
+          this.search(value);
+          if (this._config.showHints) {
+            const options = value ? this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
+            this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : '';
+          }
+        }
+      });
+      EventHandler.on(this._optionsElement, EVENT_CLICK$6, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this._onOptionsClick(event.target);
+      });
+      EventHandler.on(this._cleanerElement, EVENT_CLICK$6, event => {
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.clear();
+        }
+      });
+      EventHandler.on(this._optionsElement, EVENT_KEYDOWN$7, event => {
+        if (event.key === ENTER_KEY$4) {
+          this._onOptionsClick(event.target);
+        }
+        if ([ARROW_UP_KEY$5, ARROW_DOWN_KEY$5].includes(event.key)) {
+          event.preventDefault();
+          this._selectMenuItem(event);
+        }
+      });
+    }
+    _getOptionsFromConfig(options = this._config.options) {
+      if (!options || !Array.isArray(options)) {
+        return [];
+      }
+      const _options = [];
+      for (const option of options) {
+        var _option$value;
+        if (option.options && Array.isArray(option.options)) {
+          const customGroupProperties = {
+            ...option
+          };
+          delete customGroupProperties.label;
+          delete customGroupProperties.options;
+          _options.push({
+            ...customGroupProperties,
+            label: option.label,
+            options: this._getOptionsFromConfig(option.options)
+          });
+          continue;
+        }
+        const label = typeof option === 'string' ? option : option.label;
+        const value = (_option$value = option.value) != null ? _option$value : typeof option === 'string' ? option : option.label;
+        const isSelected = option.selected || this._config.value && this._config.value === value;
+        const customProperties = typeof option === 'object' ? {
+          ...option
+        } : {};
+        delete customProperties.label;
+        delete customProperties.value;
+        delete customProperties.selected;
+        delete customProperties.disabled;
+        _options.push({
+          ...customProperties,
+          label,
+          value,
+          ...(isSelected && {
+            selected: true
+          }),
+          ...(option.disabled && {
+            disabled: true
+          })
+        });
+        if (isSelected) {
+          this._selected.push({
+            label: option.label,
+            value: String(option.label)
+          });
+        }
+      }
+      return _options;
+    }
+    _createAutocomplete() {
+      this._element.classList.add(CLASS_NAME_AUTOCOMPLETE);
+      this._element.classList.toggle('is-invalid', this._config.invalid);
+      this._element.classList.toggle('is-valid', this._config.valid);
+      if (this._config.disabled) {
+        this._element.classList.add(CLASS_NAME_DISABLED$5);
+      }
+      for (const className of this._getClassNames()) {
+        this._element.classList.add(className);
+      }
+      this._createInputGroup();
+      this._createButtons();
+      this._createOptionsContainer();
+      this._updateOptionsList();
+    }
+    _createInputGroup() {
+      var _this$_config$placeho;
+      const togglerEl = document.createElement('div');
+      togglerEl.classList.add(CLASS_NAME_INPUT_GROUP$3);
+      this._togglerElement = togglerEl;
+      if (!this._config.search && !this._config.disabled) {
+        togglerEl.tabIndex = -1;
+      }
+      if (!this._config.disabled && this._config.showHints) {
+        const inputHintEl = document.createElement('input');
+        inputHintEl.classList.add(CLASS_NAME_INPUT$2, CLASS_NAME_INPUT_HINT);
+        inputHintEl.setAttribute('name', (this._config.name || `${this._uniqueId}-hint`).toString());
+        inputHintEl.autocomplete = 'off';
+        inputHintEl.readOnly = true;
+        inputHintEl.tabIndex = -1;
+        inputHintEl.setAttribute('aria-hidden', true);
+        togglerEl.append(inputHintEl);
+        this._inputHintElement = inputHintEl;
+      }
+      const inputEl = document.createElement('input');
+      inputEl.classList.add(CLASS_NAME_INPUT$2);
+      inputEl.id = this._uniqueId;
+      inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString());
+      inputEl.autocomplete = 'off';
+      inputEl.placeholder = (_this$_config$placeho = this._config.placeholder) != null ? _this$_config$placeho : '';
+      inputEl.role = 'combobox';
+      inputEl.setAttribute('aria-autocomplete', 'list');
+      inputEl.setAttribute('aria-expanded', 'false');
+      inputEl.setAttribute('aria-haspopup', 'listbox');
+      if (this._config.disabled) {
+        inputEl.setAttribute('disabled', true);
+        inputEl.tabIndex = -1;
+      }
+      if (this._config.required) {
+        inputEl.setAttribute('required', true);
+      }
+      togglerEl.append(inputEl);
+      this._inputElement = inputEl;
+      this._element.append(togglerEl);
+    }
+    _createButtons() {
+      if (!this._config.cleaner && !this._config.indicator) {
+        return;
+      }
+      const buttons = document.createElement('div');
+      buttons.classList.add(CLASS_NAME_BUTTONS);
+      if (!this._config.disabled && this._config.cleaner) {
+        const cleaner = document.createElement('button');
+        cleaner.type = 'button';
+        cleaner.classList.add(CLASS_NAME_CLEANER$3);
+        cleaner.style.display = 'none';
+        cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel);
+        buttons.append(cleaner);
+        this._cleanerElement = cleaner;
+      }
+      if (this._config.indicator) {
+        const indicator = document.createElement('button');
+        indicator.type = 'button';
+        indicator.classList.add(CLASS_NAME_INDICATOR$2);
+        indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel);
+        if (this._config.disabled) {
+          indicator.tabIndex = -1;
+        }
+        buttons.append(indicator);
+        this._indicatorElement = indicator;
+        this._indicatorElement = indicator;
+      }
+      this._togglerElement.append(buttons);
+      this._updateCleaner();
+    }
+    _createPopper() {
+      if (typeof Popper__namespace === 'undefined') {
+        throw new TypeError('CoreUI\'s Auto Complete component require Popper (https://popper.js.org)');
+      }
+      const popperConfig = {
+        modifiers: [{
+          name: 'preventOverflow',
+          options: {
+            boundary: 'clippingParents'
+          }
+        }, {
+          name: 'offset',
+          options: {
+            offset: [0, 2]
+          }
+        }],
+        placement: isRTL() ? 'bottom-end' : 'bottom-start'
+      };
+      this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
+    }
+    _createOptionsContainer() {
+      const dropdownDiv = document.createElement('div');
+      dropdownDiv.classList.add(CLASS_NAME_DROPDOWN$2);
+      dropdownDiv.role = 'listbox';
+      dropdownDiv.setAttribute('aria-labelledby', this._uniqueId);
+      const optionsDiv = document.createElement('div');
+      optionsDiv.classList.add(CLASS_NAME_OPTIONS$1);
+      if (this._config.optionsMaxHeight !== 'auto') {
+        optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`;
+        optionsDiv.style.overflow = 'auto';
+      }
+      dropdownDiv.append(optionsDiv);
+      const {
+        container
+      } = this._config;
+      if (container) {
+        container.append(dropdownDiv);
+      } else {
+        this._element.append(dropdownDiv);
+      }
+      this._createOptions(optionsDiv, this._options);
+      this._optionsElement = optionsDiv;
+      this._menu = dropdownDiv;
+    }
+    _createOptions(parentElement, options) {
+      for (const option of options) {
+        if (Array.isArray(option.options)) {
+          const optgroup = document.createElement('div');
+          optgroup.classList.add(CLASS_NAME_OPTGROUP$1);
+          optgroup.setAttribute('role', 'group');
+          const optgrouplabel = document.createElement('div');
+          if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
+            optgrouplabel.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsGroupsTemplate(option);
+          } else {
+            optgrouplabel.textContent = option.label;
+          }
+          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL$1);
+          optgroup.append(optgrouplabel);
+          this._createOptions(optgroup, option.options);
+          parentElement.append(optgroup);
+          continue;
+        }
+        const optionDiv = document.createElement('div');
+        optionDiv.classList.add(CLASS_NAME_OPTION$1);
+        if (option.disabled) {
+          optionDiv.classList.add(CLASS_NAME_DISABLED$5);
+          optionDiv.setAttribute('aria-disabled', 'true');
+        }
+        optionDiv.dataset.value = option.value;
+        optionDiv.tabIndex = 0;
+        if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
+          optionDiv.innerHTML = this._highlightOption(option.label);
+        } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+          optionDiv.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
+        } else {
+          optionDiv.textContent = option.label;
+        }
+        parentElement.append(optionDiv);
+      }
+    }
+    _onOptionsClick(element) {
+      if (element.classList.contains(CLASS_NAME_LABEL$1)) {
+        return;
+      }
+      if (!element.classList.contains(CLASS_NAME_OPTION$1)) {
+        element = element.closest(SELECTOR_OPTION$1);
+        if (!element) {
+          return;
+        }
+      }
+      const value = String(element.dataset.value);
+      const foundOption = this._findOptionByValue(value);
+      if (foundOption) {
+        this._selectOption(foundOption);
+      }
+    }
+    _findOptionByValue(value, options = this._options) {
+      for (const option of options) {
+        if (option.value === value) {
+          return option;
+        }
+        if (option.options && Array.isArray(option.options)) {
+          const found = this._findOptionByValue(value, option.options);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
+    }
+    _selectOption(option) {
+      this.deselectAll();
+      if (this._selected.filter(selectedOption => selectedOption.value === option.value).length === 0) {
+        this._selected.push(option);
+      }
+      const foundOption = SelectorEngine.findOne(`[data-value="${option.value}"]`, this._optionsElement);
+      if (foundOption) {
+        foundOption.classList.add(CLASS_NAME_SELECTED$2);
+        foundOption.setAttribute('aria-selected', true);
+      }
+      EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+        value: option
+      });
+      this._inputElement.value = option.label;
+      if (this._config.showHints) {
+        this._inputHintElement.value = '';
+      }
+      this.hide();
+      if (this._config.clearSearchOnSelect) {
+        this.search('');
+      }
+      this._inputElement.focus();
+      this._updateCleaner();
+    }
+    _deselectOption(value) {
+      this._selected = this._selected.filter(option => option.value !== String(value));
+      const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
+      if (option) {
+        option.classList.remove(CLASS_NAME_SELECTED$2);
+        option.setAttribute('aria-selected', false);
+      }
+      EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+        value: this._selected
+      });
+    }
+    _updateCleaner() {
+      if (!this._config.cleaner || this._cleanerElement === null) {
+        return;
+      }
+      if (this._selected.length > 0) {
+        this._cleanerElement.style.removeProperty('display');
+        return;
+      }
+      this._cleanerElement.style.display = 'none';
+    }
+    _updateOptionsList(options = this._options) {
+      for (const option of options) {
+        if (Array.isArray(option.options)) {
+          this._updateOptionsList(option.options);
+          continue;
+        }
+        if (option.selected) {
+          this._selectOption(option);
+        }
+      }
+    }
+    _filterOptionsList() {
+      const options = SelectorEngine.find(SELECTOR_OPTION$1, this._menu);
+      let visibleOptions = 0;
+      for (const option of options) {
+        // eslint-disable-next-line unicorn/prefer-includes
+        if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
+          option.style.display = 'none';
+        } else {
+          if (this._config.highlightOptionsOnSearch && !this._config.optionsTemplate) {
+            option.innerHTML = this._highlightOption(option.textContent);
+          }
+          option.style.removeProperty('display');
+          visibleOptions++;
+        }
+        const optgroup = option.closest(SELECTOR_OPTGROUP$1);
+        if (optgroup) {
+          // eslint-disable-next-line  unicorn/prefer-array-some
+          if (SelectorEngine.children(optgroup, SELECTOR_OPTION$1).filter(element => this._isVisible(element)).length > 0) {
+            optgroup.style.removeProperty('display');
+          } else {
+            optgroup.style.display = 'none';
+          }
+        }
+      }
+      if (visibleOptions > 0) {
+        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu).remove();
+        }
+        return;
+      }
+      if (visibleOptions === 0) {
+        if (this._config.searchNoResultsLabel) {
+          const placeholder = document.createElement('div');
+          placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY$1);
+          placeholder.innerHTML = this._config.searchNoResultsLabel;
+          if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu)) {
+            SelectorEngine.findOne(SELECTOR_OPTIONS$1, this._menu).append(placeholder);
+          }
+          return;
+        }
+        this.hide();
+      }
+    }
+    _selectMenuItem({
+      key,
+      target
+    }) {
+      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS$2, this._menu).filter(element => isVisible(element));
+      if (!items.length) {
+        return;
+      }
+
+      // if target isn't included in items (e.g. when expanding the dropdown)
+      // allow cycling to get the last item in case key equals ARROW_UP_KEY
+      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$5, !items.includes(target)).focus();
+    }
+    _configAfterMerge(config) {
+      if (config.container === true) {
+        config.container = document.body;
+      }
+      if (typeof config.container === 'object' || typeof config.container === 'string') {
+        config.container = getElement(config.container);
+      }
+      if (typeof config.options === 'string') {
+        config.options = config.options.split(/,\s*/).map(String);
+      }
+      if (typeof config.search === 'string') {
+        config.search = config.search.split(/,\s*/).map(String);
+      }
+      return config;
+    }
+
+    // Static
+
+    static autocompleteInterface(element, config) {
+      const data = Autocomplete.getOrCreateInstance(element, config);
+      if (typeof config === 'string') {
+        if (typeof data[config] === 'undefined') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config]();
+      }
+    }
+    static jQueryInterface(config) {
+      return this.each(function () {
+        Autocomplete.autocompleteInterface(this, config);
+      });
+    }
+    static clearMenus(event) {
+      if (event.button === RIGHT_MOUSE_BUTTON$5 || event.type === 'keyup' && event.key !== TAB_KEY$6) {
+        return;
+      }
+      const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN$4);
+      for (const toggle of openToggles) {
+        const context = Autocomplete.getInstance(toggle);
+        if (!context) {
+          continue;
+        }
+        const composedPath = event.composedPath();
+        if (composedPath.includes(context._element)) {
+          continue;
+        }
+        ({
+          relatedTarget: context._element
+        });
+        if (event.type === 'click') ;
+        context.hide();
+        context.search('');
+        if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) {
+          context._inputElement.value = '';
+        }
+      }
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(window, EVENT_LOAD_DATA_API$e, () => {
+    for (const autocomplete of SelectorEngine.find(SELECTOR_DATA_TOGGLE$g)) {
+      Autocomplete.autocompleteInterface(autocomplete);
+    }
+  });
+  EventHandler.on(document, EVENT_CLICK_DATA_API$h, Autocomplete.clearMenus);
+  EventHandler.on(document, EVENT_KEYUP_DATA_API$5, Autocomplete.clearMenus);
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Autocomplete);
 
   /**
    * --------------------------------------------------------------------------
@@ -1088,7 +2018,11 @@
       return null;
     }
     if (selectionType === 'week') {
-      return `${date.getFullYear()}W${getWeekNumber(date)}`;
+      const {
+        year,
+        weekNumber
+      } = getISOWeekNumberAndYear(date);
+      return `${year}W${weekNumber.toString().padStart(2, '0')}`;
     }
     if (selectionType === 'month') {
       const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
@@ -1195,11 +2129,19 @@
   };
 
   /**
-   * Calculates the ISO week number for a given date.
-   * @param date - The date to calculate the week number for.
-   * @returns The ISO week number.
+   * Calculates the ISO 8601 week number and year for a given date.
+   *
+   * In the ISO 8601 standard:
+   * - Weeks start on Monday.
+   * - The first week of the year is the one that contains January 4th.
+   * - The year of the week may differ from the calendar year (e.g., Dec 29, 2025 is in ISO year 2026).
+   *
+   * @param {Date} date - The date for which to calculate the ISO week number and year.
+   * @returns {{ weekNumber: number, year: number }} An object containing:
+   *   - `weekNumber`: the ISO week number (1–53),
+   *   - `year`: the ISO year (may differ from the calendar year of the date).
    */
-  const getWeekNumber = date => {
+  const getISOWeekNumberAndYear = date => {
     const tempDate = new Date(date);
     tempDate.setHours(0, 0, 0, 0);
 
@@ -1209,7 +2151,10 @@
 
     // Calculate full weeks to the date
     const weekNumber = 1 + Math.round((tempDate.getTime() - week1.getTime()) / 86400000 / 7);
-    return weekNumber;
+    return {
+      weekNumber,
+      year: tempDate.getFullYear()
+    };
   };
 
   /**
@@ -1228,11 +2173,22 @@
     for (const [index, day] of days.entries()) {
       if (index % 7 === 0 || weeks.length === 0) {
         weeks.push({
+          week: {
+            number: 0,
+            year: 0
+          },
           days: []
         });
       }
       if ((index + 1) % 7 === 0) {
-        weeks[weeks.length - 1].weekNumber = getWeekNumber(day.date);
+        const {
+          weekNumber,
+          year
+        } = getISOWeekNumberAndYear(day.date);
+        weeks[weeks.length - 1].week = {
+          number: weekNumber,
+          year
+        };
       }
       weeks[weeks.length - 1].days.push(day);
     }
@@ -2017,16 +2973,21 @@
         </tr>
       </thead>` : ''}
       <tbody>
-        ${this._view === 'days' ? monthDetails.map(week => {
-      const date = convertToDateObject(week.weekNumber === 0 ? `${calendarDate.getFullYear()}W53` : `${calendarDate.getFullYear()}W${week.weekNumber}`, this._config.selectionType);
+        ${this._view === 'days' ? monthDetails.map(({
+      week,
+      days
+    }) => {
+      const {
+        date
+      } = days[0];
       const rowAttributes = this._rowWeekAttributes(date);
       return `<tr 
               class="${rowAttributes.className}"
               tabindex="${rowAttributes.tabIndex}"
               ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
             >
-              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''}
-              ${week.days.map(({
+              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</td>` : ''}
+              ${days.map(({
         date,
         month
       }) => {
@@ -4172,10 +5133,10 @@
           this._startDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date
-          });
         }
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          date
+        });
       });
       EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
         if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
@@ -4206,10 +5167,10 @@
           this._endDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date
-          });
         }
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          date
+        });
       });
       EventHandler.on(window, EVENT_RESIZE$4, () => {
         this._mobile = window.innerWidth < 768;
@@ -6064,6 +7025,7 @@
   const CLASS_NAME_TAG = 'form-multi-select-tag';
   const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete';
   const Default$b = {
+    allowList: DefaultAllowlist,
     ariaCleanerLabel: 'Clear all selections',
     cleaner: true,
     clearSearchOnSelect: false,
@@ -6073,10 +7035,14 @@
     multiple: true,
     name: null,
     options: false,
+    optionsGroupsTemplate: null,
     optionsMaxHeight: 'auto',
     optionsStyle: 'checkbox',
+    optionsTemplate: null,
     placeholder: 'Select...',
     required: false,
+    sanitize: true,
+    sanitizeFn: null,
     search: false,
     searchNoResultsLabel: 'No results found',
     selectAll: true,
@@ -6087,6 +7053,7 @@
     value: null
   };
   const DefaultType$b = {
+    allowList: 'object',
     ariaCleanerLabel: 'string',
     cleaner: 'boolean',
     clearSearchOnSelect: 'boolean',
@@ -6096,10 +7063,14 @@
     multiple: 'boolean',
     name: '(string|null)',
     options: '(boolean|array)',
+    optionsGroupsTemplate: '(function|null)',
     optionsMaxHeight: '(number|string)',
     optionsStyle: 'string',
+    optionsTemplate: '(function|null)',
     placeholder: 'string',
     required: 'boolean',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
     search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
@@ -6340,7 +7311,13 @@
       const _options = [];
       for (const option of options) {
         if (option.options && Array.isArray(option.options)) {
+          const customGroupProperties = {
+            ...option
+          };
+          delete customGroupProperties.label;
+          delete customGroupProperties.options;
           _options.push({
+            ...customGroupProperties,
             label: option.label,
             options: this._getOptionsFromConfig(option.options)
           });
@@ -6348,8 +7325,14 @@
         }
         const value = String(option.value);
         const isSelected = option.selected || this._config.value && this._config.value.includes(value);
+        const customProperties = typeof option === 'object' ? {
+          ...option
+        } : {};
+        delete customProperties.value;
+        delete customProperties.selected;
+        delete customProperties.disabled;
         _options.push({
-          ...option,
+          ...customProperties,
           value,
           ...(isSelected && {
             selected: true
@@ -6574,14 +7557,22 @@
           }
           optionDiv.dataset.value = String(option.value);
           optionDiv.tabIndex = 0;
-          optionDiv.innerHTML = option.text;
+          if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+            optionDiv.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
+          } else {
+            optionDiv.textContent = option.text;
+          }
           parentElement.append(optionDiv);
         }
         if (typeof option.label !== 'undefined') {
           const optgroup = document.createElement('div');
           optgroup.classList.add(CLASS_NAME_OPTGROUP);
           const optgrouplabel = document.createElement('div');
-          optgrouplabel.innerHTML = option.label;
+          if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
+            optgrouplabel.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsGroupsTemplate(option);
+          } else {
+            optgrouplabel.textContent = option.label;
+          }
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
           optgroup.append(optgrouplabel);
           this._createOptions(optgroup, option.options);
@@ -6610,8 +7601,14 @@
       return tag;
     }
     _onOptionsClick(element) {
-      if (!element.classList.contains(CLASS_NAME_OPTION) || element.classList.contains(CLASS_NAME_LABEL)) {
+      if (element.classList.contains(CLASS_NAME_LABEL)) {
         return;
+      }
+      if (!element.classList.contains(CLASS_NAME_OPTION)) {
+        element = element.closest(SELECTOR_OPTION);
+        if (!element) {
+          return;
+        }
       }
       const value = String(element.dataset.value);
       const {
@@ -7472,104 +8469,6 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI util/sanitizer.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This is a modified version of the Bootstrap's util/sanitizer.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  // js-docs-start allow-list
-  const ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i;
-  const DefaultAllowlist = {
-    // Global attributes allowed on any supplied element below.
-    '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
-    a: ['target', 'href', 'title', 'rel'],
-    area: [],
-    b: [],
-    br: [],
-    col: [],
-    code: [],
-    dd: [],
-    div: [],
-    dl: [],
-    dt: [],
-    em: [],
-    hr: [],
-    h1: [],
-    h2: [],
-    h3: [],
-    h4: [],
-    h5: [],
-    h6: [],
-    i: [],
-    img: ['src', 'srcset', 'alt', 'title', 'width', 'height'],
-    li: [],
-    ol: [],
-    p: [],
-    pre: [],
-    s: [],
-    small: [],
-    span: [],
-    sub: [],
-    sup: [],
-    strong: [],
-    u: [],
-    ul: []
-  };
-  // js-docs-end allow-list
-
-  const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longdesc', 'poster', 'src', 'xlink:href']);
-
-  /**
-   * A pattern that recognizes URLs that are safe wrt. XSS in URL navigation
-   * contexts.
-   *
-   * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
-   */
-  const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
-  const allowedAttribute = (attribute, allowedAttributeList) => {
-    const attributeName = attribute.nodeName.toLowerCase();
-    if (allowedAttributeList.includes(attributeName)) {
-      if (uriAttributes.has(attributeName)) {
-        return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue));
-      }
-      return true;
-    }
-
-    // Check if a regular expression validates the attribute.
-    return allowedAttributeList.filter(attributeRegex => attributeRegex instanceof RegExp).some(regex => regex.test(attributeName));
-  };
-  function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
-    if (!unsafeHtml.length) {
-      return unsafeHtml;
-    }
-    if (sanitizeFunction && typeof sanitizeFunction === 'function') {
-      return sanitizeFunction(unsafeHtml);
-    }
-    const domParser = new window.DOMParser();
-    const createdDocument = domParser.parseFromString(unsafeHtml, 'text/html');
-    const elements = [].concat(...createdDocument.body.querySelectorAll('*'));
-    for (const element of elements) {
-      const elementName = element.nodeName.toLowerCase();
-      if (!Object.keys(allowList).includes(elementName)) {
-        element.remove();
-        continue;
-      }
-      const attributeList = [].concat(...element.attributes);
-      const allowedAttributes = [].concat(allowList['*'] || [], allowList[elementName] || []);
-      for (const attribute of attributeList) {
-        if (!allowedAttribute(attribute, allowedAttributes)) {
-          element.removeAttribute(attribute.nodeName);
-        }
-      }
-    }
-    return createdDocument.body.innerHTML;
-  }
-
-  /**
-   * --------------------------------------------------------------------------
    * CoreUI util/template-factory.js
    * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
    *
@@ -8077,6 +8976,7 @@
         if (trigger === 'click') {
           EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$2), this._config.selector, event => {
             const context = this._initializeOnDelegatedTarget(event);
+            context._activeTrigger[TRIGGER_CLICK] = !(context._isShown() && context._activeTrigger[TRIGGER_CLICK]);
             context.toggle();
           });
         } else if (trigger !== TRIGGER_MANUAL) {
@@ -10855,6 +11755,7 @@
 
   const index_umd = {
     Alert,
+    Autocomplete,
     Button,
     Calendar,
     Carousel,

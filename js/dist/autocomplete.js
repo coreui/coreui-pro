@@ -1,5 +1,5 @@
 /*!
-  * CoreUI autocomplete.js v5.15.0 (https://coreui.io)
+  * CoreUI autocomplete.js v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -202,7 +202,7 @@
       }
       EventHandler.trigger(this._element, EVENT_SHOW);
       this._element.classList.add(CLASS_NAME_SHOW);
-      this._inputElement.setAttribute('aria-expanded', true);
+      this._inputElement.setAttribute('aria-expanded', 'true');
       if (this._config.container) {
         this._menu.style.minWidth = `${this._element.offsetWidth}px`;
         this._menu.classList.add(CLASS_NAME_SHOW);
@@ -344,7 +344,6 @@
       });
       EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
         event.preventDefault();
-        // event.stopPropagation()
         this.toggle();
       });
       EventHandler.on(this._inputElement, EVENT_BLUR, () => {

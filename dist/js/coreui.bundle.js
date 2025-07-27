@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.15.0 (https://coreui.io)
+  * CoreUI v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.15.0';
+  const VERSION = '5.16.0';
 
   /**
    * Class definition
@@ -859,13 +859,13 @@
    * Constants
    */
 
-  const NAME$r = 'alert';
-  const DATA_KEY$m = 'coreui.alert';
-  const EVENT_KEY$n = `.${DATA_KEY$m}`;
-  const EVENT_CLOSE = `close${EVENT_KEY$n}`;
-  const EVENT_CLOSED = `closed${EVENT_KEY$n}`;
+  const NAME$s = 'alert';
+  const DATA_KEY$n = 'coreui.alert';
+  const EVENT_KEY$o = `.${DATA_KEY$n}`;
+  const EVENT_CLOSE = `close${EVENT_KEY$o}`;
+  const EVENT_CLOSED = `closed${EVENT_KEY$o}`;
   const CLASS_NAME_FADE$5 = 'fade';
-  const CLASS_NAME_SHOW$f = 'show';
+  const CLASS_NAME_SHOW$g = 'show';
 
   /**
    * Class definition
@@ -874,7 +874,7 @@
   class Alert extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$r;
+      return NAME$s;
     }
 
     // Public
@@ -883,7 +883,7 @@
       if (closeEvent.defaultPrevented) {
         return;
       }
-      this._element.classList.remove(CLASS_NAME_SHOW$f);
+      this._element.classList.remove(CLASS_NAME_SHOW$g);
       const isAnimated = this._element.classList.contains(CLASS_NAME_FADE$5);
       this._queueCallback(() => this._destroyElement(), this._element, isAnimated);
     }
@@ -921,2075 +921,6 @@
    */
 
   defineJQueryPlugin(Alert);
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI button.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This component is a modified version of the Bootstrap's button.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME$q = 'button';
-  const DATA_KEY$l = 'coreui.button';
-  const EVENT_KEY$m = `.${DATA_KEY$l}`;
-  const DATA_API_KEY$h = '.data-api';
-  const CLASS_NAME_ACTIVE$6 = 'active';
-  const SELECTOR_DATA_TOGGLE$f = '[data-coreui-toggle="button"]';
-  const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$m}${DATA_API_KEY$h}`;
-
-  /**
-   * Class definition
-   */
-
-  class Button extends BaseComponent {
-    // Getters
-    static get NAME() {
-      return NAME$q;
-    }
-
-    // Public
-    toggle() {
-      // Toggle class and sync the `aria-pressed` attribute with the return value of the `.toggle()` method
-      this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE$6));
-    }
-
-    // Static
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Button.getOrCreateInstance(this);
-        if (config === 'toggle') {
-          data[config]();
-        }
-      });
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(document, EVENT_CLICK_DATA_API$g, SELECTOR_DATA_TOGGLE$f, event => {
-    event.preventDefault();
-    const button = event.target.closest(SELECTOR_DATA_TOGGLE$f);
-    const data = Button.getOrCreateInstance(button);
-    data.toggle();
-  });
-
-  /**
-   * jQuery
-   */
-
-  defineJQueryPlugin(Button);
-
-  /**
-   * Converts an ISO week string to a Date object representing the Monday of that week.
-   * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
-   * @returns The Date object for the Monday of the specified week, or null if invalid.
-   */
-  const convertIsoWeekToDate = isoWeek => {
-    const [year, week] = isoWeek.split(/[Ww]/);
-    const date = new Date(Number(year), 0, 4); // 4th Jan is always in week 1
-    date.setDate(date.getDate() - (date.getDay() || 7) + 1 + (Number(week) - 1) * 7);
-    return date;
-  };
-
-  /**
-   * Converts a date string or Date object to a Date object based on selection type.
-   * @param date - The date to convert.
-   * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
-   * @returns The corresponding Date object or null if invalid.
-   */
-  const convertToDateObject = (date, selectionType) => {
-    if (date === null) {
-      return null;
-    }
-    if (date instanceof Date) {
-      return date;
-    }
-    if (selectionType === 'week') {
-      return convertIsoWeekToDate(date);
-    }
-    if (selectionType === 'month' || selectionType === 'year') {
-      const _date = new Date(Date.parse(date));
-      const userTimezoneOffset = _date.getTimezoneOffset() * 60000;
-      return new Date(_date.getTime() + userTimezoneOffset);
-    }
-    return new Date(Date.parse(date));
-  };
-
-  /**
-   * Creates groups from an array.
-   * @param arr - The array to group.
-   * @param numberOfGroups - Number of groups to create.
-   * @returns An array of grouped arrays.
-   */
-  const createGroupsInArray = (arr, numberOfGroups) => {
-    const perGroup = Math.ceil(arr.length / numberOfGroups);
-    return Array.from({
-      length: numberOfGroups
-    }).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
-  };
-
-  /**
-   * Adjusts the calendar date based on order and view type.
-   * @param calendarDate - The current calendar date.
-   * @param order - The order to adjust by.
-   * @param view - The current view type.
-   * @returns The adjusted Date object.
-   */
-  const getCalendarDate = (calendarDate, order, view) => {
-    if (order !== 0 && view === 'days') {
-      return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
-    }
-    if (order !== 0 && view === 'months') {
-      return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
-    }
-    if (order !== 0 && view === 'years') {
-      return new Date(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
-    }
-    return calendarDate;
-  };
-
-  /**
-   * Formats a date based on the selection type.
-   * @param date - The date to format.
-   * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
-   * @returns A formatted date string or the original Date object.
-   */
-  const getDateBySelectionType = (date, selectionType) => {
-    if (date === null) {
-      return null;
-    }
-    if (selectionType === 'week') {
-      return `${date.getFullYear()}W${getWeekNumber(date)}`;
-    }
-    if (selectionType === 'month') {
-      const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
-      return `${date.getFullYear()}-${monthNumber}`;
-    }
-    if (selectionType === 'year') {
-      return `${date.getFullYear()}`;
-    }
-    return date;
-  };
-
-  /**
-   * Retrieves an array of month names based on locale and format.
-   * @param locale - The locale string (e.g., 'en-US').
-   * @param format - The format of the month names ('short' or 'long').
-   * @returns An array of month names.
-   */
-  const getMonthsNames = (locale, format = 'short') => {
-    return Array.from({
-      length: 12
-    }, (_, i) => {
-      return new Date(2000, i, 1).toLocaleString(locale, {
-        month: format
-      });
-    });
-  };
-
-  /**
-   * Generates an array of years centered around a given year.
-   * @param year - The central year.
-   * @param range - The number of years before and after the central year.
-   * @returns An array of years.
-   */
-  const getYears = (year, range = 6) => {
-    return Array.from({
-      length: range * 2
-    }, (_, i) => year - range + i);
-  };
-
-  /**
-   * Retrieves leading days (from the previous month) for a calendar view.
-   * @param year - The year.
-   * @param month - The month (0-11).
-   * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
-   * @returns An array of leading day objects.
-   */
-  const getLeadingDays = (year, month, firstDayOfWeek) => {
-    // 0: sunday
-    // 1: monday
-    const dates = [];
-    const d = new Date(year, month);
-    const y = d.getFullYear();
-    const m = d.getMonth();
-    const firstWeekday = new Date(y, m, 1).getDay();
-    let leadingDays = 6 - (6 - firstWeekday) - firstDayOfWeek;
-    if (firstDayOfWeek) {
-      leadingDays = leadingDays < 0 ? 7 + leadingDays : leadingDays;
-    }
-    for (let i = leadingDays * -1; i < 0; i++) {
-      dates.push({
-        date: new Date(y, m, i + 1),
-        month: 'previous'
-      });
-    }
-    return dates;
-  };
-
-  /**
-   * Retrieves all days within a specific month.
-   * @param year - The year.
-   * @param month - The month (0-11).
-   * @returns An array of day objects.
-   */
-  const getMonthDays = (year, month) => {
-    const dates = [];
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    for (let i = 1; i <= lastDay; i++) {
-      dates.push({
-        date: new Date(year, month, i),
-        month: 'current'
-      });
-    }
-    return dates;
-  };
-
-  /**
-   * Retrieves trailing days (from the next month) for a calendar view.
-   * @param year - The year.
-   * @param month - The month (0-11).
-   * @param leadingDays - Array of leading day objects.
-   * @param monthDays - Array of current month day objects.
-   * @returns An array of trailing day objects.
-   */
-  const getTrailingDays = (year, month, leadingDays, monthDays) => {
-    const dates = [];
-    const days = 42 - (leadingDays.length + monthDays.length);
-    for (let i = 1; i <= days; i++) {
-      dates.push({
-        date: new Date(year, month + 1, i),
-        month: 'next'
-      });
-    }
-    return dates;
-  };
-
-  /**
-   * Calculates the ISO week number for a given date.
-   * @param date - The date to calculate the week number for.
-   * @returns The ISO week number.
-   */
-  const getWeekNumber = date => {
-    const tempDate = new Date(date);
-    tempDate.setHours(0, 0, 0, 0);
-
-    // Thursday in current week decides the year
-    tempDate.setDate(tempDate.getDate() + 3 - (tempDate.getDay() + 6) % 7);
-    const week1 = new Date(tempDate.getFullYear(), 0, 4);
-
-    // Calculate full weeks to the date
-    const weekNumber = 1 + Math.round((tempDate.getTime() - week1.getTime()) / 86400000 / 7);
-    return weekNumber;
-  };
-
-  /**
-   * Retrieves detailed information about each week in a month for calendar rendering.
-   * @param year - The year.
-   * @param month - The month (0-11).
-   * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
-   * @returns An array of week objects containing week numbers and day details.
-   */
-  const getMonthDetails = (year, month, firstDayOfWeek) => {
-    const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek);
-    const daysThisMonth = getMonthDays(year, month);
-    const daysNextMonth = getTrailingDays(year, month, daysPrevMonth, daysThisMonth);
-    const days = [...daysPrevMonth, ...daysThisMonth, ...daysNextMonth];
-    const weeks = [];
-    for (const [index, day] of days.entries()) {
-      if (index % 7 === 0 || weeks.length === 0) {
-        weeks.push({
-          days: []
-        });
-      }
-      if ((index + 1) % 7 === 0) {
-        weeks[weeks.length - 1].weekNumber = getWeekNumber(day.date);
-      }
-      weeks[weeks.length - 1].days.push(day);
-    }
-    return weeks;
-  };
-
-  /**
-   * Checks if a date is disabled based on the 'date' period type.
-   * @param date - The date to check.
-   * @param min - Minimum allowed date.
-   * @param max - Maximum allowed date.
-   * @param disabledDates - Criteria for disabled dates.
-   * @returns True if the date is disabled, false otherwise.
-   */
-  const isDateDisabled = (date, min, max, disabledDates) => {
-    if (min && date < min) {
-      return true;
-    }
-    if (max && date > max) {
-      return true;
-    }
-    if (disabledDates === undefined) {
-      return false;
-    }
-    if (typeof disabledDates === 'function') {
-      return disabledDates(date);
-    }
-    if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) {
-      return true;
-    }
-    if (Array.isArray(disabledDates) && disabledDates) {
-      for (const _date of disabledDates) {
-        if (typeof _date === 'function' && _date(date)) {
-          return true;
-        }
-        if (Array.isArray(_date) && isDateInRange(date, _date[0], _date[1])) {
-          return true;
-        }
-        if (_date instanceof Date && isSameDateAs(date, _date)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a date is within a specified range.
-   * @param date - The date to check.
-   * @param start - Start date of the range.
-   * @param end - End date of the range.
-   * @returns True if the date is within the range, false otherwise.
-   */
-  const isDateInRange = (date, start, end) => {
-    const _date = removeTimeFromDate(date);
-    const _start = start ? removeTimeFromDate(start) : null;
-    const _end = end ? removeTimeFromDate(end) : null;
-    return Boolean(_start && _end && _start <= _date && _date <= _end);
-  };
-
-  /**
-   * Checks if a date is selected based on start and end dates.
-   * @param date - The date to check.
-   * @param start - Start date.
-   * @param end - End date.
-   * @returns True if the date is selected, false otherwise.
-   */
-  const isDateSelected = (date, start, end) => {
-    if (start !== null && isSameDateAs(start, date)) {
-      return true;
-    }
-    if (end !== null && isSameDateAs(end, date)) {
-      return true;
-    }
-    return false;
-  };
-
-  /**
-   * Determines if any date within a range is disabled.
-   * @param startDate - Start date of the range.
-   * @param endDate - End date of the range.
-   * @param disabledDates - Criteria for disabled dates.
-   * @returns True if any date in the range is disabled, false otherwise.
-   */
-  const isDisableDateInRange = (startDate, endDate, disabledDates) => {
-    if (startDate && endDate) {
-      const date = new Date(startDate);
-      let disabled = false;
-
-      // eslint-disable-next-line no-unmodified-loop-condition
-      while (date < endDate) {
-        date.setDate(date.getDate() + 1);
-        if (isDateDisabled(date, null, null, disabledDates)) {
-          disabled = true;
-          break;
-        }
-      }
-      return disabled;
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a month is disabled based on the 'month' period type.
-   * @param date - The date representing the month to check.
-   * @param min - Minimum allowed date.
-   * @param max - Maximum allowed date.
-   * @param disabledDates - Criteria for disabled dates.
-   * @returns True if the month is disabled, false otherwise.
-   */
-  const isMonthDisabled = (date, min, max, disabledDates) => {
-    const current = date.getFullYear() * 12 + date.getMonth();
-    const _min = min ? min.getFullYear() * 12 + min.getMonth() : null;
-    const _max = max ? max.getFullYear() * 12 + max.getMonth() : null;
-    if (_min && current < _min) {
-      return true;
-    }
-    if (_max && current > _max) {
-      return true;
-    }
-    if (disabledDates === undefined) {
-      return false;
-    }
-    const start = min ? Math.max(date.getTime(), min.getTime()) : date;
-    const end = max ? Math.min(date.getTime(), max.getTime()) : new Date(new Date().getFullYear(), 11, 31);
-    for (const currentDate = new Date(start);
-    // eslint-disable-next-line no-unmodified-loop-condition
-    currentDate <= end; currentDate.setDate(currentDate.getDate() + 1)) {
-      if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-        return false;
-      }
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a month is selected based on start and end dates.
-   * @param date - The date representing the month.
-   * @param start - Start date.
-   * @param end - End date.
-   * @returns True if the month is selected, false otherwise.
-   */
-  const isMonthSelected = (date, start, end) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    if (start !== null && year === start.getFullYear() && month === start.getMonth()) {
-      return true;
-    }
-    if (end !== null && year === end.getFullYear() && month === end.getMonth()) {
-      return true;
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a month is within a specified range.
-   * @param date - The date representing the month.
-   * @param start - Start date.
-   * @param end - End date.
-   * @returns True if the month is within the range, false otherwise.
-   */
-  const isMonthInRange = (date, start, end) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const _start = start ? start.getFullYear() * 12 + start.getMonth() : null;
-    const _end = end ? end.getFullYear() * 12 + end.getMonth() : null;
-    const _date = year * 12 + month;
-    return Boolean(_start && _end && _start <= _date && _date <= _end);
-  };
-
-  /**
-   * Checks if two dates are the same calendar date.
-   * @param date - First date.
-   * @param date2 - Second date.
-   * @returns True if both dates are the same, false otherwise.
-   */
-  const isSameDateAs = (date, date2) => {
-    if (date instanceof Date && date2 instanceof Date) {
-      return date.getDate() === date2.getDate() && date.getMonth() === date2.getMonth() && date.getFullYear() === date2.getFullYear();
-    }
-    if (date === null && date2 === null) {
-      return true;
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a date is today.
-   * @param date - The date to check.
-   * @returns True if the date is today, false otherwise.
-   */
-  const isToday = date => {
-    const today = new Date();
-    return isSameDateAs(date, today);
-  };
-
-  /**
-   * Checks if a year is disabled based on the 'year' period type.
-   * @param date - The date representing the year to check.
-   * @param min - Minimum allowed date.
-   * @param max - Maximum allowed date.
-   * @param disabledDates - Criteria for disabled dates.
-   * @returns True if the year is disabled, false otherwise.
-   */
-  const isYearDisabled = (date, min, max, disabledDates) => {
-    const year = date.getFullYear();
-    const minYear = min ? min.getFullYear() : null;
-    const maxYear = max ? max.getFullYear() : null;
-    if (minYear && year < minYear) {
-      return true;
-    }
-    if (maxYear && year > maxYear) {
-      return true;
-    }
-    if (disabledDates === undefined) {
-      return false;
-    }
-    const start = min ? Math.max(date.getTime(), min.getTime()) : date;
-    const end = max ? Math.min(date.getTime(), max.getTime()) : new Date(new Date().getFullYear(), 11, 31);
-    for (const currentDate = new Date(start);
-    // eslint-disable-next-line no-unmodified-loop-condition
-    currentDate <= end; currentDate.setDate(currentDate.getDate() + 1)) {
-      if (!isDateDisabled(currentDate, min, max, disabledDates)) {
-        return false;
-      }
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a year is selected based on start and end dates.
-   * @param date - The date representing the year.
-   * @param start - Start date.
-   * @param end - End date.
-   * @returns True if the year matches the start's or end's year, false otherwise.
-   */
-  const isYearSelected = (date, start, end) => {
-    const year = date.getFullYear();
-    if (start !== null && year === start.getFullYear()) {
-      return true;
-    }
-    if (end !== null && year === end.getFullYear()) {
-      return true;
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a year is within a specified range.
-   * @param date - The date representing the year.
-   * @param start - Start date.
-   * @param end - End date.
-   * @returns True if the year's value lies between start's year and end's year, false otherwise.
-   */
-  const isYearInRange = (date, start, end) => {
-    const year = date.getFullYear();
-    const _start = start ? start.getFullYear() : null;
-    const _end = end ? end.getFullYear() : null;
-    return Boolean(_start && _end && _start <= year && year <= _end);
-  };
-
-  /**
-   * Removes the time component from a Date object.
-   * @param date - The original date.
-   * @returns A new Date object with the time set to 00:00:00.
-   */
-  const removeTimeFromDate = date => {
-    const clearedDate = new Date(date);
-    clearedDate.setHours(0, 0, 0, 0);
-    return clearedDate;
-  };
-
-  /**
-   * Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
-   *
-   * @param {Date} target - The date whose time will be updated.
-   * @param {Date} source - The date to copy the time from.
-   * @returns {Date} A new Date instance with the date from `target` and time from `source`.
-   */
-  const setTimeFromDate = (target, source) => {
-    if (target === null) {
-      return null;
-    }
-    if (!(source instanceof Date)) {
-      return target;
-    }
-    const result = new Date(target); // create a copy to avoid mutation
-    result.setHours(source.getHours(), source.getMinutes(), source.getSeconds(), source.getMilliseconds());
-    return result;
-  };
-
-  /* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI PRO calendar.js
-   * License (https://coreui.io/pro/license/)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME$p = 'calendar';
-  const DATA_KEY$k = 'coreui.calendar';
-  const EVENT_KEY$l = `.${DATA_KEY$k}`;
-  const DATA_API_KEY$g = '.data-api';
-  const ARROW_UP_KEY$4 = 'ArrowUp';
-  const ARROW_RIGHT_KEY$3 = 'ArrowRight';
-  const ARROW_DOWN_KEY$4 = 'ArrowDown';
-  const ARROW_LEFT_KEY$3 = 'ArrowLeft';
-  const ENTER_KEY$3 = 'Enter';
-  const SPACE_KEY$1 = 'Space';
-  const EVENT_BLUR = `blur${EVENT_KEY$l}`;
-  const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$l}`;
-  const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$l}`;
-  const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$l}`;
-  const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$l}`;
-  const EVENT_FOCUS = `focus${EVENT_KEY$l}`;
-  const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$l}`;
-  const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$l}`;
-  const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$l}`;
-  const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$l}`;
-  const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$l}`;
-  const EVENT_LOAD_DATA_API$d = `load${EVENT_KEY$l}${DATA_API_KEY$g}`;
-  const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$l}${DATA_API_KEY$g}`;
-  const CLASS_NAME_CALENDAR_CELL = 'calendar-cell';
-  const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner';
-  const CLASS_NAME_CALENDAR_ROW = 'calendar-row';
-  const CLASS_NAME_CALENDARS$1 = 'calendars';
-  const CLASS_NAME_SHOW_WEEK_NUMBERS = 'show-week-numbers';
-  const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next';
-  const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev';
-  const SELECTOR_BTN_MONTH = '.btn-month';
-  const SELECTOR_BTN_NEXT = '.btn-next';
-  const SELECTOR_BTN_PREV = '.btn-prev';
-  const SELECTOR_BTN_YEAR = '.btn-year';
-  const SELECTOR_CALENDAR$1 = '.calendar';
-  const SELECTOR_CALENDAR_CELL = '.calendar-cell';
-  const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`;
-  const SELECTOR_CALENDAR_ROW = '.calendar-row';
-  const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
-  const SELECTOR_DATA_TOGGLE$e = '[data-coreui-toggle="calendar"]';
-  const Default$n = {
-    ariaNavNextMonthLabel: 'Next month',
-    ariaNavNextYearLabel: 'Next year',
-    ariaNavPrevMonthLabel: 'Previous month',
-    ariaNavPrevYearLabel: 'Previous year',
-    calendarDate: null,
-    calendars: 1,
-    disabledDates: null,
-    endDate: null,
-    firstDayOfWeek: 1,
-    locale: 'default',
-    maxDate: null,
-    minDate: null,
-    range: false,
-    selectAdjacementDays: false,
-    selectEndDate: false,
-    selectionType: 'day',
-    showAdjacementDays: true,
-    showWeekNumber: false,
-    startDate: null,
-    weekdayFormat: 2,
-    weekNumbersLabel: null
-  };
-  const DefaultType$n = {
-    ariaNavNextMonthLabel: 'string',
-    ariaNavNextYearLabel: 'string',
-    ariaNavPrevMonthLabel: 'string',
-    ariaNavPrevYearLabel: 'string',
-    calendarDate: '(date|number|string|null)',
-    calendars: 'number',
-    disabledDates: '(array|date|function|null)',
-    endDate: '(date|number|string|null)',
-    firstDayOfWeek: 'number',
-    locale: 'string',
-    maxDate: '(date|number|string|null)',
-    minDate: '(date|number|string|null)',
-    range: 'boolean',
-    selectAdjacementDays: 'boolean',
-    selectEndDate: 'boolean',
-    selectionType: 'string',
-    showAdjacementDays: 'boolean',
-    showWeekNumber: 'boolean',
-    startDate: '(date|number|string|null)',
-    weekdayFormat: '(number|string)',
-    weekNumbersLabel: '(string|null)'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class Calendar extends BaseComponent {
-    constructor(element, config) {
-      super(element);
-      this._config = this._getConfig(config);
-      this._initializeDates();
-      this._initializeView();
-      this._createCalendar();
-      this._addEventListeners();
-    }
-
-    // Getters
-    static get Default() {
-      return Default$n;
-    }
-    static get DefaultType() {
-      return DefaultType$n;
-    }
-    static get NAME() {
-      return NAME$p;
-    }
-
-    // Public
-    update(config) {
-      this._config = this._getConfig(config);
-      this._initializeDates();
-      this._initializeView();
-
-      // Clear the current calendar content
-      this._element.innerHTML = '';
-      this._createCalendar();
-    }
-
-    // Private
-    _focusOnFirstAvailableCell() {
-      const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
-      if (cell) {
-        cell.focus();
-      }
-    }
-    _getDate(target) {
-      if (this._config.selectionType === 'week') {
-        const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW));
-        return new Date(Manipulator.getDataAttribute(firstCell, 'date'));
-      }
-      return new Date(Manipulator.getDataAttribute(target, 'date'));
-    }
-    _handleCalendarClick(event) {
-      const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
-      const date = this._getDate(target);
-      const cloneDate = new Date(date);
-      const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR$1), 'calendar-index');
-      if (this._view === 'days') {
-        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
-      }
-      if (this._view === 'months' && this._config.selectionType !== 'month') {
-        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
-        this._view = 'days';
-        this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
-        return;
-      }
-      if (this._view === 'years' && this._config.selectionType !== 'year') {
-        this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
-        this._view = 'months';
-        this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
-        return;
-      }
-
-      // Allow to change the calendarDate but not startDate or endDate
-      if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
-        return;
-      }
-      this._hoverDate = null;
-      this._selectDate(date);
-      this._updateClassNamesAndAriaLabels();
-    }
-    _handleCalendarKeydown(event) {
-      const date = this._getDate(event.target);
-      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$3) {
-        event.preventDefault();
-        this._handleCalendarClick(event);
-      }
-      if (event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_UP_KEY$4 || event.key === ARROW_DOWN_KEY$4) {
-        event.preventDefault();
-        if (this._maxDate && date >= convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4)) {
-          return;
-        }
-        if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_UP_KEY$4)) {
-          return;
-        }
-        let element = event.target;
-        if (this._config.selectionType === 'week' && element.tabIndex === -1) {
-          element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE);
-        }
-        const list = SelectorEngine.find(this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
-        const index = list.indexOf(element);
-        const first = index === 0;
-        const last = index === list.length - 1;
-        const toBoundary = {
-          start: index,
-          end: list.length - (index + 1)
-        };
-        const gap = {
-          ArrowRight: 1,
-          ArrowLeft: -1,
-          ArrowUp: this._config.selectionType === 'week' && this._view === 'days' ? -1 : this._view === 'days' ? -7 : -3,
-          ArrowDown: this._config.selectionType === 'week' && this._view === 'days' ? 1 : this._view === 'days' ? 7 : 3
-        };
-        if (event.key === ARROW_RIGHT_KEY$3 && last || event.key === ARROW_DOWN_KEY$4 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$3 && first || event.key === ARROW_UP_KEY$4 && toBoundary.start < Math.abs(gap.ArrowUp)) {
-          const callback = key => {
-            const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element);
-            if (_list.length && key === ARROW_RIGHT_KEY$3) {
-              _list[0].focus();
-            }
-            if (_list.length && key === ARROW_LEFT_KEY$3) {
-              _list[_list.length - 1].focus();
-            }
-            if (_list.length && key === ARROW_DOWN_KEY$4) {
-              _list[gap.ArrowDown - (list.length - index)].focus();
-            }
-            if (_list.length && key === ARROW_UP_KEY$4) {
-              _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
-            }
-          };
-          if (this._view === 'days') {
-            this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 1 : -1, callback.bind(this, event.key));
-          }
-          if (this._view === 'months') {
-            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 1 : -1, 0, callback.bind(this, event.key));
-          }
-          if (this._view === 'years') {
-            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 10 : -10, 0, callback.bind(this, event.key));
-          }
-          return;
-        }
-        if (list[index + gap[event.key]].tabIndex === 0) {
-          list[index + gap[event.key]].focus();
-          return;
-        }
-        for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? i++ : i--) {
-          if (list[i + gap[event.key]].tabIndex === 0) {
-            list[i + gap[event.key]].focus();
-            break;
-          }
-        }
-      }
-    }
-    _handleCalendarMouseEnter(event) {
-      const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
-      const date = this._getDate(target);
-      if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
-        return;
-      }
-      this._hoverDate = setTimeFromDate(date, this._selectEndDate ? this._endDate : this._startDate);
-      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-        date: getDateBySelectionType(this._hoverDate, this._config.selectionType)
-      });
-      this._updateClassNamesAndAriaLabels();
-    }
-    _handleCalendarMouseLeave() {
-      this._hoverDate = null;
-      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
-        date: null
-      });
-      this._updateClassNamesAndAriaLabels();
-    }
-    _addEventListeners() {
-      EventHandler.on(this._element, EVENT_CLICK_DATA_API$f, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
-        this._handleCalendarClick(event);
-      });
-      EventHandler.on(this._element, EVENT_KEYDOWN$6, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
-        this._handleCalendarKeydown(event);
-      });
-      EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
-        this._handleCalendarMouseEnter(event);
-      });
-      EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
-        this._handleCalendarMouseLeave();
-      });
-      EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
-        this._handleCalendarMouseEnter(event);
-      });
-      EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
-        this._handleCalendarMouseLeave();
-      });
-      EventHandler.on(this._element, EVENT_CLICK_DATA_API$f, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
-        this._handleCalendarClick(event);
-      });
-      EventHandler.on(this._element, EVENT_KEYDOWN$6, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
-        this._handleCalendarKeydown(event);
-      });
-      EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
-        this._handleCalendarMouseEnter(event);
-      });
-      EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
-        this._handleCalendarMouseLeave();
-      });
-      EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
-        this._handleCalendarMouseEnter(event);
-      });
-      EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
-        this._handleCalendarMouseLeave();
-      });
-
-      // Navigation
-      this._addNavigationEventListeners();
-      EventHandler.on(this._element, EVENT_MOUSELEAVE$3, 'table', () => {
-        EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE);
-      });
-    }
-    _addNavigationEventListeners() {
-      const navigationSelectors = {
-        [SELECTOR_BTN_PREV]: () => this._modifyCalendarDate(0, -1),
-        [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -10 : -1),
-        [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
-        [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
-        [SELECTOR_BTN_MONTH]: () => {
-          this._view = 'months';
-          this._updateCalendar();
-        },
-        [SELECTOR_BTN_YEAR]: () => {
-          this._view = 'years';
-          this._updateCalendar();
-        }
-      };
-      for (const [selector, handler] of Object.entries(navigationSelectors)) {
-        EventHandler.on(this._element, EVENT_CLICK_DATA_API$f, selector, event => {
-          event.preventDefault();
-          const selectors = SelectorEngine.find(selector, this._element);
-          const selectorIndex = selectors.indexOf(event.target.closest(selector));
-          handler();
-
-          // Retrieve focus to the navigation element
-          const _selectors = SelectorEngine.find(selector, this._element);
-          if (_selectors && _selectors[selectorIndex]) {
-            _selectors[selectorIndex].focus();
-          }
-        });
-      }
-    }
-    _setCalendarDate(date) {
-      this._calendarDate = date;
-      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-        date
-      });
-    }
-    _modifyCalendarDate(years, months = 0, callback) {
-      const year = this._calendarDate.getFullYear();
-      const month = this._calendarDate.getMonth();
-      const d = new Date(year, month, 1);
-      if (years) {
-        d.setFullYear(d.getFullYear() + years);
-      }
-      if (months) {
-        d.setMonth(d.getMonth() + months);
-      }
-      this._calendarDate = d;
-      if (this._view === 'days') {
-        EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-          date: d
-        });
-      }
-      this._updateCalendar(callback);
-    }
-    _setEndDate(date) {
-      this._endDate = setTimeFromDate(date, this._endDate);
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE$1, {
-        date: getDateBySelectionType(this._endDate, this._config.selectionType)
-      });
-    }
-    _setStartDate(date) {
-      this._startDate = setTimeFromDate(date, this._startDate);
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE$1, {
-        date: getDateBySelectionType(this._startDate, this._config.selectionType)
-      });
-    }
-    _setSelectEndDate(value) {
-      this._selectEndDate = value;
-      EventHandler.trigger(this._element, EVENT_SELECT_END_CHANGE, {
-        value
-      });
-    }
-    _selectDate(date) {
-      if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
-        return;
-      }
-      if (this._config.range) {
-        if (this._selectEndDate) {
-          this._setSelectEndDate(false);
-          if (this._startDate && this._startDate > date) {
-            this._setStartDate(null);
-            this._setEndDate(null);
-            return;
-          }
-          if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
-            this._setStartDate(null);
-            this._setEndDate(null);
-            return;
-          }
-          this._setEndDate(date);
-          return;
-        }
-        if (this._endDate && this._endDate < date) {
-          this._setStartDate(null);
-          this._setEndDate(null);
-          return;
-        }
-        if (isDisableDateInRange(date, this._endDate, this._config.disabledDates)) {
-          this._setStartDate(null);
-          this._setEndDate(null);
-          return;
-        }
-        this._setSelectEndDate(true);
-        this._setStartDate(date);
-        return;
-      }
-      this._setStartDate(date);
-    }
-    _createCalendarPanel(order) {
-      var _this$_config$weekNum;
-      const calendarDate = getCalendarDate(this._calendarDate, order, this._view);
-      const year = calendarDate.getFullYear();
-      const month = calendarDate.getMonth();
-      const calendarPanelEl = document.createElement('div');
-      calendarPanelEl.classList.add('calendar');
-      Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order);
-
-      // Create navigation
-      const navigationElement = document.createElement('div');
-      navigationElement.classList.add('calendar-nav');
-      navigationElement.innerHTML = `
-      <div class="calendar-nav-prev">
-        <button class="btn btn-transparent btn-sm btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
-          <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
-        </button>
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
-          <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
-        </button>` : ''}
-      </div>
-      <div class="calendar-nav-date" aria-live="polite">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
-          ${calendarDate.toLocaleDateString(this._config.locale, {
-      month: 'long'
-    })}
-        </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-year">
-          ${calendarDate.toLocaleDateString(this._config.locale, {
-      year: 'numeric'
-    })}
-        </button>
-      </div>
-      <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
-          <span class="calendar-nav-icon calendar-nav-icon-next"></span>
-        </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
-          <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
-        </button>
-      </div>
-    `;
-      const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek);
-      const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4);
-      const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4);
-      const weekDays = monthDetails[0].days;
-      const calendarTable = document.createElement('table');
-      calendarTable.innerHTML = `
-    ${this._view === 'days' ? `
-      <thead>
-        <tr>
-          ${this._config.showWeekNumber ? `<th class="${CLASS_NAME_CALENDAR_CELL}">
-              <div class="calendar-header-cell-inner">
-               ${(_this$_config$weekNum = this._config.weekNumbersLabel) != null ? _this$_config$weekNum : ''}
-              </div>
-            </th>` : ''}
-          ${weekDays.map(({
-      date
-    }) => `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${date.toLocaleDateString(this._config.locale, {
-      weekday: 'long'
-    })}">
-              <div class="calendar-header-cell-inner">
-              ${typeof this._config.weekdayFormat === 'string' ? date.toLocaleDateString(this._config.locale, {
-      weekday: this._config.weekdayFormat
-    }) : date.toLocaleDateString(this._config.locale, {
-      weekday: 'long'
-    }).slice(0, this._config.weekdayFormat)}
-              </div>
-            </th>`).join('')}
-        </tr>
-      </thead>` : ''}
-      <tbody>
-        ${this._view === 'days' ? monthDetails.map(week => {
-      const date = convertToDateObject(week.weekNumber === 0 ? `${calendarDate.getFullYear()}W53` : `${calendarDate.getFullYear()}W${week.weekNumber}`, this._config.selectionType);
-      const rowAttributes = this._rowWeekAttributes(date);
-      return `<tr 
-              class="${rowAttributes.className}"
-              tabindex="${rowAttributes.tabIndex}"
-              ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
-            >
-              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.weekNumber === 0 ? 53 : week.weekNumber}</td>` : ''}
-              ${week.days.map(({
-        date,
-        month
-      }) => {
-        const cellAttributes = this._cellDayAttributes(date, month);
-        return month === 'current' || this._config.showAdjacementDays ? `<td 
-                    class="${cellAttributes.className}"
-                    tabindex="${cellAttributes.tabIndex}"
-                    ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
-                    data-coreui-date="${date}"
-                  >
-                    <div class="calendar-cell-inner day">
-                      ${date.toLocaleDateString(this._config.locale, {
-          day: 'numeric'
-        })}
-                    </div>
-                  </td>` : '<td></td>';
-      }).join('')}</tr>`;
-    }).join('') : ''}
-        ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>
-            ${row.map((month, idx) => {
-      const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
-      const cellAttributes = this._cellMonthAttributes(date);
-      return `<td
-                  class="${cellAttributes.className}"
-                  tabindex="${cellAttributes.tabIndex}"
-                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
-                  data-coreui-date="${date.toDateString()}"
-                >
-                  <div class="calendar-cell-inner month">
-                    ${month}
-                  </div>
-                </td>`;
-    }).join('')}
-          </tr>`).join('') : ''}
-        ${this._view === 'years' ? listOfYears.map(row => `<tr>
-            ${row.map(year => {
-      const date = new Date(year, 0, 1);
-      const cellAttributes = this._cellYearAttributes(date);
-      return `<td
-                  class="${cellAttributes.className}"
-                  tabindex="${cellAttributes.tabIndex}"
-                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
-                  data-coreui-date="${date.toDateString()}"
-                >
-                  <div class="calendar-cell-inner year">
-                    ${year}
-                  </div>
-                </td>`;
-    }).join('')}
-          </tr>`).join('') : ''}
-      </tbody>
-    `;
-      calendarPanelEl.append(navigationElement, calendarTable);
-      return calendarPanelEl;
-    }
-    _createCalendar() {
-      if (this._config.selectionType && this._view === 'days') {
-        this._element.classList.add(`select-${this._config.selectionType}`);
-      }
-      if (this._config.showWeekNumber) {
-        this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS);
-      }
-      for (const [index, _] of Array.from({
-        length: this._config.calendars
-      }).entries()) {
-        this._element.append(this._createCalendarPanel(index));
-      }
-      this._element.classList.add(CLASS_NAME_CALENDARS$1);
-    }
-    _initializeDates() {
-      // Convert dates to date objects based on the selection type
-      this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType);
-      this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
-      this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
-      this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType);
-      this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType);
-      this._hoverDate = null;
-      this._selectEndDate = this._config.selectEndDate;
-    }
-    _initializeView() {
-      const viewMap = {
-        day: 'days',
-        week: 'days',
-        month: 'months',
-        year: 'years'
-      };
-      this._view = viewMap[this._config.selectionType] || 'days';
-    }
-    _updateCalendar(callback) {
-      this._element.innerHTML = '';
-      this._createCalendar();
-      if (callback) {
-        setTimeout(callback, 1);
-      }
-    }
-    _updateClassNamesAndAriaLabels() {
-      if (this._config.selectionType === 'week') {
-        const rows = SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element);
-        for (const row of rows) {
-          const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row);
-          const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
-          const rowAttributes = this._rowWeekAttributes(date);
-          row.className = rowAttributes.className;
-          row.tabIndex = rowAttributes.tabIndex;
-          if (rowAttributes.ariaSelected) {
-            row.setAttribute('aria-selected', true);
-          } else {
-            row.removeAttribute('aria-selected');
-          }
-        }
-        return;
-      }
-      const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
-      for (const cell of cells) {
-        const date = new Date(Manipulator.getDataAttribute(cell, 'date'));
-        let cellAttributes;
-        if (this._view === 'days') {
-          cellAttributes = this._cellDayAttributes(date, 'current');
-        } else if (this._view === 'months') {
-          cellAttributes = this._cellMonthAttributes(date);
-        } else {
-          cellAttributes = this._cellYearAttributes(date);
-        }
-        cell.className = cellAttributes.className;
-        cell.tabIndex = cellAttributes.tabIndex;
-        if (cellAttributes.ariaSelected) {
-          cell.setAttribute('aria-selected', true);
-        } else {
-          cell.removeAttribute('aria-selected');
-        }
-      }
-    }
-    _classNames(classNames) {
-      return Object.entries(classNames).filter(([_, value]) => Boolean(value)).map(([key]) => key).join(' ');
-    }
-    _cellDayAttributes(date, month) {
-      const isCurrentMonth = month === 'current';
-      const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-      const isSelected = isDateSelected(date, this._startDate, this._endDate);
-      const classNames = this._classNames({
-        [CLASS_NAME_CALENDAR_CELL]: true,
-        ...(this._config.selectionType === 'day' && this._view === 'days' && {
-          clickable: !isCurrentMonth && this._config.selectAdjacementDays,
-          disabled: isDisabled,
-          range: isCurrentMonth && isDateInRange(date, this._startDate, this._endDate),
-          'range-hover': isCurrentMonth && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
-          selected: isSelected
-        }),
-        today: isToday(date),
-        [month]: true
-      });
-      return {
-        className: classNames,
-        tabIndex: this._config.selectionType === 'day' && (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
-        ariaSelected: isSelected
-      };
-    }
-    _cellMonthAttributes(date) {
-      const isDisabled = isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-      const isSelected = isMonthSelected(date, this._startDate, this._endDate);
-      const classNames = this._classNames({
-        [CLASS_NAME_CALENDAR_CELL]: true,
-        disabled: isDisabled,
-        'range-hover': this._config.selectionType === 'month' && (this._hoverDate && this._selectEndDate ? isMonthInRange(date, this._startDate, this._hoverDate) : isMonthInRange(date, this._hoverDate, this._endDate)),
-        range: isMonthInRange(date, this._startDate, this._endDate),
-        selected: isSelected
-      });
-      return {
-        className: classNames,
-        tabIndex: isDisabled ? -1 : 0,
-        ariaSelected: isSelected
-      };
-    }
-    _cellYearAttributes(date) {
-      const isDisabled = isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-      const isSelected = isYearSelected(date, this._startDate, this._endDate);
-      const classNames = this._classNames({
-        [CLASS_NAME_CALENDAR_CELL]: true,
-        disabled: isDisabled,
-        'range-hover': this._config.selectionType === 'year' && (this._hoverDate && this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate)),
-        range: isYearInRange(date, this._startDate, this._endDate),
-        selected: isSelected
-      });
-      return {
-        className: classNames,
-        tabIndex: isDisabled ? -1 : 0,
-        ariaSelected: isSelected
-      };
-    }
-    _rowWeekAttributes(date) {
-      const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
-      const isSelected = isDateSelected(date, this._startDate, this._endDate);
-      const classNames = this._classNames({
-        [CLASS_NAME_CALENDAR_ROW]: true,
-        disabled: isDisabled,
-        range: this._config.selectionType === 'week' && isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': this._config.selectionType === 'week' && (this._hoverDate && this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate)),
-        selected: isSelected
-      });
-      return {
-        className: classNames,
-        tabIndex: this._config.selectionType === 'week' && !isDisabled ? 0 : -1,
-        ariaSelected: isSelected
-      };
-    }
-
-    // Static
-
-    static calendarInterface(element, config) {
-      const data = Calendar.getOrCreateInstance(element, config);
-      if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config]();
-      }
-    }
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Calendar.getOrCreateInstance(this, config);
-        if (typeof config !== 'string') {
-          return;
-        }
-        if (typeof data[config] === 'undefined') {
-          throw new TypeError(`No method named "${config}"`);
-        }
-        data[config]();
-      });
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(window, EVENT_LOAD_DATA_API$d, () => {
-    for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE$e))) {
-      Calendar.calendarInterface(element);
-    }
-  });
-
-  /**
-   * jQuery
-   */
-
-  defineJQueryPlugin(Calendar);
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI util/swipe.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This is a modified version of the Bootstrap's util/swipe.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME$o = 'swipe';
-  const EVENT_KEY$k = '.coreui.swipe';
-  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$k}`;
-  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$k}`;
-  const EVENT_TOUCHEND = `touchend${EVENT_KEY$k}`;
-  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$k}`;
-  const EVENT_POINTERUP = `pointerup${EVENT_KEY$k}`;
-  const POINTER_TYPE_TOUCH = 'touch';
-  const POINTER_TYPE_PEN = 'pen';
-  const CLASS_NAME_POINTER_EVENT = 'pointer-event';
-  const SWIPE_THRESHOLD = 40;
-  const Default$m = {
-    endCallback: null,
-    leftCallback: null,
-    rightCallback: null
-  };
-  const DefaultType$m = {
-    endCallback: '(function|null)',
-    leftCallback: '(function|null)',
-    rightCallback: '(function|null)'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class Swipe extends Config {
-    constructor(element, config) {
-      super();
-      this._element = element;
-      if (!element || !Swipe.isSupported()) {
-        return;
-      }
-      this._config = this._getConfig(config);
-      this._deltaX = 0;
-      this._supportPointerEvents = Boolean(window.PointerEvent);
-      this._initEvents();
-    }
-
-    // Getters
-    static get Default() {
-      return Default$m;
-    }
-    static get DefaultType() {
-      return DefaultType$m;
-    }
-    static get NAME() {
-      return NAME$o;
-    }
-
-    // Public
-    dispose() {
-      EventHandler.off(this._element, EVENT_KEY$k);
-    }
-
-    // Private
-    _start(event) {
-      if (!this._supportPointerEvents) {
-        this._deltaX = event.touches[0].clientX;
-        return;
-      }
-      if (this._eventIsPointerPenTouch(event)) {
-        this._deltaX = event.clientX;
-      }
-    }
-    _end(event) {
-      if (this._eventIsPointerPenTouch(event)) {
-        this._deltaX = event.clientX - this._deltaX;
-      }
-      this._handleSwipe();
-      execute(this._config.endCallback);
-    }
-    _move(event) {
-      this._deltaX = event.touches && event.touches.length > 1 ? 0 : event.touches[0].clientX - this._deltaX;
-    }
-    _handleSwipe() {
-      const absDeltaX = Math.abs(this._deltaX);
-      if (absDeltaX <= SWIPE_THRESHOLD) {
-        return;
-      }
-      const direction = absDeltaX / this._deltaX;
-      this._deltaX = 0;
-      if (!direction) {
-        return;
-      }
-      execute(direction > 0 ? this._config.rightCallback : this._config.leftCallback);
-    }
-    _initEvents() {
-      if (this._supportPointerEvents) {
-        EventHandler.on(this._element, EVENT_POINTERDOWN, event => this._start(event));
-        EventHandler.on(this._element, EVENT_POINTERUP, event => this._end(event));
-        this._element.classList.add(CLASS_NAME_POINTER_EVENT);
-      } else {
-        EventHandler.on(this._element, EVENT_TOUCHSTART, event => this._start(event));
-        EventHandler.on(this._element, EVENT_TOUCHMOVE, event => this._move(event));
-        EventHandler.on(this._element, EVENT_TOUCHEND, event => this._end(event));
-      }
-    }
-    _eventIsPointerPenTouch(event) {
-      return this._supportPointerEvents && (event.pointerType === POINTER_TYPE_PEN || event.pointerType === POINTER_TYPE_TOUCH);
-    }
-
-    // Static
-    static isSupported() {
-      return 'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0;
-    }
-  }
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI carousel.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This component is a modified version of the Bootstrap's carousel.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME$n = 'carousel';
-  const DATA_KEY$j = 'coreui.carousel';
-  const EVENT_KEY$j = `.${DATA_KEY$j}`;
-  const DATA_API_KEY$f = '.data-api';
-  const ARROW_LEFT_KEY$2 = 'ArrowLeft';
-  const ARROW_RIGHT_KEY$2 = 'ArrowRight';
-  const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
-
-  const ORDER_NEXT = 'next';
-  const ORDER_PREV = 'prev';
-  const DIRECTION_LEFT = 'left';
-  const DIRECTION_RIGHT = 'right';
-  const EVENT_SLIDE = `slide${EVENT_KEY$j}`;
-  const EVENT_SLID = `slid${EVENT_KEY$j}`;
-  const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$j}`;
-  const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$j}`;
-  const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$j}`;
-  const EVENT_DRAG_START = `dragstart${EVENT_KEY$j}`;
-  const EVENT_LOAD_DATA_API$c = `load${EVENT_KEY$j}${DATA_API_KEY$f}`;
-  const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$j}${DATA_API_KEY$f}`;
-  const CLASS_NAME_CAROUSEL = 'carousel';
-  const CLASS_NAME_ACTIVE$5 = 'active';
-  const CLASS_NAME_SLIDE = 'slide';
-  const CLASS_NAME_END = 'carousel-item-end';
-  const CLASS_NAME_START = 'carousel-item-start';
-  const CLASS_NAME_NEXT = 'carousel-item-next';
-  const CLASS_NAME_PREV = 'carousel-item-prev';
-  const SELECTOR_ACTIVE = '.active';
-  const SELECTOR_ITEM = '.carousel-item';
-  const SELECTOR_ACTIVE_ITEM = SELECTOR_ACTIVE + SELECTOR_ITEM;
-  const SELECTOR_ITEM_IMG = '.carousel-item img';
-  const SELECTOR_INDICATORS = '.carousel-indicators';
-  const SELECTOR_DATA_SLIDE = '[data-coreui-slide], [data-coreui-slide-to]';
-  const SELECTOR_DATA_RIDE = '[data-coreui-ride="carousel"]';
-  const KEY_TO_DIRECTION = {
-    [ARROW_LEFT_KEY$2]: DIRECTION_RIGHT,
-    [ARROW_RIGHT_KEY$2]: DIRECTION_LEFT
-  };
-  const Default$l = {
-    interval: 5000,
-    keyboard: true,
-    pause: 'hover',
-    ride: false,
-    touch: true,
-    wrap: true
-  };
-  const DefaultType$l = {
-    interval: '(number|boolean)',
-    // TODO:v6 remove boolean support
-    keyboard: 'boolean',
-    pause: '(string|boolean)',
-    ride: '(boolean|string)',
-    touch: 'boolean',
-    wrap: 'boolean'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class Carousel extends BaseComponent {
-    constructor(element, config) {
-      super(element, config);
-      this._interval = null;
-      this._activeElement = null;
-      this._isSliding = false;
-      this.touchTimeout = null;
-      this._swipeHelper = null;
-      this._indicatorsElement = SelectorEngine.findOne(SELECTOR_INDICATORS, this._element);
-      this._addEventListeners();
-      if (this._config.ride === CLASS_NAME_CAROUSEL) {
-        this.cycle();
-      }
-    }
-
-    // Getters
-    static get Default() {
-      return Default$l;
-    }
-    static get DefaultType() {
-      return DefaultType$l;
-    }
-    static get NAME() {
-      return NAME$n;
-    }
-
-    // Public
-    next() {
-      this._slide(ORDER_NEXT);
-    }
-    nextWhenVisible() {
-      // FIXME TODO use `document.visibilityState`
-      // Don't call next when the page isn't visible
-      // or the carousel or its parent isn't visible
-      if (!document.hidden && isVisible(this._element)) {
-        this.next();
-      }
-    }
-    prev() {
-      this._slide(ORDER_PREV);
-    }
-    pause() {
-      if (this._isSliding) {
-        triggerTransitionEnd(this._element);
-      }
-      this._clearInterval();
-    }
-    cycle() {
-      this._clearInterval();
-      this._updateInterval();
-      this._interval = setInterval(() => this.nextWhenVisible(), this._config.interval);
-    }
-    _maybeEnableCycle() {
-      if (!this._config.ride) {
-        return;
-      }
-      if (this._isSliding) {
-        EventHandler.one(this._element, EVENT_SLID, () => this.cycle());
-        return;
-      }
-      this.cycle();
-    }
-    to(index) {
-      const items = this._getItems();
-      if (index > items.length - 1 || index < 0) {
-        return;
-      }
-      if (this._isSliding) {
-        EventHandler.one(this._element, EVENT_SLID, () => this.to(index));
-        return;
-      }
-      const activeIndex = this._getItemIndex(this._getActive());
-      if (activeIndex === index) {
-        return;
-      }
-      const order = index > activeIndex ? ORDER_NEXT : ORDER_PREV;
-      this._slide(order, items[index]);
-    }
-    dispose() {
-      if (this._swipeHelper) {
-        this._swipeHelper.dispose();
-      }
-      super.dispose();
-    }
-
-    // Private
-    _configAfterMerge(config) {
-      config.defaultInterval = config.interval;
-      return config;
-    }
-    _addEventListeners() {
-      if (this._config.keyboard) {
-        EventHandler.on(this._element, EVENT_KEYDOWN$5, event => this._keydown(event));
-      }
-      if (this._config.pause === 'hover') {
-        EventHandler.on(this._element, EVENT_MOUSEENTER$2, () => this.pause());
-        EventHandler.on(this._element, EVENT_MOUSELEAVE$2, () => this._maybeEnableCycle());
-      }
-      if (this._config.touch && Swipe.isSupported()) {
-        this._addTouchEventListeners();
-      }
-    }
-    _addTouchEventListeners() {
-      for (const img of SelectorEngine.find(SELECTOR_ITEM_IMG, this._element)) {
-        EventHandler.on(img, EVENT_DRAG_START, event => event.preventDefault());
-      }
-      const endCallBack = () => {
-        if (this._config.pause !== 'hover') {
-          return;
-        }
-
-        // If it's a touch-enabled device, mouseenter/leave are fired as
-        // part of the mouse compatibility events on first tap - the carousel
-        // would stop cycling until user tapped out of it;
-        // here, we listen for touchend, explicitly pause the carousel
-        // (as if it's the second time we tap on it, mouseenter compat event
-        // is NOT fired) and after a timeout (to allow for mouse compatibility
-        // events to fire) we explicitly restart cycling
-
-        this.pause();
-        if (this.touchTimeout) {
-          clearTimeout(this.touchTimeout);
-        }
-        this.touchTimeout = setTimeout(() => this._maybeEnableCycle(), TOUCHEVENT_COMPAT_WAIT + this._config.interval);
-      };
-      const swipeConfig = {
-        leftCallback: () => this._slide(this._directionToOrder(DIRECTION_LEFT)),
-        rightCallback: () => this._slide(this._directionToOrder(DIRECTION_RIGHT)),
-        endCallback: endCallBack
-      };
-      this._swipeHelper = new Swipe(this._element, swipeConfig);
-    }
-    _keydown(event) {
-      if (/input|textarea/i.test(event.target.tagName)) {
-        return;
-      }
-      const direction = KEY_TO_DIRECTION[event.key];
-      if (direction) {
-        event.preventDefault();
-        this._slide(this._directionToOrder(direction));
-      }
-    }
-    _getItemIndex(element) {
-      return this._getItems().indexOf(element);
-    }
-    _setActiveIndicatorElement(index) {
-      if (!this._indicatorsElement) {
-        return;
-      }
-      const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
-      activeIndicator.classList.remove(CLASS_NAME_ACTIVE$5);
-      activeIndicator.removeAttribute('aria-current');
-      const newActiveIndicator = SelectorEngine.findOne(`[data-coreui-slide-to="${index}"]`, this._indicatorsElement);
-      if (newActiveIndicator) {
-        newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$5);
-        newActiveIndicator.setAttribute('aria-current', 'true');
-      }
-    }
-    _updateInterval() {
-      const element = this._activeElement || this._getActive();
-      if (!element) {
-        return;
-      }
-      const elementInterval = Number.parseInt(element.getAttribute('data-coreui-interval'), 10);
-      this._config.interval = elementInterval || this._config.defaultInterval;
-    }
-    _slide(order, element = null) {
-      if (this._isSliding) {
-        return;
-      }
-      const activeElement = this._getActive();
-      const isNext = order === ORDER_NEXT;
-      const nextElement = element || getNextActiveElement(this._getItems(), activeElement, isNext, this._config.wrap);
-      if (nextElement === activeElement) {
-        return;
-      }
-      const nextElementIndex = this._getItemIndex(nextElement);
-      const triggerEvent = eventName => {
-        return EventHandler.trigger(this._element, eventName, {
-          relatedTarget: nextElement,
-          direction: this._orderToDirection(order),
-          from: this._getItemIndex(activeElement),
-          to: nextElementIndex
-        });
-      };
-      const slideEvent = triggerEvent(EVENT_SLIDE);
-      if (slideEvent.defaultPrevented) {
-        return;
-      }
-      if (!activeElement || !nextElement) {
-        // Some weirdness is happening, so we bail
-        // TODO: change tests that use empty divs to avoid this check
-        return;
-      }
-      const isCycling = Boolean(this._interval);
-      this.pause();
-      this._isSliding = true;
-      this._setActiveIndicatorElement(nextElementIndex);
-      this._activeElement = nextElement;
-      const directionalClassName = isNext ? CLASS_NAME_START : CLASS_NAME_END;
-      const orderClassName = isNext ? CLASS_NAME_NEXT : CLASS_NAME_PREV;
-      nextElement.classList.add(orderClassName);
-      reflow(nextElement);
-      activeElement.classList.add(directionalClassName);
-      nextElement.classList.add(directionalClassName);
-      const completeCallBack = () => {
-        nextElement.classList.remove(directionalClassName, orderClassName);
-        nextElement.classList.add(CLASS_NAME_ACTIVE$5);
-        activeElement.classList.remove(CLASS_NAME_ACTIVE$5, orderClassName, directionalClassName);
-        this._isSliding = false;
-        triggerEvent(EVENT_SLID);
-      };
-      this._queueCallback(completeCallBack, activeElement, this._isAnimated());
-      if (isCycling) {
-        this.cycle();
-      }
-    }
-    _isAnimated() {
-      return this._element.classList.contains(CLASS_NAME_SLIDE);
-    }
-    _getActive() {
-      return SelectorEngine.findOne(SELECTOR_ACTIVE_ITEM, this._element);
-    }
-    _getItems() {
-      return SelectorEngine.find(SELECTOR_ITEM, this._element);
-    }
-    _clearInterval() {
-      if (this._interval) {
-        clearInterval(this._interval);
-        this._interval = null;
-      }
-    }
-    _directionToOrder(direction) {
-      if (isRTL()) {
-        return direction === DIRECTION_LEFT ? ORDER_PREV : ORDER_NEXT;
-      }
-      return direction === DIRECTION_LEFT ? ORDER_NEXT : ORDER_PREV;
-    }
-    _orderToDirection(order) {
-      if (isRTL()) {
-        return order === ORDER_PREV ? DIRECTION_LEFT : DIRECTION_RIGHT;
-      }
-      return order === ORDER_PREV ? DIRECTION_RIGHT : DIRECTION_LEFT;
-    }
-
-    // Static
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Carousel.getOrCreateInstance(this, config);
-        if (typeof config === 'number') {
-          data.to(config);
-          return;
-        }
-        if (typeof config === 'string') {
-          if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-            throw new TypeError(`No method named "${config}"`);
-          }
-          data[config]();
-        }
-      });
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(document, EVENT_CLICK_DATA_API$e, SELECTOR_DATA_SLIDE, function (event) {
-    const target = SelectorEngine.getElementFromSelector(this);
-    if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
-      return;
-    }
-    event.preventDefault();
-    const carousel = Carousel.getOrCreateInstance(target);
-    const slideIndex = this.getAttribute('data-coreui-slide-to');
-    if (slideIndex) {
-      carousel.to(slideIndex);
-      carousel._maybeEnableCycle();
-      return;
-    }
-    if (Manipulator.getDataAttribute(this, 'slide') === 'next') {
-      carousel.next();
-      carousel._maybeEnableCycle();
-      return;
-    }
-    carousel.prev();
-    carousel._maybeEnableCycle();
-  });
-  EventHandler.on(window, EVENT_LOAD_DATA_API$c, () => {
-    const carousels = SelectorEngine.find(SELECTOR_DATA_RIDE);
-    for (const carousel of carousels) {
-      Carousel.getOrCreateInstance(carousel);
-    }
-  });
-
-  /**
-   * jQuery
-   */
-
-  defineJQueryPlugin(Carousel);
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI collapse.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This component is a modified version of the Bootstrap's collapse.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME$m = 'collapse';
-  const DATA_KEY$i = 'coreui.collapse';
-  const EVENT_KEY$i = `.${DATA_KEY$i}`;
-  const DATA_API_KEY$e = '.data-api';
-  const EVENT_SHOW$b = `show${EVENT_KEY$i}`;
-  const EVENT_SHOWN$b = `shown${EVENT_KEY$i}`;
-  const EVENT_HIDE$b = `hide${EVENT_KEY$i}`;
-  const EVENT_HIDDEN$b = `hidden${EVENT_KEY$i}`;
-  const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$i}${DATA_API_KEY$e}`;
-  const CLASS_NAME_SHOW$e = 'show';
-  const CLASS_NAME_COLLAPSE = 'collapse';
-  const CLASS_NAME_COLLAPSING = 'collapsing';
-  const CLASS_NAME_COLLAPSED = 'collapsed';
-  const CLASS_NAME_DEEPER_CHILDREN = `:scope .${CLASS_NAME_COLLAPSE} .${CLASS_NAME_COLLAPSE}`;
-  const CLASS_NAME_HORIZONTAL = 'collapse-horizontal';
-  const WIDTH = 'width';
-  const HEIGHT = 'height';
-  const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing';
-  const SELECTOR_DATA_TOGGLE$d = '[data-coreui-toggle="collapse"]';
-  const Default$k = {
-    parent: null,
-    toggle: true
-  };
-  const DefaultType$k = {
-    parent: '(null|element)',
-    toggle: 'boolean'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class Collapse extends BaseComponent {
-    constructor(element, config) {
-      super(element, config);
-      this._isTransitioning = false;
-      this._triggerArray = [];
-      const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE$d);
-      for (const elem of toggleList) {
-        const selector = SelectorEngine.getSelectorFromElement(elem);
-        const filterElement = SelectorEngine.find(selector).filter(foundElement => foundElement === this._element);
-        if (selector !== null && filterElement.length) {
-          this._triggerArray.push(elem);
-        }
-      }
-      this._initializeChildren();
-      if (!this._config.parent) {
-        this._addAriaAndCollapsedClass(this._triggerArray, this._isShown());
-      }
-      if (this._config.toggle) {
-        this.toggle();
-      }
-    }
-
-    // Getters
-    static get Default() {
-      return Default$k;
-    }
-    static get DefaultType() {
-      return DefaultType$k;
-    }
-    static get NAME() {
-      return NAME$m;
-    }
-
-    // Public
-    toggle() {
-      if (this._isShown()) {
-        this.hide();
-      } else {
-        this.show();
-      }
-    }
-    show() {
-      if (this._isTransitioning || this._isShown()) {
-        return;
-      }
-      let activeChildren = [];
-
-      // find active children
-      if (this._config.parent) {
-        activeChildren = this._getFirstLevelChildren(SELECTOR_ACTIVES).filter(element => element !== this._element).map(element => Collapse.getOrCreateInstance(element, {
-          toggle: false
-        }));
-      }
-      if (activeChildren.length && activeChildren[0]._isTransitioning) {
-        return;
-      }
-      const startEvent = EventHandler.trigger(this._element, EVENT_SHOW$b);
-      if (startEvent.defaultPrevented) {
-        return;
-      }
-      for (const activeInstance of activeChildren) {
-        activeInstance.hide();
-      }
-      const dimension = this._getDimension();
-      this._element.classList.remove(CLASS_NAME_COLLAPSE);
-      this._element.classList.add(CLASS_NAME_COLLAPSING);
-      this._element.style[dimension] = 0;
-      this._addAriaAndCollapsedClass(this._triggerArray, true);
-      this._isTransitioning = true;
-      const complete = () => {
-        this._isTransitioning = false;
-        this._element.classList.remove(CLASS_NAME_COLLAPSING);
-        this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$e);
-        this._element.style[dimension] = '';
-        EventHandler.trigger(this._element, EVENT_SHOWN$b);
-      };
-      const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1);
-      const scrollSize = `scroll${capitalizedDimension}`;
-      this._queueCallback(complete, this._element, true);
-      this._element.style[dimension] = `${this._element[scrollSize]}px`;
-    }
-    hide() {
-      if (this._isTransitioning || !this._isShown()) {
-        return;
-      }
-      const startEvent = EventHandler.trigger(this._element, EVENT_HIDE$b);
-      if (startEvent.defaultPrevented) {
-        return;
-      }
-      const dimension = this._getDimension();
-      this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`;
-      reflow(this._element);
-      this._element.classList.add(CLASS_NAME_COLLAPSING);
-      this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$e);
-      for (const trigger of this._triggerArray) {
-        const element = SelectorEngine.getElementFromSelector(trigger);
-        if (element && !this._isShown(element)) {
-          this._addAriaAndCollapsedClass([trigger], false);
-        }
-      }
-      this._isTransitioning = true;
-      const complete = () => {
-        this._isTransitioning = false;
-        this._element.classList.remove(CLASS_NAME_COLLAPSING);
-        this._element.classList.add(CLASS_NAME_COLLAPSE);
-        EventHandler.trigger(this._element, EVENT_HIDDEN$b);
-      };
-      this._element.style[dimension] = '';
-      this._queueCallback(complete, this._element, true);
-    }
-
-    // Private
-    _isShown(element = this._element) {
-      return element.classList.contains(CLASS_NAME_SHOW$e);
-    }
-    _configAfterMerge(config) {
-      config.toggle = Boolean(config.toggle); // Coerce string values
-      config.parent = getElement(config.parent);
-      return config;
-    }
-    _getDimension() {
-      return this._element.classList.contains(CLASS_NAME_HORIZONTAL) ? WIDTH : HEIGHT;
-    }
-    _initializeChildren() {
-      if (!this._config.parent) {
-        return;
-      }
-      const children = this._getFirstLevelChildren(SELECTOR_DATA_TOGGLE$d);
-      for (const element of children) {
-        const selected = SelectorEngine.getElementFromSelector(element);
-        if (selected) {
-          this._addAriaAndCollapsedClass([element], this._isShown(selected));
-        }
-      }
-    }
-    _getFirstLevelChildren(selector) {
-      const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent);
-      // remove children if greater depth
-      return SelectorEngine.find(selector, this._config.parent).filter(element => !children.includes(element));
-    }
-    _addAriaAndCollapsedClass(triggerArray, isOpen) {
-      if (!triggerArray.length) {
-        return;
-      }
-      for (const element of triggerArray) {
-        element.classList.toggle(CLASS_NAME_COLLAPSED, !isOpen);
-        element.setAttribute('aria-expanded', isOpen);
-      }
-    }
-
-    // Static
-    static jQueryInterface(config) {
-      const _config = {};
-      if (typeof config === 'string' && /show|hide/.test(config)) {
-        _config.toggle = false;
-      }
-      return this.each(function () {
-        const data = Collapse.getOrCreateInstance(this, _config);
-        if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
-            throw new TypeError(`No method named "${config}"`);
-          }
-          data[config]();
-        }
-      });
-    }
-  }
-
-  /**
-   * Data API implementation
-   */
-
-  EventHandler.on(document, EVENT_CLICK_DATA_API$d, SELECTOR_DATA_TOGGLE$d, function (event) {
-    // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
-    if (event.target.tagName === 'A' || event.delegateTarget && event.delegateTarget.tagName === 'A') {
-      event.preventDefault();
-    }
-    for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
-      Collapse.getOrCreateInstance(element, {
-        toggle: false
-      }).toggle();
-    }
-  });
-
-  /**
-   * jQuery
-   */
-
-  defineJQueryPlugin(Collapse);
 
   var top = 'top';
   var bottom = 'bottom';
@@ -4829,6 +2760,3036 @@
   }, Symbol.toStringTag, { value: 'Module' }));
 
   /**
+   * --------------------------------------------------------------------------
+   * CoreUI util/sanitizer.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This is a modified version of the Bootstrap's util/sanitizer.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+  // js-docs-start allow-list
+  const ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i;
+  const DefaultAllowlist = {
+    // Global attributes allowed on any supplied element below.
+    '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
+    a: ['target', 'href', 'title', 'rel'],
+    area: [],
+    b: [],
+    br: [],
+    col: [],
+    code: [],
+    dd: [],
+    div: [],
+    dl: [],
+    dt: [],
+    em: [],
+    hr: [],
+    h1: [],
+    h2: [],
+    h3: [],
+    h4: [],
+    h5: [],
+    h6: [],
+    i: [],
+    img: ['src', 'srcset', 'alt', 'title', 'width', 'height'],
+    li: [],
+    ol: [],
+    p: [],
+    pre: [],
+    s: [],
+    small: [],
+    span: [],
+    sub: [],
+    sup: [],
+    strong: [],
+    u: [],
+    ul: []
+  };
+  // js-docs-end allow-list
+
+  const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longdesc', 'poster', 'src', 'xlink:href']);
+
+  /**
+   * A pattern that recognizes URLs that are safe wrt. XSS in URL navigation
+   * contexts.
+   *
+   * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
+   */
+  const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
+  const allowedAttribute = (attribute, allowedAttributeList) => {
+    const attributeName = attribute.nodeName.toLowerCase();
+    if (allowedAttributeList.includes(attributeName)) {
+      if (uriAttributes.has(attributeName)) {
+        return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue));
+      }
+      return true;
+    }
+
+    // Check if a regular expression validates the attribute.
+    return allowedAttributeList.filter(attributeRegex => attributeRegex instanceof RegExp).some(regex => regex.test(attributeName));
+  };
+  function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
+    if (!unsafeHtml.length) {
+      return unsafeHtml;
+    }
+    if (sanitizeFunction && typeof sanitizeFunction === 'function') {
+      return sanitizeFunction(unsafeHtml);
+    }
+    const domParser = new window.DOMParser();
+    const createdDocument = domParser.parseFromString(unsafeHtml, 'text/html');
+    const elements = [].concat(...createdDocument.body.querySelectorAll('*'));
+    for (const element of elements) {
+      const elementName = element.nodeName.toLowerCase();
+      if (!Object.keys(allowList).includes(elementName)) {
+        element.remove();
+        continue;
+      }
+      const attributeList = [].concat(...element.attributes);
+      const allowedAttributes = [].concat(allowList['*'] || [], allowList[elementName] || []);
+      for (const attribute of attributeList) {
+        if (!allowedAttribute(attribute, allowedAttributes)) {
+          element.removeAttribute(attribute.nodeName);
+        }
+      }
+    }
+    return createdDocument.body.innerHTML;
+  }
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI PRO autocomplete.js
+   * License (https://coreui.io/pro/license/)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * ------------------------------------------------------------------------
+   * Constants
+   * ------------------------------------------------------------------------
+   */
+
+  const NAME$r = 'autocomplete';
+  const DATA_KEY$m = 'coreui.autocomplete';
+  const EVENT_KEY$n = `.${DATA_KEY$m}`;
+  const DATA_API_KEY$i = '.data-api';
+  const ARROW_UP_KEY$5 = 'ArrowUp';
+  const ARROW_DOWN_KEY$5 = 'ArrowDown';
+  const BACKSPACE_KEY$1 = 'Backspace';
+  const DELETE_KEY$1 = 'Delete';
+  const ENTER_KEY$4 = 'Enter';
+  const ESCAPE_KEY$6 = 'Escape';
+  const TAB_KEY$6 = 'Tab';
+  const RIGHT_MOUSE_BUTTON$5 = 2; // MouseEvent.button value for the secondary button, usually the right button
+
+  const EVENT_BLUR$1 = `blur${EVENT_KEY$n}`;
+  const EVENT_CHANGED$1 = `changed${EVENT_KEY$n}`;
+  const EVENT_CLICK$6 = `click${EVENT_KEY$n}`;
+  const EVENT_HIDE$c = `hide${EVENT_KEY$n}`;
+  const EVENT_HIDDEN$c = `hidden${EVENT_KEY$n}`;
+  const EVENT_INPUT$3 = `input${EVENT_KEY$n}`;
+  const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$n}`;
+  const EVENT_KEYUP$1 = `keyup${EVENT_KEY$n}`;
+  const EVENT_SHOW$c = `show${EVENT_KEY$n}`;
+  const EVENT_SHOWN$c = `shown${EVENT_KEY$n}`;
+  const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$n}${DATA_API_KEY$i}`;
+  const EVENT_KEYUP_DATA_API$5 = `keyup${EVENT_KEY$n}${DATA_API_KEY$i}`;
+  const EVENT_LOAD_DATA_API$e = `load${EVENT_KEY$n}${DATA_API_KEY$i}`;
+  const CLASS_NAME_AUTOCOMPLETE = 'autocomplete';
+  const CLASS_NAME_BUTTONS = 'autocomplete-buttons';
+  const CLASS_NAME_CLEANER$3 = 'autocomplete-cleaner';
+  const CLASS_NAME_DISABLED$5 = 'disabled';
+  const CLASS_NAME_DROPDOWN$2 = 'autocomplete-dropdown';
+  const CLASS_NAME_INDICATOR$2 = 'autocomplete-indicator';
+  const CLASS_NAME_INPUT$2 = 'autocomplete-input';
+  const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint';
+  const CLASS_NAME_INPUT_GROUP$3 = 'autocomplete-input-group';
+  const CLASS_NAME_LABEL$1 = 'label';
+  const CLASS_NAME_OPTGROUP$1 = 'autocomplete-optgroup';
+  const CLASS_NAME_OPTGROUP_LABEL$1 = 'autocomplete-optgroup-label';
+  const CLASS_NAME_OPTION$1 = 'autocomplete-option';
+  const CLASS_NAME_OPTIONS$1 = 'autocomplete-options';
+  const CLASS_NAME_OPTIONS_EMPTY$1 = 'autocomplete-options-empty';
+  const CLASS_NAME_SELECTED$2 = 'selected';
+  const CLASS_NAME_SHOW$f = 'show';
+  const SELECTOR_DATA_TOGGLE$g = '[data-coreui-toggle="autocomplete"]:not(.disabled)';
+  const SELECTOR_DATA_TOGGLE_SHOWN$4 = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW$f}`;
+  const SELECTOR_INDICATOR = '.autocomplete-indicator';
+  const SELECTOR_OPTGROUP$1 = '.autocomplete-optgroup';
+  const SELECTOR_OPTION$1 = '.autocomplete-option';
+  const SELECTOR_OPTIONS$1 = '.autocomplete-options';
+  const SELECTOR_OPTIONS_EMPTY$1 = '.autocomplete-options-empty';
+  const SELECTOR_VISIBLE_ITEMS$2 = '.autocomplete-options .autocomplete-option:not(.disabled):not(:disabled)';
+  const Default$o = {
+    allowList: DefaultAllowlist,
+    allowOnlyDefinedOptions: false,
+    ariaCleanerLabel: 'Clear selection',
+    ariaIndicatorLabel: 'Toggle visibility of options menu',
+    cleaner: false,
+    clearSearchOnSelect: true,
+    container: false,
+    disabled: false,
+    highlightOptionsOnSearch: false,
+    id: null,
+    indicator: false,
+    invalid: false,
+    name: null,
+    options: false,
+    optionsGroupsTemplate: null,
+    optionsMaxHeight: 'auto',
+    optionsTemplate: null,
+    placeholder: null,
+    required: false,
+    sanitize: true,
+    sanitizeFn: null,
+    search: null,
+    searchNoResultsLabel: false,
+    showHints: false,
+    valid: false,
+    value: null
+  };
+  const DefaultType$o = {
+    allowList: 'object',
+    allowOnlyDefinedOptions: 'boolean',
+    ariaCleanerLabel: 'string',
+    ariaIndicatorLabel: 'string',
+    cleaner: 'boolean',
+    clearSearchOnSelect: 'boolean',
+    container: '(string|element|boolean)',
+    disabled: 'boolean',
+    highlightOptionsOnSearch: 'boolean',
+    id: '(string|null)',
+    indicator: 'boolean',
+    invalid: 'boolean',
+    name: '(string|null)',
+    options: '(array|null)',
+    optionsGroupsTemplate: '(function|null)',
+    optionsMaxHeight: '(number|string)',
+    optionsTemplate: '(function|null)',
+    placeholder: '(string|null)',
+    required: 'boolean',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
+    search: '(array|string|null)',
+    searchNoResultsLabel: 'boolean|string',
+    showHints: 'boolean',
+    valid: 'boolean',
+    value: '(number|string|null)'
+  };
+
+  /**
+   * ------------------------------------------------------------------------
+   * Class Definition
+   * ------------------------------------------------------------------------
+   */
+
+  class Autocomplete extends BaseComponent {
+    constructor(element, config) {
+      var _this$_config$id;
+      super(element, config);
+      this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : getUID(`${this.constructor.NAME}`);
+      this._indicatorElement = null;
+      this._inputElement = null;
+      this._inputHintElement = null;
+      this._togglerElement = null;
+      this._optionsElement = null;
+      this._menu = null;
+      this._selected = [];
+      this._options = this._getOptionsFromConfig();
+      this._popper = null;
+      this._search = '';
+      this._createAutocomplete();
+      this._addEventListeners();
+      Data.set(this._element, DATA_KEY$m, this);
+    }
+
+    // Getters
+
+    static get Default() {
+      return Default$o;
+    }
+    static get DefaultType() {
+      return DefaultType$o;
+    }
+    static get NAME() {
+      return NAME$r;
+    }
+
+    // Public
+
+    toggle() {
+      return this._isShown() ? this.hide() : this.show();
+    }
+    show() {
+      if (this._config.disabled || this._isShown()) {
+        return;
+      }
+      if (!this._config.searchNoResultsLabel && this._flattenOptions().filter(option => option.label.toLowerCase().includes(this._search.toLowerCase())).length === 0) {
+        return;
+      }
+      EventHandler.trigger(this._element, EVENT_SHOW$c);
+      this._element.classList.add(CLASS_NAME_SHOW$f);
+      this._inputElement.setAttribute('aria-expanded', 'true');
+      if (this._config.container) {
+        this._menu.style.minWidth = `${this._element.offsetWidth}px`;
+        this._menu.classList.add(CLASS_NAME_SHOW$f);
+      }
+      EventHandler.trigger(this._element, EVENT_SHOWN$c);
+      this._createPopper();
+    }
+    hide() {
+      EventHandler.trigger(this._element, EVENT_HIDE$c);
+      if (this._popper) {
+        this._popper.destroy();
+      }
+      this._element.classList.remove(CLASS_NAME_SHOW$f);
+      this._inputElement.setAttribute('aria-expanded', 'false');
+      if (this._config.container) {
+        this._menu.classList.remove(CLASS_NAME_SHOW$f);
+      }
+      if (this._inputHintElement) {
+        this._inputHintElement.value = '';
+      }
+      EventHandler.trigger(this._element, EVENT_HIDDEN$c);
+    }
+    dispose() {
+      if (this._popper) {
+        this._popper.destroy();
+      }
+      super.dispose();
+    }
+    clear() {
+      this.deselectAll();
+      this.search('');
+      this._filterOptionsList();
+      this._inputElement.value = '';
+    }
+    search(label) {
+      this._search = label.length > 0 ? label.toLowerCase() : '';
+      if (!this._isExternalSearch()) {
+        this._filterOptionsList();
+      }
+      EventHandler.trigger(this._element, EVENT_INPUT$3, {
+        value: label
+      });
+    }
+    update(config) {
+      if (config.value) {
+        this.deselectAll();
+      }
+      this._config = {
+        ...this._config,
+        ...this._configAfterMerge(config)
+      };
+      this._options = this._getOptionsFromConfig();
+      this._optionsElement.innerHTML = '';
+      this._createOptions(this._optionsElement, this._options);
+    }
+    deselectAll(options = this._selected) {
+      for (const option of options) {
+        if (option.disabled) {
+          continue;
+        }
+        if (Array.isArray(option.options)) {
+          this.deselectAll(option.options);
+          continue;
+        }
+        this._deselectOption(option.value);
+        this._updateCleaner();
+      }
+    }
+
+    // Helpers
+
+    _flattenOptions(options = this._options, flat = []) {
+      for (const opt of options) {
+        if (opt && Array.isArray(opt.options)) {
+          this._flattenOptions(opt.options, flat);
+          continue;
+        }
+        flat.push(opt);
+      }
+      return flat;
+    }
+    _getClassNames() {
+      return this._element.classList.value.split(' ');
+    }
+    _highlightOption(label) {
+      const regex = new RegExp(this._search, 'gi');
+      return label.replace(regex, string => `<strong>${string}</strong>`);
+    }
+    _isExternalSearch() {
+      return Array.isArray(this._config.search) && this._config.search.includes('external');
+    }
+    _isGlobalSearch() {
+      return Array.isArray(this._config.search) && this._config.search.includes('global');
+    }
+    _isVisible(element) {
+      const style = window.getComputedStyle(element);
+      return style.display !== 'none';
+    }
+    _isShown() {
+      return this._element.classList.contains(CLASS_NAME_SHOW$f);
+    }
+
+    // Private
+
+    _addEventListeners() {
+      EventHandler.on(this._element, EVENT_CLICK$6, event => {
+        if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
+          this.show();
+        }
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN$7, event => {
+        if (event.key === ESCAPE_KEY$6) {
+          this.hide();
+          if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
+            this.search('');
+            this._inputElement.value = '';
+          }
+          return;
+        }
+        if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY$1)) {
+          this._inputElement.focus();
+        }
+      });
+      EventHandler.on(this._menu, EVENT_KEYDOWN$7, event => {
+        if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY$1)) {
+          this._inputElement.focus();
+        }
+      });
+      EventHandler.on(this._togglerElement, EVENT_KEYDOWN$7, event => {
+        if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$5)) {
+          event.preventDefault();
+          this.show();
+          return;
+        }
+        if (this._isShown() && event.key === ARROW_DOWN_KEY$5) {
+          event.preventDefault();
+          this._selectMenuItem(event);
+        }
+      });
+      EventHandler.on(this._indicatorElement, EVENT_CLICK$6, event => {
+        event.preventDefault();
+        this.toggle();
+      });
+      EventHandler.on(this._inputElement, EVENT_BLUR$1, () => {
+        const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
+        if (this._config.allowOnlyDefinedOptions && this._selected.length === 0 && options.length === 0) {
+          this.clear();
+        }
+      });
+      EventHandler.on(this._inputElement, EVENT_KEYDOWN$7, event => {
+        if (!this._isShown() && event.key !== TAB_KEY$6) {
+          this.show();
+        }
+        if (event.key === ARROW_DOWN_KEY$5 && this._inputElement.value.length === this._inputElement.selectionStart) {
+          this._selectMenuItem(event);
+          return;
+        }
+        if (event.key === TAB_KEY$6 && this._config.showHints && this._inputElement.value.length > 0) {
+          if (this._inputHintElement.value) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()));
+          if (options.length > 0) {
+            this._selectOption(options[0]);
+          }
+        }
+        if (event.key === ENTER_KEY$4) {
+          event.preventDefault();
+          event.stopPropagation();
+          if (this._inputElement.value.length === 0) {
+            return;
+          }
+          const options = this._flattenOptions().filter(option => option.label.toLowerCase() === this._inputElement.value.toLowerCase());
+          if (options.length > 0) {
+            this._selectOption(options[0]);
+          }
+          if (options.length === 0 && !this._config.allowOnlyDefinedOptions) {
+            EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+              value: this._inputElement.value
+            });
+            this.hide();
+            if (this._config.clearSearchOnSelect) {
+              this.search('');
+            }
+          }
+        }
+      });
+      EventHandler.on(this._inputElement, EVENT_KEYUP$1, event => {
+        if (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY$1) {
+          const {
+            value
+          } = event.target;
+          this.deselectAll();
+          this.search(value);
+          if (this._config.showHints) {
+            const options = value ? this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
+            this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : '';
+          }
+        }
+      });
+      EventHandler.on(this._optionsElement, EVENT_CLICK$6, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        this._onOptionsClick(event.target);
+      });
+      EventHandler.on(this._cleanerElement, EVENT_CLICK$6, event => {
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.clear();
+        }
+      });
+      EventHandler.on(this._optionsElement, EVENT_KEYDOWN$7, event => {
+        if (event.key === ENTER_KEY$4) {
+          this._onOptionsClick(event.target);
+        }
+        if ([ARROW_UP_KEY$5, ARROW_DOWN_KEY$5].includes(event.key)) {
+          event.preventDefault();
+          this._selectMenuItem(event);
+        }
+      });
+    }
+    _getOptionsFromConfig(options = this._config.options) {
+      if (!options || !Array.isArray(options)) {
+        return [];
+      }
+      const _options = [];
+      for (const option of options) {
+        var _option$value;
+        if (option.options && Array.isArray(option.options)) {
+          const customGroupProperties = {
+            ...option
+          };
+          delete customGroupProperties.label;
+          delete customGroupProperties.options;
+          _options.push({
+            ...customGroupProperties,
+            label: option.label,
+            options: this._getOptionsFromConfig(option.options)
+          });
+          continue;
+        }
+        const label = typeof option === 'string' ? option : option.label;
+        const value = (_option$value = option.value) != null ? _option$value : typeof option === 'string' ? option : option.label;
+        const isSelected = option.selected || this._config.value && this._config.value === value;
+        const customProperties = typeof option === 'object' ? {
+          ...option
+        } : {};
+        delete customProperties.label;
+        delete customProperties.value;
+        delete customProperties.selected;
+        delete customProperties.disabled;
+        _options.push({
+          ...customProperties,
+          label,
+          value,
+          ...(isSelected && {
+            selected: true
+          }),
+          ...(option.disabled && {
+            disabled: true
+          })
+        });
+        if (isSelected) {
+          this._selected.push({
+            label: option.label,
+            value: String(option.label)
+          });
+        }
+      }
+      return _options;
+    }
+    _createAutocomplete() {
+      this._element.classList.add(CLASS_NAME_AUTOCOMPLETE);
+      this._element.classList.toggle('is-invalid', this._config.invalid);
+      this._element.classList.toggle('is-valid', this._config.valid);
+      if (this._config.disabled) {
+        this._element.classList.add(CLASS_NAME_DISABLED$5);
+      }
+      for (const className of this._getClassNames()) {
+        this._element.classList.add(className);
+      }
+      this._createInputGroup();
+      this._createButtons();
+      this._createOptionsContainer();
+      this._updateOptionsList();
+    }
+    _createInputGroup() {
+      var _this$_config$placeho;
+      const togglerEl = document.createElement('div');
+      togglerEl.classList.add(CLASS_NAME_INPUT_GROUP$3);
+      this._togglerElement = togglerEl;
+      if (!this._config.search && !this._config.disabled) {
+        togglerEl.tabIndex = -1;
+      }
+      if (!this._config.disabled && this._config.showHints) {
+        const inputHintEl = document.createElement('input');
+        inputHintEl.classList.add(CLASS_NAME_INPUT$2, CLASS_NAME_INPUT_HINT);
+        inputHintEl.setAttribute('name', (this._config.name || `${this._uniqueId}-hint`).toString());
+        inputHintEl.autocomplete = 'off';
+        inputHintEl.readOnly = true;
+        inputHintEl.tabIndex = -1;
+        inputHintEl.setAttribute('aria-hidden', true);
+        togglerEl.append(inputHintEl);
+        this._inputHintElement = inputHintEl;
+      }
+      const inputEl = document.createElement('input');
+      inputEl.classList.add(CLASS_NAME_INPUT$2);
+      inputEl.id = this._uniqueId;
+      inputEl.setAttribute('name', (this._config.name || this._uniqueId).toString());
+      inputEl.autocomplete = 'off';
+      inputEl.placeholder = (_this$_config$placeho = this._config.placeholder) != null ? _this$_config$placeho : '';
+      inputEl.role = 'combobox';
+      inputEl.setAttribute('aria-autocomplete', 'list');
+      inputEl.setAttribute('aria-expanded', 'false');
+      inputEl.setAttribute('aria-haspopup', 'listbox');
+      if (this._config.disabled) {
+        inputEl.setAttribute('disabled', true);
+        inputEl.tabIndex = -1;
+      }
+      if (this._config.required) {
+        inputEl.setAttribute('required', true);
+      }
+      togglerEl.append(inputEl);
+      this._inputElement = inputEl;
+      this._element.append(togglerEl);
+    }
+    _createButtons() {
+      if (!this._config.cleaner && !this._config.indicator) {
+        return;
+      }
+      const buttons = document.createElement('div');
+      buttons.classList.add(CLASS_NAME_BUTTONS);
+      if (!this._config.disabled && this._config.cleaner) {
+        const cleaner = document.createElement('button');
+        cleaner.type = 'button';
+        cleaner.classList.add(CLASS_NAME_CLEANER$3);
+        cleaner.style.display = 'none';
+        cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel);
+        buttons.append(cleaner);
+        this._cleanerElement = cleaner;
+      }
+      if (this._config.indicator) {
+        const indicator = document.createElement('button');
+        indicator.type = 'button';
+        indicator.classList.add(CLASS_NAME_INDICATOR$2);
+        indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel);
+        if (this._config.disabled) {
+          indicator.tabIndex = -1;
+        }
+        buttons.append(indicator);
+        this._indicatorElement = indicator;
+        this._indicatorElement = indicator;
+      }
+      this._togglerElement.append(buttons);
+      this._updateCleaner();
+    }
+    _createPopper() {
+      if (typeof Popper === 'undefined') {
+        throw new TypeError('CoreUI\'s Auto Complete component require Popper (https://popper.js.org)');
+      }
+      const popperConfig = {
+        modifiers: [{
+          name: 'preventOverflow',
+          options: {
+            boundary: 'clippingParents'
+          }
+        }, {
+          name: 'offset',
+          options: {
+            offset: [0, 2]
+          }
+        }],
+        placement: isRTL() ? 'bottom-end' : 'bottom-start'
+      };
+      this._popper = createPopper(this._togglerElement, this._menu, popperConfig);
+    }
+    _createOptionsContainer() {
+      const dropdownDiv = document.createElement('div');
+      dropdownDiv.classList.add(CLASS_NAME_DROPDOWN$2);
+      dropdownDiv.role = 'listbox';
+      dropdownDiv.setAttribute('aria-labelledby', this._uniqueId);
+      const optionsDiv = document.createElement('div');
+      optionsDiv.classList.add(CLASS_NAME_OPTIONS$1);
+      if (this._config.optionsMaxHeight !== 'auto') {
+        optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`;
+        optionsDiv.style.overflow = 'auto';
+      }
+      dropdownDiv.append(optionsDiv);
+      const {
+        container
+      } = this._config;
+      if (container) {
+        container.append(dropdownDiv);
+      } else {
+        this._element.append(dropdownDiv);
+      }
+      this._createOptions(optionsDiv, this._options);
+      this._optionsElement = optionsDiv;
+      this._menu = dropdownDiv;
+    }
+    _createOptions(parentElement, options) {
+      for (const option of options) {
+        if (Array.isArray(option.options)) {
+          const optgroup = document.createElement('div');
+          optgroup.classList.add(CLASS_NAME_OPTGROUP$1);
+          optgroup.setAttribute('role', 'group');
+          const optgrouplabel = document.createElement('div');
+          if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
+            optgrouplabel.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsGroupsTemplate(option);
+          } else {
+            optgrouplabel.textContent = option.label;
+          }
+          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL$1);
+          optgroup.append(optgrouplabel);
+          this._createOptions(optgroup, option.options);
+          parentElement.append(optgroup);
+          continue;
+        }
+        const optionDiv = document.createElement('div');
+        optionDiv.classList.add(CLASS_NAME_OPTION$1);
+        if (option.disabled) {
+          optionDiv.classList.add(CLASS_NAME_DISABLED$5);
+          optionDiv.setAttribute('aria-disabled', 'true');
+        }
+        optionDiv.dataset.value = option.value;
+        optionDiv.tabIndex = 0;
+        if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
+          optionDiv.innerHTML = this._highlightOption(option.label);
+        } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+          optionDiv.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
+        } else {
+          optionDiv.textContent = option.label;
+        }
+        parentElement.append(optionDiv);
+      }
+    }
+    _onOptionsClick(element) {
+      if (element.classList.contains(CLASS_NAME_LABEL$1)) {
+        return;
+      }
+      if (!element.classList.contains(CLASS_NAME_OPTION$1)) {
+        element = element.closest(SELECTOR_OPTION$1);
+        if (!element) {
+          return;
+        }
+      }
+      const value = String(element.dataset.value);
+      const foundOption = this._findOptionByValue(value);
+      if (foundOption) {
+        this._selectOption(foundOption);
+      }
+    }
+    _findOptionByValue(value, options = this._options) {
+      for (const option of options) {
+        if (option.value === value) {
+          return option;
+        }
+        if (option.options && Array.isArray(option.options)) {
+          const found = this._findOptionByValue(value, option.options);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
+    }
+    _selectOption(option) {
+      this.deselectAll();
+      if (this._selected.filter(selectedOption => selectedOption.value === option.value).length === 0) {
+        this._selected.push(option);
+      }
+      const foundOption = SelectorEngine.findOne(`[data-value="${option.value}"]`, this._optionsElement);
+      if (foundOption) {
+        foundOption.classList.add(CLASS_NAME_SELECTED$2);
+        foundOption.setAttribute('aria-selected', true);
+      }
+      EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+        value: option
+      });
+      this._inputElement.value = option.label;
+      if (this._config.showHints) {
+        this._inputHintElement.value = '';
+      }
+      this.hide();
+      if (this._config.clearSearchOnSelect) {
+        this.search('');
+      }
+      this._inputElement.focus();
+      this._updateCleaner();
+    }
+    _deselectOption(value) {
+      this._selected = this._selected.filter(option => option.value !== String(value));
+      const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
+      if (option) {
+        option.classList.remove(CLASS_NAME_SELECTED$2);
+        option.setAttribute('aria-selected', false);
+      }
+      EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+        value: this._selected
+      });
+    }
+    _updateCleaner() {
+      if (!this._config.cleaner || this._cleanerElement === null) {
+        return;
+      }
+      if (this._selected.length > 0) {
+        this._cleanerElement.style.removeProperty('display');
+        return;
+      }
+      this._cleanerElement.style.display = 'none';
+    }
+    _updateOptionsList(options = this._options) {
+      for (const option of options) {
+        if (Array.isArray(option.options)) {
+          this._updateOptionsList(option.options);
+          continue;
+        }
+        if (option.selected) {
+          this._selectOption(option);
+        }
+      }
+    }
+    _filterOptionsList() {
+      const options = SelectorEngine.find(SELECTOR_OPTION$1, this._menu);
+      let visibleOptions = 0;
+      for (const option of options) {
+        // eslint-disable-next-line unicorn/prefer-includes
+        if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
+          option.style.display = 'none';
+        } else {
+          if (this._config.highlightOptionsOnSearch && !this._config.optionsTemplate) {
+            option.innerHTML = this._highlightOption(option.textContent);
+          }
+          option.style.removeProperty('display');
+          visibleOptions++;
+        }
+        const optgroup = option.closest(SELECTOR_OPTGROUP$1);
+        if (optgroup) {
+          // eslint-disable-next-line  unicorn/prefer-array-some
+          if (SelectorEngine.children(optgroup, SELECTOR_OPTION$1).filter(element => this._isVisible(element)).length > 0) {
+            optgroup.style.removeProperty('display');
+          } else {
+            optgroup.style.display = 'none';
+          }
+        }
+      }
+      if (visibleOptions > 0) {
+        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu)) {
+          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu).remove();
+        }
+        return;
+      }
+      if (visibleOptions === 0) {
+        if (this._config.searchNoResultsLabel) {
+          const placeholder = document.createElement('div');
+          placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY$1);
+          placeholder.innerHTML = this._config.searchNoResultsLabel;
+          if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu)) {
+            SelectorEngine.findOne(SELECTOR_OPTIONS$1, this._menu).append(placeholder);
+          }
+          return;
+        }
+        this.hide();
+      }
+    }
+    _selectMenuItem({
+      key,
+      target
+    }) {
+      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS$2, this._menu).filter(element => isVisible(element));
+      if (!items.length) {
+        return;
+      }
+
+      // if target isn't included in items (e.g. when expanding the dropdown)
+      // allow cycling to get the last item in case key equals ARROW_UP_KEY
+      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$5, !items.includes(target)).focus();
+    }
+    _configAfterMerge(config) {
+      if (config.container === true) {
+        config.container = document.body;
+      }
+      if (typeof config.container === 'object' || typeof config.container === 'string') {
+        config.container = getElement(config.container);
+      }
+      if (typeof config.options === 'string') {
+        config.options = config.options.split(/,\s*/).map(String);
+      }
+      if (typeof config.search === 'string') {
+        config.search = config.search.split(/,\s*/).map(String);
+      }
+      return config;
+    }
+
+    // Static
+
+    static autocompleteInterface(element, config) {
+      const data = Autocomplete.getOrCreateInstance(element, config);
+      if (typeof config === 'string') {
+        if (typeof data[config] === 'undefined') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config]();
+      }
+    }
+    static jQueryInterface(config) {
+      return this.each(function () {
+        Autocomplete.autocompleteInterface(this, config);
+      });
+    }
+    static clearMenus(event) {
+      if (event.button === RIGHT_MOUSE_BUTTON$5 || event.type === 'keyup' && event.key !== TAB_KEY$6) {
+        return;
+      }
+      const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN$4);
+      for (const toggle of openToggles) {
+        const context = Autocomplete.getInstance(toggle);
+        if (!context) {
+          continue;
+        }
+        const composedPath = event.composedPath();
+        if (composedPath.includes(context._element)) {
+          continue;
+        }
+        ({
+          relatedTarget: context._element
+        });
+        if (event.type === 'click') ;
+        context.hide();
+        context.search('');
+        if (context._config.allowOnlyDefinedOptions && context._selected.length === 0) {
+          context._inputElement.value = '';
+        }
+      }
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(window, EVENT_LOAD_DATA_API$e, () => {
+    for (const autocomplete of SelectorEngine.find(SELECTOR_DATA_TOGGLE$g)) {
+      Autocomplete.autocompleteInterface(autocomplete);
+    }
+  });
+  EventHandler.on(document, EVENT_CLICK_DATA_API$h, Autocomplete.clearMenus);
+  EventHandler.on(document, EVENT_KEYUP_DATA_API$5, Autocomplete.clearMenus);
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Autocomplete);
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI button.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This component is a modified version of the Bootstrap's button.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$q = 'button';
+  const DATA_KEY$l = 'coreui.button';
+  const EVENT_KEY$m = `.${DATA_KEY$l}`;
+  const DATA_API_KEY$h = '.data-api';
+  const CLASS_NAME_ACTIVE$6 = 'active';
+  const SELECTOR_DATA_TOGGLE$f = '[data-coreui-toggle="button"]';
+  const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$m}${DATA_API_KEY$h}`;
+
+  /**
+   * Class definition
+   */
+
+  class Button extends BaseComponent {
+    // Getters
+    static get NAME() {
+      return NAME$q;
+    }
+
+    // Public
+    toggle() {
+      // Toggle class and sync the `aria-pressed` attribute with the return value of the `.toggle()` method
+      this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE$6));
+    }
+
+    // Static
+    static jQueryInterface(config) {
+      return this.each(function () {
+        const data = Button.getOrCreateInstance(this);
+        if (config === 'toggle') {
+          data[config]();
+        }
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(document, EVENT_CLICK_DATA_API$g, SELECTOR_DATA_TOGGLE$f, event => {
+    event.preventDefault();
+    const button = event.target.closest(SELECTOR_DATA_TOGGLE$f);
+    const data = Button.getOrCreateInstance(button);
+    data.toggle();
+  });
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Button);
+
+  /**
+   * Converts an ISO week string to a Date object representing the Monday of that week.
+   * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
+   * @returns The Date object for the Monday of the specified week, or null if invalid.
+   */
+  const convertIsoWeekToDate = isoWeek => {
+    const [year, week] = isoWeek.split(/[Ww]/);
+    const date = new Date(Number(year), 0, 4); // 4th Jan is always in week 1
+    date.setDate(date.getDate() - (date.getDay() || 7) + 1 + (Number(week) - 1) * 7);
+    return date;
+  };
+
+  /**
+   * Converts a date string or Date object to a Date object based on selection type.
+   * @param date - The date to convert.
+   * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
+   * @returns The corresponding Date object or null if invalid.
+   */
+  const convertToDateObject = (date, selectionType) => {
+    if (date === null) {
+      return null;
+    }
+    if (date instanceof Date) {
+      return date;
+    }
+    if (selectionType === 'week') {
+      return convertIsoWeekToDate(date);
+    }
+    if (selectionType === 'month' || selectionType === 'year') {
+      const _date = new Date(Date.parse(date));
+      const userTimezoneOffset = _date.getTimezoneOffset() * 60000;
+      return new Date(_date.getTime() + userTimezoneOffset);
+    }
+    return new Date(Date.parse(date));
+  };
+
+  /**
+   * Creates groups from an array.
+   * @param arr - The array to group.
+   * @param numberOfGroups - Number of groups to create.
+   * @returns An array of grouped arrays.
+   */
+  const createGroupsInArray = (arr, numberOfGroups) => {
+    const perGroup = Math.ceil(arr.length / numberOfGroups);
+    return Array.from({
+      length: numberOfGroups
+    }).fill('').map((_, i) => arr.slice(i * perGroup, (i + 1) * perGroup));
+  };
+
+  /**
+   * Adjusts the calendar date based on order and view type.
+   * @param calendarDate - The current calendar date.
+   * @param order - The order to adjust by.
+   * @param view - The current view type.
+   * @returns The adjusted Date object.
+   */
+  const getCalendarDate = (calendarDate, order, view) => {
+    if (order !== 0 && view === 'days') {
+      return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
+    }
+    if (order !== 0 && view === 'months') {
+      return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
+    }
+    if (order !== 0 && view === 'years') {
+      return new Date(calendarDate.getFullYear() + 12 * order, calendarDate.getMonth(), 1);
+    }
+    return calendarDate;
+  };
+
+  /**
+   * Formats a date based on the selection type.
+   * @param date - The date to format.
+   * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
+   * @returns A formatted date string or the original Date object.
+   */
+  const getDateBySelectionType = (date, selectionType) => {
+    if (date === null) {
+      return null;
+    }
+    if (selectionType === 'week') {
+      const {
+        year,
+        weekNumber
+      } = getISOWeekNumberAndYear(date);
+      return `${year}W${weekNumber.toString().padStart(2, '0')}`;
+    }
+    if (selectionType === 'month') {
+      const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
+      return `${date.getFullYear()}-${monthNumber}`;
+    }
+    if (selectionType === 'year') {
+      return `${date.getFullYear()}`;
+    }
+    return date;
+  };
+
+  /**
+   * Retrieves an array of month names based on locale and format.
+   * @param locale - The locale string (e.g., 'en-US').
+   * @param format - The format of the month names ('short' or 'long').
+   * @returns An array of month names.
+   */
+  const getMonthsNames = (locale, format = 'short') => {
+    return Array.from({
+      length: 12
+    }, (_, i) => {
+      return new Date(2000, i, 1).toLocaleString(locale, {
+        month: format
+      });
+    });
+  };
+
+  /**
+   * Generates an array of years centered around a given year.
+   * @param year - The central year.
+   * @param range - The number of years before and after the central year.
+   * @returns An array of years.
+   */
+  const getYears = (year, range = 6) => {
+    return Array.from({
+      length: range * 2
+    }, (_, i) => year - range + i);
+  };
+
+  /**
+   * Retrieves leading days (from the previous month) for a calendar view.
+   * @param year - The year.
+   * @param month - The month (0-11).
+   * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
+   * @returns An array of leading day objects.
+   */
+  const getLeadingDays = (year, month, firstDayOfWeek) => {
+    // 0: sunday
+    // 1: monday
+    const dates = [];
+    const d = new Date(year, month);
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    const firstWeekday = new Date(y, m, 1).getDay();
+    let leadingDays = 6 - (6 - firstWeekday) - firstDayOfWeek;
+    if (firstDayOfWeek) {
+      leadingDays = leadingDays < 0 ? 7 + leadingDays : leadingDays;
+    }
+    for (let i = leadingDays * -1; i < 0; i++) {
+      dates.push({
+        date: new Date(y, m, i + 1),
+        month: 'previous'
+      });
+    }
+    return dates;
+  };
+
+  /**
+   * Retrieves all days within a specific month.
+   * @param year - The year.
+   * @param month - The month (0-11).
+   * @returns An array of day objects.
+   */
+  const getMonthDays = (year, month) => {
+    const dates = [];
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    for (let i = 1; i <= lastDay; i++) {
+      dates.push({
+        date: new Date(year, month, i),
+        month: 'current'
+      });
+    }
+    return dates;
+  };
+
+  /**
+   * Retrieves trailing days (from the next month) for a calendar view.
+   * @param year - The year.
+   * @param month - The month (0-11).
+   * @param leadingDays - Array of leading day objects.
+   * @param monthDays - Array of current month day objects.
+   * @returns An array of trailing day objects.
+   */
+  const getTrailingDays = (year, month, leadingDays, monthDays) => {
+    const dates = [];
+    const days = 42 - (leadingDays.length + monthDays.length);
+    for (let i = 1; i <= days; i++) {
+      dates.push({
+        date: new Date(year, month + 1, i),
+        month: 'next'
+      });
+    }
+    return dates;
+  };
+
+  /**
+   * Calculates the ISO 8601 week number and year for a given date.
+   *
+   * In the ISO 8601 standard:
+   * - Weeks start on Monday.
+   * - The first week of the year is the one that contains January 4th.
+   * - The year of the week may differ from the calendar year (e.g., Dec 29, 2025 is in ISO year 2026).
+   *
+   * @param {Date} date - The date for which to calculate the ISO week number and year.
+   * @returns {{ weekNumber: number, year: number }} An object containing:
+   *   - `weekNumber`: the ISO week number (1–53),
+   *   - `year`: the ISO year (may differ from the calendar year of the date).
+   */
+  const getISOWeekNumberAndYear = date => {
+    const tempDate = new Date(date);
+    tempDate.setHours(0, 0, 0, 0);
+
+    // Thursday in current week decides the year
+    tempDate.setDate(tempDate.getDate() + 3 - (tempDate.getDay() + 6) % 7);
+    const week1 = new Date(tempDate.getFullYear(), 0, 4);
+
+    // Calculate full weeks to the date
+    const weekNumber = 1 + Math.round((tempDate.getTime() - week1.getTime()) / 86400000 / 7);
+    return {
+      weekNumber,
+      year: tempDate.getFullYear()
+    };
+  };
+
+  /**
+   * Retrieves detailed information about each week in a month for calendar rendering.
+   * @param year - The year.
+   * @param month - The month (0-11).
+   * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
+   * @returns An array of week objects containing week numbers and day details.
+   */
+  const getMonthDetails = (year, month, firstDayOfWeek) => {
+    const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek);
+    const daysThisMonth = getMonthDays(year, month);
+    const daysNextMonth = getTrailingDays(year, month, daysPrevMonth, daysThisMonth);
+    const days = [...daysPrevMonth, ...daysThisMonth, ...daysNextMonth];
+    const weeks = [];
+    for (const [index, day] of days.entries()) {
+      if (index % 7 === 0 || weeks.length === 0) {
+        weeks.push({
+          week: {
+            number: 0,
+            year: 0
+          },
+          days: []
+        });
+      }
+      if ((index + 1) % 7 === 0) {
+        const {
+          weekNumber,
+          year
+        } = getISOWeekNumberAndYear(day.date);
+        weeks[weeks.length - 1].week = {
+          number: weekNumber,
+          year
+        };
+      }
+      weeks[weeks.length - 1].days.push(day);
+    }
+    return weeks;
+  };
+
+  /**
+   * Checks if a date is disabled based on the 'date' period type.
+   * @param date - The date to check.
+   * @param min - Minimum allowed date.
+   * @param max - Maximum allowed date.
+   * @param disabledDates - Criteria for disabled dates.
+   * @returns True if the date is disabled, false otherwise.
+   */
+  const isDateDisabled = (date, min, max, disabledDates) => {
+    if (min && date < min) {
+      return true;
+    }
+    if (max && date > max) {
+      return true;
+    }
+    if (disabledDates === undefined) {
+      return false;
+    }
+    if (typeof disabledDates === 'function') {
+      return disabledDates(date);
+    }
+    if (disabledDates instanceof Date && isSameDateAs(date, disabledDates)) {
+      return true;
+    }
+    if (Array.isArray(disabledDates) && disabledDates) {
+      for (const _date of disabledDates) {
+        if (typeof _date === 'function' && _date(date)) {
+          return true;
+        }
+        if (Array.isArray(_date) && isDateInRange(date, _date[0], _date[1])) {
+          return true;
+        }
+        if (_date instanceof Date && isSameDateAs(date, _date)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a date is within a specified range.
+   * @param date - The date to check.
+   * @param start - Start date of the range.
+   * @param end - End date of the range.
+   * @returns True if the date is within the range, false otherwise.
+   */
+  const isDateInRange = (date, start, end) => {
+    const _date = removeTimeFromDate(date);
+    const _start = start ? removeTimeFromDate(start) : null;
+    const _end = end ? removeTimeFromDate(end) : null;
+    return Boolean(_start && _end && _start <= _date && _date <= _end);
+  };
+
+  /**
+   * Checks if a date is selected based on start and end dates.
+   * @param date - The date to check.
+   * @param start - Start date.
+   * @param end - End date.
+   * @returns True if the date is selected, false otherwise.
+   */
+  const isDateSelected = (date, start, end) => {
+    if (start !== null && isSameDateAs(start, date)) {
+      return true;
+    }
+    if (end !== null && isSameDateAs(end, date)) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Determines if any date within a range is disabled.
+   * @param startDate - Start date of the range.
+   * @param endDate - End date of the range.
+   * @param disabledDates - Criteria for disabled dates.
+   * @returns True if any date in the range is disabled, false otherwise.
+   */
+  const isDisableDateInRange = (startDate, endDate, disabledDates) => {
+    if (startDate && endDate) {
+      const date = new Date(startDate);
+      let disabled = false;
+
+      // eslint-disable-next-line no-unmodified-loop-condition
+      while (date < endDate) {
+        date.setDate(date.getDate() + 1);
+        if (isDateDisabled(date, null, null, disabledDates)) {
+          disabled = true;
+          break;
+        }
+      }
+      return disabled;
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a month is disabled based on the 'month' period type.
+   * @param date - The date representing the month to check.
+   * @param min - Minimum allowed date.
+   * @param max - Maximum allowed date.
+   * @param disabledDates - Criteria for disabled dates.
+   * @returns True if the month is disabled, false otherwise.
+   */
+  const isMonthDisabled = (date, min, max, disabledDates) => {
+    const current = date.getFullYear() * 12 + date.getMonth();
+    const _min = min ? min.getFullYear() * 12 + min.getMonth() : null;
+    const _max = max ? max.getFullYear() * 12 + max.getMonth() : null;
+    if (_min && current < _min) {
+      return true;
+    }
+    if (_max && current > _max) {
+      return true;
+    }
+    if (disabledDates === undefined) {
+      return false;
+    }
+    const start = min ? Math.max(date.getTime(), min.getTime()) : date;
+    const end = max ? Math.min(date.getTime(), max.getTime()) : new Date(new Date().getFullYear(), 11, 31);
+    for (const currentDate = new Date(start);
+    // eslint-disable-next-line no-unmodified-loop-condition
+    currentDate <= end; currentDate.setDate(currentDate.getDate() + 1)) {
+      if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+        return false;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a month is selected based on start and end dates.
+   * @param date - The date representing the month.
+   * @param start - Start date.
+   * @param end - End date.
+   * @returns True if the month is selected, false otherwise.
+   */
+  const isMonthSelected = (date, start, end) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    if (start !== null && year === start.getFullYear() && month === start.getMonth()) {
+      return true;
+    }
+    if (end !== null && year === end.getFullYear() && month === end.getMonth()) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a month is within a specified range.
+   * @param date - The date representing the month.
+   * @param start - Start date.
+   * @param end - End date.
+   * @returns True if the month is within the range, false otherwise.
+   */
+  const isMonthInRange = (date, start, end) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const _start = start ? start.getFullYear() * 12 + start.getMonth() : null;
+    const _end = end ? end.getFullYear() * 12 + end.getMonth() : null;
+    const _date = year * 12 + month;
+    return Boolean(_start && _end && _start <= _date && _date <= _end);
+  };
+
+  /**
+   * Checks if two dates are the same calendar date.
+   * @param date - First date.
+   * @param date2 - Second date.
+   * @returns True if both dates are the same, false otherwise.
+   */
+  const isSameDateAs = (date, date2) => {
+    if (date instanceof Date && date2 instanceof Date) {
+      return date.getDate() === date2.getDate() && date.getMonth() === date2.getMonth() && date.getFullYear() === date2.getFullYear();
+    }
+    if (date === null && date2 === null) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a date is today.
+   * @param date - The date to check.
+   * @returns True if the date is today, false otherwise.
+   */
+  const isToday = date => {
+    const today = new Date();
+    return isSameDateAs(date, today);
+  };
+
+  /**
+   * Checks if a year is disabled based on the 'year' period type.
+   * @param date - The date representing the year to check.
+   * @param min - Minimum allowed date.
+   * @param max - Maximum allowed date.
+   * @param disabledDates - Criteria for disabled dates.
+   * @returns True if the year is disabled, false otherwise.
+   */
+  const isYearDisabled = (date, min, max, disabledDates) => {
+    const year = date.getFullYear();
+    const minYear = min ? min.getFullYear() : null;
+    const maxYear = max ? max.getFullYear() : null;
+    if (minYear && year < minYear) {
+      return true;
+    }
+    if (maxYear && year > maxYear) {
+      return true;
+    }
+    if (disabledDates === undefined) {
+      return false;
+    }
+    const start = min ? Math.max(date.getTime(), min.getTime()) : date;
+    const end = max ? Math.min(date.getTime(), max.getTime()) : new Date(new Date().getFullYear(), 11, 31);
+    for (const currentDate = new Date(start);
+    // eslint-disable-next-line no-unmodified-loop-condition
+    currentDate <= end; currentDate.setDate(currentDate.getDate() + 1)) {
+      if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+        return false;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a year is selected based on start and end dates.
+   * @param date - The date representing the year.
+   * @param start - Start date.
+   * @param end - End date.
+   * @returns True if the year matches the start's or end's year, false otherwise.
+   */
+  const isYearSelected = (date, start, end) => {
+    const year = date.getFullYear();
+    if (start !== null && year === start.getFullYear()) {
+      return true;
+    }
+    if (end !== null && year === end.getFullYear()) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Checks if a year is within a specified range.
+   * @param date - The date representing the year.
+   * @param start - Start date.
+   * @param end - End date.
+   * @returns True if the year's value lies between start's year and end's year, false otherwise.
+   */
+  const isYearInRange = (date, start, end) => {
+    const year = date.getFullYear();
+    const _start = start ? start.getFullYear() : null;
+    const _end = end ? end.getFullYear() : null;
+    return Boolean(_start && _end && _start <= year && year <= _end);
+  };
+
+  /**
+   * Removes the time component from a Date object.
+   * @param date - The original date.
+   * @returns A new Date object with the time set to 00:00:00.
+   */
+  const removeTimeFromDate = date => {
+    const clearedDate = new Date(date);
+    clearedDate.setHours(0, 0, 0, 0);
+    return clearedDate;
+  };
+
+  /**
+   * Copies the time (hours, minutes, seconds, milliseconds) from one Date to another.
+   *
+   * @param {Date} target - The date whose time will be updated.
+   * @param {Date} source - The date to copy the time from.
+   * @returns {Date} A new Date instance with the date from `target` and time from `source`.
+   */
+  const setTimeFromDate = (target, source) => {
+    if (target === null) {
+      return null;
+    }
+    if (!(source instanceof Date)) {
+      return target;
+    }
+    const result = new Date(target); // create a copy to avoid mutation
+    result.setHours(source.getHours(), source.getMinutes(), source.getSeconds(), source.getMilliseconds());
+    return result;
+  };
+
+  /* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI PRO calendar.js
+   * License (https://coreui.io/pro/license/)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$p = 'calendar';
+  const DATA_KEY$k = 'coreui.calendar';
+  const EVENT_KEY$l = `.${DATA_KEY$k}`;
+  const DATA_API_KEY$g = '.data-api';
+  const ARROW_UP_KEY$4 = 'ArrowUp';
+  const ARROW_RIGHT_KEY$3 = 'ArrowRight';
+  const ARROW_DOWN_KEY$4 = 'ArrowDown';
+  const ARROW_LEFT_KEY$3 = 'ArrowLeft';
+  const ENTER_KEY$3 = 'Enter';
+  const SPACE_KEY$1 = 'Space';
+  const EVENT_BLUR = `blur${EVENT_KEY$l}`;
+  const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$l}`;
+  const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$l}`;
+  const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$l}`;
+  const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$l}`;
+  const EVENT_FOCUS = `focus${EVENT_KEY$l}`;
+  const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$l}`;
+  const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$l}`;
+  const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$l}`;
+  const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$l}`;
+  const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$l}`;
+  const EVENT_LOAD_DATA_API$d = `load${EVENT_KEY$l}${DATA_API_KEY$g}`;
+  const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$l}${DATA_API_KEY$g}`;
+  const CLASS_NAME_CALENDAR_CELL = 'calendar-cell';
+  const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner';
+  const CLASS_NAME_CALENDAR_ROW = 'calendar-row';
+  const CLASS_NAME_CALENDARS$1 = 'calendars';
+  const CLASS_NAME_SHOW_WEEK_NUMBERS = 'show-week-numbers';
+  const SELECTOR_BTN_DOUBLE_NEXT = '.btn-double-next';
+  const SELECTOR_BTN_DOUBLE_PREV = '.btn-double-prev';
+  const SELECTOR_BTN_MONTH = '.btn-month';
+  const SELECTOR_BTN_NEXT = '.btn-next';
+  const SELECTOR_BTN_PREV = '.btn-prev';
+  const SELECTOR_BTN_YEAR = '.btn-year';
+  const SELECTOR_CALENDAR$1 = '.calendar';
+  const SELECTOR_CALENDAR_CELL = '.calendar-cell';
+  const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"]`;
+  const SELECTOR_CALENDAR_ROW = '.calendar-row';
+  const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
+  const SELECTOR_DATA_TOGGLE$e = '[data-coreui-toggle="calendar"]';
+  const Default$n = {
+    ariaNavNextMonthLabel: 'Next month',
+    ariaNavNextYearLabel: 'Next year',
+    ariaNavPrevMonthLabel: 'Previous month',
+    ariaNavPrevYearLabel: 'Previous year',
+    calendarDate: null,
+    calendars: 1,
+    disabledDates: null,
+    endDate: null,
+    firstDayOfWeek: 1,
+    locale: 'default',
+    maxDate: null,
+    minDate: null,
+    range: false,
+    selectAdjacementDays: false,
+    selectEndDate: false,
+    selectionType: 'day',
+    showAdjacementDays: true,
+    showWeekNumber: false,
+    startDate: null,
+    weekdayFormat: 2,
+    weekNumbersLabel: null
+  };
+  const DefaultType$n = {
+    ariaNavNextMonthLabel: 'string',
+    ariaNavNextYearLabel: 'string',
+    ariaNavPrevMonthLabel: 'string',
+    ariaNavPrevYearLabel: 'string',
+    calendarDate: '(date|number|string|null)',
+    calendars: 'number',
+    disabledDates: '(array|date|function|null)',
+    endDate: '(date|number|string|null)',
+    firstDayOfWeek: 'number',
+    locale: 'string',
+    maxDate: '(date|number|string|null)',
+    minDate: '(date|number|string|null)',
+    range: 'boolean',
+    selectAdjacementDays: 'boolean',
+    selectEndDate: 'boolean',
+    selectionType: 'string',
+    showAdjacementDays: 'boolean',
+    showWeekNumber: 'boolean',
+    startDate: '(date|number|string|null)',
+    weekdayFormat: '(number|string)',
+    weekNumbersLabel: '(string|null)'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class Calendar extends BaseComponent {
+    constructor(element, config) {
+      super(element);
+      this._config = this._getConfig(config);
+      this._initializeDates();
+      this._initializeView();
+      this._createCalendar();
+      this._addEventListeners();
+    }
+
+    // Getters
+    static get Default() {
+      return Default$n;
+    }
+    static get DefaultType() {
+      return DefaultType$n;
+    }
+    static get NAME() {
+      return NAME$p;
+    }
+
+    // Public
+    update(config) {
+      this._config = this._getConfig(config);
+      this._initializeDates();
+      this._initializeView();
+
+      // Clear the current calendar content
+      this._element.innerHTML = '';
+      this._createCalendar();
+    }
+
+    // Private
+    _focusOnFirstAvailableCell() {
+      const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
+      if (cell) {
+        cell.focus();
+      }
+    }
+    _getDate(target) {
+      if (this._config.selectionType === 'week') {
+        const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW));
+        return new Date(Manipulator.getDataAttribute(firstCell, 'date'));
+      }
+      return new Date(Manipulator.getDataAttribute(target, 'date'));
+    }
+    _handleCalendarClick(event) {
+      const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+      const date = this._getDate(target);
+      const cloneDate = new Date(date);
+      const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR$1), 'calendar-index');
+      if (this._view === 'days') {
+        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
+      }
+      if (this._view === 'months' && this._config.selectionType !== 'month') {
+        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
+        this._view = 'days';
+        this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
+        return;
+      }
+      if (this._view === 'years' && this._config.selectionType !== 'year') {
+        this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
+        this._view = 'months';
+        this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
+        return;
+      }
+
+      // Allow to change the calendarDate but not startDate or endDate
+      if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
+        return;
+      }
+      this._hoverDate = null;
+      this._selectDate(date);
+      this._updateClassNamesAndAriaLabels();
+    }
+    _handleCalendarKeydown(event) {
+      const date = this._getDate(event.target);
+      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$3) {
+        event.preventDefault();
+        this._handleCalendarClick(event);
+      }
+      if (event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_UP_KEY$4 || event.key === ARROW_DOWN_KEY$4) {
+        event.preventDefault();
+        if (this._maxDate && date >= convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4)) {
+          return;
+        }
+        if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_UP_KEY$4)) {
+          return;
+        }
+        let element = event.target;
+        if (this._config.selectionType === 'week' && element.tabIndex === -1) {
+          element = element.closest(SELECTOR_CALENDAR_ROW_CLICKABLE);
+        }
+        const list = SelectorEngine.find(this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
+        const index = list.indexOf(element);
+        const first = index === 0;
+        const last = index === list.length - 1;
+        const toBoundary = {
+          start: index,
+          end: list.length - (index + 1)
+        };
+        const gap = {
+          ArrowRight: 1,
+          ArrowLeft: -1,
+          ArrowUp: this._config.selectionType === 'week' && this._view === 'days' ? -1 : this._view === 'days' ? -7 : -3,
+          ArrowDown: this._config.selectionType === 'week' && this._view === 'days' ? 1 : this._view === 'days' ? 7 : 3
+        };
+        if (event.key === ARROW_RIGHT_KEY$3 && last || event.key === ARROW_DOWN_KEY$4 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$3 && first || event.key === ARROW_UP_KEY$4 && toBoundary.start < Math.abs(gap.ArrowUp)) {
+          const callback = key => {
+            const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element);
+            if (_list.length && key === ARROW_RIGHT_KEY$3) {
+              _list[0].focus();
+            }
+            if (_list.length && key === ARROW_LEFT_KEY$3) {
+              _list[_list.length - 1].focus();
+            }
+            if (_list.length && key === ARROW_DOWN_KEY$4) {
+              _list[gap.ArrowDown - (list.length - index)].focus();
+            }
+            if (_list.length && key === ARROW_UP_KEY$4) {
+              _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
+            }
+          };
+          if (this._view === 'days') {
+            this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 1 : -1, callback.bind(this, event.key));
+          }
+          if (this._view === 'months') {
+            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 1 : -1, 0, callback.bind(this, event.key));
+          }
+          if (this._view === 'years') {
+            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 10 : -10, 0, callback.bind(this, event.key));
+          }
+          return;
+        }
+        if (list[index + gap[event.key]].tabIndex === 0) {
+          list[index + gap[event.key]].focus();
+          return;
+        }
+        for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? i++ : i--) {
+          if (list[i + gap[event.key]].tabIndex === 0) {
+            list[i + gap[event.key]].focus();
+            break;
+          }
+        }
+      }
+    }
+    _handleCalendarMouseEnter(event) {
+      const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+      const date = this._getDate(target);
+      if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
+        return;
+      }
+      this._hoverDate = setTimeFromDate(date, this._selectEndDate ? this._endDate : this._startDate);
+      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+        date: getDateBySelectionType(this._hoverDate, this._config.selectionType)
+      });
+      this._updateClassNamesAndAriaLabels();
+    }
+    _handleCalendarMouseLeave() {
+      this._hoverDate = null;
+      EventHandler.trigger(this._element, EVENT_CELL_HOVER, {
+        date: null
+      });
+      this._updateClassNamesAndAriaLabels();
+    }
+    _addEventListeners() {
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$f, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+        this._handleCalendarClick(event);
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN$6, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+        this._handleCalendarKeydown(event);
+      });
+      EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+        this._handleCalendarMouseEnter(event);
+      });
+      EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
+        this._handleCalendarMouseLeave();
+      });
+      EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+        this._handleCalendarMouseEnter(event);
+      });
+      EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_CELL_CLICKABLE, () => {
+        this._handleCalendarMouseLeave();
+      });
+      EventHandler.on(this._element, EVENT_CLICK_DATA_API$f, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+        this._handleCalendarClick(event);
+      });
+      EventHandler.on(this._element, EVENT_KEYDOWN$6, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+        this._handleCalendarKeydown(event);
+      });
+      EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+        this._handleCalendarMouseEnter(event);
+      });
+      EventHandler.on(this._element, EVENT_MOUSELEAVE$3, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
+        this._handleCalendarMouseLeave();
+      });
+      EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+        this._handleCalendarMouseEnter(event);
+      });
+      EventHandler.on(this._element, EVENT_BLUR, SELECTOR_CALENDAR_ROW_CLICKABLE, () => {
+        this._handleCalendarMouseLeave();
+      });
+
+      // Navigation
+      this._addNavigationEventListeners();
+      EventHandler.on(this._element, EVENT_MOUSELEAVE$3, 'table', () => {
+        EventHandler.trigger(this._element, EVENT_CALENDAR_MOUSE_LEAVE);
+      });
+    }
+    _addNavigationEventListeners() {
+      const navigationSelectors = {
+        [SELECTOR_BTN_PREV]: () => this._modifyCalendarDate(0, -1),
+        [SELECTOR_BTN_DOUBLE_PREV]: () => this._modifyCalendarDate(this._view === 'years' ? -10 : -1),
+        [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
+        [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
+        [SELECTOR_BTN_MONTH]: () => {
+          this._view = 'months';
+          this._updateCalendar();
+        },
+        [SELECTOR_BTN_YEAR]: () => {
+          this._view = 'years';
+          this._updateCalendar();
+        }
+      };
+      for (const [selector, handler] of Object.entries(navigationSelectors)) {
+        EventHandler.on(this._element, EVENT_CLICK_DATA_API$f, selector, event => {
+          event.preventDefault();
+          const selectors = SelectorEngine.find(selector, this._element);
+          const selectorIndex = selectors.indexOf(event.target.closest(selector));
+          handler();
+
+          // Retrieve focus to the navigation element
+          const _selectors = SelectorEngine.find(selector, this._element);
+          if (_selectors && _selectors[selectorIndex]) {
+            _selectors[selectorIndex].focus();
+          }
+        });
+      }
+    }
+    _setCalendarDate(date) {
+      this._calendarDate = date;
+      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+        date
+      });
+    }
+    _modifyCalendarDate(years, months = 0, callback) {
+      const year = this._calendarDate.getFullYear();
+      const month = this._calendarDate.getMonth();
+      const d = new Date(year, month, 1);
+      if (years) {
+        d.setFullYear(d.getFullYear() + years);
+      }
+      if (months) {
+        d.setMonth(d.getMonth() + months);
+      }
+      this._calendarDate = d;
+      if (this._view === 'days') {
+        EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+          date: d
+        });
+      }
+      this._updateCalendar(callback);
+    }
+    _setEndDate(date) {
+      this._endDate = setTimeFromDate(date, this._endDate);
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE$1, {
+        date: getDateBySelectionType(this._endDate, this._config.selectionType)
+      });
+    }
+    _setStartDate(date) {
+      this._startDate = setTimeFromDate(date, this._startDate);
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE$1, {
+        date: getDateBySelectionType(this._startDate, this._config.selectionType)
+      });
+    }
+    _setSelectEndDate(value) {
+      this._selectEndDate = value;
+      EventHandler.trigger(this._element, EVENT_SELECT_END_CHANGE, {
+        value
+      });
+    }
+    _selectDate(date) {
+      if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
+        return;
+      }
+      if (this._config.range) {
+        if (this._selectEndDate) {
+          this._setSelectEndDate(false);
+          if (this._startDate && this._startDate > date) {
+            this._setStartDate(null);
+            this._setEndDate(null);
+            return;
+          }
+          if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
+            this._setStartDate(null);
+            this._setEndDate(null);
+            return;
+          }
+          this._setEndDate(date);
+          return;
+        }
+        if (this._endDate && this._endDate < date) {
+          this._setStartDate(null);
+          this._setEndDate(null);
+          return;
+        }
+        if (isDisableDateInRange(date, this._endDate, this._config.disabledDates)) {
+          this._setStartDate(null);
+          this._setEndDate(null);
+          return;
+        }
+        this._setSelectEndDate(true);
+        this._setStartDate(date);
+        return;
+      }
+      this._setStartDate(date);
+    }
+    _createCalendarPanel(order) {
+      var _this$_config$weekNum;
+      const calendarDate = getCalendarDate(this._calendarDate, order, this._view);
+      const year = calendarDate.getFullYear();
+      const month = calendarDate.getMonth();
+      const calendarPanelEl = document.createElement('div');
+      calendarPanelEl.classList.add('calendar');
+      Manipulator.setDataAttribute(calendarPanelEl, 'calendar-index', order);
+
+      // Create navigation
+      const navigationElement = document.createElement('div');
+      navigationElement.classList.add('calendar-nav');
+      navigationElement.innerHTML = `
+      <div class="calendar-nav-prev">
+        <button class="btn btn-transparent btn-sm btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+          <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
+        </button>
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+          <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
+        </button>` : ''}
+      </div>
+      <div class="calendar-nav-date" aria-live="polite">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
+          ${calendarDate.toLocaleDateString(this._config.locale, {
+      month: 'long'
+    })}
+        </button>` : ''}
+        <button class="btn btn-transparent btn-sm btn-year">
+          ${calendarDate.toLocaleDateString(this._config.locale, {
+      year: 'numeric'
+    })}
+        </button>
+      </div>
+      <div class="calendar-nav-next">
+        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+          <span class="calendar-nav-icon calendar-nav-icon-next"></span>
+        </button>` : ''}
+        <button class="btn btn-transparent btn-sm btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+          <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
+        </button>
+      </div>
+    `;
+      const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek);
+      const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4);
+      const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4);
+      const weekDays = monthDetails[0].days;
+      const calendarTable = document.createElement('table');
+      calendarTable.innerHTML = `
+    ${this._view === 'days' ? `
+      <thead>
+        <tr>
+          ${this._config.showWeekNumber ? `<th class="${CLASS_NAME_CALENDAR_CELL}">
+              <div class="calendar-header-cell-inner">
+               ${(_this$_config$weekNum = this._config.weekNumbersLabel) != null ? _this$_config$weekNum : ''}
+              </div>
+            </th>` : ''}
+          ${weekDays.map(({
+      date
+    }) => `<th class="${CLASS_NAME_CALENDAR_CELL}" abbr="${date.toLocaleDateString(this._config.locale, {
+      weekday: 'long'
+    })}">
+              <div class="calendar-header-cell-inner">
+              ${typeof this._config.weekdayFormat === 'string' ? date.toLocaleDateString(this._config.locale, {
+      weekday: this._config.weekdayFormat
+    }) : date.toLocaleDateString(this._config.locale, {
+      weekday: 'long'
+    }).slice(0, this._config.weekdayFormat)}
+              </div>
+            </th>`).join('')}
+        </tr>
+      </thead>` : ''}
+      <tbody>
+        ${this._view === 'days' ? monthDetails.map(({
+      week,
+      days
+    }) => {
+      const {
+        date
+      } = days[0];
+      const rowAttributes = this._rowWeekAttributes(date);
+      return `<tr 
+              class="${rowAttributes.className}"
+              tabindex="${rowAttributes.tabIndex}"
+              ${rowAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+            >
+              ${this._config.showWeekNumber ? `<th class="calendar-cell-week-number">${week.number}</td>` : ''}
+              ${days.map(({
+        date,
+        month
+      }) => {
+        const cellAttributes = this._cellDayAttributes(date, month);
+        return month === 'current' || this._config.showAdjacementDays ? `<td 
+                    class="${cellAttributes.className}"
+                    tabindex="${cellAttributes.tabIndex}"
+                    ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                    data-coreui-date="${date}"
+                  >
+                    <div class="calendar-cell-inner day">
+                      ${date.toLocaleDateString(this._config.locale, {
+          day: 'numeric'
+        })}
+                    </div>
+                  </td>` : '<td></td>';
+      }).join('')}</tr>`;
+    }).join('') : ''}
+        ${this._view === 'months' ? listOfMonths.map((row, index) => `<tr>
+            ${row.map((month, idx) => {
+      const date = new Date(calendarDate.getFullYear(), index * 3 + idx, 1);
+      const cellAttributes = this._cellMonthAttributes(date);
+      return `<td
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  data-coreui-date="${date.toDateString()}"
+                >
+                  <div class="calendar-cell-inner month">
+                    ${month}
+                  </div>
+                </td>`;
+    }).join('')}
+          </tr>`).join('') : ''}
+        ${this._view === 'years' ? listOfYears.map(row => `<tr>
+            ${row.map(year => {
+      const date = new Date(year, 0, 1);
+      const cellAttributes = this._cellYearAttributes(date);
+      return `<td
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  data-coreui-date="${date.toDateString()}"
+                >
+                  <div class="calendar-cell-inner year">
+                    ${year}
+                  </div>
+                </td>`;
+    }).join('')}
+          </tr>`).join('') : ''}
+      </tbody>
+    `;
+      calendarPanelEl.append(navigationElement, calendarTable);
+      return calendarPanelEl;
+    }
+    _createCalendar() {
+      if (this._config.selectionType && this._view === 'days') {
+        this._element.classList.add(`select-${this._config.selectionType}`);
+      }
+      if (this._config.showWeekNumber) {
+        this._element.classList.add(CLASS_NAME_SHOW_WEEK_NUMBERS);
+      }
+      for (const [index, _] of Array.from({
+        length: this._config.calendars
+      }).entries()) {
+        this._element.append(this._createCalendarPanel(index));
+      }
+      this._element.classList.add(CLASS_NAME_CALENDARS$1);
+    }
+    _initializeDates() {
+      // Convert dates to date objects based on the selection type
+      this._calendarDate = convertToDateObject(this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType);
+      this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType);
+      this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType);
+      this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType);
+      this._maxDate = convertToDateObject(this._config.maxDate, this._config.selectionType);
+      this._hoverDate = null;
+      this._selectEndDate = this._config.selectEndDate;
+    }
+    _initializeView() {
+      const viewMap = {
+        day: 'days',
+        week: 'days',
+        month: 'months',
+        year: 'years'
+      };
+      this._view = viewMap[this._config.selectionType] || 'days';
+    }
+    _updateCalendar(callback) {
+      this._element.innerHTML = '';
+      this._createCalendar();
+      if (callback) {
+        setTimeout(callback, 1);
+      }
+    }
+    _updateClassNamesAndAriaLabels() {
+      if (this._config.selectionType === 'week') {
+        const rows = SelectorEngine.find(SELECTOR_CALENDAR_ROW, this._element);
+        for (const row of rows) {
+          const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, row);
+          const date = new Date(Manipulator.getDataAttribute(firstCell, 'date'));
+          const rowAttributes = this._rowWeekAttributes(date);
+          row.className = rowAttributes.className;
+          row.tabIndex = rowAttributes.tabIndex;
+          if (rowAttributes.ariaSelected) {
+            row.setAttribute('aria-selected', true);
+          } else {
+            row.removeAttribute('aria-selected');
+          }
+        }
+        return;
+      }
+      const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element);
+      for (const cell of cells) {
+        const date = new Date(Manipulator.getDataAttribute(cell, 'date'));
+        let cellAttributes;
+        if (this._view === 'days') {
+          cellAttributes = this._cellDayAttributes(date, 'current');
+        } else if (this._view === 'months') {
+          cellAttributes = this._cellMonthAttributes(date);
+        } else {
+          cellAttributes = this._cellYearAttributes(date);
+        }
+        cell.className = cellAttributes.className;
+        cell.tabIndex = cellAttributes.tabIndex;
+        if (cellAttributes.ariaSelected) {
+          cell.setAttribute('aria-selected', true);
+        } else {
+          cell.removeAttribute('aria-selected');
+        }
+      }
+    }
+    _classNames(classNames) {
+      return Object.entries(classNames).filter(([_, value]) => Boolean(value)).map(([key]) => key).join(' ');
+    }
+    _cellDayAttributes(date, month) {
+      const isCurrentMonth = month === 'current';
+      const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
+      const isSelected = isDateSelected(date, this._startDate, this._endDate);
+      const classNames = this._classNames({
+        [CLASS_NAME_CALENDAR_CELL]: true,
+        ...(this._config.selectionType === 'day' && this._view === 'days' && {
+          clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+          disabled: isDisabled,
+          range: isCurrentMonth && isDateInRange(date, this._startDate, this._endDate),
+          'range-hover': isCurrentMonth && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
+          selected: isSelected
+        }),
+        today: isToday(date),
+        [month]: true
+      });
+      return {
+        className: classNames,
+        tabIndex: this._config.selectionType === 'day' && (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
+        ariaSelected: isSelected
+      };
+    }
+    _cellMonthAttributes(date) {
+      const isDisabled = isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
+      const isSelected = isMonthSelected(date, this._startDate, this._endDate);
+      const classNames = this._classNames({
+        [CLASS_NAME_CALENDAR_CELL]: true,
+        disabled: isDisabled,
+        'range-hover': this._config.selectionType === 'month' && (this._hoverDate && this._selectEndDate ? isMonthInRange(date, this._startDate, this._hoverDate) : isMonthInRange(date, this._hoverDate, this._endDate)),
+        range: isMonthInRange(date, this._startDate, this._endDate),
+        selected: isSelected
+      });
+      return {
+        className: classNames,
+        tabIndex: isDisabled ? -1 : 0,
+        ariaSelected: isSelected
+      };
+    }
+    _cellYearAttributes(date) {
+      const isDisabled = isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
+      const isSelected = isYearSelected(date, this._startDate, this._endDate);
+      const classNames = this._classNames({
+        [CLASS_NAME_CALENDAR_CELL]: true,
+        disabled: isDisabled,
+        'range-hover': this._config.selectionType === 'year' && (this._hoverDate && this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate)),
+        range: isYearInRange(date, this._startDate, this._endDate),
+        selected: isSelected
+      });
+      return {
+        className: classNames,
+        tabIndex: isDisabled ? -1 : 0,
+        ariaSelected: isSelected
+      };
+    }
+    _rowWeekAttributes(date) {
+      const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
+      const isSelected = isDateSelected(date, this._startDate, this._endDate);
+      const classNames = this._classNames({
+        [CLASS_NAME_CALENDAR_ROW]: true,
+        disabled: isDisabled,
+        range: this._config.selectionType === 'week' && isDateInRange(date, this._startDate, this._endDate),
+        'range-hover': this._config.selectionType === 'week' && (this._hoverDate && this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate)),
+        selected: isSelected
+      });
+      return {
+        className: classNames,
+        tabIndex: this._config.selectionType === 'week' && !isDisabled ? 0 : -1,
+        ariaSelected: isSelected
+      };
+    }
+
+    // Static
+
+    static calendarInterface(element, config) {
+      const data = Calendar.getOrCreateInstance(element, config);
+      if (typeof config === 'string') {
+        if (typeof data[config] === 'undefined') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config]();
+      }
+    }
+    static jQueryInterface(config) {
+      return this.each(function () {
+        const data = Calendar.getOrCreateInstance(this, config);
+        if (typeof config !== 'string') {
+          return;
+        }
+        if (typeof data[config] === 'undefined') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config]();
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(window, EVENT_LOAD_DATA_API$d, () => {
+    for (const element of Array.from(document.querySelectorAll(SELECTOR_DATA_TOGGLE$e))) {
+      Calendar.calendarInterface(element);
+    }
+  });
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Calendar);
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI util/swipe.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This is a modified version of the Bootstrap's util/swipe.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$o = 'swipe';
+  const EVENT_KEY$k = '.coreui.swipe';
+  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$k}`;
+  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$k}`;
+  const EVENT_TOUCHEND = `touchend${EVENT_KEY$k}`;
+  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$k}`;
+  const EVENT_POINTERUP = `pointerup${EVENT_KEY$k}`;
+  const POINTER_TYPE_TOUCH = 'touch';
+  const POINTER_TYPE_PEN = 'pen';
+  const CLASS_NAME_POINTER_EVENT = 'pointer-event';
+  const SWIPE_THRESHOLD = 40;
+  const Default$m = {
+    endCallback: null,
+    leftCallback: null,
+    rightCallback: null
+  };
+  const DefaultType$m = {
+    endCallback: '(function|null)',
+    leftCallback: '(function|null)',
+    rightCallback: '(function|null)'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class Swipe extends Config {
+    constructor(element, config) {
+      super();
+      this._element = element;
+      if (!element || !Swipe.isSupported()) {
+        return;
+      }
+      this._config = this._getConfig(config);
+      this._deltaX = 0;
+      this._supportPointerEvents = Boolean(window.PointerEvent);
+      this._initEvents();
+    }
+
+    // Getters
+    static get Default() {
+      return Default$m;
+    }
+    static get DefaultType() {
+      return DefaultType$m;
+    }
+    static get NAME() {
+      return NAME$o;
+    }
+
+    // Public
+    dispose() {
+      EventHandler.off(this._element, EVENT_KEY$k);
+    }
+
+    // Private
+    _start(event) {
+      if (!this._supportPointerEvents) {
+        this._deltaX = event.touches[0].clientX;
+        return;
+      }
+      if (this._eventIsPointerPenTouch(event)) {
+        this._deltaX = event.clientX;
+      }
+    }
+    _end(event) {
+      if (this._eventIsPointerPenTouch(event)) {
+        this._deltaX = event.clientX - this._deltaX;
+      }
+      this._handleSwipe();
+      execute(this._config.endCallback);
+    }
+    _move(event) {
+      this._deltaX = event.touches && event.touches.length > 1 ? 0 : event.touches[0].clientX - this._deltaX;
+    }
+    _handleSwipe() {
+      const absDeltaX = Math.abs(this._deltaX);
+      if (absDeltaX <= SWIPE_THRESHOLD) {
+        return;
+      }
+      const direction = absDeltaX / this._deltaX;
+      this._deltaX = 0;
+      if (!direction) {
+        return;
+      }
+      execute(direction > 0 ? this._config.rightCallback : this._config.leftCallback);
+    }
+    _initEvents() {
+      if (this._supportPointerEvents) {
+        EventHandler.on(this._element, EVENT_POINTERDOWN, event => this._start(event));
+        EventHandler.on(this._element, EVENT_POINTERUP, event => this._end(event));
+        this._element.classList.add(CLASS_NAME_POINTER_EVENT);
+      } else {
+        EventHandler.on(this._element, EVENT_TOUCHSTART, event => this._start(event));
+        EventHandler.on(this._element, EVENT_TOUCHMOVE, event => this._move(event));
+        EventHandler.on(this._element, EVENT_TOUCHEND, event => this._end(event));
+      }
+    }
+    _eventIsPointerPenTouch(event) {
+      return this._supportPointerEvents && (event.pointerType === POINTER_TYPE_PEN || event.pointerType === POINTER_TYPE_TOUCH);
+    }
+
+    // Static
+    static isSupported() {
+      return 'ontouchstart' in document.documentElement || navigator.maxTouchPoints > 0;
+    }
+  }
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI carousel.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This component is a modified version of the Bootstrap's carousel.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$n = 'carousel';
+  const DATA_KEY$j = 'coreui.carousel';
+  const EVENT_KEY$j = `.${DATA_KEY$j}`;
+  const DATA_API_KEY$f = '.data-api';
+  const ARROW_LEFT_KEY$2 = 'ArrowLeft';
+  const ARROW_RIGHT_KEY$2 = 'ArrowRight';
+  const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
+
+  const ORDER_NEXT = 'next';
+  const ORDER_PREV = 'prev';
+  const DIRECTION_LEFT = 'left';
+  const DIRECTION_RIGHT = 'right';
+  const EVENT_SLIDE = `slide${EVENT_KEY$j}`;
+  const EVENT_SLID = `slid${EVENT_KEY$j}`;
+  const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$j}`;
+  const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$j}`;
+  const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$j}`;
+  const EVENT_DRAG_START = `dragstart${EVENT_KEY$j}`;
+  const EVENT_LOAD_DATA_API$c = `load${EVENT_KEY$j}${DATA_API_KEY$f}`;
+  const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$j}${DATA_API_KEY$f}`;
+  const CLASS_NAME_CAROUSEL = 'carousel';
+  const CLASS_NAME_ACTIVE$5 = 'active';
+  const CLASS_NAME_SLIDE = 'slide';
+  const CLASS_NAME_END = 'carousel-item-end';
+  const CLASS_NAME_START = 'carousel-item-start';
+  const CLASS_NAME_NEXT = 'carousel-item-next';
+  const CLASS_NAME_PREV = 'carousel-item-prev';
+  const SELECTOR_ACTIVE = '.active';
+  const SELECTOR_ITEM = '.carousel-item';
+  const SELECTOR_ACTIVE_ITEM = SELECTOR_ACTIVE + SELECTOR_ITEM;
+  const SELECTOR_ITEM_IMG = '.carousel-item img';
+  const SELECTOR_INDICATORS = '.carousel-indicators';
+  const SELECTOR_DATA_SLIDE = '[data-coreui-slide], [data-coreui-slide-to]';
+  const SELECTOR_DATA_RIDE = '[data-coreui-ride="carousel"]';
+  const KEY_TO_DIRECTION = {
+    [ARROW_LEFT_KEY$2]: DIRECTION_RIGHT,
+    [ARROW_RIGHT_KEY$2]: DIRECTION_LEFT
+  };
+  const Default$l = {
+    interval: 5000,
+    keyboard: true,
+    pause: 'hover',
+    ride: false,
+    touch: true,
+    wrap: true
+  };
+  const DefaultType$l = {
+    interval: '(number|boolean)',
+    // TODO:v6 remove boolean support
+    keyboard: 'boolean',
+    pause: '(string|boolean)',
+    ride: '(boolean|string)',
+    touch: 'boolean',
+    wrap: 'boolean'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class Carousel extends BaseComponent {
+    constructor(element, config) {
+      super(element, config);
+      this._interval = null;
+      this._activeElement = null;
+      this._isSliding = false;
+      this.touchTimeout = null;
+      this._swipeHelper = null;
+      this._indicatorsElement = SelectorEngine.findOne(SELECTOR_INDICATORS, this._element);
+      this._addEventListeners();
+      if (this._config.ride === CLASS_NAME_CAROUSEL) {
+        this.cycle();
+      }
+    }
+
+    // Getters
+    static get Default() {
+      return Default$l;
+    }
+    static get DefaultType() {
+      return DefaultType$l;
+    }
+    static get NAME() {
+      return NAME$n;
+    }
+
+    // Public
+    next() {
+      this._slide(ORDER_NEXT);
+    }
+    nextWhenVisible() {
+      // FIXME TODO use `document.visibilityState`
+      // Don't call next when the page isn't visible
+      // or the carousel or its parent isn't visible
+      if (!document.hidden && isVisible(this._element)) {
+        this.next();
+      }
+    }
+    prev() {
+      this._slide(ORDER_PREV);
+    }
+    pause() {
+      if (this._isSliding) {
+        triggerTransitionEnd(this._element);
+      }
+      this._clearInterval();
+    }
+    cycle() {
+      this._clearInterval();
+      this._updateInterval();
+      this._interval = setInterval(() => this.nextWhenVisible(), this._config.interval);
+    }
+    _maybeEnableCycle() {
+      if (!this._config.ride) {
+        return;
+      }
+      if (this._isSliding) {
+        EventHandler.one(this._element, EVENT_SLID, () => this.cycle());
+        return;
+      }
+      this.cycle();
+    }
+    to(index) {
+      const items = this._getItems();
+      if (index > items.length - 1 || index < 0) {
+        return;
+      }
+      if (this._isSliding) {
+        EventHandler.one(this._element, EVENT_SLID, () => this.to(index));
+        return;
+      }
+      const activeIndex = this._getItemIndex(this._getActive());
+      if (activeIndex === index) {
+        return;
+      }
+      const order = index > activeIndex ? ORDER_NEXT : ORDER_PREV;
+      this._slide(order, items[index]);
+    }
+    dispose() {
+      if (this._swipeHelper) {
+        this._swipeHelper.dispose();
+      }
+      super.dispose();
+    }
+
+    // Private
+    _configAfterMerge(config) {
+      config.defaultInterval = config.interval;
+      return config;
+    }
+    _addEventListeners() {
+      if (this._config.keyboard) {
+        EventHandler.on(this._element, EVENT_KEYDOWN$5, event => this._keydown(event));
+      }
+      if (this._config.pause === 'hover') {
+        EventHandler.on(this._element, EVENT_MOUSEENTER$2, () => this.pause());
+        EventHandler.on(this._element, EVENT_MOUSELEAVE$2, () => this._maybeEnableCycle());
+      }
+      if (this._config.touch && Swipe.isSupported()) {
+        this._addTouchEventListeners();
+      }
+    }
+    _addTouchEventListeners() {
+      for (const img of SelectorEngine.find(SELECTOR_ITEM_IMG, this._element)) {
+        EventHandler.on(img, EVENT_DRAG_START, event => event.preventDefault());
+      }
+      const endCallBack = () => {
+        if (this._config.pause !== 'hover') {
+          return;
+        }
+
+        // If it's a touch-enabled device, mouseenter/leave are fired as
+        // part of the mouse compatibility events on first tap - the carousel
+        // would stop cycling until user tapped out of it;
+        // here, we listen for touchend, explicitly pause the carousel
+        // (as if it's the second time we tap on it, mouseenter compat event
+        // is NOT fired) and after a timeout (to allow for mouse compatibility
+        // events to fire) we explicitly restart cycling
+
+        this.pause();
+        if (this.touchTimeout) {
+          clearTimeout(this.touchTimeout);
+        }
+        this.touchTimeout = setTimeout(() => this._maybeEnableCycle(), TOUCHEVENT_COMPAT_WAIT + this._config.interval);
+      };
+      const swipeConfig = {
+        leftCallback: () => this._slide(this._directionToOrder(DIRECTION_LEFT)),
+        rightCallback: () => this._slide(this._directionToOrder(DIRECTION_RIGHT)),
+        endCallback: endCallBack
+      };
+      this._swipeHelper = new Swipe(this._element, swipeConfig);
+    }
+    _keydown(event) {
+      if (/input|textarea/i.test(event.target.tagName)) {
+        return;
+      }
+      const direction = KEY_TO_DIRECTION[event.key];
+      if (direction) {
+        event.preventDefault();
+        this._slide(this._directionToOrder(direction));
+      }
+    }
+    _getItemIndex(element) {
+      return this._getItems().indexOf(element);
+    }
+    _setActiveIndicatorElement(index) {
+      if (!this._indicatorsElement) {
+        return;
+      }
+      const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
+      activeIndicator.classList.remove(CLASS_NAME_ACTIVE$5);
+      activeIndicator.removeAttribute('aria-current');
+      const newActiveIndicator = SelectorEngine.findOne(`[data-coreui-slide-to="${index}"]`, this._indicatorsElement);
+      if (newActiveIndicator) {
+        newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$5);
+        newActiveIndicator.setAttribute('aria-current', 'true');
+      }
+    }
+    _updateInterval() {
+      const element = this._activeElement || this._getActive();
+      if (!element) {
+        return;
+      }
+      const elementInterval = Number.parseInt(element.getAttribute('data-coreui-interval'), 10);
+      this._config.interval = elementInterval || this._config.defaultInterval;
+    }
+    _slide(order, element = null) {
+      if (this._isSliding) {
+        return;
+      }
+      const activeElement = this._getActive();
+      const isNext = order === ORDER_NEXT;
+      const nextElement = element || getNextActiveElement(this._getItems(), activeElement, isNext, this._config.wrap);
+      if (nextElement === activeElement) {
+        return;
+      }
+      const nextElementIndex = this._getItemIndex(nextElement);
+      const triggerEvent = eventName => {
+        return EventHandler.trigger(this._element, eventName, {
+          relatedTarget: nextElement,
+          direction: this._orderToDirection(order),
+          from: this._getItemIndex(activeElement),
+          to: nextElementIndex
+        });
+      };
+      const slideEvent = triggerEvent(EVENT_SLIDE);
+      if (slideEvent.defaultPrevented) {
+        return;
+      }
+      if (!activeElement || !nextElement) {
+        // Some weirdness is happening, so we bail
+        // TODO: change tests that use empty divs to avoid this check
+        return;
+      }
+      const isCycling = Boolean(this._interval);
+      this.pause();
+      this._isSliding = true;
+      this._setActiveIndicatorElement(nextElementIndex);
+      this._activeElement = nextElement;
+      const directionalClassName = isNext ? CLASS_NAME_START : CLASS_NAME_END;
+      const orderClassName = isNext ? CLASS_NAME_NEXT : CLASS_NAME_PREV;
+      nextElement.classList.add(orderClassName);
+      reflow(nextElement);
+      activeElement.classList.add(directionalClassName);
+      nextElement.classList.add(directionalClassName);
+      const completeCallBack = () => {
+        nextElement.classList.remove(directionalClassName, orderClassName);
+        nextElement.classList.add(CLASS_NAME_ACTIVE$5);
+        activeElement.classList.remove(CLASS_NAME_ACTIVE$5, orderClassName, directionalClassName);
+        this._isSliding = false;
+        triggerEvent(EVENT_SLID);
+      };
+      this._queueCallback(completeCallBack, activeElement, this._isAnimated());
+      if (isCycling) {
+        this.cycle();
+      }
+    }
+    _isAnimated() {
+      return this._element.classList.contains(CLASS_NAME_SLIDE);
+    }
+    _getActive() {
+      return SelectorEngine.findOne(SELECTOR_ACTIVE_ITEM, this._element);
+    }
+    _getItems() {
+      return SelectorEngine.find(SELECTOR_ITEM, this._element);
+    }
+    _clearInterval() {
+      if (this._interval) {
+        clearInterval(this._interval);
+        this._interval = null;
+      }
+    }
+    _directionToOrder(direction) {
+      if (isRTL()) {
+        return direction === DIRECTION_LEFT ? ORDER_PREV : ORDER_NEXT;
+      }
+      return direction === DIRECTION_LEFT ? ORDER_NEXT : ORDER_PREV;
+    }
+    _orderToDirection(order) {
+      if (isRTL()) {
+        return order === ORDER_PREV ? DIRECTION_LEFT : DIRECTION_RIGHT;
+      }
+      return order === ORDER_PREV ? DIRECTION_RIGHT : DIRECTION_LEFT;
+    }
+
+    // Static
+    static jQueryInterface(config) {
+      return this.each(function () {
+        const data = Carousel.getOrCreateInstance(this, config);
+        if (typeof config === 'number') {
+          data.to(config);
+          return;
+        }
+        if (typeof config === 'string') {
+          if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+            throw new TypeError(`No method named "${config}"`);
+          }
+          data[config]();
+        }
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(document, EVENT_CLICK_DATA_API$e, SELECTOR_DATA_SLIDE, function (event) {
+    const target = SelectorEngine.getElementFromSelector(this);
+    if (!target || !target.classList.contains(CLASS_NAME_CAROUSEL)) {
+      return;
+    }
+    event.preventDefault();
+    const carousel = Carousel.getOrCreateInstance(target);
+    const slideIndex = this.getAttribute('data-coreui-slide-to');
+    if (slideIndex) {
+      carousel.to(slideIndex);
+      carousel._maybeEnableCycle();
+      return;
+    }
+    if (Manipulator.getDataAttribute(this, 'slide') === 'next') {
+      carousel.next();
+      carousel._maybeEnableCycle();
+      return;
+    }
+    carousel.prev();
+    carousel._maybeEnableCycle();
+  });
+  EventHandler.on(window, EVENT_LOAD_DATA_API$c, () => {
+    const carousels = SelectorEngine.find(SELECTOR_DATA_RIDE);
+    for (const carousel of carousels) {
+      Carousel.getOrCreateInstance(carousel);
+    }
+  });
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Carousel);
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI collapse.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This component is a modified version of the Bootstrap's collapse.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$m = 'collapse';
+  const DATA_KEY$i = 'coreui.collapse';
+  const EVENT_KEY$i = `.${DATA_KEY$i}`;
+  const DATA_API_KEY$e = '.data-api';
+  const EVENT_SHOW$b = `show${EVENT_KEY$i}`;
+  const EVENT_SHOWN$b = `shown${EVENT_KEY$i}`;
+  const EVENT_HIDE$b = `hide${EVENT_KEY$i}`;
+  const EVENT_HIDDEN$b = `hidden${EVENT_KEY$i}`;
+  const EVENT_CLICK_DATA_API$d = `click${EVENT_KEY$i}${DATA_API_KEY$e}`;
+  const CLASS_NAME_SHOW$e = 'show';
+  const CLASS_NAME_COLLAPSE = 'collapse';
+  const CLASS_NAME_COLLAPSING = 'collapsing';
+  const CLASS_NAME_COLLAPSED = 'collapsed';
+  const CLASS_NAME_DEEPER_CHILDREN = `:scope .${CLASS_NAME_COLLAPSE} .${CLASS_NAME_COLLAPSE}`;
+  const CLASS_NAME_HORIZONTAL = 'collapse-horizontal';
+  const WIDTH = 'width';
+  const HEIGHT = 'height';
+  const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing';
+  const SELECTOR_DATA_TOGGLE$d = '[data-coreui-toggle="collapse"]';
+  const Default$k = {
+    parent: null,
+    toggle: true
+  };
+  const DefaultType$k = {
+    parent: '(null|element)',
+    toggle: 'boolean'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class Collapse extends BaseComponent {
+    constructor(element, config) {
+      super(element, config);
+      this._isTransitioning = false;
+      this._triggerArray = [];
+      const toggleList = SelectorEngine.find(SELECTOR_DATA_TOGGLE$d);
+      for (const elem of toggleList) {
+        const selector = SelectorEngine.getSelectorFromElement(elem);
+        const filterElement = SelectorEngine.find(selector).filter(foundElement => foundElement === this._element);
+        if (selector !== null && filterElement.length) {
+          this._triggerArray.push(elem);
+        }
+      }
+      this._initializeChildren();
+      if (!this._config.parent) {
+        this._addAriaAndCollapsedClass(this._triggerArray, this._isShown());
+      }
+      if (this._config.toggle) {
+        this.toggle();
+      }
+    }
+
+    // Getters
+    static get Default() {
+      return Default$k;
+    }
+    static get DefaultType() {
+      return DefaultType$k;
+    }
+    static get NAME() {
+      return NAME$m;
+    }
+
+    // Public
+    toggle() {
+      if (this._isShown()) {
+        this.hide();
+      } else {
+        this.show();
+      }
+    }
+    show() {
+      if (this._isTransitioning || this._isShown()) {
+        return;
+      }
+      let activeChildren = [];
+
+      // find active children
+      if (this._config.parent) {
+        activeChildren = this._getFirstLevelChildren(SELECTOR_ACTIVES).filter(element => element !== this._element).map(element => Collapse.getOrCreateInstance(element, {
+          toggle: false
+        }));
+      }
+      if (activeChildren.length && activeChildren[0]._isTransitioning) {
+        return;
+      }
+      const startEvent = EventHandler.trigger(this._element, EVENT_SHOW$b);
+      if (startEvent.defaultPrevented) {
+        return;
+      }
+      for (const activeInstance of activeChildren) {
+        activeInstance.hide();
+      }
+      const dimension = this._getDimension();
+      this._element.classList.remove(CLASS_NAME_COLLAPSE);
+      this._element.classList.add(CLASS_NAME_COLLAPSING);
+      this._element.style[dimension] = 0;
+      this._addAriaAndCollapsedClass(this._triggerArray, true);
+      this._isTransitioning = true;
+      const complete = () => {
+        this._isTransitioning = false;
+        this._element.classList.remove(CLASS_NAME_COLLAPSING);
+        this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$e);
+        this._element.style[dimension] = '';
+        EventHandler.trigger(this._element, EVENT_SHOWN$b);
+      };
+      const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1);
+      const scrollSize = `scroll${capitalizedDimension}`;
+      this._queueCallback(complete, this._element, true);
+      this._element.style[dimension] = `${this._element[scrollSize]}px`;
+    }
+    hide() {
+      if (this._isTransitioning || !this._isShown()) {
+        return;
+      }
+      const startEvent = EventHandler.trigger(this._element, EVENT_HIDE$b);
+      if (startEvent.defaultPrevented) {
+        return;
+      }
+      const dimension = this._getDimension();
+      this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`;
+      reflow(this._element);
+      this._element.classList.add(CLASS_NAME_COLLAPSING);
+      this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW$e);
+      for (const trigger of this._triggerArray) {
+        const element = SelectorEngine.getElementFromSelector(trigger);
+        if (element && !this._isShown(element)) {
+          this._addAriaAndCollapsedClass([trigger], false);
+        }
+      }
+      this._isTransitioning = true;
+      const complete = () => {
+        this._isTransitioning = false;
+        this._element.classList.remove(CLASS_NAME_COLLAPSING);
+        this._element.classList.add(CLASS_NAME_COLLAPSE);
+        EventHandler.trigger(this._element, EVENT_HIDDEN$b);
+      };
+      this._element.style[dimension] = '';
+      this._queueCallback(complete, this._element, true);
+    }
+
+    // Private
+    _isShown(element = this._element) {
+      return element.classList.contains(CLASS_NAME_SHOW$e);
+    }
+    _configAfterMerge(config) {
+      config.toggle = Boolean(config.toggle); // Coerce string values
+      config.parent = getElement(config.parent);
+      return config;
+    }
+    _getDimension() {
+      return this._element.classList.contains(CLASS_NAME_HORIZONTAL) ? WIDTH : HEIGHT;
+    }
+    _initializeChildren() {
+      if (!this._config.parent) {
+        return;
+      }
+      const children = this._getFirstLevelChildren(SELECTOR_DATA_TOGGLE$d);
+      for (const element of children) {
+        const selected = SelectorEngine.getElementFromSelector(element);
+        if (selected) {
+          this._addAriaAndCollapsedClass([element], this._isShown(selected));
+        }
+      }
+    }
+    _getFirstLevelChildren(selector) {
+      const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent);
+      // remove children if greater depth
+      return SelectorEngine.find(selector, this._config.parent).filter(element => !children.includes(element));
+    }
+    _addAriaAndCollapsedClass(triggerArray, isOpen) {
+      if (!triggerArray.length) {
+        return;
+      }
+      for (const element of triggerArray) {
+        element.classList.toggle(CLASS_NAME_COLLAPSED, !isOpen);
+        element.setAttribute('aria-expanded', isOpen);
+      }
+    }
+
+    // Static
+    static jQueryInterface(config) {
+      const _config = {};
+      if (typeof config === 'string' && /show|hide/.test(config)) {
+        _config.toggle = false;
+      }
+      return this.each(function () {
+        const data = Collapse.getOrCreateInstance(this, _config);
+        if (typeof config === 'string') {
+          if (typeof data[config] === 'undefined') {
+            throw new TypeError(`No method named "${config}"`);
+          }
+          data[config]();
+        }
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(document, EVENT_CLICK_DATA_API$d, SELECTOR_DATA_TOGGLE$d, function (event) {
+    // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
+    if (event.target.tagName === 'A' || event.delegateTarget && event.delegateTarget.tagName === 'A') {
+      event.preventDefault();
+    }
+    for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
+      Collapse.getOrCreateInstance(element, {
+        toggle: false
+      }).toggle();
+    }
+  });
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(Collapse);
+
+  /**
    * Converts a 12-hour time format to a 24-hour time format.
    * @param {('am' | 'pm')} abbr The abbreviation indicating AM or PM.
    * @param {number} hour The hour to be converted.
@@ -5990,10 +6951,10 @@
           this._startDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date
-          });
         }
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          date
+        });
       });
       EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
         if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
@@ -6024,10 +6985,10 @@
           this._endDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date
-          });
         }
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          date
+        });
       });
       EventHandler.on(window, EVENT_RESIZE$4, () => {
         this._mobile = window.innerWidth < 768;
@@ -7882,6 +8843,7 @@
   const CLASS_NAME_TAG = 'form-multi-select-tag';
   const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete';
   const Default$b = {
+    allowList: DefaultAllowlist,
     ariaCleanerLabel: 'Clear all selections',
     cleaner: true,
     clearSearchOnSelect: false,
@@ -7891,10 +8853,14 @@
     multiple: true,
     name: null,
     options: false,
+    optionsGroupsTemplate: null,
     optionsMaxHeight: 'auto',
     optionsStyle: 'checkbox',
+    optionsTemplate: null,
     placeholder: 'Select...',
     required: false,
+    sanitize: true,
+    sanitizeFn: null,
     search: false,
     searchNoResultsLabel: 'No results found',
     selectAll: true,
@@ -7905,6 +8871,7 @@
     value: null
   };
   const DefaultType$b = {
+    allowList: 'object',
     ariaCleanerLabel: 'string',
     cleaner: 'boolean',
     clearSearchOnSelect: 'boolean',
@@ -7914,10 +8881,14 @@
     multiple: 'boolean',
     name: '(string|null)',
     options: '(boolean|array)',
+    optionsGroupsTemplate: '(function|null)',
     optionsMaxHeight: '(number|string)',
     optionsStyle: 'string',
+    optionsTemplate: '(function|null)',
     placeholder: 'string',
     required: 'boolean',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
     search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
@@ -8158,7 +9129,13 @@
       const _options = [];
       for (const option of options) {
         if (option.options && Array.isArray(option.options)) {
+          const customGroupProperties = {
+            ...option
+          };
+          delete customGroupProperties.label;
+          delete customGroupProperties.options;
           _options.push({
+            ...customGroupProperties,
             label: option.label,
             options: this._getOptionsFromConfig(option.options)
           });
@@ -8166,8 +9143,14 @@
         }
         const value = String(option.value);
         const isSelected = option.selected || this._config.value && this._config.value.includes(value);
+        const customProperties = typeof option === 'object' ? {
+          ...option
+        } : {};
+        delete customProperties.value;
+        delete customProperties.selected;
+        delete customProperties.disabled;
         _options.push({
-          ...option,
+          ...customProperties,
           value,
           ...(isSelected && {
             selected: true
@@ -8392,14 +9375,22 @@
           }
           optionDiv.dataset.value = String(option.value);
           optionDiv.tabIndex = 0;
-          optionDiv.innerHTML = option.text;
+          if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+            optionDiv.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
+          } else {
+            optionDiv.textContent = option.text;
+          }
           parentElement.append(optionDiv);
         }
         if (typeof option.label !== 'undefined') {
           const optgroup = document.createElement('div');
           optgroup.classList.add(CLASS_NAME_OPTGROUP);
           const optgrouplabel = document.createElement('div');
-          optgrouplabel.innerHTML = option.label;
+          if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
+            optgrouplabel.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsGroupsTemplate(option);
+          } else {
+            optgrouplabel.textContent = option.label;
+          }
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
           optgroup.append(optgrouplabel);
           this._createOptions(optgroup, option.options);
@@ -8428,8 +9419,14 @@
       return tag;
     }
     _onOptionsClick(element) {
-      if (!element.classList.contains(CLASS_NAME_OPTION) || element.classList.contains(CLASS_NAME_LABEL)) {
+      if (element.classList.contains(CLASS_NAME_LABEL)) {
         return;
+      }
+      if (!element.classList.contains(CLASS_NAME_OPTION)) {
+        element = element.closest(SELECTOR_OPTION);
+        if (!element) {
+          return;
+        }
       }
       const value = String(element.dataset.value);
       const {
@@ -9290,104 +10287,6 @@
 
   /**
    * --------------------------------------------------------------------------
-   * CoreUI util/sanitizer.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This is a modified version of the Bootstrap's util/sanitizer.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  // js-docs-start allow-list
-  const ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i;
-  const DefaultAllowlist = {
-    // Global attributes allowed on any supplied element below.
-    '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
-    a: ['target', 'href', 'title', 'rel'],
-    area: [],
-    b: [],
-    br: [],
-    col: [],
-    code: [],
-    dd: [],
-    div: [],
-    dl: [],
-    dt: [],
-    em: [],
-    hr: [],
-    h1: [],
-    h2: [],
-    h3: [],
-    h4: [],
-    h5: [],
-    h6: [],
-    i: [],
-    img: ['src', 'srcset', 'alt', 'title', 'width', 'height'],
-    li: [],
-    ol: [],
-    p: [],
-    pre: [],
-    s: [],
-    small: [],
-    span: [],
-    sub: [],
-    sup: [],
-    strong: [],
-    u: [],
-    ul: []
-  };
-  // js-docs-end allow-list
-
-  const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longdesc', 'poster', 'src', 'xlink:href']);
-
-  /**
-   * A pattern that recognizes URLs that are safe wrt. XSS in URL navigation
-   * contexts.
-   *
-   * Shout-out to Angular https://github.com/angular/angular/blob/15.2.8/packages/core/src/sanitization/url_sanitizer.ts#L38
-   */
-  const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i;
-  const allowedAttribute = (attribute, allowedAttributeList) => {
-    const attributeName = attribute.nodeName.toLowerCase();
-    if (allowedAttributeList.includes(attributeName)) {
-      if (uriAttributes.has(attributeName)) {
-        return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue));
-      }
-      return true;
-    }
-
-    // Check if a regular expression validates the attribute.
-    return allowedAttributeList.filter(attributeRegex => attributeRegex instanceof RegExp).some(regex => regex.test(attributeName));
-  };
-  function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
-    if (!unsafeHtml.length) {
-      return unsafeHtml;
-    }
-    if (sanitizeFunction && typeof sanitizeFunction === 'function') {
-      return sanitizeFunction(unsafeHtml);
-    }
-    const domParser = new window.DOMParser();
-    const createdDocument = domParser.parseFromString(unsafeHtml, 'text/html');
-    const elements = [].concat(...createdDocument.body.querySelectorAll('*'));
-    for (const element of elements) {
-      const elementName = element.nodeName.toLowerCase();
-      if (!Object.keys(allowList).includes(elementName)) {
-        element.remove();
-        continue;
-      }
-      const attributeList = [].concat(...element.attributes);
-      const allowedAttributes = [].concat(allowList['*'] || [], allowList[elementName] || []);
-      for (const attribute of attributeList) {
-        if (!allowedAttribute(attribute, allowedAttributes)) {
-          element.removeAttribute(attribute.nodeName);
-        }
-      }
-    }
-    return createdDocument.body.innerHTML;
-  }
-
-  /**
-   * --------------------------------------------------------------------------
    * CoreUI util/template-factory.js
    * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
    *
@@ -9895,6 +10794,7 @@
         if (trigger === 'click') {
           EventHandler.on(this._element, this.constructor.eventName(EVENT_CLICK$2), this._config.selector, event => {
             const context = this._initializeOnDelegatedTarget(event);
+            context._activeTrigger[TRIGGER_CLICK] = !(context._isShown() && context._activeTrigger[TRIGGER_CLICK]);
             context.toggle();
           });
         } else if (trigger !== TRIGGER_MANUAL) {
@@ -12673,6 +13573,7 @@
 
   const index_umd = {
     Alert,
+    Autocomplete,
     Button,
     Calendar,
     Carousel,

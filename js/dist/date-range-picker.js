@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.15.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -337,10 +337,10 @@
           this._startDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date
-          });
         }
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          date
+        });
       });
       EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
         if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
@@ -371,10 +371,10 @@
           this._endDate = date;
           this._calendarDate = date;
           this._calendar.update(this._getCalendarConfig());
-          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date
-          });
         }
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          date
+        });
       });
       EventHandler.on(window, EVENT_RESIZE, () => {
         this._mobile = window.innerWidth < 768;

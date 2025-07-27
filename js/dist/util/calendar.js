@@ -1,5 +1,5 @@
 /*!
-  * CoreUI calendar.js v5.15.0 (https://coreui.io)
+  * CoreUI calendar.js v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -89,7 +89,11 @@
       return null;
     }
     if (selectionType === 'week') {
-      return `${date.getFullYear()}W${getWeekNumber(date)}`;
+      const {
+        year,
+        weekNumber
+      } = getISOWeekNumberAndYear(date);
+      return `${year}W${weekNumber.toString().padStart(2, '0')}`;
     }
     if (selectionType === 'month') {
       const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
@@ -231,11 +235,19 @@
   };
 
   /**
-   * Calculates the ISO week number for a given date.
-   * @param date - The date to calculate the week number for.
-   * @returns The ISO week number.
+   * Calculates the ISO 8601 week number and year for a given date.
+   *
+   * In the ISO 8601 standard:
+   * - Weeks start on Monday.
+   * - The first week of the year is the one that contains January 4th.
+   * - The year of the week may differ from the calendar year (e.g., Dec 29, 2025 is in ISO year 2026).
+   *
+   * @param {Date} date - The date for which to calculate the ISO week number and year.
+   * @returns {{ weekNumber: number, year: number }} An object containing:
+   *   - `weekNumber`: the ISO week number (1–53),
+   *   - `year`: the ISO year (may differ from the calendar year of the date).
    */
-  const getWeekNumber = date => {
+  const getISOWeekNumberAndYear = date => {
     const tempDate = new Date(date);
     tempDate.setHours(0, 0, 0, 0);
 
@@ -245,7 +257,10 @@
 
     // Calculate full weeks to the date
     const weekNumber = 1 + Math.round((tempDate.getTime() - week1.getTime()) / 86400000 / 7);
-    return weekNumber;
+    return {
+      weekNumber,
+      year: tempDate.getFullYear()
+    };
   };
 
   /**
@@ -264,11 +279,22 @@
     for (const [index, day] of days.entries()) {
       if (index % 7 === 0 || weeks.length === 0) {
         weeks.push({
+          week: {
+            number: 0,
+            year: 0
+          },
           days: []
         });
       }
       if ((index + 1) % 7 === 0) {
-        weeks[weeks.length - 1].weekNumber = getWeekNumber(day.date);
+        const {
+          weekNumber,
+          year
+        } = getISOWeekNumberAndYear(day.date);
+        weeks[weeks.length - 1].week = {
+          number: weekNumber,
+          year
+        };
       }
       weeks[weeks.length - 1].days.push(day);
     }
@@ -566,10 +592,10 @@
   exports.getCalendarDate = getCalendarDate;
   exports.getDateBySelectionType = getDateBySelectionType;
   exports.getFirstAvailableDateInRange = getFirstAvailableDateInRange;
+  exports.getISOWeekNumberAndYear = getISOWeekNumberAndYear;
   exports.getMonthDetails = getMonthDetails;
   exports.getMonthsNames = getMonthsNames;
   exports.getSelectableDates = getSelectableDates;
-  exports.getWeekNumber = getWeekNumber;
   exports.getYears = getYears;
   exports.isDateDisabled = isDateDisabled;
   exports.isDateInRange = isDateInRange;

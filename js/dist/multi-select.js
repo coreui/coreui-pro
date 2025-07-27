@@ -1,13 +1,13 @@
 /*!
-  * CoreUI multi-select.js v5.15.0 (https://coreui.io)
+  * CoreUI multi-select.js v5.16.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/data', './dom/event-handler', './dom/selector-engine', './util/index'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global["@popperjs/core"], global.BaseComponent, global.Data, global.EventHandler, global.SelectorEngine, global.Index));
-})(this, (function (Popper, BaseComponent, Data, EventHandler, SelectorEngine, index_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/data.js'), require('./dom/event-handler.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/data', './dom/event-handler', './dom/selector-engine', './util/sanitizer', './util/index'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.MultiSelect = factory(global["@popperjs/core"], global.BaseComponent, global.Data, global.EventHandler, global.SelectorEngine, global.Sanitizer, global.Index));
+})(this, (function (Popper, BaseComponent, Data, EventHandler, SelectorEngine, sanitizer_js, index_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -97,6 +97,7 @@
   const CLASS_NAME_TAG = 'form-multi-select-tag';
   const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete';
   const Default = {
+    allowList: sanitizer_js.DefaultAllowlist,
     ariaCleanerLabel: 'Clear all selections',
     cleaner: true,
     clearSearchOnSelect: false,
@@ -106,10 +107,14 @@
     multiple: true,
     name: null,
     options: false,
+    optionsGroupsTemplate: null,
     optionsMaxHeight: 'auto',
     optionsStyle: 'checkbox',
+    optionsTemplate: null,
     placeholder: 'Select...',
     required: false,
+    sanitize: true,
+    sanitizeFn: null,
     search: false,
     searchNoResultsLabel: 'No results found',
     selectAll: true,
@@ -120,6 +125,7 @@
     value: null
   };
   const DefaultType = {
+    allowList: 'object',
     ariaCleanerLabel: 'string',
     cleaner: 'boolean',
     clearSearchOnSelect: 'boolean',
@@ -129,10 +135,14 @@
     multiple: 'boolean',
     name: '(string|null)',
     options: '(boolean|array)',
+    optionsGroupsTemplate: '(function|null)',
     optionsMaxHeight: '(number|string)',
     optionsStyle: 'string',
+    optionsTemplate: '(function|null)',
     placeholder: 'string',
     required: 'boolean',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
     search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
@@ -373,7 +383,13 @@
       const _options = [];
       for (const option of options) {
         if (option.options && Array.isArray(option.options)) {
+          const customGroupProperties = {
+            ...option
+          };
+          delete customGroupProperties.label;
+          delete customGroupProperties.options;
           _options.push({
+            ...customGroupProperties,
             label: option.label,
             options: this._getOptionsFromConfig(option.options)
           });
@@ -381,8 +397,14 @@
         }
         const value = String(option.value);
         const isSelected = option.selected || this._config.value && this._config.value.includes(value);
+        const customProperties = typeof option === 'object' ? {
+          ...option
+        } : {};
+        delete customProperties.value;
+        delete customProperties.selected;
+        delete customProperties.disabled;
         _options.push({
-          ...option,
+          ...customProperties,
           value,
           ...(isSelected && {
             selected: true
@@ -607,14 +629,22 @@
           }
           optionDiv.dataset.value = String(option.value);
           optionDiv.tabIndex = 0;
-          optionDiv.innerHTML = option.text;
+          if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+            optionDiv.innerHTML = this._config.sanitize ? sanitizer_js.sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
+          } else {
+            optionDiv.textContent = option.text;
+          }
           parentElement.append(optionDiv);
         }
         if (typeof option.label !== 'undefined') {
           const optgroup = document.createElement('div');
           optgroup.classList.add(CLASS_NAME_OPTGROUP);
           const optgrouplabel = document.createElement('div');
-          optgrouplabel.innerHTML = option.label;
+          if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
+            optgrouplabel.innerHTML = this._config.sanitize ? sanitizer_js.sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsGroupsTemplate(option);
+          } else {
+            optgrouplabel.textContent = option.label;
+          }
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
           optgroup.append(optgrouplabel);
           this._createOptions(optgroup, option.options);
@@ -643,8 +673,14 @@
       return tag;
     }
     _onOptionsClick(element) {
-      if (!element.classList.contains(CLASS_NAME_OPTION) || element.classList.contains(CLASS_NAME_LABEL)) {
+      if (element.classList.contains(CLASS_NAME_LABEL)) {
         return;
+      }
+      if (!element.classList.contains(CLASS_NAME_OPTION)) {
+        element = element.closest(SELECTOR_OPTION);
+        if (!element) {
+          return;
+        }
       }
       const value = String(element.dataset.value);
       const {

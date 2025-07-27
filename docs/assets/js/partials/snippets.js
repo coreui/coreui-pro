@@ -799,6 +799,11 @@ export default () => {
     }
 
     new coreui.DateRangePicker(myDateRangePickerCustomRanges, optionsCustomRanges)
+
+    myDateRangePickerCustomRanges.addEventListener('startDateChange.coreui.date-range-picker', event => {
+      // eslint-disable-next-line no-console
+      console.log(event.date)
+    })
   }
   // js-docs-end date-range-picker-custom-ranges
 
