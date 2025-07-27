@@ -374,7 +374,6 @@ class Autocomplete extends BaseComponent {
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
       event.preventDefault()
-      // event.stopPropagation()
       this.toggle()
     })
 
