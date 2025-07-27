@@ -7,11 +7,11 @@ import {
   getCalendarDate,
   getDateBySelectionType,
   getFirstAvailableDateInRange,
+  getISOWeekNumberAndYear,
   getMonthsNames,
   getSelectableDates,
   getYears,
   getMonthDetails,
-  getWeekNumber,
   isDateDisabled,
   isDateInRange,
   isDateSelected,
@@ -266,21 +266,21 @@ describe('Calendar Utilities', () => {
     })
   })
 
-  describe('getWeekNumber', () => {
+  describe('getISOWeekNumberAndYear', () => {
     it('should return correct ISO week number', () => {
       // 2023-01-01 is a Sunday => last week of 2022 in ISO
       const date = new Date(2023, 0, 1)
-      const weekNum = getWeekNumber(date)
+      const week = getISOWeekNumberAndYear(date)
       // The ISO week for Sunday 2023-01-01 is typically 52 or 52/53 from the previous year
       // We'll just ensure it's not 1
-      expect(weekNum).not.toBe(1)
+      expect(week.weekNumber).not.toBe(1)
     })
 
     it('should properly handle mid-year dates', () => {
       // Monday 2023-06-05 => ISO week 23
       const date = new Date(2023, 5, 5)
-      const weekNum = getWeekNumber(date)
-      expect(weekNum).toBe(23)
+      const week = getISOWeekNumberAndYear(date)
+      expect(week.weekNumber).toBe(23)
     })
   })
 

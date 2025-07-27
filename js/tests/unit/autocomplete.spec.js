@@ -105,8 +105,8 @@ describe('Autocomplete', () => {
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, { cleaner: true, options: [] })
 
-      expect(autocomplete._selectionCleanerElement).toBeTruthy()
-      expect(autocomplete._selectionCleanerElement.classList.contains('autocomplete-cleaner')).toBe(true)
+      expect(autocomplete._cleanerElement).toBeTruthy()
+      expect(autocomplete._cleanerElement.classList.contains('autocomplete-cleaner')).toBe(true)
     })
 
     it('should create autocomplete with indicator button when indicator option is true', () => {
@@ -173,7 +173,7 @@ describe('Autocomplete', () => {
         autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
           expect(autocomplete._isShown()).toBe(true)
           expect(autocompleteEl.classList.contains('show')).toBe(true)
-          expect(autocompleteEl.getAttribute('aria-expanded')).toBe('true')
+          expect(autocomplete._inputElement.getAttribute('aria-expanded')).toBe('true')
           resolve()
         })
 
@@ -252,7 +252,7 @@ describe('Autocomplete', () => {
         autocompleteEl.addEventListener('hidden.coreui.autocomplete', () => {
           expect(autocomplete._isShown()).toBe(false)
           expect(autocompleteEl.classList.contains('show')).toBe(false)
-          expect(autocompleteEl.getAttribute('aria-expanded')).toBe('false')
+          expect(autocomplete._inputElement.getAttribute('aria-expanded')).toBe('false')
           resolve()
         })
 
@@ -776,7 +776,7 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.value = 'test'
       autocomplete._selected.push({ label: 'Option 1', value: '1' })
 
-      autocomplete._selectionCleanerElement.click()
+      autocomplete._cleanerElement.click()
 
       expect(autocomplete._inputElement.value).toBe('')
       expect(autocomplete._selected).toEqual([])
@@ -791,9 +791,9 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._selected.push({ label: 'Option 1', value: '1' })
-      autocomplete._updateSelectionCleaner()
+      autocomplete._updateCleaner()
 
-      expect(autocomplete._selectionCleanerElement.style.display).not.toBe('none')
+      expect(autocomplete._cleanerElement.style.display).not.toBe('none')
     })
 
     it('should hide cleaner button when there are no selections', () => {
@@ -805,9 +805,9 @@ describe('Autocomplete', () => {
       })
 
       autocomplete._selected = []
-      autocomplete._updateSelectionCleaner()
+      autocomplete._updateCleaner()
 
-      expect(autocomplete._selectionCleanerElement.style.display).toBe('none')
+      expect(autocomplete._cleanerElement.style.display).toBe('none')
     })
   })
 
