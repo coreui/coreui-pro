@@ -6,6 +6,7 @@
  */
 
 import Alert from './src/alert.js'
+import Autocomplete from './src/autocomplete.js'
 import Button from './src/button.js'
 import Calendar from './src/calendar.js'
 import Carousel from './src/carousel.js'
@@ -32,6 +33,7 @@ import Tooltip from './src/tooltip.js'
 
 export default {
   Alert,
+  Autocomplete,
   Button,
   Calendar,
   Carousel,

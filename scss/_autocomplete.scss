@@ -1,0 +1,353 @@
+@use "functions/escape-svg" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/elevation" as *;
+@use "mixins/transition" as *;
+@use "vendor/rfs" as *;
+@use "variables" as *;
+
+
+.autocomplete,
+*:not(.autocomplete) > .autocomplete-dropdown {
+  // scss-docs-start autocomplete-css-vars
+  --#{$prefix}autocomplete-zindex: #{$autocomplete-zindex};
+  --#{$prefix}autocomplete-font-family: #{$autocomplete-font-family};
+  --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size};
+  --#{$prefix}autocomplete-font-weight: #{$autocomplete-font-weight};
+  --#{$prefix}autocomplete-line-height: #{$autocomplete-line-height};
+  --#{$prefix}autocomplete-color: #{$autocomplete-color};
+  --#{$prefix}autocomplete-bg: #{$autocomplete-bg};
+  --#{$prefix}autocomplete-box-shadow: #{$autocomplete-box-shadow};
+  --#{$prefix}autocomplete-border-width: #{$autocomplete-border-width};
+  --#{$prefix}autocomplete-border-color: #{$autocomplete-border-color};
+  --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius};
+  --#{$prefix}autocomplete-disabled-color: #{$autocomplete-disabled-color};
+  --#{$prefix}autocomplete-disabled-bg: #{$autocomplete-disabled-bg};
+  --#{$prefix}autocomplete-disabled-border-color: #{$autocomplete-disabled-border-color};
+  --#{$prefix}autocomplete-focus-color: #{$autocomplete-focus-color};
+  --#{$prefix}autocomplete-focus-bg: #{$autocomplete-focus-bg};
+  --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-focus-border-color};
+  --#{$prefix}autocomplete-focus-box-shadow: #{$autocomplete-focus-box-shadow};
+  --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color};
+  --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y};
+  --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x};
+  --#{$prefix}autocomplete-cleaner-width: #{$autocomplete-cleaner-width};
+  --#{$prefix}autocomplete-cleaner-height: #{$autocomplete-cleaner-height};
+  --#{$prefix}autocomplete-cleaner-padding-y: #{$autocomplete-cleaner-padding-y};
+  --#{$prefix}autocomplete-cleaner-padding-x: #{$autocomplete-cleaner-padding-x};
+  --#{$prefix}autocomplete-cleaner-icon: #{escape-svg($autocomplete-cleaner-icon)};
+  --#{$prefix}autocomplete-cleaner-icon-color: #{$autocomplete-cleaner-icon-color};
+  --#{$prefix}autocomplete-cleaner-icon-hover-color: #{$autocomplete-cleaner-icon-hover-color};
+  --#{$prefix}autocomplete-cleaner-icon-size: #{$autocomplete-cleaner-icon-size};
+  --#{$prefix}autocomplete-indicator-width: #{$autocomplete-indicator-width};
+  --#{$prefix}autocomplete-indicator-height: #{$autocomplete-indicator-height};
+  --#{$prefix}autocomplete-indicator-padding-y: #{$autocomplete-indicator-padding-y};
+  --#{$prefix}autocomplete-indicator-padding-x: #{$autocomplete-indicator-padding-x};
+  --#{$prefix}autocomplete-indicator-icon: #{escape-svg($autocomplete-indicator-icon)};
+  --#{$prefix}autocomplete-indicator-icon-color: #{$autocomplete-indicator-icon-color};
+  --#{$prefix}autocomplete-indicator-icon-hover-color: #{$autocomplete-indicator-icon-hover-color};
+  --#{$prefix}autocomplete-indicator-icon-size: #{$autocomplete-indicator-icon-size};
+  --#{$prefix}autocomplete-dropdown-min-width: #{$autocomplete-dropdown-min-width};
+  --#{$prefix}autocomplete-dropdown-bg: #{$autocomplete-dropdown-bg};
+  --#{$prefix}autocomplete-dropdown-border-width: #{$autocomplete-dropdown-border-width};
+  --#{$prefix}autocomplete-dropdown-border-color: #{$autocomplete-dropdown-border-color};
+  --#{$prefix}autocomplete-dropdown-border-radius: #{$autocomplete-dropdown-border-radius};
+  --#{$prefix}autocomplete-dropdown-box-shadow: #{$autocomplete-dropdown-box-shadow};
+  --#{$prefix}autocomplete-options-padding-y: #{$autocomplete-options-padding-y};
+  --#{$prefix}autocomplete-options-padding-x: #{$autocomplete-options-padding-x};
+  --#{$prefix}autocomplete-options-font-size: #{$autocomplete-options-font-size};
+  --#{$prefix}autocomplete-options-font-weight: #{$autocomplete-options-font-weight};
+  --#{$prefix}autocomplete-options-color: #{$autocomplete-options-color};
+  --#{$prefix}autocomplete-optgroup-label-padding-y: #{$autocomplete-optgroup-label-padding-y};
+  --#{$prefix}autocomplete-optgroup-label-padding-x: #{$autocomplete-optgroup-label-padding-x};
+  --#{$prefix}autocomplete-optgroup-label-font-size: #{$autocomplete-optgroup-label-font-size};
+  --#{$prefix}autocomplete-optgroup-label-font-weight: #{$autocomplete-optgroup-label-font-weight};
+  --#{$prefix}autocomplete-optgroup-label-color: #{$autocomplete-optgroup-label-color};
+  --#{$prefix}autocomplete-optgroup-label-text-transform: #{$autocomplete-optgroup-label-text-transform};
+  --#{$prefix}autocomplete-option-padding-y: #{$autocomplete-option-padding-y};
+  --#{$prefix}autocomplete-option-padding-x: #{$autocomplete-option-padding-x};
+  --#{$prefix}autocomplete-option-margin-y: #{$autocomplete-option-margin-y};
+  --#{$prefix}autocomplete-option-margin-x: #{$autocomplete-option-margin-x};
+  --#{$prefix}autocomplete-option-border-width: #{$autocomplete-option-border-width};
+  --#{$prefix}autocomplete-option-border-color: #{$autocomplete-option-border-color};
+  --#{$prefix}autocomplete-option-border-radius: #{$autocomplete-option-border-radius};
+  --#{$prefix}autocomplete-option-box-shadow: #{$autocomplete-option-box-shadow};
+  --#{$prefix}autocomplete-option-hover-color: #{$autocomplete-option-hover-color};
+  --#{$prefix}autocomplete-option-hover-bg: #{$autocomplete-option-hover-bg};
+  --#{$prefix}autocomplete-option-focus-box-shadow: #{$autocomplete-option-focus-box-shadow};
+  --#{$prefix}autocomplete-option-disabled-color: #{$autocomplete-option-disabled-color};
+  --#{$prefix}autocomplete-option-indicator-width: #{$autocomplete-option-indicator-width};
+  --#{$prefix}autocomplete-option-indicator-bg: #{$autocomplete-option-indicator-bg};
+  --#{$prefix}autocomplete-option-indicator-border: #{$autocomplete-option-indicator-border};
+  --#{$prefix}autocomplete-option-indicator-border-radius: #{$autocomplete-option-indicator-border-radius};
+  --#{$prefix}autocomplete-option-selected-bg: #{$autocomplete-option-selected-bg};
+  --#{$prefix}autocomplete-option-selected-indicator-bg: #{$autocomplete-option-selected-indicator-bg};
+  --#{$prefix}autocomplete-option-selected-indicator-bg-image: #{escape-svg($autocomplete-option-selected-indicator-bg-image)};
+  --#{$prefix}autocomplete-option-selected-indicator-border-color: #{$autocomplete-option-selected-indicator-border-color};
+  // scss-docs-end autocomplete-css-vars
+
+  position: relative;
+
+  .was-validated .autocomplete:invalid + &,
+  &.is-invalid {
+    $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($autocomplete-invalid-border-color, $input-btn-focus-color-opacity);
+
+    --#{$prefix}autocomplete-border-color: #{$autocomplete-invalid-border-color};
+    --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-invalid-border-color};
+    --#{$prefix}autocomplete-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+
+  }
+
+  .was-validated .autocomplete:valid + &,
+  &.is-valid {
+    $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($autocomplete-valid-border-color, $input-btn-focus-color-opacity);
+
+    --#{$prefix}autocomplete-border-color: #{$autocomplete-valid-border-color};
+    --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-valid-border-color};
+    --#{$prefix}autocomplete-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+  }
+}
+
+.autocomplete-input-group {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+  background-color: var(--#{$prefix}autocomplete-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}autocomplete-border-width) solid var(--#{$prefix}autocomplete-border-color);
+  @include border-radius(var(--#{$prefix}autocomplete-border-radius));
+
+  .autocomplete & {
+    @include transition($input-transition);
+  }
+
+  .autocomplete.disabled & {
+    background-color: var(--#{$prefix}autocomplete-disabled-bg);
+    border-color: $input-disabled-border-color;
+  }
+
+  .autocomplete.show &,
+  &:has(*:focus),
+  &:focus {
+    background-color: var(--#{$prefix}autocomplete-focus-bg);
+    border-color: var(--#{$prefix}autocomplete-focus-border-color);
+    @if $enable-shadows {
+      box-shadow: var(--#{$prefix}autocomplete-box-shadow), var(--#{$prefix}autocomplete-focus-box-shadow);
+    } @else {
+      box-shadow: var(--#{$prefix}autocomplete-focus-box-shadow);
+    }
+  }
+}
+
+.autocomplete-input {
+  position: relative;
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+  padding: var(--#{$prefix}autocomplete-padding-y) var(--#{$prefix}autocomplete-padding-x);
+  font-family: var(--#{$prefix}autocomplete-font-family);
+  @include font-size(var(--#{$prefix}autocomplete-font-size));
+  font-weight: var(--#{$prefix}autocomplete-font-weight);
+  line-height: var(--#{$prefix}autocomplete-line-height);
+  color: var(--#{$prefix}autocomplete-color);
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+
+  .autocomplete.show & {
+    color: var(--#{$prefix}autocomplete-focus-color);
+  }
+
+  &:disabled {
+    color: var(--#{$prefix}autocomplete-disabled-color);
+  }
+
+  &:focus {
+    color: var(--#{$prefix}autocomplete-focus-color);
+    outline: 0;
+  }
+
+  &::placeholder {
+    color: var(--#{$prefix}autocomplete-placeholder-color);
+    opacity: 1;
+  }
+}
+
+.autocomplete-input-hint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: .5;
+}
+
+.autocomplete-buttons {
+  display: flex;
+  align-items: center;
+  min-height: calc(2 * var(--#{$prefix}autocomplete-padding-y) + calc(var(--#{$prefix}autocomplete-font-size) * var(--#{$prefix}autocomplete-line-height)));  // stylelint-disable-line function-disallowed-list
+  padding: 0 var(--#{$prefix}autocomplete-padding-y);
+}
+
+.autocomplete-cleaner,
+.autocomplete-indicator {
+  position: relative;
+  z-index: 2;
+  box-sizing: content-box;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: 0;
+
+  &:focus {
+    z-index: 5;
+    outline: 0;
+    box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+    @include border-radius($border-radius);
+  }
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+  }
+}
+
+.autocomplete-cleaner {
+  width: var(--#{$prefix}autocomplete-cleaner-width);
+  height: var(--#{$prefix}autocomplete-cleaner-height);
+  padding: var(--#{$prefix}autocomplete-cleaner-padding-y) var(--#{$prefix}autocomplete-cleaner-padding-x);
+
+  &::before {
+    background-color: var(--#{$prefix}autocomplete-cleaner-icon-color);
+    mask: var(--#{$prefix}autocomplete-cleaner-icon) center / var(--#{$prefix}autocomplete-cleaner-icon-size) no-repeat;
+  }
+
+  &:focus::before,
+  &:hover::before {
+    background-color: var(--#{$prefix}autocomplete-cleaner-icon-hover-color);
+  }
+}
+
+.autocomplete-indicator {
+  width: var(--#{$prefix}autocomplete-indicator-width);
+  height: var(--#{$prefix}autocomplete-indicator-height);
+  padding: var(--#{$prefix}autocomplete-indicator-padding-y) var(--#{$prefix}autocomplete-indicator-padding-x);
+  @include transition(transform .15s ease-in-out);
+
+  &::before {
+    background-color: var(--#{$prefix}autocomplete-indicator-icon-color);
+    mask: var(--#{$prefix}autocomplete-indicator-icon) center / var(--#{$prefix}autocomplete-indicator-icon-size) no-repeat;
+  }
+
+  &:focus::before,
+  &:hover::before {
+    background-color: var(--#{$prefix}autocomplete-indicator-icon-hover-color);
+  }
+
+  .autocomplete.show & {
+    transform: rotate(180deg);
+  }
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  z-index: var(--#{$prefix}autocomplete-zindex);
+  display: none; // none by default, but block on "open" of the menu
+  min-width: var(--#{$prefix}autocomplete-dropdown-min-width);
+  background-color: var(--#{$prefix}autocomplete-dropdown-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}autocomplete-dropdown-border-width) solid var(--#{$prefix}autocomplete-dropdown-border-color);
+  @include border-radius(var(--#{$prefix}autocomplete-dropdown-border-radius));
+  @include box-shadow(var(--#{$prefix}autocomplete-dropdown-box-shadow));
+  @include elevation(4);
+
+  .autocomplete.show &,
+  &.show {
+    display: block;
+  }
+}
+
+.autocomplete-options {
+  padding: var(--#{$prefix}autocomplete-options-padding-y) var(--#{$prefix}autocomplete-options-padding-x);
+  font-size: var(--#{$prefix}autocomplete-options-font-size);
+  font-weight: var(--#{$prefix}autocomplete-options-font-weight);
+  color: var(--#{$prefix}autocomplete-options-color);
+}
+
+.autocomplete-option {
+  position: relative;
+  z-index: 2;
+  padding: var(--#{$prefix}autocomplete-option-padding-y) var(--#{$prefix}autocomplete-option-padding-x);
+  margin: var(--#{$prefix}autocomplete-option-margin-y) var(--#{$prefix}autocomplete-option-margin-x);
+  cursor: pointer;
+  border: var(--#{$prefix}autocomplete-option-border-width) solid var(--#{$prefix}autocomplete-option-border-color);
+  @include border-radius(var(--#{$prefix}autocomplete-option-border-radius), 0);
+
+  &:hover,
+  &:focus {
+    color: var(--#{$prefix}autocomplete-option-hover-color);
+    text-decoration: none;
+    background-color: var(--#{$prefix}autocomplete-option-hover-bg);
+  }
+
+  &:focus {
+    z-index: 5;
+    border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+    outline: 0;
+    @if $enable-shadows {
+      box-shadow: var(--#{$prefix}autocomplete-box-shadow), var(--#{$prefix}autocomplete-focus-box-shadow);
+    } @else {
+      box-shadow: var(--#{$prefix}autocomplete-focus-box-shadow);
+    }
+  }
+
+  &.disabled {
+    color: var(--#{$prefix}autocomplete-option-disabled-color);
+    pointer-events: none;
+    background-color: transparent;
+  }
+
+  &.selected {
+    background-color: var(--#{$prefix}autocomplete-option-selected-bg);
+
+    &::before {
+      background-color: var(--#{$prefix}autocomplete-option-selected-indicator-bg);
+      background-image: var(--#{$prefix}autocomplete-option-selected-indicator-bg-image);
+      border-color: var(--#{$prefix}autocomplete-option-selected-indicator-border-color);
+    }
+  }
+}
+
+.autocomplete-optgroup-label {
+  padding: var(--#{$prefix}autocomplete-options-padding-y) var(--#{$prefix}autocomplete-options-padding-x);
+  font-size: var(--#{$prefix}autocomplete-optgroup-label-font-size);
+  font-weight: var(--#{$prefix}autocomplete-optgroup-label-font-weight);
+  color: var(--#{$prefix}autocomplete-optgroup-label-color);
+  text-transform: var(--#{$prefix}autocomplete-optgroup-label-text-transform);
+}
+
+.autocomplete-options-empty {
+  padding: var(--#{$prefix}autocomplete-option-padding-y) var(--#{$prefix}autocomplete-option-padding-x);
+}
+
+
+.autocomplete-sm {
+  --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y-sm};
+  --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x-sm};
+  --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size-sm};
+  --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius-sm};
+}
+
+.autocomplete-lg {
+  --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y-lg};
+  --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x-lg};
+  --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size-lg};
+  --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius-lg};
+}

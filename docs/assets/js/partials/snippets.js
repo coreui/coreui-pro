@@ -168,6 +168,224 @@ export default () => {
   }
 
   // -------------------------------
+  // Aurocomplete
+  // -------------------------------
+  // 'Autocomplete components' example in docs only
+  // js-docs-start autocomplete-array-data
+  const myAutoComplete = document.getElementById('myAutoComplete')
+
+  if (myAutoComplete) {
+    new coreui.Autocomplete(myAutoComplete, {
+      name: 'autocomplete',
+      options: [
+        'Angular',
+        'Bootstrap',
+        {
+          label: 'React.js',
+          disabled: true
+        },
+        'Vue.js',
+        {
+          label: 'backend',
+          options: ['Django', 'Laravel', 'Node.js']
+        }
+      ],
+      value: 'Laravel'
+    })
+  }
+  // js-docs-end autocomplete-array-data
+
+  // js-docs-start autocomplete-grouped-data
+  const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')
+
+  if (myAutoCompleteGrouped) {
+    new coreui.Autocomplete(myAutoCompleteGrouped, {
+      name: 'autocomplete-grouped',
+      options: [
+        'Angular',
+        {
+          label: 'Bootstrap',
+          selected: true
+        },
+        {
+          label: 'React.js',
+          disabled: true
+        },
+        'Vue.js',
+        {
+          label: 'backend',
+          options: ['Django', 'Laravel', 'Node.js']
+        }
+      ]
+    })
+  }
+  // js-docs-end autocomplete-grouped-data
+
+  // js-docs-start autocomplete-external-data
+  const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExternalData')
+
+  if (myAutoCompleteExternalData) {
+    const getUsers = async (name = '') => {
+      try {
+        const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${name}&limit=10`)
+        const users = await response.json()
+
+        return users.records.map(user => ({
+          value: user.id,
+          label: user.first_name
+        }))
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching users:', error)
+      }
+    }
+
+    const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {
+      cleaner: true,
+      highlightOptionsOnSearch: true,
+      name: 'autocomplete-external',
+      options: [],
+      placeholder: 'Search names...',
+      search: ['external', 'global'], // 🔴 'external' is required for external search
+      showHints: true
+    })
+
+    let lastQuery = null
+    let debounceTimer = null
+
+    myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {
+      const users = await getUsers()
+      autocomplete.update({ options: users })
+    })
+
+    myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {
+      const query = event.value
+
+      if (query === lastQuery) {
+        return
+      }
+
+      lastQuery = query
+
+      clearTimeout(debounceTimer)
+
+      debounceTimer = setTimeout(async () => {
+        const users = await getUsers(query)
+        autocomplete.update({ options: users })
+      }, 200)
+    })
+  }
+  // js-docs-end autocomplete-external-data
+
+  // js-docs-start autocomplete-custom-options
+  const myAutocompleteCountries = document.getElementById('myAutocompleteCountries')
+  const myAutocompleteCountriesAndCities = document.getElementById('myAutocompleteCountriesAndCities')
+
+  if (myAutocompleteCountries && myAutocompleteCountriesAndCities) {
+    const countries = [
+      {
+        value: 'pl',
+        label: 'Poland',
+        flag: '🇵🇱'
+      },
+      {
+        value: 'de',
+        label: 'Germany',
+        flag: '🇩🇪'
+      },
+      {
+        value: 'us',
+        label: 'United States',
+        flag: '🇺🇸'
+      },
+      {
+        value: 'es',
+        label: 'Spain',
+        flag: '🇪🇸'
+      },
+      {
+        value: 'gb',
+        label: 'United Kingdom',
+        flag: '🇬🇧'
+      }
+    ]
+
+    const cities = [
+      {
+        label: 'United States',
+        code: 'us',
+        flag: '🇺🇸',
+        options: [
+          {
+            value: 'au',
+            label: 'Austin'
+          },
+          {
+            value: 'ch',
+            label: 'Chicago'
+          },
+          {
+            value: 'la',
+            label: 'Los Angeles'
+          },
+          {
+            value: 'ny',
+            label: 'New York'
+          },
+          {
+            value: 'sa',
+            label: 'San Jose'
+          }
+        ]
+      },
+      {
+        label: 'United Kingdom',
+        code: 'gb',
+        flag: '🇬🇧',
+        options: [
+          {
+            value: 'li',
+            label: 'Liverpool'
+          },
+          {
+            value: 'lo',
+            label: 'London'
+          },
+          {
+            value: 'ma',
+            label: 'Manchester'
+          }
+        ]
+      }
+    ]
+
+    new coreui.Autocomplete(myAutocompleteCountries, {
+      cleaner: true,
+      indicator: true,
+      options: countries,
+      optionsTemplate(option) {
+        return `<div class="d-flex align-items-center gap-2"><span class="fs-5">${option.flag}</span><span>${option.label}</span></div>`
+      },
+      placeholder: 'Select country',
+      showHints: true,
+      search: 'global'
+    })
+
+    new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
+      cleaner: true,
+      indicator: true,
+      options: cities,
+      optionsGroupsTemplate(optionGroup) {
+        return `<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
+      },
+      placeholder: 'Select city',
+      showHints: true,
+      search: 'global'
+    })
+  }
+  // js-docs-end autocomplete-custom-options
+
+  // -------------------------------
   // Multi Selects
   // -------------------------------
   // 'Multi Selects components' example in docs only
