@@ -59,20 +59,11 @@
   icon: pen-alt
   pages:
     - title: Overview
-    - title: Form control
-    - title: Select
-    - title: Checks & radios
-    - title: Range
-    - title: Range Slider
-      badge:
-        color: danger
-        text: PRO
-    - title: Input group
-    - title: Floating labels
     - title: Autocomplete
       badge:
         color: danger
         text: PRO
+    - title: Checks & radios
     - title: Date Picker
       badge:
         color: danger
@@ -81,6 +72,9 @@
       badge:
         color: danger
         text: PRO
+    - title: Floating labels
+    - title: Form control
+    - title: Input group
     - title: Multi Select
       badge:
         color: danger
@@ -89,6 +83,8 @@
       badge:
         color: danger
         text: PRO
+    - title: Range
+    - title: Range Slider
       badge:
         color: danger
         text: PRO
@@ -96,6 +92,7 @@
       badge:
         color: danger
         text: PRO
+    - title: Select
     - title: Stepper
       badge:
         color: danger
