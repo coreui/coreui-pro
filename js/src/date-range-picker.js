@@ -354,11 +354,11 @@ class DateRangePicker extends BaseComponent {
         this._startDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
-
-        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date
-        })
       }
+
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+        date
+      })
     })
 
     EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
@@ -396,11 +396,11 @@ class DateRangePicker extends BaseComponent {
         this._endDate = date
         this._calendarDate = date
         this._calendar.update(this._getCalendarConfig())
-
-        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date
-        })
       }
+
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+        date
+      })
     })
 
     EventHandler.on(window, EVENT_RESIZE, () => {
