@@ -751,6 +751,7 @@ class Autocomplete extends BaseComponent {
 
     if (foundOption) {
       this._selectOption(foundOption)
+      this._inputElement.focus()
     }
   }
 
@@ -800,7 +801,6 @@ class Autocomplete extends BaseComponent {
       this.search('')
     }
 
-    this._inputElement.focus()
     this._updateCleaner()
   }
 
