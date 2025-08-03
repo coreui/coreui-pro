@@ -15,6 +15,7 @@ import {
   defineJQueryPlugin,
   getNextActiveElement,
   getElement,
+  getUID,
   isVisible,
   isRTL
 } from './util/index.js'
@@ -86,10 +87,12 @@ const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 const Default = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
+  ariaIndicatorLabel: 'Toggle visibility of options menu',
   cleaner: true,
   clearSearchOnSelect: false,
   container: false,
   disabled: false,
+  id: null,
   invalid: false,
   multiple: true,
   name: null,
@@ -115,10 +118,12 @@ const Default = {
 const DefaultType = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
+  ariaIndicatorLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
   disabled: 'boolean',
+  id: '(string|null)',
   invalid: 'boolean',
   multiple: 'boolean',
   name: '(string|null)',
@@ -151,6 +156,8 @@ class MultiSelect extends BaseComponent {
   constructor(element, config) {
     super(element, config)
 
+    this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`)
+    this._uniqueName = this._config.name || this._element.name || this._uniqueId
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -542,7 +549,10 @@ class MultiSelect extends BaseComponent {
     multiSelectEl.classList.add(CLASS_NAME_SELECT)
     multiSelectEl.classList.toggle('is-invalid', this._config.invalid)
     multiSelectEl.classList.toggle('is-valid', this._config.valid)
+    multiSelectEl.role = 'combobox'
     multiSelectEl.setAttribute('aria-expanded', 'false')
+    multiSelectEl.setAttribute('aria-haspopup', 'listbox')
+    multiSelectEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
@@ -562,9 +572,8 @@ class MultiSelect extends BaseComponent {
       this._updateSearch()
     }
 
-    if (this._config.name || this._element.id || this._element.name) {
-      this._element.setAttribute('name', (this._config.name || this._element.name || `multi-select-${this._element.id}`))
-    }
+    this._element.setAttribute('id', this._uniqueId)
+    this._element.setAttribute('name', this._uniqueName)
 
     this._createOptionsContainer()
     this._hideNativeSelect()
@@ -612,6 +621,7 @@ class MultiSelect extends BaseComponent {
     const indicator = document.createElement('button')
     indicator.type = 'button'
     indicator.classList.add('form-multi-select-indicator')
+    indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
 
     if (this._config.disabled) {
       indicator.tabIndex = -1
@@ -656,6 +666,9 @@ class MultiSelect extends BaseComponent {
       input.disabled = true
     }
 
+    input.setAttribute('id', `search-${this._uniqueId}`)
+    input.setAttribute('name', `search-${this._uniqueName}`)
+
     this._searchElement = input
     this._updateSearchSize()
 
@@ -665,6 +678,12 @@ class MultiSelect extends BaseComponent {
   _createOptionsContainer() {
     const dropdownDiv = document.createElement('div')
     dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
+    dropdownDiv.role = 'listbox'
+    dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`)
+
+    if (this._config.multiple) {
+      dropdownDiv.setAttribute('aria-multiselectable', 'true')
+    }
 
     if (this._config.selectAll && this._config.multiple) {
       const selectAllButton = document.createElement('button')
@@ -715,6 +734,7 @@ class MultiSelect extends BaseComponent {
 
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
+        optionDiv.role = 'option'
 
         if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
           optionDiv.innerHTML = this._config.sanitize ?
@@ -851,6 +871,7 @@ class MultiSelect extends BaseComponent {
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
+      option.setAttribute('aria-selected', 'true')
     }
 
     EventHandler.trigger(this._element, EVENT_CHANGED, {
@@ -871,6 +892,7 @@ class MultiSelect extends BaseComponent {
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
+      option.setAttribute('aria-selected', 'false')
     }
 
     EventHandler.trigger(this._element, EVENT_CHANGED, {
