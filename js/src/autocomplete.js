@@ -661,6 +661,7 @@ class Autocomplete extends BaseComponent {
     dropdownDiv.classList.add(CLASS_NAME_DROPDOWN)
     dropdownDiv.role = 'listbox'
     dropdownDiv.setAttribute('aria-labelledby', this._uniqueId)
+    dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`)
 
     const optionsDiv = document.createElement('div')
     optionsDiv.classList.add(CLASS_NAME_OPTIONS)
@@ -674,6 +675,8 @@ class Autocomplete extends BaseComponent {
 
     const { container } = this._config
     if (container) {
+      this._inputElement.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
+      dropdownDiv.id = `${this._uniqueId}-listbox`
       container.append(dropdownDiv)
     } else {
       this._element.append(dropdownDiv)
