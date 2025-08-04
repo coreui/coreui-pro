@@ -1,5 +1,5 @@
 /*!
-  * CoreUI autocomplete.js v5.16.0 (https://coreui.io)
+  * CoreUI autocomplete.js v5.17.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -586,6 +586,7 @@
       dropdownDiv.classList.add(CLASS_NAME_DROPDOWN);
       dropdownDiv.role = 'listbox';
       dropdownDiv.setAttribute('aria-labelledby', this._uniqueId);
+      dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`);
       const optionsDiv = document.createElement('div');
       optionsDiv.classList.add(CLASS_NAME_OPTIONS);
       if (this._config.optionsMaxHeight !== 'auto') {
@@ -597,6 +598,8 @@
         container
       } = this._config;
       if (container) {
+        this._inputElement.setAttribute('aria-owns', `${this._uniqueId}-listbox`);
+        dropdownDiv.id = `${this._uniqueId}-listbox`;
         container.append(dropdownDiv);
       } else {
         this._element.append(dropdownDiv);
@@ -655,6 +658,7 @@
       const foundOption = this._findOptionByValue(value);
       if (foundOption) {
         this._selectOption(foundOption);
+        this._inputElement.focus();
       }
     }
     _findOptionByValue(value, options = this._options) {
@@ -692,7 +696,6 @@
       if (this._config.clearSearchOnSelect) {
         this.search('');
       }
-      this._inputElement.focus();
       this._updateCleaner();
     }
     _deselectOption(value) {

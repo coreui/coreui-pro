@@ -1,5 +1,5 @@
 /*!
-  * CoreUI rating.js v5.16.0 (https://coreui.io)
+  * CoreUI rating.js v5.17.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -88,6 +88,7 @@
     name: null,
     precision: 1,
     readOnly: false,
+    sanitize: true,
     sanitizeFn: null,
     size: null,
     tooltips: false,
@@ -104,6 +105,7 @@
     name: '(string|null)',
     precision: 'number',
     readOnly: 'boolean',
+    sanitize: 'boolean',
     sanitizeFn: '(null|function)',
     size: '(string|null)',
     tooltips: '(array|boolean|object)',

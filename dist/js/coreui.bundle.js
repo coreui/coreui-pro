@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.16.0 (https://coreui.io)
+  * CoreUI v5.17.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.16.0';
+  const VERSION = '5.17.0';
 
   /**
    * Class definition
@@ -3415,6 +3415,7 @@
       dropdownDiv.classList.add(CLASS_NAME_DROPDOWN$2);
       dropdownDiv.role = 'listbox';
       dropdownDiv.setAttribute('aria-labelledby', this._uniqueId);
+      dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`);
       const optionsDiv = document.createElement('div');
       optionsDiv.classList.add(CLASS_NAME_OPTIONS$1);
       if (this._config.optionsMaxHeight !== 'auto') {
@@ -3426,6 +3427,8 @@
         container
       } = this._config;
       if (container) {
+        this._inputElement.setAttribute('aria-owns', `${this._uniqueId}-listbox`);
+        dropdownDiv.id = `${this._uniqueId}-listbox`;
         container.append(dropdownDiv);
       } else {
         this._element.append(dropdownDiv);
@@ -3484,6 +3487,7 @@
       const foundOption = this._findOptionByValue(value);
       if (foundOption) {
         this._selectOption(foundOption);
+        this._inputElement.focus();
       }
     }
     _findOptionByValue(value, options = this._options) {
@@ -3521,7 +3525,6 @@
       if (this._config.clearSearchOnSelect) {
         this.search('');
       }
-      this._inputElement.focus();
       this._updateCleaner();
     }
     _deselectOption(value) {
@@ -8845,10 +8848,12 @@
   const Default$b = {
     allowList: DefaultAllowlist,
     ariaCleanerLabel: 'Clear all selections',
+    ariaIndicatorLabel: 'Toggle visibility of options menu',
     cleaner: true,
     clearSearchOnSelect: false,
     container: false,
     disabled: false,
+    id: null,
     invalid: false,
     multiple: true,
     name: null,
@@ -8873,10 +8878,12 @@
   const DefaultType$b = {
     allowList: 'object',
     ariaCleanerLabel: 'string',
+    ariaIndicatorLabel: 'string',
     cleaner: 'boolean',
     clearSearchOnSelect: 'boolean',
     container: '(string|element|boolean)',
     disabled: 'boolean',
+    id: '(string|null)',
     invalid: 'boolean',
     multiple: 'boolean',
     name: '(string|null)',
@@ -8908,6 +8915,8 @@
   class MultiSelect extends BaseComponent {
     constructor(element, config) {
       super(element, config);
+      this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`);
+      this._uniqueName = this._config.name || this._element.name || this._uniqueId;
       this._configureNativeSelect();
       this._indicatorElement = null;
       this._selectAllElement = null;
@@ -9240,7 +9249,10 @@
       multiSelectEl.classList.add(CLASS_NAME_SELECT);
       multiSelectEl.classList.toggle('is-invalid', this._config.invalid);
       multiSelectEl.classList.toggle('is-valid', this._config.valid);
+      multiSelectEl.role = 'combobox';
       multiSelectEl.setAttribute('aria-expanded', 'false');
+      multiSelectEl.setAttribute('aria-haspopup', 'listbox');
+      multiSelectEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`);
       if (this._config.disabled) {
         this._element.classList.add(CLASS_NAME_DISABLED$2);
       }
@@ -9255,9 +9267,8 @@
         this._createSearchInput();
         this._updateSearch();
       }
-      if (this._config.name || this._element.id || this._element.name) {
-        this._element.setAttribute('name', this._config.name || this._element.name || `multi-select-${this._element.id}`);
-      }
+      this._element.setAttribute('id', this._uniqueId);
+      this._element.setAttribute('name', this._uniqueName);
       this._createOptionsContainer();
       this._hideNativeSelect();
       this._updateOptionsList();
@@ -9294,6 +9305,7 @@
       const indicator = document.createElement('button');
       indicator.type = 'button';
       indicator.classList.add('form-multi-select-indicator');
+      indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel);
       if (this._config.disabled) {
         indicator.tabIndex = -1;
       }
@@ -9328,6 +9340,8 @@
       if (this._config.disabled) {
         input.disabled = true;
       }
+      input.setAttribute('id', `search-${this._uniqueId}`);
+      input.setAttribute('name', `search-${this._uniqueName}`);
       this._searchElement = input;
       this._updateSearchSize();
       this._selectionElement.append(input);
@@ -9335,6 +9349,11 @@
     _createOptionsContainer() {
       const dropdownDiv = document.createElement('div');
       dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN);
+      dropdownDiv.role = 'listbox';
+      dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`);
+      if (this._config.multiple) {
+        dropdownDiv.setAttribute('aria-multiselectable', 'true');
+      }
       if (this._config.selectAll && this._config.multiple) {
         const selectAllButton = document.createElement('button');
         selectAllButton.type = 'button';
@@ -9375,6 +9394,7 @@
           }
           optionDiv.dataset.value = String(option.value);
           optionDiv.tabIndex = 0;
+          optionDiv.role = 'option';
           if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
             optionDiv.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
           } else {
@@ -9481,6 +9501,7 @@
       const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
       if (option) {
         option.classList.add(CLASS_NAME_SELECTED);
+        option.setAttribute('aria-selected', 'true');
       }
       EventHandler.trigger(this._element, EVENT_CHANGED, {
         value: this._selected
@@ -9496,6 +9517,7 @@
       const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
       if (option) {
         option.classList.remove(CLASS_NAME_SELECTED);
+        option.setAttribute('aria-selected', 'false');
       }
       EventHandler.trigger(this._element, EVENT_CHANGED, {
         value: this._selected
@@ -11643,6 +11665,7 @@
     name: null,
     precision: 1,
     readOnly: false,
+    sanitize: true,
     sanitizeFn: null,
     size: null,
     tooltips: false,
@@ -11659,6 +11682,7 @@
     name: '(string|null)',
     precision: 'number',
     readOnly: 'boolean',
+    sanitize: 'boolean',
     sanitizeFn: '(null|function)',
     size: '(string|null)',
     tooltips: '(array|boolean|object)',
