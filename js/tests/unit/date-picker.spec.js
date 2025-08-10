@@ -65,11 +65,13 @@ describe('DatePicker', () => {
       const div = fixtureEl.querySelector('div')
       const datePicker = new DatePicker(div, {
         locale: 'fr-FR',
-        date: new Date(2023, 0, 15)
+        date: new Date(2023, 0, 15),
+        previewDateOnHover: false
       })
 
       expect(datePicker._config.locale).toEqual('fr-FR')
       expect(datePicker._config.date).toEqual(new Date(2023, 0, 15))
+      expect(datePicker._config.previewDateOnHover).toEqual(false)
     })
 
     it('should create proper DOM structure', () => {
@@ -291,6 +293,40 @@ describe('DatePicker', () => {
 
         datePicker.show()
       })
+    })
+  })
+
+  describe('previewDateOnHover', () => {
+    it('should be enabled by default', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div)
+
+      expect(datePicker._config.previewDateOnHover).toBe(true)
+    })
+
+    it('should be configurable', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, {
+        previewDateOnHover: false
+      })
+
+      expect(datePicker._config.previewDateOnHover).toBe(false)
+    })
+
+    it('should update configuration with previewDateOnHover option', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const datePicker = new DatePicker(div, {
+        previewDateOnHover: true
+      })
+
+      datePicker.update({
+        previewDateOnHover: false
+      })
+
+      expect(datePicker._config.previewDateOnHover).toBe(false)
     })
   })
 

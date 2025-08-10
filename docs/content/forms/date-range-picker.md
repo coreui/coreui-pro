@@ -204,6 +204,30 @@ Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modifi
 </div>
 {{< /example >}}
 
+## Preview date on hover
+
+By default, the date range picker shows a live preview in the input fields when hovering over calendar dates. To disable this feature, set `data-coreui-preview-date-on-hover="false"`.
+
+{{< example stackblitz_pro="true" >}}
+  <div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+      <label class="form-label">With preview (default)</label>
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker">
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <label class="form-label">Without preview</label>
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-preview-date-on-hover="false"
+        data-coreui-toggle="date-range-picker">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
 ## Disabled dates
 
 The CoreUI Bootstrap DateRangePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
@@ -428,6 +452,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `maxDate` | date, number, string, null | `null` | Max selectable date. |
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `placeholder` | string | `['Start date', 'End date']` | Specifies a short hint that is visible in the input. |
+| `previewDateOnHover` | boolean | `true` | Enable live preview of dates in input fields when hovering over calendar cells. |
 | `ranges` | object | `{}` | Predefined date ranges the user can select from. |
 | `rangesButtonsClasses` | array, string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |

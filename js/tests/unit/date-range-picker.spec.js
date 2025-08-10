@@ -65,12 +65,14 @@ describe('DateRangePicker', () => {
       const dateRangePicker = new DateRangePicker(div, {
         locale: 'fr-FR',
         startDate: new Date(2023, 0, 1),
-        endDate: new Date(2023, 0, 15)
+        endDate: new Date(2023, 0, 15),
+        previewDateOnHover: false
       })
 
       expect(dateRangePicker._config.locale).toEqual('fr-FR')
       expect(dateRangePicker._config.startDate).toEqual(new Date(2023, 0, 1))
       expect(dateRangePicker._config.endDate).toEqual(new Date(2023, 0, 15))
+      expect(dateRangePicker._config.previewDateOnHover).toEqual(false)
     })
 
     it('should create proper DOM structure', () => {
@@ -493,6 +495,40 @@ describe('DateRangePicker', () => {
         expect(dateRangePicker2).toEqual(dateRangePicker)
         expect(dateRangePicker2._config.locale).toEqual('en-US')
       })
+    })
+  })
+
+  describe('previewDateOnHover', () => {
+    it('should be enabled by default', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div)
+
+      expect(dateRangePicker._config.previewDateOnHover).toBe(true)
+    })
+
+    it('should be configurable', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, {
+        previewDateOnHover: false
+      })
+
+      expect(dateRangePicker._config.previewDateOnHover).toBe(false)
+    })
+
+    it('should update configuration with previewDateOnHover option', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, {
+        previewDateOnHover: true
+      })
+
+      dateRangePicker.update({
+        previewDateOnHover: false
+      })
+
+      expect(dateRangePicker._config.previewDateOnHover).toBe(false)
     })
   })
 

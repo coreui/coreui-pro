@@ -102,6 +102,7 @@ const Default = {
   minDate: null,
   name: null,
   placeholder: ['Start date', 'End date'],
+  previewDateOnHover: true,
   range: true,
   ranges: {},
   rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
@@ -153,6 +154,7 @@ const DefaultType = {
   minDate: '(date|number|string|null)',
   name: '(string|null)',
   placeholder: '(array|string)',
+  previewDateOnHover: 'boolean',
   range: 'boolean',
   ranges: 'object',
   rangesButtonsClasses: '(array|string)',
@@ -426,14 +428,16 @@ class DateRangePicker extends BaseComponent {
         }
       })
 
-      EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
-        if (this._selectEndDate) {
-          this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate)
-          return
-        }
+      if (this._config.previewDateOnHover) {
+        EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
+          if (this._selectEndDate) {
+            this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate)
+            return
+          }
 
-        this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate)
-      })
+          this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate)
+        })
+      }
 
       EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
         this._selectEndDate = event.value
