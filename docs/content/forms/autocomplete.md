@@ -58,6 +58,25 @@ You can organize suggestions into groups using optgroups for better categorizati
 
 {{< js-docs name="autocomplete-grouped-data" file="docs/assets/js/partials/snippets.js" >}}
 
+### Options with values
+
+You can use values in your options array. This is particularly useful when working with database IDs, product codes, or any numeric identifiers. Note that the component internally converts number values to strings for consistency and DOM compatibility.
+
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+<div id="myAutoCompleteValues"></div>
+{{< /example >}}
+
+{{< js-docs name="autocomplete-option-values" file="docs/assets/js/partials/snippets.js" >}}
+
+{{< callout info >}}
+**Important:** While you can pass number values in your options, the component internally converts all values to strings using `String(value)`. When handling selection events, remember that `event.value.value` will always be a string representation of your original number.
+
+For example:
+- Input: `{ label: 'Product A', value: 42 }`
+- Internal storage: `{ label: 'Product A', value: '42' }`
+- Event output: `event.value.value === '42'` (string)
+{{< /callout >}}
+
 ### External data
 
 You can configure CoreUI's AutoComplete component to fetch and display options dynamically from an external API. This is useful when you need to autocomplete data that changes frequently or is too large to preload. 
