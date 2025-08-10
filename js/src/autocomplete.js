@@ -247,6 +247,10 @@ class Autocomplete extends BaseComponent {
     this.search('')
     this._filterOptionsList()
     this._inputElement.value = ''
+
+    EventHandler.trigger(this._element, EVENT_CHANGED, {
+      value: this._selected
+    })
   }
 
   search(label) {
@@ -272,6 +276,10 @@ class Autocomplete extends BaseComponent {
   }
 
   deselectAll(options = this._selected) {
+    if (this._selected.length === 0) {
+      return
+    }
+
     for (const option of options) {
       if (option.disabled) {
         continue
@@ -438,13 +446,19 @@ class Autocomplete extends BaseComponent {
     EventHandler.on(this._inputElement, EVENT_KEYUP, event => {
       if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
         const { value } = event.target
-        this.deselectAll()
         this.search(value)
         if (this._config.showHints) {
           const options = value ?
             this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) :
             []
           this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : ''
+        }
+
+        if (this._selected.length > 0) {
+          this.deselectAll()
+          EventHandler.trigger(this._element, EVENT_CHANGED, {
+            value: this._selected
+          })
         }
       }
     })
@@ -816,9 +830,9 @@ class Autocomplete extends BaseComponent {
       option.setAttribute('aria-selected', false)
     }
 
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: this._selected
-    })
+    // EventHandler.trigger(this._element, EVENT_CHANGED, {
+    //   value: this._selected
+    // })
   }
 
   _updateCleaner() {
