@@ -1055,4 +1055,172 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.value).toBe('Option 1')
     })
   })
+
+  describe('number value handling', () => {
+    it('should convert number values to strings internally', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const options = [
+        { label: 'First Option', value: 1 },
+        { label: 'Second Option', value: 2 },
+        { label: 'Third Option', value: 3.5 }
+      ]
+      const autocomplete = new Autocomplete(autocompleteEl, { options })
+
+      expect(autocomplete._options[0].value).toBe('1')
+      expect(autocomplete._options[1].value).toBe('2')
+      expect(autocomplete._options[2].value).toBe('3.5')
+      expect(typeof autocomplete._options[0].value).toBe('string')
+    })
+
+    it('should select option with number value converted to string', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          options: [
+            { label: 'Option 1', value: 1 },
+            { label: 'Option 2', value: 2 }
+          ]
+        })
+
+        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+          expect(event.value.label).toBe('Option 1')
+          expect(event.value.value).toBe('1')
+          expect(typeof event.value.value).toBe('string')
+          resolve()
+        })
+
+        const option = autocomplete._options[0]
+        autocomplete._selectOption(option)
+      })
+    })
+
+    it('should update input value when option with number value is selected', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ label: 'Option 1', value: 1 }]
+      })
+
+      const option = autocomplete._options[0]
+      autocomplete._selectOption(option)
+
+      expect(autocomplete._inputElement.value).toBe('Option 1')
+      expect(autocomplete._selected).toContain(option)
+      expect(autocomplete._selected[0].value).toBe('1')
+      expect(typeof autocomplete._selected[0].value).toBe('string')
+    })
+
+    it('should filter options with number values based on search term', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [
+          { label: 'Apple', value: 1 },
+          { label: 'Banana', value: 2 },
+          { label: 'Cherry', value: 3 }
+        ]
+      })
+
+      autocomplete.show()
+      autocomplete._search = 'app'
+      autocomplete._filterOptionsList()
+
+      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+        .filter(option => option.style.display !== 'none')
+
+      expect(visibleOptions).toHaveSize(1)
+      expect(visibleOptions[0].textContent).toBe('Apple')
+      expect(visibleOptions[0].dataset.value).toBe('1')
+    })
+
+    it('should handle mixed string and number values by converting to strings', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const options = [
+        { label: 'String Option', value: 'string' },
+        { label: 'Number Option', value: 42 },
+        { label: 'Float Option', value: 3.14 },
+        { label: 'Zero Option', value: 0 }
+      ]
+      const autocomplete = new Autocomplete(autocompleteEl, { options })
+
+      expect(autocomplete._options[0].value).toBe('string')
+      expect(autocomplete._options[1].value).toBe('42')
+      expect(autocomplete._options[2].value).toBe('3.14')
+      expect(autocomplete._options[3].value).toBe('0')
+      expect(typeof autocomplete._options[0].value).toBe('string')
+      expect(typeof autocomplete._options[1].value).toBe('string')
+      expect(typeof autocomplete._options[2].value).toBe('string')
+      expect(typeof autocomplete._options[3].value).toBe('string')
+    })
+
+    it('should handle zero as a valid number value converted to string', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          options: [{ label: 'Zero Option', value: 0 }]
+        })
+
+        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+          expect(event.value.value).toBe('0')
+          expect(typeof event.value.value).toBe('string')
+          resolve()
+        })
+
+        const option = autocomplete._options[0]
+        autocomplete._selectOption(option)
+      })
+    })
+
+    it('should handle negative number values converted to strings', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const options = [
+        { label: 'Negative Option', value: -1 },
+        { label: 'Negative Float', value: -2.5 }
+      ]
+      const autocomplete = new Autocomplete(autocompleteEl, { options })
+
+      expect(autocomplete._options[0].value).toBe('-1')
+      expect(autocomplete._options[1].value).toBe('-2.5')
+      expect(typeof autocomplete._options[0].value).toBe('string')
+      expect(typeof autocomplete._options[1].value).toBe('string')
+    })
+
+    it('should create autocomplete with number values in initial configuration', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const config = {
+        value: 1,
+        options: [
+          { label: 'Option 1', value: 1 },
+          { label: 'Option 2', value: 2 }
+        ]
+      }
+      const autocomplete = new Autocomplete(autocompleteEl, config)
+
+      expect(autocomplete._config.value).toBe(1)
+      expect(autocomplete._options[0].value).toBe('1')
+      expect(autocomplete._options[1].value).toBe('2')
+    })
+
+    it('should match options by string comparison even when passed number values', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        value: 1,
+        options: [
+          { label: 'Option 1', value: 1 },
+          { label: 'Option 2', value: 2 }
+        ]
+      })
+
+      expect(autocomplete._selected).toHaveSize(1)
+      expect(autocomplete._selected[0].value).toBe('1')
+      expect(autocomplete._selected[0].label).toBe('Option 1')
+    })
+  })
 })

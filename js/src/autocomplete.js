@@ -511,7 +511,7 @@ class Autocomplete extends BaseComponent {
       _options.push({
         ...customProperties,
         label,
-        value,
+        value: String(value),
         ...isSelected && { selected: true },
         ...option.disabled && { disabled: true }
       })
@@ -519,7 +519,7 @@ class Autocomplete extends BaseComponent {
       if (isSelected) {
         this._selected.push({
           label: option.label,
-          value: String(option.label)
+          value: String(value)
         })
       }
     }
@@ -749,7 +749,7 @@ class Autocomplete extends BaseComponent {
       }
     }
 
-    const value = String(element.dataset.value)
+    const { value } = element.dataset
     const foundOption = this._findOptionByValue(value)
 
     if (foundOption) {
@@ -808,7 +808,7 @@ class Autocomplete extends BaseComponent {
   }
 
   _deselectOption(value) {
-    this._selected = this._selected.filter(option => option.value !== String(value))
+    this._selected = this._selected.filter(option => option.value !== value)
 
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
