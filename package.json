@@ -1,9 +1,9 @@
 {
   "name": "@coreui/coreui-pro",
   "description": "The most popular front-end framework for developing responsive, mobile-first projects on the web rewritten by the CoreUI Team",
-  "version": "5.17.0",
+  "version": "5.18.0",
   "config": {
-    "version_short": "5.17"
+    "version_short": "5.18"
   },
   "keywords": [
     "css",
@@ -177,6 +177,7 @@
   },
   "dependencies": {
     "html-entities": "^2.6.0",
-    "html-to-md": "^0.8.8"
+    "html-to-md": "^0.8.8",
+    "sass": "^1.90.0"
   }
 }

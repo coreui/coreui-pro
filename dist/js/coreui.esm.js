@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.17.0 (https://coreui.io)
+  * CoreUI v5.18.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -661,7 +661,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.17.0';
+const VERSION = '5.18.0';
 
 /**
  * Class definition
@@ -1224,6 +1224,9 @@ class Autocomplete extends BaseComponent {
     this.search('');
     this._filterOptionsList();
     this._inputElement.value = '';
+    EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+      value: this._selected
+    });
   }
   search(label) {
     this._search = label.length > 0 ? label.toLowerCase() : '';
@@ -1247,6 +1250,9 @@ class Autocomplete extends BaseComponent {
     this._createOptions(this._optionsElement, this._options);
   }
   deselectAll(options = this._selected) {
+    if (this._selected.length === 0) {
+      return;
+    }
     for (const option of options) {
       if (option.disabled) {
         continue;
@@ -1384,11 +1390,16 @@ class Autocomplete extends BaseComponent {
         const {
           value
         } = event.target;
-        this.deselectAll();
         this.search(value);
         if (this._config.showHints) {
           const options = value ? this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(value.toLowerCase())) : [];
           this._inputHintElement.value = options.length > 0 ? `${value}${options[0].label.slice(value.length)}` : '';
+        }
+        if (this._selected.length > 0) {
+          this.deselectAll();
+          EventHandler.trigger(this._element, EVENT_CHANGED$1, {
+            value: this._selected
+          });
         }
       }
     });
@@ -1447,7 +1458,7 @@ class Autocomplete extends BaseComponent {
       _options.push({
         ...customProperties,
         label,
-        value,
+        value: String(value),
         ...(isSelected && {
           selected: true
         }),
@@ -1458,7 +1469,7 @@ class Autocomplete extends BaseComponent {
       if (isSelected) {
         this._selected.push({
           label: option.label,
-          value: String(option.label)
+          value: String(value)
         });
       }
     }
@@ -1642,7 +1653,9 @@ class Autocomplete extends BaseComponent {
         return;
       }
     }
-    const value = String(element.dataset.value);
+    const {
+      value
+    } = element.dataset;
     const foundOption = this._findOptionByValue(value);
     if (foundOption) {
       this._selectOption(foundOption);
@@ -1687,15 +1700,16 @@ class Autocomplete extends BaseComponent {
     this._updateCleaner();
   }
   _deselectOption(value) {
-    this._selected = this._selected.filter(option => option.value !== String(value));
+    this._selected = this._selected.filter(option => option.value !== value);
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED$2);
       option.setAttribute('aria-selected', false);
     }
-    EventHandler.trigger(this._element, EVENT_CHANGED$1, {
-      value: this._selected
-    });
+
+    // EventHandler.trigger(this._element, EVENT_CHANGED, {
+    //   value: this._selected
+    // })
   }
   _updateCleaner() {
     if (!this._config.cleaner || this._cleanerElement === null) {
@@ -4893,6 +4907,7 @@ const Default$i = {
   minDate: null,
   name: null,
   placeholder: ['Start date', 'End date'],
+  previewDateOnHover: true,
   range: true,
   ranges: {},
   rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
@@ -4943,6 +4958,7 @@ const DefaultType$i = {
   minDate: '(date|number|string|null)',
   name: '(string|null)',
   placeholder: '(array|string)',
+  previewDateOnHover: 'boolean',
   range: 'boolean',
   ranges: 'object',
   rangesButtonsClasses: '(array|string)',
@@ -5170,13 +5186,15 @@ class DateRangePicker extends BaseComponent {
           this.hide();
         }
       });
-      EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
-        if (this._selectEndDate) {
-          this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
-          return;
-        }
-        this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
-      });
+      if (this._config.previewDateOnHover) {
+        EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
+          if (this._selectEndDate) {
+            this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
+            return;
+          }
+          this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
+        });
+      }
       EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
         this._selectEndDate = event.value;
       });
