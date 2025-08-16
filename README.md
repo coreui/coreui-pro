@@ -69,6 +69,7 @@ Read the [Getting started page](https://coreui.io/docs/getting-started/introduct
 
 - [Bootstrap Accordion](https://coreui.io/bootstrap/docs/components/accordion/)
 - [Bootstrap Alert](https://coreui.io/bootstrap/docs/components/alert/)
+- [Bootstrap Autocomplete](https://coreui.io/bootstrap/docs/forms/autocomplete/) **PRO**
 - [Bootstrap Avatar](https://coreui.io/bootstrap/docs/components/avatar/)
 - [Bootstrap Badge](https://coreui.io/bootstrap/docs/components/badge/)
 - [Bootstrap Breadcrumb](https://coreui.io/bootstrap/docs/components/breadcrumb/)
@@ -216,10 +217,11 @@ CoreUI supports most popular frameworks.
 
 Fully featured, out-of-the-box, templates for your application based on CoreUI.
 
-- [Angular Admin Template](https://coreui.io/angular)
-- [Bootstrap Admin Template](https://coreui.io/)
-- [React Admin Template](https://coreui.io/react)
-- [Vue Admin Template](https://coreui.io/vue)
+- [Angular Admin Templates](https://coreui.io/themes-templates/admin-dashboard/angular/)
+- [Bootstrap Admin Templates](https://coreui.io/themes-templates/admin-dashboard/bootstrap/)
+- [Next.js Admin Templates](https://coreui.io/themes-templates/admin-dashboard/next-js/)
+- [React Admin Templates](https://coreui.io/themes-templates/admin-dashboard/react/)
+- [Vue Admin Templates](https://coreui.io/themes-templates/admin-dashboard/vue/)
 
 ## Contributing
 
@@ -232,7 +234,8 @@ Editor preferences are available in the [editor config](https://github.com/coreu
 Stay up to date on the development of CoreUI and reach out to the community with these helpful resources.
 
 - Read and subscribe to [The Official CoreUI Blog](https://coreui.io/blog).
-- Follow [@core_ui on Twitter](https://twitter.com/core_ui).
+- Follow [@core_ui on Twitter](https://x.com/core_ui).
+- Discuss, ask questions, and more on [the community Discord](https://discord.gg/pQRWe5XdGm).
 
 ## Versioning
 

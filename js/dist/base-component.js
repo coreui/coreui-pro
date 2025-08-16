@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI base-component.js v5.18.0 (https://coreui.io)
+=======
+  * CoreUI base-component.js v5.4.2 (https://coreui.io)
+>>>>>>> a8ab9fd81f2dadfc1a04ce6e8377878efcb79d53
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -24,7 +28,11 @@
    * Constants
    */
 
+<<<<<<< HEAD
   const VERSION = '5.18.0';
+=======
+  const VERSION = '5.4.2';
+>>>>>>> a8ab9fd81f2dadfc1a04ce6e8377878efcb79d53
 
   /**
    * Class definition
