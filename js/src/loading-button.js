@@ -122,11 +122,6 @@ class LoadingButton extends BaseComponent {
     stoped()
   }
 
-  dispose() {
-    Data.removeData(this._element, DATA_KEY)
-    this._element = null
-  }
-
   _createButton() {
     this._element.classList.add(CLASS_NAME_LOADING_BUTTON)
   }
