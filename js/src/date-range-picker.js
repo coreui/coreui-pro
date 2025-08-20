@@ -13,7 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
-import { convertToDateObject } from './util/calendar.js'
+import { convertToDateObject, isDateDisabled } from './util/calendar.js'
 import { getLocalDateFromString } from './util/date-range-picker.js'
 
 /**
@@ -370,6 +370,11 @@ class DateRangePicker extends BaseComponent {
 
         // valid date or empty date
         if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
+          // Check if the date is disabled
+          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            return // Don't update if date is disabled
+          }
+
           this._startDate = date
           this._calendarDate = date
           this._calendar.update(this._getCalendarConfig())
@@ -418,6 +423,11 @@ class DateRangePicker extends BaseComponent {
 
         // valid date or empty date
         if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
+          // Check if the date is disabled
+          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            return // Don't update if date is disabled
+          }
+
           this._endDate = date
           this._calendarDate = date
           this._calendar.update(this._getCalendarConfig())
