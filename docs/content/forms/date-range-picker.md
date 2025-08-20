@@ -446,6 +446,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
 | `inputDateFormat` | function, null | `null` | Custom function to format the selected date into a string according to a custom format. |
 | `inputDateParse` | function, null | `null` | Custom function to parse the input value into a valid Date object. |
+| `inputOnChangeDelay` | number | `750` | Delay in milliseconds before processing manual date input changes. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
