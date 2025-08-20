@@ -875,23 +875,35 @@ class Calendar extends BaseComponent {
   }
 
   _rowWeekAttributes(date) {
+    if (this._config.selectionType !== 'week') {
+      return {
+        className: this._classNames({ [CLASS_NAME_CALENDAR_ROW]: true }),
+        tabIndex: -1,
+        ariaSelected: false
+      }
+    }
+
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
+    const isInRange = isDateInRange(date, this._startDate, this._endDate)
+
+    const isRangeHover = this._hoverDate && (
+      this._selectEndDate ?
+        isYearInRange(date, this._startDate, this._hoverDate) :
+        isYearInRange(date, this._hoverDate, this._endDate)
+    )
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_ROW]: true,
       disabled: isDisabled,
-      range: this._config.selectionType === 'week' && isDateInRange(date, this._startDate, this._endDate),
-      'range-hover': this._config.selectionType === 'week' &&
-        (this._hoverDate && this._selectEndDate ?
-          isYearInRange(date, this._startDate, this._hoverDate) :
-          isYearInRange(date, this._hoverDate, this._endDate)),
+      range: isInRange,
+      'range-hover': isRangeHover,
       selected: isSelected
     })
 
     return {
       className: classNames,
-      tabIndex: this._config.selectionType === 'week' && !isDisabled ? 0 : -1,
+      tabIndex: isDisabled ? -1 : 0,
       ariaSelected: isSelected
     }
   }
