@@ -802,30 +802,44 @@ class Calendar extends BaseComponent {
 
   _cellDayAttributes(date, month) {
     const isCurrentMonth = month === 'current'
+
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isDateSelected(date, this._startDate, this._endDate)
+    const isTodayDate = isToday(date)
+
+    if (this._config.selectionType !== 'day' || this._view !== 'days') {
+      return {
+        className: this._classNames({
+          [CLASS_NAME_CALENDAR_CELL]: true,
+          today: isTodayDate,
+          [month]: true
+        }),
+        tabIndex: -1,
+        ariaSelected: false
+      }
+    }
+
+    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate)
+    const isRangeHover = isCurrentMonth && this._hoverDate && (
+      this._selectEndDate ?
+        isDateInRange(date, this._startDate, this._hoverDate) :
+        isDateInRange(date, this._hoverDate, this._endDate)
+    )
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
-      ...(this._config.selectionType === 'day' && this._view === 'days' && {
-        clickable: !isCurrentMonth && this._config.selectAdjacementDays,
-        disabled: isDisabled,
-        range: isCurrentMonth && isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': isCurrentMonth &&
-          (this._hoverDate && this._selectEndDate ?
-            isDateInRange(date, this._startDate, this._hoverDate) :
-            isDateInRange(date, this._hoverDate, this._endDate)),
-        selected: isSelected
-      }),
-      today: isToday(date),
+      clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+      disabled: isDisabled,
+      range: isInRange,
+      'range-hover': isRangeHover,
+      selected: isSelected,
+      today: isTodayDate,
       [month]: true
     })
 
     return {
       className: classNames,
-      tabIndex: this._config.selectionType === 'day' &&
-        (isCurrentMonth || this._config.selectAdjacementDays) &&
-        !isDisabled ? 0 : -1,
+      tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected
     }
   }
@@ -833,15 +847,18 @@ class Calendar extends BaseComponent {
   _cellMonthAttributes(date) {
     const isDisabled = isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isMonthSelected(date, this._startDate, this._endDate)
+    const isInRange = isMonthInRange(date, this._startDate, this._endDate)
+    const isRangeHover = this._config.selectionType === 'month' && this._hoverDate && (
+      this._selectEndDate ?
+        isMonthInRange(date, this._startDate, this._hoverDate) :
+        isMonthInRange(date, this._hoverDate, this._endDate)
+    )
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
       disabled: isDisabled,
-      'range-hover': this._config.selectionType === 'month' &&
-        (this._hoverDate && this._selectEndDate ?
-          isMonthInRange(date, this._startDate, this._hoverDate) :
-          isMonthInRange(date, this._hoverDate, this._endDate)),
-      range: isMonthInRange(date, this._startDate, this._endDate),
+      'range-hover': isRangeHover,
+      range: isInRange,
       selected: isSelected
     })
 
@@ -855,15 +872,18 @@ class Calendar extends BaseComponent {
   _cellYearAttributes(date) {
     const isDisabled = isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
     const isSelected = isYearSelected(date, this._startDate, this._endDate)
+    const isInRange = isYearInRange(date, this._startDate, this._endDate)
+    const isRangeHover = this._config.selectionType === 'year' && this._hoverDate && (
+      this._selectEndDate ?
+        isYearInRange(date, this._startDate, this._hoverDate) :
+        isYearInRange(date, this._hoverDate, this._endDate)
+    )
 
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
       disabled: isDisabled,
-      'range-hover': this._config.selectionType === 'year' &&
-        (this._hoverDate && this._selectEndDate ?
-          isYearInRange(date, this._startDate, this._hoverDate) :
-          isYearInRange(date, this._hoverDate, this._endDate)),
-      range: isYearInRange(date, this._startDate, this._endDate),
+      'range-hover': isRangeHover,
+      range: isInRange,
       selected: isSelected
     })
 
