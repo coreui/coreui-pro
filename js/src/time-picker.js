@@ -84,6 +84,7 @@ const Default = {
   footer: true,
   hours: null,
   indicator: true,
+  inputOnChangeDelay: 750,
   inputReadOnly: false,
   invalid: false,
   locale: 'default',
@@ -110,6 +111,7 @@ const DefaultType = {
   footer: 'boolean',
   hours: '(array|function|null)',
   indicator: 'boolean',
+  inputOnChangeDelay: 'number',
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
@@ -145,6 +147,7 @@ class TimePicker extends BaseComponent {
     this._input = null
     this._menu = null
     this._timePickerBody = null
+    this._inputTimeout = null
 
     this._localizedTimePartials = getLocalizedTimePartials(
       this._config.locale,
@@ -218,6 +221,10 @@ class TimePicker extends BaseComponent {
   dispose() {
     if (this._popper) {
       this._popper.destroy()
+    }
+
+    if (this._inputTimeout) {
+      clearTimeout(this._inputTimeout)
     }
 
     super.dispose()
@@ -308,15 +315,21 @@ class TimePicker extends BaseComponent {
     })
 
     EventHandler.on(this._input, EVENT_INPUT, event => {
-      if (isValidTime(event.target.value)) {
-        this._date = this._convertStringToDate(event.target.value)
-
-        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-          timeString: this._date ? this._date.toTimeString() : null,
-          localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
-          date: this._date
-        })
+      if (this._inputTimeout) {
+        clearTimeout(this._inputTimeout)
       }
+
+      this._inputTimeout = setTimeout(() => {
+        if (isValidTime(event.target.value)) {
+          this._date = this._convertStringToDate(event.target.value)
+
+          EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
+            timeString: this._date ? this._date.toTimeString() : null,
+            localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
+            date: this._date
+          })
+        }
+      }, this._config.inputOnChangeDelay)
     })
 
     if (this._config.type === 'dropdown') {

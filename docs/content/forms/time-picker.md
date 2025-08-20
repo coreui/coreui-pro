@@ -223,6 +223,7 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 | `footer` | boolean | `true` | Toggle visibility of footer element. |
 | `hours` | array, function, null | `null` | Specify a list of available hours using an array, or customize the filtering of hours through a function. |
 | `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
+| `inputOnChangeDelay` | number | `750` | Delay in milliseconds before processing manual time input changes. |
 | `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
