@@ -2307,6 +2307,21 @@ $calendar-nav-padding:                       .5rem !default;
 $calendar-nav-border-width:                  1px !default;
 $calendar-nav-border-color:                  var(--#{$prefix}border-color) !default;
 $calendar-nav-date-color:                    var(--#{$prefix}body-color) !default;
+
+$calendar-nav-btn-padding-y:                 .25rem !default;
+$calendar-nav-btn-padding-x:                 .5rem !default;
+$calendar-nav-btn-font-size:                 $font-size-sm !default;
+$calendar-nav-btn-bg:                        transparent !default;
+$calendar-nav-btn-border-width:              1px !default;
+$calendar-nav-btn-border-color:              transparent !default;
+$calendar-nav-btn-border-radius:             $border-radius !default;
+
+$calendar-nav-btn-hover-bg:                  transparent !default;
+$calendar-nav-btn-hover-border-color:        transparent !default;
+
+$calendar-nav-btn-focus-border-color:        transparent !default;
+$calendar-nav-btn-focus-box-shadow:          $focus-ring-box-shadow !default;
+
 $calendar-nav-date-hover-color:              var(--#{$prefix}primary) !default;
 $calendar-nav-icon-width:                    1rem !default;
 $calendar-nav-icon-height:                   1rem !default;

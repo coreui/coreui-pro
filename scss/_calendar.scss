@@ -2,8 +2,10 @@
 @use "functions/escape-svg" as *;
 @use "mixins/breakpoints" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
+@use "vendor/rfs" as *;
 @use "variables" as *;
 
 .calendar {
@@ -13,6 +15,17 @@
   --#{$prefix}calendar-nav-padding: #{$calendar-nav-padding};
   --#{$prefix}calendar-nav-border-color: #{$calendar-nav-border-color};
   --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid var(--#{$prefix}calendar-nav-border-color);
+  --#{$prefix}calendar-nav-btn-padding-x: #{$calendar-nav-btn-padding-x};
+  --#{$prefix}calendar-nav-btn-padding-y: #{$calendar-nav-btn-padding-y};
+  @include rfs($calendar-nav-btn-font-size, --#{$prefix}calendar-nav-btn-font-size);
+  --#{$prefix}calendar-nav-btn-bg: #{$calendar-nav-btn-bg};
+  --#{$prefix}calendar-nav-btn-border-width: #{$calendar-nav-btn-border-width};
+  --#{$prefix}calendar-nav-btn-border-color: #{$calendar-nav-btn-border-color};
+  --#{$prefix}calendar-nav-btn-border-radius: #{$calendar-nav-btn-border-radius};
+  --#{$prefix}calendar-nav-btn-hover-bg: #{$calendar-nav-btn-hover-bg};
+  --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color};
+  --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color};
+  --#{$prefix}calendar-nav-btn-focus-box-shadow: #{$calendar-nav-btn-focus-box-shadow};
   --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color};
   --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
   --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};
@@ -82,10 +95,36 @@
   border-bottom: var(--#{$prefix}calendar-nav-border);
 }
 
+.calendar-nav-btn {
+  display: inline-block;
+  padding: var(--#{$prefix}calendar-nav-btn-padding-y) var(--#{$prefix}calendar-nav-btn-padding-x);
+  @include font-size(var(--#{$prefix}calendar-nav-btn-font-size));
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  background-color: var(--#{$prefix}calendar-nav-btn-bg);
+  border: var(--#{$prefix}calendar-nav-btn-border-width) solid var(--#{$prefix}calendar-nav-btn-border-color);
+  @include border-radius(var(--#{$prefix}calendar-nav-btn-border-radius));
+  @include transition($btn-transition);
+
+  &:hover {
+    background-color: var(--#{$prefix}calendar-nav-btn-hover-bg);
+    border-color: var(--#{$prefix}calendar-nav-btn-hover-border-color);
+  }
+
+  &:focus-visible {
+    border-color: var(--#{$prefix}calendar-nav-btn-focus-border-color);
+    outline: 0;
+    box-shadow: var(--#{$prefix}calendar-nav-btn-focus-box-shadow);
+  }
+}
+
 .calendar-nav-date {
   flex: 1;
   text-align: center;
 
+  .calendar-nav-btn,
+  // TODO: remove .btn class when no longer needed in v6
   .btn {
     font-weight: 600;
     color: var(--#{$prefix}calendar-nav-date-color);

@@ -564,26 +564,26 @@ class Calendar extends BaseComponent {
     navigationElement.classList.add('calendar-nav')
     navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button class="btn btn-transparent btn-sm btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
       <div class="calendar-nav-date" aria-live="polite">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-sm btn-month">
           ${calendarDate.toLocaleDateString(this._config.locale, { month: 'long' })}
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-year">
+        <button class="calendar-nav-btn btn-year">
           ${calendarDate.toLocaleDateString(this._config.locale, { year: 'numeric' })}
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
