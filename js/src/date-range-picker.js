@@ -368,6 +368,11 @@ class DateRangePicker extends BaseComponent {
       this._startInputTimeout = setTimeout(() => {
         const date = this._parseDate(event.target.value)
 
+        if (date === 'invalid') {
+          this._startDate = null
+          this._calendar.update(this._getCalendarConfig())
+        }
+
         // valid date or empty date
         if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
           // Check if the date is disabled
@@ -375,6 +380,7 @@ class DateRangePicker extends BaseComponent {
             return // Don't update if date is disabled
           }
 
+          this._startInput.value = this._setInputValue(date)
           this._startDate = date
           this._calendarDate = date
           this._calendar.update(this._getCalendarConfig())
@@ -421,6 +427,11 @@ class DateRangePicker extends BaseComponent {
       this._endInputTimeout = setTimeout(() => {
         const date = this._parseDate(event.target.value)
 
+        if (date === 'invalid') {
+          this._endDate = null
+          this._calendar.update(this._getCalendarConfig())
+        }
+
         // valid date or empty date
         if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
           // Check if the date is disabled
@@ -428,6 +439,7 @@ class DateRangePicker extends BaseComponent {
             return // Don't update if date is disabled
           }
 
+          this._endInput.value = this._setInputValue(date)
           this._endDate = date
           this._calendarDate = date
           this._calendar.update(this._getCalendarConfig())
