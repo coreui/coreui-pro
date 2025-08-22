@@ -57,8 +57,8 @@ Whether you're starting a new project or migrating from Bootstrap, CoreUI gives 
 
 Several quick start options are available:
 
-- [Download the latest release](https://github.com/coreui/coreui-pro/archive/v5.18.0.zip)
-- Clone the repo: `git clone https://github.com/coreui/coreui-pro.git`
+- [Download the latest release](https://github.com/coreui/coreui-pro/archive/v5.18.0.zip) (CoreUI PRO Enterprise subscription required)
+- Clone the repo: `git clone https://github.com/coreui/coreui-pro.git` (CoreUI PRO Enterprise subscription required)
 - Install with [npm](https://www.npmjs.com/): `npm install @coreui/coreui-pro`
 - Install with [yarn](https://yarnpkg.com/): `yarn add @coreui/coreui-pro`
 - Install with [Composer](https://getcomposer.org/): `composer require coreui/coreui-pro:5.18.0`
