@@ -444,30 +444,30 @@
       navigationElement.classList.add('calendar-nav');
       navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button class="btn btn-transparent btn-sm btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
       <div class="calendar-nav-date" aria-live="polite">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-sm btn-month">
           ${calendarDate.toLocaleDateString(this._config.locale, {
       month: 'long'
     })}
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-year">
+        <button class="calendar-nav-btn btn-year">
           ${calendarDate.toLocaleDateString(this._config.locale, {
       year: 'numeric'
     })}
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -656,32 +656,46 @@
       const isCurrentMonth = month === 'current';
       const isDisabled = calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isDateSelected(date, this._startDate, this._endDate);
+      const isTodayDate = calendar_js.isToday(date);
+      if (this._config.selectionType !== 'day' || this._view !== 'days') {
+        return {
+          className: this._classNames({
+            [CLASS_NAME_CALENDAR_CELL]: true,
+            today: isTodayDate,
+            [month]: true
+          }),
+          tabIndex: -1,
+          ariaSelected: false
+        };
+      }
+      const isInRange = isCurrentMonth && calendar_js.isDateInRange(date, this._startDate, this._endDate);
+      const isRangeHover = isCurrentMonth && this._hoverDate && (this._selectEndDate ? calendar_js.isDateInRange(date, this._startDate, this._hoverDate) : calendar_js.isDateInRange(date, this._hoverDate, this._endDate));
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_CELL]: true,
-        ...(this._config.selectionType === 'day' && this._view === 'days' && {
-          clickable: !isCurrentMonth && this._config.selectAdjacementDays,
-          disabled: isDisabled,
-          range: isCurrentMonth && calendar_js.isDateInRange(date, this._startDate, this._endDate),
-          'range-hover': isCurrentMonth && (this._hoverDate && this._selectEndDate ? calendar_js.isDateInRange(date, this._startDate, this._hoverDate) : calendar_js.isDateInRange(date, this._hoverDate, this._endDate)),
-          selected: isSelected
-        }),
-        today: calendar_js.isToday(date),
+        clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+        disabled: isDisabled,
+        range: isInRange,
+        'range-hover': isRangeHover,
+        selected: isSelected,
+        today: isTodayDate,
         [month]: true
       });
       return {
         className: classNames,
-        tabIndex: this._config.selectionType === 'day' && (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
+        tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
         ariaSelected: isSelected
       };
     }
     _cellMonthAttributes(date) {
       const isDisabled = calendar_js.isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isMonthSelected(date, this._startDate, this._endDate);
+      const isInRange = calendar_js.isMonthInRange(date, this._startDate, this._endDate);
+      const isRangeHover = this._config.selectionType === 'month' && this._hoverDate && (this._selectEndDate ? calendar_js.isMonthInRange(date, this._startDate, this._hoverDate) : calendar_js.isMonthInRange(date, this._hoverDate, this._endDate));
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_CELL]: true,
         disabled: isDisabled,
-        'range-hover': this._config.selectionType === 'month' && (this._hoverDate && this._selectEndDate ? calendar_js.isMonthInRange(date, this._startDate, this._hoverDate) : calendar_js.isMonthInRange(date, this._hoverDate, this._endDate)),
-        range: calendar_js.isMonthInRange(date, this._startDate, this._endDate),
+        'range-hover': isRangeHover,
+        range: isInRange,
         selected: isSelected
       });
       return {
@@ -693,11 +707,13 @@
     _cellYearAttributes(date) {
       const isDisabled = calendar_js.isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isYearSelected(date, this._startDate, this._endDate);
+      const isInRange = calendar_js.isYearInRange(date, this._startDate, this._endDate);
+      const isRangeHover = this._config.selectionType === 'year' && this._hoverDate && (this._selectEndDate ? calendar_js.isYearInRange(date, this._startDate, this._hoverDate) : calendar_js.isYearInRange(date, this._hoverDate, this._endDate));
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_CELL]: true,
         disabled: isDisabled,
-        'range-hover': this._config.selectionType === 'year' && (this._hoverDate && this._selectEndDate ? calendar_js.isYearInRange(date, this._startDate, this._hoverDate) : calendar_js.isYearInRange(date, this._hoverDate, this._endDate)),
-        range: calendar_js.isYearInRange(date, this._startDate, this._endDate),
+        'range-hover': isRangeHover,
+        range: isInRange,
         selected: isSelected
       });
       return {
@@ -707,18 +723,29 @@
       };
     }
     _rowWeekAttributes(date) {
+      if (this._config.selectionType !== 'week') {
+        return {
+          className: this._classNames({
+            [CLASS_NAME_CALENDAR_ROW]: true
+          }),
+          tabIndex: -1,
+          ariaSelected: false
+        };
+      }
       const isDisabled = calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
       const isSelected = calendar_js.isDateSelected(date, this._startDate, this._endDate);
+      const isInRange = calendar_js.isDateInRange(date, this._startDate, this._endDate);
+      const isRangeHover = this._hoverDate && (this._selectEndDate ? calendar_js.isYearInRange(date, this._startDate, this._hoverDate) : calendar_js.isYearInRange(date, this._hoverDate, this._endDate));
       const classNames = this._classNames({
         [CLASS_NAME_CALENDAR_ROW]: true,
         disabled: isDisabled,
-        range: this._config.selectionType === 'week' && calendar_js.isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': this._config.selectionType === 'week' && (this._hoverDate && this._selectEndDate ? calendar_js.isYearInRange(date, this._startDate, this._hoverDate) : calendar_js.isYearInRange(date, this._hoverDate, this._endDate)),
+        range: isInRange,
+        'range-hover': isRangeHover,
         selected: isSelected
       });
       return {
         className: classNames,
-        tabIndex: this._config.selectionType === 'week' && !isDisabled ? 0 : -1,
+        tabIndex: isDisabled ? -1 : 0,
         ariaSelected: isSelected
       };
     }

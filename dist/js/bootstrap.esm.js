@@ -1,9 +1,5 @@
 /*!
-<<<<<<< HEAD
   * CoreUI v5.18.0 (https://coreui.io)
-=======
-  * CoreUI v5.4.2 (https://coreui.io)
->>>>>>> a8ab9fd81f2dadfc1a04ce6e8377878efcb79d53
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -665,11 +661,7 @@ class Config {
  * Constants
  */
 
-<<<<<<< HEAD
 const VERSION = '5.18.0';
-=======
-const VERSION = '5.4.2';
->>>>>>> a8ab9fd81f2dadfc1a04ce6e8377878efcb79d53
 
 /**
  * Class definition
@@ -2917,30 +2909,30 @@ class Calendar extends BaseComponent {
     navigationElement.classList.add('calendar-nav');
     navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button class="btn btn-transparent btn-sm btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
       <div class="calendar-nav-date" aria-live="polite">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-month">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-sm btn-month">
           ${calendarDate.toLocaleDateString(this._config.locale, {
       month: 'long'
     })}
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-year">
+        <button class="calendar-nav-btn btn-year">
           ${calendarDate.toLocaleDateString(this._config.locale, {
       year: 'numeric'
     })}
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button class="btn btn-transparent btn-sm btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button class="btn btn-transparent btn-sm btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -3129,32 +3121,46 @@ class Calendar extends BaseComponent {
     const isCurrentMonth = month === 'current';
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
     const isSelected = isDateSelected(date, this._startDate, this._endDate);
+    const isTodayDate = isToday(date);
+    if (this._config.selectionType !== 'day' || this._view !== 'days') {
+      return {
+        className: this._classNames({
+          [CLASS_NAME_CALENDAR_CELL]: true,
+          today: isTodayDate,
+          [month]: true
+        }),
+        tabIndex: -1,
+        ariaSelected: false
+      };
+    }
+    const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate);
+    const isRangeHover = isCurrentMonth && this._hoverDate && (this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate));
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
-      ...(this._config.selectionType === 'day' && this._view === 'days' && {
-        clickable: !isCurrentMonth && this._config.selectAdjacementDays,
-        disabled: isDisabled,
-        range: isCurrentMonth && isDateInRange(date, this._startDate, this._endDate),
-        'range-hover': isCurrentMonth && (this._hoverDate && this._selectEndDate ? isDateInRange(date, this._startDate, this._hoverDate) : isDateInRange(date, this._hoverDate, this._endDate)),
-        selected: isSelected
-      }),
-      today: isToday(date),
+      clickable: !isCurrentMonth && this._config.selectAdjacementDays,
+      disabled: isDisabled,
+      range: isInRange,
+      'range-hover': isRangeHover,
+      selected: isSelected,
+      today: isTodayDate,
       [month]: true
     });
     return {
       className: classNames,
-      tabIndex: this._config.selectionType === 'day' && (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
+      tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected
     };
   }
   _cellMonthAttributes(date) {
     const isDisabled = isMonthDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
     const isSelected = isMonthSelected(date, this._startDate, this._endDate);
+    const isInRange = isMonthInRange(date, this._startDate, this._endDate);
+    const isRangeHover = this._config.selectionType === 'month' && this._hoverDate && (this._selectEndDate ? isMonthInRange(date, this._startDate, this._hoverDate) : isMonthInRange(date, this._hoverDate, this._endDate));
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
       disabled: isDisabled,
-      'range-hover': this._config.selectionType === 'month' && (this._hoverDate && this._selectEndDate ? isMonthInRange(date, this._startDate, this._hoverDate) : isMonthInRange(date, this._hoverDate, this._endDate)),
-      range: isMonthInRange(date, this._startDate, this._endDate),
+      'range-hover': isRangeHover,
+      range: isInRange,
       selected: isSelected
     });
     return {
@@ -3166,11 +3172,13 @@ class Calendar extends BaseComponent {
   _cellYearAttributes(date) {
     const isDisabled = isYearDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
     const isSelected = isYearSelected(date, this._startDate, this._endDate);
+    const isInRange = isYearInRange(date, this._startDate, this._endDate);
+    const isRangeHover = this._config.selectionType === 'year' && this._hoverDate && (this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate));
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_CELL]: true,
       disabled: isDisabled,
-      'range-hover': this._config.selectionType === 'year' && (this._hoverDate && this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate)),
-      range: isYearInRange(date, this._startDate, this._endDate),
+      'range-hover': isRangeHover,
+      range: isInRange,
       selected: isSelected
     });
     return {
@@ -3180,18 +3188,29 @@ class Calendar extends BaseComponent {
     };
   }
   _rowWeekAttributes(date) {
+    if (this._config.selectionType !== 'week') {
+      return {
+        className: this._classNames({
+          [CLASS_NAME_CALENDAR_ROW]: true
+        }),
+        tabIndex: -1,
+        ariaSelected: false
+      };
+    }
     const isDisabled = isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
     const isSelected = isDateSelected(date, this._startDate, this._endDate);
+    const isInRange = isDateInRange(date, this._startDate, this._endDate);
+    const isRangeHover = this._hoverDate && (this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate));
     const classNames = this._classNames({
       [CLASS_NAME_CALENDAR_ROW]: true,
       disabled: isDisabled,
-      range: this._config.selectionType === 'week' && isDateInRange(date, this._startDate, this._endDate),
-      'range-hover': this._config.selectionType === 'week' && (this._hoverDate && this._selectEndDate ? isYearInRange(date, this._startDate, this._hoverDate) : isYearInRange(date, this._hoverDate, this._endDate)),
+      range: isInRange,
+      'range-hover': isRangeHover,
       selected: isSelected
     });
     return {
       className: classNames,
-      tabIndex: this._config.selectionType === 'week' && !isDisabled ? 0 : -1,
+      tabIndex: isDisabled ? -1 : 0,
       ariaSelected: isSelected
     };
   }
@@ -4180,6 +4199,7 @@ const Default$j = {
   footer: true,
   hours: null,
   indicator: true,
+  inputOnChangeDelay: 750,
   inputReadOnly: false,
   invalid: false,
   locale: 'default',
@@ -4205,6 +4225,7 @@ const DefaultType$j = {
   footer: 'boolean',
   hours: '(array|function|null)',
   indicator: 'boolean',
+  inputOnChangeDelay: 'number',
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
@@ -4272,6 +4293,7 @@ class TimePicker extends BaseComponent {
     this._input = null;
     this._menu = null;
     this._timePickerBody = null;
+    this._inputTimeout = null;
     this._localizedTimePartials = getLocalizedTimePartials(this._config.locale, this.ampm, this._config.hours, this._config.minutes, this._config.seconds);
     this._createTimePicker();
     this._createTimePickerSelection();
@@ -4323,6 +4345,9 @@ class TimePicker extends BaseComponent {
   dispose() {
     if (this._popper) {
       this._popper.destroy();
+    }
+    if (this._inputTimeout) {
+      clearTimeout(this._inputTimeout);
     }
     super.dispose();
   }
@@ -4397,14 +4422,19 @@ class TimePicker extends BaseComponent {
       this.cancel();
     });
     EventHandler.on(this._input, EVENT_INPUT$2, event => {
-      if (isValidTime(event.target.value)) {
-        this._date = this._convertStringToDate(event.target.value);
-        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-          timeString: this._date ? this._date.toTimeString() : null,
-          localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
-          date: this._date
-        });
+      if (this._inputTimeout) {
+        clearTimeout(this._inputTimeout);
       }
+      this._inputTimeout = setTimeout(() => {
+        if (isValidTime(event.target.value)) {
+          this._date = this._convertStringToDate(event.target.value);
+          EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
+            timeString: this._date ? this._date.toTimeString() : null,
+            localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
+            date: this._date
+          });
+        }
+      }, this._config.inputOnChangeDelay);
     });
     if (this._config.type === 'dropdown') {
       EventHandler.on(this._input.form, EVENT_SUBMIT$1, () => {
@@ -4810,20 +4840,166 @@ EventHandler.on(document, EVENT_KEYUP_DATA_API$4, TimePicker.clearMenus);
 
 defineJQueryPlugin(TimePicker);
 
-const getLocalDateFromString = (string, locale, time) => {
-  const date = new Date(2013, 11, 31, 17, 19, 22);
-  let regex = time ? date.toLocaleString(locale) : date.toLocaleDateString(locale);
-  regex = regex.replace('2013', '(?<year>[0-9]{2,4})').replace('12', '(?<month>[0-9]{1,2})').replace('31', '(?<day>[0-9]{1,2})');
-  if (time) {
-    regex = regex.replace('5', '(?<hour>[0-9]{1,2})').replace('17', '(?<hour>[0-9]{1,2})').replace('19', '(?<minute>[0-9]{1,2})').replace('22', '(?<second>[0-9]{1,2})').replace('PM', '(?<ampm>[A-Z]{2})');
+// Helper function to generate multiple date format patterns
+const generateDatePatterns = (locale, includeTime) => {
+  const referenceDate = new Date(2013, 11, 31, 17, 19, 22);
+  const patterns = [];
+  try {
+    // Get the standard locale format
+    const standardFormat = includeTime ? referenceDate.toLocaleString(locale) : referenceDate.toLocaleDateString(locale);
+    patterns.push(standardFormat);
+  } catch (_unused) {
+    // Fallback to default locale if invalid locale provided
+    const standardFormat = includeTime ? referenceDate.toLocaleString('en-US') : referenceDate.toLocaleDateString('en-US');
+    patterns.push(standardFormat);
   }
-  const rgx = new RegExp(`${regex}`);
-  const partials = string.match(rgx);
-  if (partials === null) {
+
+  // Generate common alternative formats by replacing separators
+  const separators = ['/', '-', '.', ' '];
+  const standardFormat = patterns[0];
+
+  // Detect the original separator
+  let originalSeparator = '/'; // default
+  if (standardFormat.includes('/')) {
+    originalSeparator = '/';
+  } else if (standardFormat.includes('-')) {
+    originalSeparator = '-';
+  } else if (standardFormat.includes('.')) {
+    originalSeparator = '.';
+  }
+  for (const sep of separators) {
+    if (sep !== originalSeparator) {
+      const altFormat = standardFormat.replace(new RegExp(`\\${originalSeparator}`, 'g'), sep);
+      patterns.push(altFormat);
+    }
+  }
+  return patterns;
+};
+
+// Helper function to build regex pattern for date parsing
+const buildDateRegexPattern = (formatString, includeTime) => {
+  let regexPattern = formatString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace('2013', '(?<year>\\d{2,4})').replace('12', '(?<month>\\d{1,2})').replace('31', '(?<day>\\d{1,2})');
+  if (includeTime) {
+    regexPattern = regexPattern.replace(/17|5/g, '(?<hour>\\d{1,2})').replace('19', '(?<minute>\\d{1,2})').replace('22', '(?<second>\\d{1,2})').replace(/AM|PM/gi, '(?<ampm>[APap][Mm])');
+  }
+  return regexPattern;
+};
+
+// Helper function to try parsing with multiple patterns
+const tryParseWithPatterns = (dateString, patterns, includeTime) => {
+  for (const pattern of patterns) {
+    const regexPattern = buildDateRegexPattern(pattern, includeTime);
+    const regex = new RegExp(`^${regexPattern}$`);
+    const match = dateString.trim().match(regex);
+    if (match != null && match.groups) {
+      return match.groups;
+    }
+  }
+  return null;
+};
+
+// Helper function to validate date components
+const validateDateComponents = (month, day) => {
+  const parsedMonth = Number.parseInt(month, 10) - 1;
+  const parsedDay = Number.parseInt(day, 10);
+  return parsedMonth >= 0 && parsedMonth <= 11 && parsedDay >= 1 && parsedDay <= 31;
+};
+
+// Helper function to convert 12-hour to 24-hour format
+const convertTo24Hour = (hour, ampm) => {
+  const parsedHour = Number.parseInt(hour, 10);
+  if (!ampm) {
+    return parsedHour;
+  }
+  const isPM = ampm.toLowerCase() === 'pm';
+  if (isPM && parsedHour !== 12) {
+    return parsedHour + 12;
+  }
+  if (!isPM && parsedHour === 12) {
+    return 0;
+  }
+  return parsedHour;
+};
+
+// Helper function to validate time components
+const validateTimeComponents = (hour, minute, second) => {
+  return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59;
+};
+
+// Helper function to create date with time
+const createDateWithTime = groups => {
+  const {
+    year,
+    month,
+    day,
+    hour,
+    minute,
+    second,
+    ampm
+  } = groups;
+  const parsedYear = Number.parseInt(year, 10);
+  const parsedMonth = Number.parseInt(month, 10) - 1;
+  const parsedDay = Number.parseInt(day, 10);
+  const parsedHour = convertTo24Hour(hour, ampm);
+  const parsedMinute = Number.parseInt(minute, 10) || 0;
+  const parsedSecond = Number.parseInt(second, 10) || 0;
+  if (!validateTimeComponents(parsedHour, parsedMinute, parsedSecond)) {
+    return 'invalid';
+  }
+  return new Date(parsedYear, parsedMonth, parsedDay, parsedHour, parsedMinute, parsedSecond);
+};
+
+// Helper function to create date without time
+const createDateOnly = groups => {
+  const {
+    year,
+    month,
+    day
+  } = groups;
+  const parsedYear = Number.parseInt(year, 10);
+  const parsedMonth = Number.parseInt(month, 10) - 1;
+  const parsedDay = Number.parseInt(day, 10);
+  return new Date(parsedYear, parsedMonth, parsedDay);
+};
+
+/**
+ * Parses a date string using locale-aware patterns and returns a Date object.
+ *
+ * This function generates multiple date format patterns based on the provided locale
+ * and attempts to parse the input string using these patterns. It supports various
+ * date separators (/, -, ., space) and handles both date-only and date-time formats.
+ *
+ * @param {string} dateString - The date string to parse (e.g., "12/31/2023", "31-12-2023")
+ * @param {string} [locale='en-US'] - The locale to use for date format patterns (e.g., 'en-US', 'en-GB', 'de-DE')
+ * @param {boolean} [includeTime=false] - Whether to include time parsing in the pattern matching
+ * @returns {Date|string|undefined} A Date object if parsing succeeds, 'invalid' for malformed dates, undefined for empty input
+ */
+const getLocalDateFromString = (dateString, locale = 'en-US', includeTime = false) => {
+  // Input validation
+  if (!dateString || typeof dateString !== 'string') {
     return;
   }
-  const newDate = partials.groups && (time ? new Date(Number(partials.groups.year, 10), Number(partials.groups.month, 10) - 1, Number(partials.groups.day), partials.groups.ampm ? partials.groups.ampm === 'PM' ? Number(partials.groups.hour) + 12 : Number(partials.groups.hour) : Number(partials.groups.hour), Number(partials.groups.minute), Number(partials.groups.second)) : new Date(Number(partials.groups.year), Number(partials.groups.month) - 1, Number(partials.groups.day)));
-  return newDate;
+
+  // Generate multiple format patterns to try
+  const patterns = generateDatePatterns(locale, includeTime);
+
+  // Try parsing with different patterns
+  const groups = tryParseWithPatterns(dateString, patterns, includeTime);
+  if (!groups) {
+    return 'invalid';
+  }
+
+  // Validate date components
+  const {
+    month,
+    day
+  } = groups;
+  if (!validateDateComponents(month, day)) {
+    return 'invalid';
+  }
+
+  // Create and return appropriate date object
+  return includeTime ? createDateWithTime(groups) : createDateOnly(groups);
 };
 
 /**
@@ -4907,6 +5083,7 @@ const Default$i = {
   footer: false,
   inputDateFormat: null,
   inputDateParse: null,
+  inputOnChangeDelay: 750,
   inputReadOnly: false,
   invalid: false,
   indicator: true,
@@ -4959,6 +5136,7 @@ const DefaultType$i = {
   indicator: 'boolean',
   inputDateFormat: '(function|null)',
   inputDateParse: '(function|null)',
+  inputOnChangeDelay: 'number',
   inputReadOnly: 'boolean',
   invalid: 'boolean',
   locale: 'string',
@@ -5014,6 +5192,8 @@ class DateRangePicker extends BaseComponent {
     this._timePickerEnd = null;
     this._timePickerStart = null;
     this._togglerElement = null;
+    this._startInputTimeout = null;
+    this._endInputTimeout = null;
     this._createDateRangePicker();
     this._createDateRangePickerCalendars();
     this._addEventListeners();
@@ -5065,6 +5245,12 @@ class DateRangePicker extends BaseComponent {
   dispose() {
     if (this._popper) {
       this._popper.destroy();
+    }
+    if (this._startInputTimeout) {
+      clearTimeout(this._startInputTimeout);
+    }
+    if (this._endInputTimeout) {
+      clearTimeout(this._endInputTimeout);
     }
     super.dispose();
   }
@@ -5130,17 +5316,31 @@ class DateRangePicker extends BaseComponent {
       this._calendar.update(this._getCalendarConfig());
     });
     EventHandler.on(this._startInput, EVENT_INPUT$1, event => {
-      const date = this._parseDate(event.target.value);
-
-      // valid date or empty date
-      if (date instanceof Date && !Number.isNaN(date) || date === null) {
-        this._startDate = date;
-        this._calendarDate = date;
-        this._calendar.update(this._getCalendarConfig());
+      if (this._startInputTimeout) {
+        clearTimeout(this._startInputTimeout);
       }
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-        date
-      });
+      this._startInputTimeout = setTimeout(() => {
+        const date = this._parseDate(event.target.value);
+        if (date === 'invalid') {
+          this._startDate = null;
+          this._calendar.update(this._getCalendarConfig());
+        }
+
+        // valid date or empty date
+        if (date instanceof Date && !Number.isNaN(date) || date === null) {
+          // Check if the date is disabled
+          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            return; // Don't update if date is disabled
+          }
+          this._startInput.value = this._setInputValue(date);
+          this._startDate = date;
+          this._calendarDate = date;
+          this._calendar.update(this._getCalendarConfig());
+        }
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+          date
+        });
+      }, this._config.inputOnChangeDelay);
     });
     EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
       if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
@@ -5164,17 +5364,31 @@ class DateRangePicker extends BaseComponent {
       this._calendar.update(this._getCalendarConfig());
     });
     EventHandler.on(this._endInput, EVENT_INPUT$1, event => {
-      const date = this._parseDate(event.target.value);
-
-      // valid date or empty date
-      if (date instanceof Date && !Number.isNaN(date) || date === null) {
-        this._endDate = date;
-        this._calendarDate = date;
-        this._calendar.update(this._getCalendarConfig());
+      if (this._endInputTimeout) {
+        clearTimeout(this._endInputTimeout);
       }
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-        date
-      });
+      this._endInputTimeout = setTimeout(() => {
+        const date = this._parseDate(event.target.value);
+        if (date === 'invalid') {
+          this._endDate = null;
+          this._calendar.update(this._getCalendarConfig());
+        }
+
+        // valid date or empty date
+        if (date instanceof Date && !Number.isNaN(date) || date === null) {
+          // Check if the date is disabled
+          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            return; // Don't update if date is disabled
+          }
+          this._endInput.value = this._setInputValue(date);
+          this._endDate = date;
+          this._calendarDate = date;
+          this._calendar.update(this._getCalendarConfig());
+        }
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+          date
+        });
+      }, this._config.inputOnChangeDelay);
     });
     EventHandler.on(window, EVENT_RESIZE$4, () => {
       this._mobile = window.innerWidth < 768;
@@ -6264,10 +6478,6 @@ class LoadingButton extends BaseComponent {
       return;
     }
     stoped();
-  }
-  dispose() {
-    Data.removeData(this._element, DATA_KEY$d);
-    this._element = null;
   }
   _createButton() {
     this._element.classList.add(CLASS_NAME_LOADING_BUTTON);

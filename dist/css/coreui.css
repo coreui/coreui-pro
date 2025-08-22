@@ -1,10 +1,6 @@
 @charset "UTF-8";
 /*!
-<<<<<<< HEAD
  * CoreUI PRO  v5.18.0 (https://coreui.io)
-=======
- * CoreUI  v5.4.2 (https://coreui.io)
->>>>>>> a8ab9fd81f2dadfc1a04ce6e8377878efcb79d53
  * Copyright (c) 2025 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -8655,6 +8651,17 @@ select.form-multi-select {
   --cui-calendar-nav-padding: 0.5rem;
   --cui-calendar-nav-border-color: var(--cui-border-color);
   --cui-calendar-nav-border: 1px solid var(--cui-calendar-nav-border-color);
+  --cui-calendar-nav-btn-padding-x: 0.5rem;
+  --cui-calendar-nav-btn-padding-y: 0.25rem;
+  --cui-calendar-nav-btn-font-size: 0.875rem;
+  --cui-calendar-nav-btn-bg: transparent;
+  --cui-calendar-nav-btn-border-width: 1px;
+  --cui-calendar-nav-btn-border-color: transparent;
+  --cui-calendar-nav-btn-border-radius: 0.375rem;
+  --cui-calendar-nav-btn-hover-bg: transparent;
+  --cui-calendar-nav-btn-hover-border-color: transparent;
+  --cui-calendar-nav-btn-focus-border-color: transparent;
+  --cui-calendar-nav-btn-focus-box-shadow: 0 0 0 0.25rem rgba(88, 86, 214, 0.25);
   --cui-calendar-nav-date-color: var(--cui-body-color);
   --cui-calendar-nav-date-hover-color: var(--cui-primary);
   --cui-calendar-nav-icon-width: 1rem;
@@ -8718,14 +8725,45 @@ select.form-multi-select {
   border-bottom: var(--cui-calendar-nav-border);
 }
 
+.calendar-nav-btn {
+  display: inline-block;
+  padding: var(--cui-calendar-nav-btn-padding-y) var(--cui-calendar-nav-btn-padding-x);
+  font-size: var(--cui-calendar-nav-btn-font-size);
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  background-color: var(--cui-calendar-nav-btn-bg);
+  border: var(--cui-calendar-nav-btn-border-width) solid var(--cui-calendar-nav-btn-border-color);
+  border-radius: var(--cui-calendar-nav-btn-border-radius);
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .calendar-nav-btn {
+    transition: none;
+  }
+}
+.calendar-nav-btn:hover {
+  background-color: var(--cui-calendar-nav-btn-hover-bg);
+  border-color: var(--cui-calendar-nav-btn-hover-border-color);
+}
+.calendar-nav-btn:focus-visible {
+  border-color: var(--cui-calendar-nav-btn-focus-border-color);
+  outline: 0;
+  box-shadow: var(--cui-calendar-nav-btn-focus-box-shadow);
+}
+
 .calendar-nav-date {
   flex: 1;
   text-align: center;
 }
+.calendar-nav-date .calendar-nav-btn,
 .calendar-nav-date .btn {
   font-weight: 600;
   color: var(--cui-calendar-nav-date-color);
 }
+.calendar-nav-date .calendar-nav-btn:hover,
 .calendar-nav-date .btn:hover {
   color: var(--cui-calendar-nav-date-hover-color);
 }

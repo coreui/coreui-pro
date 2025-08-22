@@ -94,6 +94,7 @@
     footer: true,
     hours: null,
     indicator: true,
+    inputOnChangeDelay: 750,
     inputReadOnly: false,
     invalid: false,
     locale: 'default',
@@ -119,6 +120,7 @@
     footer: 'boolean',
     hours: '(array|function|null)',
     indicator: 'boolean',
+    inputOnChangeDelay: 'number',
     inputReadOnly: 'boolean',
     invalid: 'boolean',
     locale: 'string',
@@ -186,6 +188,7 @@
       this._input = null;
       this._menu = null;
       this._timePickerBody = null;
+      this._inputTimeout = null;
       this._localizedTimePartials = time_js.getLocalizedTimePartials(this._config.locale, this.ampm, this._config.hours, this._config.minutes, this._config.seconds);
       this._createTimePicker();
       this._createTimePickerSelection();
@@ -237,6 +240,9 @@
     dispose() {
       if (this._popper) {
         this._popper.destroy();
+      }
+      if (this._inputTimeout) {
+        clearTimeout(this._inputTimeout);
       }
       super.dispose();
     }
@@ -311,14 +317,19 @@
         this.cancel();
       });
       EventHandler.on(this._input, EVENT_INPUT, event => {
-        if (time_js.isValidTime(event.target.value)) {
-          this._date = this._convertStringToDate(event.target.value);
-          EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-            timeString: this._date ? this._date.toTimeString() : null,
-            localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
-            date: this._date
-          });
+        if (this._inputTimeout) {
+          clearTimeout(this._inputTimeout);
         }
+        this._inputTimeout = setTimeout(() => {
+          if (time_js.isValidTime(event.target.value)) {
+            this._date = this._convertStringToDate(event.target.value);
+            EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
+              timeString: this._date ? this._date.toTimeString() : null,
+              localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
+              date: this._date
+            });
+          }
+        }, this._config.inputOnChangeDelay);
       });
       if (this._config.type === 'dropdown') {
         EventHandler.on(this._input.form, EVENT_SUBMIT, () => {

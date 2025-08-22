@@ -109,6 +109,7 @@
     footer: false,
     inputDateFormat: null,
     inputDateParse: null,
+    inputOnChangeDelay: 750,
     inputReadOnly: false,
     invalid: false,
     indicator: true,
@@ -161,6 +162,7 @@
     indicator: 'boolean',
     inputDateFormat: '(function|null)',
     inputDateParse: '(function|null)',
+    inputOnChangeDelay: 'number',
     inputReadOnly: 'boolean',
     invalid: 'boolean',
     locale: 'string',
@@ -216,6 +218,8 @@
       this._timePickerEnd = null;
       this._timePickerStart = null;
       this._togglerElement = null;
+      this._startInputTimeout = null;
+      this._endInputTimeout = null;
       this._createDateRangePicker();
       this._createDateRangePickerCalendars();
       this._addEventListeners();
@@ -267,6 +271,12 @@
     dispose() {
       if (this._popper) {
         this._popper.destroy();
+      }
+      if (this._startInputTimeout) {
+        clearTimeout(this._startInputTimeout);
+      }
+      if (this._endInputTimeout) {
+        clearTimeout(this._endInputTimeout);
       }
       super.dispose();
     }
@@ -332,17 +342,31 @@
         this._calendar.update(this._getCalendarConfig());
       });
       EventHandler.on(this._startInput, EVENT_INPUT, event => {
-        const date = this._parseDate(event.target.value);
-
-        // valid date or empty date
-        if (date instanceof Date && !Number.isNaN(date) || date === null) {
-          this._startDate = date;
-          this._calendarDate = date;
-          this._calendar.update(this._getCalendarConfig());
+        if (this._startInputTimeout) {
+          clearTimeout(this._startInputTimeout);
         }
-        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date
-        });
+        this._startInputTimeout = setTimeout(() => {
+          const date = this._parseDate(event.target.value);
+          if (date === 'invalid') {
+            this._startDate = null;
+            this._calendar.update(this._getCalendarConfig());
+          }
+
+          // valid date or empty date
+          if (date instanceof Date && !Number.isNaN(date) || date === null) {
+            // Check if the date is disabled
+            if (date && calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+              return; // Don't update if date is disabled
+            }
+            this._startInput.value = this._setInputValue(date);
+            this._startDate = date;
+            this._calendarDate = date;
+            this._calendar.update(this._getCalendarConfig());
+          }
+          EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
+            date
+          });
+        }, this._config.inputOnChangeDelay);
       });
       EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
         if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
@@ -366,17 +390,31 @@
         this._calendar.update(this._getCalendarConfig());
       });
       EventHandler.on(this._endInput, EVENT_INPUT, event => {
-        const date = this._parseDate(event.target.value);
-
-        // valid date or empty date
-        if (date instanceof Date && !Number.isNaN(date) || date === null) {
-          this._endDate = date;
-          this._calendarDate = date;
-          this._calendar.update(this._getCalendarConfig());
+        if (this._endInputTimeout) {
+          clearTimeout(this._endInputTimeout);
         }
-        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date
-        });
+        this._endInputTimeout = setTimeout(() => {
+          const date = this._parseDate(event.target.value);
+          if (date === 'invalid') {
+            this._endDate = null;
+            this._calendar.update(this._getCalendarConfig());
+          }
+
+          // valid date or empty date
+          if (date instanceof Date && !Number.isNaN(date) || date === null) {
+            // Check if the date is disabled
+            if (date && calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+              return; // Don't update if date is disabled
+            }
+            this._endInput.value = this._setInputValue(date);
+            this._endDate = date;
+            this._calendarDate = date;
+            this._calendar.update(this._getCalendarConfig());
+          }
+          EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
+            date
+          });
+        }, this._config.inputOnChangeDelay);
       });
       EventHandler.on(window, EVENT_RESIZE, () => {
         this._mobile = window.innerWidth < 768;
