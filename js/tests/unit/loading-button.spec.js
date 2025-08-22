@@ -295,10 +295,10 @@ describe('LoadingButton', () => {
       const loadingButton = new LoadingButton(button)
 
       expect(Data.get(button, 'coreui.loading-button')).toEqual(loadingButton)
-      expect(() => {
-        loadingButton.dispose()
-      }).toThrow() // Will throw because Data.removeData doesn't exist
-      // The actual implementation has a bug - it should call Data.remove instead
+
+      loadingButton.dispose()
+
+      expect(Data.get(button, 'coreui.loading-button')).toBeNull()
     })
   })
 
