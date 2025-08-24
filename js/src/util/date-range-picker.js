@@ -124,7 +124,7 @@ const createDateWithTime = groups => {
   const parsedSecond = Number.parseInt(second, 10) || 0
 
   if (!validateTimeComponents(parsedHour, parsedMinute, parsedSecond)) {
-    return 'invalid'
+    return new Date('invalid')
   }
 
   return new Date(parsedYear, parsedMonth, parsedDay, parsedHour, parsedMinute, parsedSecond)
@@ -166,13 +166,13 @@ export const getLocalDateFromString = (dateString, locale = 'en-US', includeTime
   const groups = tryParseWithPatterns(dateString, patterns, includeTime)
 
   if (!groups) {
-    return 'invalid'
+    return new Date('invalid')
   }
 
   // Validate date components
   const { month, day } = groups
   if (!validateDateComponents(month, day)) {
-    return 'invalid'
+    return new Date('invalid')
   }
 
   // Create and return appropriate date object

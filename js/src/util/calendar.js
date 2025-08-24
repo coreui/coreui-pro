@@ -24,6 +24,10 @@ export const convertToDateObject = (date, selectionType) => {
   }
 
   if (date instanceof Date) {
+    if (Number.isNaN(date.getTime())) {
+      return null
+    }
+
     return date
   }
 
