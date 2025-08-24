@@ -56,6 +56,8 @@ const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_INDICATOR = 'date-picker-indicator'
 const CLASS_NAME_INPUT = 'date-picker-input'
 const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
+const CLASS_NAME_INPUT_PREVIEW = 'date-picker-input-preview'
+const CLASS_NAME_INPUT_WRAPPER = 'date-picker-input-wrapper'
 const CLASS_NAME_IS_INVALID = 'is-invalid'
 const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
@@ -199,15 +201,17 @@ class DateRangePicker extends BaseComponent {
     this._calendar = null
     this._calendars = null
     this._endInput = null
+    this._endInputTimeout = null
+    this._endPreviewInput = null
     this._indicatorElement = null
     this._menu = null
     this._startInput = null
+    this._startInputTimeout = null
+    this._startPreviewInput = null
     this._timepickers = null
     this._timePickerEnd = null
     this._timePickerStart = null
     this._togglerElement = null
-    this._startInputTimeout = null
-    this._endInputTimeout = null
 
     this._createDateRangePicker()
     this._createDateRangePickerCalendars()
@@ -368,23 +372,17 @@ class DateRangePicker extends BaseComponent {
       this._startInputTimeout = setTimeout(() => {
         const date = this._parseDate(event.target.value)
 
-        if (date === 'invalid') {
-          this._startDate = null
-          this._calendar.update(this._getCalendarConfig())
-        }
-
-        // valid date or empty date
-        if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
-          // Check if the date is disabled
-          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+        if (date instanceof Date && date.getTime()) {
+          if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
             return // Don't update if date is disabled
           }
 
-          this._startInput.value = this._setInputValue(date)
-          this._startDate = date
           this._calendarDate = date
-          this._calendar.update(this._getCalendarConfig())
+          this._startInput.value = this._setInputValue(date)
         }
+
+        this._startDate = date
+        this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
           date
@@ -427,23 +425,17 @@ class DateRangePicker extends BaseComponent {
       this._endInputTimeout = setTimeout(() => {
         const date = this._parseDate(event.target.value)
 
-        if (date === 'invalid') {
-          this._endDate = null
-          this._calendar.update(this._getCalendarConfig())
-        }
-
-        // valid date or empty date
-        if ((date instanceof Date && !Number.isNaN(date)) || (date === null)) {
-          // Check if the date is disabled
+        if (date instanceof Date && date.getTime()) {
           if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
             return // Don't update if date is disabled
           }
 
-          this._endInput.value = this._setInputValue(date)
-          this._endDate = date
           this._calendarDate = date
-          this._calendar.update(this._getCalendarConfig())
+          this._endInput.value = this._setInputValue(date)
         }
+
+        this._endDate = date
+        this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
           date
@@ -474,14 +466,17 @@ class DateRangePicker extends BaseComponent {
         }
       })
 
-      if (this._config.previewDateOnHover) {
+      if (this._config.previewDateOnHover && !this._config.disabled) {
         EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
           if (this._selectEndDate) {
-            this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate)
+            const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate)
+            this._updatePreviewInputVisibility(this._endPreviewInput, event.date ? previewValue : '')
+
             return
           }
 
-          this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate)
+          const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate)
+          this._updatePreviewInputVisibility(this._startPreviewInput, event.date ? previewValue : '')
         })
       }
 
@@ -590,6 +585,48 @@ class DateRangePicker extends BaseComponent {
     this._menu = dropdownEl
   }
 
+  _updatePreviewInputVisibility(previewInput, value) {
+    if (!previewInput) {
+      return
+    }
+
+    if (value && value.trim() !== '') {
+      previewInput.style.display = 'block'
+      previewInput.value = value
+    } else {
+      previewInput.style.display = 'none'
+      previewInput.value = ''
+    }
+  }
+
+  _createInputWrapper(inputEl, isStart = true) {
+    if (!this._config.previewDateOnHover || this._config.disabled) {
+      return inputEl
+    }
+
+    const wrapperEl = document.createElement('div')
+    wrapperEl.classList.add(CLASS_NAME_INPUT_WRAPPER)
+
+    wrapperEl.append(inputEl)
+
+    const previewInputEl = document.createElement('input')
+    previewInputEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_PREVIEW)
+    previewInputEl.type = 'text'
+    previewInputEl.readOnly = true
+    previewInputEl.tabIndex = -1
+    previewInputEl.style.display = 'none'
+
+    if (isStart) {
+      this._startPreviewInput = previewInputEl
+    } else {
+      this._endPreviewInput = previewInputEl
+    }
+
+    wrapperEl.append(previewInputEl)
+
+    return wrapperEl
+  }
+
   _createDateRangePickerInputGroup() {
     const inputGroupEl = document.createElement('div')
     inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP)
@@ -616,14 +653,16 @@ class DateRangePicker extends BaseComponent {
     this._startInput = startInputEl
     this._endInput = endInputEl
 
-    inputGroupEl.append(startInputEl)
+    const startInputWrapper = this._createInputWrapper(startInputEl, true)
+    inputGroupEl.append(startInputWrapper)
 
     if (this._config.separator) {
       inputGroupEl.append(inputGroupTextSeparatorEl)
     }
 
     if (this._config.range) {
-      inputGroupEl.append(endInputEl)
+      const endInputWrapper = this._createInputWrapper(endInputEl, false)
+      inputGroupEl.append(endInputWrapper)
     }
 
     if (this._config.indicator) {
@@ -712,13 +751,8 @@ class DateRangePicker extends BaseComponent {
     })
 
     EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
-      if (this._startDate) {
-        this._startInput.value = this._setInputValue(this._startDate)
-      }
-
-      if (this._endDate) {
-        this._endInput.value = this._setInputValue(this._endDate)
-      }
+      this._updatePreviewInputVisibility(this._startPreviewInput, '')
+      this._updatePreviewInputVisibility(this._endPreviewInput, '')
     })
 
     if (this._config.timepicker) {

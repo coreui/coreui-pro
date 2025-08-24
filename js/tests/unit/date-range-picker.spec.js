@@ -83,7 +83,7 @@ describe('DateRangePicker', () => {
 
       expect(div.classList.contains('date-picker')).toBe(true)
       expect(div.querySelector('.date-picker-input-group')).toBeTruthy()
-      expect(div.querySelectorAll('.date-picker-input')).toHaveSize(2)
+      expect(div.querySelectorAll('.date-picker-input-wrapper')).toHaveSize(2)
     })
 
     it('should handle disabled state', () => {

@@ -716,8 +716,8 @@ class Calendar extends BaseComponent {
   _initializeDates() {
     // Convert dates to date objects based on the selection type
     this._calendarDate = convertToDateObject(
-      this._config.calendarDate || this._config.startDate || this._config.endDate || new Date(), this._config.selectionType
-    )
+      this._config.calendarDate || this._config.startDate || this._config.endDate, this._config.selectionType
+    ) || new Date()
     this._startDate = convertToDateObject(this._config.startDate, this._config.selectionType)
     this._endDate = convertToDateObject(this._config.endDate, this._config.selectionType)
     this._minDate = convertToDateObject(this._config.minDate, this._config.selectionType)

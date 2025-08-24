@@ -98,7 +98,8 @@
   @include border-radius(var(--#{$prefix}date-picker-border-radius));
 
   &:hover {
-    .date-picker-input:not(:placeholder-shown) {
+    .date-picker-input:not(:placeholder-shown),
+    .date-picker-input-wrapper:has(.date-picker-input:not(.date-picker-input-preview):not(:placeholder-shown)) {
       ~ .date-picker-indicator:not(:last-child) {
         display: none;
       }
@@ -130,11 +131,17 @@
   }
 }
 
-.date-picker-input {
+.date-picker-input-wrapper {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
   min-width: 0;
+}
+
+.date-picker-input {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   padding: 0;
   font-family: var(--#{$prefix}date-picker-font-family);
   @include font-size(var(--#{$prefix}date-picker-font-size));
@@ -166,6 +173,24 @@
   &.hover {
     color: var(--#{$prefix}date-picker-placeholder-color);
   }
+}
+
+:not(.date-picker-input-wrapper) > .date-picker-input {
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+
+.date-picker-input-preview {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  background: var(--#{$prefix}date-picker-bg);
 }
 
 .date-picker-cleaner,
