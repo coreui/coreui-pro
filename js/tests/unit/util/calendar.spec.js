@@ -3,11 +3,15 @@
 import {
   convertIsoWeekToDate,
   convertToDateObject,
+  createDateFromMonth,
+  createDateFromWeek,
+  createDateFromYear,
   createGroupsInArray,
   getCalendarDate,
   getDateBySelectionType,
   getFirstAvailableDateInRange,
   getISOWeekNumberAndYear,
+  getLocalDateFromString,
   getMonthsNames,
   getSelectableDates,
   getYears,
@@ -24,7 +28,9 @@ import {
   isYearDisabled,
   isYearSelected,
   isYearInRange,
-  removeTimeFromDate
+  parseYearSmart,
+  removeTimeFromDate,
+  setTimeFromDate
 } from '../../../src/util/calendar.js'
 
 describe('Calendar Utilities', () => {
@@ -66,12 +72,37 @@ describe('Calendar Utilities', () => {
       expect(result).toEqual(originalDate)
     })
 
-    it('should parse a string date for "day" selectionType', () => {
-      const result = convertToDateObject('2023-02-15', 'day')
+    it('should return null for invalid Date object', () => {
+      const invalidDate = new Date('invalid')
+      const result = convertToDateObject(invalidDate, 'day')
+      expect(result).toBeNull()
+    })
+
+    it('should parse a string date for "day" selectionType with default locale', () => {
+      const result = convertToDateObject('2/15/2023', 'day')
       expect(result).toBeInstanceOf(Date)
       expect(result.getFullYear()).toBe(2023)
       expect(result.getMonth()).toBe(1) // February
       expect(result.getDate()).toBe(15)
+    })
+
+    it('should parse a string date for "day" selectionType with custom locale', () => {
+      const result = convertToDateObject('15.2.2023', 'day', 'de-DE')
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(1) // February
+      expect(result.getDate()).toBe(15)
+    })
+
+    it('should parse a string date with time when includeTime is true', () => {
+      const result = convertToDateObject('2/15/2023, 2:30:45 PM', 'day', 'en-US', true)
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(1) // February
+      expect(result.getDate()).toBe(15)
+      expect(result.getHours()).toBe(14)
+      expect(result.getMinutes()).toBe(30)
+      expect(result.getSeconds()).toBe(45)
     })
 
     it('should call convertIsoWeekToDate for "week" selectionType', () => {
@@ -84,18 +115,20 @@ describe('Calendar Utilities', () => {
       expect(result.getDate()).toBe(20)
     })
 
-    it('should adjust timezone offset for "month" selectionType', () => {
-      // Simulate a date string
-      const result = convertToDateObject('2023-06-01', 'month')
-      // We only check it doesn't produce an invalid date
+    it('should parse month string for "month" selectionType', () => {
+      const result = convertToDateObject('2023-06', 'month')
       expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(5) // June
+      expect(result.getDate()).toBe(1)
     })
 
-    it('should parse the string for "year" selectionType', () => {
-      const result = convertToDateObject('2025-08-15', 'year')
+    it('should parse year string for "year" selectionType', () => {
+      const result = convertToDateObject('2025', 'year')
       expect(result).toBeInstanceOf(Date)
       expect(result.getFullYear()).toBe(2025)
-      // We only check that it's a valid date
+      expect(result.getMonth()).toBe(0) // January
+      expect(result.getDate()).toBe(1)
     })
   })
 
@@ -536,6 +569,135 @@ describe('Calendar Utilities', () => {
       expect(cleared.getMinutes()).toBe(0)
       expect(cleared.getSeconds()).toBe(0)
       expect(cleared.getMilliseconds()).toBe(0)
+    })
+  })
+
+  describe('setTimeFromDate', () => {
+    it('should return null if target is null', () => {
+      const source = new Date(2023, 0, 1, 12, 30, 45)
+      const result = setTimeFromDate(null, source)
+      expect(result).toBeNull()
+    })
+
+    it('should return target unchanged if source is not a Date', () => {
+      const target = new Date(2023, 0, 1, 0, 0, 0)
+      const result = setTimeFromDate(target, null)
+      expect(result).toEqual(target)
+    })
+
+    it('should copy time from source to target date', () => {
+      const target = new Date(2023, 5, 15, 0, 0, 0, 0) // June 15, 2023
+      const source = new Date(2022, 0, 1, 14, 30, 45, 123) // Any date with time
+      const result = setTimeFromDate(target, source)
+
+      expect(result).not.toBe(target) // should be a new object
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(5)
+      expect(result.getDate()).toBe(15)
+      expect(result.getHours()).toBe(14)
+      expect(result.getMinutes()).toBe(30)
+      expect(result.getSeconds()).toBe(45)
+      expect(result.getMilliseconds()).toBe(123)
+    })
+  })
+
+  describe('parseYearSmart', () => {
+    it('should parse 4-digit years as-is', () => {
+      expect(parseYearSmart('2023')).toBe(2023)
+      expect(parseYearSmart('1999')).toBe(1999)
+    })
+
+    it('should handle 2-digit years with smart century assignment', () => {
+      const currentYear = new Date().getFullYear()
+      const currentCentury = Math.floor(currentYear / 100) * 100
+
+      // Test a year that should be in current century
+      const result1 = parseYearSmart('25')
+      expect(result1).toBe(currentCentury + 25)
+
+      // Test a year that should be in previous century (more than 50 years in future)
+      const result2 = parseYearSmart('90')
+      if (currentCentury + 90 > currentYear + 50) {
+        expect(result2).toBe(currentCentury + 90 - 100)
+      } else {
+        expect(result2).toBe(currentCentury + 90)
+      }
+    })
+  })
+
+  describe('createDateFromYear', () => {
+    it('should create a date for January 1st of the given year', () => {
+      const result = createDateFromYear({ year: '2023' })
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(0) // January
+      expect(result.getDate()).toBe(1)
+    })
+  })
+
+  describe('createDateFromMonth', () => {
+    it('should create a date for the first day of the given month', () => {
+      const result = createDateFromMonth({ year: '2023', month: '6' })
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(5) // June (0-indexed)
+      expect(result.getDate()).toBe(1)
+    })
+  })
+
+  describe('createDateFromWeek', () => {
+    it('should create a date for the Monday of the given ISO week', () => {
+      const result = createDateFromWeek({ year: '2023', week: '12' })
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(2) // March
+      expect(result.getDate()).toBe(20) // Monday of week 12
+    })
+  })
+
+  describe('getLocalDateFromString', () => {
+    it('should return null for invalid input', () => {
+      expect(getLocalDateFromString(null)).toBeNull()
+      expect(getLocalDateFromString('')).toBeNull()
+      expect(getLocalDateFromString(123)).toBeNull()
+    })
+
+    it('should parse date string with default parameters', () => {
+      const result = getLocalDateFromString('2/15/2023')
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(1) // February
+      expect(result.getDate()).toBe(15)
+    })
+
+    it('should parse date string with custom locale', () => {
+      const result = getLocalDateFromString('15.2.2023', 'de-DE')
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2023)
+      expect(result.getMonth()).toBe(1) // February
+      expect(result.getDate()).toBe(15)
+    })
+
+    it('should parse date string with time when includeTime is true', () => {
+      const result = getLocalDateFromString('2/15/2023, 2:30:45 PM', 'en-US', true)
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getHours()).toBe(14)
+      expect(result.getMinutes()).toBe(30)
+      expect(result.getSeconds()).toBe(45)
+    })
+
+    it('should handle different selection types', () => {
+      const weekResult = getLocalDateFromString('2023W12', 'en-US', false, 'week')
+      expect(weekResult).toBeInstanceOf(Date)
+      expect(weekResult.getDate()).toBe(20) // Monday of week 12
+
+      const monthResult = getLocalDateFromString('2023-06', 'en-US', false, 'month')
+      expect(monthResult).toBeInstanceOf(Date)
+      expect(monthResult.getMonth()).toBe(5) // June
+
+      const yearResult = getLocalDateFromString('2023', 'en-US', false, 'year')
+      expect(yearResult).toBeInstanceOf(Date)
+      expect(yearResult.getFullYear()).toBe(2023)
     })
   })
 })

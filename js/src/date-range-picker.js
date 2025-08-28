@@ -13,8 +13,9 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
-import { convertToDateObject, isDateDisabled } from './util/calendar.js'
-import { getLocalDateFromString } from './util/date-range-picker.js'
+import {
+  convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
+} from './util/calendar.js'
 
 /**
  * Constants
@@ -371,21 +372,26 @@ class DateRangePicker extends BaseComponent {
 
       this._startInputTimeout = setTimeout(() => {
         const date = this._parseDate(event.target.value)
+        let formatedDate = date
 
         if (date instanceof Date && date.getTime()) {
           if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
             return // Don't update if date is disabled
           }
 
-          this._calendarDate = date
-          this._startInput.value = this._setInputValue(date)
+          if (this._config.selectionType !== 'day') {
+            formatedDate = getDateBySelectionType(date, this._config.selectionType)
+          }
+
+          this._calendarDate = formatedDate
+          this._startInput.value = this._setInputValue(formatedDate)
         }
 
-        this._startDate = date
+        this._startDate = formatedDate
         this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date
+          date: formatedDate
         })
       }, this._config.inputOnChangeDelay)
     })
@@ -424,21 +430,26 @@ class DateRangePicker extends BaseComponent {
 
       this._endInputTimeout = setTimeout(() => {
         const date = this._parseDate(event.target.value)
+        let formatedDate = date
 
         if (date instanceof Date && date.getTime()) {
           if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
             return // Don't update if date is disabled
           }
 
-          this._calendarDate = date
-          this._endInput.value = this._setInputValue(date)
+          if (this._config.selectionType !== 'day') {
+            formatedDate = getDateBySelectionType(date, this._config.selectionType)
+          }
+
+          this._calendarDate = formatedDate
+          this._endInput.value = this._setInputValue(formatedDate)
         }
 
-        this._endDate = date
+        this._endDate = formatedDate
         this._calendar.update(this._getCalendarConfig())
 
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date
+          date: formatedDate
         })
       }, this._config.inputOnChangeDelay)
     })
@@ -938,9 +949,15 @@ class DateRangePicker extends BaseComponent {
       return null
     }
 
-    return this._config.inputDateParse ?
-      this._config.inputDateParse(str) :
-      getLocalDateFromString(str, this._config.locale, this._config.timepicker)
+    if (this._config.inputDateParse) {
+      return this._config.inputDateParse(str)
+    }
+
+    if (this._config.selectionType === 'day') {
+      return getLocalDateFromString(str, this._config.locale, this._config.timepicker)
+    }
+
+    return convertToDateObject(str, this._config.selectionType)
   }
 
   _formatDate(date) {
