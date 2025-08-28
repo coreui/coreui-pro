@@ -15,7 +15,12 @@
   align-items: stretch;
   width: 100%;
 
+  > .autocomplete,
+  > .date-picker,
+  > .time-picker,
   > .form-control,
+  > .form-multi-select,
+  > .form-password,
   > .form-select,
   > .form-floating {
     position: relative; // For focus state's z-index
@@ -149,7 +154,7 @@
   > .autocomplete:not(:first-child) > .autocomplete-input-group,
   > .date-picker:not(:first-child) > .date-picker-input-group,
   > .time-picker:not(:first-child) > .time-picker-input-group,
-  > .form-multi-select:not(:first-child) > .form-multi-select .form-multi-select-input-group,
+  > .form-multi-select:not(:first-child) + .form-multi-select > .form-multi-select-input-group,
   > .form-floating:not(:first-child) > .form-control,
   > .form-floating:not(:first-child) > .form-select,
   > .form-password:not(:first-child) > .form-control {
