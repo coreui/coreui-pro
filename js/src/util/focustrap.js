@@ -27,11 +27,13 @@ const TAB_NAV_FORWARD = 'forward'
 const TAB_NAV_BACKWARD = 'backward'
 
 const Default = {
+  additionalElement: null,
   autofocus: true,
   trapElement: null // The element to trap focus inside of
 }
 
 const DefaultType = {
+  additionalElement: '(element|null|undefined)',
   autofocus: 'boolean',
   trapElement: 'element'
 }
@@ -89,9 +91,13 @@ class FocusTrap extends Config {
 
   // Private
   _handleFocusin(event) {
-    const { trapElement } = this._config
+    const { additionalElement, trapElement } = this._config
 
     if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+      return
+    }
+
+    if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) {
       return
     }
 
@@ -112,6 +118,40 @@ class FocusTrap extends Config {
     }
 
     this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD
+
+    const { additionalElement, trapElement } = this._config
+
+    if (!additionalElement) {
+      return
+    }
+
+    const trapElements = SelectorEngine.focusableChildren(trapElement)
+    const additionalElements = SelectorEngine.focusableChildren(additionalElement)
+
+    if (trapElements.length === 0 || additionalElements.length === 0) {
+      return
+    }
+
+    event.preventDefault()
+
+    if (trapElements.indexOf(event.target) === trapElements.length - 1 && !event.shiftKey) {
+      additionalElements[0].focus()
+      return
+    }
+
+    if (trapElements.indexOf(event.target) === 0 && event.shiftKey) {
+      additionalElements[additionalElements.length - 1].focus()
+      return
+    }
+
+    if (additionalElements.indexOf(event.target) === additionalElements.length - 1 && !event.shiftKey) {
+      trapElements[0].focus()
+      return
+    }
+
+    if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
+      trapElements[trapElements.length - 1].focus()
+    }
   }
 }
 

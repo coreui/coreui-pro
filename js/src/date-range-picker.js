@@ -13,6 +13,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
+import FocusTrap from './util/focustrap.js'
 import {
   convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
 } from './util/calendar.js'
@@ -218,6 +219,8 @@ class DateRangePicker extends BaseComponent {
     this._createDateRangePickerCalendars()
     this._addEventListeners()
     this._addCalendarEventListeners()
+
+    this._focustrap = this._initializeFocusTrap()
   }
 
   // Getters
@@ -254,6 +257,7 @@ class DateRangePicker extends BaseComponent {
       this._menu.classList.add(CLASS_NAME_SHOW)
     }
 
+    this._focustrap.activate()
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
     this._createPopper()
@@ -273,6 +277,7 @@ class DateRangePicker extends BaseComponent {
       this._menu.classList.remove(CLASS_NAME_SHOW)
     }
 
+    this._focustrap.deactivate()
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -288,6 +293,8 @@ class DateRangePicker extends BaseComponent {
     if (this._endInputTimeout) {
       clearTimeout(this._endInputTimeout)
     }
+
+    this._focustrap.deactivate()
 
     super.dispose()
   }
@@ -335,6 +342,13 @@ class DateRangePicker extends BaseComponent {
   }
 
   // Private
+  _initializeFocusTrap() {
+    return new FocusTrap({
+      additionalElement: this._config.container ? this._menu : null,
+      trapElement: this._element
+    })
+  }
+
   _addEventListeners() {
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
@@ -357,6 +371,7 @@ class DateRangePicker extends BaseComponent {
     EventHandler.on(this._element, EVENT_KEYDOWN, event => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
+        this._startInput.focus()
       }
     })
 
@@ -460,7 +475,7 @@ class DateRangePicker extends BaseComponent {
   }
 
   _addCalendarEventListeners() {
-    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
+    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._menu)) {
       EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
         this._changeStartDate(event.date)
 
@@ -1068,7 +1083,7 @@ class DateRangePicker extends BaseComponent {
       const composedPath = event.composedPath()
 
       if (
-        composedPath.includes(context._element)
+        composedPath.includes(context._element) || composedPath.includes(context._menu)
       ) {
         continue
       }

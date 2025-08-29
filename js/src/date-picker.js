@@ -140,7 +140,7 @@ class DatePicker extends DateRangePicker {
       const composedPath = event.composedPath()
 
       if (
-        composedPath.includes(context._element)
+        composedPath.includes(context._element) || composedPath.includes(context._menu)
       ) {
         continue
       }
