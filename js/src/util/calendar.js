@@ -177,7 +177,7 @@ const parseYearString = dateString => {
     return createDateFromYear(groups)
   }
 
-  return parseWithTimezoneOffset(yearString)
+  return parseLocalDateString(yearString)
 }
 
 /**
@@ -415,7 +415,7 @@ const parseDayString = (dateString, locale, includeTime) => {
 
     if (hasDateSeparators && hasMultipleParts) {
       // Use fallback for complete date strings that don't match locale patterns
-      return parseWithTimezoneOffset(dateString)
+      return parseLocalDateString(dateString)
     }
 
     // For incomplete input like "1" or "12", return null
@@ -438,15 +438,14 @@ const parseDayString = (dateString, locale, includeTime) => {
 }
 
 /**
- * Parses a date string with timezone offset adjustment.
+ * Parses a date string into a local Date object.
  * @param dateString - The date string to parse.
- * @returns The Date object with timezone offset applied, or null if invalid.
+ * @returns The Date object in local timezone, or null if invalid.
  */
-const parseWithTimezoneOffset = dateString => {
+const parseLocalDateString = dateString => {
   const _date = new Date(Date.parse(dateString))
   if (!Number.isNaN(_date.getTime())) {
-    const userTimezoneOffset = _date.getTimezoneOffset() * 60_000
-    return new Date(_date.getTime() + userTimezoneOffset)
+    return _date
   }
 
   return null
@@ -796,10 +795,16 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
 
     if ((index + 1) % 7 === 0) {
       const { weekNumber, year } = getISOWeekNumberAndYear(day.date)
-      weeks.at(-1).week = { number: weekNumber, year }
+      const lastWeek = weeks.at(-1)
+      if (lastWeek) {
+        lastWeek.week = { number: weekNumber, year }
+      }
     }
 
-    weeks.at(-1).days.push(day)
+    const lastWeek = weeks.at(-1)
+    if (lastWeek) {
+      lastWeek.days.push(day)
+    }
   }
 
   return weeks
