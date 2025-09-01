@@ -628,6 +628,10 @@ legend + * {
   -webkit-appearance: textfield;
   outline-offset: -2px;
 }
+[type=search]::-webkit-search-cancel-button {
+  cursor: pointer;
+  filter: grayscale(1);
+}
 
 *[dir=rtl] [type=tel],
 *[dir=rtl] [type=url],
@@ -3239,7 +3243,12 @@ select.form-multi-select {
   align-items: stretch;
   width: 100%;
 }
+.input-group > .autocomplete,
+.input-group > .date-picker,
+.input-group > .time-picker,
 .input-group > .form-control,
+.input-group > .form-multi-select,
+.input-group > .form-password,
 .input-group > .form-select,
 .input-group > .form-floating {
   position: relative;
@@ -3335,7 +3344,7 @@ select.form-multi-select {
 .input-group > .autocomplete:not(:first-child) > .autocomplete-input-group,
 .input-group > .date-picker:not(:first-child) > .date-picker-input-group,
 .input-group > .time-picker:not(:first-child) > .time-picker-input-group,
-.input-group > .form-multi-select:not(:first-child) > .form-multi-select .form-multi-select-input-group,
+.input-group > .form-multi-select:not(:first-child) + .form-multi-select > .form-multi-select-input-group,
 .input-group > .form-floating:not(:first-child) > .form-control,
 .input-group > .form-floating:not(:first-child) > .form-select,
 .input-group > .form-password:not(:first-child) > .form-control {
@@ -7425,6 +7434,7 @@ select.form-multi-select {
 .spinner-grow,
 .spinner-border {
   display: inline-block;
+  flex-shrink: 0;
   width: var(--cui-spinner-width);
   height: var(--cui-spinner-height);
   vertical-align: var(--cui-spinner-vertical-align);
@@ -8865,10 +8875,12 @@ select.form-multi-select {
   border: var(--cui-date-picker-border-width) solid var(--cui-date-picker-border-color);
   border-radius: var(--cui-date-picker-border-radius);
 }
-.date-picker-input-group:hover .date-picker-input:not(:placeholder-shown) ~ .date-picker-indicator:not(:last-child) {
+.date-picker-input-group:hover .date-picker-input:not(:placeholder-shown) ~ .date-picker-indicator:not(:last-child),
+.date-picker-input-group:hover .date-picker-input-wrapper:has(.date-picker-input:not(.date-picker-input-preview):not(:placeholder-shown)) ~ .date-picker-indicator:not(:last-child) {
   display: none;
 }
-.date-picker-input-group:hover .date-picker-input:not(:placeholder-shown) ~ .date-picker-cleaner {
+.date-picker-input-group:hover .date-picker-input:not(:placeholder-shown) ~ .date-picker-cleaner,
+.date-picker-input-group:hover .date-picker-input-wrapper:has(.date-picker-input:not(.date-picker-input-preview):not(:placeholder-shown)) ~ .date-picker-cleaner {
   display: flex;
 }
 .date-picker .date-picker-input-group {
@@ -8890,11 +8902,17 @@ select.form-multi-select {
   box-shadow: var(--cui-date-picker-focus-box-shadow);
 }
 
-.date-picker-input {
+.date-picker-input-wrapper {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
   min-width: 0;
+}
+
+.date-picker-input {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   padding: 0;
   font-family: var(--cui-date-picker-font-family);
   font-size: var(--cui-date-picker-font-size);
@@ -8921,6 +8939,24 @@ select.form-multi-select {
 }
 .date-picker-input.hover {
   color: var(--cui-date-picker-placeholder-color);
+}
+
+:not(.date-picker-input-wrapper) > .date-picker-input {
+  flex: 1 1 auto;
+  width: 1%;
+  min-width: 0;
+}
+
+.date-picker-input-preview {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  background: var(--cui-date-picker-bg);
 }
 
 .date-picker-cleaner,

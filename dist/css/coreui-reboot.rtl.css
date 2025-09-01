@@ -628,6 +628,10 @@ legend + * {
   -webkit-appearance: textfield;
   outline-offset: -2px;
 }
+[type=search]::-webkit-search-cancel-button {
+  cursor: pointer;
+  filter: grayscale(1);
+}
 
 *[dir=rtl] [type=tel],
 *[dir=rtl] [type=url],

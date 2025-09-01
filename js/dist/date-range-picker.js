@@ -4,10 +4,10 @@
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/date-range-picker.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar', './util/date-range-picker'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar, global.DateRangePicker));
-})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js, dateRangePicker_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/focustrap.js'), require('./util/calendar.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/focustrap', './util/calendar'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Focustrap, global.Calendar));
+})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, FocusTrap, calendar_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -73,6 +73,8 @@
   const CLASS_NAME_INDICATOR = 'date-picker-indicator';
   const CLASS_NAME_INPUT = 'date-picker-input';
   const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group';
+  const CLASS_NAME_INPUT_PREVIEW = 'date-picker-input-preview';
+  const CLASS_NAME_INPUT_WRAPPER = 'date-picker-input-wrapper';
   const CLASS_NAME_IS_INVALID = 'is-invalid';
   const CLASS_NAME_IS_VALID = 'is-valid';
   const CLASS_NAME_FOOTER = 'date-picker-footer';
@@ -211,19 +213,22 @@
       this._calendar = null;
       this._calendars = null;
       this._endInput = null;
+      this._endInputTimeout = null;
+      this._endPreviewInput = null;
       this._indicatorElement = null;
       this._menu = null;
       this._startInput = null;
+      this._startInputTimeout = null;
+      this._startPreviewInput = null;
       this._timepickers = null;
       this._timePickerEnd = null;
       this._timePickerStart = null;
       this._togglerElement = null;
-      this._startInputTimeout = null;
-      this._endInputTimeout = null;
       this._createDateRangePicker();
       this._createDateRangePickerCalendars();
       this._addEventListeners();
       this._addCalendarEventListeners();
+      this._focustrap = this._initializeFocusTrap();
     }
 
     // Getters
@@ -253,6 +258,7 @@
       if (this._config.container) {
         this._menu.classList.add(CLASS_NAME_SHOW);
       }
+      this._focustrap.activate();
       EventHandler.trigger(this._element, EVENT_SHOWN);
       this._createPopper();
     }
@@ -266,6 +272,7 @@
       if (this._config.container) {
         this._menu.classList.remove(CLASS_NAME_SHOW);
       }
+      this._focustrap.deactivate();
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
@@ -278,6 +285,7 @@
       if (this._endInputTimeout) {
         clearTimeout(this._endInputTimeout);
       }
+      this._focustrap.deactivate();
       super.dispose();
     }
     cancel() {
@@ -316,6 +324,12 @@
     }
 
     // Private
+    _initializeFocusTrap() {
+      return new FocusTrap({
+        additionalElement: this._config.container ? this._menu : null,
+        trapElement: this._element
+      });
+    }
     _addEventListeners() {
       EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
         if (!this._config.disabled) {
@@ -335,6 +349,7 @@
       EventHandler.on(this._element, EVENT_KEYDOWN, event => {
         if (event.key === ESCAPE_KEY) {
           this.hide();
+          this._startInput.focus();
         }
       });
       EventHandler.on(this._startInput, EVENT_CLICK, () => {
@@ -347,24 +362,21 @@
         }
         this._startInputTimeout = setTimeout(() => {
           const date = this._parseDate(event.target.value);
-          if (date === 'invalid') {
-            this._startDate = null;
-            this._calendar.update(this._getCalendarConfig());
-          }
-
-          // valid date or empty date
-          if (date instanceof Date && !Number.isNaN(date) || date === null) {
-            // Check if the date is disabled
-            if (date && calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+          let formatedDate = date;
+          if (date instanceof Date && date.getTime()) {
+            if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
               return; // Don't update if date is disabled
             }
-            this._startInput.value = this._setInputValue(date);
-            this._startDate = date;
-            this._calendarDate = date;
-            this._calendar.update(this._getCalendarConfig());
+            if (this._config.selectionType !== 'day') {
+              formatedDate = calendar_js.getDateBySelectionType(date, this._config.selectionType);
+            }
+            this._calendarDate = formatedDate;
+            this._startInput.value = this._setInputValue(formatedDate);
           }
+          this._startDate = formatedDate;
+          this._calendar.update(this._getCalendarConfig());
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-            date
+            date: formatedDate
           });
         }, this._config.inputOnChangeDelay);
       });
@@ -395,24 +407,21 @@
         }
         this._endInputTimeout = setTimeout(() => {
           const date = this._parseDate(event.target.value);
-          if (date === 'invalid') {
-            this._endDate = null;
-            this._calendar.update(this._getCalendarConfig());
-          }
-
-          // valid date or empty date
-          if (date instanceof Date && !Number.isNaN(date) || date === null) {
-            // Check if the date is disabled
+          let formatedDate = date;
+          if (date instanceof Date && date.getTime()) {
             if (date && calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
               return; // Don't update if date is disabled
             }
-            this._endInput.value = this._setInputValue(date);
-            this._endDate = date;
-            this._calendarDate = date;
-            this._calendar.update(this._getCalendarConfig());
+            if (this._config.selectionType !== 'day') {
+              formatedDate = calendar_js.getDateBySelectionType(date, this._config.selectionType);
+            }
+            this._calendarDate = formatedDate;
+            this._endInput.value = this._setInputValue(formatedDate);
           }
+          this._endDate = formatedDate;
+          this._calendar.update(this._getCalendarConfig());
           EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-            date
+            date: formatedDate
           });
         }, this._config.inputOnChangeDelay);
       });
@@ -421,7 +430,7 @@
       });
     }
     _addCalendarEventListeners() {
-      for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._element)) {
+      for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._menu)) {
         EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
           this._changeStartDate(event.date);
           if (!this._config.range && !this._config.footer && !this._config.timepicker) {
@@ -434,13 +443,15 @@
             this.hide();
           }
         });
-        if (this._config.previewDateOnHover) {
+        if (this._config.previewDateOnHover && !this._config.disabled) {
           EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
             if (this._selectEndDate) {
-              this._endInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
+              const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate);
+              this._updatePreviewInputVisibility(this._endPreviewInput, event.date ? previewValue : '');
               return;
             }
-            this._startInput.value = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
+            const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate);
+            this._updatePreviewInputVisibility(this._startPreviewInput, event.date ? previewValue : '');
           });
         }
         EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
@@ -532,6 +543,39 @@
       }
       this._menu = dropdownEl;
     }
+    _updatePreviewInputVisibility(previewInput, value) {
+      if (!previewInput) {
+        return;
+      }
+      if (value && value.trim() !== '') {
+        previewInput.style.display = 'block';
+        previewInput.value = value;
+      } else {
+        previewInput.style.display = 'none';
+        previewInput.value = '';
+      }
+    }
+    _createInputWrapper(inputEl, isStart = true) {
+      if (!this._config.previewDateOnHover || this._config.disabled) {
+        return inputEl;
+      }
+      const wrapperEl = document.createElement('div');
+      wrapperEl.classList.add(CLASS_NAME_INPUT_WRAPPER);
+      wrapperEl.append(inputEl);
+      const previewInputEl = document.createElement('input');
+      previewInputEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_PREVIEW);
+      previewInputEl.type = 'text';
+      previewInputEl.readOnly = true;
+      previewInputEl.tabIndex = -1;
+      previewInputEl.style.display = 'none';
+      if (isStart) {
+        this._startPreviewInput = previewInputEl;
+      } else {
+        this._endPreviewInput = previewInputEl;
+      }
+      wrapperEl.append(previewInputEl);
+      return wrapperEl;
+    }
     _createDateRangePickerInputGroup() {
       const inputGroupEl = document.createElement('div');
       inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP);
@@ -549,12 +593,14 @@
       inputGroupTextSeparatorEl.classList.add(CLASS_NAME_SEPARATOR);
       this._startInput = startInputEl;
       this._endInput = endInputEl;
-      inputGroupEl.append(startInputEl);
+      const startInputWrapper = this._createInputWrapper(startInputEl, true);
+      inputGroupEl.append(startInputWrapper);
       if (this._config.separator) {
         inputGroupEl.append(inputGroupTextSeparatorEl);
       }
       if (this._config.range) {
-        inputGroupEl.append(endInputEl);
+        const endInputWrapper = this._createInputWrapper(endInputEl, false);
+        inputGroupEl.append(endInputWrapper);
       }
       if (this._config.indicator) {
         const inputGroupIndicatorEl = document.createElement('div');
@@ -618,12 +664,8 @@
         this._calendarDate = event.date;
       });
       EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
-        if (this._startDate) {
-          this._startInput.value = this._setInputValue(this._startDate);
-        }
-        if (this._endDate) {
-          this._endInput.value = this._setInputValue(this._endDate);
-        }
+        this._updatePreviewInputVisibility(this._startPreviewInput, '');
+        this._updatePreviewInputVisibility(this._endPreviewInput, '');
       });
       if (this._config.timepicker) {
         if (this._mobile && this._config.range || this._config.range && this._config.calendars === 1) {
@@ -777,7 +819,13 @@
       if (!str) {
         return null;
       }
-      return this._config.inputDateParse ? this._config.inputDateParse(str) : dateRangePicker_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+      if (this._config.inputDateParse) {
+        return this._config.inputDateParse(str);
+      }
+      if (this._config.selectionType === 'day') {
+        return calendar_js.getLocalDateFromString(str, this._config.locale, this._config.timepicker);
+      }
+      return calendar_js.convertToDateObject(str, this._config.selectionType);
     }
     _formatDate(date) {
       if (!date) {
@@ -859,7 +907,7 @@
           continue;
         }
         const composedPath = event.composedPath();
-        if (composedPath.includes(context._element)) {
+        if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
           continue;
         }
         ({
