@@ -10,7 +10,9 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
+import {
+  defineJQueryPlugin, getElement, getNextActiveElement, isRTL
+} from './util/index.js'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -33,9 +35,14 @@ const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
 const SPACE_KEY = 'Space'
 const TAB_KEY = 'Tab'
+const ARROW_UP_KEY = 'ArrowUp'
+const ARROW_DOWN_KEY = 'ArrowDown'
+const ARROW_LEFT_KEY = 'ArrowLeft'
+const ARROW_RIGHT_KEY = 'ArrowRight'
 const RIGHT_MOUSE_BUTTON = 2
 
 const EVENT_CLICK = `click${EVENT_KEY}`
+const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = 'input'
@@ -71,6 +78,9 @@ const CLASS_NAME_WAS_VALIDATED = 'was-validated'
 const SELECTOR_DATA_TOGGLE =
   '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
+const SELECTOR_ROLL_CELL = '.time-picker-roll-cell'
+const SELECTOR_ROLL_CELL_SELECTED = '.time-picker-roll-cell.selected'
+const SELECTOR_ROLL_COL = '.time-picker-roll-col'
 const SELECTOR_WAS_VALIDATED = 'form.was-validated'
 
 const Default = {
@@ -293,6 +303,58 @@ class TimePicker extends BaseComponent {
         }
       }
     })
+
+    if (this._config.variant === 'roll') {
+      EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, () => {
+        this._setUpRolls(false)
+      })
+
+      EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, event => {
+        if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+          event.preventDefault()
+          const { key, target } = event
+          const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement)
+
+          if (!items.length) {
+            return
+          }
+
+          getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
+        }
+
+        if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
+          event.preventDefault()
+          const { key, target } = event
+          const columnElement = target.parentElement
+
+          if (this._timePickerBody) {
+            const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody)
+            const currentColumnIndex = columns.indexOf(columnElement)
+
+            let targetColumnIndex
+            const isRtl = isRTL()
+            const shouldGoLeft = (key === ARROW_LEFT_KEY && !isRtl) || (key === ARROW_RIGHT_KEY && isRtl)
+            if (shouldGoLeft) {
+              targetColumnIndex = currentColumnIndex > 0 ? currentColumnIndex - 1 : columns.length - 1
+            } else {
+              targetColumnIndex = currentColumnIndex < columns.length - 1 ? currentColumnIndex + 1 : 0
+            }
+
+            const targetColumn = columns[targetColumnIndex]
+            const selectedCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_SELECTED, targetColumn)
+
+            if (selectedCell) {
+              selectedCell.focus()
+              return
+            }
+
+            const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL, targetColumn)
+
+            firstFocusableCell.focus()
+          }
+        }
+      })
+    }
 
     EventHandler.on(this._element, EVENT_KEYDOWN, event => {
       if (event.key === ESCAPE_KEY) {
