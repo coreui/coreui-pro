@@ -13,6 +13,7 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   defineJQueryPlugin, getElement, getNextActiveElement, isRTL
 } from './util/index.js'
+import FocusTrap from './util/focustrap.js'
 import {
   convert12hTo24h,
   convert24hTo12h,
@@ -171,6 +172,8 @@ class TimePicker extends BaseComponent {
     this._createTimePickerSelection()
     this._addEventListeners()
     this._setUpSelects()
+
+    this._focustrap = this._initializeFocusTrap()
   }
 
   // Getters
@@ -206,6 +209,7 @@ class TimePicker extends BaseComponent {
       this._menu.classList.add(CLASS_NAME_SHOW)
     }
 
+    this._focustrap.activate()
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
     this._createPopper()
@@ -225,6 +229,7 @@ class TimePicker extends BaseComponent {
       this._menu.classList.remove(CLASS_NAME_SHOW)
     }
 
+    this._focustrap.deactivate()
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -236,6 +241,8 @@ class TimePicker extends BaseComponent {
     if (this._inputTimeout) {
       clearTimeout(this._inputTimeout)
     }
+
+    this._focustrap.deactivate()
 
     super.dispose()
   }
@@ -277,6 +284,13 @@ class TimePicker extends BaseComponent {
   }
 
   // Private
+  _initializeFocusTrap() {
+    return new FocusTrap({
+      additionalElement: this._config.container ? this._menu : null,
+      trapElement: this._element
+    })
+  }
+
   _addEventListeners() {
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
