@@ -13,10 +13,10 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
-import FocusTrap from './util/focustrap.js'
 import {
   convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
 } from './util/calendar.js'
+import FocusTrap from './util/focustrap.js'
 
 /**
  * Constants
