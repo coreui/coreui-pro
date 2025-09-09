@@ -477,7 +477,7 @@ class TimePicker extends BaseComponent {
 
     Manipulator.setDataAttribute(
       this._element,
-      'toggle',
+      'meridiem',
       CLASS_NAME_TIME_PICKER
     )
 
@@ -674,7 +674,7 @@ class TimePicker extends BaseComponent {
     if (this._localizedTimePartials.hour12) {
       this._timePickerBody.append(
         this._createTimePickerInlineSelect(
-          'toggle',
+          'meridiem',
           [
             { value: 'am', label: 'AM' },
             { value: 'pm', label: 'PM' }
@@ -721,7 +721,7 @@ class TimePicker extends BaseComponent {
             { value: 'am', label: 'AM' },
             { value: 'pm', label: 'PM' }
           ],
-          'toggle',
+          'meridiem',
           this._config.ariaSelectMeridiemLabel
         )
       )
@@ -808,7 +808,7 @@ class TimePicker extends BaseComponent {
   }
 
   _setUpRolls(initial = false) {
-    const parts = ['hours', 'minutes', 'seconds', 'toggle']
+    const parts = ['hours', 'minutes', 'seconds', 'meridiem']
 
     for (const part of parts) {
       const partValue = this._getPartOfTime(part)
@@ -855,7 +855,7 @@ class TimePicker extends BaseComponent {
   }
 
   _setUpSelects() {
-    for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
+    for (const part of Array.from(['hours', 'minutes', 'seconds', 'meridiem'])) {
       for (const element of SelectorEngine.find(
         `select.${part}`,
         this._element
@@ -939,7 +939,7 @@ class TimePicker extends BaseComponent {
       return this._date.getSeconds()
     }
 
-    if (part === 'toggle') {
+    if (part === 'meridiem') {
       return getAmPm(new Date(this._date), this._config.locale)
     }
   }
@@ -947,15 +947,23 @@ class TimePicker extends BaseComponent {
   _handleTimeChange = (set, value) => {
     const _date = this._date || new Date('1970-01-01')
 
-    if (set === 'toggle') {
+    if (set === 'meridiem') {
+      const currentHours = _date.getHours()
+
       if (value === 'am') {
         this._ampm = 'am'
-        _date.setHours(_date.getHours() - 12)
+        // Convert PM hours (12-23) to AM hours (0-11)
+        if (currentHours >= 12) {
+          _date.setHours(currentHours - 12)
+        }
       }
 
       if (value === 'pm') {
         this._ampm = 'pm'
-        _date.setHours(_date.getHours() + 12)
+        // Convert AM hours (0-11) to PM hours (12-23)
+        if (currentHours < 12) {
+          _date.setHours(currentHours + 12)
+        }
       }
     }
 
