@@ -2684,14 +2684,14 @@ $time-picker-footer-padding:                .5rem !default;
 $time-picker-footer-border-width:           1px !default;
 $time-picker-footer-border-color:           var(--#{$prefix}border-color) !default;
 
-$time-picker-roll-col-border-width:                var(--#{$prefix}border-width) !default;
-$time-picker-roll-col-border-color:                var(--#{$prefix}border-color) !default;
-$time-picker-roll-cell-hover-color:                var(--#{$prefix}body-color) !default;
-$time-picker-roll-cell-hover-bg:                   var(--#{$prefix}tertiary-bg) !default;
-$time-picker-roll-cell-selected-color:             var(--#{$prefix}white) !default;
-$time-picker-roll-cell-selected-bg:                var(--#{$prefix}primary) !default;
-$time-picker-roll-cell-focus-box-shadow:           inset 0 0 $focus-ring-blur .125rem $focus-ring-color !default;
-$time-picker-roll-cell-selected-focus-box-shadow:  inset 0 0 $focus-ring-blur .125rem rgba($white, .75) !default;
+$time-picker-roll-col-border-width:           var(--#{$prefix}border-width) !default;
+$time-picker-roll-col-border-color:           var(--#{$prefix}border-color) !default;
+$time-picker-roll-cell-hover-color:           var(--#{$prefix}body-color) !default;
+$time-picker-roll-cell-hover-bg:              var(--#{$prefix}tertiary-bg) !default;
+$time-picker-roll-cell-selected-color:        var(--#{$prefix}white) !default;
+$time-picker-roll-cell-selected-bg:           var(--#{$prefix}primary) !default;
+$time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}white) !default;
+$time-picker-roll-cell-selected-hover-bg:     light-dark(color.scale($primary, $lightness: -20%), color.scale($primary, $saturation: -10%, $lightness: -10%)) !default; // stylelint-disable-line scss/at-function-named-arguments
 
 $time-picker-inline-select-font-size:       $form-select-font-size-sm !default;
 $time-picker-inline-select-color:           $input-color !default;

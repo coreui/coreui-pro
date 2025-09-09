@@ -213,6 +213,10 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `ariaSelectHoursLabel` | string | `'Select hours'` | Accessible label for the hours selection element. |
+| `ariaSelectMeridiemLabel` | string | `'Select AM/PM'` | Accessible label for the AM/PM selection element. |
+| `ariaSelectMinutesLabel` | string | `'Select minutes'` | Accessible label for the minutes selection element. |
+| `ariaSelectSecondsLabel` | string | `'Select seconds'` | Accessible label for the seconds selection element. |
 | `cancelButton` | boolean, string | `'Cancel'` | Cancel button inner HTML |
 | `cancelButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
 | `cleaner` | boolean | `true` | Enables selection cleaner element. |

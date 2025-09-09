@@ -32,8 +32,10 @@ const DATA_KEY = 'coreui.time-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
+const END_KEY = 'End'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const HOME_KEY = 'Home'
 const SPACE_KEY = 'Space'
 const TAB_KEY = 'Tab'
 const ARROW_UP_KEY = 'ArrowUp'
@@ -80,11 +82,15 @@ const SELECTOR_DATA_TOGGLE =
   '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
 const SELECTOR_ROLL_CELL = '.time-picker-roll-cell'
-const SELECTOR_ROLL_CELL_SELECTED = '.time-picker-roll-cell.selected'
+const SELECTOR_ROLL_CELL_FOCUSABLE = '.time-picker-roll-cell[tabindex="0"]'
 const SELECTOR_ROLL_COL = '.time-picker-roll-col'
 const SELECTOR_WAS_VALIDATED = 'form.was-validated'
 
 const Default = {
+  ariaSelectHoursLabel: 'Select hours',
+  ariaSelectMeridiemLabel: 'Select AM/PM',
+  ariaSelectMinutesLabel: 'Select minutes',
+  ariaSelectSecondsLabel: 'Select seconds',
   cancelButton: 'Cancel',
   cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
   cleaner: true,
@@ -112,6 +118,10 @@ const Default = {
 }
 
 const DefaultType = {
+  ariaSelectHoursLabel: 'string',
+  ariaSelectMeridiemLabel: 'string',
+  ariaSelectMinutesLabel: 'string',
+  ariaSelectSecondsLabel: 'string',
   cancelButton: '(boolean|string)',
   cancelButtonClasses: '(array|string)',
   cleaner: 'boolean',
@@ -291,6 +301,42 @@ class TimePicker extends BaseComponent {
     })
   }
 
+  _moveFocusToNextColumn(event) {
+    if (!this._timePickerBody) {
+      return
+    }
+
+    const { target } = event
+    const columnElement = target.parentElement
+
+    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody)
+    const currentColumnIndex = columns.indexOf(columnElement)
+
+    if (currentColumnIndex < columns.length - 1) {
+      const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex + 1])
+
+      firstFocusableCell.focus()
+    }
+  }
+
+  _moveFocusToPreviousColumn(event) {
+    if (!this._timePickerBody) {
+      return
+    }
+
+    const { target } = event
+    const columnElement = target.parentElement
+
+    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody)
+    const currentColumnIndex = columns.indexOf(columnElement)
+
+    if (currentColumnIndex > 0) {
+      const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex - 1])
+
+      firstFocusableCell.focus()
+    }
+  }
+
   _addEventListeners() {
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
@@ -319,8 +365,10 @@ class TimePicker extends BaseComponent {
     })
 
     if (this._config.variant === 'roll') {
-      EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, () => {
-        this._setUpRolls(false)
+      EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, event => {
+        if (!event.delegateTarget.contains(event.relatedTarget)) {
+          this._setUpRolls(false)
+        }
       })
 
       EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, event => {
@@ -333,38 +381,37 @@ class TimePicker extends BaseComponent {
             return
           }
 
-          getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
+          const nextElement = getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target))
+          if (nextElement) {
+            nextElement.focus()
+          }
+
+          return
+        }
+
+        if (event.key === HOME_KEY || event.key === END_KEY) {
+          event.preventDefault()
+          const { key, target } = event
+          const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement)
+
+          if (!items.length) {
+            return
+          }
+
+          const index = key === HOME_KEY ? 0 : items.length - 1
+          items[index].focus()
+          return
         }
 
         if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
           event.preventDefault()
-          const { key, target } = event
-          const columnElement = target.parentElement
-
-          if (this._timePickerBody) {
-            const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody)
-            const currentColumnIndex = columns.indexOf(columnElement)
-
-            let targetColumnIndex
-            const isRtl = isRTL()
-            const shouldGoLeft = (key === ARROW_LEFT_KEY && !isRtl) || (key === ARROW_RIGHT_KEY && isRtl)
-            if (shouldGoLeft) {
-              targetColumnIndex = currentColumnIndex > 0 ? currentColumnIndex - 1 : columns.length - 1
-            } else {
-              targetColumnIndex = currentColumnIndex < columns.length - 1 ? currentColumnIndex + 1 : 0
-            }
-
-            const targetColumn = columns[targetColumnIndex]
-            const selectedCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_SELECTED, targetColumn)
-
-            if (selectedCell) {
-              selectedCell.focus()
-              return
-            }
-
-            const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL, targetColumn)
-
-            firstFocusableCell.focus()
+          const { key } = event
+          const isRtl = isRTL()
+          const shouldGoLeft = (key === ARROW_LEFT_KEY && !isRtl) || (key === ARROW_RIGHT_KEY && isRtl)
+          if (shouldGoLeft) {
+            this._moveFocusToPreviousColumn(event)
+          } else {
+            this._moveFocusToNextColumn(event)
           }
         }
       })
@@ -561,6 +608,7 @@ class TimePicker extends BaseComponent {
 
     if (this._config.variant === 'roll') {
       timePickerBodyEl.classList.add(CLASS_NAME_ROLL)
+      timePickerBodyEl.setAttribute('role', 'group')
     }
 
     this._timePickerBody = timePickerBodyEl
@@ -568,10 +616,11 @@ class TimePicker extends BaseComponent {
     return timePickerBodyEl
   }
 
-  _createTimePickerInlineSelect(className, options) {
+  _createTimePickerInlineSelect(className, options, ariaLabel) {
     const selectEl = document.createElement('select')
     selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className)
     selectEl.disabled = this._config.disabled
+    selectEl.setAttribute('aria-label', ariaLabel)
     selectEl.addEventListener('change', event =>
       this._handleTimeChange(className, event.target.value)
     )
@@ -595,7 +644,8 @@ class TimePicker extends BaseComponent {
     this._timePickerBody.append(
       this._createTimePickerInlineSelect(
         'hours',
-        this._localizedTimePartials.listOfHours
+        this._localizedTimePartials.listOfHours,
+        this._config.ariaSelectHoursLabel
       )
     )
 
@@ -604,7 +654,8 @@ class TimePicker extends BaseComponent {
         timeSeparatorEl.cloneNode(true),
         this._createTimePickerInlineSelect(
           'minutes',
-          this._localizedTimePartials.listOfMinutes
+          this._localizedTimePartials.listOfMinutes,
+          this._config.ariaSelectMinutesLabel
         )
       )
     }
@@ -614,7 +665,8 @@ class TimePicker extends BaseComponent {
         timeSeparatorEl,
         this._createTimePickerInlineSelect(
           'seconds',
-          this._localizedTimePartials.listOfSeconds
+          this._localizedTimePartials.listOfSeconds,
+          this._config.ariaSelectSecondsLabel
         )
       )
     }
@@ -627,8 +679,7 @@ class TimePicker extends BaseComponent {
             { value: 'am', label: 'AM' },
             { value: 'pm', label: 'PM' }
           ],
-          '_selectAmPm',
-          this._ampm
+          this._config.ariaSelectMeridiemLabel
         )
       )
     }
@@ -638,7 +689,8 @@ class TimePicker extends BaseComponent {
     this._timePickerBody.append(
       this._createTimePickerRollCol(
         this._localizedTimePartials.listOfHours,
-        'hours'
+        'hours',
+        this._config.ariaSelectHoursLabel
       )
     )
 
@@ -646,7 +698,8 @@ class TimePicker extends BaseComponent {
       this._timePickerBody.append(
         this._createTimePickerRollCol(
           this._localizedTimePartials.listOfMinutes,
-          'minutes'
+          'minutes',
+          this._config.ariaSelectMinutesLabel
         )
       )
     }
@@ -655,7 +708,8 @@ class TimePicker extends BaseComponent {
       this._timePickerBody.append(
         this._createTimePickerRollCol(
           this._localizedTimePartials.listOfSeconds,
-          'seconds'
+          'seconds',
+          this._config.ariaSelectSecondsLabel
         )
       )
     }
@@ -668,21 +722,27 @@ class TimePicker extends BaseComponent {
             { value: 'pm', label: 'PM' }
           ],
           'toggle',
-          this._ampm
+          this._config.ariaSelectMeridiemLabel
         )
       )
     }
   }
 
-  _createTimePickerRollCol(options, part) {
+  _createTimePickerRollCol(options, part, ariaLabel) {
     const timePickerRollColEl = document.createElement('div')
     timePickerRollColEl.classList.add(CLASS_NAME_ROLL_COL)
+    timePickerRollColEl.setAttribute('role', 'listbox')
+    timePickerRollColEl.setAttribute('aria-label', ariaLabel)
 
-    for (const option of options) {
+    for (const [index, option] of options.entries()) {
       const timePickerRollCellEl = document.createElement('div')
       timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL)
-      timePickerRollCellEl.setAttribute('role', 'button')
-      timePickerRollCellEl.tabIndex = 0
+
+      timePickerRollCellEl.setAttribute('role', 'option')
+      timePickerRollCellEl.tabIndex = index === 0 ? 0 : -1
+      timePickerRollCellEl.setAttribute('aria-label', option.label.toString())
+      timePickerRollCellEl.setAttribute('aria-selected', 'false')
+
       timePickerRollCellEl.innerHTML = option.label
       timePickerRollCellEl.addEventListener('click', () => {
         this._handleTimeChange(part, option.value)
@@ -691,6 +751,7 @@ class TimePicker extends BaseComponent {
         if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
           event.preventDefault()
           this._handleTimeChange(part, option.value)
+          this._moveFocusToNextColumn(event)
         }
       })
 
@@ -747,27 +808,39 @@ class TimePicker extends BaseComponent {
   }
 
   _setUpRolls(initial = false) {
-    for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-      for (const element of SelectorEngine.find(
-        `[data-coreui-${part}]`,
-        this._element
-      )) {
-        if (
-          this._getPartOfTime(part) ===
-          Manipulator.getDataAttribute(element, part)
-        ) {
-          element.classList.add(CLASS_NAME_SELECTED)
-          this._scrollTo(element.parentElement, element, initial)
+    const parts = ['hours', 'minutes', 'seconds', 'toggle']
 
-          for (const sibling of element.parentElement.children) {
-            // eslint-disable-next-line max-depth
-            if (sibling !== element) {
-              sibling.classList.remove(CLASS_NAME_SELECTED)
-            }
-          }
-        }
+    for (const part of parts) {
+      const partValue = this._getPartOfTime(part)
+      if (partValue === null) {
+        continue
+      }
+
+      const elements = SelectorEngine.find(`[data-coreui-${part}]`, this._element)
+      const selectedElement = elements.find(element =>
+        partValue === Manipulator.getDataAttribute(element, part)
+      )
+
+      if (selectedElement) {
+        this._selectRollElement(selectedElement, initial)
       }
     }
+  }
+
+  _selectRollElement(element, initial = false) {
+    const { parentElement } = element
+
+    const currentSelected = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, parentElement)
+    if (currentSelected && currentSelected !== element) {
+      currentSelected.classList.remove(CLASS_NAME_SELECTED)
+      currentSelected.tabIndex = -1
+      currentSelected.setAttribute('aria-selected', 'false')
+    }
+
+    element.classList.add(CLASS_NAME_SELECTED)
+    element.tabIndex = 0
+    element.setAttribute('aria-selected', 'true')
+    this._scrollTo(parentElement, element, initial)
   }
 
   _setInputValue(date, input = this._input) {

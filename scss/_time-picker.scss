@@ -55,8 +55,8 @@
   --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
   --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
   --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
-  --#{$prefix}time-picker-roll-cell-focus-box-shadow: #{$time-picker-roll-cell-focus-box-shadow};
-  --#{$prefix}time-picker-roll-cell-selected-focus-box-shadow: #{$time-picker-roll-cell-selected-focus-box-shadow};
+  --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color};
+  --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg};
   --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
   --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color};
   --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
@@ -313,6 +313,7 @@
   height: 32px;
   padding-inline: $spacer * .5 $spacer;
   line-height: 32px;
+  cursor: pointer;
 
   &:hover,
   &:focus-visible:not(.selected) {
@@ -320,18 +321,19 @@
     background: var(--#{$prefix}time-picker-roll-cell-hover-bg);
   }
 
+  &:focus-visible {
+    outline: 0;
+  }
+
   &.selected {
     color: var(--#{$prefix}time-picker-roll-cell-selected-color);
     background: var(--#{$prefix}time-picker-roll-cell-selected-bg);
 
+    &:hover,
     &:focus-visible {
-      box-shadow: var(--#{$prefix}time-picker-roll-cell-selected-focus-box-shadow);
+      color: var(--#{$prefix}time-picker-roll-cell-selected-hover-color);
+      background: var(--#{$prefix}time-picker-roll-cell-selected-hover-bg);
     }
-  }
-
-  &:focus-visible {
-    outline: 0;
-    box-shadow: var(--#{$prefix}time-picker-roll-cell-focus-box-shadow);
   }
 
   &:last-child::after {
