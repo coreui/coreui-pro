@@ -51,6 +51,8 @@
   --#{$prefix}time-picker-dropdown-box-shadow: #{$time-picker-dropdown-box-shadow};
   --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
   --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
+  --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width};
+  --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height};
   --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color};
   --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
   --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
@@ -292,7 +294,7 @@
 }
 
 .time-picker-roll-col {
-  height: calc(8 * 32px); // stylelint-disable-line
+  height: calc(8 * var(--#{$prefix}time-picker-roll-cell-height)); // stylelint-disable-line
   overflow: scroll;
 
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
@@ -309,10 +311,11 @@
 }
 
 .time-picker-roll-cell {
-  width: 50px;
-  height: 32px;
-  padding-inline: $spacer * .5 $spacer;
-  line-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--#{$prefix}time-picker-roll-cell-width);
+  height: var(--#{$prefix}time-picker-roll-cell-height);
   cursor: pointer;
 
   &:hover,
@@ -336,10 +339,8 @@
     }
   }
 
-  &:last-child::after {
-    display: block;
-    height: calc(7 * 32px); // stylelint-disable-line
-    content: "";
+  &:last-child {
+    margin-bottom: calc(7 * var(--#{$prefix}time-picker-roll-cell-height)); // stylelint-disable-line
   }
 }
 

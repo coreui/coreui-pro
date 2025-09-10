@@ -2686,6 +2686,8 @@ $time-picker-footer-border-color:           var(--#{$prefix}border-color) !defau
 
 $time-picker-roll-col-border-width:           var(--#{$prefix}border-width) !default;
 $time-picker-roll-col-border-color:           var(--#{$prefix}border-color) !default;
+$time-picker-roll-cell-width:                 3rem !default;
+$time-picker-roll-cell-height:                2rem !default;
 $time-picker-roll-cell-hover-color:           var(--#{$prefix}body-color) !default;
 $time-picker-roll-cell-hover-bg:              var(--#{$prefix}tertiary-bg) !default;
 $time-picker-roll-cell-selected-color:        var(--#{$prefix}white) !default;
