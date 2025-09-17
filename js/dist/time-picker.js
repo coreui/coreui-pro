@@ -1,13 +1,13 @@
 /*!
-  * CoreUI time-picker.js v5.19.0 (https://coreui.io)
+  * CoreUI time-picker.js v5.20.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/time.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/time'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global["@popperjs/core"], global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Time));
-})(this, (function (Popper, BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, time_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/focustrap.js'), require('./util/time.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/focustrap', './util/time'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.TimePicker = factory(global["@popperjs/core"], global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Focustrap, global.Time));
+})(this, (function (Popper, BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, FocusTrap, time_js) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -44,12 +44,19 @@
   const DATA_KEY = 'coreui.time-picker';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const END_KEY = 'End';
   const ENTER_KEY = 'Enter';
   const ESCAPE_KEY = 'Escape';
+  const HOME_KEY = 'Home';
   const SPACE_KEY = 'Space';
   const TAB_KEY = 'Tab';
+  const ARROW_UP_KEY = 'ArrowUp';
+  const ARROW_DOWN_KEY = 'ArrowDown';
+  const ARROW_LEFT_KEY = 'ArrowLeft';
+  const ARROW_RIGHT_KEY = 'ArrowRight';
   const RIGHT_MOUSE_BUTTON = 2;
   const EVENT_CLICK = `click${EVENT_KEY}`;
+  const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`;
   const EVENT_HIDE = `hide${EVENT_KEY}`;
   const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
   const EVENT_INPUT = 'input';
@@ -82,8 +89,15 @@
   const CLASS_NAME_WAS_VALIDATED = 'was-validated';
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`;
+  const SELECTOR_ROLL_CELL = '.time-picker-roll-cell';
+  const SELECTOR_ROLL_CELL_FOCUSABLE = '.time-picker-roll-cell[tabindex="0"]';
+  const SELECTOR_ROLL_COL = '.time-picker-roll-col';
   const SELECTOR_WAS_VALIDATED = 'form.was-validated';
   const Default = {
+    ariaSelectHoursLabel: 'Select hours',
+    ariaSelectMeridiemLabel: 'Select AM/PM',
+    ariaSelectMinutesLabel: 'Select minutes',
+    ariaSelectSecondsLabel: 'Select seconds',
     cancelButton: 'Cancel',
     cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
     cleaner: true,
@@ -110,6 +124,10 @@
     variant: 'roll'
   };
   const DefaultType = {
+    ariaSelectHoursLabel: 'string',
+    ariaSelectMeridiemLabel: 'string',
+    ariaSelectMinutesLabel: 'string',
+    ariaSelectSecondsLabel: 'string',
     cancelButton: '(boolean|string)',
     cancelButtonClasses: '(array|string)',
     cleaner: 'boolean',
@@ -145,14 +163,21 @@
       super(element);
       this._handleTimeChange = (set, value) => {
         const _date = this._date || new Date('1970-01-01');
-        if (set === 'toggle') {
+        if (set === 'meridiem') {
+          const currentHours = _date.getHours();
           if (value === 'am') {
             this._ampm = 'am';
-            _date.setHours(_date.getHours() - 12);
+            // Convert PM hours (12-23) to AM hours (0-11)
+            if (currentHours >= 12) {
+              _date.setHours(currentHours - 12);
+            }
           }
           if (value === 'pm') {
             this._ampm = 'pm';
-            _date.setHours(_date.getHours() + 12);
+            // Convert AM hours (0-11) to PM hours (12-23)
+            if (currentHours < 12) {
+              _date.setHours(currentHours + 12);
+            }
           }
         }
         if (set === 'hours') {
@@ -194,6 +219,7 @@
       this._createTimePickerSelection();
       this._addEventListeners();
       this._setUpSelects();
+      this._focustrap = this._initializeFocusTrap();
     }
 
     // Getters
@@ -222,6 +248,7 @@
       if (this._config.container) {
         this._menu.classList.add(CLASS_NAME_SHOW);
       }
+      this._focustrap.activate();
       EventHandler.trigger(this._element, EVENT_SHOWN);
       this._createPopper();
     }
@@ -235,6 +262,7 @@
       if (this._config.container) {
         this._menu.classList.remove(CLASS_NAME_SHOW);
       }
+      this._focustrap.deactivate();
       EventHandler.trigger(this._element, EVENT_HIDDEN);
     }
     dispose() {
@@ -244,6 +272,7 @@
       if (this._inputTimeout) {
         clearTimeout(this._inputTimeout);
       }
+      this._focustrap.deactivate();
       super.dispose();
     }
     cancel() {
@@ -278,6 +307,42 @@
     }
 
     // Private
+    _initializeFocusTrap() {
+      return new FocusTrap({
+        additionalElement: this._config.container ? this._menu : null,
+        trapElement: this._element
+      });
+    }
+    _moveFocusToNextColumn(event) {
+      if (!this._timePickerBody) {
+        return;
+      }
+      const {
+        target
+      } = event;
+      const columnElement = target.parentElement;
+      const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody);
+      const currentColumnIndex = columns.indexOf(columnElement);
+      if (currentColumnIndex < columns.length - 1) {
+        const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex + 1]);
+        firstFocusableCell.focus();
+      }
+    }
+    _moveFocusToPreviousColumn(event) {
+      if (!this._timePickerBody) {
+        return;
+      }
+      const {
+        target
+      } = event;
+      const columnElement = target.parentElement;
+      const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody);
+      const currentColumnIndex = columns.indexOf(columnElement);
+      if (currentColumnIndex > 0) {
+        const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex - 1]);
+        firstFocusableCell.focus();
+      }
+    }
     _addEventListeners() {
       EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
         if (!this._config.disabled) {
@@ -300,6 +365,58 @@
           }
         }
       });
+      if (this._config.variant === 'roll') {
+        EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, event => {
+          if (!event.delegateTarget.contains(event.relatedTarget)) {
+            this._setUpRolls(false);
+          }
+        });
+        EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, event => {
+          if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+            event.preventDefault();
+            const {
+              key,
+              target
+            } = event;
+            const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
+            if (!items.length) {
+              return;
+            }
+            const nextElement = index_js.getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target));
+            if (nextElement) {
+              nextElement.focus();
+            }
+            return;
+          }
+          if (event.key === HOME_KEY || event.key === END_KEY) {
+            event.preventDefault();
+            const {
+              key,
+              target
+            } = event;
+            const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
+            if (!items.length) {
+              return;
+            }
+            const index = key === HOME_KEY ? 0 : items.length - 1;
+            items[index].focus();
+            return;
+          }
+          if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
+            event.preventDefault();
+            const {
+              key
+            } = event;
+            const isRtl = index_js.isRTL();
+            const shouldGoLeft = key === ARROW_LEFT_KEY && !isRtl || key === ARROW_RIGHT_KEY && isRtl;
+            if (shouldGoLeft) {
+              this._moveFocusToPreviousColumn(event);
+            } else {
+              this._moveFocusToNextColumn(event);
+            }
+          }
+        });
+      }
       EventHandler.on(this._element, EVENT_KEYDOWN, event => {
         if (event.key === ESCAPE_KEY) {
           this.hide();
@@ -347,7 +464,7 @@
     }
     _createTimePicker() {
       this._element.classList.add(CLASS_NAME_TIME_PICKER);
-      Manipulator.setDataAttribute(this._element, 'toggle', CLASS_NAME_TIME_PICKER);
+      Manipulator.setDataAttribute(this._element, 'meridiem', CLASS_NAME_TIME_PICKER);
       if (this._config.size) {
         this._element.classList.add(`time-picker-${this._config.size}`);
       }
@@ -450,14 +567,16 @@
       timePickerBodyEl.classList.add(CLASS_NAME_BODY);
       if (this._config.variant === 'roll') {
         timePickerBodyEl.classList.add(CLASS_NAME_ROLL);
+        timePickerBodyEl.setAttribute('role', 'group');
       }
       this._timePickerBody = timePickerBodyEl;
       return timePickerBodyEl;
     }
-    _createTimePickerInlineSelect(className, options) {
+    _createTimePickerInlineSelect(className, options, ariaLabel) {
       const selectEl = document.createElement('select');
       selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className);
       selectEl.disabled = this._config.disabled;
+      selectEl.setAttribute('aria-label', ariaLabel);
       selectEl.addEventListener('change', event => this._handleTimeChange(className, event.target.value));
       for (const option of options) {
         const optionEl = document.createElement('option');
@@ -471,30 +590,30 @@
       const timeSeparatorEl = document.createElement('div');
       timeSeparatorEl.innerHTML = ':';
       this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`;
-      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours));
+      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours, this._config.ariaSelectHoursLabel));
       if (this._config.minutes) {
-        this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes));
+        this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes, this._config.ariaSelectMinutesLabel));
       }
       if (this._config.seconds) {
-        this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds));
+        this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds, this._config.ariaSelectSecondsLabel));
       }
       if (this._localizedTimePartials.hour12) {
-        this._timePickerBody.append(this._createTimePickerInlineSelect('toggle', [{
+        this._timePickerBody.append(this._createTimePickerInlineSelect('meridiem', [{
           value: 'am',
           label: 'AM'
         }, {
           value: 'pm',
           label: 'PM'
-        }], '_selectAmPm', this._ampm));
+        }], this._config.ariaSelectMeridiemLabel));
       }
     }
     _createTimePickerRoll() {
-      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours'));
+      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours', this._config.ariaSelectHoursLabel));
       if (this._config.minutes) {
-        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes'));
+        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes', this._config.ariaSelectMinutesLabel));
       }
       if (this._config.seconds) {
-        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds'));
+        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds', this._config.ariaSelectSecondsLabel));
       }
       if (this._localizedTimePartials.hour12) {
         this._timePickerBody.append(this._createTimePickerRollCol([{
@@ -503,17 +622,21 @@
         }, {
           value: 'pm',
           label: 'PM'
-        }], 'toggle', this._ampm));
+        }], 'meridiem', this._config.ariaSelectMeridiemLabel));
       }
     }
-    _createTimePickerRollCol(options, part) {
+    _createTimePickerRollCol(options, part, ariaLabel) {
       const timePickerRollColEl = document.createElement('div');
       timePickerRollColEl.classList.add(CLASS_NAME_ROLL_COL);
-      for (const option of options) {
+      timePickerRollColEl.setAttribute('role', 'listbox');
+      timePickerRollColEl.setAttribute('aria-label', ariaLabel);
+      for (const [index, option] of options.entries()) {
         const timePickerRollCellEl = document.createElement('div');
         timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL);
-        timePickerRollCellEl.setAttribute('role', 'button');
-        timePickerRollCellEl.tabIndex = 0;
+        timePickerRollCellEl.setAttribute('role', 'option');
+        timePickerRollCellEl.tabIndex = index === 0 ? 0 : -1;
+        timePickerRollCellEl.setAttribute('aria-label', option.label.toString());
+        timePickerRollCellEl.setAttribute('aria-selected', 'false');
         timePickerRollCellEl.innerHTML = option.label;
         timePickerRollCellEl.addEventListener('click', () => {
           this._handleTimeChange(part, option.value);
@@ -522,6 +645,7 @@
           if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
             event.preventDefault();
             this._handleTimeChange(part, option.value);
+            this._moveFocusToNextColumn(event);
           }
         });
         Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
@@ -563,20 +687,33 @@
       });
     }
     _setUpRolls(initial = false) {
-      for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-        for (const element of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
-          if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
-            element.classList.add(CLASS_NAME_SELECTED);
-            this._scrollTo(element.parentElement, element, initial);
-            for (const sibling of element.parentElement.children) {
-              // eslint-disable-next-line max-depth
-              if (sibling !== element) {
-                sibling.classList.remove(CLASS_NAME_SELECTED);
-              }
-            }
-          }
+      const parts = ['hours', 'minutes', 'seconds', 'meridiem'];
+      for (const part of parts) {
+        const partValue = this._getPartOfTime(part);
+        if (partValue === null) {
+          continue;
+        }
+        const elements = SelectorEngine.find(`[data-coreui-${part}]`, this._element);
+        const selectedElement = elements.find(element => partValue === Manipulator.getDataAttribute(element, part));
+        if (selectedElement) {
+          this._selectRollElement(selectedElement, initial);
         }
       }
+    }
+    _selectRollElement(element, initial = false) {
+      const {
+        parentElement
+      } = element;
+      const currentSelected = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, parentElement);
+      if (currentSelected && currentSelected !== element) {
+        currentSelected.classList.remove(CLASS_NAME_SELECTED);
+        currentSelected.tabIndex = -1;
+        currentSelected.setAttribute('aria-selected', 'false');
+      }
+      element.classList.add(CLASS_NAME_SELECTED);
+      element.tabIndex = 0;
+      element.setAttribute('aria-selected', 'true');
+      this._scrollTo(parentElement, element, initial);
     }
     _setInputValue(date, input = this._input) {
       input.value = date instanceof Date ? date.toLocaleTimeString(this._config.locale, {
@@ -591,7 +728,7 @@
       }) : date;
     }
     _setUpSelects() {
-      for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
+      for (const part of Array.from(['hours', 'minutes', 'seconds', 'meridiem'])) {
         for (const element of SelectorEngine.find(`select.${part}`, this._element)) {
           if (this._getPartOfTime(part)) {
             element.value = this._getPartOfTime(part);
@@ -645,7 +782,7 @@
       if (part === 'seconds') {
         return this._date.getSeconds();
       }
-      if (part === 'toggle') {
+      if (part === 'meridiem') {
         return time_js.getAmPm(new Date(this._date), this._config.locale);
       }
     }

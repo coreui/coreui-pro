@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*!
- * CoreUI PRO Bootstrap Theme v5.19.0 (https://coreui.io)
+ * CoreUI PRO Bootstrap Theme v5.20.0 (https://coreui.io)
  * Copyright (c) 2025 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -10160,8 +10160,14 @@ select.form-multi-select {
   --bs-time-picker-dropdown-box-shadow: var(--bs-box-shadow);
   --bs-time-picker-roll-col-border-width: var(--bs-border-width);
   --bs-time-picker-roll-col-border-color: var(--bs-border-color);
+  --bs-time-picker-roll-cell-width: 3rem;
+  --bs-time-picker-roll-cell-height: 2rem;
+  --bs-time-picker-roll-cell-hover-color: var(--bs-body-color);
+  --bs-time-picker-roll-cell-hover-bg: var(--bs-tertiary-bg);
   --bs-time-picker-roll-cell-selected-color: var(--bs-white);
   --bs-time-picker-roll-cell-selected-bg: var(--bs-primary);
+  --bs-time-picker-roll-cell-selected-hover-color: var(--bs-white);
+  --bs-time-picker-roll-cell-selected-hover-bg: light-dark(rgb(1.7442622951, 86.3409836066, 211.0557377049), rgb(13.7360655738, 99.3902459016, 225.6639344262));
   --bs-time-picker-inline-select-font-size: 0.875rem;
   --bs-time-picker-inline-select-color: var(--bs-body-color);
   --bs-time-picker-inline-select-padding-y: 0.25rem;
@@ -10365,10 +10371,11 @@ select.form-multi-select {
 }
 
 .time-picker-roll-col {
-  height: 256px;
+  height: calc(8 * var(--bs-time-picker-roll-cell-height));
   overflow: scroll;
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
+  scroll-behavior: smooth;
 }
 .time-picker-roll-col::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
@@ -10378,19 +10385,30 @@ select.form-multi-select {
 }
 
 .time-picker-roll-cell {
-  width: 50px;
-  height: 32px;
-  padding-inline: 0.5rem 1rem;
-  line-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--bs-time-picker-roll-cell-width);
+  height: var(--bs-time-picker-roll-cell-height);
+  cursor: pointer;
+}
+.time-picker-roll-cell:hover, .time-picker-roll-cell:focus-visible:not(.selected) {
+  color: var(--bs-time-picker-roll-cell-hover-color);
+  background: var(--bs-time-picker-roll-cell-hover-bg);
+}
+.time-picker-roll-cell:focus-visible {
+  outline: 0;
 }
 .time-picker-roll-cell.selected {
   color: var(--bs-time-picker-roll-cell-selected-color);
   background: var(--bs-time-picker-roll-cell-selected-bg);
 }
-.time-picker-roll-cell:last-child::after {
-  display: block;
-  height: 224px;
-  content: "";
+.time-picker-roll-cell.selected:hover, .time-picker-roll-cell.selected:focus-visible {
+  color: var(--bs-time-picker-roll-cell-selected-hover-color);
+  background: var(--bs-time-picker-roll-cell-selected-hover-bg);
+}
+.time-picker-roll-cell:last-child {
+  margin-bottom: calc(7 * var(--bs-time-picker-roll-cell-height));
 }
 
 .time-picker-sm {

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.19.0 (https://coreui.io)
+  * CoreUI v5.20.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -684,7 +684,7 @@
    * Constants
    */
 
-  const VERSION = '5.19.0';
+  const VERSION = '5.20.0';
 
   /**
    * Class definition
@@ -1057,8 +1057,8 @@
   const DATA_KEY$m = 'bs.autocomplete';
   const EVENT_KEY$n = `.${DATA_KEY$m}`;
   const DATA_API_KEY$i = '.data-api';
-  const ARROW_UP_KEY$5 = 'ArrowUp';
-  const ARROW_DOWN_KEY$5 = 'ArrowDown';
+  const ARROW_UP_KEY$6 = 'ArrowUp';
+  const ARROW_DOWN_KEY$6 = 'ArrowDown';
   const BACKSPACE_KEY$1 = 'Backspace';
   const DELETE_KEY$1 = 'Delete';
   const ENTER_KEY$4 = 'Enter';
@@ -1349,12 +1349,12 @@
         }
       });
       EventHandler.on(this._togglerElement, EVENT_KEYDOWN$7, event => {
-        if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$5)) {
+        if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$6)) {
           event.preventDefault();
           this.show();
           return;
         }
-        if (this._isShown() && event.key === ARROW_DOWN_KEY$5) {
+        if (this._isShown() && event.key === ARROW_DOWN_KEY$6) {
           event.preventDefault();
           this._selectMenuItem(event);
         }
@@ -1373,7 +1373,7 @@
         if (!this._isShown() && event.key !== TAB_KEY$6) {
           this.show();
         }
-        if (event.key === ARROW_DOWN_KEY$5 && this._inputElement.value.length === this._inputElement.selectionStart) {
+        if (event.key === ARROW_DOWN_KEY$6 && this._inputElement.value.length === this._inputElement.selectionStart) {
           this._selectMenuItem(event);
           return;
         }
@@ -1442,7 +1442,7 @@
         if (event.key === ENTER_KEY$4) {
           this._onOptionsClick(event.target);
         }
-        if ([ARROW_UP_KEY$5, ARROW_DOWN_KEY$5].includes(event.key)) {
+        if ([ARROW_UP_KEY$6, ARROW_DOWN_KEY$6].includes(event.key)) {
           event.preventDefault();
           this._selectMenuItem(event);
         }
@@ -1809,7 +1809,7 @@
 
       // if target isn't included in items (e.g. when expanding the dropdown)
       // allow cycling to get the last item in case key equals ARROW_UP_KEY
-      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$5, !items.includes(target)).focus();
+      getNextActiveElement(items, target, key === ARROW_DOWN_KEY$6, !items.includes(target)).focus();
     }
     _configAfterMerge(config) {
       if (config.container === true) {
@@ -2974,10 +2974,10 @@
   const DATA_KEY$k = 'bs.calendar';
   const EVENT_KEY$l = `.${DATA_KEY$k}`;
   const DATA_API_KEY$g = '.data-api';
-  const ARROW_UP_KEY$4 = 'ArrowUp';
-  const ARROW_RIGHT_KEY$3 = 'ArrowRight';
-  const ARROW_DOWN_KEY$4 = 'ArrowDown';
-  const ARROW_LEFT_KEY$3 = 'ArrowLeft';
+  const ARROW_UP_KEY$5 = 'ArrowUp';
+  const ARROW_RIGHT_KEY$4 = 'ArrowRight';
+  const ARROW_DOWN_KEY$5 = 'ArrowDown';
+  const ARROW_LEFT_KEY$4 = 'ArrowLeft';
   const ENTER_KEY$3 = 'Enter';
   const SPACE_KEY$1 = 'Space';
   const EVENT_BLUR = `blur${EVENT_KEY$l}`;
@@ -3142,12 +3142,12 @@
         event.preventDefault();
         this._handleCalendarClick(event);
       }
-      if (event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_UP_KEY$4 || event.key === ARROW_DOWN_KEY$4) {
+      if (event.key === ARROW_RIGHT_KEY$4 || event.key === ARROW_LEFT_KEY$4 || event.key === ARROW_UP_KEY$5 || event.key === ARROW_DOWN_KEY$5) {
         event.preventDefault();
-        if (this._maxDate && date >= convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4)) {
+        if (this._maxDate && date >= convertToDateObject(this._maxDate, this._config.selectionType) && (event.key === ARROW_RIGHT_KEY$4 || event.key === ARROW_DOWN_KEY$5)) {
           return;
         }
-        if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$3 || event.key === ARROW_UP_KEY$4)) {
+        if (this._minDate && date <= convertToDateObject(this._minDate, this._config.selectionType) && (event.key === ARROW_LEFT_KEY$4 || event.key === ARROW_UP_KEY$5)) {
           return;
         }
         let element = event.target;
@@ -3168,30 +3168,30 @@
           ArrowUp: this._config.selectionType === 'week' && this._view === 'days' ? -1 : this._view === 'days' ? -7 : -3,
           ArrowDown: this._config.selectionType === 'week' && this._view === 'days' ? 1 : this._view === 'days' ? 7 : 3
         };
-        if (event.key === ARROW_RIGHT_KEY$3 && last || event.key === ARROW_DOWN_KEY$4 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$3 && first || event.key === ARROW_UP_KEY$4 && toBoundary.start < Math.abs(gap.ArrowUp)) {
+        if (event.key === ARROW_RIGHT_KEY$4 && last || event.key === ARROW_DOWN_KEY$5 && toBoundary.end < gap.ArrowDown || event.key === ARROW_LEFT_KEY$4 && first || event.key === ARROW_UP_KEY$5 && toBoundary.start < Math.abs(gap.ArrowUp)) {
           const callback = key => {
             const _list = SelectorEngine.find(`${SELECTOR_CALENDAR_CELL_CLICKABLE}, ${SELECTOR_CALENDAR_ROW_CLICKABLE}`, this._element);
-            if (_list.length && key === ARROW_RIGHT_KEY$3) {
+            if (_list.length && key === ARROW_RIGHT_KEY$4) {
               _list[0].focus();
             }
-            if (_list.length && key === ARROW_LEFT_KEY$3) {
+            if (_list.length && key === ARROW_LEFT_KEY$4) {
               _list[_list.length - 1].focus();
             }
-            if (_list.length && key === ARROW_DOWN_KEY$4) {
+            if (_list.length && key === ARROW_DOWN_KEY$5) {
               _list[gap.ArrowDown - (list.length - index)].focus();
             }
-            if (_list.length && key === ARROW_UP_KEY$4) {
+            if (_list.length && key === ARROW_UP_KEY$5) {
               _list[_list.length - (Math.abs(gap.ArrowUp) + 1 - (index + 1))].focus();
             }
           };
           if (this._view === 'days') {
-            this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 1 : -1, callback.bind(this, event.key));
+            this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$4 || event.key === ARROW_DOWN_KEY$5 ? 1 : -1, callback.bind(this, event.key));
           }
           if (this._view === 'months') {
-            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 1 : -1, 0, callback.bind(this, event.key));
+            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$4 || event.key === ARROW_DOWN_KEY$5 ? 1 : -1, 0, callback.bind(this, event.key));
           }
           if (this._view === 'years') {
-            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? 10 : -10, 0, callback.bind(this, event.key));
+            this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$4 || event.key === ARROW_DOWN_KEY$5 ? 10 : -10, 0, callback.bind(this, event.key));
           }
           return;
         }
@@ -3199,7 +3199,7 @@
           list[index + gap[event.key]].focus();
           return;
         }
-        for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$3 || event.key === ARROW_DOWN_KEY$4 ? i++ : i--) {
+        for (let i = index; i < list.length; event.key === ARROW_RIGHT_KEY$4 || event.key === ARROW_DOWN_KEY$5 ? i++ : i--) {
           if (list[i + gap[event.key]].tabIndex === 0) {
             list[i + gap[event.key]].focus();
             break;
@@ -3392,30 +3392,30 @@
       navigationElement.classList.add('calendar-nav');
       navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
       <div class="calendar-nav-date" aria-live="polite">
-        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-sm btn-month">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-sm btn-month">
           ${calendarDate.toLocaleDateString(this._config.locale, {
       month: 'long'
     })}
         </button>` : ''}
-        <button class="calendar-nav-btn btn-year">
+        <button type="button" class="calendar-nav-btn btn-year">
           ${calendarDate.toLocaleDateString(this._config.locale, {
       year: 'numeric'
     })}
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -3881,8 +3881,8 @@
   const DATA_KEY$j = 'bs.carousel';
   const EVENT_KEY$j = `.${DATA_KEY$j}`;
   const DATA_API_KEY$f = '.data-api';
-  const ARROW_LEFT_KEY$2 = 'ArrowLeft';
-  const ARROW_RIGHT_KEY$2 = 'ArrowRight';
+  const ARROW_LEFT_KEY$3 = 'ArrowLeft';
+  const ARROW_RIGHT_KEY$3 = 'ArrowRight';
   const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
 
   const ORDER_NEXT = 'next';
@@ -3912,8 +3912,8 @@
   const SELECTOR_DATA_SLIDE = '[data-bs-slide], [data-bs-slide-to]';
   const SELECTOR_DATA_RIDE = '[data-bs-ride="carousel"]';
   const KEY_TO_DIRECTION = {
-    [ARROW_LEFT_KEY$2]: DIRECTION_RIGHT,
-    [ARROW_RIGHT_KEY$2]: DIRECTION_LEFT
+    [ARROW_LEFT_KEY$3]: DIRECTION_RIGHT,
+    [ARROW_RIGHT_KEY$3]: DIRECTION_LEFT
   };
   const Default$l = {
     interval: 5000,
@@ -4476,6 +4476,141 @@
   defineJQueryPlugin(Collapse);
 
   /**
+   * --------------------------------------------------------------------------
+   * CoreUI util/focustrap.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   *
+   * This is a modified version of the Bootstrap's util/focustrap.js
+   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$l = 'focustrap';
+  const DATA_KEY$h = 'bs.focustrap';
+  const EVENT_KEY$h = `.${DATA_KEY$h}`;
+  const EVENT_FOCUSIN$3 = `focusin${EVENT_KEY$h}`;
+  const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$h}`;
+  const TAB_KEY$5 = 'Tab';
+  const TAB_NAV_FORWARD = 'forward';
+  const TAB_NAV_BACKWARD = 'backward';
+  const Default$j = {
+    additionalElement: null,
+    autofocus: true,
+    trapElement: null // The element to trap focus inside of
+  };
+  const DefaultType$j = {
+    additionalElement: '(element|null|undefined)',
+    autofocus: 'boolean',
+    trapElement: 'element'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class FocusTrap extends Config {
+    constructor(config) {
+      super();
+      this._config = this._getConfig(config);
+      this._isActive = false;
+      this._lastTabNavDirection = null;
+    }
+
+    // Getters
+    static get Default() {
+      return Default$j;
+    }
+    static get DefaultType() {
+      return DefaultType$j;
+    }
+    static get NAME() {
+      return NAME$l;
+    }
+
+    // Public
+    activate() {
+      if (this._isActive) {
+        return;
+      }
+      if (this._config.autofocus) {
+        this._config.trapElement.focus();
+      }
+      EventHandler.off(document, EVENT_KEY$h); // guard against infinite focus loop
+      EventHandler.on(document, EVENT_FOCUSIN$3, event => this._handleFocusin(event));
+      EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event));
+      this._isActive = true;
+    }
+    deactivate() {
+      if (!this._isActive) {
+        return;
+      }
+      this._isActive = false;
+      EventHandler.off(document, EVENT_KEY$h);
+    }
+
+    // Private
+    _handleFocusin(event) {
+      const {
+        additionalElement,
+        trapElement
+      } = this._config;
+      if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+        return;
+      }
+      if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) {
+        return;
+      }
+      const elements = SelectorEngine.focusableChildren(trapElement);
+      if (elements.length === 0) {
+        trapElement.focus();
+      } else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) {
+        elements[elements.length - 1].focus();
+      } else {
+        elements[0].focus();
+      }
+    }
+    _handleKeydown(event) {
+      if (event.key !== TAB_KEY$5) {
+        return;
+      }
+      this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
+      const {
+        additionalElement,
+        trapElement
+      } = this._config;
+      if (!additionalElement) {
+        return;
+      }
+      const trapElements = SelectorEngine.focusableChildren(trapElement);
+      const additionalElements = SelectorEngine.focusableChildren(additionalElement);
+      if (trapElements.length === 0 || additionalElements.length === 0) {
+        return;
+      }
+      event.preventDefault();
+      if (trapElements.indexOf(event.target) === trapElements.length - 1 && !event.shiftKey) {
+        additionalElements[0].focus();
+        return;
+      }
+      if (trapElements.indexOf(event.target) === 0 && event.shiftKey) {
+        additionalElements[additionalElements.length - 1].focus();
+        return;
+      }
+      if (additionalElements.indexOf(event.target) === additionalElements.length - 1 && !event.shiftKey) {
+        trapElements[0].focus();
+        return;
+      }
+      if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
+        trapElements[trapElements.length - 1].focus();
+      }
+    }
+  }
+
+  /**
    * Converts a 12-hour time format to a 24-hour time format.
    * @param {('am' | 'pm')} abbr The abbreviation indicating AM or PM.
    * @param {number} hour The hour to be converted.
@@ -4628,27 +4763,34 @@
    * Constants
    */
 
-  const NAME$l = 'time-picker';
-  const DATA_KEY$h = 'bs.time-picker';
-  const EVENT_KEY$h = `.${DATA_KEY$h}`;
+  const NAME$k = 'time-picker';
+  const DATA_KEY$g = 'bs.time-picker';
+  const EVENT_KEY$g = `.${DATA_KEY$g}`;
   const DATA_API_KEY$d = '.data-api';
+  const END_KEY$2 = 'End';
   const ENTER_KEY$2 = 'Enter';
   const ESCAPE_KEY$5 = 'Escape';
+  const HOME_KEY$2 = 'Home';
   const SPACE_KEY = 'Space';
-  const TAB_KEY$5 = 'Tab';
+  const TAB_KEY$4 = 'Tab';
+  const ARROW_UP_KEY$4 = 'ArrowUp';
+  const ARROW_DOWN_KEY$4 = 'ArrowDown';
+  const ARROW_LEFT_KEY$2 = 'ArrowLeft';
+  const ARROW_RIGHT_KEY$2 = 'ArrowRight';
   const RIGHT_MOUSE_BUTTON$4 = 2;
-  const EVENT_CLICK$5 = `click${EVENT_KEY$h}`;
-  const EVENT_HIDE$a = `hide${EVENT_KEY$h}`;
-  const EVENT_HIDDEN$a = `hidden${EVENT_KEY$h}`;
+  const EVENT_CLICK$5 = `click${EVENT_KEY$g}`;
+  const EVENT_FOCUSOUT$3 = `focusout${EVENT_KEY$g}`;
+  const EVENT_HIDE$a = `hide${EVENT_KEY$g}`;
+  const EVENT_HIDDEN$a = `hidden${EVENT_KEY$g}`;
   const EVENT_INPUT$2 = 'input';
-  const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$h}`;
-  const EVENT_SHOW$a = `show${EVENT_KEY$h}`;
-  const EVENT_SHOWN$a = `shown${EVENT_KEY$h}`;
+  const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$g}`;
+  const EVENT_SHOW$a = `show${EVENT_KEY$g}`;
+  const EVENT_SHOWN$a = `shown${EVENT_KEY$g}`;
   const EVENT_SUBMIT$1 = 'submit';
-  const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$h}`;
-  const EVENT_CLICK_DATA_API$c = `click${EVENT_KEY$h}${DATA_API_KEY$d}`;
-  const EVENT_KEYUP_DATA_API$4 = `keyup${EVENT_KEY$h}${DATA_API_KEY$d}`;
-  const EVENT_LOAD_DATA_API$b = `load${EVENT_KEY$h}${DATA_API_KEY$d}`;
+  const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY$g}`;
+  const EVENT_CLICK_DATA_API$c = `click${EVENT_KEY$g}${DATA_API_KEY$d}`;
+  const EVENT_KEYUP_DATA_API$4 = `keyup${EVENT_KEY$g}${DATA_API_KEY$d}`;
+  const EVENT_LOAD_DATA_API$b = `load${EVENT_KEY$g}${DATA_API_KEY$d}`;
   const CLASS_NAME_BODY$1 = 'time-picker-body';
   const CLASS_NAME_CLEANER$2 = 'time-picker-cleaner';
   const CLASS_NAME_DISABLED$4 = 'disabled';
@@ -4670,8 +4812,15 @@
   const CLASS_NAME_WAS_VALIDATED$1 = 'was-validated';
   const SELECTOR_DATA_TOGGLE$c = '[data-bs-toggle="time-picker"]:not(.disabled):not(:disabled)';
   const SELECTOR_DATA_TOGGLE_SHOWN$3 = `${SELECTOR_DATA_TOGGLE$c}.${CLASS_NAME_SHOW$d}`;
+  const SELECTOR_ROLL_CELL = '.time-picker-roll-cell';
+  const SELECTOR_ROLL_CELL_FOCUSABLE = '.time-picker-roll-cell[tabindex="0"]';
+  const SELECTOR_ROLL_COL = '.time-picker-roll-col';
   const SELECTOR_WAS_VALIDATED$1 = 'form.was-validated';
-  const Default$j = {
+  const Default$i = {
+    ariaSelectHoursLabel: 'Select hours',
+    ariaSelectMeridiemLabel: 'Select AM/PM',
+    ariaSelectMinutesLabel: 'Select minutes',
+    ariaSelectSecondsLabel: 'Select seconds',
     cancelButton: 'Cancel',
     cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
     cleaner: true,
@@ -4697,7 +4846,11 @@
     valid: false,
     variant: 'roll'
   };
-  const DefaultType$j = {
+  const DefaultType$i = {
+    ariaSelectHoursLabel: 'string',
+    ariaSelectMeridiemLabel: 'string',
+    ariaSelectMinutesLabel: 'string',
+    ariaSelectSecondsLabel: 'string',
     cancelButton: '(boolean|string)',
     cancelButtonClasses: '(array|string)',
     cleaner: 'boolean',
@@ -4733,14 +4886,21 @@
       super(element);
       this._handleTimeChange = (set, value) => {
         const _date = this._date || new Date('1970-01-01');
-        if (set === 'toggle') {
+        if (set === 'meridiem') {
+          const currentHours = _date.getHours();
           if (value === 'am') {
             this._ampm = 'am';
-            _date.setHours(_date.getHours() - 12);
+            // Convert PM hours (12-23) to AM hours (0-11)
+            if (currentHours >= 12) {
+              _date.setHours(currentHours - 12);
+            }
           }
           if (value === 'pm') {
             this._ampm = 'pm';
-            _date.setHours(_date.getHours() + 12);
+            // Convert AM hours (0-11) to PM hours (12-23)
+            if (currentHours < 12) {
+              _date.setHours(currentHours + 12);
+            }
           }
         }
         if (set === 'hours') {
@@ -4782,17 +4942,18 @@
       this._createTimePickerSelection();
       this._addEventListeners();
       this._setUpSelects();
+      this._focustrap = this._initializeFocusTrap();
     }
 
     // Getters
     static get Default() {
-      return Default$j;
+      return Default$i;
     }
     static get DefaultType() {
-      return DefaultType$j;
+      return DefaultType$i;
     }
     static get NAME() {
-      return NAME$l;
+      return NAME$k;
     }
 
     // Public
@@ -4810,6 +4971,7 @@
       if (this._config.container) {
         this._menu.classList.add(CLASS_NAME_SHOW$d);
       }
+      this._focustrap.activate();
       EventHandler.trigger(this._element, EVENT_SHOWN$a);
       this._createPopper();
     }
@@ -4823,6 +4985,7 @@
       if (this._config.container) {
         this._menu.classList.remove(CLASS_NAME_SHOW$d);
       }
+      this._focustrap.deactivate();
       EventHandler.trigger(this._element, EVENT_HIDDEN$a);
     }
     dispose() {
@@ -4832,6 +4995,7 @@
       if (this._inputTimeout) {
         clearTimeout(this._inputTimeout);
       }
+      this._focustrap.deactivate();
       super.dispose();
     }
     cancel() {
@@ -4866,6 +5030,42 @@
     }
 
     // Private
+    _initializeFocusTrap() {
+      return new FocusTrap({
+        additionalElement: this._config.container ? this._menu : null,
+        trapElement: this._element
+      });
+    }
+    _moveFocusToNextColumn(event) {
+      if (!this._timePickerBody) {
+        return;
+      }
+      const {
+        target
+      } = event;
+      const columnElement = target.parentElement;
+      const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody);
+      const currentColumnIndex = columns.indexOf(columnElement);
+      if (currentColumnIndex < columns.length - 1) {
+        const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex + 1]);
+        firstFocusableCell.focus();
+      }
+    }
+    _moveFocusToPreviousColumn(event) {
+      if (!this._timePickerBody) {
+        return;
+      }
+      const {
+        target
+      } = event;
+      const columnElement = target.parentElement;
+      const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody);
+      const currentColumnIndex = columns.indexOf(columnElement);
+      if (currentColumnIndex > 0) {
+        const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex - 1]);
+        firstFocusableCell.focus();
+      }
+    }
     _addEventListeners() {
       EventHandler.on(this._indicatorElement, EVENT_CLICK$5, () => {
         if (!this._config.disabled) {
@@ -4888,6 +5088,58 @@
           }
         }
       });
+      if (this._config.variant === 'roll') {
+        EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT$3, SELECTOR_ROLL_COL, event => {
+          if (!event.delegateTarget.contains(event.relatedTarget)) {
+            this._setUpRolls(false);
+          }
+        });
+        EventHandler.on(this._timePickerBody, EVENT_KEYDOWN$4, SELECTOR_ROLL_CELL, event => {
+          if (event.key === ARROW_DOWN_KEY$4 || event.key === ARROW_UP_KEY$4) {
+            event.preventDefault();
+            const {
+              key,
+              target
+            } = event;
+            const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
+            if (!items.length) {
+              return;
+            }
+            const nextElement = getNextActiveElement(items, target, key === ARROW_DOWN_KEY$4, !items.includes(target));
+            if (nextElement) {
+              nextElement.focus();
+            }
+            return;
+          }
+          if (event.key === HOME_KEY$2 || event.key === END_KEY$2) {
+            event.preventDefault();
+            const {
+              key,
+              target
+            } = event;
+            const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement);
+            if (!items.length) {
+              return;
+            }
+            const index = key === HOME_KEY$2 ? 0 : items.length - 1;
+            items[index].focus();
+            return;
+          }
+          if (event.key === ARROW_LEFT_KEY$2 || event.key === ARROW_RIGHT_KEY$2) {
+            event.preventDefault();
+            const {
+              key
+            } = event;
+            const isRtl = isRTL();
+            const shouldGoLeft = key === ARROW_LEFT_KEY$2 && !isRtl || key === ARROW_RIGHT_KEY$2 && isRtl;
+            if (shouldGoLeft) {
+              this._moveFocusToPreviousColumn(event);
+            } else {
+              this._moveFocusToNextColumn(event);
+            }
+          }
+        });
+      }
       EventHandler.on(this._element, EVENT_KEYDOWN$4, event => {
         if (event.key === ESCAPE_KEY$5) {
           this.hide();
@@ -4935,7 +5187,7 @@
     }
     _createTimePicker() {
       this._element.classList.add(CLASS_NAME_TIME_PICKER$1);
-      Manipulator.setDataAttribute(this._element, 'toggle', CLASS_NAME_TIME_PICKER$1);
+      Manipulator.setDataAttribute(this._element, 'meridiem', CLASS_NAME_TIME_PICKER$1);
       if (this._config.size) {
         this._element.classList.add(`time-picker-${this._config.size}`);
       }
@@ -5038,14 +5290,16 @@
       timePickerBodyEl.classList.add(CLASS_NAME_BODY$1);
       if (this._config.variant === 'roll') {
         timePickerBodyEl.classList.add(CLASS_NAME_ROLL);
+        timePickerBodyEl.setAttribute('role', 'group');
       }
       this._timePickerBody = timePickerBodyEl;
       return timePickerBodyEl;
     }
-    _createTimePickerInlineSelect(className, options) {
+    _createTimePickerInlineSelect(className, options, ariaLabel) {
       const selectEl = document.createElement('select');
       selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className);
       selectEl.disabled = this._config.disabled;
+      selectEl.setAttribute('aria-label', ariaLabel);
       selectEl.addEventListener('change', event => this._handleTimeChange(className, event.target.value));
       for (const option of options) {
         const optionEl = document.createElement('option');
@@ -5059,30 +5313,30 @@
       const timeSeparatorEl = document.createElement('div');
       timeSeparatorEl.innerHTML = ':';
       this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`;
-      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours));
+      this._timePickerBody.append(this._createTimePickerInlineSelect('hours', this._localizedTimePartials.listOfHours, this._config.ariaSelectHoursLabel));
       if (this._config.minutes) {
-        this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes));
+        this._timePickerBody.append(timeSeparatorEl.cloneNode(true), this._createTimePickerInlineSelect('minutes', this._localizedTimePartials.listOfMinutes, this._config.ariaSelectMinutesLabel));
       }
       if (this._config.seconds) {
-        this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds));
+        this._timePickerBody.append(timeSeparatorEl, this._createTimePickerInlineSelect('seconds', this._localizedTimePartials.listOfSeconds, this._config.ariaSelectSecondsLabel));
       }
       if (this._localizedTimePartials.hour12) {
-        this._timePickerBody.append(this._createTimePickerInlineSelect('toggle', [{
+        this._timePickerBody.append(this._createTimePickerInlineSelect('meridiem', [{
           value: 'am',
           label: 'AM'
         }, {
           value: 'pm',
           label: 'PM'
-        }], '_selectAmPm', this._ampm));
+        }], this._config.ariaSelectMeridiemLabel));
       }
     }
     _createTimePickerRoll() {
-      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours'));
+      this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfHours, 'hours', this._config.ariaSelectHoursLabel));
       if (this._config.minutes) {
-        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes'));
+        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfMinutes, 'minutes', this._config.ariaSelectMinutesLabel));
       }
       if (this._config.seconds) {
-        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds'));
+        this._timePickerBody.append(this._createTimePickerRollCol(this._localizedTimePartials.listOfSeconds, 'seconds', this._config.ariaSelectSecondsLabel));
       }
       if (this._localizedTimePartials.hour12) {
         this._timePickerBody.append(this._createTimePickerRollCol([{
@@ -5091,17 +5345,21 @@
         }, {
           value: 'pm',
           label: 'PM'
-        }], 'toggle', this._ampm));
+        }], 'meridiem', this._config.ariaSelectMeridiemLabel));
       }
     }
-    _createTimePickerRollCol(options, part) {
+    _createTimePickerRollCol(options, part, ariaLabel) {
       const timePickerRollColEl = document.createElement('div');
       timePickerRollColEl.classList.add(CLASS_NAME_ROLL_COL);
-      for (const option of options) {
+      timePickerRollColEl.setAttribute('role', 'listbox');
+      timePickerRollColEl.setAttribute('aria-label', ariaLabel);
+      for (const [index, option] of options.entries()) {
         const timePickerRollCellEl = document.createElement('div');
         timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL);
-        timePickerRollCellEl.setAttribute('role', 'button');
-        timePickerRollCellEl.tabIndex = 0;
+        timePickerRollCellEl.setAttribute('role', 'option');
+        timePickerRollCellEl.tabIndex = index === 0 ? 0 : -1;
+        timePickerRollCellEl.setAttribute('aria-label', option.label.toString());
+        timePickerRollCellEl.setAttribute('aria-selected', 'false');
         timePickerRollCellEl.innerHTML = option.label;
         timePickerRollCellEl.addEventListener('click', () => {
           this._handleTimeChange(part, option.value);
@@ -5110,6 +5368,7 @@
           if (event.code === SPACE_KEY || event.key === ENTER_KEY$2) {
             event.preventDefault();
             this._handleTimeChange(part, option.value);
+            this._moveFocusToNextColumn(event);
           }
         });
         Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value);
@@ -5151,20 +5410,33 @@
       });
     }
     _setUpRolls(initial = false) {
-      for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
-        for (const element of SelectorEngine.find(`[data-bs-${part}]`, this._element)) {
-          if (this._getPartOfTime(part) === Manipulator.getDataAttribute(element, part)) {
-            element.classList.add(CLASS_NAME_SELECTED$1);
-            this._scrollTo(element.parentElement, element, initial);
-            for (const sibling of element.parentElement.children) {
-              // eslint-disable-next-line max-depth
-              if (sibling !== element) {
-                sibling.classList.remove(CLASS_NAME_SELECTED$1);
-              }
-            }
-          }
+      const parts = ['hours', 'minutes', 'seconds', 'meridiem'];
+      for (const part of parts) {
+        const partValue = this._getPartOfTime(part);
+        if (partValue === null) {
+          continue;
+        }
+        const elements = SelectorEngine.find(`[data-bs-${part}]`, this._element);
+        const selectedElement = elements.find(element => partValue === Manipulator.getDataAttribute(element, part));
+        if (selectedElement) {
+          this._selectRollElement(selectedElement, initial);
         }
       }
+    }
+    _selectRollElement(element, initial = false) {
+      const {
+        parentElement
+      } = element;
+      const currentSelected = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, parentElement);
+      if (currentSelected && currentSelected !== element) {
+        currentSelected.classList.remove(CLASS_NAME_SELECTED$1);
+        currentSelected.tabIndex = -1;
+        currentSelected.setAttribute('aria-selected', 'false');
+      }
+      element.classList.add(CLASS_NAME_SELECTED$1);
+      element.tabIndex = 0;
+      element.setAttribute('aria-selected', 'true');
+      this._scrollTo(parentElement, element, initial);
     }
     _setInputValue(date, input = this._input) {
       input.value = date instanceof Date ? date.toLocaleTimeString(this._config.locale, {
@@ -5179,7 +5451,7 @@
       }) : date;
     }
     _setUpSelects() {
-      for (const part of Array.from(['hours', 'minutes', 'seconds', 'toggle'])) {
+      for (const part of Array.from(['hours', 'minutes', 'seconds', 'meridiem'])) {
         for (const element of SelectorEngine.find(`select.${part}`, this._element)) {
           if (this._getPartOfTime(part)) {
             element.value = this._getPartOfTime(part);
@@ -5233,7 +5505,7 @@
       if (part === 'seconds') {
         return this._date.getSeconds();
       }
-      if (part === 'toggle') {
+      if (part === 'meridiem') {
         return getAmPm(new Date(this._date), this._config.locale);
       }
     }
@@ -5282,7 +5554,7 @@
       });
     }
     static clearMenus(event) {
-      if (event.button === RIGHT_MOUSE_BUTTON$4 || event.type === 'keyup' && event.key !== TAB_KEY$5) {
+      if (event.button === RIGHT_MOUSE_BUTTON$4 || event.type === 'keyup' && event.key !== TAB_KEY$4) {
         return;
       }
       const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN$3);
@@ -5322,141 +5594,6 @@
    */
 
   defineJQueryPlugin(TimePicker);
-
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI util/focustrap.js
-   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
-   *
-   * This is a modified version of the Bootstrap's util/focustrap.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-
-  /**
-   * Constants
-   */
-
-  const NAME$k = 'focustrap';
-  const DATA_KEY$g = 'bs.focustrap';
-  const EVENT_KEY$g = `.${DATA_KEY$g}`;
-  const EVENT_FOCUSIN$3 = `focusin${EVENT_KEY$g}`;
-  const EVENT_KEYDOWN_TAB = `keydown.tab${EVENT_KEY$g}`;
-  const TAB_KEY$4 = 'Tab';
-  const TAB_NAV_FORWARD = 'forward';
-  const TAB_NAV_BACKWARD = 'backward';
-  const Default$i = {
-    additionalElement: null,
-    autofocus: true,
-    trapElement: null // The element to trap focus inside of
-  };
-  const DefaultType$i = {
-    additionalElement: '(element|null|undefined)',
-    autofocus: 'boolean',
-    trapElement: 'element'
-  };
-
-  /**
-   * Class definition
-   */
-
-  class FocusTrap extends Config {
-    constructor(config) {
-      super();
-      this._config = this._getConfig(config);
-      this._isActive = false;
-      this._lastTabNavDirection = null;
-    }
-
-    // Getters
-    static get Default() {
-      return Default$i;
-    }
-    static get DefaultType() {
-      return DefaultType$i;
-    }
-    static get NAME() {
-      return NAME$k;
-    }
-
-    // Public
-    activate() {
-      if (this._isActive) {
-        return;
-      }
-      if (this._config.autofocus) {
-        this._config.trapElement.focus();
-      }
-      EventHandler.off(document, EVENT_KEY$g); // guard against infinite focus loop
-      EventHandler.on(document, EVENT_FOCUSIN$3, event => this._handleFocusin(event));
-      EventHandler.on(document, EVENT_KEYDOWN_TAB, event => this._handleKeydown(event));
-      this._isActive = true;
-    }
-    deactivate() {
-      if (!this._isActive) {
-        return;
-      }
-      this._isActive = false;
-      EventHandler.off(document, EVENT_KEY$g);
-    }
-
-    // Private
-    _handleFocusin(event) {
-      const {
-        additionalElement,
-        trapElement
-      } = this._config;
-      if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
-        return;
-      }
-      if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) {
-        return;
-      }
-      const elements = SelectorEngine.focusableChildren(trapElement);
-      if (elements.length === 0) {
-        trapElement.focus();
-      } else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) {
-        elements[elements.length - 1].focus();
-      } else {
-        elements[0].focus();
-      }
-    }
-    _handleKeydown(event) {
-      if (event.key !== TAB_KEY$4) {
-        return;
-      }
-      this._lastTabNavDirection = event.shiftKey ? TAB_NAV_BACKWARD : TAB_NAV_FORWARD;
-      const {
-        additionalElement,
-        trapElement
-      } = this._config;
-      if (!additionalElement) {
-        return;
-      }
-      const trapElements = SelectorEngine.focusableChildren(trapElement);
-      const additionalElements = SelectorEngine.focusableChildren(additionalElement);
-      if (trapElements.length === 0 || additionalElements.length === 0) {
-        return;
-      }
-      event.preventDefault();
-      if (trapElements.indexOf(event.target) === trapElements.length - 1 && !event.shiftKey) {
-        additionalElements[0].focus();
-        return;
-      }
-      if (trapElements.indexOf(event.target) === 0 && event.shiftKey) {
-        additionalElements[additionalElements.length - 1].focus();
-        return;
-      }
-      if (additionalElements.indexOf(event.target) === additionalElements.length - 1 && !event.shiftKey) {
-        trapElements[0].focus();
-        return;
-      }
-      if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
-        trapElements[trapElements.length - 1].focus();
-      }
-    }
-  }
 
   /**
    * --------------------------------------------------------------------------
