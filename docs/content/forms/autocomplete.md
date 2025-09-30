@@ -398,12 +398,12 @@ The Autocomplete component includes several accessibility features:
 {{< bs-table >}}
 | Key | Action |
 | --- | --- |
-| `Arrow Down` | Navigate to the next option or open dropdown |
-| `Arrow Up` | Navigate to the previous option |
-| `Enter` | Select the highlighted option |
-| `Escape` | Close the dropdown and clear focus |
-| `Tab` | Accept hint completion (when hints are enabled) |
-| `Backspace/Delete` | Clear input and trigger search |
+| <kbd>Arrow Down</kbd> | Navigate to the next option or open dropdown |
+| <kbd>Arrow Up</kbd> | Navigate to the previous option |
+| <kbd>Enter</kbd> | Select the highlighted option |
+| <kbd>Escape</kbd> | Close the dropdown and clear focus |
+| <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
+| <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Clear input and trigger search |
 {{< /bs-table >}}
 
 ## Customizing
