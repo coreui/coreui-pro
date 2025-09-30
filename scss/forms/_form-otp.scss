@@ -1,0 +1,61 @@
+@use "sass:math";
+@use "../mixins/border-radius" as *;
+@use "../mixins/box-shadow" as *;
+@use "../mixins/transition" as *;
+@use "../vendor/rfs" as *;
+@use "../variables" as *;
+
+
+.form-otp {
+  display: flex;
+  gap: $form-otp-gap;
+  align-items: center;
+}
+
+.form-otp-control {
+  width: $form-otp-control-width;
+  padding: $form-otp-control-padding-y $form-otp-control-padding-x;
+  font-family: $form-otp-control-font-family;
+  @include font-size($form-otp-control-font-size);
+  font-weight: $form-otp-control-font-weight;
+  line-height: $form-otp-control-line-height;
+  color: $form-otp-control-color;
+  text-align: center;
+  appearance: none; // Fix appearance for date inputs in Safari
+  background-color: $form-otp-control-bg;
+  background-clip: padding-box;
+  border: $form-otp-control-border-width solid $form-otp-control-border-color;
+
+  // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
+  @include border-radius($form-otp-control-border-radius, 0);
+
+  @include box-shadow($form-otp-control-box-shadow);
+  @include transition($form-otp-control-transition);
+
+  &:focus {
+    color: $form-otp-control-focus-color;
+    background-color: $form-otp-control-focus-bg;
+    border-color: $form-otp-control-focus-border-color;
+    outline: 0;
+    @if $enable-shadows {
+      @include box-shadow($form-otp-control-box-shadow, $form-otp-control-focus-box-shadow);
+    } @else {
+      // Avoid using mixin so we can pass custom focus shadow properly
+      box-shadow: $form-otp-control-focus-box-shadow;
+    }
+  }
+}
+
+.form-otp-sm .form-otp-control {
+  width: $form-otp-control-width-sm;
+  padding: $form-otp-control-padding-y-sm $form-otp-control-padding-x-sm;
+  @include font-size($form-otp-control-font-size-sm);
+  @include border-radius($form-otp-control-border-radius-sm);
+}
+
+.form-otp-lg .form-otp-control{
+  width: $form-otp-control-width-lg;
+  padding: $form-otp-control-padding-y-lg $form-otp-control-padding-x-lg;
+  @include font-size($form-otp-control-font-size-lg);
+  @include border-radius($form-otp-control-border-radius-lg);
+}

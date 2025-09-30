@@ -87,6 +87,22 @@
     }
   }
 
+  .form-otp-control {
+    @include form-validation-state-selector($state) {
+      border-color: $border-color;
+
+      &:focus {
+        border-color: $border-color;
+        @if $enable-shadows {
+          @include box-shadow($input-box-shadow, $focus-box-shadow);
+        } @else {
+          // Avoid using mixin so we can pass custom focus shadow properly
+          box-shadow: $focus-box-shadow;
+        }
+      }
+    }
+  }
+
   .form-password .form-control {
     @include form-validation-state-selector($state) {
 

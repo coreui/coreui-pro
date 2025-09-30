@@ -79,6 +79,10 @@
       badge:
         color: danger
         text: PRO
+    - title: OTP Input
+      badge:
+        color: danger
+        text: PRO
     - title: Password Input
       badge:
         color: danger
