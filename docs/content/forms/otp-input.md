@@ -402,12 +402,12 @@ otp.update({ type: 'number', masked: true }) // Update configuration
 ```javascript
 document.addEventListener('change.coreui.otp-input', event => {
   // eslint-disable-next-line no-console
-  console.log('OTP value changed:', event.detail.value)
+  console.log('OTP value changed:', event.value)
 })
 
 document.addEventListener('complete.coreui.otp-input', event => {
   // eslint-disable-next-line no-console
-  console.log('OTP completed:', event.detail.value)
+  console.log('OTP completed:', event.value)
 })
 ```
 
