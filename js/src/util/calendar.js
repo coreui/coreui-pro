@@ -394,6 +394,22 @@ const createDateOnly = groups => {
 }
 
 /**
+ * Helper function to determine expected parts count from patterns.
+ * @param patterns - Array of date format patterns.
+ * @returns Expected number of parts for a complete date.
+ */
+const getExpectedPartsCount = patterns => {
+  if (patterns.length === 0) {
+    return 3
+  } // Default fallback
+
+  // Analyze the first pattern to determine expected parts count
+  const firstPattern = patterns[0]
+  const parts = firstPattern.split(/[-/.\s:]+/).filter(part => part.length > 0)
+  return parts.length
+}
+
+/**
  * Enhanced day parsing with locale-aware patterns.
  * @param dateString - The day string to parse.
  * @param locale - The locale to use for parsing.
@@ -407,25 +423,26 @@ const parseDayString = (dateString, locale, includeTime) => {
   if (!groups) {
     // Check if input looks like a complete date (has separators and multiple parts)
     // If so, use fallback parsing for formats like "2022/08/17", "2022-08-17"
-    // If not (like "1", "12"), return null
+    // If not (like "1", "12", "1/1"), return null
     const trimmed = dateString.trim()
     const hasDateSeparators = /[-/.:]/.test(trimmed)
     const parts = trimmed.split(/[-/.\s:]+/).filter(part => part.length > 0)
-    const hasMultipleParts = parts.length >= 2
+    const expectedPartsCount = getExpectedPartsCount(patterns)
+    const hasRequiredParts = parts.length >= expectedPartsCount
 
-    if (hasDateSeparators && hasMultipleParts) {
+    if (hasDateSeparators && hasRequiredParts) {
       // Use fallback for complete date strings that don't match locale patterns
       return parseLocalDateString(dateString)
     }
 
-    // For incomplete input like "1" or "12", return null
+    // For incomplete input return null
     return null
   }
 
-  // For day selection, require at least month and day to be present
-  if ("month" in groups && "day" in groups) {
-    const { month, day } = groups
-    if (!validateDateComponents(month, day)) {
+  // For day selection, require at least year, month, and day to be present
+  if ("year" in groups && "month" in groups && "day" in groups) {
+    const { month, day, year } = groups
+    if (!validateDateComponents(month, day, year)) {
       return null
     }
   } else {
