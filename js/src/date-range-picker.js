@@ -405,6 +405,10 @@ class DateRangePicker extends BaseComponent {
         this._startDate = formatedDate
         this._calendar.update(this._getCalendarConfig())
 
+        if (this._timePickerStart) {
+          this._timePickerStart.update(this._getTimePickerConfig(true))
+        }
+
         EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
           date: formatedDate
         })
@@ -462,6 +466,10 @@ class DateRangePicker extends BaseComponent {
 
         this._endDate = formatedDate
         this._calendar.update(this._getCalendarConfig())
+
+        if (this._timePickerEnd) {
+          this._timePickerEnd.update(this._getTimePickerConfig(false))
+        }
 
         EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
           date: formatedDate
