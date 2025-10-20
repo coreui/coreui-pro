@@ -6,7 +6,6 @@ group: forms
 toc: true
 bootstrap: true
 pro_component: true
-preview_component: true
 ---
 
 ## Example

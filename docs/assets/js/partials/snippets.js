@@ -695,7 +695,7 @@ export default () => {
       locale: 'en-US'
     }
 
-    new coreui.DateRangePicker(document.getElementById('myDatePickerDisabledDates2'), optionsDatePickerDisabledDates2)
+    new coreui.DatePicker(document.getElementById('myDatePickerDisabledDates2'), optionsDatePickerDisabledDates2)
   }
   // js-docs-end date-picker-disabled-dates2
 
