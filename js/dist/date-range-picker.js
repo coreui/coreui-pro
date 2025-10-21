@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.21.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.21.1 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -375,6 +375,9 @@
           }
           this._startDate = formatedDate;
           this._calendar.update(this._getCalendarConfig());
+          if (this._timePickerStart) {
+            this._timePickerStart.update(this._getTimePickerConfig(true));
+          }
           EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
             date: formatedDate
           });
@@ -420,6 +423,9 @@
           }
           this._endDate = formatedDate;
           this._calendar.update(this._getCalendarConfig());
+          if (this._timePickerEnd) {
+            this._timePickerEnd.update(this._getTimePickerConfig(false));
+          }
           EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
             date: formatedDate
           });
