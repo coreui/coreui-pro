@@ -3,10 +3,10 @@
 /* global Package */
 
 Package.describe({
-  name: 'coreui:coreui', // https://atmospherejs.com/coreui/coreui
+  name: 'coreui:coreui-pro', // https://atmospherejs.com/coreui/coreui
   summary: 'The most popular front-end framework for developing responsive, mobile-first projects on the web rewritten and maintained by the CoreUI Team.',
   version: '5.21.0',
-  git: 'https://github.com/coreui/coreui.git'
+  git: 'https://github.com/coreui/coreui-pro.git'
 })
 
 Package.onUse(api => {
