@@ -361,7 +361,7 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
-      if (!this._isShown()) {
+      if ((!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
         this.show()
       }
 
