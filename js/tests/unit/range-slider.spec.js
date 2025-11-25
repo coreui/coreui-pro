@@ -175,7 +175,7 @@ describe('RangeSlider', () => {
         expect(labels.length).toBe(3)
 
         // Spy on the updateNearestValue method indirectly via event
-        element.addEventListener('change.coreui.range-slider', event => {
+        element.addEventListener('input.coreui.range-slider', event => {
           const newValue = event.value
           expect(newValue).toEqual([20, 50, 90])
           resolve()
@@ -244,7 +244,7 @@ describe('RangeSlider', () => {
         expect(tooltip.textContent).toBe('$25')
 
         // Update the value
-        element.addEventListener('change.coreui.range-slider', event => {
+        element.addEventListener('input.coreui.range-slider', event => {
           const newValue = event.value
           const updatedTooltip = element.querySelector('.range-slider-tooltip-inner')
           expect(updatedTooltip.textContent).toBe('$35')

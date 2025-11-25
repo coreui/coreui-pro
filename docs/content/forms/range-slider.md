@@ -230,7 +230,8 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
 {{< bs-table >}}
 | Method | Description |
 | --- | --- |
-| `change.coreui.range-slider` | Fired when the slider value changes. |
+| `change.coreui.range-slider` | Fired when the slider value changes and the user finishes interacting (mouse up). |
+| `input.coreui.range-slider` | Fired continuously while the slider value is being changed during user interaction. |
 {{< /bs-table >}}
 
 ```js
