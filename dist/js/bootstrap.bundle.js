@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.21.1 (https://coreui.io)
+  * CoreUI v5.22.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -333,7 +333,7 @@
     mouseenter: 'mouseover',
     mouseleave: 'mouseout'
   };
-  const nativeEvents = new Set(['click', 'dblclick', 'mouseup', 'mousedown', 'contextmenu', 'mousewheel', 'DOMMouseScroll', 'mouseover', 'mouseout', 'mousemove', 'selectstart', 'selectend', 'keydown', 'keypress', 'keyup', 'orientationchange', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'pointercancel', 'gesturestart', 'gesturechange', 'gestureend', 'focus', 'blur', 'change', 'reset', 'select', 'submit', 'focusin', 'focusout', 'load', 'unload', 'beforeunload', 'resize', 'move', 'DOMContentLoaded', 'readystatechange', 'error', 'abort', 'scroll']);
+  const nativeEvents = new Set(['click', 'dblclick', 'mouseup', 'mousedown', 'contextmenu', 'mousewheel', 'DOMMouseScroll', 'mouseover', 'mouseout', 'mousemove', 'selectstart', 'selectend', 'keydown', 'keypress', 'keyup', 'orientationchange', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'pointercancel', 'gesturestart', 'gesturechange', 'gestureend', 'focus', 'blur', 'change', 'input', 'reset', 'select', 'submit', 'focusin', 'focusout', 'load', 'unload', 'beforeunload', 'resize', 'move', 'DOMContentLoaded', 'readystatechange', 'error', 'abort', 'scroll']);
 
   /**
    * Private methods
@@ -665,7 +665,7 @@
    * Constants
    */
 
-  const VERSION = '5.21.1';
+  const VERSION = '5.22.0';
 
   /**
    * Class definition
@@ -3251,6 +3251,13 @@
       });
       EventHandler.on(this._cleanerElement, EVENT_CLICK$6, event => {
         if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.clear();
+        }
+      });
+      EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$8, event => {
+        if (!this._config.disabled && event.key === ENTER_KEY$4) {
           event.preventDefault();
           event.stopPropagation();
           this.clear();
@@ -6618,7 +6625,7 @@
   const EVENT_FOCUSOUT$3 = `focusout${EVENT_KEY$h}`;
   const EVENT_HIDE$a = `hide${EVENT_KEY$h}`;
   const EVENT_HIDDEN$a = `hidden${EVENT_KEY$h}`;
-  const EVENT_INPUT$3 = 'input';
+  const EVENT_INPUT$3 = `input${EVENT_KEY$h}`;
   const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$h}`;
   const EVENT_SHOW$a = `show${EVENT_KEY$h}`;
   const EVENT_SHOWN$a = `shown${EVENT_KEY$h}`;
@@ -7455,7 +7462,7 @@
   const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY$g}`;
   const EVENT_HIDE$9 = `hide${EVENT_KEY$g}`;
   const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$g}`;
-  const EVENT_INPUT$2 = 'input';
+  const EVENT_INPUT$2 = `input${EVENT_KEY$g}`;
   const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$g}`;
   const EVENT_RESIZE$4 = 'resize';
   const EVENT_SHOW$9 = `show${EVENT_KEY$g}`;
@@ -9863,7 +9870,7 @@
         this._onSearchChange(this._searchElement);
       });
       EventHandler.on(this._searchElement, EVENT_KEYDOWN$3, event => {
-        if (!this._isShown()) {
+        if (!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY$2) {
           this.show();
         }
         if (event.key === ARROW_DOWN_KEY$2 && this._searchElement.value.length === this._searchElement.selectionStart) {
@@ -11046,7 +11053,7 @@
   const EVENT_CHANGE$2 = `change${EVENT_KEY$8}`;
   const EVENT_COMPLETE = `complete${EVENT_KEY$8}`;
   const EVENT_FOCUS = `focus${EVENT_KEY$8}`;
-  const EVENT_INPUT$1 = `input`;
+  const EVENT_INPUT$1 = `input${EVENT_KEY$8}`;
   const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$8}`;
   const EVENT_PASTE = `paste`;
   const EVENT_LOAD_DATA_API$6 = `load${EVENT_KEY$8}${DATA_API_KEY$5}`;
@@ -12249,7 +12256,7 @@
   const EVENT_KEY$6 = `.${DATA_KEY$6}`;
   const DATA_API_KEY$3 = '.data-api';
   const EVENT_CHANGE$1 = `change${EVENT_KEY$6}`;
-  const EVENT_INPUT = 'input';
+  const EVENT_INPUT = `input${EVENT_KEY$6}`;
   const EVENT_LOAD_DATA_API$5 = `load${EVENT_KEY$6}${DATA_API_KEY$3}`;
   const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY$6}`;
   const EVENT_MOUSEMOVE = `mousemove${EVENT_KEY$6}`;
@@ -12353,6 +12360,14 @@
         const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT);
         const index = Array.from(children).indexOf(target);
         this._updateValue(target.value, index);
+        EventHandler.trigger(this._element, EVENT_INPUT, {
+          value: this._currentValue
+        });
+      });
+      EventHandler.on(this._element, EVENT_CHANGE$1, SELECTOR_RANGE_SLIDER_INPUT, () => {
+        EventHandler.trigger(this._element, EVENT_CHANGE$1, {
+          value: this._currentValue
+        });
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_LABEL, event => {
         if (!this._config.clickableLabels || event.button !== 0) {
@@ -12664,9 +12679,6 @@
       this._updateInput(index, _value);
       this._updateGradient();
       this._updateTooltip(index, _value);
-      EventHandler.trigger(this._element, EVENT_CHANGE$1, {
-        value: this._currentValue
-      });
     }
     _updateInput(index, value) {
       const input = this._inputs[index];
@@ -12726,7 +12738,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config);
+      config = this._mergeConfigObj(config, this._element);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;
@@ -13175,7 +13187,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config);
+      config = this._mergeConfigObj(config, this._element);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;

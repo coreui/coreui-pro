@@ -1,5 +1,5 @@
 /*!
-  * CoreUI rating.js v5.21.1 (https://coreui.io)
+  * CoreUI rating.js v5.22.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -411,7 +411,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config);
+      config = this._mergeConfigObj(config, this._element);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;

@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.21.1 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.22.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -52,7 +52,7 @@
   const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`;
   const EVENT_HIDE = `hide${EVENT_KEY}`;
   const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
-  const EVENT_INPUT = 'input';
+  const EVENT_INPUT = `input${EVENT_KEY}`;
   const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
   const EVENT_RESIZE = 'resize';
   const EVENT_SHOW = `show${EVENT_KEY}`;

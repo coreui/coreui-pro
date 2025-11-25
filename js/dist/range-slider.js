@@ -1,5 +1,5 @@
 /*!
-  * CoreUI range-slider.js v5.21.1 (https://coreui.io)
+  * CoreUI range-slider.js v5.22.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -26,7 +26,7 @@
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
   const EVENT_CHANGE = `change${EVENT_KEY}`;
-  const EVENT_INPUT = 'input';
+  const EVENT_INPUT = `input${EVENT_KEY}`;
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
   const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`;
   const EVENT_MOUSEMOVE = `mousemove${EVENT_KEY}`;
@@ -130,6 +130,14 @@
         const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT);
         const index = Array.from(children).indexOf(target);
         this._updateValue(target.value, index);
+        EventHandler.trigger(this._element, EVENT_INPUT, {
+          value: this._currentValue
+        });
+      });
+      EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RANGE_SLIDER_INPUT, () => {
+        EventHandler.trigger(this._element, EVENT_CHANGE, {
+          value: this._currentValue
+        });
       });
       EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_LABEL, event => {
         if (!this._config.clickableLabels || event.button !== 0) {
@@ -441,9 +449,6 @@
       this._updateInput(index, _value);
       this._updateGradient();
       this._updateTooltip(index, _value);
-      EventHandler.trigger(this._element, EVENT_CHANGE, {
-        value: this._currentValue
-      });
     }
     _updateInput(index, value) {
       const input = this._inputs[index];
@@ -503,7 +508,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config);
+      config = this._mergeConfigObj(config, this._element);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;

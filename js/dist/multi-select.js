@@ -1,5 +1,5 @@
 /*!
-  * CoreUI multi-select.js v5.21.1 (https://coreui.io)
+  * CoreUI multi-select.js v5.22.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -337,7 +337,7 @@
         this._onSearchChange(this._searchElement);
       });
       EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
-        if (!this._isShown()) {
+        if (!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY) {
           this.show();
         }
         if (event.key === ARROW_DOWN_KEY && this._searchElement.value.length === this._searchElement.selectionStart) {

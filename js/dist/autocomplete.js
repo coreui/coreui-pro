@@ -1,5 +1,5 @@
 /*!
-  * CoreUI autocomplete.js v5.21.1 (https://coreui.io)
+  * CoreUI autocomplete.js v5.22.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -422,6 +422,13 @@
       });
       EventHandler.on(this._cleanerElement, EVENT_CLICK, event => {
         if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.clear();
+        }
+      });
+      EventHandler.on(this._cleanerElement, EVENT_KEYDOWN, event => {
+        if (!this._config.disabled && event.key === ENTER_KEY) {
           event.preventDefault();
           event.stopPropagation();
           this.clear();
