@@ -477,6 +477,14 @@ class Autocomplete extends BaseComponent {
       }
     })
 
+    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN, event => {
+      if (!this._config.disabled && event.key === ENTER_KEY) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.clear()
+      }
+    })
+
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
       if (event.key === ENTER_KEY) {
         this._onOptionsClick(event.target)
