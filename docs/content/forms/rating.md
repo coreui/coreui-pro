@@ -184,6 +184,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | --- | --- | --- | --- |
 | `activeIcon` | object, string, null | `null` | The default icon to display when the item is selected. |
 | `allowClear` | boolean | `false` | Enables the clearing upon clicking the selected item again. |
+| `allowList` | object | [Default value]({{< docsref "/getting-started/javascript#sanitizer" >}}) |  Object which contains allowed attributes and tags. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `highlightOnlySelected` | boolean | `false` | If enabled, only the currently selected icon will be visibly highlighted. |
 | `icon` | object, string, null | `null` | The default icon to display when the item is not selected. |
@@ -195,7 +196,6 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `tooltips` | array, boolean, object | `false` | Enable tooltips with default values or set specific labels for each icon. |
 | `value` | number, null | `null` |  The default `value` of component. |
 | `sanitize` | boolean | `true` |  Enable or disable the sanitization. If activated `activeIcon`, and `icon` options will be sanitized. |
-| `allowList` | object | [Default value]({{< docsref "/getting-started/javascript#sanitizer" >}}) |  Object which contains allowed attributes and tags. |
 | `sanitizeFn` | null, function | `null` |  Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 {{< /bs-table >}}
 
