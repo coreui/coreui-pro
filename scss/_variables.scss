@@ -2764,6 +2764,7 @@ $range-slider-thumb-active-bg:             tint-color($primary, 70%) !default;
 $range-slider-thumb-disabled-bg:           rgba(var(--#{$prefix}secondary-rgb), 1) !default;
 $range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 
+$range-slider-tooltip-max-width:           200px !default;
 $range-slider-tooltip-padding-y:           $spacer * .25 !default;
 $range-slider-tooltip-padding-x:           $spacer * .5 !default;
 $range-slider-tooltip-margin-end:          .25rem !default;

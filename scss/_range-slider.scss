@@ -35,6 +35,7 @@
   --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition};
 
   --#{$prefix}range-slider-tooltip-zindex: #{$zindex-tooltip};
+  --#{$prefix}range-slider-tooltip-max-width: #{$range-slider-tooltip-max-width};
   --#{$prefix}range-slider-tooltip-padding-y: #{$range-slider-tooltip-padding-y};
   --#{$prefix}range-slider-tooltip-padding-x: #{$range-slider-tooltip-padding-x};
   --#{$prefix}range-slider-tooltip-margin-end: #{$range-slider-tooltip-margin-end};
@@ -182,6 +183,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: max-content;
   visibility: hidden;
   opacity: 0;
   @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
@@ -190,6 +192,7 @@
 }
 
 .range-slider-tooltip-inner {
+  max-width: var(--#{$prefix}range-slider-tooltip-max-width);
   padding: var(--#{$prefix}range-slider-tooltip-padding-y) var(--#{$prefix}range-slider-tooltip-padding-x);
   @include font-size(var(--#{$prefix}range-slider-tooltip-font-size));
   color: var(--#{$prefix}range-slider-tooltip-color);
