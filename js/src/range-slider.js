@@ -162,6 +162,9 @@ class RangeSlider extends BaseComponent {
       const clickValue = this._calculateClickValue(event)
       this._dragIndex = this._getNearestValueIndex(clickValue)
       this._updateNearestValue(clickValue)
+
+      EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._currentValue })
+      EventHandler.trigger(this._element, EVENT_INPUT, { value: this._currentValue })
     })
 
     EventHandler.on(document.documentElement, EVENT_MOUSEUP, () => {
