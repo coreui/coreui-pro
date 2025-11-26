@@ -10,6 +10,7 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { defineJQueryPlugin, isRTL } from './util/index.js'
+import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -19,6 +20,7 @@ const NAME = 'range-slider'
 const DATA_KEY = 'coreui.range-slider'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const EVENT_CHANGE = `change${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
@@ -48,6 +50,7 @@ const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label'
 const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container'
 
 const Default = {
+  allowList: DefaultAllowlist,
   clickableLabels: true,
   disabled: false,
   distance: 0,
@@ -55,6 +58,8 @@ const Default = {
   max: 100,
   min: 0,
   name: null,
+  sanitize: true,
+  sanitizeFn: null,
   step: 1,
   tooltips: true,
   tooltipsFormat: null,
@@ -64,6 +69,7 @@ const Default = {
 }
 
 const DefaultType = {
+  allowList: 'object',
   clickableLabels: 'boolean',
   disabled: 'boolean',
   distance: 'number',
@@ -71,6 +77,8 @@ const DefaultType = {
   max: 'number',
   min: 'number',
   name: '(array|string|null)',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   step: '(number|string)',
   tooltips: 'boolean',
   tooltipsFormat: '(function|null)',
@@ -339,7 +347,9 @@ class RangeSlider extends BaseComponent {
       const tooltipInnerElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP_INNER)
       const tooltipArrowElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP_ARROW)
 
-      tooltipInnerElement.innerHTML = this._config.tooltipsFormat ? this._config.tooltipsFormat(input.value) : input.value
+      tooltipInnerElement.innerHTML = this._config.tooltipsFormat ?
+        (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(input.value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(input.value)) :
+        input.value
       tooltipElement.append(tooltipInnerElement, tooltipArrowElement)
 
       input.parentNode.insertBefore(tooltipElement, input.nextSibling)
@@ -591,6 +601,12 @@ class RangeSlider extends BaseComponent {
 
   _getConfig(config) {
     const dataAttributes = Manipulator.getDataAttributes(this._element)
+
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute]
+      }
+    }
 
     config = {
       ...dataAttributes,

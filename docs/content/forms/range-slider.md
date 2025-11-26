@@ -194,10 +194,14 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
 {{< partial "js-data-attributes.md" >}}
 {{< /markdown >}}
 
+{{< callout warning >}}
+Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied via data attributes.
+{{< /callout >}}
 
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowList` | object | [Default value](/getting-started/javascript#sanitizer) |  Defines the set of permitted HTML tags and attributes that can safely appear in the tooltip content when HTML content is passedd. This helps maintain control over the output and prevent injection of malicious code. |
 | `clickableLabels` | boolean | `true` | Enables or disables the ability to click on labels to set slider values. |
 | `disabled` | boolean | `false` | Disables the slider, making it non-interactive and grayed out. |
 | `distance` | number | `0` | Sets the minimum distance between multiple slider handles. |
@@ -211,6 +215,8 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
 | `track` | boolean, 'fill' | `'fill'` | Controls the visual representation of the slider's track. When set to `'fill'`, the track is dynamically filled based on the slider's value(s). Setting it to `false` disables the filled track. |
 | `value` | array, number | `0` | Sets the initial value(s) of the slider. |
 | `vertical` | boolean | `false` | Rotates the slider to a vertical orientation. |
+| `sanitize` | boolean | `true` | Controls whether HTML content in the tooltip should be sanitized before rendering. Strongly recommended to leave enabled unless you’re fully managing the content and trust its source. |
+| `sanitizeFn` | null, function | `null` | You can define your own custom sanitization logic by passing a function here. Ideal if you want to use a specialized HTML sanitizer or integrate with existing security tool. |
 {{< /bs-table >}}
 
 
