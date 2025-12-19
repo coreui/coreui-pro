@@ -1,5 +1,5 @@
 /*!
-  * CoreUI otp-input.js v5.22.0 (https://coreui.io)
+  * CoreUI otp-input.js v5.23.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */

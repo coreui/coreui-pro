@@ -1,6 +1,6 @@
 @charset "UTF-8";
 /*!
- * CoreUI PRO Bootstrap Theme v5.22.0 (https://coreui.io)
+ * CoreUI PRO Bootstrap Theme v5.23.0 (https://coreui.io)
  * Copyright (c) 2025 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -9316,6 +9316,7 @@ select.form-multi-select {
   --bs-range-slider-thumb-disabled-bg: rgba(var(--bs-secondary-rgb), 1);
   --bs-range-slider-thumb-transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   --bs-range-slider-tooltip-zindex: 1080;
+  --bs-range-slider-tooltip-max-width: 200px;
   --bs-range-slider-tooltip-padding-y: 0.25rem;
   --bs-range-slider-tooltip-padding-x: 0.5rem;
   --bs-range-slider-tooltip-margin-end: 0.25rem;
@@ -9462,6 +9463,9 @@ select.form-multi-select {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
   visibility: hidden;
   opacity: 0;
   transform: translateX(-50%);
@@ -9474,6 +9478,7 @@ select.form-multi-select {
 }
 
 .range-slider-tooltip-inner {
+  max-width: var(--bs-range-slider-tooltip-max-width);
   padding: var(--bs-range-slider-tooltip-padding-y) var(--bs-range-slider-tooltip-padding-x);
   font-size: var(--bs-range-slider-tooltip-font-size);
   color: var(--bs-range-slider-tooltip-color);

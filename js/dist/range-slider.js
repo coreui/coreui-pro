@@ -1,13 +1,13 @@
 /*!
-  * CoreUI range-slider.js v5.22.0 (https://coreui.io)
+  * CoreUI range-slider.js v5.23.0 (https://coreui.io)
   * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js')) :
-  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.RangeSlider = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index));
-})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/sanitizer.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/sanitizer'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.RangeSlider = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Sanitizer));
+})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, sanitizer_js) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
@@ -25,6 +25,7 @@
   const DATA_KEY = 'coreui.range-slider';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn']);
   const EVENT_CHANGE = `change${EVENT_KEY}`;
   const EVENT_INPUT = `input${EVENT_KEY}`;
   const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`;
@@ -50,6 +51,7 @@
   const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label';
   const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container';
   const Default = {
+    allowList: sanitizer_js.DefaultAllowlist,
     clickableLabels: true,
     disabled: false,
     distance: 0,
@@ -57,6 +59,8 @@
     max: 100,
     min: 0,
     name: null,
+    sanitize: true,
+    sanitizeFn: null,
     step: 1,
     tooltips: true,
     tooltipsFormat: null,
@@ -65,6 +69,7 @@
     vertical: false
   };
   const DefaultType = {
+    allowList: 'object',
     clickableLabels: 'boolean',
     disabled: 'boolean',
     distance: 'number',
@@ -72,6 +77,8 @@
     max: 'number',
     min: 'number',
     name: '(array|string|null)',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
     step: '(number|string)',
     tooltips: 'boolean',
     tooltipsFormat: '(function|null)',
@@ -157,6 +164,12 @@
         const clickValue = this._calculateClickValue(event);
         this._dragIndex = this._getNearestValueIndex(clickValue);
         this._updateNearestValue(clickValue);
+        EventHandler.trigger(this._element, EVENT_CHANGE, {
+          value: this._currentValue
+        });
+        EventHandler.trigger(this._element, EVENT_INPUT, {
+          value: this._currentValue
+        });
       });
       EventHandler.on(document.documentElement, EVENT_MOUSEUP, () => {
         this._isDragging = false;
@@ -209,7 +222,9 @@
       inputElement.max = this._config.max;
       inputElement.step = this._config.step;
       inputElement.value = value;
-      inputElement.name = Array.isArray(this._config.name) ? `${this._config.name[index]}` : `${this._config.name || ''}-${index}`;
+      if (this._config.name) {
+        inputElement.name = Array.isArray(this._config.name) ? `${this._config.name[index]}` : `${this._config.name}-${index}`;
+      }
       inputElement.disabled = this._config.disabled;
 
       // Accessibility attributes
@@ -300,7 +315,7 @@
         const tooltipElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP);
         const tooltipInnerElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP_INNER);
         const tooltipArrowElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP_ARROW);
-        tooltipInnerElement.innerHTML = this._config.tooltipsFormat ? this._config.tooltipsFormat(input.value) : input.value;
+        tooltipInnerElement.innerHTML = this._config.tooltipsFormat ? this._config.sanitize ? sanitizer_js.sanitizeHtml(this._config.tooltipsFormat(input.value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(input.value) : input.value;
         tooltipElement.append(tooltipInnerElement, tooltipArrowElement);
         input.parentNode.insertBefore(tooltipElement, input.nextSibling);
         this._positionTooltip(tooltipElement, input);
@@ -491,7 +506,7 @@
       if (typeof config.labels === 'string') {
         config.labels = config.labels.split(/,\s*/);
       }
-      if (typeof config.name === 'string') {
+      if (typeof config.name === 'string' && config.name.includes(',')) {
         config.name = config.name.split(/,\s*/);
       }
       if (typeof config.value === 'number') {
@@ -504,6 +519,11 @@
     }
     _getConfig(config) {
       const dataAttributes = Manipulator.getDataAttributes(this._element);
+      for (const dataAttribute of Object.keys(dataAttributes)) {
+        if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+          delete dataAttributes[dataAttribute];
+        }
+      }
       config = {
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
