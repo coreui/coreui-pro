@@ -241,9 +241,12 @@ class RangeSlider extends BaseComponent {
     inputElement.max = this._config.max
     inputElement.step = this._config.step
     inputElement.value = value
-    inputElement.name = Array.isArray(this._config.name) ?
-      `${this._config.name[index]}` :
-      `${this._config.name || ''}-${index}`
+    if (this._config.name) {
+      inputElement.name = Array.isArray(this._config.name) ?
+        `${this._config.name[index]}` :
+        `${this._config.name}-${index}`
+    }
+
     inputElement.disabled = this._config.disabled
 
     // Accessibility attributes
@@ -584,7 +587,7 @@ class RangeSlider extends BaseComponent {
       config.labels = config.labels.split(/,\s*/)
     }
 
-    if (typeof config.name === 'string') {
+    if (typeof config.name === 'string' && config.name.includes(',')) {
       config.name = config.name.split(/,\s*/)
     }
 
