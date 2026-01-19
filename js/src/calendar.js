@@ -26,6 +26,9 @@ import {
   isMonthDisabled,
   isMonthInRange,
   isMonthSelected,
+  isQuarterDisabled,
+  isQuarterInRange,
+  isQuarterSelected,
   isToday,
   isYearDisabled,
   isYearInRange,
@@ -206,7 +209,7 @@ class Calendar extends BaseComponent {
 
     if (this._view === 'years' && this._config.selectionType !== 'year') {
       this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date)
-      this._view = 'months'
+      this._view = this._config.selectionType === 'quarter' ? 'quarters' : 'months'
       this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
       return
     }
@@ -310,7 +313,7 @@ class Calendar extends BaseComponent {
           this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback.bind(this, event.key))
         }
 
-        if (this._view === 'months') {
+        if (this._view === 'months' || this._view === 'quarters') {
           this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, 0, callback.bind(this, event.key))
         }
 
@@ -670,6 +673,25 @@ class Calendar extends BaseComponent {
             }).join('')}
           </tr>`
         )).join('') : ''}
+        ${this._view === 'quarters' ?
+          `<tr>
+            ${Array.from({ length: 4 }, (_, index) => {
+              const date = new Date(calendarDate.getFullYear(), index * 3, 1)
+              const cellAttributes = this._cellQuarterAttributes(date)
+              return (
+                `<td
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  data-coreui-date="${date.toDateString()}"
+                >
+                  <div class="calendar-cell-inner quarter">
+                    ${`Q${index + 1}`}
+                  </div>
+                </td>`
+              )
+            }).join('')}
+          </tr>` : ''}
         ${this._view === 'years' ? listOfYears.map(row => (
           `<tr>
             ${row.map(year => {
@@ -731,6 +753,7 @@ class Calendar extends BaseComponent {
       day: 'days',
       week: 'days',
       month: 'months',
+      quarter: 'quarters',
       year: 'years'
     }
 
@@ -774,12 +797,25 @@ class Calendar extends BaseComponent {
       const date = new Date(Manipulator.getDataAttribute(cell, 'date'))
       let cellAttributes
 
-      if (this._view === 'days') {
+      switch (this._view) {
+      case 'days': {
         cellAttributes = this._cellDayAttributes(date, 'current')
-      } else if (this._view === 'months') {
+        break
+      }
+
+      case 'months': {
         cellAttributes = this._cellMonthAttributes(date)
-      } else {
+        break
+      }
+
+      case 'quarters': {
+        cellAttributes = this._cellQuarterAttributes(date)
+        break
+      }
+
+      default: {
         cellAttributes = this._cellYearAttributes(date)
+      }
       }
 
       cell.className = cellAttributes.className
@@ -852,6 +888,31 @@ class Calendar extends BaseComponent {
       this._selectEndDate ?
         isMonthInRange(date, this._startDate, this._hoverDate) :
         isMonthInRange(date, this._hoverDate, this._endDate)
+    )
+
+    const classNames = this._classNames({
+      [CLASS_NAME_CALENDAR_CELL]: true,
+      disabled: isDisabled,
+      'range-hover': isRangeHover,
+      range: isInRange,
+      selected: isSelected
+    })
+
+    return {
+      className: classNames,
+      tabIndex: isDisabled ? -1 : 0,
+      ariaSelected: isSelected
+    }
+  }
+
+  _cellQuarterAttributes(date) {
+    const isDisabled = isQuarterDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
+    const isSelected = isQuarterSelected(date, this._startDate, this._endDate)
+    const isInRange = isQuarterInRange(date, this._startDate, this._endDate)
+    const isRangeHover = this._config.selectionType === 'quarter' && this._hoverDate && (
+      this._selectEndDate ?
+        isQuarterInRange(date, this._startDate, this._hoverDate) :
+        isQuarterInRange(date, this._hoverDate, this._endDate)
     )
 
     const classNames = this._classNames({

@@ -109,6 +109,30 @@ Selecting whole month by adding the `data-coreui-selection-type="month"` attribu
 </div>
 {{< /example >}}
 
+### Quarters
+
+Selecting quarter by adding the `data-coreui-selection-type="quarter"` attribute.
+
+{{< example stackblitz_pro="true" >}}
+<div class="row">
+  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+    <div 
+      data-coreui-locale="en-US"
+      data-coreui-toggle="date-picker"
+      data-coreui-selection-type="quarter">
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-5">
+    <div
+      data-coreui-date="2025Q1"
+      data-coreui-locale="en-US"
+      data-coreui-toggle="date-picker"
+      data-coreui-selection-type="quarter">
+    </div>
+  </div>
+</div>
+{{< /example >}}
+
 ### Years
 
 Add the `data-coreui-selection-type="year"` attribute to allow pick years.
@@ -403,7 +427,7 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
 | `previewDateOnHover` | boolean | `true` | Enable live preview of dates in input field when hovering over calendar cells. |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
-| `selectionType` | `'day'`, `'week'`, `'month'`, `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
+| `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |

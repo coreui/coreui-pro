@@ -137,6 +137,31 @@ Select range of months by adding the `data-coreui-selection-type="month"` attrib
   </div>
 {{< /example >}}
 
+### Quarters
+
+Select range of quartes by adding the `data-coreui-selection-type="quarter"` attribute.
+
+{{< example stackblitz_pro="true" >}}
+  <div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="quarter">
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div
+        data-coreui-start-date="2025Q3"
+        data-coreui-end-date="2026Q2"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="quarter">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
 ### Years
 
 Add the `data-coreui-selection-type="year"` attribute to allow a pick range of years.
@@ -457,7 +482,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `ranges` | object | `{}` | Predefined date ranges the user can select from. |
 | `rangesButtonsClasses` | array, string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
-| `selectionType` | `'day'`, `'week'`, `'month'`, `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
+| `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `separator` | boolean | `true` | Toggle visibility or set the content of the inputs separator. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |

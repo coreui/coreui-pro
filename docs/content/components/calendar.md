@@ -61,6 +61,22 @@ Set the `data-coreui-selection-type` to `month` to enable selection of entire mo
 </div>
 {{< /example >}}
 
+### Quarters
+
+Set the `data-coreui-selection-type` property to `quarter` to enable quarters range selection.
+
+{{< example stackblitz_pro="true" >}}
+<div class="d-flex justify-content-center">
+  <div
+    class="border rounded"
+    data-coreui-locale="en-US"
+    data-coreui-selection-type="quarter"
+    data-coreui-start-date="2024Q1"
+    data-coreui-toggle="calendar"
+  ></div>
+</div>
+{{< /example >}}
+
 ### Years
 
 Set the `data-coreui-selection-type` to `year` to enable years range selection.
@@ -281,7 +297,7 @@ const calendarList = calendarElementList.map(calendarEl => {
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `range` | boolean | `false` | Allow range selection |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
-| `selectionType` | `'day'`, `'week'`, `'month'`, `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
+| `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
 | `startDate` | date, number, string, null | `null` | Initial selected date. |
