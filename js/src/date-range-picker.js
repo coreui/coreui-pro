@@ -90,6 +90,7 @@ const Default = {
   cleaner: true,
   container: false,
   date: null,
+  dayFormat: 'numeric',
   disabled: false,
   disabledDates: null,
   endDate: null,
@@ -105,6 +106,7 @@ const Default = {
   locale: 'default',
   maxDate: null,
   minDate: null,
+  monthFormat: 'short',
   name: null,
   placeholder: ['Start date', 'End date'],
   previewDateOnHover: true,
@@ -126,7 +128,8 @@ const Default = {
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
   valid: false,
   weekdayFormat: 2,
-  weekNumbersLabel: null
+  weekNumbersLabel: null,
+  yearFormat: 'numeric'
 }
 
 const DefaultType = {
@@ -143,6 +146,7 @@ const DefaultType = {
   confirmButtonClasses: '(array|string)',
   container: '(string|element|boolean)',
   date: '(date|number|string|null)',
+  dayFormat: 'string',
   disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
   endDate: '(date|number|string|null)',
@@ -158,6 +162,7 @@ const DefaultType = {
   locale: 'string',
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
+  monthFormat: 'string',
   name: '(string|null)',
   placeholder: '(array|string)',
   previewDateOnHover: 'boolean',
@@ -179,7 +184,8 @@ const DefaultType = {
   todayButtonClasses: '(array|string)',
   valid: 'boolean',
   weekdayFormat: '(number|string)',
-  weekNumbersLabel: '(string|null)'
+  weekNumbersLabel: '(string|null)',
+  yearFormat: 'string'
 }
 
 /**
@@ -556,12 +562,14 @@ class DateRangePicker extends BaseComponent {
       ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
       calendarDate: this._calendarDate,
       calendars: this._mobile ? 1 : this._config.calendars,
+      dayFormat: this._config.dayFormat,
       disabledDates: this._config.disabledDates,
       endDate: this._endDate,
       firstDayOfWeek: this._config.firstDayOfWeek,
       locale: this._config.locale,
       maxDate: this._config.maxDate,
       minDate: this._config.minDate,
+      monthFormat: this._config.monthFormat,
       range: this._config.range,
       selectAdjacementDays: this._config.selectAdjacementDays,
       selectEndDate: this._selectEndDate,
@@ -570,7 +578,8 @@ class DateRangePicker extends BaseComponent {
       showWeekNumber: this._config.showWeekNumber,
       startDate: this._startDate,
       weekdayFormat: this._config.weekdayFormat,
-      weekNumbersLabel: this._config.weekNumbersLabel
+      weekNumbersLabel: this._config.weekNumbersLabel,
+      yearFormat: this._config.yearFormat
     }
   }
 

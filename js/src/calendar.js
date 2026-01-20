@@ -92,12 +92,14 @@ const Default = {
   ariaNavPrevYearLabel: 'Previous year',
   calendarDate: null,
   calendars: 1,
+  dayFormat: 'numeric',
   disabledDates: null,
   endDate: null,
   firstDayOfWeek: 1,
   locale: 'default',
   maxDate: null,
   minDate: null,
+  monthFormat: 'short',
   range: false,
   selectAdjacementDays: false,
   selectEndDate: false,
@@ -106,7 +108,8 @@ const Default = {
   showWeekNumber: false,
   startDate: null,
   weekdayFormat: 2,
-  weekNumbersLabel: null
+  weekNumbersLabel: null,
+  yearFormat: 'numeric'
 }
 
 const DefaultType = {
@@ -116,12 +119,14 @@ const DefaultType = {
   ariaNavPrevYearLabel: 'string',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
+  dayFormat: 'string',
   disabledDates: '(array|date|function|null)',
   endDate: '(date|number|string|null)',
   firstDayOfWeek: 'number',
   locale: 'string',
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
+  monthFormat: 'string',
   range: 'boolean',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
@@ -130,7 +135,8 @@ const DefaultType = {
   showWeekNumber: 'boolean',
   startDate: '(date|number|string|null)',
   weekdayFormat: '(number|string)',
-  weekNumbersLabel: '(string|null)'
+  weekNumbersLabel: '(string|null)',
+  yearFormat: 'string'
 }
 
 /**
@@ -593,7 +599,7 @@ class Calendar extends BaseComponent {
     `
 
     const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek)
-    const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4)
+    const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale, this._config.monthFormat), 4)
     const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4)
     const weekDays = monthDetails[0].days
 
@@ -645,7 +651,7 @@ class Calendar extends BaseComponent {
                     data-coreui-date="${date}"
                   >
                     <div class="calendar-cell-inner day">
-                      ${date.toLocaleDateString(this._config.locale, { day: 'numeric' })}
+                      ${date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
                     </div>
                   </td>` :
                   '<td></td>'
@@ -705,7 +711,7 @@ class Calendar extends BaseComponent {
                   data-coreui-date="${date.toDateString()}"
                 >
                   <div class="calendar-cell-inner year">
-                    ${year}
+                    ${date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
                   </div>
                 </td>`
               )

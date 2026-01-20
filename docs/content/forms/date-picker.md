@@ -410,6 +410,7 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
 | `date` | date, number, string, null | `null` | Default value of the component |
+| `dayFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for days. Accepts a built-in format (`'numeric'` or `'2-digit'`) |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
 | `firstDayOfWeek` | number | `1` | <p>Sets the day of start week.</p><ul><li>`0` - Sunday</li><li>`1` - Monday</li><li>`2` - Tuesday</li><li>`3` - Wednesday</li><li>`4` - Thursday</li><li>`5` - Friday</li><li>`6` - Saturday</li></ul> |
@@ -423,6 +424,7 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
 | `maxDate` | date, number, string, null | `null` | Max selectable date. |
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
+| `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
 | `name` | string, null | `null` | Set the name attribute for the input element. |
 | `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
 | `previewDateOnHover` | boolean | `true` | Enable live preview of dates in input field when hovering over calendar cells. |
@@ -435,8 +437,9 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `todayButton` | string | `'Today'` | Today button inner HTML |
 | `todayButtonClasses` | array, string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `weekdayFormat` | number, 'long', 'narrow', 'short' | `2` | Set length or format of day name. |
+| `weekdayFormat` | number, `'long'`, `'narrow'`, `'short'` | `2` | Set length or format of day name. |
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
+| `yearFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for years. Accepts built-in formats (`'numeric'` or `'2-digit'`) |
 {{< /bs-table >}}
 
 ### Methods
