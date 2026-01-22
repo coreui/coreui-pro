@@ -395,9 +395,14 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 {{< partial "js-data-attributes.md" >}}
 {{< /markdown >}}
 
+{{< callout warning >}}
+Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied using data attributes.
+{{< /callout >}}
+
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowList` | object | [Default value]({{< docsref "/getting-started/javascript#sanitizer" >}}) | Object which contains allowed attributes and tags. |
 | `ariaNavNextMonthLabel` | string | `'Next month'` | A string that provides an accessible label for the button that navigates to the next month in the calendar. This label is read by screen readers to describe the action associated with the button. |
 | `ariaNavNextYearLabel` | string | `'Next year'` | A string that provides an accessible label for the button that navigates to the next year in the calendar. This label is intended for screen readers to help users understand the button's functionality. |
 | `ariaNavPrevMonthLabel` | string | `'Previous month'` | A string that provides an accessible label for the button that navigates to the previous month in the calendar. Screen readers will use this label to explain the purpose of the button. |
@@ -428,6 +433,12 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 | `name` | string, null | `null` | Set the name attribute for the input element. |
 | `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
 | `previewDateOnHover` | boolean | `true` | Enable live preview of dates in input field when hovering over calendar cells. |
+| `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`) as parameters and should return HTML string. |
+| `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderQuarterCell` | function, null | `null` | Custom function to render quarter cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
+| `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
 | `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |

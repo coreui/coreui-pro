@@ -26,6 +26,7 @@
   --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color};
   --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color};
   --#{$prefix}calendar-nav-btn-focus-box-shadow: #{$calendar-nav-btn-focus-box-shadow};
+  --#{$prefix}calendar-nav-date-font-weight: #{$calendar-nav-date-font-weight};
   --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color};
   --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
   --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};
@@ -36,7 +37,9 @@
   --#{$prefix}calendar-nav-icon-prev: #{escape-svg($calendar-nav-icon-prev)};
   --#{$prefix}calendar-nav-icon-color: #{$calendar-nav-icon-color};
   --#{$prefix}calendar-nav-icon-hover-color: #{$calendar-nav-icon-hover-color};
+  --#{$prefix}calendar-cell-header-inner-font-weight: #{$calendar-cell-header-inner-font-weight};
   --#{$prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color};
+  --#{$prefix}calendar-cell-week-number-font-weight: #{$calendar-cell-week-number-font-weight};
   --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
   --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color};
   --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
@@ -126,7 +129,7 @@
   .calendar-nav-btn,
   // TODO: remove .btn class when no longer needed in v6
   .btn {
-    font-weight: 600;
+    font-weight: var(--#{$prefix}calendar-nav-date-font-weight);
     color: var(--#{$prefix}calendar-nav-date-color);
 
     &:hover {
@@ -164,16 +167,17 @@
 }
 
 .calendar-header-cell-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   height: var(--#{$prefix}calendar-table-cell-size);
-  font-weight: 600;
+  font-weight: var(--#{$prefix}calendar-cell-header-inner-font-weight);
   color: var(--#{$prefix}calendar-cell-header-inner-color);
 }
 
 .calendar-cell-week-number {
-  font-weight: 600;
+  font-weight: var(--#{$prefix}calendar-cell-week-number-font-weight);
   color: var(--#{$prefix}calendar-cell-week-number-color);
 }
 
@@ -181,7 +185,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: var(--#{$prefix}calendar-table-cell-size);
+  min-height: var(--#{$prefix}calendar-table-cell-size);
 }
 
 .calendar-row,

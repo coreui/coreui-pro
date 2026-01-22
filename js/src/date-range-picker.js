@@ -12,6 +12,7 @@ import TimePicker from './time-picker.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { DefaultAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
 import {
   convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
@@ -26,6 +27,7 @@ const NAME = 'date-range-picker'
 const DATA_KEY = 'coreui.date-range-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
@@ -77,6 +79,7 @@ const SELECTOR_INPUT = '.date-picker-input'
 const SELECTOR_WAS_VALIDATED = 'form.was-validated'
 
 const Default = {
+  allowList: DefaultAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
   ariaNavPrevMonthLabel: 'Previous month',
@@ -113,7 +116,13 @@ const Default = {
   range: true,
   ranges: {},
   rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
+  renderDayCell: null,
+  renderMonthCell: null,
+  renderQuarterCell: null,
+  renderYearCell: null,
   required: true,
+  sanitize: true,
+  sanitizeFn: null,
   separator: true,
   size: null,
   startDate: null,
@@ -133,6 +142,7 @@ const Default = {
 }
 
 const DefaultType = {
+  allowList: 'object',
   ariaNavNextMonthLabel: 'string',
   ariaNavNextYearLabel: 'string',
   ariaNavPrevMonthLabel: 'string',
@@ -169,7 +179,13 @@ const DefaultType = {
   range: 'boolean',
   ranges: 'object',
   rangesButtonsClasses: '(array|string)',
+  renderDayCell: '(function|null)',
+  renderMonthCell: '(function|null)',
+  renderQuarterCell: '(function|null)',
+  renderYearCell: '(function|null)',
   required: 'boolean',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   separator: 'boolean',
   size: '(string|null)',
   startDate: '(date|number|string|null)',
@@ -556,6 +572,7 @@ class DateRangePicker extends BaseComponent {
 
   _getCalendarConfig() {
     return {
+      allowList: this._config.allowList,
       ariaNavNextMonthLabel: this._config.ariaNavNextMonthLabel,
       ariaNavNextYearLabel: this._config.ariaNavNextYearLabel,
       ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
@@ -571,6 +588,12 @@ class DateRangePicker extends BaseComponent {
       minDate: this._config.minDate,
       monthFormat: this._config.monthFormat,
       range: this._config.range,
+      renderDayCell: this._config.renderDayCell,
+      renderMonthCell: this._config.renderMonthCell,
+      renderQuarterCell: this._config.renderQuarterCell,
+      renderYearCell: this._config.renderYearCell,
+      sanitize: this._config.sanitize,
+      sanitizeFn: this._config.sanitizeFn,
       selectAdjacementDays: this._config.selectAdjacementDays,
       selectEndDate: this._selectEndDate,
       selectionType: this._config.selectionType,
@@ -1040,6 +1063,26 @@ class DateRangePicker extends BaseComponent {
     }
 
     return ''
+  }
+
+  _getConfig(config) {
+    const dataAttributes = Manipulator.getDataAttributes(this._element)
+
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute]
+      }
+    }
+
+    config = {
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    }
+    config = this._mergeConfigObj(config, this._element)
+    config = this._configAfterMerge(config)
+    this._typeCheckConfig(config)
+
+    return config
   }
 
   _configAfterMerge(config) {

@@ -10,6 +10,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
 import {
   convertToDateObject,
@@ -44,6 +45,7 @@ const NAME = 'calendar'
 const DATA_KEY = 'coreui.calendar'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
+const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_RIGHT_KEY = 'ArrowRight'
@@ -55,6 +57,7 @@ const SPACE_KEY = 'Space'
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`
 const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY}`
+const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY}`
 const EVENT_CELL_HOVER = `cellHover${EVENT_KEY}`
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
 const EVENT_FOCUS = `focus${EVENT_KEY}`
@@ -86,6 +89,7 @@ const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 
 const Default = {
+  allowList: DefaultAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
   ariaNavPrevMonthLabel: 'Previous month',
@@ -101,6 +105,12 @@ const Default = {
   minDate: null,
   monthFormat: 'short',
   range: false,
+  renderDayCell: null,
+  renderMonthCell: null,
+  renderQuarterCell: null,
+  renderYearCell: null,
+  sanitize: true,
+  sanitizeFn: null,
   selectAdjacementDays: false,
   selectEndDate: false,
   selectionType: 'day',
@@ -113,6 +123,7 @@ const Default = {
 }
 
 const DefaultType = {
+  allowList: 'object',
   ariaNavNextMonthLabel: 'string',
   ariaNavNextYearLabel: 'string',
   ariaNavPrevMonthLabel: 'string',
@@ -128,6 +139,12 @@ const DefaultType = {
   minDate: '(date|number|string|null)',
   monthFormat: 'string',
   range: 'boolean',
+  renderDayCell: '(function|null)',
+  renderMonthCell: '(function|null)',
+  renderQuarterCell: '(function|null)',
+  renderYearCell: '(function|null)',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
@@ -178,6 +195,12 @@ class Calendar extends BaseComponent {
     this._createCalendar()
   }
 
+  refresh() {
+    // Clear the current calendar content
+    this._element.innerHTML = ''
+    this._createCalendar()
+  }
+
   // Private
   _focusOnFirstAvailableCell() {
     const cell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL_CLICKABLE, this._element)
@@ -197,7 +220,7 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarClick(event) {
-    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target
+    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
     const date = this._getDate(target)
     const cloneDate = new Date(date)
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index')
@@ -207,15 +230,15 @@ class Calendar extends BaseComponent {
     }
 
     if (this._view === 'months' && this._config.selectionType !== 'month') {
-      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date)
-      this._view = 'days'
+      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, 'days')
+      this._setCalendarView('days', 'cellClick')
       this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
       return
     }
 
     if (this._view === 'years' && this._config.selectionType !== 'year') {
-      this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date)
-      this._view = this._config.selectionType === 'quarter' ? 'quarters' : 'months'
+      this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date, 'months')
+      this._setCalendarView(this._config.selectionType === 'quarter' ? 'quarters' : 'months', 'cellClick')
       this._updateCalendar(this._focusOnFirstAvailableCell.bind(this))
       return
     }
@@ -345,7 +368,7 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarMouseEnter(event) {
-    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target
+    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
     const date = this._getDate(target)
 
     if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
@@ -435,11 +458,11 @@ class Calendar extends BaseComponent {
       [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
       [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
       [SELECTOR_BTN_MONTH]: () => {
-        this._view = 'months'
+        this._setCalendarView('months', 'navigation')
         this._updateCalendar()
       },
       [SELECTOR_BTN_YEAR]: () => {
-        this._view = 'years'
+        this._setCalendarView('years', 'navigation')
         this._updateCalendar()
       }
     }
@@ -460,11 +483,21 @@ class Calendar extends BaseComponent {
     }
   }
 
-  _setCalendarDate(date) {
+  _setCalendarDate(date, view = this._view) {
     this._calendarDate = date
 
     EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-      date
+      date,
+      view
+    })
+  }
+
+  _setCalendarView(view, source) {
+    this._view = view
+
+    EventHandler.trigger(this._element, EVENT_CALENDAR_VIEW_CHANGE, {
+      view,
+      source
     })
   }
 
@@ -483,11 +516,10 @@ class Calendar extends BaseComponent {
 
     this._calendarDate = d
 
-    if (this._view === 'days') {
-      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-        date: d
-      })
-    }
+    EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+      date: d,
+      view: this._view
+    })
 
     this._updateCalendar(callback)
   }
@@ -650,8 +682,8 @@ class Calendar extends BaseComponent {
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                     data-coreui-date="${date}"
                   >
-                    <div class="calendar-cell-inner day">
-                      ${date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
+                    <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
+                      ${this._config.renderDayCell ? this._sanitizeHtml(this._config.renderDayCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, { day: this._config.dayFormat })}
                     </div>
                   </td>` :
                   '<td></td>'
@@ -671,8 +703,8 @@ class Calendar extends BaseComponent {
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner month">
-                    ${month}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
+                    ${this._config.renderMonthCell ? this._sanitizeHtml(this._config.renderMonthCell(date, cellAttributes.meta)) : month}
                   </div>
                 </td>`
               )
@@ -691,8 +723,8 @@ class Calendar extends BaseComponent {
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner quarter">
-                    ${`Q${index + 1}`}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
+                    ${this._config.renderQuarterCell ? this._sanitizeHtml(this._config.renderQuarterCell(date, cellAttributes.meta)) : `Q${index + 1}`}
                   </div>
                 </td>`
               )
@@ -710,8 +742,8 @@ class Calendar extends BaseComponent {
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner year">
-                    ${date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
+                    ${this._config.renderYearCell ? this._sanitizeHtml(this._config.renderYearCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, { year: this._config.yearFormat })}
                   </div>
                 </td>`
               )
@@ -882,7 +914,14 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInCurrentMonth: isCurrentMonth,
+        isInRange,
+        isSelected,
+        isToday: isTodayDate
+      }
     }
   }
 
@@ -907,7 +946,12 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: isDisabled ? -1 : 0,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
     }
   }
 
@@ -932,7 +976,12 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: isDisabled ? -1 : 0,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
     }
   }
 
@@ -957,7 +1006,12 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: isDisabled ? -1 : 0,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
     }
   }
 
@@ -993,6 +1047,34 @@ class Calendar extends BaseComponent {
       tabIndex: isDisabled ? -1 : 0,
       ariaSelected: isSelected
     }
+  }
+
+  _sanitizeHtml(html) {
+    if (this._config.sanitize) {
+      return sanitizeHtml(html, this._config.allowList, this._config.sanitizeFn)
+    }
+
+    return html
+  }
+
+  _getConfig(config) {
+    const dataAttributes = Manipulator.getDataAttributes(this._element)
+
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute]
+      }
+    }
+
+    config = {
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    }
+    config = this._mergeConfigObj(config, this._element)
+    config = this._configAfterMerge(config)
+    this._typeCheckConfig(config)
+
+    return config
   }
 
   // Static

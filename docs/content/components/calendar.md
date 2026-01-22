@@ -247,6 +247,66 @@ Example of the Bootstrap Calendar component with Persian locale settings.
 </div>
 {{< /example >}}
 
+## Custom cell rendering
+
+The Calendar component provides powerful customization options through render functions that allow you to completely control how calendar cells are displayed. These render functions are particularly useful when you need to add custom content, styling, or data to calendar cells.
+
+### Render functions
+
+The component supports four render functions, one for each view type:
+
+- `renderDayCell(date, meta)` - Customize day cells in the days view
+- `renderMonthCell(date, meta)` - Customize month cells in the months view
+- `renderQuarterCell(date, meta)` - Customize quarter cells in the quarters view
+- `renderYearCell(date, meta)` - Customize year cells in the years view
+
+Each render function receives two parameters:
+
+1. `date` - A JavaScript Date object representing the cell's date
+2. `meta` - An object containing cell state information:
+   - `isDisabled` - Whether the cell is disabled
+   - `isInRange` - Whether the cell is within a selected range (range selection only)
+   - `isSelected` - Whether the cell is selected
+   - For `renderDayCell` only:
+     - `isInCurrentMonth` - Whether the day belongs to the current month
+     - `isToday` - Whether the day is today
+
+The render functions should return an HTML string that will be displayed inside the cell. The returned HTML is automatically sanitized to prevent XSS attacks.
+
+### Format options
+
+In addition to custom rendering, you can control the display format of calendar elements using format options:
+
+- `dayFormat` - Controls how day numbers are displayed (`'numeric'` or `'2-digit'`)
+- `monthFormat` - Controls how month names are displayed (`'long'`, `'narrow'`, `'short'`, `'numeric'`, or `'2-digit'`)
+- `yearFormat` - Controls how year numbers are displayed (`'numeric'` or `'2-digit'`)
+- `weekdayFormat` - Controls how weekday names are displayed (number for character length, or `'long'`, `'narrow'`, `'short'`)
+
+These format options use the JavaScript `Intl.DateTimeFormat` API and respect the `locale` setting.
+
+### Security considerations
+
+For security reasons, all HTML returned by render functions is automatically sanitized using the built-in sanitizer. You can:
+
+- Disable sanitization by setting `sanitize: false` (not recommended)
+- Customize allowed HTML tags and attributes using the `allowList` option
+- Provide your own sanitization function using the `sanitizeFn` option
+
+Note that `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied via data attributes for security reasons.
+
+### Pricing calendar with custom cells
+
+This example demonstrates advanced usage of custom cell rendering to display pricing data across different calendar views. It uses `renderDayCell` to show daily prices, `renderMonthCell` to display monthly price ranges, and `renderYearCell` to show annual price ranges. The data is fetched from an external API and cached for performance.
+
+{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+<div class="d-flex justify-content-center">
+  <div id="myCalendarCustomizeCells" class="border rounded"></div>
+</div>
+{{< /example >}}
+
+{{< js-docs name="calendar-customize-cells" file="docs/assets/js/partials/snippets.js" >}}
+
+
 ## Usage
 
 {{< bootstrap-compatibility >}}
@@ -280,9 +340,14 @@ const calendarList = calendarElementList.map(calendarEl => {
 {{< partial "js-data-attributes.md" >}}
 {{< /markdown >}}
 
+{{< callout warning >}}
+Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied using data attributes.
+{{< /callout >}}
+
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowList` | object | [Default value]({{< docsref "/getting-started/javascript#sanitizer" >}}) | Object which contains allowed attributes and tags. |
 | `ariaNavNextMonthLabel` | string | `'Next month'` | A string that provides an accessible label for the button that navigates to the next month in the calendar. This label is read by screen readers to describe the action associated with the button. |
 | `ariaNavNextYearLabel` | string | `'Next year'` | A string that provides an accessible label for the button that navigates to the next year in the calendar. This label is intended for screen readers to help users understand the button's functionality. |
 | `ariaNavPrevMonthLabel` | string | `'Previous month'` | A string that provides an accessible label for the button that navigates to the previous month in the calendar. Screen readers will use this label to explain the purpose of the button. |
@@ -298,6 +363,12 @@ const calendarList = calendarElementList.map(calendarEl => {
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
 | `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
 | `range` | boolean | `false` | Allow range selection |
+| `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`) as parameters and should return HTML string. |
+| `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderQuarterCell` | function, null | `null` | Custom function to render quarter cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
+| `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
 | `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
@@ -322,14 +393,15 @@ const calendarList = calendarElementList.map(calendarEl => {
 ### Events
 
 {{< bs-table >}}
-| Method | Description |
-| --- | --- |
-| `calendarDateChange.coreui.calendar` | Callback fired when the calendar date changed. |
-| `calendarMouseleave.coreui.calendar` | Callback fired when the cursor leave the calendar. |
-| `cellHover.coreui.calendar` | Callback fired when the user hovers over the calendar cell. |
-| `endDateChange.coreui.calendar` | Callback fired when the end date changed. |
-| `selectEndChange.coreui.calendar` | Callback fired when the selection type changed. |
-| `startDateChange.coreui.calendar` | Callback fired when the start date changed. |
+| Method | Description | Event detail |
+| --- | --- | --- |
+| `calendarDateChange.coreui.calendar` | Fired when the calendar date changes. | `{ date: Date, view: 'days' \| 'months' \| 'quarters' \| 'years' }` |
+| `calendarViewChange.coreui.calendar` | Fired when the calendar view changes. | `{ view: 'days' \| 'months' \| 'quarters' \| 'years', source: 'cellClick' \| 'navigation' }` |
+| `calendarMouseleave.coreui.calendar` | Fired when the cursor leaves the calendar. | — |
+| `cellHover.coreui.calendar` | Fired when the user hovers over a calendar cell. | `{ date: Date \| null }` |
+| `endDateChange.coreui.calendar` | Fired when the end date changes. | `{ date: Date \| null }` |
+| `selectEndChange.coreui.calendar` | Fired when the selection mode changes. | `{ value: boolean }` |
+| `startDateChange.coreui.calendar` | Fired when the start date changes. | `{ date: Date \| null }` |
 {{< /bs-table >}}
 
 ```js
