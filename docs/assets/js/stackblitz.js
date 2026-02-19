@@ -37,6 +37,12 @@ document.querySelectorAll('.btn-edit').forEach(btn => {
 })
 
 const openCoreUISnippet = (htmlSnippet, jsSnippet, classes, title, pro, addDayJs) => {
+  let code
+  if (jsSnippet && jsSnippet !== 'true') {
+    const snippetElement = document.getElementById(jsSnippet)
+    code = snippetElement.querySelector('.highlight').textContent.trimEnd()
+  }
+
   const indexHtml = `<!doctype html>
 <html lang="en">
   <head>
@@ -62,7 +68,7 @@ ${htmlSnippet.trimStart().replace(/^/gm, '    ').replace(/^ {4}$/gm, '').trimEnd
   const project = {
     files: {
       'index.html': indexHtml,
-      ...(jsSnippet && { 'index.js': jsSnippetFile })
+      ...(jsSnippet && { 'index.js': code || jsSnippetFile })
     },
     title: `${title.innerHTML} Example`,
     description: `Official example from ${window.location.href}`,

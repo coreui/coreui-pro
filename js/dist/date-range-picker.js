@@ -1,13 +1,13 @@
 /*!
   * CoreUI date-range-picker.js v5.23.0 (https://coreui.io)
-  * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/focustrap.js')) :
-  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar', './util/focustrap'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar, global.Focustrap));
-})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js, FocusTrap) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@popperjs/core'), require('./base-component.js'), require('./calendar.js'), require('./time-picker.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./util/calendar.js'), require('./util/focustrap.js')) :
+  typeof define === 'function' && define.amd ? define(['@popperjs/core', './base-component', './calendar', './time-picker', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './util/calendar', './util/focustrap'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.DateRangePicker = factory(global["@popperjs/core"], global.BaseComponent, global.Calendar, global.TimePicker, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Calendar, global.Focustrap));
+})(this, (function (Popper, BaseComponent, Calendar, TimePicker, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, calendar_js, FocusTrap) { 'use strict';
 
   function _interopNamespaceDefault(e) {
     const n = Object.create(null, { [Symbol.toStringTag]: { value: 'Module' } });
@@ -44,6 +44,7 @@
   const DATA_KEY = 'coreui.date-range-picker';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn']);
   const ENTER_KEY = 'Enter';
   const ESCAPE_KEY = 'Escape';
   const TAB_KEY = 'Tab';
@@ -90,6 +91,7 @@
   const SELECTOR_INPUT = '.date-picker-input';
   const SELECTOR_WAS_VALIDATED = 'form.was-validated';
   const Default = {
+    allowList: sanitizer_js.DefaultAllowlist,
     ariaNavNextMonthLabel: 'Next month',
     ariaNavNextYearLabel: 'Next year',
     ariaNavPrevMonthLabel: 'Previous month',
@@ -103,6 +105,7 @@
     cleaner: true,
     container: false,
     date: null,
+    dayFormat: 'numeric',
     disabled: false,
     disabledDates: null,
     endDate: null,
@@ -118,13 +121,20 @@
     locale: 'default',
     maxDate: null,
     minDate: null,
+    monthFormat: 'short',
     name: null,
     placeholder: ['Start date', 'End date'],
     previewDateOnHover: true,
     range: true,
     ranges: {},
     rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
+    renderDayCell: null,
+    renderMonthCell: null,
+    renderQuarterCell: null,
+    renderYearCell: null,
     required: true,
+    sanitize: true,
+    sanitizeFn: null,
     separator: true,
     size: null,
     startDate: null,
@@ -139,9 +149,11 @@
     todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
     valid: false,
     weekdayFormat: 2,
-    weekNumbersLabel: null
+    weekNumbersLabel: null,
+    yearFormat: 'numeric'
   };
   const DefaultType = {
+    allowList: 'object',
     ariaNavNextMonthLabel: 'string',
     ariaNavNextYearLabel: 'string',
     ariaNavPrevMonthLabel: 'string',
@@ -155,6 +167,7 @@
     confirmButtonClasses: '(array|string)',
     container: '(string|element|boolean)',
     date: '(date|number|string|null)',
+    dayFormat: 'string',
     disabledDates: '(array|date|function|null)',
     disabled: 'boolean',
     endDate: '(date|number|string|null)',
@@ -170,13 +183,20 @@
     locale: 'string',
     maxDate: '(date|number|string|null)',
     minDate: '(date|number|string|null)',
+    monthFormat: 'string',
     name: '(string|null)',
     placeholder: '(array|string)',
     previewDateOnHover: 'boolean',
     range: 'boolean',
     ranges: 'object',
     rangesButtonsClasses: '(array|string)',
+    renderDayCell: '(function|null)',
+    renderMonthCell: '(function|null)',
+    renderQuarterCell: '(function|null)',
+    renderYearCell: '(function|null)',
     required: 'boolean',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
     separator: 'boolean',
     size: '(string|null)',
     startDate: '(date|number|string|null)',
@@ -191,7 +211,8 @@
     todayButtonClasses: '(array|string)',
     valid: 'boolean',
     weekdayFormat: '(number|string)',
-    weekNumbersLabel: '(string|null)'
+    weekNumbersLabel: '(string|null)',
+    yearFormat: 'string'
   };
 
   /**
@@ -489,19 +510,28 @@
     }
     _getCalendarConfig() {
       return {
+        allowList: this._config.allowList,
         ariaNavNextMonthLabel: this._config.ariaNavNextMonthLabel,
         ariaNavNextYearLabel: this._config.ariaNavNextYearLabel,
         ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
         ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
         calendarDate: this._calendarDate,
         calendars: this._mobile ? 1 : this._config.calendars,
+        dayFormat: this._config.dayFormat,
         disabledDates: this._config.disabledDates,
         endDate: this._endDate,
         firstDayOfWeek: this._config.firstDayOfWeek,
         locale: this._config.locale,
         maxDate: this._config.maxDate,
         minDate: this._config.minDate,
+        monthFormat: this._config.monthFormat,
         range: this._config.range,
+        renderDayCell: this._config.renderDayCell,
+        renderMonthCell: this._config.renderMonthCell,
+        renderQuarterCell: this._config.renderQuarterCell,
+        renderYearCell: this._config.renderYearCell,
+        sanitize: this._config.sanitize,
+        sanitizeFn: this._config.sanitizeFn,
         selectAdjacementDays: this._config.selectAdjacementDays,
         selectEndDate: this._selectEndDate,
         selectionType: this._config.selectionType,
@@ -509,7 +539,8 @@
         showWeekNumber: this._config.showWeekNumber,
         startDate: this._startDate,
         weekdayFormat: this._config.weekdayFormat,
-        weekNumbersLabel: this._config.weekNumbersLabel
+        weekNumbersLabel: this._config.weekNumbersLabel,
+        yearFormat: this._config.yearFormat
       };
     }
     _getTimePickerConfig(start) {
@@ -869,6 +900,22 @@
         return this._formatDate(date);
       }
       return '';
+    }
+    _getConfig(config) {
+      const dataAttributes = Manipulator.getDataAttributes(this._element);
+      for (const dataAttribute of Object.keys(dataAttributes)) {
+        if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+          delete dataAttributes[dataAttribute];
+        }
+      }
+      config = {
+        ...dataAttributes,
+        ...(typeof config === 'object' && config ? config : {})
+      };
+      config = this._mergeConfigObj(config, this._element);
+      config = this._configAfterMerge(config);
+      this._typeCheckConfig(config);
+      return config;
     }
     _configAfterMerge(config) {
       if (config.container === true) {

@@ -10,6 +10,8 @@ import Autocomplete from './src/autocomplete.js'
 import Button from './src/button.js'
 import Calendar from './src/calendar.js'
 import Carousel from './src/carousel.js'
+import Chip from './src/chip.js'
+import ChipInput from './src/chip-input.js'
 import Collapse from './src/collapse.js'
 import DatePicker from './src/date-picker.js'
 import DateRangePicker from './src/date-range-picker.js'
@@ -38,6 +40,8 @@ export default {
   Button,
   Calendar,
   Carousel,
+  Chip,
+  ChipInput,
   Collapse,
   DatePicker,
   DateRangePicker,

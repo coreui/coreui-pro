@@ -1,13 +1,13 @@
 /*!
   * CoreUI calendar.js v5.23.0 (https://coreui.io)
-  * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/index.js'), require('./util/calendar.js')) :
-  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/index', './util/calendar'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Index, global.Calendar));
-})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, index_js, calendar_js) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./util/calendar.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './util/calendar'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Calendar = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Calendar));
+})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, calendar_js) { 'use strict';
 
   /* eslint-disable complexity, indent, multiline-ternary, @stylistic/multiline-ternary */
   /**
@@ -26,6 +26,7 @@
   const DATA_KEY = 'coreui.calendar';
   const EVENT_KEY = `.${DATA_KEY}`;
   const DATA_API_KEY = '.data-api';
+  const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn']);
   const ARROW_UP_KEY = 'ArrowUp';
   const ARROW_RIGHT_KEY = 'ArrowRight';
   const ARROW_DOWN_KEY = 'ArrowDown';
@@ -35,6 +36,7 @@
   const EVENT_BLUR = `blur${EVENT_KEY}`;
   const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`;
   const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY}`;
+  const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY}`;
   const EVENT_CELL_HOVER = `cellHover${EVENT_KEY}`;
   const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`;
   const EVENT_FOCUS = `focus${EVENT_KEY}`;
@@ -63,19 +65,28 @@
   const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]';
   const Default = {
+    allowList: sanitizer_js.DefaultAllowlist,
     ariaNavNextMonthLabel: 'Next month',
     ariaNavNextYearLabel: 'Next year',
     ariaNavPrevMonthLabel: 'Previous month',
     ariaNavPrevYearLabel: 'Previous year',
     calendarDate: null,
     calendars: 1,
+    dayFormat: 'numeric',
     disabledDates: null,
     endDate: null,
     firstDayOfWeek: 1,
     locale: 'default',
     maxDate: null,
     minDate: null,
+    monthFormat: 'short',
     range: false,
+    renderDayCell: null,
+    renderMonthCell: null,
+    renderQuarterCell: null,
+    renderYearCell: null,
+    sanitize: true,
+    sanitizeFn: null,
     selectAdjacementDays: false,
     selectEndDate: false,
     selectionType: 'day',
@@ -83,22 +94,32 @@
     showWeekNumber: false,
     startDate: null,
     weekdayFormat: 2,
-    weekNumbersLabel: null
+    weekNumbersLabel: null,
+    yearFormat: 'numeric'
   };
   const DefaultType = {
+    allowList: 'object',
     ariaNavNextMonthLabel: 'string',
     ariaNavNextYearLabel: 'string',
     ariaNavPrevMonthLabel: 'string',
     ariaNavPrevYearLabel: 'string',
     calendarDate: '(date|number|string|null)',
     calendars: 'number',
+    dayFormat: 'string',
     disabledDates: '(array|date|function|null)',
     endDate: '(date|number|string|null)',
     firstDayOfWeek: 'number',
     locale: 'string',
     maxDate: '(date|number|string|null)',
     minDate: '(date|number|string|null)',
+    monthFormat: 'string',
     range: 'boolean',
+    renderDayCell: '(function|null)',
+    renderMonthCell: '(function|null)',
+    renderQuarterCell: '(function|null)',
+    renderYearCell: '(function|null)',
+    sanitize: 'boolean',
+    sanitizeFn: '(null|function)',
     selectAdjacementDays: 'boolean',
     selectEndDate: 'boolean',
     selectionType: 'string',
@@ -106,7 +127,8 @@
     showWeekNumber: 'boolean',
     startDate: '(date|number|string|null)',
     weekdayFormat: '(number|string)',
-    weekNumbersLabel: '(string|null)'
+    weekNumbersLabel: '(string|null)',
+    yearFormat: 'string'
   };
 
   /**
@@ -144,6 +166,11 @@
       this._element.innerHTML = '';
       this._createCalendar();
     }
+    refresh() {
+      // Clear the current calendar content
+      this._element.innerHTML = '';
+      this._createCalendar();
+    }
 
     // Private
     _focusOnFirstAvailableCell() {
@@ -160,7 +187,7 @@
       return new Date(Manipulator.getDataAttribute(target, 'date'));
     }
     _handleCalendarClick(event) {
-      const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+      const target = event.target.closest(SELECTOR_CALENDAR_CELL);
       const date = this._getDate(target);
       const cloneDate = new Date(date);
       const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR), 'calendar-index');
@@ -168,14 +195,14 @@
         this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
       }
       if (this._view === 'months' && this._config.selectionType !== 'month') {
-        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
-        this._view = 'days';
+        this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, 'days');
+        this._setCalendarView('days', 'cellClick');
         this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
         return;
       }
       if (this._view === 'years' && this._config.selectionType !== 'year') {
-        this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
-        this._view = 'months';
+        this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date, 'months');
+        this._setCalendarView(this._config.selectionType === 'quarter' ? 'quarters' : 'months', 'cellClick');
         this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
         return;
       }
@@ -239,7 +266,7 @@
           if (this._view === 'days') {
             this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, callback.bind(this, event.key));
           }
-          if (this._view === 'months') {
+          if (this._view === 'months' || this._view === 'quarters') {
             this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY || event.key === ARROW_DOWN_KEY ? 1 : -1, 0, callback.bind(this, event.key));
           }
           if (this._view === 'years') {
@@ -260,7 +287,7 @@
       }
     }
     _handleCalendarMouseEnter(event) {
-      const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+      const target = event.target.closest(SELECTOR_CALENDAR_CELL);
       const date = this._getDate(target);
       if (calendar_js.isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
         return;
@@ -329,11 +356,11 @@
         [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
         [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
         [SELECTOR_BTN_MONTH]: () => {
-          this._view = 'months';
+          this._setCalendarView('months', 'navigation');
           this._updateCalendar();
         },
         [SELECTOR_BTN_YEAR]: () => {
-          this._view = 'years';
+          this._setCalendarView('years', 'navigation');
           this._updateCalendar();
         }
       };
@@ -352,10 +379,18 @@
         });
       }
     }
-    _setCalendarDate(date) {
+    _setCalendarDate(date, view = this._view) {
       this._calendarDate = date;
       EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-        date
+        date,
+        view
+      });
+    }
+    _setCalendarView(view, source) {
+      this._view = view;
+      EventHandler.trigger(this._element, EVENT_CALENDAR_VIEW_CHANGE, {
+        view,
+        source
       });
     }
     _modifyCalendarDate(years, months = 0, callback) {
@@ -369,11 +404,10 @@
         d.setMonth(d.getMonth() + months);
       }
       this._calendarDate = d;
-      if (this._view === 'days') {
-        EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-          date: d
-        });
-      }
+      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+        date: d,
+        view: this._view
+      });
       this._updateCalendar(callback);
     }
     _setEndDate(date) {
@@ -473,7 +507,7 @@
       </div>
     `;
       const monthDetails = calendar_js.getMonthDetails(year, month, this._config.firstDayOfWeek);
-      const listOfMonths = calendar_js.createGroupsInArray(calendar_js.getMonthsNames(this._config.locale), 4);
+      const listOfMonths = calendar_js.createGroupsInArray(calendar_js.getMonthsNames(this._config.locale, this._config.monthFormat), 4);
       const listOfYears = calendar_js.createGroupsInArray(calendar_js.getYears(calendarDate.getFullYear()), 4);
       const weekDays = monthDetails[0].days;
       const calendarTable = document.createElement('table');
@@ -527,9 +561,9 @@
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                     data-coreui-date="${date}"
                   >
-                    <div class="calendar-cell-inner day">
-                      ${date.toLocaleDateString(this._config.locale, {
-          day: 'numeric'
+                    <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
+                      ${this._config.renderDayCell ? this._sanitizeHtml(this._config.renderDayCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, {
+          day: this._config.dayFormat
         })}
                     </div>
                   </td>` : '<td></td>';
@@ -545,12 +579,30 @@
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner month">
-                    ${month}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
+                    ${this._config.renderMonthCell ? this._sanitizeHtml(this._config.renderMonthCell(date, cellAttributes.meta)) : month}
                   </div>
                 </td>`;
     }).join('')}
           </tr>`).join('') : ''}
+        ${this._view === 'quarters' ? `<tr>
+            ${Array.from({
+      length: 4
+    }, (_, index) => {
+      const date = new Date(calendarDate.getFullYear(), index * 3, 1);
+      const cellAttributes = this._cellQuarterAttributes(date);
+      return `<td
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  data-coreui-date="${date.toDateString()}"
+                >
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
+                    ${this._config.renderQuarterCell ? this._sanitizeHtml(this._config.renderQuarterCell(date, cellAttributes.meta)) : `Q${index + 1}`}
+                  </div>
+                </td>`;
+    }).join('')}
+          </tr>` : ''}
         ${this._view === 'years' ? listOfYears.map(row => `<tr>
             ${row.map(year => {
       const date = new Date(year, 0, 1);
@@ -561,8 +613,10 @@
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-coreui-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner year">
-                    ${year}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
+                    ${this._config.renderYearCell ? this._sanitizeHtml(this._config.renderYearCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, {
+        year: this._config.yearFormat
+      })}
                   </div>
                 </td>`;
     }).join('')}
@@ -601,6 +655,7 @@
         day: 'days',
         week: 'days',
         month: 'months',
+        quarter: 'quarters',
         year: 'years'
       };
       this._view = viewMap[this._config.selectionType] || 'days';
@@ -633,12 +688,26 @@
       for (const cell of cells) {
         const date = new Date(Manipulator.getDataAttribute(cell, 'date'));
         let cellAttributes;
-        if (this._view === 'days') {
-          cellAttributes = this._cellDayAttributes(date, 'current');
-        } else if (this._view === 'months') {
-          cellAttributes = this._cellMonthAttributes(date);
-        } else {
-          cellAttributes = this._cellYearAttributes(date);
+        switch (this._view) {
+          case 'days':
+            {
+              cellAttributes = this._cellDayAttributes(date, 'current');
+              break;
+            }
+          case 'months':
+            {
+              cellAttributes = this._cellMonthAttributes(date);
+              break;
+            }
+          case 'quarters':
+            {
+              cellAttributes = this._cellQuarterAttributes(date);
+              break;
+            }
+          default:
+            {
+              cellAttributes = this._cellYearAttributes(date);
+            }
         }
         cell.className = cellAttributes.className;
         cell.tabIndex = cellAttributes.tabIndex;
@@ -683,7 +752,14 @@
       return {
         className: classNames,
         tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
-        ariaSelected: isSelected
+        ariaSelected: isSelected,
+        meta: {
+          isDisabled,
+          isInCurrentMonth: isCurrentMonth,
+          isInRange,
+          isSelected,
+          isToday: isTodayDate
+        }
       };
     }
     _cellMonthAttributes(date) {
@@ -701,7 +777,35 @@
       return {
         className: classNames,
         tabIndex: isDisabled ? -1 : 0,
-        ariaSelected: isSelected
+        ariaSelected: isSelected,
+        meta: {
+          isDisabled,
+          isInRange,
+          isSelected
+        }
+      };
+    }
+    _cellQuarterAttributes(date) {
+      const isDisabled = calendar_js.isQuarterDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
+      const isSelected = calendar_js.isQuarterSelected(date, this._startDate, this._endDate);
+      const isInRange = calendar_js.isQuarterInRange(date, this._startDate, this._endDate);
+      const isRangeHover = this._config.selectionType === 'quarter' && this._hoverDate && (this._selectEndDate ? calendar_js.isQuarterInRange(date, this._startDate, this._hoverDate) : calendar_js.isQuarterInRange(date, this._hoverDate, this._endDate));
+      const classNames = this._classNames({
+        [CLASS_NAME_CALENDAR_CELL]: true,
+        disabled: isDisabled,
+        'range-hover': isRangeHover,
+        range: isInRange,
+        selected: isSelected
+      });
+      return {
+        className: classNames,
+        tabIndex: isDisabled ? -1 : 0,
+        ariaSelected: isSelected,
+        meta: {
+          isDisabled,
+          isInRange,
+          isSelected
+        }
       };
     }
     _cellYearAttributes(date) {
@@ -719,7 +823,12 @@
       return {
         className: classNames,
         tabIndex: isDisabled ? -1 : 0,
-        ariaSelected: isSelected
+        ariaSelected: isSelected,
+        meta: {
+          isDisabled,
+          isInRange,
+          isSelected
+        }
       };
     }
     _rowWeekAttributes(date) {
@@ -748,6 +857,28 @@
         tabIndex: isDisabled ? -1 : 0,
         ariaSelected: isSelected
       };
+    }
+    _sanitizeHtml(html) {
+      if (this._config.sanitize) {
+        return sanitizer_js.sanitizeHtml(html, this._config.allowList, this._config.sanitizeFn);
+      }
+      return html;
+    }
+    _getConfig(config) {
+      const dataAttributes = Manipulator.getDataAttributes(this._element);
+      for (const dataAttribute of Object.keys(dataAttributes)) {
+        if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
+          delete dataAttributes[dataAttribute];
+        }
+      }
+      config = {
+        ...dataAttributes,
+        ...(typeof config === 'object' && config ? config : {})
+      };
+      config = this._mergeConfigObj(config, this._element);
+      config = this._configAfterMerge(config);
+      this._typeCheckConfig(config);
+      return config;
     }
 
     // Static

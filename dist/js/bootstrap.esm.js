@@ -1,6 +1,6 @@
 /*!
   * CoreUI v5.23.0 (https://coreui.io)
-  * Copyright 2025 The CoreUI Team (https://github.com/orgs/coreui/people)
+  * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 import * as Popper from '@popperjs/core';
@@ -855,11 +855,11 @@ const enableDismissTrigger = (component, method = 'hide') => {
  * Constants
  */
 
-const NAME$t = 'alert';
-const DATA_KEY$o = 'bs.alert';
-const EVENT_KEY$p = `.${DATA_KEY$o}`;
-const EVENT_CLOSE = `close${EVENT_KEY$p}`;
-const EVENT_CLOSED = `closed${EVENT_KEY$p}`;
+const NAME$v = 'alert';
+const DATA_KEY$q = 'bs.alert';
+const EVENT_KEY$r = `.${DATA_KEY$q}`;
+const EVENT_CLOSE = `close${EVENT_KEY$r}`;
+const EVENT_CLOSED = `closed${EVENT_KEY$r}`;
 const CLASS_NAME_FADE$5 = 'fade';
 const CLASS_NAME_SHOW$g = 'show';
 
@@ -870,7 +870,7 @@ const CLASS_NAME_SHOW$g = 'show';
 class Alert extends BaseComponent {
   // Getters
   static get NAME() {
-    return NAME$t;
+    return NAME$v;
   }
 
   // Public
@@ -1030,10 +1030,10 @@ function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
  * ------------------------------------------------------------------------
  */
 
-const NAME$s = 'autocomplete';
-const DATA_KEY$n = 'bs.autocomplete';
-const EVENT_KEY$o = `.${DATA_KEY$n}`;
-const DATA_API_KEY$j = '.data-api';
+const NAME$u = 'autocomplete';
+const DATA_KEY$p = 'bs.autocomplete';
+const EVENT_KEY$q = `.${DATA_KEY$p}`;
+const DATA_API_KEY$l = '.data-api';
 const ARROW_UP_KEY$6 = 'ArrowUp';
 const ARROW_DOWN_KEY$6 = 'ArrowDown';
 const BACKSPACE_KEY$2 = 'Backspace';
@@ -1043,23 +1043,23 @@ const ESCAPE_KEY$6 = 'Escape';
 const TAB_KEY$6 = 'Tab';
 const RIGHT_MOUSE_BUTTON$5 = 2; // MouseEvent.button value for the secondary button, usually the right button
 
-const EVENT_BLUR$1 = `blur${EVENT_KEY$o}`;
-const EVENT_CHANGED$1 = `changed${EVENT_KEY$o}`;
-const EVENT_CLICK$6 = `click${EVENT_KEY$o}`;
-const EVENT_HIDE$c = `hide${EVENT_KEY$o}`;
-const EVENT_HIDDEN$c = `hidden${EVENT_KEY$o}`;
-const EVENT_INPUT$4 = `input${EVENT_KEY$o}`;
-const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$o}`;
-const EVENT_KEYUP$1 = `keyup${EVENT_KEY$o}`;
-const EVENT_SHOW$c = `show${EVENT_KEY$o}`;
-const EVENT_SHOWN$c = `shown${EVENT_KEY$o}`;
-const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$o}${DATA_API_KEY$j}`;
-const EVENT_KEYUP_DATA_API$5 = `keyup${EVENT_KEY$o}${DATA_API_KEY$j}`;
-const EVENT_LOAD_DATA_API$f = `load${EVENT_KEY$o}${DATA_API_KEY$j}`;
+const EVENT_BLUR$1 = `blur${EVENT_KEY$q}`;
+const EVENT_CHANGED$1 = `changed${EVENT_KEY$q}`;
+const EVENT_CLICK$6 = `click${EVENT_KEY$q}`;
+const EVENT_HIDE$c = `hide${EVENT_KEY$q}`;
+const EVENT_HIDDEN$c = `hidden${EVENT_KEY$q}`;
+const EVENT_INPUT$5 = `input${EVENT_KEY$q}`;
+const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$q}`;
+const EVENT_KEYUP$1 = `keyup${EVENT_KEY$q}`;
+const EVENT_SHOW$c = `show${EVENT_KEY$q}`;
+const EVENT_SHOWN$c = `shown${EVENT_KEY$q}`;
+const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$q}${DATA_API_KEY$l}`;
+const EVENT_KEYUP_DATA_API$5 = `keyup${EVENT_KEY$q}${DATA_API_KEY$l}`;
+const EVENT_LOAD_DATA_API$f = `load${EVENT_KEY$q}${DATA_API_KEY$l}`;
 const CLASS_NAME_AUTOCOMPLETE = 'autocomplete';
 const CLASS_NAME_BUTTONS = 'autocomplete-buttons';
 const CLASS_NAME_CLEANER$3 = 'autocomplete-cleaner';
-const CLASS_NAME_DISABLED$5 = 'disabled';
+const CLASS_NAME_DISABLED$7 = 'disabled';
 const CLASS_NAME_DROPDOWN$2 = 'autocomplete-dropdown';
 const CLASS_NAME_INDICATOR$2 = 'autocomplete-indicator';
 const CLASS_NAME_INPUT$2 = 'autocomplete-input';
@@ -1081,7 +1081,7 @@ const SELECTOR_OPTION$1 = '.autocomplete-option';
 const SELECTOR_OPTIONS$1 = '.autocomplete-options';
 const SELECTOR_OPTIONS_EMPTY$1 = '.autocomplete-options-empty';
 const SELECTOR_VISIBLE_ITEMS$2 = '.autocomplete-options .autocomplete-option:not(.disabled):not(:disabled)';
-const Default$p = {
+const Default$r = {
   allowList: DefaultAllowlist,
   allowOnlyDefinedOptions: false,
   ariaCleanerLabel: 'Clear selection',
@@ -1109,7 +1109,7 @@ const Default$p = {
   valid: false,
   value: null
 };
-const DefaultType$p = {
+const DefaultType$r = {
   allowList: 'object',
   allowOnlyDefinedOptions: 'boolean',
   ariaCleanerLabel: 'string',
@@ -1161,19 +1161,19 @@ class Autocomplete extends BaseComponent {
     this._search = '';
     this._createAutocomplete();
     this._addEventListeners();
-    Data.set(this._element, DATA_KEY$n, this);
+    Data.set(this._element, DATA_KEY$p, this);
   }
 
   // Getters
 
   static get Default() {
-    return Default$p;
+    return Default$r;
   }
   static get DefaultType() {
-    return DefaultType$p;
+    return DefaultType$r;
   }
   static get NAME() {
-    return NAME$s;
+    return NAME$u;
   }
 
   // Public
@@ -1233,7 +1233,7 @@ class Autocomplete extends BaseComponent {
     if (!this._isExternalSearch()) {
       this._filterOptionsList();
     }
-    EventHandler.trigger(this._element, EVENT_INPUT$4, {
+    EventHandler.trigger(this._element, EVENT_INPUT$5, {
       value: label
     });
   }
@@ -1487,7 +1487,7 @@ class Autocomplete extends BaseComponent {
     this._element.classList.toggle('is-invalid', this._config.invalid);
     this._element.classList.toggle('is-valid', this._config.valid);
     if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED$5);
+      this._element.classList.add(CLASS_NAME_DISABLED$7);
     }
     for (const className of this._getClassNames()) {
       this._element.classList.add(className);
@@ -1635,7 +1635,7 @@ class Autocomplete extends BaseComponent {
       const optionDiv = document.createElement('div');
       optionDiv.classList.add(CLASS_NAME_OPTION$1);
       if (option.disabled) {
-        optionDiv.classList.add(CLASS_NAME_DISABLED$5);
+        optionDiv.classList.add(CLASS_NAME_DISABLED$7);
         optionDiv.setAttribute('aria-disabled', 'true');
       }
       optionDiv.dataset.value = option.value;
@@ -1887,13 +1887,13 @@ defineJQueryPlugin(Autocomplete);
  * Constants
  */
 
-const NAME$r = 'button';
-const DATA_KEY$m = 'bs.button';
-const EVENT_KEY$n = `.${DATA_KEY$m}`;
-const DATA_API_KEY$i = '.data-api';
-const CLASS_NAME_ACTIVE$6 = 'active';
+const NAME$t = 'button';
+const DATA_KEY$o = 'bs.button';
+const EVENT_KEY$p = `.${DATA_KEY$o}`;
+const DATA_API_KEY$k = '.data-api';
+const CLASS_NAME_ACTIVE$7 = 'active';
 const SELECTOR_DATA_TOGGLE$g = '[data-bs-toggle="button"]';
-const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$n}${DATA_API_KEY$i}`;
+const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$p}${DATA_API_KEY$k}`;
 
 /**
  * Class definition
@@ -1902,13 +1902,13 @@ const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$n}${DATA_API_KEY$i}`;
 class Button extends BaseComponent {
   // Getters
   static get NAME() {
-    return NAME$r;
+    return NAME$t;
   }
 
   // Public
   toggle() {
     // Toggle class and sync the `aria-pressed` attribute with the return value of the `.toggle()` method
-    this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE$6));
+    this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE$7));
   }
 
   // Static
@@ -1991,6 +1991,16 @@ const dateToMonthNumber = date => {
 };
 
 /**
+ * Helper function to convert a date to a quarter number for comparison.
+ * @param date - The date to convert.
+ * @returns A number representing year*4 + quarter for easy comparison.
+ */
+const dateToQuarterNumber = date => {
+  const quarter = Math.floor(date.getMonth() / 3);
+  return date.getFullYear() * 4 + quarter;
+};
+
+/**
  * Helper function to check if a value is within min/max range.
  * @param value - The value to check.
  * @param min - Minimum allowed value (null means no minimum).
@@ -2046,6 +2056,35 @@ const parseWeekString = dateString => {
 
   // Fallback to existing ISO week parsing
   return convertIsoWeekToDate(dateString);
+};
+
+/**
+ * Parses a quarter string and returns a Date object for the first day of that quarter.
+ * @param dateString - The quarter string to parse.
+ * @returns The Date object for the first day of the quarter, or null if invalid.
+ */
+const parseQuarterString = dateString => {
+  const quarterPatterns = [/^(\d{4})-Q(\d{1})$/,
+  // 2023-Q1, 2023-Q4
+  /^(\d{4})Q(\d{1})$/,
+  // 2023Q1, 2023Q4
+  /^(\d{4})\s+Q(\d{1})$/ // 2023 Q1, 2023 Q4
+  ];
+  for (const pattern of quarterPatterns) {
+    const match = dateString.trim().match(pattern);
+    if (match) {
+      const parsedYear = parseYearSmart(match[1]);
+      const parsedQuarter = Number.parseInt(match[2], 10);
+
+      // Validate quarter (1-4)
+      if (parsedQuarter >= 1 && parsedQuarter <= 4) {
+        // Calculate the first month of the quarter (Q1=0, Q2=3, Q3=6, Q4=9)
+        const monthIndex = (parsedQuarter - 1) * 3;
+        return new Date(parsedYear, monthIndex, 1);
+      }
+    }
+  }
+  return null;
 };
 
 /**
@@ -2300,7 +2339,7 @@ const createDateOnly = groups => {
 const getExpectedPartsCount = patterns => {
   if (patterns.length === 0) {
     return 3;
-  } // Default fallback
+  }
 
   // Analyze the first pattern to determine expected parts count
   const firstPattern = patterns[0];
@@ -2320,8 +2359,6 @@ const parseDayString = (dateString, locale, includeTime) => {
   const groups = tryParseWithPatterns(dateString, patterns, includeTime);
   if (!groups) {
     // Check if input looks like a complete date (has separators and multiple parts)
-    // If so, use fallback parsing for formats like "2022/08/17", "2022-08-17"
-    // If not (like "1", "12", "1/1"), return null
     const trimmed = dateString.trim();
     const hasDateSeparators = /[-/.:]/.test(trimmed);
     const parts = trimmed.split(/[-/.\s:]+/).filter(part => part.length > 0);
@@ -2340,8 +2377,7 @@ const parseDayString = (dateString, locale, includeTime) => {
   if ("year" in groups && "month" in groups && "day" in groups) {
     const {
       month,
-      day,
-      year
+      day
     } = groups;
     if (!validateDateComponents(month, day)) {
       return null;
@@ -2393,6 +2429,10 @@ const convertToDateObject = (date, selectionType, locale = "en-US", includeTime 
       {
         return parseMonthString(dateString);
       }
+    case "quarter":
+      {
+        return parseQuarterString(dateString);
+      }
     case "year":
       {
         return parseYearString(dateString);
@@ -2410,7 +2450,7 @@ const convertToDateObject = (date, selectionType, locale = "en-US", includeTime 
  * @param dateString - The date string to parse.
  * @param locale - The locale to use for date format patterns.
  * @param includeTime - Whether to include time parsing.
- * @param selectionType - The selection type ('day', 'week', 'month', 'year').
+ * @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
  * @returns A Date object if parsing succeeds, null if parsing fails.
  */
 const getLocalDateFromString = (dateString, locale = "en-US", includeTime = false, selectionType = "day") => {
@@ -2445,7 +2485,7 @@ const getCalendarDate = (calendarDate, order, view) => {
   if (order !== 0 && view === "days") {
     return new Date(calendarDate.getFullYear(), calendarDate.getMonth() + order, 1);
   }
-  if (order !== 0 && view === "months") {
+  if (order !== 0 && (view === "months" || view === "quarters")) {
     return new Date(calendarDate.getFullYear() + order, calendarDate.getMonth(), 1);
   }
   if (order !== 0 && view === "years") {
@@ -2458,7 +2498,7 @@ const getCalendarDate = (calendarDate, order, view) => {
 /**
  * Formats a date based on the selection type.
  * @param date - The date to format.
- * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
+ * @param selectionType - The type of selection ('day', 'week', 'month', 'quarter', 'year').
  * @returns A formatted date string or the original Date object.
  */
 const getDateBySelectionType = (date, selectionType) => {
@@ -2475,6 +2515,10 @@ const getDateBySelectionType = (date, selectionType) => {
   if (selectionType === "month") {
     const monthNumber = `0${date.getMonth() + 1}`.slice(-2);
     return `${date.getFullYear()}-${monthNumber}`;
+  }
+  if (selectionType === "quarter") {
+    const quarter = Math.floor(date.getMonth() / 3) + 1;
+    return `${date.getFullYear()}Q${quarter}`;
   }
   if (selectionType === "year") {
     return `${date.getFullYear()}`;
@@ -2807,6 +2851,84 @@ const isMonthInRange = (date, start, end) => {
 };
 
 /**
+ * Checks if a quarter is disabled based on the 'quarter' period type.
+ * @param date - The date representing the quarter to check.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if the quarter is disabled, false otherwise.
+ */
+const isQuarterDisabled = (date, min, max, disabledDates) => {
+  const current = dateToQuarterNumber(date);
+  const _min = min ? dateToQuarterNumber(min) : null;
+  const _max = max ? dateToQuarterNumber(max) : null;
+  if (isOutsideRange(current, _min, _max)) {
+    return true;
+  }
+  if (disabledDates === undefined) {
+    return false;
+  }
+
+  // Get the start and end of the quarter
+  const quarter = Math.floor(date.getMonth() / 3);
+  const quarterStartMonth = quarter * 3;
+  const quarterEndMonth = quarterStartMonth + 2;
+  const year = date.getFullYear();
+  const quarterStart = new Date(year, quarterStartMonth, 1);
+  const quarterEnd = new Date(year, quarterEndMonth + 1, 0); // Last day of the quarter
+
+  const startTime = min ? Math.max(quarterStart.getTime(), min.getTime()) : quarterStart.getTime();
+  const endTime = max ? Math.min(quarterEnd.getTime(), max.getTime()) : quarterEnd.getTime();
+  for (const currentDate = new Date(startTime); currentDate.getTime() <= endTime; currentDate.setDate(currentDate.getDate() + 1)) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false;
+    }
+  }
+  return false;
+};
+
+/**
+ * Checks if a quarter is selected based on start and end dates.
+ * @param date - The date representing the quarter.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the quarter is selected, false otherwise.
+ */
+const isQuarterSelected = (date, start, end) => {
+  const year = date.getFullYear();
+  const quarter = Math.floor(date.getMonth() / 3);
+  if (start !== null) {
+    const startYear = start.getFullYear();
+    const startQuarter = Math.floor(start.getMonth() / 3);
+    if (year === startYear && quarter === startQuarter) {
+      return true;
+    }
+  }
+  if (end !== null) {
+    const endYear = end.getFullYear();
+    const endQuarter = Math.floor(end.getMonth() / 3);
+    if (year === endYear && quarter === endQuarter) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Checks if a quarter is within a specified range.
+ * @param date - The date representing the quarter.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the quarter is within the range, false otherwise.
+ */
+const isQuarterInRange = (date, start, end) => {
+  const _start = start ? dateToQuarterNumber(start) : null;
+  const _end = end ? dateToQuarterNumber(end) : null;
+  const _date = dateToQuarterNumber(date);
+  return Boolean(_start && _end && _start <= _date && _date <= _end);
+};
+
+/**
  * Checks if two dates are the same calendar date.
  * @param date - First date.
  * @param date2 - Second date.
@@ -2972,29 +3094,31 @@ const createDateFromYear = groups => {
  * Constants
  */
 
-const NAME$q = 'calendar';
-const DATA_KEY$l = 'bs.calendar';
-const EVENT_KEY$m = `.${DATA_KEY$l}`;
-const DATA_API_KEY$h = '.data-api';
+const NAME$s = 'calendar';
+const DATA_KEY$n = 'bs.calendar';
+const EVENT_KEY$o = `.${DATA_KEY$n}`;
+const DATA_API_KEY$j = '.data-api';
+const DISALLOWED_ATTRIBUTES$4 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ARROW_UP_KEY$5 = 'ArrowUp';
 const ARROW_RIGHT_KEY$5 = 'ArrowRight';
 const ARROW_DOWN_KEY$5 = 'ArrowDown';
 const ARROW_LEFT_KEY$5 = 'ArrowLeft';
 const ENTER_KEY$3 = 'Enter';
 const SPACE_KEY$1 = 'Space';
-const EVENT_BLUR = `blur${EVENT_KEY$m}`;
-const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$m}`;
-const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$m}`;
-const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$m}`;
-const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$m}`;
-const EVENT_FOCUS$1 = `focus${EVENT_KEY$m}`;
-const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$m}`;
-const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$m}`;
-const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$m}`;
-const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$m}`;
-const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$m}`;
-const EVENT_LOAD_DATA_API$e = `load${EVENT_KEY$m}${DATA_API_KEY$h}`;
-const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$m}${DATA_API_KEY$h}`;
+const EVENT_BLUR = `blur${EVENT_KEY$o}`;
+const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$o}`;
+const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$o}`;
+const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$o}`;
+const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$o}`;
+const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$o}`;
+const EVENT_FOCUS$1 = `focus${EVENT_KEY$o}`;
+const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$o}`;
+const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$o}`;
+const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$o}`;
+const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$o}`;
+const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$o}`;
+const EVENT_LOAD_DATA_API$e = `load${EVENT_KEY$o}${DATA_API_KEY$j}`;
+const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$o}${DATA_API_KEY$j}`;
 const CLASS_NAME_CALENDAR_CELL = 'calendar-cell';
 const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner';
 const CLASS_NAME_CALENDAR_ROW = 'calendar-row';
@@ -3012,20 +3136,29 @@ const SELECTOR_CALENDAR_CELL_CLICKABLE = `${SELECTOR_CALENDAR_CELL}[tabindex="0"
 const SELECTOR_CALENDAR_ROW = '.calendar-row';
 const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
 const SELECTOR_DATA_TOGGLE$f = '[data-bs-toggle="calendar"]';
-const Default$o = {
+const Default$q = {
+  allowList: DefaultAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
   ariaNavPrevMonthLabel: 'Previous month',
   ariaNavPrevYearLabel: 'Previous year',
   calendarDate: null,
   calendars: 1,
+  dayFormat: 'numeric',
   disabledDates: null,
   endDate: null,
   firstDayOfWeek: 1,
   locale: 'default',
   maxDate: null,
   minDate: null,
+  monthFormat: 'short',
   range: false,
+  renderDayCell: null,
+  renderMonthCell: null,
+  renderQuarterCell: null,
+  renderYearCell: null,
+  sanitize: true,
+  sanitizeFn: null,
   selectAdjacementDays: false,
   selectEndDate: false,
   selectionType: 'day',
@@ -3033,22 +3166,32 @@ const Default$o = {
   showWeekNumber: false,
   startDate: null,
   weekdayFormat: 2,
-  weekNumbersLabel: null
+  weekNumbersLabel: null,
+  yearFormat: 'numeric'
 };
-const DefaultType$o = {
+const DefaultType$q = {
+  allowList: 'object',
   ariaNavNextMonthLabel: 'string',
   ariaNavNextYearLabel: 'string',
   ariaNavPrevMonthLabel: 'string',
   ariaNavPrevYearLabel: 'string',
   calendarDate: '(date|number|string|null)',
   calendars: 'number',
+  dayFormat: 'string',
   disabledDates: '(array|date|function|null)',
   endDate: '(date|number|string|null)',
   firstDayOfWeek: 'number',
   locale: 'string',
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
+  monthFormat: 'string',
   range: 'boolean',
+  renderDayCell: '(function|null)',
+  renderMonthCell: '(function|null)',
+  renderQuarterCell: '(function|null)',
+  renderYearCell: '(function|null)',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   selectAdjacementDays: 'boolean',
   selectEndDate: 'boolean',
   selectionType: 'string',
@@ -3056,7 +3199,8 @@ const DefaultType$o = {
   showWeekNumber: 'boolean',
   startDate: '(date|number|string|null)',
   weekdayFormat: '(number|string)',
-  weekNumbersLabel: '(string|null)'
+  weekNumbersLabel: '(string|null)',
+  yearFormat: 'string'
 };
 
 /**
@@ -3075,13 +3219,13 @@ class Calendar extends BaseComponent {
 
   // Getters
   static get Default() {
-    return Default$o;
+    return Default$q;
   }
   static get DefaultType() {
-    return DefaultType$o;
+    return DefaultType$q;
   }
   static get NAME() {
-    return NAME$q;
+    return NAME$s;
   }
 
   // Public
@@ -3090,6 +3234,11 @@ class Calendar extends BaseComponent {
     this._initializeDates();
     this._initializeView();
 
+    // Clear the current calendar content
+    this._element.innerHTML = '';
+    this._createCalendar();
+  }
+  refresh() {
     // Clear the current calendar content
     this._element.innerHTML = '';
     this._createCalendar();
@@ -3110,7 +3259,7 @@ class Calendar extends BaseComponent {
     return new Date(Manipulator.getDataAttribute(target, 'date'));
   }
   _handleCalendarClick(event) {
-    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+    const target = event.target.closest(SELECTOR_CALENDAR_CELL);
     const date = this._getDate(target);
     const cloneDate = new Date(date);
     const index = Manipulator.getDataAttribute(target.closest(SELECTOR_CALENDAR$1), 'calendar-index');
@@ -3118,14 +3267,14 @@ class Calendar extends BaseComponent {
       this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
     }
     if (this._view === 'months' && this._config.selectionType !== 'month') {
-      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date);
-      this._view = 'days';
+      this._setCalendarDate(index ? new Date(cloneDate.setMonth(cloneDate.getMonth() - index)) : date, 'days');
+      this._setCalendarView('days', 'cellClick');
       this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
       return;
     }
     if (this._view === 'years' && this._config.selectionType !== 'year') {
-      this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date);
-      this._view = 'months';
+      this._setCalendarDate(index ? new Date(cloneDate.setFullYear(cloneDate.getFullYear() - index)) : date, 'months');
+      this._setCalendarView(this._config.selectionType === 'quarter' ? 'quarters' : 'months', 'cellClick');
       this._updateCalendar(this._focusOnFirstAvailableCell.bind(this));
       return;
     }
@@ -3189,7 +3338,7 @@ class Calendar extends BaseComponent {
         if (this._view === 'days') {
           this._modifyCalendarDate(0, event.key === ARROW_RIGHT_KEY$5 || event.key === ARROW_DOWN_KEY$5 ? 1 : -1, callback.bind(this, event.key));
         }
-        if (this._view === 'months') {
+        if (this._view === 'months' || this._view === 'quarters') {
           this._modifyCalendarDate(event.key === ARROW_RIGHT_KEY$5 || event.key === ARROW_DOWN_KEY$5 ? 1 : -1, 0, callback.bind(this, event.key));
         }
         if (this._view === 'years') {
@@ -3210,7 +3359,7 @@ class Calendar extends BaseComponent {
     }
   }
   _handleCalendarMouseEnter(event) {
-    const target = event.target.classList.contains(CLASS_NAME_CALENDAR_CELL_INNER) ? event.target.parentElement : event.target;
+    const target = event.target.closest(SELECTOR_CALENDAR_CELL);
     const date = this._getDate(target);
     if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {
       return;
@@ -3279,11 +3428,11 @@ class Calendar extends BaseComponent {
       [SELECTOR_BTN_NEXT]: () => this._modifyCalendarDate(0, 1),
       [SELECTOR_BTN_DOUBLE_NEXT]: () => this._modifyCalendarDate(this._view === 'years' ? 10 : 1),
       [SELECTOR_BTN_MONTH]: () => {
-        this._view = 'months';
+        this._setCalendarView('months', 'navigation');
         this._updateCalendar();
       },
       [SELECTOR_BTN_YEAR]: () => {
-        this._view = 'years';
+        this._setCalendarView('years', 'navigation');
         this._updateCalendar();
       }
     };
@@ -3302,10 +3451,18 @@ class Calendar extends BaseComponent {
       });
     }
   }
-  _setCalendarDate(date) {
+  _setCalendarDate(date, view = this._view) {
     this._calendarDate = date;
     EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-      date
+      date,
+      view
+    });
+  }
+  _setCalendarView(view, source) {
+    this._view = view;
+    EventHandler.trigger(this._element, EVENT_CALENDAR_VIEW_CHANGE, {
+      view,
+      source
     });
   }
   _modifyCalendarDate(years, months = 0, callback) {
@@ -3319,11 +3476,10 @@ class Calendar extends BaseComponent {
       d.setMonth(d.getMonth() + months);
     }
     this._calendarDate = d;
-    if (this._view === 'days') {
-      EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
-        date: d
-      });
-    }
+    EventHandler.trigger(this._element, EVENT_CALENDAR_DATE_CHANGE, {
+      date: d,
+      view: this._view
+    });
     this._updateCalendar(callback);
   }
   _setEndDate(date) {
@@ -3423,7 +3579,7 @@ class Calendar extends BaseComponent {
       </div>
     `;
     const monthDetails = getMonthDetails(year, month, this._config.firstDayOfWeek);
-    const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale), 4);
+    const listOfMonths = createGroupsInArray(getMonthsNames(this._config.locale, this._config.monthFormat), 4);
     const listOfYears = createGroupsInArray(getYears(calendarDate.getFullYear()), 4);
     const weekDays = monthDetails[0].days;
     const calendarTable = document.createElement('table');
@@ -3477,9 +3633,9 @@ class Calendar extends BaseComponent {
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                     data-bs-date="${date}"
                   >
-                    <div class="calendar-cell-inner day">
-                      ${date.toLocaleDateString(this._config.locale, {
-          day: 'numeric'
+                    <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
+                      ${this._config.renderDayCell ? this._sanitizeHtml(this._config.renderDayCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, {
+          day: this._config.dayFormat
         })}
                     </div>
                   </td>` : '<td></td>';
@@ -3495,12 +3651,30 @@ class Calendar extends BaseComponent {
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-bs-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner month">
-                    ${month}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} month">
+                    ${this._config.renderMonthCell ? this._sanitizeHtml(this._config.renderMonthCell(date, cellAttributes.meta)) : month}
                   </div>
                 </td>`;
     }).join('')}
           </tr>`).join('') : ''}
+        ${this._view === 'quarters' ? `<tr>
+            ${Array.from({
+      length: 4
+    }, (_, index) => {
+      const date = new Date(calendarDate.getFullYear(), index * 3, 1);
+      const cellAttributes = this._cellQuarterAttributes(date);
+      return `<td
+                  class="${cellAttributes.className}"
+                  tabindex="${cellAttributes.tabIndex}"
+                  ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                  data-bs-date="${date.toDateString()}"
+                >
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} quarter">
+                    ${this._config.renderQuarterCell ? this._sanitizeHtml(this._config.renderQuarterCell(date, cellAttributes.meta)) : `Q${index + 1}`}
+                  </div>
+                </td>`;
+    }).join('')}
+          </tr>` : ''}
         ${this._view === 'years' ? listOfYears.map(row => `<tr>
             ${row.map(year => {
       const date = new Date(year, 0, 1);
@@ -3511,8 +3685,10 @@ class Calendar extends BaseComponent {
                   ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
                   data-bs-date="${date.toDateString()}"
                 >
-                  <div class="calendar-cell-inner year">
-                    ${year}
+                  <div class="${CLASS_NAME_CALENDAR_CELL_INNER} year">
+                    ${this._config.renderYearCell ? this._sanitizeHtml(this._config.renderYearCell(date, cellAttributes.meta)) : date.toLocaleDateString(this._config.locale, {
+        year: this._config.yearFormat
+      })}
                   </div>
                 </td>`;
     }).join('')}
@@ -3551,6 +3727,7 @@ class Calendar extends BaseComponent {
       day: 'days',
       week: 'days',
       month: 'months',
+      quarter: 'quarters',
       year: 'years'
     };
     this._view = viewMap[this._config.selectionType] || 'days';
@@ -3583,12 +3760,26 @@ class Calendar extends BaseComponent {
     for (const cell of cells) {
       const date = new Date(Manipulator.getDataAttribute(cell, 'date'));
       let cellAttributes;
-      if (this._view === 'days') {
-        cellAttributes = this._cellDayAttributes(date, 'current');
-      } else if (this._view === 'months') {
-        cellAttributes = this._cellMonthAttributes(date);
-      } else {
-        cellAttributes = this._cellYearAttributes(date);
+      switch (this._view) {
+        case 'days':
+          {
+            cellAttributes = this._cellDayAttributes(date, 'current');
+            break;
+          }
+        case 'months':
+          {
+            cellAttributes = this._cellMonthAttributes(date);
+            break;
+          }
+        case 'quarters':
+          {
+            cellAttributes = this._cellQuarterAttributes(date);
+            break;
+          }
+        default:
+          {
+            cellAttributes = this._cellYearAttributes(date);
+          }
       }
       cell.className = cellAttributes.className;
       cell.tabIndex = cellAttributes.tabIndex;
@@ -3633,7 +3824,14 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInCurrentMonth: isCurrentMonth,
+        isInRange,
+        isSelected,
+        isToday: isTodayDate
+      }
     };
   }
   _cellMonthAttributes(date) {
@@ -3651,7 +3849,35 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: isDisabled ? -1 : 0,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
+    };
+  }
+  _cellQuarterAttributes(date) {
+    const isDisabled = isQuarterDisabled(date, this._minDate, this._maxDate, this._config.disabledDates);
+    const isSelected = isQuarterSelected(date, this._startDate, this._endDate);
+    const isInRange = isQuarterInRange(date, this._startDate, this._endDate);
+    const isRangeHover = this._config.selectionType === 'quarter' && this._hoverDate && (this._selectEndDate ? isQuarterInRange(date, this._startDate, this._hoverDate) : isQuarterInRange(date, this._hoverDate, this._endDate));
+    const classNames = this._classNames({
+      [CLASS_NAME_CALENDAR_CELL]: true,
+      disabled: isDisabled,
+      'range-hover': isRangeHover,
+      range: isInRange,
+      selected: isSelected
+    });
+    return {
+      className: classNames,
+      tabIndex: isDisabled ? -1 : 0,
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
     };
   }
   _cellYearAttributes(date) {
@@ -3669,7 +3895,12 @@ class Calendar extends BaseComponent {
     return {
       className: classNames,
       tabIndex: isDisabled ? -1 : 0,
-      ariaSelected: isSelected
+      ariaSelected: isSelected,
+      meta: {
+        isDisabled,
+        isInRange,
+        isSelected
+      }
     };
   }
   _rowWeekAttributes(date) {
@@ -3698,6 +3929,28 @@ class Calendar extends BaseComponent {
       tabIndex: isDisabled ? -1 : 0,
       ariaSelected: isSelected
     };
+  }
+  _sanitizeHtml(html) {
+    if (this._config.sanitize) {
+      return sanitizeHtml(html, this._config.allowList, this._config.sanitizeFn);
+    }
+    return html;
+  }
+  _getConfig(config) {
+    const dataAttributes = Manipulator.getDataAttributes(this._element);
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES$4.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute];
+      }
+    }
+    config = {
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    };
+    config = this._mergeConfigObj(config, this._element);
+    config = this._configAfterMerge(config);
+    this._typeCheckConfig(config);
+    return config;
   }
 
   // Static
@@ -3756,23 +4009,23 @@ defineJQueryPlugin(Calendar);
  * Constants
  */
 
-const NAME$p = 'swipe';
-const EVENT_KEY$l = '.bs.swipe';
-const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$l}`;
-const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$l}`;
-const EVENT_TOUCHEND = `touchend${EVENT_KEY$l}`;
-const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$l}`;
-const EVENT_POINTERUP = `pointerup${EVENT_KEY$l}`;
+const NAME$r = 'swipe';
+const EVENT_KEY$n = '.bs.swipe';
+const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$n}`;
+const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$n}`;
+const EVENT_TOUCHEND = `touchend${EVENT_KEY$n}`;
+const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$n}`;
+const EVENT_POINTERUP = `pointerup${EVENT_KEY$n}`;
 const POINTER_TYPE_TOUCH = 'touch';
 const POINTER_TYPE_PEN = 'pen';
 const CLASS_NAME_POINTER_EVENT = 'pointer-event';
 const SWIPE_THRESHOLD = 40;
-const Default$n = {
+const Default$p = {
   endCallback: null,
   leftCallback: null,
   rightCallback: null
 };
-const DefaultType$n = {
+const DefaultType$p = {
   endCallback: '(function|null)',
   leftCallback: '(function|null)',
   rightCallback: '(function|null)'
@@ -3797,18 +4050,18 @@ class Swipe extends Config {
 
   // Getters
   static get Default() {
-    return Default$n;
+    return Default$p;
   }
   static get DefaultType() {
-    return DefaultType$n;
+    return DefaultType$p;
   }
   static get NAME() {
-    return NAME$p;
+    return NAME$r;
   }
 
   // Public
   dispose() {
-    EventHandler.off(this._element, EVENT_KEY$l);
+    EventHandler.off(this._element, EVENT_KEY$n);
   }
 
   // Private
@@ -3879,10 +4132,10 @@ class Swipe extends Config {
  * Constants
  */
 
-const NAME$o = 'carousel';
-const DATA_KEY$k = 'bs.carousel';
-const EVENT_KEY$k = `.${DATA_KEY$k}`;
-const DATA_API_KEY$g = '.data-api';
+const NAME$q = 'carousel';
+const DATA_KEY$m = 'bs.carousel';
+const EVENT_KEY$m = `.${DATA_KEY$m}`;
+const DATA_API_KEY$i = '.data-api';
 const ARROW_LEFT_KEY$4 = 'ArrowLeft';
 const ARROW_RIGHT_KEY$4 = 'ArrowRight';
 const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
@@ -3891,16 +4144,16 @@ const ORDER_NEXT = 'next';
 const ORDER_PREV = 'prev';
 const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
-const EVENT_SLIDE = `slide${EVENT_KEY$k}`;
-const EVENT_SLID = `slid${EVENT_KEY$k}`;
-const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$k}`;
-const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$k}`;
-const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$k}`;
-const EVENT_DRAG_START = `dragstart${EVENT_KEY$k}`;
-const EVENT_LOAD_DATA_API$d = `load${EVENT_KEY$k}${DATA_API_KEY$g}`;
-const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$k}${DATA_API_KEY$g}`;
+const EVENT_SLIDE = `slide${EVENT_KEY$m}`;
+const EVENT_SLID = `slid${EVENT_KEY$m}`;
+const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$m}`;
+const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$m}`;
+const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$m}`;
+const EVENT_DRAG_START = `dragstart${EVENT_KEY$m}`;
+const EVENT_LOAD_DATA_API$d = `load${EVENT_KEY$m}${DATA_API_KEY$i}`;
+const EVENT_CLICK_DATA_API$e = `click${EVENT_KEY$m}${DATA_API_KEY$i}`;
 const CLASS_NAME_CAROUSEL = 'carousel';
-const CLASS_NAME_ACTIVE$5 = 'active';
+const CLASS_NAME_ACTIVE$6 = 'active';
 const CLASS_NAME_SLIDE = 'slide';
 const CLASS_NAME_END = 'carousel-item-end';
 const CLASS_NAME_START = 'carousel-item-start';
@@ -3917,7 +4170,7 @@ const KEY_TO_DIRECTION = {
   [ARROW_LEFT_KEY$4]: DIRECTION_RIGHT,
   [ARROW_RIGHT_KEY$4]: DIRECTION_LEFT
 };
-const Default$m = {
+const Default$o = {
   interval: 5000,
   keyboard: true,
   pause: 'hover',
@@ -3925,7 +4178,7 @@ const Default$m = {
   touch: true,
   wrap: true
 };
-const DefaultType$m = {
+const DefaultType$o = {
   interval: '(number|boolean)',
   // TODO:v6 remove boolean support
   keyboard: 'boolean',
@@ -3956,13 +4209,13 @@ class Carousel extends BaseComponent {
 
   // Getters
   static get Default() {
-    return Default$m;
+    return Default$o;
   }
   static get DefaultType() {
-    return DefaultType$m;
+    return DefaultType$o;
   }
   static get NAME() {
-    return NAME$o;
+    return NAME$q;
   }
 
   // Public
@@ -4089,11 +4342,11 @@ class Carousel extends BaseComponent {
       return;
     }
     const activeIndicator = SelectorEngine.findOne(SELECTOR_ACTIVE, this._indicatorsElement);
-    activeIndicator.classList.remove(CLASS_NAME_ACTIVE$5);
+    activeIndicator.classList.remove(CLASS_NAME_ACTIVE$6);
     activeIndicator.removeAttribute('aria-current');
     const newActiveIndicator = SelectorEngine.findOne(`[data-bs-slide-to="${index}"]`, this._indicatorsElement);
     if (newActiveIndicator) {
-      newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$5);
+      newActiveIndicator.classList.add(CLASS_NAME_ACTIVE$6);
       newActiveIndicator.setAttribute('aria-current', 'true');
     }
   }
@@ -4146,8 +4399,8 @@ class Carousel extends BaseComponent {
     nextElement.classList.add(directionalClassName);
     const completeCallBack = () => {
       nextElement.classList.remove(directionalClassName, orderClassName);
-      nextElement.classList.add(CLASS_NAME_ACTIVE$5);
-      activeElement.classList.remove(CLASS_NAME_ACTIVE$5, orderClassName, directionalClassName);
+      nextElement.classList.add(CLASS_NAME_ACTIVE$6);
+      activeElement.classList.remove(CLASS_NAME_ACTIVE$6, orderClassName, directionalClassName);
       this._isSliding = false;
       triggerEvent(EVENT_SLID);
     };
@@ -4239,6 +4492,834 @@ EventHandler.on(window, EVENT_LOAD_DATA_API$d, () => {
  */
 
 defineJQueryPlugin(Carousel);
+
+/**
+ * --------------------------------------------------------------------------
+ * CoreUI chip.js
+ * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+ * --------------------------------------------------------------------------
+ */
+
+
+/**
+ * Constants
+ */
+
+const NAME$p = 'chip';
+const DATA_KEY$l = 'bs.chip';
+const EVENT_KEY$l = `.${DATA_KEY$l}`;
+const DATA_API_KEY$h = '.data-api';
+const EVENT_REMOVE$1 = `remove${EVENT_KEY$l}`;
+const EVENT_REMOVED = `removed${EVENT_KEY$l}`;
+const EVENT_SELECT$1 = `select${EVENT_KEY$l}`;
+const EVENT_SELECTED = `selected${EVENT_KEY$l}`;
+const EVENT_DESELECT = `deselect${EVENT_KEY$l}`;
+const EVENT_DESELECTED = `deselected${EVENT_KEY$l}`;
+const SELECTOR_CHIP_DISMISS$1 = '.chip-dismiss';
+const SELECTOR_DATA_CHIP = '[data-bs-chip]';
+const SELECTOR_FOCUSABLE_ITEMS$1 = '.chip:not(.disabled)';
+const CLASS_NAME_CHIP_CLICKABLE = 'chip-clickable';
+const CLASS_NAME_CHIP_DISMISS = 'chip-dismiss';
+const CLASS_NAME_ACTIVE$5 = 'active';
+const CLASS_NAME_DISABLED$6 = 'disabled';
+const DEFAULT_DISMISS_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
+const Default$n = {
+  ariaDismissLabel: 'Remove',
+  disabled: false,
+  dismissible: false,
+  dismissIcon: DEFAULT_DISMISS_ICON$1,
+  selectable: false,
+  selected: false
+};
+const DefaultType$n = {
+  ariaDismissLabel: 'string',
+  disabled: 'boolean',
+  dismissible: 'boolean',
+  dismissIcon: 'string',
+  selectable: 'boolean',
+  selected: 'boolean'
+};
+
+/**
+ * Class definition
+ */
+
+class Chip extends BaseComponent {
+  constructor(element, config) {
+    super(element, config);
+    this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$6);
+    this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE$5);
+    this._ensureDismissButton();
+    this._applyState();
+    if (this._config.selectable || this._config.dismissible) {
+      this._makeFocusable();
+    }
+    this._addEventListeners();
+  }
+
+  // Getters
+  static get Default() {
+    return Default$n;
+  }
+  static get DefaultType() {
+    return DefaultType$n;
+  }
+  static get NAME() {
+    return NAME$p;
+  }
+
+  // Public
+  remove() {
+    const removeEvent = EventHandler.trigger(this._element, EVENT_REMOVE$1);
+    if (removeEvent.defaultPrevented) {
+      return;
+    }
+    this._destroyElement();
+  }
+  toggle() {
+    if (!this._config.selectable) {
+      return;
+    }
+    if (this._selected) {
+      this.deselect();
+      return;
+    }
+    this.select();
+  }
+  select() {
+    if (!this._config.selectable) {
+      return;
+    }
+    if (this._selected) {
+      return;
+    }
+    const selectEvent = EventHandler.trigger(this._element, EVENT_SELECT$1);
+    if (selectEvent.defaultPrevented) {
+      return;
+    }
+    this._selected = true;
+    this._applyState();
+    EventHandler.trigger(this._element, EVENT_SELECTED);
+  }
+  deselect() {
+    if (!this._config.selectable) {
+      return;
+    }
+    if (!this._selected) {
+      return;
+    }
+    const deselectEvent = EventHandler.trigger(this._element, EVENT_DESELECT);
+    if (deselectEvent.defaultPrevented) {
+      return;
+    }
+    this._selected = false;
+    this._applyState();
+    EventHandler.trigger(this._element, EVENT_DESELECTED);
+  }
+
+  // Private
+  _addEventListeners() {
+    EventHandler.on(this._element, 'keydown', event => this._handleKeydown(event));
+    EventHandler.on(this._element, 'click', event => {
+      if (this._disabled) {
+        return;
+      }
+      if (event.target.closest(SELECTOR_CHIP_DISMISS$1)) {
+        return;
+      }
+      this.toggle();
+    });
+  }
+  _applyState() {
+    if (!this._disabled && (this._config.clickable || this._config.selectable)) {
+      this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE);
+    }
+    if (this._disabled) {
+      this._element.classList.add(CLASS_NAME_DISABLED$6);
+      this._element.setAttribute('aria-disabled', 'true');
+    } else {
+      this._element.classList.remove(CLASS_NAME_DISABLED$6);
+      if (this._element.getAttribute('aria-disabled') === 'true') {
+        this._element.setAttribute('aria-disabled', 'false');
+      }
+    }
+    if (this._config.selectable) {
+      this._element.classList.toggle(CLASS_NAME_ACTIVE$5, this._selected);
+      this._element.setAttribute('aria-selected', this._selected ? 'true' : 'false');
+    } else {
+      this._element.classList.remove(CLASS_NAME_ACTIVE$5);
+      if (this._element.getAttribute('aria-selected') === 'true') {
+        this._element.setAttribute('aria-selected', 'false');
+      }
+    }
+  }
+  _createDismissButton() {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = CLASS_NAME_CHIP_DISMISS;
+    button.setAttribute('data-bs-dismiss', NAME$p);
+    button.setAttribute('aria-label', this._config.ariaDismissLabel);
+    button.setAttribute('tabindex', '-1'); // Not in tab order, chips handle keyboard
+    button.innerHTML = this._config.dismissIcon;
+    return button;
+  }
+  _ensureDismissButton() {
+    if (!this._config.dismissible) {
+      return;
+    }
+    if (SelectorEngine.findOne(SELECTOR_CHIP_DISMISS$1, this._element)) {
+      return;
+    }
+    this._element.append(this._createDismissButton());
+  }
+  _makeFocusable() {
+    if (this._element.hasAttribute('tabindex') || this._disabled) {
+      return;
+    }
+    this._element.setAttribute('tabindex', '0');
+  }
+
+  // eslint-disable-next-line complexity
+  _handleKeydown(event) {
+    const {
+      key
+    } = event;
+    if (this._disabled) {
+      return;
+    }
+    switch (key) {
+      case 'Enter':
+      case ' ':
+      case 'Spacebar':
+        {
+          if (!this._config.selectable) {
+            return;
+          }
+          event.preventDefault();
+          this.toggle();
+          break;
+        }
+      case 'Backspace':
+      case 'Delete':
+        {
+          if (this._config.dismissible) {
+            event.preventDefault();
+            const sibling = this._getFocusableSibling(false) || this._getFocusableSibling(true);
+            sibling == null || sibling.focus();
+            this.remove();
+          }
+          break;
+        }
+      case 'ArrowLeft':
+        {
+          event.preventDefault();
+          const chip = this._getFocusableSibling(false);
+          chip == null || chip.focus();
+          if (this._selected && event.shiftKey && chip) {
+            var _Chip$getInstance;
+            (_Chip$getInstance = Chip.getInstance(chip)) == null || _Chip$getInstance.select();
+          }
+          break;
+        }
+      case 'ArrowRight':
+        {
+          event.preventDefault();
+          const chip = this._getFocusableSibling(true);
+          chip == null || chip.focus();
+          if (this._selected && event.shiftKey && chip) {
+            var _Chip$getInstance2;
+            (_Chip$getInstance2 = Chip.getInstance(chip)) == null || _Chip$getInstance2.select();
+          }
+          break;
+        }
+      case 'Home':
+        {
+          event.preventDefault();
+          this._navigateToEdge(0);
+          break;
+        }
+      case 'End':
+        {
+          event.preventDefault();
+          this._navigateToEdge(-1);
+          break;
+        }
+
+      // No default
+    }
+  }
+  _getFocusableSibling(shouldGetNext) {
+    const chips = SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS$1, this._element.parentElement);
+    const sibling = getNextActiveElement(chips, this._element, shouldGetNext, !chips.includes(this._element));
+    return sibling === this._element ? null : sibling;
+  }
+  _navigateToEdge(targetIndex) {
+    const chips = SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS$1, this._element.parentElement);
+    if (chips.length === 0) {
+      return;
+    }
+    const targetChip = chips.at(targetIndex);
+    targetChip == null || targetChip.focus();
+  }
+  _destroyElement() {
+    EventHandler.trigger(this._element, EVENT_REMOVED);
+    this._element.remove();
+    this.dispose();
+  }
+
+  // Static
+  static chipInterface(element, config) {
+    const data = Chip.getOrCreateInstance(element, config);
+    if (typeof config === 'string') {
+      if (typeof data[config] === 'undefined') {
+        throw new TypeError(`No method named "${config}"`);
+      }
+      data[config]();
+    }
+  }
+  static jQueryInterface(config) {
+    return this.each(function () {
+      const data = Chip.getOrCreateInstance(this);
+      if (typeof config !== 'string') {
+        return;
+      }
+      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+        throw new TypeError(`No method named "${config}"`);
+      }
+      data[config](this);
+    });
+  }
+}
+
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$l}${DATA_API_KEY$h}`, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP)) {
+    Chip.chipInterface(element);
+  }
+});
+enableDismissTrigger(Chip, 'remove');
+
+/**
+ * jQuery
+ */
+
+defineJQueryPlugin(Chip);
+
+/**
+ * --------------------------------------------------------------------------
+ * CoreUI chip-input.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ *
+ * This component is a highly modified version of the Bootstrap's chip-input.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ * --------------------------------------------------------------------------
+ */
+
+
+/**
+ * Constants
+ */
+
+const NAME$o = 'chip-input';
+const DATA_KEY$k = 'bs.chip-input';
+const EVENT_KEY$k = `.${DATA_KEY$k}`;
+const DATA_API_KEY$g = '.data-api';
+const EVENT_ADD = `add${EVENT_KEY$k}`;
+const EVENT_REMOVE = `remove${EVENT_KEY$k}`;
+const EVENT_CHANGE$3 = `change${EVENT_KEY$k}`;
+const EVENT_SELECT = `select${EVENT_KEY$k}`;
+const EVENT_INPUT$4 = `input${EVENT_KEY$k}`;
+const SELECTOR_DATA_CHIP_INPUT = '[data-bs-chip-input]';
+const SELECTOR_CHIP = '.chip';
+const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP}.active`;
+const SELECTOR_CHIP_DISMISS = '.chip-dismiss';
+const SELECTOR_CHIP_INPUT_LABEL = '.chip-input-label';
+const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)';
+const CLASS_NAME_CHIP = 'chip';
+const CLASS_NAME_DISABLED$5 = 'disabled';
+const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field';
+const DEFAULT_DISMISS_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
+const Default$m = {
+  chipClassName: null,
+  createOnBlur: true,
+  disabled: false,
+  readonly: false,
+  dismissible: true,
+  dismissIcon: DEFAULT_DISMISS_ICON,
+  id: null,
+  maxChips: null,
+  name: null,
+  placeholder: '',
+  selectable: false,
+  separator: ','
+};
+const DefaultType$m = {
+  chipClassName: '(string|function|null)',
+  createOnBlur: 'boolean',
+  disabled: 'boolean',
+  readonly: 'boolean',
+  dismissible: 'boolean',
+  dismissIcon: 'string',
+  maxChips: '(number|null)',
+  id: '(string|null)',
+  name: '(string|null)',
+  placeholder: 'string',
+  selectable: 'boolean',
+  separator: '(string|null)'
+};
+
+/**
+ * Class definition
+ */
+
+class ChipInput extends BaseComponent {
+  constructor(element, config) {
+    var _this$_config$id;
+    super(element, config);
+    this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : getUID(`${this.constructor.NAME}`);
+    this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$5);
+    this._readonly = this._config.readonly;
+    this._chips = [];
+    this._input = SelectorEngine.findOne('input', this._element);
+    this._hiddenInput = null;
+    if (this._input) {
+      this._setInputSize();
+    } else {
+      this._createInput();
+    }
+    this._applyInteractionState();
+    this._initializeExistingChips();
+    this._createHiddenInput();
+    this._addEventListeners();
+  }
+
+  // Getters
+  static get Default() {
+    return Default$m;
+  }
+  static get DefaultType() {
+    return DefaultType$m;
+  }
+  static get NAME() {
+    return NAME$o;
+  }
+
+  // Public
+  add(value) {
+    if (this._disabled || this._readonly) {
+      return null;
+    }
+    const trimmedValue = String(value).trim();
+    if (!trimmedValue) {
+      return null;
+    }
+
+    // Chips are unique by value
+    if (this._chips.includes(trimmedValue)) {
+      return null;
+    }
+
+    // Check max chips limit
+    if (this._config.maxChips !== null && this._chips.length >= this._config.maxChips) {
+      return null;
+    }
+    const addEvent = EventHandler.trigger(this._element, EVENT_ADD, {
+      value: trimmedValue,
+      relatedTarget: this._input
+    });
+    if (addEvent.defaultPrevented) {
+      return null;
+    }
+    const chip = this._createChip(trimmedValue);
+    this._element.insertBefore(chip, this._input);
+    this._chips.push(trimmedValue);
+    const values = this.getValues();
+    this._hiddenInput.value = values.join(',');
+    EventHandler.trigger(this._element, EVENT_CHANGE$3, {
+      values
+    });
+    return chip;
+  }
+  remove(chipOrValue) {
+    if (this._disabled || this._readonly) {
+      return false;
+    }
+    let chip;
+    let value;
+    if (typeof chipOrValue === 'string') {
+      value = chipOrValue;
+      chip = this._findChipByValue(value);
+    } else {
+      chip = chipOrValue;
+      value = this._getChipValue(chip);
+    }
+    if (!chip || !value) {
+      return false;
+    }
+    const removeEvent = EventHandler.trigger(this._element, EVENT_REMOVE, {
+      value,
+      chip,
+      relatedTarget: this._input
+    });
+    if (removeEvent.defaultPrevented) {
+      return false;
+    }
+    const chipInstance = Chip.getInstance(chip);
+    if (chipInstance) {
+      chipInstance.remove();
+    } else {
+      chip.remove();
+      this._handleChipRemoved(chip, value);
+    }
+    return !chip.isConnected;
+  }
+  removeSelected() {
+    var _this$_input;
+    const chipsToRemove = this._getSelectedChipElements();
+    for (const chip of chipsToRemove) {
+      this.remove(chip);
+    }
+    (_this$_input = this._input) == null || _this$_input.focus();
+  }
+  getValues() {
+    return [...this._chips];
+  }
+  getSelectedValues() {
+    return this._getSelectedChipElements().map(chip => this._getChipValue(chip));
+  }
+  clear() {
+    const chips = SelectorEngine.find(SELECTOR_CHIP, this._element);
+    for (const chip of chips) {
+      this.remove(chip);
+    }
+  }
+  clearSelection() {
+    for (const chip of this._getSelectedChipElements()) {
+      var _Chip$getInstance;
+      (_Chip$getInstance = Chip.getInstance(chip)) == null || _Chip$getInstance.deselect();
+    }
+    EventHandler.trigger(this._element, EVENT_SELECT, {
+      selected: []
+    });
+  }
+  selectChip(chip) {
+    const chipElements = this._getChipElements();
+    if (!chipElements.includes(chip)) {
+      return;
+    }
+    const chipInstance = Chip.getInstance(chip);
+    if (!chipInstance) {
+      return;
+    }
+    chipInstance.select();
+  }
+  focus() {
+    var _this$_input2;
+    (_this$_input2 = this._input) == null || _this$_input2.focus();
+  }
+
+  // Private
+  _emitSelectionChange() {
+    EventHandler.trigger(this._element, EVENT_SELECT, {
+      selected: this.getSelectedValues()
+    });
+  }
+  _getChipElements() {
+    return SelectorEngine.find(SELECTOR_CHIP, this._element);
+  }
+  _getSelectedChipElements() {
+    return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element);
+  }
+  _createInput() {
+    const input = document.createElement('input');
+    const label = SelectorEngine.findOne(SELECTOR_CHIP_INPUT_LABEL, this._element);
+    const labelFor = label == null ? void 0 : label.getAttribute('for');
+    const generatedInputId = labelFor || getUID(`${this.constructor.NAME}-input`);
+    input.type = 'text';
+    input.className = CLASS_NAME_CHIP_INPUT_FIELD;
+    input.id = generatedInputId;
+    if (this._config.placeholder) {
+      input.placeholder = this._config.placeholder;
+    }
+    if (label && !labelFor) {
+      label.setAttribute('for', generatedInputId);
+    }
+    this._input = input;
+    this._setInputSize();
+    this._element.append(input);
+  }
+  _createHiddenInput() {
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.id = this._uniqueId;
+    hiddenInput.name = this._config.name || this._uniqueId;
+    this._element.append(hiddenInput);
+    this._hiddenInput = hiddenInput;
+    this._hiddenInput.value = this.getValues().join(',');
+  }
+  _createChip(value) {
+    const chip = document.createElement('span');
+    chip.className = CLASS_NAME_CHIP;
+    chip.dataset.bsChipValue = value;
+    chip.append(document.createTextNode(value));
+    this._applyChipClassName(chip, value);
+    this._setupChip(chip);
+    return chip;
+  }
+  _createChipFromInput() {
+    if (this._disabled || this._readonly) {
+      return;
+    }
+    const value = this._input.value.trim();
+    if (value) {
+      this.add(value);
+      this._input.value = '';
+      this._setInputSize();
+    }
+  }
+  _findChipByValue(value) {
+    const chips = this._getChipElements();
+    return chips.find(chip => this._getChipValue(chip) === value);
+  }
+  _getChipValue(chip) {
+    var _clone$textContent;
+    if (chip.dataset.bsChipValue) {
+      return chip.dataset.bsChipValue;
+    }
+    const clone = chip.cloneNode(true);
+    const dismiss = SelectorEngine.findOne(SELECTOR_CHIP_DISMISS, clone);
+    if (dismiss) {
+      dismiss.remove();
+    }
+    return ((_clone$textContent = clone.textContent) == null ? void 0 : _clone$textContent.trim()) || '';
+  }
+  _initializeExistingChips() {
+    const existingChips = SelectorEngine.find(SELECTOR_CHIP, this._element);
+    for (const chip of existingChips) {
+      const value = this._getChipValue(chip);
+      if (value) {
+        this._chips.push(value);
+        this._applyChipClassName(chip, value);
+        this._setupChip(chip);
+      }
+    }
+  }
+  _applyChipClassName(chip, value) {
+    const className = this._resolveChipClassName(value);
+    if (!className) {
+      return;
+    }
+    chip.classList.add(...className.split(/\s+/).filter(Boolean));
+  }
+  _resolveChipClassName(value) {
+    const {
+      chipClassName
+    } = this._config;
+    if (!chipClassName) {
+      return '';
+    }
+    if (typeof chipClassName === 'function') {
+      const resolvedClassName = chipClassName(value);
+      return typeof resolvedClassName === 'string' ? resolvedClassName : '';
+    }
+    return typeof chipClassName === 'string' ? chipClassName : '';
+  }
+  _setupChip(chip) {
+    Chip.getOrCreateInstance(chip, {
+      ariaDismissLabel: `Remove ${this._getChipValue(chip)}`,
+      disabled: this._disabled,
+      dismissible: this._config.dismissible && !this._readonly && !this._disabled,
+      dismissIcon: this._config.dismissIcon,
+      selectable: this._config.selectable
+    });
+    const dismissButton = SelectorEngine.findOne(SELECTOR_CHIP_DISMISS, chip);
+    if (dismissButton) {
+      dismissButton.disabled = this._disabled || this._readonly;
+    }
+  }
+  _applyInteractionState() {
+    this._element.classList.toggle(CLASS_NAME_DISABLED$5, this._disabled);
+    this._input.disabled = this._disabled;
+    this._input.readOnly = !this._disabled && this._readonly;
+    this._element.setAttribute('aria-disabled', this._disabled ? 'true' : 'false');
+    this._element.setAttribute('aria-readonly', this._readonly ? 'true' : 'false');
+  }
+  _addEventListeners() {
+    EventHandler.on(this._element, 'keydown', event => {
+      if (event.target === this._input) {
+        return;
+      }
+      if (event.key.length === 1) {
+        // eslint-disable-next-line no-console
+        console.log(event.key.length);
+        this._input.focus();
+      }
+    });
+    EventHandler.on(this._input, 'keydown', event => this._handleInputKeydown(event));
+    EventHandler.on(this._input, 'input', event => this._handleInput(event));
+    EventHandler.on(this._input, 'paste', event => this._handlePaste(event));
+    EventHandler.on(this._input, 'focus', () => this.clearSelection());
+    if (this._config.createOnBlur) {
+      EventHandler.on(this._input, 'blur', event => {
+        var _event$relatedTarget;
+        // Don't create chip if clicking on a chip
+        if (!((_event$relatedTarget = event.relatedTarget) != null && _event$relatedTarget.closest(SELECTOR_CHIP))) {
+          this._createChipFromInput();
+        }
+      });
+    }
+    EventHandler.on(this._element, 'selected.bs.chip', SELECTOR_CHIP, () => {
+      this._emitSelectionChange();
+    });
+    EventHandler.on(this._element, 'deselected.bs.chip', SELECTOR_CHIP, () => {
+      this._emitSelectionChange();
+    });
+    EventHandler.on(this._element, 'remove.bs.chip', SELECTOR_CHIP, event => {
+      if (this._disabled || this._readonly) {
+        event.preventDefault();
+      }
+    });
+    EventHandler.on(this._element, 'removed.bs.chip', SELECTOR_CHIP, event => {
+      const chip = event.target.closest(SELECTOR_CHIP);
+      if (chip) {
+        this._handleChipRemoved(chip);
+        const focusableChips = SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS, this._element);
+        if (focusableChips.length > 0) {
+          var _this$_input3;
+          (_this$_input3 = this._input) == null || _this$_input3.focus();
+        }
+        this._emitSelectionChange();
+      }
+    });
+
+    // Focus input when clicking container background
+    EventHandler.on(this._element, 'click', event => {
+      if (event.target === this._element) {
+        var _this$_input4;
+        (_this$_input4 = this._input) == null || _this$_input4.focus();
+      }
+    });
+  }
+  _handleInputKeydown(event) {
+    const {
+      key
+    } = event;
+    switch (key) {
+      case 'Enter':
+        {
+          event.preventDefault();
+          this._createChipFromInput();
+          break;
+        }
+      case 'Backspace':
+      case 'Delete':
+        {
+          if (this._input.value === '') {
+            event.preventDefault();
+            const chips = this._getChipElements();
+            if (chips.length > 0) {
+              const lastChip = chips.at(-1);
+              lastChip.focus();
+            }
+          }
+          break;
+        }
+      case 'ArrowLeft':
+        {
+          if (this._input.selectionStart === 0 && this._input.selectionEnd === 0) {
+            event.preventDefault();
+            const chips = this._getChipElements();
+            if (chips.length > 0) {
+              const lastChip = chips.at(-1);
+              lastChip.focus();
+            }
+          }
+          break;
+        }
+      case 'Escape':
+        {
+          this._input.value = '';
+          this._input.blur();
+          break;
+        }
+
+      // No default
+    }
+  }
+  _handleChipRemoved(chip, value = null) {
+    const chipValue = value || this._getChipValue(chip);
+    const valueIndex = this._chips.indexOf(chipValue);
+    if (valueIndex !== -1) {
+      this._chips.splice(valueIndex, 1);
+    }
+    const values = this.getValues();
+    this._hiddenInput.value = values.join(',');
+    EventHandler.trigger(this._element, EVENT_CHANGE$3, {
+      values
+    });
+  }
+  _handleInput(event) {
+    if (this._disabled || this._readonly) {
+      return;
+    }
+    const {
+      value
+    } = event.target;
+    const {
+      separator
+    } = this._config;
+    if (separator && value.includes(separator)) {
+      const parts = value.split(separator);
+      for (const part of parts.slice(0, -1)) {
+        this.add(part.trim());
+      }
+      this._input.value = parts.at(-1);
+    }
+    this._setInputSize();
+    EventHandler.trigger(this._element, EVENT_INPUT$4, {
+      value: this._input.value,
+      relatedTarget: this._input
+    });
+  }
+  _handlePaste(event) {
+    if (this._disabled || this._readonly) {
+      return;
+    }
+    const {
+      separator
+    } = this._config;
+    if (!separator) {
+      return;
+    }
+    const pastedData = (event.clipboardData || window.clipboardData).getData('text');
+    if (pastedData.includes(separator)) {
+      event.preventDefault();
+      const parts = pastedData.split(separator);
+      for (const part of parts) {
+        this.add(part.trim());
+      }
+    }
+  }
+  _setInputSize() {
+    if (!this._input) {
+      return;
+    }
+    this._input.size = Math.max(this._input.placeholder.length, this._input.value.length) || 1;
+  }
+}
+
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$k}${DATA_API_KEY$g}`, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_INPUT)) {
+    ChipInput.getOrCreateInstance(element);
+  }
+});
 
 /**
  * --------------------------------------------------------------------------
@@ -5613,6 +6694,7 @@ const NAME$k = 'date-range-picker';
 const DATA_KEY$g = 'bs.date-range-picker';
 const EVENT_KEY$g = `.${DATA_KEY$g}`;
 const DATA_API_KEY$d = '.data-api';
+const DISALLOWED_ATTRIBUTES$3 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ENTER_KEY$1 = 'Enter';
 const ESCAPE_KEY$4 = 'Escape';
 const TAB_KEY$3 = 'Tab';
@@ -5659,6 +6741,7 @@ const SELECTOR_DATA_TOGGLE_SHOWN$2 = `${SELECTOR_DATA_TOGGLE$c}.${CLASS_NAME_SHO
 const SELECTOR_INPUT = '.date-picker-input';
 const SELECTOR_WAS_VALIDATED = 'form.was-validated';
 const Default$i = {
+  allowList: DefaultAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
   ariaNavPrevMonthLabel: 'Previous month',
@@ -5672,6 +6755,7 @@ const Default$i = {
   cleaner: true,
   container: false,
   date: null,
+  dayFormat: 'numeric',
   disabled: false,
   disabledDates: null,
   endDate: null,
@@ -5687,13 +6771,20 @@ const Default$i = {
   locale: 'default',
   maxDate: null,
   minDate: null,
+  monthFormat: 'short',
   name: null,
   placeholder: ['Start date', 'End date'],
   previewDateOnHover: true,
   range: true,
   ranges: {},
   rangesButtonsClasses: ['btn', 'btn-ghost-secondary'],
+  renderDayCell: null,
+  renderMonthCell: null,
+  renderQuarterCell: null,
+  renderYearCell: null,
   required: true,
+  sanitize: true,
+  sanitizeFn: null,
   separator: true,
   size: null,
   startDate: null,
@@ -5708,9 +6799,11 @@ const Default$i = {
   todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'],
   valid: false,
   weekdayFormat: 2,
-  weekNumbersLabel: null
+  weekNumbersLabel: null,
+  yearFormat: 'numeric'
 };
 const DefaultType$i = {
+  allowList: 'object',
   ariaNavNextMonthLabel: 'string',
   ariaNavNextYearLabel: 'string',
   ariaNavPrevMonthLabel: 'string',
@@ -5724,6 +6817,7 @@ const DefaultType$i = {
   confirmButtonClasses: '(array|string)',
   container: '(string|element|boolean)',
   date: '(date|number|string|null)',
+  dayFormat: 'string',
   disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
   endDate: '(date|number|string|null)',
@@ -5739,13 +6833,20 @@ const DefaultType$i = {
   locale: 'string',
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
+  monthFormat: 'string',
   name: '(string|null)',
   placeholder: '(array|string)',
   previewDateOnHover: 'boolean',
   range: 'boolean',
   ranges: 'object',
   rangesButtonsClasses: '(array|string)',
+  renderDayCell: '(function|null)',
+  renderMonthCell: '(function|null)',
+  renderQuarterCell: '(function|null)',
+  renderYearCell: '(function|null)',
   required: 'boolean',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   separator: 'boolean',
   size: '(string|null)',
   startDate: '(date|number|string|null)',
@@ -5760,7 +6861,8 @@ const DefaultType$i = {
   todayButtonClasses: '(array|string)',
   valid: 'boolean',
   weekdayFormat: '(number|string)',
-  weekNumbersLabel: '(string|null)'
+  weekNumbersLabel: '(string|null)',
+  yearFormat: 'string'
 };
 
 /**
@@ -6058,19 +7160,28 @@ class DateRangePicker extends BaseComponent {
   }
   _getCalendarConfig() {
     return {
+      allowList: this._config.allowList,
       ariaNavNextMonthLabel: this._config.ariaNavNextMonthLabel,
       ariaNavNextYearLabel: this._config.ariaNavNextYearLabel,
       ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
       ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
       calendarDate: this._calendarDate,
       calendars: this._mobile ? 1 : this._config.calendars,
+      dayFormat: this._config.dayFormat,
       disabledDates: this._config.disabledDates,
       endDate: this._endDate,
       firstDayOfWeek: this._config.firstDayOfWeek,
       locale: this._config.locale,
       maxDate: this._config.maxDate,
       minDate: this._config.minDate,
+      monthFormat: this._config.monthFormat,
       range: this._config.range,
+      renderDayCell: this._config.renderDayCell,
+      renderMonthCell: this._config.renderMonthCell,
+      renderQuarterCell: this._config.renderQuarterCell,
+      renderYearCell: this._config.renderYearCell,
+      sanitize: this._config.sanitize,
+      sanitizeFn: this._config.sanitizeFn,
       selectAdjacementDays: this._config.selectAdjacementDays,
       selectEndDate: this._selectEndDate,
       selectionType: this._config.selectionType,
@@ -6078,7 +7189,8 @@ class DateRangePicker extends BaseComponent {
       showWeekNumber: this._config.showWeekNumber,
       startDate: this._startDate,
       weekdayFormat: this._config.weekdayFormat,
-      weekNumbersLabel: this._config.weekNumbersLabel
+      weekNumbersLabel: this._config.weekNumbersLabel,
+      yearFormat: this._config.yearFormat
     };
   }
   _getTimePickerConfig(start) {
@@ -6438,6 +7550,22 @@ class DateRangePicker extends BaseComponent {
       return this._formatDate(date);
     }
     return '';
+  }
+  _getConfig(config) {
+    const dataAttributes = Manipulator.getDataAttributes(this._element);
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES$3.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute];
+      }
+    }
+    config = {
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    };
+    config = this._mergeConfigObj(config, this._element);
+    config = this._configAfterMerge(config);
+    this._typeCheckConfig(config);
+    return config;
   }
   _configAfterMerge(config) {
     if (config.container === true) {
@@ -12966,5 +14094,5 @@ enableDismissTrigger(Toast);
 
 defineJQueryPlugin(Toast);
 
-export { Alert, Autocomplete, Button, Calendar, Carousel, Collapse, DatePicker, DateRangePicker, Dropdown, LoadingButton, Modal, MultiSelect, Navigation, OTPInput, Offcanvas, PasswordInput, Popover, RangeSlider, Rating, ScrollSpy, Sidebar, Stepper, Tab, TimePicker, Toast, Tooltip };
+export { Alert, Autocomplete, Button, Calendar, Carousel, Chip, ChipInput, Collapse, DatePicker, DateRangePicker, Dropdown, LoadingButton, Modal, MultiSelect, Navigation, OTPInput, Offcanvas, PasswordInput, Popover, RangeSlider, Rating, ScrollSpy, Sidebar, Stepper, Tab, TimePicker, Toast, Tooltip };
 //# sourceMappingURL=bootstrap.esm.js.map

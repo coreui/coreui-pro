@@ -64,6 +64,7 @@
         color: danger
         text: PRO
     - title: Checks & radios
+    - title: Chip input
     - title: Date Picker
       badge:
         color: danger
@@ -125,6 +126,7 @@
     - title: Callout
     - title: Card
     - title: Carousel
+    - title: Chip
     - title: Close button
     - title: Collapse
     - title: Dropdowns
