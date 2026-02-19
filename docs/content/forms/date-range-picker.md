@@ -7,6 +7,12 @@ bootstrap: true
 pro_component: true
 other_frameworks: date-range-picker
 dayjs: true
+snippets:
+  - date-range-picker-custom-formats1.js
+  - date-range-picker-custom-formats2.js
+  - date-range-picker-custom-ranges.js
+  - date-range-picker-disabled-dates.js
+  - date-range-picker-disabled-dates2.js
 ---
 
 ## Example
@@ -257,7 +263,7 @@ By default, the date range picker shows a live preview in the input fields when 
 
 The CoreUI Bootstrap DateRangePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
 
-{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="dateRangePickerDisabledDatesSnippet">}}
 <div class="row">
   <div class="col-sm-6">
     <div id="myDateRangePickerDisabledDates"></div>
@@ -265,13 +271,13 @@ The CoreUI Bootstrap DateRangePicker component allows you to disable certain dat
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-range-picker-disabled-dates" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="dateRangePickerDisabledDatesSnippet" name="date-range-picker-disabled-dates" file="docs/assets/js/snippets/date-range-picker-disabled-dates.js" >}}
 
 ### Disabling weekends
 
 You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
 
-{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="dateRangePickerDisabledDates2Snippet">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDateRangePickerDisabledDates2"></div>
@@ -279,14 +285,14 @@ You can disable weekends by passing a function to the `disabledDates` option. He
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-range-picker-disabled-dates2" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="dateRangePickerDisabledDates2Snippet" name="date-range-picker-disabled-dates2" file="docs/assets/js/snippets/date-range-picker-disabled-dates2.js" >}}
 
 ## Custom ranges
 
 In order to configure custom date ranges in the Date Range component, you must use the `ranges` option to define a set of predefined ranges. These ranges can include predefined options such as "Today", "Yesterday", "Last 7 Days", etc.
 
 
-{{< example stackblitz_pro="true"  stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="dateRangePickerCustomRangesSnippet">}}
 <div class="row">
   <div class="col-sm-6">
     <div id="myDateRangePickerCustomRanges"></div>
@@ -294,7 +300,7 @@ In order to configure custom date ranges in the Date Range component, you must u
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-range-picker-custom-ranges" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="dateRangePickerCustomRangesSnippet" name="date-range-picker-custom-ranges" file="docs/assets/js/snippets/date-range-picker-custom-ranges.js" >}}
 
 ## Non-english locale
 
@@ -381,7 +387,7 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
 
-{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="dateRangePickerCustomFormats1Snippet">}}
 <div class="row">
   <div class="col-lg-7">
     <div id="myDateRangePickerCustomFormats1"></div>
@@ -394,11 +400,11 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
 ```
 
-{{< js-docs name="date-range-picker-custom-formats1" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="dateRangePickerCustomFormats1Snippet" name="date-range-picker-custom-formats1" file="docs/assets/js/snippets/date-range-picker-custom-formats1.js" >}}
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
-{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="dateRangePickerCustomFormats2Snippet">}}
 <div class="row">
   <div class="col-lg-7">
     <div id="myDateRangePickerCustomFormats2"></div>
@@ -412,7 +418,7 @@ To use localized dates, we need to additionally add locale files, in this case, 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
 ```
 
-{{< js-docs name="date-range-picker-custom-formats2" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="dateRangePickerCustomFormats2Snippet" name="date-range-picker-custom-formats2" file="docs/assets/js/snippets/date-range-picker-custom-formats2.js" >}}
 
 ## Usage
 

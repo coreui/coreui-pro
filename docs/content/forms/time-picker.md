@@ -7,6 +7,8 @@ toc: true
 bootstrap: true
 pro_component: true
 other_frameworks: time-picker
+snippets:
+  - time-picker-custom.js
 ---
 
 ## Example
@@ -88,7 +90,7 @@ Customize Bootstrap Time Picker to display only hours, or hours and minutes by d
 
 Tailor the Bootstrap Time Picker to your needs by specifying custom values for hours, minutes, and seconds. Use arrays to define selectable options or functions for dynamic filtering. The example below demonstrates setting specific hour options, minute intervals, and a condition for seconds only to include values less than 20.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="timePickerCustomSnippet">}}
 <div class="row">
   <div class="col-lg-4">
     <div id="myTimePickerCustom"></div>
@@ -96,7 +98,7 @@ Tailor the Bootstrap Time Picker to your needs by specifying custom values for h
 </div>
 {{< /example >}}
 
-{{< js-docs name="time-picker-custom" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="timePickerCustomSnippet" name="time-picker-custom" file="docs/assets/js/snippets/time-picker-custom.js" >}}
 
 In this configuration, the Bootstrap TimePicker restricts hours to a predefined set, minutes to quarter intervals, and seconds to values under 20, offering a high degree of customization for precise time selection scenarios.
 

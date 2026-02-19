@@ -9,6 +9,9 @@ toc: true
 bootstrap: true
 pro_component: true
 other_frameworks: multi-select
+snippets:
+  - multi-select-array-data.js
+  - multi-select-custom-options.js
 ---
 
 ## Basic example
@@ -69,13 +72,13 @@ If you want to create a multi-select dropdown with predefined options, use the `
 
 To dynamically populate a multi-select dropdown with options from an array, start with an empty `<select>` element. Use JavaScript to add options programmatically. This allows for more flexible and dynamic content management.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="multiSelectArrayDataSnippet">}}
 <select id="multiSelect" name="multiSelect"></select>
 {{< /example >}}
 
 We use the following JavaScript to set up our multi-select:
 
-{{< js-docs name="multi-select-array-data" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="multiSelectArrayDataSnippet" name="multi-select-array-data" file="docs/assets/js/snippets/multi-select-array-data.js" >}}
 
 ## Search
 
@@ -232,7 +235,7 @@ Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out 
 
 The CoreUI Bootstrap Multi Select Component provides the flexibility to personalize options and group labels by utilizing custom templates. You can easily customize the options using the `optionsTemplate`, and for groups, you can use `optionsGroupsTemplate`, as demonstrated in the examples below:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="multiSelectCustomOptionsSnippet">}}
 <div class="row">
   <div class="col-md-6">
     <select id="myMultiSelectCountries" class="form-multi-select"></select>
@@ -245,7 +248,7 @@ The CoreUI Bootstrap Multi Select Component provides the flexibility to personal
 
 We use the following JavaScript to set up our multi-select:
 
-{{< js-docs name="multi-select-custom-options" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="multiSelectCustomOptionsSnippet" name="multi-select-custom-options" file="docs/assets/js/snippets/multi-select-custom-options.js" >}}
 
 ## Sizing
 

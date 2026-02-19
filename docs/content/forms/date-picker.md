@@ -8,6 +8,11 @@ bootstrap: true
 pro_component: true
 other_frameworks: date-picker
 dayjs: true
+snippets:
+  - date-picker-custom-formats1.js
+  - date-picker-custom-formats2.js
+  - date-picker-disabled-dates.js
+  - date-picker-disabled-dates2.js
 ---
 
 ## Example
@@ -219,7 +224,7 @@ By default, the date picker shows a live preview in the input field when hoverin
 
 The CoreUI Bootstrap DatePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="datePickerDisabledDatesSnippet">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerDisabledDates"></div>
@@ -227,13 +232,13 @@ The CoreUI Bootstrap DatePicker component allows you to disable certain dates, s
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-picker-disabled-dates" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="datePickerDisabledDatesSnippet" name="date-picker-disabled-dates" file="docs/assets/js/snippets/date-picker-disabled-dates.js" >}}
 
 ### Disabling weekends
 
 You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="datePickerDisabledDates2Snippet">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerDisabledDates2"></div>
@@ -241,7 +246,7 @@ You can disable weekends by passing a function to the `disabledDates` option. He
 </div>
 {{< /example >}}
 
-{{< js-docs name="date-picker-disabled-dates2" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="datePickerDisabledDates2Snippet" name="date-picker-disabled-dates2" file="docs/assets/js/snippets/date-picker-disabled-dates2.js" >}}
 
 ## Non-english locale
 
@@ -328,7 +333,7 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
 
-{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="datePickerCustomFormats1Snippet">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerCustomFormats1"></div>
@@ -342,11 +347,11 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/en.js"></script>
 ```
 
-{{< js-docs name="date-picker-custom-formats1" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="datePickerCustomFormats1Snippet" name="date-picker-custom-formats1" file="docs/assets/js/snippets/date-picker-custom-formats1.js" >}}
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
-{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_dayjs="true" stackblitz_add_js="datePickerCustomFormats2Snippet">}}
 <div class="row">
   <div class="col-lg-5">
     <div id="myDatePickerCustomFormats2"></div>
@@ -360,7 +365,7 @@ To use localized dates, we need to additionally add locale files, in this case, 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
 ```
 
-{{< js-docs name="date-picker-custom-formats2" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="datePickerCustomFormats2Snippet" name="date-picker-custom-formats2" file="docs/assets/js/snippets/date-picker-custom-formats2.js" >}}
 
 ## Usage
 

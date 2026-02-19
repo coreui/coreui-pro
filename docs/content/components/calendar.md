@@ -7,6 +7,11 @@ toc: true
 bootstrap: true
 pro_component: true
 other_frameworks: calendar
+snippets:
+  - calendar-customize-cells.js
+  - calendar-disabled-dates.js
+  - calendar-disabled-dates2.js
+  - calendar-disabled-dates3.js
 ---
 
 ## Example
@@ -136,25 +141,25 @@ The Bootstrap Calendar component includes functionality to disable specific date
 
 To disable certain dates, you can provide them in an array. For date ranges, use nested arrays, where each inner array indicates a start date and an end date for that range:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="calendarDisabledDatesSnippet">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarDisabledDates" class="border rounded"></div>
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-disabled-dates" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="calendarDisabledDatesSnippet" name="calendar-disabled-dates" file="docs/assets/js/snippets/calendar-disabled-dates.js" >}}
 
 ### Disabling weekends
 
 To disable weekends, provide a function for the `disabledDates` option. Here's the method:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="calendarDisabledDates2Snippet">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarDisabledDates2" class="border rounded"></div>
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-disabled-dates2" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="calendarDisabledDates2Snippet" name="calendar-disabled-dates2" file="docs/assets/js/snippets/calendar-disabled-dates2.js" >}}
 
 In the example above:
 
@@ -165,13 +170,13 @@ In the example above:
 
 You can also combine specific dates and functions in the `disabledDates` array. For instance:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="calendarDisabledDates3Snippet">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarDisabledDates3" class="border rounded"></div>
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-disabled-dates3" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="calendarDisabledDates3Snippet" name="calendar-disabled-dates3" file="docs/assets/js/snippets/calendar-disabled-dates3.js" >}}
 
 In this example:
 
@@ -298,13 +303,13 @@ Note that `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied v
 
 This example demonstrates advanced usage of custom cell rendering to display pricing data across different calendar views. It uses `renderDayCell` to show daily prices, `renderMonthCell` to display monthly price ranges, and `renderYearCell` to show annual price ranges. The data is fetched from an external API and cached for performance.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="calendarCustomizeCellsSnippet">}}
 <div class="d-flex justify-content-center">
   <div id="myCalendarCustomizeCells" class="border rounded"></div>
 </div>
 {{< /example >}}
 
-{{< js-docs name="calendar-customize-cells" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="calendarCustomizeCellsSnippet" name="calendar-customize-cells" file="docs/assets/js/snippets/calendar-customize-cells.js" >}}
 
 
 ## Usage

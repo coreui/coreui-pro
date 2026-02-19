@@ -7,6 +7,9 @@ toc: true
 bootstrap: true
 pro_component: true
 other_frameworks: range-slider
+snippets:
+  - range-slider-custom-labels.js
+  - range-slider-custom-tooltips.js
 ---
 
 ## Overview
@@ -106,11 +109,11 @@ Add labels to specific points on the slider for better context. If you provide a
 
 Labels can be configured as an array of strings or objects. When using objects, you can specify additional properties like `value`, `label`, `class`, and `style`.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="rangeSliderCustomLabelsSnippet">}}
 <div id="myRangeSliderCustomLabels"></div>
 {{< /example >}}
 
-{{< js-docs name="range-slider-custom-labels" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="rangeSliderCustomLabelsSnippet" name="range-slider-custom-labels" file="docs/assets/js/snippets/range-slider-custom-labels.js" >}}
 
 ### Clickable labels
 
@@ -132,11 +135,11 @@ By default, tooltips display the current value of each handle. You can disable t
 
 Customize the content of tooltips using the `tooltipsFormat` option. This can be a function that formats the tooltip text based on the current value.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="rangeSliderCustomTooltipsSnippet">}}
 <div id="myRangeSliderCustomTooltips"></div>
 {{< /example >}}
 
-{{< js-docs name="range-slider-custom-tooltips" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="rangeSliderCustomTooltipsSnippet" name="range-slider-custom-tooltips" file="docs/assets/js/snippets/range-slider-custom-tooltips.js" >}}
 
 ## Track
 

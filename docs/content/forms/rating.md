@@ -7,6 +7,11 @@ toc: true
 bootstrap: true
 pro_component: true
 other_frameworks: rating
+snippets:
+  - rating-custom-icons1.js
+  - rating-custom-icons2.js
+  - rating-custom-icons3.js
+  - rating-custom-feedback.js
 ---
 
 ## How to use Rating Component.
@@ -106,33 +111,33 @@ The Rating component can be customized with either SVG or font icons, allowing f
 
 In the example below, we demonstrate how to set custom icons using SVG, allowing for detailed customization of the visual elements within the Rating component.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="ratingCustomIcons1Snippet">}}
 <div id="myRatingCustomIcons1"></div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-icons1" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="ratingCustomIcons1Snippet" name="rating-custom-icons1" file="docs/assets/js/snippets/rating-custom-icons1.js" >}}
 
 In the example below, we use font icons from the CoreUI Icons set. In the `activeIcon` configuration, we also apply the utility class `text-danger` to change the icon's color to red when it is active.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="ratingCustomIcons2Snippet">}}
 <div id="myRatingCustomIcons2"></div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-icons2" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="ratingCustomIcons2Snippet" name="rating-custom-icons2" file="docs/assets/js/snippets/rating-custom-icons2.js" >}}
 
 For a more dynamic experience, define different icons for each rating value, enhancing the visual feedback:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="ratingCustomIcons3Snippet">}}
 <div id="myRatingCustomIcons3"></div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-icons3" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="ratingCustomIcons3Snippet" name="rating-custom-icons3" file="docs/assets/js/snippets/rating-custom-icons3.js" >}}
 
 ## Custom feedback
 
 The Bootstrap Rating component integrates interactive star ratings with dynamic textual feedback using other components from CoreUI. It enables users to select a rating that updates the display and label in real-time, enhancing the interactive experience. Hover effects provide immediate feedback on potential ratings before selection, ensuring an intuitive user interface.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="ratingCustomFeedbackSnippet">}}
 <div class="d-flex align-items-center">
   <div id="myRatingCustomFeedbackStart" class="text-body-secondary me-3">3 / 5</div>
   <div id="myRatingCustomFeedback"></div>
@@ -140,7 +145,7 @@ The Bootstrap Rating component integrates interactive star ratings with dynamic 
 </div>
 {{< /example >}}
 
-{{< js-docs name="rating-custom-feedback" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="ratingCustomFeedbackSnippet" name="rating-custom-feedback" file="docs/assets/js/snippets/rating-custom-feedback.js" >}}
 
 ## Usage
 

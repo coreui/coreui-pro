@@ -6,6 +6,12 @@ group: forms
 toc: true
 bootstrap: true
 pro_component: true
+snippets:
+  - autocomplete-array-data.js
+  - autocomplete-custom-options.js
+  - autocomplete-external-data.js
+  - autocomplete-grouped-data.js
+  - autocomplete-option-values.js
 ---
 
 ## Overview
@@ -16,7 +22,7 @@ The **Bootstrap Autocomplete Dropdown** component is a powerful autocomplete dro
 
 A straightforward demonstration of how to implement a basic Bootstrap Autocomplete input field, highlighting essential attributes and configurations.
 
-{{< example stackblitz_pro="true" >}}
+{{< example stackblitz_pro="true">}}
 <div
   data-coreui-toggle="autocomplete"
   data-coreui-cleaner="true"
@@ -39,33 +45,33 @@ Learn how to populate the autocomplete component with data from various sources,
 
 To dynamically populate an autocomplete input with suggestions from an array, use JavaScript to configure the component with predefined options.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="autocompleteArrayDataSnippet" >}}
 <div id="myAutoComplete"></div>
 {{< /example >}}
 
 We use the following JavaScript to set up our autocomplete:
 
-{{< js-docs name="autocomplete-array-data" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="autocompleteArrayDataSnippet" name="autocomplete-array-data" file="docs/assets/js/snippets/autocomplete-array-data.js" >}}
 
 ### Object data with groups
 
 You can organize suggestions into groups using optgroups for better categorization and user experience.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="autocompleteGroupedDataSnippet" >}}
 <div id="myAutoCompleteGrouped"></div>
 {{< /example >}}
 
-{{< js-docs name="autocomplete-grouped-data" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="autocompleteGroupedDataSnippet" name="autocomplete-grouped-data" file="docs/assets/js/snippets/autocomplete-grouped-data.js" >}}
 
 ### Options with values
 
 You can use values in your options array. This is particularly useful when working with database IDs, product codes, or any numeric identifiers. Note that the component internally converts number values to strings for consistency and DOM compatibility.
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="autocompleteOptionsValuesSnippet" >}}
 <div id="myAutoCompleteValues"></div>
 {{< /example >}}
 
-{{< js-docs name="autocomplete-option-values" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="autocompleteOptionsValuesSnippet" name="autocomplete-option-values" file="docs/assets/js/snippets/autocomplete-option-values.js" >}}
 
 {{< callout info >}}
 **Important:** While you can pass number values in your options, the component internally converts all values to strings using `String(value)`. When handling selection events, remember that `event.value.value` will always be a string representation of your original number.
@@ -82,14 +88,14 @@ You can configure CoreUI's AutoComplete component to fetch and display options d
 
 This example shows how to connect the AutoComplete to a remote API to search users by first name.
 
-{{< example stackblitz_pro="true" >}}
+{{< example stackblitz_pro="autocompleteExternalDataSnippet" >}}
 <div id="myAutoCompleteExternalData"></div>
 {{< /example >}}
 
 To fetch data from an external source, you must set the search option to `'external'` or `['external', 'global']`.
 This disables internal filtering and allows you to provide custom data (e.g., from an API) based on user input.
 
-{{< js-docs name="autocomplete-external-data" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="autocompleteExternalDataSnippet" name="autocomplete-external-data" file="docs/assets/js/snippets/autocomplete-external-data.js" >}}
 
 ## Search functionality
 
@@ -244,7 +250,7 @@ Enable a cleaner button to quickly clear input element:
 
 The CoreUI Bootstrap Autocomplete Component provides the flexibility to personalize options and group labels by utilizing custom templates. You can easily customize the options using the `optionsTemplate`, and for groups, you can use `optionsGroupsTemplate`, as demonstrated in the examples below:
 
-{{< example stackblitz_pro="true" stackblitz_add_js="true">}}
+{{< example stackblitz_pro="true" stackblitz_add_js="autocompleteCustomOptionsSnippet">}}
 <div class="row">
   <div class="col-md-6">
     <div id="myAutocompleteCountries"></div>
@@ -257,7 +263,7 @@ The CoreUI Bootstrap Autocomplete Component provides the flexibility to personal
 
 We use the following JavaScript to set up our autocomplete:
 
-{{< js-docs name="autocomplete-custom-options" file="docs/assets/js/partials/snippets.js" >}}
+{{< js-docs id="autocompleteCustomOptionsSnippet" name="autocomplete-custom-options" file="docs/assets/js/snippets/autocomplete-custom-options.js" >}}
 
 
 ## Usage
