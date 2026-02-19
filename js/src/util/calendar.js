@@ -42,6 +42,16 @@ const dateToMonthNumber = date => {
 }
 
 /**
+ * Helper function to convert a date to a quarter number for comparison.
+ * @param date - The date to convert.
+ * @returns A number representing year*4 + quarter for easy comparison.
+ */
+const dateToQuarterNumber = date => {
+  const quarter = Math.floor(date.getMonth() / 3)
+  return (date.getFullYear() * 4) + quarter
+}
+
+/**
  * Helper function to check if a value is within min/max range.
  * @param value - The value to check.
  * @param min - Minimum allowed value (null means no minimum).
@@ -99,6 +109,36 @@ const parseWeekString = dateString => {
 
   // Fallback to existing ISO week parsing
   return convertIsoWeekToDate(dateString)
+}
+
+/**
+ * Parses a quarter string and returns a Date object for the first day of that quarter.
+ * @param dateString - The quarter string to parse.
+ * @returns The Date object for the first day of the quarter, or null if invalid.
+ */
+const parseQuarterString = dateString => {
+  const quarterPatterns = [
+    /^(\d{4})-Q(\d{1})$/, // 2023-Q1, 2023-Q4
+    /^(\d{4})Q(\d{1})$/, // 2023Q1, 2023Q4
+    /^(\d{4})\s+Q(\d{1})$/ // 2023 Q1, 2023 Q4
+  ]
+
+  for (const pattern of quarterPatterns) {
+    const match = dateString.trim().match(pattern)
+    if (match) {
+      const parsedYear = parseYearSmart(match[1])
+      const parsedQuarter = Number.parseInt(match[2], 10)
+
+      // Validate quarter (1-4)
+      if (parsedQuarter >= 1 && parsedQuarter <= 4) {
+        // Calculate the first month of the quarter (Q1=0, Q2=3, Q3=6, Q4=9)
+        const monthIndex = (parsedQuarter - 1) * 3
+        return new Date(parsedYear, monthIndex, 1)
+      }
+    }
+  }
+
+  return null
 }
 
 /**
@@ -401,7 +441,7 @@ const createDateOnly = groups => {
 const getExpectedPartsCount = patterns => {
   if (patterns.length === 0) {
     return 3
-  } // Default fallback
+  }
 
   // Analyze the first pattern to determine expected parts count
   const firstPattern = patterns[0]
@@ -422,8 +462,6 @@ const parseDayString = (dateString, locale, includeTime) => {
 
   if (!groups) {
     // Check if input looks like a complete date (has separators and multiple parts)
-    // If so, use fallback parsing for formats like "2022/08/17", "2022-08-17"
-    // If not (like "1", "12", "1/1"), return null
     const trimmed = dateString.trim()
     const hasDateSeparators = /[-/.:]/.test(trimmed)
     const parts = trimmed.split(/[-/.\s:]+/).filter(part => part.length > 0)
@@ -441,8 +479,8 @@ const parseDayString = (dateString, locale, includeTime) => {
 
   // For day selection, require at least year, month, and day to be present
   if ("year" in groups && "month" in groups && "day" in groups) {
-    const { month, day, year } = groups
-    if (!validateDateComponents(month, day, year)) {
+    const { month, day } = groups
+    if (!validateDateComponents(month, day)) {
       return null
     }
   } else {
@@ -501,6 +539,10 @@ export const convertToDateObject = (
       return parseMonthString(dateString)
     }
 
+    case "quarter": {
+      return parseQuarterString(dateString)
+    }
+
     case "year": {
       return parseYearString(dateString)
     }
@@ -517,7 +559,7 @@ export const convertToDateObject = (
  * @param dateString - The date string to parse.
  * @param locale - The locale to use for date format patterns.
  * @param includeTime - Whether to include time parsing.
- * @param selectionType - The selection type ('day', 'week', 'month', 'year').
+ * @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
  * @returns A Date object if parsing succeeds, null if parsing fails.
  */
 export const getLocalDateFromString = (
@@ -563,7 +605,7 @@ export const getCalendarDate = (calendarDate, order, view) => {
     )
   }
 
-  if (order !== 0 && view === "months") {
+  if (order !== 0 && (view === "months" || view === "quarters")) {
     return new Date(
       calendarDate.getFullYear() + order,
       calendarDate.getMonth(),
@@ -582,7 +624,7 @@ export const getCalendarDate = (calendarDate, order, view) => {
 /**
  * Formats a date based on the selection type.
  * @param date - The date to format.
- * @param selectionType - The type of selection ('day', 'week', 'month', 'year').
+ * @param selectionType - The type of selection ('day', 'week', 'month', 'quarter', 'year').
  * @returns A formatted date string or the original Date object.
  */
 export const getDateBySelectionType = (date, selectionType) => {
@@ -598,6 +640,11 @@ export const getDateBySelectionType = (date, selectionType) => {
   if (selectionType === "month") {
     const monthNumber = `0${date.getMonth() + 1}`.slice(-2)
     return `${date.getFullYear()}-${monthNumber}`
+  }
+
+  if (selectionType === "quarter") {
+    const quarter = Math.floor(date.getMonth() / 3) + 1
+    return `${date.getFullYear()}Q${quarter}`
   }
 
   if (selectionType === "year") {
@@ -1014,6 +1061,101 @@ export const isMonthInRange = (date, start, end) => {
   const _start = start ? dateToMonthNumber(start) : null
   const _end = end ? dateToMonthNumber(end) : null
   const _date = dateToMonthNumber(date)
+
+  return Boolean(_start && _end && _start <= _date && _date <= _end)
+}
+
+/**
+ * Checks if a quarter is disabled based on the 'quarter' period type.
+ * @param date - The date representing the quarter to check.
+ * @param min - Minimum allowed date.
+ * @param max - Maximum allowed date.
+ * @param disabledDates - Criteria for disabled dates.
+ * @returns True if the quarter is disabled, false otherwise.
+ */
+export const isQuarterDisabled = (date, min, max, disabledDates) => {
+  const current = dateToQuarterNumber(date)
+  const _min = min ? dateToQuarterNumber(min) : null
+  const _max = max ? dateToQuarterNumber(max) : null
+
+  if (isOutsideRange(current, _min, _max)) {
+    return true
+  }
+
+  if (disabledDates === undefined) {
+    return false
+  }
+
+  // Get the start and end of the quarter
+  const quarter = Math.floor(date.getMonth() / 3)
+  const quarterStartMonth = quarter * 3
+  const quarterEndMonth = quarterStartMonth + 2
+  const year = date.getFullYear()
+
+  const quarterStart = new Date(year, quarterStartMonth, 1)
+  const quarterEnd = new Date(year, quarterEndMonth + 1, 0) // Last day of the quarter
+
+  const startTime = min ?
+    Math.max(quarterStart.getTime(), min.getTime()) :
+    quarterStart.getTime()
+  const endTime = max ?
+    Math.min(quarterEnd.getTime(), max.getTime()) :
+    quarterEnd.getTime()
+
+  for (
+    const currentDate = new Date(startTime);
+    currentDate.getTime() <= endTime;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    if (!isDateDisabled(currentDate, min, max, disabledDates)) {
+      return false
+    }
+  }
+
+  return false
+}
+
+/**
+ * Checks if a quarter is selected based on start and end dates.
+ * @param date - The date representing the quarter.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the quarter is selected, false otherwise.
+ */
+export const isQuarterSelected = (date, start, end) => {
+  const year = date.getFullYear()
+  const quarter = Math.floor(date.getMonth() / 3)
+
+  if (start !== null) {
+    const startYear = start.getFullYear()
+    const startQuarter = Math.floor(start.getMonth() / 3)
+    if (year === startYear && quarter === startQuarter) {
+      return true
+    }
+  }
+
+  if (end !== null) {
+    const endYear = end.getFullYear()
+    const endQuarter = Math.floor(end.getMonth() / 3)
+    if (year === endYear && quarter === endQuarter) {
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
+ * Checks if a quarter is within a specified range.
+ * @param date - The date representing the quarter.
+ * @param start - Start date.
+ * @param end - End date.
+ * @returns True if the quarter is within the range, false otherwise.
+ */
+export const isQuarterInRange = (date, start, end) => {
+  const _start = start ? dateToQuarterNumber(start) : null
+  const _end = end ? dateToQuarterNumber(end) : null
+  const _date = dateToQuarterNumber(date)
 
   return Boolean(_start && _end && _start <= _date && _date <= _end)
 }

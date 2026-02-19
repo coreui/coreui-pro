@@ -137,6 +137,31 @@ Select range of months by adding the `data-coreui-selection-type="month"` attrib
   </div>
 {{< /example >}}
 
+### Quarters
+
+Select range of quartes by adding the `data-coreui-selection-type="quarter"` attribute.
+
+{{< example stackblitz_pro="true" >}}
+  <div class="row">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="quarter">
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div
+        data-coreui-start-date="2025Q3"
+        data-coreui-end-date="2026Q2"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-range-picker"
+        data-coreui-selection-type="quarter">
+      </div>
+    </div>
+  </div>
+{{< /example >}}
+
 ### Years
 
 Add the `data-coreui-selection-type="year"` attribute to allow a pick range of years.
@@ -422,9 +447,14 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 {{< partial "js-data-attributes.md" >}}
 {{< /markdown >}}
 
+{{< callout warning >}}
+Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied using data attributes.
+{{< /callout >}}
+
 {{< bs-table >}}
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+| `allowList` | object | [Default value]({{< docsref "/getting-started/javascript#sanitizer" >}}) | Object which contains allowed attributes and tags. |
 | `ariaNavNextMonthLabel` | string | `'Next month'` | A string that provides an accessible label for the button that navigates to the next month in the calendar. This label is read by screen readers to describe the action associated with the button. |
 | `ariaNavNextYearLabel` | string | `'Next year'` | A string that provides an accessible label for the button that navigates to the next year in the calendar. This label is intended for screen readers to help users understand the button's functionality. |
 | `ariaNavPrevMonthLabel` | string | `'Previous month'` | A string that provides an accessible label for the button that navigates to the previous month in the calendar. Screen readers will use this label to explain the purpose of the button. |
@@ -437,6 +467,7 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `confirmButton` | boolean, string | `'OK'` | Confirm button inner HTML |
 | `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
+| `dayFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for days. Accepts a built-in format (`'numeric'` or `'2-digit'`) |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `disabledDates` | array, function, null | `null` | Specify the list of dates that cannot be selected. |
 | `endDate` | date, number, string, null | `null` | Initial selected to date (range). |
@@ -452,12 +483,19 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
 | `maxDate` | date, number, string, null | `null` | Max selectable date. |
 | `minDate` | date, number, string, null | `null` | Min selectable date. |
+| `monthFormat` | `'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'` | `'short'` | Sets the format for month names. Accepts built-in formats (`'long'`, `'narrow'`, `'short'`, `'numeric'`, `'2-digit'`). |
 | `placeholder` | string | `['Start date', 'End date']` | Specifies a short hint that is visible in the input. |
 | `previewDateOnHover` | boolean | `true` | Enable live preview of dates in input fields when hovering over calendar cells. |
 | `ranges` | object | `{}` | Predefined date ranges the user can select from. |
 | `rangesButtonsClasses` | array, string | `['btn', 'btn-ghost-secondary']` | CSS class names that will be added to ranges buttons |
+| `renderDayCell` | function, null | `null` | Custom function to render day cells. Receives `date` and `meta` object (with `isDisabled`, `isInCurrentMonth`, `isInRange`, `isSelected`, `isToday`) as parameters and should return HTML string. |
+| `renderMonthCell` | function, null | `null` | Custom function to render month cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderQuarterCell` | function, null | `null` | Custom function to render quarter cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `renderYearCell` | function, null | `null` | Custom function to render year cells. Receives `date` and `meta` object (with `isDisabled`, `isInRange`, `isSelected`) as parameters and should return HTML string. |
+| `sanitize` | boolean | `true` | Enable or disable the sanitization. If activated `renderDayCell`, `renderMonthCell`, `renderQuarterCell`, and `renderYearCell` options will be sanitized. |
+| `sanitizeFn` | null, function | `null` | Here you can supply your own sanitize function. This can be useful if you prefer to use a dedicated library to perform sanitization. |
 | `selectAdjacementDays` | boolean | `false` | Set whether days in adjacent months shown before or after the current month are selectable. This only applies if the `showAdjacementDays` option is set to true. |
-| `selectionType` | `'day'`, `'week'`, `'month'`, `'year'` | `day` | Specify the type of date selection as day, week, month, or year. |
+| `selectionType` | `'day'`, `'week'`, `'month'`, `'quarter'`, `'year'` | `day` | Specify the type of date selection as day, week, month, quarter, or year. |
 | `separator` | boolean | `true` | Toggle visibility or set the content of the inputs separator. |
 | `showAdjacementDays` | boolean | `true` | Set whether to display dates in adjacent months (non-selectable) at the start and end of the current month. |
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
@@ -468,8 +506,9 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 | `todayButton` | string | `'Today'` | Today button inner HTML |
 | `todayButtonClasses` | array, string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
-| `weekdayFormat` | number, 'long', 'narrow', 'short' | `2` | Set length or format of day name. |
+| `weekdayFormat` | number, `'long'`, `'narrow'`, `'short'` | `2` | Set length or format of day name. |
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
+| `yearFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for years. Accepts built-in formats (`'numeric'` or `'2-digit'`) |
 {{< /bs-table >}}
 
 ### Methods
