@@ -61,6 +61,3 @@
 {{- $esbuildOptions = merge $esbuildOptions (dict "params" $esbuildParams) -}}
 {{- $stackblitzJs := resources.Get "js/stackblitz.js" | js.Build $esbuildOptions | resources.Copy "/assets/js/stackblitz.js" }}
 <script defer src="{{ $stackblitzJs.Permalink }}"></script>
-
-{{- $snowflakesJs := resources.Get "js/snowflakes.js" | js.Build $esbuildOptions | resources.Copy "/assets/js/snowflakes.js" }}
-<script defer src="{{ $snowflakesJs.Permalink }}"></script>
