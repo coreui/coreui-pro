@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO Bootstrap Theme v5.23.0 (https://coreui.io)
- * Copyright (c) 2025 creativeLabs Łukasz Holeczek
+ * Copyright (c) 2026 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
 :root,
@@ -7814,14 +7814,14 @@ select.form-multi-select {
   --bs-chip-remove-hover-opacity: 1;
   --bs-chip-transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out;
   --bs-chip-color: var(--bs-text-emphasis, var(--bs-body-color));
-  --bs-chip-bg: var(--bs-bg-subtle, var(--bs-tertiary-bg));
+  --bs-chip-bg: var(--bs-bg-subtle, var(--bs-secondary-bg));
   --bs-chip-border-width: var(--bs-border-width);
   --bs-chip-border-color: transparent;
   --bs-chip-active-color: var(--bs-contrast, rgba(255, 255, 255, 0.87));
   --bs-chip-active-bg: var(--bs-color, var(--bs-primary));
   --bs-chip-active-border-color: transparent;
   --bs-chip-hover-color: var(--bs-contrast, var(--bs-body-color));
-  --bs-chip-hover-bg: var(--bs-color, var(--bs-secondary-bg));
+  --bs-chip-hover-bg: var(--bs-color, color-mix(in srgb, var(--bs-secondary-bg) 95%, #000));
   --bs-chip-hover-border-color: transparent;
   display: inline-flex;
   gap: var(--bs-chip-gap);
@@ -7870,7 +7870,7 @@ select.form-multi-select {
   --bs-chip-color: var(--bs-color, var(--bs-body-color));
   --bs-chip-bg: transparent;
   --bs-chip-border-color: var(--bs-color, var(--bs-border-color));
-  --bs-chip-hover-bg: var(--bs-bg-subtle, var(--bs-secondary-bg));
+  --bs-chip-hover-bg: var(--bs-bg-subtle, color-mix(in srgb, var(--bs-secondary-bg) 95%, #000));
   --bs-chip-hover-color: var(--bs-text-emphasis, var(--bs-body-color));
   --bs-chip-hover-border-color: var(--bs-color, var(--bs-border-color));
   --bs-chip-active-bg: var(--bs-color, var(--bs-primary));

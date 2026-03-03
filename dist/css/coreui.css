@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /*!
  * CoreUI PRO  v5.23.0 (https://coreui.io)
- * Copyright (c) 2025 creativeLabs Łukasz Holeczek
+ * Copyright (c) 2026 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
 :root,
@@ -8414,14 +8414,14 @@ select.form-multi-select {
   --cui-chip-remove-hover-opacity: 1;
   --cui-chip-transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out;
   --cui-chip-color: var(--cui-text-emphasis, var(--cui-body-color));
-  --cui-chip-bg: var(--cui-bg-subtle, var(--cui-tertiary-bg));
+  --cui-chip-bg: var(--cui-bg-subtle, var(--cui-secondary-bg));
   --cui-chip-border-width: var(--cui-border-width);
   --cui-chip-border-color: transparent;
   --cui-chip-active-color: var(--cui-contrast, rgba(255, 255, 255, 0.87));
   --cui-chip-active-bg: var(--cui-color, var(--cui-primary));
   --cui-chip-active-border-color: transparent;
   --cui-chip-hover-color: var(--cui-contrast, var(--cui-body-color));
-  --cui-chip-hover-bg: var(--cui-color, var(--cui-secondary-bg));
+  --cui-chip-hover-bg: var(--cui-color, color-mix(in srgb, var(--cui-secondary-bg) 95%, #000));
   --cui-chip-hover-border-color: transparent;
   display: inline-flex;
   gap: var(--cui-chip-gap);
@@ -8471,7 +8471,7 @@ select.form-multi-select {
   --cui-chip-color: var(--cui-color, var(--cui-body-color));
   --cui-chip-bg: transparent;
   --cui-chip-border-color: var(--cui-color, var(--cui-border-color));
-  --cui-chip-hover-bg: var(--cui-bg-subtle, var(--cui-secondary-bg));
+  --cui-chip-hover-bg: var(--cui-bg-subtle, color-mix(in srgb, var(--cui-secondary-bg) 95%, #000));
   --cui-chip-hover-color: var(--cui-text-emphasis, var(--cui-body-color));
   --cui-chip-hover-border-color: var(--cui-color, var(--cui-border-color));
   --cui-chip-active-bg: var(--cui-color, var(--cui-primary));
