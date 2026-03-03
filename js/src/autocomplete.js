@@ -248,9 +248,7 @@ class Autocomplete extends BaseComponent {
     this._filterOptionsList()
     this._inputElement.value = ''
 
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: this._selected
-    })
+    this._triggerChangeEvent(null)
   }
 
   search(label) {
@@ -296,6 +294,12 @@ class Autocomplete extends BaseComponent {
   }
 
   // Helpers
+
+  _triggerChangeEvent(value) {
+    EventHandler.trigger(this._element, EVENT_CHANGED, {
+      value
+    })
+  }
 
   _flattenOptions(options = this._options, flat = []) {
     for (const opt of options) {
@@ -386,10 +390,26 @@ class Autocomplete extends BaseComponent {
     })
 
     EventHandler.on(this._inputElement, EVENT_BLUR, () => {
-      const options = this._flattenOptions().filter(option => option.label.toLowerCase().startsWith(this._inputElement.value.toLowerCase()))
-      if (this._config.allowOnlyDefinedOptions && this._selected.length === 0 && options.length === 0) {
-        this.clear()
+      const inputValue = this._inputElement.value
+
+      if (inputValue.length === 0) {
+        return
       }
+
+      const inputValueLower = inputValue.toLowerCase()
+      const exactMatches = this._flattenOptions().filter(option => option.label.toLowerCase() === inputValueLower)
+
+      if (exactMatches.length === 1) {
+        this._selectOption(exactMatches[0])
+        return
+      }
+
+      if (this._config.allowOnlyDefinedOptions) {
+        this.clear()
+        return
+      }
+
+      this._triggerChangeEvent(inputValue)
     })
 
     EventHandler.on(this._inputElement, EVENT_KEYDOWN, event => {
@@ -430,9 +450,7 @@ class Autocomplete extends BaseComponent {
         }
 
         if (options.length === 0 && !this._config.allowOnlyDefinedOptions) {
-          EventHandler.trigger(this._element, EVENT_CHANGED, {
-            value: this._inputElement.value
-          })
+          this._triggerChangeEvent(this._inputElement.value)
 
           this.hide()
 
@@ -456,9 +474,7 @@ class Autocomplete extends BaseComponent {
 
         if (this._selected.length > 0) {
           this.deselectAll()
-          EventHandler.trigger(this._element, EVENT_CHANGED, {
-            value: this._selected
-          })
+          this._triggerChangeEvent(null)
         }
       }
     })
@@ -810,9 +826,7 @@ class Autocomplete extends BaseComponent {
       foundOption.setAttribute('aria-selected', true)
     }
 
-    EventHandler.trigger(this._element, EVENT_CHANGED, {
-      value: option
-    })
+    this._triggerChangeEvent(option)
 
     this._inputElement.value = option.label
 
@@ -837,10 +851,6 @@ class Autocomplete extends BaseComponent {
       option.classList.remove(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', false)
     }
-
-    // EventHandler.trigger(this._element, EVENT_CHANGED, {
-    //   value: this._selected
-    // })
   }
 
   _updateCleaner() {
