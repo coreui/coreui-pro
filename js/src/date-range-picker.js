@@ -771,7 +771,7 @@ class DateRangePicker extends BaseComponent {
       for (const key of Object.keys(this._config.ranges)) {
         const buttonEl = document.createElement('button')
         buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses))
-        buttonEl.role = 'button'
+        buttonEl.type = 'button'
         buttonEl.addEventListener('click', () => {
           this._changeStartDate(this._config.ranges[key][0])
           this._changeEndDate(this._config.ranges[key][1])
