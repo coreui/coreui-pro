@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.24.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.24.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -669,7 +669,7 @@
         for (const key of Object.keys(this._config.ranges)) {
           const buttonEl = document.createElement('button');
           buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses));
-          buttonEl.role = 'button';
+          buttonEl.type = 'button';
           buttonEl.addEventListener('click', () => {
             this._changeStartDate(this._config.ranges[key][0]);
             this._changeEndDate(this._config.ranges[key][1]);
