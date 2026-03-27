@@ -1,5 +1,5 @@
 /*!
-  * CoreUI event-handler.js v5.24.1 (https://coreui.io)
+  * CoreUI event-handler.js v5.24.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */

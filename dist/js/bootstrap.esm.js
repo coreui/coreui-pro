@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.24.1 (https://coreui.io)
+  * CoreUI v5.24.2 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -661,7 +661,7 @@ class Config {
  * Constants
  */
 
-const VERSION = '5.24.1';
+const VERSION = '5.24.2';
 
 /**
  * Class definition
@@ -3510,12 +3510,12 @@ class Calendar extends BaseComponent {
     }
     if (this._config.range) {
       if (this._selectEndDate) {
-        this._setSelectEndDate(false);
         if (this._startDate && this._startDate > date) {
-          this._setStartDate(null);
+          this._setStartDate(date);
           this._setEndDate(null);
           return;
         }
+        this._setSelectEndDate(false);
         if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
           this._setStartDate(null);
           this._setEndDate(null);
@@ -3525,8 +3525,9 @@ class Calendar extends BaseComponent {
         return;
       }
       if (this._endDate && this._endDate < date) {
-        this._setStartDate(null);
+        this._setStartDate(date);
         this._setEndDate(null);
+        this._setSelectEndDate(true);
         return;
       }
       if (isDisableDateInRange(date, this._endDate, this._config.disabledDates)) {
