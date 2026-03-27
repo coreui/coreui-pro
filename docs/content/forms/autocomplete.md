@@ -6,6 +6,7 @@ group: forms
 toc: true
 bootstrap: true
 pro_component: true
+other_frameworks: autocomplete
 snippets:
   - autocomplete-array-data.js
   - autocomplete-custom-options.js

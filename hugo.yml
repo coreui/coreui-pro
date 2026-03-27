@@ -56,6 +56,8 @@ module:
       target:           content
     - source:           docs/data
       target:           data
+    - source:           node_modules/@coreui/internal-links/components.json
+      target:           data/component-links.json
     - source:           docs/layouts
       target:           layouts
     - source:           docs/static
