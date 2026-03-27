@@ -552,13 +552,13 @@ class Calendar extends BaseComponent {
 
     if (this._config.range) {
       if (this._selectEndDate) {
-        this._setSelectEndDate(false)
-
         if (this._startDate && this._startDate > date) {
-          this._setStartDate(null)
+          this._setStartDate(date)
           this._setEndDate(null)
           return
         }
+
+        this._setSelectEndDate(false)
 
         if (isDisableDateInRange(this._startDate, date, this._config.disabledDates)) {
           this._setStartDate(null)
@@ -571,8 +571,9 @@ class Calendar extends BaseComponent {
       }
 
       if (this._endDate && this._endDate < date) {
-        this._setStartDate(null)
+        this._setStartDate(date)
         this._setEndDate(null)
+        this._setSelectEndDate(true)
         return
       }
 
