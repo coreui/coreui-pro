@@ -3,8 +3,6 @@ layout: docs
 title: CoreUI Icons
 description: CoreUI Icons is an open-source icon set with more than 500 icons in multiple formats SVG, PNG, and Webfonts. CoreUI Icons are beautifully crafted symbols for common actions and items. You can use them in your digital products for web or mobile app.
 group: icons
-extra_css:
-  - css/all-icons.css
 toc: true
 ---
 
@@ -28,7 +26,7 @@ npm install @coreui/icons --save
 yarn add @coreui/icons
 ```
 
-Or, you can also clone or [download this repository](https://github.com/coreui/coreui-icons/archive/master.zip) as zip.
+Or, you can also clone or [download this repository](https://github.com/coreui/coreui-icons/archive/main.zip) as zip.
 
 
 ## Usage
@@ -40,8 +38,8 @@ You can place CoreUI Icons just about anywhere using a CSS style prefix and the 
 Please use `cil-` prefix for linear icons, `cib-` prefix for brand icons, and `cif-` prefix for flag icons.
 
 {{< example >}}
-<i class="cil-energy icon icon-xxl"></i>
-<i class="cib-twitter icon icon-xxl"></i>
+<i class="cil-paperclip icon icon-xxl"></i>
+<i class="cil-tag icon icon-xxl"></i>
 {{< /example >}}
 
 ### SVG Sprites
