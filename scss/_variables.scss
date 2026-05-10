@@ -4,6 +4,7 @@
 @use "functions/assert-starts-at-zero" as *;
 @use "functions/color" as *;
 @use "functions/color-contrast-variables" as *;
+@use "functions/color-translucent" as *;
 @use "functions/math" as *;
 @use "functions/to-rgb" as *;
 
@@ -656,7 +657,7 @@ $border-widths: (
 
 $border-style:                solid !default;
 $border-color:                $gray-300 !default;
-$border-color-translucent:    rgba($black, .175) !default;
+$border-color-translucent:    color-translucent($gray-300, .175) !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
@@ -2044,7 +2045,6 @@ $sidebar-widths: (
   lg: 20rem,
   xl: 24rem
 ) !default;
-$sidebar-narrow-width:                     4rem !default;
 $sidebar-padding-y:                        $spacer !default;
 $sidebar-padding-x:                        $spacer !default;
 $sidebar-color:                            var(--#{$prefix}body-color) !default;
@@ -2055,6 +2055,9 @@ $sidebar-brand-bg:                         rgba($black, .2) !default;
 $sidebar-backdrop-bg:                      $black !default;
 $sidebar-backdrop-opacity:                 .5 !default;
 $sidebar-overlaid-box-shadow:              var(--#{$prefix}box-shadow) !default;
+
+$sidebar-narrow-width:                     4rem !default;
+$sidebar-narrow-padding-x:                 .5rem !default;
 $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 // scss-docs-end sidebar-variables
 
@@ -2096,13 +2099,13 @@ $sidebar-nav-link-icon-bullet-border-color:   var(--#{$prefix}tertiary-color) !d
 $sidebar-nav-link-icon-bullet-border-radius:  50rem !default;
 
 $sidebar-nav-link-hover-color:                        var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-hover-bg:                           var(--#{$prefix}tertiary-bg) !default;
+$sidebar-nav-link-hover-bg:                           var(--#{$prefix}tertiary-bg-translucent) !default;
 $sidebar-nav-link-hover-icon-color:                   var(--#{$prefix}body-color) !default;
 $sidebar-nav-link-hover-icon-bullet-bg:               transparent !default;
 $sidebar-nav-link-hover-icon-bullet-border-color:     var(--#{$prefix}body-color) !default;
 
 $sidebar-nav-link-active-color:                       var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-active-bg:                          var(--#{$prefix}tertiary-bg) !default;
+$sidebar-nav-link-active-bg:                          var(--#{$prefix}tertiary-bg-translucent) !default;
 $sidebar-nav-link-active-icon-color:                  var(--#{$prefix}emphasis-color) !default;
 $sidebar-nav-link-active-icon-bullet-bg:              transparent !default;
 $sidebar-nav-link-active-icon-bullet-border-color:    var(--#{$prefix}emphasis-color) !default;
@@ -2119,8 +2122,6 @@ $sidebar-nav-group-border-radius:             var(--#{$prefix}border-radius) !de
 $sidebar-nav-group-transition:                background .15s ease-in-out !default;
 $sidebar-nav-group-toggle-show-color:         $sidebar-nav-link-color !default;
 
-$sidebar-nav-group-items-padding-y:           0 !default;
-$sidebar-nav-group-items-padding-x:           0 !default;
 $sidebar-nav-group-items-transition:          height .15s ease !default;
 
 $sidebar-nav-group-indicator-color:           var(--#{$prefix}tertiary-color) !default;
@@ -2128,6 +2129,11 @@ $sidebar-nav-group-indicator-icon:            url("data:image/svg+xml,<svg xmlns
 $sidebar-nav-group-indicator-hover-color:     $sidebar-nav-link-hover-color !default;
 $sidebar-nav-group-indicator-hover-icon:      $sidebar-nav-group-indicator-icon !default;
 $sidebar-nav-group-indicator-transition:      transform .15s !default;
+
+$sidebar-nav-tree-group-border-color:          var(--#{$prefix}border-color) !default;
+$sidebar-nav-tree-link-icon-bullet-bg:         var(--#{$prefix}border-color) !default;
+$sidebar-nav-tree-link-hover-icon-bullet-bg:   var(--#{$prefix}border-color) !default;
+$sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !default;
 // scss-docs-end sidebar-nav-variables
 
 // scss-docs-start sidebar-toggler

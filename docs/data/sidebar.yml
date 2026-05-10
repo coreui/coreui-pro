@@ -65,6 +65,9 @@
         text: PRO
     - title: Checks & radios
     - title: Chip input
+      badge:
+        color: success
+        text: NEW
     - title: Date Picker
       badge:
         color: danger
@@ -127,6 +130,9 @@
     - title: Card
     - title: Carousel
     - title: Chip
+      badge:
+        color: success
+        text: NEW
     - title: Close button
     - title: Collapse
     - title: Dropdowns
@@ -147,6 +153,10 @@
     - title: Popovers
     - title: Progress
     - title: Scrollspy
+    - title: Search Button
+      badge:
+        color: success
+        text: NEW
     - title: Sidebar
     - title: Spinners
     - title: Toasts

@@ -27,6 +27,7 @@ import Popover from './src/popover.js'
 import RangeSlider from './src/range-slider.js'
 import Rating from './src/rating.js'
 import ScrollSpy from './src/scrollspy.js'
+import SearchButton from './src/search-button.js'
 import Sidebar from './src/sidebar.js'
 import Stepper from './src/stepper.js'
 import Tab from './src/tab.js'
@@ -57,6 +58,7 @@ export default {
   RangeSlider,
   Rating,
   ScrollSpy,
+  SearchButton,
   Sidebar,
   Stepper,
   Tab,
