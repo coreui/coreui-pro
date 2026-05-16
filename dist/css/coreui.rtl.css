@@ -10517,7 +10517,8 @@ select.form-multi-select {
 .sidebar-nav .nav-item + .nav-item,
 .sidebar-nav .nav-item + .nav-group,
 .sidebar-nav .nav-group + .nav-item,
-.sidebar-nav .nav-group + .nav-group {
+.sidebar-nav .nav-group + .nav-group,
+.sidebar-nav .nav-group-items {
   margin-top: var(--cui-sidebar-nav-gap);
 }
 .sidebar-nav .nav-title {

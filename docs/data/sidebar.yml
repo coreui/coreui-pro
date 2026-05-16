@@ -158,6 +158,9 @@
         color: success
         text: NEW
     - title: Sidebar
+      badge:
+        color: success
+        text: NEW
     - title: Spinners
     - title: Toasts
     - title: Tooltips
