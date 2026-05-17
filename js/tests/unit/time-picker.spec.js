@@ -422,7 +422,7 @@ describe('TimePicker', () => {
     it('should not create minutes column when minutes is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'roll', minutes: false, seconds: false }) // eslint-disable-line no-new
+      new TimePicker(div, { variant: 'roll', minutes: false, seconds: false, locale: 'en-GB' }) // eslint-disable-line no-new
 
       const rollCols = div.querySelectorAll('.time-picker-roll-col')
       // Only hours column
@@ -432,7 +432,7 @@ describe('TimePicker', () => {
     it('should not create seconds column when seconds is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'roll', seconds: false }) // eslint-disable-line no-new
+      new TimePicker(div, { variant: 'roll', seconds: false, locale: 'en-GB' }) // eslint-disable-line no-new
 
       const rollCols = div.querySelectorAll('.time-picker-roll-col')
       // hours + minutes = 2 columns
@@ -825,7 +825,7 @@ describe('TimePicker', () => {
     it('should not create minutes select when minutes is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'select', minutes: false, seconds: false }) // eslint-disable-line no-new
+      new TimePicker(div, { variant: 'select', minutes: false, seconds: false, locale: 'en-GB' }) // eslint-disable-line no-new
 
       const selects = div.querySelectorAll('.time-picker-inline-select')
       // Only hours
@@ -835,7 +835,7 @@ describe('TimePicker', () => {
     it('should not create seconds select when seconds is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'select', seconds: false }) // eslint-disable-line no-new
+      new TimePicker(div, { variant: 'select', seconds: false, locale: 'en-GB' }) // eslint-disable-line no-new
 
       const selects = div.querySelectorAll('.time-picker-inline-select')
       // hours + minutes
@@ -928,7 +928,7 @@ describe('TimePicker', () => {
     it('should set select values when time is provided', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'select', time: '14:30:45' }) // eslint-disable-line no-new
+      new TimePicker(div, { variant: 'select', time: '14:30:45', locale: 'en-GB' }) // eslint-disable-line no-new
 
       const hoursSelect = div.querySelector('select.hours')
       const minutesSelect = div.querySelector('select.minutes')
@@ -1861,6 +1861,7 @@ describe('TimePicker', () => {
       const div = fixtureEl.querySelector('div')
       new TimePicker(div, { // eslint-disable-line no-new
         variant: 'roll',
+        locale: 'en-GB',
         hours: index => index % 2 === 0
       })
 
@@ -2722,7 +2723,7 @@ describe('TimePicker', () => {
     it('should set select values based on current time', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tp = new TimePicker(div, { time: '14:30:45', variant: 'select' })
+      const tp = new TimePicker(div, { time: '14:30:45', variant: 'select', locale: 'en-GB' })
 
       tp._setUpSelects()
 
