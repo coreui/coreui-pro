@@ -1209,7 +1209,7 @@ describe('DateRangePicker', () => {
     it('should not make inputs readonly when inputReadOnly is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+      const dateRangePicker = new DateRangePicker(div, {
         inputReadOnly: false
       })
 
@@ -1421,7 +1421,7 @@ describe('DateRangePicker', () => {
     it('should toggle dropdown on indicator click', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div)
+      new DateRangePicker(div) // eslint-disable-line no-new
 
       const indicator = div.querySelector('.date-picker-indicator')
       indicator.click()
@@ -1432,7 +1432,7 @@ describe('DateRangePicker', () => {
     it('should toggle dropdown on indicator Enter keydown', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div)
+      new DateRangePicker(div) // eslint-disable-line no-new
 
       const indicator = div.querySelector('.date-picker-indicator')
       const enterEvent = new KeyboardEvent('keydown', {
@@ -1548,7 +1548,7 @@ describe('DateRangePicker', () => {
     it('should stop propagation on cleaner click', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div, {
+      new DateRangePicker(div, { // eslint-disable-line no-new
         startDate: new Date(2023, 0, 1)
       })
 
@@ -1775,7 +1775,7 @@ describe('DateRangePicker', () => {
     it('should disable inputs', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+      const dateRangePicker = new DateRangePicker(div, {
         disabled: true
       })
 
@@ -1812,7 +1812,7 @@ describe('DateRangePicker', () => {
     it('should make inputs readonly', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+      const dateRangePicker = new DateRangePicker(div, {
         inputReadOnly: true
       })
 
@@ -1823,7 +1823,7 @@ describe('DateRangePicker', () => {
     it('should not make inputs readonly by default', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const dateRangePicker = new DateRangePicker(div) // eslint-disable-line no-unused-vars
+      const dateRangePicker = new DateRangePicker(div)
 
       expect(dateRangePicker._startInput.readOnly).toBe(false)
       expect(dateRangePicker._endInput.readOnly).toBe(false)
@@ -2082,7 +2082,7 @@ describe('DateRangePicker', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const dateRangePicker = new DateRangePicker(div, {
-        inputDateFormat: (date) => `custom-${date.getFullYear()}`
+        inputDateFormat: date => `custom-${date.getFullYear()}`
       })
 
       const result = dateRangePicker._formatDate(new Date(2023, 0, 15))

@@ -216,7 +216,7 @@ describe('Autocomplete', () => {
     it('should add is-invalid class when invalid is true', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      new Autocomplete(autocompleteEl, {
+      const autocomplete = new Autocomplete(autocompleteEl, { // eslint-disable-line no-unused-vars
         invalid: true,
         options: []
       })
@@ -227,7 +227,7 @@ describe('Autocomplete', () => {
     it('should add is-valid class when valid is true', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
-      new Autocomplete(autocompleteEl, {
+      const autocomplete = new Autocomplete(autocompleteEl, { // eslint-disable-line no-unused-vars
         valid: true,
         options: []
       })
@@ -1820,10 +1820,10 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
-        .filter(option => option.style.display !== 'none')
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+        .find(option => option.style.display !== 'none')
 
-      expect(visibleOptions[0].innerHTML).toContain('<strong>')
+      expect(visibleOption.innerHTML).toContain('<strong>')
     })
 
     it('should not highlight when optionsTemplate is set', () => {
@@ -1842,11 +1842,11 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
-        .filter(option => option.style.display !== 'none')
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+        .find(option => option.style.display !== 'none')
 
       // Should not highlight since optionsTemplate is set
-      expect(visibleOptions[0].innerHTML).not.toContain('<strong>App</strong>')
+      expect(visibleOption.innerHTML).not.toContain('<strong>App</strong>')
     })
 
     it('should hide optgroup when all its children are hidden', () => {
@@ -3232,7 +3232,9 @@ describe('Autocomplete', () => {
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         options: [
-          { label: 'Option 1', value: '1', customData: 'extra', icon: 'star' }
+          {
+            label: 'Option 1', value: '1', customData: 'extra', icon: 'star'
+          }
         ]
       })
 

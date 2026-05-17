@@ -1,9 +1,8 @@
 /* eslint-env jasmine */
 
 import MultiSelect from '../../src/multi-select.js'
-import EventHandler from '../../src/dom/event-handler.js'
 import {
-  getFixture, clearFixture, createEvent, jQueryMock
+  getFixture, clearFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('MultiSelect', () => {
@@ -1804,9 +1803,6 @@ describe('MultiSelect', () => {
     })
 
     it('should handle tags with disabled options', () => {
-      fixtureEl.innerHTML = '<select></select>'
-      const selectEl = fixtureEl.querySelector('select')
-
       // Pre-select via native element with disabled option
       fixtureEl.innerHTML = [
         '<select>',
@@ -2215,7 +2211,6 @@ describe('MultiSelect', () => {
 
       // Simulate disabled state after creation
       multiSelect._config.disabled = true
-      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
 
       // Trigger the event handler directly
       const event = new Event('click', { bubbles: true })

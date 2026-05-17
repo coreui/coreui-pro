@@ -1,7 +1,6 @@
 /* eslint-env jasmine */
 
 import Rating from '../../src/rating.js'
-import EventHandler from '../../src/dom/event-handler.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -862,7 +861,9 @@ describe('Rating', () => {
     it('should not clear on click when readOnly even with allowClear', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { itemCount: 3, readOnly: true, value: 2, allowClear: true }) // eslint-disable-line no-new
+      const rating = new Rating(div, { // eslint-disable-line no-unused-vars
+        itemCount: 3, readOnly: true, value: 2, allowClear: true
+      })
 
       const inputs = div.querySelectorAll('.rating-item-input')
       inputs[1].click()
@@ -875,7 +876,9 @@ describe('Rating', () => {
     it('should not clear on click when disabled even with allowClear', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new Rating(div, { itemCount: 3, disabled: true, value: 2, allowClear: true }) // eslint-disable-line no-new
+      const rating = new Rating(div, { // eslint-disable-line no-unused-vars
+        itemCount: 3, disabled: true, value: 2, allowClear: true
+      })
 
       const inputs = div.querySelectorAll('.rating-item-input')
       inputs[1].click()

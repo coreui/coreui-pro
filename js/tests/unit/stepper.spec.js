@@ -1,6 +1,5 @@
 // stepper.spec.js
 import Stepper from '../../src/stepper.js'
-import EventHandler from '../../src/dom/event-handler.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'
 
 describe('Stepper', () => {
@@ -952,7 +951,7 @@ describe('Stepper', () => {
     it('should prevent skipping steps forward', () => {
       fixtureEl.innerHTML = getThreeStepFixture()
       const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement, { linear: true })
+      new Stepper(stepperElement, { linear: true }) // eslint-disable-line no-new
 
       // With linear: true, step 3 button is disabled by _updateStepButtonsDisabledState
       // showStep(3) passes the linear guard because disabled buttons aren't in _getEnabledStepButtons
@@ -2233,7 +2232,7 @@ describe('Stepper', () => {
       const stepsContainer = fixtureEl.querySelector('.stepper-steps')
       const outsideBtn = document.createElement('button')
       outsideBtn.classList.add('stepper-step-button')
-      stepsContainer.appendChild(outsideBtn)
+      stepsContainer.append(outsideBtn)
 
       // _complete should return early because activeStepIdx will be -1
       // (outsideBtn.parentNode is stepper-steps, not a stepper-step)

@@ -1604,7 +1604,7 @@ describe('TimePicker', () => {
     it('should toggle on indicator click', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tp = new TimePicker(div)
+      new TimePicker(div) // eslint-disable-line no-new
 
       const indicator = div.querySelector('.time-picker-indicator')
       expect(div.classList.contains('show')).toBeFalse()
@@ -1678,7 +1678,7 @@ describe('TimePicker', () => {
     it('should stop propagation on cleaner click', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tp = new TimePicker(div, { time: '10:00:00', cleaner: true })
+      new TimePicker(div, { time: '10:00:00', cleaner: true }) // eslint-disable-line no-new
 
       // The picker should not show when cleaner is clicked
       const cleaner = div.querySelector('.time-picker-cleaner')
@@ -1782,7 +1782,6 @@ describe('TimePicker', () => {
       const div = fixtureEl.querySelector('div')
       new TimePicker(div) // eslint-disable-line no-new
 
-      const inputGroup = div.querySelector('.time-picker-input-group')
       const input = div.querySelector('.time-picker-input')
       input.click()
 
@@ -1803,7 +1802,7 @@ describe('TimePicker', () => {
     it('should not show picker when indicator is clicked via input group handler', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tp = new TimePicker(div)
+      new TimePicker(div) // eslint-disable-line no-new
 
       // Clicking indicator should go through indicator handler, not toggler
       const indicator = div.querySelector('.time-picker-indicator')
@@ -2821,7 +2820,7 @@ describe('TimePicker', () => {
     it('should call _setUpRolls when showing via input group click for roll variant', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tp = new TimePicker(div, { time: '10:00:00', variant: 'roll' })
+      new TimePicker(div, { time: '10:00:00', variant: 'roll' }) // eslint-disable-line no-new
 
       const input = div.querySelector('.time-picker-input')
       input.click()
@@ -2833,7 +2832,7 @@ describe('TimePicker', () => {
     it('should call _setUpSelects when showing via input group click for select variant', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const tp = new TimePicker(div, { time: '10:00:00', variant: 'select' })
+      new TimePicker(div, { time: '10:00:00', variant: 'select' }) // eslint-disable-line no-new
 
       const input = div.querySelector('.time-picker-input')
       input.click()

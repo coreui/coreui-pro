@@ -303,7 +303,6 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       new Calendar(div, { calendarDate: new Date(2023, 5, 1) }) // eslint-disable-line no-new
 
-      const cells = div.querySelectorAll('.calendar-cell')
       const prevMonthCells = div.querySelectorAll('.calendar-cell.previous')
       const nextMonthCells = div.querySelectorAll('.calendar-cell.next')
 
@@ -447,7 +446,7 @@ describe('Calendar', () => {
       const div = fixtureEl.querySelector('div')
       new Calendar(div, { // eslint-disable-line no-new
         calendarDate: new Date(2023, 5, 1),
-        renderDayCell: (date, meta) => `<span class="custom-day">${date.getDate()}</span>`
+        renderDayCell: date => `<span class="custom-day">${date.getDate()}</span>`
       })
 
       const customDays = div.querySelectorAll('.custom-day')
@@ -463,7 +462,7 @@ describe('Calendar', () => {
       new Calendar(div, { // eslint-disable-line no-new
         selectionType: 'month',
         calendarDate: new Date(2023, 5, 1),
-        renderMonthCell: (date, meta) => `<span class="custom-month">M${date.getMonth() + 1}</span>`
+        renderMonthCell: date => `<span class="custom-month">M${date.getMonth() + 1}</span>`
       })
 
       const customMonths = div.querySelectorAll('.custom-month')
@@ -479,7 +478,7 @@ describe('Calendar', () => {
       new Calendar(div, { // eslint-disable-line no-new
         selectionType: 'quarter',
         calendarDate: new Date(2023, 5, 1),
-        renderQuarterCell: (date, meta) => `<span class="custom-quarter">Quarter</span>`
+        renderQuarterCell: () => `<span class="custom-quarter">Quarter</span>`
       })
 
       const customQuarters = div.querySelectorAll('.custom-quarter')
@@ -495,7 +494,7 @@ describe('Calendar', () => {
       new Calendar(div, { // eslint-disable-line no-new
         selectionType: 'year',
         calendarDate: new Date(2023, 5, 1),
-        renderYearCell: (date, meta) => `<span class="custom-year">${date.getFullYear()}</span>`
+        renderYearCell: date => `<span class="custom-year">${date.getFullYear()}</span>`
       })
 
       const customYears = div.querySelectorAll('.custom-year')
@@ -1152,7 +1151,9 @@ describe('Calendar', () => {
       const cell = secondRow.querySelector('.calendar-cell')
       expect(cell).not.toBeNull()
 
-      const event = { target: cell, key: 'Enter', code: 'Space', preventDefault: () => {} }
+      const event = {
+        target: cell, key: 'Enter', code: 'Space', preventDefault() {}
+      }
       calendar._handleCalendarKeydown(event)
       // After Enter on a week cell, the start date should be set
       expect(calendar._startDate).toBeDefined()

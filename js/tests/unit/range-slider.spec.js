@@ -469,7 +469,7 @@ describe('RangeSlider', () => {
     it('should handle a single label', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { // eslint-disable-line no-unused-vars
+      const rangeSlider = new RangeSlider(element, {
         value: [50],
         labels: ['Only']
       })

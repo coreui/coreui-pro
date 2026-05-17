@@ -3,7 +3,7 @@
 import DatePicker from '../../src/date-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import {
-  getFixture, clearFixture, createEvent, jQueryMock
+  getFixture, clearFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('DatePicker', () => {
@@ -769,7 +769,7 @@ describe('DatePicker', () => {
         const div = fixtureEl.querySelector('div')
         const disabledDate = new Date(2023, 5, 15)
 
-        const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+        const datePicker = new DatePicker(div, {
           disabledDates: [disabledDate],
           inputOnChangeDelay: 10
         })
@@ -823,7 +823,7 @@ describe('DatePicker', () => {
         const div = fixtureEl.querySelector('div')
         const minDate = new Date(2023, 5, 15)
 
-        const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+        const datePicker = new DatePicker(div, {
           minDate,
           inputOnChangeDelay: 10,
           locale: 'en-US'
@@ -849,7 +849,7 @@ describe('DatePicker', () => {
         const div = fixtureEl.querySelector('div')
         const maxDate = new Date(2023, 5, 15)
 
-        const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+        const datePicker = new DatePicker(div, {
           maxDate,
           inputOnChangeDelay: 10,
           locale: 'en-US'
@@ -911,7 +911,7 @@ describe('DatePicker', () => {
       fixtureEl.innerHTML = '<div></div>'
 
       const div = fixtureEl.querySelector('div')
-      const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+      const datePicker = new DatePicker(div, {
         footer: true,
         todayButton: 'Today'
       })
@@ -1299,7 +1299,7 @@ describe('DatePicker', () => {
       fixtureEl.innerHTML = '<form class="was-validated"><div></div></form>'
       const form = fixtureEl.querySelector('form')
       const div = form.querySelector('div')
-      const datePicker = new DatePicker(div, {
+      new DatePicker(div, { // eslint-disable-line no-new
         date: new Date(2023, 5, 15),
         locale: 'en-US'
       })
@@ -1541,7 +1541,7 @@ describe('DatePicker', () => {
     it('should clear date on cleaner click', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      const datePicker = new DatePicker(div, { // eslint-disable-line no-unused-vars
+      const datePicker = new DatePicker(div, {
         date: new Date(2023, 5, 15)
       })
 
@@ -2295,7 +2295,6 @@ describe('DatePicker', () => {
           resolve()
         })
 
-        const inputGroup = div.querySelector('.date-picker-input-group')
         // Click on input group (not indicator)
         const input = div.querySelector('.date-picker-input')
         input.click()
