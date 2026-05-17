@@ -422,7 +422,9 @@ describe('TimePicker', () => {
     it('should not create minutes column when minutes is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'roll', minutes: false, seconds: false, locale: 'en-GB' }) // eslint-disable-line no-new
+      const tp = new TimePicker(div, { // eslint-disable-line no-unused-vars
+        variant: 'roll', minutes: false, seconds: false, locale: 'en-GB'
+      })
 
       const rollCols = div.querySelectorAll('.time-picker-roll-col')
       // Only hours column
@@ -825,7 +827,9 @@ describe('TimePicker', () => {
     it('should not create minutes select when minutes is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
-      new TimePicker(div, { variant: 'select', minutes: false, seconds: false, locale: 'en-GB' }) // eslint-disable-line no-new
+      const tp = new TimePicker(div, { // eslint-disable-line no-unused-vars
+        variant: 'select', minutes: false, seconds: false, locale: 'en-GB'
+      })
 
       const selects = div.querySelectorAll('.time-picker-inline-select')
       // Only hours
