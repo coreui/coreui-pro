@@ -1,6 +1,10 @@
 @charset "UTF-8";
 /*!
+<<<<<<< HEAD
  * CoreUI PRO  v5.25.0 (https://coreui.io)
+=======
+ * CoreUI  v5.7.1 (https://coreui.io)
+>>>>>>> 79ee8846b7fcb1adc2a0becdb098c057a36b4325
  * Copyright (c) 2026 creativeLabs Łukasz Holeczek
  * License (https://coreui.io/pro/license/)
  */
@@ -10770,6 +10774,8 @@ select.form-multi-select {
   --cui-sidebar-nav-group-border-width: 0;
   --cui-sidebar-nav-group-border-radius: var(--cui-border-radius);
   --cui-sidebar-nav-group-border-color: transparent;
+  --cui-sidebar-nav-group-items-padding-y: 0;
+  --cui-sidebar-nav-group-items-padding-x: 0;
   --cui-sidebar-nav-group-indicator-color: var(--cui-tertiary-color);
   --cui-sidebar-nav-group-indicator-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/%3e%3c/svg%3e");
   --cui-sidebar-nav-group-indicator-hover-color: var(--cui-emphasis-color);
@@ -10952,7 +10958,7 @@ select.form-multi-select {
   color: var(--cui-sidebar-nav-group-indicator-color);
 }
 .sidebar-nav .nav-group-items {
-  padding: 0;
+  padding: var(--cui-sidebar-nav-group-items-padding-y) var(--cui-sidebar-nav-group-items-padding-x);
   overflow: hidden;
   list-style: none;
   transition: height 0.15s ease;

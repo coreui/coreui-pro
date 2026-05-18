@@ -1,5 +1,9 @@
 /*!
+<<<<<<< HEAD
   * CoreUI dropdown.js v5.25.0 (https://coreui.io)
+=======
+  * CoreUI dropdown.js v5.7.1 (https://coreui.io)
+>>>>>>> 79ee8846b7fcb1adc2a0becdb098c057a36b4325
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
