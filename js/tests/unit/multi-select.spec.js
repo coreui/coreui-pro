@@ -434,13 +434,12 @@ describe('MultiSelect', () => {
       expect(placeholder.textContent).toBe('Choose...')
     })
 
-    it('should create cleaner button when cleaner is true and multiple', () => {
+    it('should create cleaner button when cleaner is true and selected', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
-        options: [{ value: '1', text: 'Opt 1' }],
-        cleaner: true,
-        multiple: true
+        options: [{ value: '1', text: 'Opt 1', selected: true }],
+        cleaner: true
       })
 
       expect(multiSelect._selectionCleanerElement).not.toBeNull()
@@ -2150,7 +2149,7 @@ describe('MultiSelect', () => {
   })
 
   describe('cleaner', () => {
-    it('should show cleaner when items are selected', () => {
+    it('should insert cleaner when items are selected', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -2162,10 +2161,10 @@ describe('MultiSelect', () => {
       })
 
       const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
-      expect(cleaner.style.display).not.toBe('none')
+      expect(cleaner).not.toBeNull()
     })
 
-    it('should hide cleaner when no items are selected', () => {
+    it('should not insert cleaner when no items are selected', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -2175,7 +2174,41 @@ describe('MultiSelect', () => {
       })
 
       const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
-      expect(cleaner.style.display).toBe('none')
+      expect(cleaner).toBeNull()
+    })
+
+    it('should insert cleaner after selecting an item', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }],
+        cleaner: true,
+        multiple: true
+      })
+
+      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
+
+      multiSelect._selectOption('1', 'Opt 1')
+
+      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).not.toBeNull()
+    })
+
+    it('should insert cleaner and clear selection for single select', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1', selected: true }],
+        cleaner: true,
+        multiple: false
+      })
+
+      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      expect(cleaner).not.toBeNull()
+
+      cleaner.click()
+
+      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
     })
 
     it('should deselect all on cleaner click', () => {
@@ -2196,6 +2229,7 @@ describe('MultiSelect', () => {
       cleaner.click()
 
       expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
     })
 
     it('should not deselect on cleaner click when disabled', () => {
@@ -2805,18 +2839,18 @@ describe('MultiSelect', () => {
       expect(true).toBe(true)
     })
 
-    it('should return early when _selectionCleanerElement is null', () => {
+    it('should not insert cleaner when _selectionCleanerElement is null and no items are selected', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }],
         cleaner: true,
-        multiple: false // cleaner only created when multiple
+        multiple: false
       })
 
       // Should not throw
       multiSelect._updateSelectionCleaner()
-      expect(true).toBe(true)
+      expect(multiSelect._selectionCleanerElement).toBeNull()
     })
   })
 
@@ -3136,7 +3170,7 @@ describe('MultiSelect', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
-        options: [{ value: '1', text: 'Opt 1' }],
+        options: [{ value: '1', text: 'Opt 1', selected: true }],
         cleaner: true,
         multiple: true,
         ariaCleanerLabel: 'Clear all'

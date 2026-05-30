@@ -40,7 +40,6 @@ const ESCAPE_KEY = 'Escape'
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
-const SELECTOR_CLEANER = '.form-multi-select-cleaner'
 const SELECTOR_OPTGROUP = '.form-multi-select-optgroup'
 const SELECTOR_OPTION = '.form-multi-select-option'
 const SELECTOR_OPTIONS = '.form-multi-select-options'
@@ -67,6 +66,7 @@ const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group'
 const CLASS_NAME_LABEL = 'label'
+const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
 const CLASS_NAME_SELECT_ALL = 'form-multi-select-all'
@@ -389,14 +389,6 @@ class MultiSelect extends BaseComponent {
       this._onOptionsClick(event.target)
     })
 
-    EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
-      if (!this._config.disabled) {
-        event.preventDefault()
-        event.stopPropagation()
-        this.deselectAll()
-      }
-    })
-
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
       if (event.key === ENTER_KEY) {
         this._onOptionsClick(event.target)
@@ -605,18 +597,7 @@ class MultiSelect extends BaseComponent {
 
   _createButtons() {
     const buttons = document.createElement('div')
-    buttons.classList.add('form-multi-select-buttons')
-
-    if (!this._config.disabled && this._config.cleaner && this._config.multiple) {
-      const cleaner = document.createElement('button')
-      cleaner.type = 'button'
-      cleaner.classList.add(CLASS_NAME_CLEANER)
-      cleaner.style.display = 'none'
-      cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
-
-      buttons.append(cleaner)
-      this._selectionCleanerElement = cleaner
-    }
+    buttons.classList.add(CLASS_NAME_BUTTONS)
 
     const indicator = document.createElement('button')
     indicator.type = 'button'
@@ -632,6 +613,23 @@ class MultiSelect extends BaseComponent {
     this._indicatorElement = indicator
     this._togglerElement.append(buttons)
     this._updateSelectionCleaner()
+  }
+
+  _createSelectionCleaner() {
+    const cleaner = document.createElement('button')
+    cleaner.type = 'button'
+    cleaner.classList.add(CLASS_NAME_CLEANER)
+    cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
+
+    EventHandler.on(cleaner, EVENT_CLICK, event => {
+      if (!this._config.disabled) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.deselectAll()
+      }
+    })
+
+    return cleaner
   }
 
   _createPopper() {
@@ -953,18 +951,24 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateSelectionCleaner() {
-    if (!this._config.cleaner || this._selectionCleanerElement === null) {
+    if (!this._config.cleaner || this._config.disabled) {
       return
     }
 
-    const selectionCleaner = SelectorEngine.findOne(SELECTOR_CLEANER, this._clone)
+    if (this._selected.length > 0 && this._selectionCleanerElement === null) {
+      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._clone)
+      const selectionCleaner = this._createSelectionCleaner()
 
-    if (this._selected.length > 0) {
-      selectionCleaner.style.removeProperty('display')
+      buttons.insertBefore(selectionCleaner, this._indicatorElement)
+      this._selectionCleanerElement = selectionCleaner
       return
     }
 
-    selectionCleaner.style.display = 'none'
+    if (this._selected.length === 0 && this._selectionCleanerElement !== null) {
+      EventHandler.off(this._selectionCleanerElement, EVENT_CLICK)
+      this._selectionCleanerElement.remove()
+      this._selectionCleanerElement = null
+    }
   }
 
   _updateSearch() {
