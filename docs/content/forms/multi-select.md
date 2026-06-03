@@ -12,6 +12,7 @@ other_frameworks: multi-select
 snippets:
   - multi-select-array-data.js
   - multi-select-custom-options.js
+  - multi-select-selection-limit.js
 ---
 
 ## Basic example
@@ -195,6 +196,29 @@ If you prefer to show a counter indicating the number of selected options, add t
 </select>
 {{< /example >}}
 
+## Selection limit
+
+Use `data-coreui-selection-limit` to limit how many options can be selected. When the number of visible available options exceeds the limit, the select all button is disabled. The `selectionLimit.coreui.multi-select` event can be used to show feedback when a user tries to select more options than allowed.
+
+{{< example stackblitz_pro="true" stackblitz_add_js="multiSelectSelectionLimitSnippet">}}
+<div class="alert alert-warning d-none" id="multiSelectSelectionLimitAlert" role="alert"></div>
+<select class="form-multi-select" id="multiSelectSelectionLimit" multiple data-coreui-search="true" data-coreui-selection-limit="3">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+We use the following JavaScript to show an alert when the selection limit is reached:
+
+{{< js-docs id="multiSelectSelectionLimitSnippet" name="multi-select-selection-limit" file="docs/assets/js/snippets/multi-select-selection-limit.js" >}}
+
 ## Single Select
 
 Add the `data-coreui-multiple="false"` boolean attribute to implement single-selection mode, enabling users to select only one option from the dropdown at a time.
@@ -377,6 +401,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all options'` | Sets the select all button label.	 |
+| `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. When visible available options exceed the limit, the select all button is disabled. |
 | `selectionType` | string | `'tag'` | Sets the selection style.	 |
 | `selectionTypeCounterText` | string | `'item(s) selected'` | Sets the counter selection label.	|
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
@@ -406,6 +431,7 @@ Multi Select component exposes a few events for hooking into multi select functi
 | Method | Description |
 | --- | --- |
 | `changed.coreui.multi-select` | Fires immediately when an option is selected or deselected. |
+| `selectionLimit.coreui.multi-select` | Fires when selecting an option is blocked because the selection limit has been reached. |
 | `show.coreui.multi-select` | Fires immediately when the show instance method is called. |
 | `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
 | `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. |

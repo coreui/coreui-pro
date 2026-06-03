@@ -56,6 +56,7 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
@@ -109,6 +110,7 @@ const Default = {
   searchNoResultsLabel: 'No results found',
   selectAll: true,
   selectAllLabel: 'Select all options',
+  selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
   valid: false,
@@ -140,6 +142,7 @@ const DefaultType = {
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
   selectAllLabel: 'string',
+  selectionLimit: '(number|null)',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
   valid: 'boolean',
@@ -285,7 +288,16 @@ class MultiSelect extends BaseComponent {
 
       if (option.label) {
         this.selectAll(option.options)
+        if (this._isSelectionLimitReached()) {
+          return
+        }
+
         continue
+      }
+
+      if (this._isSelectionLimitReached()) {
+        this._triggerSelectionLimit()
+        return
       }
 
       this._selectOption(option.value, option.text)
@@ -378,6 +390,10 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
+      if (this._selectAllElement.disabled) {
+        return
+      }
+
       event.preventDefault()
       event.stopPropagation()
       this.selectAll()
@@ -433,6 +449,7 @@ class MultiSelect extends BaseComponent {
 
       const value = String(option.value)
       const isSelected = option.selected || (this._config.value && this._config.value.includes(value))
+      const shouldSelect = isSelected && !this._isSelectionLimitReached()
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
@@ -443,11 +460,11 @@ class MultiSelect extends BaseComponent {
       _options.push({
         ...customProperties,
         value,
-        ...isSelected && { selected: true },
+        ...shouldSelect && { selected: true },
         ...option.disabled && { disabled: true }
       })
 
-      if (isSelected) {
+      if (shouldSelect) {
         this._selected.push({
           value: String(option.value),
           text: option.text
@@ -467,14 +484,17 @@ class MultiSelect extends BaseComponent {
         const value = String(node.value)
         const text = node.innerHTML
         const isSelected = node.selected || (this._config.value && this._config.value.includes(node.value))
+        const shouldSelect = isSelected && !this._isSelectionLimitReached()
         options.push({
           value,
           text,
-          selected: isSelected,
+          selected: shouldSelect,
           disabled: node.disabled
         })
 
-        if (node.selected || isSelected) {
+        node.selected = shouldSelect
+
+        if (shouldSelect) {
           this._selected.push({
             value,
             text: node.innerHTML,
@@ -714,6 +734,7 @@ class MultiSelect extends BaseComponent {
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
     this._menu = dropdownDiv
+    this._updateSelectAll()
   }
 
   _createOptions(parentElement, options) {
@@ -853,7 +874,14 @@ class MultiSelect extends BaseComponent {
       this.deselectAll()
     }
 
-    if (this._selected.filter(option => option.value === String(value)).length === 0) {
+    const isSelected = this._selected.some(option => option.value === String(value))
+
+    if (!isSelected && this._isSelectionLimitReached()) {
+      this._triggerSelectionLimit()
+      return
+    }
+
+    if (!isSelected) {
       this._selected.push({
         value: String(value),
         text
@@ -880,6 +908,7 @@ class MultiSelect extends BaseComponent {
     this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
+    this._updateSelectAll()
   }
 
   _deselectOption(value) {
@@ -901,6 +930,7 @@ class MultiSelect extends BaseComponent {
     this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
+    this._updateSelectAll()
   }
 
   _deselectLastOption() {
@@ -1020,6 +1050,14 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _updateSelectAll() {
+    if (!this._selectAllElement) {
+      return
+    }
+
+    this._selectAllElement.disabled = this._hasSelectionLimit() && this._getAvailableOptionsCount() > this._config.selectionLimit
+  }
+
   _onSearchChange(element) {
     if (element) {
       this.search(element.value)
@@ -1050,6 +1088,24 @@ class MultiSelect extends BaseComponent {
     return this._clone.classList.contains(CLASS_NAME_SHOW)
   }
 
+  _hasSelectionLimit() {
+    return this._config.multiple && this._config.selectionLimit !== null
+  }
+
+  _isSelectionLimitReached() {
+    return this._hasSelectionLimit() && this._selected.length >= this._config.selectionLimit
+  }
+
+  _triggerSelectionLimit() {
+    EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, {
+      selectionLimit: this._config.selectionLimit
+    })
+  }
+
+  _getAvailableOptionsCount() {
+    return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => this._isVisible(element)).length
+  }
+
   _filterOptionsList() {
     const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
     let visibleOptions = 0
@@ -1073,6 +1129,8 @@ class MultiSelect extends BaseComponent {
         }
       }
     }
+
+    this._updateSelectAll()
 
     if (visibleOptions > 0) {
       if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {

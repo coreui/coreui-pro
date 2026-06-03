@@ -1008,6 +1008,155 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected.find(item => item.value === '2')).toBeUndefined()
     })
 
+    it('should not select more options than selectionLimit', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 2
+      })
+
+      multiSelect.selectAll()
+      expect(multiSelect._selected.length).toBe(2)
+    })
+
+    it('should not select an option when selectionLimit is reached', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 1
+      })
+
+      multiSelect._selectOption('1', 'Option 1')
+      multiSelect._selectOption('2', 'Option 2')
+
+      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect._selected[0].value).toBe('1')
+    })
+
+    it('should trigger selectionLimit event when selectionLimit is reached', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 1
+      })
+      let eventValue = null
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', event => {
+        eventValue = event
+      })
+
+      multiSelect._selectOption('1', 'Option 1')
+      multiSelect._selectOption('2', 'Option 2')
+
+      expect(eventValue).not.toBeNull()
+      expect(eventValue.selectionLimit).toBe(1)
+    })
+
+    it('should trigger selectionLimit event when clicking an option after initial selection reaches selectionLimit', () => {
+      fixtureEl.innerHTML = [
+        '<select multiple>',
+        '  <option value="1" selected>Option 1</option>',
+        '  <option value="2" selected>Option 2</option>',
+        '  <option value="3" selected>Option 3</option>',
+        '  <option value="4">Option 4</option>',
+        '</select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        selectionLimit: 3
+      })
+      let eventValue = null
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', event => {
+        eventValue = event
+      })
+
+      multiSelect._optionsElement.querySelector('[data-value="4"]').click()
+
+      expect(eventValue).not.toBeNull()
+      expect(eventValue.selectionLimit).toBe(3)
+    })
+
+    it('should bubble selectionLimit event', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 1
+      })
+      let eventValue = null
+
+      document.addEventListener('selectionLimit.coreui.multi-select', event => {
+        eventValue = event
+      }, { once: true })
+
+      multiSelect._selectOption('1', 'Option 1')
+      multiSelect._selectOption('2', 'Option 2')
+
+      expect(eventValue).not.toBeNull()
+      expect(eventValue.target).toBe(selectEl)
+    })
+
+    it('should trigger selectionLimit event when selectAll reaches selectionLimit', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 2
+      })
+      let eventValue = null
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', event => {
+        eventValue = event
+      })
+
+      multiSelect.selectAll()
+
+      expect(eventValue).not.toBeNull()
+      expect(eventValue.selectionLimit).toBe(2)
+    })
+
+    it('should apply selectionLimit to initially selected options', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1', selected: true },
+        { value: '2', text: 'Option 2', selected: true },
+        { value: '3', text: 'Option 3', selected: true }
+      ]
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 2
+      })
+
+      expect(multiSelect._selected.length).toBe(2)
+    })
+
     it('should select all options within groups', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -2303,6 +2452,62 @@ describe('MultiSelect', () => {
       multiSelect._selectAllElement.click()
 
       expect(multiSelect._selected.length).toBe(3)
+    })
+
+    it('should disable selectAll button when available options count is greater than selectionLimit', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2' },
+          { value: '3', text: 'Opt 3' }
+        ],
+        selectAll: true,
+        multiple: true,
+        selectionLimit: 2
+      })
+
+      expect(multiSelect._selectAllElement.disabled).toBe(true)
+    })
+
+    it('should keep selectAll button enabled when available options count is not greater than selectionLimit', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2' },
+          { value: '3', text: 'Opt 3', disabled: true }
+        ],
+        selectAll: true,
+        multiple: true,
+        selectionLimit: 2
+      })
+
+      expect(multiSelect._selectAllElement.disabled).toBe(false)
+    })
+
+    it('should update selectAll button disabled state after search', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Apple' },
+          { value: '2', text: 'Apricot' },
+          { value: '3', text: 'Banana' }
+        ],
+        search: true,
+        selectAll: true,
+        multiple: true,
+        selectionLimit: 2
+      })
+
+      expect(multiSelect._selectAllElement.disabled).toBe(true)
+
+      multiSelect.search('ban')
+
+      expect(multiSelect._selectAllElement.disabled).toBe(false)
     })
 
     it('should display custom selectAllLabel', () => {
