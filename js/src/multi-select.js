@@ -888,13 +888,13 @@ class MultiSelect extends BaseComponent {
       })
     }
 
-    const nativeOption = SelectorEngine.findOne(`option[value="${value}"]`, this._element)
+    const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
 
     if (nativeOption) {
       nativeOption.selected = true
     }
 
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
+    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', 'true')
@@ -914,9 +914,12 @@ class MultiSelect extends BaseComponent {
   _deselectOption(value) {
     this._selected = this._selected.filter(option => option.value !== String(value))
 
-    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
+    const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
+    if (nativeOption) {
+      nativeOption.selected = false
+    }
 
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
+    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', 'false')
