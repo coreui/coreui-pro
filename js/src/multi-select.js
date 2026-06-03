@@ -482,7 +482,7 @@ class MultiSelect extends BaseComponent {
     for (const node of nodes) {
       if (node.nodeName === 'OPTION' && node.value) {
         const value = String(node.value)
-        const text = node.innerHTML
+        const text = node.textContent
         const isSelected = node.selected || (this._config.value && this._config.value.includes(node.value))
         const shouldSelect = isSelected && !this._isSelectionLimitReached()
         options.push({
@@ -497,7 +497,7 @@ class MultiSelect extends BaseComponent {
         if (shouldSelect) {
           this._selected.push({
             value,
-            text: node.innerHTML,
+            text: node.textContent,
             ...node.disabled && { disabled: true }
           })
         }
@@ -540,7 +540,7 @@ class MultiSelect extends BaseComponent {
           opt.setAttribute('selected', 'selected')
         }
 
-        opt.innerHTML = option.text
+        opt.textContent = option.text
         parentElement.append(opt)
       } else {
         const optgroup = document.createElement('optgroup')
@@ -793,7 +793,7 @@ class MultiSelect extends BaseComponent {
     const tag = document.createElement('div')
     tag.classList.add(CLASS_NAME_TAG)
     tag.dataset.value = value
-    tag.innerHTML = text
+    tag.textContent = text
 
     if (!this._config.disabled && disabled !== true) {
       const closeBtn = document.createElement('button')
@@ -964,11 +964,17 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._config.multiple && this._config.selectionType === 'text') {
-      selection.innerHTML = this._selected.map((option, index) => `<span>${option.text}${index === this._selected.length - 1 ? '' : ','}&nbsp;</span>`).join('')
+      selection.innerHTML = ''
+
+      for (const [index, option] of this._selected.entries()) {
+        const span = document.createElement('span')
+        span.textContent = `${option.text}${index === this._selected.length - 1 ? '' : ','}\u00A0`
+        selection.append(span)
+      }
     }
 
     if (!this._config.multiple && this._selected.length > 0 && !this._config.search) {
-      selection.innerHTML = this._selected[0].text
+      selection.textContent = this._selected[0].text
     }
 
     if (search) {
