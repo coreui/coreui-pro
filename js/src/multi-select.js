@@ -707,7 +707,7 @@ class MultiSelect extends BaseComponent {
       const selectAllButton = document.createElement('button')
       selectAllButton.type = 'button'
       selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
-      selectAllButton.innerHTML = this._config.selectAllLabel
+      selectAllButton.textContent = this._config.selectAllLabel
 
       this._selectAllElement = selectAllButton
 
@@ -947,12 +947,16 @@ class MultiSelect extends BaseComponent {
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._clone)
 
     if (this._selected.length === 0 && !this._config.search) {
-      selection.innerHTML = `<span class="form-multi-select-placeholder">${this._config.placeholder}</span>`
+      const placeholder = document.createElement('span')
+      placeholder.classList.add('form-multi-select-placeholder')
+      placeholder.textContent = this._config.placeholder
+      selection.innerHTML = ''
+      selection.append(placeholder)
       return
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-      selection.innerHTML = `${this._selected.length} ${this._config.selectionTypeCounterText}`
+      selection.textContent = `${this._selected.length} ${this._config.selectionTypeCounterText}`
     }
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
@@ -1149,7 +1153,7 @@ class MultiSelect extends BaseComponent {
     if (visibleOptions === 0) {
       const placeholder = document.createElement('div')
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-      placeholder.innerHTML = this._config.searchNoResultsLabel
+      placeholder.textContent = this._config.searchNoResultsLabel
 
       if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
         SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
