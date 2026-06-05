@@ -1248,7 +1248,6 @@ class MultiSelect extends BaseComponent {
     }
 
     this._selectAllElement.textContent = this._getSelectAllLabel()
-    this._selectAllElement.disabled = this._hasSelectionLimit() && this._getAvailableOptionsCount() > this._config.selectionLimit
   }
 
   _getSelectAllLabel() {
@@ -1257,7 +1256,15 @@ class MultiSelect extends BaseComponent {
 
   _isAllSelected() {
     const { selected, total } = this._getSelectionState()
-    return total > 0 && selected >= total
+    const target = this._getSelectableTarget(total)
+    return target > 0 && selected >= target
+  }
+
+  // How many options the select all button can actually select: capped by the
+  // selection limit when one is set, so the toggle flips to "deselect all" once
+  // the limit is reached instead of being unreachable.
+  _getSelectableTarget(total) {
+    return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
   }
 
   _toggleGroup(optgroupEl) {
@@ -1325,7 +1332,7 @@ class MultiSelect extends BaseComponent {
     }
 
     const { selected, total } = this._getSelectionState()
-    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, total))
+    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)))
   }
 
   _renderHeader() {
@@ -1407,10 +1414,6 @@ class MultiSelect extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, {
       selectionLimit: this._config.selectionLimit
     })
-  }
-
-  _getAvailableOptionsCount() {
-    return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => this._isVisible(element)).length
   }
 
   _filterOptionsList() {

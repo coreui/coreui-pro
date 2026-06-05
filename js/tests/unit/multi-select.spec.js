@@ -2667,7 +2667,7 @@ describe('MultiSelect', () => {
       expect(document.activeElement).toBe(firstOption)
     })
 
-    it('should skip the disabled select all button during navigation', () => {
+    it('should navigate to the select all button even with a selection limit', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -2681,12 +2681,13 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      expect(multiSelect._selectAllElement.disabled).toBe(true)
+      // The button stays enabled with a limit, so it joins the navigation flow.
+      expect(multiSelect._selectAllElement.disabled).toBe(false)
 
       const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
       multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
 
-      expect(document.activeElement).not.toBe(multiSelect._selectAllElement)
+      expect(document.activeElement).toBe(multiSelect._selectAllElement)
     })
 
     it('should close dropdown on Escape key', () => {
@@ -3175,7 +3176,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected.length).toBe(3)
     })
 
-    it('should disable selectAll button when available options count is greater than selectionLimit', () => {
+    it('should keep selectAll button enabled and select up to the limit on click', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -3188,28 +3189,47 @@ describe('MultiSelect', () => {
         multiple: true,
         selectionLimit: 2
       })
+      let eventCount = 0
 
-      expect(multiSelect._selectAllElement.disabled).toBe(true)
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', () => {
+        eventCount += 1
+      })
+
+      expect(multiSelect._selectAllElement.disabled).toBe(false)
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(2)
+      expect(eventCount).toBe(1)
     })
 
-    it('should keep selectAll button enabled when available options count is not greater than selectionLimit', () => {
+    it('should toggle to deselect all once the limit is reached', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [
           { value: '1', text: 'Opt 1' },
           { value: '2', text: 'Opt 2' },
-          { value: '3', text: 'Opt 3', disabled: true }
+          { value: '3', text: 'Opt 3' }
         ],
         selectAll: true,
         multiple: true,
-        selectionLimit: 2
+        selectionLimit: 2,
+        deselectAllLabel: 'Deselect all'
       })
 
-      expect(multiSelect._selectAllElement.disabled).toBe(false)
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(2)
+
+      // At the limit the toggle flips to "deselect all" and the checkbox reads as full.
+      expect(multiSelect._isAllSelected()).toBe(true)
+      expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
+      expect(multiSelect._selectAllElement.classList.contains('form-multi-selected')).toBe(true)
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(0)
     })
 
-    it('should update selectAll button disabled state after search', () => {
+    it('should keep the selectAll button enabled regardless of search with a limit', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -3224,7 +3244,7 @@ describe('MultiSelect', () => {
         selectionLimit: 2
       })
 
-      expect(multiSelect._selectAllElement.disabled).toBe(true)
+      expect(multiSelect._selectAllElement.disabled).toBe(false)
 
       multiSelect.search('ban')
 

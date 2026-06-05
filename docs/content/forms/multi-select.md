@@ -200,7 +200,7 @@ If you prefer to show a counter indicating the number of selected options, add t
 
 ## Selection limit
 
-Use `data-coreui-selection-limit` to limit how many options can be selected. When the number of visible available options exceeds the limit, the select all button is disabled. The `selectionLimit.coreui.multi-select` event can be used to show feedback when a user tries to select more options than allowed.
+Use `data-coreui-selection-limit` to limit how many options can be selected. The select all button stays enabled and selects options up to the limit, then toggles to deselect all once the limit is reached. The `selectionLimit.coreui.multi-select` event can be used to show feedback when a user tries to select more options than allowed.
 
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectSelectionLimitSnippet">}}
 <select class="form-multi-select" id="multiSelectSelectionLimit" multiple data-coreui-search="true" data-coreui-selection-limit="3">
@@ -432,7 +432,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `selectAll` | boolean | `true` | Enables select all button.|
 | `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
 | `selectAllStyle` | string | `'checkbox'` | Sets the select all button style: `'checkbox'` or `'text'`. With `'checkbox'` (and `multiple`), the built-in select all button shows a tri-state checkbox indicator (`none` / `all` / `indeterminate`) reflecting the overall selection, and clicking it toggles between selecting and deselecting all. |
-| `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. When visible available options exceed the limit, the select all button is disabled. |
+| `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectionType` | string | `'tag'` | Sets the selection style.	 |
 | `selectionTypeCounterText` | string | `'item(s) selected'` | Sets the counter selection label.	|
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
