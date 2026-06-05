@@ -339,65 +339,41 @@ class MultiSelect extends BaseComponent {
   }
 
   selectAll(options = this._options) {
-    if (this._selectAllOptions(options)) {
+    const limitReached = this._selectAllOptions(options)
+    this._refreshAfterSelectionChange()
+
+    if (limitReached) {
       this._triggerSelectionLimit()
     }
   }
 
-  _selectAllOptions(options) {
-    for (const option of options) {
-      if (option.disabled) {
-        continue
-      }
-
-      if (option.label) {
-        if (this._selectAllOptions(option.options)) {
-          return true
-        }
-
-        continue
-      }
-
-      if (this._isSelectionLimitReached()) {
-        return true
-      }
-
-      this._selectOption(option.value, option.text)
-    }
-
-    return false
-  }
-
   deselectAll(options = this._options) {
-    for (const option of options) {
-      if (option.disabled) {
-        continue
-      }
-
-      if (option.label) {
-        this.deselectAll(option.options)
-        continue
-      }
-
-      this._deselectOption(option.value)
-    }
+    this._deselectAllOptions(options)
+    this._refreshAfterSelectionChange()
   }
 
   selectVisible() {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
       .filter(element => this._isOptionDisplayed(element))
 
+    let limitReached = false
     for (const item of items) {
       if (this._isSelectionLimitReached()) {
-        this._triggerSelectionLimit()
-        return
+        limitReached = true
+        break
       }
 
       const value = String(item.dataset.value)
       const option = this._findOptionByValue(value)
       if (option && !this._selected.some(selected => selected.value === value)) {
-        this._selectOption(value, option.text)
+        this._selectOption(value, option.text, { refresh: false })
       }
+    }
+
+    this._refreshAfterSelectionChange()
+
+    if (limitReached) {
+      this._triggerSelectionLimit()
     }
   }
 
@@ -408,9 +384,11 @@ class MultiSelect extends BaseComponent {
     for (const item of items) {
       const value = String(item.dataset.value)
       if (this._selected.some(selected => selected.value === value)) {
-        this._deselectOption(value)
+        this._deselectOption(value, { refresh: false })
       }
     }
+
+    this._refreshAfterSelectionChange()
   }
 
   getValue() {
@@ -1055,7 +1033,46 @@ class MultiSelect extends BaseComponent {
     return null
   }
 
-  _selectOption(value, text) {
+  _selectAllOptions(options) {
+    for (const option of options) {
+      if (option.disabled) {
+        continue
+      }
+
+      if (option.label) {
+        if (this._selectAllOptions(option.options)) {
+          return true
+        }
+
+        continue
+      }
+
+      if (this._isSelectionLimitReached()) {
+        return true
+      }
+
+      this._selectOption(option.value, option.text, { refresh: false })
+    }
+
+    return false
+  }
+
+  _deselectAllOptions(options) {
+    for (const option of options) {
+      if (option.disabled) {
+        continue
+      }
+
+      if (option.label) {
+        this._deselectAllOptions(option.options)
+        continue
+      }
+
+      this._deselectOption(option.value, { refresh: false })
+    }
+  }
+
+  _selectOption(value, text, { refresh = true } = {}) {
     if (!this._config.multiple) {
       this.deselectAll()
     }
@@ -1090,16 +1107,15 @@ class MultiSelect extends BaseComponent {
       value: this._selected
     })
 
-    this._updateSelection()
-    this._updateSelectionCleaner()
-    this._updateSearch()
-    this._updateSearchSize()
-    this._updateHeader()
-    this._updateGroupsState()
-    this._updateMasterCheckbox()
+    // During init every preselected option runs through here while `_selected` is
+    // already fully populated, so callers can batch the costly DOM refresh into a
+    // single `_refreshAfterSelectionChange()` instead of repeating it per option.
+    if (refresh) {
+      this._refreshAfterSelectionChange()
+    }
   }
 
-  _deselectOption(value) {
+  _deselectOption(value, { refresh = true } = {}) {
     this._selected = this._selected.filter(option => option.value !== String(value))
 
     const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
@@ -1117,13 +1133,9 @@ class MultiSelect extends BaseComponent {
       value: this._selected
     })
 
-    this._updateSelection()
-    this._updateSelectionCleaner()
-    this._updateSearch()
-    this._updateSearchSize()
-    this._updateHeader()
-    this._updateGroupsState()
-    this._updateMasterCheckbox()
+    if (refresh) {
+      this._refreshAfterSelectionChange()
+    }
   }
 
   _deselectLastOption() {
@@ -1133,6 +1145,61 @@ class MultiSelect extends BaseComponent {
         this._deselectOption(last.value)
       }
     }
+  }
+
+  _refreshAfterSelectionChange() {
+    this._updateSelection()
+    this._updateSelectionCleaner()
+    this._updateSearch()
+    this._updateSearchSize()
+    this._updateHeader()
+    this._updateGroupsState()
+    this._updateMasterCheckbox()
+  }
+
+  _toggleGroup(optgroupEl) {
+    if (!optgroupEl) {
+      return
+    }
+
+    const items = SelectorEngine.children(optgroupEl, SELECTOR_OPTION)
+      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    const allSelected = items.length > 0 && items.every(element => element.classList.contains(CLASS_NAME_SELECTED))
+
+    let limitReached = false
+    for (const item of items) {
+      const value = String(item.dataset.value)
+
+      if (allSelected) {
+        this._deselectOption(value, { refresh: false })
+      } else if (!item.classList.contains(CLASS_NAME_SELECTED)) {
+        if (this._isSelectionLimitReached()) {
+          limitReached = true
+          break
+        }
+
+        const option = this._findOptionByValue(value)
+        if (option) {
+          this._selectOption(value, option.text, { refresh: false })
+        }
+      }
+    }
+
+    this._refreshAfterSelectionChange()
+
+    if (limitReached) {
+      this._triggerSelectionLimit()
+    }
+  }
+
+  _updateOptionsList() {
+    // `_selected` is already fully populated by `_getOptions()` before this runs,
+    // so iterate it directly (no tree walk) and batch the DOM refresh into one call.
+    for (const option of this._selected) {
+      this._selectOption(option.value, option.text, { refresh: false })
+    }
+
+    this._refreshAfterSelectionChange()
   }
 
   _updateSelection() {
@@ -1275,34 +1342,6 @@ class MultiSelect extends BaseComponent {
     return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
   }
 
-  _toggleGroup(optgroupEl) {
-    if (!optgroupEl) {
-      return
-    }
-
-    const items = SelectorEngine.children(optgroupEl, SELECTOR_OPTION)
-      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
-    const allSelected = items.length > 0 && items.every(element => element.classList.contains(CLASS_NAME_SELECTED))
-
-    for (const item of items) {
-      const value = String(item.dataset.value)
-
-      if (allSelected) {
-        this._deselectOption(value)
-      } else if (!item.classList.contains(CLASS_NAME_SELECTED)) {
-        if (this._isSelectionLimitReached()) {
-          this._triggerSelectionLimit()
-          break
-        }
-
-        const option = this._findOptionByValue(value)
-        if (option) {
-          this._selectOption(value, option.text)
-        }
-      }
-    }
-  }
-
   _getCheckboxState(selected, total) {
     if (total > 0 && selected >= total) {
       return 'all'
@@ -1385,19 +1424,6 @@ class MultiSelect extends BaseComponent {
       this.search(element.value)
 
       this._updateSearchSize(element.value.length + 1)
-    }
-  }
-
-  _updateOptionsList(options = this._options) {
-    for (const option of options) {
-      if (option.label) {
-        this._updateOptionsList(option.options)
-        continue
-      }
-
-      if (option.selected) {
-        this._selectOption(option.value, option.text)
-      }
     }
   }
 
