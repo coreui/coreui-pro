@@ -40,6 +40,7 @@ const ESCAPE_KEY = 'Escape'
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
+const SELECTOR_CLEANER = '.form-multi-select-cleaner'
 const SELECTOR_OPTGROUP = '.form-multi-select-optgroup'
 const SELECTOR_OPTION = '.form-multi-select-option'
 const SELECTOR_OPTIONS = '.form-multi-select-options'
@@ -47,6 +48,8 @@ const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
 const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_SELECT = '.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
+const SELECTOR_TAG = '.form-multi-select-tag'
+const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
 const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`
 
@@ -289,6 +292,39 @@ class MultiSelect extends BaseComponent {
       this._popper.destroy()
     }
 
+    // Detach listeners before removing the DOM: EventHandler keeps handlers in a
+    // module-level registry keyed per element, so DOM removal alone won't clear
+    // them. Listener sites are a fixed set of stable elements — tags and the
+    // cleaner share one delegated listener on `_selectionElement` / `_togglerElement`.
+    for (const element of [
+      this._clone,
+      this._menu,
+      this._selectionElement,
+      this._togglerElement,
+      this._searchElement,
+      this._indicatorElement,
+      this._selectAllElement,
+      this._headerElement,
+      this._optionsElement
+    ]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY)
+      }
+    }
+
+    // Remove the generated DOM. With `container` the menu lives outside `_clone`.
+    if (this._menu) {
+      this._menu.remove()
+    }
+
+    if (this._clone) {
+      this._clone.remove()
+    }
+
+    // Restore the native select to its pre-init, interactive state.
+    this._element.style.removeProperty('display')
+    this._element.removeAttribute('tabindex')
+
     super.dispose()
   }
 
@@ -398,6 +434,29 @@ class MultiSelect extends BaseComponent {
   // Private
 
   _addEventListeners() {
+    // Delegated once on the stable selection container: tags come and go, so a
+    // per-tag listener would mean constant bind/unbind. stopPropagation keeps the
+    // delete click from bubbling to the clone's "open dropdown" handler.
+    EventHandler.on(this._selectionElement, EVENT_CLICK, SELECTOR_TAG_DELETE, event => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      const tag = event.target.closest(SELECTOR_TAG)
+      if (tag) {
+        this._deselectOption(String(tag.dataset.value))
+      }
+    })
+
+    // Delegated for the same reason as the tags: the cleaner is created and removed
+    // as the selection comes and goes.
+    EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, event => {
+      if (!this._config.disabled) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.deselectAll()
+      }
+    })
+
     EventHandler.on(this._clone, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.show()
@@ -730,14 +789,6 @@ class MultiSelect extends BaseComponent {
     cleaner.classList.add(CLASS_NAME_CLEANER)
     cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
 
-    EventHandler.on(cleaner, EVENT_CLICK, event => {
-      if (!this._config.disabled) {
-        event.preventDefault()
-        event.stopPropagation()
-        this.deselectAll()
-      }
-    })
-
     return cleaner
   }
 
@@ -922,14 +973,6 @@ class MultiSelect extends BaseComponent {
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
       closeBtn.setAttribute('aria-label', `${this._config.ariaTagDeleteLabel} ${text}`.trim())
 
-      EventHandler.on(closeBtn, EVENT_CLICK, event => {
-        event.preventDefault()
-        event.stopPropagation()
-
-        tag.remove()
-        this._deselectOption(value)
-      })
-
       tag.append(closeBtn)
     }
 
@@ -946,21 +989,17 @@ class MultiSelect extends BaseComponent {
 
     const existingTags = new Map()
 
-    for (const tag of SelectorEngine.children(selection, `.${CLASS_NAME_TAG}`)) {
+    for (const tag of SelectorEngine.children(selection, SELECTOR_TAG)) {
       existingTags.set(tag.dataset.value, tag)
     }
 
     const selectedValues = new Set(this._selected.map(option => String(option.value)))
 
-    // Remove tags whose option is no longer selected, detaching their listeners
-    // so the close buttons don't leak in EventHandler's internal registry.
+    // Remove tags whose option is no longer selected. The delete buttons share a
+    // single delegated listener on the selection container, so there is nothing
+    // per-tag to detach here.
     for (const [value, tag] of existingTags) {
       if (!selectedValues.has(value)) {
-        const closeBtn = SelectorEngine.findOne(`.${CLASS_NAME_TAG_DELETE}`, tag)
-        if (closeBtn) {
-          EventHandler.off(closeBtn, EVENT_CLICK)
-        }
-
         tag.remove()
         existingTags.delete(value)
       }
@@ -1182,7 +1221,6 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._selected.length === 0 && this._selectionCleanerElement !== null) {
-      EventHandler.off(this._selectionCleanerElement, EVENT_CLICK)
       this._selectionCleanerElement.remove()
       this._selectionCleanerElement = null
     }

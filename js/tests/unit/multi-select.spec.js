@@ -1,6 +1,7 @@
 /* eslint-env jasmine */
 
 import MultiSelect from '../../src/multi-select.js'
+import EventHandler from '../../src/dom/event-handler.js'
 import {
   getFixture, clearFixture, jQueryMock
 } from '../helpers/fixture.js'
@@ -2451,6 +2452,44 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected.length).toBe(1)
     })
 
+    it('should not open the dropdown when clicking a tag delete button', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1', selected: true }],
+        selectionType: 'tags'
+      })
+
+      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+
+      multiSelect._clone.querySelector('.form-multi-select-tag-delete').click()
+
+      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+    })
+
+    it('should remove a tag created after initialization via delegation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1', selected: true },
+          { value: '2', text: 'Opt 2' }
+        ],
+        selectionType: 'tags'
+      })
+
+      // This tag node did not exist when listeners were bound.
+      multiSelect._selectOption('2', 'Opt 2')
+      const newTagDelete = multiSelect._clone
+        .querySelector('.form-multi-select-tag[data-value="2"] .form-multi-select-tag-delete')
+
+      newTagDelete.click()
+
+      expect(multiSelect._selected.some(option => option.value === '2')).toBe(false)
+      expect(multiSelect._selected.length).toBe(1)
+    })
+
     it('should update search size based on selections', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -3035,6 +3074,32 @@ describe('MultiSelect', () => {
       expect(cleaner).not.toBeNull()
     })
 
+    it('should deselect all when clicking a re-created cleaner via delegation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1', selected: true },
+          { value: '2', text: 'Opt 2' }
+        ],
+        cleaner: true,
+        multiple: true
+      })
+
+      // Empty the selection so the cleaner is removed, then re-create it.
+      multiSelect.deselectAll()
+      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
+
+      multiSelect._selectOption('2', 'Opt 2')
+      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      expect(cleaner).not.toBeNull()
+
+      cleaner.click()
+
+      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+    })
+
     it('should not insert cleaner when no items are selected', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -3419,6 +3484,68 @@ describe('MultiSelect', () => {
       // Should not throw
       multiSelect.dispose()
       expect(multiSelect._element).toBeNull()
+    })
+
+    it('should remove the generated DOM and restore the native select', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      const clone = multiSelect._clone
+      const menu = multiSelect._menu
+
+      expect(fixtureEl.querySelector('.form-multi-select')).not.toBeNull()
+      expect(selectEl.style.display).toBe('none')
+
+      multiSelect.dispose()
+
+      expect(clone.isConnected).toBe(false)
+      expect(menu.isConnected).toBe(false)
+      expect(selectEl.style.display).toBe('')
+      expect(selectEl.getAttribute('tabindex')).toBeNull()
+    })
+
+    it('should remove the menu appended to a container', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }],
+        container: 'body'
+      })
+
+      multiSelect.show()
+      const menu = multiSelect._menu
+      expect(menu.isConnected).toBe(true)
+
+      multiSelect.dispose()
+
+      expect(menu.isConnected).toBe(false)
+    })
+
+    it('should detach listeners from generated elements on dispose', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ],
+        cleaner: true
+      })
+
+      multiSelect._selectOption('1', 'Option 1')
+
+      const clone = multiSelect._clone
+      const optionsElement = multiSelect._optionsElement
+      const spy = spyOn(EventHandler, 'off').and.callThrough()
+
+      multiSelect.dispose()
+
+      const offTargets = spy.calls.allArgs().map(args => args[0])
+      expect(offTargets).toContain(clone)
+      expect(offTargets).toContain(optionsElement)
     })
   })
 
