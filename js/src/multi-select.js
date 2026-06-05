@@ -524,10 +524,6 @@ class MultiSelect extends BaseComponent {
     })
   }
 
-  _getClassNames() {
-    return this._element.classList.value.split(' ')
-  }
-
   _getOptions() {
     if (this._config.options) {
       return this._getOptionsFromConfig()
@@ -677,7 +673,7 @@ class MultiSelect extends BaseComponent {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
-    for (const className of this._getClassNames()) {
+    for (const className of this._element.classList.value.split(' ')) {
       multiSelectEl.classList.add(className)
     }
 
@@ -1325,11 +1321,7 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    this._selectAllElement.textContent = this._getSelectAllLabel()
-  }
-
-  _getSelectAllLabel() {
-    return this._isAllSelected() ? this._config.deselectAllLabel : this._config.selectAllLabel
+    this._selectAllElement.textContent = this._isAllSelected() ? this._config.deselectAllLabel : this._config.selectAllLabel
   }
 
   _isAllSelected() {
