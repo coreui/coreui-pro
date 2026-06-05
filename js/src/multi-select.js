@@ -48,6 +48,7 @@ const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_SELECT = '.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
+const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -63,22 +64,26 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
+const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
 const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_DROPDOWN_HEADER = 'form-multi-select-dropdown-header'
 const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group'
 const CLASS_NAME_LABEL = 'label'
-const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
 const CLASS_NAME_SELECT_ALL = 'form-multi-select-all'
+const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'form-multi-select-all-with-checkbox'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
+const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'form-multi-select-optgroup-label-with-checkbox'
 const CLASS_NAME_OPTION = 'form-multi-select-option'
 const CLASS_NAME_OPTION_WITH_CHECKBOX = 'form-multi-select-option-with-checkbox'
 const CLASS_NAME_OPTIONS = 'form-multi-select-options'
 const CLASS_NAME_OPTIONS_EMPTY = 'form-multi-select-options-empty'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'form-multi-selected'
+const CLASS_NAME_INDETERMINATE = 'form-multi-select-indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
@@ -92,12 +97,16 @@ const Default = {
   cleaner: true,
   clearSearchOnSelect: false,
   container: false,
+  deselectAllLabel: 'Deselect all',
   disabled: false,
+  headerTemplate: null,
   id: null,
   invalid: false,
   multiple: true,
   name: null,
   options: false,
+  optionsGroupsSelectable: false,
+  optionsGroupsStyle: 'checkbox',
   optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
   optionsStyle: 'checkbox',
@@ -109,7 +118,8 @@ const Default = {
   search: false,
   searchNoResultsLabel: 'No results found',
   selectAll: true,
-  selectAllLabel: 'Select all options',
+  selectAllLabel: 'Select all',
+  selectAllStyle: 'checkbox',
   selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
@@ -124,12 +134,16 @@ const DefaultType = {
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
+  deselectAllLabel: 'string',
   disabled: 'boolean',
+  headerTemplate: '(function|null)',
   id: '(string|null)',
   invalid: 'boolean',
   multiple: 'boolean',
   name: '(string|null)',
   options: '(boolean|array)',
+  optionsGroupsSelectable: 'boolean',
+  optionsGroupsStyle: 'string',
   optionsGroupsTemplate: '(function|null)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
@@ -141,6 +155,7 @@ const DefaultType = {
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
+  selectAllStyle: 'string',
   selectAllLabel: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
@@ -164,6 +179,7 @@ class MultiSelect extends BaseComponent {
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
+    this._headerElement = null
     this._selectionElement = null
     this._selectionCleanerElement = null
     this._searchElement = null
@@ -319,6 +335,36 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  selectVisible() {
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+      .filter(element => this._isVisible(element))
+
+    for (const item of items) {
+      if (this._isSelectionLimitReached()) {
+        this._triggerSelectionLimit()
+        return
+      }
+
+      const value = String(item.dataset.value)
+      const option = this._findOptionByValue(value)
+      if (option && !this._selected.some(selected => selected.value === value)) {
+        this._selectOption(value, option.text)
+      }
+    }
+  }
+
+  deselectVisible() {
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+      .filter(element => this._isVisible(element))
+
+    for (const item of items) {
+      const value = String(item.dataset.value)
+      if (this._selected.some(selected => selected.value === value)) {
+        this._deselectOption(value)
+      }
+    }
+  }
+
   getValue() {
     return this._selected
   }
@@ -389,15 +435,32 @@ class MultiSelect extends BaseComponent {
       this._searchElement.focus()
     })
 
-    EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
-      if (this._selectAllElement.disabled) {
-        return
-      }
+    if (this._selectAllElement) {
+      EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
+        if (this._selectAllElement.disabled) {
+          return
+        }
 
-      event.preventDefault()
-      event.stopPropagation()
-      this.selectAll()
-    })
+        event.preventDefault()
+        event.stopPropagation()
+
+        if (this._isAllSelected()) {
+          this.deselectAll()
+        } else {
+          this.selectAll()
+        }
+      })
+
+      // The select all button lives in the header, outside the options list, so it
+      // needs its own arrow-key handler to join the navigation flow (Enter/Space
+      // already toggle via the native button click above).
+      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN, event => {
+        if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
+          event.preventDefault()
+          this._selectMenuItem(event)
+        }
+      })
+    }
 
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
       event.preventDefault()
@@ -696,26 +759,49 @@ class MultiSelect extends BaseComponent {
   _createOptionsContainer() {
     const dropdownDiv = document.createElement('div')
     dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
-    dropdownDiv.role = 'listbox'
-    dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`)
 
-    if (this._config.multiple) {
-      dropdownDiv.setAttribute('aria-multiselectable', 'true')
-    }
+    const hasHeaderTemplate = typeof this._config.headerTemplate === 'function'
+    const showSelectAll = this._config.selectAll && this._config.multiple
 
-    if (this._config.selectAll && this._config.multiple) {
-      const selectAllButton = document.createElement('button')
-      selectAllButton.type = 'button'
-      selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
-      selectAllButton.textContent = this._config.selectAllLabel
+    if (hasHeaderTemplate || showSelectAll) {
+      const header = document.createElement('div')
+      header.classList.add(CLASS_NAME_DROPDOWN_HEADER)
 
-      this._selectAllElement = selectAllButton
+      if (hasHeaderTemplate) {
+        const headerContent = document.createElement('div')
 
-      dropdownDiv.append(selectAllButton)
+        // Keep interactions with custom controls from closing the dropdown,
+        // mirroring the built-in button's stopPropagation behavior.
+        EventHandler.on(headerContent, EVENT_CLICK, event => {
+          event.stopPropagation()
+        })
+
+        this._headerElement = headerContent
+        header.append(headerContent)
+      } else {
+        const selectAllButton = document.createElement('button')
+        selectAllButton.type = 'button'
+        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
+
+        if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
+          selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX)
+        }
+
+        this._selectAllElement = selectAllButton
+        header.append(selectAllButton)
+      }
+
+      dropdownDiv.append(header)
     }
 
     const optionsDiv = document.createElement('div')
     optionsDiv.classList.add(CLASS_NAME_OPTIONS)
+    optionsDiv.setAttribute('role', 'listbox')
+    optionsDiv.setAttribute('id', `${this._uniqueId}-listbox`)
+
+    if (this._config.multiple) {
+      optionsDiv.setAttribute('aria-multiselectable', 'true')
+    }
 
     if (this._config.optionsMaxHeight !== 'auto') {
       optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
@@ -734,7 +820,9 @@ class MultiSelect extends BaseComponent {
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
     this._menu = dropdownDiv
-    this._updateSelectAll()
+    this._updateHeader()
+    this._updateGroupsState()
+    this._updateMasterCheckbox()
   }
 
   _createOptions(parentElement, options) {
@@ -781,6 +869,13 @@ class MultiSelect extends BaseComponent {
         }
 
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
+
+        if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
+          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
+          optgrouplabel.tabIndex = 0
+          optgrouplabel.setAttribute('role', 'button')
+        }
+
         optgroup.append(optgrouplabel)
 
         this._createOptions(optgroup, option.options)
@@ -816,6 +911,14 @@ class MultiSelect extends BaseComponent {
   }
 
   _onOptionsClick(element) {
+    if (this._config.optionsGroupsSelectable) {
+      const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
+      if (groupLabel) {
+        this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
+        return
+      }
+    }
+
     if (element.classList.contains(CLASS_NAME_LABEL)) {
       return
     }
@@ -908,7 +1011,9 @@ class MultiSelect extends BaseComponent {
     this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
-    this._updateSelectAll()
+    this._updateHeader()
+    this._updateGroupsState()
+    this._updateMasterCheckbox()
   }
 
   _deselectOption(value) {
@@ -933,7 +1038,9 @@ class MultiSelect extends BaseComponent {
     this._updateSelectionCleaner()
     this._updateSearch()
     this._updateSearchSize()
-    this._updateSelectAll()
+    this._updateHeader()
+    this._updateGroupsState()
+    this._updateMasterCheckbox()
   }
 
   _deselectLastOption() {
@@ -1063,12 +1170,132 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateSelectAll() {
+  _updateHeader() {
+    if (this._headerElement) {
+      this._renderHeader()
+      return
+    }
+
     if (!this._selectAllElement) {
       return
     }
 
+    this._selectAllElement.textContent = this._getSelectAllLabel()
     this._selectAllElement.disabled = this._hasSelectionLimit() && this._getAvailableOptionsCount() > this._config.selectionLimit
+  }
+
+  _getSelectAllLabel() {
+    return this._isAllSelected() ? this._config.deselectAllLabel : this._config.selectAllLabel
+  }
+
+  _isAllSelected() {
+    const { selected, total } = this._getSelectionState()
+    return total > 0 && selected >= total
+  }
+
+  _toggleGroup(optgroupEl) {
+    if (!optgroupEl) {
+      return
+    }
+
+    const items = SelectorEngine.children(optgroupEl, SELECTOR_OPTION)
+      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    const allSelected = items.length > 0 && items.every(element => element.classList.contains(CLASS_NAME_SELECTED))
+
+    for (const item of items) {
+      const value = String(item.dataset.value)
+
+      if (allSelected) {
+        this._deselectOption(value)
+      } else if (!item.classList.contains(CLASS_NAME_SELECTED)) {
+        if (this._isSelectionLimitReached()) {
+          this._triggerSelectionLimit()
+          break
+        }
+
+        const option = this._findOptionByValue(value)
+        if (option) {
+          this._selectOption(value, option.text)
+        }
+      }
+    }
+  }
+
+  _getCheckboxState(selected, total) {
+    if (total > 0 && selected >= total) {
+      return 'all'
+    }
+
+    return selected === 0 ? 'none' : 'indeterminate'
+  }
+
+  _applyCheckboxState(element, state) {
+    element.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
+    element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'indeterminate')
+  }
+
+  _updateGroupsState() {
+    if (!this._config.optionsGroupsSelectable) {
+      return
+    }
+
+    for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
+      const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup)
+      if (!label) {
+        continue
+      }
+
+      const items = SelectorEngine.children(optgroup, SELECTOR_OPTION)
+        .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+      const selected = items.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
+      this._applyCheckboxState(label, this._getCheckboxState(selected, items.length))
+    }
+  }
+
+  _updateMasterCheckbox() {
+    if (this._config.selectAllStyle !== 'checkbox' || !this._selectAllElement) {
+      return
+    }
+
+    const { selected, total } = this._getSelectionState()
+    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, total))
+  }
+
+  _renderHeader() {
+    if (!this._headerElement || typeof this._config.headerTemplate !== 'function') {
+      return
+    }
+
+    const result = this._config.headerTemplate(this._getSelectionState(), this._getSelectionActions())
+
+    if (result instanceof Node) {
+      this._headerElement.replaceChildren(result)
+    } else {
+      this._headerElement.innerHTML = this._config.sanitize ?
+        sanitizeHtml(result, this._config.allowList, this._config.sanitizeFn) :
+        result
+    }
+  }
+
+  _getSelectionState() {
+    const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+    const visibleItems = allItems.filter(element => this._isVisible(element))
+
+    return {
+      selected: this._selected.length,
+      total: allItems.length,
+      visible: visibleItems.length,
+      visibleSelected: visibleItems.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
+    }
+  }
+
+  _getSelectionActions() {
+    return {
+      selectAll: () => this.selectAll(),
+      deselectAll: () => this.deselectAll(),
+      selectVisible: () => this.selectVisible(),
+      deselectVisible: () => this.deselectVisible()
+    }
   }
 
   _onSearchChange(element) {
@@ -1143,7 +1370,7 @@ class MultiSelect extends BaseComponent {
       }
     }
 
-    this._updateSelectAll()
+    this._updateHeader()
 
     if (visibleOptions > 0) {
       if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
@@ -1165,7 +1392,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _selectMenuItem({ key, target }) {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
+    const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
       return

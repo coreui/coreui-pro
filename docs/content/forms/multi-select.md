@@ -12,6 +12,8 @@ other_frameworks: multi-select
 snippets:
   - multi-select-array-data.js
   - multi-select-custom-options.js
+  - multi-select-header.js
+  - multi-select-indeterminate.js
   - multi-select-selection-limit.js
 ---
 
@@ -201,7 +203,6 @@ If you prefer to show a counter indicating the number of selected options, add t
 Use `data-coreui-selection-limit` to limit how many options can be selected. When the number of visible available options exceeds the limit, the select all button is disabled. The `selectionLimit.coreui.multi-select` event can be used to show feedback when a user tries to select more options than allowed.
 
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectSelectionLimitSnippet">}}
-<div class="alert alert-warning d-none" id="multiSelectSelectionLimitAlert" role="alert"></div>
 <select class="form-multi-select" id="multiSelectSelectionLimit" multiple data-coreui-search="true" data-coreui-selection-limit="3">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
@@ -215,7 +216,7 @@ Use `data-coreui-selection-limit` to limit how many options can be selected. Whe
 </select>
 {{< /example >}}
 
-We use the following JavaScript to show an alert when the selection limit is reached:
+We use the following JavaScript to show a toast when the selection limit is reached. The toast container is created on demand and appended to `<body>`, so it floats above the page instead of being constrained by the example:
 
 {{< js-docs id="multiSelectSelectionLimitSnippet" name="multi-select-selection-limit" file="docs/assets/js/snippets/multi-select-selection-limit.js" >}}
 
@@ -273,6 +274,30 @@ The CoreUI Bootstrap Multi Select Component provides the flexibility to personal
 We use the following JavaScript to set up our multi-select:
 
 {{< js-docs id="multiSelectCustomOptionsSnippet" name="multi-select-custom-options" file="docs/assets/js/snippets/multi-select-custom-options.js" >}}
+
+## Custom dropdown header
+
+Use the `headerTemplate` option to fully customize the dropdown header — the area above the options list — including rendering several action buttons. It renders independently of `selectAll`. The template function receives a `state` object (`{ selected, total, visible, visibleSelected }`) and an `actions` object with bound component methods (`selectAll`, `selectVisible`, `deselectVisible`, `deselectAll`). Return an `HTMLElement` and wire your own listeners to the `actions`, or return an HTML string (sanitized) for simple custom content. The header re-renders on every selection change and search filter, so labels and `disabled` states stay up to date.
+
+{{< example stackblitz_pro="true" stackblitz_add_js="multiSelectHeaderSnippet">}}
+<select id="myMultiSelectHeader" class="form-multi-select"></select>
+{{< /example >}}
+
+We use the following JavaScript to set up our multi-select:
+
+{{< js-docs id="multiSelectHeaderSnippet" name="multi-select-header" file="docs/assets/js/snippets/multi-select-header.js" >}}
+
+## Selectable groups & indeterminate state
+
+The checkbox indicator is rendered with CSS, so it supports a third, indeterminate state without any real `<input>` element. Enable `optionsGroupsSelectable` to turn each group label into a tri-state checkbox that toggles the whole group, and set `selectAllStyle: 'checkbox'` (the default) to give the built-in select all button the same `none` / `all` / `indeterminate` behavior. The checkbox indicators follow each section's own `*Style` option (`optionsStyle`, `optionsGroupsStyle`, `selectAllStyle`, all defaulting to `'checkbox'`) and require `multiple`.
+
+{{< example stackblitz_pro="true" stackblitz_add_js="multiSelectIndeterminateSnippet">}}
+<select id="myMultiSelectIndeterminate" class="form-multi-select"></select>
+{{< /example >}}
+
+We use the following JavaScript to set up our multi-select:
+
+{{< js-docs id="multiSelectIndeterminateSnippet" name="multi-select-indeterminate" file="docs/assets/js/snippets/multi-select-indeterminate.js" >}}
 
 ## Sizing
 
@@ -384,14 +409,18 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
 | `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
+| `deselectAllLabel` | string | `'Deselect all'` | Sets the select all button label shown once everything is selected. See `selectAllLabel`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Renders independently of `selectAll`. Receives a `state` object (`{ selected, total, visible, visibleSelected }`) and an `actions` object (`{ selectAll, deselectAll, selectVisible, deselectVisible }`) with bound component methods. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Set the name attribute for the native select element. |
 | `options` | boolean, array | `false` | List of option elements. |
+| `optionsGroupsSelectable` | boolean | `false` | When enabled (with `optionsGroupsStyle: 'checkbox'` and `multiple`), each option group label becomes a tri-state checkbox: clicking it toggles the whole group, and it reflects `none` / `all` / `indeterminate` based on the group's selected options. |
+| `optionsGroupsStyle` | string | `'checkbox'` | Sets the option group label style: `'checkbox'` or `'text'`. Controls the checkbox appearance used by `optionsGroupsSelectable`. |
 | `optionsGroupsTemplate` | function, null | `null` | Custom template function for rendering option group labels. Receives the group object as parameter. |
 | `optionsMaxHeight` | number, string | `'auto'` | Sets `max-height` of options list.	 |
-| `optionsStyle` | string | `'checkbox'` | Sets option style. |
+| `optionsStyle` | string | `'checkbox'` | Sets the option style: `'checkbox'` or `'text'`. |
 | `optionsTemplate` | function, null | `null` | Custom template function for rendering individual options. Receives the option object as parameter. |
 | `placeholder` | string | `'Select...'` | Specifies a short hint that is visible in the input. |
 | `required` | boolean | `false` | Makes the input field required for form validation. |
@@ -400,7 +429,8 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `search` | boolean, string | `false` | Enables search input element. When set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. |
 | `searchNoResultsLabel` | string | `'No results found'` | Sets the label for no results when filtering.	|
 | `selectAll` | boolean | `true` | Enables select all button.|
-| `selectAllLabel` | string | `'Select all options'` | Sets the select all button label.	 |
+| `selectAllLabel` | string | `'Select all'` | Sets the select all button label shown until everything is selected. The button is a toggle: it shows `selectAllLabel` (and selects all) until everything is selected, then shows `deselectAllLabel` (and deselects all). |
+| `selectAllStyle` | string | `'checkbox'` | Sets the select all button style: `'checkbox'` or `'text'`. With `'checkbox'` (and `multiple`), the built-in select all button shows a tri-state checkbox indicator (`none` / `all` / `indeterminate`) reflecting the overall selection, and clicking it toggles between selecting and deselecting all. |
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. When visible available options exceed the limit, the select all button is disabled. |
 | `selectionType` | string | `'tag'` | Sets the selection style.	 |
 | `selectionTypeCounterText` | string | `'item(s) selected'` | Sets the counter selection label.	|
@@ -417,6 +447,8 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `hide` | Hides the multi select's options. |
 | `update` | Updates the configuration of multi select. |
 | `selectAll` | Select all options. |
+| `selectVisible` | Select only the currently visible (search-filtered) options. |
+| `deselectVisible` | Deselect only the currently visible (search-filtered) options. |
 | `deselectAll` | Deselect all options. |
 | `dispose` | Destroys an element's multi select. (Removes stored data on the DOM element) |
 | `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |

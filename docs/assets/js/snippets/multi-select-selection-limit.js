@@ -1,7 +1,20 @@
 /* global coreui: false */
 
 // js-docs-start multi-select-selection-limit
-const multiSelectSelectionLimitToastContainer = document.getElementById('multiSelectSelectionLimitToastContainer')
+const getMultiSelectSelectionLimitToastContainer = () => {
+  let container = document.getElementById('multiSelectSelectionLimitToastContainer')
+
+  if (!container) {
+    container = document.createElement('div')
+    container.id = 'multiSelectSelectionLimitToastContainer'
+    container.className = 'toast-container position-fixed bottom-0 end-0 p-3'
+    container.setAttribute('aria-live', 'polite')
+    container.setAttribute('aria-atomic', 'true')
+    document.body.append(container)
+  }
+
+  return container
+}
 
 const showMultiSelectSelectionLimitToast = message => {
   const toast = document.createElement('div')
@@ -17,7 +30,7 @@ const showMultiSelectSelectionLimitToast = message => {
     `<div class="toast-body">${message}</div>`
   ].join('')
 
-  multiSelectSelectionLimitToastContainer.append(toast)
+  getMultiSelectSelectionLimitToastContainer().append(toast)
 
   toast.addEventListener('hidden.coreui.toast', () => {
     toast.remove()

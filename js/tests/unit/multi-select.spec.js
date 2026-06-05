@@ -294,6 +294,20 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement.classList.contains('form-multi-select-all')).toBe(true)
     })
 
+    it('should wrap select all in a dropdown header', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }],
+        multiple: true,
+        selectAll: true
+      })
+
+      const header = multiSelect._selectAllElement.closest('.form-multi-select-dropdown-header')
+      expect(header).not.toBeNull()
+      expect(header.parentNode).toBe(multiSelect._menu)
+    })
+
     it('should not create select all button when multiple is false', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -527,7 +541,7 @@ describe('MultiSelect', () => {
       expect(groupLabel.querySelector('strong')).not.toBeNull()
     })
 
-    it('should set aria-multiselectable on dropdown when multiple', () => {
+    it('should set aria-multiselectable on the options element when multiple', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -535,7 +549,7 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      expect(multiSelect._menu.getAttribute('aria-multiselectable')).toBe('true')
+      expect(multiSelect._optionsElement.getAttribute('aria-multiselectable')).toBe('true')
     })
 
     it('should not set aria-multiselectable when not multiple', () => {
@@ -546,7 +560,7 @@ describe('MultiSelect', () => {
         multiple: false
       })
 
-      expect(multiSelect._menu.getAttribute('aria-multiselectable')).toBeNull()
+      expect(multiSelect._optionsElement.getAttribute('aria-multiselectable')).toBeNull()
     })
 
     it('should handle container option', () => {
@@ -1330,6 +1344,473 @@ describe('MultiSelect', () => {
     })
   })
 
+  describe('selectVisible', () => {
+    it('should select only the currently visible (filtered) options', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Apple' },
+        { value: '2', text: 'Banana' },
+        { value: '3', text: 'Avocado' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options, search: true })
+
+      multiSelect.search('av')
+      multiSelect.selectVisible()
+
+      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect._selected[0].value).toBe('3')
+    })
+
+    it('should select all options when no filter is applied', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      multiSelect.selectVisible()
+      expect(multiSelect._selected.length).toBe(3)
+    })
+
+    it('should not select disabled options', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2', disabled: true },
+        { value: '3', text: 'Option 3' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      multiSelect.selectVisible()
+      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect._selected.find(item => item.value === '2')).toBeUndefined()
+    })
+
+    it('should respect selectionLimit', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Option 1' },
+        { value: '2', text: 'Option 2' },
+        { value: '3', text: 'Option 3' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options, selectionLimit: 2 })
+
+      multiSelect.selectVisible()
+      expect(multiSelect._selected.length).toBe(2)
+    })
+  })
+
+  describe('deselectVisible', () => {
+    it('should deselect only the currently visible (filtered) options', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        { value: '1', text: 'Apple' },
+        { value: '2', text: 'Banana' },
+        { value: '3', text: 'Avocado' }
+      ]
+      const multiSelect = new MultiSelect(selectEl, { options, search: true })
+
+      multiSelect.selectAll()
+      expect(multiSelect._selected.length).toBe(3)
+
+      multiSelect.search('av')
+      multiSelect.deselectVisible()
+
+      expect(multiSelect._selected.length).toBe(2)
+      expect(multiSelect._selected.find(item => item.value === '3')).toBeUndefined()
+    })
+  })
+
+  describe('headerTemplate', () => {
+    const options = [
+      { value: '1', text: 'Apple' },
+      { value: '2', text: 'Banana' },
+      { value: '3', text: 'Avocado' }
+    ]
+
+    it('should render a div container inside the dropdown header', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        headerTemplate: () => document.createElement('span')
+      })
+
+      expect(multiSelect._headerElement.tagName).toBe('DIV')
+      expect(multiSelect._headerElement.closest('.form-multi-select-dropdown-header')).not.toBeNull()
+    })
+
+    it('should render even when selectAll is false', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectAll: false,
+        headerTemplate: () => document.createElement('span')
+      })
+
+      expect(multiSelect._headerElement).not.toBeNull()
+      expect(multiSelect._selectAllElement).toBeNull()
+    })
+
+    it('should pass state and actions to the template', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      let received = null
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        headerTemplate(state, actions) {
+          received = { state, actions }
+          return document.createElement('span')
+        }
+      })
+
+      expect(multiSelect).toBeDefined()
+      expect(received.state).toEqual({
+        selected: 0, total: 3, visible: 3, visibleSelected: 0
+      })
+      expect(typeof received.actions.selectAll).toBe('function')
+      expect(typeof received.actions.deselectAll).toBe('function')
+      expect(typeof received.actions.selectVisible).toBe('function')
+      expect(typeof received.actions.deselectVisible).toBe('function')
+    })
+
+    it('should render the returned element', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        headerTemplate(state) {
+          const el = document.createElement('span')
+          el.textContent = `${state.selected}/${state.total}`
+          return el
+        }
+      })
+
+      expect(multiSelect._headerElement.querySelector('span').textContent).toBe('0/3')
+    })
+
+    it('should re-render the template on selection change', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        headerTemplate(state) {
+          const el = document.createElement('span')
+          el.textContent = String(state.selected)
+          return el
+        }
+      })
+
+      expect(multiSelect._headerElement.textContent).toBe('0')
+
+      multiSelect.selectAll()
+      expect(multiSelect._headerElement.textContent).toBe('3')
+    })
+
+    it('should report visibleSelected after filtering', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      let received = null
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        search: true,
+        headerTemplate(state) {
+          received = state
+          return document.createElement('span')
+        }
+      })
+
+      multiSelect.selectAll()
+      multiSelect.search('av')
+
+      expect(received.visible).toBe(1)
+      expect(received.visibleSelected).toBe(1)
+    })
+
+    it('should sanitize a string returned from the template', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        headerTemplate: () => '<span>ok</span><script>window.brokenMultiSelect = true</script>'
+      })
+
+      expect(multiSelect._headerElement.querySelector('span')).not.toBeNull()
+      expect(multiSelect._headerElement.querySelector('script')).toBeNull()
+    })
+
+    it('should not select all when the container is clicked', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        headerTemplate: () => document.createElement('span')
+      })
+
+      multiSelect._headerElement.click()
+      expect(multiSelect._selected.length).toBe(0)
+    })
+  })
+
+  describe('selectAllLabel', () => {
+    const options = [
+      { value: '1', text: 'Apple' },
+      { value: '2', text: 'Banana' },
+      { value: '3', text: 'Avocado' }
+    ]
+
+    it('should set the button text from selectAllLabel', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectAllLabel: 'Pick everything'
+      })
+
+      expect(multiSelect._selectAllElement.textContent).toBe('Pick everything')
+    })
+
+    it('should toggle between the default labels', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+    })
+
+    it('should toggle with custom labels regardless of style', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectAllStyle: 'text',
+        selectAllLabel: 'Select all',
+        deselectAllLabel: 'Deselect all'
+      })
+
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(3)
+      expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(0)
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+    })
+
+    it('should switch to deselectAllLabel when everything is selected', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectAllLabel: 'Grab all',
+        deselectAllLabel: 'Drop all'
+      })
+
+      expect(multiSelect._selectAllElement.textContent).toBe('Grab all')
+
+      multiSelect.selectAll()
+      expect(multiSelect._selectAllElement.textContent).toBe('Drop all')
+    })
+  })
+
+  describe('optionsGroupsSelectable', () => {
+    const groupedOptions = [
+      {
+        label: 'Group A',
+        options: [
+          { value: '1', text: 'A1' },
+          { value: '2', text: 'A2' }
+        ]
+      },
+      {
+        label: 'Group B',
+        options: [
+          { value: '3', text: 'B1' }
+        ]
+      }
+    ]
+
+    it('should not make group labels selectable by default', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions })
+
+      const label = multiSelect._menu.querySelector('.form-multi-select-optgroup-label')
+      expect(label.classList.contains('form-multi-select-optgroup-label-with-checkbox')).toBe(false)
+    })
+
+    it('should add the checkbox class to group labels when enabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
+
+      const label = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      expect(label).not.toBeNull()
+    })
+
+    it('should not add the checkbox class when optionsGroupsStyle is text', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true, optionsGroupsStyle: 'text' })
+
+      const label = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      expect(label).toBeNull()
+    })
+
+    it('should select and deselect a whole group on label click', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
+
+      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+
+      groupLabel.click()
+      expect(multiSelect._selected.length).toBe(2)
+      expect(groupLabel.classList.contains('form-multi-selected')).toBe(true)
+
+      groupLabel.click()
+      expect(multiSelect._selected.length).toBe(0)
+    })
+
+    it('should mark the group label as indeterminate on partial selection', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
+
+      multiSelect._selectOption('1', 'A1')
+
+      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      expect(groupLabel.classList.contains('form-multi-select-indeterminate')).toBe(true)
+      expect(groupLabel.classList.contains('form-multi-selected')).toBe(false)
+    })
+
+    it('should respect selectionLimit when toggling a group', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: groupedOptions,
+        optionsGroupsSelectable: true,
+        selectionLimit: 1
+      })
+
+      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      groupLabel.click()
+
+      expect(multiSelect._selected.length).toBe(1)
+    })
+
+    it('should focus a selectable group label during arrow navigation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
+
+      multiSelect.show()
+
+      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      const firstOption = multiSelect._menu.querySelector('.form-multi-select-option')
+
+      // Arrow up from the first option lands on the group label above it.
+      multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
+
+      expect(document.activeElement).toBe(groupLabel)
+    })
+
+    it('should not focus group labels during navigation when not selectable', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: groupedOptions })
+
+      multiSelect.show()
+
+      const firstOption = multiSelect._menu.querySelector('.form-multi-select-option')
+      multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
+
+      expect(document.activeElement.classList.contains('form-multi-select-optgroup-label')).toBe(false)
+    })
+  })
+
+  describe('selectAllStyle', () => {
+    const options = [
+      { value: '1', text: 'Apple' },
+      { value: '2', text: 'Banana' },
+      { value: '3', text: 'Avocado' }
+    ]
+
+    it('should add the checkbox class by default', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-all-with-checkbox')).toBe(true)
+    })
+
+    it('should not add the checkbox class when disabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, selectAllStyle: 'text' })
+
+      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-all-with-checkbox')).toBe(false)
+    })
+
+    it('should reflect none / indeterminate / all states', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, selectAllStyle: 'checkbox' })
+      const master = multiSelect._selectAllElement
+
+      expect(master.classList.contains('form-multi-select-all-with-checkbox')).toBe(true)
+      expect(master.classList.contains('form-multi-selected')).toBe(false)
+      expect(master.classList.contains('form-multi-select-indeterminate')).toBe(false)
+
+      multiSelect._selectOption('1', 'Apple')
+      expect(master.classList.contains('form-multi-select-indeterminate')).toBe(true)
+
+      multiSelect.selectAll()
+      expect(master.classList.contains('form-multi-selected')).toBe(true)
+      expect(master.classList.contains('form-multi-select-indeterminate')).toBe(false)
+    })
+
+    it('should toggle selection on click', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, selectAllStyle: 'checkbox' })
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(3)
+
+      multiSelect._selectAllElement.click()
+      expect(multiSelect._selected.length).toBe(0)
+    })
+
+    it('should compute checkbox state at boundaries', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, selectAllStyle: 'checkbox' })
+
+      expect(multiSelect._getCheckboxState(0, 3)).toBe('none')
+      expect(multiSelect._getCheckboxState(2, 3)).toBe('indeterminate')
+      expect(multiSelect._getCheckboxState(3, 3)).toBe('all')
+    })
+  })
+
   describe('getValue', () => {
     it('should return empty array when nothing selected', () => {
       fixtureEl.innerHTML = '<select></select>'
@@ -2017,6 +2498,67 @@ describe('MultiSelect', () => {
 
       // Should not throw and should handle navigation
       expect(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option').length).toBe(2)
+    })
+
+    it('should focus the select all button during arrow navigation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ]
+      })
+
+      multiSelect.show()
+
+      const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+
+      // Arrow up from the first option lands on the select all button above the list.
+      multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
+
+      expect(document.activeElement).toBe(multiSelect._selectAllElement)
+    })
+
+    it('should navigate from the select all button to the first option with ArrowDown', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ]
+      })
+
+      multiSelect.show()
+
+      const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+      multiSelect._selectAllElement.dispatchEvent(event)
+
+      expect(document.activeElement).toBe(firstOption)
+    })
+
+    it('should skip the disabled select all button during navigation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' },
+          { value: '3', text: 'Option 3' }
+        ],
+        selectionLimit: 1
+      })
+
+      multiSelect.show()
+
+      expect(multiSelect._selectAllElement.disabled).toBe(true)
+
+      const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
+
+      expect(document.activeElement).not.toBe(multiSelect._selectAllElement)
     })
 
     it('should close dropdown on Escape key', () => {
@@ -3350,14 +3892,15 @@ describe('MultiSelect', () => {
       expect(multiSelect._clone.getAttribute('aria-owns')).toBe('test-select-listbox')
     })
 
-    it('should set listbox role on dropdown', () => {
+    it('should set listbox role on the options element', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }]
       })
 
-      expect(multiSelect._menu.role).toBe('listbox')
+      expect(multiSelect._optionsElement.getAttribute('role')).toBe('listbox')
+      expect(multiSelect._optionsElement.getAttribute('id')).toBe(`${multiSelect._uniqueId}-listbox`)
     })
 
     it('should set option role on each option element', () => {
