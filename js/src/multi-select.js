@@ -230,7 +230,7 @@ class MultiSelect extends BaseComponent {
 
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._clone.classList.add(CLASS_NAME_SHOW)
-    this._clone.setAttribute('aria-expanded', true)
+    this._clone.setAttribute('aria-expanded', 'true')
 
     if (this._config.container) {
       this._menu.style.minWidth = `${this._clone.offsetWidth}px`
