@@ -1155,6 +1155,46 @@ describe('MultiSelect', () => {
       expect(eventValue.selectionLimit).toBe(2)
     })
 
+    it('should trigger selectionLimit once when selectAll truncates grouped options', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const options = [
+        {
+          label: 'Group A',
+          options: [
+            { value: '1', text: 'Option 1' },
+            { value: '2', text: 'Option 2' }
+          ]
+        },
+        {
+          label: 'Group B',
+          options: [
+            { value: '3', text: 'Option 3' },
+            { value: '4', text: 'Option 4' }
+          ]
+        }
+      ]
+      // Limit falls exactly on the group boundary: the first group fills it, so the
+      // old code returned from the group branch without firing the event.
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        selectionLimit: 2
+      })
+      let eventCount = 0
+      let eventValue = null
+
+      selectEl.addEventListener('selectionLimit.coreui.multi-select', event => {
+        eventCount += 1
+        eventValue = event
+      })
+
+      multiSelect.selectAll()
+
+      expect(multiSelect._selected.length).toBe(2)
+      expect(eventCount).toBe(1)
+      expect(eventValue.selectionLimit).toBe(2)
+    })
+
     it('should apply selectionLimit to initially selected options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

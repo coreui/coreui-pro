@@ -315,27 +315,35 @@ class MultiSelect extends BaseComponent {
   }
 
   selectAll(options = this._options) {
+    // Fire the limit event once, here, when the selection was truncated — instead
+    // of from inside the recursion, so flat and grouped options behave the same.
+    if (this._selectAllOptions(options)) {
+      this._triggerSelectionLimit()
+    }
+  }
+
+  _selectAllOptions(options) {
     for (const option of options) {
       if (option.disabled) {
         continue
       }
 
       if (option.label) {
-        this.selectAll(option.options)
-        if (this._isSelectionLimitReached()) {
-          return
+        if (this._selectAllOptions(option.options)) {
+          return true
         }
 
         continue
       }
 
       if (this._isSelectionLimitReached()) {
-        this._triggerSelectionLimit()
-        return
+        return true
       }
 
       this._selectOption(option.value, option.text)
     }
+
+    return false
   }
 
   deselectAll(options = this._options) {
