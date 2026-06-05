@@ -910,6 +910,51 @@ class MultiSelect extends BaseComponent {
     return tag
   }
 
+  _updateTags(selection, search) {
+    // The tags branch no longer clears the container, so drop the placeholder
+    // left behind when the selection grows from empty to one or more tags.
+    const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
+    if (placeholder) {
+      placeholder.remove()
+    }
+
+    const existingTags = new Map()
+
+    for (const tag of SelectorEngine.children(selection, `.${CLASS_NAME_TAG}`)) {
+      existingTags.set(tag.dataset.value, tag)
+    }
+
+    const selectedValues = new Set(this._selected.map(option => String(option.value)))
+
+    // Remove tags whose option is no longer selected, detaching their listeners
+    // so the close buttons don't leak in EventHandler's internal registry.
+    for (const [value, tag] of existingTags) {
+      if (!selectedValues.has(value)) {
+        const closeBtn = SelectorEngine.findOne(`.${CLASS_NAME_TAG_DELETE}`, tag)
+        if (closeBtn) {
+          EventHandler.off(closeBtn, EVENT_CLICK)
+        }
+
+        tag.remove()
+        existingTags.delete(value)
+      }
+    }
+
+    // Reuse an existing tag when present, otherwise create one, and place every
+    // tag before the search input so the order matches `_selected`. Without a
+    // search input the tags are simply appended.
+    for (const option of this._selected) {
+      const value = String(option.value)
+      const tag = existingTags.get(value) || this._createTag(option.value, option.text, option.disabled)
+
+      if (search) {
+        search.before(tag)
+      } else {
+        selection.append(tag)
+      }
+    }
+  }
+
   _onOptionsClick(element) {
     if (this._config.optionsGroupsSelectable) {
       const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
@@ -1070,11 +1115,7 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
-      selection.innerHTML = ''
-
-      for (const option of this._selected) {
-        selection.append(this._createTag(option.value, option.text, option.disabled))
-      }
+      this._updateTags(selection, search)
     }
 
     if (this._config.multiple && this._config.selectionType === 'text') {

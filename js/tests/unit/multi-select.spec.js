@@ -2452,6 +2452,68 @@ describe('MultiSelect', () => {
         expect(disabledTag.querySelector('.form-multi-select-tag-delete')).toBeNull()
       }
     })
+
+    it('should reuse existing tag nodes across selection changes', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1', selected: true },
+          { value: '2', text: 'Opt 2' },
+          { value: '3', text: 'Opt 3' }
+        ],
+        selectionType: 'tags'
+      })
+
+      const firstTag = multiSelect._clone.querySelector('.form-multi-select-tag[data-value="1"]')
+
+      multiSelect._selectOption('2', 'Opt 2')
+
+      // The diff update keeps the already-rendered tag node instead of recreating it.
+      expect(multiSelect._clone.querySelector('.form-multi-select-tag[data-value="1"]')).toBe(firstTag)
+      expect(multiSelect._clone.querySelectorAll('.form-multi-select-tag').length).toBe(2)
+    })
+
+    it('should remove the placeholder when the first tag is added', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' }
+        ],
+        selectionType: 'tags'
+      })
+
+      expect(multiSelect._clone.querySelector('.form-multi-select-placeholder')).not.toBeNull()
+
+      multiSelect._selectOption('1', 'Opt 1')
+
+      expect(multiSelect._clone.querySelector('.form-multi-select-placeholder')).toBeNull()
+      expect(multiSelect._clone.querySelectorAll('.form-multi-select-tag').length).toBe(1)
+    })
+
+    it('should keep tags ordered and before the search input', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1' },
+          { value: '2', text: 'Opt 2' },
+          { value: '3', text: 'Opt 3' }
+        ],
+        selectionType: 'tags',
+        search: true,
+        multiple: true
+      })
+
+      multiSelect._selectOption('2', 'Opt 2')
+      multiSelect._selectOption('1', 'Opt 1')
+
+      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const order = Array.from(selection.children).map(child => child.dataset.value || 'search')
+
+      expect(order).toEqual(['2', '1', 'search'])
+    })
   })
 
   describe('keyboard navigation', () => {
