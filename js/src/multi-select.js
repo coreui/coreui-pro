@@ -642,7 +642,7 @@ class MultiSelect extends BaseComponent {
     multiSelectEl.classList.add(CLASS_NAME_SELECT)
     multiSelectEl.classList.toggle('is-invalid', this._config.invalid)
     multiSelectEl.classList.toggle('is-valid', this._config.valid)
-    multiSelectEl.role = 'combobox'
+    multiSelectEl.setAttribute('role', 'combobox')
     multiSelectEl.setAttribute('aria-expanded', 'false')
     multiSelectEl.setAttribute('aria-haspopup', 'listbox')
     multiSelectEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
@@ -859,7 +859,7 @@ class MultiSelect extends BaseComponent {
 
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
-        optionDiv.role = 'option'
+        optionDiv.setAttribute('role', 'option')
 
         if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
           optionDiv.innerHTML = this._config.sanitize ?

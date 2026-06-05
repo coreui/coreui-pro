@@ -4012,7 +4012,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._clone.role).toBe('combobox')
+      expect(multiSelect._clone.getAttribute('role')).toBe('combobox')
     })
 
     it('should set aria-haspopup to listbox', () => {
@@ -4050,7 +4050,7 @@ describe('MultiSelect', () => {
       })
 
       const optionEl = multiSelect._optionsElement.querySelector('.form-multi-select-option')
-      expect(optionEl.role).toBe('option')
+      expect(optionEl.getAttribute('role')).toBe('option')
     })
 
     it('should set aria-label on cleaner button', () => {
