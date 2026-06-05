@@ -385,7 +385,7 @@ class MultiSelect extends BaseComponent {
 
   selectVisible() {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-      .filter(element => this._isVisible(element))
+      .filter(element => this._isOptionDisplayed(element))
 
     for (const item of items) {
       if (this._isSelectionLimitReached()) {
@@ -403,7 +403,7 @@ class MultiSelect extends BaseComponent {
 
   deselectVisible() {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-      .filter(element => this._isVisible(element))
+      .filter(element => this._isOptionDisplayed(element))
 
     for (const item of items) {
       const value = String(item.dataset.value)
@@ -1361,7 +1361,7 @@ class MultiSelect extends BaseComponent {
 
   _getSelectionState() {
     const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-    const visibleItems = allItems.filter(element => this._isVisible(element))
+    const visibleItems = allItems.filter(element => this._isOptionDisplayed(element))
 
     return {
       selected: this._selected.length,
@@ -1401,7 +1401,9 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _isVisible(element) {
+  // Checks only `display` (unlike the imported `isVisible`) so it still works while
+  // the menu is closed, e.g. when called from the constructor.
+  _isOptionDisplayed(element) {
     const style = window.getComputedStyle(element)
     return (style.display !== 'none')
   }
@@ -1440,7 +1442,7 @@ class MultiSelect extends BaseComponent {
       const optgroup = option.closest(SELECTOR_OPTGROUP)
       if (optgroup) {
         // eslint-disable-next-line  unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
+        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isOptionDisplayed(element)).length > 0) {
           optgroup.style.removeProperty('display')
         } else {
           optgroup.style.display = 'none'

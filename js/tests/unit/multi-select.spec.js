@@ -4291,7 +4291,7 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('_isVisible', () => {
+  describe('_isOptionDisplayed', () => {
     it('should return true for visible elements', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
@@ -4302,7 +4302,7 @@ describe('MultiSelect', () => {
       const el = document.createElement('div')
       document.body.append(el)
 
-      expect(multiSelect._isVisible(el)).toBe(true)
+      expect(multiSelect._isOptionDisplayed(el)).toBe(true)
       el.remove()
     })
 
@@ -4317,7 +4317,7 @@ describe('MultiSelect', () => {
       el.style.display = 'none'
       document.body.append(el)
 
-      expect(multiSelect._isVisible(el)).toBe(false)
+      expect(multiSelect._isOptionDisplayed(el)).toBe(false)
       el.remove()
     })
   })
