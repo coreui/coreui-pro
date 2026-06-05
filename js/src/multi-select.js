@@ -94,6 +94,7 @@ const Default = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
+  ariaTagDeleteLabel: 'Remove',
   cleaner: true,
   clearSearchOnSelect: false,
   container: false,
@@ -131,6 +132,7 @@ const DefaultType = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
   ariaIndicatorLabel: 'string',
+  ariaTagDeleteLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
@@ -894,7 +896,7 @@ class MultiSelect extends BaseComponent {
       const closeBtn = document.createElement('button')
       closeBtn.type = 'button'
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
-      closeBtn.setAttribute('aria-label', 'Close')
+      closeBtn.setAttribute('aria-label', `${this._config.ariaTagDeleteLabel} ${text}`.trim())
 
       EventHandler.on(closeBtn, EVENT_CLICK, event => {
         event.preventDefault()

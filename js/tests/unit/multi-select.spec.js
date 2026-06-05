@@ -2453,6 +2453,32 @@ describe('MultiSelect', () => {
       }
     })
 
+    it('should set the tag delete aria-label from ariaTagDeleteLabel and the option text', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Angular', selected: true }
+        ],
+        selectionType: 'tags'
+      })
+
+      let tagDelete = multiSelect._clone.querySelector('.form-multi-select-tag-delete')
+      expect(tagDelete.getAttribute('aria-label')).toBe('Remove Angular')
+
+      multiSelect.dispose()
+      const multiSelect2 = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Angular', selected: true }
+        ],
+        selectionType: 'tags',
+        ariaTagDeleteLabel: 'Usuń'
+      })
+
+      tagDelete = multiSelect2._clone.querySelector('.form-multi-select-tag-delete')
+      expect(tagDelete.getAttribute('aria-label')).toBe('Usuń Angular')
+    })
+
     it('should reuse existing tag nodes across selection changes', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

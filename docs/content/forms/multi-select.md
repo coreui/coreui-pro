@@ -406,6 +406,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | --- | --- | --- | --- |
 | `allowList` | object | `DefaultAllowlist` | Object containing allowed tags and attributes for HTML sanitization when using custom templates. |
 | `ariaCleanerLabel`| string | `Clear all selections` | A string that provides an accessible label for the cleaner button. This label is read by screen readers to describe the action associated with the button. |
+| `ariaTagDeleteLabel`| string | `Remove` | Accessible label prefix for a tag's delete button (selection type `tags`). The selected option's text is appended, so screen readers announce e.g. "Remove Angular". |
 | `cleaner`| boolean | `true` | Enables selection cleaner element. |
 | `clearSearchOnSelect`| boolean | `false` | Clear current search on selecting an item. |
 | `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
