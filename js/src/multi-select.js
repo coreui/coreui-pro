@@ -249,6 +249,13 @@ class MultiSelect extends BaseComponent {
   hide() {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
+    // Capture before any DOM updates: only pull focus back into the control when it
+    // currently lives inside the component (e.g. Escape or keyboard selection), so
+    // closing via an outside click doesn't steal focus from wherever the user went.
+    // The menu is checked separately because `container` moves it out of `_clone`.
+    const refocusFromInside = this._clone.contains(document.activeElement) ||
+      this._menu.contains(document.activeElement)
+
     if (this._popper) {
       this._popper.destroy()
     }
@@ -263,6 +270,15 @@ class MultiSelect extends BaseComponent {
 
     if (this._config.container) {
       this._menu.classList.remove(CLASS_NAME_SHOW)
+    }
+
+    if (refocusFromInside && !this._config.disabled) {
+      // With search the input stays focusable while closed, so it owns focus;
+      // otherwise the toggler is the control's focusable element.
+      const refocusTarget = this._config.search ? this._searchElement : this._togglerElement
+      if (refocusTarget) {
+        refocusTarget.focus()
+      }
     }
 
     EventHandler.trigger(this._element, EVENT_HIDDEN)

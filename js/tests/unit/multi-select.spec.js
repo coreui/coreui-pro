@@ -2665,6 +2665,57 @@ describe('MultiSelect', () => {
       expect(multiSelect._clone.classList.contains('show')).toBe(false)
     })
 
+    it('should return focus to the toggler when closed from inside the component', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      multiSelect.show()
+      const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
+      option.focus()
+      expect(multiSelect._clone.contains(document.activeElement)).toBe(true)
+
+      multiSelect.hide()
+
+      expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should return focus to the search input on close when search is enabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }],
+        search: true
+      })
+
+      multiSelect.show()
+      const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
+      option.focus()
+
+      multiSelect.hide()
+
+      expect(document.activeElement).toBe(multiSelect._searchElement)
+    })
+
+    it('should not move focus when closed from outside the component', () => {
+      fixtureEl.innerHTML = '<select></select><button id="multiSelectOutsideBtn">Outside</button>'
+      const selectEl = fixtureEl.querySelector('select')
+      const outside = fixtureEl.querySelector('#multiSelectOutsideBtn')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      multiSelect.show()
+      outside.focus()
+      expect(document.activeElement).toBe(outside)
+
+      multiSelect.hide()
+
+      expect(document.activeElement).toBe(outside)
+    })
+
     it('should select option on Enter key in options list', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
