@@ -252,10 +252,6 @@ class MultiSelect extends BaseComponent {
   hide() {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
-    // Capture before any DOM updates: only pull focus back into the control when it
-    // currently lives inside the component (e.g. Escape or keyboard selection), so
-    // closing via an outside click doesn't steal focus from wherever the user went.
-    // The menu is checked separately because `container` moves it out of `_clone`.
     const refocusFromInside = this._clone.contains(document.activeElement) ||
       this._menu.contains(document.activeElement)
 
@@ -276,8 +272,6 @@ class MultiSelect extends BaseComponent {
     }
 
     if (refocusFromInside && !this._config.disabled) {
-      // With search the input stays focusable while closed, so it owns focus;
-      // otherwise the toggler is the control's focusable element.
       const refocusTarget = this._config.search ? this._searchElement : this._togglerElement
       if (refocusTarget) {
         refocusTarget.focus()
@@ -292,10 +286,6 @@ class MultiSelect extends BaseComponent {
       this._popper.destroy()
     }
 
-    // Detach listeners before removing the DOM: EventHandler keeps handlers in a
-    // module-level registry keyed per element, so DOM removal alone won't clear
-    // them. Listener sites are a fixed set of stable elements — tags and the
-    // cleaner share one delegated listener on `_selectionElement` / `_togglerElement`.
     for (const element of [
       this._clone,
       this._menu,
@@ -312,7 +302,6 @@ class MultiSelect extends BaseComponent {
       }
     }
 
-    // Remove the generated DOM. With `container` the menu lives outside `_clone`.
     if (this._menu) {
       this._menu.remove()
     }
@@ -321,7 +310,6 @@ class MultiSelect extends BaseComponent {
       this._clone.remove()
     }
 
-    // Restore the native select to its pre-init, interactive state.
     this._element.style.removeProperty('display')
     this._element.removeAttribute('tabindex')
 
@@ -351,8 +339,6 @@ class MultiSelect extends BaseComponent {
   }
 
   selectAll(options = this._options) {
-    // Fire the limit event once, here, when the selection was truncated — instead
-    // of from inside the recursion, so flat and grouped options behave the same.
     if (this._selectAllOptions(options)) {
       this._triggerSelectionLimit()
     }
@@ -434,9 +420,6 @@ class MultiSelect extends BaseComponent {
   // Private
 
   _addEventListeners() {
-    // Delegated once on the stable selection container: tags come and go, so a
-    // per-tag listener would mean constant bind/unbind. stopPropagation keeps the
-    // delete click from bubbling to the clone's "open dropdown" handler.
     EventHandler.on(this._selectionElement, EVENT_CLICK, SELECTOR_TAG_DELETE, event => {
       event.preventDefault()
       event.stopPropagation()
@@ -447,8 +430,6 @@ class MultiSelect extends BaseComponent {
       }
     })
 
-    // Delegated for the same reason as the tags: the cleaner is created and removed
-    // as the selection comes and goes.
     EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, event => {
       if (!this._config.disabled) {
         event.preventDefault()
@@ -980,8 +961,6 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateTags(selection, search) {
-    // The tags branch no longer clears the container, so drop the placeholder
-    // left behind when the selection grows from empty to one or more tags.
     const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
     if (placeholder) {
       placeholder.remove()
@@ -995,9 +974,6 @@ class MultiSelect extends BaseComponent {
 
     const selectedValues = new Set(this._selected.map(option => String(option.value)))
 
-    // Remove tags whose option is no longer selected. The delete buttons share a
-    // single delegated listener on the selection container, so there is nothing
-    // per-tag to detach here.
     for (const [value, tag] of existingTags) {
       if (!selectedValues.has(value)) {
         tag.remove()
@@ -1005,9 +981,6 @@ class MultiSelect extends BaseComponent {
       }
     }
 
-    // Reuse an existing tag when present, otherwise create one, and place every
-    // tag before the search input so the order matches `_selected`. Without a
-    // search input the tags are simply appended.
     for (const option of this._selected) {
       const value = String(option.value)
       const tag = existingTags.get(value) || this._createTag(option.value, option.text, option.disabled)
@@ -1298,9 +1271,6 @@ class MultiSelect extends BaseComponent {
     return target > 0 && selected >= target
   }
 
-  // How many options the select all button can actually select: capped by the
-  // selection limit when one is set, so the toggle flips to "deselect all" once
-  // the limit is reached instead of being unreachable.
   _getSelectableTarget(total) {
     return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
   }
