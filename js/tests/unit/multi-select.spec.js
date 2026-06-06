@@ -1385,8 +1385,8 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('selectVisible', () => {
-    it('should select only the currently visible (filtered) options', () => {
+  describe('selectFiltered', () => {
+    it('should select only the currently filtered options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const options = [
@@ -1397,7 +1397,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options, search: true })
 
       multiSelect.search('av')
-      multiSelect.selectVisible()
+      multiSelect.selectFiltered()
 
       expect(multiSelect._selected.length).toBe(1)
       expect(multiSelect._selected[0].value).toBe('3')
@@ -1413,7 +1413,7 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options })
 
-      multiSelect.selectVisible()
+      multiSelect.selectFiltered()
       expect(multiSelect._selected.length).toBe(3)
     })
 
@@ -1427,7 +1427,7 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options })
 
-      multiSelect.selectVisible()
+      multiSelect.selectFiltered()
       expect(multiSelect._selected.length).toBe(2)
       expect(multiSelect._selected.find(item => item.value === '2')).toBeUndefined()
     })
@@ -1442,13 +1442,13 @@ describe('MultiSelect', () => {
       ]
       const multiSelect = new MultiSelect(selectEl, { options, selectionLimit: 2 })
 
-      multiSelect.selectVisible()
+      multiSelect.selectFiltered()
       expect(multiSelect._selected.length).toBe(2)
     })
   })
 
-  describe('deselectVisible', () => {
-    it('should deselect only the currently visible (filtered) options', () => {
+  describe('deselectFiltered', () => {
+    it('should deselect only the currently filtered options', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const options = [
@@ -1462,7 +1462,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected.length).toBe(3)
 
       multiSelect.search('av')
-      multiSelect.deselectVisible()
+      multiSelect.deselectFiltered()
 
       expect(multiSelect._selected.length).toBe(2)
       expect(multiSelect._selected.find(item => item.value === '3')).toBeUndefined()
@@ -1515,12 +1515,12 @@ describe('MultiSelect', () => {
 
       expect(multiSelect).toBeDefined()
       expect(received.state).toEqual({
-        selected: 0, total: 3, visible: 3, visibleSelected: 0
+        selected: 0, total: 3, filtered: 3, filteredSelected: 0
       })
       expect(typeof received.actions.selectAll).toBe('function')
       expect(typeof received.actions.deselectAll).toBe('function')
-      expect(typeof received.actions.selectVisible).toBe('function')
-      expect(typeof received.actions.deselectVisible).toBe('function')
+      expect(typeof received.actions.selectFiltered).toBe('function')
+      expect(typeof received.actions.deselectFiltered).toBe('function')
     })
 
     it('should render the returned element', () => {
@@ -1556,7 +1556,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._headerElement.textContent).toBe('3')
     })
 
-    it('should report visibleSelected after filtering', () => {
+    it('should report filteredSelected after filtering', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       let received = null
@@ -1572,8 +1572,8 @@ describe('MultiSelect', () => {
       multiSelect.selectAll()
       multiSelect.search('av')
 
-      expect(received.visible).toBe(1)
-      expect(received.visibleSelected).toBe(1)
+      expect(received.filtered).toBe(1)
+      expect(received.filteredSelected).toBe(1)
     })
 
     it('should sanitize a string returned from the template', () => {
@@ -1669,6 +1669,114 @@ describe('MultiSelect', () => {
 
       multiSelect.selectAll()
       expect(multiSelect._selectAllElement.textContent).toBe('Drop all')
+    })
+  })
+
+  describe('selectAllMode', () => {
+    const options = [
+      { value: '1', text: 'Apple' },
+      { value: '2', text: 'Apricot' },
+      { value: '3', text: 'Banana' }
+    ]
+
+    it("defaults to 'all'", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options })
+
+      expect(multiSelect._config.selectAllMode).toBe('all')
+    })
+
+    it("in 'all' mode the button ignores the search filter and selects every option", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, search: true })
+
+      multiSelect.search('ap')
+      multiSelect._selectAllElement.click()
+
+      expect(multiSelect._selected.length).toBe(3)
+    })
+
+    it("in 'filtered' mode the button selects only the search-filtered options", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        search: true,
+        selectAllMode: 'filtered'
+      })
+
+      multiSelect.search('ap') // Apple + Apricot visible, Banana hidden
+      multiSelect._selectAllElement.click()
+
+      expect(multiSelect._selected.map(option => option.value).toSorted()).toEqual(['1', '2'])
+    })
+
+    it("in 'filtered' mode with no active filter behaves like 'all'", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        search: true,
+        selectAllMode: 'filtered'
+      })
+
+      multiSelect._selectAllElement.click()
+
+      expect(multiSelect._selected.length).toBe(3)
+    })
+
+    it("in 'filtered' mode the checkbox tracks the filtered set and drops to indeterminate after clearing search", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        search: true,
+        selectAllMode: 'filtered'
+      })
+
+      multiSelect.search('ap')
+      multiSelect._selectAllElement.click()
+
+      // all filtered (2/2) selected -> 'all' state + deselect-filtered label
+      expect(multiSelect._selectAllElement.classList.contains('form-multi-selected')).toBe(true)
+      expect(multiSelect._selectAllElement.textContent).toBe('Deselect filtered')
+
+      // clearing the filter widens the set to all 3, only 2 selected -> indeterminate
+      multiSelect.search('')
+      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-indeterminate')).toBe(true)
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+    })
+
+    it("in 'filtered' mode the label switches to the filtered variant only while a filter narrows the list", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options,
+        search: true,
+        selectAllMode: 'filtered'
+      })
+
+      // no active filter -> full scope -> "Select all"
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+
+      // filter narrows the list -> "Select filtered"
+      multiSelect.search('ap')
+      expect(multiSelect._selectAllElement.textContent).toBe('Select filtered')
+
+      // a filter that matches everything is not narrowing -> back to "Select all"
+      multiSelect.search('a')
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
+    })
+
+    it("in 'all' mode the label never switches to the filtered variant", () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options, search: true })
+
+      multiSelect.search('ap')
+      expect(multiSelect._selectAllElement.textContent).toBe('Select all')
     })
   })
 

@@ -104,6 +104,7 @@ const Default = {
   clearSearchOnSelect: false,
   container: false,
   deselectAllLabel: 'Deselect all',
+  deselectFilteredLabel: 'Deselect filtered',
   disabled: false,
   headerTemplate: null,
   id: null,
@@ -125,10 +126,12 @@ const Default = {
   searchNoResultsLabel: 'No results found',
   selectAll: true,
   selectAllLabel: 'Select all',
+  selectAllMode: 'all',
   selectAllStyle: 'checkbox',
   selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
+  selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
 }
@@ -142,6 +145,7 @@ const DefaultType = {
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
   deselectAllLabel: 'string',
+  deselectFilteredLabel: 'string',
   disabled: 'boolean',
   headerTemplate: '(function|null)',
   id: '(string|null)',
@@ -164,9 +168,11 @@ const DefaultType = {
   selectAll: 'boolean',
   selectAllStyle: 'string',
   selectAllLabel: 'string',
+  selectAllMode: 'string',
   selectionLimit: '(number|null)',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
+  selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
 }
@@ -354,7 +360,7 @@ class MultiSelect extends BaseComponent {
     this._refreshAfterSelectionChange()
   }
 
-  selectVisible() {
+  selectFiltered() {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
       .filter(element => this._isOptionDisplayed(element))
 
@@ -379,7 +385,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  deselectVisible() {
+  deselectFiltered() {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
       .filter(element => this._isOptionDisplayed(element))
 
@@ -490,11 +496,7 @@ class MultiSelect extends BaseComponent {
         event.preventDefault()
         event.stopPropagation()
 
-        if (this._isAllSelected()) {
-          this.deselectAll()
-        } else {
-          this.selectAll()
-        }
+        this._toggleSelectAll()
       })
 
       // The select all button lives in the header, outside the options list, so it
@@ -1323,13 +1325,59 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    this._selectAllElement.textContent = this._isAllSelected() ? this._config.deselectAllLabel : this._config.selectAllLabel
+    this._selectAllElement.textContent = this._getSelectAllLabel()
+  }
+
+  _getSelectAllLabel() {
+    const allSelected = this._isAllSelected()
+
+    if (this._isFilteredScopeNarrowed()) {
+      return allSelected ? this._config.deselectFilteredLabel : this._config.selectFilteredLabel
+    }
+
+    return allSelected ? this._config.deselectAllLabel : this._config.selectAllLabel
   }
 
   _isAllSelected() {
-    const { selected, total } = this._getSelectionState()
+    const { selected, total } = this._getSelectAllScope()
     const target = this._getSelectableTarget(total)
     return target > 0 && selected >= target
+  }
+
+  _getSelectAllScope() {
+    const { selected, total, filtered, filteredSelected } = this._getSelectionState()
+    return this._config.selectAllMode === 'filtered' ?
+      { selected: filteredSelected, total: filtered } :
+      { selected, total }
+  }
+
+  _isFilteredScopeNarrowed() {
+    if (this._config.selectAllMode !== 'filtered') {
+      return false
+    }
+
+    const { filtered, total } = this._getSelectionState()
+    return filtered < total
+  }
+
+  _toggleSelectAll() {
+    const filteredMode = this._config.selectAllMode === 'filtered'
+
+    if (this._isAllSelected()) {
+      if (filteredMode) {
+        this.deselectFiltered()
+      } else {
+        this.deselectAll()
+      }
+
+      return
+    }
+
+    if (filteredMode) {
+      this.selectFiltered()
+    } else {
+      this.selectAll()
+    }
   }
 
   _getSelectableTarget(total) {
@@ -1372,7 +1420,7 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    const { selected, total } = this._getSelectionState()
+    const { selected, total } = this._getSelectAllScope()
     this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)))
   }
 
@@ -1394,13 +1442,13 @@ class MultiSelect extends BaseComponent {
 
   _getSelectionState() {
     const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-    const visibleItems = allItems.filter(element => this._isOptionDisplayed(element))
+    const filteredItems = allItems.filter(element => this._isOptionDisplayed(element))
 
     return {
       selected: this._selected.length,
       total: allItems.length,
-      visible: visibleItems.length,
-      visibleSelected: visibleItems.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
+      filtered: filteredItems.length,
+      filteredSelected: filteredItems.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
     }
   }
 
@@ -1408,8 +1456,8 @@ class MultiSelect extends BaseComponent {
     return {
       selectAll: () => this.selectAll(),
       deselectAll: () => this.deselectAll(),
-      selectVisible: () => this.selectVisible(),
-      deselectVisible: () => this.deselectVisible()
+      selectFiltered: () => this.selectFiltered(),
+      deselectFiltered: () => this.deselectFiltered()
     }
   }
 
@@ -1471,6 +1519,7 @@ class MultiSelect extends BaseComponent {
     }
 
     this._updateHeader()
+    this._updateMasterCheckbox()
 
     if (visibleOptions > 0) {
       if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
