@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 /**
  * --------------------------------------------------------------------------
  * CoreUI PRO multi-select.js
@@ -48,7 +50,10 @@ const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
 const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_SELECT = '.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
+const SELECTOR_TAG = '.form-multi-select-tag'
+const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
 const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
+const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -57,27 +62,33 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
+const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
+const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
 const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_DROPDOWN_HEADER = 'form-multi-select-dropdown-header'
 const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group'
 const CLASS_NAME_LABEL = 'label'
 const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
 const CLASS_NAME_SELECT_ALL = 'form-multi-select-all'
+const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'form-multi-select-all-with-checkbox'
 const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
+const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'form-multi-select-optgroup-label-with-checkbox'
 const CLASS_NAME_OPTION = 'form-multi-select-option'
 const CLASS_NAME_OPTION_WITH_CHECKBOX = 'form-multi-select-option-with-checkbox'
 const CLASS_NAME_OPTIONS = 'form-multi-select-options'
 const CLASS_NAME_OPTIONS_EMPTY = 'form-multi-select-options-empty'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'form-multi-selected'
+const CLASS_NAME_INDETERMINATE = 'form-multi-select-indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
@@ -88,15 +99,21 @@ const Default = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
+  ariaTagDeleteLabel: 'Remove',
   cleaner: true,
   clearSearchOnSelect: false,
   container: false,
+  deselectAllLabel: 'Deselect all',
+  deselectFilteredLabel: 'Deselect filtered',
   disabled: false,
+  headerTemplate: null,
   id: null,
   invalid: false,
   multiple: true,
   name: null,
   options: false,
+  optionsGroupsSelectable: false,
+  optionsGroupsStyle: 'checkbox',
   optionsGroupsTemplate: null,
   optionsMaxHeight: 'auto',
   optionsStyle: 'checkbox',
@@ -108,9 +125,13 @@ const Default = {
   search: false,
   searchNoResultsLabel: 'No results found',
   selectAll: true,
-  selectAllLabel: 'Select all options',
+  selectAllLabel: 'Select all',
+  selectAllMode: 'all',
+  selectAllStyle: 'checkbox',
+  selectionLimit: null,
   selectionType: 'tags',
   selectionTypeCounterText: 'item(s) selected',
+  selectFilteredLabel: 'Select filtered',
   valid: false,
   value: null
 }
@@ -119,15 +140,21 @@ const DefaultType = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
   ariaIndicatorLabel: 'string',
+  ariaTagDeleteLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
   container: '(string|element|boolean)',
+  deselectAllLabel: 'string',
+  deselectFilteredLabel: 'string',
   disabled: 'boolean',
+  headerTemplate: '(function|null)',
   id: '(string|null)',
   invalid: 'boolean',
   multiple: 'boolean',
   name: '(string|null)',
   options: '(boolean|array)',
+  optionsGroupsSelectable: 'boolean',
+  optionsGroupsStyle: 'string',
   optionsGroupsTemplate: '(function|null)',
   optionsMaxHeight: '(number|string)',
   optionsStyle: 'string',
@@ -139,9 +166,13 @@ const DefaultType = {
   search: '(boolean|string)',
   searchNoResultsLabel: 'string',
   selectAll: 'boolean',
+  selectAllStyle: 'string',
   selectAllLabel: 'string',
+  selectAllMode: 'string',
+  selectionLimit: '(number|null)',
   selectionType: 'string',
   selectionTypeCounterText: 'string',
+  selectFilteredLabel: 'string',
   valid: 'boolean',
   value: '(string|array|null)'
 }
@@ -161,6 +192,7 @@ class MultiSelect extends BaseComponent {
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
+    this._headerElement = null
     this._selectionElement = null
     this._selectionCleanerElement = null
     this._searchElement = null
@@ -209,7 +241,7 @@ class MultiSelect extends BaseComponent {
 
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._clone.classList.add(CLASS_NAME_SHOW)
-    this._clone.setAttribute('aria-expanded', true)
+    this._clone.setAttribute('aria-expanded', 'true')
 
     if (this._config.container) {
       this._menu.style.minWidth = `${this._clone.offsetWidth}px`
@@ -228,6 +260,9 @@ class MultiSelect extends BaseComponent {
   hide() {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
+    const refocusFromInside = this._clone.contains(document.activeElement) ||
+      this._menu.contains(document.activeElement)
+
     if (this._popper) {
       this._popper.destroy()
     }
@@ -244,6 +279,13 @@ class MultiSelect extends BaseComponent {
       this._menu.classList.remove(CLASS_NAME_SHOW)
     }
 
+    if (refocusFromInside && !this._config.disabled) {
+      const refocusTarget = this._config.search ? this._searchElement : this._togglerElement
+      if (refocusTarget) {
+        refocusTarget.focus()
+      }
+    }
+
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
@@ -251,6 +293,33 @@ class MultiSelect extends BaseComponent {
     if (this._popper) {
       this._popper.destroy()
     }
+
+    for (const element of [
+      this._clone,
+      this._menu,
+      this._selectionElement,
+      this._togglerElement,
+      this._searchElement,
+      this._indicatorElement,
+      this._selectAllElement,
+      this._headerElement,
+      this._optionsElement
+    ]) {
+      if (element) {
+        EventHandler.off(element, EVENT_KEY)
+      }
+    }
+
+    if (this._menu) {
+      this._menu.remove()
+    }
+
+    if (this._clone) {
+      this._clone.remove()
+    }
+
+    this._element.style.removeProperty('display')
+    this._element.removeAttribute('tabindex')
 
     super.dispose()
   }
@@ -278,33 +347,56 @@ class MultiSelect extends BaseComponent {
   }
 
   selectAll(options = this._options) {
-    for (const option of options) {
-      if (option.disabled) {
-        continue
-      }
+    const limitReached = this._selectAllOptions(options)
+    this._refreshAfterSelectionChange()
 
-      if (option.label) {
-        this.selectAll(option.options)
-        continue
-      }
-
-      this._selectOption(option.value, option.text)
+    if (limitReached) {
+      this._triggerSelectionLimit()
     }
   }
 
   deselectAll(options = this._options) {
-    for (const option of options) {
-      if (option.disabled) {
-        continue
+    this._deselectAllOptions(options)
+    this._refreshAfterSelectionChange()
+  }
+
+  selectFiltered() {
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+      .filter(element => this._isOptionDisplayed(element))
+
+    let limitReached = false
+    for (const item of items) {
+      if (this._isSelectionLimitReached()) {
+        limitReached = true
+        break
       }
 
-      if (option.label) {
-        this.deselectAll(option.options)
-        continue
+      const value = String(item.dataset.value)
+      const option = this._findOptionByValue(value)
+      if (option && !this._selected.some(selected => selected.value === value)) {
+        this._selectOption(value, option.text, { refresh: false })
       }
-
-      this._deselectOption(option.value)
     }
+
+    this._refreshAfterSelectionChange()
+
+    if (limitReached) {
+      this._triggerSelectionLimit()
+    }
+  }
+
+  deselectFiltered() {
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+      .filter(element => this._isOptionDisplayed(element))
+
+    for (const item of items) {
+      const value = String(item.dataset.value)
+      if (this._selected.some(selected => selected.value === value)) {
+        this._deselectOption(value, { refresh: false })
+      }
+    }
+
+    this._refreshAfterSelectionChange()
   }
 
   getValue() {
@@ -314,6 +406,24 @@ class MultiSelect extends BaseComponent {
   // Private
 
   _addEventListeners() {
+    EventHandler.on(this._selectionElement, EVENT_CLICK, SELECTOR_TAG_DELETE, event => {
+      event.preventDefault()
+      event.stopPropagation()
+
+      const tag = event.target.closest(SELECTOR_TAG)
+      if (tag) {
+        this._deselectOption(String(tag.dataset.value))
+      }
+    })
+
+    EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, event => {
+      if (!this._config.disabled) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.deselectAll()
+      }
+    })
+
     EventHandler.on(this._clone, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.show()
@@ -377,24 +487,33 @@ class MultiSelect extends BaseComponent {
       this._searchElement.focus()
     })
 
-    EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
-      event.preventDefault()
-      event.stopPropagation()
-      this.selectAll()
-    })
+    if (this._selectAllElement) {
+      EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
+        if (this._selectAllElement.disabled) {
+          return
+        }
+
+        event.preventDefault()
+        event.stopPropagation()
+
+        this._toggleSelectAll()
+      })
+
+      // The select all button lives in the header, outside the options list, so it
+      // needs its own arrow-key handler to join the navigation flow (Enter/Space
+      // already toggle via the native button click above).
+      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN, event => {
+        if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
+          event.preventDefault()
+          this._selectMenuItem(event)
+        }
+      })
+    }
 
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
       event.preventDefault()
       event.stopPropagation()
       this._onOptionsClick(event.target)
-    })
-
-    EventHandler.on(this._selectionCleanerElement, EVENT_CLICK, event => {
-      if (!this._config.disabled) {
-        event.preventDefault()
-        event.stopPropagation()
-        this.deselectAll()
-      }
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
@@ -407,10 +526,6 @@ class MultiSelect extends BaseComponent {
         this._selectMenuItem(event)
       }
     })
-  }
-
-  _getClassNames() {
-    return this._element.classList.value.split(' ')
   }
 
   _getOptions() {
@@ -441,6 +556,7 @@ class MultiSelect extends BaseComponent {
 
       const value = String(option.value)
       const isSelected = option.selected || (this._config.value && this._config.value.includes(value))
+      const shouldSelect = isSelected && !this._isSelectionLimitReached()
 
       const customProperties = typeof option === 'object' ? { ...option } : {}
 
@@ -451,11 +567,11 @@ class MultiSelect extends BaseComponent {
       _options.push({
         ...customProperties,
         value,
-        ...isSelected && { selected: true },
+        ...shouldSelect && { selected: true },
         ...option.disabled && { disabled: true }
       })
 
-      if (isSelected) {
+      if (shouldSelect) {
         this._selected.push({
           value: String(option.value),
           text: option.text
@@ -473,19 +589,22 @@ class MultiSelect extends BaseComponent {
     for (const node of nodes) {
       if (node.nodeName === 'OPTION' && node.value) {
         const value = String(node.value)
-        const text = node.innerHTML
+        const text = node.textContent
         const isSelected = node.selected || (this._config.value && this._config.value.includes(node.value))
+        const shouldSelect = isSelected && !this._isSelectionLimitReached()
         options.push({
           value,
           text,
-          selected: isSelected,
+          selected: shouldSelect,
           disabled: node.disabled
         })
 
-        if (node.selected || isSelected) {
+        node.selected = shouldSelect
+
+        if (shouldSelect) {
           this._selected.push({
             value,
-            text: node.innerHTML,
+            text: node.textContent,
             ...node.disabled && { disabled: true }
           })
         }
@@ -528,7 +647,7 @@ class MultiSelect extends BaseComponent {
           opt.setAttribute('selected', 'selected')
         }
 
-        opt.innerHTML = option.text
+        opt.textContent = option.text
         parentElement.append(opt)
       } else {
         const optgroup = document.createElement('optgroup')
@@ -549,7 +668,7 @@ class MultiSelect extends BaseComponent {
     multiSelectEl.classList.add(CLASS_NAME_SELECT)
     multiSelectEl.classList.toggle('is-invalid', this._config.invalid)
     multiSelectEl.classList.toggle('is-valid', this._config.valid)
-    multiSelectEl.role = 'combobox'
+    multiSelectEl.setAttribute('role', 'combobox')
     multiSelectEl.setAttribute('aria-expanded', 'false')
     multiSelectEl.setAttribute('aria-haspopup', 'listbox')
     multiSelectEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
@@ -558,7 +677,7 @@ class MultiSelect extends BaseComponent {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
-    for (const className of this._getClassNames()) {
+    for (const className of this._element.classList.value.split(' ')) {
       multiSelectEl.classList.add(className)
     }
 
@@ -605,18 +724,7 @@ class MultiSelect extends BaseComponent {
 
   _createButtons() {
     const buttons = document.createElement('div')
-    buttons.classList.add('form-multi-select-buttons')
-
-    if (!this._config.disabled && this._config.cleaner && this._config.multiple) {
-      const cleaner = document.createElement('button')
-      cleaner.type = 'button'
-      cleaner.classList.add(CLASS_NAME_CLEANER)
-      cleaner.style.display = 'none'
-      cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
-
-      buttons.append(cleaner)
-      this._selectionCleanerElement = cleaner
-    }
+    buttons.classList.add(CLASS_NAME_BUTTONS)
 
     const indicator = document.createElement('button')
     indicator.type = 'button'
@@ -632,6 +740,15 @@ class MultiSelect extends BaseComponent {
     this._indicatorElement = indicator
     this._togglerElement.append(buttons)
     this._updateSelectionCleaner()
+  }
+
+  _createSelectionCleaner() {
+    const cleaner = document.createElement('button')
+    cleaner.type = 'button'
+    cleaner.classList.add(CLASS_NAME_CLEANER)
+    cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
+
+    return cleaner
   }
 
   _createPopper() {
@@ -678,26 +795,49 @@ class MultiSelect extends BaseComponent {
   _createOptionsContainer() {
     const dropdownDiv = document.createElement('div')
     dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
-    dropdownDiv.role = 'listbox'
-    dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`)
 
-    if (this._config.multiple) {
-      dropdownDiv.setAttribute('aria-multiselectable', 'true')
-    }
+    const hasHeaderTemplate = typeof this._config.headerTemplate === 'function'
+    const showSelectAll = this._config.selectAll && this._config.multiple
 
-    if (this._config.selectAll && this._config.multiple) {
-      const selectAllButton = document.createElement('button')
-      selectAllButton.type = 'button'
-      selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
-      selectAllButton.innerHTML = this._config.selectAllLabel
+    if (hasHeaderTemplate || showSelectAll) {
+      const header = document.createElement('div')
+      header.classList.add(CLASS_NAME_DROPDOWN_HEADER)
 
-      this._selectAllElement = selectAllButton
+      if (hasHeaderTemplate) {
+        const headerContent = document.createElement('div')
 
-      dropdownDiv.append(selectAllButton)
+        // Keep interactions with custom controls from closing the dropdown,
+        // mirroring the built-in button's stopPropagation behavior.
+        EventHandler.on(headerContent, EVENT_CLICK, event => {
+          event.stopPropagation()
+        })
+
+        this._headerElement = headerContent
+        header.append(headerContent)
+      } else {
+        const selectAllButton = document.createElement('button')
+        selectAllButton.type = 'button'
+        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
+
+        if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
+          selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX)
+        }
+
+        this._selectAllElement = selectAllButton
+        header.append(selectAllButton)
+      }
+
+      dropdownDiv.append(header)
     }
 
     const optionsDiv = document.createElement('div')
     optionsDiv.classList.add(CLASS_NAME_OPTIONS)
+    optionsDiv.setAttribute('role', 'listbox')
+    optionsDiv.setAttribute('id', `${this._uniqueId}-listbox`)
+
+    if (this._config.multiple) {
+      optionsDiv.setAttribute('aria-multiselectable', 'true')
+    }
 
     if (this._config.optionsMaxHeight !== 'auto') {
       optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
@@ -716,6 +856,9 @@ class MultiSelect extends BaseComponent {
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
     this._menu = dropdownDiv
+    this._updateHeader()
+    this._updateGroupsState()
+    this._updateMasterCheckbox()
   }
 
   _createOptions(parentElement, options) {
@@ -734,7 +877,7 @@ class MultiSelect extends BaseComponent {
 
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
-        optionDiv.role = 'option'
+        optionDiv.setAttribute('role', 'option')
 
         if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
           optionDiv.innerHTML = this._config.sanitize ?
@@ -762,6 +905,13 @@ class MultiSelect extends BaseComponent {
         }
 
         optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
+
+        if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
+          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
+          optgrouplabel.tabIndex = 0
+          optgrouplabel.setAttribute('role', 'button')
+        }
+
         optgroup.append(optgrouplabel)
 
         this._createOptions(optgroup, option.options)
@@ -774,21 +924,13 @@ class MultiSelect extends BaseComponent {
     const tag = document.createElement('div')
     tag.classList.add(CLASS_NAME_TAG)
     tag.dataset.value = value
-    tag.innerHTML = text
+    tag.textContent = text
 
     if (!this._config.disabled && disabled !== true) {
       const closeBtn = document.createElement('button')
       closeBtn.type = 'button'
       closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
-      closeBtn.setAttribute('aria-label', 'Close')
-
-      EventHandler.on(closeBtn, EVENT_CLICK, event => {
-        event.preventDefault()
-        event.stopPropagation()
-
-        tag.remove()
-        this._deselectOption(value)
-      })
+      closeBtn.setAttribute('aria-label', `${this._config.ariaTagDeleteLabel} ${text}`.trim())
 
       tag.append(closeBtn)
     }
@@ -796,7 +938,48 @@ class MultiSelect extends BaseComponent {
     return tag
   }
 
+  _updateTags(selection, search) {
+    const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
+    if (placeholder) {
+      placeholder.remove()
+    }
+
+    const existingTags = new Map()
+
+    for (const tag of SelectorEngine.children(selection, SELECTOR_TAG)) {
+      existingTags.set(tag.dataset.value, tag)
+    }
+
+    const selectedValues = new Set(this._selected.map(option => String(option.value)))
+
+    for (const [value, tag] of existingTags) {
+      if (!selectedValues.has(value)) {
+        tag.remove()
+        existingTags.delete(value)
+      }
+    }
+
+    for (const option of this._selected) {
+      const value = String(option.value)
+      const tag = existingTags.get(value) || this._createTag(option.value, option.text, option.disabled)
+
+      if (search) {
+        search.before(tag)
+      } else {
+        selection.append(tag)
+      }
+    }
+  }
+
   _onOptionsClick(element) {
+    if (this._config.optionsGroupsSelectable) {
+      const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
+      if (groupLabel) {
+        this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
+        return
+      }
+    }
+
     if (element.classList.contains(CLASS_NAME_LABEL)) {
       return
     }
@@ -850,25 +1033,71 @@ class MultiSelect extends BaseComponent {
     return null
   }
 
-  _selectOption(value, text) {
+  _selectAllOptions(options) {
+    for (const option of options) {
+      if (option.disabled) {
+        continue
+      }
+
+      if (option.label) {
+        if (this._selectAllOptions(option.options)) {
+          return true
+        }
+
+        continue
+      }
+
+      if (this._isSelectionLimitReached()) {
+        return true
+      }
+
+      this._selectOption(option.value, option.text, { refresh: false })
+    }
+
+    return false
+  }
+
+  _deselectAllOptions(options) {
+    for (const option of options) {
+      if (option.disabled) {
+        continue
+      }
+
+      if (option.label) {
+        this._deselectAllOptions(option.options)
+        continue
+      }
+
+      this._deselectOption(option.value, { refresh: false })
+    }
+  }
+
+  _selectOption(value, text, { refresh = true } = {}) {
     if (!this._config.multiple) {
       this.deselectAll()
     }
 
-    if (this._selected.filter(option => option.value === String(value)).length === 0) {
+    const isSelected = this._selected.some(option => option.value === String(value))
+
+    if (!isSelected && this._isSelectionLimitReached()) {
+      this._triggerSelectionLimit()
+      return
+    }
+
+    if (!isSelected) {
       this._selected.push({
         value: String(value),
         text
       })
     }
 
-    const nativeOption = SelectorEngine.findOne(`option[value="${value}"]`, this._element)
+    const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
 
     if (nativeOption) {
       nativeOption.selected = true
     }
 
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
+    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', 'true')
@@ -878,18 +1107,23 @@ class MultiSelect extends BaseComponent {
       value: this._selected
     })
 
-    this._updateSelection()
-    this._updateSelectionCleaner()
-    this._updateSearch()
-    this._updateSearchSize()
+    // During init every preselected option runs through here while `_selected` is
+    // already fully populated, so callers can batch the costly DOM refresh into a
+    // single `_refreshAfterSelectionChange()` instead of repeating it per option.
+    if (refresh) {
+      this._refreshAfterSelectionChange()
+    }
   }
 
-  _deselectOption(value) {
+  _deselectOption(value, { refresh = true } = {}) {
     this._selected = this._selected.filter(option => option.value !== String(value))
 
-    SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false
+    const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
+    if (nativeOption) {
+      nativeOption.selected = false
+    }
 
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
+    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', 'false')
@@ -899,10 +1133,9 @@ class MultiSelect extends BaseComponent {
       value: this._selected
     })
 
-    this._updateSelection()
-    this._updateSelectionCleaner()
-    this._updateSearch()
-    this._updateSearchSize()
+    if (refresh) {
+      this._refreshAfterSelectionChange()
+    }
   }
 
   _deselectLastOption() {
@@ -914,33 +1147,94 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _refreshAfterSelectionChange() {
+    this._updateSelection()
+    this._updateSelectionCleaner()
+    this._updateSearch()
+    this._updateSearchSize()
+    this._updateHeader()
+    this._updateGroupsState()
+    this._updateMasterCheckbox()
+  }
+
+  _toggleGroup(optgroupEl) {
+    if (!optgroupEl) {
+      return
+    }
+
+    const items = SelectorEngine.children(optgroupEl, SELECTOR_OPTION)
+      .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+    const allSelected = items.length > 0 && items.every(element => element.classList.contains(CLASS_NAME_SELECTED))
+
+    let limitReached = false
+    for (const item of items) {
+      const value = String(item.dataset.value)
+
+      if (allSelected) {
+        this._deselectOption(value, { refresh: false })
+      } else if (!item.classList.contains(CLASS_NAME_SELECTED)) {
+        if (this._isSelectionLimitReached()) {
+          limitReached = true
+          break
+        }
+
+        const option = this._findOptionByValue(value)
+        if (option) {
+          this._selectOption(value, option.text, { refresh: false })
+        }
+      }
+    }
+
+    this._refreshAfterSelectionChange()
+
+    if (limitReached) {
+      this._triggerSelectionLimit()
+    }
+  }
+
+  _updateOptionsList() {
+    // `_selected` is already fully populated by `_getOptions()` before this runs,
+    // so iterate it directly (no tree walk) and batch the DOM refresh into one call.
+    for (const option of this._selected) {
+      this._selectOption(option.value, option.text, { refresh: false })
+    }
+
+    this._refreshAfterSelectionChange()
+  }
+
   _updateSelection() {
     const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._clone)
 
     if (this._selected.length === 0 && !this._config.search) {
-      selection.innerHTML = `<span class="form-multi-select-placeholder">${this._config.placeholder}</span>`
+      const placeholder = document.createElement('span')
+      placeholder.classList.add('form-multi-select-placeholder')
+      placeholder.textContent = this._config.placeholder
+      selection.innerHTML = ''
+      selection.append(placeholder)
       return
     }
 
     if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-      selection.innerHTML = `${this._selected.length} ${this._config.selectionTypeCounterText}`
+      selection.textContent = `${this._selected.length} ${this._config.selectionTypeCounterText}`
     }
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
-      selection.innerHTML = ''
-
-      for (const option of this._selected) {
-        selection.append(this._createTag(option.value, option.text, option.disabled))
-      }
+      this._updateTags(selection, search)
     }
 
     if (this._config.multiple && this._config.selectionType === 'text') {
-      selection.innerHTML = this._selected.map((option, index) => `<span>${option.text}${index === this._selected.length - 1 ? '' : ','}&nbsp;</span>`).join('')
+      selection.innerHTML = ''
+
+      for (const [index, option] of this._selected.entries()) {
+        const span = document.createElement('span')
+        span.textContent = `${option.text}${index === this._selected.length - 1 ? '' : ','}\u00A0`
+        selection.append(span)
+      }
     }
 
     if (!this._config.multiple && this._selected.length > 0 && !this._config.search) {
-      selection.innerHTML = this._selected[0].text
+      selection.textContent = this._selected[0].text
     }
 
     if (search) {
@@ -953,18 +1247,23 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateSelectionCleaner() {
-    if (!this._config.cleaner || this._selectionCleanerElement === null) {
+    if (!this._config.cleaner || this._config.disabled) {
       return
     }
 
-    const selectionCleaner = SelectorEngine.findOne(SELECTOR_CLEANER, this._clone)
+    if (this._selected.length > 0 && this._selectionCleanerElement === null) {
+      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._clone)
+      const selectionCleaner = this._createSelectionCleaner()
 
-    if (this._selected.length > 0) {
-      selectionCleaner.style.removeProperty('display')
+      buttons.insertBefore(selectionCleaner, this._indicatorElement)
+      this._selectionCleanerElement = selectionCleaner
       return
     }
 
-    selectionCleaner.style.display = 'none'
+    if (this._selected.length === 0 && this._selectionCleanerElement !== null) {
+      this._selectionCleanerElement.remove()
+      this._selectionCleanerElement = null
+    }
   }
 
   _updateSearch() {
@@ -1016,6 +1315,152 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _updateHeader() {
+    if (this._headerElement) {
+      this._renderHeader()
+      return
+    }
+
+    if (!this._selectAllElement) {
+      return
+    }
+
+    this._selectAllElement.textContent = this._getSelectAllLabel()
+  }
+
+  _getSelectAllLabel() {
+    const allSelected = this._isAllSelected()
+
+    if (this._isFilteredScopeNarrowed()) {
+      return allSelected ? this._config.deselectFilteredLabel : this._config.selectFilteredLabel
+    }
+
+    return allSelected ? this._config.deselectAllLabel : this._config.selectAllLabel
+  }
+
+  _isAllSelected() {
+    const { selected, total } = this._getSelectAllScope()
+    const target = this._getSelectableTarget(total)
+    return target > 0 && selected >= target
+  }
+
+  _getSelectAllScope() {
+    const { selected, total, filtered, filteredSelected } = this._getSelectionState()
+    return this._config.selectAllMode === 'filtered' ?
+      { selected: filteredSelected, total: filtered } :
+      { selected, total }
+  }
+
+  _isFilteredScopeNarrowed() {
+    if (this._config.selectAllMode !== 'filtered') {
+      return false
+    }
+
+    const { filtered, total } = this._getSelectionState()
+    return filtered < total
+  }
+
+  _toggleSelectAll() {
+    const filteredMode = this._config.selectAllMode === 'filtered'
+
+    if (this._isAllSelected()) {
+      if (filteredMode) {
+        this.deselectFiltered()
+      } else {
+        this.deselectAll()
+      }
+
+      return
+    }
+
+    if (filteredMode) {
+      this.selectFiltered()
+    } else {
+      this.selectAll()
+    }
+  }
+
+  _getSelectableTarget(total) {
+    return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
+  }
+
+  _getCheckboxState(selected, total) {
+    if (total > 0 && selected >= total) {
+      return 'all'
+    }
+
+    return selected === 0 ? 'none' : 'indeterminate'
+  }
+
+  _applyCheckboxState(element, state) {
+    element.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
+    element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'indeterminate')
+  }
+
+  _updateGroupsState() {
+    if (!this._config.optionsGroupsSelectable) {
+      return
+    }
+
+    for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
+      const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup)
+      if (!label) {
+        continue
+      }
+
+      const items = SelectorEngine.children(optgroup, SELECTOR_OPTION)
+        .filter(element => !element.classList.contains(CLASS_NAME_DISABLED))
+      const selected = items.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
+      this._applyCheckboxState(label, this._getCheckboxState(selected, items.length))
+    }
+  }
+
+  _updateMasterCheckbox() {
+    if (this._config.selectAllStyle !== 'checkbox' || !this._selectAllElement) {
+      return
+    }
+
+    const { selected, total } = this._getSelectAllScope()
+    this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)))
+  }
+
+  _renderHeader() {
+    if (!this._headerElement || typeof this._config.headerTemplate !== 'function') {
+      return
+    }
+
+    const result = this._config.headerTemplate(this._getSelectionState(), this._getSelectionActions())
+
+    if (result instanceof Node) {
+      this._headerElement.replaceChildren(result)
+    } else {
+      this._headerElement.innerHTML = this._config.sanitize ?
+        sanitizeHtml(result, this._config.allowList, this._config.sanitizeFn) :
+        result
+    }
+  }
+
+  _getSelectionState() {
+    const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+    const filteredItems = allItems.filter(element => this._isOptionDisplayed(element))
+
+    return {
+      selected: this._selected.length,
+      total: allItems.length,
+      filtered: filteredItems.length,
+      filteredSelected: filteredItems.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
+    }
+  }
+
+  _getSelectionActions() {
+    return {
+      selectAll: () => this.selectAll(),
+      deselectAll: () => this.deselectAll(),
+      selectFiltered: () => this.selectFiltered(),
+      deselectFiltered: () => this.deselectFiltered()
+    }
+  }
+
   _onSearchChange(element) {
     if (element) {
       this.search(element.value)
@@ -1024,26 +1469,29 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateOptionsList(options = this._options) {
-    for (const option of options) {
-      if (option.label) {
-        this._updateOptionsList(option.options)
-        continue
-      }
-
-      if (option.selected) {
-        this._selectOption(option.value, option.text)
-      }
-    }
-  }
-
-  _isVisible(element) {
+  // Checks only `display` (unlike the imported `isVisible`) so it still works while
+  // the menu is closed, e.g. when called from the constructor.
+  _isOptionDisplayed(element) {
     const style = window.getComputedStyle(element)
     return (style.display !== 'none')
   }
 
   _isShown() {
     return this._clone.classList.contains(CLASS_NAME_SHOW)
+  }
+
+  _hasSelectionLimit() {
+    return this._config.multiple && this._config.selectionLimit !== null
+  }
+
+  _isSelectionLimitReached() {
+    return this._hasSelectionLimit() && this._selected.length >= this._config.selectionLimit
+  }
+
+  _triggerSelectionLimit() {
+    EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, {
+      selectionLimit: this._config.selectionLimit
+    })
   }
 
   _filterOptionsList() {
@@ -1062,13 +1510,16 @@ class MultiSelect extends BaseComponent {
       const optgroup = option.closest(SELECTOR_OPTGROUP)
       if (optgroup) {
         // eslint-disable-next-line  unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
+        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isOptionDisplayed(element)).length > 0) {
           optgroup.style.removeProperty('display')
         } else {
           optgroup.style.display = 'none'
         }
       }
     }
+
+    this._updateHeader()
+    this._updateMasterCheckbox()
 
     if (visibleOptions > 0) {
       if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
@@ -1081,7 +1532,7 @@ class MultiSelect extends BaseComponent {
     if (visibleOptions === 0) {
       const placeholder = document.createElement('div')
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-      placeholder.innerHTML = this._config.searchNoResultsLabel
+      placeholder.textContent = this._config.searchNoResultsLabel
 
       if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
         SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
@@ -1090,7 +1541,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _selectMenuItem({ key, target }) {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
+    const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
       return

@@ -90,6 +90,8 @@ new coreui.MultiSelect(myMultiSelectCountries, {
   },
   placeholder: 'Select countries',
   search: true,
+  selectAllLabel: 'Select all countries',
+  deselectAllLabel: 'Deselect all countries',
   selectionType: 'tags'
 })
 
@@ -102,6 +104,8 @@ new coreui.MultiSelect(myMultiSelectCountriesAndCities, {
   },
   placeholder: 'Select cities',
   search: true,
+  selectAllLabel: 'Select all cities',
+  deselectAllLabel: 'Deselect all cities',
   selectionType: 'tags'
 })
 // js-docs-end multi-select-custom-options
