@@ -748,6 +748,7 @@ class MultiSelect extends BaseComponent {
 
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
+    selectionEl.setAttribute('aria-live', 'polite')
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
       selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS)
@@ -1571,6 +1572,7 @@ class MultiSelect extends BaseComponent {
     if (visibleOptions === 0) {
       const placeholder = document.createElement('div')
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
+      placeholder.setAttribute('role', 'status')
       placeholder.textContent = this._config.searchNoResultsLabel
 
       if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {

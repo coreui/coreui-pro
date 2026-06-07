@@ -2134,6 +2134,7 @@ describe('MultiSelect', () => {
       const emptyMessage = multiSelect._menu.querySelector('.form-multi-select-options-empty')
       expect(emptyMessage).not.toBeNull()
       expect(emptyMessage.textContent).toBe('No results found')
+      expect(emptyMessage.getAttribute('role')).toBe('status')
     })
 
     it('should remove "no results" message when results are found again', () => {
@@ -4405,6 +4406,14 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
       expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
+    })
+
+    it('should mark the selection as an aria-live region', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], selectionType: 'counter' })
+
+      expect(multiSelect._selectionElement.getAttribute('aria-live')).toBe('polite')
     })
 
     it('should set aria-disabled on the toggler when disabled', () => {
