@@ -120,7 +120,7 @@
 
   position: relative;
 
-  .was-validated .form-multi-select:invalid + &,
+  .was-validated .form-multi-select:has(> select:invalid),
   &.is-invalid {
     $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($form-multi-select-invalid-border-color, $input-btn-focus-color-opacity);
 
@@ -130,7 +130,7 @@
 
   }
 
-  .was-validated .form-multi-select:valid + &,
+  .was-validated .form-multi-select:has(> select:valid),
   &.is-valid {
     $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($form-multi-select-valid-border-color, $input-btn-focus-color-opacity);
 
@@ -140,9 +140,21 @@
   }
 }
 
+// The native select stays in the DOM as an invisible overlay covering the control
+// so native `required` constraint validation focuses and anchors over the field.
 // stylelint-disable-next-line selector-no-qualifying-type
-select.form-multi-select {
-  display: none;
+select.form-multi-select,
+[data-coreui-multi-select] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+  border: 0;
+  outline: 0;
+  opacity: 0;
 }
 
 .form-multi-select-input-group {
@@ -171,6 +183,7 @@ select.form-multi-select {
   }
 
   .form-multi-select.show &,
+  .form-multi-select:has(> select:focus) &,
   &:has(*:focus),
   &:focus {
     color: var(--#{$prefix}form-multi-select-focus-color);

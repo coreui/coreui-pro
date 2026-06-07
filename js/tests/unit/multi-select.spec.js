@@ -84,9 +84,9 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._clone.classList.contains('form-multi-select')).toBe(true)
-      expect(multiSelect._clone.querySelector('.form-multi-select-input-group')).toBeTruthy()
-      expect(multiSelect._clone.querySelector('.form-multi-select-selection')).toBeTruthy()
+      expect(multiSelect._wrapperElement.classList.contains('form-multi-select')).toBe(true)
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-input-group')).toBeTruthy()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-selection')).toBeTruthy()
     })
 
     it('should handle disabled state', () => {
@@ -196,10 +196,78 @@ describe('MultiSelect', () => {
     it('should hide native select', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
-      new MultiSelect(selectEl, { options: [] }) // eslint-disable-line no-new
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(selectEl.style.display).toBe('none')
+      // The native select stays in the DOM as an overlay inside the wrapper.
       expect(selectEl.tabIndex).toBe(-1)
+      expect(selectEl.parentNode).toBe(multiSelect._wrapperElement)
+    })
+
+    it('should keep the native select usable for required validation', () => {
+      fixtureEl.innerHTML = '<form><select required multiple></select></form>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }],
+        multiple: true,
+        required: true
+      })
+
+      // Not removed from the DOM via inline display:none, so the browser can focus it
+      // to anchor the constraint-validation bubble over the control.
+      expect(selectEl.style.display).toBe('')
+      expect(selectEl.willValidate).toBe(true)
+      expect(selectEl.checkValidity()).toBe(false)
+
+      multiSelect.selectAll()
+
+      expect(selectEl.checkValidity()).toBe(true)
+    })
+
+    it('should hand native select keyboard interaction to the custom control', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }]
+      })
+
+      // Simulate validation having focused the native overlay select.
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true })
+      selectEl.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
+      expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
+    it('should not intercept Tab on the native select', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      new MultiSelect(selectEl, { options: [{ value: '1', text: 'Option 1' }] }) // eslint-disable-line no-new
+
+      const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true })
+      selectEl.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(false)
+    })
+
+    it('should open and start searching on the first printable key from the native select', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Apple' },
+          { value: '2', text: 'Banana' }
+        ],
+        search: true
+      })
+
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true, cancelable: true })
+      selectEl.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
+      expect(multiSelect._searchElement.value).toBe('a')
+      expect(document.activeElement).toBe(multiSelect._searchElement)
     })
 
     it('should use element id when provided', () => {
@@ -341,7 +409,7 @@ describe('MultiSelect', () => {
         invalid: true
       })
 
-      expect(multiSelect._clone.classList.contains('is-invalid')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('is-invalid')).toBe(true)
     })
 
     it('should set is-valid class when valid config is true', () => {
@@ -352,7 +420,7 @@ describe('MultiSelect', () => {
         valid: true
       })
 
-      expect(multiSelect._clone.classList.contains('is-valid')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('is-valid')).toBe(true)
     })
 
     it('should apply optionsMaxHeight when not auto', () => {
@@ -444,7 +512,7 @@ describe('MultiSelect', () => {
         placeholder: 'Choose...'
       })
 
-      const placeholder = multiSelect._clone.querySelector('.form-multi-select-placeholder')
+      const placeholder = multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')
       expect(placeholder).not.toBeNull()
       expect(placeholder.textContent).toBe('Choose...')
     })
@@ -616,7 +684,7 @@ describe('MultiSelect', () => {
         selectionTypeCounterText: 'items selected'
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.textContent).toContain('2')
       expect(selection.textContent).toContain('items selected')
     })
@@ -632,7 +700,7 @@ describe('MultiSelect', () => {
         selectionType: 'text'
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.textContent).toContain('Opt 1')
       expect(selection.textContent).toContain('Opt 2')
     })
@@ -648,7 +716,7 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const tags = multiSelect._clone.querySelectorAll('.form-multi-select-tag')
+      const tags = multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag')
       expect(tags.length).toBe(2)
     })
 
@@ -662,7 +730,7 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const tag = multiSelect._clone.querySelector('.form-multi-select-tag')
+      const tag = multiSelect._wrapperElement.querySelector('.form-multi-select-tag')
       expect(tag.querySelector('.form-multi-select-tag-delete')).not.toBeNull()
     })
 
@@ -677,7 +745,7 @@ describe('MultiSelect', () => {
         disabled: true
       })
 
-      const tag = multiSelect._clone.querySelector('.form-multi-select-tag')
+      const tag = multiSelect._wrapperElement.querySelector('.form-multi-select-tag')
       expect(tag.querySelector('.form-multi-select-tag-delete')).toBeNull()
     })
 
@@ -692,7 +760,7 @@ describe('MultiSelect', () => {
         multiple: false
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.textContent).toContain('Opt 1')
     })
 
@@ -701,8 +769,8 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._clone.classList.contains('custom-class')).toBe(true)
-      expect(multiSelect._clone.classList.contains('another-class')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('custom-class')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('another-class')).toBe(true)
     })
 
     it('should handle custom group properties', () => {
@@ -731,7 +799,7 @@ describe('MultiSelect', () => {
         })
 
         selectEl.addEventListener('shown.coreui.multi-select', () => {
-          expect(multiSelect._clone.classList.contains('show')).toBe(true)
+          expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
           resolve()
         })
 
@@ -765,7 +833,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should not show if already shown', () => {
@@ -776,11 +844,11 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
 
       // Call show again - should not throw
       multiSelect.show()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should set aria-expanded to true', () => {
@@ -791,7 +859,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._clone.getAttribute('aria-expanded')).toBe('true')
+      expect(multiSelect._togglerElement.getAttribute('aria-expanded')).toBe('true')
     })
 
     it('should focus search input when search is enabled', () => {
@@ -804,7 +872,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const searchInput = multiSelect._clone.querySelector('.form-multi-select-search')
+      const searchInput = multiSelect._wrapperElement.querySelector('.form-multi-select-search')
       expect(searchInput).not.toBeNull()
     })
 
@@ -847,7 +915,7 @@ describe('MultiSelect', () => {
         })
 
         selectEl.addEventListener('hidden.coreui.multi-select', () => {
-          expect(multiSelect._clone.classList.contains('show')).toBe(false)
+          expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
           resolve()
         })
 
@@ -885,7 +953,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
       multiSelect.hide()
-      expect(multiSelect._clone.getAttribute('aria-expanded')).toBe('false')
+      expect(multiSelect._togglerElement.getAttribute('aria-expanded')).toBe('false')
     })
 
     it('should destroy popper', () => {
@@ -974,9 +1042,9 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Option 1' }]
       })
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
       multiSelect.toggle()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should hide when shown', () => {
@@ -987,9 +1055,9 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
       multiSelect.toggle()
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
   })
 
@@ -2378,7 +2446,7 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       multiSelect._onOptionsClick(option)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should add form-multi-selected class on selected option', () => {
@@ -2554,7 +2622,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._selected.length).toBe(2)
 
-      const tagDelete = multiSelect._clone.querySelector('.form-multi-select-tag-delete')
+      const tagDelete = multiSelect._wrapperElement.querySelector('.form-multi-select-tag-delete')
       tagDelete.click()
 
       expect(multiSelect._selected.length).toBe(1)
@@ -2568,12 +2636,12 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
 
-      multiSelect._clone.querySelector('.form-multi-select-tag-delete').click()
+      multiSelect._wrapperElement.querySelector('.form-multi-select-tag-delete').click()
 
       expect(multiSelect._selected.length).toBe(0)
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should remove a tag created after initialization via delegation', () => {
@@ -2589,7 +2657,7 @@ describe('MultiSelect', () => {
 
       // This tag node did not exist when listeners were bound.
       multiSelect._selectOption('2', 'Opt 2')
-      const newTagDelete = multiSelect._clone
+      const newTagDelete = multiSelect._wrapperElement
         .querySelector('.form-multi-select-tag[data-value="2"] .form-multi-select-tag-delete')
 
       newTagDelete.click()
@@ -2633,7 +2701,7 @@ describe('MultiSelect', () => {
       })
 
       // The disabled option's tag should not have a delete button
-      const tags = multiSelect._clone.querySelectorAll('.form-multi-select-tag')
+      const tags = multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag')
       const disabledTag = Array.from(tags).find(t => t.dataset.value === '1')
       if (disabledTag) {
         expect(disabledTag.querySelector('.form-multi-select-tag-delete')).toBeNull()
@@ -2650,7 +2718,7 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      let tagDelete = multiSelect._clone.querySelector('.form-multi-select-tag-delete')
+      let tagDelete = multiSelect._wrapperElement.querySelector('.form-multi-select-tag-delete')
       expect(tagDelete.getAttribute('aria-label')).toBe('Remove Angular')
 
       multiSelect.dispose()
@@ -2662,7 +2730,7 @@ describe('MultiSelect', () => {
         ariaTagDeleteLabel: 'Usuń'
       })
 
-      tagDelete = multiSelect2._clone.querySelector('.form-multi-select-tag-delete')
+      tagDelete = multiSelect2._wrapperElement.querySelector('.form-multi-select-tag-delete')
       expect(tagDelete.getAttribute('aria-label')).toBe('Usuń Angular')
     })
 
@@ -2678,13 +2746,13 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const firstTag = multiSelect._clone.querySelector('.form-multi-select-tag[data-value="1"]')
+      const firstTag = multiSelect._wrapperElement.querySelector('.form-multi-select-tag[data-value="1"]')
 
       multiSelect._selectOption('2', 'Opt 2')
 
       // The diff update keeps the already-rendered tag node instead of recreating it.
-      expect(multiSelect._clone.querySelector('.form-multi-select-tag[data-value="1"]')).toBe(firstTag)
-      expect(multiSelect._clone.querySelectorAll('.form-multi-select-tag').length).toBe(2)
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-tag[data-value="1"]')).toBe(firstTag)
+      expect(multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag').length).toBe(2)
     })
 
     it('should remove the placeholder when the first tag is added', () => {
@@ -2697,12 +2765,12 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      expect(multiSelect._clone.querySelector('.form-multi-select-placeholder')).not.toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).not.toBeNull()
 
       multiSelect._selectOption('1', 'Opt 1')
 
-      expect(multiSelect._clone.querySelector('.form-multi-select-placeholder')).toBeNull()
-      expect(multiSelect._clone.querySelectorAll('.form-multi-select-tag').length).toBe(1)
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag').length).toBe(1)
     })
 
     it('should keep tags ordered and before the search input', () => {
@@ -2722,7 +2790,7 @@ describe('MultiSelect', () => {
       multiSelect._selectOption('2', 'Opt 2')
       multiSelect._selectOption('1', 'Opt 1')
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       const order = Array.from(selection.children).map(child => child.dataset.value || 'search')
 
       expect(order).toEqual(['2', '1', 'search'])
@@ -2740,7 +2808,7 @@ describe('MultiSelect', () => {
       const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
       multiSelect._togglerElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should open dropdown on ArrowDown key on toggler when closed', () => {
@@ -2753,7 +2821,7 @@ describe('MultiSelect', () => {
       const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
       multiSelect._togglerElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should navigate to menu item on ArrowDown when already open', () => {
@@ -2845,12 +2913,12 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
 
       const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
-      multiSelect._clone.dispatchEvent(event)
+      multiSelect._wrapperElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should return focus to the toggler when closed from inside the component', () => {
@@ -2863,7 +2931,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       option.focus()
-      expect(multiSelect._clone.contains(document.activeElement)).toBe(true)
+      expect(multiSelect._wrapperElement.contains(document.activeElement)).toBe(true)
 
       multiSelect.hide()
 
@@ -3036,12 +3104,12 @@ describe('MultiSelect', () => {
         search: true
       })
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
 
       const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should open dropdown on ArrowDown from search input', () => {
@@ -3055,7 +3123,7 @@ describe('MultiSelect', () => {
       const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should not open on typing when ctrlKey is pressed', () => {
@@ -3069,7 +3137,7 @@ describe('MultiSelect', () => {
       const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true, ctrlKey: true })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should not open on typing when metaKey is pressed', () => {
@@ -3083,7 +3151,7 @@ describe('MultiSelect', () => {
       const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true, metaKey: true })
       multiSelect._searchElement.dispatchEvent(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should focus search on global search keydown on clone', () => {
@@ -3097,7 +3165,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true })
-      multiSelect._clone.dispatchEvent(event)
+      multiSelect._wrapperElement.dispatchEvent(event)
 
       // Should focus the search element (no error thrown)
       expect(multiSelect._searchElement).not.toBeNull()
@@ -3130,7 +3198,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       const event = new KeyboardEvent('keydown', { key: 'Backspace', bubbles: true })
-      multiSelect._clone.dispatchEvent(event)
+      multiSelect._wrapperElement.dispatchEvent(event)
 
       expect(multiSelect._searchElement).not.toBeNull()
     })
@@ -3178,7 +3246,7 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
       expect(cleaner).not.toBeNull()
     })
 
@@ -3196,16 +3264,16 @@ describe('MultiSelect', () => {
 
       // Empty the selection so the cleaner is removed, then re-create it.
       multiSelect.deselectAll()
-      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
 
       multiSelect._selectOption('2', 'Opt 2')
-      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
       expect(cleaner).not.toBeNull()
 
       cleaner.click()
 
       expect(multiSelect._selected.length).toBe(0)
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should not insert cleaner when no items are selected', () => {
@@ -3217,7 +3285,7 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
       expect(cleaner).toBeNull()
     })
 
@@ -3230,11 +3298,11 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
 
       multiSelect._selectOption('1', 'Opt 1')
 
-      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).not.toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).not.toBeNull()
     })
 
     it('should insert cleaner and clear selection for single select', () => {
@@ -3246,13 +3314,13 @@ describe('MultiSelect', () => {
         multiple: false
       })
 
-      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
       expect(cleaner).not.toBeNull()
 
       cleaner.click()
 
       expect(multiSelect._selected.length).toBe(0)
-      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
     })
 
     it('should deselect all on cleaner click', () => {
@@ -3269,11 +3337,11 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._selected.length).toBe(2)
 
-      const cleaner = multiSelect._clone.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
       cleaner.click()
 
       expect(multiSelect._selected.length).toBe(0)
-      expect(multiSelect._clone.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
     })
 
     it('should not deselect on cleaner click when disabled', () => {
@@ -3312,9 +3380,9 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }]
       })
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
       multiSelect._indicatorElement.click()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should set tabIndex -1 on indicator when disabled', () => {
@@ -3483,13 +3551,13 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Option 1' }]
       })
 
-      const oldClone = multiSelect._clone
+      const oldClone = multiSelect._wrapperElement
 
       multiSelect.update({
         options: [{ value: '2', text: 'Option 2' }]
       })
 
-      expect(multiSelect._clone).not.toBe(oldClone)
+      expect(multiSelect._wrapperElement).not.toBe(oldClone)
     })
   })
 
@@ -3537,8 +3605,8 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Option 1' }]
       })
 
-      multiSelect._clone.click()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      multiSelect._wrapperElement.click()
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should not show on clone click when disabled', () => {
@@ -3549,8 +3617,8 @@ describe('MultiSelect', () => {
         disabled: true
       })
 
-      multiSelect._clone.click()
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      multiSelect._wrapperElement.click()
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
   })
 
@@ -3601,17 +3669,18 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Option 1' }]
       })
 
-      const clone = multiSelect._clone
+      const wrapper = multiSelect._wrapperElement
       const menu = multiSelect._menu
 
       expect(fixtureEl.querySelector('.form-multi-select')).not.toBeNull()
-      expect(selectEl.style.display).toBe('none')
+      expect(selectEl.parentNode).toBe(wrapper)
 
       multiSelect.dispose()
 
-      expect(clone.isConnected).toBe(false)
+      expect(wrapper.isConnected).toBe(false)
       expect(menu.isConnected).toBe(false)
-      expect(selectEl.style.display).toBe('')
+      expect(selectEl.isConnected).toBe(true)
+      expect(selectEl.parentNode).toBe(fixtureEl)
       expect(selectEl.getAttribute('tabindex')).toBeNull()
     })
 
@@ -3645,7 +3714,7 @@ describe('MultiSelect', () => {
 
       multiSelect._selectOption('1', 'Option 1')
 
-      const clone = multiSelect._clone
+      const clone = multiSelect._wrapperElement
       const optionsElement = multiSelect._optionsElement
       const spy = spyOn(EventHandler, 'off').and.callThrough()
 
@@ -3666,7 +3735,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
 
       const outsideEl = fixtureEl.querySelector('#outside')
       const clickEvent = new Event('click', { bubbles: true })
@@ -3674,7 +3743,7 @@ describe('MultiSelect', () => {
 
       MultiSelect.clearMenus(clickEvent)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should not close on right mouse button click', () => {
@@ -3691,7 +3760,7 @@ describe('MultiSelect', () => {
 
       MultiSelect.clearMenus(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should not close on keyup that is not Tab', () => {
@@ -3708,7 +3777,7 @@ describe('MultiSelect', () => {
 
       MultiSelect.clearMenus(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
     it('should close on Tab keyup', () => {
@@ -3727,7 +3796,7 @@ describe('MultiSelect', () => {
 
       MultiSelect.clearMenus(event)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should not close when clicking inside the clone', () => {
@@ -3740,11 +3809,11 @@ describe('MultiSelect', () => {
       multiSelect.show()
 
       const clickEvent = new Event('click', { bubbles: true })
-      Object.defineProperty(clickEvent, 'target', { value: multiSelect._clone })
+      Object.defineProperty(clickEvent, 'target', { value: multiSelect._wrapperElement })
 
       MultiSelect.clearMenus(clickEvent)
 
-      expect(multiSelect._clone.classList.contains('show')).toBe(true)
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
   })
 
@@ -4004,6 +4073,26 @@ describe('MultiSelect', () => {
       const _multiSelect = new MultiSelect(selectEl, { options: [] })
       expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
     })
+
+    it('should auto-initialize on load via the data-coreui-multi-select attribute', () => {
+      fixtureEl.innerHTML = '<select data-coreui-multi-select><option value="1">One</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      expect(MultiSelect.getInstance(selectEl)).toBeNull()
+
+      window.dispatchEvent(new Event('load'))
+
+      expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
+    })
+
+    it('should still auto-initialize on load via the form-multi-select class (backward compat)', () => {
+      fixtureEl.innerHTML = '<select class="form-multi-select"><option value="1">One</option></select>'
+      const selectEl = fixtureEl.querySelector('select')
+
+      window.dispatchEvent(new Event('load'))
+
+      expect(MultiSelect.getInstance(selectEl)).toBeInstanceOf(MultiSelect)
+    })
   })
 
   describe('_updateSelectionCleaner', () => {
@@ -4190,7 +4279,7 @@ describe('MultiSelect', () => {
         search: false
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.innerHTML).toContain('Select something')
     })
 
@@ -4205,7 +4294,7 @@ describe('MultiSelect', () => {
         search: false
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.textContent).toContain('Opt 1')
     })
 
@@ -4224,7 +4313,7 @@ describe('MultiSelect', () => {
         search: false
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.textContent).toContain('2')
       expect(selection.textContent).toContain('item(s) selected')
     })
@@ -4242,7 +4331,7 @@ describe('MultiSelect', () => {
         selectionType: 'text'
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.textContent).toContain('Apple')
       expect(selection.textContent).toContain('Banana')
     })
@@ -4257,8 +4346,8 @@ describe('MultiSelect', () => {
         disabled: true
       })
 
-      multiSelect._clone.click()
-      expect(multiSelect._clone.classList.contains('show')).toBe(false)
+      multiSelect._wrapperElement.click()
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
     it('should add disabled class to element', () => {
@@ -4283,7 +4372,7 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.classList.contains('form-multi-select-selection-tags')).toBe(true)
     })
 
@@ -4296,7 +4385,7 @@ describe('MultiSelect', () => {
         selectionType: 'counter'
       })
 
-      const selection = multiSelect._clone.querySelector('.form-multi-select-selection')
+      const selection = multiSelect._wrapperElement.querySelector('.form-multi-select-selection')
       expect(selection.classList.contains('form-multi-select-selection-tags')).toBe(false)
     })
   })
@@ -4307,7 +4396,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._clone.getAttribute('role')).toBe('combobox')
+      expect(multiSelect._togglerElement.getAttribute('role')).toBe('combobox')
     })
 
     it('should set aria-haspopup to listbox', () => {
@@ -4315,7 +4404,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._clone.getAttribute('aria-haspopup')).toBe('listbox')
+      expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
     })
 
     it('should set aria-owns referencing listbox id', () => {
@@ -4323,7 +4412,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._clone.getAttribute('aria-owns')).toBe('test-select-listbox')
+      expect(multiSelect._togglerElement.getAttribute('aria-owns')).toBe('test-select-listbox')
     })
 
     it('should set listbox role on the options element', () => {
