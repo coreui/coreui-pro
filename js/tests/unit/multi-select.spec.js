@@ -4429,6 +4429,25 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
     })
 
+    it('should give the search input an accessible label and combobox-supporting attributes', () => {
+      fixtureEl.innerHTML = '<select id="test-select"></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
+      const input = multiSelect._searchElement
+
+      expect(input.getAttribute('aria-label')).toBe('Search')
+      expect(input.getAttribute('aria-autocomplete')).toBe('list')
+      expect(input.getAttribute('aria-controls')).toBe('test-select-listbox')
+    })
+
+    it('should use a custom ariaSearchLabel', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], search: true, ariaSearchLabel: 'Szukaj' })
+
+      expect(multiSelect._searchElement.getAttribute('aria-label')).toBe('Szukaj')
+    })
+
     it('should mark the selection as an aria-live region', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

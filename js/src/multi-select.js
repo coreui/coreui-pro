@@ -102,6 +102,7 @@ const Default = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
+  ariaSearchLabel: 'Search',
   ariaTagDeleteLabel: 'Remove',
   cleaner: true,
   clearSearchOnSelect: false,
@@ -143,6 +144,7 @@ const DefaultType = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
   ariaIndicatorLabel: 'string',
+  ariaSearchLabel: 'string',
   ariaTagDeleteLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
@@ -827,6 +829,9 @@ class MultiSelect extends BaseComponent {
 
     input.setAttribute('id', `search-${this._uniqueId}`)
     input.setAttribute('name', `search-${this._uniqueName}`)
+    input.setAttribute('aria-label', this._config.ariaSearchLabel)
+    input.setAttribute('aria-autocomplete', 'list')
+    input.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     this._searchElement = input
     this._updateSearchSize()
