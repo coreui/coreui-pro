@@ -347,6 +347,7 @@ class MultiSelect extends BaseComponent {
     this._wrapperElement.before(this._element)
     this._wrapperElement.remove()
     this._element.innerHTML = ''
+    this._configureNativeSelect()
     this._createNativeOptions(this._element, this._options)
     this._createSelect()
     this._addEventListeners()
@@ -661,12 +662,17 @@ class MultiSelect extends BaseComponent {
   _configureNativeSelect() {
     this._element.classList.add(CLASS_NAME_SELECT)
 
+    // Set or clear so update() can flip these on or off.
     if (this._config.multiple) {
       this._element.setAttribute('multiple', true)
+    } else {
+      this._element.removeAttribute('multiple')
     }
 
     if (this._config.required) {
       this._element.setAttribute('required', true)
+    } else {
+      this._element.removeAttribute('required')
     }
   }
 

@@ -3546,6 +3546,29 @@ describe('MultiSelect', () => {
       expect(multiSelect._options[0].value).toBe('new1')
     })
 
+    it('should refresh multiple and required on the native select', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Option 1' }],
+        multiple: true,
+        required: true
+      })
+
+      expect(selectEl.getAttribute('multiple')).toBe('true')
+      expect(selectEl.getAttribute('required')).toBe('true')
+
+      multiSelect.update({ multiple: false, required: false })
+
+      expect(selectEl.hasAttribute('multiple')).toBe(false)
+      expect(selectEl.hasAttribute('required')).toBe(false)
+
+      multiSelect.update({ multiple: true, required: true })
+
+      expect(selectEl.getAttribute('multiple')).toBe('true')
+      expect(selectEl.getAttribute('required')).toBe('true')
+    })
+
     it('should deselect all when value is provided in update config', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
