@@ -22,7 +22,7 @@ snippets:
 A straightforward demonstration of how to implement a basic Bootstrap Multi Select dropdown, highlighting essential attributes and configurations.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="ms1" multiple data-coreui-search="global">
+<select id="ms1" data-coreui-multi-select multiple data-coreui-search="global">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -36,7 +36,7 @@ A straightforward demonstration of how to implement a basic Bootstrap Multi Sele
 {{< /example >}}
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" multiple data-coreui-search="true">
+<select data-coreui-multi-select multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1" disabled>Bootstrap</option>
   <option value="2">React.js</option>
@@ -58,7 +58,7 @@ Learn how to populate the multi-select component with data from various sources,
 If you want to create a multi-select dropdown with predefined options, use the `<option>` elements inside the `<select>` tag.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" multiple data-coreui-search="true">
+<select data-coreui-multi-select multiple data-coreui-search="true">
   <option value="0" selected>Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -88,7 +88,7 @@ We use the following JavaScript to set up our multi-select:
 You can configure the search functionality within the component. The `data-coreui-search` option determines how the search input element is enabled and behaves. It accepts multiple types to provide flexibility in configuring search behavior. By default is set to `false`.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" multiple>
+<select data-coreui-multi-select multiple>
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -106,7 +106,7 @@ You can configure the search functionality within the component. The `data-coreu
 To enable the default search input element with standard behavior, please add `data-coreui-search="true"` like in the example below:
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" multiple data-coreui-search="true">
+<select data-coreui-multi-select multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -126,7 +126,7 @@ To enable the default search input element with standard behavior, please add `d
 To enable the global search functionality within the Multi Select component, please add `data-coreui-search="global"`. When `data-coreui-search` is set to `'global'`, the user can perform searches across the entire component, regardless of where their focus is within the component. This allows for a more flexible and intuitive search experience, ensuring the search input is recognized from any point within the component.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" multiple data-coreui-search="global">
+<select data-coreui-multi-select multiple data-coreui-search="global">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -149,7 +149,7 @@ Explore different selection modes, including single and multiple selections, all
 If you want to enable users to select multiple options as text entries, add the `data-coreui-selection-type="text"`. This configuration includes search functionality, making it easier to filter options by typing.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="multiple-select-text" multiple data-coreui-selection-type="text" data-coreui-search="true">
+<select id="multiple-select-text" data-coreui-multi-select multiple data-coreui-selection-type="text" data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -167,7 +167,7 @@ If you want to enable users to select multiple options as text entries, add the 
 If you want to display selected options as tags, add the `data-coreui-selection-type="tags"`. This mode is useful for visually grouping selected items. The search functionality is also enabled for better user experience.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="multiple-select-tag" multiple data-coreui-selection-type="tags" data-coreui-search="true">
+<select id="multiple-select-tag" data-coreui-multi-select multiple data-coreui-selection-type="tags" data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -185,7 +185,7 @@ If you want to display selected options as tags, add the `data-coreui-selection-
 If you prefer to show a counter indicating the number of selected options, add the `data-coreui-selection-type="tags"`. This helps users keep track of their selections and includes search functionality for filtering options.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="multiple-select-counter" multiple data-coreui-selection-type="counter" data-coreui-search="true">
+<select id="multiple-select-counter" data-coreui-multi-select multiple data-coreui-selection-type="counter" data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -205,7 +205,7 @@ When `multiple` is enabled, a **select all** button is rendered in the dropdown 
 With the default `selectAllStyle: 'checkbox'` the button shows a tri-state indicator that mirrors the overall selection — `none` when nothing is selected, `all` when everything is, and `indeterminate` in between. Set `selectAllStyle: 'text'` for a plain text toggle instead.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="multiSelectSelectAll" multiple data-coreui-search="true">
+<select id="multiSelectSelectAll" data-coreui-multi-select multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -233,7 +233,7 @@ To avoid a misleading "Select all" while a filter is active, the label switches 
 Type into the search box below, then use select all — only the matching options are selected.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="multiSelectSelectAllMode" multiple data-coreui-search="true" data-coreui-select-all-mode="filtered">
+<select id="multiSelectSelectAllMode" data-coreui-multi-select multiple data-coreui-search="true" data-coreui-select-all-mode="filtered">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -264,7 +264,7 @@ To surface these as buttons inside the dropdown, render them through the [custom
 Use `data-coreui-selection-limit` to limit how many options can be selected. The select all button stays enabled and selects options up to the limit, then toggles to deselect all once the limit is reached. The `selectionLimit.coreui.multi-select` event can be used to show feedback when a user tries to select more options than allowed.
 
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectSelectionLimitSnippet">}}
-<select class="form-multi-select" id="multiSelectSelectionLimit" multiple data-coreui-search="true" data-coreui-selection-limit="3">
+<select id="multiSelectSelectionLimit" data-coreui-multi-select multiple data-coreui-search="true" data-coreui-selection-limit="3">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -286,7 +286,7 @@ We use the following JavaScript to show a toast when the selection limit is reac
 Add the `data-coreui-multiple="false"` boolean attribute to implement single-selection mode, enabling users to select only one option from the dropdown at a time.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="single-select" data-coreui-multiple="false">
+<select id="single-select" data-coreui-multi-select data-coreui-multiple="false">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -304,7 +304,7 @@ Add the `data-coreui-multiple="false"` boolean attribute to implement single-sel
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
 {{< example stackblitz_pro="true" >}}
-<select class="form-multi-select" id="ms1" multiple data-coreui-search="true"  data-coreui-disabled="true">
+<select id="ms1" data-coreui-multi-select multiple data-coreui-search="true"  data-coreui-disabled="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -324,10 +324,10 @@ The CoreUI Bootstrap Multi Select Component provides the flexibility to personal
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectCustomOptionsSnippet">}}
 <div class="row">
   <div class="col-md-6">
-    <select id="myMultiSelectCountries" class="form-multi-select"></select>
+    <select id="myMultiSelectCountries" data-coreui-multi-select></select>
   </div>
   <div class="col-md-6">
-    <select id="myMultiSelectCountriesAndCities" class="form-multi-select"></select>
+    <select id="myMultiSelectCountriesAndCities" data-coreui-multi-select></select>
   </div>
 </div>
 {{< /example >}}
@@ -341,7 +341,7 @@ We use the following JavaScript to set up our multi-select:
 Use the `headerTemplate` option to fully customize the dropdown header — the area above the options list — including rendering several action buttons. It renders independently of `selectAll`. The template function receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object with bound component methods (`selectAll`, `selectFiltered`, `deselectFiltered`, `deselectAll`). Return an `HTMLElement` and wire your own listeners to the `actions`, or return an HTML string (sanitized) for simple custom content. The header re-renders on every selection change and search filter, so labels and `disabled` states stay up to date.
 
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectHeaderSnippet">}}
-<select id="myMultiSelectHeader" class="form-multi-select"></select>
+<select id="myMultiSelectHeader" data-coreui-multi-select></select>
 {{< /example >}}
 
 We use the following JavaScript to set up our multi-select:
@@ -353,7 +353,7 @@ We use the following JavaScript to set up our multi-select:
 Enable `optionsGroupsSelectable` to turn each group label into its own tri-state checkbox that toggles the whole group. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input>` element. The same tri-state logic drives the header [select all](#select-all) button when `selectAllStyle: 'checkbox'`. Each section's indicator follows its own `*Style` option (`optionsStyle`, `optionsGroupsStyle`, `selectAllStyle`, all defaulting to `'checkbox'`) and requires `multiple`.
 
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectIndeterminateSnippet">}}
-<select id="myMultiSelectIndeterminate" class="form-multi-select"></select>
+<select id="myMultiSelectIndeterminate" data-coreui-multi-select></select>
 {{< /example >}}
 
 We use the following JavaScript to set up our multi-select:
@@ -367,7 +367,7 @@ You may also choose from small and large multi selects to match our similarly si
 {{< example stackblitz_pro="true" >}}
 <div class="row">
   <div class="col-md-6">
-    <select class="form-multi-select form-multi-select-lg mb-3" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
+    <select id="multiple-select-counter" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
       <option value="0">Angular</option>
       <option value="1">Bootstrap</option>
       <option value="2">React.js</option>
@@ -378,7 +378,7 @@ You may also choose from small and large multi selects to match our similarly si
         <option value="6">Node.js</option>
       </optgroup>
     </select>
-    <select class="form-multi-select form-multi-select-sm" id="multiple-select-counter" data-coreui-selection-type="counter" data-coreui-search="true">
+    <select id="multiple-select-counter" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
       <option value="0">Angular</option>
       <option value="1">Bootstrap</option>
       <option value="2">React.js</option>
@@ -391,7 +391,7 @@ You may also choose from small and large multi selects to match our similarly si
     </select>
   </div>
   <div class="col-md-6">
-    <select class="form-multi-select form-multi-select-lg mb-3" id="multiple-select-counter" data-coreui-selection-type="tags" data-coreui-search="true">
+    <select id="multiple-select-counter" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
       <option value="0">Angular</option>
       <option value="1">Bootstrap</option>
       <option value="2">React.js</option>
@@ -402,7 +402,7 @@ You may also choose from small and large multi selects to match our similarly si
         <option value="6">Node.js</option>
       </optgroup>
     </select>
-    <select class="form-multi-select form-multi-select-sm" id="multiple-select-counter" data-coreui-selection-type="tags" data-coreui-search="true">
+    <select id="multiple-select-counter" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
       <option value="0">Angular</option>
       <option value="1">Bootstrap</option>
       <option value="2">React.js</option>
@@ -423,10 +423,10 @@ You may also choose from small and large multi selects to match our similarly si
 
 ### Via data attributes
 
-Add `form-multi-select` class to a `select` element.
+Add the `data-coreui-multi-select` attribute to a `select` element.
 
 ```html
-<select class="form-multi-select" id="ms1" multiple data-coreui-search="true">
+<select id="ms1" data-coreui-multi-select multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -444,11 +444,11 @@ Add `form-multi-select` class to a `select` element.
 Call the time picker via JavaScript:
 
 ```html
-<select class="form-multi-select"></select>
+<select data-coreui-multi-select></select>
 ```
 
 ```js
-const mulitSelectElementList = Array.prototype.slice.call(document.querySelectorAll('.form-multi-select'))
+const mulitSelectElementList = Array.prototype.slice.call(document.querySelectorAll('[data-coreui-multi-select]'))
 const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
   return new coreui.MultiSelect(mulitSelectEl, {
     // options

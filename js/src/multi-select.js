@@ -48,7 +48,9 @@ const SELECTOR_OPTION = '.form-multi-select-option'
 const SELECTOR_OPTIONS = '.form-multi-select-options'
 const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
 const SELECTOR_SEARCH = '.form-multi-select-search'
-const SELECTOR_SELECT = '.form-multi-select'
+const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
+// TODO: remove the class-based selector in v6, use the data attribute instead
+const SELECTOR_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_TAG = '.form-multi-select-tag'
 const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
@@ -199,7 +201,7 @@ class MultiSelect extends BaseComponent {
     this._togglerElement = null
     this._optionsElement = null
 
-    this._clone = null
+    this._wrapperElement = null
     this._menu = null
     this._selected = []
     this._options = this._getOptions()
@@ -240,11 +242,11 @@ class MultiSelect extends BaseComponent {
     }
 
     EventHandler.trigger(this._element, EVENT_SHOW)
-    this._clone.classList.add(CLASS_NAME_SHOW)
-    this._clone.setAttribute('aria-expanded', 'true')
+    this._wrapperElement.classList.add(CLASS_NAME_SHOW)
+    this._togglerElement.setAttribute('aria-expanded', 'true')
 
     if (this._config.container) {
-      this._menu.style.minWidth = `${this._clone.offsetWidth}px`
+      this._menu.style.minWidth = `${this._wrapperElement.offsetWidth}px`
       this._menu.classList.add(CLASS_NAME_SHOW)
     }
 
@@ -253,14 +255,14 @@ class MultiSelect extends BaseComponent {
     this._createPopper()
 
     if (this._config.search) {
-      SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus()
+      SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement).focus()
     }
   }
 
   hide() {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
-    const refocusFromInside = this._clone.contains(document.activeElement) ||
+    const refocusFromInside = this._wrapperElement.contains(document.activeElement) ||
       this._menu.contains(document.activeElement)
 
     if (this._popper) {
@@ -272,8 +274,8 @@ class MultiSelect extends BaseComponent {
     }
 
     this._onSearchChange(this._searchElement)
-    this._clone.classList.remove(CLASS_NAME_SHOW)
-    this._clone.setAttribute('aria-expanded', 'false')
+    this._wrapperElement.classList.remove(CLASS_NAME_SHOW)
+    this._togglerElement.setAttribute('aria-expanded', 'false')
 
     if (this._config.container) {
       this._menu.classList.remove(CLASS_NAME_SHOW)
@@ -295,7 +297,7 @@ class MultiSelect extends BaseComponent {
     }
 
     for (const element of [
-      this._clone,
+      this._wrapperElement,
       this._menu,
       this._selectionElement,
       this._togglerElement,
@@ -314,11 +316,11 @@ class MultiSelect extends BaseComponent {
       this._menu.remove()
     }
 
-    if (this._clone) {
-      this._clone.remove()
+    if (this._wrapperElement) {
+      this._wrapperElement.before(this._element)
+      this._wrapperElement.remove()
     }
 
-    this._element.style.removeProperty('display')
     this._element.removeAttribute('tabindex')
 
     super.dispose()
@@ -339,7 +341,8 @@ class MultiSelect extends BaseComponent {
     this._selected = []
     this._options = this._getOptions()
     this._menu.remove()
-    this._clone.remove()
+    this._wrapperElement.before(this._element)
+    this._wrapperElement.remove()
     this._element.innerHTML = ''
     this._createNativeOptions(this._element, this._options)
     this._createSelect()
@@ -424,13 +427,13 @@ class MultiSelect extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._clone, EVENT_CLICK, () => {
+    EventHandler.on(this._wrapperElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.show()
       }
     })
 
-    EventHandler.on(this._clone, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, event => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
         return
@@ -457,6 +460,35 @@ class MultiSelect extends BaseComponent {
       if (this._isShown() && event.key === ARROW_DOWN_KEY) {
         event.preventDefault()
         this._selectMenuItem(event)
+      }
+    })
+
+    // Validation focuses the overlay select; hand its keystrokes to the custom control.
+    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+      if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
+        return
+      }
+
+      // Suppress the native select's own keyboard behavior (typeahead, value change).
+      event.preventDefault()
+
+      const isPrintable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
+
+      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY || (this._config.search && isPrintable))) {
+        this.show()
+      }
+
+      if (this._config.search) {
+        this._searchElement.focus()
+
+        // The keystroke can't be retargeted mid-event, so inject the character that
+        // would otherwise be lost and start filtering on this first press.
+        if (isPrintable) {
+          this._searchElement.value += event.key
+          this._onSearchChange(this._searchElement)
+        }
+      } else {
+        this._togglerElement.focus()
       }
     })
 
@@ -660,29 +692,27 @@ class MultiSelect extends BaseComponent {
 
   _hideNativeSelect() {
     this._element.tabIndex = '-1'
-    this._element.style.display = 'none'
   }
 
   _createSelect() {
-    const multiSelectEl = document.createElement('div')
-    multiSelectEl.classList.add(CLASS_NAME_SELECT)
-    multiSelectEl.classList.toggle('is-invalid', this._config.invalid)
-    multiSelectEl.classList.toggle('is-valid', this._config.valid)
-    multiSelectEl.setAttribute('role', 'combobox')
-    multiSelectEl.setAttribute('aria-expanded', 'false')
-    multiSelectEl.setAttribute('aria-haspopup', 'listbox')
-    multiSelectEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
+    const wrapper = document.createElement('div')
+    wrapper.classList.add(CLASS_NAME_SELECT)
+    wrapper.classList.toggle('is-invalid', this._config.invalid)
+    wrapper.classList.toggle('is-valid', this._config.valid)
 
     if (this._config.disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
     }
 
     for (const className of this._element.classList.value.split(' ')) {
-      multiSelectEl.classList.add(className)
+      wrapper.classList.add(className)
     }
 
-    this._clone = multiSelectEl
-    this._element.parentNode.insertBefore(multiSelectEl, this._element.nextSibling)
+    this._wrapperElement = wrapper
+    // The wrapper takes the native select's place, then the select moves inside it
+    // as an invisible overlay so native `required` validation anchors over the control.
+    this._element.parentNode.insertBefore(wrapper, this._element)
+    wrapper.prepend(this._element)
     this._createSelection()
     this._createButtons()
 
@@ -702,6 +732,10 @@ class MultiSelect extends BaseComponent {
   _createSelection() {
     const togglerEl = document.createElement('div')
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
+    togglerEl.setAttribute('role', 'combobox')
+    togglerEl.setAttribute('aria-expanded', 'false')
+    togglerEl.setAttribute('aria-haspopup', 'listbox')
+    togglerEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
     this._togglerElement = togglerEl
 
     if (!this._config.search && !this._config.disabled) {
@@ -716,7 +750,7 @@ class MultiSelect extends BaseComponent {
     }
 
     togglerEl.append(selectionEl)
-    this._clone.append(togglerEl)
+    this._wrapperElement.append(togglerEl)
 
     this._updateSelection()
     this._selectionElement = selectionEl
@@ -850,7 +884,7 @@ class MultiSelect extends BaseComponent {
     if (container) {
       container.append(dropdownDiv)
     } else {
-      this._clone.append(dropdownDiv)
+      this._wrapperElement.append(dropdownDiv)
     }
 
     this._createOptions(optionsDiv, this._options)
@@ -1203,8 +1237,8 @@ class MultiSelect extends BaseComponent {
   }
 
   _updateSelection() {
-    const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone)
-    const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._clone)
+    const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement)
+    const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)
 
     if (this._selected.length === 0 && !this._config.search) {
       const placeholder = document.createElement('span')
@@ -1252,7 +1286,7 @@ class MultiSelect extends BaseComponent {
     }
 
     if (this._selected.length > 0 && this._selectionCleanerElement === null) {
-      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._clone)
+      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._wrapperElement)
       const selectionCleaner = this._createSelectionCleaner()
 
       buttons.insertBefore(selectionCleaner, this._indicatorElement)
@@ -1477,7 +1511,7 @@ class MultiSelect extends BaseComponent {
   }
 
   _isShown() {
-    return this._clone.classList.contains(CLASS_NAME_SHOW)
+    return this._wrapperElement.classList.contains(CLASS_NAME_SHOW)
   }
 
   _hasSelectionLimit() {
@@ -1614,11 +1648,11 @@ class MultiSelect extends BaseComponent {
         continue
       }
 
-      if (!context._clone.classList.contains(CLASS_NAME_SHOW)) {
+      if (!context._wrapperElement.classList.contains(CLASS_NAME_SHOW)) {
         continue
       }
 
-      if (context._clone.contains(event.target)) {
+      if (context._wrapperElement.contains(event.target)) {
         continue
       }
 
@@ -1634,7 +1668,12 @@ class MultiSelect extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const ms of SelectorEngine.find(SELECTOR_SELECT)) {
+  const elements = new Set([
+    ...SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT),
+    ...SelectorEngine.find(SELECTOR_SELECT)
+  ])
+
+  for (const ms of elements) {
     if (ms.tabIndex !== -1) {
       MultiSelect.multiSelectInterface(ms)
     }
