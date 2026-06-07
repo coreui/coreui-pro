@@ -39,6 +39,7 @@ const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
@@ -101,6 +102,7 @@ const Default = {
   allowList: DefaultAllowlist,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
+  ariaSearchLabel: 'Search',
   ariaTagDeleteLabel: 'Remove',
   cleaner: true,
   clearSearchOnSelect: false,
@@ -142,6 +144,7 @@ const DefaultType = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
   ariaIndicatorLabel: 'string',
+  ariaSearchLabel: 'string',
   ariaTagDeleteLabel: 'string',
   cleaner: 'boolean',
   clearSearchOnSelect: 'boolean',
@@ -549,7 +552,9 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
-      if (event.key === ENTER_KEY) {
+      if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
+        // Space would otherwise scroll the options list.
+        event.preventDefault()
         this._onOptionsClick(event.target)
       }
 
@@ -735,8 +740,12 @@ class MultiSelect extends BaseComponent {
     togglerEl.setAttribute('role', 'combobox')
     togglerEl.setAttribute('aria-expanded', 'false')
     togglerEl.setAttribute('aria-haspopup', 'listbox')
-    togglerEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
+    togglerEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
     this._togglerElement = togglerEl
+
+    if (this._config.disabled) {
+      togglerEl.setAttribute('aria-disabled', 'true')
+    }
 
     if (!this._config.search && !this._config.disabled) {
       togglerEl.tabIndex = 0
@@ -744,6 +753,7 @@ class MultiSelect extends BaseComponent {
 
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
+    selectionEl.setAttribute('aria-live', 'polite')
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
       selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS)
@@ -819,6 +829,9 @@ class MultiSelect extends BaseComponent {
 
     input.setAttribute('id', `search-${this._uniqueId}`)
     input.setAttribute('name', `search-${this._uniqueName}`)
+    input.setAttribute('aria-label', this._config.ariaSearchLabel)
+    input.setAttribute('aria-autocomplete', 'list')
+    input.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     this._searchElement = input
     this._updateSearchSize()
@@ -912,6 +925,7 @@ class MultiSelect extends BaseComponent {
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
         optionDiv.setAttribute('role', 'option')
+        optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false')
 
         if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
           optionDiv.innerHTML = this._config.sanitize ?
@@ -1566,6 +1580,7 @@ class MultiSelect extends BaseComponent {
     if (visibleOptions === 0) {
       const placeholder = document.createElement('div')
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
+      placeholder.setAttribute('role', 'status')
       placeholder.textContent = this._config.searchNoResultsLabel
 
       if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {

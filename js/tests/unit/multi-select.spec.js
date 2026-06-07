@@ -2134,6 +2134,7 @@ describe('MultiSelect', () => {
       const emptyMessage = multiSelect._menu.querySelector('.form-multi-select-options-empty')
       expect(emptyMessage).not.toBeNull()
       expect(emptyMessage.textContent).toBe('No results found')
+      expect(emptyMessage.getAttribute('role')).toBe('status')
     })
 
     it('should remove "no results" message when results are found again', () => {
@@ -2988,6 +2989,27 @@ describe('MultiSelect', () => {
       const enterEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
       optionEl.dispatchEvent(enterEvent)
 
+      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect._selected[0].value).toBe('1')
+    })
+
+    it('should select option on Space key in options list', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ]
+      })
+
+      multiSelect.show()
+
+      const optionEl = multiSelect._optionsElement.querySelector('[data-value="1"]')
+      const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
+      optionEl.dispatchEvent(spaceEvent)
+
+      expect(spaceEvent.defaultPrevented).toBe(true)
       expect(multiSelect._selected.length).toBe(1)
       expect(multiSelect._selected[0].value).toBe('1')
     })
@@ -4407,12 +4429,55 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
     })
 
-    it('should set aria-owns referencing listbox id', () => {
+    it('should give the search input an accessible label and combobox-supporting attributes', () => {
+      fixtureEl.innerHTML = '<select id="test-select"></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], search: true })
+      const input = multiSelect._searchElement
+
+      expect(input.getAttribute('aria-label')).toBe('Search')
+      expect(input.getAttribute('aria-autocomplete')).toBe('list')
+      expect(input.getAttribute('aria-controls')).toBe('test-select-listbox')
+    })
+
+    it('should use a custom ariaSearchLabel', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], search: true, ariaSearchLabel: 'Szukaj' })
+
+      expect(multiSelect._searchElement.getAttribute('aria-label')).toBe('Szukaj')
+    })
+
+    it('should mark the selection as an aria-live region', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], selectionType: 'counter' })
+
+      expect(multiSelect._selectionElement.getAttribute('aria-live')).toBe('polite')
+    })
+
+    it('should set aria-disabled on the toggler when disabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], disabled: true })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBe('true')
+    })
+
+    it('should not set aria-disabled on the toggler when enabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
+    })
+
+    it('should set aria-controls referencing listbox id', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._togglerElement.getAttribute('aria-owns')).toBe('test-select-listbox')
+      expect(multiSelect._togglerElement.getAttribute('aria-controls')).toBe('test-select-listbox')
     })
 
     it('should set listbox role on the options element', () => {
@@ -4435,6 +4500,23 @@ describe('MultiSelect', () => {
 
       const optionEl = multiSelect._optionsElement.querySelector('.form-multi-select-option')
       expect(optionEl.getAttribute('role')).toBe('option')
+    })
+
+    it('should set aria-selected on options at creation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1', selected: true },
+          { value: '2', text: 'Opt 2' }
+        ]
+      })
+
+      const selectedOption = multiSelect._optionsElement.querySelector('[data-value="1"]')
+      const unselectedOption = multiSelect._optionsElement.querySelector('[data-value="2"]')
+
+      expect(selectedOption.getAttribute('aria-selected')).toBe('true')
+      expect(unselectedOption.getAttribute('aria-selected')).toBe('false')
     })
 
     it('should set aria-label on cleaner button', () => {
