@@ -738,7 +738,7 @@ class MultiSelect extends BaseComponent {
     togglerEl.setAttribute('role', 'combobox')
     togglerEl.setAttribute('aria-expanded', 'false')
     togglerEl.setAttribute('aria-haspopup', 'listbox')
-    togglerEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
+    togglerEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
     this._togglerElement = togglerEl
 
     if (this._config.disabled) {

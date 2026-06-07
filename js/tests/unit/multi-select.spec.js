@@ -4453,12 +4453,12 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('should set aria-owns referencing listbox id', () => {
+    it('should set aria-controls referencing listbox id', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      expect(multiSelect._togglerElement.getAttribute('aria-owns')).toBe('test-select-listbox')
+      expect(multiSelect._togglerElement.getAttribute('aria-controls')).toBe('test-select-listbox')
     })
 
     it('should set listbox role on the options element', () => {
