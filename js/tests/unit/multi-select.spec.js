@@ -4437,6 +4437,23 @@ describe('MultiSelect', () => {
       expect(optionEl.getAttribute('role')).toBe('option')
     })
 
+    it('should set aria-selected on options at creation', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Opt 1', selected: true },
+          { value: '2', text: 'Opt 2' }
+        ]
+      })
+
+      const selectedOption = multiSelect._optionsElement.querySelector('[data-value="1"]')
+      const unselectedOption = multiSelect._optionsElement.querySelector('[data-value="2"]')
+
+      expect(selectedOption.getAttribute('aria-selected')).toBe('true')
+      expect(unselectedOption.getAttribute('aria-selected')).toBe('false')
+    })
+
     it('should set aria-label on cleaner button', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

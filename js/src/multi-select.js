@@ -912,6 +912,7 @@ class MultiSelect extends BaseComponent {
         optionDiv.dataset.value = String(option.value)
         optionDiv.tabIndex = 0
         optionDiv.setAttribute('role', 'option')
+        optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false')
 
         if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
           optionDiv.innerHTML = this._config.sanitize ?
