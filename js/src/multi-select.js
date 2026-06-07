@@ -738,6 +738,10 @@ class MultiSelect extends BaseComponent {
     togglerEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
     this._togglerElement = togglerEl
 
+    if (this._config.disabled) {
+      togglerEl.setAttribute('aria-disabled', 'true')
+    }
+
     if (!this._config.search && !this._config.disabled) {
       togglerEl.tabIndex = 0
     }

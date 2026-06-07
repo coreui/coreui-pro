@@ -4407,6 +4407,22 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-haspopup')).toBe('listbox')
     })
 
+    it('should set aria-disabled on the toggler when disabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [], disabled: true })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBe('true')
+    })
+
+    it('should not set aria-disabled on the toggler when enabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-disabled')).toBeNull()
+    })
+
     it('should set aria-owns referencing listbox id', () => {
       fixtureEl.innerHTML = '<select id="test-select"></select>'
       const selectEl = fixtureEl.querySelector('select')
