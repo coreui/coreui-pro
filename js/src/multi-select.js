@@ -39,6 +39,7 @@ const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
@@ -549,7 +550,9 @@ class MultiSelect extends BaseComponent {
     })
 
     EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
-      if (event.key === ENTER_KEY) {
+      if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
+        // Space would otherwise scroll the options list.
+        event.preventDefault()
         this._onOptionsClick(event.target)
       }
 

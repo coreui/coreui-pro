@@ -2993,6 +2993,27 @@ describe('MultiSelect', () => {
       expect(multiSelect._selected[0].value).toBe('1')
     })
 
+    it('should select option on Space key in options list', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' }
+        ]
+      })
+
+      multiSelect.show()
+
+      const optionEl = multiSelect._optionsElement.querySelector('[data-value="1"]')
+      const spaceEvent = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true })
+      optionEl.dispatchEvent(spaceEvent)
+
+      expect(spaceEvent.defaultPrevented).toBe(true)
+      expect(multiSelect._selected.length).toBe(1)
+      expect(multiSelect._selected[0].value).toBe('1')
+    })
+
     it('should navigate options with ArrowDown in options list', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
