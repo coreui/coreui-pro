@@ -575,7 +575,7 @@ class MultiSelect extends BaseComponent {
   _getOptionsFromConfig(options = this._config.options) {
     const _options = []
     for (const option of options) {
-      if (option.options && Array.isArray(option.options)) {
+      if (this._isOptionGroup(option)) {
         const customGroupProperties = { ...option }
 
         delete customGroupProperties.label
@@ -676,7 +676,12 @@ class MultiSelect extends BaseComponent {
 
   _createNativeOptions(parentElement, options) {
     for (const option of options) {
-      if ((typeof option.options === 'undefined')) {
+      if (this._isOptionGroup(option)) {
+        const optgroup = document.createElement('optgroup')
+        optgroup.label = option.label
+        this._createNativeOptions(optgroup, option.options)
+        parentElement.append(optgroup)
+      } else {
         const opt = document.createElement('OPTION')
         opt.value = option.value
 
@@ -690,11 +695,6 @@ class MultiSelect extends BaseComponent {
 
         opt.textContent = option.text
         parentElement.append(opt)
-      } else {
-        const optgroup = document.createElement('optgroup')
-        optgroup.label = option.label
-        this._createNativeOptions(optgroup, option.options)
-        parentElement.append(optgroup)
       }
     }
   }
@@ -914,7 +914,7 @@ class MultiSelect extends BaseComponent {
 
   _createOptions(parentElement, options) {
     for (const option of options) {
-      if (typeof option.value !== 'undefined') {
+      if (!this._isOptionGroup(option)) {
         const optionDiv = document.createElement('div')
         optionDiv.classList.add(CLASS_NAME_OPTION)
 
@@ -940,7 +940,7 @@ class MultiSelect extends BaseComponent {
         parentElement.append(optionDiv)
       }
 
-      if (typeof option.label !== 'undefined') {
+      if (this._isOptionGroup(option)) {
         const optgroup = document.createElement('div')
         optgroup.classList.add(CLASS_NAME_OPTGROUP)
 
@@ -1070,7 +1070,7 @@ class MultiSelect extends BaseComponent {
         return option
       }
 
-      if (option.options && Array.isArray(option.options)) {
+      if (this._isOptionGroup(option)) {
         const found = this._findOptionByValue(value, option.options)
         if (found) {
           return found
@@ -1087,7 +1087,7 @@ class MultiSelect extends BaseComponent {
         continue
       }
 
-      if (option.label) {
+      if (this._isOptionGroup(option)) {
         if (this._selectAllOptions(option.options)) {
           return true
         }
@@ -1111,7 +1111,7 @@ class MultiSelect extends BaseComponent {
         continue
       }
 
-      if (option.label) {
+      if (this._isOptionGroup(option)) {
         this._deselectAllOptions(option.options)
         continue
       }
@@ -1137,6 +1137,10 @@ class MultiSelect extends BaseComponent {
     return this._config.sanitize ?
       sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
       content
+  }
+
+  _isOptionGroup(option) {
+    return Array.isArray(option.options)
   }
 
   _selectOption(value, text, { refresh = true } = {}) {
