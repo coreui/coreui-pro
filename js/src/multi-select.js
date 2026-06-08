@@ -735,7 +735,7 @@ class MultiSelect extends BaseComponent {
 
     this._createOptionsContainer()
     this._hideNativeSelect()
-    this._updateOptionsList()
+    this._selectInitialOptions()
   }
 
   _createSelection() {
@@ -1263,7 +1263,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateOptionsList() {
+  _selectInitialOptions() {
     // `_selected` is already fully populated by `_getOptions()` before this runs,
     // so iterate it directly (no tree walk) and batch the DOM refresh into one call.
     for (const option of this._selected) {
