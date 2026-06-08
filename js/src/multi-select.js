@@ -368,8 +368,7 @@ class MultiSelect extends BaseComponent {
   }
 
   selectFiltered() {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-      .filter(element => this._isOptionDisplayed(element))
+    const items = this._getDisplayedItems()
 
     let limitReached = false
     for (const item of items) {
@@ -393,8 +392,7 @@ class MultiSelect extends BaseComponent {
   }
 
   deselectFiltered() {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
-      .filter(element => this._isOptionDisplayed(element))
+    const items = this._getDisplayedItems()
 
     for (const item of items) {
       const value = String(item.dataset.value)
@@ -933,10 +931,8 @@ class MultiSelect extends BaseComponent {
         optionDiv.setAttribute('role', 'option')
         optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false')
 
-        if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
-          optionDiv.innerHTML = this._config.sanitize ?
-            sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
-            this._config.optionsTemplate(option)
+        if (typeof this._config.optionsTemplate === 'function') {
+          optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
         } else {
           optionDiv.textContent = option.text
         }
@@ -950,10 +946,8 @@ class MultiSelect extends BaseComponent {
 
         const optgrouplabel = document.createElement('div')
 
-        if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
-          optgrouplabel.innerHTML = this._config.sanitize ?
-            sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
-            this._config.optionsGroupsTemplate(option)
+        if (typeof this._config.optionsGroupsTemplate === 'function') {
+          optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option))
         } else {
           optgrouplabel.textContent = option.label
         }
@@ -1126,6 +1120,25 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _getNativeOption(value) {
+    return SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
+  }
+
+  _getOptionElement(value) {
+    return SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
+  }
+
+  _getDisplayedItems() {
+    return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
+      .filter(element => this._isOptionDisplayed(element))
+  }
+
+  _maybeSanitize(content) {
+    return this._config.sanitize ?
+      sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
+      content
+  }
+
   _selectOption(value, text, { refresh = true } = {}) {
     if (!this._config.multiple) {
       this.deselectAll()
@@ -1145,13 +1158,13 @@ class MultiSelect extends BaseComponent {
       })
     }
 
-    const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
+    const nativeOption = this._getNativeOption(value)
 
     if (nativeOption) {
       nativeOption.selected = true
     }
 
-    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
+    const option = this._getOptionElement(value)
     if (option) {
       option.classList.add(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', 'true')
@@ -1172,12 +1185,12 @@ class MultiSelect extends BaseComponent {
   _deselectOption(value, { refresh = true } = {}) {
     this._selected = this._selected.filter(option => option.value !== String(value))
 
-    const nativeOption = SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
+    const nativeOption = this._getNativeOption(value)
     if (nativeOption) {
       nativeOption.selected = false
     }
 
-    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
+    const option = this._getOptionElement(value)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
       option.setAttribute('aria-selected', 'false')
@@ -1488,9 +1501,7 @@ class MultiSelect extends BaseComponent {
     if (result instanceof Node) {
       this._headerElement.replaceChildren(result)
     } else {
-      this._headerElement.innerHTML = this._config.sanitize ?
-        sanitizeHtml(result, this._config.allowList, this._config.sanitizeFn) :
-        result
+      this._headerElement.innerHTML = this._maybeSanitize(result)
     }
   }
 
@@ -1575,23 +1586,23 @@ class MultiSelect extends BaseComponent {
     this._updateHeader()
     this._updateMasterCheckbox()
 
+    const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)
+
     if (visibleOptions > 0) {
-      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove()
+      if (emptyMessage) {
+        emptyMessage.remove()
       }
 
       return
     }
 
-    if (visibleOptions === 0) {
+    if (visibleOptions === 0 && !emptyMessage) {
       const placeholder = document.createElement('div')
       placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
       placeholder.setAttribute('role', 'status')
       placeholder.textContent = this._config.searchNoResultsLabel
 
-      if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
-      }
+      SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
     }
   }
 
