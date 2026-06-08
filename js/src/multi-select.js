@@ -932,9 +932,7 @@ class MultiSelect extends BaseComponent {
         optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false')
 
         if (typeof this._config.optionsTemplate === 'function') {
-          optionDiv.innerHTML = this._config.sanitize ?
-            sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
-            this._config.optionsTemplate(option)
+          optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
         } else {
           optionDiv.textContent = option.text
         }
@@ -949,9 +947,7 @@ class MultiSelect extends BaseComponent {
         const optgrouplabel = document.createElement('div')
 
         if (typeof this._config.optionsGroupsTemplate === 'function') {
-          optgrouplabel.innerHTML = this._config.sanitize ?
-            sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
-            this._config.optionsGroupsTemplate(option)
+          optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option))
         } else {
           optgrouplabel.textContent = option.label
         }
@@ -1135,6 +1131,12 @@ class MultiSelect extends BaseComponent {
   _getDisplayedItems() {
     return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
       .filter(element => this._isOptionDisplayed(element))
+  }
+
+  _maybeSanitize(content) {
+    return this._config.sanitize ?
+      sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
+      content
   }
 
   _selectOption(value, text, { refresh = true } = {}) {
@@ -1499,9 +1501,7 @@ class MultiSelect extends BaseComponent {
     if (result instanceof Node) {
       this._headerElement.replaceChildren(result)
     } else {
-      this._headerElement.innerHTML = this._config.sanitize ?
-        sanitizeHtml(result, this._config.allowList, this._config.sanitizeFn) :
-        result
+      this._headerElement.innerHTML = this._maybeSanitize(result)
     }
   }
 
