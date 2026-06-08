@@ -3881,6 +3881,18 @@ describe('MultiSelect', () => {
     })
   })
 
+  describe('_isOptionGroup', () => {
+    it('should detect groups by their options array', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, { options: [] })
+
+      expect(multiSelect._isOptionGroup({ label: 'Group', options: [] })).toBe(true)
+      expect(multiSelect._isOptionGroup({ value: '1', text: 'Opt' })).toBe(false)
+      expect(multiSelect._isOptionGroup({ label: 'No options array' })).toBe(false)
+    })
+  })
+
   describe('_findOptionByValue', () => {
     it('should find option by value', () => {
       fixtureEl.innerHTML = '<select></select>'
