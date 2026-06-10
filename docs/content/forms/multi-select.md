@@ -200,6 +200,8 @@ If you prefer to show a counter indicating the number of selected options, add t
 
 ## Select all
 
+{{< added-in "5.26.0" >}}
+
 When `multiple` is enabled, a **select all** button is rendered in the dropdown header (toggle it with the `selectAll` option, on by default). The button works as a toggle: it selects every option and its label switches to `deselectAllLabel`, then deselects everything on the next click.
 
 With the default `selectAllStyle: 'checkbox'` the button shows a tri-state indicator that mirrors the overall selection — `none` when nothing is selected, `all` when everything is, and `indeterminate` in between. Set `selectAllStyle: 'text'` for a plain text toggle instead.
@@ -260,6 +262,8 @@ multiSelect.deselectFiltered() // deselect only the search-filtered options
 To surface these as buttons inside the dropdown, render them through the [custom dropdown header](#custom-dropdown-header) `actions`.
 
 ## Selection limit
+
+{{< added-in "5.26.0" >}}
 
 Use `data-coreui-selection-limit` to limit how many options can be selected. The select all button stays enabled and selects options up to the limit, then toggles to deselect all once the limit is reached. The `selectionLimit.coreui.multi-select` event can be used to show feedback when a user tries to select more options than allowed.
 
@@ -338,6 +342,8 @@ We use the following JavaScript to set up our multi-select:
 
 ## Custom dropdown header
 
+{{< added-in "5.26.0" >}}
+
 Use the `headerTemplate` option to fully customize the dropdown header — the area above the options list — including rendering several action buttons. It renders independently of `selectAll`. The template function receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object with bound component methods (`selectAll`, `selectFiltered`, `deselectFiltered`, `deselectAll`). Return an `HTMLElement` and wire your own listeners to the `actions`, or return an HTML string (sanitized) for simple custom content. The header re-renders on every selection change and search filter, so labels and `disabled` states stay up to date.
 
 {{< example stackblitz_pro="true" stackblitz_add_js="multiSelectHeaderSnippet">}}
@@ -349,6 +355,8 @@ We use the following JavaScript to set up our multi-select:
 {{< js-docs id="multiSelectHeaderSnippet" name="multi-select-header" file="docs/assets/js/snippets/multi-select-header.js" >}}
 
 ## Selectable groups
+
+{{< added-in "5.26.0" >}}
 
 Enable `optionsGroupsSelectable` to turn each group label into its own tri-state checkbox that toggles the whole group. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input>` element. The same tri-state logic drives the header [select all](#select-all) button when `selectAllStyle: 'checkbox'`. Each section's indicator follows its own `*Style` option (`optionsStyle`, `optionsGroupsStyle`, `selectAllStyle`, all defaulting to `'checkbox'`) and requires `multiple`.
 
