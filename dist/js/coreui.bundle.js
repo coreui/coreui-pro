@@ -859,11 +859,11 @@
    * Constants
    */
 
-  const NAME$w = 'alert';
-  const DATA_KEY$r = 'coreui.alert';
-  const EVENT_KEY$s = `.${DATA_KEY$r}`;
-  const EVENT_CLOSE = `close${EVENT_KEY$s}`;
-  const EVENT_CLOSED = `closed${EVENT_KEY$s}`;
+  const NAME$x = 'alert';
+  const DATA_KEY$s = 'coreui.alert';
+  const EVENT_KEY$t = `.${DATA_KEY$s}`;
+  const EVENT_CLOSE = `close${EVENT_KEY$t}`;
+  const EVENT_CLOSED = `closed${EVENT_KEY$t}`;
   const CLASS_NAME_FADE$5 = 'fade';
   const CLASS_NAME_SHOW$g = 'show';
 
@@ -874,7 +874,7 @@
   class Alert extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$w;
+      return NAME$x;
     }
 
     // Public
@@ -2863,10 +2863,10 @@
    * ------------------------------------------------------------------------
    */
 
-  const NAME$v = 'autocomplete';
-  const DATA_KEY$q = 'coreui.autocomplete';
-  const EVENT_KEY$r = `.${DATA_KEY$q}`;
-  const DATA_API_KEY$m = '.data-api';
+  const NAME$w = 'autocomplete';
+  const DATA_KEY$r = 'coreui.autocomplete';
+  const EVENT_KEY$s = `.${DATA_KEY$r}`;
+  const DATA_API_KEY$n = '.data-api';
   const ARROW_UP_KEY$6 = 'ArrowUp';
   const ARROW_DOWN_KEY$6 = 'ArrowDown';
   const BACKSPACE_KEY$2 = 'Backspace';
@@ -2876,23 +2876,23 @@
   const TAB_KEY$6 = 'Tab';
   const RIGHT_MOUSE_BUTTON$5 = 2; // MouseEvent.button value for the secondary button, usually the right button
 
-  const EVENT_BLUR$1 = `blur${EVENT_KEY$r}`;
-  const EVENT_CHANGED$1 = `changed${EVENT_KEY$r}`;
-  const EVENT_CLICK$6 = `click${EVENT_KEY$r}`;
-  const EVENT_HIDE$c = `hide${EVENT_KEY$r}`;
-  const EVENT_HIDDEN$c = `hidden${EVENT_KEY$r}`;
-  const EVENT_INPUT$5 = `input${EVENT_KEY$r}`;
-  const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$r}`;
-  const EVENT_KEYUP$1 = `keyup${EVENT_KEY$r}`;
-  const EVENT_SHOW$c = `show${EVENT_KEY$r}`;
-  const EVENT_SHOWN$c = `shown${EVENT_KEY$r}`;
-  const EVENT_CLICK_DATA_API$i = `click${EVENT_KEY$r}${DATA_API_KEY$m}`;
-  const EVENT_KEYUP_DATA_API$6 = `keyup${EVENT_KEY$r}${DATA_API_KEY$m}`;
-  const EVENT_LOAD_DATA_API$f = `load${EVENT_KEY$r}${DATA_API_KEY$m}`;
+  const EVENT_BLUR$1 = `blur${EVENT_KEY$s}`;
+  const EVENT_CHANGED$1 = `changed${EVENT_KEY$s}`;
+  const EVENT_CLICK$6 = `click${EVENT_KEY$s}`;
+  const EVENT_HIDE$c = `hide${EVENT_KEY$s}`;
+  const EVENT_HIDDEN$c = `hidden${EVENT_KEY$s}`;
+  const EVENT_INPUT$5 = `input${EVENT_KEY$s}`;
+  const EVENT_KEYDOWN$9 = `keydown${EVENT_KEY$s}`;
+  const EVENT_KEYUP$1 = `keyup${EVENT_KEY$s}`;
+  const EVENT_SHOW$c = `show${EVENT_KEY$s}`;
+  const EVENT_SHOWN$c = `shown${EVENT_KEY$s}`;
+  const EVENT_CLICK_DATA_API$i = `click${EVENT_KEY$s}${DATA_API_KEY$n}`;
+  const EVENT_KEYUP_DATA_API$6 = `keyup${EVENT_KEY$s}${DATA_API_KEY$n}`;
+  const EVENT_LOAD_DATA_API$f = `load${EVENT_KEY$s}${DATA_API_KEY$n}`;
   const CLASS_NAME_AUTOCOMPLETE = 'autocomplete';
-  const CLASS_NAME_BUTTONS = 'autocomplete-buttons';
+  const CLASS_NAME_BUTTONS$1 = 'autocomplete-buttons';
   const CLASS_NAME_CLEANER$3 = 'autocomplete-cleaner';
-  const CLASS_NAME_DISABLED$7 = 'disabled';
+  const CLASS_NAME_DISABLED$8 = 'disabled';
   const CLASS_NAME_DROPDOWN$2 = 'autocomplete-dropdown';
   const CLASS_NAME_INDICATOR$2 = 'autocomplete-indicator';
   const CLASS_NAME_INPUT$2 = 'autocomplete-input';
@@ -2914,7 +2914,7 @@
   const SELECTOR_OPTIONS$1 = '.autocomplete-options';
   const SELECTOR_OPTIONS_EMPTY$1 = '.autocomplete-options-empty';
   const SELECTOR_VISIBLE_ITEMS$2 = '.autocomplete-options .autocomplete-option:not(.disabled):not(:disabled)';
-  const Default$s = {
+  const Default$t = {
     allowList: DefaultAllowlist,
     allowOnlyDefinedOptions: false,
     ariaCleanerLabel: 'Clear selection',
@@ -2942,7 +2942,7 @@
     valid: false,
     value: null
   };
-  const DefaultType$s = {
+  const DefaultType$t = {
     allowList: 'object',
     allowOnlyDefinedOptions: 'boolean',
     ariaCleanerLabel: 'string',
@@ -2994,19 +2994,19 @@
       this._search = '';
       this._createAutocomplete();
       this._addEventListeners();
-      Data.set(this._element, DATA_KEY$q, this);
+      Data.set(this._element, DATA_KEY$r, this);
     }
 
     // Getters
 
     static get Default() {
-      return Default$s;
+      return Default$t;
     }
     static get DefaultType() {
-      return DefaultType$s;
+      return DefaultType$t;
     }
     static get NAME() {
-      return NAME$v;
+      return NAME$w;
     }
 
     // Public
@@ -3143,7 +3143,7 @@
           this.show();
         }
       });
-      EventHandler.on(this._element, EVENT_KEYDOWN$8, event => {
+      EventHandler.on(this._element, EVENT_KEYDOWN$9, event => {
         if (event.key === ESCAPE_KEY$6) {
           this.hide();
           if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
@@ -3156,12 +3156,12 @@
           this._inputElement.focus();
         }
       });
-      EventHandler.on(this._menu, EVENT_KEYDOWN$8, event => {
+      EventHandler.on(this._menu, EVENT_KEYDOWN$9, event => {
         if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$2 || event.key === DELETE_KEY$1)) {
           this._inputElement.focus();
         }
       });
-      EventHandler.on(this._togglerElement, EVENT_KEYDOWN$8, event => {
+      EventHandler.on(this._togglerElement, EVENT_KEYDOWN$9, event => {
         if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$6)) {
           event.preventDefault();
           this.show();
@@ -3193,7 +3193,7 @@
         }
         this._triggerChangeEvent(inputValue);
       });
-      EventHandler.on(this._inputElement, EVENT_KEYDOWN$8, event => {
+      EventHandler.on(this._inputElement, EVENT_KEYDOWN$9, event => {
         if (!this._isShown() && event.key !== TAB_KEY$6) {
           this.show();
         }
@@ -3258,14 +3258,14 @@
           this.clear();
         }
       });
-      EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$8, event => {
+      EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$9, event => {
         if (!this._config.disabled && event.key === ENTER_KEY$4) {
           event.preventDefault();
           event.stopPropagation();
           this.clear();
         }
       });
-      EventHandler.on(this._optionsElement, EVENT_KEYDOWN$8, event => {
+      EventHandler.on(this._optionsElement, EVENT_KEYDOWN$9, event => {
         if (event.key === ENTER_KEY$4) {
           this._onOptionsClick(event.target);
         }
@@ -3330,7 +3330,7 @@
       this._element.classList.toggle('is-invalid', this._config.invalid);
       this._element.classList.toggle('is-valid', this._config.valid);
       if (this._config.disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED$7);
+        this._element.classList.add(CLASS_NAME_DISABLED$8);
       }
       for (const className of this._getClassNames()) {
         this._element.classList.add(className);
@@ -3385,7 +3385,7 @@
         return;
       }
       const buttons = document.createElement('div');
-      buttons.classList.add(CLASS_NAME_BUTTONS);
+      buttons.classList.add(CLASS_NAME_BUTTONS$1);
       if (!this._config.disabled && this._config.cleaner) {
         const cleaner = document.createElement('button');
         cleaner.type = 'button';
@@ -3478,7 +3478,7 @@
         const optionDiv = document.createElement('div');
         optionDiv.classList.add(CLASS_NAME_OPTION$1);
         if (option.disabled) {
-          optionDiv.classList.add(CLASS_NAME_DISABLED$7);
+          optionDiv.classList.add(CLASS_NAME_DISABLED$8);
           optionDiv.setAttribute('aria-disabled', 'true');
         }
         optionDiv.dataset.value = option.value;
@@ -3724,13 +3724,13 @@
    * Constants
    */
 
-  const NAME$u = 'button';
-  const DATA_KEY$p = 'coreui.button';
-  const EVENT_KEY$q = `.${DATA_KEY$p}`;
-  const DATA_API_KEY$l = '.data-api';
+  const NAME$v = 'button';
+  const DATA_KEY$q = 'coreui.button';
+  const EVENT_KEY$r = `.${DATA_KEY$q}`;
+  const DATA_API_KEY$m = '.data-api';
   const CLASS_NAME_ACTIVE$8 = 'active';
   const SELECTOR_DATA_TOGGLE$h = '[data-coreui-toggle="button"]';
-  const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$q}${DATA_API_KEY$l}`;
+  const EVENT_CLICK_DATA_API$h = `click${EVENT_KEY$r}${DATA_API_KEY$m}`;
 
   /**
    * Class definition
@@ -3739,7 +3739,7 @@
   class Button extends BaseComponent {
     // Getters
     static get NAME() {
-      return NAME$u;
+      return NAME$v;
     }
 
     // Public
@@ -4931,31 +4931,31 @@
    * Constants
    */
 
-  const NAME$t = 'calendar';
-  const DATA_KEY$o = 'coreui.calendar';
-  const EVENT_KEY$p = `.${DATA_KEY$o}`;
-  const DATA_API_KEY$k = '.data-api';
+  const NAME$u = 'calendar';
+  const DATA_KEY$p = 'coreui.calendar';
+  const EVENT_KEY$q = `.${DATA_KEY$p}`;
+  const DATA_API_KEY$l = '.data-api';
   const DISALLOWED_ATTRIBUTES$4 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
   const ARROW_UP_KEY$5 = 'ArrowUp';
   const ARROW_RIGHT_KEY$5 = 'ArrowRight';
   const ARROW_DOWN_KEY$5 = 'ArrowDown';
   const ARROW_LEFT_KEY$5 = 'ArrowLeft';
   const ENTER_KEY$3 = 'Enter';
-  const SPACE_KEY$1 = 'Space';
-  const EVENT_BLUR = `blur${EVENT_KEY$p}`;
-  const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$p}`;
-  const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$p}`;
-  const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$p}`;
-  const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$p}`;
-  const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$p}`;
-  const EVENT_FOCUS$1 = `focus${EVENT_KEY$p}`;
-  const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$p}`;
-  const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$p}`;
-  const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$p}`;
-  const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$p}`;
-  const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$p}`;
-  const EVENT_LOAD_DATA_API$e = `load${EVENT_KEY$p}${DATA_API_KEY$k}`;
-  const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$p}${DATA_API_KEY$k}`;
+  const SPACE_KEY$2 = 'Space';
+  const EVENT_BLUR = `blur${EVENT_KEY$q}`;
+  const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY$q}`;
+  const EVENT_CALENDAR_MOUSE_LEAVE = `calendarMouseleave${EVENT_KEY$q}`;
+  const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$q}`;
+  const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$q}`;
+  const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$q}`;
+  const EVENT_FOCUS$1 = `focus${EVENT_KEY$q}`;
+  const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$q}`;
+  const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$q}`;
+  const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$q}`;
+  const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$q}`;
+  const EVENT_MOUSELEAVE$3 = `mouseleave${EVENT_KEY$q}`;
+  const EVENT_LOAD_DATA_API$e = `load${EVENT_KEY$q}${DATA_API_KEY$l}`;
+  const EVENT_CLICK_DATA_API$g = `click${EVENT_KEY$q}${DATA_API_KEY$l}`;
   const CLASS_NAME_CALENDAR_CELL = 'calendar-cell';
   const CLASS_NAME_CALENDAR_CELL_INNER = 'calendar-cell-inner';
   const CLASS_NAME_CALENDAR_ROW = 'calendar-row';
@@ -4973,7 +4973,7 @@
   const SELECTOR_CALENDAR_ROW = '.calendar-row';
   const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`;
   const SELECTOR_DATA_TOGGLE$g = '[data-coreui-toggle="calendar"]';
-  const Default$r = {
+  const Default$s = {
     allowList: DefaultAllowlist,
     ariaNavNextMonthLabel: 'Next month',
     ariaNavNextYearLabel: 'Next year',
@@ -5006,7 +5006,7 @@
     weekNumbersLabel: null,
     yearFormat: 'numeric'
   };
-  const DefaultType$r = {
+  const DefaultType$s = {
     allowList: 'object',
     ariaNavNextMonthLabel: 'string',
     ariaNavNextYearLabel: 'string',
@@ -5056,13 +5056,13 @@
 
     // Getters
     static get Default() {
-      return Default$r;
+      return Default$s;
     }
     static get DefaultType() {
-      return DefaultType$r;
+      return DefaultType$s;
     }
     static get NAME() {
-      return NAME$t;
+      return NAME$u;
     }
 
     // Public
@@ -5126,7 +5126,7 @@
     }
     _handleCalendarKeydown(event) {
       const date = this._getDate(event.target);
-      if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$3) {
+      if (event.code === SPACE_KEY$2 || event.key === ENTER_KEY$3) {
         event.preventDefault();
         this._handleCalendarClick(event);
       }
@@ -5218,7 +5218,7 @@
       EventHandler.on(this._element, EVENT_CLICK_DATA_API$g, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
         this._handleCalendarClick(event);
       });
-      EventHandler.on(this._element, EVENT_KEYDOWN$7, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+      EventHandler.on(this._element, EVENT_KEYDOWN$8, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
         this._handleCalendarKeydown(event);
       });
       EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
@@ -5236,7 +5236,7 @@
       EventHandler.on(this._element, EVENT_CLICK_DATA_API$g, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
         this._handleCalendarClick(event);
       });
-      EventHandler.on(this._element, EVENT_KEYDOWN$7, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+      EventHandler.on(this._element, EVENT_KEYDOWN$8, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
         this._handleCalendarKeydown(event);
       });
       EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
@@ -5847,23 +5847,23 @@
    * Constants
    */
 
-  const NAME$s = 'swipe';
-  const EVENT_KEY$o = '.coreui.swipe';
-  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$o}`;
-  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$o}`;
-  const EVENT_TOUCHEND = `touchend${EVENT_KEY$o}`;
-  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$o}`;
-  const EVENT_POINTERUP = `pointerup${EVENT_KEY$o}`;
+  const NAME$t = 'swipe';
+  const EVENT_KEY$p = '.coreui.swipe';
+  const EVENT_TOUCHSTART = `touchstart${EVENT_KEY$p}`;
+  const EVENT_TOUCHMOVE = `touchmove${EVENT_KEY$p}`;
+  const EVENT_TOUCHEND = `touchend${EVENT_KEY$p}`;
+  const EVENT_POINTERDOWN = `pointerdown${EVENT_KEY$p}`;
+  const EVENT_POINTERUP = `pointerup${EVENT_KEY$p}`;
   const POINTER_TYPE_TOUCH = 'touch';
   const POINTER_TYPE_PEN = 'pen';
   const CLASS_NAME_POINTER_EVENT = 'pointer-event';
   const SWIPE_THRESHOLD = 40;
-  const Default$q = {
+  const Default$r = {
     endCallback: null,
     leftCallback: null,
     rightCallback: null
   };
-  const DefaultType$q = {
+  const DefaultType$r = {
     endCallback: '(function|null)',
     leftCallback: '(function|null)',
     rightCallback: '(function|null)'
@@ -5888,18 +5888,18 @@
 
     // Getters
     static get Default() {
-      return Default$q;
+      return Default$r;
     }
     static get DefaultType() {
-      return DefaultType$q;
+      return DefaultType$r;
     }
     static get NAME() {
-      return NAME$s;
+      return NAME$t;
     }
 
     // Public
     dispose() {
-      EventHandler.off(this._element, EVENT_KEY$o);
+      EventHandler.off(this._element, EVENT_KEY$p);
     }
 
     // Private
@@ -5970,10 +5970,10 @@
    * Constants
    */
 
-  const NAME$r = 'carousel';
-  const DATA_KEY$n = 'coreui.carousel';
-  const EVENT_KEY$n = `.${DATA_KEY$n}`;
-  const DATA_API_KEY$j = '.data-api';
+  const NAME$s = 'carousel';
+  const DATA_KEY$o = 'coreui.carousel';
+  const EVENT_KEY$o = `.${DATA_KEY$o}`;
+  const DATA_API_KEY$k = '.data-api';
   const ARROW_LEFT_KEY$4 = 'ArrowLeft';
   const ARROW_RIGHT_KEY$4 = 'ArrowRight';
   const TOUCHEVENT_COMPAT_WAIT = 500; // Time for mouse compat events to fire after touch
@@ -5982,14 +5982,14 @@
   const ORDER_PREV = 'prev';
   const DIRECTION_LEFT = 'left';
   const DIRECTION_RIGHT = 'right';
-  const EVENT_SLIDE = `slide${EVENT_KEY$n}`;
-  const EVENT_SLID = `slid${EVENT_KEY$n}`;
-  const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$n}`;
-  const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$n}`;
-  const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$n}`;
-  const EVENT_DRAG_START = `dragstart${EVENT_KEY$n}`;
-  const EVENT_LOAD_DATA_API$d = `load${EVENT_KEY$n}${DATA_API_KEY$j}`;
-  const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$n}${DATA_API_KEY$j}`;
+  const EVENT_SLIDE = `slide${EVENT_KEY$o}`;
+  const EVENT_SLID = `slid${EVENT_KEY$o}`;
+  const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$o}`;
+  const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$o}`;
+  const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$o}`;
+  const EVENT_DRAG_START = `dragstart${EVENT_KEY$o}`;
+  const EVENT_LOAD_DATA_API$d = `load${EVENT_KEY$o}${DATA_API_KEY$k}`;
+  const EVENT_CLICK_DATA_API$f = `click${EVENT_KEY$o}${DATA_API_KEY$k}`;
   const CLASS_NAME_CAROUSEL = 'carousel';
   const CLASS_NAME_ACTIVE$7 = 'active';
   const CLASS_NAME_SLIDE = 'slide';
@@ -6008,7 +6008,7 @@
     [ARROW_LEFT_KEY$4]: DIRECTION_RIGHT,
     [ARROW_RIGHT_KEY$4]: DIRECTION_LEFT
   };
-  const Default$p = {
+  const Default$q = {
     interval: 5000,
     keyboard: true,
     pause: 'hover',
@@ -6016,7 +6016,7 @@
     touch: true,
     wrap: true
   };
-  const DefaultType$p = {
+  const DefaultType$q = {
     interval: '(number|boolean)',
     // TODO:v6 remove boolean support
     keyboard: 'boolean',
@@ -6047,13 +6047,13 @@
 
     // Getters
     static get Default() {
-      return Default$p;
+      return Default$q;
     }
     static get DefaultType() {
-      return DefaultType$p;
+      return DefaultType$q;
     }
     static get NAME() {
-      return NAME$r;
+      return NAME$s;
     }
 
     // Public
@@ -6122,7 +6122,7 @@
     }
     _addEventListeners() {
       if (this._config.keyboard) {
-        EventHandler.on(this._element, EVENT_KEYDOWN$6, event => this._keydown(event));
+        EventHandler.on(this._element, EVENT_KEYDOWN$7, event => this._keydown(event));
       }
       if (this._config.pause === 'hover') {
         EventHandler.on(this._element, EVENT_MOUSEENTER$2, () => this.pause());
@@ -6343,39 +6343,45 @@
    * Constants
    */
 
-  const NAME$q = 'chip';
-  const DATA_KEY$m = 'coreui.chip';
-  const EVENT_KEY$m = `.${DATA_KEY$m}`;
-  const DATA_API_KEY$i = '.data-api';
-  const EVENT_REMOVE$1 = `remove${EVENT_KEY$m}`;
-  const EVENT_REMOVED = `removed${EVENT_KEY$m}`;
-  const EVENT_SELECT$1 = `select${EVENT_KEY$m}`;
-  const EVENT_SELECTED = `selected${EVENT_KEY$m}`;
-  const EVENT_DESELECT = `deselect${EVENT_KEY$m}`;
-  const EVENT_DESELECTED = `deselected${EVENT_KEY$m}`;
-  const SELECTOR_CHIP_REMOVE$1 = '.chip-remove';
+  const NAME$r = 'chip';
+  const DATA_KEY$n = 'coreui.chip';
+  const EVENT_KEY$n = `.${DATA_KEY$n}`;
+  const DATA_API_KEY$j = '.data-api';
+  const EVENT_REMOVE$1 = `remove${EVENT_KEY$n}`;
+  const EVENT_REMOVED = `removed${EVENT_KEY$n}`;
+  const EVENT_SELECT$1 = `select${EVENT_KEY$n}`;
+  const EVENT_SELECTED = `selected${EVENT_KEY$n}`;
+  const EVENT_DESELECT = `deselect${EVENT_KEY$n}`;
+  const EVENT_DESELECTED = `deselected${EVENT_KEY$n}`;
+  const SELECTOR_CHIP_CHECK = '.chip-check';
+  const SELECTOR_CHIP_REMOVE$2 = '.chip-remove';
   const SELECTOR_DATA_CHIP = '[data-coreui-chip]';
-  const SELECTOR_FOCUSABLE_ITEMS$1 = '.chip:not(.disabled)';
+  const CLASS_NAME_CHIP_CHECK = 'chip-check';
   const CLASS_NAME_CHIP_CLICKABLE = 'chip-clickable';
   const CLASS_NAME_CHIP_REMOVE = 'chip-remove';
   const CLASS_NAME_ACTIVE$6 = 'active';
-  const CLASS_NAME_DISABLED$6 = 'disabled';
+  const CLASS_NAME_DISABLED$7 = 'disabled';
   const DEFAULT_REMOVE_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
-  const Default$o = {
+  const DEFAULT_SELECTED_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>';
+  const Default$p = {
     ariaRemoveLabel: 'Remove',
     disabled: false,
+    filter: false,
     removable: false,
     removeIcon: DEFAULT_REMOVE_ICON$1,
     selectable: false,
-    selected: false
+    selected: false,
+    selectedIcon: DEFAULT_SELECTED_ICON$1
   };
-  const DefaultType$o = {
+  const DefaultType$p = {
     ariaRemoveLabel: 'string',
     disabled: 'boolean',
+    filter: 'boolean',
     removable: 'boolean',
     removeIcon: 'string',
     selectable: 'boolean',
-    selected: 'boolean'
+    selected: 'boolean',
+    selectedIcon: 'string'
   };
 
   /**
@@ -6385,7 +6391,7 @@
   class Chip extends BaseComponent {
     constructor(element, config) {
       super(element, config);
-      this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$6);
+      this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$7);
       this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE$6);
       this._ensureRemoveButton();
       this._applyState();
@@ -6397,13 +6403,13 @@
 
     // Getters
     static get Default() {
-      return Default$o;
+      return Default$p;
     }
     static get DefaultType() {
-      return DefaultType$o;
+      return DefaultType$p;
     }
     static get NAME() {
-      return NAME$q;
+      return NAME$r;
     }
 
     // Public
@@ -6456,18 +6462,25 @@
     }
 
     // Private
+    _configAfterMerge(config) {
+      // A filter chip is selectable by definition.
+      if (config.filter) {
+        config.selectable = true;
+      }
+      return config;
+    }
     _addEventListeners() {
       EventHandler.on(this._element, 'keydown', event => this._handleKeydown(event));
       EventHandler.on(this._element, 'click', event => {
         if (this._disabled) {
           return;
         }
-        if (event.target.closest(SELECTOR_CHIP_REMOVE$1)) {
+        if (event.target.closest(SELECTOR_CHIP_REMOVE$2)) {
           return;
         }
         this.toggle();
       });
-      EventHandler.on(this._element, 'click', SELECTOR_CHIP_REMOVE$1, event => {
+      EventHandler.on(this._element, 'click', SELECTOR_CHIP_REMOVE$2, event => {
         event.stopPropagation();
         this.remove();
       });
@@ -6477,10 +6490,10 @@
         this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE);
       }
       if (this._disabled) {
-        this._element.classList.add(CLASS_NAME_DISABLED$6);
+        this._element.classList.add(CLASS_NAME_DISABLED$7);
         this._element.setAttribute('aria-disabled', 'true');
       } else {
-        this._element.classList.remove(CLASS_NAME_DISABLED$6);
+        this._element.classList.remove(CLASS_NAME_DISABLED$7);
         if (this._element.getAttribute('aria-disabled') === 'true') {
           this._element.setAttribute('aria-disabled', 'false');
         }
@@ -6488,12 +6501,30 @@
       if (this._config.selectable) {
         this._element.classList.toggle(CLASS_NAME_ACTIVE$6, this._selected);
         this._element.setAttribute('aria-selected', this._selected ? 'true' : 'false');
+        if (this._config.filter) {
+          if (this._selected) {
+            this._ensureCheckIcon();
+          } else {
+            var _SelectorEngine$findO;
+            (_SelectorEngine$findO = SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)) == null || _SelectorEngine$findO.remove();
+          }
+        }
       } else {
         this._element.classList.remove(CLASS_NAME_ACTIVE$6);
         if (this._element.getAttribute('aria-selected') === 'true') {
           this._element.setAttribute('aria-selected', 'false');
         }
       }
+    }
+    _ensureCheckIcon() {
+      if (SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)) {
+        return;
+      }
+      const check = document.createElement('span');
+      check.className = CLASS_NAME_CHIP_CHECK;
+      check.setAttribute('aria-hidden', 'true');
+      check.innerHTML = this._config.selectedIcon;
+      this._element.prepend(check);
     }
     _createRemoveButton() {
       const button = document.createElement('button');
@@ -6505,10 +6536,11 @@
       return button;
     }
     _ensureRemoveButton() {
-      if (!this._config.removable) {
+      // A disabled chip is not interactive, so it never shows a remove button.
+      if (!this._config.removable || this._disabled) {
         return;
       }
-      if (SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$1, this._element)) {
+      if (SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$2, this._element)) {
         return;
       }
       this._element.append(this._createRemoveButton());
@@ -6543,54 +6575,13 @@
           {
             if (this._config.removable) {
               event.preventDefault();
-              const sibling = this._getFocusableSibling(false) || this._getFocusableSibling(true);
-              sibling == null || sibling.focus();
               this.remove();
             }
-            break;
-          }
-        case 'ArrowLeft':
-          {
-            event.preventDefault();
-            const chip = this._getFocusableSibling(false);
-            chip == null || chip.focus();
-            break;
-          }
-        case 'ArrowRight':
-          {
-            event.preventDefault();
-            const chip = this._getFocusableSibling(true);
-            chip == null || chip.focus();
-            break;
-          }
-        case 'Home':
-          {
-            event.preventDefault();
-            this._navigateToEdge(0);
-            break;
-          }
-        case 'End':
-          {
-            event.preventDefault();
-            this._navigateToEdge(-1);
             break;
           }
 
         // No default
       }
-    }
-    _getFocusableSibling(shouldGetNext) {
-      const chips = SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS$1, this._element.parentElement);
-      const sibling = getNextActiveElement(chips, this._element, shouldGetNext, !chips.includes(this._element));
-      return sibling === this._element ? null : sibling;
-    }
-    _navigateToEdge(targetIndex) {
-      const chips = SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS$1, this._element.parentElement);
-      if (chips.length === 0) {
-        return;
-      }
-      const targetChip = chips.at(targetIndex);
-      targetChip == null || targetChip.focus();
     }
     _destroyElement() {
       EventHandler.trigger(this._element, EVENT_REMOVED);
@@ -6626,7 +6617,7 @@
    * Data API implementation
    */
 
-  EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$m}${DATA_API_KEY$i}`, () => {
+  EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$n}${DATA_API_KEY$j}`, () => {
     for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP)) {
       Chip.chipInterface(element);
     }
@@ -6637,6 +6628,455 @@
    */
 
   defineJQueryPlugin(Chip);
+
+  /**
+   * --------------------------------------------------------------------------
+   * CoreUI chip-set.js
+   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
+   * --------------------------------------------------------------------------
+   */
+
+
+  /**
+   * Constants
+   */
+
+  const NAME$q = 'chip-set';
+  const DATA_KEY$m = 'coreui.chip-set';
+  const EVENT_KEY$m = `.${DATA_KEY$m}`;
+  const DATA_API_KEY$i = '.data-api';
+  const EVENT_ADD = 'add';
+  const EVENT_REMOVE = 'remove';
+  const EVENT_CHANGE$3 = 'change';
+  const EVENT_SELECT = 'select';
+  const EVENT_KEYDOWN$6 = 'keydown';
+  const EVENT_CHIP_SELECTED = 'selected.coreui.chip';
+  const EVENT_CHIP_DESELECTED = 'deselected.coreui.chip';
+  const EVENT_CHIP_REMOVE = 'remove.coreui.chip';
+  const EVENT_CHIP_REMOVED = 'removed.coreui.chip';
+  const SELECTOR_DATA_CHIP_SET = '[data-coreui-chip-set]';
+  const SELECTOR_CHIP$1 = '.chip';
+  const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP$1}.active`;
+  const SELECTOR_CHIP_REMOVE$1 = '.chip-remove';
+  const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)';
+  const CLASS_NAME_CHIP = 'chip';
+  const CLASS_NAME_DISABLED$6 = 'disabled';
+  const SELECTION_MODE_SINGLE = 'single';
+  const DEFAULT_REMOVE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
+  const DEFAULT_SELECTED_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>';
+  const Default$o = {
+    ariaRemoveLabel: 'Remove',
+    chipClassName: null,
+    disabled: false,
+    filter: false,
+    maxChips: null,
+    removable: false,
+    removeIcon: DEFAULT_REMOVE_ICON,
+    selectable: false,
+    selectedIcon: DEFAULT_SELECTED_ICON,
+    selectionMode: 'multiple',
+    unique: false
+  };
+  const DefaultType$o = {
+    ariaRemoveLabel: 'string',
+    chipClassName: '(string|function|null)',
+    disabled: 'boolean',
+    filter: 'boolean',
+    maxChips: '(number|null)',
+    removable: 'boolean',
+    removeIcon: 'string',
+    selectable: 'boolean',
+    selectedIcon: 'string',
+    selectionMode: 'string',
+    unique: 'boolean'
+  };
+
+  /**
+   * Class definition
+   */
+
+  class ChipSet extends BaseComponent {
+    constructor(element, config) {
+      super(element, config);
+      this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$6);
+      this._pendingFocus = null;
+      this._chips = [];
+      this._initChips();
+      this._addEventListeners();
+    }
+
+    // Getters
+    static get Default() {
+      return Default$o;
+    }
+    static get DefaultType() {
+      return DefaultType$o;
+    }
+    static get NAME() {
+      return NAME$q;
+    }
+
+    // Public
+    add(chip) {
+      var _this$_input;
+      if (!this._canModify()) {
+        return null;
+      }
+      const isElement = typeof chip !== 'string';
+      const value = isElement ? this._getChipValue(chip) : String(chip).trim();
+      if (!value) {
+        return null;
+      }
+      if (this._config.unique && this._chips.includes(value)) {
+        return null;
+      }
+      if (this._config.maxChips !== null && this._chips.length >= this._config.maxChips) {
+        return null;
+      }
+      const addEvent = EventHandler.trigger(this._element, this.constructor.eventName(EVENT_ADD), {
+        value,
+        relatedTarget: (_this$_input = this._input) != null ? _this$_input : null
+      });
+      if (addEvent.defaultPrevented) {
+        return null;
+      }
+      const element = isElement ? chip : this._createChip(value);
+      this._appendChip(element);
+      this._setupChip(element);
+      this._chips.push(value);
+      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE$3), {
+        values: this.getValues()
+      });
+      return element;
+    }
+    remove(chipOrValue) {
+      var _this$_input2;
+      if (!this._canModify()) {
+        return false;
+      }
+      let chip;
+      let value;
+      if (typeof chipOrValue === 'string') {
+        value = chipOrValue;
+        chip = this._findChipByValue(value);
+      } else {
+        chip = chipOrValue;
+        value = this._getChipValue(chip);
+      }
+      if (!chip || !value) {
+        return false;
+      }
+      const removeEvent = EventHandler.trigger(this._element, this.constructor.eventName(EVENT_REMOVE), {
+        value,
+        chip,
+        relatedTarget: (_this$_input2 = this._input) != null ? _this$_input2 : null
+      });
+      if (removeEvent.defaultPrevented) {
+        return false;
+      }
+      const instance = Chip.getInstance(chip);
+      if (instance) {
+        instance.remove();
+      } else {
+        chip.remove();
+        this._handleChipRemoval(chip, value);
+      }
+      return !chip.isConnected;
+    }
+    removeSelected() {
+      for (const chip of this.getSelected()) {
+        this.remove(chip);
+      }
+    }
+    clear() {
+      for (const chip of this._getChipElements()) {
+        this.remove(chip);
+      }
+    }
+    selectChip(chip) {
+      var _Chip$getInstance;
+      if (!this._getChipElements().includes(chip)) {
+        return;
+      }
+      (_Chip$getInstance = Chip.getInstance(chip)) == null || _Chip$getInstance.select();
+    }
+    selectAll() {
+      if (!this._config.selectable) {
+        return;
+      }
+      for (const chip of this._getChipElements()) {
+        var _Chip$getInstance2;
+        (_Chip$getInstance2 = Chip.getInstance(chip)) == null || _Chip$getInstance2.select();
+      }
+    }
+    deselectAll() {
+      for (const chip of this.getSelected()) {
+        var _Chip$getInstance3;
+        (_Chip$getInstance3 = Chip.getInstance(chip)) == null || _Chip$getInstance3.deselect();
+      }
+    }
+    clearSelection() {
+      this.deselectAll();
+      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
+        selected: this.getSelectedValues()
+      });
+    }
+    getSelected() {
+      return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element);
+    }
+    getValues() {
+      return [...this._chips];
+    }
+    getSelectedValues() {
+      return this.getSelected().map(chip => this._getChipValue(chip));
+    }
+    dispose() {
+      EventHandler.off(this._element, Chip.EVENT_KEY);
+      super.dispose();
+    }
+
+    // Private
+    _configAfterMerge(config) {
+      // Filter chips are selectable by definition.
+      if (config.filter) {
+        config.selectable = true;
+      }
+      return config;
+    }
+    _canModify() {
+      return !this._disabled;
+    }
+    _appendChip(chip) {
+      this._element.append(chip);
+    }
+    _getChipElements() {
+      return SelectorEngine.find(SELECTOR_CHIP$1, this._element);
+    }
+    _findChipByValue(value) {
+      return this._getChipElements().find(chip => this._getChipValue(chip) === value);
+    }
+    _getChipValue(chip) {
+      var _clone$textContent;
+      if (chip.dataset.coreuiChipValue) {
+        return chip.dataset.coreuiChipValue;
+      }
+      const clone = chip.cloneNode(true);
+      const remove = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE$1, clone);
+      if (remove) {
+        remove.remove();
+      }
+      return ((_clone$textContent = clone.textContent) == null ? void 0 : _clone$textContent.trim()) || '';
+    }
+    _getFocusableChips() {
+      return SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS, this._element);
+    }
+    _initChips() {
+      for (const chip of this._getChipElements()) {
+        const value = this._getChipValue(chip);
+        if (value) {
+          this._chips.push(value);
+          this._applyChipClassName(chip, value);
+        }
+        this._setupChip(chip);
+      }
+    }
+    _setupChip(chip) {
+      Chip.getOrCreateInstance(chip, this._getChipConfig(chip));
+    }
+    _getChipConfig(chip) {
+      // A chip's own data attributes override the set's options.
+      return {
+        ariaRemoveLabel: this._config.ariaRemoveLabel,
+        disabled: this._disabled,
+        filter: this._config.filter,
+        removable: this._config.removable,
+        removeIcon: this._config.removeIcon,
+        selectable: this._config.selectable,
+        selectedIcon: this._config.selectedIcon,
+        ...Manipulator.getDataAttributes(chip)
+      };
+    }
+    _createChip(value) {
+      const chip = document.createElement('span');
+      chip.className = CLASS_NAME_CHIP;
+      chip.dataset.coreuiChipValue = value;
+      chip.append(document.createTextNode(value));
+      this._applyChipClassName(chip, value);
+      return chip;
+    }
+    _applyChipClassName(chip, value) {
+      const className = this._resolveChipClassName(value);
+      if (!className) {
+        return;
+      }
+      chip.classList.add(...className.split(/\s+/).filter(Boolean));
+    }
+    _resolveChipClassName(value) {
+      const {
+        chipClassName
+      } = this._config;
+      if (!chipClassName) {
+        return '';
+      }
+      if (typeof chipClassName === 'function') {
+        const resolvedClassName = chipClassName(value);
+        return typeof resolvedClassName === 'string' ? resolvedClassName : '';
+      }
+      return typeof chipClassName === 'string' ? chipClassName : '';
+    }
+    _addEventListeners() {
+      EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$6), SELECTOR_CHIP$1, event => this._handleKeydown(event));
+      EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP$1, event => this._handleSelectionChange(event));
+      EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP$1, event => this._handleSelectionChange(event));
+      EventHandler.on(this._element, EVENT_CHIP_REMOVE, SELECTOR_CHIP$1, event => this._handleChipRemove(event));
+      EventHandler.on(this._element, EVENT_CHIP_REMOVED, SELECTOR_CHIP$1, event => this._handleChipRemoved(event));
+    }
+    _handleKeydown(event) {
+      const chip = event.target.closest(SELECTOR_CHIP$1);
+      if (!chip || chip.classList.contains(CLASS_NAME_DISABLED$6)) {
+        return;
+      }
+      switch (event.key) {
+        case 'ArrowLeft':
+          {
+            event.preventDefault();
+            // In RTL the visual direction is mirrored, so ArrowLeft moves to the next chip.
+            this._focusSibling(chip, isRTL());
+            break;
+          }
+        case 'ArrowRight':
+          {
+            event.preventDefault();
+            this._focusSibling(chip, !isRTL());
+            break;
+          }
+        case 'Home':
+          {
+            event.preventDefault();
+            this._navigateToEdge(0);
+            break;
+          }
+        case 'End':
+          {
+            event.preventDefault();
+            this._navigateToEdge(-1);
+            break;
+          }
+
+        // No default
+      }
+    }
+    _focusSibling(chip, shouldGetNext) {
+      const chips = this._getFocusableChips();
+      if (chips.length === 0) {
+        return;
+      }
+
+      // No cycling: navigation stops at the edges.
+      const sibling = getNextActiveElement(chips, chip, shouldGetNext, false);
+      if (sibling && sibling !== chip) {
+        sibling.focus();
+      }
+    }
+    _getRemovalNeighbor(chip) {
+      const chips = this._getFocusableChips();
+      if (chips.length === 0) {
+        return null;
+      }
+
+      // Prefer the next chip, fall back to the previous one at the end.
+      const next = getNextActiveElement(chips, chip, true, false);
+      if (next && next !== chip) {
+        return next;
+      }
+      const previous = getNextActiveElement(chips, chip, false, false);
+      return previous && previous !== chip ? previous : null;
+    }
+    _navigateToEdge(targetIndex) {
+      var _chips$at;
+      const chips = this._getFocusableChips();
+      (_chips$at = chips.at(targetIndex)) == null || _chips$at.focus();
+    }
+    _handleSelectionChange(event) {
+      const chip = event.target.closest(SELECTOR_CHIP$1);
+      if (this._config.selectionMode === SELECTION_MODE_SINGLE && chip != null && chip.matches(SELECTOR_CHIP_ACTIVE)) {
+        this._enforceSingleSelection(chip);
+      }
+      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
+        selected: this.getSelectedValues()
+      });
+    }
+    _enforceSingleSelection(selectedChip) {
+      for (const chip of this.getSelected()) {
+        if (chip !== selectedChip) {
+          var _Chip$getInstance4;
+          (_Chip$getInstance4 = Chip.getInstance(chip)) == null || _Chip$getInstance4.deselect();
+        }
+      }
+    }
+    _handleChipRemove(event) {
+      const chip = event.target.closest(SELECTOR_CHIP$1);
+      this._pendingFocus = chip ? this._getRemovalNeighbor(chip) : null;
+    }
+    _handleChipRemoved(event) {
+      var _this$_pendingFocus;
+      const chip = event.target.closest(SELECTOR_CHIP$1);
+      (_this$_pendingFocus = this._pendingFocus) == null || _this$_pendingFocus.focus();
+      this._pendingFocus = null;
+      this._handleChipRemoval(chip, this._getChipValue(chip));
+    }
+    _handleChipRemoval(chip, value) {
+      const index = this._chips.indexOf(value);
+      if (index !== -1) {
+        this._chips.splice(index, 1);
+      }
+      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE$3), {
+        values: this.getValues()
+      });
+      EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
+        selected: this.getSelectedValues()
+      });
+    }
+
+    // Static
+    static chipSetInterface(element, config) {
+      const data = ChipSet.getOrCreateInstance(element, config);
+      if (typeof config === 'string') {
+        if (typeof data[config] === 'undefined') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config]();
+      }
+    }
+    static jQueryInterface(config) {
+      return this.each(function () {
+        const data = ChipSet.getOrCreateInstance(this);
+        if (typeof config !== 'string') {
+          return;
+        }
+        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+          throw new TypeError(`No method named "${config}"`);
+        }
+        data[config](this);
+      });
+    }
+  }
+
+  /**
+   * Data API implementation
+   */
+
+  EventHandler.on(document, `DOMContentLoaded${EVENT_KEY$m}${DATA_API_KEY$i}`, () => {
+    for (const element of SelectorEngine.find(SELECTOR_DATA_CHIP_SET)) {
+      ChipSet.chipSetInterface(element);
+    }
+  });
+
+  /**
+   * jQuery
+   */
+
+  defineJQueryPlugin(ChipSet);
 
   /**
    * --------------------------------------------------------------------------
@@ -6657,73 +7097,58 @@
   const DATA_KEY$l = 'coreui.chip-input';
   const EVENT_KEY$l = `.${DATA_KEY$l}`;
   const DATA_API_KEY$h = '.data-api';
-  const EVENT_ADD = `add${EVENT_KEY$l}`;
-  const EVENT_REMOVE = `remove${EVENT_KEY$l}`;
-  const EVENT_CHANGE$3 = `change${EVENT_KEY$l}`;
-  const EVENT_SELECT = `select${EVENT_KEY$l}`;
   const EVENT_INPUT$4 = `input${EVENT_KEY$l}`;
   const SELECTOR_DATA_CHIP_INPUT = '[data-coreui-chip-input]';
   const SELECTOR_CHIP = '.chip';
-  const SELECTOR_CHIP_ACTIVE = `${SELECTOR_CHIP}.active`;
   const SELECTOR_CHIP_INPUT_LABEL = '.chip-input-label';
   const SELECTOR_CHIP_REMOVE = '.chip-remove';
-  const SELECTOR_FOCUSABLE_ITEMS = '.chip:not(.disabled)';
-  const CLASS_NAME_CHIP = 'chip';
   const CLASS_NAME_DISABLED$5 = 'disabled';
   const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field';
-  const DEFAULT_REMOVE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
   const Default$n = {
-    chipClassName: null,
+    ...ChipSet.Default,
     createOnBlur: true,
-    disabled: false,
     id: null,
-    maxChips: null,
     name: null,
     placeholder: '',
     readonly: false,
     removable: true,
-    removeIcon: DEFAULT_REMOVE_ICON,
-    selectable: false,
-    separator: ','
+    separator: ',',
+    unique: true
   };
   const DefaultType$n = {
-    chipClassName: '(string|function|null)',
+    ...ChipSet.DefaultType,
     createOnBlur: 'boolean',
-    disabled: 'boolean',
-    maxChips: '(number|null)',
     id: '(string|null)',
     name: '(string|null)',
     placeholder: 'string',
     readonly: 'boolean',
-    removable: 'boolean',
-    removeIcon: 'string',
-    selectable: 'boolean',
     separator: '(string|null)'
   };
 
   /**
    * Class definition
+   *
+   * ChipInput is a thin input layer on top of ChipSet: ChipSet owns the chips
+   * (the single source of truth), while ChipInput only adds the text field, form
+   * integration (hidden input) and turns typed text into chips. The public API
+   * (methods + `*.coreui.chip-input` events) is preserved through overrides.
    */
 
-  class ChipInput extends BaseComponent {
+  class ChipInput extends ChipSet {
     constructor(element, config) {
       var _this$_config$id;
       super(element, config);
-      this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : getUID(`${this.constructor.NAME}`);
-      this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED$5);
-      this._readonly = this._config.readonly;
-      this._chips = [];
-      this._input = SelectorEngine.findOne('input', this._element);
+      this._uniqueId = (_this$_config$id = this._config.id) != null ? _this$_config$id : getUID(NAME$p);
       this._hiddenInput = null;
+      this._input = SelectorEngine.findOne('input', this._element);
       if (this._input) {
         this._setInputSize();
       } else {
         this._createInput();
       }
       this._applyInteractionState();
-      this._initializeExistingChips();
       this._createHiddenInput();
-      this._addEventListeners();
+      this._addInputEventListeners();
     }
 
     // Getters
@@ -6738,136 +7163,110 @@
     }
 
     // Public
+    // Keep the inherited add behavior and mirror the new value into the form input.
     add(value) {
-      if (this._disabled || this._readonly) {
-        return null;
+      const chip = super.add(value);
+      if (chip) {
+        this._syncHiddenInput();
       }
-      const trimmedValue = String(value).trim();
-      if (!trimmedValue) {
-        return null;
-      }
-
-      // Chips are unique by value
-      if (this._chips.includes(trimmedValue)) {
-        return null;
-      }
-
-      // Check max chips limit
-      if (this._config.maxChips !== null && this._chips.length >= this._config.maxChips) {
-        return null;
-      }
-      const addEvent = EventHandler.trigger(this._element, EVENT_ADD, {
-        value: trimmedValue,
-        relatedTarget: this._input
-      });
-      if (addEvent.defaultPrevented) {
-        return null;
-      }
-      const chip = this._createChip(trimmedValue);
-      this._element.insertBefore(chip, this._input);
-      this._chips.push(trimmedValue);
-      const values = this.getValues();
-      this._hiddenInput.value = values.join(',');
-      EventHandler.trigger(this._element, EVENT_CHANGE$3, {
-        values
-      });
       return chip;
     }
-    remove(chipOrValue) {
-      if (this._disabled || this._readonly) {
-        return false;
-      }
-      let chip;
-      let value;
-      if (typeof chipOrValue === 'string') {
-        value = chipOrValue;
-        chip = this._findChipByValue(value);
-      } else {
-        chip = chipOrValue;
-        value = this._getChipValue(chip);
-      }
-      if (!chip || !value) {
-        return false;
-      }
-      const removeEvent = EventHandler.trigger(this._element, EVENT_REMOVE, {
-        value,
-        chip,
-        relatedTarget: this._input
-      });
-      if (removeEvent.defaultPrevented) {
-        return false;
-      }
-      const chipInstance = Chip.getInstance(chip);
-      if (chipInstance) {
-        chipInstance.remove();
-      } else {
-        chip.remove();
-        this._handleChipRemoved(chip, value);
-      }
-      return !chip.isConnected;
-    }
-    removeSelected() {
-      var _this$_input;
-      const chipsToRemove = this._getSelectedChipElements();
-      for (const chip of chipsToRemove) {
-        this.remove(chip);
-      }
-      (_this$_input = this._input) == null || _this$_input.focus();
-    }
-    getValues() {
-      return [...this._chips];
-    }
-    getSelectedValues() {
-      return this._getSelectedChipElements().map(chip => this._getChipValue(chip));
-    }
-    clear() {
-      const chips = SelectorEngine.find(SELECTOR_CHIP, this._element);
-      for (const chip of chips) {
-        this.remove(chip);
-      }
-    }
-    clearSelection() {
-      for (const chip of this._getSelectedChipElements()) {
-        var _Chip$getInstance;
-        (_Chip$getInstance = Chip.getInstance(chip)) == null || _Chip$getInstance.deselect();
-      }
-      EventHandler.trigger(this._element, EVENT_SELECT, {
-        selected: []
-      });
-    }
-    selectChip(chip) {
-      const chipElements = this._getChipElements();
-      if (!chipElements.includes(chip)) {
-        return;
-      }
-      const chipInstance = Chip.getInstance(chip);
-      if (!chipInstance) {
-        return;
-      }
-      chipInstance.select();
-    }
     focus() {
-      var _this$_input2;
-      (_this$_input2 = this._input) == null || _this$_input2.focus();
+      var _this$_input;
+      (_this$_input = this._input) == null || _this$_input.focus();
     }
 
     // Private
-    _emitSelectionChange() {
-      EventHandler.trigger(this._element, EVENT_SELECT, {
-        selected: this.getSelectedValues()
+    _canModify() {
+      return !this._disabled && !this._config.readonly;
+    }
+
+    // Chips live before the text field, not at the end of the set.
+    _appendChip(chip) {
+      this._element.insertBefore(chip, this._input);
+    }
+
+    // Per-chip configuration based on the chip value and the input's
+    // disabled/readonly state.
+    _getChipConfig(chip) {
+      return {
+        ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
+        disabled: this._disabled,
+        removable: this._config.removable && !this._config.readonly && !this._disabled,
+        removeIcon: this._config.removeIcon,
+        selectable: this._config.selectable
+      };
+    }
+
+    // Keep the inherited chip instantiation and sync the remove button.
+    _setupChip(chip) {
+      super._setupChip(chip);
+      const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip);
+      if (removeButton) {
+        removeButton.disabled = this._disabled || this._config.readonly;
+      }
+    }
+
+    // Sync the form mirror and refocus the text field after a chip is removed.
+    _handleChipRemoved(event) {
+      var _this$_input2;
+      super._handleChipRemoved(event);
+      this._syncHiddenInput();
+      (_this$_input2 = this._input) == null || _this$_input2.focus();
+    }
+    _syncHiddenInput() {
+      if (this._hiddenInput) {
+        this._hiddenInput.value = this.getValues().join(',');
+      }
+    }
+    _addInputEventListeners() {
+      EventHandler.on(this._element, 'keydown', event => {
+        if (event.target === this._input) {
+          return;
+        }
+
+        // The arrow key past the last chip moves focus into the text field, which
+        // sits after the chips (mirrors the input's "go to last chip" key). The
+        // direction is mirrored in RTL.
+        if (event.key === (isRTL() ? 'ArrowLeft' : 'ArrowRight')) {
+          const chips = this._getFocusableChips();
+          if (chips.length > 0 && chips.at(-1).contains(event.target)) {
+            event.preventDefault();
+            this._input.focus();
+            return;
+          }
+        }
+        if (event.key.length === 1) {
+          this._input.focus();
+        }
       });
-    }
-    _getChipElements() {
-      return SelectorEngine.find(SELECTOR_CHIP, this._element);
-    }
-    _getSelectedChipElements() {
-      return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element);
+      EventHandler.on(this._input, 'keydown', event => this._handleInputKeydown(event));
+      EventHandler.on(this._input, 'input', event => this._handleInput(event));
+      EventHandler.on(this._input, 'paste', event => this._handlePaste(event));
+      EventHandler.on(this._input, 'focus', () => this.clearSelection());
+      if (this._config.createOnBlur) {
+        EventHandler.on(this._input, 'blur', event => {
+          var _event$relatedTarget;
+          // Don't create chip if clicking on a chip
+          if (!((_event$relatedTarget = event.relatedTarget) != null && _event$relatedTarget.closest(SELECTOR_CHIP))) {
+            this._createChipFromInput();
+          }
+        });
+      }
+
+      // Focus input when clicking container background
+      EventHandler.on(this._element, 'click', event => {
+        if (event.target === this._element) {
+          var _this$_input3;
+          (_this$_input3 = this._input) == null || _this$_input3.focus();
+        }
+      });
     }
     _createInput() {
       const input = document.createElement('input');
       const label = SelectorEngine.findOne(SELECTOR_CHIP_INPUT_LABEL, this._element);
       const labelFor = label == null ? void 0 : label.getAttribute('for');
-      const generatedInputId = labelFor || getUID(`${this.constructor.NAME}-input`);
+      const generatedInputId = labelFor || getUID(`${NAME$p}-input`);
       input.type = 'text';
       input.className = CLASS_NAME_CHIP_INPUT_FIELD;
       input.id = generatedInputId;
@@ -6890,17 +7289,8 @@
       this._hiddenInput = hiddenInput;
       this._hiddenInput.value = this.getValues().join(',');
     }
-    _createChip(value) {
-      const chip = document.createElement('span');
-      chip.className = CLASS_NAME_CHIP;
-      chip.dataset.coreuiChipValue = value;
-      chip.append(document.createTextNode(value));
-      this._applyChipClassName(chip, value);
-      this._setupChip(chip);
-      return chip;
-    }
     _createChipFromInput() {
-      if (this._disabled || this._readonly) {
+      if (!this._canModify()) {
         return;
       }
       const value = this._input.value.trim();
@@ -6910,126 +7300,15 @@
         this._setInputSize();
       }
     }
-    _findChipByValue(value) {
-      const chips = this._getChipElements();
-      return chips.find(chip => this._getChipValue(chip) === value);
-    }
-    _getChipValue(chip) {
-      var _clone$textContent;
-      if (chip.dataset.coreuiChipValue) {
-        return chip.dataset.coreuiChipValue;
-      }
-      const clone = chip.cloneNode(true);
-      const remove = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, clone);
-      if (remove) {
-        remove.remove();
-      }
-      return ((_clone$textContent = clone.textContent) == null ? void 0 : _clone$textContent.trim()) || '';
-    }
-    _initializeExistingChips() {
-      const existingChips = SelectorEngine.find(SELECTOR_CHIP, this._element);
-      for (const chip of existingChips) {
-        const value = this._getChipValue(chip);
-        if (value) {
-          this._chips.push(value);
-          this._applyChipClassName(chip, value);
-          this._setupChip(chip);
-        }
-      }
-    }
-    _applyChipClassName(chip, value) {
-      const className = this._resolveChipClassName(value);
-      if (!className) {
-        return;
-      }
-      chip.classList.add(...className.split(/\s+/).filter(Boolean));
-    }
-    _resolveChipClassName(value) {
-      const {
-        chipClassName
-      } = this._config;
-      if (!chipClassName) {
-        return '';
-      }
-      if (typeof chipClassName === 'function') {
-        const resolvedClassName = chipClassName(value);
-        return typeof resolvedClassName === 'string' ? resolvedClassName : '';
-      }
-      return typeof chipClassName === 'string' ? chipClassName : '';
-    }
-    _setupChip(chip) {
-      Chip.getOrCreateInstance(chip, {
-        ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
-        disabled: this._disabled,
-        removable: this._config.removable && !this._readonly && !this._disabled,
-        removeIcon: this._config.removeIcon,
-        selectable: this._config.selectable
-      });
-      const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip);
-      if (removeButton) {
-        removeButton.disabled = this._disabled || this._readonly;
-      }
-    }
     _applyInteractionState() {
+      const {
+        readonly
+      } = this._config;
       this._element.classList.toggle(CLASS_NAME_DISABLED$5, this._disabled);
       this._input.disabled = this._disabled;
-      this._input.readOnly = !this._disabled && this._readonly;
+      this._input.readOnly = !this._disabled && readonly;
       this._element.setAttribute('aria-disabled', this._disabled ? 'true' : 'false');
-      this._element.setAttribute('aria-readonly', this._readonly ? 'true' : 'false');
-    }
-    _addEventListeners() {
-      EventHandler.on(this._element, 'keydown', event => {
-        if (event.target === this._input) {
-          return;
-        }
-        if (event.key.length === 1) {
-          this._input.focus();
-        }
-      });
-      EventHandler.on(this._input, 'keydown', event => this._handleInputKeydown(event));
-      EventHandler.on(this._input, 'input', event => this._handleInput(event));
-      EventHandler.on(this._input, 'paste', event => this._handlePaste(event));
-      EventHandler.on(this._input, 'focus', () => this.clearSelection());
-      if (this._config.createOnBlur) {
-        EventHandler.on(this._input, 'blur', event => {
-          var _event$relatedTarget;
-          // Don't create chip if clicking on a chip
-          if (!((_event$relatedTarget = event.relatedTarget) != null && _event$relatedTarget.closest(SELECTOR_CHIP))) {
-            this._createChipFromInput();
-          }
-        });
-      }
-      EventHandler.on(this._element, 'selected.coreui.chip', SELECTOR_CHIP, () => {
-        this._emitSelectionChange();
-      });
-      EventHandler.on(this._element, 'deselected.coreui.chip', SELECTOR_CHIP, () => {
-        this._emitSelectionChange();
-      });
-      EventHandler.on(this._element, 'remove.coreui.chip', SELECTOR_CHIP, event => {
-        if (this._disabled || this._readonly) {
-          event.preventDefault();
-        }
-      });
-      EventHandler.on(this._element, 'removed.coreui.chip', SELECTOR_CHIP, event => {
-        const chip = event.target.closest(SELECTOR_CHIP);
-        if (chip) {
-          this._handleChipRemoved(chip);
-          const focusableChips = SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS, this._element);
-          if (focusableChips.length > 0) {
-            var _this$_input3;
-            (_this$_input3 = this._input) == null || _this$_input3.focus();
-          }
-          this._emitSelectionChange();
-        }
-      });
-
-      // Focus input when clicking container background
-      EventHandler.on(this._element, 'click', event => {
-        if (event.target === this._element) {
-          var _this$_input4;
-          (_this$_input4 = this._input) == null || _this$_input4.focus();
-        }
-      });
+      this._element.setAttribute('aria-readonly', readonly ? 'true' : 'false');
     }
     _handleInputKeydown(event) {
       const {
@@ -7049,20 +7328,22 @@
               event.preventDefault();
               const chips = this._getChipElements();
               if (chips.length > 0) {
-                const lastChip = chips.at(-1);
-                lastChip.focus();
+                chips.at(-1).focus();
               }
             }
             break;
           }
         case 'ArrowLeft':
+        case 'ArrowRight':
           {
-            if (this._input.selectionStart === 0 && this._input.selectionEnd === 0) {
+            // The arrow pointing toward the chips (left in LTR, right in RTL) jumps
+            // to the last chip when the caret is at the start of the input.
+            const towardChipsKey = isRTL() ? 'ArrowRight' : 'ArrowLeft';
+            if (key === towardChipsKey && this._input.selectionStart === 0 && this._input.selectionEnd === 0) {
               event.preventDefault();
               const chips = this._getChipElements();
               if (chips.length > 0) {
-                const lastChip = chips.at(-1);
-                lastChip.focus();
+                chips.at(-1).focus();
               }
             }
             break;
@@ -7077,20 +7358,8 @@
         // No default
       }
     }
-    _handleChipRemoved(chip, value = null) {
-      const chipValue = value || this._getChipValue(chip);
-      const valueIndex = this._chips.indexOf(chipValue);
-      if (valueIndex !== -1) {
-        this._chips.splice(valueIndex, 1);
-      }
-      const values = this.getValues();
-      this._hiddenInput.value = values.join(',');
-      EventHandler.trigger(this._element, EVENT_CHANGE$3, {
-        values
-      });
-    }
     _handleInput(event) {
-      if (this._disabled || this._readonly) {
+      if (!this._canModify()) {
         return;
       }
       const {
@@ -7113,7 +7382,7 @@
       });
     }
     _handlePaste(event) {
-      if (this._disabled || this._readonly) {
+      if (!this._canModify()) {
         return;
       }
       const {
@@ -7682,7 +7951,7 @@
   const ENTER_KEY$2 = 'Enter';
   const ESCAPE_KEY$5 = 'Escape';
   const HOME_KEY$2 = 'Home';
-  const SPACE_KEY = 'Space';
+  const SPACE_KEY$1 = 'Space';
   const TAB_KEY$4 = 'Tab';
   const ARROW_UP_KEY$4 = 'ArrowUp';
   const ARROW_DOWN_KEY$4 = 'ArrowDown';
@@ -8276,7 +8545,7 @@
           this._handleTimeChange(part, option.value);
         });
         timePickerRollCellEl.addEventListener('keydown', event => {
-          if (event.code === SPACE_KEY || event.key === ENTER_KEY$2) {
+          if (event.code === SPACE_KEY$1 || event.key === ENTER_KEY$2) {
             event.preventDefault();
             this._handleTimeChange(part, option.value);
             this._moveFocusToNextColumn(event);
@@ -10676,12 +10945,7 @@
 
   defineJQueryPlugin(Modal);
 
-  /**
-   * --------------------------------------------------------------------------
-   * CoreUI PRO multi-select.js
-   * License (https://coreui.io/pro/license/)
-   * --------------------------------------------------------------------------
-   */
+  /* eslint-disable max-lines */
 
 
   /**
@@ -10700,6 +10964,7 @@
   const DELETE_KEY = 'Delete';
   const ENTER_KEY = 'Enter';
   const ESCAPE_KEY$1 = 'Escape';
+  const SPACE_KEY = ' ';
   const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
 
@@ -10709,9 +10974,14 @@
   const SELECTOR_OPTIONS = '.form-multi-select-options';
   const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty';
   const SELECTOR_SEARCH = '.form-multi-select-search';
-  const SELECTOR_SELECT = '.form-multi-select';
+  const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]';
+  // TODO: remove the class-based selector in v6, use the data attribute instead
+  const SELECTOR_SELECT = 'select.form-multi-select';
   const SELECTOR_SELECTION = '.form-multi-select-selection';
+  const SELECTOR_TAG = '.form-multi-select-tag';
+  const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete';
   const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)';
+  const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`;
   const EVENT_CHANGED = `changed${EVENT_KEY$c}`;
   const EVENT_CLICK$3 = `click${EVENT_KEY$c}`;
   const EVENT_HIDE$5 = `hide${EVENT_KEY$c}`;
@@ -10719,26 +10989,32 @@
   const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$c}`;
   const EVENT_KEYUP = `keyup${EVENT_KEY$c}`;
   const EVENT_SEARCH = `search${EVENT_KEY$c}`;
+  const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY$c}`;
   const EVENT_SHOW$5 = `show${EVENT_KEY$c}`;
   const EVENT_SHOWN$5 = `shown${EVENT_KEY$c}`;
   const EVENT_CLICK_DATA_API$7 = `click${EVENT_KEY$c}${DATA_API_KEY$9}`;
   const EVENT_KEYUP_DATA_API$1 = `keyup${EVENT_KEY$c}${DATA_API_KEY$9}`;
   const EVENT_LOAD_DATA_API$9 = `load${EVENT_KEY$c}${DATA_API_KEY$9}`;
+  const CLASS_NAME_BUTTONS = 'form-multi-select-buttons';
   const CLASS_NAME_CLEANER = 'form-multi-select-cleaner';
   const CLASS_NAME_DISABLED$2 = 'disabled';
+  const CLASS_NAME_DROPDOWN_HEADER = 'form-multi-select-dropdown-header';
   const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group';
   const CLASS_NAME_LABEL = 'label';
   const CLASS_NAME_SELECT = 'form-multi-select';
   const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown';
   const CLASS_NAME_SELECT_ALL = 'form-multi-select-all';
+  const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'form-multi-select-all-with-checkbox';
   const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup';
   const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label';
+  const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'form-multi-select-optgroup-label-with-checkbox';
   const CLASS_NAME_OPTION = 'form-multi-select-option';
   const CLASS_NAME_OPTION_WITH_CHECKBOX = 'form-multi-select-option-with-checkbox';
   const CLASS_NAME_OPTIONS = 'form-multi-select-options';
   const CLASS_NAME_OPTIONS_EMPTY = 'form-multi-select-options-empty';
   const CLASS_NAME_SEARCH = 'form-multi-select-search';
   const CLASS_NAME_SELECTED = 'form-multi-selected';
+  const CLASS_NAME_INDETERMINATE = 'form-multi-select-indeterminate';
   const CLASS_NAME_SELECTION = 'form-multi-select-selection';
   const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags';
   const CLASS_NAME_SHOW$7 = 'show';
@@ -10748,15 +11024,22 @@
     allowList: DefaultAllowlist,
     ariaCleanerLabel: 'Clear all selections',
     ariaIndicatorLabel: 'Toggle visibility of options menu',
+    ariaSearchLabel: 'Search',
+    ariaTagDeleteLabel: 'Remove',
     cleaner: true,
     clearSearchOnSelect: false,
     container: false,
+    deselectAllLabel: 'Deselect all',
+    deselectFilteredLabel: 'Deselect filtered',
     disabled: false,
+    headerTemplate: null,
     id: null,
     invalid: false,
     multiple: true,
     name: null,
     options: false,
+    optionsGroupsSelectable: false,
+    optionsGroupsStyle: 'checkbox',
     optionsGroupsTemplate: null,
     optionsMaxHeight: 'auto',
     optionsStyle: 'checkbox',
@@ -10768,9 +11051,13 @@
     search: false,
     searchNoResultsLabel: 'No results found',
     selectAll: true,
-    selectAllLabel: 'Select all options',
+    selectAllLabel: 'Select all',
+    selectAllMode: 'all',
+    selectAllStyle: 'checkbox',
+    selectionLimit: null,
     selectionType: 'tags',
     selectionTypeCounterText: 'item(s) selected',
+    selectFilteredLabel: 'Select filtered',
     valid: false,
     value: null
   };
@@ -10778,15 +11065,22 @@
     allowList: 'object',
     ariaCleanerLabel: 'string',
     ariaIndicatorLabel: 'string',
+    ariaSearchLabel: 'string',
+    ariaTagDeleteLabel: 'string',
     cleaner: 'boolean',
     clearSearchOnSelect: 'boolean',
     container: '(string|element|boolean)',
+    deselectAllLabel: 'string',
+    deselectFilteredLabel: 'string',
     disabled: 'boolean',
+    headerTemplate: '(function|null)',
     id: '(string|null)',
     invalid: 'boolean',
     multiple: 'boolean',
     name: '(string|null)',
     options: '(boolean|array)',
+    optionsGroupsSelectable: 'boolean',
+    optionsGroupsStyle: 'string',
     optionsGroupsTemplate: '(function|null)',
     optionsMaxHeight: '(number|string)',
     optionsStyle: 'string',
@@ -10798,9 +11092,13 @@
     search: '(boolean|string)',
     searchNoResultsLabel: 'string',
     selectAll: 'boolean',
+    selectAllStyle: 'string',
     selectAllLabel: 'string',
+    selectAllMode: 'string',
+    selectionLimit: '(number|null)',
     selectionType: 'string',
     selectionTypeCounterText: 'string',
+    selectFilteredLabel: 'string',
     valid: 'boolean',
     value: '(string|array|null)'
   };
@@ -10819,12 +11117,13 @@
       this._configureNativeSelect();
       this._indicatorElement = null;
       this._selectAllElement = null;
+      this._headerElement = null;
       this._selectionElement = null;
       this._selectionCleanerElement = null;
       this._searchElement = null;
       this._togglerElement = null;
       this._optionsElement = null;
-      this._clone = null;
+      this._wrapperElement = null;
       this._menu = null;
       this._selected = [];
       this._options = this._getOptions();
@@ -10859,20 +11158,21 @@
         return;
       }
       EventHandler.trigger(this._element, EVENT_SHOW$5);
-      this._clone.classList.add(CLASS_NAME_SHOW$7);
-      this._clone.setAttribute('aria-expanded', true);
+      this._wrapperElement.classList.add(CLASS_NAME_SHOW$7);
+      this._togglerElement.setAttribute('aria-expanded', 'true');
       if (this._config.container) {
-        this._menu.style.minWidth = `${this._clone.offsetWidth}px`;
+        this._menu.style.minWidth = `${this._wrapperElement.offsetWidth}px`;
         this._menu.classList.add(CLASS_NAME_SHOW$7);
       }
       EventHandler.trigger(this._element, EVENT_SHOWN$5);
       this._createPopper();
       if (this._config.search) {
-        SelectorEngine.findOne(SELECTOR_SEARCH, this._clone).focus();
+        SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement).focus();
       }
     }
     hide() {
       EventHandler.trigger(this._element, EVENT_HIDE$5);
+      const refocusFromInside = this._wrapperElement.contains(document.activeElement) || this._menu.contains(document.activeElement);
       if (this._popper) {
         this._popper.destroy();
       }
@@ -10880,10 +11180,16 @@
         this._searchElement.value = '';
       }
       this._onSearchChange(this._searchElement);
-      this._clone.classList.remove(CLASS_NAME_SHOW$7);
-      this._clone.setAttribute('aria-expanded', 'false');
+      this._wrapperElement.classList.remove(CLASS_NAME_SHOW$7);
+      this._togglerElement.setAttribute('aria-expanded', 'false');
       if (this._config.container) {
         this._menu.classList.remove(CLASS_NAME_SHOW$7);
+      }
+      if (refocusFromInside && !this._config.disabled) {
+        const refocusTarget = this._config.search ? this._searchElement : this._togglerElement;
+        if (refocusTarget) {
+          refocusTarget.focus();
+        }
       }
       EventHandler.trigger(this._element, EVENT_HIDDEN$5);
     }
@@ -10891,6 +11197,19 @@
       if (this._popper) {
         this._popper.destroy();
       }
+      for (const element of [this._wrapperElement, this._menu, this._selectionElement, this._togglerElement, this._searchElement, this._indicatorElement, this._selectAllElement, this._headerElement, this._optionsElement]) {
+        if (element) {
+          EventHandler.off(element, EVENT_KEY$c);
+        }
+      }
+      if (this._menu) {
+        this._menu.remove();
+      }
+      if (this._wrapperElement) {
+        this._wrapperElement.before(this._element);
+        this._wrapperElement.remove();
+      }
+      this._element.removeAttribute('tabindex');
       super.dispose();
     }
     search(text) {
@@ -10909,35 +11228,57 @@
       this._selected = [];
       this._options = this._getOptions();
       this._menu.remove();
-      this._clone.remove();
+      this._wrapperElement.before(this._element);
+      this._wrapperElement.remove();
       this._element.innerHTML = '';
+      this._configureNativeSelect();
       this._createNativeOptions(this._element, this._options);
       this._createSelect();
       this._addEventListeners();
     }
     selectAll(options = this._options) {
-      for (const option of options) {
-        if (option.disabled) {
-          continue;
-        }
-        if (option.label) {
-          this.selectAll(option.options);
-          continue;
-        }
-        this._selectOption(option.value, option.text);
+      const limitReached = this._selectAllOptions(options);
+      this._refreshAfterSelectionChange();
+      if (limitReached) {
+        this._triggerSelectionLimit();
       }
     }
     deselectAll(options = this._options) {
-      for (const option of options) {
-        if (option.disabled) {
-          continue;
+      this._deselectAllOptions(options);
+      this._refreshAfterSelectionChange();
+    }
+    selectFiltered() {
+      const items = this._getDisplayedItems();
+      let limitReached = false;
+      for (const item of items) {
+        if (this._isSelectionLimitReached()) {
+          limitReached = true;
+          break;
         }
-        if (option.label) {
-          this.deselectAll(option.options);
-          continue;
+        const value = String(item.dataset.value);
+        const option = this._findOptionByValue(value);
+        if (option && !this._selected.some(selected => selected.value === value)) {
+          this._selectOption(value, option.text, {
+            refresh: false
+          });
         }
-        this._deselectOption(option.value);
       }
+      this._refreshAfterSelectionChange();
+      if (limitReached) {
+        this._triggerSelectionLimit();
+      }
+    }
+    deselectFiltered() {
+      const items = this._getDisplayedItems();
+      for (const item of items) {
+        const value = String(item.dataset.value);
+        if (this._selected.some(selected => selected.value === value)) {
+          this._deselectOption(value, {
+            refresh: false
+          });
+        }
+      }
+      this._refreshAfterSelectionChange();
     }
     getValue() {
       return this._selected;
@@ -10946,12 +11287,27 @@
     // Private
 
     _addEventListeners() {
-      EventHandler.on(this._clone, EVENT_CLICK$3, () => {
+      EventHandler.on(this._selectionElement, EVENT_CLICK$3, SELECTOR_TAG_DELETE, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const tag = event.target.closest(SELECTOR_TAG);
+        if (tag) {
+          this._deselectOption(String(tag.dataset.value));
+        }
+      });
+      EventHandler.on(this._togglerElement, EVENT_CLICK$3, SELECTOR_CLEANER, event => {
+        if (!this._config.disabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.deselectAll();
+        }
+      });
+      EventHandler.on(this._wrapperElement, EVENT_CLICK$3, () => {
         if (!this._config.disabled) {
           this.show();
         }
       });
-      EventHandler.on(this._clone, EVENT_KEYDOWN$3, event => {
+      EventHandler.on(this._wrapperElement, EVENT_KEYDOWN$3, event => {
         if (event.key === ESCAPE_KEY$1) {
           this.hide();
           return;
@@ -10976,6 +11332,32 @@
           this._selectMenuItem(event);
         }
       });
+
+      // Validation focuses the overlay select; hand its keystrokes to the custom control.
+      EventHandler.on(this._element, EVENT_KEYDOWN$3, event => {
+        if (event.key === TAB_KEY || event.key === ESCAPE_KEY$1) {
+          return;
+        }
+
+        // Suppress the native select's own keyboard behavior (typeahead, value change).
+        event.preventDefault();
+        const isPrintable = event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
+        if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY$2 || this._config.search && isPrintable)) {
+          this.show();
+        }
+        if (this._config.search) {
+          this._searchElement.focus();
+
+          // The keystroke can't be retargeted mid-event, so inject the character that
+          // would otherwise be lost and start filtering on this first press.
+          if (isPrintable) {
+            this._searchElement.value += event.key;
+            this._onSearchChange(this._searchElement);
+          }
+        } else {
+          this._togglerElement.focus();
+        }
+      });
       EventHandler.on(this._indicatorElement, EVENT_CLICK$3, event => {
         event.preventDefault();
         event.stopPropagation();
@@ -10997,25 +11379,35 @@
         }
         this._searchElement.focus();
       });
-      EventHandler.on(this._selectAllElement, EVENT_CLICK$3, event => {
-        event.preventDefault();
-        event.stopPropagation();
-        this.selectAll();
-      });
+      if (this._selectAllElement) {
+        EventHandler.on(this._selectAllElement, EVENT_CLICK$3, event => {
+          if (this._selectAllElement.disabled) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          this._toggleSelectAll();
+        });
+
+        // The select all button lives in the header, outside the options list, so it
+        // needs its own arrow-key handler to join the navigation flow (Enter/Space
+        // already toggle via the native button click above).
+        EventHandler.on(this._selectAllElement, EVENT_KEYDOWN$3, event => {
+          if ([ARROW_UP_KEY$2, ARROW_DOWN_KEY$2].includes(event.key)) {
+            event.preventDefault();
+            this._selectMenuItem(event);
+          }
+        });
+      }
       EventHandler.on(this._optionsElement, EVENT_CLICK$3, event => {
         event.preventDefault();
         event.stopPropagation();
         this._onOptionsClick(event.target);
       });
-      EventHandler.on(this._selectionCleanerElement, EVENT_CLICK$3, event => {
-        if (!this._config.disabled) {
-          event.preventDefault();
-          event.stopPropagation();
-          this.deselectAll();
-        }
-      });
       EventHandler.on(this._optionsElement, EVENT_KEYDOWN$3, event => {
-        if (event.key === ENTER_KEY) {
+        if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
+          // Space would otherwise scroll the options list.
+          event.preventDefault();
           this._onOptionsClick(event.target);
         }
         if ([ARROW_UP_KEY$2, ARROW_DOWN_KEY$2].includes(event.key)) {
@@ -11023,9 +11415,6 @@
           this._selectMenuItem(event);
         }
       });
-    }
-    _getClassNames() {
-      return this._element.classList.value.split(' ');
     }
     _getOptions() {
       if (this._config.options) {
@@ -11036,7 +11425,7 @@
     _getOptionsFromConfig(options = this._config.options) {
       const _options = [];
       for (const option of options) {
-        if (option.options && Array.isArray(option.options)) {
+        if (this._isOptionGroup(option)) {
           const customGroupProperties = {
             ...option
           };
@@ -11051,6 +11440,7 @@
         }
         const value = String(option.value);
         const isSelected = option.selected || this._config.value && this._config.value.includes(value);
+        const shouldSelect = isSelected && !this._isSelectionLimitReached();
         const customProperties = typeof option === 'object' ? {
           ...option
         } : {};
@@ -11060,14 +11450,14 @@
         _options.push({
           ...customProperties,
           value,
-          ...(isSelected && {
+          ...(shouldSelect && {
             selected: true
           }),
           ...(option.disabled && {
             disabled: true
           })
         });
-        if (isSelected) {
+        if (shouldSelect) {
           this._selected.push({
             value: String(option.value),
             text: option.text
@@ -11082,18 +11472,20 @@
       for (const node of nodes) {
         if (node.nodeName === 'OPTION' && node.value) {
           const value = String(node.value);
-          const text = node.innerHTML;
+          const text = node.textContent;
           const isSelected = node.selected || this._config.value && this._config.value.includes(node.value);
+          const shouldSelect = isSelected && !this._isSelectionLimitReached();
           options.push({
             value,
             text,
-            selected: isSelected,
+            selected: shouldSelect,
             disabled: node.disabled
           });
-          if (node.selected || isSelected) {
+          node.selected = shouldSelect;
+          if (shouldSelect) {
             this._selected.push({
               value,
-              text: node.innerHTML,
+              text: node.textContent,
               ...(node.disabled && {
                 disabled: true
               })
@@ -11111,16 +11503,27 @@
     }
     _configureNativeSelect() {
       this._element.classList.add(CLASS_NAME_SELECT);
+
+      // Set or clear so update() can flip these on or off.
       if (this._config.multiple) {
         this._element.setAttribute('multiple', true);
+      } else {
+        this._element.removeAttribute('multiple');
       }
       if (this._config.required) {
         this._element.setAttribute('required', true);
+      } else {
+        this._element.removeAttribute('required');
       }
     }
     _createNativeOptions(parentElement, options) {
       for (const option of options) {
-        if (typeof option.options === 'undefined') {
+        if (this._isOptionGroup(option)) {
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = option.label;
+          this._createNativeOptions(optgroup, option.options);
+          parentElement.append(optgroup);
+        } else {
           const opt = document.createElement('OPTION');
           opt.value = option.value;
           if (option.disabled === true) {
@@ -11129,37 +11532,30 @@
           if (option.selected === true) {
             opt.setAttribute('selected', 'selected');
           }
-          opt.innerHTML = option.text;
+          opt.textContent = option.text;
           parentElement.append(opt);
-        } else {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = option.label;
-          this._createNativeOptions(optgroup, option.options);
-          parentElement.append(optgroup);
         }
       }
     }
     _hideNativeSelect() {
       this._element.tabIndex = '-1';
-      this._element.style.display = 'none';
     }
     _createSelect() {
-      const multiSelectEl = document.createElement('div');
-      multiSelectEl.classList.add(CLASS_NAME_SELECT);
-      multiSelectEl.classList.toggle('is-invalid', this._config.invalid);
-      multiSelectEl.classList.toggle('is-valid', this._config.valid);
-      multiSelectEl.role = 'combobox';
-      multiSelectEl.setAttribute('aria-expanded', 'false');
-      multiSelectEl.setAttribute('aria-haspopup', 'listbox');
-      multiSelectEl.setAttribute('aria-owns', `${this._uniqueId}-listbox`);
+      const wrapper = document.createElement('div');
+      wrapper.classList.add(CLASS_NAME_SELECT);
+      wrapper.classList.toggle('is-invalid', this._config.invalid);
+      wrapper.classList.toggle('is-valid', this._config.valid);
       if (this._config.disabled) {
         this._element.classList.add(CLASS_NAME_DISABLED$2);
       }
-      for (const className of this._getClassNames()) {
-        multiSelectEl.classList.add(className);
+      for (const className of this._element.classList.value.split(' ')) {
+        wrapper.classList.add(className);
       }
-      this._clone = multiSelectEl;
-      this._element.parentNode.insertBefore(multiSelectEl, this._element.nextSibling);
+      this._wrapperElement = wrapper;
+      // The wrapper takes the native select's place, then the select moves inside it
+      // as an invisible overlay so native `required` validation anchors over the control.
+      this._element.parentNode.insertBefore(wrapper, this._element);
+      wrapper.prepend(this._element);
       this._createSelection();
       this._createButtons();
       if (this._config.search) {
@@ -11170,37 +11566,36 @@
       this._element.setAttribute('name', this._uniqueName);
       this._createOptionsContainer();
       this._hideNativeSelect();
-      this._updateOptionsList();
+      this._selectInitialOptions();
     }
     _createSelection() {
       const togglerEl = document.createElement('div');
       togglerEl.classList.add(CLASS_NAME_INPUT_GROUP);
+      togglerEl.setAttribute('role', 'combobox');
+      togglerEl.setAttribute('aria-expanded', 'false');
+      togglerEl.setAttribute('aria-haspopup', 'listbox');
+      togglerEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`);
       this._togglerElement = togglerEl;
+      if (this._config.disabled) {
+        togglerEl.setAttribute('aria-disabled', 'true');
+      }
       if (!this._config.search && !this._config.disabled) {
         togglerEl.tabIndex = 0;
       }
       const selectionEl = document.createElement('div');
       selectionEl.classList.add(CLASS_NAME_SELECTION);
+      selectionEl.setAttribute('aria-live', 'polite');
       if (this._config.multiple && this._config.selectionType === 'tags') {
         selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS);
       }
       togglerEl.append(selectionEl);
-      this._clone.append(togglerEl);
+      this._wrapperElement.append(togglerEl);
       this._updateSelection();
       this._selectionElement = selectionEl;
     }
     _createButtons() {
       const buttons = document.createElement('div');
-      buttons.classList.add('form-multi-select-buttons');
-      if (!this._config.disabled && this._config.cleaner && this._config.multiple) {
-        const cleaner = document.createElement('button');
-        cleaner.type = 'button';
-        cleaner.classList.add(CLASS_NAME_CLEANER);
-        cleaner.style.display = 'none';
-        cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel);
-        buttons.append(cleaner);
-        this._selectionCleanerElement = cleaner;
-      }
+      buttons.classList.add(CLASS_NAME_BUTTONS);
       const indicator = document.createElement('button');
       indicator.type = 'button';
       indicator.classList.add('form-multi-select-indicator');
@@ -11212,6 +11607,13 @@
       this._indicatorElement = indicator;
       this._togglerElement.append(buttons);
       this._updateSelectionCleaner();
+    }
+    _createSelectionCleaner() {
+      const cleaner = document.createElement('button');
+      cleaner.type = 'button';
+      cleaner.classList.add(CLASS_NAME_CLEANER);
+      cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel);
+      return cleaner;
     }
     _createPopper() {
       if (typeof Popper === 'undefined') {
@@ -11241,6 +11643,9 @@
       }
       input.setAttribute('id', `search-${this._uniqueId}`);
       input.setAttribute('name', `search-${this._uniqueName}`);
+      input.setAttribute('aria-label', this._config.ariaSearchLabel);
+      input.setAttribute('aria-autocomplete', 'list');
+      input.setAttribute('aria-controls', `${this._uniqueId}-listbox`);
       this._searchElement = input;
       this._updateSearchSize();
       this._selectionElement.append(input);
@@ -11248,21 +11653,40 @@
     _createOptionsContainer() {
       const dropdownDiv = document.createElement('div');
       dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN);
-      dropdownDiv.role = 'listbox';
-      dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`);
-      if (this._config.multiple) {
-        dropdownDiv.setAttribute('aria-multiselectable', 'true');
-      }
-      if (this._config.selectAll && this._config.multiple) {
-        const selectAllButton = document.createElement('button');
-        selectAllButton.type = 'button';
-        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL);
-        selectAllButton.innerHTML = this._config.selectAllLabel;
-        this._selectAllElement = selectAllButton;
-        dropdownDiv.append(selectAllButton);
+      const hasHeaderTemplate = typeof this._config.headerTemplate === 'function';
+      const showSelectAll = this._config.selectAll && this._config.multiple;
+      if (hasHeaderTemplate || showSelectAll) {
+        const header = document.createElement('div');
+        header.classList.add(CLASS_NAME_DROPDOWN_HEADER);
+        if (hasHeaderTemplate) {
+          const headerContent = document.createElement('div');
+
+          // Keep interactions with custom controls from closing the dropdown,
+          // mirroring the built-in button's stopPropagation behavior.
+          EventHandler.on(headerContent, EVENT_CLICK$3, event => {
+            event.stopPropagation();
+          });
+          this._headerElement = headerContent;
+          header.append(headerContent);
+        } else {
+          const selectAllButton = document.createElement('button');
+          selectAllButton.type = 'button';
+          selectAllButton.classList.add(CLASS_NAME_SELECT_ALL);
+          if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
+            selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX);
+          }
+          this._selectAllElement = selectAllButton;
+          header.append(selectAllButton);
+        }
+        dropdownDiv.append(header);
       }
       const optionsDiv = document.createElement('div');
       optionsDiv.classList.add(CLASS_NAME_OPTIONS);
+      optionsDiv.setAttribute('role', 'listbox');
+      optionsDiv.setAttribute('id', `${this._uniqueId}-listbox`);
+      if (this._config.multiple) {
+        optionsDiv.setAttribute('aria-multiselectable', 'true');
+      }
       if (this._config.optionsMaxHeight !== 'auto') {
         optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`;
         optionsDiv.style.overflow = 'auto';
@@ -11274,15 +11698,18 @@
       if (container) {
         container.append(dropdownDiv);
       } else {
-        this._clone.append(dropdownDiv);
+        this._wrapperElement.append(dropdownDiv);
       }
       this._createOptions(optionsDiv, this._options);
       this._optionsElement = optionsDiv;
       this._menu = dropdownDiv;
+      this._updateHeader();
+      this._updateGroupsState();
+      this._updateMasterCheckbox();
     }
     _createOptions(parentElement, options) {
       for (const option of options) {
-        if (typeof option.value !== 'undefined') {
+        if (!this._isOptionGroup(option)) {
           const optionDiv = document.createElement('div');
           optionDiv.classList.add(CLASS_NAME_OPTION);
           if (option.disabled) {
@@ -11293,24 +11720,30 @@
           }
           optionDiv.dataset.value = String(option.value);
           optionDiv.tabIndex = 0;
-          optionDiv.role = 'option';
-          if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
-            optionDiv.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsTemplate(option);
+          optionDiv.setAttribute('role', 'option');
+          optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false');
+          if (typeof this._config.optionsTemplate === 'function') {
+            optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option));
           } else {
             optionDiv.textContent = option.text;
           }
           parentElement.append(optionDiv);
         }
-        if (typeof option.label !== 'undefined') {
+        if (this._isOptionGroup(option)) {
           const optgroup = document.createElement('div');
           optgroup.classList.add(CLASS_NAME_OPTGROUP);
           const optgrouplabel = document.createElement('div');
-          if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
-            optgrouplabel.innerHTML = this._config.sanitize ? sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) : this._config.optionsGroupsTemplate(option);
+          if (typeof this._config.optionsGroupsTemplate === 'function') {
+            optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option));
           } else {
             optgrouplabel.textContent = option.label;
           }
           optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL);
+          if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
+            optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX);
+            optgrouplabel.tabIndex = 0;
+            optgrouplabel.setAttribute('role', 'button');
+          }
           optgroup.append(optgrouplabel);
           this._createOptions(optgroup, option.options);
           parentElement.append(optgroup);
@@ -11321,23 +11754,50 @@
       const tag = document.createElement('div');
       tag.classList.add(CLASS_NAME_TAG);
       tag.dataset.value = value;
-      tag.innerHTML = text;
+      tag.textContent = text;
       if (!this._config.disabled && disabled !== true) {
         const closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.classList.add(CLASS_NAME_TAG_DELETE);
-        closeBtn.setAttribute('aria-label', 'Close');
-        EventHandler.on(closeBtn, EVENT_CLICK$3, event => {
-          event.preventDefault();
-          event.stopPropagation();
-          tag.remove();
-          this._deselectOption(value);
-        });
+        closeBtn.setAttribute('aria-label', `${this._config.ariaTagDeleteLabel} ${text}`.trim());
         tag.append(closeBtn);
       }
       return tag;
     }
+    _updateTags(selection, search) {
+      const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection);
+      if (placeholder) {
+        placeholder.remove();
+      }
+      const existingTags = new Map();
+      for (const tag of SelectorEngine.children(selection, SELECTOR_TAG)) {
+        existingTags.set(tag.dataset.value, tag);
+      }
+      const selectedValues = new Set(this._selected.map(option => String(option.value)));
+      for (const [value, tag] of existingTags) {
+        if (!selectedValues.has(value)) {
+          tag.remove();
+          existingTags.delete(value);
+        }
+      }
+      for (const option of this._selected) {
+        const value = String(option.value);
+        const tag = existingTags.get(value) || this._createTag(option.value, option.text, option.disabled);
+        if (search) {
+          search.before(tag);
+        } else {
+          selection.append(tag);
+        }
+      }
+    }
     _onOptionsClick(element) {
+      if (this._config.optionsGroupsSelectable) {
+        const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`);
+        if (groupLabel) {
+          this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP));
+          return;
+        }
+      }
       if (element.classList.contains(CLASS_NAME_LABEL)) {
         return;
       }
@@ -11374,7 +11834,7 @@
         if (String(option.value) === value) {
           return option;
         }
-        if (option.options && Array.isArray(option.options)) {
+        if (this._isOptionGroup(option)) {
           const found = this._findOptionByValue(value, option.options);
           if (found) {
             return found;
@@ -11383,21 +11843,77 @@
       }
       return null;
     }
-    _selectOption(value, text) {
+    _selectAllOptions(options) {
+      for (const option of options) {
+        if (option.disabled) {
+          continue;
+        }
+        if (this._isOptionGroup(option)) {
+          if (this._selectAllOptions(option.options)) {
+            return true;
+          }
+          continue;
+        }
+        if (this._isSelectionLimitReached()) {
+          return true;
+        }
+        this._selectOption(option.value, option.text, {
+          refresh: false
+        });
+      }
+      return false;
+    }
+    _deselectAllOptions(options) {
+      for (const option of options) {
+        if (option.disabled) {
+          continue;
+        }
+        if (this._isOptionGroup(option)) {
+          this._deselectAllOptions(option.options);
+          continue;
+        }
+        this._deselectOption(option.value, {
+          refresh: false
+        });
+      }
+    }
+    _getNativeOption(value) {
+      return SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element);
+    }
+    _getOptionElement(value) {
+      return SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement);
+    }
+    _getDisplayedItems() {
+      return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => this._isOptionDisplayed(element));
+    }
+    _maybeSanitize(content) {
+      return this._config.sanitize ? sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) : content;
+    }
+    _isOptionGroup(option) {
+      return Array.isArray(option.options);
+    }
+    _selectOption(value, text, {
+      refresh = true
+    } = {}) {
       if (!this._config.multiple) {
         this.deselectAll();
       }
-      if (this._selected.filter(option => option.value === String(value)).length === 0) {
+      const isSelected = this._selected.some(option => option.value === String(value));
+      if (!isSelected && this._isSelectionLimitReached()) {
+        this._triggerSelectionLimit();
+        return;
+      }
+      if (!isSelected) {
         this._selected.push({
           value: String(value),
           text
         });
       }
-      const nativeOption = SelectorEngine.findOne(`option[value="${value}"]`, this._element);
+      const nativeOption = this._getNativeOption(value);
       if (nativeOption) {
         nativeOption.selected = true;
       }
-      const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
+      const option = this._getOptionElement(value);
       if (option) {
         option.classList.add(CLASS_NAME_SELECTED);
         option.setAttribute('aria-selected', 'true');
@@ -11405,15 +11921,23 @@
       EventHandler.trigger(this._element, EVENT_CHANGED, {
         value: this._selected
       });
-      this._updateSelection();
-      this._updateSelectionCleaner();
-      this._updateSearch();
-      this._updateSearchSize();
+
+      // During init every preselected option runs through here while `_selected` is
+      // already fully populated, so callers can batch the costly DOM refresh into a
+      // single `_refreshAfterSelectionChange()` instead of repeating it per option.
+      if (refresh) {
+        this._refreshAfterSelectionChange();
+      }
     }
-    _deselectOption(value) {
+    _deselectOption(value, {
+      refresh = true
+    } = {}) {
       this._selected = this._selected.filter(option => option.value !== String(value));
-      SelectorEngine.findOne(`option[value="${value}"]`, this._element).selected = false;
-      const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement);
+      const nativeOption = this._getNativeOption(value);
+      if (nativeOption) {
+        nativeOption.selected = false;
+      }
+      const option = this._getOptionElement(value);
       if (option) {
         option.classList.remove(CLASS_NAME_SELECTED);
         option.setAttribute('aria-selected', 'false');
@@ -11421,10 +11945,9 @@
       EventHandler.trigger(this._element, EVENT_CHANGED, {
         value: this._selected
       });
-      this._updateSelection();
-      this._updateSelectionCleaner();
-      this._updateSearch();
-      this._updateSearchSize();
+      if (refresh) {
+        this._refreshAfterSelectionChange();
+      }
     }
     _deselectLastOption() {
       if (this._selected.length > 0) {
@@ -11434,27 +11957,83 @@
         }
       }
     }
+    _refreshAfterSelectionChange() {
+      this._updateSelection();
+      this._updateSelectionCleaner();
+      this._updateSearch();
+      this._updateSearchSize();
+      this._updateHeader();
+      this._updateGroupsState();
+      this._updateMasterCheckbox();
+    }
+    _toggleGroup(optgroupEl) {
+      if (!optgroupEl) {
+        return;
+      }
+      const items = SelectorEngine.children(optgroupEl, SELECTOR_OPTION).filter(element => !element.classList.contains(CLASS_NAME_DISABLED$2));
+      const allSelected = items.length > 0 && items.every(element => element.classList.contains(CLASS_NAME_SELECTED));
+      let limitReached = false;
+      for (const item of items) {
+        const value = String(item.dataset.value);
+        if (allSelected) {
+          this._deselectOption(value, {
+            refresh: false
+          });
+        } else if (!item.classList.contains(CLASS_NAME_SELECTED)) {
+          if (this._isSelectionLimitReached()) {
+            limitReached = true;
+            break;
+          }
+          const option = this._findOptionByValue(value);
+          if (option) {
+            this._selectOption(value, option.text, {
+              refresh: false
+            });
+          }
+        }
+      }
+      this._refreshAfterSelectionChange();
+      if (limitReached) {
+        this._triggerSelectionLimit();
+      }
+    }
+    _selectInitialOptions() {
+      // `_selected` is already fully populated by `_getOptions()` before this runs,
+      // so iterate it directly (no tree walk) and batch the DOM refresh into one call.
+      for (const option of this._selected) {
+        this._selectOption(option.value, option.text, {
+          refresh: false
+        });
+      }
+      this._refreshAfterSelectionChange();
+    }
     _updateSelection() {
-      const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._clone);
-      const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._clone);
+      const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement);
+      const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement);
       if (this._selected.length === 0 && !this._config.search) {
-        selection.innerHTML = `<span class="form-multi-select-placeholder">${this._config.placeholder}</span>`;
+        const placeholder = document.createElement('span');
+        placeholder.classList.add('form-multi-select-placeholder');
+        placeholder.textContent = this._config.placeholder;
+        selection.innerHTML = '';
+        selection.append(placeholder);
         return;
       }
       if (this._config.multiple && this._config.selectionType === 'counter' && !this._config.search) {
-        selection.innerHTML = `${this._selected.length} ${this._config.selectionTypeCounterText}`;
+        selection.textContent = `${this._selected.length} ${this._config.selectionTypeCounterText}`;
       }
       if (this._config.multiple && this._config.selectionType === 'tags') {
-        selection.innerHTML = '';
-        for (const option of this._selected) {
-          selection.append(this._createTag(option.value, option.text, option.disabled));
-        }
+        this._updateTags(selection, search);
       }
       if (this._config.multiple && this._config.selectionType === 'text') {
-        selection.innerHTML = this._selected.map((option, index) => `<span>${option.text}${index === this._selected.length - 1 ? '' : ','}&nbsp;</span>`).join('');
+        selection.innerHTML = '';
+        for (const [index, option] of this._selected.entries()) {
+          const span = document.createElement('span');
+          span.textContent = `${option.text}${index === this._selected.length - 1 ? '' : ','}\u00A0`;
+          selection.append(span);
+        }
       }
       if (!this._config.multiple && this._selected.length > 0 && !this._config.search) {
-        selection.innerHTML = this._selected[0].text;
+        selection.textContent = this._selected[0].text;
       }
       if (search) {
         selection.append(search);
@@ -11464,15 +12043,20 @@
       }
     }
     _updateSelectionCleaner() {
-      if (!this._config.cleaner || this._selectionCleanerElement === null) {
+      if (!this._config.cleaner || this._config.disabled) {
         return;
       }
-      const selectionCleaner = SelectorEngine.findOne(SELECTOR_CLEANER, this._clone);
-      if (this._selected.length > 0) {
-        selectionCleaner.style.removeProperty('display');
+      if (this._selected.length > 0 && this._selectionCleanerElement === null) {
+        const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._wrapperElement);
+        const selectionCleaner = this._createSelectionCleaner();
+        buttons.insertBefore(selectionCleaner, this._indicatorElement);
+        this._selectionCleanerElement = selectionCleaner;
         return;
       }
-      selectionCleaner.style.display = 'none';
+      if (this._selected.length === 0 && this._selectionCleanerElement !== null) {
+        this._selectionCleanerElement.remove();
+        this._selectionCleanerElement = null;
+      }
     }
     _updateSearch() {
       if (!this._config.search) {
@@ -11516,29 +12100,164 @@
         this._searchElement.removeAttribute('size');
       }
     }
+    _updateHeader() {
+      if (this._headerElement) {
+        this._renderHeader();
+        return;
+      }
+      if (!this._selectAllElement) {
+        return;
+      }
+      this._selectAllElement.textContent = this._getSelectAllLabel();
+    }
+    _getSelectAllLabel() {
+      const allSelected = this._isAllSelected();
+      if (this._isFilteredScopeNarrowed()) {
+        return allSelected ? this._config.deselectFilteredLabel : this._config.selectFilteredLabel;
+      }
+      return allSelected ? this._config.deselectAllLabel : this._config.selectAllLabel;
+    }
+    _isAllSelected() {
+      const {
+        selected,
+        total
+      } = this._getSelectAllScope();
+      const target = this._getSelectableTarget(total);
+      return target > 0 && selected >= target;
+    }
+    _getSelectAllScope() {
+      const {
+        selected,
+        total,
+        filtered,
+        filteredSelected
+      } = this._getSelectionState();
+      return this._config.selectAllMode === 'filtered' ? {
+        selected: filteredSelected,
+        total: filtered
+      } : {
+        selected,
+        total
+      };
+    }
+    _isFilteredScopeNarrowed() {
+      if (this._config.selectAllMode !== 'filtered') {
+        return false;
+      }
+      const {
+        filtered,
+        total
+      } = this._getSelectionState();
+      return filtered < total;
+    }
+    _toggleSelectAll() {
+      const filteredMode = this._config.selectAllMode === 'filtered';
+      if (this._isAllSelected()) {
+        if (filteredMode) {
+          this.deselectFiltered();
+        } else {
+          this.deselectAll();
+        }
+        return;
+      }
+      if (filteredMode) {
+        this.selectFiltered();
+      } else {
+        this.selectAll();
+      }
+    }
+    _getSelectableTarget(total) {
+      return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total;
+    }
+    _getCheckboxState(selected, total) {
+      if (total > 0 && selected >= total) {
+        return 'all';
+      }
+      return selected === 0 ? 'none' : 'indeterminate';
+    }
+    _applyCheckboxState(element, state) {
+      element.classList.toggle(CLASS_NAME_SELECTED, state === 'all');
+      element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'indeterminate');
+    }
+    _updateGroupsState() {
+      if (!this._config.optionsGroupsSelectable) {
+        return;
+      }
+      for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
+        const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup);
+        if (!label) {
+          continue;
+        }
+        const items = SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => !element.classList.contains(CLASS_NAME_DISABLED$2));
+        const selected = items.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length;
+        this._applyCheckboxState(label, this._getCheckboxState(selected, items.length));
+      }
+    }
+    _updateMasterCheckbox() {
+      if (this._config.selectAllStyle !== 'checkbox' || !this._selectAllElement) {
+        return;
+      }
+      const {
+        selected,
+        total
+      } = this._getSelectAllScope();
+      this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)));
+    }
+    _renderHeader() {
+      if (!this._headerElement || typeof this._config.headerTemplate !== 'function') {
+        return;
+      }
+      const result = this._config.headerTemplate(this._getSelectionState(), this._getSelectionActions());
+      if (result instanceof Node) {
+        this._headerElement.replaceChildren(result);
+      } else {
+        this._headerElement.innerHTML = this._maybeSanitize(result);
+      }
+    }
+    _getSelectionState() {
+      const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu);
+      const filteredItems = allItems.filter(element => this._isOptionDisplayed(element));
+      return {
+        selected: this._selected.length,
+        total: allItems.length,
+        filtered: filteredItems.length,
+        filteredSelected: filteredItems.filter(element => element.classList.contains(CLASS_NAME_SELECTED)).length
+      };
+    }
+    _getSelectionActions() {
+      return {
+        selectAll: () => this.selectAll(),
+        deselectAll: () => this.deselectAll(),
+        selectFiltered: () => this.selectFiltered(),
+        deselectFiltered: () => this.deselectFiltered()
+      };
+    }
     _onSearchChange(element) {
       if (element) {
         this.search(element.value);
         this._updateSearchSize(element.value.length + 1);
       }
     }
-    _updateOptionsList(options = this._options) {
-      for (const option of options) {
-        if (option.label) {
-          this._updateOptionsList(option.options);
-          continue;
-        }
-        if (option.selected) {
-          this._selectOption(option.value, option.text);
-        }
-      }
-    }
-    _isVisible(element) {
+
+    // Checks only `display` (unlike the imported `isVisible`) so it still works while
+    // the menu is closed, e.g. when called from the constructor.
+    _isOptionDisplayed(element) {
       const style = window.getComputedStyle(element);
       return style.display !== 'none';
     }
     _isShown() {
-      return this._clone.classList.contains(CLASS_NAME_SHOW$7);
+      return this._wrapperElement.classList.contains(CLASS_NAME_SHOW$7);
+    }
+    _hasSelectionLimit() {
+      return this._config.multiple && this._config.selectionLimit !== null;
+    }
+    _isSelectionLimitReached() {
+      return this._hasSelectionLimit() && this._selected.length >= this._config.selectionLimit;
+    }
+    _triggerSelectionLimit() {
+      EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, {
+        selectionLimit: this._config.selectionLimit
+      });
     }
     _filterOptionsList() {
       const options = SelectorEngine.find(SELECTOR_OPTION, this._menu);
@@ -11554,33 +12273,35 @@
         const optgroup = option.closest(SELECTOR_OPTGROUP);
         if (optgroup) {
           // eslint-disable-next-line  unicorn/prefer-array-some
-          if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
+          if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isOptionDisplayed(element)).length > 0) {
             optgroup.style.removeProperty('display');
           } else {
             optgroup.style.display = 'none';
           }
         }
       }
+      this._updateHeader();
+      this._updateMasterCheckbox();
+      const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu);
       if (visibleOptions > 0) {
-        if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove();
+        if (emptyMessage) {
+          emptyMessage.remove();
         }
         return;
       }
-      if (visibleOptions === 0) {
+      if (visibleOptions === 0 && !emptyMessage) {
         const placeholder = document.createElement('div');
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY);
-        placeholder.innerHTML = this._config.searchNoResultsLabel;
-        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
-        }
+        placeholder.setAttribute('role', 'status');
+        placeholder.textContent = this._config.searchNoResultsLabel;
+        SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
       }
     }
     _selectMenuItem({
       key,
       target
     }) {
-      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element));
+      const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element));
       if (!items.length) {
         return;
       }
@@ -11635,10 +12356,10 @@
         if (!context) {
           continue;
         }
-        if (!context._clone.classList.contains(CLASS_NAME_SHOW$7)) {
+        if (!context._wrapperElement.classList.contains(CLASS_NAME_SHOW$7)) {
           continue;
         }
-        if (context._clone.contains(event.target)) {
+        if (context._wrapperElement.contains(event.target)) {
           continue;
         }
         context.hide();
@@ -11652,7 +12373,8 @@
    */
 
   EventHandler.on(window, EVENT_LOAD_DATA_API$9, () => {
-    for (const ms of SelectorEngine.find(SELECTOR_SELECT)) {
+    const elements = new Set([...SelectorEngine.find(SELECTOR_DATA_MULTI_SELECT), ...SelectorEngine.find(SELECTOR_SELECT)]);
+    for (const ms of elements) {
       if (ms.tabIndex !== -1) {
         MultiSelect.multiSelectInterface(ms);
       }
@@ -16255,6 +16977,7 @@
     Carousel,
     Chip,
     ChipInput,
+    ChipSet,
     Collapse,
     DatePicker,
     DateRangePicker,
