@@ -111,6 +111,7 @@ const Default = {
   deselectFilteredLabel: 'Deselect filtered',
   disabled: false,
   headerTemplate: null,
+  hideSelectAllOnSearchNoResults: true,
   id: null,
   invalid: false,
   multiple: true,
@@ -153,6 +154,7 @@ const DefaultType = {
   deselectFilteredLabel: 'string',
   disabled: 'boolean',
   headerTemplate: '(function|null)',
+  hideSelectAllOnSearchNoResults: 'boolean',
   id: '(string|null)',
   invalid: 'boolean',
   multiple: 'boolean',
@@ -197,6 +199,7 @@ class MultiSelect extends BaseComponent {
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
+    this._dropdownHeaderElement = null
     this._headerElement = null
     this._selectionElement = null
     this._selectionCleanerElement = null
@@ -853,6 +856,7 @@ class MultiSelect extends BaseComponent {
     if (hasHeaderTemplate || showSelectAll) {
       const header = document.createElement('div')
       header.classList.add(CLASS_NAME_DROPDOWN_HEADER)
+      this._dropdownHeaderElement = header
 
       if (hasHeaderTemplate) {
         const headerContent = document.createElement('div')
@@ -1589,6 +1593,7 @@ class MultiSelect extends BaseComponent {
 
     this._updateHeader()
     this._updateMasterCheckbox()
+    this._updateSelectAllVisibility(visibleOptions)
 
     const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)
 
@@ -1607,6 +1612,18 @@ class MultiSelect extends BaseComponent {
       placeholder.textContent = this._config.searchNoResultsLabel
 
       SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
+    }
+  }
+
+  _updateSelectAllVisibility(visibleOptions) {
+    if (!this._dropdownHeaderElement || !this._selectAllElement) {
+      return
+    }
+
+    if (this._config.hideSelectAllOnSearchNoResults && visibleOptions === 0) {
+      this._dropdownHeaderElement.style.display = 'none'
+    } else {
+      this._dropdownHeaderElement.style.removeProperty('display')
     }
   }
 
