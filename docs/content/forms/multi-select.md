@@ -261,6 +261,46 @@ multiSelect.deselectFiltered() // deselect only the search-filtered options
 
 To surface these as buttons inside the dropdown, render them through the [custom dropdown header](#custom-dropdown-header) `actions`.
 
+### Hiding select all when search has no results
+
+{{< added-in "5.27.0" >}}
+
+When `search` is enabled and the user types a query that matches no options, there is nothing left to select — so leaving the **select all** button visible above the empty "No results found" message is misleading. By default (`hideSelectAllOnSearchNoResults: true`) the component hides the whole dropdown header in that case, and brings it back as soon as the search matches at least one option again.
+
+Type a query that matches nothing (for example `xyz`) into the example below — the select all button disappears together with the options, then returns when you clear or change the search.
+
+{{< example stackblitz_pro="true" >}}
+<select id="multiSelectHideSelectAll" data-coreui-multi-select multiple data-coreui-search="true">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+Set `hideSelectAllOnSearchNoResults: false` to keep the header (and the select all button) visible even when the search returns no results.
+
+{{< example stackblitz_pro="true" >}}
+<select id="multiSelectKeepSelectAll" data-coreui-multi-select multiple data-coreui-search="true" data-coreui-hide-select-all-on-search-no-results="false">
+  <option value="0">Angular</option>
+  <option value="1">Bootstrap</option>
+  <option value="2">React.js</option>
+  <option value="3">Vue.js</option>
+  <optgroup label="backend">
+    <option value="4">Django</option>
+    <option value="5">Laravel</option>
+    <option value="6">Node.js</option>
+  </optgroup>
+</select>
+{{< /example >}}
+
+This option only affects the built-in select all button. A [custom dropdown header](#custom-dropdown-header) is always rendered, since it may contain controls unrelated to the options list.
+
 ## Selection limit
 
 {{< added-in "5.26.0" >}}
@@ -484,6 +524,7 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 | `deselectFilteredLabel` | string | `'Deselect filtered'` | Label shown instead of `deselectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list. See `selectFilteredLabel`. |
 | `disabled` | boolean | `false` | Toggle the disabled state for the component. |
 | `headerTemplate` | function, null | `null` | Custom template function for rendering the dropdown header (the area above the options list). Renders independently of `selectAll`. Receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object (`{ selectAll, deselectAll, selectFiltered, deselectFiltered }`) with bound component methods. Return an `HTMLElement` (wire your own listeners using `actions`, supports multiple controls) or an HTML string (sanitized, no actions wired). Re-renders on every selection change and search filter. |
+| `hideSelectAllOnSearchNoResults` | boolean | `true` | Hides the dropdown header with the built-in select all button when a search filter leaves no matching options. Set to `false` to keep the select all button visible even when there are no results. |
 | `invalid` | boolean | `false` | Toggle the invalid state for the component. |
 | `multiple` | boolean | `true` | It specifies that multiple options can be selected at once. |
 | `name` | string, null | `null` | Set the name attribute for the native select element. |

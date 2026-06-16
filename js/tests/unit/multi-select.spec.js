@@ -401,6 +401,40 @@ describe('MultiSelect', () => {
       expect(multiSelect._selectAllElement).toBeNull()
     })
 
+    it('should hide the dropdown header when search yields no results by default', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }],
+        multiple: true,
+        search: true,
+        selectAll: true
+      })
+
+      const header = multiSelect._dropdownHeaderElement
+
+      multiSelect.search('no-match')
+      expect(header.style.display).toBe('none')
+
+      multiSelect.search('')
+      expect(header.style.display).not.toBe('none')
+    })
+
+    it('should keep the dropdown header visible on no results when hideSelectAllOnSearchNoResults is false', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }],
+        multiple: true,
+        search: true,
+        selectAll: true,
+        hideSelectAllOnSearchNoResults: false
+      })
+
+      multiSelect.search('no-match')
+      expect(multiSelect._dropdownHeaderElement.style.display).not.toBe('none')
+    })
+
     it('should set is-invalid class when invalid config is true', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
