@@ -1,3 +1,0 @@
----
-aliases: "/components/masked-input/"
----
