@@ -14,7 +14,7 @@ The **Bootstrap Autocomplete Dropdown** component is a powerful autocomplete dro
 
 A straightforward demonstration of how to implement a basic Bootstrap Autocomplete input field, highlighting essential attributes and configurations.
 
-<Example pro lang="html" name="forms-autocomplete-1" componentName="Autocomplete" code={`<div
+<Example pro code={`<div
     data-coreui-toggle="autocomplete"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
@@ -35,7 +35,7 @@ Learn how to populate the autocomplete component with data from various sources,
 
 To dynamically populate an autocomplete input with suggestions from an array, use JavaScript to configure the component with predefined options.
 
-<Example pro lang="html" name="forms-autocomplete-2" componentName="Autocomplete" code={`<div id="myAutoComplete"></div>`} sandboxJs={[`const myAutoComplete = document.getElementById('myAutoComplete')`, ``, `new coreui.Autocomplete(myAutoComplete, {`, `  name: 'autocomplete',`, `  options: [`, `    'Angular',`, `    'Bootstrap',`, `    {`, `      label: 'React.js',`, `      disabled: true`, `    },`, `    'Vue.js',`, `    {`, `      label: 'backend',`, `      options: ['Django', 'Laravel', 'Node.js']`, `    }`, `  ],`, `  value: 'Laravel'`, `})`].join('\n')} />
+<Example pro code={`<div id="myAutoComplete"></div>`} sandboxJs={[`const myAutoComplete = document.getElementById('myAutoComplete')`, ``, `new coreui.Autocomplete(myAutoComplete, {`, `  name: 'autocomplete',`, `  options: [`, `    'Angular',`, `    'Bootstrap',`, `    {`, `      label: 'React.js',`, `      disabled: true`, `    },`, `    'Vue.js',`, `    {`, `      label: 'backend',`, `      options: ['Django', 'Laravel', 'Node.js']`, `    }`, `  ],`, `  value: 'Laravel'`, `})`].join('\n')} />
 
 We use the following JavaScript to set up our autocomplete:
 
@@ -65,7 +65,7 @@ new coreui.Autocomplete(myAutoComplete, {
 
 You can organize suggestions into groups using optgroups for better categorization and user experience.
 
-<Example pro lang="html" name="forms-autocomplete-3" componentName="Autocomplete" code={`<div id="myAutoCompleteGrouped"></div>`} sandboxJs={[`const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')`, ``, `new coreui.Autocomplete(myAutoCompleteGrouped, {`, `  name: 'autocomplete-grouped',`, `  options: [`, `    'Angular',`, `    {`, `      label: 'Bootstrap',`, `      selected: true`, `    },`, `    {`, `      label: 'React.js',`, `      disabled: true`, `    },`, `    'Vue.js',`, `    {`, `      label: 'backend',`, `      options: ['Django', 'Laravel', 'Node.js']`, `    }`, `  ]`, `})`].join('\n')} />
+<Example pro code={`<div id="myAutoCompleteGrouped"></div>`} sandboxJs={[`const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')`, ``, `new coreui.Autocomplete(myAutoCompleteGrouped, {`, `  name: 'autocomplete-grouped',`, `  options: [`, `    'Angular',`, `    {`, `      label: 'Bootstrap',`, `      selected: true`, `    },`, `    {`, `      label: 'React.js',`, `      disabled: true`, `    },`, `    'Vue.js',`, `    {`, `      label: 'backend',`, `      options: ['Django', 'Laravel', 'Node.js']`, `    }`, `  ]`, `})`].join('\n')} />
 
 ```js
 const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')
@@ -95,7 +95,7 @@ new coreui.Autocomplete(myAutoCompleteGrouped, {
 
 You can use values in your options array. This is particularly useful when working with database IDs, product codes, or any numeric identifiers. Note that the component internally converts number values to strings for consistency and DOM compatibility.
 
-<Example pro lang="html" name="forms-autocomplete-4" componentName="Autocomplete" code={`<div id="myAutoCompleteValues"></div>`} sandboxJs={[`const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')`, ``, `new coreui.Autocomplete(myAutoCompleteValues, {`, `  cleaner: true,`, `  indicator: true,`, `  name: 'autocomplete-option-values',`, `  options: [`, `    { label: 'Product A', value: 1 },`, `    { label: 'Product B', value: 2 },`, `    { label: 'Product C', value: 3.5 },`, `    { label: 'Product D', value: 42 },`, `    {`, `      label: 'Categories',`, `      options: [`, `        { label: 'Electronics', value: 100 },`, `        { label: 'Books', value: 200 },`, `        { label: 'Clothing', value: 300 }`, `      ]`, `    }`, `  ],`, `  placeholder: 'Select product by ID...',`, `  search: 'global',`, `  value: 100`, `})`, ``, `// Log the selected value to demonstrate that numbers are converted to strings`, `myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {`, `  // eslint-disable-next-line no-console`, `  console.log('Selected value:', event.value.value)`, `  // eslint-disable-next-line no-console`, `  console.log('Selected label:', event.value.label)`, `})`].join('\n')} />
+<Example pro code={`<div id="myAutoCompleteValues"></div>`} sandboxJs={[`const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')`, ``, `new coreui.Autocomplete(myAutoCompleteValues, {`, `  cleaner: true,`, `  indicator: true,`, `  name: 'autocomplete-option-values',`, `  options: [`, `    { label: 'Product A', value: 1 },`, `    { label: 'Product B', value: 2 },`, `    { label: 'Product C', value: 3.5 },`, `    { label: 'Product D', value: 42 },`, `    {`, `      label: 'Categories',`, `      options: [`, `        { label: 'Electronics', value: 100 },`, `        { label: 'Books', value: 200 },`, `        { label: 'Clothing', value: 300 }`, `      ]`, `    }`, `  ],`, `  placeholder: 'Select product by ID...',`, `  search: 'global',`, `  value: 100`, `})`, ``, `// Log the selected value to demonstrate that numbers are converted to strings`, `myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {`, `  // eslint-disable-next-line no-console`, `  console.log('Selected value:', event.value.value)`, `  // eslint-disable-next-line no-console`, `  console.log('Selected label:', event.value.label)`, `})`].join('\n')} />
 
 ```js
 const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')
@@ -147,7 +147,7 @@ You can configure CoreUI's AutoComplete component to fetch and display options d
 
 This example shows how to connect the AutoComplete to a remote API to search users by first name.
 
-<Example lang="html" name="forms-autocomplete-5" componentName="Autocomplete" code={`<div id="myAutoCompleteExternalData"></div>`} />
+<Example code={`<div id="myAutoCompleteExternalData"></div>`} />
 
 To fetch data from an external source, you must set the search option to `'external'` or `['external', 'global']`.
 This disables internal filtering and allows you to provide custom data (e.g., from an API) based on user input.
@@ -212,13 +212,13 @@ Configure the search behavior within the component. The `data-coreui-search` opt
 
 By default, search applies only while the input field is focused:
 
-<Example pro lang="html" name="forms-autocomplete-6" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search technologies..."></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search technologies..."></div>`} />
 
 ### Global search
 
 Enable global search functionality that works across the entire component, regardless of focus position:
 
-<Example pro lang="html" name="forms-autocomplete-7" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-search="global" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Global search enabled..."></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-search="global" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Global search enabled..."></div>`} />
 
 ### External search
 
@@ -259,7 +259,7 @@ You can combine it with `'global'` (e.g. search: `['external', 'global']`) to al
 
 Restrict users to only select from predefined options by setting `data-coreui-allow-only-defined-options="true"`:
 
-<Example pro lang="html" name="forms-autocomplete-8" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-allow-only-defined-options="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Only predefined options allowed..."></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-allow-only-defined-options="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Only predefined options allowed..."></div>`} />
 
 ## Hints and completion
 
@@ -269,33 +269,33 @@ Enable intelligent hints and auto-completion features to improve user experience
 
 Display completion hints as users type:
 
-<Example pro lang="html" name="forms-autocomplete-9" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Type to see hints..." data-coreui-show-hints="true"></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Type to see hints..." data-coreui-show-hints="true"></div>`} />
 
 ### Highlight matching text
 
 Highlight matching portions of suggestions during search:
 
-<Example pro lang="html" name="forms-autocomplete-10" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-highlight-options-on-search="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search with highlighting..."></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-highlight-options-on-search="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Search with highlighting..."></div>`} />
 
 ## Validation states
 
 Apply validation styling to indicate input validity.
 
-<Example pro lang="html" name="forms-autocomplete-11" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Valid autocomplete..." data-coreui-valid="true"></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Valid autocomplete..." data-coreui-valid="true"></div>`} />
 
-<Example pro lang="html" name="forms-autocomplete-12" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
 
 ## Disabled state
 
 Add the `data-coreui-disabled="true"` attribute to disable the component:
 
-<Example pro lang="html" name="forms-autocomplete-13" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
 
 ## Sizing
 
 You may also choose from small and large auto completes to match our similarly sized text inputs.
 
-<Example pro lang="html" name="forms-autocomplete-14" componentName="Autocomplete" class="d-flex flex-column gap-3" code={`<div 
+<Example pro class="d-flex flex-column gap-3" code={`<div 
     class="autocomplete-lg"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
@@ -332,13 +332,13 @@ You may also choose from small and large auto completes to match our similarly s
 
 Enable a cleaner button to quickly clear input element:
 
-<Example pro lang="html" name="forms-autocomplete-15" componentName="Autocomplete" code={`<div data-coreui-toggle="autocomplete" data-coreui-cleaner="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="With cleaner button..."></div>`} />
+<Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-cleaner="true" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="With cleaner button..."></div>`} />
 
 ## Custom templates
 
 The CoreUI Bootstrap Autocomplete Component provides the flexibility to personalize options and group labels by utilizing custom templates. You can easily customize the options using the `optionsTemplate`, and for groups, you can use `optionsGroupsTemplate`, as demonstrated in the examples below:
 
-<Example pro lang="html" name="forms-autocomplete-16" componentName="Autocomplete" code={`<div class="row">
+<Example pro code={`<div class="row">
     <div class="col-md-6">
       <div id="myAutocompleteCountries"></div>
     </div>

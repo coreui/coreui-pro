@@ -10,7 +10,7 @@ otherFrameworks:
 
 Use the `form-otp` wrapper with `data-coreui-toggle="otp"` to create an one-time password input field with automatic character navigation and validation.
 
-<Example pro lang="html" name="forms-otp-input-1" componentName="One Time Password (OTP) Input" code={`<label for="basicOTP" class="form-label">Enter OTP Code</label>
+<Example pro code={`<label for="basicOTP" class="form-label">Enter OTP Code</label>
   <div class="form-otp" data-coreui-toggle="otp" data-coreui-id="basicOTP" data-coreui-name="otp">
     <input class="form-otp-control">
     <input class="form-otp-control">
@@ -24,7 +24,7 @@ Use the `form-otp` wrapper with `data-coreui-toggle="otp"` to create an one-time
 
 The one-time password input supports different input types for various use cases.
 
-<Example pro lang="html" name="forms-otp-input-2" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+<Example pro code={`<div class="mb-3">
     <label class="form-label">Numeric OTP (default)</label>
     <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="number">
       <input class="form-otp-control">
@@ -62,7 +62,7 @@ The one-time password input supports different input types for various use cases
 
 Provide visual hints to users by setting placeholder text for OTP input fields. You can use a single character for all fields or specify different placeholders for each field.
 
-<Example pro lang="html" name="forms-otp-input-3" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+<Example pro code={`<div class="mb-3">
     <label class="form-label">Single character placeholder</label>
     <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="0">
       <input class="form-otp-control">
@@ -100,7 +100,7 @@ Provide visual hints to users by setting placeholder text for OTP input fields. 
 
 Set initial values using the `data-coreui-value` attribute.
 
-<Example pro lang="html" name="forms-otp-input-4" componentName="One Time Password (OTP) Input" code={`<label class="form-label">OTP with pre-filled value</label>
+<Example pro code={`<label class="form-label">OTP with pre-filled value</label>
   <div class="form-otp" data-coreui-toggle="otp" data-coreui-value="123456">
     <input class="form-otp-control">
     <input class="form-otp-control">
@@ -114,7 +114,7 @@ Set initial values using the `data-coreui-value` attribute.
 
 Control user input behavior with linear and non-linear modes.
 
-<Example pro lang="html" name="forms-otp-input-5" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+<Example pro code={`<div class="mb-3">
     <label class="form-label">Linear mode (sequential input)</label>
     <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="true">
       <input class="form-otp-control">
@@ -141,7 +141,7 @@ Control user input behavior with linear and non-linear modes.
 
 Enable automatic form submission when all one-time password fields are completed.
 
-<Example pro lang="html" name="forms-otp-input-6" componentName="One Time Password (OTP) Input" code={`<form>
+<Example pro code={`<form>
     <label class="form-label">Auto-submit OTP</label>
     <div class="form-otp" data-coreui-toggle="otp" data-coreui-auto-submit="true">
       <input class="form-otp-control">
@@ -157,7 +157,7 @@ Enable automatic form submission when all one-time password fields are completed
 
 Create custom one-time password layouts with separators and different field counts.
 
-<Example pro lang="html" name="forms-otp-input-7" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+<Example pro code={`<div class="mb-3">
     <label class="form-label">6-digit OTP with separators</label>
     <div class="form-otp" data-coreui-toggle="otp">
       <input class="form-otp-control">
@@ -199,7 +199,7 @@ Create custom one-time password layouts with separators and different field coun
 
 One-time password input supports different sizes. You may choose from small, normal (default), and large inputs to match our similarly sized text inputs.  To adjust the size of a component, use `.form-otp-lg` or `.form-otp-sm`.
 
-<Example pro lang="html" name="forms-otp-input-8" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+<Example pro code={`<div class="mb-3">
     <label class="form-label">Large OTP input</label>
     <div class="form-otp form-otp-lg" data-coreui-toggle="otp">
       <input class="form-otp-control">
@@ -237,7 +237,7 @@ One-time password input supports different sizes. You may choose from small, nor
 
 Disable the entire one-time password input by adding the `data-coreui-disabled="true"` attribute.
 
-<Example pro lang="html" name="forms-otp-input-9" componentName="One Time Password (OTP) Input" code={`<label class="form-label">Disabled OTP input</label>
+<Example pro code={`<label class="form-label">Disabled OTP input</label>
   <div class="form-otp" data-coreui-toggle="otp" data-coreui-disabled="true" data-coreui-value="123456">
     <input class="form-otp-control">
     <input class="form-otp-control">
@@ -251,7 +251,7 @@ Disable the entire one-time password input by adding the `data-coreui-disabled="
 
 Use the `data-coreui-readonly="true"` attribute to make the one-time password input non-editable but still selectable.
 
-<Example pro lang="html" name="forms-otp-input-10" componentName="One Time Password (OTP) Input" code={`<label class="form-label">Readonly OTP input</label>
+<Example pro code={`<label class="form-label">Readonly OTP input</label>
   <div class="form-otp" data-coreui-toggle="otp" data-coreui-readonly="true" data-coreui-value="123456">
     <input class="form-otp-control">
     <input class="form-otp-control">
