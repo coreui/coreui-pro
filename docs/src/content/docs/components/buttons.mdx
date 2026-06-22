@@ -122,23 +122,13 @@ You can even roll your own custom sizing with CSS variables:
 
 ### Pill buttons
 
-<Example code={`<button type="button" class="btn btn-primary rounded-pill">Primary</button>
-  <button type="button" class="btn btn-secondary rounded-pill">Secondary</button>
-  <button type="button" class="btn btn-success rounded-pill">Success</button>
-  <button type="button" class="btn btn-danger rounded-pill">Danger</button>
-  <button type="button" class="btn btn-warning rounded-pill">Warning</button>
-  <button type="button" class="btn btn-info rounded-pill">Info</button>`} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name} rounded-pill">${c.title}</button>`)} />
 
 <div class="pro-component"></div>
 
 ### Square buttons
 
-<Example code={`<button type="button" class="btn btn-primary rounded-0">Primary</button>
-  <button type="button" class="btn btn-secondary rounded-0">Secondary</button>
-  <button type="button" class="btn btn-success rounded-0">Success</button>
-  <button type="button" class="btn btn-danger rounded-0">Danger</button>
-  <button type="button" class="btn btn-warning rounded-0">Warning</button>
-  <button type="button" class="btn btn-info rounded-0">Info</button>`} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name} rounded-0">${c.title}</button>`)} />
 
 
 
