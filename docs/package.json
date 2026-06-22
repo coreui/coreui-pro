@@ -1,5 +1,6 @@
 {
   "name": "@coreui/coreui-pro-docs",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +11,7 @@
   "dependencies": {
     "@astrojs/mdx": "^6.0.0",
     "@coreui/astro-docs": "link:../../coreui-astro-docs/packages/astro-docs",
-    "@coreui/coreui-pro": "link:../..",
+    "@coreui/coreui-pro": "^5.26.0",
     "@popperjs/core": "^2.11.8",
     "astro": "^6.4.0",
     "sass": "^1.77.0"
