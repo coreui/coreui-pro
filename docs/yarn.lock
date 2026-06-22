@@ -132,13 +132,30 @@
     fast-wrap-ansi "^0.2.0"
     sisteransi "^1.0.5"
 
-"@coreui/astro-docs@link:../../coreui-astro-docs/packages/astro-docs":
-  version "0.0.0"
-  uid ""
+"@coreui/astro-docs@0.1.0-beta.2":
+  version "0.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@coreui/astro-docs/-/astro-docs-0.1.0-beta.2.tgz#6bc4405d4b5e7cfcbfc83f30bef5c462190025ba"
+  integrity sha512-d3uAYK/2PSh5ivmYNZHHLfWZQaEjOjvYa/z8aSh2NyGYBRlomWH3kjCrvV3MfBEM8kKuIQEU5NBEvli40LOJMg==
+  dependencies:
+    "@astrojs/markdown-remark" "^7.2.0"
+    "@coreui/icons" "^3.1.0"
+    "@coreui/internal-links" "^5.1.0"
+    "@docsearch/css" "^4.6.3"
+    "@docsearch/js" "^4.6.3"
+    "@stackblitz/sdk" "^1.11.0"
+    astro-auto-import "^0.5.1"
+    js-yaml "^4.2.0"
+    lz-string "^1.5.0"
+    rehype-autolink-headings "^7.1.0"
+    unist-util-visit "^5.1.0"
+    zod "^4.4.3"
 
-"@coreui/coreui-pro@link:../..":
-  version "0.0.0"
-  uid ""
+"@coreui/coreui-pro@^5.26.0":
+  version "5.26.0"
+  resolved "https://registry.yarnpkg.com/@coreui/coreui-pro/-/coreui-pro-5.26.0.tgz#46a71bf98e2b9e0f8648ba6cddd879050a64d2c7"
+  integrity sha512-uBGagwk+MmhRMNvJ+2HvhFuta8p740Plzm0q1ypRZByMnvXMwR6wxcrksH2hj5a8LZuVdUDagYI/4b22gtCbpA==
+  dependencies:
+    html-entities "^2.6.0"
 
 "@coreui/icons@^3.1.0":
   version "3.1.0"
@@ -1556,6 +1573,11 @@ hastscript@^9.0.0:
     hast-util-parse-selector "^4.0.0"
     property-information "^7.0.0"
     space-separated-tokens "^2.0.0"
+
+html-entities@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-2.6.0.tgz#7c64f1ea3b36818ccae3d3fb48b6974208e984f8"
+  integrity sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==
 
 html-escaper@3.0.3:
   version "3.0.3"
