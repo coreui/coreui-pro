@@ -10,61 +10,256 @@ otherFrameworks:
 
 Use the `form-otp` wrapper with `data-coreui-toggle="otp"` to create an one-time password input field with automatic character navigation and validation.
 
-<Example pro lang="html" name="forms-otp-input-1" componentName="One Time Password (OTP) Input" code={[`<label for="basicOTP" class="form-label">Enter OTP Code</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-id="basicOTP" data-coreui-name="otp">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} html={[`<label for="basicOTP" class="form-label">Enter OTP Code</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-id="basicOTP" data-coreui-name="otp">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-1" componentName="One Time Password (OTP) Input" code={`<label for="basicOTP" class="form-label">Enter OTP Code</label>
+  <div class="form-otp" data-coreui-toggle="otp" data-coreui-id="basicOTP" data-coreui-name="otp">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+  </div>`} />
 
 ## One-time password types
 
 The one-time password input supports different input types for various use cases.
 
-<Example pro lang="html" name="forms-otp-input-2" componentName="One Time Password (OTP) Input" code={[`<div class="mb-3">`, `  <label class="form-label">Numeric OTP (default)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="number">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">Text OTP</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="text">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Masked OTP (hidden characters)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-masked="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} html={[`<div class="mb-3">`, `  <label class="form-label">Numeric OTP (default)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="number">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">Text OTP</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="text">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Masked OTP (hidden characters)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-masked="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-2" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+    <label class="form-label">Numeric OTP (default)</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="number">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Text OTP</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="text">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div>
+    <label class="form-label">Masked OTP (hidden characters)</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-masked="true">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>`} />
 
 ## Placeholders
 
 Provide visual hints to users by setting placeholder text for OTP input fields. You can use a single character for all fields or specify different placeholders for each field.
 
-<Example pro lang="html" name="forms-otp-input-3" componentName="One Time Password (OTP) Input" code={[`<div class="mb-3">`, `  <label class="form-label">Single character placeholder</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="0">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">Different placeholders per field</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="123456">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Letter placeholders</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="text" data-coreui-placeholder="ABCDEF">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} html={[`<div class="mb-3">`, `  <label class="form-label">Single character placeholder</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="0">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">Different placeholders per field</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="123456">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Letter placeholders</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="text" data-coreui-placeholder="ABCDEF">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-3" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+    <label class="form-label">Single character placeholder</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="0">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Different placeholders per field</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-placeholder="123456">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div>
+    <label class="form-label">Letter placeholders</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-type="text" data-coreui-placeholder="ABCDEF">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>`} />
 
 ## Pre-filled values
 
 Set initial values using the `data-coreui-value` attribute.
 
-<Example pro lang="html" name="forms-otp-input-4" componentName="One Time Password (OTP) Input" code={[`<label class="form-label">OTP with pre-filled value</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-value="123456">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} html={[`<label class="form-label">OTP with pre-filled value</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-value="123456">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-4" componentName="One Time Password (OTP) Input" code={`<label class="form-label">OTP with pre-filled value</label>
+  <div class="form-otp" data-coreui-toggle="otp" data-coreui-value="123456">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+  </div>`} />
 
 ## Input modes
 
 Control user input behavior with linear and non-linear modes.
 
-<Example pro lang="html" name="forms-otp-input-5" componentName="One Time Password (OTP) Input" code={[`<div class="mb-3">`, `  <label class="form-label">Linear mode (sequential input)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Non-linear mode (free navigation)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="false">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} html={[`<div class="mb-3">`, `  <label class="form-label">Linear mode (sequential input)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Non-linear mode (free navigation)</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="false">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-5" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+    <label class="form-label">Linear mode (sequential input)</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="true">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div>
+    <label class="form-label">Non-linear mode (free navigation)</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-linear="false">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>`} />
 
 ## Auto-submit
 
 Enable automatic form submission when all one-time password fields are completed.
 
-<Example pro lang="html" name="forms-otp-input-6" componentName="One Time Password (OTP) Input" code={[`<form>`, `  <label class="form-label">Auto-submit OTP</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-auto-submit="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</form>`]} html={[`<form>`, `  <label class="form-label">Auto-submit OTP</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-auto-submit="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</form>`]} />
+<Example pro lang="html" name="forms-otp-input-6" componentName="One Time Password (OTP) Input" code={`<form>
+    <label class="form-label">Auto-submit OTP</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-auto-submit="true">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </form>`} />
 
 ## Custom layouts
 
 Create custom one-time password layouts with separators and different field counts.
 
-<Example pro lang="html" name="forms-otp-input-7" componentName="One Time Password (OTP) Input" code={[`<div class="mb-3">`, `  <label class="form-label">6-digit OTP with separators</label>`, `  <div class="form-otp" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <div class="px-2 text-body-tertiary fw-bold">-</div>`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">9-digit OTP with separators</label>`, `  <div class="form-otp" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <div class="px-2 text-body-tertiary fw-bold">•</div>`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <div class="px-2 text-body-tertiary fw-bold">•</div>`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">4-digit PIN</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-masked="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} html={[`<div class="mb-3">`, `  <label class="form-label">6-digit OTP with separators</label>`, `  <div class="form-otp" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <div class="px-2 text-body-tertiary fw-bold">-</div>`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">9-digit OTP with separators</label>`, `  <div class="form-otp" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <div class="px-2 text-body-tertiary fw-bold">•</div>`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <div class="px-2 text-body-tertiary fw-bold">•</div>`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">4-digit PIN</label>`, `  <div class="form-otp" data-coreui-toggle="otp" data-coreui-masked="true">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-7" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+    <label class="form-label">6-digit OTP with separators</label>
+    <div class="form-otp" data-coreui-toggle="otp">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <div class="px-2 text-body-tertiary fw-bold">-</div>
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">9-digit OTP with separators</label>
+    <div class="form-otp" data-coreui-toggle="otp">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <div class="px-2 text-body-tertiary fw-bold">•</div>
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <div class="px-2 text-body-tertiary fw-bold">•</div>
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div>
+    <label class="form-label">4-digit PIN</label>
+    <div class="form-otp" data-coreui-toggle="otp" data-coreui-masked="true">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>`} />
 
 ## Sizing variants
 
 One-time password input supports different sizes. You may choose from small, normal (default), and large inputs to match our similarly sized text inputs.  To adjust the size of a component, use `.form-otp-lg` or `.form-otp-sm`.
 
-<Example pro lang="html" name="forms-otp-input-8" componentName="One Time Password (OTP) Input" code={[`<div class="mb-3">`, `  <label class="form-label">Large OTP input</label>`, `  <div class="form-otp form-otp-lg" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">Default OTP input</label>`, `  <div class="form-otp" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Small OTP input</label>`, `  <div class="form-otp form-otp-sm" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} html={[`<div class="mb-3">`, `  <label class="form-label">Large OTP input</label>`, `  <div class="form-otp form-otp-lg" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div class="mb-3">`, `  <label class="form-label">Default OTP input</label>`, `  <div class="form-otp" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`, `<div>`, `  <label class="form-label">Small OTP input</label>`, `  <div class="form-otp form-otp-sm" data-coreui-toggle="otp">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `    <input class="form-otp-control">`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-8" componentName="One Time Password (OTP) Input" code={`<div class="mb-3">
+    <label class="form-label">Large OTP input</label>
+    <div class="form-otp form-otp-lg" data-coreui-toggle="otp">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Default OTP input</label>
+    <div class="form-otp" data-coreui-toggle="otp">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>
+  <div>
+    <label class="form-label">Small OTP input</label>
+    <div class="form-otp form-otp-sm" data-coreui-toggle="otp">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+      <input class="form-otp-control">
+    </div>
+  </div>`} />
 
 ## Disabled state
 
 Disable the entire one-time password input by adding the `data-coreui-disabled="true"` attribute.
 
-<Example pro lang="html" name="forms-otp-input-9" componentName="One Time Password (OTP) Input" code={[`<label class="form-label">Disabled OTP input</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-disabled="true" data-coreui-value="123456">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} html={[`<label class="form-label">Disabled OTP input</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-disabled="true" data-coreui-value="123456">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-9" componentName="One Time Password (OTP) Input" code={`<label class="form-label">Disabled OTP input</label>
+  <div class="form-otp" data-coreui-toggle="otp" data-coreui-disabled="true" data-coreui-value="123456">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+  </div>`} />
 
 ## Readonly state
 
 Use the `data-coreui-readonly="true"` attribute to make the one-time password input non-editable but still selectable.
 
-<Example pro lang="html" name="forms-otp-input-10" componentName="One Time Password (OTP) Input" code={[`<label class="form-label">Readonly OTP input</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-readonly="true" data-coreui-value="123456">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} html={[`<label class="form-label">Readonly OTP input</label>`, `<div class="form-otp" data-coreui-toggle="otp" data-coreui-readonly="true" data-coreui-value="123456">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `  <input class="form-otp-control">`, `</div>`]} />
+<Example pro lang="html" name="forms-otp-input-10" componentName="One Time Password (OTP) Input" code={`<label class="form-label">Readonly OTP input</label>
+  <div class="form-otp" data-coreui-toggle="otp" data-coreui-readonly="true" data-coreui-value="123456">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+    <input class="form-otp-control">
+  </div>`} />
 
 ## Accessibility
 

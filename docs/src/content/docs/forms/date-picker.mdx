@@ -19,73 +19,190 @@ Below is an example of a basic Bootstrap DatePicker.
 
 The following examples demonstrating how to pick dates using the Bootstrap Date Picker Component.
 
-<Example pro lang="html" name="forms-date-picker-1" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div data-coreui-date="2023/03/15" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div data-coreui-date="2023/03/15" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-1" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div data-coreui-date="2023/03/15" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 #### With timepicker
 
 In addition to supporting date selection, our Bootstrap Date Picker component also includes a Time Picker feature, allowing users to select a specific time of day. Bootstrap Time Picker can be enabled by adding `data-coreui-timepicker="true"`.
 
-<Example pro lang="html" name="forms-date-picker-2" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div data-coreui-date="2023/03/15 02:22:13 PM" data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div data-coreui-date="2023/03/15 02:22:13 PM" data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-2" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div data-coreui-date="2023/03/15 02:22:13 PM" data-coreui-locale="en-US" data-coreui-timepicker="true" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 #### With footer
 
 To add a footer, use `data-coreui-footer="true"`. The footer can display extra information or actions related to the selected date, such as buttons for "Today" or "Clear".
 
-<Example pro lang="html" name="forms-date-picker-3" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div data-coreui-date="2023/03/15" data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div data-coreui-date="2023/03/15" data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-3" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div data-coreui-date="2023/03/15" data-coreui-footer="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ### Weeks
 
 If you want to select the week number, add the `data-coreui-selection-type="week"` attribute. You can also use `data-coreui-show-week-number="true"` to show week numbers.
 
-<Example pro lang="html" name="forms-date-picker-4" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div `, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-show-week-number="true"`, `      data-coreui-selection-type="week">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2025W07"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-show-week-number="true"`, `      data-coreui-selection-type="week">`, `    </div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div `, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-show-week-number="true"`, `      data-coreui-selection-type="week">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2025W07"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-show-week-number="true"`, `      data-coreui-selection-type="week">`, `    </div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-4" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-show-week-number="true"
+        data-coreui-selection-type="week">
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div
+        data-coreui-date="2025W07"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-show-week-number="true"
+        data-coreui-selection-type="week">
+      </div>
+    </div>
+  </div>`} />
 
 ### Months
 
 Selecting whole month by adding the `data-coreui-selection-type="month"` attribute.
 
-<Example pro lang="html" name="forms-date-picker-5" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div `, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="month">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2022-08"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="month">`, `    </div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div `, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="month">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2022-08"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="month">`, `    </div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-5" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-selection-type="month">
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div
+        data-coreui-date="2022-08"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-selection-type="month">
+      </div>
+    </div>
+  </div>`} />
 
 ### Quarters
 
 Selecting quarter by adding the `data-coreui-selection-type="quarter"` attribute.
 
-<Example pro lang="html" name="forms-date-picker-6" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div `, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="quarter">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2025Q1"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="quarter">`, `    </div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div `, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="quarter">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2025Q1"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="quarter">`, `    </div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-6" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div 
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-selection-type="quarter">
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div
+        data-coreui-date="2025Q1"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-selection-type="quarter">
+      </div>
+    </div>
+  </div>`} />
 
 ### Years
 
 Add the `data-coreui-selection-type="year"` attribute to allow pick years.
 
-<Example pro lang="html" name="forms-date-picker-7" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="year">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2022"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="year">`, `    </div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <div`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="year">`, `    </div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <div`, `      data-coreui-date="2022"`, `      data-coreui-locale="en-US"`, `      data-coreui-toggle="date-picker"`, `      data-coreui-selection-type="year">`, `    </div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-7" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-selection-type="year">
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div
+        data-coreui-date="2022"
+        data-coreui-locale="en-US"
+        data-coreui-toggle="date-picker"
+        data-coreui-selection-type="year">
+      </div>
+    </div>
+  </div>`} />
 
 ## Sizing
 
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
 
-<Example pro lang="html" name="forms-date-picker-8" componentName="Date Picker" code={[`<div class="row mb-3">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`, `<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row mb-3">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`, `<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-8" componentName="Date Picker" code={`<div class="row mb-3">
+    <div class="col-lg-5">
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ## Disabled
 
 Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed out appearance and remove pointer events.
 
-<Example pro lang="html" name="forms-date-picker-9" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-9" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ## Readonly
 
 Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modification of the input's value.
 
-<Example pro lang="html" name="forms-date-picker-10" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-10" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ## Preview date on hover
 
 By default, the date picker shows a live preview in the input field when hovering over calendar dates. To disable this feature, set `data-coreui-preview-date-on-hover="false"`.
 
-<Example pro lang="html" name="forms-date-picker-11" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <label class="form-label">With preview (default)</label>`, `    <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <label class="form-label">Without preview</label>`, `    <div data-coreui-locale="en-US" data-coreui-preview-date-on-hover="false" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">`, `    <label class="form-label">With preview (default)</label>`, `    <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>`, `  </div>`, `  <div class="col-sm-6 col-lg-5">`, `    <label class="form-label">Without preview</label>`, `    <div data-coreui-locale="en-US" data-coreui-preview-date-on-hover="false" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-11" componentName="Date Picker" code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <label class="form-label">With preview (default)</label>
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-picker"></div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <label class="form-label">Without preview</label>
+      <div data-coreui-locale="en-US" data-coreui-preview-date-on-hover="false" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ## Disabled dates
 
 The CoreUI Bootstrap DatePicker component allows you to disable certain dates, such as weekends or holidays. You can accomplish this by passing the `disabledDates` option to the component, which determines which dates should be disabled based on custom logic.
 
-<Example pro lang="html" name="forms-date-picker-12" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerDisabledDates"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerDisabledDates"></div>`, `  </div>`, `</div>`]} sandboxJs={[`const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')`, ``, `const optionsDatePickerDisabledDates = {`, `  locale: 'en-US',`, `  calendarDate: new Date(2022, 2, 1),`, `  disabledDates: [`, `    [new Date(2022, 2, 4), new Date(2022, 2, 7)],`, `    new Date(2022, 2, 16),`, `    new Date(2022, 3, 16),`, `    [new Date(2022, 4, 2), new Date(2022, 4, 8)]`, `  ],`, `  maxDate: new Date(2022, 5, 0),`, `  minDate: new Date(2022, 1, 1)`, `}`, ``, `new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)`].join('\n')} />
+<Example pro lang="html" name="forms-date-picker-12" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div id="myDatePickerDisabledDates"></div>
+    </div>
+  </div>`} sandboxJs={[`const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')`, ``, `const optionsDatePickerDisabledDates = {`, `  locale: 'en-US',`, `  calendarDate: new Date(2022, 2, 1),`, `  disabledDates: [`, `    [new Date(2022, 2, 4), new Date(2022, 2, 7)],`, `    new Date(2022, 2, 16),`, `    new Date(2022, 3, 16),`, `    [new Date(2022, 4, 2), new Date(2022, 4, 8)]`, `  ],`, `  maxDate: new Date(2022, 5, 0),`, `  minDate: new Date(2022, 1, 1)`, `}`, ``, `new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)`].join('\n')} />
 
 ```js
 const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')
@@ -110,7 +227,11 @@ new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)
 
 You can disable weekends by passing a function to the `disabledDates` option. Here's how to do it:
 
-<Example pro lang="html" name="forms-date-picker-13" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerDisabledDates2"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerDisabledDates2"></div>`, `  </div>`, `</div>`]} sandboxJs={[`const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')`, ``, `const optionsDatePickerDisabledDates2 = {`, `  disabledDates(date) {`, `    const day = date.getDay()`, `    return day === 0 || day === 6`, `  },`, `  locale: 'en-US'`, `}`, ``, `new coreui.DatePicker(myDatePickerDisabledDates2, optionsDatePickerDisabledDates2)`].join('\n')} />
+<Example pro lang="html" name="forms-date-picker-13" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div id="myDatePickerDisabledDates2"></div>
+    </div>
+  </div>`} sandboxJs={[`const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')`, ``, `const optionsDatePickerDisabledDates2 = {`, `  disabledDates(date) {`, `    const day = date.getDay()`, `    return day === 0 || day === 6`, `  },`, `  locale: 'en-US'`, `}`, ``, `new coreui.DatePicker(myDatePickerDisabledDates2, optionsDatePickerDisabledDates2)`].join('\n')} />
 
 ```js
 const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')
@@ -134,25 +255,41 @@ CoreUI Date Picker allows users to display dates and times in a non-English loca
 
 By default, the DatePicker component uses the default browser locale, but it can be easily configured to use a different locale supported by the JavaScript Internationalization API. To set the locale, you can pass the desired language code as a prop to the DatePicker component. This feature enables the creation of more inclusive and accessible applications that cater to a diverse audience.
 
-<Example pro lang="html" name="forms-date-picker-14" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-14" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ### Chinese
 
 Here is an example of a simple Bootstrap Date Picker with Chinese locales.
 
-<Example pro lang="html" name="forms-date-picker-15" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-15" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ### Japanese
 
 Here is a basic Date Picker with Japanese locales.
 
-<Example pro lang="html" name="forms-date-picker-16" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="ja" data-coreui-placeholder="日付を選択" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="ja" data-coreui-placeholder="日付を選択" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-16" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="ja" data-coreui-placeholder="日付を選択" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ### Korean
 
 Take a look at the following example, which demonstrates a simple date picker designed to work with Korean locales.
 
-<Example pro lang="html" name="forms-date-picker-17" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="ko" data-coreui-placeholder="날짜 선택" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="ko" data-coreui-placeholder="날짜 선택" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-17" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div data-coreui-locale="ko" data-coreui-placeholder="날짜 선택" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ## Right to left support
 
@@ -160,11 +297,19 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ### Hebrew
 
-<Example pro lang="html" name="forms-date-picker-18" componentName="Date Picker" code={[`<div class="row" dir="rtl">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row" dir="rtl">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-18" componentName="Date Picker" code={`<div class="row" dir="rtl">
+    <div class="col-lg-5">
+      <div data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ### Persian
 
-<Example pro lang="html" name="forms-date-picker-19" componentName="Date Picker" code={[`<div class="row" dir="rtl">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} html={[`<div class="row" dir="rtl">`, `  <div class="col-lg-5">`, `    <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="date-picker"></div>`, `  </div>`, `</div>`]} />
+<Example pro lang="html" name="forms-date-picker-19" componentName="Date Picker" code={`<div class="row" dir="rtl">
+    <div class="col-lg-5">
+      <div data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="date-picker"></div>
+    </div>
+  </div>`} />
 
 ## Custom formats
 
@@ -175,7 +320,11 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
 
-<Example pro lang="html" name="forms-date-picker-20" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerCustomFormats1"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerCustomFormats1"></div>`, `  </div>`, `</div>`]} sandboxJs={[`const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')`, ``, `dayjs.extend(window.dayjs_plugin_customParseFormat)`, `const optionsDatePickerCustomFormats1 = {`, `  locale: 'en-US',`, `  date: new Date(2022, 8, 3),`, `  inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),`, `  inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()`, `}`, ``, `new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)`].join('\n')} />
+<Example pro lang="html" name="forms-date-picker-20" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div id="myDatePickerCustomFormats1"></div>
+    </div>
+  </div>`} sandboxJs={[`const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')`, ``, `dayjs.extend(window.dayjs_plugin_customParseFormat)`, `const optionsDatePickerCustomFormats1 = {`, `  locale: 'en-US',`, `  date: new Date(2022, 8, 3),`, `  inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),`, `  inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()`, `}`, ``, `new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)`].join('\n')} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -199,7 +348,11 @@ new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
-<Example pro lang="html" name="forms-date-picker-21" componentName="Date Picker" code={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerCustomFormats2"></div>`, `  </div>`, `</div>`]} html={[`<div class="row">`, `  <div class="col-lg-5">`, `    <div id="myDatePickerCustomFormats2"></div>`, `  </div>`, `</div>`]} sandboxJs={[`const myDatePickerCustomFormats2 = document.getElementById('myDatePickerCustomFormats2')`, ``, `dayjs.extend(window.dayjs_plugin_customParseFormat)`, `dayjs.locale('es')`, `const optionsDatePickerCustomFormats2 = {`, `  locale: 'es-ES',`, `  date: new Date(2022, 8, 3),`, `  inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),`, `  inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()`, `}`, ``, `new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)`].join('\n')} />
+<Example pro lang="html" name="forms-date-picker-21" componentName="Date Picker" code={`<div class="row">
+    <div class="col-lg-5">
+      <div id="myDatePickerCustomFormats2"></div>
+    </div>
+  </div>`} sandboxJs={[`const myDatePickerCustomFormats2 = document.getElementById('myDatePickerCustomFormats2')`, ``, `dayjs.extend(window.dayjs_plugin_customParseFormat)`, `dayjs.locale('es')`, `const optionsDatePickerCustomFormats2 = {`, `  locale: 'es-ES',`, `  date: new Date(2022, 8, 3),`, `  inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),`, `  inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()`, `}`, ``, `new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)`].join('\n')} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
