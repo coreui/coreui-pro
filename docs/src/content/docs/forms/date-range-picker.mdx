@@ -174,7 +174,6 @@ Add the `data-coreui-selection-type="year"` attribute to allow a pick range of y
       </div>
     </div>`} />
 
-
 ## Sizing
 
 Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
@@ -288,7 +287,6 @@ new coreui.DateRangePicker(myDateRangePickerDisabledDates2, optionsDateRangePick
 ## Custom ranges
 
 In order to configure custom date ranges in the Date Range component, you must use the `ranges` option to define a set of predefined ranges. These ranges can include predefined options such as "Today", "Yesterday", "Last 7 Days", etc.
-
 
 <Example pro code={`<div class="row">
     <div class="col-sm-6">
@@ -406,7 +404,6 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
-
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
       <div id="myDateRangePickerCustomFormats1"></div>
@@ -465,8 +462,6 @@ new coreui.DateRangePicker(myDateRangePickerCustomFormats2, optionsDateRangePick
 
 ## Usage
 
-
-
 ### Via data attributes
 
 Add `data-coreui-toggle="date-range-picker"` to a `div` element.
@@ -492,17 +487,13 @@ const dateRangePickerList = dateRangePickerElementList.map(dateRangePickerEl => 
 
 ### Options
 
-
 Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.0, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
 
-
-
 <Callout color="warning">
 Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied using data attributes.
 </Callout>
-
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -562,9 +553,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
 | `yearFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for years. Accepts built-in formats (`'numeric'` or `'2-digit'`) |
 
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
@@ -575,9 +564,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `getInstance` | Static method which allows you to get the date range picker instance associated to a DOM element, you can use it like this: `coreui.DateRangePicker.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a date range picker instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.DateRangePicker.getOrCreateInstance(element)` |
 
-
 ### Events
-
 
 | Method | Description |
 | --- | --- |
@@ -587,7 +574,6 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `shown.coreui.date-range-picker` | Fired when the calendar has been made visible to the user and CSS transitions have completed. |
 | `hide.coreui.date-range-picker` | Fires immediately when the hide instance method has been called. |
 | `hidden.coreui.date-range-picker` | Fired when the calendar has finished being hidden from the user and CSS transitions have completed. |
-
 
 ```js
 const myDateRangePicker = document.getElementById('myDateRangePicker')
@@ -611,102 +597,3 @@ DateRangePickers use local CSS variables on `.date-picker` and `.calendar` for e
 <ScssDocs file="scss/_variables.scss" capture="date-picker-variables" />
 
 <ScssDocs file="scss/_variables.scss" capture="calendar-variables" />
-
-
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDateRangePickerCustomFormats1 = document.getElementById('myDateRangePickerCustomFormats1')
-
-dayjs.extend(window.dayjs_plugin_customParseFormat)
-const optionsDateRangePickerCustomFormats1 = {
-  locale: 'en-US',
-  startDate: new Date(2022, 8, 3),
-  endDate: new Date(2022, 8, 17),
-  inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),
-  inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()
-}
-
-new coreui.DateRangePicker(myDateRangePickerCustomFormats1, optionsDateRangePickerCustomFormats1)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDateRangePickerCustomFormats2 = document.getElementById('myDateRangePickerCustomFormats2')
-
-dayjs.extend(window.dayjs_plugin_customParseFormat)
-dayjs.locale('es')
-const optionsDateRangePickerCustomFormats2 = {
-  locale: 'es-ES',
-  startDate: new Date(2022, 8, 3),
-  endDate: new Date(2022, 8, 17),
-  inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),
-  inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()
-}
-
-new coreui.DateRangePicker(myDateRangePickerCustomFormats2, optionsDateRangePickerCustomFormats2)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDateRangePickerCustomRanges = document.getElementById('myDateRangePickerCustomRanges')
-
-const optionsCustomRanges = {
-  locale: 'en-US',
-  ranges: {
-    Today: [new Date(), new Date()],
-    Yesterday: [
-      new Date(new Date().setDate(new Date().getDate() - 1)),
-      new Date(new Date().setDate(new Date().getDate() - 1))
-    ],
-    'Last 7 Days': [
-      new Date(new Date().setDate(new Date().getDate() - 6)),
-      new Date(new Date())
-    ],
-    'Last 30 Days': [
-      new Date(new Date().setDate(new Date().getDate() - 29)),
-      new Date(new Date())
-    ],
-    'This Month': [
-      new Date(new Date().setDate(1)),
-      new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
-    ],
-    'Last Month': [
-      new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
-      new Date(new Date().getFullYear(), new Date().getMonth(), 0)
-    ]
-  }
-}
-
-new coreui.DateRangePicker(myDateRangePickerCustomRanges, optionsCustomRanges)
-
-myDateRangePickerCustomRanges.addEventListener('startDateChange.coreui.date-range-picker', event => {
-  // eslint-disable-next-line no-console
-  console.log(event.date)
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDateRangePickerDisabledDates = document.getElementById('myDateRangePickerDisabledDates')
-
-const optionsDateRangePickerDisabledDates = {
-  locale: 'en-US',
-  calendarDate: new Date(2022, 2, 1),
-  disabledDates: [
-    [new Date(2022, 2, 4), new Date(2022, 2, 7)],
-    new Date(2022, 2, 16),
-    new Date(2022, 3, 16),
-    [new Date(2022, 4, 2), new Date(2022, 4, 8)]
-  ],
-  maxDate: new Date(2022, 5, 0),
-  minDate: new Date(2022, 1, 1)
-}
-
-new coreui.DateRangePicker(myDateRangePickerDisabledDates, optionsDateRangePickerDisabledDates)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDateRangePickerDisabledDates2 = document.getElementById('myDateRangePickerDisabledDates2')
-
-const optionsDateRangePickerDisabledDates2 = {
-  disabledDates(date) {
-    const day = date.getDay()
-    return day === 0 || day === 6
-  },
-  locale: 'en-US'
-}
-
-new coreui.DateRangePicker(myDateRangePickerDisabledDates2, optionsDateRangePickerDisabledDates2)
-})`} />

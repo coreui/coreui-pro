@@ -164,7 +164,6 @@ To enable the global search functionality within the Multi Select component, ple
     </optgroup>
   </select>`} />
 
-
 ## Selection types
 
 Explore different selection modes, including single and multiple selections, allowing customization based on user requirements.
@@ -664,8 +663,6 @@ You may also choose from small and large multi selects to match our similarly si
 
 ## Usage
 
-
-
 ### Via data attributes
 
 Add the `data-coreui-multi-select` attribute to a `select` element.
@@ -703,13 +700,9 @@ const mulitSelectList = mulitSelectElementList.map(mulitSelectEl => {
 
 ### Options
 
-
 Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.0, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
-
-
-
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -751,9 +744,7 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
 | `value` | boolean | `null` | Sets the initially selected values for the multi-select component. |
 
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
@@ -768,11 +759,9 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 | `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |
 | `getValue` | Returns the array with selected elements. |
 
-
 ### Events
 
 Multi Select component exposes a few events for hooking into multi select functionality.
-
 
 | Method | Description |
 | --- | --- |
@@ -782,7 +771,6 @@ Multi Select component exposes a few events for hooking into multi select functi
 | `shown.coreui.multi-select` | Fired when the multi select options have been made visible to the user and CSS transitions have completed. |
 | `hide.coreui.multi-select` | Fires immediately when the hide instance method has been called. |
 | `hidden.coreui.multi-select` | Fired when the multi select options have finished being hidden from the user and CSS transitions have completed. |
-
 
 ```js
 const myMutliSelect = document.getElementById('myMutliSelect')
@@ -803,296 +791,3 @@ MultiSelects use local CSS variables on `.multi-select` for enhanced real-time c
 ### SASS variables
 
 <ScssDocs file="scss/_variables.scss" capture="form-multi-select-variables" />
-
-
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myMultiSelect = document.getElementById('multiSelect')
-
-new coreui.MultiSelect(myMultiSelect, {
-  name: 'multiSelect',
-  options: [
-    {
-      label: 'frontend',
-      options: [
-        {
-          value: 0,
-          text: 'Angular'
-        },
-        {
-          value: 1,
-          text: 'Bootstrap',
-          selected: true
-        },
-        {
-          value: 2,
-          text: 'React.js',
-          selected: true
-        },
-        {
-          value: 3,
-          text: 'Vue.js'
-        }
-      ]
-    },
-    {
-      label: 'backend',
-      options: [
-        {
-          value: 4,
-          text: 'Django'
-        },
-        {
-          value: 5,
-          text: 'Laravel'
-        },
-        {
-          value: 6,
-          text: 'Node.js',
-          selected: true
-        }
-      ]
-    }
-  ],
-  search: true
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myMultiSelectCountries = document.getElementById('myMultiSelectCountries')
-const myMultiSelectCountriesAndCities = document.getElementById('myMultiSelectCountriesAndCities')
-
-const countries = [
-  {
-    value: 'pl',
-    text: 'Poland',
-    flag: '🇵🇱'
-  },
-  {
-    value: 'de',
-    text: 'Germany',
-    flag: '🇩🇪'
-  },
-  {
-    value: 'us',
-    text: 'United States',
-    flag: '🇺🇸'
-  },
-  {
-    value: 'es',
-    text: 'Spain',
-    flag: '🇪🇸'
-  },
-  {
-    value: 'gb',
-    text: 'United Kingdom',
-    flag: '🇬🇧'
-  }
-]
-
-const cities = [
-  {
-    label: 'United States',
-    code: 'us',
-    flag: '🇺🇸',
-    options: [
-      {
-        value: 'au',
-        text: 'Austin'
-      },
-      {
-        value: 'ch',
-        text: 'Chicago'
-      },
-      {
-        value: 'la',
-        text: 'Los Angeles'
-      },
-      {
-        value: 'ny',
-        text: 'New York'
-      },
-      {
-        value: 'sa',
-        text: 'San Jose'
-      }
-    ]
-  },
-  {
-    label: 'United Kingdom',
-    code: 'gb',
-    flag: '🇬🇧',
-    options: [
-      {
-        value: 'li',
-        text: 'Liverpool'
-      },
-      {
-        value: 'lo',
-        text: 'London'
-      },
-      {
-        value: 'ma',
-        text: 'Manchester'
-      }
-    ]
-  }
-]
-
-new coreui.MultiSelect(myMultiSelectCountries, {
-  cleaner: true,
-  multiple: true,
-  options: countries,
-  optionsTemplate(option) {
-    return \`<div class="d-flex align-items-center gap-2"><span class="fs-5">\${option.flag}</span><span>\${option.text}</span></div>\`
-  },
-  placeholder: 'Select countries',
-  search: true,
-  selectAllLabel: 'Select all countries',
-  deselectAllLabel: 'Deselect all countries',
-  selectionType: 'tags'
-})
-
-new coreui.MultiSelect(myMultiSelectCountriesAndCities, {
-  cleaner: true,
-  multiple: true,
-  options: cities,
-  optionsGroupsTemplate(optionGroup) {
-    return \`<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">\${optionGroup.flag}</span><span>\${optionGroup.label}</span></div>\`
-  },
-  placeholder: 'Select cities',
-  search: true,
-  selectAllLabel: 'Select all cities',
-  deselectAllLabel: 'Deselect all cities',
-  selectionType: 'tags'
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myMultiSelectHeader = document.getElementById('myMultiSelectHeader')
-
-new coreui.MultiSelect(myMultiSelectHeader, {
-  multiple: true,
-  options: [
-    { value: 'angular', text: 'Angular' },
-    { value: 'bootstrap', text: 'Bootstrap' },
-    { value: 'react', text: 'React.js' },
-    { value: 'vue', text: 'Vue.js' },
-    { value: 'django', text: 'Django' },
-    { value: 'laravel', text: 'Laravel' },
-    { value: 'node', text: 'Node.js' }
-  ],
-  placeholder: 'Select frameworks',
-  search: true,
-  selectionType: 'tags',
-  headerTemplate(state, actions) {
-    const wrapper = document.createElement('div')
-    wrapper.className = 'd-flex flex-wrap gap-2'
-
-    const selectAll = document.createElement('button')
-    selectAll.type = 'button'
-    selectAll.className = 'btn btn-sm btn-primary'
-    selectAll.textContent = \`Select all (\${state.total})\`
-    selectAll.disabled = state.selected >= state.total
-    selectAll.addEventListener('click', () => actions.selectAll())
-
-    const selectFiltered = document.createElement('button')
-    selectFiltered.type = 'button'
-    selectFiltered.className = 'btn btn-sm btn-secondary'
-    selectFiltered.textContent = \`Select filtered (\${state.filtered})\`
-    selectFiltered.disabled = state.filtered === state.filteredSelected
-    selectFiltered.addEventListener('click', () => actions.selectFiltered())
-
-    const deselectFiltered = document.createElement('button')
-    deselectFiltered.type = 'button'
-    deselectFiltered.className = 'btn btn-sm btn-outline-secondary'
-    deselectFiltered.textContent = \`Deselect filtered (\${state.filteredSelected})\`
-    deselectFiltered.disabled = state.filteredSelected === 0
-    deselectFiltered.addEventListener('click', () => actions.deselectFiltered())
-
-    const deselectAll = document.createElement('button')
-    deselectAll.type = 'button'
-    deselectAll.className = 'btn btn-sm btn-outline-danger'
-    deselectAll.textContent = \`Deselect all (\${state.selected})\`
-    deselectAll.disabled = state.selected === 0
-    deselectAll.addEventListener('click', () => actions.deselectAll())
-
-    wrapper.append(selectAll, selectFiltered, deselectFiltered, deselectAll)
-    return wrapper
-  }
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myMultiSelectIndeterminate = document.getElementById('myMultiSelectIndeterminate')
-
-new coreui.MultiSelect(myMultiSelectIndeterminate, {
-  multiple: true,
-  optionsGroupsSelectable: true,
-  options: [
-    {
-      label: 'Frontend',
-      options: [
-        { value: 'angular', text: 'Angular' },
-        { value: 'react', text: 'React.js' },
-        { value: 'vue', text: 'Vue.js' }
-      ]
-    },
-    {
-      label: 'Backend',
-      options: [
-        { value: 'django', text: 'Django' },
-        { value: 'laravel', text: 'Laravel' },
-        { value: 'node', text: 'Node.js' }
-      ]
-    }
-  ],
-  placeholder: 'Select frameworks',
-  search: true,
-  selectAllStyle: 'checkbox',
-  selectionType: 'counter'
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const getMultiSelectSelectionLimitToastContainer = () => {
-  let container = document.getElementById('multiSelectSelectionLimitToastContainer')
-
-  if (!container) {
-    container = document.createElement('div')
-    container.id = 'multiSelectSelectionLimitToastContainer'
-    container.className = 'toast-container position-fixed bottom-0 end-0 p-3'
-    container.setAttribute('aria-live', 'polite')
-    container.setAttribute('aria-atomic', 'true')
-    document.body.append(container)
-  }
-
-  return container
-}
-
-const showMultiSelectSelectionLimitToast = message => {
-  const toast = document.createElement('div')
-  toast.classList.add('toast')
-  toast.setAttribute('role', 'alert')
-  toast.setAttribute('aria-live', 'assertive')
-  toast.setAttribute('aria-atomic', 'true')
-  toast.innerHTML = [
-    '<div class="toast-header">',
-    '  <strong class="me-auto">Selection limit</strong>',
-    '  <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>',
-    '</div>',
-    \`<div class="toast-body">\${message}</div>\`
-  ].join('')
-
-  getMultiSelectSelectionLimitToastContainer().append(toast)
-
-  toast.addEventListener('hidden.coreui.toast', () => {
-    toast.remove()
-  })
-
-  coreui.Toast.getOrCreateInstance(toast).show()
-}
-
-document.addEventListener('selectionLimit.coreui.multi-select', event => {
-  if (event.target.id !== 'multiSelectSelectionLimit') {
-    return
-  }
-
-  showMultiSelectSelectionLimitToast(\`You can select up to \${event.selectionLimit} options.\`)
-})
-})`} />

@@ -319,7 +319,6 @@ The provided code demonstrates how to use the `inputDateFormat` and `inputDatePa
 
 The `inputDateFormat` property formats the date into a custom string, while the `inputDateParse` property parses a custom string into a Date object. The code showcases the date range in different formats based on locale, such as 'MMMM DD, YYYY' and 'YYYY MMMM DD', and accommodates different locales, like 'en-US' and 'es-ES'.
 
-
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
       <div id="myDatePickerCustomFormats1"></div>
@@ -377,8 +376,6 @@ new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats
 
 ## Usage
 
-
-
 ### Via data attributes
 
 Add `data-coreui-toggle="date-picker"` to a `div` element.
@@ -404,17 +401,13 @@ const datePickerList = datePickerElementList.map(datePickerEl => {
 
 ### Options
 
-
 Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.0, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
 
-
-
 <Callout color="warning">
 Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied using data attributes.
 </Callout>
-
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -468,9 +461,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
 | `yearFormat` | `'numeric'`, `'2-digit'` | `'numeric'` | Sets the format for years. Accepts built-in formats (`'numeric'` or `'2-digit'`) |
 
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
@@ -481,9 +472,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `getInstance` | Static method which allows you to get the date picker instance associated to a DOM element, you can use it like this: `coreui.DatePicker.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a date picker instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.DatePicker.getOrCreateInstance(element)` |
 
-
 ### Events
-
 
 | Method | Description |
 | --- | --- |
@@ -492,7 +481,6 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `shown.coreui.date-picker` | Fired when the calendar has been made visible to the user and CSS transitions have completed. |
 | `hide.coreui.date-picker` | Fires immediately when the hide instance method has been called. |
 | `hidden.coreui.date-picker` | Fired when the calendar has finished being hidden from the user and CSS transitions have completed. |
-
 
 ```js
 const myDatePicker = document.getElementById('myDatePicker')
@@ -516,63 +504,3 @@ DatePickers use local CSS variables on `.date-picker` and `.calendar` for enhanc
 <ScssDocs file="scss/_variables.scss" capture="date-picker-variables" />
 
 <ScssDocs file="scss/_variables.scss" capture="calendar-variables" />
-
-
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')
-
-dayjs.extend(window.dayjs_plugin_customParseFormat)
-const optionsDatePickerCustomFormats1 = {
-  locale: 'en-US',
-  date: new Date(2022, 8, 3),
-  inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),
-  inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()
-}
-
-new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDatePickerCustomFormats2 = document.getElementById('myDatePickerCustomFormats2')
-
-dayjs.extend(window.dayjs_plugin_customParseFormat)
-dayjs.locale('es')
-const optionsDatePickerCustomFormats2 = {
-  locale: 'es-ES',
-  date: new Date(2022, 8, 3),
-  inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),
-  inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()
-}
-
-new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')
-
-const optionsDatePickerDisabledDates = {
-  locale: 'en-US',
-  calendarDate: new Date(2022, 2, 1),
-  disabledDates: [
-    [new Date(2022, 2, 4), new Date(2022, 2, 7)],
-    new Date(2022, 2, 16),
-    new Date(2022, 3, 16),
-    [new Date(2022, 4, 2), new Date(2022, 4, 8)]
-  ],
-  maxDate: new Date(2022, 5, 0),
-  minDate: new Date(2022, 1, 1)
-}
-
-new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')
-
-const optionsDatePickerDisabledDates2 = {
-  disabledDates(date) {
-    const day = date.getDay()
-    return day === 0 || day === 6
-  },
-  locale: 'en-US'
-}
-
-new coreui.DatePicker(myDatePickerDisabledDates2, optionsDatePickerDisabledDates2)
-})`} />

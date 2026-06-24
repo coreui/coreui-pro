@@ -96,7 +96,6 @@ new coreui.TimePicker(myTimePickerCustom, options)
 
 In this configuration, the Bootstrap TimePicker restricts hours to a predefined set, minutes to quarter intervals, and seconds to values under 20, offering a high degree of customization for precise time selection scenarios.
 
-
 ## Non-english locale
 
 CoreUI Time Picker allows you to display times in a non-English locale, ideal for international users or multilingual applications.
@@ -163,8 +162,6 @@ RTL support is built-in and can be explicitly controlled through the `$enable-rt
 
 ## Usage
 
-
-
 ### Via data attributes
 
 Add `data-coreui-toggle="time-picker"` to a `div` element.
@@ -190,13 +187,9 @@ const timePickerList = timePickerElementList.map(timePickerEl => {
 
 ### Options
 
-
 Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.0, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
-
-
-
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -229,7 +222,6 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 
 ### Methods
 
-
 | Method | Description |
 | --- | --- |
 | `clear` | Clear selection of the time picker. |
@@ -239,9 +231,7 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 | `getInstance` | Static method which allows you to get the time picker instance associated to a DOM element, you can use it like this: `coreui.TimePicker.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a time picker instance associated to a DOM element or create a new one in case it wasn't initialized.  You can use it like this: `coreui.TimePicker.getOrCreateInstance(element)` |
 
-
 ### Events
-
 
 | Method | Description |
 | --- | --- |
@@ -250,7 +240,6 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 | `shown.coreui.time-picker` | Fired when the dropdown has been made visible to the user and CSS transitions have completed. |
 | `hide.coreui.time-picker` | Fires immediately when the hide instance method has been called. |
 | `hidden.coreui.time-picker` | Fired when the dropdown has finished being hidden from the user and CSS transitions have completed. |
-
 
 ```js
 const myTimePicker = document.getElementById('myTimePicker')
@@ -270,17 +259,3 @@ TimePickers use local CSS variables on `.time-picker` for enhanced real-time cus
 ### SASS variables
 
 <ScssDocs file="scss/_variables.scss" capture="time-picker-variables" />
-
-
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myTimePickerCustom = document.getElementById('myTimePickerCustom')
-
-const options = {
-  locale: 'en-US',
-  hours: [1, 3, 5, 7],
-  minutes: [0, 15, 30, 45],
-  seconds: s => s < 20
-}
-
-new coreui.TimePicker(myTimePickerCustom, options)
-})`} />

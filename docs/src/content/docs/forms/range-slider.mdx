@@ -186,8 +186,6 @@ If you set `data-coreui-track` to `false`, the slider's track will not display a
 
 ### Via data attributes
 
-
-
 Add `data-coreui-toggle="range-slider"` to a `div` element.
 
 ```html
@@ -220,17 +218,13 @@ const rangeSlider = new RangeSlider(rangeSliderElement, {
 
 ### Options
 
-
 Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.0, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
 
-
-
 <Callout color="warning">
 Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowList` options cannot be supplied via data attributes.
 </Callout>
-
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -251,10 +245,7 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `sanitize` | boolean | `true` | Controls whether HTML content in the tooltip should be sanitized before rendering. Strongly recommended to leave enabled unless you’re fully managing the content and trust its source. |
 | `sanitizeFn` | null, function | `null` | You can define your own custom sanitization logic by passing a function here. Ideal if you want to use a specialized HTML sanitizer or integrate with existing security tool. |
 
-
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
@@ -263,15 +254,12 @@ Please note that for security reasons, the `sanitize`, `sanitizeFn`, and `allowL
 | `getInstance` | Static method which allows you to get the Range Slider instance associated to a DOM element, you can use it like this: `coreui.RangeSlider.getInstance(element)` |
 | `getOrCreateInstance` | Static method which returns a Range Slider instance associated to a DOM element or create a new one in case it wasn't initialized. You can use it like this: `coreui.Rating.getOrCreateInstance(element)` |
 
-
 ### Events
-
 
 | Method | Description |
 | --- | --- |
 | `change.coreui.range-slider` | Fired when the slider value changes and the user finishes interacting (mouse up). |
 | `input.coreui.range-slider` | Fired continuously while the slider value is being changed during user interaction. |
-
 
 ```js
 const myRangeSlider = document.getElementById('myRangeSlider')
@@ -305,68 +293,3 @@ Bootstap Range Sliders use local CSS variables on `.range-slider` for enhanced r
 ### SASS variables
 
 <ScssDocs file="scss/_variables.scss" capture="range-slider-variables" />
-
-
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myRangeSliderCustomLabels = document.getElementById('myRangeSliderCustomLabels')
-
-const optionsRangeSliderCustomLabels = {
-  min: -50,
-  max: 100,
-  labels: [
-    {
-      value: -50,
-      label: '-50°C',
-      class: 'text-info'
-    },
-    {
-      value: 0,
-      label: '0°C',
-      style: {
-        fontWeight: 'bold'
-      }
-    },
-    {
-      value: 20,
-      label: '20°C',
-      class: ['text-warning']
-    },
-    {
-      value: 100,
-      label: '100°C',
-      class: 'text-danger'
-    }
-  ],
-  tooltipsFormat: value => \`\${value}°C\`,
-  value: [-10, 40]
-}
-new coreui.RangeSlider(myRangeSliderCustomLabels, optionsRangeSliderCustomLabels)
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myRangeSliderCustomTooltips = document.getElementById('myRangeSliderCustomTooltips')
-
-const optionsRangeSliderCustomTooltips = {
-  max: 1000,
-  labels: [
-    {
-      value: 0,
-      label: '$0'
-    },
-    {
-      value: 250,
-      label: '$250'
-    },
-    {
-      value: 500,
-      label: '$500'
-    },
-    {
-      value: 1000,
-      label: '$1000'
-    }
-  ],
-  tooltipsFormat: value => \`$\${value}\`,
-  value: [100, 350]
-}
-new coreui.RangeSlider(myRangeSliderCustomTooltips, optionsRangeSliderCustomTooltips)
-})`} />

@@ -147,64 +147,10 @@ You can configure CoreUI's AutoComplete component to fetch and display options d
 
 This example shows how to connect the AutoComplete to a remote API to search users by first name.
 
-<Example code={`<div id="myAutoCompleteExternalData"></div>`} />
+<Example code={`<div id="myAutoCompleteExternalData"></div>`} sandboxJs={[`const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExternalData')`, ``, `const getUsers = async (name = '') => {`, `  try {`, `    const response = await fetch(\`https://apitest.coreui.io/demos/users?first_name=\${name}&limit=10\`)`, `    const users = await response.json()`, ``, `    return users.records.map(user => ({`, `      value: user.id,`, `      label: user.first_name`, `    }))`, `  } catch (error) {`, `    // eslint-disable-next-line no-console`, `    console.error('Error fetching users:', error)`, `  }`, `}`, ``, `const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {`, `  cleaner: true,`, `  highlightOptionsOnSearch: true,`, `  name: 'autocomplete-external',`, `  options: [],`, `  placeholder: 'Search names...',`, `  search: ['external', 'global'], // 🔴 'external' is required for external search`, `  showHints: true`, `})`, ``, `let lastQuery = null`, `let debounceTimer = null`, ``, `myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {`, `  const users = await getUsers()`, `  autocomplete.update({ options: users })`, `})`, ``, `myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {`, `  const query = event.value`, ``, `  if (query === lastQuery) {`, `    return`, `  }`, ``, `  lastQuery = query`, ``, `  clearTimeout(debounceTimer)`, ``, `  debounceTimer = setTimeout(async () => {`, `    const users = await getUsers(query)`, `    autocomplete.update({ options: users })`, `  }, 200)`, `})`].join('\n')} />
 
 To fetch data from an external source, you must set the search option to `'external'` or `['external', 'global']`.
 This disables internal filtering and allows you to provide custom data (e.g., from an API) based on user input.
-
-```js
-const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExternalData')
-
-const getUsers = async (name = '') => {
-  try {
-    const response = await fetch(`https://apitest.coreui.io/demos/users?first_name=${name}&limit=10`)
-    const users = await response.json()
-
-    return users.records.map(user => ({
-      value: user.id,
-      label: user.first_name
-    }))
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error fetching users:', error)
-  }
-}
-
-const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {
-  cleaner: true,
-  highlightOptionsOnSearch: true,
-  name: 'autocomplete-external',
-  options: [],
-  placeholder: 'Search names...',
-  search: ['external', 'global'], // 🔴 'external' is required for external search
-  showHints: true
-})
-
-let lastQuery = null
-let debounceTimer = null
-
-myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {
-  const users = await getUsers()
-  autocomplete.update({ options: users })
-})
-
-myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {
-  const query = event.value
-
-  if (query === lastQuery) {
-    return
-  }
-
-  lastQuery = query
-
-  clearTimeout(debounceTimer)
-
-  debounceTimer = setTimeout(async () => {
-    const users = await getUsers(query)
-    autocomplete.update({ options: users })
-  }, 200)
-})
-```
 
 ## Search functionality
 
@@ -455,10 +401,7 @@ new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
 })
 ```
 
-
 ## Usage
-
-
 
 ### Via data attributes
 
@@ -494,13 +437,9 @@ const autoCompleteList = autoCompleteElementList.map(autoCompleteEl => {
 
 ### Options
 
-
 Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.0, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
-
-
-
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -531,9 +470,7 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 | `valid` | boolean | `false` | Applies valid styling to the component. |
 | `value` | number, string, null | `null` | Sets the initial value of the component. |
 
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
@@ -546,11 +483,9 @@ Starting with CoreUI 4.2.0, all components support an **experimental** reserved 
 | `dispose` | Destroys the component instance and removes stored data. |
 | `getInstance` | Static method to get the Bootstrap autocomplete instance associated with a DOM element. |
 
-
 ### Events
 
 The Autocomplete component exposes several events for integrating with application logic.
-
 
 | Event | Description |
 | --- | --- |
@@ -560,7 +495,6 @@ The Autocomplete component exposes several events for integrating with applicati
 | `hide.coreui.autocomplete` | Event fires immediately when the hide method is called. |
 | `hidden.coreui.autocomplete` | Fired when the dropdown has been hidden and CSS transitions completed. |
 | `input.coreui.autocomplete` | Fires when the search input value changes. |
-
 
 ```js
 const myAutocomplete = document.getElementById('myAutocomplete')
@@ -593,7 +527,6 @@ The Autocomplete component includes several accessibility features:
 
 ### Keyboard shortcuts
 
-
 | Key | Action |
 | --- | --- |
 | <kbd>Arrow Down</kbd> | Navigate to the next option or open dropdown |
@@ -602,7 +535,6 @@ The Autocomplete component includes several accessibility features:
 | <kbd>Escape</kbd> | Close the dropdown and clear focus |
 | <kbd>Tab</kbd> | Accept hint completion (when hints are enabled) |
 | <kbd>Backspace</kbd>/<kbd>Delete</kbd> | Clear input and trigger search |
-
 
 ## Customizing
 
@@ -615,241 +547,3 @@ Autocomplete components use local CSS variables on `.autocomplete` for enhanced 
 ### SASS variables
 
 <ScssDocs file="scss/_variables.scss" capture="autocomplete-variables" />
-
-
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myAutoComplete = document.getElementById('myAutoComplete')
-
-new coreui.Autocomplete(myAutoComplete, {
-  name: 'autocomplete',
-  options: [
-    'Angular',
-    'Bootstrap',
-    {
-      label: 'React.js',
-      disabled: true
-    },
-    'Vue.js',
-    {
-      label: 'backend',
-      options: ['Django', 'Laravel', 'Node.js']
-    }
-  ],
-  value: 'Laravel'
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myAutocompleteCountries = document.getElementById('myAutocompleteCountries')
-const myAutocompleteCountriesAndCities = document.getElementById('myAutocompleteCountriesAndCities')
-
-const countries = [
-  {
-    value: 'pl',
-    label: 'Poland',
-    flag: '🇵🇱'
-  },
-  {
-    value: 'de',
-    label: 'Germany',
-    flag: '🇩🇪'
-  },
-  {
-    value: 'us',
-    label: 'United States',
-    flag: '🇺🇸'
-  },
-  {
-    value: 'es',
-    label: 'Spain',
-    flag: '🇪🇸'
-  },
-  {
-    value: 'gb',
-    label: 'United Kingdom',
-    flag: '🇬🇧'
-  }
-]
-
-const cities = [
-  {
-    label: 'United States',
-    code: 'us',
-    flag: '🇺🇸',
-    options: [
-      {
-        value: 'au',
-        label: 'Austin'
-      },
-      {
-        value: 'ch',
-        label: 'Chicago'
-      },
-      {
-        value: 'la',
-        label: 'Los Angeles'
-      },
-      {
-        value: 'ny',
-        label: 'New York'
-      },
-      {
-        value: 'sa',
-        label: 'San Jose'
-      }
-    ]
-  },
-  {
-    label: 'United Kingdom',
-    code: 'gb',
-    flag: '🇬🇧',
-    options: [
-      {
-        value: 'li',
-        label: 'Liverpool'
-      },
-      {
-        value: 'lo',
-        label: 'London'
-      },
-      {
-        value: 'ma',
-        label: 'Manchester'
-      }
-    ]
-  }
-]
-
-new coreui.Autocomplete(myAutocompleteCountries, {
-  cleaner: true,
-  indicator: true,
-  options: countries,
-  optionsTemplate(option) {
-    return \`<div class="d-flex align-items-center gap-2"><span class="fs-5">\${option.flag}</span><span>\${option.label}</span></div>\`
-  },
-  placeholder: 'Select country',
-  showHints: true,
-  search: 'global'
-})
-
-new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
-  cleaner: true,
-  indicator: true,
-  options: cities,
-  optionsGroupsTemplate(optionGroup) {
-    return \`<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">\${optionGroup.flag}</span><span>\${optionGroup.label}</span></div>\`
-  },
-  placeholder: 'Select city',
-  showHints: true,
-  search: 'global'
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExternalData')
-
-const getUsers = async (name = '') => {
-  try {
-    const response = await fetch(\`https://apitest.coreui.io/demos/users?first_name=\${name}&limit=10\`)
-    const users = await response.json()
-
-    return users.records.map(user => ({
-      value: user.id,
-      label: user.first_name
-    }))
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error fetching users:', error)
-  }
-}
-
-const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {
-  cleaner: true,
-  highlightOptionsOnSearch: true,
-  name: 'autocomplete-external',
-  options: [],
-  placeholder: 'Search names...',
-  search: ['external', 'global'], // 🔴 'external' is required for external search
-  showHints: true
-})
-
-let lastQuery = null
-let debounceTimer = null
-
-myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {
-  const users = await getUsers()
-  autocomplete.update({ options: users })
-})
-
-myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {
-  const query = event.value
-
-  if (query === lastQuery) {
-    return
-  }
-
-  lastQuery = query
-
-  clearTimeout(debounceTimer)
-
-  debounceTimer = setTimeout(async () => {
-    const users = await getUsers(query)
-    autocomplete.update({ options: users })
-  }, 200)
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')
-
-new coreui.Autocomplete(myAutoCompleteGrouped, {
-  name: 'autocomplete-grouped',
-  options: [
-    'Angular',
-    {
-      label: 'Bootstrap',
-      selected: true
-    },
-    {
-      label: 'React.js',
-      disabled: true
-    },
-    'Vue.js',
-    {
-      label: 'backend',
-      options: ['Django', 'Laravel', 'Node.js']
-    }
-  ]
-})
-})`} />
-<script is:inline set:html={`document.addEventListener('DOMContentLoaded', function () {
-const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')
-
-new coreui.Autocomplete(myAutoCompleteValues, {
-  cleaner: true,
-  indicator: true,
-  name: 'autocomplete-option-values',
-  options: [
-    { label: 'Product A', value: 1 },
-    { label: 'Product B', value: 2 },
-    { label: 'Product C', value: 3.5 },
-    { label: 'Product D', value: 42 },
-    {
-      label: 'Categories',
-      options: [
-        { label: 'Electronics', value: 100 },
-        { label: 'Books', value: 200 },
-        { label: 'Clothing', value: 300 }
-      ]
-    }
-  ],
-  placeholder: 'Select product by ID...',
-  search: 'global',
-  value: 100
-})
-
-// Log the selected value to demonstrate that numbers are converted to strings
-myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {
-  // eslint-disable-next-line no-console
-  console.log('Selected value:', event.value.value)
-  // eslint-disable-next-line no-console
-  console.log('Selected label:', event.value.label)
-})
-})`} />
