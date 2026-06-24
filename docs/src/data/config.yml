@@ -31,6 +31,10 @@ seo:
     - { name: CoreUI, item: https://coreui.io }
     - { name: Documentation, item: https://coreui.io/bootstrap/docs/ }
 
+ads:
+  code: CEAICKJY
+  placement: coreuiio
+
 # DocSearch (Algolia) — the live vanilla docs keys.
 search:
   appId: 5OOVC1SDJS
