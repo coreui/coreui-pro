@@ -347,7 +347,7 @@ document.addEventListener('selectionLimit.coreui.multi-select', event => {
 
 Add the `data-coreui-multiple="false"` boolean attribute to implement single-selection mode, enabling users to select only one option from the dropdown at a time.
 
-<Example pro code={`<select id="single-select" data-coreui-multi-select data-coreui-multiple="false">
+<Example pro code={`<select id="single-select-example" data-coreui-multi-select data-coreui-multiple="false">
     <option value="0">Angular</option>
     <option value="1">Bootstrap</option>
     <option value="2">React.js</option>
@@ -363,7 +363,7 @@ Add the `data-coreui-multiple="false"` boolean attribute to implement single-sel
 
 Add the `data-coreui-disabled="true"` boolean attribute to give it a grayed out appearance, remove pointer events, and prevent focusing.
 
-<Example pro code={`<select id="ms1" data-coreui-multi-select multiple data-coreui-search="true"  data-coreui-disabled="true">
+<Example pro code={`<select id="ms1-disabled" data-coreui-multi-select multiple data-coreui-search="true"  data-coreui-disabled="true">
     <option value="0">Angular</option>
     <option value="1">Bootstrap</option>
     <option value="2">React.js</option>
@@ -612,7 +612,7 @@ You may also choose from small and large multi selects to match our similarly si
 
 <Example pro code={`<div class="row">
     <div class="col-md-6">
-      <select id="multiple-select-counter" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
+      <select id="multiple-select-counter-lg" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -623,7 +623,7 @@ You may also choose from small and large multi selects to match our similarly si
           <option value="6">Node.js</option>
         </optgroup>
       </select>
-      <select id="multiple-select-counter" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
+      <select id="multiple-select-counter-sm" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -636,7 +636,7 @@ You may also choose from small and large multi selects to match our similarly si
       </select>
     </div>
     <div class="col-md-6">
-      <select id="multiple-select-counter" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
+      <select id="multiple-select-tags-lg" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -647,7 +647,7 @@ You may also choose from small and large multi selects to match our similarly si
           <option value="6">Node.js</option>
         </optgroup>
       </select>
-      <select id="multiple-select-counter" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
+      <select id="multiple-select-tags-sm" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
