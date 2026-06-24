@@ -285,7 +285,6 @@ const otp = new coreui.OTPInput(element, {
 
 The one-time password input component provides comprehensive keyboard navigation support:
 
-
 | Key | Action |
 | --- | --- |
 | <kbd>Arrow Right</kbd> | Move focus to next input field |
@@ -295,10 +294,7 @@ The one-time password input component provides comprehensive keyboard navigation
 | <kbd>Shift</kbd> + <kbd>Tab</kbd> | Move to previous focusable element |
 | <kbd>Ctrl</kbd> + <kbd>V</kbd> / <kbd>Cmd</kbd> + <kbd>V</kbd> | Paste clipboard content and auto-fill fields |
 
-
 ## Usage
-
-
 
 ### Via data attributes
 
@@ -333,7 +329,6 @@ const otp = new coreui.OTPInput(otpElement, {
 
 Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-type="number"`.
 
-
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `ariaLabel` | function | `(index, total) => Digit ${index + 1} of ${total}` | Function to generate aria-label for each input field. Receives current index (0-based) and total number of inputs |
@@ -349,16 +344,13 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 | `type` | string | `'number'` | Input validation type: 'number' for digits only, or any other string for free text |
 | `value` | string, number, null | `null` | Initial value for the OTP input |
 
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
 | `clear` | Clear all OTP input fields |
 | `reset` | Reset OTP input to its initial value |
 | `update` | Update the OTP input configuration |
-
 
 ```javascript
 const otp = coreui.OTPInput.getInstance(document.querySelector('.form-otp'))
@@ -369,12 +361,10 @@ otp.update({ type: 'number', masked: true }) // Update configuration
 
 ### Events
 
-
 | Event | Description |
 | --- | --- |
 | `change.coreui.otp-input` | Fired whenever the OTP value changes |
 | `complete.coreui.otp-input` | Fired when all OTP fields are filled |
-
 
 ```javascript
 document.addEventListener('change.coreui.otp-input', event => {
@@ -395,4 +385,3 @@ document.addEventListener('complete.coreui.otp-input', event => {
 Customize the appearance of the one-time password input using the following SASS variables:
 
 <ScssDocs file="scss/_variables.scss" capture="form-otp-variables" />
-

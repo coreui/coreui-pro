@@ -16,18 +16,13 @@ There are two strict requirements for enabling RTL in Bootstrap-powered pages.
 
 From there, you'll need to include an RTL version of our CSS. For example, here's the stylesheet for our compiled and minified CSS with RTL enabled:
 
-
-
 ```html tab={"label":"CoreUI"}
 <link rel="stylesheet" href="[[config:cdn.css_rtl]]" integrity="[[config:cdn.css_rtl_hash]]" crossorigin="anonymous">
 ```
 
-
 ```html tab={"label":"CoreUI PRO"}
 <link rel="stylesheet" href="[[config:cdn_pro.css_pro_rtl]]" integrity="[[config:cdn_pro.css_pro_rtl_hash]]" crossorigin="anonymous">
 ```
-
-
 
 ### Starter template
 
@@ -87,7 +82,6 @@ Working with RTL, through our source Sass or compiled CSS, shouldn't be much dif
 
 When it comes to [customization](/customize/sass/), the preferred way is to take advantage of variables, maps, and mixins.
 
-
 ### LTR and RTL at the same time
 
 Need both LTR and RTL on the same page? All you have to do is set following variables:
@@ -109,7 +103,6 @@ $enable-rtl: true;
 
 @import "../node_modules/@coreui/coreui/scss/coreui";
 ```
-
 
 After running Sass, each selector in your CSS files will be prepended by `html:not([dir=rtl])`, and `*[dir=rtl]` for RTL files. Now you're able to use both files on the same page.
 
@@ -138,4 +131,3 @@ $enable-rtl: true;
 ## Additional resources
 
 - [RTL Styling 101](https://rtlstyling.com/posts/rtl-styling)
-

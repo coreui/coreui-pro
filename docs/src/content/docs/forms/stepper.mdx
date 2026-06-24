@@ -542,17 +542,13 @@ Thanks to these features, your form wizard will be fully compliant with WCAG and
 
 The Stepper component supports comprehensive keyboard navigation out of the box:
 
-
 | Key | Function |
 | --- | --- |
 | <kbd>ArrowLeft</kbd> / <kbd>ArrowUp</kbd> | Moves focus to previous step. |
 | <kbd>ArrowRight</kbd> / <kbd>ArrowDown</kbd> | Moves focus to next step. |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Jumps focus to first or last step |
 
-
 ## Usage
-
-
 
 ### Via data attributes
 
@@ -581,15 +577,12 @@ const stepperList = stepperElementList.map(stepperEl => {
 
 ### Options
 
-
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `linear` | boolean | `true` | Forces steps to be completed in order (sequential navigation). Set `false` for free navigation. |
 | `skipValidation` | boolean | `false` | When set to `true`, disables form validation completely, allowing users to navigate between steps regardless of form state. |
 
-
 ### Methods
-
 
 | Method | Description |
 | --- | --- |
@@ -601,9 +594,7 @@ const stepperList = stepperElementList.map(stepperEl => {
 | `getInstance(element)` | Retrieve the Stepper instance from a DOM element. |
 | `getOrCreateInstance(element)` | Get or create the Stepper instance associated with a DOM element. |
 
-
 ### Events
-
 
 | Event | Description |
 | --- | --- |
@@ -611,7 +602,6 @@ const stepperList = stepperElementList.map(stepperEl => {
 | `reset.coreui.stepper` | Triggered when the stepper is reset. |
 | `stepChange.coreui.stepper` | Fired when the active step changes. |
 | `stepValidationComplete.coreui.stepper` | Fired after validating the current step's form. |
-
 
 Example:
 
@@ -636,4 +626,3 @@ The Stepper component uses CSS variables to allow easy customization of colors, 
 Advanced theming is possible via Sass variables.
 
 <ScssDocs file="scss/_variables.scss" capture="stepper-variables" />
-
