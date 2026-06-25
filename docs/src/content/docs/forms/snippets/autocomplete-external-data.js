@@ -10,7 +10,6 @@ const getUsers = async (name = '') => {
       label: user.first_name
     }))
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error fetching users:', error)
   }
 }

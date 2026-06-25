@@ -36,7 +36,6 @@ const fetchPricingData = async (startDate, endDate, view = 'days', limit = 400) 
       }
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Error fetching pricing data:', error)
   }
 }

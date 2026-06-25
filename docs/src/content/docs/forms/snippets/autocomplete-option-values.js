@@ -25,8 +25,7 @@ new coreui.Autocomplete(myAutoCompleteValues, {
 
 // Log the selected value to demonstrate that numbers are converted to strings
 myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {
-  // eslint-disable-next-line no-console
   console.log('Selected value:', event.value.value)
-  // eslint-disable-next-line no-console
+
   console.log('Selected label:', event.value.label)
 })
