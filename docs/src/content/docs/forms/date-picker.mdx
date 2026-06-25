@@ -11,6 +11,11 @@ js:
   - https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js
 ---
 
+import datePickerDisabledDates from './snippets/date-picker-disabled-dates.js?raw'
+import datePickerDisabledDates2 from './snippets/date-picker-disabled-dates2.js?raw'
+import datePickerCustomFormats1 from './snippets/date-picker-custom-formats1.js?raw'
+import datePickerCustomFormats2 from './snippets/date-picker-custom-formats2.js?raw'
+
 ## Example
 
 Below is an example of a basic Bootstrap DatePicker.
@@ -202,26 +207,9 @@ The CoreUI Bootstrap DatePicker component allows you to disable certain dates, s
     <div class="col-lg-5">
       <div id="myDatePickerDisabledDates"></div>
     </div>
-  </div>`} sandboxJs={[`const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')`, ``, `const optionsDatePickerDisabledDates = {`, `  locale: 'en-US',`, `  calendarDate: new Date(2022, 2, 1),`, `  disabledDates: [`, `    [new Date(2022, 2, 4), new Date(2022, 2, 7)],`, `    new Date(2022, 2, 16),`, `    new Date(2022, 3, 16),`, `    [new Date(2022, 4, 2), new Date(2022, 4, 8)]`, `  ],`, `  maxDate: new Date(2022, 5, 0),`, `  minDate: new Date(2022, 1, 1)`, `}`, ``, `new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)`].join('\n')} />
+  </div>`} sandboxJs={datePickerDisabledDates} />
 
-```js
-const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')
-
-const optionsDatePickerDisabledDates = {
-  locale: 'en-US',
-  calendarDate: new Date(2022, 2, 1),
-  disabledDates: [
-    [new Date(2022, 2, 4), new Date(2022, 2, 7)],
-    new Date(2022, 2, 16),
-    new Date(2022, 3, 16),
-    [new Date(2022, 4, 2), new Date(2022, 4, 8)]
-  ],
-  maxDate: new Date(2022, 5, 0),
-  minDate: new Date(2022, 1, 1)
-}
-
-new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)
-```
+<Code code={datePickerDisabledDates} lang="js" />
 
 ### Disabling weekends
 
@@ -231,21 +219,9 @@ You can disable weekends by passing a function to the `disabledDates` option. He
     <div class="col-lg-5">
       <div id="myDatePickerDisabledDates2"></div>
     </div>
-  </div>`} sandboxJs={[`const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')`, ``, `const optionsDatePickerDisabledDates2 = {`, `  disabledDates(date) {`, `    const day = date.getDay()`, `    return day === 0 || day === 6`, `  },`, `  locale: 'en-US'`, `}`, ``, `new coreui.DatePicker(myDatePickerDisabledDates2, optionsDatePickerDisabledDates2)`].join('\n')} />
+  </div>`} sandboxJs={datePickerDisabledDates2} />
 
-```js
-const myDatePickerDisabledDates2 = document.getElementById('myDatePickerDisabledDates2')
-
-const optionsDatePickerDisabledDates2 = {
-  disabledDates(date) {
-    const day = date.getDay()
-    return day === 0 || day === 6
-  },
-  locale: 'en-US'
-}
-
-new coreui.DatePicker(myDatePickerDisabledDates2, optionsDatePickerDisabledDates2)
-```
+<Code code={datePickerDisabledDates2} lang="js" />
 
 ## Non-english locale
 
@@ -323,7 +299,7 @@ The `inputDateFormat` property formats the date into a custom string, while the 
     <div class="col-lg-5">
       <div id="myDatePickerCustomFormats1"></div>
     </div>
-  </div>`} sandboxJs={[`const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')`, ``, `dayjs.extend(window.dayjs_plugin_customParseFormat)`, `const optionsDatePickerCustomFormats1 = {`, `  locale: 'en-US',`, `  date: new Date(2022, 8, 3),`, `  inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),`, `  inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()`, `}`, ``, `new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)`].join('\n')} />
+  </div>`} sandboxJs={datePickerCustomFormats1} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -331,19 +307,7 @@ The `inputDateFormat` property formats the date into a custom string, while the 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/en.js"></script>
 ```
 
-```js
-const myDatePickerCustomFormats1 = document.getElementById('myDatePickerCustomFormats1')
-
-dayjs.extend(window.dayjs_plugin_customParseFormat)
-const optionsDatePickerCustomFormats1 = {
-  locale: 'en-US',
-  date: new Date(2022, 8, 3),
-  inputDateFormat: date => dayjs(date).locale('en').format('MMMM DD, YYYY'),
-  inputDateParse: date => dayjs(date, 'MMMM DD, YYYY', 'en').toDate()
-}
-
-new coreui.DatePicker(myDatePickerCustomFormats1, optionsDatePickerCustomFormats1)
-```
+<Code code={datePickerCustomFormats1} lang="js" />
 
 To use localized dates, we need to additionally add locale files, in this case, Spanish:
 
@@ -351,7 +315,7 @@ To use localized dates, we need to additionally add locale files, in this case, 
     <div class="col-lg-5">
       <div id="myDatePickerCustomFormats2"></div>
     </div>
-  </div>`} sandboxJs={[`const myDatePickerCustomFormats2 = document.getElementById('myDatePickerCustomFormats2')`, ``, `dayjs.extend(window.dayjs_plugin_customParseFormat)`, `dayjs.locale('es')`, `const optionsDatePickerCustomFormats2 = {`, `  locale: 'es-ES',`, `  date: new Date(2022, 8, 3),`, `  inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),`, `  inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()`, `}`, ``, `new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)`].join('\n')} />
+  </div>`} sandboxJs={datePickerCustomFormats2} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -359,20 +323,7 @@ To use localized dates, we need to additionally add locale files, in this case, 
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
 ```
 
-```js
-const myDatePickerCustomFormats2 = document.getElementById('myDatePickerCustomFormats2')
-
-dayjs.extend(window.dayjs_plugin_customParseFormat)
-dayjs.locale('es')
-const optionsDatePickerCustomFormats2 = {
-  locale: 'es-ES',
-  date: new Date(2022, 8, 3),
-  inputDateFormat: date => dayjs(date).locale('es').format('YYYY MMMM DD'),
-  inputDateParse: date => dayjs(date, 'YYYY MMMM DD', 'es').toDate()
-}
-
-new coreui.DatePicker(myDatePickerCustomFormats2, optionsDatePickerCustomFormats2)
-```
+<Code code={datePickerCustomFormats2} lang="js" />
 
 ## Usage
 

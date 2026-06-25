@@ -6,6 +6,12 @@ otherFrameworks:
   - autocomplete
 ---
 
+import autocompleteArrayData from './snippets/autocomplete-array-data.js?raw'
+import autocompleteGroupedData from './snippets/autocomplete-grouped-data.js?raw'
+import autocompleteOptionValues from './snippets/autocomplete-option-values.js?raw'
+import autocompleteExternalData from './snippets/autocomplete-external-data.js?raw'
+import autocompleteCustomOptions from './snippets/autocomplete-custom-options.js?raw'
+
 ## Overview
 
 The **Bootstrap Autocomplete Dropdown** component is a powerful autocomplete dropdown plugin that enhances form control usability by suggesting completions as the user types. Whether you're integrating with local JavaScript arrays or fetching live server responses via AJAX, this plugin enables rich, dynamic user interactions.
@@ -35,102 +41,27 @@ Learn how to populate the autocomplete component with data from various sources,
 
 To dynamically populate an autocomplete input with suggestions from an array, use JavaScript to configure the component with predefined options.
 
-<Example pro code={`<div id="myAutoComplete"></div>`} sandboxJs={[`const myAutoComplete = document.getElementById('myAutoComplete')`, ``, `new coreui.Autocomplete(myAutoComplete, {`, `  name: 'autocomplete',`, `  options: [`, `    'Angular',`, `    'Bootstrap',`, `    {`, `      label: 'React.js',`, `      disabled: true`, `    },`, `    'Vue.js',`, `    {`, `      label: 'backend',`, `      options: ['Django', 'Laravel', 'Node.js']`, `    }`, `  ],`, `  value: 'Laravel'`, `})`].join('\n')} />
+<Example pro code={`<div id="myAutoComplete"></div>`} sandboxJs={autocompleteArrayData} />
 
 We use the following JavaScript to set up our autocomplete:
 
-```js
-const myAutoComplete = document.getElementById('myAutoComplete')
-
-new coreui.Autocomplete(myAutoComplete, {
-  name: 'autocomplete',
-  options: [
-    'Angular',
-    'Bootstrap',
-    {
-      label: 'React.js',
-      disabled: true
-    },
-    'Vue.js',
-    {
-      label: 'backend',
-      options: ['Django', 'Laravel', 'Node.js']
-    }
-  ],
-  value: 'Laravel'
-})
-```
+<Code code={autocompleteArrayData} lang="js" />
 
 ### Object data with groups
 
 You can organize suggestions into groups using optgroups for better categorization and user experience.
 
-<Example pro code={`<div id="myAutoCompleteGrouped"></div>`} sandboxJs={[`const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')`, ``, `new coreui.Autocomplete(myAutoCompleteGrouped, {`, `  name: 'autocomplete-grouped',`, `  options: [`, `    'Angular',`, `    {`, `      label: 'Bootstrap',`, `      selected: true`, `    },`, `    {`, `      label: 'React.js',`, `      disabled: true`, `    },`, `    'Vue.js',`, `    {`, `      label: 'backend',`, `      options: ['Django', 'Laravel', 'Node.js']`, `    }`, `  ]`, `})`].join('\n')} />
+<Example pro code={`<div id="myAutoCompleteGrouped"></div>`} sandboxJs={autocompleteGroupedData} />
 
-```js
-const myAutoCompleteGrouped = document.getElementById('myAutoCompleteGrouped')
-
-new coreui.Autocomplete(myAutoCompleteGrouped, {
-  name: 'autocomplete-grouped',
-  options: [
-    'Angular',
-    {
-      label: 'Bootstrap',
-      selected: true
-    },
-    {
-      label: 'React.js',
-      disabled: true
-    },
-    'Vue.js',
-    {
-      label: 'backend',
-      options: ['Django', 'Laravel', 'Node.js']
-    }
-  ]
-})
-```
+<Code code={autocompleteGroupedData} lang="js" />
 
 ### Options with values
 
 You can use values in your options array. This is particularly useful when working with database IDs, product codes, or any numeric identifiers. Note that the component internally converts number values to strings for consistency and DOM compatibility.
 
-<Example pro code={`<div id="myAutoCompleteValues"></div>`} sandboxJs={[`const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')`, ``, `new coreui.Autocomplete(myAutoCompleteValues, {`, `  cleaner: true,`, `  indicator: true,`, `  name: 'autocomplete-option-values',`, `  options: [`, `    { label: 'Product A', value: 1 },`, `    { label: 'Product B', value: 2 },`, `    { label: 'Product C', value: 3.5 },`, `    { label: 'Product D', value: 42 },`, `    {`, `      label: 'Categories',`, `      options: [`, `        { label: 'Electronics', value: 100 },`, `        { label: 'Books', value: 200 },`, `        { label: 'Clothing', value: 300 }`, `      ]`, `    }`, `  ],`, `  placeholder: 'Select product by ID...',`, `  search: 'global',`, `  value: 100`, `})`, ``, `// Log the selected value to demonstrate that numbers are converted to strings`, `myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {`, `  // eslint-disable-next-line no-console`, `  console.log('Selected value:', event.value.value)`, `  // eslint-disable-next-line no-console`, `  console.log('Selected label:', event.value.label)`, `})`].join('\n')} />
+<Example pro code={`<div id="myAutoCompleteValues"></div>`} sandboxJs={autocompleteOptionValues} />
 
-```js
-const myAutoCompleteValues = document.getElementById('myAutoCompleteValues')
-
-new coreui.Autocomplete(myAutoCompleteValues, {
-  cleaner: true,
-  indicator: true,
-  name: 'autocomplete-option-values',
-  options: [
-    { label: 'Product A', value: 1 },
-    { label: 'Product B', value: 2 },
-    { label: 'Product C', value: 3.5 },
-    { label: 'Product D', value: 42 },
-    {
-      label: 'Categories',
-      options: [
-        { label: 'Electronics', value: 100 },
-        { label: 'Books', value: 200 },
-        { label: 'Clothing', value: 300 }
-      ]
-    }
-  ],
-  placeholder: 'Select product by ID...',
-  search: 'global',
-  value: 100
-})
-
-// Log the selected value to demonstrate that numbers are converted to strings
-myAutoCompleteValues.addEventListener('changed.coreui.autocomplete', event => {
-  // eslint-disable-next-line no-console
-  console.log('Selected value:', event.value.value)
-  // eslint-disable-next-line no-console
-  console.log('Selected label:', event.value.label)
-})
-```
+<Code code={autocompleteOptionValues} lang="js" />
 
 <Callout color="info">
 **Important:** While you can pass number values in your options, the component internally converts all values to strings using `String(value)`. When handling selection events, remember that `event.value.value` will always be a string representation of your original number.
@@ -147,7 +78,7 @@ You can configure CoreUI's AutoComplete component to fetch and display options d
 
 This example shows how to connect the AutoComplete to a remote API to search users by first name.
 
-<Example code={`<div id="myAutoCompleteExternalData"></div>`} sandboxJs={[`const myAutoCompleteExternalData = document.getElementById('myAutoCompleteExternalData')`, ``, `const getUsers = async (name = '') => {`, `  try {`, `    const response = await fetch(\`https://apitest.coreui.io/demos/users?first_name=\${name}&limit=10\`)`, `    const users = await response.json()`, ``, `    return users.records.map(user => ({`, `      value: user.id,`, `      label: user.first_name`, `    }))`, `  } catch (error) {`, `    // eslint-disable-next-line no-console`, `    console.error('Error fetching users:', error)`, `  }`, `}`, ``, `const autocomplete = new coreui.Autocomplete(myAutoCompleteExternalData, {`, `  cleaner: true,`, `  highlightOptionsOnSearch: true,`, `  name: 'autocomplete-external',`, `  options: [],`, `  placeholder: 'Search names...',`, `  search: ['external', 'global'], // 🔴 'external' is required for external search`, `  showHints: true`, `})`, ``, `let lastQuery = null`, `let debounceTimer = null`, ``, `myAutoCompleteExternalData.addEventListener('show.coreui.autocomplete', async () => {`, `  const users = await getUsers()`, `  autocomplete.update({ options: users })`, `})`, ``, `myAutoCompleteExternalData.addEventListener('input.coreui.autocomplete', event => {`, `  const query = event.value`, ``, `  if (query === lastQuery) {`, `    return`, `  }`, ``, `  lastQuery = query`, ``, `  clearTimeout(debounceTimer)`, ``, `  debounceTimer = setTimeout(async () => {`, `    const users = await getUsers(query)`, `    autocomplete.update({ options: users })`, `  }, 200)`, `})`].join('\n')} />
+<Example code={`<div id="myAutoCompleteExternalData"></div>`} sandboxJs={autocompleteExternalData} />
 
 To fetch data from an external source, you must set the search option to `'external'` or `['external', 'global']`.
 This disables internal filtering and allows you to provide custom data (e.g., from an API) based on user input.
@@ -291,115 +222,11 @@ The CoreUI Bootstrap Autocomplete Component provides the flexibility to personal
     <div class="col-md-6">
       <div id="myAutocompleteCountriesAndCities"></div>
     </div>
-  </div>`} sandboxJs={[`const myAutocompleteCountries = document.getElementById('myAutocompleteCountries')`, `const myAutocompleteCountriesAndCities = document.getElementById('myAutocompleteCountriesAndCities')`, ``, `const countries = [`, `  {`, `    value: 'pl',`, `    label: 'Poland',`, `    flag: '🇵🇱'`, `  },`, `  {`, `    value: 'de',`, `    label: 'Germany',`, `    flag: '🇩🇪'`, `  },`, `  {`, `    value: 'us',`, `    label: 'United States',`, `    flag: '🇺🇸'`, `  },`, `  {`, `    value: 'es',`, `    label: 'Spain',`, `    flag: '🇪🇸'`, `  },`, `  {`, `    value: 'gb',`, `    label: 'United Kingdom',`, `    flag: '🇬🇧'`, `  }`, `]`, ``, `const cities = [`, `  {`, `    label: 'United States',`, `    code: 'us',`, `    flag: '🇺🇸',`, `    options: [`, `      {`, `        value: 'au',`, `        label: 'Austin'`, `      },`, `      {`, `        value: 'ch',`, `        label: 'Chicago'`, `      },`, `      {`, `        value: 'la',`, `        label: 'Los Angeles'`, `      },`, `      {`, `        value: 'ny',`, `        label: 'New York'`, `      },`, `      {`, `        value: 'sa',`, `        label: 'San Jose'`, `      }`, `    ]`, `  },`, `  {`, `    label: 'United Kingdom',`, `    code: 'gb',`, `    flag: '🇬🇧',`, `    options: [`, `      {`, `        value: 'li',`, `        label: 'Liverpool'`, `      },`, `      {`, `        value: 'lo',`, `        label: 'London'`, `      },`, `      {`, `        value: 'ma',`, `        label: 'Manchester'`, `      }`, `    ]`, `  }`, `]`, ``, `new coreui.Autocomplete(myAutocompleteCountries, {`, `  cleaner: true,`, `  indicator: true,`, `  options: countries,`, `  optionsTemplate(option) {`, `    return \`<div class="d-flex align-items-center gap-2"><span class="fs-5">\${option.flag}</span><span>\${option.label}</span></div>\``, `  },`, `  placeholder: 'Select country',`, `  showHints: true,`, `  search: 'global'`, `})`, ``, `new coreui.Autocomplete(myAutocompleteCountriesAndCities, {`, `  cleaner: true,`, `  indicator: true,`, `  options: cities,`, `  optionsGroupsTemplate(optionGroup) {`, `    return \`<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">\${optionGroup.flag}</span><span>\${optionGroup.label}</span></div>\``, `  },`, `  placeholder: 'Select city',`, `  showHints: true,`, `  search: 'global'`, `})`].join('\n')} />
+  </div>`} sandboxJs={autocompleteCustomOptions} />
 
 We use the following JavaScript to set up our autocomplete:
 
-```js
-const myAutocompleteCountries = document.getElementById('myAutocompleteCountries')
-const myAutocompleteCountriesAndCities = document.getElementById('myAutocompleteCountriesAndCities')
-
-const countries = [
-  {
-    value: 'pl',
-    label: 'Poland',
-    flag: '🇵🇱'
-  },
-  {
-    value: 'de',
-    label: 'Germany',
-    flag: '🇩🇪'
-  },
-  {
-    value: 'us',
-    label: 'United States',
-    flag: '🇺🇸'
-  },
-  {
-    value: 'es',
-    label: 'Spain',
-    flag: '🇪🇸'
-  },
-  {
-    value: 'gb',
-    label: 'United Kingdom',
-    flag: '🇬🇧'
-  }
-]
-
-const cities = [
-  {
-    label: 'United States',
-    code: 'us',
-    flag: '🇺🇸',
-    options: [
-      {
-        value: 'au',
-        label: 'Austin'
-      },
-      {
-        value: 'ch',
-        label: 'Chicago'
-      },
-      {
-        value: 'la',
-        label: 'Los Angeles'
-      },
-      {
-        value: 'ny',
-        label: 'New York'
-      },
-      {
-        value: 'sa',
-        label: 'San Jose'
-      }
-    ]
-  },
-  {
-    label: 'United Kingdom',
-    code: 'gb',
-    flag: '🇬🇧',
-    options: [
-      {
-        value: 'li',
-        label: 'Liverpool'
-      },
-      {
-        value: 'lo',
-        label: 'London'
-      },
-      {
-        value: 'ma',
-        label: 'Manchester'
-      }
-    ]
-  }
-]
-
-new coreui.Autocomplete(myAutocompleteCountries, {
-  cleaner: true,
-  indicator: true,
-  options: countries,
-  optionsTemplate(option) {
-    return `<div class="d-flex align-items-center gap-2"><span class="fs-5">${option.flag}</span><span>${option.label}</span></div>`
-  },
-  placeholder: 'Select country',
-  showHints: true,
-  search: 'global'
-})
-
-new coreui.Autocomplete(myAutocompleteCountriesAndCities, {
-  cleaner: true,
-  indicator: true,
-  options: cities,
-  optionsGroupsTemplate(optionGroup) {
-    return `<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
-  },
-  placeholder: 'Select city',
-  showHints: true,
-  search: 'global'
-})
-```
+<Code code={autocompleteCustomOptions} lang="js" />
 
 ## Usage
 

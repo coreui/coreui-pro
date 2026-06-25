@@ -6,6 +6,12 @@ otherFrameworks:
   - multi-select
 ---
 
+import multiSelectArrayData from './snippets/multi-select-array-data.js?raw'
+import multiSelectCustomOptions from './snippets/multi-select-custom-options.js?raw'
+import multiSelectHeader from './snippets/multi-select-header.js?raw'
+import multiSelectIndeterminate from './snippets/multi-select-indeterminate.js?raw'
+import multiSelectSelectionLimit from './snippets/multi-select-selection-limit.js?raw'
+
 ## Basic example
 
 A straightforward demonstration of how to implement a basic Bootstrap Multi Select dropdown, highlighting essential attributes and configurations.
@@ -58,61 +64,11 @@ If you want to create a multi-select dropdown with predefined options, use the `
 
 To dynamically populate a multi-select dropdown with options from an array, start with an empty `<select>` element. Use JavaScript to add options programmatically. This allows for more flexible and dynamic content management.
 
-<Example pro code={`<select id="multiSelect" name="multiSelect"></select>`} sandboxJs={[`const myMultiSelect = document.getElementById('multiSelect')`, ``, `new coreui.MultiSelect(myMultiSelect, {`, `  name: 'multiSelect',`, `  options: [`, `    {`, `      label: 'frontend',`, `      options: [`, `        {`, `          value: 0,`, `          text: 'Angular'`, `        },`, `        {`, `          value: 1,`, `          text: 'Bootstrap',`, `          selected: true`, `        },`, `        {`, `          value: 2,`, `          text: 'React.js',`, `          selected: true`, `        },`, `        {`, `          value: 3,`, `          text: 'Vue.js'`, `        }`, `      ]`, `    },`, `    {`, `      label: 'backend',`, `      options: [`, `        {`, `          value: 4,`, `          text: 'Django'`, `        },`, `        {`, `          value: 5,`, `          text: 'Laravel'`, `        },`, `        {`, `          value: 6,`, `          text: 'Node.js',`, `          selected: true`, `        }`, `      ]`, `    }`, `  ],`, `  search: true`, `})`].join('\n')} />
+<Example pro code={`<select id="multiSelect" name="multiSelect"></select>`} sandboxJs={multiSelectArrayData} />
 
 We use the following JavaScript to set up our multi-select:
 
-```js
-const myMultiSelect = document.getElementById('multiSelect')
-
-new coreui.MultiSelect(myMultiSelect, {
-  name: 'multiSelect',
-  options: [
-    {
-      label: 'frontend',
-      options: [
-        {
-          value: 0,
-          text: 'Angular'
-        },
-        {
-          value: 1,
-          text: 'Bootstrap',
-          selected: true
-        },
-        {
-          value: 2,
-          text: 'React.js',
-          selected: true
-        },
-        {
-          value: 3,
-          text: 'Vue.js'
-        }
-      ]
-    },
-    {
-      label: 'backend',
-      options: [
-        {
-          value: 4,
-          text: 'Django'
-        },
-        {
-          value: 5,
-          text: 'Laravel'
-        },
-        {
-          value: 6,
-          text: 'Node.js',
-          selected: true
-        }
-      ]
-    }
-  ],
-  search: true
-})
-```
+<Code code={multiSelectArrayData} lang="js" />
 
 ## Search
 
@@ -291,57 +247,11 @@ Use `data-coreui-selection-limit` to limit how many options can be selected. The
       <option value="5">Laravel</option>
       <option value="6">Node.js</option>
     </optgroup>
-  </select>`} sandboxJs={[`const getMultiSelectSelectionLimitToastContainer = () => {`, `  let container = document.getElementById('multiSelectSelectionLimitToastContainer')`, ``, `  if (!container) {`, `    container = document.createElement('div')`, `    container.id = 'multiSelectSelectionLimitToastContainer'`, `    container.className = 'toast-container position-fixed bottom-0 end-0 p-3'`, `    container.setAttribute('aria-live', 'polite')`, `    container.setAttribute('aria-atomic', 'true')`, `    document.body.append(container)`, `  }`, ``, `  return container`, `}`, ``, `const showMultiSelectSelectionLimitToast = message => {`, `  const toast = document.createElement('div')`, `  toast.classList.add('toast')`, `  toast.setAttribute('role', 'alert')`, `  toast.setAttribute('aria-live', 'assertive')`, `  toast.setAttribute('aria-atomic', 'true')`, `  toast.innerHTML = [`, `    '<div class="toast-header">',`, `    '  <strong class="me-auto">Selection limit</strong>',`, `    '  <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>',`, `    '</div>',`, `    \`<div class="toast-body">\${message}</div>\``, `  ].join('')`, ``, `  getMultiSelectSelectionLimitToastContainer().append(toast)`, ``, `  toast.addEventListener('hidden.coreui.toast', () => {`, `    toast.remove()`, `  })`, ``, `  coreui.Toast.getOrCreateInstance(toast).show()`, `}`, ``, `document.addEventListener('selectionLimit.coreui.multi-select', event => {`, `  if (event.target.id !== 'multiSelectSelectionLimit') {`, `    return`, `  }`, ``, `  showMultiSelectSelectionLimitToast(\`You can select up to \${event.selectionLimit} options.\`)`, `})`].join('\n')} />
+  </select>`} sandboxJs={multiSelectSelectionLimit} />
 
 We use the following JavaScript to show a toast when the selection limit is reached. The toast container is created on demand and appended to `<body>`, so it floats above the page instead of being constrained by the example:
 
-```js
-const getMultiSelectSelectionLimitToastContainer = () => {
-  let container = document.getElementById('multiSelectSelectionLimitToastContainer')
-
-  if (!container) {
-    container = document.createElement('div')
-    container.id = 'multiSelectSelectionLimitToastContainer'
-    container.className = 'toast-container position-fixed bottom-0 end-0 p-3'
-    container.setAttribute('aria-live', 'polite')
-    container.setAttribute('aria-atomic', 'true')
-    document.body.append(container)
-  }
-
-  return container
-}
-
-const showMultiSelectSelectionLimitToast = message => {
-  const toast = document.createElement('div')
-  toast.classList.add('toast')
-  toast.setAttribute('role', 'alert')
-  toast.setAttribute('aria-live', 'assertive')
-  toast.setAttribute('aria-atomic', 'true')
-  toast.innerHTML = [
-    '<div class="toast-header">',
-    '  <strong class="me-auto">Selection limit</strong>',
-    '  <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>',
-    '</div>',
-    `<div class="toast-body">${message}</div>`
-  ].join('')
-
-  getMultiSelectSelectionLimitToastContainer().append(toast)
-
-  toast.addEventListener('hidden.coreui.toast', () => {
-    toast.remove()
-  })
-
-  coreui.Toast.getOrCreateInstance(toast).show()
-}
-
-document.addEventListener('selectionLimit.coreui.multi-select', event => {
-  if (event.target.id !== 'multiSelectSelectionLimit') {
-    return
-  }
-
-  showMultiSelectSelectionLimitToast(`You can select up to ${event.selectionLimit} options.`)
-})
-```
+<Code code={multiSelectSelectionLimit} lang="js" />
 
 ## Single Select
 
@@ -386,119 +296,11 @@ The CoreUI Bootstrap Multi Select Component provides the flexibility to personal
     <div class="col-md-6">
       <select id="myMultiSelectCountriesAndCities" data-coreui-multi-select></select>
     </div>
-  </div>`} sandboxJs={[`const myMultiSelectCountries = document.getElementById('myMultiSelectCountries')`, `const myMultiSelectCountriesAndCities = document.getElementById('myMultiSelectCountriesAndCities')`, ``, `const countries = [`, `  {`, `    value: 'pl',`, `    text: 'Poland',`, `    flag: '🇵🇱'`, `  },`, `  {`, `    value: 'de',`, `    text: 'Germany',`, `    flag: '🇩🇪'`, `  },`, `  {`, `    value: 'us',`, `    text: 'United States',`, `    flag: '🇺🇸'`, `  },`, `  {`, `    value: 'es',`, `    text: 'Spain',`, `    flag: '🇪🇸'`, `  },`, `  {`, `    value: 'gb',`, `    text: 'United Kingdom',`, `    flag: '🇬🇧'`, `  }`, `]`, ``, `const cities = [`, `  {`, `    label: 'United States',`, `    code: 'us',`, `    flag: '🇺🇸',`, `    options: [`, `      {`, `        value: 'au',`, `        text: 'Austin'`, `      },`, `      {`, `        value: 'ch',`, `        text: 'Chicago'`, `      },`, `      {`, `        value: 'la',`, `        text: 'Los Angeles'`, `      },`, `      {`, `        value: 'ny',`, `        text: 'New York'`, `      },`, `      {`, `        value: 'sa',`, `        text: 'San Jose'`, `      }`, `    ]`, `  },`, `  {`, `    label: 'United Kingdom',`, `    code: 'gb',`, `    flag: '🇬🇧',`, `    options: [`, `      {`, `        value: 'li',`, `        text: 'Liverpool'`, `      },`, `      {`, `        value: 'lo',`, `        text: 'London'`, `      },`, `      {`, `        value: 'ma',`, `        text: 'Manchester'`, `      }`, `    ]`, `  }`, `]`, ``, `new coreui.MultiSelect(myMultiSelectCountries, {`, `  cleaner: true,`, `  multiple: true,`, `  options: countries,`, `  optionsTemplate(option) {`, `    return \`<div class="d-flex align-items-center gap-2"><span class="fs-5">\${option.flag}</span><span>\${option.text}</span></div>\``, `  },`, `  placeholder: 'Select countries',`, `  search: true,`, `  selectAllLabel: 'Select all countries',`, `  deselectAllLabel: 'Deselect all countries',`, `  selectionType: 'tags'`, `})`, ``, `new coreui.MultiSelect(myMultiSelectCountriesAndCities, {`, `  cleaner: true,`, `  multiple: true,`, `  options: cities,`, `  optionsGroupsTemplate(optionGroup) {`, `    return \`<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">\${optionGroup.flag}</span><span>\${optionGroup.label}</span></div>\``, `  },`, `  placeholder: 'Select cities',`, `  search: true,`, `  selectAllLabel: 'Select all cities',`, `  deselectAllLabel: 'Deselect all cities',`, `  selectionType: 'tags'`, `})`].join('\n')} />
+  </div>`} sandboxJs={multiSelectCustomOptions} />
 
 We use the following JavaScript to set up our multi-select:
 
-```js
-const myMultiSelectCountries = document.getElementById('myMultiSelectCountries')
-const myMultiSelectCountriesAndCities = document.getElementById('myMultiSelectCountriesAndCities')
-
-const countries = [
-  {
-    value: 'pl',
-    text: 'Poland',
-    flag: '🇵🇱'
-  },
-  {
-    value: 'de',
-    text: 'Germany',
-    flag: '🇩🇪'
-  },
-  {
-    value: 'us',
-    text: 'United States',
-    flag: '🇺🇸'
-  },
-  {
-    value: 'es',
-    text: 'Spain',
-    flag: '🇪🇸'
-  },
-  {
-    value: 'gb',
-    text: 'United Kingdom',
-    flag: '🇬🇧'
-  }
-]
-
-const cities = [
-  {
-    label: 'United States',
-    code: 'us',
-    flag: '🇺🇸',
-    options: [
-      {
-        value: 'au',
-        text: 'Austin'
-      },
-      {
-        value: 'ch',
-        text: 'Chicago'
-      },
-      {
-        value: 'la',
-        text: 'Los Angeles'
-      },
-      {
-        value: 'ny',
-        text: 'New York'
-      },
-      {
-        value: 'sa',
-        text: 'San Jose'
-      }
-    ]
-  },
-  {
-    label: 'United Kingdom',
-    code: 'gb',
-    flag: '🇬🇧',
-    options: [
-      {
-        value: 'li',
-        text: 'Liverpool'
-      },
-      {
-        value: 'lo',
-        text: 'London'
-      },
-      {
-        value: 'ma',
-        text: 'Manchester'
-      }
-    ]
-  }
-]
-
-new coreui.MultiSelect(myMultiSelectCountries, {
-  cleaner: true,
-  multiple: true,
-  options: countries,
-  optionsTemplate(option) {
-    return `<div class="d-flex align-items-center gap-2"><span class="fs-5">${option.flag}</span><span>${option.text}</span></div>`
-  },
-  placeholder: 'Select countries',
-  search: true,
-  selectAllLabel: 'Select all countries',
-  deselectAllLabel: 'Deselect all countries',
-  selectionType: 'tags'
-})
-
-new coreui.MultiSelect(myMultiSelectCountriesAndCities, {
-  cleaner: true,
-  multiple: true,
-  options: cities,
-  optionsGroupsTemplate(optionGroup) {
-    return `<div class="d-flex align-items-center gap-2"><span class="text-body fs-5">${optionGroup.flag}</span><span>${optionGroup.label}</span></div>`
-  },
-  placeholder: 'Select cities',
-  search: true,
-  selectAllLabel: 'Select all cities',
-  deselectAllLabel: 'Deselect all cities',
-  selectionType: 'tags'
-})
-```
+<Code code={multiSelectCustomOptions} lang="js" />
 
 ## Custom dropdown header
 
@@ -506,64 +308,11 @@ new coreui.MultiSelect(myMultiSelectCountriesAndCities, {
 
 Use the `headerTemplate` option to fully customize the dropdown header — the area above the options list — including rendering several action buttons. It renders independently of `selectAll`. The template function receives a `state` object (`{ selected, total, filtered, filteredSelected }`) and an `actions` object with bound component methods (`selectAll`, `selectFiltered`, `deselectFiltered`, `deselectAll`). Return an `HTMLElement` and wire your own listeners to the `actions`, or return an HTML string (sanitized) for simple custom content. The header re-renders on every selection change and search filter, so labels and `disabled` states stay up to date.
 
-<Example pro code={`<select id="myMultiSelectHeader" data-coreui-multi-select></select>`} sandboxJs={[`const myMultiSelectHeader = document.getElementById('myMultiSelectHeader')`, ``, `new coreui.MultiSelect(myMultiSelectHeader, {`, `  multiple: true,`, `  options: [`, `    { value: 'angular', text: 'Angular' },`, `    { value: 'bootstrap', text: 'Bootstrap' },`, `    { value: 'react', text: 'React.js' },`, `    { value: 'vue', text: 'Vue.js' },`, `    { value: 'django', text: 'Django' },`, `    { value: 'laravel', text: 'Laravel' },`, `    { value: 'node', text: 'Node.js' }`, `  ],`, `  placeholder: 'Select frameworks',`, `  search: true,`, `  selectionType: 'tags',`, `  headerTemplate(state, actions) {`, `    const wrapper = document.createElement('div')`, `    wrapper.className = 'd-flex flex-wrap gap-2'`, ``, `    const selectAll = document.createElement('button')`, `    selectAll.type = 'button'`, `    selectAll.className = 'btn btn-sm btn-primary'`, `    selectAll.textContent = \`Select all (\${state.total})\``, `    selectAll.disabled = state.selected >= state.total`, `    selectAll.addEventListener('click', () => actions.selectAll())`, ``, `    const selectFiltered = document.createElement('button')`, `    selectFiltered.type = 'button'`, `    selectFiltered.className = 'btn btn-sm btn-secondary'`, `    selectFiltered.textContent = \`Select filtered (\${state.filtered})\``, `    selectFiltered.disabled = state.filtered === state.filteredSelected`, `    selectFiltered.addEventListener('click', () => actions.selectFiltered())`, ``, `    const deselectFiltered = document.createElement('button')`, `    deselectFiltered.type = 'button'`, `    deselectFiltered.className = 'btn btn-sm btn-outline-secondary'`, `    deselectFiltered.textContent = \`Deselect filtered (\${state.filteredSelected})\``, `    deselectFiltered.disabled = state.filteredSelected === 0`, `    deselectFiltered.addEventListener('click', () => actions.deselectFiltered())`, ``, `    const deselectAll = document.createElement('button')`, `    deselectAll.type = 'button'`, `    deselectAll.className = 'btn btn-sm btn-outline-danger'`, `    deselectAll.textContent = \`Deselect all (\${state.selected})\``, `    deselectAll.disabled = state.selected === 0`, `    deselectAll.addEventListener('click', () => actions.deselectAll())`, ``, `    wrapper.append(selectAll, selectFiltered, deselectFiltered, deselectAll)`, `    return wrapper`, `  }`, `})`].join('\n')} />
+<Example pro code={`<select id="myMultiSelectHeader" data-coreui-multi-select></select>`} sandboxJs={multiSelectHeader} />
 
 We use the following JavaScript to set up our multi-select:
 
-```js
-const myMultiSelectHeader = document.getElementById('myMultiSelectHeader')
-
-new coreui.MultiSelect(myMultiSelectHeader, {
-  multiple: true,
-  options: [
-    { value: 'angular', text: 'Angular' },
-    { value: 'bootstrap', text: 'Bootstrap' },
-    { value: 'react', text: 'React.js' },
-    { value: 'vue', text: 'Vue.js' },
-    { value: 'django', text: 'Django' },
-    { value: 'laravel', text: 'Laravel' },
-    { value: 'node', text: 'Node.js' }
-  ],
-  placeholder: 'Select frameworks',
-  search: true,
-  selectionType: 'tags',
-  headerTemplate(state, actions) {
-    const wrapper = document.createElement('div')
-    wrapper.className = 'd-flex flex-wrap gap-2'
-
-    const selectAll = document.createElement('button')
-    selectAll.type = 'button'
-    selectAll.className = 'btn btn-sm btn-primary'
-    selectAll.textContent = `Select all (${state.total})`
-    selectAll.disabled = state.selected >= state.total
-    selectAll.addEventListener('click', () => actions.selectAll())
-
-    const selectFiltered = document.createElement('button')
-    selectFiltered.type = 'button'
-    selectFiltered.className = 'btn btn-sm btn-secondary'
-    selectFiltered.textContent = `Select filtered (${state.filtered})`
-    selectFiltered.disabled = state.filtered === state.filteredSelected
-    selectFiltered.addEventListener('click', () => actions.selectFiltered())
-
-    const deselectFiltered = document.createElement('button')
-    deselectFiltered.type = 'button'
-    deselectFiltered.className = 'btn btn-sm btn-outline-secondary'
-    deselectFiltered.textContent = `Deselect filtered (${state.filteredSelected})`
-    deselectFiltered.disabled = state.filteredSelected === 0
-    deselectFiltered.addEventListener('click', () => actions.deselectFiltered())
-
-    const deselectAll = document.createElement('button')
-    deselectAll.type = 'button'
-    deselectAll.className = 'btn btn-sm btn-outline-danger'
-    deselectAll.textContent = `Deselect all (${state.selected})`
-    deselectAll.disabled = state.selected === 0
-    deselectAll.addEventListener('click', () => actions.deselectAll())
-
-    wrapper.append(selectAll, selectFiltered, deselectFiltered, deselectAll)
-    return wrapper
-  }
-})
-```
+<Code code={multiSelectHeader} lang="js" />
 
 ## Selectable groups
 
@@ -571,40 +320,11 @@ new coreui.MultiSelect(myMultiSelectHeader, {
 
 Enable `optionsGroupsSelectable` to turn each group label into its own tri-state checkbox that toggles the whole group. Because the indicator is rendered with CSS, it supports a third, `indeterminate` state — shown when only some of a group's options are selected — without any real `<input />` element. The same tri-state logic drives the header [select all](#select-all) button when `selectAllStyle: 'checkbox'`. Each section's indicator follows its own `*Style` option (`optionsStyle`, `optionsGroupsStyle`, `selectAllStyle`, all defaulting to `'checkbox'`) and requires `multiple`.
 
-<Example pro code={`<select id="myMultiSelectIndeterminate" data-coreui-multi-select></select>`} sandboxJs={[`const myMultiSelectIndeterminate = document.getElementById('myMultiSelectIndeterminate')`, ``, `new coreui.MultiSelect(myMultiSelectIndeterminate, {`, `  multiple: true,`, `  optionsGroupsSelectable: true,`, `  options: [`, `    {`, `      label: 'Frontend',`, `      options: [`, `        { value: 'angular', text: 'Angular' },`, `        { value: 'react', text: 'React.js' },`, `        { value: 'vue', text: 'Vue.js' }`, `      ]`, `    },`, `    {`, `      label: 'Backend',`, `      options: [`, `        { value: 'django', text: 'Django' },`, `        { value: 'laravel', text: 'Laravel' },`, `        { value: 'node', text: 'Node.js' }`, `      ]`, `    }`, `  ],`, `  placeholder: 'Select frameworks',`, `  search: true,`, `  selectAllStyle: 'checkbox',`, `  selectionType: 'counter'`, `})`].join('\n')} />
+<Example pro code={`<select id="myMultiSelectIndeterminate" data-coreui-multi-select></select>`} sandboxJs={multiSelectIndeterminate} />
 
 We use the following JavaScript to set up our multi-select:
 
-```js
-const myMultiSelectIndeterminate = document.getElementById('myMultiSelectIndeterminate')
-
-new coreui.MultiSelect(myMultiSelectIndeterminate, {
-  multiple: true,
-  optionsGroupsSelectable: true,
-  options: [
-    {
-      label: 'Frontend',
-      options: [
-        { value: 'angular', text: 'Angular' },
-        { value: 'react', text: 'React.js' },
-        { value: 'vue', text: 'Vue.js' }
-      ]
-    },
-    {
-      label: 'Backend',
-      options: [
-        { value: 'django', text: 'Django' },
-        { value: 'laravel', text: 'Laravel' },
-        { value: 'node', text: 'Node.js' }
-      ]
-    }
-  ],
-  placeholder: 'Select frameworks',
-  search: true,
-  selectAllStyle: 'checkbox',
-  selectionType: 'counter'
-})
-```
+<Code code={multiSelectIndeterminate} lang="js" />
 
 ## Sizing
 

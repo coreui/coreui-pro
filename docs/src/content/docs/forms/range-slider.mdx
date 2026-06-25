@@ -6,6 +6,9 @@ otherFrameworks:
   - range-slider
 ---
 
+import rangeSliderCustomLabels from './snippets/range-slider-custom-labels.js?raw'
+import rangeSliderCustomTooltips from './snippets/range-slider-custom-tooltips.js?raw'
+
 ## Overview
 
 The **Bootstrap 5 Range Slider** component allows users to select a value or range of values within a predefined range. Unlike the standard `<input type="range" />`, the Range Slider offers enhanced customization options, including multiple handles, labels, tooltips, and vertical orientation. It ensures consistent styling across browsers and provides a rich set of features for advanced use cases.
@@ -85,43 +88,9 @@ Add labels to specific points on the slider for better context. If you provide a
 
 Labels can be configured as an array of strings or objects. When using objects, you can specify additional properties like `value`, `label`, `class`, and `style`.
 
-<Example pro code={`<div id="myRangeSliderCustomLabels"></div>`} sandboxJs={[`const myRangeSliderCustomLabels = document.getElementById('myRangeSliderCustomLabels')`, ``, `const optionsRangeSliderCustomLabels = {`, `  min: -50,`, `  max: 100,`, `  labels: [`, `    {`, `      value: -50,`, `      label: '-50°C',`, `      class: 'text-info'`, `    },`, `    {`, `      value: 0,`, `      label: '0°C',`, `      style: {`, `        fontWeight: 'bold'`, `      }`, `    },`, `    {`, `      value: 20,`, `      label: '20°C',`, `      class: ['text-warning']`, `    },`, `    {`, `      value: 100,`, `      label: '100°C',`, `      class: 'text-danger'`, `    }`, `  ],`, `  tooltipsFormat: value => \`\${value}°C\`,`, `  value: [-10, 40]`, `}`, `new coreui.RangeSlider(myRangeSliderCustomLabels, optionsRangeSliderCustomLabels)`].join('\n')} />
+<Example pro code={`<div id="myRangeSliderCustomLabels"></div>`} sandboxJs={rangeSliderCustomLabels} />
 
-```js
-const myRangeSliderCustomLabels = document.getElementById('myRangeSliderCustomLabels')
-
-const optionsRangeSliderCustomLabels = {
-  min: -50,
-  max: 100,
-  labels: [
-    {
-      value: -50,
-      label: '-50°C',
-      class: 'text-info'
-    },
-    {
-      value: 0,
-      label: '0°C',
-      style: {
-        fontWeight: 'bold'
-      }
-    },
-    {
-      value: 20,
-      label: '20°C',
-      class: ['text-warning']
-    },
-    {
-      value: 100,
-      label: '100°C',
-      class: 'text-danger'
-    }
-  ],
-  tooltipsFormat: value => `${value}°C`,
-  value: [-10, 40]
-}
-new coreui.RangeSlider(myRangeSliderCustomLabels, optionsRangeSliderCustomLabels)
-```
+<Code code={rangeSliderCustomLabels} lang="js" />
 
 ### Clickable labels
 
@@ -139,36 +108,9 @@ By default, tooltips display the current value of each handle. You can disable t
 
 Customize the content of tooltips using the `tooltipsFormat` option. This can be a function that formats the tooltip text based on the current value.
 
-<Example pro code={`<div id="myRangeSliderCustomTooltips"></div>`} sandboxJs={[`const myRangeSliderCustomTooltips = document.getElementById('myRangeSliderCustomTooltips')`, ``, `const optionsRangeSliderCustomTooltips = {`, `  max: 1000,`, `  labels: [`, `    {`, `      value: 0,`, `      label: '$0'`, `    },`, `    {`, `      value: 250,`, `      label: '$250'`, `    },`, `    {`, `      value: 500,`, `      label: '$500'`, `    },`, `    {`, `      value: 1000,`, `      label: '$1000'`, `    }`, `  ],`, `  tooltipsFormat: value => \`$\${value}\`,`, `  value: [100, 350]`, `}`, `new coreui.RangeSlider(myRangeSliderCustomTooltips, optionsRangeSliderCustomTooltips)`].join('\n')} />
+<Example pro code={`<div id="myRangeSliderCustomTooltips"></div>`} sandboxJs={rangeSliderCustomTooltips} />
 
-```js
-const myRangeSliderCustomTooltips = document.getElementById('myRangeSliderCustomTooltips')
-
-const optionsRangeSliderCustomTooltips = {
-  max: 1000,
-  labels: [
-    {
-      value: 0,
-      label: '$0'
-    },
-    {
-      value: 250,
-      label: '$250'
-    },
-    {
-      value: 500,
-      label: '$500'
-    },
-    {
-      value: 1000,
-      label: '$1000'
-    }
-  ],
-  tooltipsFormat: value => `$${value}`,
-  value: [100, 350]
-}
-new coreui.RangeSlider(myRangeSliderCustomTooltips, optionsRangeSliderCustomTooltips)
-```
+<Code code={rangeSliderCustomTooltips} lang="js" />
 
 ## Track
 
