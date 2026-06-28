@@ -54,7 +54,7 @@ Call the loading button via JavaScript:
 ```js
 const loadingButtonElementList = Array.prototype.slice.call(document.querySelectorAll('.btn-loading'))
 const loadingButtonList = loadingButtonElementList.map(loadingButtonEl => {
-  return new coreui.DatePicker(loadingButtonEl)
+  return new coreui.LoadingButton(loadingButtonEl)
 })
 ```
 
@@ -77,7 +77,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `start` | Starts loading. |
 | `stop` | Stops loading. |
 | `dispose` | Destroys an element's loading button. (Removes stored data on the DOM element) |
-| `getInstance` | Static method which allows you to get the multi select instance associated with a DOM element. |
+| `getInstance` | Static method which allows you to get the loading button instance associated with a DOM element. |
 
 ```js
 const myBtnLoading = document.getElementById('btn-loading')
@@ -87,7 +87,7 @@ myBtn.start()
 
 ### Events
 
-Loading Button component exposes a few events for hooking into multi select functionality.
+Loading Button component exposes a few events for hooking into loading button functionality.
 
 | Method | Description |
 | --- | --- |
