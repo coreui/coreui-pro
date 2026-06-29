@@ -1,0 +1,253 @@
+---
+pro: true
+title: "Bootstrap 5 Time Picker"
+name: "Time Picker"
+description: "Bootstrap Time Picker is a customizable and user-friendly tool for selecting times in forms. It supports various locales, sizes, and states to enhance the user experience."
+otherFrameworks:
+  - time-picker
+---
+
+import timePickerCustom from './snippets/time-picker-custom.js?raw'
+
+## Example
+
+To create a basic Bootstrap Time Picker, use:
+
+<Example pro code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker" id="timePicker1"></div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+      <div class="time-picker" data-coreui-locale="en-US" data-coreui-time="02:17:35 PM" data-coreui-toggle="time-picker" id="timePicker2"></div>
+    </div>
+  </div>`} />
+
+## Sizing
+
+Set heights using `data-coreui-size` attribute like `data-coreui-size="lg"` and `data-coreui-size="sm"`.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5 mb-3">
+      <div class="time-picker" data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+## Disabled
+
+Add the `data-coreui-disabled="true"` attribute on an input to give it a grayed out appearance and remove pointer events.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+## Readonly
+
+Add the `data-coreui-input-read-only="true"` boolean attribute to prevent modification of the input's value.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-input-read-only="true" data-coreui-locale="en-US" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+## Custom formats
+
+### Disable minutes and seconds
+
+Customize Bootstrap Time Picker to display only hours, or hours and minutes by disabling minutes/seconds.
+
+<Example pro code={`<div class="row">
+    <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+      <label class="form-label">Only hours and minutes</label>
+      <div class="time-picker" data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-toggle="time-picker"></div>
+    </div>
+    <div class="col-sm-6 col-lg-5">
+    <label class="form-label">Only hours</label>
+      <div class="time-picker" data-coreui-locale="en-US" data-coreui-minutes="false" data-coreui-seconds="false" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+### Custom hours, minutes and seconds
+
+Tailor the Bootstrap Time Picker to your needs by specifying custom values for hours, minutes, and seconds. Use arrays to define selectable options or functions for dynamic filtering. The example below demonstrates setting specific hour options, minute intervals, and a condition for seconds only to include values less than 20.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div id="myTimePickerCustom"></div>
+    </div>
+  </div>`} sandboxJs={timePickerCustom} />
+
+<Code code={timePickerCustom} lang="js" />
+
+In this configuration, the Bootstrap TimePicker restricts hours to a predefined set, minutes to quarter intervals, and seconds to values under 20, offering a high degree of customization for precise time selection scenarios.
+
+## Non-english locale
+
+CoreUI Time Picker allows you to display times in a non-English locale, ideal for international users or multilingual applications.
+
+### Auto
+
+By default, the Time Picker uses the browser’s locale. To set a different locale, use the `data-coreui-locale` attribute.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+### Chinese
+
+To configure the Time Picker for Chinese users, set the locale to `zh-CN` and provide a placeholder text:
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-locale="zh-CN" data-coreui-placeholder="入住日期" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+### Japanese
+
+To localize the Time Picker for Japanese, set the locale to `ja` and use an appropriate placeholder:
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-locale="ja" data-coreui-placeholder="日付を選択" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+### Korean
+
+For Korean localization, set the locale to `ko` and include placeholder text:
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-locale="ko" data-coreui-placeholder="날짜 선택" data-coreui-toggle="time-picker"></div>
+    </div>
+  </div>`} />
+
+## Right to left support
+
+RTL support is built-in and can be explicitly controlled through the `$enable-rtl` variables in scss.
+
+### Hebrew
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-locale="he-IL" data-coreui-placeholder="בחר תאריך" data-coreui-toggle="time-picker" dir="rtl"></div>
+    </div>
+  </div>`} />
+
+### Persian
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-4">
+      <div class="time-picker" data-coreui-locale="fa-IR" data-coreui-placeholder="تاریخ شروع" data-coreui-toggle="time-picker" dir="rtl"></div>
+    </div>
+  </div>`} />
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-toggle="time-picker"` to a `div` element.
+
+```html
+<div data-coreui-toggle="time-picker"></div>
+```
+
+### Via JavaScript
+
+Call the time picker via JavaScript:
+
+```html
+<div class="time-picker"></div>
+```
+
+```js
+const timePickerElementList = Array.prototype.slice.call(document.querySelectorAll('.time-picker'))
+const timePickerList = timePickerElementList.map(timePickerEl => {
+  return new coreui.TimePicker(timePickerEl)
+})
+```
+
+### Options
+
+Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
+
+Starting with CoreUI 4.2.6, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `ariaSelectHoursLabel` | string | `'Select hours'` | Accessible label for the hours selection element. |
+| `ariaSelectMeridiemLabel` | string | `'Select AM/PM'` | Accessible label for the AM/PM selection element. |
+| `ariaSelectMinutesLabel` | string | `'Select minutes'` | Accessible label for the minutes selection element. |
+| `ariaSelectSecondsLabel` | string | `'Select seconds'` | Accessible label for the seconds selection element. |
+| `cancelButton` | boolean, string | `'Cancel'` | Cancel button inner HTML |
+| `cancelButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-ghost-primary']` | CSS class names that will be added to the cancel button |
+| `cleaner` | boolean | `true` | Enables selection cleaner element. |
+| `confirmButton` | boolean, string | `'OK'` | Confirm button inner HTML |
+| `confirmButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary']` | CSS class names that will be added to the confirm button |
+| `container` | string, element, false | `false` | Appends the dropdown to a specific element. Example: `container: 'body'`. |
+| `disabled` | boolean | `false` | Toggle the disabled state for the component. |
+| `footer` | boolean | `true` | Toggle visibility of footer element. |
+| `hours` | array, function, null | `null` | Specify a list of available hours using an array, or customize the filtering of hours through a function. |
+| `indicator` | boolean | `true` | Toggle visibility or set the content of the input indicator. |
+| `inputOnChangeDelay` | number | `750` | Delay in milliseconds before processing manual time input changes. |
+| `inputReadOnly` | boolean | `false` | Toggle the readonly state for the component. |
+| `invalid` | boolean | `false` | Toggle the invalid state for the component. |
+| `locale` | string | `'default'` | Sets the default locale for components. If not set, it is inherited from the navigator.language. |
+| `minutes` | array, boolean, function | `true` | Toggle the display of minutes, specify a list of available minutes using an array, or customize the filtering of minutes through a function. |
+| `name` | string | `null` | Set the name attribute for the input element. |
+| `placeholder` | string | `'Select time'` | Specifies a short hint that is visible in the input. |
+| `seconds` | array, boolean, function | `true` | Toggle the display of seconds, specify a list of available seconds using an array, or customize the filtering of seconds through a function. |
+| `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
+| `time` | date, string, null | `null` | Default value of the component |
+| `valid` | boolean | `false` | Toggle the valid state for the component. |
+| `variant` | `'roll'`, `'select'` | `'roll'` | Set the time picker variant to a roll or select. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `clear` | Clear selection of the time picker. |
+| `reset` | Reset selection of the time picker to the initial value. |
+| `update` | Updates the configuration of the time picker. |
+| `dispose` | Destroys a component. (Removes stored data on the DOM element) |
+| `getInstance` | Static method which allows you to get the time picker instance associated to a DOM element, you can use it like this: `coreui.TimePicker.getInstance(element)` |
+| `getOrCreateInstance` | Static method which returns a time picker instance associated to a DOM element or create a new one in case it wasn't initialized.  You can use it like this: `coreui.TimePicker.getOrCreateInstance(element)` |
+
+### Events
+
+| Method | Description |
+| --- | --- |
+| `timeChange.coreui.time-picker` | Callback fired when the value changed. |
+| `show.coreui.time-picker` | Fires immediately when the show instance method is called. |
+| `shown.coreui.time-picker` | Fired when the dropdown has been made visible to the user and CSS transitions have completed. |
+| `hide.coreui.time-picker` | Fires immediately when the hide instance method has been called. |
+| `hidden.coreui.time-picker` | Fired when the dropdown has finished being hidden from the user and CSS transitions have completed. |
+
+```js
+const myTimePicker = document.getElementById('myTimePicker')
+myTimePicker.addEventListener('timeChange.coreui.time-picker', ({ timeString, localeTimeString, date }) => {
+  // do something...
+})
+```
+
+## Customizing
+
+### CSS variables
+
+TimePickers use local CSS variables on `.time-picker` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
+
+<ScssDocs file="scss/_time-picker.scss" capture="time-picker-css-vars" />
+
+### SASS variables
+
+<ScssDocs file="scss/_variables.scss" capture="time-picker-variables" />
