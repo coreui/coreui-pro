@@ -48,6 +48,7 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
+const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
@@ -477,6 +478,12 @@ class Autocomplete extends BaseComponent {
           this._triggerChangeEvent(null)
         }
       }
+    })
+
+    EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, event => {
+      // Keep focus on the input so its blur handler doesn't clear the search
+      // (and re-render the list) before the click selects the option.
+      event.preventDefault()
     })
 
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {

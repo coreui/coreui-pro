@@ -2202,6 +2202,71 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.value).toBe('')
     })
 
+    it('should prevent default on options mousedown so clicking a filtered option keeps focus', () => {
+      // Regression test for #484: clicking a filtered option must not be hijacked by
+      // the input blur clearing the search and re-rendering the full list. The fix
+      // prevents the option mousedown from blurring the input.
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [
+          { label: 'Angular', value: 'angular' },
+          { label: 'Vue.js', value: 'vue' }
+        ]
+      })
+
+      autocomplete.show()
+      autocomplete._inputElement.value = 'vue'
+      autocomplete._search = 'vue'
+      autocomplete._filterOptionsList()
+
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+        .find(option => option.style.display !== 'none')
+      expect(visibleOption.textContent).toBe('Vue.js')
+
+      const mousedown = createEvent('mousedown', { bubbles: true, cancelable: true })
+      visibleOption.dispatchEvent(mousedown)
+
+      expect(mousedown.defaultPrevented).toBe(true)
+    })
+
+    it('should select the clicked option after filtering with allowOnlyDefinedOptions', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          allowOnlyDefinedOptions: true,
+          options: [
+            { label: 'Angular', value: 'angular' },
+            { label: 'Vue.js', value: 'vue' }
+          ]
+        })
+
+        autocomplete.show()
+        autocomplete._inputElement.value = 'vue'
+        autocomplete._search = 'vue'
+        autocomplete._filterOptionsList()
+
+        const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+          .find(option => option.style.display !== 'none')
+
+        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+          expect(event.value.label).toBe('Vue.js')
+          resolve()
+        })
+
+        // Model the real browser ordering: mousedown -> (blur unless prevented) -> click.
+        const mousedown = createEvent('mousedown', { bubbles: true, cancelable: true })
+        visibleOption.dispatchEvent(mousedown)
+        if (!mousedown.defaultPrevented) {
+          autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+        }
+
+        visibleOption.dispatchEvent(createEvent('click', { bubbles: true }))
+      })
+    })
+
     it('should not clear on blur when there is exactly one case-insensitive match', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'
