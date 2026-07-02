@@ -58,16 +58,21 @@ export const getAmPm = (date, locale) => {
  * @param {number[]} values An array of time values to format.
  * @param {string} locale The locale to use for formatting.
  * @param {('hour' | 'minute' | 'second')} partial The type of time value to format.
+ * @param {boolean} [hour12] Whether the hour labels should use the 12-hour cycle. When omitted the formatter falls back to the locale's default cycle.
  * @returns {Array} An array of objects with the original value and its localized label.
  */
-export const formatTimePartials = (values, locale, partial) => {
+export const formatTimePartials = (values, locale, partial, hour12) => {
   const date = new Date()
 
   const forceTwoDigit = shouldUseTwoDigitHour(locale)
+  // `hour12: false` lets ICU pick either h23 (00–23) or h24 (01–24), so older
+  // engines label midnight as "24"; pin the cycle explicitly to stay stable.
+  const hourCycle = hour12 === undefined ? undefined : (hour12 ? 'h12' : 'h23')
   const formatter = new Intl.DateTimeFormat(locale, {
     hour: forceTwoDigit ? '2-digit' : 'numeric',
     minute: '2-digit',
-    second: '2-digit'
+    second: '2-digit',
+    hourCycle
   })
 
   return values.map(value => {
@@ -138,7 +143,7 @@ export const getLocalizedTimePartials = (
         Array.from({ length: 60 }, (_, i) => i))
 
   return {
-    listOfHours: formatTimePartials(listOfHours, locale, 'hour'),
+    listOfHours: formatTimePartials(listOfHours, locale, 'hour', hour12),
     listOfMinutes: formatTimePartials(listOfMinutes, locale, 'minute'),
     listOfSeconds: formatTimePartials(listOfSeconds, locale, 'second'),
     hour12
