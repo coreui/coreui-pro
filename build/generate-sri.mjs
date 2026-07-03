@@ -27,7 +27,7 @@ const isCanaryVersion = pkg.version.includes('canary')
 
 // Array of objects which holds the files to generate SRI hashes for.
 // `file` is the path from the root folder
-// `configPropertyName` is the hugo.yml variable's name of the file
+// `configPropertyName` is the config.yml variable's name of the file
 const files = [
   {
     file: 'dist/css/coreui.min.css',
