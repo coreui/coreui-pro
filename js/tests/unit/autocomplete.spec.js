@@ -894,6 +894,37 @@ describe('Autocomplete', () => {
 
       expect(highlighted).toBe('<strong>O</strong>pti<strong>o</strong>n <strong>O</strong>ne')
     })
+
+    it('should escape HTML in the label to prevent XSS', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = 'img'
+      const highlighted = autocomplete._highlightOption('<img src=x onerror=alert(1)> img')
+
+      expect(highlighted).not.toContain('<img')
+      expect(highlighted).toBe('&lt;<strong>img</strong> src=x onerror=alert(1)&gt; <strong>img</strong>')
+    })
+
+    it('should not throw on regex-special characters in the search', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = '('
+      expect(() => autocomplete._highlightOption('a (b) c')).not.toThrow()
+      expect(autocomplete._highlightOption('a (b) c')).toBe('a <strong>(</strong>b) c')
+    })
+
+    it('should return the escaped label when the search is empty', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = ''
+      expect(autocomplete._highlightOption('<b>x</b>')).toBe('&lt;b&gt;x&lt;/b&gt;')
+    })
   })
 
   describe('_isExternalSearch', () => {

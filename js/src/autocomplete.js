@@ -10,7 +10,7 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
+import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
@@ -320,8 +320,16 @@ class Autocomplete extends BaseComponent {
   }
 
   _highlightOption(label) {
-    const regex = new RegExp(this._search, 'gi')
-    return label.replace(regex, string => `<strong>${string}</strong>`)
+    if (!this._search) {
+      return escapeHtml(label)
+    }
+
+    const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`(${escapedSearch})`, 'gi')
+    return String(label)
+      .split(regex)
+      .map((part, index) => (index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`))
+      .join('')
   }
 
   _isExternalSearch() {
