@@ -479,6 +479,23 @@ describe('Autocomplete', () => {
       expect(autocomplete._isShown()).toBe(true)
     })
 
+    it('should render searchNoResultsLabel as text, not markup', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        searchNoResultsLabel: '<img src=x onerror="window.xss = true">',
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      autocomplete._search = 'nonexistent'
+      autocomplete._filterOptionsList()
+
+      const placeholder = autocomplete._menu.querySelector('.autocomplete-options-empty')
+      expect(placeholder.querySelector('img')).toBeNull()
+      expect(placeholder.textContent).toBe('<img src=x onerror="window.xss = true">')
+    })
+
     it('should show with container mode', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

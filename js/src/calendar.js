@@ -10,7 +10,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
+import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
 import {
   convertToDateObject,
@@ -606,10 +606,10 @@ class Calendar extends BaseComponent {
     navigationElement.classList.add('calendar-nav')
     navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${escapeHtml(this._config.ariaNavPrevYearLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${escapeHtml(this._config.ariaNavPrevMonthLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
@@ -622,10 +622,10 @@ class Calendar extends BaseComponent {
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${escapeHtml(this._config.ariaNavNextMonthLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${escapeHtml(this._config.ariaNavNextYearLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -644,7 +644,7 @@ class Calendar extends BaseComponent {
           ${this._config.showWeekNumber ?
             `<th class="${CLASS_NAME_CALENDAR_CELL}">
               <div class="calendar-header-cell-inner">
-               ${this._config.weekNumbersLabel ?? ''}
+               ${this._config.weekNumbersLabel ? escapeHtml(this._config.weekNumbersLabel) : ''}
               </div>
             </th>` : ''
           }

@@ -2664,5 +2664,30 @@ describe('Calendar', () => {
       expect(btnDoubleNext.getAttribute('aria-label')).toEqual('Go to next year')
       expect(btnDoublePrev.getAttribute('aria-label')).toEqual('Go to previous year')
     })
+
+    it('should escape aria labels so they cannot break out of the attribute', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        ariaNavNextYearLabel: '"><img src=x onerror="window.xss = true">'
+      })
+
+      expect(div.querySelector('.calendar-nav img')).toBeNull()
+      expect(div.querySelector('.btn-double-next').getAttribute('aria-label'))
+        .toEqual('"><img src=x onerror="window.xss = true">')
+    })
+
+    it('should escape the week numbers label', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { // eslint-disable-line no-new
+        showWeekNumber: true,
+        weekNumbersLabel: '<img src=x onerror="window.xss = true">'
+      })
+
+      expect(div.querySelector('.calendar-header-cell-inner img')).toBeNull()
+    })
   })
 })

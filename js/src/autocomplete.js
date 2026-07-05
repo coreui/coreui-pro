@@ -926,7 +926,7 @@ class Autocomplete extends BaseComponent {
       if (this._config.searchNoResultsLabel) {
         const placeholder = document.createElement('div')
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-        placeholder.innerHTML = this._config.searchNoResultsLabel
+        placeholder.textContent = this._config.searchNoResultsLabel
 
         if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
           SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
