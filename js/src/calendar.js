@@ -1071,7 +1071,7 @@ class Calendar extends BaseComponent {
       ...dataAttributes,
       ...(typeof config === 'object' && config ? config : {})
     }
-    config = this._mergeConfigObj(config, this._element)
+    config = this._mergeConfigObj(config)
     config = this._configAfterMerge(config)
     this._typeCheckConfig(config)
 
