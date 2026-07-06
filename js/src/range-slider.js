@@ -406,7 +406,9 @@ class RangeSlider extends BaseComponent {
     }
 
     if (this._tooltips[index]) {
-      this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ? this._config.tooltipsFormat(value) : value
+      this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ?
+        (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(value)) :
+        value
       const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)[index]
       this._positionTooltip(this._tooltips[index], input)
     }

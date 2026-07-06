@@ -779,7 +779,7 @@ class DateRangePicker extends BaseComponent {
           this._calendar.update(this._getCalendarConfig())
         })
 
-        buttonEl.innerHTML = key
+        buttonEl.textContent = key
         dateRangePickerRangesEl.append(buttonEl)
       }
 
@@ -881,7 +881,7 @@ class DateRangePicker extends BaseComponent {
       const todayButtonEl = document.createElement('button')
       todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses))
       todayButtonEl.type = 'button'
-      todayButtonEl.innerHTML = this._config.todayButton
+      todayButtonEl.textContent = this._config.todayButton
       todayButtonEl.addEventListener('click', () => {
         const date = new Date()
         this._calendarDate = date
@@ -901,7 +901,7 @@ class DateRangePicker extends BaseComponent {
       const cancelButtonEl = document.createElement('button')
       cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses))
       cancelButtonEl.type = 'button'
-      cancelButtonEl.innerHTML = this._config.cancelButton
+      cancelButtonEl.textContent = this._config.cancelButton
       cancelButtonEl.addEventListener('click', () => {
         this.cancel()
       })
@@ -913,7 +913,7 @@ class DateRangePicker extends BaseComponent {
       const confirmButtonEl = document.createElement('button')
       confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses))
       confirmButtonEl.type = 'button'
-      confirmButtonEl.innerHTML = this._config.confirmButton
+      confirmButtonEl.textContent = this._config.confirmButton
       confirmButtonEl.addEventListener('click', () => {
         this.hide()
       })
