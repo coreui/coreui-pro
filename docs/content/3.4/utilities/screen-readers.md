@@ -1,3 +1,0 @@
----
-aliases: "/utilities/screen-readers/"
----

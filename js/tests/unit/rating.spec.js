@@ -1484,4 +1484,25 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item-label.active')).toHaveSize(3)
     })
   })
+
+  describe('sanitize', () => {
+    it('should strip event-handler attributes from a custom icon', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Rating(div, { readOnly: true, value: 1, icon: '<img src=x onerror="window.xss = true">' })
+
+      const icon = div.querySelector('.rating-item-custom-icon img')
+      expect(icon.hasAttribute('onerror')).toBeFalse()
+    })
+
+    it('should not disable sanitization via a data attribute', () => {
+      fixtureEl.innerHTML = '<div data-coreui-sanitize="false" data-coreui-read-only="true" data-coreui-value="1" data-coreui-icon="<img src=x onerror=alert(1)>"></div>'
+      const div = fixtureEl.querySelector('div')
+      const rating = new Rating(div)
+
+      expect(rating._config.sanitize).toBeTrue()
+      expect(div.querySelector('.rating-item-custom-icon img').hasAttribute('onerror')).toBeFalse()
+    })
+  })
 })

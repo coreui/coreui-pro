@@ -479,6 +479,23 @@ describe('Autocomplete', () => {
       expect(autocomplete._isShown()).toBe(true)
     })
 
+    it('should render searchNoResultsLabel as text, not markup', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        searchNoResultsLabel: '<img src=x onerror="window.xss = true">',
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      autocomplete._search = 'nonexistent'
+      autocomplete._filterOptionsList()
+
+      const placeholder = autocomplete._menu.querySelector('.autocomplete-options-empty')
+      expect(placeholder.querySelector('img')).toBeNull()
+      expect(placeholder.textContent).toBe('<img src=x onerror="window.xss = true">')
+    })
+
     it('should show with container mode', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -893,6 +910,37 @@ describe('Autocomplete', () => {
       const highlighted = autocomplete._highlightOption('Option One')
 
       expect(highlighted).toBe('<strong>O</strong>pti<strong>o</strong>n <strong>O</strong>ne')
+    })
+
+    it('should escape HTML in the label to prevent XSS', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = 'img'
+      const highlighted = autocomplete._highlightOption('<img src=x onerror=alert(1)> img')
+
+      expect(highlighted).not.toContain('<img')
+      expect(highlighted).toBe('&lt;<strong>img</strong> src=x onerror=alert(1)&gt; <strong>img</strong>')
+    })
+
+    it('should not throw on regex-special characters in the search', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = '('
+      expect(() => autocomplete._highlightOption('a (b) c')).not.toThrow()
+      expect(autocomplete._highlightOption('a (b) c')).toBe('a <strong>(</strong>b) c')
+    })
+
+    it('should return the escaped label when the search is empty', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
+
+      autocomplete._search = ''
+      expect(autocomplete._highlightOption('<b>x</b>')).toBe('&lt;b&gt;x&lt;/b&gt;')
     })
   })
 
@@ -2200,6 +2248,71 @@ describe('Autocomplete', () => {
       autocomplete._inputElement.dispatchEvent(createEvent('blur'))
 
       expect(autocomplete._inputElement.value).toBe('')
+    })
+
+    it('should prevent default on options mousedown so clicking a filtered option keeps focus', () => {
+      // Regression test for #484: clicking a filtered option must not be hijacked by
+      // the input blur clearing the search and re-rendering the full list. The fix
+      // prevents the option mousedown from blurring the input.
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        allowOnlyDefinedOptions: true,
+        options: [
+          { label: 'Angular', value: 'angular' },
+          { label: 'Vue.js', value: 'vue' }
+        ]
+      })
+
+      autocomplete.show()
+      autocomplete._inputElement.value = 'vue'
+      autocomplete._search = 'vue'
+      autocomplete._filterOptionsList()
+
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+        .find(option => option.style.display !== 'none')
+      expect(visibleOption.textContent).toBe('Vue.js')
+
+      const mousedown = createEvent('mousedown', { bubbles: true, cancelable: true })
+      visibleOption.dispatchEvent(mousedown)
+
+      expect(mousedown.defaultPrevented).toBe(true)
+    })
+
+    it('should select the clicked option after filtering with allowOnlyDefinedOptions', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          allowOnlyDefinedOptions: true,
+          options: [
+            { label: 'Angular', value: 'angular' },
+            { label: 'Vue.js', value: 'vue' }
+          ]
+        })
+
+        autocomplete.show()
+        autocomplete._inputElement.value = 'vue'
+        autocomplete._search = 'vue'
+        autocomplete._filterOptionsList()
+
+        const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+          .find(option => option.style.display !== 'none')
+
+        autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
+          expect(event.value.label).toBe('Vue.js')
+          resolve()
+        })
+
+        // Model the real browser ordering: mousedown -> (blur unless prevented) -> click.
+        const mousedown = createEvent('mousedown', { bubbles: true, cancelable: true })
+        visibleOption.dispatchEvent(mousedown)
+        if (!mousedown.defaultPrevented) {
+          autocomplete._inputElement.dispatchEvent(createEvent('blur'))
+        }
+
+        visibleOption.dispatchEvent(createEvent('click', { bubbles: true }))
+      })
     })
 
     it('should not clear on blur when there is exactly one case-insensitive match', () => {

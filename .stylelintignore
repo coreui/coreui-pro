@@ -1,6 +1,6 @@
 **/*.min.css
 **/dist/
 **/vendor/
-/_gh_pages/
+/_site/
 /docs/assets/css/all-icons.css
 /js/coverage/

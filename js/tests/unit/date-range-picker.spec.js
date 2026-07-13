@@ -832,6 +832,35 @@ describe('DateRangePicker', () => {
       expect(dateRangePicker._endDate.toDateString()).toBe(today.toDateString())
     })
 
+    it('should disable today button when today is a disabled date', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+        footer: true,
+        todayButton: 'Today',
+        maxDate: yesterday
+      })
+
+      const footer = div.querySelector('.date-picker-footer')
+      const todayBtn = Array.from(footer.querySelectorAll('button')).find(b => b.innerHTML === 'Today')
+      expect(todayBtn.disabled).toBeTrue()
+    })
+
+    it('should not disable today button when today is selectable', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+        footer: true,
+        todayButton: 'Today'
+      })
+
+      const footer = div.querySelector('.date-picker-footer')
+      const todayBtn = Array.from(footer.querySelectorAll('button')).find(b => b.innerHTML === 'Today')
+      expect(todayBtn.disabled).toBeFalse()
+    })
+
     it('should not set end date on today click when range is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

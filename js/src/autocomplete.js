@@ -10,7 +10,7 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
+import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
@@ -48,6 +48,7 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
+const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
@@ -319,8 +320,16 @@ class Autocomplete extends BaseComponent {
   }
 
   _highlightOption(label) {
-    const regex = new RegExp(this._search, 'gi')
-    return label.replace(regex, string => `<strong>${string}</strong>`)
+    if (!this._search) {
+      return escapeHtml(label)
+    }
+
+    const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`(${escapedSearch})`, 'gi')
+    return String(label)
+      .split(regex)
+      .map((part, index) => (index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`))
+      .join('')
   }
 
   _isExternalSearch() {
@@ -477,6 +486,12 @@ class Autocomplete extends BaseComponent {
           this._triggerChangeEvent(null)
         }
       }
+    })
+
+    EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, event => {
+      // Keep focus on the input so its blur handler doesn't clear the search
+      // (and re-render the list) before the click selects the option.
+      event.preventDefault()
     })
 
     EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
@@ -919,7 +934,7 @@ class Autocomplete extends BaseComponent {
       if (this._config.searchNoResultsLabel) {
         const placeholder = document.createElement('div')
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-        placeholder.innerHTML = this._config.searchNoResultsLabel
+        placeholder.textContent = this._config.searchNoResultsLabel
 
         if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
           SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)

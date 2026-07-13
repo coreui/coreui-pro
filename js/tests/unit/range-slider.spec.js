@@ -113,6 +113,21 @@ describe('RangeSlider', () => {
       expect(tooltips[1].textContent).toBe('150%')
     })
 
+    it('should sanitize tooltip content on the update path', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, {
+        tooltips: true,
+        value: 50,
+        tooltipsFormat: () => '<img src=x onerror="window.xss = true">'
+      })
+
+      rangeSlider._updateTooltip(0, 60)
+
+      const inner = element.querySelector('.range-slider-tooltip-inner')
+      expect(inner.querySelector('img').hasAttribute('onerror')).toBeFalse()
+    })
+
     it('should initialize with a single numeric value', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')

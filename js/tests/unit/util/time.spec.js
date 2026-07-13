@@ -133,6 +133,17 @@ describe('Time Utilities', () => {
       expect(listOfHours[23].value).toBe(23)
     })
 
+    it('should label a 24-hour picker with 24-hour hours (00…23) in a 12-hour locale', () => {
+      // en-CA defaults to a 12-hour cycle, so without pinning the hour cycle a
+      // 24-hour picker rendered duplicated 12-hour labels (12,01,…,11,12,01,…)
+      // and older ICU labelled midnight "24".
+      const { listOfHours } = getLocalizedTimePartials('en-CA', false)
+      const labels = listOfHours.map(({ label }) => label)
+      expect(labels).toContain('00')
+      expect(labels).toContain('13')
+      expect(labels).toContain('23')
+    })
+
     it('should filter hours if a function is passed', () => {
       // For example, only even hours in 24-hour format
       const hoursFn = hour => hour % 2 === 0
