@@ -444,7 +444,7 @@ describe('LoadingButton', () => {
       })
     })
 
-    it('should prevent default behavior on click', () => {
+    it('should not prevent default behavior on click', () => {
       fixtureEl.innerHTML = '<button data-coreui-toggle="loading-button">Click me</button>'
       const button = fixtureEl.querySelector('[data-coreui-toggle="loading-button"]')
 
@@ -452,7 +452,26 @@ describe('LoadingButton', () => {
       spyOn(clickEvent, 'preventDefault')
       button.dispatchEvent(clickEvent)
 
-      expect(clickEvent.preventDefault).toHaveBeenCalled()
+      expect(clickEvent.preventDefault).not.toHaveBeenCalled()
+    })
+
+    it('should not prevent a submit button from submitting its form', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<form>',
+          '  <button type="submit" data-coreui-toggle="loading-button">Save</button>',
+          '</form>'
+        ].join('')
+        const form = fixtureEl.querySelector('form')
+        const button = fixtureEl.querySelector('[data-coreui-toggle="loading-button"]')
+
+        form.addEventListener('submit', event => {
+          event.preventDefault()
+          resolve()
+        })
+
+        button.click()
+      })
     })
 
     it('should work with nested elements', () => {
