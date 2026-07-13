@@ -882,6 +882,11 @@ class DateRangePicker extends BaseComponent {
       todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses))
       todayButtonEl.type = 'button'
       todayButtonEl.textContent = this._config.todayButton
+
+      if (isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+        todayButtonEl.disabled = true
+      }
+
       todayButtonEl.addEventListener('click', () => {
         const date = new Date()
         this._calendarDate = date
