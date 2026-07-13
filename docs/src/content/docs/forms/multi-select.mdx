@@ -234,14 +234,13 @@ To surface these as buttons inside the dropdown, render them through the [custom
 
 ### Hiding select all when search has no results
 
-{{< added-in "5.27.0" >}}
+<AddedIn version="5.27.0" />
 
 When `search` is enabled and the user types a query that matches no options, there is nothing left to select — so leaving the **select all** button visible above the empty "No results found" message is misleading. By default (`hideSelectAllOnSearchNoResults: true`) the component hides the whole dropdown header in that case, and brings it back as soon as the search matches at least one option again.
 
 Type a query that matches nothing (for example `xyz`) into the example below — the select all button disappears together with the options, then returns when you clear or change the search.
 
-{{< example stackblitz_pro="true" >}}
-<select id="multiSelectHideSelectAll" data-coreui-multi-select multiple data-coreui-search="true">
+<Example pro code={`<select id="multiSelectHideSelectAll" data-coreui-multi-select multiple data-coreui-search="true">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -251,13 +250,11 @@ Type a query that matches nothing (for example `xyz`) into the example below —
     <option value="5">Laravel</option>
     <option value="6">Node.js</option>
   </optgroup>
-</select>
-{{< /example >}}
+</select>`} />
 
 Set `hideSelectAllOnSearchNoResults: false` to keep the header (and the select all button) visible even when the search returns no results.
 
-{{< example stackblitz_pro="true" >}}
-<select id="multiSelectKeepSelectAll" data-coreui-multi-select multiple data-coreui-search="true" data-coreui-hide-select-all-on-search-no-results="false">
+<Example pro code={`<select id="multiSelectKeepSelectAll" data-coreui-multi-select multiple data-coreui-search="true" data-coreui-hide-select-all-on-search-no-results="false">
   <option value="0">Angular</option>
   <option value="1">Bootstrap</option>
   <option value="2">React.js</option>
@@ -267,8 +264,7 @@ Set `hideSelectAllOnSearchNoResults: false` to keep the header (and the select a
     <option value="5">Laravel</option>
     <option value="6">Node.js</option>
   </optgroup>
-</select>
-{{< /example >}}
+</select>`} />
 
 This option only affects the built-in select all button. A [custom dropdown header](#custom-dropdown-header) is always rendered, since it may contain controls unrelated to the options list.
 
