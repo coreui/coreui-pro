@@ -859,13 +859,13 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
 
     if ((index + 1) % 7 === 0) {
       const { weekNumber, year } = getISOWeekNumberAndYear(day.date)
-      const lastWeek = weeks.at(-1)
+      const lastWeek = weeks[weeks.length - 1]
       if (lastWeek) {
         lastWeek.week = { number: weekNumber, year }
       }
     }
 
-    const lastWeek = weeks.at(-1)
+    const lastWeek = weeks[weeks.length - 1]
     if (lastWeek) {
       lastWeek.days.push(day)
     }
