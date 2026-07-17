@@ -93,6 +93,28 @@ describe('Rating', () => {
       expect(div.querySelectorAll('.rating-item')).toHaveSize(10)
     })
 
+    it('should set a default aria-label on each rating radio', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Rating(div, { itemCount: 5 }) // eslint-disable-line no-new
+
+      const inputs = div.querySelectorAll('.rating-item-input')
+      expect(inputs[0].getAttribute('aria-label')).toEqual('1 of 5')
+      expect(inputs[4].getAttribute('aria-label')).toEqual('5 of 5')
+    })
+
+    it('should use a custom ariaLabel function', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      new Rating(div, { // eslint-disable-line no-new
+        itemCount: 5,
+        ariaLabel: (value, itemCount) => `${value} star of ${itemCount}`
+      })
+
+      const inputs = div.querySelectorAll('.rating-item-input')
+      expect(inputs[2].getAttribute('aria-label')).toEqual('3 star of 5')
+    })
+
     it('should set the initial checked input if "value" is provided', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

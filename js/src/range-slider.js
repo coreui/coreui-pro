@@ -51,6 +51,7 @@ const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container'
 
 const Default = {
   allowList: DefaultAllowlist,
+  ariaLabels: null,
   clickableLabels: true,
   disabled: false,
   distance: 0,
@@ -70,6 +71,7 @@ const Default = {
 
 const DefaultType = {
   allowList: 'object',
+  ariaLabels: '(array|null)',
   clickableLabels: 'boolean',
   disabled: 'boolean',
   distance: 'number',
@@ -256,7 +258,32 @@ class RangeSlider extends BaseComponent {
     inputElement.setAttribute('aria-valuenow', value)
     inputElement.setAttribute('aria-orientation', this._config.vertical ? 'vertical' : 'horizontal')
 
+    if (this._currentValue.length > 1) {
+      inputElement.setAttribute('aria-label', this._getAriaLabel(index))
+    }
+
+    const valueText = this._getValueText(value)
+    if (valueText !== null) {
+      inputElement.setAttribute('aria-valuetext', valueText)
+    }
+
     return inputElement
+  }
+
+  _getAriaLabel(index) {
+    if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) {
+      return this._config.ariaLabels[index]
+    }
+
+    if (this._currentValue.length === 2) {
+      return index === 0 ? 'Minimum value' : 'Maximum value'
+    }
+
+    return `Value ${index + 1}`
+  }
+
+  _getValueText(value) {
+    return typeof this._config.tooltipsFormat === 'function' ? `${this._config.tooltipsFormat(value)}` : null
   }
 
   _createLabels() {
@@ -546,6 +573,12 @@ class RangeSlider extends BaseComponent {
 
     input.value = value
     input.setAttribute('aria-valuenow', value)
+
+    const valueText = this._getValueText(value)
+    if (valueText !== null) {
+      input.setAttribute('aria-valuetext', valueText)
+    }
+
     setTimeout(() => {
       input.focus()
     })

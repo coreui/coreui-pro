@@ -51,6 +51,7 @@ const Default = {
   activeIcon: null,
   allowClear: false,
   allowList: SVGAllowlist,
+  ariaLabel: (value, itemCount) => `${value} of ${itemCount}`,
   disabled: false,
   highlightOnlySelected: false,
   icon: null,
@@ -69,6 +70,7 @@ const DefaultType = {
   activeIcon: '(object|string|null)',
   allowClear: 'boolean',
   allowList: 'object',
+  ariaLabel: 'function',
   disabled: 'boolean',
   highlightOnlySelected: 'boolean',
   icon: '(object|string|null)',
@@ -399,6 +401,10 @@ class Rating extends BaseComponent {
       ratingItemInputElement.type = 'radio'
       ratingItemInputElement.value = value
       ratingItemInputElement.name = this._name
+
+      if (typeof this._config.ariaLabel === 'function') {
+        ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount))
+      }
 
       if (this._config.disabled || this._config.readOnly) {
         ratingItemInputElement.setAttribute('disabled', true)
