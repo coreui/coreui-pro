@@ -677,10 +677,12 @@ class Calendar extends BaseComponent {
               ${days.map(({ date, month }) => {
                 const cellAttributes = this._cellDayAttributes(date, month)
                 return month === 'current' || this._config.showAdjacementDays ?
-                  `<td 
+                  `<td
                     class="${cellAttributes.className}"
                     tabindex="${cellAttributes.tabIndex}"
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                    ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
+                    aria-label="${escapeHtml(cellAttributes.ariaLabel)}"
                     data-coreui-date="${date}"
                   >
                     <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
@@ -890,7 +892,9 @@ class Calendar extends BaseComponent {
           [month]: true
         }),
         tabIndex: -1,
-        ariaSelected: false
+        ariaSelected: false,
+        ariaLabel: date.toLocaleDateString(this._config.locale),
+        ariaCurrent: isTodayDate
       }
     }
 
@@ -916,6 +920,8 @@ class Calendar extends BaseComponent {
       className: classNames,
       tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected,
+      ariaLabel: date.toLocaleDateString(this._config.locale),
+      ariaCurrent: isTodayDate,
       meta: {
         isDisabled,
         isInCurrentMonth: isCurrentMonth,
