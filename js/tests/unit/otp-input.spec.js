@@ -106,7 +106,7 @@ describe('OTPInput', () => {
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
       for (const input of inputs) {
         expect(input.maxLength).toBe(1)
-        expect(input.autocomplete).toBe('off')
+        expect(input.autocomplete).toBe('one-time-code')
         expect(input.hasAttribute('required')).toBe(true)
         expect(input.inputMode).toBe('numeric')
         expect(input.pattern).toBe('[0-9]*')
