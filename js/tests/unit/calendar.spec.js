@@ -296,6 +296,19 @@ describe('Calendar', () => {
     })
   })
 
+  describe('accessibility', () => {
+    it('should give day cells a full-date aria-label and mark today with aria-current', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { locale: 'en-US' }) // eslint-disable-line no-new
+
+      const labelledCells = div.querySelectorAll('td.calendar-cell[aria-label]')
+      expect(labelledCells.length).toBeGreaterThan(0)
+      expect(div.querySelector('[aria-current="date"]')).not.toBeNull()
+    })
+  })
+
   describe('showAdjacementDays', () => {
     it('should show adjacement days by default', () => {
       fixtureEl.innerHTML = '<div></div>'
