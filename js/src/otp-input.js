@@ -352,7 +352,7 @@ class OTPInput extends BaseComponent {
       input.type = this._config.masked ? 'password' : 'text'
 
       input.maxLength = 1
-      input.autocomplete = 'off'
+      input.autocomplete = 'one-time-code'
 
       if (this._config.placeholder !== null) {
         const placeholder = String(this._config.placeholder)
