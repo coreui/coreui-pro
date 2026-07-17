@@ -631,6 +631,7 @@ class Autocomplete extends BaseComponent {
     inputEl.setAttribute('aria-autocomplete', 'list')
     inputEl.setAttribute('aria-expanded', 'false')
     inputEl.setAttribute('aria-haspopup', 'listbox')
+    inputEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     if (this._config.disabled) {
       inputEl.setAttribute('disabled', true)
@@ -767,6 +768,11 @@ class Autocomplete extends BaseComponent {
 
       const optionDiv = document.createElement('div')
       optionDiv.classList.add(CLASS_NAME_OPTION)
+      optionDiv.setAttribute('role', 'option')
+      optionDiv.setAttribute(
+        'aria-selected',
+        this._selected.some(selected => selected.value === option.value) ? 'true' : 'false'
+      )
 
       if (option.disabled) {
         optionDiv.classList.add(CLASS_NAME_DISABLED)
