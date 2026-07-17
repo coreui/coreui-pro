@@ -150,6 +150,57 @@ describe('RangeSlider', () => {
     })
   })
 
+  describe('Accessibility labels', () => {
+    it('should not set aria-label on a single-thumb slider', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: 30 }) // eslint-disable-line no-new
+
+      const input = element.querySelector('.range-slider-input')
+      expect(input.getAttribute('aria-label')).toBeNull()
+    })
+
+    it('should label a two-thumb slider with Minimum/Maximum value by default', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [20, 80] }) // eslint-disable-line no-new
+
+      const inputs = element.querySelectorAll('.range-slider-input')
+      expect(inputs[0].getAttribute('aria-label')).toBe('Minimum value')
+      expect(inputs[1].getAttribute('aria-label')).toBe('Maximum value')
+    })
+
+    it('should label sliders with three or more thumbs positionally', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [10, 50, 90] }) // eslint-disable-line no-new
+
+      const inputs = element.querySelectorAll('.range-slider-input')
+      expect(inputs[0].getAttribute('aria-label')).toBe('Value 1')
+      expect(inputs[1].getAttribute('aria-label')).toBe('Value 2')
+      expect(inputs[2].getAttribute('aria-label')).toBe('Value 3')
+    })
+
+    it('should apply custom ariaLabels over the defaults', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: [20, 80], ariaLabels: ['From', 'To'] }) // eslint-disable-line no-new
+
+      const inputs = element.querySelectorAll('.range-slider-input')
+      expect(inputs[0].getAttribute('aria-label')).toBe('From')
+      expect(inputs[1].getAttribute('aria-label')).toBe('To')
+    })
+
+    it('should expose the formatted value via aria-valuetext when tooltipsFormat is set', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      new RangeSlider(element, { value: 40, tooltipsFormat: value => `$${value}` }) // eslint-disable-line no-new
+
+      const input = element.querySelector('.range-slider-input')
+      expect(input.getAttribute('aria-valuetext')).toBe('$40')
+    })
+  })
+
   describe('Multi-thumb', () => {
     it('should create multiple thumbs for array values', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'

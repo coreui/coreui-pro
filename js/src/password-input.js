@@ -22,7 +22,8 @@ const DATA_API_KEY = '.data-api'
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_FORM_CONTROL = '.form-control'
-const SELECTOR_DATA_TOGGLE = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ [data-coreui-toggle="password"]`
+const SELECTOR_TOGGLE = '[data-coreui-toggle="password"]'
+const SELECTOR_DATA_TOGGLE = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ ${SELECTOR_TOGGLE}`
 
 /**
  * Class definition
@@ -37,6 +38,20 @@ class PasswordInput extends BaseComponent {
   // Public
   toggle() {
     this._element.type = this._element.type === 'password' ? 'text' : 'password'
+    this._updateToggleState()
+  }
+
+  // Private
+  _updateToggleState() {
+    if (!this._element.parentNode) {
+      return
+    }
+
+    const toggler = SelectorEngine.findOne(SELECTOR_TOGGLE, this._element.parentNode)
+
+    if (toggler) {
+      toggler.setAttribute('aria-pressed', this._element.type === 'text' ? 'true' : 'false')
+    }
   }
 
   // Static

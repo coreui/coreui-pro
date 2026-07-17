@@ -238,6 +238,22 @@ describe('PasswordInput', () => {
       expect(PasswordInput.getInstance(input)).toBeInstanceOf(PasswordInput)
     })
 
+    it('should reflect visibility state via aria-pressed on the toggle button', () => {
+      fixtureEl.innerHTML = `
+        <div class="input-group">
+          <input type="password" class="form-control">
+          <button data-coreui-toggle="password" type="button">Toggle</button>
+        </div>
+      `
+      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+
+      toggleButton.dispatchEvent(createEvent('click'))
+      expect(toggleButton.getAttribute('aria-pressed')).toBe('true')
+
+      toggleButton.dispatchEvent(createEvent('click'))
+      expect(toggleButton.getAttribute('aria-pressed')).toBe('false')
+    })
+
     it('should prevent default behavior on toggle button click', () => {
       fixtureEl.innerHTML = `
         <div class="input-group">
