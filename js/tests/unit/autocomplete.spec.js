@@ -98,6 +98,22 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputElement.getAttribute('role')).toBe('combobox')
       expect(autocomplete._inputElement.getAttribute('aria-autocomplete')).toBe('list')
       expect(autocomplete._inputElement.getAttribute('aria-haspopup')).toBe('listbox')
+      expect(autocomplete._inputElement.getAttribute('aria-controls')).toBe(`${autocomplete._uniqueId}-listbox`)
+    })
+
+    it('should render each option with role="option"', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        options: [{ value: 1, label: 'One' }, { value: 2, label: 'Two' }]
+      })
+
+      const optionEls = autocomplete._optionsElement.querySelectorAll('.autocomplete-option')
+      expect(optionEls.length).toBe(2)
+      for (const optionEl of optionEls) {
+        expect(optionEl.getAttribute('role')).toBe('option')
+        expect(optionEl.getAttribute('aria-selected')).toBe('false')
+      }
     })
 
     it('should create autocomplete with cleaner button when cleaner option is true', () => {
