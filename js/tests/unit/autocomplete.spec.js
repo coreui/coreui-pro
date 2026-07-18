@@ -495,6 +495,22 @@ describe('Autocomplete', () => {
       expect(autocomplete._isShown()).toBe(true)
     })
 
+    it('should expose the no-results placeholder as a role="status" live region', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+      const autocomplete = new Autocomplete(autocompleteEl, {
+        searchNoResultsLabel: 'No results',
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      autocomplete._search = 'nonexistent'
+      autocomplete._filterOptionsList()
+
+      const placeholder = autocomplete._menu.querySelector('.autocomplete-options-empty')
+      expect(placeholder.getAttribute('role')).toBe('status')
+    })
+
     it('should render searchNoResultsLabel as text, not markup', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
