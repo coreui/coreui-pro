@@ -1050,6 +1050,37 @@ describe('Autocomplete', () => {
       })
     })
 
+    it('should focus the first/last option on Home/End keys', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+        const autocompleteEl = fixtureEl.querySelector('.autocomplete')
+        const autocomplete = new Autocomplete(autocompleteEl, {
+          options: [
+            { label: 'Option 1', value: '1' },
+            { label: 'Option 2', value: '2' },
+            { label: 'Option 3', value: '3' }
+          ]
+        })
+
+        autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
+          const options = autocomplete._optionsElement.querySelectorAll('.autocomplete-option')
+
+          const endEvent = createEvent('keydown')
+          endEvent.key = 'End'
+          autocomplete._optionsElement.dispatchEvent(endEvent)
+          expect(document.activeElement).toBe(options[options.length - 1])
+
+          const homeEvent = createEvent('keydown')
+          homeEvent.key = 'Home'
+          autocomplete._optionsElement.dispatchEvent(homeEvent)
+          expect(document.activeElement).toBe(options[0])
+          resolve()
+        })
+
+        autocomplete.show()
+      })
+    })
+
     it('should open dropdown on Enter key', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'

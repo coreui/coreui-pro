@@ -2878,6 +2878,31 @@ describe('MultiSelect', () => {
       expect(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option').length).toBe(2)
     })
 
+    it('should focus the first/last navigable item on Home/End keys', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Option 1' },
+          { value: '2', text: 'Option 2' },
+          { value: '3', text: 'Option 3' }
+        ],
+        selectAll: false
+      })
+
+      multiSelect.show()
+
+      const items = multiSelect._optionsElement.querySelectorAll('.form-multi-select-option')
+
+      const endEvent = new KeyboardEvent('keydown', { key: 'End', bubbles: true })
+      multiSelect._optionsElement.dispatchEvent(endEvent)
+      expect(document.activeElement).toBe(items[items.length - 1])
+
+      const homeEvent = new KeyboardEvent('keydown', { key: 'Home', bubbles: true })
+      multiSelect._optionsElement.dispatchEvent(homeEvent)
+      expect(document.activeElement).toBe(items[0])
+    })
+
     it('should focus the select all button during arrow navigation', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

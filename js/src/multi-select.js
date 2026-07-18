@@ -37,8 +37,10 @@ const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
+const END_KEY = 'End'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
+const HOME_KEY = 'Home'
 const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
@@ -544,6 +546,11 @@ class MultiSelect extends BaseComponent {
           event.preventDefault()
           this._selectMenuItem(event)
         }
+
+        if ([HOME_KEY, END_KEY].includes(event.key)) {
+          event.preventDefault()
+          this._selectFirstOrLastMenuItem(event.key === HOME_KEY)
+        }
       })
     }
 
@@ -563,6 +570,11 @@ class MultiSelect extends BaseComponent {
       if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
         event.preventDefault()
         this._selectMenuItem(event)
+      }
+
+      if ([HOME_KEY, END_KEY].includes(event.key)) {
+        event.preventDefault()
+        this._selectFirstOrLastMenuItem(event.key === HOME_KEY)
       }
     })
   }
@@ -1637,6 +1649,17 @@ class MultiSelect extends BaseComponent {
     // if target isn't included in items (e.g. when expanding the dropdown)
     // allow cycling to get the last item in case key equals ARROW_UP_KEY
     getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
+  }
+
+  _selectFirstOrLastMenuItem(first) {
+    const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
+
+    if (!items.length) {
+      return
+    }
+
+    const item = first ? items[0] : items[items.length - 1]
+    item.focus()
   }
 
   _configAfterMerge(config) {
