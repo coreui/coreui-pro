@@ -332,22 +332,21 @@ describe('DateInput', () => {
       expect(day.textContent).toEqual('13')
     })
 
-    it('should start an empty section at today', () => {
+    it('should start empty sections at the boundary, except year at the current year', () => {
       const dateInput = createDateInput()
       const [day, month, year] = getSections(dateInput._element)
-      const now = new Date()
 
       day.focus()
       pressKey(day, 'ArrowUp')
-      expect(day.textContent).toEqual(String(now.getDate()).padStart(2, '0'))
+      expect(day.textContent).toEqual('01')
 
       month.focus()
       pressKey(month, 'ArrowDown')
-      expect(month.textContent).toEqual(String(now.getMonth() + 1).padStart(2, '0'))
+      expect(month.textContent).toEqual('12')
 
       year.focus()
       pressKey(year, 'ArrowUp')
-      expect(year.textContent).toEqual(String(now.getFullYear()))
+      expect(year.textContent).toEqual(String(new Date().getFullYear()))
     })
 
     it('should wrap month around its bounds', () => {

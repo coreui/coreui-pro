@@ -151,14 +151,14 @@ describe('TimeInput', () => {
       expect(hour.textContent).toEqual('23')
     })
 
-    it('should start an empty hour at the current time', () => {
+    it('should start an empty hour at the boundary', () => {
       const timeInput = createTimeInput()
       const [hour] = getSections(timeInput._element)
 
       hour.focus()
-      pressKey(hour, 'ArrowUp')
+      pressKey(hour, 'ArrowDown')
 
-      expect(hour.textContent).toEqual(String(new Date().getHours()).padStart(2, '0'))
+      expect(hour.textContent).toEqual('23')
     })
   })
 
