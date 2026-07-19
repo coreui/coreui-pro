@@ -24,7 +24,7 @@ const DATA_API_KEY = '.data-api'
 
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-input"]'
+const SELECTOR_DATA_TIME_INPUT = '[data-coreui-time-input]'
 
 const Default = {
   ...SectionInput.Default,
@@ -104,7 +104,7 @@ class TimeInput extends SectionInput {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  for (const timeInput of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+  for (const timeInput of SelectorEngine.find(SELECTOR_DATA_TIME_INPUT)) {
     TimeInput.componentInterface(timeInput)
   }
 })

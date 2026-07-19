@@ -17,10 +17,10 @@ import timeInputCustomFormats1 from './snippets/time-input-custom-formats1.js?ra
 
 <AddedIn version="5.27.0" />
 
-Use an empty container with `data-coreui-toggle="time-input"` to create a masked time field. The mask is split into hour, minute, and — depending on the locale — AM/PM sections. Click or focus a section and type, use arrow keys to adjust values, and the caret moves to the next section automatically.
+Use an empty container with `data-coreui-time-input` to create a masked time field. The mask is split into hour, minute, and — depending on the locale — AM/PM sections. Click or focus a section and type, use arrow keys to adjust values, and the caret moves to the next section automatically.
 
 <Example pro code={`<label class="form-label">Meeting time</label>
-  <div data-coreui-toggle="time-input" data-coreui-name="meeting-time"></div>`} />
+  <div data-coreui-time-input data-coreui-name="meeting-time"></div>`} />
 
 ## Formats
 
@@ -28,15 +28,15 @@ Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">HH:mm</label>
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm"></div>
   </div>
   <div class="mb-3">
     <label class="form-label">HH:mm:ss</label>
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm:ss"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm:ss"></div>
   </div>
   <div>
     <label class="form-label">hh:mm A</label>
-    <div data-coreui-toggle="time-input" data-coreui-format="hh:mm A" data-coreui-locale="en-US"></div>
+    <div data-coreui-time-input data-coreui-format="hh:mm A" data-coreui-locale="en-US"></div>
   </div>`} />
 
 ## Locales
@@ -45,15 +45,15 @@ Without an explicit format, the hour cycle and layout follow the locale set via 
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">en-US</label>
-    <div data-coreui-toggle="time-input" data-coreui-locale="en-US"></div>
+    <div data-coreui-time-input data-coreui-locale="en-US"></div>
   </div>
   <div class="mb-3">
     <label class="form-label">pl-PL</label>
-    <div data-coreui-toggle="time-input" data-coreui-locale="pl-PL"></div>
+    <div data-coreui-time-input data-coreui-locale="pl-PL"></div>
   </div>
   <div>
     <label class="form-label">de-DE</label>
-    <div data-coreui-toggle="time-input" data-coreui-locale="de-DE"></div>
+    <div data-coreui-time-input data-coreui-locale="de-DE"></div>
   </div>`} />
 
 ## Seconds
@@ -61,21 +61,21 @@ Without an explicit format, the hour cycle and layout follow the locale set via 
 Without an explicit format, enable the seconds section with `data-coreui-seconds="true"`.
 
 <Example pro code={`<label class="form-label">Time with seconds</label>
-  <div data-coreui-toggle="time-input" data-coreui-seconds="true"></div>`} />
+  <div data-coreui-time-input data-coreui-seconds="true"></div>`} />
 
 ## Initial value
 
 Set the initial time with the `data-coreui-date` attribute — a time string like `09:30` or a `Date` object via JavaScript.
 
 <Example pro code={`<label class="form-label">Opening time</label>
-  <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-date="09:30"></div>`} />
+  <div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"></div>`} />
 
 ## Min and max times
 
 Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected.
 
 <Example pro code={`<label class="form-label">Business hours (09:00–17:00)</label>
-  <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-date="09:30"
+  <div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
        data-coreui-min-date="09:00" data-coreui-max-date="17:00"></div>`} />
 
 ## Custom formats
@@ -97,11 +97,11 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state, and submitting a form with the `.was-validated` class marks a `required` empty field invalid and a filled one valid. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
 <Example pro code={`<div class="mb-3">
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-valid="true"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-valid="true"></div>
     <div class="valid-feedback">Looks good!</div>
   </div>
   <div>
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-invalid="true" data-coreui-required="true"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-invalid="true" data-coreui-required="true"></div>
     <div class="invalid-feedback">Please provide a meeting time.</div>
   </div>`} />
 
@@ -110,7 +110,7 @@ The field participates in the standard form validation styling, [the same way as
 The time input supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/). When the field is empty and not focused, the mask placeholders are hidden so the label can rest inside the field; focusing the field floats the label and reveals the mask.
 
 <Example pro code={`<div class="form-floating">
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" id="floatingTimeInput"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm" id="floatingTimeInput"></div>
     <label for="floatingTimeInput">Meeting time</label>
   </div>`} />
 
@@ -120,15 +120,15 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">Large</label>
-    <div class="form-control-lg" data-coreui-toggle="time-input" data-coreui-format="HH:mm"></div>
+    <div class="form-control-lg" data-coreui-time-input data-coreui-format="HH:mm"></div>
   </div>
   <div class="mb-3">
     <label class="form-label">Default</label>
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm"></div>
   </div>
   <div>
     <label class="form-label">Small</label>
-    <div class="form-control-sm" data-coreui-toggle="time-input" data-coreui-format="HH:mm"></div>
+    <div class="form-control-sm" data-coreui-time-input data-coreui-format="HH:mm"></div>
   </div>`} />
 
 ## Disabled and readonly
@@ -137,11 +137,11 @@ Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">Disabled</label>
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true"></div>
   </div>
   <div>
     <label class="form-label">Readonly</label>
-    <div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-readonly="true"></div>
+    <div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-readonly="true"></div>
   </div>`} />
 
 ## Value semantics
@@ -158,10 +158,10 @@ The [keyboard support table](/forms/date-input/#keyboard-support) applies unchan
 
 ### Via data attributes
 
-Add `data-coreui-toggle="time-input"` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission.
+Add `data-coreui-time-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission.
 
 ```html
-<div data-coreui-toggle="time-input" data-coreui-format="HH:mm" data-coreui-name="time"></div>
+<div data-coreui-time-input data-coreui-format="HH:mm" data-coreui-name="time"></div>
 ```
 
 ### Via JavaScript
