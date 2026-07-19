@@ -1,0 +1,100 @@
+@use "../mixins/border-radius" as *;
+@use "../mixins/box-shadow" as *;
+@use "../variables" as *;
+
+
+// The component element carries `.form-control` for the base look, sizing
+// (`.form-control-sm`/`-lg`), validation states, and input group support.
+// This layer only covers what a div of contenteditable sections needs on top
+// of it: `:focus`/`:disabled` don't apply to the wrapper, so their styles are
+// re-bound to `:focus-within` and the `.disabled` class.
+.form-date-time {
+  display: flex;
+  align-items: center;
+  cursor: text;
+
+  &:focus-within {
+    color: $input-focus-color;
+    background-color: $input-focus-bg;
+    border-color: $input-focus-border-color;
+    outline: 0;
+    @if $enable-shadows {
+      @include box-shadow($input-box-shadow, $input-focus-box-shadow);
+    } @else {
+      // Avoid using mixin so we can pass custom focus shadow properly
+      box-shadow: $input-focus-box-shadow;
+    }
+  }
+
+  &.disabled {
+    color: $input-disabled-color;
+    cursor: default;
+    background-color: $input-disabled-bg;
+    border-color: $input-disabled-border-color;
+  }
+}
+
+.form-date-time-section {
+  white-space: pre;
+  caret-color: transparent;
+  outline: 0;
+  @include border-radius($form-date-time-section-border-radius, 0);
+
+  &:focus {
+    background-color: $form-date-time-section-focus-bg;
+
+    &::selection {
+      background-color: transparent;
+    }
+  }
+}
+
+.form-date-time-section-empty {
+  color: $form-date-time-placeholder-color;
+}
+
+.form-date-time-all-selected {
+  .form-date-time-section,
+  .form-date-time-separator {
+    background-color: $form-date-time-section-focus-bg;
+  }
+}
+
+.form-date-time-separator {
+  white-space: pre;
+}
+
+// `.form-floating` drives its label with `:placeholder-shown`, which never
+// matches a div, so the field would render as permanently "filled". Re-bind
+// the float to `:focus-within` and the JS-managed `.form-date-time-filled`
+// class, and hide the mask placeholders while the label rests in the field.
+.form-floating > .form-date-time {
+  height: $form-floating-height;
+  min-height: $form-floating-height;
+  line-height: $form-floating-line-height;
+
+  &:focus-within,
+  &.form-date-time-filled {
+    padding-top: $form-floating-input-padding-t;
+    padding-bottom: $form-floating-input-padding-b;
+  }
+
+  &:not(:focus-within):not(.form-date-time-filled) {
+    padding-top: $form-floating-padding-y;
+    padding-bottom: $form-floating-padding-y;
+
+    .form-date-time-section,
+    .form-date-time-separator {
+      color: transparent;
+    }
+
+    ~ label {
+      transform: none;
+    }
+  }
+
+  &:focus-within ~ label,
+  &.form-date-time-filled ~ label {
+    transform: $form-floating-label-transform;
+  }
+}
