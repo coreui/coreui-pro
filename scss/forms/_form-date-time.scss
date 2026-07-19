@@ -64,6 +64,12 @@
   white-space: pre;
 }
 
+// While the whole field is empty the separators are part of the mask
+// placeholder, so they take the placeholder color too.
+.form-date-time:not(.form-date-time-filled) .form-date-time-separator {
+  color: $form-date-time-placeholder-color;
+}
+
 // `.form-floating` drives its label with `:placeholder-shown`, which never
 // matches a div, so the field would render as permanently "filled". Re-bind
 // the float to `:focus-within` and the JS-managed `.form-date-time-filled`
