@@ -1,0 +1,345 @@
+---
+pro: true
+title: "Bootstrap 5 Date Input"
+name: "Date Input"
+description: "Create date fields with a section-based input mask. Users type the day, month, and year in separate sections with automatic navigation and validation — like the native date input, but with full control over the format."
+otherFrameworks:
+  - date-input
+js:
+  - https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js
+  - https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js
+  - https://cdn.jsdelivr.net/npm/dayjs@1/locale/en.js
+  - https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js
+---
+
+import dateInputCustomFormats1 from './snippets/date-input-custom-formats1.js?raw'
+import dateInputCustomFormats2 from './snippets/date-input-custom-formats2.js?raw'
+import dateInputDisabledDates from './snippets/date-input-disabled-dates.js?raw'
+import dateInputDisabledDates2 from './snippets/date-input-disabled-dates2.js?raw'
+
+## Example
+
+<AddedIn version="5.27.0" />
+
+Use an empty container with `data-coreui-date-input` to create a masked date field. The mask is split into day, month, and year sections — click or focus a section and type, use arrow keys to adjust values, and the caret moves to the next section automatically.
+
+By default, the section order and separators are derived from the user's locale, so `12/31/2026` in `en-US` becomes `31.12.2026` in `de-DE` without any configuration.
+
+<Example pro code={`<label class="form-label" id="basicDateInputLabel">Delivery date</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-name="delivery-date"></div>`} />
+
+## Formats
+
+Set an explicit format with the `data-coreui-format` attribute. The parser accepts both dayjs/moment-style tokens (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`, `yyyy`, `yy`), so you can reuse the format strings from the date library you already use. Any other character becomes a literal separator.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">dd.MM.yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">YYYY-MM-DD</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="YYYY-MM-DD"></div>
+  </div>
+  <div>
+    <label class="form-label">MM/DD/YY</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM/DD/YY"></div>
+  </div>`} />
+
+Two-digit year sections expand with smart century assignment — values up to 50 years in the future resolve to the current century, older ones to the previous century.
+
+The format doesn't have to include every section — a month-and-year mask works like the native `month` input and reports the first day of the month:
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">MM.yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MM.yyyy"></div>
+  </div>
+  <div>
+    <label class="form-label">MMMM yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMMM yyyy" data-coreui-locale="en-US"></div>
+  </div>`} />
+
+For picking whole weeks, use the [date picker](/forms/date-picker/) with `selectionType="week"` — a masked week-number field has no native or MUI equivalent and isn't supported.
+
+## Month names
+
+Use the `MMM` or `MMMM` tokens for text month sections with localized short or full month names. Type letters to match a month by prefix — `m` selects <strong>M</strong>arch, continuing with `may` switches to <strong>May</strong> — and the caret moves on as soon as the prefix is unambiguous. Digits and arrow keys keep working too.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">DD MMMM YYYY</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="DD MMMM YYYY" data-coreui-locale="en-US"></div>
+  </div>
+  <div>
+    <label class="form-label">MMM D, YYYY</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMM D, YYYY" data-coreui-locale="en-US"></div>
+  </div>`} />
+
+Month names default to the grammatical form used inside a full date — e.g. Polish shows the genitive `14 lipca 2026`, not the standalone `lipiec`. To use a different form (or your own localization), pass all twelve names through the `monthNames` option; they are used for display, letter matching, and paste alike.
+
+<Example pro code={`<label class="form-label">Standalone Polish month names</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="DD MMMM YYYY" data-coreui-locale="pl-PL"
+       data-coreui-month-names='["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]'></div>`} />
+
+## Locales
+
+Without an explicit format, the mask follows the locale set via `data-coreui-locale`.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">en-US</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="en-US"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">pl-PL</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="pl-PL" data-coreui-placeholders='{"day": "DD", "month": "MM", "year": "RRRR"}'></div>
+  </div>
+  <div>
+    <label class="form-label">ja-JP</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-locale="ja-JP"></div>
+  </div>`} />
+
+## Initial value
+
+Set the initial date with the `data-coreui-date` attribute.
+
+<Example pro code={`<label class="form-label">Date of birth</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2000-01-15"></div>`} />
+
+## Min and max dates
+
+Constrain the selectable range with `minDate` and `maxDate`. A completed date outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+
+<Example pro code={`<label class="form-label">Date in July 2026</label>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31"></div>`} />
+
+## Disabled dates
+
+Beyond a simple range, the `disabledDates` option excludes specific dates — single `Date`s, `[start, end]` ranges, or a matcher function. Unlike in the [date picker](/forms/date-picker/#disabled-dates), there is no calendar to gray out: a completed date that hits a disabled entry gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+
+In this example July 4–7 and July 16 can't be entered — try typing one of them:
+
+<Example pro code={`<label class="form-label">Delivery date</label>
+  <div class="form-control form-date-time" id="myDateInputDisabledDates"></div>`} sandboxJs={dateInputDisabledDates} />
+
+<Code code={dateInputDisabledDates} lang="js" />
+
+### Disabling weekends
+
+Pass a function to disable dates by rule — here Saturdays and Sundays:
+
+<Example pro code={`<label class="form-label">Business day</label>
+  <div class="form-control form-date-time" id="myDateInputDisabledDates2"></div>`} sandboxJs={dateInputDisabledDates2} />
+
+<Code code={dateInputDisabledDates2} lang="js" />
+
+## Custom formats
+
+The built-in token parser covers dayjs, moment, date-fns, and luxon format strings for date masks, so you can reuse the format string from the date library you already work with — the library itself isn't required to render or edit the mask. Pair it with `inputDateParse` when you want that library to also parse text pasted into the field.
+
+In this example the mask uses the dayjs format `MMMM DD, YYYY`, and dayjs (with the `customParseFormat` plugin) parses pasted strings:
+
+<Example pro code={`<label class="form-label">dayjs format</label>
+  <div class="form-control form-date-time" id="myDateInputCustomFormats1"></div>`} sandboxJs={dateInputCustomFormats1} />
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+```
+
+<Code code={dateInputCustomFormats1} lang="js" />
+
+Localized formats work the same way — the section names come from the component's `locale` (or the `monthNames` option), while the dayjs locale file handles parsing pasted text, here in Spanish:
+
+<Example pro code={`<label class="form-label">Localized dayjs format</label>
+  <div class="form-control form-date-time" id="myDateInputCustomFormats2"></div>`} sandboxJs={dateInputCustomFormats2} />
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/locale/es.js"></script>
+```
+
+<Code code={dateInputCustomFormats2} lang="js" />
+
+## Validation
+
+The field participates in the standard form validation styling. Three mechanisms set the state:
+
+- **Range validation (automatic)** — a completed date outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` until corrected.
+- **The `valid`/`invalid` options** — force the state, e.g. after server-side validation.
+- **Form submit** — the date input renders a hidden input, which is excluded from native constraint validation, so the component applies `.is-valid`/`.is-invalid` itself when a form with the `.was-validated` class is submitted: a `required` empty field becomes invalid, a filled one valid.
+
+Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
+
+<Example pro code={`<div class="mb-3">
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-valid="true"></div>
+    <div class="valid-feedback">Looks good!</div>
+  </div>
+  <div>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-invalid="true" data-coreui-required="true"></div>
+    <div class="invalid-feedback">Please provide a delivery date.</div>
+  </div>`} />
+
+```html
+<form class="needs-validation" novalidate>
+  <div class="form-control form-date-time" data-coreui-date-input data-coreui-required="true"></div>
+  <div class="invalid-feedback">Please provide a delivery date.</div>
+  <button type="submit">Submit</button>
+</form>
+```
+
+```javascript
+const form = document.querySelector('.needs-validation')
+
+form.addEventListener('submit', event => {
+  if (!form.checkValidity()) {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  form.classList.add('was-validated')
+})
+```
+
+## Floating labels
+
+The date input supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/). When the field is empty and not focused, the mask placeholders are hidden so the label can rest inside the field; focusing the field floats the label and reveals the mask.
+
+<Example pro code={`<div class="form-floating">
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" id="floatingDateInput"></div>
+    <label for="floatingDateInput">Delivery date</label>
+  </div>`} />
+
+## Sizing
+
+The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container. Validation states (`.is-invalid` set automatically for out-of-range dates, or your own `.is-valid`) and input groups work the same way.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">Large</label>
+    <div class="form-control form-date-time form-control-lg" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Default</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+  </div>
+  <div>
+    <label class="form-label">Small</label>
+    <div class="form-control form-date-time form-control-sm" data-coreui-date-input data-coreui-format="dd.MM.yyyy"></div>
+  </div>`} />
+
+## Disabled and readonly
+
+Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">Disabled</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-disabled="true"></div>
+  </div>
+  <div>
+    <label class="form-label">Readonly</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-date="2026-07-14" data-coreui-readonly="true"></div>
+  </div>`} />
+
+## Accessibility
+
+The date input implements the [spinbutton pattern](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/) per section, mirroring the internal structure of the native date input:
+
+- **Role attributes**: the container has `role="group"`, every section is a `role="spinbutton"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `aria-valuetext` (month sections announce the localized month name).
+- **Roving tabindex**: the whole field is a single tab stop; arrow keys move between sections.
+- **Labels**: sections receive `aria-label`s (`Day`, `Month`, `Year`), customizable via the `sectionLabels` option for localization.
+- **Mobile input**: sections use `inputmode="numeric"`, so touch devices show the numeric keyboard.
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>0</kbd>–<kbd>9</kbd> | Type into the focused section; the caret advances when the section is complete |
+| <kbd>A</kbd>–<kbd>Z</kbd> | In text month sections, match a month name by prefix; the caret advances when the prefix is unambiguous |
+| <kbd>Arrow Up</kbd> / <kbd>Arrow Down</kbd> | Increment / decrement the focused section, wrapping day and month around their bounds; an empty year starts at the current year |
+| <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous section |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last section |
+| <kbd>Backspace</kbd> | Clear the focused section; move to the previous section when already empty |
+| <kbd>Delete</kbd> | Clear the focused section |
+| <kbd>Ctrl</kbd> + <kbd>A</kbd> / <kbd>Cmd</kbd> + <kbd>A</kbd> | Select the whole value; <kbd>Backspace</kbd> then clears all sections, typing restarts from the first section |
+| <kbd>Ctrl</kbd> + <kbd>C</kbd> / <kbd>Cmd</kbd> + <kbd>C</kbd> | Copy the selection — the whole formatted value after <kbd>Ctrl</kbd> + <kbd>A</kbd> |
+| <kbd>Ctrl</kbd> + <kbd>V</kbd> / <kbd>Cmd</kbd> + <kbd>V</kbd> | Paste a date and fill all sections |
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-date-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
+
+```html
+<div class="form-control form-date-time" data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-name="date"></div>
+```
+
+### Via JavaScript
+
+```javascript
+const dateInput = new coreui.DateInput(document.querySelector('#myDateInput'), {
+  format: 'dd.MM.yyyy',
+  date: new Date(2026, 6, 14)
+})
+```
+
+### Options
+
+Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-format="dd.MM.yyyy"`.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `ariaLabel` | string | `'Date input'` | The `aria-label` of the `role="group"` container |
+| `autofocus` | boolean | `false` | Focus the first section right after initialization |
+| `date` | date, number, string, null | `null` | Initial date |
+| `disabled` | boolean | `false` | Disable the component |
+| `disabledDates` | array, date, function, null | `null` | Dates (or a matcher function) that can't be selected |
+| `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
+| `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
+| `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) |
+| `locale` | string | `'default'` | Locale used to derive the mask layout and month names |
+| `maxDate` | date, number, string, null | `null` | Latest selectable date |
+| `minDate` | date, number, string, null | `null` | Earliest selectable date |
+| `monthNames` | array, null | `null` | Twelve custom month names for text month sections (`MMM`/`MMMM`), overriding the locale-derived, date-context grammatical form |
+| `name` | string, null | `null` | Name attribute of the hidden input |
+| `placeholders` | object, null | `null` | Per-section placeholder overrides, e.g. `{"day": "DD", "month": "MM", "year": "RRRR"}` |
+| `readonly` | boolean | `false` | Make the field focusable but non-editable |
+| `required` | boolean | `false` | Required attribute of the hidden input |
+| `sectionLabels` | object, null | `null` | Per-section `aria-label` overrides, e.g. `{"day": "Dzień", "month": "Miesiąc", "year": "Rok"}` |
+| `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `clear` | Clear all sections |
+| `getDate` | Return the current date, or `null` when incomplete or invalid |
+| `reset` | Reset the field to its initial date |
+| `update` | Update the configuration and re-render |
+
+```javascript
+const dateInput = coreui.DateInput.getInstance(document.querySelector('#myDateInput'))
+dateInput.clear()
+dateInput.getDate()
+dateInput.update({ format: 'yyyy-MM-dd' })
+```
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| `dateChange.coreui.date-input` | Fired when the date changes; `event.date` is a `Date`, or `null` when the field is incomplete or invalid |
+| `errorChange.coreui.date-input` | Fired when the validation state changes; `event.error` is `'incomplete'`, `'minDate'`, `'maxDate'`, `'disabledDate'`, or `null` when the value is valid or the field is empty |
+
+```javascript
+document.addEventListener('dateChange.coreui.date-input', event => {
+  // eslint-disable-next-line no-console
+  console.log('Date changed:', event.date)
+})
+```
+
+## Customizing
+
+### SASS variables
+
+The date, time, and date-time inputs share one set of styles and variables under the `form-date-time` name.
+
+<ScssDocs file="scss/_variables.scss" capture="form-date-time-variables" />

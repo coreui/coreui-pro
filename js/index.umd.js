@@ -14,8 +14,10 @@ import Chip from './src/chip.js'
 import ChipInput from './src/chip-input.js'
 import ChipSet from './src/chip-set.js'
 import Collapse from './src/collapse.js'
+import DateInput from './src/date-input.js'
 import DatePicker from './src/date-picker.js'
 import DateRangePicker from './src/date-range-picker.js'
+import DateTimeInput from './src/date-time-input.js'
 import Dropdown from './src/dropdown.js'
 import LoadingButton from './src/loading-button.js'
 import Modal from './src/modal.js'
@@ -32,6 +34,7 @@ import SearchButton from './src/search-button.js'
 import Sidebar from './src/sidebar.js'
 import Stepper from './src/stepper.js'
 import Tab from './src/tab.js'
+import TimeInput from './src/time-input.js'
 import TimePicker from './src/time-picker.js'
 import Toast from './src/toast.js'
 import Tooltip from './src/tooltip.js'
@@ -46,8 +49,10 @@ export default {
   ChipInput,
   ChipSet,
   Collapse,
+  DateInput,
   DatePicker,
   DateRangePicker,
+  DateTimeInput,
   Dropdown,
   LoadingButton,
   Modal,
@@ -64,6 +69,7 @@ export default {
   Sidebar,
   Stepper,
   Tab,
+  TimeInput,
   TimePicker,
   Toast,
   Tooltip

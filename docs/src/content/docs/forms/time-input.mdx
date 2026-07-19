@@ -1,0 +1,237 @@
+---
+pro: true
+title: "Bootstrap 5 Time Input"
+name: "Time Input"
+description: "Create time fields with a section-based input mask. Users type the hour, minutes, and seconds in separate sections with automatic navigation and validation — like the native time input, but with full control over the format."
+otherFrameworks:
+  - time-input
+js:
+  - https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js
+  - https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js
+  - https://cdn.jsdelivr.net/npm/dayjs@1/locale/en.js
+---
+
+import timeInputCustomFormats1 from './snippets/time-input-custom-formats1.js?raw'
+
+## Example
+
+<AddedIn version="5.27.0" />
+
+Use an empty container with `data-coreui-time-input` to create a masked time field. The mask is split into hour, minute, and — depending on the locale — AM/PM sections. Click or focus a section and type, use arrow keys to adjust values, and the caret moves to the next section automatically.
+
+<Example pro code={`<label class="form-label">Meeting time</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-name="meeting-time"></div>`} />
+
+## Formats
+
+Set an explicit format with the `data-coreui-format` attribute: `HH`/`H` for the 23-hour cycle, `hh`/`h` for the 12-hour cycle, `mm` for minutes, `ss` for seconds, and `A`/`a` for the day period. Type `a` or `p` in the AM/PM section to switch it, or use the arrow keys.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">HH:mm</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">HH:mm:ss</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm:ss"></div>
+  </div>
+  <div>
+    <label class="form-label">hh:mm A</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="hh:mm A" data-coreui-locale="en-US"></div>
+  </div>`} />
+
+## Locales
+
+Without an explicit format, the hour cycle and layout follow the locale set via `data-coreui-locale` — `en-US` gets a 12-hour clock with an AM/PM section, `pl-PL` or `de-DE` a 24-hour one.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">en-US</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="en-US"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">pl-PL</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="pl-PL"></div>
+  </div>
+  <div>
+    <label class="form-label">de-DE</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-locale="de-DE"></div>
+  </div>`} />
+
+## Seconds
+
+Without an explicit format, enable the seconds section with `data-coreui-seconds="true"`.
+
+<Example pro code={`<label class="form-label">Time with seconds</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-seconds="true"></div>`} />
+
+## Initial value
+
+Set the initial time with the `data-coreui-date` attribute — a time string like `09:30` or a `Date` object via JavaScript.
+
+<Example pro code={`<label class="form-label">Opening time</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"></div>`} />
+
+## Min and max times
+
+Constrain the selectable range with `minDate` and `maxDate` — time strings work here too. A completed time outside the range gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+
+<Example pro code={`<label class="form-label">Business hours (09:00–17:00)</label>
+  <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30"
+       data-coreui-min-date="09:00" data-coreui-max-date="17:00"></div>`} />
+
+## Custom formats
+
+The built-in token parser covers dayjs, moment, date-fns, and luxon format strings for time masks, so you can reuse the format string from the date library you already work with — the library itself isn't required to render or edit the mask. Pair it with `inputDateParse` when you want that library to also parse text pasted into the field.
+
+<Example pro code={`<label class="form-label">dayjs format</label>
+  <div class="form-control form-date-time" id="myTimeInputCustomFormats1"></div>`} sandboxJs={timeInputCustomFormats1} />
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+```
+
+<Code code={timeInputCustomFormats1} lang="js" />
+
+## Validation
+
+The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed time outside `minDate`/`maxDate` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state, and submitting a form with the `.was-validated` class marks a `required` empty field invalid and a filled one valid. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
+
+<Example pro code={`<div class="mb-3">
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="09:30" data-coreui-valid="true"></div>
+    <div class="valid-feedback">Looks good!</div>
+  </div>
+  <div>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-invalid="true" data-coreui-required="true"></div>
+    <div class="invalid-feedback">Please provide a meeting time.</div>
+  </div>`} />
+
+## Floating labels
+
+The time input supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/). When the field is empty and not focused, the mask placeholders are hidden so the label can rest inside the field; focusing the field floats the label and reveals the mask.
+
+<Example pro code={`<div class="form-floating">
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" id="floatingTimeInput"></div>
+    <label for="floatingTimeInput">Meeting time</label>
+  </div>`} />
+
+## Sizing
+
+The field renders as a `.form-control`, so the standard sizing classes work — add `.form-control-sm` or `.form-control-lg` to the container.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">Large</label>
+    <div class="form-control form-date-time form-control-lg" data-coreui-time-input data-coreui-format="HH:mm"></div>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Default</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm"></div>
+  </div>
+  <div>
+    <label class="form-label">Small</label>
+    <div class="form-control form-date-time form-control-sm" data-coreui-time-input data-coreui-format="HH:mm"></div>
+  </div>`} />
+
+## Disabled and readonly
+
+Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly="true"` to make it focusable but non-editable.
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">Disabled</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-disabled="true"></div>
+  </div>
+  <div>
+    <label class="form-label">Readonly</label>
+    <div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-date="14:30" data-coreui-readonly="true"></div>
+  </div>`} />
+
+## Value semantics
+
+The component reports a `Date` object anchored to `1970-01-01` — the same convention as the CoreUI time picker — so only the time part is meaningful. `minDate`/`maxDate` therefore constrain the time of day.
+
+## Accessibility
+
+The time input shares the [accessibility model of the date input](/forms/date-input/#accessibility): `role="group"` on the container, a `role="spinbutton"` with full ARIA value attributes per section, a single tab stop with roving focus, and `inputmode` hints for mobile keyboards. The AM/PM section announces its localized name via `aria-valuetext` and can be toggled with the <kbd>A</kbd>/<kbd>P</kbd> letters or arrow keys.
+
+The [keyboard support table](/forms/date-input/#keyboard-support) applies unchanged, including <kbd>Ctrl</kbd> + <kbd>A</kbd> (select all), <kbd>Ctrl</kbd> + <kbd>C</kbd> (copy), and paste.
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-time-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
+
+```html
+<div class="form-control form-date-time" data-coreui-time-input data-coreui-format="HH:mm" data-coreui-name="time"></div>
+```
+
+### Via JavaScript
+
+```javascript
+const timeInput = new coreui.TimeInput(document.querySelector('#myTimeInput'), {
+  format: 'HH:mm',
+  date: '14:30'
+})
+```
+
+### Options
+
+Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-coreui-`, as in `data-coreui-format="HH:mm"`.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `ariaLabel` | string | `'Time input'` | The `aria-label` of the `role="group"` container |
+| `autofocus` | boolean | `false` | Focus the first section right after initialization |
+| `date` | date, number, string, null | `null` | Initial time — a `Date` or a time string like `'14:30'` |
+| `disabled` | boolean | `false` | Disable the component |
+| `disabledDates` | array, date, function, null | `null` | Times (or a matcher function) that can't be selected |
+| `format` | function, string, null | `null` | Mask layout: `null` derives it from the locale, a string is parsed as format tokens, a function receives the locale and returns the section layout |
+| `inputDateParse` | function, null | `null` | Custom parser used for pasted text, e.g. a date library |
+| `invalid` | boolean | `false` | Force the invalid state (`.is-invalid`) |
+| `locale` | string | `'default'` | Locale used to derive the hour cycle and layout |
+| `maxDate` | date, number, string, null | `null` | Latest selectable time |
+| `minDate` | date, number, string, null | `null` | Earliest selectable time |
+| `name` | string, null | `null` | Name attribute of the hidden input |
+| `placeholders` | object, null | `null` | Per-section placeholder overrides, e.g. `{"hour": "gg", "minute": "mm"}` |
+| `readonly` | boolean | `false` | Make the field focusable but non-editable |
+| `required` | boolean | `false` | Required attribute of the hidden input |
+| `seconds` | boolean | `false` | Include a seconds section in the locale-derived layout |
+| `sectionLabels` | object, null | `null` | Per-section `aria-label` overrides, e.g. `{"hour": "Godzina", "minute": "Minuta"}` |
+| `valid` | boolean | `false` | Force the valid state (`.is-valid`) |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `clear` | Clear all sections |
+| `getDate` | Return the current time as a `Date` on 1970-01-01, or `null` when incomplete or invalid |
+| `reset` | Reset the field to its initial time |
+| `update` | Update the configuration and re-render |
+
+```javascript
+const timeInput = coreui.TimeInput.getInstance(document.querySelector('#myTimeInput'))
+timeInput.clear()
+timeInput.getDate()
+timeInput.update({ format: 'hh:mm A' })
+```
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| `timeChange.coreui.time-input` | Fired when the time changes; `event.date` is a `Date` on 1970-01-01, or `null` when incomplete or invalid |
+| `errorChange.coreui.time-input` | Fired when the validation state changes; `event.error` is `'incomplete'`, `'minDate'`, `'maxDate'`, `'disabledDate'`, or `null` when the value is valid or the field is empty |
+
+```javascript
+document.addEventListener('timeChange.coreui.time-input', event => {
+  // eslint-disable-next-line no-console
+  console.log('Time changed:', event.date)
+})
+```
+
+## Customizing
+
+### SASS variables
+
+The date, time, and date-time inputs share one set of styles and variables under the `form-date-time` name.
+
+<ScssDocs file="scss/_variables.scss" capture="form-date-time-variables" />

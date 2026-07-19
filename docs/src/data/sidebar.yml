@@ -114,6 +114,11 @@
       badge:
         color: success
         text: NEW
+    - title: Date Input
+      to: /forms/date-input/
+      badge:
+        color: danger
+        text: PRO
     - title: Date Picker
       to: /forms/date-picker/
       badge:
@@ -121,6 +126,11 @@
         text: PRO
     - title: Date Range Picker
       to: /forms/date-range-picker/
+      badge:
+        color: danger
+        text: PRO
+    - title: Date Time Input
+      to: /forms/date-time-input/
       badge:
         color: danger
         text: PRO
@@ -161,6 +171,11 @@
       to: /forms/select/
     - title: Stepper
       to: /forms/stepper/
+      badge:
+        color: danger
+        text: PRO
+    - title: Time Input
+      to: /forms/time-input/
       badge:
         color: danger
         text: PRO
