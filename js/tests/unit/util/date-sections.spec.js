@@ -272,14 +272,24 @@ describe('Date Sections Utilities', () => {
       expect(getIncrementedSectionValue({ type: 'day', value: 31 }, 1)).toBe(1)
     })
 
-    it('should start empty sections at the boundary', () => {
-      expect(getIncrementedSectionValue({ type: 'day', value: null }, 1)).toBe(1)
-      expect(getIncrementedSectionValue({ type: 'day', value: null }, -1)).toBe(31)
+    it('should start empty sections at today', () => {
+      const now = new Date()
+
+      expect(getIncrementedSectionValue({ type: 'day', value: null }, 1)).toBe(now.getDate())
+      expect(getIncrementedSectionValue({ type: 'day', value: null }, -1)).toBe(now.getDate())
+      expect(getIncrementedSectionValue({ type: 'month', value: null }, 1)).toBe(now.getMonth() + 1)
+      expect(getIncrementedSectionValue({ type: 'year', value: null, length: 4 }, 1)).toBe(now.getFullYear())
+      expect(getIncrementedSectionValue({ type: 'year', value: null, length: 4 }, -1)).toBe(now.getFullYear())
     })
 
     it('should wrap at a custom upper bound', () => {
       expect(getIncrementedSectionValue({ type: 'day', value: 28 }, 1, 28)).toBe(1)
-      expect(getIncrementedSectionValue({ type: 'day', value: null }, -1, 28)).toBe(28)
+    })
+
+    it('should clamp the today start of an empty day to the custom upper bound', () => {
+      const today = new Date().getDate()
+
+      expect(getIncrementedSectionValue({ type: 'day', value: null }, -1, 28)).toBe(Math.min(today, 28))
     })
 
     it('should clamp year instead of wrapping', () => {

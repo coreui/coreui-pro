@@ -342,9 +342,50 @@ export const applyLetterToSection = (section, draft, letter) => {
 }
 
 /**
+ * Returns today's value for a section, MUI DateField-style: arrow keys on an
+ * empty section start from the current date and time instead of the bounds
+ * (an empty year jumping to 0001 or 9999 would be useless).
+ * @param {object} section The section descriptor.
+ * @returns {number} Today's value for the section type.
+ */
+export const getTodaySectionValue = section => {
+  const now = new Date()
+
+  switch (section.type) {
+    case 'day': {
+      return now.getDate()
+    }
+
+    case 'month': {
+      return now.getMonth() + 1
+    }
+
+    case 'hour': {
+      return section.cycle === 'h12' ? convert24hTo12h(now.getHours()) : now.getHours()
+    }
+
+    case 'minute': {
+      return now.getMinutes()
+    }
+
+    case 'second': {
+      return now.getSeconds()
+    }
+
+    case 'meridiem': {
+      return now.getHours() >= 12 ? 2 : 1
+    }
+
+    default: {
+      return now.getFullYear()
+    }
+  }
+}
+
+/**
  * Returns the section value after an increment or decrement, wrapping within
- * the bounds (except year, which clamps). An empty section starts at the
- * minimum when incrementing and at the maximum when decrementing.
+ * the bounds (except year, which clamps). An empty section starts at today's
+ * value.
  * @param {object} section The section descriptor.
  * @param {number} delta The signed step.
  * @param {number} [max] The upper bound, e.g. the day count of the selected month.
@@ -354,7 +395,7 @@ export const getIncrementedSectionValue = (section, delta, max = getSectionBound
   const { min } = getSectionBounds(section)
 
   if (section.value === null) {
-    return delta > 0 ? min : max
+    return Math.min(getTodaySectionValue(section), max)
   }
 
   if (section.type === 'year') {

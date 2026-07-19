@@ -140,15 +140,25 @@ describe('TimeInput', () => {
     })
 
     it('should wrap the hour with arrow keys', () => {
+      const timeInput = createTimeInput({ date: '23:30' })
+      const [hour] = getSections(timeInput._element)
+
+      hour.focus()
+      pressKey(hour, 'ArrowUp')
+      expect(hour.textContent).toEqual('00')
+
+      pressKey(hour, 'ArrowDown')
+      expect(hour.textContent).toEqual('23')
+    })
+
+    it('should start an empty hour at the current time', () => {
       const timeInput = createTimeInput()
       const [hour] = getSections(timeInput._element)
 
       hour.focus()
-      pressKey(hour, 'ArrowDown')
-      expect(hour.textContent).toEqual('23')
-
       pressKey(hour, 'ArrowUp')
-      expect(hour.textContent).toEqual('00')
+
+      expect(hour.textContent).toEqual(String(new Date().getHours()).padStart(2, '0'))
     })
   })
 

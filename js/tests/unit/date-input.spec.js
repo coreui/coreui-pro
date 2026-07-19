@@ -294,39 +294,46 @@ describe('DateInput', () => {
     })
 
     it('should increment and decrement with arrow up and down', () => {
-      const dateInput = createDateInput()
+      const dateInput = createDateInput({ date: new Date(2026, 6, 14) })
       const [day] = getSections(dateInput._element)
 
       day.focus()
       pressKey(day, 'ArrowUp')
-      expect(day.textContent).toEqual('01')
-
-      pressKey(day, 'ArrowUp')
-      expect(day.textContent).toEqual('02')
+      expect(day.textContent).toEqual('15')
 
       pressKey(day, 'ArrowDown')
-      expect(day.textContent).toEqual('01')
+      pressKey(day, 'ArrowDown')
+      expect(day.textContent).toEqual('13')
     })
 
-    it('should start at the maximum when decrementing an empty section', () => {
+    it('should start an empty section at today', () => {
       const dateInput = createDateInput()
-      const [, month] = getSections(dateInput._element)
+      const [day, month, year] = getSections(dateInput._element)
+      const now = new Date()
+
+      day.focus()
+      pressKey(day, 'ArrowUp')
+      expect(day.textContent).toEqual(String(now.getDate()).padStart(2, '0'))
 
       month.focus()
       pressKey(month, 'ArrowDown')
+      expect(month.textContent).toEqual(String(now.getMonth() + 1).padStart(2, '0'))
 
-      expect(month.textContent).toEqual('12')
+      year.focus()
+      pressKey(year, 'ArrowUp')
+      expect(year.textContent).toEqual(String(now.getFullYear()))
     })
 
     it('should wrap month around its bounds', () => {
-      const dateInput = createDateInput()
+      const dateInput = createDateInput({ date: new Date(2026, 11, 14) })
       const [, month] = getSections(dateInput._element)
 
       month.focus()
-      pressKey(month, 'ArrowDown')
       pressKey(month, 'ArrowUp')
-
       expect(month.textContent).toEqual('01')
+
+      pressKey(month, 'ArrowDown')
+      expect(month.textContent).toEqual('12')
     })
 
     it('should clear the section with Backspace and move to the previous one when empty', () => {
