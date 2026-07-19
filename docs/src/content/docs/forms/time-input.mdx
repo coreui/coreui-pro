@@ -218,6 +218,7 @@ timeInput.update({ format: 'hh:mm A' })
 | Event | Description |
 | --- | --- |
 | `timeChange.coreui.time-input` | Fired when the time changes; `event.date` is a `Date` on 1970-01-01, or `null` when incomplete or invalid |
+| `errorChange.coreui.time-input` | Fired when the validation state changes; `event.error` is `'incomplete'`, `'minDate'`, `'maxDate'`, `'disabledDate'`, or `null` when the value is valid or the field is empty |
 
 ```javascript
 document.addEventListener('timeChange.coreui.time-input', event => {

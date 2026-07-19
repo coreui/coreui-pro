@@ -128,6 +128,7 @@ class SectionInput extends BaseComponent {
     this._date = getDateFromSections(this._sections)
     this._draft = ''
     this._allSelected = false
+    this._error = null
     this._inputElement = null
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 
@@ -522,13 +523,22 @@ class SectionInput extends BaseComponent {
     }
 
     const date = getDateFromSections(this._sections)
-    const isDisabled = date instanceof Date &&
-      isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)
+    const isFilled = this._sections.some(section => section.type !== 'literal' && section.value !== null)
+    const error = this._getValidationError(date, isFilled)
+    const isDisabled = error !== null && error !== 'incomplete'
     const nextDate = isDisabled ? null : date
 
-    this._element.classList.toggle(CLASS_NAME_FILLED, this._sections.some(section => section.type !== 'literal' && section.value !== null))
+    this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
     this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled)
     this._setHiddenInputValue()
+
+    if (error !== this._error) {
+      this._error = error
+
+      EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
+        error
+      })
+    }
 
     if (this._isSameDate(nextDate, this._date)) {
       return
@@ -539,6 +549,26 @@ class SectionInput extends BaseComponent {
     EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
       date: nextDate
     })
+  }
+
+  _getValidationError(date, isFilled) {
+    if (!(date instanceof Date)) {
+      return isFilled ? 'incomplete' : null
+    }
+
+    if (this._minDate && date < this._minDate) {
+      return 'minDate'
+    }
+
+    if (this._maxDate && date > this._maxDate) {
+      return 'maxDate'
+    }
+
+    if (isDateDisabled(date, null, null, this._config.disabledDates)) {
+      return 'disabledDate'
+    }
+
+    return null
   }
 
   _isSameDate(date, date2) {

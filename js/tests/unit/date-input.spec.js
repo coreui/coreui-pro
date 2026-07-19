@@ -573,6 +573,44 @@ describe('DateInput', () => {
       expect(dateInput._element.classList.contains('is-valid')).toBeFalse()
     })
 
+    it('should emit errorChange with a reason when validation state changes', () => {
+      const dateInput = createDateInput({
+        date: new Date(2026, 6, 14),
+        minDate: new Date(2026, 6, 10),
+        maxDate: new Date(2026, 6, 14)
+      })
+      const spy = jasmine.createSpy('errorChange')
+      dateInput._element.addEventListener('errorChange.coreui.date-input', spy)
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'ArrowUp')
+      expect(spy.calls.mostRecent().args[0].error).toEqual('maxDate')
+
+      pressKey(day, 'ArrowDown')
+      expect(spy.calls.mostRecent().args[0].error).toBeNull()
+
+      pressKey(day, 'Delete')
+      expect(spy.calls.mostRecent().args[0].error).toEqual('incomplete')
+
+      expect(spy).toHaveBeenCalledTimes(3)
+    })
+
+    it('should report disabled dates through errorChange', () => {
+      const dateInput = createDateInput({
+        date: new Date(2026, 6, 14),
+        disabledDates: [new Date(2026, 6, 15)]
+      })
+      const spy = jasmine.createSpy('errorChange')
+      dateInput._element.addEventListener('errorChange.coreui.date-input', spy)
+      const [day] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'ArrowUp')
+
+      expect(spy.calls.mostRecent().args[0].error).toEqual('disabledDate')
+    })
+
     it('should mark dates outside min and max as invalid', () => {
       const dateInput = createDateInput({
         date: new Date(2026, 6, 14),

@@ -216,6 +216,7 @@ dateTimeInput.update({ format: 'yyyy-MM-dd HH:mm' })
 | Event | Description |
 | --- | --- |
 | `dateChange.coreui.date-time-input` | Fired when the date or time changes; `event.date` is a `Date`, or `null` when incomplete or invalid |
+| `errorChange.coreui.date-time-input` | Fired when the validation state changes; `event.error` is `'incomplete'`, `'minDate'`, `'maxDate'`, `'disabledDate'`, or `null` when the value is valid or the field is empty |
 
 ```javascript
 document.addEventListener('dateChange.coreui.date-time-input', event => {
