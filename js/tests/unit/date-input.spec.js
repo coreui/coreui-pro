@@ -194,6 +194,32 @@ describe('DateInput', () => {
     })
   })
 
+  describe('partial masks', () => {
+    it('should support month and year formats, valued at the first day of the month', () => {
+      const dateInput = createDateInput({ format: 'MM.yyyy' })
+      const [month, year] = getSections(dateInput._element)
+
+      expect(getSections(dateInput._element)).toHaveSize(2)
+
+      month.focus()
+      pressKey(month, '7')
+      for (const digit of '2026') {
+        pressKey(year, digit)
+      }
+
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
+      expect(dateInput._element.querySelector('input[type="hidden"]').value).toEqual('07.2026')
+    })
+
+    it('should fill month and year sections from an initial date', () => {
+      const dateInput = createDateInput({ format: 'MMMM yyyy', locale: 'en-US', date: new Date(2026, 6, 14) })
+      const [month] = getSections(dateInput._element)
+
+      expect(month.textContent).toEqual('July')
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 1))
+    })
+  })
+
   describe('text month sections', () => {
     const createTextDateInput = () => createDateInput({ format: 'DD MMMM YYYY', locale: 'en-US' })
 

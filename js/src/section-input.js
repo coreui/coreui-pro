@@ -125,6 +125,7 @@ class SectionInput extends BaseComponent {
     this._minDate = this._convertDate(this._config.minDate)
     this._maxDate = this._convertDate(this._config.maxDate)
     this._sections = setSectionsFromDate(this._resolveSections(), this._date)
+    this._date = getDateFromSections(this._sections)
     this._draft = ''
     this._allSelected = false
     this._inputElement = null
@@ -158,6 +159,7 @@ class SectionInput extends BaseComponent {
   reset() {
     this._date = this._config.date ? this._convertDate(this._config.date) : null
     this._sections = setSectionsFromDate(this._sections, this._date)
+    this._date = getDateFromSections(this._sections)
     this._draft = ''
     this._syncSections()
     this._setHiddenInputValue()
@@ -181,6 +183,7 @@ class SectionInput extends BaseComponent {
     this._minDate = this._convertDate(this._config.minDate)
     this._maxDate = this._convertDate(this._config.maxDate)
     this._sections = setSectionsFromDate(this._resolveSections(), this._date)
+    this._date = getDateFromSections(this._sections)
     this._draft = ''
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 

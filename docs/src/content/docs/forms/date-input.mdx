@@ -45,6 +45,19 @@ Set an explicit format with the `data-coreui-format` attribute. The parser accep
 
 Two-digit year sections expand with smart century assignment — values up to 50 years in the future resolve to the current century, older ones to the previous century.
 
+The format doesn't have to include every section — a month-and-year mask works like the native `month` input and reports the first day of the month:
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">MM.yyyy</label>
+    <div data-coreui-date-input data-coreui-format="MM.yyyy"></div>
+  </div>
+  <div>
+    <label class="form-label">MMMM yyyy</label>
+    <div data-coreui-date-input data-coreui-format="MMMM yyyy" data-coreui-locale="en-US"></div>
+  </div>`} />
+
+For picking whole weeks, use the [date picker](/forms/date-picker/) with `selectionType="week"` — a masked week-number field has no native or MUI equivalent and isn't supported.
+
 ## Month names
 
 Use the `MMM` or `MMMM` tokens for text month sections with localized short or full month names. Type letters to match a month by prefix — `m` selects <strong>M</strong>arch, continuing with `may` switches to <strong>May</strong> — and the caret moves on as soon as the prefix is unambiguous. Digits and arrow keys keep working too.
