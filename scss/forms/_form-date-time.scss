@@ -11,7 +11,18 @@
 .form-date-time {
   display: flex;
   align-items: center;
+  // Hold the final height before initialization — the sections are injected
+  // by JS, so an empty container would collapse and flash on load.
+  min-height: $input-height;
   cursor: text;
+
+  &.form-control-sm {
+    min-height: $input-height-sm;
+  }
+
+  &.form-control-lg {
+    min-height: $input-height-lg;
+  }
 
   &:focus-within {
     color: $input-focus-color;

@@ -20,7 +20,7 @@ import dateTimeInputCustomFormats1 from './snippets/date-time-input-custom-forma
 Use an empty container with `data-coreui-date-time-input` to create a masked date and time field. Both the date layout and the hour cycle follow the locale, and every section supports typing, arrow keys, and automatic caret advancement.
 
 <Example pro code={`<label class="form-label">Appointment</label>
-  <div data-coreui-date-time-input data-coreui-name="appointment"></div>`} />
+  <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-name="appointment"></div>`} />
 
 ## Formats
 
@@ -28,15 +28,15 @@ Combine [date tokens](/forms/date-input/#formats) and [time tokens](/forms/time-
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">dd.MM.yyyy HH:mm</label>
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
   </div>
   <div class="mb-3">
     <label class="form-label">YYYY-MM-DD HH:mm:ss</label>
-    <div data-coreui-date-time-input data-coreui-format="YYYY-MM-DD HH:mm:ss"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="YYYY-MM-DD HH:mm:ss"></div>
   </div>
   <div>
     <label class="form-label">MMM D, YYYY h:mm A</label>
-    <div data-coreui-date-time-input data-coreui-format="MMM D, YYYY h:mm A" data-coreui-locale="en-US"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="MMM D, YYYY h:mm A" data-coreui-locale="en-US"></div>
   </div>`} />
 
 ## Locales
@@ -45,15 +45,15 @@ Without an explicit format, the section order, separators, and hour cycle all de
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">en-US</label>
-    <div data-coreui-date-time-input data-coreui-locale="en-US"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-locale="en-US"></div>
   </div>
   <div class="mb-3">
     <label class="form-label">pl-PL</label>
-    <div data-coreui-date-time-input data-coreui-locale="pl-PL"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-locale="pl-PL"></div>
   </div>
   <div>
     <label class="form-label">ja-JP</label>
-    <div data-coreui-date-time-input data-coreui-locale="ja-JP"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-locale="ja-JP"></div>
   </div>`} />
 
 ## Seconds
@@ -61,21 +61,21 @@ Without an explicit format, the section order, separators, and hour cycle all de
 Without an explicit format, enable the seconds section with `data-coreui-seconds="true"`.
 
 <Example pro code={`<label class="form-label">Timestamp</label>
-  <div data-coreui-date-time-input data-coreui-seconds="true"></div>`} />
+  <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-seconds="true"></div>`} />
 
 ## Initial value
 
 Set the initial value with the `data-coreui-date` attribute — a `Date` or a string with a time part.
 
 <Example pro code={`<label class="form-label">Appointment</label>
-  <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30"></div>`} />
+  <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30"></div>`} />
 
 ## Min and max dates
 
 Constrain the selectable range with `minDate` and `maxDate`. A completed value outside the range gets the `.is-invalid` class and the component reports `null` until corrected.
 
 <Example pro code={`<label class="form-label">Delivery slot (July 2026)</label>
-  <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"
+  <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"
        data-coreui-date="2026-07-14 14:30"
        data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31 23:59"></div>`} />
 
@@ -84,7 +84,7 @@ Constrain the selectable range with `minDate` and `maxDate`. A completed value o
 The built-in token parser covers dayjs, moment, date-fns, and luxon format strings, so you can reuse the format string from the date library you already work with — the library itself isn't required to render or edit the mask. Pair it with `inputDateParse` when you want that library to also parse text pasted into the field.
 
 <Example pro code={`<label class="form-label">dayjs format</label>
-  <div id="myDateTimeInputCustomFormats1"></div>`} sandboxJs={dateTimeInputCustomFormats1} />
+  <div class="form-control form-date-time" id="myDateTimeInputCustomFormats1"></div>`} sandboxJs={dateTimeInputCustomFormats1} />
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
@@ -98,11 +98,11 @@ The built-in token parser covers dayjs, moment, date-fns, and luxon format strin
 The field participates in the standard form validation styling, [the same way as the date input](/forms/date-input/#validation): a completed value outside `minDate`/`maxDate`/`disabledDates` gets `.is-invalid` automatically, the `valid`/`invalid` options force a state, and submitting a form with the `.was-validated` class marks a `required` empty field invalid and a filled one valid. Sibling `.valid-feedback`/`.invalid-feedback` elements work as with any other form control.
 
 <Example pro code={`<div class="mb-3">
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-valid="true"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-valid="true"></div>
     <div class="valid-feedback">Looks good!</div>
   </div>
   <div>
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-invalid="true" data-coreui-required="true"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-invalid="true" data-coreui-required="true"></div>
     <div class="invalid-feedback">Please provide an appointment date and time.</div>
   </div>`} />
 
@@ -111,7 +111,7 @@ The field participates in the standard form validation styling, [the same way as
 The date-time input supports [floating labels](https://coreui.io/bootstrap/docs/forms/floating-labels/). When the field is empty and not focused, the mask placeholders are hidden so the label can rest inside the field; focusing the field floats the label and reveals the mask.
 
 <Example pro code={`<div class="form-floating">
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" id="floatingDateTimeInput"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" id="floatingDateTimeInput"></div>
     <label for="floatingDateTimeInput">Appointment</label>
   </div>`} />
 
@@ -121,15 +121,15 @@ The field renders as a `.form-control`, so the standard sizing classes work — 
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">Large</label>
-    <div class="form-control-lg" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
+    <div class="form-control form-date-time form-control-lg" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
   </div>
   <div class="mb-3">
     <label class="form-label">Default</label>
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
   </div>
   <div>
     <label class="form-label">Small</label>
-    <div class="form-control-sm" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
+    <div class="form-control form-date-time form-control-sm" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm"></div>
   </div>`} />
 
 ## Disabled and readonly
@@ -138,11 +138,11 @@ Add `data-coreui-disabled="true"` to disable the field, or `data-coreui-readonly
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">Disabled</label>
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-disabled="true"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-disabled="true"></div>
   </div>
   <div>
     <label class="form-label">Readonly</label>
-    <div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-readonly="true"></div>
+    <div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-date="2026-07-14 14:30" data-coreui-readonly="true"></div>
   </div>`} />
 
 ## Accessibility
@@ -155,10 +155,10 @@ The [keyboard support table](/forms/date-input/#keyboard-support) applies unchan
 
 ### Via data attributes
 
-Add `data-coreui-date-time-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission.
+Add `data-coreui-date-time-input` to an empty `div`. The component renders the sections, separators, and a hidden input for form submission. Include the `form-control form-date-time` classes in the markup — the component adds them on initialization anyway, but having them from the start keeps the field styled and full-height before the JavaScript runs (no flash of an unstyled element on load).
 
 ```html
-<div data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-name="datetime"></div>
+<div class="form-control form-date-time" data-coreui-date-time-input data-coreui-format="dd.MM.yyyy HH:mm" data-coreui-name="datetime"></div>
 ```
 
 ### Via JavaScript
