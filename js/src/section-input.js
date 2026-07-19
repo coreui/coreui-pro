@@ -54,6 +54,7 @@ const SELECTOR_SECTION = '.form-date-time-section'
 
 const Default = {
   ariaLabel: 'Date input',
+  autofocus: false,
   date: null,
   disabled: false,
   disabledDates: null,
@@ -74,6 +75,7 @@ const Default = {
 
 const DefaultType = {
   ariaLabel: 'string',
+  autofocus: 'boolean',
   date: '(date|number|string|null)',
   disabled: 'boolean',
   disabledDates: '(array|date|function|null)',
@@ -134,6 +136,10 @@ class SectionInput extends BaseComponent {
 
     this._createSectionInput()
     this._addEventListeners()
+
+    if (this._config.autofocus && !this._config.disabled) {
+      this._getSectionElements()[0]?.focus()
+    }
   }
 
   // Getters

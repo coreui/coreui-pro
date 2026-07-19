@@ -118,6 +118,12 @@ describe('DateInput', () => {
       expect(getSections(dateInput._element)[0].getAttribute('aria-label')).toEqual('Month')
     })
 
+    it('should focus the first section when autofocus is set', () => {
+      const dateInput = createDateInput({ autofocus: true })
+
+      expect(document.activeElement).toEqual(getSections(dateInput._element)[0])
+    })
+
     it('should make the first section tabbable and the rest not', () => {
       const dateInput = createDateInput()
       const sections = getSections(dateInput._element)
