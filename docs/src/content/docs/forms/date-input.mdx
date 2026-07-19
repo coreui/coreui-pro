@@ -14,6 +14,8 @@ js:
 
 import dateInputCustomFormats1 from './snippets/date-input-custom-formats1.js?raw'
 import dateInputCustomFormats2 from './snippets/date-input-custom-formats2.js?raw'
+import dateInputDisabledDates from './snippets/date-input-disabled-dates.js?raw'
+import dateInputDisabledDates2 from './snippets/date-input-disabled-dates2.js?raw'
 
 ## Example
 
@@ -107,6 +109,26 @@ Constrain the selectable range with `minDate` and `maxDate`. A completed date ou
 
 <Example pro code={`<label class="form-label">Date in July 2026</label>
   <div data-coreui-date-input data-coreui-format="dd.MM.yyyy" data-coreui-min-date="2026-07-01" data-coreui-max-date="2026-07-31"></div>`} />
+
+## Disabled dates
+
+Beyond a simple range, the `disabledDates` option excludes specific dates — single `Date`s, `[start, end]` ranges, or a matcher function. Unlike in the [date picker](/forms/date-picker/#disabled-dates), there is no calendar to gray out: a completed date that hits a disabled entry gets the `.is-invalid` class and the component reports `null` until the value is corrected.
+
+In this example July 4–7 and July 16 can't be entered — try typing one of them:
+
+<Example pro code={`<label class="form-label">Delivery date</label>
+  <div id="myDateInputDisabledDates"></div>`} sandboxJs={dateInputDisabledDates} />
+
+<Code code={dateInputDisabledDates} lang="js" />
+
+### Disabling weekends
+
+Pass a function to disable dates by rule — here Saturdays and Sundays:
+
+<Example pro code={`<label class="form-label">Business day</label>
+  <div id="myDateInputDisabledDates2"></div>`} sandboxJs={dateInputDisabledDates2} />
+
+<Code code={dateInputDisabledDates2} lang="js" />
 
 ## Custom formats
 
