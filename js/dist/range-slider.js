@@ -52,6 +52,7 @@
   const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container';
   const Default = {
     allowList: sanitizer_js.DefaultAllowlist,
+    ariaLabels: null,
     clickableLabels: true,
     disabled: false,
     distance: 0,
@@ -70,6 +71,7 @@
   };
   const DefaultType = {
     allowList: 'object',
+    ariaLabels: '(array|null)',
     clickableLabels: 'boolean',
     disabled: 'boolean',
     distance: 'number',
@@ -233,7 +235,26 @@
       inputElement.setAttribute('aria-valuemax', this._config.max);
       inputElement.setAttribute('aria-valuenow', value);
       inputElement.setAttribute('aria-orientation', this._config.vertical ? 'vertical' : 'horizontal');
+      if (this._currentValue.length > 1) {
+        inputElement.setAttribute('aria-label', this._getAriaLabel(index));
+      }
+      const valueText = this._getValueText(value);
+      if (valueText !== null) {
+        inputElement.setAttribute('aria-valuetext', valueText);
+      }
       return inputElement;
+    }
+    _getAriaLabel(index) {
+      if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) {
+        return this._config.ariaLabels[index];
+      }
+      if (this._currentValue.length === 2) {
+        return index === 0 ? 'Minimum value' : 'Maximum value';
+      }
+      return `Value ${index + 1}`;
+    }
+    _getValueText(value) {
+      return typeof this._config.tooltipsFormat === 'function' ? `${this._config.tooltipsFormat(value)}` : null;
     }
     _createLabels() {
       const {
@@ -355,7 +376,7 @@
         return;
       }
       if (this._tooltips[index]) {
-        this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ? this._config.tooltipsFormat(value) : value;
+        this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ? this._config.sanitize ? sanitizer_js.sanitizeHtml(this._config.tooltipsFormat(value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(value) : value;
         const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)[index];
         this._positionTooltip(this._tooltips[index], input);
       }
@@ -469,6 +490,10 @@
       const input = this._inputs[index];
       input.value = value;
       input.setAttribute('aria-valuenow', value);
+      const valueText = this._getValueText(value);
+      if (valueText !== null) {
+        input.setAttribute('aria-valuetext', valueText);
+      }
       setTimeout(() => {
         input.focus();
       });
@@ -528,7 +553,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config, this._element);
+      config = this._mergeConfigObj(config);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;

@@ -4,10 +4,10 @@
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./tooltip.js')) :
-  typeof define === 'function' && define.amd ? define(['exports', './base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './tooltip'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.Rating = {}, global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Tooltip));
-})(this, (function (exports, BaseComponent, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, Tooltip) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('./base-component.js'), require('./dom/event-handler.js'), require('./dom/manipulator.js'), require('./dom/selector-engine.js'), require('./util/sanitizer.js'), require('./util/index.js'), require('./tooltip.js')) :
+  typeof define === 'function' && define.amd ? define(['./base-component', './dom/event-handler', './dom/manipulator', './dom/selector-engine', './util/sanitizer', './util/index', './tooltip'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Rating = factory(global.BaseComponent, global.EventHandler, global.Manipulator, global.SelectorEngine, global.Sanitizer, global.Index, global.Tooltip));
+})(this, (function (BaseComponent, EventHandler, Manipulator, SelectorEngine, sanitizer_js, index_js, Tooltip) { 'use strict';
 
   /**
    * --------------------------------------------------------------------------
@@ -47,40 +47,11 @@
   const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]';
   const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
   const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
-
-  // js-docs-start svg-allow-list
-  const svgAllowList = {
-    ...sanitizer_js.DefaultAllowlist,
-    svg: ['xmlns', 'version', 'baseprofile', 'width', 'height', 'viewbox', 'preserveaspectratio', 'aria-hidden', 'role', 'focusable'],
-    g: ['id', 'class', 'transform', 'style'],
-    path: ['id', 'class', 'd', 'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-opacity'],
-    circle: ['id', 'class', 'cx', 'cy', 'r', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    rect: ['id', 'class', 'x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    ellipse: ['id', 'class', 'cx', 'cy', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    line: ['id', 'class', 'x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'stroke-opacity'],
-    polygon: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    polyline: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    text: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    tspan: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-    defs: [],
-    symbol: ['id', 'class', 'viewbox', 'preserveaspectratio'],
-    use: ['id', 'class', 'x', 'y', 'width', 'height', 'href'],
-    image: ['id', 'class', 'x', 'y', 'width', 'height', 'href', 'preserveaspectratio', 'xlink:href'],
-    pattern: ['id', 'class', 'x', 'y', 'width', 'height', 'patternunits', 'patterncontentunits', 'patterntransform', 'preserveaspectratio'],
-    lineargradient: ['id', 'class', 'gradientunits', 'x1', 'y1', 'x2', 'y2', 'spreadmethod', 'gradienttransform'],
-    radialgradient: ['id', 'class', 'gradientunits', 'cx', 'cy', 'r', 'fx', 'fy', 'spreadmethod', 'gradienttransform'],
-    mask: ['id', 'class', 'x', 'y', 'width', 'height', 'maskunits', 'maskcontentunits', 'masktransform'],
-    clippath: ['id', 'class', 'clippathunits'],
-    marker: ['id', 'class', 'markerunits', 'markerwidth', 'markerheight', 'orient', 'preserveaspectratio', 'viewbox', 'refx', 'refy'],
-    title: [],
-    desc: []
-  };
-  // js-docs-end svg-allow-list
-
   const Default = {
     activeIcon: null,
     allowClear: false,
-    allowList: svgAllowList,
+    allowList: sanitizer_js.SVGAllowlist,
+    ariaLabel: (value, itemCount) => `${value} of ${itemCount}`,
     disabled: false,
     highlightOnlySelected: false,
     icon: null,
@@ -98,6 +69,7 @@
     activeIcon: '(object|string|null)',
     allowClear: 'boolean',
     allowList: 'object',
+    ariaLabel: 'function',
     disabled: 'boolean',
     highlightOnlySelected: 'boolean',
     icon: '(object|string|null)',
@@ -376,6 +348,9 @@
         ratingItemInputElement.type = 'radio';
         ratingItemInputElement.value = value;
         ratingItemInputElement.name = this._name;
+        if (typeof this._config.ariaLabel === 'function') {
+          ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount));
+        }
         if (this._config.disabled || this._config.readOnly) {
           ratingItemInputElement.setAttribute('disabled', true);
         }
@@ -411,7 +386,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config, this._element);
+      config = this._mergeConfigObj(config);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;
@@ -458,10 +433,7 @@
 
   index_js.defineJQueryPlugin(Rating);
 
-  exports.default = Rating;
-  exports.svgAllowList = svgAllowList;
-
-  Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
+  return Rating;
 
 }));
 //# sourceMappingURL=rating.js.map

@@ -968,6 +968,45 @@ const DefaultAllowlist = {
 };
 // js-docs-end allow-list
 
+// js-docs-start svg-allow-list
+const SVGAllowlist = {
+  ...DefaultAllowlist,
+  svg: ['xmlns', 'version', 'baseprofile', 'width', 'height', 'viewbox', 'preserveaspectratio', 'aria-hidden', 'role', 'focusable', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+  g: ['id', 'class', 'transform', 'style'],
+  path: ['id', 'class', 'd', 'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-opacity'],
+  circle: ['id', 'class', 'cx', 'cy', 'r', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  rect: ['id', 'class', 'x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  ellipse: ['id', 'class', 'cx', 'cy', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  line: ['id', 'class', 'x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-opacity'],
+  polygon: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  polyline: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  text: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  tspan: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
+  defs: [],
+  symbol: ['id', 'class', 'viewbox', 'preserveaspectratio'],
+  use: ['id', 'class', 'x', 'y', 'width', 'height', 'href'],
+  image: ['id', 'class', 'x', 'y', 'width', 'height', 'href', 'preserveaspectratio', 'xlink:href'],
+  pattern: ['id', 'class', 'x', 'y', 'width', 'height', 'patternunits', 'patterncontentunits', 'patterntransform', 'preserveaspectratio'],
+  lineargradient: ['id', 'class', 'gradientunits', 'x1', 'y1', 'x2', 'y2', 'spreadmethod', 'gradienttransform'],
+  radialgradient: ['id', 'class', 'gradientunits', 'cx', 'cy', 'r', 'fx', 'fy', 'spreadmethod', 'gradienttransform'],
+  mask: ['id', 'class', 'x', 'y', 'width', 'height', 'maskunits', 'maskcontentunits', 'masktransform'],
+  clippath: ['id', 'class', 'clippathunits'],
+  marker: ['id', 'class', 'markerunits', 'markerwidth', 'markerheight', 'orient', 'preserveaspectratio', 'viewbox', 'refx', 'refy'],
+  title: [],
+  desc: []
+};
+// js-docs-end svg-allow-list
+
+const ESCAPE_HTML_MAP = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;'
+};
+function escapeHtml(unsafeText) {
+  return String(unsafeText).replace(/[&<>"']/g, character => ESCAPE_HTML_MAP[character]);
+}
 const uriAttributes = new Set(['background', 'cite', 'href', 'itemtype', 'longdesc', 'poster', 'src', 'xlink:href']);
 
 /**
@@ -1038,8 +1077,10 @@ const ARROW_UP_KEY$6 = 'ArrowUp';
 const ARROW_DOWN_KEY$6 = 'ArrowDown';
 const BACKSPACE_KEY$2 = 'Backspace';
 const DELETE_KEY$1 = 'Delete';
+const END_KEY$4 = 'End';
 const ENTER_KEY$4 = 'Enter';
-const ESCAPE_KEY$6 = 'Escape';
+const ESCAPE_KEY$7 = 'Escape';
+const HOME_KEY$4 = 'Home';
 const TAB_KEY$6 = 'Tab';
 const RIGHT_MOUSE_BUTTON$5 = 2; // MouseEvent.button value for the secondary button, usually the right button
 
@@ -1049,8 +1090,9 @@ const EVENT_CLICK$6 = `click${EVENT_KEY$s}`;
 const EVENT_HIDE$c = `hide${EVENT_KEY$s}`;
 const EVENT_HIDDEN$c = `hidden${EVENT_KEY$s}`;
 const EVENT_INPUT$5 = `input${EVENT_KEY$s}`;
-const EVENT_KEYDOWN$9 = `keydown${EVENT_KEY$s}`;
+const EVENT_KEYDOWN$a = `keydown${EVENT_KEY$s}`;
 const EVENT_KEYUP$1 = `keyup${EVENT_KEY$s}`;
+const EVENT_MOUSEDOWN$2 = `mousedown${EVENT_KEY$s}`;
 const EVENT_SHOW$c = `show${EVENT_KEY$s}`;
 const EVENT_SHOWN$c = `shown${EVENT_KEY$s}`;
 const EVENT_CLICK_DATA_API$i = `click${EVENT_KEY$s}${DATA_API_KEY$n}`;
@@ -1285,8 +1327,12 @@ class Autocomplete extends BaseComponent {
     return this._element.classList.value.split(' ');
   }
   _highlightOption(label) {
-    const regex = new RegExp(this._search, 'gi');
-    return label.replace(regex, string => `<strong>${string}</strong>`);
+    if (!this._search) {
+      return escapeHtml(label);
+    }
+    const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedSearch})`, 'gi');
+    return String(label).split(regex).map((part, index) => index % 2 === 0 ? escapeHtml(part) : `<strong>${escapeHtml(part)}</strong>`).join('');
   }
   _isExternalSearch() {
     return Array.isArray(this._config.search) && this._config.search.includes('external');
@@ -1310,8 +1356,8 @@ class Autocomplete extends BaseComponent {
         this.show();
       }
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$9, event => {
-      if (event.key === ESCAPE_KEY$6) {
+    EventHandler.on(this._element, EVENT_KEYDOWN$a, event => {
+      if (event.key === ESCAPE_KEY$7) {
         this.hide();
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
           this.search('');
@@ -1323,12 +1369,12 @@ class Autocomplete extends BaseComponent {
         this._inputElement.focus();
       }
     });
-    EventHandler.on(this._menu, EVENT_KEYDOWN$9, event => {
+    EventHandler.on(this._menu, EVENT_KEYDOWN$a, event => {
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY$2 || event.key === DELETE_KEY$1)) {
         this._inputElement.focus();
       }
     });
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN$9, event => {
+    EventHandler.on(this._togglerElement, EVENT_KEYDOWN$a, event => {
       if (!this._isShown() && (event.key === ENTER_KEY$4 || event.key === ARROW_DOWN_KEY$6)) {
         event.preventDefault();
         this.show();
@@ -1360,7 +1406,7 @@ class Autocomplete extends BaseComponent {
       }
       this._triggerChangeEvent(inputValue);
     });
-    EventHandler.on(this._inputElement, EVENT_KEYDOWN$9, event => {
+    EventHandler.on(this._inputElement, EVENT_KEYDOWN$a, event => {
       if (!this._isShown() && event.key !== TAB_KEY$6) {
         this.show();
       }
@@ -1413,6 +1459,11 @@ class Autocomplete extends BaseComponent {
         }
       }
     });
+    EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN$2, event => {
+      // Keep focus on the input so its blur handler doesn't clear the search
+      // (and re-render the list) before the click selects the option.
+      event.preventDefault();
+    });
     EventHandler.on(this._optionsElement, EVENT_CLICK$6, event => {
       event.preventDefault();
       event.stopPropagation();
@@ -1425,20 +1476,24 @@ class Autocomplete extends BaseComponent {
         this.clear();
       }
     });
-    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$9, event => {
+    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN$a, event => {
       if (!this._config.disabled && event.key === ENTER_KEY$4) {
         event.preventDefault();
         event.stopPropagation();
         this.clear();
       }
     });
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN$9, event => {
+    EventHandler.on(this._optionsElement, EVENT_KEYDOWN$a, event => {
       if (event.key === ENTER_KEY$4) {
         this._onOptionsClick(event.target);
       }
       if ([ARROW_UP_KEY$6, ARROW_DOWN_KEY$6].includes(event.key)) {
         event.preventDefault();
         this._selectMenuItem(event);
+      }
+      if ([HOME_KEY$4, END_KEY$4].includes(event.key)) {
+        event.preventDefault();
+        this._selectFirstOrLastMenuItem(event.key === HOME_KEY$4);
       }
     });
   }
@@ -1536,6 +1591,7 @@ class Autocomplete extends BaseComponent {
     inputEl.setAttribute('aria-autocomplete', 'list');
     inputEl.setAttribute('aria-expanded', 'false');
     inputEl.setAttribute('aria-haspopup', 'listbox');
+    inputEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`);
     if (this._config.disabled) {
       inputEl.setAttribute('disabled', true);
       inputEl.tabIndex = -1;
@@ -1644,6 +1700,8 @@ class Autocomplete extends BaseComponent {
       }
       const optionDiv = document.createElement('div');
       optionDiv.classList.add(CLASS_NAME_OPTION$1);
+      optionDiv.setAttribute('role', 'option');
+      optionDiv.setAttribute('aria-selected', this._selected.some(selected => selected.value === option.value) ? 'true' : 'false');
       if (option.disabled) {
         optionDiv.classList.add(CLASS_NAME_DISABLED$8);
         optionDiv.setAttribute('aria-disabled', 'true');
@@ -1777,7 +1835,8 @@ class Autocomplete extends BaseComponent {
       if (this._config.searchNoResultsLabel) {
         const placeholder = document.createElement('div');
         placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY$1);
-        placeholder.innerHTML = this._config.searchNoResultsLabel;
+        placeholder.setAttribute('role', 'status');
+        placeholder.textContent = this._config.searchNoResultsLabel;
         if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY$1, this._menu)) {
           SelectorEngine.findOne(SELECTOR_OPTIONS$1, this._menu).append(placeholder);
         }
@@ -1798,6 +1857,14 @@ class Autocomplete extends BaseComponent {
     // if target isn't included in items (e.g. when expanding the dropdown)
     // allow cycling to get the last item in case key equals ARROW_UP_KEY
     getNextActiveElement(items, target, key === ARROW_DOWN_KEY$6, !items.includes(target)).focus();
+  }
+  _selectFirstOrLastMenuItem(first) {
+    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS$2, this._menu).filter(element => isVisible(element));
+    if (!items.length) {
+      return;
+    }
+    const item = first ? items[0] : items[items.length - 1];
+    item.focus();
   }
   _configAfterMerge(config) {
     if (config.container === true) {
@@ -2681,7 +2748,7 @@ const getMonthDetails = (year, month, firstDayOfWeek) => {
         weekNumber,
         year
       } = getISOWeekNumberAndYear(day.date);
-      const lastWeek = weeks.at(-1);
+      const lastWeek = weeks[weeks.length - 1];
       if (lastWeek) {
         lastWeek.week = {
           number: weekNumber,
@@ -2689,7 +2756,7 @@ const getMonthDetails = (year, month, firstDayOfWeek) => {
         };
       }
     }
-    const lastWeek = weeks.at(-1);
+    const lastWeek = weeks[weeks.length - 1];
     if (lastWeek) {
       lastWeek.days.push(day);
     }
@@ -3102,7 +3169,7 @@ const NAME$u = 'calendar';
 const DATA_KEY$p = 'coreui.calendar';
 const EVENT_KEY$q = `.${DATA_KEY$p}`;
 const DATA_API_KEY$l = '.data-api';
-const DISALLOWED_ATTRIBUTES$4 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
+const DISALLOWED_ATTRIBUTES$5 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ARROW_UP_KEY$5 = 'ArrowUp';
 const ARROW_RIGHT_KEY$5 = 'ArrowRight';
 const ARROW_DOWN_KEY$5 = 'ArrowDown';
@@ -3116,7 +3183,7 @@ const EVENT_CALENDAR_VIEW_CHANGE = `calendarViewChange${EVENT_KEY$q}`;
 const EVENT_CELL_HOVER = `cellHover${EVENT_KEY$q}`;
 const EVENT_END_DATE_CHANGE$1 = `endDateChange${EVENT_KEY$q}`;
 const EVENT_FOCUS$1 = `focus${EVENT_KEY$q}`;
-const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$q}`;
+const EVENT_KEYDOWN$9 = `keydown${EVENT_KEY$q}`;
 const EVENT_SELECT_END_CHANGE = `selectEndChange${EVENT_KEY$q}`;
 const EVENT_START_DATE_CHANGE$1 = `startDateChange${EVENT_KEY$q}`;
 const EVENT_MOUSEENTER$3 = `mouseenter${EVENT_KEY$q}`;
@@ -3385,7 +3452,7 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_CLICK_DATA_API$g, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarClick(event);
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$8, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$9, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
       this._handleCalendarKeydown(event);
     });
     EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_CELL_CLICKABLE, event => {
@@ -3403,7 +3470,7 @@ class Calendar extends BaseComponent {
     EventHandler.on(this._element, EVENT_CLICK_DATA_API$g, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarClick(event);
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$8, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$9, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
       this._handleCalendarKeydown(event);
     });
     EventHandler.on(this._element, EVENT_MOUSEENTER$3, SELECTOR_CALENDAR_ROW_CLICKABLE, event => {
@@ -3542,7 +3609,6 @@ class Calendar extends BaseComponent {
     this._setStartDate(date);
   }
   _createCalendarPanel(order) {
-    var _this$_config$weekNum;
     const calendarDate = getCalendarDate(this._calendarDate, order, this._view);
     const year = calendarDate.getFullYear();
     const month = calendarDate.getMonth();
@@ -3555,10 +3621,10 @@ class Calendar extends BaseComponent {
     navigationElement.classList.add('calendar-nav');
     navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${escapeHtml(this._config.ariaNavPrevYearLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${escapeHtml(this._config.ariaNavPrevMonthLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
@@ -3575,10 +3641,10 @@ class Calendar extends BaseComponent {
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${escapeHtml(this._config.ariaNavNextMonthLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${escapeHtml(this._config.ariaNavNextYearLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -3594,7 +3660,7 @@ class Calendar extends BaseComponent {
         <tr>
           ${this._config.showWeekNumber ? `<th class="${CLASS_NAME_CALENDAR_CELL}">
               <div class="calendar-header-cell-inner">
-               ${(_this$_config$weekNum = this._config.weekNumbersLabel) != null ? _this$_config$weekNum : ''}
+               ${this._config.weekNumbersLabel ? escapeHtml(this._config.weekNumbersLabel) : ''}
               </div>
             </th>` : ''}
           ${weekDays.map(({
@@ -3632,10 +3698,12 @@ class Calendar extends BaseComponent {
         month
       }) => {
         const cellAttributes = this._cellDayAttributes(date, month);
-        return month === 'current' || this._config.showAdjacementDays ? `<td 
+        return month === 'current' || this._config.showAdjacementDays ? `<td
                     class="${cellAttributes.className}"
                     tabindex="${cellAttributes.tabIndex}"
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                    ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
+                    aria-label="${escapeHtml(cellAttributes.ariaLabel)}"
                     data-coreui-date="${date}"
                   >
                     <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
@@ -3811,7 +3879,9 @@ class Calendar extends BaseComponent {
           [month]: true
         }),
         tabIndex: -1,
-        ariaSelected: false
+        ariaSelected: false,
+        ariaLabel: date.toLocaleDateString(this._config.locale),
+        ariaCurrent: isTodayDate
       };
     }
     const isInRange = isCurrentMonth && isDateInRange(date, this._startDate, this._endDate);
@@ -3830,6 +3900,8 @@ class Calendar extends BaseComponent {
       className: classNames,
       tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
       ariaSelected: isSelected,
+      ariaLabel: date.toLocaleDateString(this._config.locale),
+      ariaCurrent: isTodayDate,
       meta: {
         isDisabled,
         isInCurrentMonth: isCurrentMonth,
@@ -3944,7 +4016,7 @@ class Calendar extends BaseComponent {
   _getConfig(config) {
     const dataAttributes = Manipulator.getDataAttributes(this._element);
     for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES$4.has(dataAttribute)) {
+      if (DISALLOWED_ATTRIBUTES$5.has(dataAttribute)) {
         delete dataAttributes[dataAttribute];
       }
     }
@@ -3952,7 +4024,7 @@ class Calendar extends BaseComponent {
       ...dataAttributes,
       ...(typeof config === 'object' && config ? config : {})
     };
-    config = this._mergeConfigObj(config, this._element);
+    config = this._mergeConfigObj(config);
     config = this._configAfterMerge(config);
     this._typeCheckConfig(config);
     return config;
@@ -4151,7 +4223,7 @@ const DIRECTION_LEFT = 'left';
 const DIRECTION_RIGHT = 'right';
 const EVENT_SLIDE = `slide${EVENT_KEY$o}`;
 const EVENT_SLID = `slid${EVENT_KEY$o}`;
-const EVENT_KEYDOWN$7 = `keydown${EVENT_KEY$o}`;
+const EVENT_KEYDOWN$8 = `keydown${EVENT_KEY$o}`;
 const EVENT_MOUSEENTER$2 = `mouseenter${EVENT_KEY$o}`;
 const EVENT_MOUSELEAVE$2 = `mouseleave${EVENT_KEY$o}`;
 const EVENT_DRAG_START = `dragstart${EVENT_KEY$o}`;
@@ -4289,7 +4361,7 @@ class Carousel extends BaseComponent {
   }
   _addEventListeners() {
     if (this._config.keyboard) {
-      EventHandler.on(this._element, EVENT_KEYDOWN$7, event => this._keydown(event));
+      EventHandler.on(this._element, EVENT_KEYDOWN$8, event => this._keydown(event));
     }
     if (this._config.pause === 'hover') {
       EventHandler.on(this._element, EVENT_MOUSEENTER$2, () => this.pause());
@@ -4530,22 +4602,29 @@ const CLASS_NAME_ACTIVE$6 = 'active';
 const CLASS_NAME_DISABLED$7 = 'disabled';
 const DEFAULT_REMOVE_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>';
 const DEFAULT_SELECTED_ICON$1 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>';
+const DISALLOWED_ATTRIBUTES$4 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const Default$p = {
+  allowList: SVGAllowlist,
   ariaRemoveLabel: 'Remove',
   disabled: false,
   filter: false,
   removable: false,
   removeIcon: DEFAULT_REMOVE_ICON$1,
+  sanitize: true,
+  sanitizeFn: null,
   selectable: false,
   selected: false,
   selectedIcon: DEFAULT_SELECTED_ICON$1
 };
 const DefaultType$p = {
+  allowList: 'object',
   ariaRemoveLabel: 'string',
   disabled: 'boolean',
   filter: 'boolean',
   removable: 'boolean',
   removeIcon: 'string',
+  sanitize: 'boolean',
+  sanitizeFn: '(null|function)',
   selectable: 'boolean',
   selected: 'boolean',
   selectedIcon: 'string'
@@ -4690,7 +4769,7 @@ class Chip extends BaseComponent {
     const check = document.createElement('span');
     check.className = CLASS_NAME_CHIP_CHECK;
     check.setAttribute('aria-hidden', 'true');
-    check.innerHTML = this._config.selectedIcon;
+    check.innerHTML = this._sanitizeIcon(this._config.selectedIcon);
     this._element.prepend(check);
   }
   _createRemoveButton() {
@@ -4699,7 +4778,7 @@ class Chip extends BaseComponent {
     button.className = CLASS_NAME_CHIP_REMOVE;
     button.setAttribute('aria-label', this._config.ariaRemoveLabel);
     button.setAttribute('tabindex', '-1'); // Not in tab order, chips handle keyboard
-    button.innerHTML = this._config.removeIcon;
+    button.innerHTML = this._sanitizeIcon(this._config.removeIcon);
     return button;
   }
   _ensureRemoveButton() {
@@ -4754,6 +4833,25 @@ class Chip extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_REMOVED);
     this._element.remove();
     this.dispose();
+  }
+  _sanitizeIcon(icon) {
+    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon;
+  }
+  _getConfig(config) {
+    const dataAttributes = Manipulator.getDataAttributes(this._element);
+    for (const dataAttribute of Object.keys(dataAttributes)) {
+      if (DISALLOWED_ATTRIBUTES$4.has(dataAttribute)) {
+        delete dataAttributes[dataAttribute];
+      }
+    }
+    config = {
+      ...dataAttributes,
+      ...(typeof config === 'object' && config ? config : {})
+    };
+    config = this._mergeConfigObj(config);
+    config = this._configAfterMerge(config);
+    this._typeCheckConfig(config);
+    return config;
   }
 
   // Static
@@ -4816,7 +4914,7 @@ const EVENT_ADD = 'add';
 const EVENT_REMOVE = 'remove';
 const EVENT_CHANGE$3 = 'change';
 const EVENT_SELECT = 'select';
-const EVENT_KEYDOWN$6 = 'keydown';
+const EVENT_KEYDOWN$7 = 'keydown';
 const EVENT_CHIP_SELECTED = 'selected.coreui.chip';
 const EVENT_CHIP_DESELECTED = 'deselected.coreui.chip';
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip';
@@ -5092,7 +5190,7 @@ class ChipSet extends BaseComponent {
     return typeof chipClassName === 'string' ? chipClassName : '';
   }
   _addEventListeners() {
-    EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$6), SELECTOR_CHIP$1, event => this._handleKeydown(event));
+    EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN$7), SELECTOR_CHIP$1, event => this._handleKeydown(event));
     EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP$1, event => this._handleSelectionChange(event));
     EventHandler.on(this._element, EVENT_CHIP_DESELECTED, SELECTOR_CHIP$1, event => this._handleSelectionChange(event));
     EventHandler.on(this._element, EVENT_CHIP_REMOVE, SELECTOR_CHIP$1, event => this._handleChipRemove(event));
@@ -5160,9 +5258,9 @@ class ChipSet extends BaseComponent {
     return previous && previous !== chip ? previous : null;
   }
   _navigateToEdge(targetIndex) {
-    var _chips$at;
+    var _chips;
     const chips = this._getFocusableChips();
-    (_chips$at = chips.at(targetIndex)) == null || _chips$at.focus();
+    (_chips = chips[targetIndex < 0 ? chips.length + targetIndex : targetIndex]) == null || _chips.focus();
   }
   _handleSelectionChange(event) {
     const chip = event.target.closest(SELECTOR_CHIP$1);
@@ -5397,7 +5495,7 @@ class ChipInput extends ChipSet {
       // direction is mirrored in RTL.
       if (event.key === (isRTL() ? 'ArrowLeft' : 'ArrowRight')) {
         const chips = this._getFocusableChips();
-        if (chips.length > 0 && chips.at(-1).contains(event.target)) {
+        if (chips.length > 0 && chips[chips.length - 1].contains(event.target)) {
           event.preventDefault();
           this._input.focus();
           return;
@@ -5495,7 +5593,7 @@ class ChipInput extends ChipSet {
             event.preventDefault();
             const chips = this._getChipElements();
             if (chips.length > 0) {
-              chips.at(-1).focus();
+              chips[chips.length - 1].focus();
             }
           }
           break;
@@ -5510,7 +5608,7 @@ class ChipInput extends ChipSet {
             event.preventDefault();
             const chips = this._getChipElements();
             if (chips.length > 0) {
-              chips.at(-1).focus();
+              chips[chips.length - 1].focus();
             }
           }
           break;
@@ -5540,7 +5638,7 @@ class ChipInput extends ChipSet {
       for (const part of parts.slice(0, -1)) {
         this.add(part.trim());
       }
-      this._input.value = parts.at(-1);
+      this._input.value = parts[parts.length - 1];
     }
     this._setInputSize();
     EventHandler.trigger(this._element, EVENT_INPUT$4, {
@@ -6004,15 +6102,20 @@ const getAmPm = (date, locale) => {
  * @param {number[]} values An array of time values to format.
  * @param {string} locale The locale to use for formatting.
  * @param {('hour' | 'minute' | 'second')} partial The type of time value to format.
+ * @param {boolean} [hour12] Whether the hour labels should use the 12-hour cycle. When omitted the formatter falls back to the locale's default cycle.
  * @returns {Array} An array of objects with the original value and its localized label.
  */
-const formatTimePartials = (values, locale, partial) => {
+const formatTimePartials = (values, locale, partial, hour12) => {
   const date = new Date();
   const forceTwoDigit = shouldUseTwoDigitHour(locale);
+  // `hour12: false` lets ICU pick either h23 (00–23) or h24 (01–24), so older
+  // engines label midnight as "24"; pin the cycle explicitly to stay stable.
+  const hourCycle = hour12 === undefined ? undefined : hour12 ? 'h12' : 'h23';
   const formatter = new Intl.DateTimeFormat(locale, {
     hour: forceTwoDigit ? '2-digit' : 'numeric',
     minute: '2-digit',
-    second: '2-digit'
+    second: '2-digit',
+    hourCycle
   });
   return values.map(value => {
     var _formatter$formatToPa;
@@ -6059,7 +6162,7 @@ const getLocalizedTimePartials = (locale, ampm = 'auto', hours = [], minutes = [
     length: 60
   }, (_, i) => i);
   return {
-    listOfHours: formatTimePartials(listOfHours, locale, 'hour'),
+    listOfHours: formatTimePartials(listOfHours, locale, 'hour', hour12),
     listOfMinutes: formatTimePartials(listOfMinutes, locale, 'minute'),
     listOfSeconds: formatTimePartials(listOfSeconds, locale, 'second'),
     hour12
@@ -6114,10 +6217,10 @@ const NAME$m = 'time-picker';
 const DATA_KEY$i = 'coreui.time-picker';
 const EVENT_KEY$i = `.${DATA_KEY$i}`;
 const DATA_API_KEY$f = '.data-api';
-const END_KEY$2 = 'End';
+const END_KEY$3 = 'End';
 const ENTER_KEY$2 = 'Enter';
-const ESCAPE_KEY$5 = 'Escape';
-const HOME_KEY$2 = 'Home';
+const ESCAPE_KEY$6 = 'Escape';
+const HOME_KEY$3 = 'Home';
 const SPACE_KEY$1 = 'Space';
 const TAB_KEY$4 = 'Tab';
 const ARROW_UP_KEY$4 = 'ArrowUp';
@@ -6130,7 +6233,7 @@ const EVENT_FOCUSOUT$3 = `focusout${EVENT_KEY$i}`;
 const EVENT_HIDE$a = `hide${EVENT_KEY$i}`;
 const EVENT_HIDDEN$a = `hidden${EVENT_KEY$i}`;
 const EVENT_INPUT$3 = `input${EVENT_KEY$i}`;
-const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$i}`;
+const EVENT_KEYDOWN$6 = `keydown${EVENT_KEY$i}`;
 const EVENT_SHOW$a = `show${EVENT_KEY$i}`;
 const EVENT_SHOWN$a = `shown${EVENT_KEY$i}`;
 const EVENT_SUBMIT$1 = 'submit';
@@ -6419,7 +6522,7 @@ class TimePicker extends BaseComponent {
         this.toggle();
       }
     });
-    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN$5, event => {
+    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN$6, event => {
       if (!this._config.disabled && event.key === ENTER_KEY$2) {
         this.toggle();
       }
@@ -6441,7 +6544,7 @@ class TimePicker extends BaseComponent {
           this._setUpRolls(false);
         }
       });
-      EventHandler.on(this._timePickerBody, EVENT_KEYDOWN$5, SELECTOR_ROLL_CELL, event => {
+      EventHandler.on(this._timePickerBody, EVENT_KEYDOWN$6, SELECTOR_ROLL_CELL, event => {
         if (event.key === ARROW_DOWN_KEY$4 || event.key === ARROW_UP_KEY$4) {
           event.preventDefault();
           const {
@@ -6458,7 +6561,7 @@ class TimePicker extends BaseComponent {
           }
           return;
         }
-        if (event.key === HOME_KEY$2 || event.key === END_KEY$2) {
+        if (event.key === HOME_KEY$3 || event.key === END_KEY$3) {
           event.preventDefault();
           const {
             key,
@@ -6468,7 +6571,7 @@ class TimePicker extends BaseComponent {
           if (!items.length) {
             return;
           }
-          const index = key === HOME_KEY$2 ? 0 : items.length - 1;
+          const index = key === HOME_KEY$3 ? 0 : items.length - 1;
           items[index].focus();
           return;
         }
@@ -6487,8 +6590,8 @@ class TimePicker extends BaseComponent {
         }
       });
     }
-    EventHandler.on(this._element, EVENT_KEYDOWN$5, event => {
-      if (event.key === ESCAPE_KEY$5) {
+    EventHandler.on(this._element, EVENT_KEYDOWN$6, event => {
+      if (event.key === ESCAPE_KEY$6) {
         this.hide();
       }
     });
@@ -6730,7 +6833,7 @@ class TimePicker extends BaseComponent {
       const cancelButtonEl = document.createElement('button');
       cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
       cancelButtonEl.type = 'button';
-      cancelButtonEl.innerHTML = this._config.cancelButton;
+      cancelButtonEl.textContent = this._config.cancelButton;
       cancelButtonEl.addEventListener('click', () => {
         this.cancel();
       });
@@ -6740,7 +6843,7 @@ class TimePicker extends BaseComponent {
       const confirmButtonEl = document.createElement('button');
       confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
       confirmButtonEl.type = 'button';
-      confirmButtonEl.innerHTML = this._config.confirmButton;
+      confirmButtonEl.textContent = this._config.confirmButton;
       confirmButtonEl.addEventListener('click', () => {
         this.hide();
       });
@@ -6960,7 +7063,7 @@ const EVENT_KEY$h = `.${DATA_KEY$h}`;
 const DATA_API_KEY$e = '.data-api';
 const DISALLOWED_ATTRIBUTES$3 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
 const ENTER_KEY$1 = 'Enter';
-const ESCAPE_KEY$4 = 'Escape';
+const ESCAPE_KEY$5 = 'Escape';
 const TAB_KEY$3 = 'Tab';
 const RIGHT_MOUSE_BUTTON$3 = 2;
 const EVENT_CLICK$4 = `click${EVENT_KEY$h}`;
@@ -6968,7 +7071,7 @@ const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY$h}`;
 const EVENT_HIDE$9 = `hide${EVENT_KEY$h}`;
 const EVENT_HIDDEN$9 = `hidden${EVENT_KEY$h}`;
 const EVENT_INPUT$2 = `input${EVENT_KEY$h}`;
-const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$h}`;
+const EVENT_KEYDOWN$5 = `keydown${EVENT_KEY$h}`;
 const EVENT_RESIZE$4 = 'resize';
 const EVENT_SHOW$9 = `show${EVENT_KEY$h}`;
 const EVENT_SHOWN$9 = `shown${EVENT_KEY$h}`;
@@ -7271,7 +7374,7 @@ class DateRangePicker extends BaseComponent {
         this.toggle();
       }
     });
-    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN$4, event => {
+    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN$5, event => {
       if (!this._config.disabled && event.key === ENTER_KEY$1) {
         this.toggle();
       }
@@ -7281,8 +7384,8 @@ class DateRangePicker extends BaseComponent {
         this.show();
       }
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$4, event => {
-      if (event.key === ESCAPE_KEY$4) {
+    EventHandler.on(this._element, EVENT_KEYDOWN$5, event => {
+      if (event.key === ESCAPE_KEY$5) {
         this.hide();
         this._startInput.focus();
       }
@@ -7589,7 +7692,7 @@ class DateRangePicker extends BaseComponent {
           this._changeEndDate(this._config.ranges[key][1]);
           this._calendar.update(this._getCalendarConfig());
         });
-        buttonEl.innerHTML = key;
+        buttonEl.textContent = key;
         dateRangePickerRangesEl.append(buttonEl);
       }
       dateRangePickerBodyEl.append(dateRangePickerRangesEl);
@@ -7668,7 +7771,10 @@ class DateRangePicker extends BaseComponent {
       const todayButtonEl = document.createElement('button');
       todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses));
       todayButtonEl.type = 'button';
-      todayButtonEl.innerHTML = this._config.todayButton;
+      todayButtonEl.textContent = this._config.todayButton;
+      if (isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+        todayButtonEl.disabled = true;
+      }
       todayButtonEl.addEventListener('click', () => {
         const date = new Date();
         this._calendarDate = date;
@@ -7684,7 +7790,7 @@ class DateRangePicker extends BaseComponent {
       const cancelButtonEl = document.createElement('button');
       cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
       cancelButtonEl.type = 'button';
-      cancelButtonEl.innerHTML = this._config.cancelButton;
+      cancelButtonEl.textContent = this._config.cancelButton;
       cancelButtonEl.addEventListener('click', () => {
         this.cancel();
       });
@@ -7694,7 +7800,7 @@ class DateRangePicker extends BaseComponent {
       const confirmButtonEl = document.createElement('button');
       confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
       confirmButtonEl.type = 'button';
-      confirmButtonEl.innerHTML = this._config.confirmButton;
+      confirmButtonEl.textContent = this._config.confirmButton;
       confirmButtonEl.addEventListener('click', () => {
         this.hide();
       });
@@ -7826,7 +7932,7 @@ class DateRangePicker extends BaseComponent {
       ...dataAttributes,
       ...(typeof config === 'object' && config ? config : {})
     };
-    config = this._mergeConfigObj(config, this._element);
+    config = this._mergeConfigObj(config);
     config = this._configAfterMerge(config);
     this._typeCheckConfig(config);
     return config;
@@ -8067,7 +8173,7 @@ const NAME$j = 'dropdown';
 const DATA_KEY$f = 'coreui.dropdown';
 const EVENT_KEY$f = `.${DATA_KEY$f}`;
 const DATA_API_KEY$c = '.data-api';
-const ESCAPE_KEY$3 = 'Escape';
+const ESCAPE_KEY$4 = 'Escape';
 const TAB_KEY$1 = 'Tab';
 const ARROW_UP_KEY$3 = 'ArrowUp';
 const ARROW_DOWN_KEY$3 = 'ArrowDown';
@@ -8372,7 +8478,7 @@ class Dropdown extends BaseComponent {
     // If input/textarea && if key is other than ESCAPE => not a dropdown command
 
     const isInput = /input|textarea/i.test(event.target.tagName);
-    const isEscapeEvent = event.key === ESCAPE_KEY$3;
+    const isEscapeEvent = event.key === ESCAPE_KEY$4;
     const isUpOrDownEvent = [ARROW_UP_KEY$3, ARROW_DOWN_KEY$3].includes(event.key);
     if (!isUpOrDownEvent && !isEscapeEvent) {
       return;
@@ -8564,7 +8670,6 @@ class LoadingButton extends BaseComponent {
  */
 
 EventHandler.on(document, EVENT_CLICK_DATA_API$9, SELECTOR_DATA_TOGGLE$a, event => {
-  event.preventDefault();
   const button = event.target.closest(SELECTOR_DATA_TOGGLE$a);
   const data = LoadingButton.getOrCreateInstance(button);
   data.start();
@@ -8823,7 +8928,7 @@ const NAME$g = 'modal';
 const DATA_KEY$d = 'coreui.modal';
 const EVENT_KEY$d = `.${DATA_KEY$d}`;
 const DATA_API_KEY$a = '.data-api';
-const ESCAPE_KEY$2 = 'Escape';
+const ESCAPE_KEY$3 = 'Escape';
 const EVENT_HIDE$6 = `hide${EVENT_KEY$d}`;
 const EVENT_HIDE_PREVENTED$1 = `hidePrevented${EVENT_KEY$d}`;
 const EVENT_HIDDEN$6 = `hidden${EVENT_KEY$d}`;
@@ -8968,7 +9073,7 @@ class Modal extends BaseComponent {
   }
   _addEventListeners() {
     EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS$1, event => {
-      if (event.key !== ESCAPE_KEY$2) {
+      if (event.key !== ESCAPE_KEY$3) {
         return;
       }
       if (this._config.keyboard) {
@@ -9129,8 +9234,10 @@ const ARROW_UP_KEY$2 = 'ArrowUp';
 const ARROW_DOWN_KEY$2 = 'ArrowDown';
 const BACKSPACE_KEY$1 = 'Backspace';
 const DELETE_KEY = 'Delete';
+const END_KEY$2 = 'End';
 const ENTER_KEY = 'Enter';
-const ESCAPE_KEY$1 = 'Escape';
+const ESCAPE_KEY$2 = 'Escape';
+const HOME_KEY$2 = 'Home';
 const SPACE_KEY = ' ';
 const TAB_KEY = 'Tab';
 const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
@@ -9153,7 +9260,7 @@ const EVENT_CHANGED = `changed${EVENT_KEY$c}`;
 const EVENT_CLICK$3 = `click${EVENT_KEY$c}`;
 const EVENT_HIDE$5 = `hide${EVENT_KEY$c}`;
 const EVENT_HIDDEN$5 = `hidden${EVENT_KEY$c}`;
-const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$c}`;
+const EVENT_KEYDOWN$4 = `keydown${EVENT_KEY$c}`;
 const EVENT_KEYUP = `keyup${EVENT_KEY$c}`;
 const EVENT_SEARCH = `search${EVENT_KEY$c}`;
 const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY$c}`;
@@ -9200,6 +9307,7 @@ const Default$d = {
   deselectFilteredLabel: 'Deselect filtered',
   disabled: false,
   headerTemplate: null,
+  hideSelectAllOnSearchNoResults: true,
   id: null,
   invalid: false,
   multiple: true,
@@ -9241,6 +9349,7 @@ const DefaultType$d = {
   deselectFilteredLabel: 'string',
   disabled: 'boolean',
   headerTemplate: '(function|null)',
+  hideSelectAllOnSearchNoResults: 'boolean',
   id: '(string|null)',
   invalid: 'boolean',
   multiple: 'boolean',
@@ -9284,6 +9393,7 @@ class MultiSelect extends BaseComponent {
     this._configureNativeSelect();
     this._indicatorElement = null;
     this._selectAllElement = null;
+    this._dropdownHeaderElement = null;
     this._headerElement = null;
     this._selectionElement = null;
     this._selectionCleanerElement = null;
@@ -9474,8 +9584,8 @@ class MultiSelect extends BaseComponent {
         this.show();
       }
     });
-    EventHandler.on(this._wrapperElement, EVENT_KEYDOWN$3, event => {
-      if (event.key === ESCAPE_KEY$1) {
+    EventHandler.on(this._wrapperElement, EVENT_KEYDOWN$4, event => {
+      if (event.key === ESCAPE_KEY$2) {
         this.hide();
         return;
       }
@@ -9483,12 +9593,12 @@ class MultiSelect extends BaseComponent {
         this._searchElement.focus();
       }
     });
-    EventHandler.on(this._menu, EVENT_KEYDOWN$3, event => {
+    EventHandler.on(this._menu, EVENT_KEYDOWN$4, event => {
       if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY$1 || event.key === DELETE_KEY)) {
         this._searchElement.focus();
       }
     });
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN$3, event => {
+    EventHandler.on(this._togglerElement, EVENT_KEYDOWN$4, event => {
       if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY$2)) {
         event.preventDefault();
         this.show();
@@ -9501,8 +9611,8 @@ class MultiSelect extends BaseComponent {
     });
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
-    EventHandler.on(this._element, EVENT_KEYDOWN$3, event => {
-      if (event.key === TAB_KEY || event.key === ESCAPE_KEY$1) {
+    EventHandler.on(this._element, EVENT_KEYDOWN$4, event => {
+      if (event.key === TAB_KEY || event.key === ESCAPE_KEY$2) {
         return;
       }
 
@@ -9533,7 +9643,7 @@ class MultiSelect extends BaseComponent {
     EventHandler.on(this._searchElement, EVENT_KEYUP, () => {
       this._onSearchChange(this._searchElement);
     });
-    EventHandler.on(this._searchElement, EVENT_KEYDOWN$3, event => {
+    EventHandler.on(this._searchElement, EVENT_KEYDOWN$4, event => {
       if (!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey || event.key === ARROW_DOWN_KEY$2) {
         this.show();
       }
@@ -9559,10 +9669,14 @@ class MultiSelect extends BaseComponent {
       // The select all button lives in the header, outside the options list, so it
       // needs its own arrow-key handler to join the navigation flow (Enter/Space
       // already toggle via the native button click above).
-      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN$3, event => {
+      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN$4, event => {
         if ([ARROW_UP_KEY$2, ARROW_DOWN_KEY$2].includes(event.key)) {
           event.preventDefault();
           this._selectMenuItem(event);
+        }
+        if ([HOME_KEY$2, END_KEY$2].includes(event.key)) {
+          event.preventDefault();
+          this._selectFirstOrLastMenuItem(event.key === HOME_KEY$2);
         }
       });
     }
@@ -9571,7 +9685,7 @@ class MultiSelect extends BaseComponent {
       event.stopPropagation();
       this._onOptionsClick(event.target);
     });
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN$3, event => {
+    EventHandler.on(this._optionsElement, EVENT_KEYDOWN$4, event => {
       if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
         // Space would otherwise scroll the options list.
         event.preventDefault();
@@ -9580,6 +9694,10 @@ class MultiSelect extends BaseComponent {
       if ([ARROW_UP_KEY$2, ARROW_DOWN_KEY$2].includes(event.key)) {
         event.preventDefault();
         this._selectMenuItem(event);
+      }
+      if ([HOME_KEY$2, END_KEY$2].includes(event.key)) {
+        event.preventDefault();
+        this._selectFirstOrLastMenuItem(event.key === HOME_KEY$2);
       }
     });
   }
@@ -9825,6 +9943,7 @@ class MultiSelect extends BaseComponent {
     if (hasHeaderTemplate || showSelectAll) {
       const header = document.createElement('div');
       header.classList.add(CLASS_NAME_DROPDOWN_HEADER);
+      this._dropdownHeaderElement = header;
       if (hasHeaderTemplate) {
         const headerContent = document.createElement('div');
 
@@ -10449,6 +10568,7 @@ class MultiSelect extends BaseComponent {
     }
     this._updateHeader();
     this._updateMasterCheckbox();
+    this._updateSelectAllVisibility(visibleOptions);
     const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu);
     if (visibleOptions > 0) {
       if (emptyMessage) {
@@ -10464,6 +10584,16 @@ class MultiSelect extends BaseComponent {
       SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
     }
   }
+  _updateSelectAllVisibility(visibleOptions) {
+    if (!this._dropdownHeaderElement || !this._selectAllElement) {
+      return;
+    }
+    if (this._config.hideSelectAllOnSearchNoResults && visibleOptions === 0) {
+      this._dropdownHeaderElement.style.display = 'none';
+    } else {
+      this._dropdownHeaderElement.style.removeProperty('display');
+    }
+  }
   _selectMenuItem({
     key,
     target
@@ -10476,6 +10606,14 @@ class MultiSelect extends BaseComponent {
     // if target isn't included in items (e.g. when expanding the dropdown)
     // allow cycling to get the last item in case key equals ARROW_UP_KEY
     getNextActiveElement(items, target, key === ARROW_DOWN_KEY$2, !items.includes(target)).focus();
+  }
+  _selectFirstOrLastMenuItem(first) {
+    const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element));
+    if (!items.length) {
+      return;
+    }
+    const item = first ? items[0] : items[items.length - 1];
+    item.focus();
   }
   _configAfterMerge(config) {
     if (config.container === true) {
@@ -10821,7 +10959,7 @@ const DATA_KEY$a = 'coreui.offcanvas';
 const EVENT_KEY$a = `.${DATA_KEY$a}`;
 const DATA_API_KEY$7 = '.data-api';
 const EVENT_LOAD_DATA_API$7 = `load${EVENT_KEY$a}${DATA_API_KEY$7}`;
-const ESCAPE_KEY = 'Escape';
+const ESCAPE_KEY$1 = 'Escape';
 const CLASS_NAME_SHOW$5 = 'show';
 const CLASS_NAME_SHOWING$1 = 'showing';
 const CLASS_NAME_HIDING = 'hiding';
@@ -10962,7 +11100,7 @@ class Offcanvas extends BaseComponent {
   }
   _addEventListeners() {
     EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS, event => {
-      if (event.key !== ESCAPE_KEY) {
+      if (event.key !== ESCAPE_KEY$1) {
         return;
       }
       if (this._config.keyboard) {
@@ -11058,7 +11196,7 @@ const EVENT_CHANGE$2 = `change${EVENT_KEY$9}`;
 const EVENT_COMPLETE = `complete${EVENT_KEY$9}`;
 const EVENT_FOCUS = `focus${EVENT_KEY$9}`;
 const EVENT_INPUT$1 = `input${EVENT_KEY$9}`;
-const EVENT_KEYDOWN$2 = `keydown${EVENT_KEY$9}`;
+const EVENT_KEYDOWN$3 = `keydown${EVENT_KEY$9}`;
 const EVENT_PASTE = `paste`;
 const EVENT_LOAD_DATA_API$6 = `load${EVENT_KEY$9}${DATA_API_KEY$6}`;
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control';
@@ -11195,7 +11333,7 @@ class OTPInput extends BaseComponent {
         this._checkAutoSubmit(inputs);
       }
     });
-    EventHandler.on(this._element, EVENT_KEYDOWN$2, SELECTOR_FORM_OTP_CONTROL, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN$3, SELECTOR_FORM_OTP_CONTROL, event => {
       const {
         key,
         target
@@ -11340,7 +11478,7 @@ class OTPInput extends BaseComponent {
     for (const [index, input] of inputs.entries()) {
       input.type = this._config.masked ? 'password' : 'text';
       input.maxLength = 1;
-      input.autocomplete = 'off';
+      input.autocomplete = 'one-time-code';
       if (this._config.placeholder !== null) {
         const placeholder = String(this._config.placeholder);
         input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder;
@@ -11463,7 +11601,8 @@ const EVENT_KEY$8 = `.${DATA_KEY$8}`;
 const DATA_API_KEY$5 = '.data-api';
 const EVENT_CLICK_DATA_API$4 = `click${EVENT_KEY$8}${DATA_API_KEY$5}`;
 const SELECTOR_FORM_CONTROL = '.form-control';
-const SELECTOR_DATA_TOGGLE$6 = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ [data-coreui-toggle="password"]`;
+const SELECTOR_TOGGLE = '[data-coreui-toggle="password"]';
+const SELECTOR_DATA_TOGGLE$6 = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ ${SELECTOR_TOGGLE}`;
 
 /**
  * Class definition
@@ -11478,6 +11617,18 @@ class PasswordInput extends BaseComponent {
   // Public
   toggle() {
     this._element.type = this._element.type === 'password' ? 'text' : 'password';
+    this._updateToggleState();
+  }
+
+  // Private
+  _updateToggleState() {
+    if (!this._element.parentNode) {
+      return;
+    }
+    const toggler = SelectorEngine.findOne(SELECTOR_TOGGLE, this._element.parentNode);
+    if (toggler) {
+      toggler.setAttribute('aria-pressed', this._element.type === 'text' ? 'true' : 'false');
+    }
   }
 
   // Static
@@ -11661,12 +11812,14 @@ class TemplateFactory extends Config {
 
 const NAME$9 = 'tooltip';
 const DISALLOWED_ATTRIBUTES$2 = new Set(['sanitize', 'allowList', 'sanitizeFn']);
+const ESCAPE_KEY = 'Escape';
 const CLASS_NAME_FADE$2 = 'fade';
 const CLASS_NAME_MODAL = 'modal';
 const CLASS_NAME_SHOW$4 = 'show';
 const SELECTOR_TOOLTIP_INNER = '.tooltip-inner';
 const SELECTOR_MODAL = `.${CLASS_NAME_MODAL}`;
 const EVENT_MODAL_HIDE = 'hide.coreui.modal';
+const EVENT_KEYDOWN$2 = 'keydown';
 const TRIGGER_HOVER = 'hover';
 const TRIGGER_FOCUS = 'focus';
 const TRIGGER_CLICK = 'click';
@@ -11749,6 +11902,9 @@ class Tooltip extends BaseComponent {
 
     // Protected
     this.tip = null;
+
+    // Private
+    this._keydownHandler = null;
     this._setListeners();
     if (!this._config.selector) {
       this._fixTitle();
@@ -11788,6 +11944,7 @@ class Tooltip extends BaseComponent {
   }
   dispose() {
     clearTimeout(this._timeout);
+    this._removeEscapeListener();
     EventHandler.off(this._element.closest(SELECTOR_MODAL), EVENT_MODAL_HIDE, this._hideModalHandler);
     if (this._element.getAttribute('data-coreui-original-title')) {
       this._element.setAttribute('title', this._element.getAttribute('data-coreui-original-title'));
@@ -11822,6 +11979,7 @@ class Tooltip extends BaseComponent {
     }
     this._popper = this._createPopper(tip);
     tip.classList.add(CLASS_NAME_SHOW$4);
+    this._setEscapeListener();
 
     // If this is a touch-enabled device we add extra
     // empty mouseover listeners to the body's immediate children;
@@ -11851,6 +12009,7 @@ class Tooltip extends BaseComponent {
     }
     const tip = this._getTipElement();
     tip.classList.remove(CLASS_NAME_SHOW$4);
+    this._removeEscapeListener();
 
     // If this is a touch-enabled device we remove the extra
     // empty mouseover listeners we added for iOS support
@@ -11948,6 +12107,27 @@ class Tooltip extends BaseComponent {
   }
   _isShown() {
     return this.tip && this.tip.classList.contains(CLASS_NAME_SHOW$4);
+  }
+  _setEscapeListener() {
+    if (this._keydownHandler) {
+      return;
+    }
+    this._keydownHandler = event => {
+      if (event.key !== ESCAPE_KEY || !this._isShown() || !this.tip.isConnected) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      this.hide();
+    };
+    this._element.ownerDocument.addEventListener(EVENT_KEYDOWN$2, this._keydownHandler, true);
+  }
+  _removeEscapeListener() {
+    if (!this._keydownHandler) {
+      return;
+    }
+    this._element.ownerDocument.removeEventListener(EVENT_KEYDOWN$2, this._keydownHandler, true);
+    this._keydownHandler = null;
   }
   _createPopper(tip) {
     const placement = execute(this._config.placement, [this, tip, this._element]);
@@ -12286,6 +12466,7 @@ const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label';
 const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container';
 const Default$6 = {
   allowList: DefaultAllowlist,
+  ariaLabels: null,
   clickableLabels: true,
   disabled: false,
   distance: 0,
@@ -12304,6 +12485,7 @@ const Default$6 = {
 };
 const DefaultType$6 = {
   allowList: 'object',
+  ariaLabels: '(array|null)',
   clickableLabels: 'boolean',
   disabled: 'boolean',
   distance: 'number',
@@ -12467,7 +12649,26 @@ class RangeSlider extends BaseComponent {
     inputElement.setAttribute('aria-valuemax', this._config.max);
     inputElement.setAttribute('aria-valuenow', value);
     inputElement.setAttribute('aria-orientation', this._config.vertical ? 'vertical' : 'horizontal');
+    if (this._currentValue.length > 1) {
+      inputElement.setAttribute('aria-label', this._getAriaLabel(index));
+    }
+    const valueText = this._getValueText(value);
+    if (valueText !== null) {
+      inputElement.setAttribute('aria-valuetext', valueText);
+    }
     return inputElement;
+  }
+  _getAriaLabel(index) {
+    if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) {
+      return this._config.ariaLabels[index];
+    }
+    if (this._currentValue.length === 2) {
+      return index === 0 ? 'Minimum value' : 'Maximum value';
+    }
+    return `Value ${index + 1}`;
+  }
+  _getValueText(value) {
+    return typeof this._config.tooltipsFormat === 'function' ? `${this._config.tooltipsFormat(value)}` : null;
   }
   _createLabels() {
     const {
@@ -12589,7 +12790,7 @@ class RangeSlider extends BaseComponent {
       return;
     }
     if (this._tooltips[index]) {
-      this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ? this._config.tooltipsFormat(value) : value;
+      this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ? this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(value) : value;
       const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)[index];
       this._positionTooltip(this._tooltips[index], input);
     }
@@ -12703,6 +12904,10 @@ class RangeSlider extends BaseComponent {
     const input = this._inputs[index];
     input.value = value;
     input.setAttribute('aria-valuenow', value);
+    const valueText = this._getValueText(value);
+    if (valueText !== null) {
+      input.setAttribute('aria-valuetext', valueText);
+    }
     setTimeout(() => {
       input.focus();
     });
@@ -12762,7 +12967,7 @@ class RangeSlider extends BaseComponent {
       ...dataAttributes,
       ...(typeof config === 'object' && config ? config : {})
     };
-    config = this._mergeConfigObj(config, this._element);
+    config = this._mergeConfigObj(config);
     config = this._configAfterMerge(config);
     this._typeCheckConfig(config);
     return config;
@@ -12847,40 +13052,11 @@ const CLASS_NAME_READONLY = 'readonly';
 const SELECTOR_DATA_TOGGLE$4 = '[data-coreui-toggle="rating"]';
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input';
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label';
-
-// js-docs-start svg-allow-list
-const svgAllowList = {
-  ...DefaultAllowlist,
-  svg: ['xmlns', 'version', 'baseprofile', 'width', 'height', 'viewbox', 'preserveaspectratio', 'aria-hidden', 'role', 'focusable'],
-  g: ['id', 'class', 'transform', 'style'],
-  path: ['id', 'class', 'd', 'fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-dasharray', 'stroke-dashoffset', 'stroke-opacity'],
-  circle: ['id', 'class', 'cx', 'cy', 'r', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  rect: ['id', 'class', 'x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  ellipse: ['id', 'class', 'cx', 'cy', 'rx', 'ry', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  line: ['id', 'class', 'x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'stroke-opacity'],
-  polygon: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  polyline: ['id', 'class', 'points', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  text: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  tspan: ['id', 'class', 'x', 'y', 'dx', 'dy', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity'],
-  defs: [],
-  symbol: ['id', 'class', 'viewbox', 'preserveaspectratio'],
-  use: ['id', 'class', 'x', 'y', 'width', 'height', 'href'],
-  image: ['id', 'class', 'x', 'y', 'width', 'height', 'href', 'preserveaspectratio', 'xlink:href'],
-  pattern: ['id', 'class', 'x', 'y', 'width', 'height', 'patternunits', 'patterncontentunits', 'patterntransform', 'preserveaspectratio'],
-  lineargradient: ['id', 'class', 'gradientunits', 'x1', 'y1', 'x2', 'y2', 'spreadmethod', 'gradienttransform'],
-  radialgradient: ['id', 'class', 'gradientunits', 'cx', 'cy', 'r', 'fx', 'fy', 'spreadmethod', 'gradienttransform'],
-  mask: ['id', 'class', 'x', 'y', 'width', 'height', 'maskunits', 'maskcontentunits', 'masktransform'],
-  clippath: ['id', 'class', 'clippathunits'],
-  marker: ['id', 'class', 'markerunits', 'markerwidth', 'markerheight', 'orient', 'preserveaspectratio', 'viewbox', 'refx', 'refy'],
-  title: [],
-  desc: []
-};
-// js-docs-end svg-allow-list
-
 const Default$5 = {
   activeIcon: null,
   allowClear: false,
-  allowList: svgAllowList,
+  allowList: SVGAllowlist,
+  ariaLabel: (value, itemCount) => `${value} of ${itemCount}`,
   disabled: false,
   highlightOnlySelected: false,
   icon: null,
@@ -12898,6 +13074,7 @@ const DefaultType$5 = {
   activeIcon: '(object|string|null)',
   allowClear: 'boolean',
   allowList: 'object',
+  ariaLabel: 'function',
   disabled: 'boolean',
   highlightOnlySelected: 'boolean',
   icon: '(object|string|null)',
@@ -13176,6 +13353,9 @@ class Rating extends BaseComponent {
       ratingItemInputElement.type = 'radio';
       ratingItemInputElement.value = value;
       ratingItemInputElement.name = this._name;
+      if (typeof this._config.ariaLabel === 'function') {
+        ratingItemInputElement.setAttribute('aria-label', this._config.ariaLabel(value, this._config.itemCount));
+      }
       if (this._config.disabled || this._config.readOnly) {
         ratingItemInputElement.setAttribute('disabled', true);
       }
@@ -13211,7 +13391,7 @@ class Rating extends BaseComponent {
       ...dataAttributes,
       ...(typeof config === 'object' && config ? config : {})
     };
-    config = this._mergeConfigObj(config, this._element);
+    config = this._mergeConfigObj(config);
     config = this._configAfterMerge(config);
     this._typeCheckConfig(config);
     return config;

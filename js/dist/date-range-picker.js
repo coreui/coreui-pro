@@ -675,7 +675,7 @@
             this._changeEndDate(this._config.ranges[key][1]);
             this._calendar.update(this._getCalendarConfig());
           });
-          buttonEl.innerHTML = key;
+          buttonEl.textContent = key;
           dateRangePickerRangesEl.append(buttonEl);
         }
         dateRangePickerBodyEl.append(dateRangePickerRangesEl);
@@ -754,7 +754,10 @@
         const todayButtonEl = document.createElement('button');
         todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses));
         todayButtonEl.type = 'button';
-        todayButtonEl.innerHTML = this._config.todayButton;
+        todayButtonEl.textContent = this._config.todayButton;
+        if (calendar_js.isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+          todayButtonEl.disabled = true;
+        }
         todayButtonEl.addEventListener('click', () => {
           const date = new Date();
           this._calendarDate = date;
@@ -770,7 +773,7 @@
         const cancelButtonEl = document.createElement('button');
         cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
         cancelButtonEl.type = 'button';
-        cancelButtonEl.innerHTML = this._config.cancelButton;
+        cancelButtonEl.textContent = this._config.cancelButton;
         cancelButtonEl.addEventListener('click', () => {
           this.cancel();
         });
@@ -780,7 +783,7 @@
         const confirmButtonEl = document.createElement('button');
         confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
         confirmButtonEl.type = 'button';
-        confirmButtonEl.innerHTML = this._config.confirmButton;
+        confirmButtonEl.textContent = this._config.confirmButton;
         confirmButtonEl.addEventListener('click', () => {
           this.hide();
         });
@@ -912,7 +915,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config, this._element);
+      config = this._mergeConfigObj(config);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;

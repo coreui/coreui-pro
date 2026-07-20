@@ -373,9 +373,9 @@
       return previous && previous !== chip ? previous : null;
     }
     _navigateToEdge(targetIndex) {
-      var _chips$at;
+      var _chips;
       const chips = this._getFocusableChips();
-      (_chips$at = chips.at(targetIndex)) == null || _chips$at.focus();
+      (_chips = chips[targetIndex < 0 ? chips.length + targetIndex : targetIndex]) == null || _chips.focus();
     }
     _handleSelectionChange(event) {
       const chip = event.target.closest(SELECTOR_CHIP);

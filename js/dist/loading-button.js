@@ -154,7 +154,6 @@
    */
 
   EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
-    event.preventDefault();
     const button = event.target.closest(SELECTOR_DATA_TOGGLE);
     const data = LoadingButton.getOrCreateInstance(button);
     data.start();

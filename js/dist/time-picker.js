@@ -660,7 +660,7 @@
         const cancelButtonEl = document.createElement('button');
         cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses));
         cancelButtonEl.type = 'button';
-        cancelButtonEl.innerHTML = this._config.cancelButton;
+        cancelButtonEl.textContent = this._config.cancelButton;
         cancelButtonEl.addEventListener('click', () => {
           this.cancel();
         });
@@ -670,7 +670,7 @@
         const confirmButtonEl = document.createElement('button');
         confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses));
         confirmButtonEl.type = 'button';
-        confirmButtonEl.innerHTML = this._config.confirmButton;
+        confirmButtonEl.textContent = this._config.confirmButton;
         confirmButtonEl.addEventListener('click', () => {
           this.hide();
         });

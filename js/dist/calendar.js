@@ -466,7 +466,6 @@
       this._setStartDate(date);
     }
     _createCalendarPanel(order) {
-      var _this$_config$weekNum;
       const calendarDate = calendar_js.getCalendarDate(this._calendarDate, order, this._view);
       const year = calendarDate.getFullYear();
       const month = calendarDate.getMonth();
@@ -479,10 +478,10 @@
       navigationElement.classList.add('calendar-nav');
       navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
-        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${this._config.ariaNavPrevYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${sanitizer_js.escapeHtml(this._config.ariaNavPrevYearLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
         </button>
-        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${this._config.ariaNavPrevMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${sanitizer_js.escapeHtml(this._config.ariaNavPrevMonthLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
         </button>` : ''}
       </div>
@@ -499,10 +498,10 @@
         </button>
       </div>
       <div class="calendar-nav-next">
-        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${this._config.ariaNavNextMonthLabel}">
+        ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${sanitizer_js.escapeHtml(this._config.ariaNavNextMonthLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-next"></span>
         </button>` : ''}
-        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${this._config.ariaNavNextYearLabel}">
+        <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${sanitizer_js.escapeHtml(this._config.ariaNavNextYearLabel)}">
           <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
         </button>
       </div>
@@ -518,7 +517,7 @@
         <tr>
           ${this._config.showWeekNumber ? `<th class="${CLASS_NAME_CALENDAR_CELL}">
               <div class="calendar-header-cell-inner">
-               ${(_this$_config$weekNum = this._config.weekNumbersLabel) != null ? _this$_config$weekNum : ''}
+               ${this._config.weekNumbersLabel ? sanitizer_js.escapeHtml(this._config.weekNumbersLabel) : ''}
               </div>
             </th>` : ''}
           ${weekDays.map(({
@@ -556,10 +555,12 @@
         month
       }) => {
         const cellAttributes = this._cellDayAttributes(date, month);
-        return month === 'current' || this._config.showAdjacementDays ? `<td 
+        return month === 'current' || this._config.showAdjacementDays ? `<td
                     class="${cellAttributes.className}"
                     tabindex="${cellAttributes.tabIndex}"
                     ${cellAttributes.ariaSelected ? 'aria-selected="true"' : ''}
+                    ${cellAttributes.ariaCurrent ? 'aria-current="date"' : ''}
+                    aria-label="${sanitizer_js.escapeHtml(cellAttributes.ariaLabel)}"
                     data-coreui-date="${date}"
                   >
                     <div class="${CLASS_NAME_CALENDAR_CELL_INNER} day">
@@ -735,7 +736,9 @@
             [month]: true
           }),
           tabIndex: -1,
-          ariaSelected: false
+          ariaSelected: false,
+          ariaLabel: date.toLocaleDateString(this._config.locale),
+          ariaCurrent: isTodayDate
         };
       }
       const isInRange = isCurrentMonth && calendar_js.isDateInRange(date, this._startDate, this._endDate);
@@ -754,6 +757,8 @@
         className: classNames,
         tabIndex: (isCurrentMonth || this._config.selectAdjacementDays) && !isDisabled ? 0 : -1,
         ariaSelected: isSelected,
+        ariaLabel: date.toLocaleDateString(this._config.locale),
+        ariaCurrent: isTodayDate,
         meta: {
           isDisabled,
           isInCurrentMonth: isCurrentMonth,
@@ -876,7 +881,7 @@
         ...dataAttributes,
         ...(typeof config === 'object' && config ? config : {})
       };
-      config = this._mergeConfigObj(config, this._element);
+      config = this._mergeConfigObj(config);
       config = this._configAfterMerge(config);
       this._typeCheckConfig(config);
       return config;
