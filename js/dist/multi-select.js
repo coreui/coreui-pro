@@ -45,8 +45,10 @@
   const ARROW_DOWN_KEY = 'ArrowDown';
   const BACKSPACE_KEY = 'Backspace';
   const DELETE_KEY = 'Delete';
+  const END_KEY = 'End';
   const ENTER_KEY = 'Enter';
   const ESCAPE_KEY = 'Escape';
+  const HOME_KEY = 'Home';
   const SPACE_KEY = ' ';
   const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
@@ -116,6 +118,7 @@
     deselectFilteredLabel: 'Deselect filtered',
     disabled: false,
     headerTemplate: null,
+    hideSelectAllOnSearchNoResults: true,
     id: null,
     invalid: false,
     multiple: true,
@@ -157,6 +160,7 @@
     deselectFilteredLabel: 'string',
     disabled: 'boolean',
     headerTemplate: '(function|null)',
+    hideSelectAllOnSearchNoResults: 'boolean',
     id: '(string|null)',
     invalid: 'boolean',
     multiple: 'boolean',
@@ -200,6 +204,7 @@
       this._configureNativeSelect();
       this._indicatorElement = null;
       this._selectAllElement = null;
+      this._dropdownHeaderElement = null;
       this._headerElement = null;
       this._selectionElement = null;
       this._selectionCleanerElement = null;
@@ -480,6 +485,10 @@
             event.preventDefault();
             this._selectMenuItem(event);
           }
+          if ([HOME_KEY, END_KEY].includes(event.key)) {
+            event.preventDefault();
+            this._selectFirstOrLastMenuItem(event.key === HOME_KEY);
+          }
         });
       }
       EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
@@ -496,6 +505,10 @@
         if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
           event.preventDefault();
           this._selectMenuItem(event);
+        }
+        if ([HOME_KEY, END_KEY].includes(event.key)) {
+          event.preventDefault();
+          this._selectFirstOrLastMenuItem(event.key === HOME_KEY);
         }
       });
     }
@@ -741,6 +754,7 @@
       if (hasHeaderTemplate || showSelectAll) {
         const header = document.createElement('div');
         header.classList.add(CLASS_NAME_DROPDOWN_HEADER);
+        this._dropdownHeaderElement = header;
         if (hasHeaderTemplate) {
           const headerContent = document.createElement('div');
 
@@ -1365,6 +1379,7 @@
       }
       this._updateHeader();
       this._updateMasterCheckbox();
+      this._updateSelectAllVisibility(visibleOptions);
       const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu);
       if (visibleOptions > 0) {
         if (emptyMessage) {
@@ -1380,6 +1395,16 @@
         SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
       }
     }
+    _updateSelectAllVisibility(visibleOptions) {
+      if (!this._dropdownHeaderElement || !this._selectAllElement) {
+        return;
+      }
+      if (this._config.hideSelectAllOnSearchNoResults && visibleOptions === 0) {
+        this._dropdownHeaderElement.style.display = 'none';
+      } else {
+        this._dropdownHeaderElement.style.removeProperty('display');
+      }
+    }
     _selectMenuItem({
       key,
       target
@@ -1392,6 +1417,14 @@
       // if target isn't included in items (e.g. when expanding the dropdown)
       // allow cycling to get the last item in case key equals ARROW_UP_KEY
       index_js.getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus();
+    }
+    _selectFirstOrLastMenuItem(first) {
+      const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => index_js.isVisible(element));
+      if (!items.length) {
+        return;
+      }
+      const item = first ? items[0] : items[items.length - 1];
+      item.focus();
     }
     _configAfterMerge(config) {
       if (config.container === true) {

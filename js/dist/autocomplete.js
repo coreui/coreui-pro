@@ -50,8 +50,10 @@
   const ARROW_DOWN_KEY = 'ArrowDown';
   const BACKSPACE_KEY = 'Backspace';
   const DELETE_KEY = 'Delete';
+  const END_KEY = 'End';
   const ENTER_KEY = 'Enter';
   const ESCAPE_KEY = 'Escape';
+  const HOME_KEY = 'Home';
   const TAB_KEY = 'Tab';
   const RIGHT_MOUSE_BUTTON = 2; // MouseEvent.button value for the secondary button, usually the right button
 
@@ -63,6 +65,7 @@
   const EVENT_INPUT = `input${EVENT_KEY}`;
   const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
   const EVENT_KEYUP = `keyup${EVENT_KEY}`;
+  const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`;
   const EVENT_SHOW = `show${EVENT_KEY}`;
   const EVENT_SHOWN = `shown${EVENT_KEY}`;
   const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
@@ -297,8 +300,12 @@
       return this._element.classList.value.split(' ');
     }
     _highlightOption(label) {
-      const regex = new RegExp(this._search, 'gi');
-      return label.replace(regex, string => `<strong>${string}</strong>`);
+      if (!this._search) {
+        return sanitizer_js.escapeHtml(label);
+      }
+      const escapedSearch = this._search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedSearch})`, 'gi');
+      return String(label).split(regex).map((part, index) => index % 2 === 0 ? sanitizer_js.escapeHtml(part) : `<strong>${sanitizer_js.escapeHtml(part)}</strong>`).join('');
     }
     _isExternalSearch() {
       return Array.isArray(this._config.search) && this._config.search.includes('external');
@@ -425,6 +432,11 @@
           }
         }
       });
+      EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, event => {
+        // Keep focus on the input so its blur handler doesn't clear the search
+        // (and re-render the list) before the click selects the option.
+        event.preventDefault();
+      });
       EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
         event.preventDefault();
         event.stopPropagation();
@@ -451,6 +463,10 @@
         if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
           event.preventDefault();
           this._selectMenuItem(event);
+        }
+        if ([HOME_KEY, END_KEY].includes(event.key)) {
+          event.preventDefault();
+          this._selectFirstOrLastMenuItem(event.key === HOME_KEY);
         }
       });
     }
@@ -548,6 +564,7 @@
       inputEl.setAttribute('aria-autocomplete', 'list');
       inputEl.setAttribute('aria-expanded', 'false');
       inputEl.setAttribute('aria-haspopup', 'listbox');
+      inputEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`);
       if (this._config.disabled) {
         inputEl.setAttribute('disabled', true);
         inputEl.tabIndex = -1;
@@ -656,6 +673,8 @@
         }
         const optionDiv = document.createElement('div');
         optionDiv.classList.add(CLASS_NAME_OPTION);
+        optionDiv.setAttribute('role', 'option');
+        optionDiv.setAttribute('aria-selected', this._selected.some(selected => selected.value === option.value) ? 'true' : 'false');
         if (option.disabled) {
           optionDiv.classList.add(CLASS_NAME_DISABLED);
           optionDiv.setAttribute('aria-disabled', 'true');
@@ -789,7 +808,8 @@
         if (this._config.searchNoResultsLabel) {
           const placeholder = document.createElement('div');
           placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY);
-          placeholder.innerHTML = this._config.searchNoResultsLabel;
+          placeholder.setAttribute('role', 'status');
+          placeholder.textContent = this._config.searchNoResultsLabel;
           if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
             SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder);
           }
@@ -810,6 +830,14 @@
       // if target isn't included in items (e.g. when expanding the dropdown)
       // allow cycling to get the last item in case key equals ARROW_UP_KEY
       index_js.getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus();
+    }
+    _selectFirstOrLastMenuItem(first) {
+      const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => index_js.isVisible(element));
+      if (!items.length) {
+        return;
+      }
+      const item = first ? items[0] : items[items.length - 1];
+      item.focus();
     }
     _configAfterMerge(config) {
       if (config.container === true) {
