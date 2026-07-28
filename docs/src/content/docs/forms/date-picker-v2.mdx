@@ -1,0 +1,104 @@
+---
+pro: true
+title: "Bootstrap 5 Date Picker v2 (preview)"
+name: "Date Picker v2"
+description: "Preview of the v6 date picker: a section-based masked field composed with a calendar popup. Projected footer regions replace button configuration props."
+---
+
+import datePickerV2Basic from './snippets/date-picker-v2-basic.js?raw'
+import datePickerV2Date from './snippets/date-picker-v2-date.js?raw'
+import datePickerV2Footer from './snippets/date-picker-v2-footer.js?raw'
+
+<Callout color="warning">
+  **Preview.** This is the in-progress v6 rewrite of the date picker — a
+  composition of the [date input](/forms/date-input/) masked field, the
+  [calendar](/components/calendar/), and a shared popup primitive. The API is
+  under review and **will change**; the current date picker remains the stable
+  component. Feedback is welcome on GitHub.
+</Callout>
+
+## Example
+
+Initialize the picker on an empty container. The input is a section-based mask —
+type a date directly, use arrow keys to adjust sections, or pick a day from the
+calendar popup. There is no free-text parsing and no debounce: the field is
+always a valid partial date.
+
+<Example pro code={`<label class="form-label">Delivery date</label>
+  <div id="myDatePickerV2"></div>`} sandboxJs={datePickerV2Basic} />
+
+<Code code={datePickerV2Basic} lang="js" />
+
+## Initial value, min and max
+
+Constraints belong to the shell and flow into both layers: the field rejects
+out-of-range values through its validation path, the calendar grays the days
+out.
+
+<Example pro code={`<label class="form-label">Appointment</label>
+  <div id="myDatePickerV2Date"></div>`} sandboxJs={datePickerV2Date} />
+
+<Code code={datePickerV2Date} lang="js" />
+
+## Footer projection
+
+There are no `todayButton` / `cancelButton` / `confirmButton` options in v2.
+Put a `<template data-coreui-template="footer">` inside the container instead —
+its content is projected into the dropdown. Buttons act through
+`data-coreui-picker-action` (`today`, `clear`, `reset`, `close`) or through the
+`getContext()` API, so labels, order, and logic are yours — including i18n.
+
+<Example pro code={`<label class="form-label">Delivery date</label>
+  <div id="myDatePickerV2Footer">
+    <template data-coreui-template="footer">
+      <button type="button" class="btn btn-sm btn-ghost-danger me-auto" data-coreui-picker-action="today">Today</button>
+      <button type="button" class="btn btn-sm btn-ghost-primary" data-coreui-picker-action="clear">Clear</button>
+      <button type="button" class="btn btn-sm btn-primary" data-coreui-picker-action="close">OK</button>
+    </template>
+  </div>`} sandboxJs={datePickerV2Footer} />
+
+<Code code={datePickerV2Footer} lang="js" />
+
+## Slot context
+
+Custom code inside projected regions (or anywhere else) can drive the picker
+through a small imperative contract instead of configuration:
+
+```js
+const picker = new coreui.DatePickerV2(element, { locale: 'en-US' })
+const context = picker.getContext()
+
+context.today()          // set today's date
+context.setDate(date)    // set any date
+context.clear()          // clear the value
+context.reset()          // restore the initial value
+context.close()          // close the popup
+context.date             // current value (Date | null)
+context.disabled         // disabled state
+```
+
+## Events
+
+| Event | Description |
+| --- | --- |
+| `dateChange.coreui.date-picker-v2` | Fired when the value changes — from the calendar, the field, or a context action. `event.date` carries the new value. |
+| `show.coreui.date-picker-v2` / `shown.coreui.date-picker-v2` | Popup opening lifecycle. |
+| `hide.coreui.date-picker-v2` / `hidden.coreui.date-picker-v2` | Popup closing lifecycle. |
+
+The section field's own events (`dateChange.coreui.date-input`,
+`errorChange.coreui.date-input`) still bubble from the inner element — the shell
+does not duplicate them.
+
+## Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `calendarOptions` | object | `{}` | Extra options forwarded to the inner [calendar](/components/calendar/#options). |
+| `container` | string, element, false | `false` | Teleport target for the dropdown. |
+| `date` | date, string, null | `null` | Initial value. |
+| `disabled` | boolean | `false` | Disables the field and the popup. |
+| `inputOptions` | object | `{}` | Extra options forwarded to the inner [date input](/forms/date-input/#options). |
+| `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
+| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
+| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
+| `name` | string, null | `null` | Name of the generated hidden input. |

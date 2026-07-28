@@ -16,6 +16,7 @@ import ChipSet from './src/chip-set.js'
 import Collapse from './src/collapse.js'
 import DateInput from './src/date-input.js'
 import DatePicker from './src/date-picker.js'
+import DatePickerV2 from './src/date-picker-v2.js'
 import DateRangePicker from './src/date-range-picker.js'
 import DateTimeInput from './src/date-time-input.js'
 import Dropdown from './src/dropdown.js'
@@ -51,6 +52,7 @@ export default {
   Collapse,
   DateInput,
   DatePicker,
+  DatePickerV2,
   DateRangePicker,
   DateTimeInput,
   Dropdown,
