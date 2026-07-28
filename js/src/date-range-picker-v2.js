@@ -125,6 +125,9 @@ class DateRangePickerV2 extends BaseComponent {
     this._menu = null
     this._popup = null
     this._selectEndDate = false
+    // see DatePickerV2 — the shell owns the initial range for reset()
+    this._initialStartDate = config?.startDate ?? this._config.startDate
+    this._initialEndDate = config?.endDate ?? this._config.endDate
 
     this._createDateRangePicker()
     this._createPopup()
@@ -183,14 +186,7 @@ class DateRangePickerV2 extends BaseComponent {
   }
 
   reset() {
-    this._startInput.reset()
-    this._endInput.reset()
-    const startDate = this._startInput.getDate()
-    const endDate = this._endInput.getDate()
-    this._selectEndDate = false
-    this._calendar?.update({ endDate, selectEndDate: false, startDate })
-    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
-    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
+    this.setRange(this._initialStartDate, this._initialEndDate)
   }
 
   getContext() {

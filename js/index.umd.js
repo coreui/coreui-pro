@@ -19,6 +19,7 @@ import DatePicker from './src/date-picker.js'
 import DatePickerV2 from './src/date-picker-v2.js'
 import DateRangePicker from './src/date-range-picker.js'
 import DateRangePickerV2 from './src/date-range-picker-v2.js'
+import DateTimePickerV2 from './src/date-time-picker-v2.js'
 import DateTimeInput from './src/date-time-input.js'
 import Dropdown from './src/dropdown.js'
 import LoadingButton from './src/loading-button.js'
@@ -38,6 +39,7 @@ import Stepper from './src/stepper.js'
 import Tab from './src/tab.js'
 import TimeInput from './src/time-input.js'
 import TimePicker from './src/time-picker.js'
+import TimePickerV2 from './src/time-picker-v2.js'
 import Toast from './src/toast.js'
 import Tooltip from './src/tooltip.js'
 
@@ -56,6 +58,7 @@ export default {
   DatePickerV2,
   DateRangePicker,
   DateRangePickerV2,
+  DateTimePickerV2,
   DateTimeInput,
   Dropdown,
   LoadingButton,
@@ -75,6 +78,7 @@ export default {
   Tab,
   TimeInput,
   TimePicker,
+  TimePickerV2,
   Toast,
   Tooltip
 }

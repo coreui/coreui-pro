@@ -77,11 +77,12 @@
   }
 }
 
-// TRANSITIONAL (remove with _date-picker.scss): the v1 partial paints the
-// indicator and separator icons via ::before masks; the v2 shell renders
-// inline SVG, so the v1 pseudo-elements must not double the icons on v2 markup.
+// TRANSITIONAL (remove with _date-picker.scss / _time-picker.scss): the v1
+// partials paint the indicator and separator icons via ::before masks; the v2
+// shells render inline SVG, so the v1 pseudo-elements must not double them.
 .date-picker-v2 .date-picker-indicator::before,
-.date-picker-v2 .date-picker-separator::before {
+.date-picker-v2 .date-picker-separator::before,
+.time-picker-v2 .time-picker-indicator::before {
   content: none;
 }
 
@@ -125,6 +126,72 @@
 
 .date-picker-body {
   display: flex;
+}
+
+// the time picker shell reuses the date picker's frame and indicator rules
+.time-picker-v2 {
+  position: relative;
+
+  .time-picker-input-group {
+    display: flex;
+    align-items: stretch;
+    background-color: var(--#{$prefix}date-picker-bg);
+    background-clip: padding-box;
+    border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
+    @include border-radius(var(--#{$prefix}date-picker-border-radius));
+
+    &:focus-within {
+      border-color: var(--#{$prefix}date-picker-focus-border-color);
+    }
+
+    .form-date-time {
+      flex: 1;
+      background-color: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+  }
+
+  .time-picker-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--#{$prefix}date-picker-indicator-width);
+    padding: 0;
+    color: var(--#{$prefix}date-picker-indicator-color);
+    background: transparent;
+    border: 0;
+  }
+}
+
+// the date-time picker puts the calendar and the time body side by side. The
+// time body's layout rules are global but read --#{$prefix}time-picker-* custom
+// properties that _time-picker.scss only defines on `.time-picker`; this shell's
+// root is a date picker, so the ones the body needs are declared here.
+.date-time-picker {
+  .date-picker-timepickers {
+    display: flex;
+    border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+  }
+
+  .time-picker-body {
+    --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
+    --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height};
+    --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width};
+    --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
+    --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color};
+    --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
+    --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
+    --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg};
+    --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color};
+    --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
+    --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
+    --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color};
+    --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color};
+    --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
+    --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x};
+    --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
+  }
 }
 
 .date-picker-ranges {
