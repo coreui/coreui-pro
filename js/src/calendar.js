@@ -10,7 +10,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
+import { escapeHtml, sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
 import {
   convertToDateObject,
@@ -88,8 +88,16 @@ const SELECTOR_CALENDAR_ROW = '.calendar-row'
 const SELECTOR_CALENDAR_ROW_CLICKABLE = `${SELECTOR_CALENDAR_ROW}[tabindex="0"]`
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="calendar"]'
 
+// Navigation icons live in JavaScript, not in CSS masks — the chips pattern:
+// inline SVG on currentColor, swappable through an option, sanitized like any
+// user-provided markup.
+const DEFAULT_NAV_ICON_DOUBLE_NEXT = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="95.314 447.313 72.686 424.687 245.373 252 72.686 79.313 95.314 56.687 290.627 252 95.314 447.313"></polygon><polygon points="255.314 447.313 232.686 424.687 405.373 252 232.686 79.313 255.314 56.687 450.627 252 255.314 447.313"></polygon></svg>'
+const DEFAULT_NAV_ICON_DOUBLE_PREV = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="416.686 447.313 221.373 252 416.686 56.687 439.314 79.313 266.627 252 439.314 424.687 416.686 447.313"></polygon><polygon points="256.686 447.313 61.373 252 256.686 56.687 279.314 79.313 106.627 252 279.314 424.687 256.686 447.313"></polygon></svg>'
+const DEFAULT_NAV_ICON_NEXT = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="179.313 451.313 156.687 428.687 329.372 256 156.687 83.313 179.313 60.687 374.627 256 179.313 451.313"></polygon></svg>'
+const DEFAULT_NAV_ICON_PREV = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" fill="currentColor"><polygon points="324.687 451.313 129.373 256 324.687 60.687 347.313 83.313 174.628 256 347.313 428.687 324.687 451.313"></polygon></svg>'
+
 const Default = {
-  allowList: DefaultAllowlist,
+  allowList: SVGAllowlist,
   ariaNavNextMonthLabel: 'Next month',
   ariaNavNextYearLabel: 'Next year',
   ariaNavPrevMonthLabel: 'Previous month',
@@ -104,6 +112,10 @@ const Default = {
   maxDate: null,
   minDate: null,
   monthFormat: 'short',
+  navIconDoubleNext: DEFAULT_NAV_ICON_DOUBLE_NEXT,
+  navIconDoublePrev: DEFAULT_NAV_ICON_DOUBLE_PREV,
+  navIconNext: DEFAULT_NAV_ICON_NEXT,
+  navIconPrev: DEFAULT_NAV_ICON_PREV,
   range: false,
   renderDayCell: null,
   renderMonthCell: null,
@@ -138,6 +150,10 @@ const DefaultType = {
   maxDate: '(date|number|string|null)',
   minDate: '(date|number|string|null)',
   monthFormat: 'string',
+  navIconDoubleNext: 'string',
+  navIconDoublePrev: 'string',
+  navIconNext: 'string',
+  navIconPrev: 'string',
   range: 'boolean',
   renderDayCell: '(function|null)',
   renderMonthCell: '(function|null)',
@@ -611,10 +627,10 @@ class Calendar extends BaseComponent {
     navigationElement.innerHTML = `
       <div class="calendar-nav-prev">
         <button type="button" class="calendar-nav-btn btn-double-prev" aria-label="${escapeHtml(this._config.ariaNavPrevYearLabel)}">
-          <span class="calendar-nav-icon calendar-nav-icon-double-prev"></span>
+          <span class="calendar-nav-icon">${this._navIcon('navIconDoublePrev')}</span>
         </button>
         ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-prev" aria-label="${escapeHtml(this._config.ariaNavPrevMonthLabel)}">
-          <span class="calendar-nav-icon calendar-nav-icon-prev"></span>
+          <span class="calendar-nav-icon">${this._navIcon('navIconPrev')}</span>
         </button>` : ''}
       </div>
       <div class="calendar-nav-date" aria-live="polite">
@@ -627,10 +643,10 @@ class Calendar extends BaseComponent {
       </div>
       <div class="calendar-nav-next">
         ${this._view === 'days' ? `<button type="button" class="calendar-nav-btn btn-next" aria-label="${escapeHtml(this._config.ariaNavNextMonthLabel)}">
-          <span class="calendar-nav-icon calendar-nav-icon-next"></span>
+          <span class="calendar-nav-icon">${this._navIcon('navIconNext')}</span>
         </button>` : ''}
         <button type="button" class="calendar-nav-btn btn-double-next" aria-label="${escapeHtml(this._config.ariaNavNextYearLabel)}">
-          <span class="calendar-nav-icon calendar-nav-icon-double-next"></span>
+          <span class="calendar-nav-icon">${this._navIcon('navIconDoubleNext')}</span>
         </button>
       </div>
     `
@@ -1058,6 +1074,31 @@ class Calendar extends BaseComponent {
       tabIndex: isDisabled ? -1 : 0,
       ariaSelected: isSelected
     }
+  }
+
+  // Navigation icons are directional, so prev/next swap when the calendar
+  // renders right-to-left. The direction comes from the element's computed
+  // style rather than isRTL(): the document can be LTR while an ancestor sets
+  // dir="rtl" around the calendar.
+  _isRtl() {
+    // A detached element has no computed direction, so fall back to the nearest
+    // ancestor that declares one (and finally to the document).
+    if (this._element.isConnected) {
+      return window.getComputedStyle(this._element).direction === 'rtl'
+    }
+
+    return (this._element.closest('[dir]')?.dir ?? document.documentElement.dir) === 'rtl'
+  }
+
+  _navIcon(name) {
+    const mirrored = {
+      navIconDoubleNext: 'navIconDoublePrev',
+      navIconDoublePrev: 'navIconDoubleNext',
+      navIconNext: 'navIconPrev',
+      navIconPrev: 'navIconNext'
+    }
+
+    return this._sanitizeHtml(this._config[this._isRtl() ? mirrored[name] : name])
   }
 
   _sanitizeHtml(html) {

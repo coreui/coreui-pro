@@ -1,9 +1,7 @@
 // stylelint-disable selector-max-class
-@use "functions/escape-svg" as *;
 @use "mixins/breakpoints" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
-@use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
 @use "vendor/rfs" as *;
 @use "variables" as *;
@@ -31,10 +29,6 @@
   --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
   --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};
   --#{$prefix}calendar-nav-icon-height: #{$calendar-nav-icon-height};
-  --#{$prefix}calendar-nav-icon-double-next: #{escape-svg($calendar-nav-icon-double-next)};
-  --#{$prefix}calendar-nav-icon-double-prev: #{escape-svg($calendar-nav-icon-double-prev)};
-  --#{$prefix}calendar-nav-icon-next: #{escape-svg($calendar-nav-icon-next)};
-  --#{$prefix}calendar-nav-icon-prev: #{escape-svg($calendar-nav-icon-prev)};
   --#{$prefix}calendar-nav-icon-color: #{$calendar-nav-icon-color};
   --#{$prefix}calendar-nav-icon-hover-color: #{$calendar-nav-icon-hover-color};
   --#{$prefix}calendar-cell-header-inner-font-weight: #{$calendar-cell-header-inner-font-weight};
@@ -142,28 +136,19 @@
   display: block;
   width: var(--#{$prefix}calendar-nav-icon-width);
   height: var(--#{$prefix}calendar-nav-icon-height);
-  background-color: var(--#{$prefix}calendar-nav-icon-color);
-  @include transition(background-image .15s ease-in-out);
+  color: var(--#{$prefix}calendar-nav-icon-color);
+  @include transition(color .15s ease-in-out);
 
   &:hover {
-    background-color: var(--#{$prefix}calendar-nav-icon-hover-color);
+    color: var(--#{$prefix}calendar-nav-icon-hover-color);
   }
-}
 
-.calendar-nav-icon-double-next {
-  @include ltr-rtl-value-only("mask", var(--#{$prefix}calendar-nav-icon-double-next) no-repeat center, var(--#{$prefix}calendar-nav-icon-double-prev) no-repeat center);
-}
-
-.calendar-nav-icon-double-prev {
-  @include ltr-rtl-value-only("mask", var(--#{$prefix}calendar-nav-icon-double-prev) no-repeat center, var(--#{$prefix}calendar-nav-icon-double-next) no-repeat center);
-}
-
-.calendar-nav-icon-next {
-  @include ltr-rtl-value-only("mask", var(--#{$prefix}calendar-nav-icon-next) no-repeat center, var(--#{$prefix}calendar-nav-icon-prev) no-repeat center);
-}
-
-.calendar-nav-icon-prev {
-  @include ltr-rtl-value-only("mask", var(--#{$prefix}calendar-nav-icon-prev) no-repeat center, var(--#{$prefix}calendar-nav-icon-next) no-repeat center);
+  // the component renders the icon inline; it inherits color and fills the box
+  > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .calendar-header-cell-inner {

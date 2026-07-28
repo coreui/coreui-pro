@@ -333,6 +333,10 @@ class DateRangePickerV2 extends BaseComponent {
     calendars.append(calendarEl)
     body.append(calendars)
     this._menu.append(body)
+    // The calendar must be in its final DOM position before it is constructed:
+    // it resolves its directional icons from the computed direction, which a
+    // detached element does not have.
+    this._element.append(this._menu)
 
     this._calendar = new Calendar(calendarEl, this._forwardConfig(Calendar, {
       calendars: this._config.calendars,
@@ -348,8 +352,6 @@ class DateRangePickerV2 extends BaseComponent {
       footer.append(this._footerTemplate.content.cloneNode(true))
       this._menu.append(footer)
     }
-
-    this._element.append(this._menu)
   }
 
   _createPopup() {

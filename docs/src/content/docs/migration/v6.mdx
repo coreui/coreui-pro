@@ -101,12 +101,28 @@ the option-by-option migration map. Planned mapping:
   recolor them with plain CSS `color`. The corresponding
   `$date-picker-*-icon`/`-icon-size` Sass variables disappear with the v1
   shells.
+- **The calendar navigation icons moved to JavaScript too.** The four
+  `$calendar-nav-icon-{prev,next,double-prev,double-next}` Sass variables are
+  **removed**, along with the CSS custom properties and mask rules that painted
+  them. Customize them with the new `navIconPrev` / `navIconNext` /
+  `navIconDoublePrev` / `navIconDoubleNext` calendar options instead (inline SVG,
+  sanitized). `$calendar-nav-icon-width/-height/-color/-hover-color` stay — the
+  icon inherits `color`, so recoloring is plain CSS.
+- **`Calendar`'s default `allowList` is now `SVGAllowlist`** (was
+  `DefaultAllowlist`), so the component can render its own inline SVG icons —
+  and custom cell renderers may return SVG as well. Strictly more permissive;
+  scripts and event handlers are still stripped.
 - **Directional icons are resolved in JavaScript, not CSS.** v1 swapped the
   range separator with a second Sass variable
   (`$date-picker-separator-icon-rtl`) applied through an RTL mask; v2 picks
   between `separatorIcon` and `separatorIconRtl` when it renders, based on the
   element's computed direction — so a `dir="rtl"` ancestor works, not just a
-  document-level direction.
+  document-level direction. The calendar mirrors its prev/next icons the same
+  way. **Consequence for custom code:** a component that resolves directional
+  icons at construction time must be in its final DOM position when it is
+  created — a detached element has no computed direction (the calendar falls
+  back to the nearest `[dir]` ancestor, but placement first is the reliable
+  path).
 
 ### Sass & CSS
 

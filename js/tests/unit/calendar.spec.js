@@ -557,6 +557,55 @@ describe('Calendar', () => {
     })
   })
 
+  describe('navigation icons', () => {
+    const navIcon = (element, selector) => element.querySelector(`${selector} .calendar-nav-icon svg`)
+
+    it('should render the navigation icons as inline SVG on currentColor', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Calendar(div)
+
+      for (const selector of ['.btn-double-prev', '.btn-prev', '.btn-next', '.btn-double-next']) {
+        const svg = navIcon(div, selector)
+        expect(svg).not.toBeNull()
+        expect(svg.getAttribute('fill')).toEqual('currentColor')
+      }
+    })
+
+    it('should swap the directional icons inside an RTL ancestor', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><div id="ltr-calendar"></div></div><div id="rtl-probe"></div>'
+
+      const rtlEl = fixtureEl.querySelector('#ltr-calendar')
+      const ltrEl = fixtureEl.querySelector('#rtl-probe')
+      // eslint-disable-next-line no-new
+      new Calendar(rtlEl)
+      // eslint-disable-next-line no-new
+      new Calendar(ltrEl)
+
+      const rtlNext = navIcon(rtlEl, '.btn-next').innerHTML
+      const ltrPrev = navIcon(ltrEl, '.btn-prev').innerHTML
+
+      expect(rtlNext).toEqual(ltrPrev)
+      expect(rtlNext).not.toEqual(navIcon(ltrEl, '.btn-next').innerHTML)
+    })
+
+    it('should accept a custom navigation icon and sanitize it', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      // eslint-disable-next-line no-new
+      new Calendar(div, {
+        navIconNext: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.calendarHacked = true</script><circle r="4" /></svg>'
+      })
+
+      expect(navIcon(div, '.btn-next').querySelector('circle')).not.toBeNull()
+      expect(navIcon(div, '.btn-next').querySelector('script')).toBeNull()
+      expect(window.calendarHacked).toBeUndefined()
+    })
+  })
+
   describe('update', () => {
     it('should merge the previous configuration on a partial update', () => {
       fixtureEl.innerHTML = '<div></div>'
