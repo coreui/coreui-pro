@@ -63,8 +63,11 @@ the option-by-option migration map. Planned mapping:
   `inputOnChangeDelay`, `inputReadOnly`, `placeholder` — the masked field is
   always a valid partial date; there is no free-text parsing to debounce.
   Section placeholders come from the input triad's `placeholders`.
-- **Changed.** `timepicker: true` is replaced by the upcoming standalone
-  `DateTimePicker` (DateTimeInput + calendar + time).
+- **Changed.** `timepicker: true` is replaced by the standalone
+  [date time picker](/forms/date-time-picker-v2/) — a DateTimeInput field with a
+  calendar and the time selection body side by side. Because the two halves own
+  different parts of one value, that picker does not auto-close: picking a day
+  keeps the time and picking a time keeps the day.
 - **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
@@ -100,6 +103,23 @@ the option-by-option migration map. Planned mapping:
   right-to-left; the direction is read from the element's computed style
   instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
   and not only a document-level direction.
+
+#### Time Picker v2 / Date Time Picker v2 (preview)
+
+- The time selection body is now a shared primitive used by both pickers, so the
+  `roll` and `select` variants, the `hours`/`minutes`/`seconds` filters and the
+  12/24-hour locale split behave identically in each. Preview pages:
+  [time picker v2](/forms/time-picker-v2/),
+  [date time picker v2](/forms/date-time-picker-v2/).
+- Same removals as the date pickers: `footer`/`cancelButton`/`confirmButton` and
+  their class options give way to a projected
+  `<template data-coreui-template="footer">` with
+  `data-coreui-picker-action="now|clear|reset|close"`; `inputReadOnly`,
+  `inputOnChangeDelay` and `placeholder` are obsolete with a section field.
+- **`reset()` restores the value the picker was constructed with.** In v2 the
+  shell remembers it: setting a value goes through the field's `update()`, which
+  rewrites the field's own configuration, so the field can no longer restore the
+  original on its own.
 
 #### Icons rendered by JavaScript
 
