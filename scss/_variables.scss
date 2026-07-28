@@ -1046,41 +1046,6 @@ $form-select-border-radius-lg:    $input-border-radius-lg !default;
 $form-select-transition:          $input-transition !default;
 // scss-docs-end form-select-variables
 
-// scss-docs-start form-range-variables
-$form-range-track-width:          100% !default;
-$form-range-track-height:         .5rem !default;
-$form-range-track-cursor:         pointer !default;
-$form-range-track-bg:             var(--#{$prefix}secondary-bg) !default;
-$form-range-track-border-radius:  1rem !default;
-$form-range-track-box-shadow:     var(--#{$prefix}box-shadow-inset) !default;
-
-$form-range-thumb-width:                   1rem !default;
-$form-range-thumb-height:                  $form-range-thumb-width !default;
-$form-range-thumb-bg:                      $component-active-bg !default;
-$form-range-thumb-border:                  0 !default;
-$form-range-thumb-border-radius:           1rem !default;
-$form-range-thumb-box-shadow:              0 .1rem .25rem rgba($black, .1) !default;
-$form-range-thumb-focus-box-shadow:        0 0 0 1px $body-bg, $input-focus-box-shadow !default;
-$form-range-thumb-focus-box-shadow-width:  $input-focus-width !default; // For focus box shadow issue in Edge
-$form-range-thumb-active-bg:               tint-color($primary, 70%) !default;
-$form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color) !default;
-$form-range-thumb-transition:              background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-// scss-docs-end form-range-variables
-
-
-// scss-docs-start form-floating-variables
-$form-floating-height:                  add(3.5rem, $input-height-border) !default;
-$form-floating-line-height:             1.25 !default;
-$form-floating-padding-x:               $input-padding-x !default;
-$form-floating-padding-y:               1rem !default;
-$form-floating-input-padding-t:         1.625rem !default;
-$form-floating-input-padding-b:         .625rem !default;
-$form-floating-label-height:            1.5em !default;
-$form-floating-label-opacity:           .65 !default;
-$form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX(.15rem) !default;
-$form-floating-label-disabled-color:    $gray-600 !default;
-$form-floating-transition:              opacity .1s ease-in-out, transform .1s ease-in-out !default;
-// scss-docs-end form-floating-variables
 
 // scss-docs-start form-check-variables
 $form-check-input-width:                  1em !default;
@@ -1220,89 +1185,8 @@ $zindex-levels: (
 
 // Navs
 
-// scss-docs-start nav-variables
-$nav-link-padding-y:                .5rem !default;
-$nav-link-padding-x:                1rem !default;
-$nav-link-font-size:                null !default;
-$nav-link-font-weight:              null !default;
-$nav-link-color:                    var(--#{$prefix}link-color) !default;
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
-$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out !default;
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
-$nav-link-focus-box-shadow:         $focus-ring-box-shadow !default;
-
-$nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
-$nav-tabs-border-width:             var(--#{$prefix}border-width) !default;
-$nav-tabs-border-radius:            var(--#{$prefix}border-radius) !default;
-$nav-tabs-link-hover-border-color:  var(--#{$prefix}secondary-bg) var(--#{$prefix}secondary-bg) $nav-tabs-border-color !default;
-$nav-tabs-link-active-color:        var(--#{$prefix}emphasis-color) !default;
-$nav-tabs-link-active-bg:           var(--#{$prefix}body-bg) !default;
-$nav-tabs-link-active-border-color: var(--#{$prefix}border-color) var(--#{$prefix}border-color) $nav-tabs-link-active-bg !default;
-
-$nav-pills-border-radius:           var(--#{$prefix}border-radius) !default;
-$nav-pills-link-active-color:       $component-active-color !default;
-$nav-pills-link-active-bg:          $component-active-bg !default;
-
-$nav-underline-gap:                 1rem !default;
-$nav-underline-border-width:        .125rem !default;
-$nav-underline-link-active-color:   var(--#{$prefix}emphasis-color) !default;
-
-$nav-underline-border-gap:                  .5rem !default;
-$nav-underline-border-border-color:         var(--#{$prefix}border-color) !default;
-$nav-underline-border-border-width:         .125rem !default;
-$nav-underline-border-link-padding-y:       .5rem !default;
-$nav-underline-border-link-padding-x:       .5rem !default;
-$nav-underline-border-link-color:           var(--#{$prefix}secondary-color) !default;
-$nav-underline-border-link-active-color:    var(--#{$prefix}primary) !default;
-$nav-underline-border-link-disabled-color:  var(--#{$prefix}tertiary-color) !default;
-
-$nav-enclosed-padding:                   .125rem !default;
-$nav-enclosed-bg:                        var(--#{$prefix}tertiary-bg) !default;
-$nav-enclosed-border-radius:             $border-radius-lg !default;
-$nav-enclosed-link-padding-y:            .375rem !default;
-$nav-enclosed-link-padding-x:            .875rem !default;
-$nav-enclosed-link-color:                var(--#{$prefix}body-color) !default;
-$nav-enclosed-link-border-width:         1px !default;
-$nav-enclosed-link-active-color:         var(--#{$prefix}body-color) !default;
-$nav-enclosed-link-active-bg:            var(--#{$prefix}body-bg) !default;
-$nav-enclosed-link-active-border-color:  var(--#{$prefix}border-color) !default;
-$nav-enclosed-link-hover-box-shadow:     var(--#{$prefix}box-shadow-sm) !default;
-$nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !default;
-// scss-docs-end nav-variables
-
 
 // Navbar
-
-// scss-docs-start navbar-variables
-$navbar-padding-y:                  $spacer * .5 !default;
-$navbar-padding-x:                  null !default;
-
-$navbar-nav-link-padding-x:         .5rem !default;
-
-$navbar-brand-font-size:            $font-size-lg !default;
-// Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
-$nav-link-height:                   $font-size-base * $line-height-base + $nav-link-padding-y * 2 !default;
-$navbar-brand-height:               $navbar-brand-font-size * $line-height-base !default;
-$navbar-brand-padding-y:            ($nav-link-height - $navbar-brand-height) * .5 !default;
-$navbar-brand-margin-end:           1rem !default;
-
-$navbar-toggler-padding-y:          .25rem !default;
-$navbar-toggler-padding-x:          .75rem !default;
-$navbar-toggler-font-size:          $font-size-lg !default;
-$navbar-toggler-border-radius:      $btn-border-radius !default;
-$navbar-toggler-focus-width:        $btn-focus-width !default;
-$navbar-toggler-transition:         box-shadow .15s ease-in-out !default;
-
-$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8) !default;
-$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
-$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3) !default;
-$navbar-light-icon-color:           rgba($body-color, .75) !default;
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
-$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15) !default;
-$navbar-light-brand-color:          $navbar-light-active-color !default;
-$navbar-light-brand-hover-color:    $navbar-light-active-color !default;
-// scss-docs-end navbar-variables
 
 
 // Dropdown menu container and contents.

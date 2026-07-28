@@ -6,6 +6,8 @@
 @use "mixins/elevation" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "nav" as *;
+@use "navbar" as *;
 @use "variables" as *;
 
 // Header
@@ -23,7 +25,6 @@ $header-disabled-color:         rgba(var(--#{$prefix}emphasis-color-rgb), .3) !d
 $header-transition:             box-shadow .15s ease-in-out !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
-$nav-link-height:               $font-size-base * $line-height-base + $nav-link-padding-y * 2 !default;
 $header-brand-height:           $header-brand-font-size * $line-height-base !default;
 $header-brand-padding-y:        ($nav-link-height - $header-brand-height) * .5 !default;
 $header-brand-margin-end:       1rem !default;
@@ -101,7 +102,7 @@ $header-tokens: defaults(
     // Because flex properties aren't inherited, we need to redeclare these first
     // few properties so that content nested within behave properly.
     // The `flex-wrap` property is inherited to simplify the expanded navbars
-    %container-flex-properties {
+    %header-container-flex-properties {
       display: flex;
       flex-wrap: inherit;
       align-items: center;
@@ -110,12 +111,12 @@ $header-tokens: defaults(
 
     > .container,
     > .container-fluid {
-      @extend %container-flex-properties;
+      @extend %header-container-flex-properties;
     }
 
     @each $breakpoint, $container-max-width in $container-max-widths {
       > .container#{breakpoint-infix($breakpoint, $container-max-widths)} {
-        @extend %container-flex-properties;
+        @extend %header-container-flex-properties;
       }
     }
 

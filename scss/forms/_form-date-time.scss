@@ -1,6 +1,7 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../variables" as *;
+@use "floating-labels" as *;
 
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       $input-placeholder-color !default;

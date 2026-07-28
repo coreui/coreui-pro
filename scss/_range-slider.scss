@@ -1,4 +1,5 @@
 @use "sass:string";
+@use "forms/form-range" as *;
 @use "functions/color" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
