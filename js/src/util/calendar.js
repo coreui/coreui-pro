@@ -498,7 +498,12 @@ const parseDayString = (dateString, locale, includeTime) => {
  * @returns The Date object in local timezone, or null if invalid.
  */
 const parseLocalDateString = dateString => {
-  const _date = new Date(Date.parse(dateString))
+  // Date.parse treats date-only ISO strings ("2026-07-14") as UTC midnight,
+  // which shifts the date one day back in negative-offset timezones — append
+  // a time part so the string parses in the local timezone instead.
+  const trimmed = dateString.trim()
+  const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+  const _date = new Date(Date.parse(isoDateOnly ? `${trimmed}T00:00` : dateString))
   if (!Number.isNaN(_date.getTime())) {
     return _date
   }

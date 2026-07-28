@@ -662,6 +662,11 @@ describe('Calendar Utilities', () => {
       expect(getLocalDateFromString(123)).toBeNull()
     })
 
+    it('should parse date-only ISO strings as local midnight in every timezone', () => {
+      expect(getLocalDateFromString('2026-07-14', 'en-US')).toEqual(new Date(2026, 6, 14))
+      expect(getLocalDateFromString('2000-01-15', 'pl-PL')).toEqual(new Date(2000, 0, 15))
+    })
+
     it('should parse date string with default parameters', () => {
       const result = getLocalDateFromString('2/15/2023')
       expect(result).toBeInstanceOf(Date)
