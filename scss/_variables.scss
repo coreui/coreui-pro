@@ -539,14 +539,6 @@ $link-hover-decoration:                   null !default;
 $stretched-link-pseudo-element:           after !default;
 $stretched-link-z-index:                  1 !default;
 
-// Icon links
-// scss-docs-start icon-link-variables
-$icon-link-gap:               .375rem !default;
-$icon-link-underline-offset:  .25em !default;
-$icon-link-icon-size:         1em !default;
-$icon-link-icon-transition:   .2s ease-in-out transform !default;
-$icon-link-icon-transform:    translate3d(.25em, 0, 0) !default;
-// scss-docs-end icon-link-variables
 
 // Style p element.
 
@@ -657,11 +649,6 @@ $focus-ring-blur:       0 !default;
 $focus-ring-box-shadow: 0 0 $focus-ring-blur $focus-ring-width $focus-ring-color !default;
 // scss-docs-end focus-ring-variables
 
-// scss-docs-start caret-variables
-$caret-width:                 .3em !default;
-$caret-vertical-align:        $caret-width * .85 !default;
-$caret-spacing:               $caret-width * .85 !default;
-// scss-docs-end caret-variables
 
 $transition-base:             all .2s ease-in-out !default;
 $transition-fade:             opacity .15s linear !default;
@@ -945,29 +932,6 @@ $btn-active-border-shade-amount:  25% !default;
 $btn-active-border-tint-amount:   10% !default;
 // scss-docs-end btn-variables
 
-// scss-docs-start btn-outline-variables
-$btn-outline-color: var(--#{$prefix}secondary-color) !default;
-$btn-outline-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-active-color: var(--#{$prefix}body-color) !default;
-$btn-outline-active-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-outline-active-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-disabled-color: var(--#{$prefix}secondary-color) !default;
-$btn-outline-disabled-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-hover-color: var(--#{$prefix}body-color) !default;
-$btn-outline-hover-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-outline-hover-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
-// scss-docs-end btn-outline-variables
-
-// scss-docs-start btn-ghost-variables
-$btn-ghost-color: var(--#{$prefix}secondary-color) !default;
-$btn-ghost-active-color: var(--#{$prefix}body-color) !default;
-$btn-ghost-active-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-ghost-disabled-color: var(--#{$prefix}secondary-color) !default;
-$btn-ghost-hover-color: var(--#{$prefix}body-color) !default;
-$btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
-// scss-docs-end btn-ghost-variables
 
 // Forms
 
