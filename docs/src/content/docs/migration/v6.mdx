@@ -34,6 +34,11 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   `Calendar.update()` with `DateInput`/`TimeInput`/`DateTimeInput` `update()`
   semantics. Callers that passed the complete configuration on every update are
   unaffected.
+- **Additive:** `startDateChange` and `endDateChange` now carry a `dateObject`
+  property with the underlying `Date`, alongside the existing `date` property.
+  `date` remains formatted per `selectionType` — a `Date` for day selection, but
+  a string for week (`"2026W27"`), month (`"2026-01"`), quarter (`"2026Q1"`) and
+  year (`"2026"`). Existing listeners are unaffected.
 
 #### Date Picker v2 / Date Range Picker v2 (preview)
 
@@ -61,9 +66,24 @@ the option-by-option migration map. Planned mapping:
 - **Changed.** `timepicker: true` is replaced by the upcoming standalone
   `DateTimePicker` (DateTimeInput + calendar + time).
 - **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
-  `disabledDates`, `selectionType`, custom cell renderers, …), `container`,
-  `startDate`/`endDate`/`date`, `startName`/`endName`/`name`, validation states,
-  and the imperative API (`show`/`hide`/`toggle`/`clear`/`reset`/`update`).
+  `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
+  `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
+  `size`, validation states, the data API
+  (`data-coreui-toggle="date-picker-v2"`), and the imperative API
+  (`show`/`hide`/`toggle`/`clear`/`reset`).
+- **Passthrough is by name.** Options that belong to the inner calendar or date
+  input are forwarded automatically, so `data-coreui-selection-type`,
+  `data-coreui-show-week-number` and `data-coreui-format` work on the picker
+  element. `calendarOptions` / `inputOptions` remain as the programmatic escape
+  hatch.
+- **Week and quarter selection display the underlying date.** A section mask is
+  built from date sections, so it cannot render `2026W27` or `2026Q1` the way
+  the v1 text input did — the field shows the first day of the selected week or
+  quarter. The formatted value stays available on the event (`event.date`).
+  Dedicated week/quarter sections are an open design item. Month and year
+  selection **do** adapt: the mask narrows to `MM/yyyy` and `yyyy`.
+- **Format comes from the mask.** `inputDateFormat` is replaced by `format`
+  (forwarded to the field); `inputDateParse` still applies to pasted text.
 
 #### Icons rendered by JavaScript
 
