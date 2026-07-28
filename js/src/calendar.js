@@ -186,7 +186,9 @@ class Calendar extends BaseComponent {
 
   // Public
   update(config) {
-    this._config = this._getConfig(config)
+    // Merge over the current configuration (like SectionInput.update) — a
+    // partial update must not reset the remaining options to their defaults
+    this._config = this._getConfig({ ...this._config, ...config })
     this._initializeDates()
     this._initializeView()
 

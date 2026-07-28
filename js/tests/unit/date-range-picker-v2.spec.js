@@ -112,6 +112,26 @@ describe('DateRangePickerV2', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should select a full range after the start field was focused', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+
+      // focusing a section of the start field steers the calendar to
+      // start-date selection — it must NOT reset the range configuration
+      el.querySelector('.form-date-time-section').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      picker.show()
+
+      expect(el.querySelectorAll('.calendar-nav')).toHaveSize(2)
+
+      const cells = el.querySelectorAll('.calendar-cell[tabindex="0"]')
+      cells[0].click()
+      el.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
+
+      expect(picker.getStartDate()).not.toBeNull()
+      expect(picker.getEndDate()).not.toBeNull()
+      expect(picker.getEndDate()).toBeGreaterThan(picker.getStartDate())
+    })
+
     it('should keep the popup open when navigating months', () => {
       const picker = buildPicker()
       const el = fixtureEl.querySelector('#picker')

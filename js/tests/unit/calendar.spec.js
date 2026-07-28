@@ -558,6 +558,24 @@ describe('Calendar', () => {
   })
 
   describe('update', () => {
+    it('should merge the previous configuration on a partial update', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      const calendar = new Calendar(div, {
+        calendars: 2,
+        range: true
+      })
+
+      expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
+
+      calendar.update({ selectEndDate: true })
+
+      expect(calendar._config.range).toBeTrue()
+      expect(calendar._config.calendars).toEqual(2)
+      expect(div.querySelectorAll('.calendar-nav')).toHaveSize(2)
+    })
+
     it('should clear the calendar HTML and create a new one', () => {
       fixtureEl.innerHTML = '<div></div>'
 

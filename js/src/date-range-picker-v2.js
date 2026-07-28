@@ -114,6 +114,7 @@ class DateRangePickerV2 extends BaseComponent {
     this._calendar = null
     this._menu = null
     this._popup = null
+    this._selectEndDate = false
 
     this._createDateRangePicker()
     this._createPopup()
@@ -161,6 +162,7 @@ class DateRangePickerV2 extends BaseComponent {
   setRange(startDate, endDate) {
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
+    this._selectEndDate = false
     this._calendar.update({ endDate, selectEndDate: false, startDate })
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
@@ -175,6 +177,7 @@ class DateRangePickerV2 extends BaseComponent {
     this._endInput.reset()
     const startDate = this._startInput.getDate()
     const endDate = this._endInput.getDate()
+    this._selectEndDate = false
     this._calendar.update({ endDate, selectEndDate: false, startDate })
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
@@ -201,6 +204,15 @@ class DateRangePickerV2 extends BaseComponent {
   }
 
   // Private
+  _setSelectEndDate(value) {
+    if (this._selectEndDate === value) {
+      return
+    }
+
+    this._selectEndDate = value
+    this._calendar.update({ selectEndDate: value })
+  }
+
   _sanitizeIcon(icon) {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
@@ -326,13 +338,19 @@ class DateRangePickerV2 extends BaseComponent {
     })
 
     // Focusing a field steers which end of the range the calendar selects —
-    // the v1 behavior of clicking the start/end input, on section fields.
+    // the v1 behavior of clicking the start/end input, on section fields. The
+    // guard matters: focusin fires per section, and an unguarded update would
+    // re-render the calendar on every keystroke-navigation between sections.
     EventHandler.on(this._startInputElement, EVENT_FOCUSIN, () => {
-      this._calendar.update({ selectEndDate: false })
+      this._setSelectEndDate(false)
     })
 
     EventHandler.on(this._endInputElement, EVENT_FOCUSIN, () => {
-      this._calendar.update({ selectEndDate: true })
+      this._setSelectEndDate(true)
+    })
+
+    EventHandler.on(this._calendar._element, 'selectEndChange.coreui.calendar', event => {
+      this._selectEndDate = event.value
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
