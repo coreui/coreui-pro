@@ -7,58 +7,310 @@ description: "Preview of the v6 date range picker: two section-based masked fiel
 
 import dateRangePickerV2Basic from './snippets/date-range-picker-v2-basic.js?raw'
 import dateRangePickerV2Ranges from './snippets/date-range-picker-v2-ranges.js?raw'
+import dateRangePickerV2DisabledDates from './snippets/date-range-picker-v2-disabled-dates.js?raw'
 
 <Callout color="warning">
-  **Preview.** This is the in-progress v6 rewrite of the date range picker —
-  see the [date picker v2](/forms/date-picker-v2/) page for the composition
-  model. The API is under review and **will change**; the current date range
-  picker remains the stable component.
+  **Preview.** This is the in-progress v6 rewrite of the date range picker — see
+  [date picker v2](/forms/date-picker-v2/) for the composition model. The API is
+  under review and **will change**; the current
+  [date range picker](/forms/date-range-picker/) remains the stable component.
+  See the [v6 migration guide](/migration/v6/) for the option-by-option map.
 </Callout>
 
 ## Example
 
-Two masked fields share one input-group frame; the calendar spans two months
-and owns the range mechanics — pick a start day, the selection automatically
-advances to the end date, and the popup closes when the range is complete.
-Focusing the end field switches the calendar to end-date selection, like
-clicking the end input does today.
+### Days
 
-<Example pro code={`<label class="form-label">Reporting period</label>
-  <div id="myDateRangePickerV2"></div>`} sandboxJs={dateRangePickerV2Basic} />
+Two masked fields share one input-group frame; the calendar spans two months and
+owns the range mechanics — pick a start day and the selection advances to the
+end date automatically. Focusing the end field switches the calendar to
+end-date selection, the way clicking the end input does in v1.
 
-<Code code={dateRangePickerV2Basic} lang="js" />
+<Example pro code={`<div class="row">
+    <div class="col-lg-7 mb-3">
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-7">
+      <div
+        data-coreui-end-date="2026/03/20"
+        data-coreui-locale="en-US"
+        data-coreui-start-date="2026/03/15"
+        data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
 
-## Ranges and footer projection
+#### With footer
 
-There are no `ranges` / `todayButton` / `confirmButton` options. Project the
-regions with `<template>` children instead: `data-coreui-template="ranges"`
-renders as a column beside the calendars, `data-coreui-template="footer"`
-below them. Zero-argument actions bind through `data-coreui-picker-action`;
-range presets take arguments, so they go through `getContext().setRange()` —
-the date math, labels, and order are yours.
+There is no `footer` option — project a `<template data-coreui-template="footer">`
+child. With a footer present, completing a range does **not** auto-close;
+closing is the footer's job.
 
-With a footer projected, completing a range does **not** auto-close — closing
-is the footer's job (`close` action).
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-range-picker-v2">
+        <template data-coreui-template="footer">
+          <button type="button" class="btn btn-sm btn-ghost-primary" data-coreui-picker-action="clear">Clear</button>
+          <button type="button" class="btn btn-sm btn-primary" data-coreui-picker-action="close">OK</button>
+        </template>
+      </div>
+    </div>
+  </div>`} />
 
-<Example pro code={`<label class="form-label">Reporting period</label>
-  <div id="myDateRangePickerV2Ranges">
-    <template data-coreui-template="ranges">
-      <button type="button" class="btn btn-sm btn-ghost-primary" id="rangeLast7">Last 7 days</button>
-      <button type="button" class="btn btn-sm btn-ghost-primary" id="rangeLast30">Last 30 days</button>
-      <button type="button" class="btn btn-sm btn-ghost-primary" id="rangeThisMonth">This month</button>
-    </template>
-    <template data-coreui-template="footer">
-      <button type="button" class="btn btn-sm btn-ghost-primary" data-coreui-picker-action="clear">Clear</button>
-      <button type="button" class="btn btn-sm btn-primary" data-coreui-picker-action="close">OK</button>
-    </template>
+### Weeks
+
+Add `data-coreui-selection-type="week"` to select week ranges, and
+`data-coreui-show-week-number="true"` to show week numbers.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-selection-type="week"
+        data-coreui-show-week-number="true"
+        data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+<Callout color="warning">
+  **Week and quarter selection display the underlying dates.** A section mask is
+  built from date sections, so it cannot render `2026W27` the way the v1 text
+  inputs did — the fields show the first day of the selected week or quarter.
+  The formatted value stays available on the event (`event.date`), alongside the
+  `Date` (`event.dateObject`). See the [date picker v2](/forms/date-picker-v2/#weeks)
+  note.
+</Callout>
+
+### Months
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-selection-type="month"
+        data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+### Quarters
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-selection-type="quarter"
+        data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+### Years
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div
+        data-coreui-locale="en-US"
+        data-coreui-selection-type="year"
+        data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+## Sizing
+
+<Example pro code={`<div class="row mb-3">
+    <div class="col-lg-7">
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+## Disabled
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+<Callout color="info">
+  **`inputReadOnly` and `previewDateOnHover` are gone in v2** — see the
+  [migration guide](/migration/v6/).
+</Callout>
+
+## Disabled dates
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div id="myDateRangePickerV2DisabledDates"></div>
+    </div>
+  </div>`} sandboxJs={dateRangePickerV2DisabledDates} />
+
+<Code code={dateRangePickerV2DisabledDates} lang="js" />
+
+## Custom ranges
+
+There is no `ranges` option. Project a `<template data-coreui-template="ranges">`
+child — it renders as a column beside the calendars. Presets take arguments, so
+they run through `getContext().setRange()`: the date math, labels, and order are
+yours.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-8">
+      <div id="myDateRangePickerV2Ranges">
+        <template data-coreui-template="ranges">
+          <button type="button" class="btn btn-sm btn-ghost-primary" id="rangeLast7">Last 7 days</button>
+          <button type="button" class="btn btn-sm btn-ghost-primary" id="rangeLast30">Last 30 days</button>
+          <button type="button" class="btn btn-sm btn-ghost-primary" id="rangeThisMonth">This month</button>
+        </template>
+        <template data-coreui-template="footer">
+          <button type="button" class="btn btn-sm btn-ghost-primary" data-coreui-picker-action="clear">Clear</button>
+          <button type="button" class="btn btn-sm btn-primary" data-coreui-picker-action="close">OK</button>
+        </template>
+      </div>
+    </div>
   </div>`} sandboxJs={dateRangePickerV2Ranges} />
 
 <Code code={dateRangePickerV2Ranges} lang="js" />
 
-## Slot context
+## Non-english locale
+
+### Auto
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+### Chinese
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-locale="zh-CN" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+### Japanese
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-locale="ja" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+### Korean
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-locale="ko" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+## Right to left support
+
+### Hebrew
+
+<Example pro code={`<div class="row" dir="rtl">
+    <div class="col-lg-7">
+      <div data-coreui-locale="he-IL" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+### Persian
+
+<Example pro code={`<div class="row" dir="rtl">
+    <div class="col-lg-7">
+      <div data-coreui-locale="fa-IR" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+## Custom formats
+
+`inputDateFormat` and `inputOnChangeDelay` are gone — the mask defines the
+format. Set it with `data-coreui-format`, forwarded to both fields.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-7">
+      <div data-coreui-format="dd.MM.yyyy" data-coreui-locale="en-US" data-coreui-toggle="date-range-picker-v2"></div>
+    </div>
+  </div>`} />
+
+## Usage
+
+### Via data attributes
+
+Add `data-coreui-toggle="date-range-picker-v2"` to a `div` element.
+
+```html
+<div data-coreui-toggle="date-range-picker-v2"></div>
+```
+
+### Via JavaScript
+
+```html
+<div class="my-date-range-picker"></div>
+```
 
 ```js
-const picker = new coreui.DateRangePickerV2(element, { locale: 'en-US' })
+const pickerElementList = Array.prototype.slice.call(document.querySelectorAll('.my-date-range-picker'))
+const pickerList = pickerElementList.map(pickerEl => {
+  return new coreui.DateRangePickerV2(pickerEl)
+})
+```
+
+### Options
+
+Options belonging to the inner [calendar](/components/calendar/#options) or
+[date input](/forms/date-input/#options) are forwarded by name, so their data
+attributes work on the picker element too.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing icon markup. |
+| `ariaToggleLabel` | string | `'Toggle the calendar'` | Accessible label of the indicator button. |
+| `calendarOptions` | object | `{}` | Programmatic escape hatch for calendar options. |
+| `calendars` | number | `2` | Months shown side by side. |
+| `container` | string, element, false | `false` | Teleport target for the dropdown. |
+| `disabled` | boolean | `false` | Disables the fields and the popup. |
+| `endDate` | date, string, null | `null` | Initial end of the range. |
+| `endName` | string, null | `null` | Name of the end hidden input. |
+| `indicatorIcon` | string | calendar SVG | Inline SVG rendered by the component (sanitized). |
+| `inputOptions` | object | `{}` | Programmatic escape hatch for date input options. |
+| `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
+| `maxDate` | date, string, null | `null` | Upper bound, enforced by both layers. |
+| `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
+| `sanitize` | boolean | `true` | Sanitize the icon markup. |
+| `sanitizeFn` | function, null | `null` | Custom sanitizer. |
+| `separatorIcon` | string | arrow SVG | Inline SVG between the two fields. |
+| `size` | string, null | `null` | `'sm'` or `'lg'`. |
+| `startDate` | date, string, null | `null` | Initial start of the range. |
+| `startName` | string, null | `null` | Name of the start hidden input. |
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `show` | Opens the popup. |
+| `hide` | Closes the popup. |
+| `toggle` | Toggles the popup. |
+| `getStartDate` | Returns the start of the range (`Date` or `null`). |
+| `getEndDate` | Returns the end of the range (`Date` or `null`). |
+| `setRange` | Sets both ends and emits both change events. |
+| `clear` | Clears the range. |
+| `reset` | Restores the initial range. |
+| `getContext` | Returns the slot context (see below). |
+| `dispose` | Destroys the picker and its inner components. |
+| `getInstance` | Static — returns the instance for a DOM element. |
+| `getOrCreateInstance` | Static — returns the instance, creating it if needed. |
+
+#### Slot context
+
+```js
+const picker = coreui.DateRangePickerV2.getOrCreateInstance(element)
 const context = picker.getContext()
 
 context.setRange(start, end)   // set both ends (null allowed)
@@ -70,25 +322,34 @@ context.endDate                // current end (Date | null)
 context.disabled               // disabled state
 ```
 
-## Events
+### Events
 
 | Event | Description |
 | --- | --- |
-| `startDateChange.coreui.date-range-picker-v2` | Fired when the start of the range changes. `event.date` carries the value. |
-| `endDateChange.coreui.date-range-picker-v2` | Fired when the end of the range changes. `event.date` carries the value. |
-| `show/shown/hide/hidden.coreui.date-range-picker-v2` | Popup lifecycle. |
+| `startDateChange.coreui.date-range-picker-v2` | Fired when the start changes. `event.date` is formatted per `selectionType`, `event.dateObject` is the `Date`. |
+| `endDateChange.coreui.date-range-picker-v2` | Fired when the end changes, with the same payload shape. |
+| `show.coreui.date-range-picker-v2` | Fired immediately when `show` is called. |
+| `shown.coreui.date-range-picker-v2` | Fired when the popup has been made visible. |
+| `hide.coreui.date-range-picker-v2` | Fired immediately when `hide` is called. |
+| `hidden.coreui.date-range-picker-v2` | Fired when the popup has been hidden. |
 
-## Options
+```js
+const myPicker = document.getElementById('myPicker')
+myPicker.addEventListener('endDateChange.coreui.date-range-picker-v2', event => {
+  console.log(event.date, event.dateObject)
+})
+```
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `calendarOptions` | object | `{}` | Extra options forwarded to the inner [calendar](/components/calendar/#options). |
-| `calendars` | number | `2` | Months shown side by side. |
-| `container` | string, element, false | `false` | Teleport target for the dropdown. |
-| `disabled` | boolean | `false` | Disables the fields and the popup. |
-| `endDate`, `startDate` | date, string, null | `null` | Initial range. |
-| `endName`, `startName` | string, null | `null` | Names of the generated hidden inputs. |
-| `indicatorIcon`, `separatorIcon` | string | calendar / arrow SVG | Inline SVG rendered by the component (sanitized). |
-| `inputOptions` | object | `{}` | Extra options forwarded to both [date inputs](/forms/date-input/#options). |
-| `locale` | string | browser locale | Drives section order, separators, and calendar labels. |
-| `maxDate`, `minDate` | date, string, null | `null` | Bounds, enforced by both layers. |
+## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/_date-picker-v2.scss" capture="date-picker-v2-css-vars" />
+
+<ScssDocs file="scss/_calendar.scss" capture="calendar-css-vars" />
+
+### SASS variables
+
+<ScssDocs file="scss/_variables.scss" capture="date-picker-variables" />
+
+<ScssDocs file="scss/_variables.scss" capture="calendar-variables" />
