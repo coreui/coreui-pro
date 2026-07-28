@@ -84,6 +84,14 @@ the option-by-option migration map. Planned mapping:
   selection **do** adapt: the mask narrows to `MM/yyyy` and `yyyy`.
 - **Format comes from the mask.** `inputDateFormat` is replaced by `format`
   (forwarded to the field); `inputDateParse` still applies to pasted text.
+- **The calendar is built on first open, not at construction.** It accounts for
+  ~83% of a date picker's DOM (and ~89% of a range picker's), and it is not
+  observable before the popup opens, so the shells create it in `show()` and
+  seed it from the field values. Measured over 20 pickers: date picker
+  **65 ms → 15 ms** and **3200 → 540** DOM nodes, range picker **93 ms → 12 ms**
+  and **6060 → 740** nodes. The first open costs a few milliseconds more (the
+  calendar is built then); later opens are unchanged. Code reaching into the
+  private `picker._calendar` before the first open now finds `null`.
 
 #### Date Input / Time Input / Date Time Input
 

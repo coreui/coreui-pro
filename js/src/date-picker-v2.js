@@ -106,6 +106,7 @@ class DatePickerV2 extends BaseComponent {
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     this._input = null
     this._calendar = null
+    this._calendarElement = null
     this._menu = null
     this._popup = null
 
@@ -150,20 +151,20 @@ class DatePickerV2 extends BaseComponent {
 
   setDate(date) {
     this._input.update({ date })
-    this._calendar.update({ startDate: date })
+    this._calendar?.update({ startDate: date })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
   }
 
   clear() {
     this._input.clear()
-    this._calendar.update({ startDate: null })
+    this._calendar?.update({ startDate: null })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
   reset() {
     this._input.reset()
     const date = this._input.getDate()
-    this._calendar.update({ startDate: date })
+    this._calendar?.update({ startDate: date })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
   }
 
@@ -186,7 +187,7 @@ class DatePickerV2 extends BaseComponent {
   dispose() {
     this._popup.dispose()
     this._input.dispose()
-    this._calendar.dispose()
+    this._calendar?.dispose()
     super.dispose()
   }
 
@@ -264,20 +265,12 @@ class DatePickerV2 extends BaseComponent {
     const calendars = document.createElement('div')
     calendars.classList.add(CLASS_NAME_CALENDARS)
 
-    const calendarEl = document.createElement('div')
-    calendarEl.classList.add(CLASS_NAME_CALENDAR)
-    calendars.append(calendarEl)
+    this._calendarElement = document.createElement('div')
+    this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
+    calendars.append(this._calendarElement)
     body.append(calendars)
     this._menu.append(body)
-    // The calendar must be in its final DOM position before it is constructed:
-    // it resolves its directional icons from the computed direction, which a
-    // detached element does not have.
     this._element.append(this._menu)
-
-    this._calendar = new Calendar(calendarEl, this._forwardConfig(Calendar, {
-      locale: this._config.locale,
-      startDate: this._config.date
-    }, this._config.calendarOptions))
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')
@@ -285,6 +278,29 @@ class DatePickerV2 extends BaseComponent {
       footer.append(this._footerTemplate.content.cloneNode(true))
       this._menu.append(footer)
     }
+  }
+
+  // The calendar is ~83% of the picker's DOM and construction cost, and it is
+  // not observable before the popup opens — so it is built on first show, in
+  // its final DOM position (which is also where it can resolve its direction).
+  _ensureCalendar() {
+    if (this._calendar) {
+      return
+    }
+
+    this._calendar = new Calendar(this._calendarElement, this._forwardConfig(Calendar, {
+      locale: this._config.locale,
+      startDate: this.getDate()
+    }, this._config.calendarOptions))
+
+    EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
+      // `date` is formatted per selectionType ("2026-01", "2026Q1", …);
+      // `dateObject` is the underlying Date the section field can hold
+      const { date, dateObject } = event
+      this._input.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, dateObject })
+      this.hide()
+    })
   }
 
   _createPopup() {
@@ -300,6 +316,7 @@ class DatePickerV2 extends BaseComponent {
         EventHandler.trigger(this._element, EVENT_HIDE)
       },
       onShow: () => {
+        this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
         this._element.setAttribute('aria-expanded', 'true')
@@ -314,15 +331,6 @@ class DatePickerV2 extends BaseComponent {
       if (!this._config.disabled) {
         this.toggle()
       }
-    })
-
-    EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      // `date` is formatted per selectionType ("2026-01", "2026Q1", …);
-      // `dateObject` is the underlying Date the section field can hold
-      const { date, dateObject } = event
-      this._input.update({ date: dateObject })
-      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, dateObject })
-      this.hide()
     })
 
     EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, event => {

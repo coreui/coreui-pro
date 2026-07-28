@@ -121,6 +121,7 @@ class DateRangePickerV2 extends BaseComponent {
     this._startInput = null
     this._endInput = null
     this._calendar = null
+    this._calendarElement = null
     this._menu = null
     this._popup = null
     this._selectEndDate = false
@@ -172,7 +173,7 @@ class DateRangePickerV2 extends BaseComponent {
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
     this._selectEndDate = false
-    this._calendar.update({ endDate, selectEndDate: false, startDate })
+    this._calendar?.update({ endDate, selectEndDate: false, startDate })
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
   }
@@ -187,7 +188,7 @@ class DateRangePickerV2 extends BaseComponent {
     const startDate = this._startInput.getDate()
     const endDate = this._endInput.getDate()
     this._selectEndDate = false
-    this._calendar.update({ endDate, selectEndDate: false, startDate })
+    this._calendar?.update({ endDate, selectEndDate: false, startDate })
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
   }
@@ -208,7 +209,7 @@ class DateRangePickerV2 extends BaseComponent {
     this._popup.dispose()
     this._startInput.dispose()
     this._endInput.dispose()
-    this._calendar.dispose()
+    this._calendar?.dispose()
     super.dispose()
   }
 
@@ -245,7 +246,7 @@ class DateRangePickerV2 extends BaseComponent {
     }
 
     this._selectEndDate = value
-    this._calendar.update({ selectEndDate: value })
+    this._calendar?.update({ selectEndDate: value })
   }
 
   _sanitizeIcon(icon) {
@@ -328,23 +329,12 @@ class DateRangePickerV2 extends BaseComponent {
     const calendars = document.createElement('div')
     calendars.classList.add(CLASS_NAME_CALENDARS)
 
-    const calendarEl = document.createElement('div')
-    calendarEl.classList.add(CLASS_NAME_CALENDAR)
-    calendars.append(calendarEl)
+    this._calendarElement = document.createElement('div')
+    this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
+    calendars.append(this._calendarElement)
     body.append(calendars)
     this._menu.append(body)
-    // The calendar must be in its final DOM position before it is constructed:
-    // it resolves its directional icons from the computed direction, which a
-    // detached element does not have.
     this._element.append(this._menu)
-
-    this._calendar = new Calendar(calendarEl, this._forwardConfig(Calendar, {
-      calendars: this._config.calendars,
-      endDate: this._config.endDate,
-      locale: this._config.locale,
-      range: true,
-      startDate: this._config.startDate
-    }, this._config.calendarOptions))
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')
@@ -352,6 +342,43 @@ class DateRangePickerV2 extends BaseComponent {
       footer.append(this._footerTemplate.content.cloneNode(true))
       this._menu.append(footer)
     }
+  }
+
+  // See DatePickerV2._ensureCalendar — the calendar is built on first show,
+  // seeded from the shell's own state (the fields plus _selectEndDate).
+  _ensureCalendar() {
+    if (this._calendar) {
+      return
+    }
+
+    this._calendar = new Calendar(this._calendarElement, this._forwardConfig(Calendar, {
+      calendars: this._config.calendars,
+      endDate: this.getEndDate(),
+      locale: this._config.locale,
+      range: true,
+      selectEndDate: this._selectEndDate,
+      startDate: this.getStartDate()
+    }, this._config.calendarOptions))
+
+    EventHandler.on(this._calendar._element, 'selectEndChange.coreui.calendar', event => {
+      this._selectEndDate = event.value
+    })
+
+    EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
+      const { date, dateObject } = event
+      this._startInput.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date, dateObject })
+    })
+
+    EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
+      const { date, dateObject } = event
+      this._endInput.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date, dateObject })
+
+      if (dateObject && this.getStartDate() && !this._footerTemplate) {
+        this.hide()
+      }
+    })
   }
 
   _createPopup() {
@@ -367,6 +394,7 @@ class DateRangePickerV2 extends BaseComponent {
         EventHandler.trigger(this._element, EVENT_HIDE)
       },
       onShow: () => {
+        this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
         this._element.setAttribute('aria-expanded', 'true')
@@ -393,26 +421,6 @@ class DateRangePickerV2 extends BaseComponent {
 
     EventHandler.on(this._endInputElement, EVENT_FOCUSIN, () => {
       this._setSelectEndDate(true)
-    })
-
-    EventHandler.on(this._calendar._element, 'selectEndChange.coreui.calendar', event => {
-      this._selectEndDate = event.value
-    })
-
-    EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      const { date, dateObject } = event
-      this._startInput.update({ date: dateObject })
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date, dateObject })
-    })
-
-    EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      const { date, dateObject } = event
-      this._endInput.update({ date: dateObject })
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date, dateObject })
-
-      if (dateObject && this.getStartDate() && !this._footerTemplate) {
-        this.hide()
-      }
     })
 
     EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, event => {

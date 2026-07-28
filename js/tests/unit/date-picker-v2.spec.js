@@ -26,14 +26,36 @@ describe('DatePickerV2', () => {
   }
 
   describe('constructor', () => {
-    it('should compose an input group, an indicator, and a calendar dropdown', () => {
+    it('should compose an input group, an indicator, and an empty calendar container', () => {
       buildPicker()
 
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('date-picker')).toBeTrue()
       expect(el.querySelector('.date-picker-input-group')).not.toBeNull()
       expect(el.querySelector('.date-picker-indicator')).not.toBeNull()
+      expect(el.querySelector('.date-picker-dropdown .date-picker-calendar')).not.toBeNull()
+    })
+
+    it('should not build the calendar until the popup opens', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+
+      expect(picker._calendar).toBeNull()
+      expect(el.querySelector('.calendar')).toBeNull()
+
+      picker.show()
+
+      expect(picker._calendar).not.toBeNull()
       expect(el.querySelector('.date-picker-dropdown .calendar')).not.toBeNull()
+    })
+
+    it('should seed the lazily built calendar with the current value', () => {
+      const picker = buildPicker()
+      picker.setDate(new Date(2026, 5, 15))
+
+      picker.show()
+
+      expect(picker._calendar._config.startDate).toEqual(new Date(2026, 5, 15))
     })
 
     it('should initialize the section input with the configured date', () => {

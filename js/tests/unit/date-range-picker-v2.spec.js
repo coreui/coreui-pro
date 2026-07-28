@@ -27,14 +27,31 @@ describe('DateRangePickerV2', () => {
 
   describe('constructor', () => {
     it('should compose two section fields, a separator, and one multi-month calendar', () => {
-      buildPicker()
+      const picker = buildPicker()
 
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('date-range-picker')).toBeTrue()
       expect(el.querySelectorAll('.form-date-time')).toHaveSize(2)
       expect(el.querySelector('.date-picker-separator svg')).not.toBeNull()
       expect(el.querySelectorAll('.date-picker-calendar')).toHaveSize(1)
+
+      // the calendar itself is built on first open
+      expect(picker._calendar).toBeNull()
+      picker.show()
       expect(el.querySelectorAll('.calendar-nav')).toHaveSize(2)
+    })
+
+    it('should seed the lazily built calendar with the current range and selection side', () => {
+      const picker = buildPicker({
+        startDate: new Date(2026, 5, 1),
+        endDate: new Date(2026, 5, 15)
+      })
+
+      picker.show()
+
+      expect(picker._calendar._config.startDate).toEqual(new Date(2026, 5, 1))
+      expect(picker._calendar._config.endDate).toEqual(new Date(2026, 5, 15))
+      expect(picker._calendar._config.range).toBeTrue()
     })
 
     it('should initialize the fields with the configured range', () => {
