@@ -1,0 +1,14 @@
+// Compatibility shim for @coreui/astro-docs
+//
+// RFS is gone in v6 — fluid type is written as clamp() where it is wanted. The
+// docs engine still does `@use "@coreui-docs-source/scss/vendor/rfs"` in several
+// of its stylesheets, so these keep it building until the engine drops the
+// import. They emit the value as given; nothing is rescaled.
+
+@mixin font-size($value) {
+  font-size: $value;
+}
+
+@mixin rfs($value, $property: font-size) {
+  #{$property}: $value;
+}

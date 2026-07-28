@@ -246,7 +246,7 @@ Buttons use local CSS variables on `.btn` for enhanced real-time customization. 
 
 <ScssDocs file="scss/_buttons.scss" capture="btn-css-vars" />
 
-Each `.btn-*` modifier class updates the appropriate CSS variables to minimize additional CSS rules with our `button-variant()`, `button-outline-variant()`, and `button-size()` mixins.
+Each `.btn-*` modifier class updates the appropriate CSS variables to minimize additional CSS rules with our `button-variant()` and `button-size()` mixins.
 
 Here's an example of building a custom `.btn-*` modifier class like we do for the buttons unique to our docs by reassigning Bootstrap's CSS variables with a mixture of our own CSS and Sass variables.
 
@@ -262,18 +262,18 @@ Here's an example of building a custom `.btn-*` modifier class like we do for th
 
 CoreUI's button component is built with a base-modifier class approach. This means the bulk of the styling is contained to a base class `.btn` while style variations are confined to modifier classes (e.g., `.btn-danger`). These modifier classes are built from the `$button-variants` map to make customizing the number and name of our modifier classes.
 
-There are three mixins for buttons: button and button outline variant mixins, plus a button size mixin.
+There are two mixins for buttons: a variant mixin and a size mixin. Both live in `scss/_buttons.scss`.
 
-<ScssDocs file="scss/mixins/_buttons.scss" capture="btn-variant-mixin" />
+`button-variant()` takes a variant name rather than colors. It reads that variant's entry from `$button-variants`, which maps each button token to a `--#{$prefix}theme-*` token, and derives the hover and active states from the same token in CSS. That is what lets a theme color you add yourself get correct states without compiling Sass.
 
-<ScssDocs file="scss/mixins/_buttons.scss" capture="btn-outline-variant-mixin" />
+<ScssDocs file="scss/_buttons.scss" capture="btn-variants" />
 
-<ScssDocs file="scss/mixins/_buttons.scss" capture="btn-ghost-variant-mixin" />
+<ScssDocs file="scss/_buttons.scss" capture="btn-variant-mixin" />
 
-<ScssDocs file="scss/mixins/_buttons.scss" capture="btn-size-mixin" />
+<ScssDocs file="scss/_buttons.scss" capture="btn-size-mixin" />
 
 ### SASS loops
 
-Button variants (for regular and outline buttons) use their respective mixins with our `$theme-colors` map to generate the modifier classes in `scss/_buttons.scss`.
+Button variants pair the `button-variant()` mixin with our `$theme-colors` map to generate the modifier classes in `scss/_buttons.scss`. Each class sets the theme tokens for its color and then the variant's token mapping, so `.btn-primary` and `.theme-primary` stay in step.
 
 <ScssDocs file="scss/_buttons.scss" capture="btn-variant-loops" />

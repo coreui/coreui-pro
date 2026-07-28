@@ -19,8 +19,6 @@
       to: /getting-started/vite/
     - title: Accessibility
       to: /getting-started/accessibility/
-    - title: RFS
-      to: /getting-started/rfs/
     - title: RTL
       to: /getting-started/rtl/
 - title: AI Tools

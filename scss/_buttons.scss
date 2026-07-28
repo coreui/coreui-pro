@@ -1,10 +1,13 @@
+@use "sass:map";
 @use "functions/color" as *;
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
-@use "mixins/buttons" as *;
 @use "mixins/color-mode" as *;
 @use "mixins/gradients" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "theme" as *;
 @use "variables" as *;
 @use "variables-dark" as *;
 
@@ -21,6 +24,86 @@ $btn-outline-hover-bg: var(--#{$prefix}tertiary-bg) !default;
 $btn-outline-hover-border-color: var(--#{$prefix}border-color) !default;
 $btn-outline-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
 // scss-docs-end btn-outline-variables
+// Lightness applied to a theme color for the hover and active states. Upstream
+// uses .95/.9; these are tuned to land near the shade-color() amounts CoreUI
+// compiled before the states moved into CSS.
+$btn-hover-lightness: .85 !default;
+$btn-active-lightness: .8 !default;
+
+// Dark theme colors are already near the bottom of the lightness range, so
+// darkening them further reads as no hover at all. They brighten instead, the
+// direction tint-color() used to take them.
+$btn-lightness-overrides: (
+  "dark": ("hover": 1.48, "active": 1.62)
+) !default;
+
+// scss-docs-start btn-variants
+// Each variant maps a button token to a --#{$prefix}theme-* token, so one set of
+// rules serves every theme color. Hover and active are derived in CSS from the
+// same token, which is what lets a custom theme color work without Sass.
+$button-variants: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$button-variants: defaults(
+  (
+    "solid": (
+      "base": ("bg": "base", "color": "contrast", "border-color": "base"),
+      "hover": ("bg": "base", "color": "contrast", "border-color": "base"),
+      "active": ("bg": "base", "color": "contrast", "border-color": "base")
+    ),
+    "outline": (
+      "base": ("bg": "transparent", "color": "base", "border-color": "base"),
+      "hover": ("bg": "base", "color": "contrast", "border-color": "base"),
+      "active": ("bg": "base", "color": "contrast", "border-color": "base")
+    ),
+    "ghost": (
+      "base": ("bg": "transparent", "color": "base", "border-color": "transparent"),
+      "hover": ("bg": "base", "color": "contrast", "border-color": "base"),
+      "active": ("bg": "base", "color": "contrast", "border-color": "base")
+    )
+  ),
+  $button-variants
+);
+// scss-docs-end btn-variants
+
+// scss-docs-start btn-variant-mixin
+@mixin button-variant($variant, $hover-lightness: $btn-hover-lightness, $active-lightness: $btn-active-lightness) {
+  @each $property, $token in map.get($button-variants, $variant, "base") {
+    @if $token == "transparent" {
+      --#{$prefix}btn-#{$property}: transparent;
+      --#{$prefix}btn-disabled-#{$property}: transparent;
+    } @else {
+      --#{$prefix}btn-#{$property}: var(--#{$prefix}theme-#{$token});
+      --#{$prefix}btn-disabled-#{$property}: var(--#{$prefix}theme-#{$token});
+    }
+  }
+
+  @each $state, $shift in ("hover": $hover-lightness, "active": $active-lightness) {
+    @each $property, $token in map.get($button-variants, $variant, $state) {
+      @if $token == "transparent" {
+        --#{$prefix}btn-#{$state}-#{$property}: transparent;
+      } @else if $property == "color" {
+        --#{$prefix}btn-#{$state}-#{$property}: var(--#{$prefix}theme-#{$token});
+      } @else {
+        // stylelint-disable-next-line function-disallowed-list
+        --#{$prefix}btn-#{$state}-#{$property}: oklch(from var(--#{$prefix}theme-#{$token}) calc(l * #{$shift}) c h);
+      }
+    }
+  }
+
+  --#{$prefix}btn-active-shadow: #{$btn-active-box-shadow};
+  --#{$prefix}btn-focus-shadow-rgb: var(--#{$prefix}theme-rgb);
+}
+// scss-docs-end btn-variant-mixin
+
+// scss-docs-start btn-size-mixin
+@mixin button-size($padding-y, $padding-x, $font-size, $border-radius) {
+  --#{$prefix}btn-padding-y: #{$padding-y};
+  --#{$prefix}btn-padding-x: #{$padding-x};
+  --#{$prefix}btn-font-size: #{$font-size};
+  --#{$prefix}btn-border-radius: #{$border-radius};
+}
+// scss-docs-end btn-size-mixin
+
 // scss-docs-start btn-ghost-variables
 $btn-ghost-color: var(--#{$prefix}secondary-color) !default;
 $btn-ghost-active-color: var(--#{$prefix}body-color) !default;
@@ -204,41 +287,27 @@ $btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
   }
 
   // scss-docs-start btn-variant-loops
-  @each $color, $value in $theme-colors {
+  // .btn-outline and .btn-ghost keep their standalone neutral meaning, so the
+  // colour-bearing spellings below are the composable form: the variant's token
+  // mapping plus the matching theme tokens.
+  @each $color in map.keys($theme-colors) {
+    $overrides: map.get($btn-lightness-overrides, $color) or ();
+    $hover-l: map.get($overrides, "hover") or $btn-hover-lightness;
+    $active-l: map.get($overrides, "active") or $btn-active-lightness;
+
     .btn-#{$color} {
-      @if $color == "light" {
-        @include button-variant(
-          $value,
-          $value,
-          $hover-background: shade-color($value, $btn-hover-bg-shade-amount),
-          $hover-border: shade-color($value, $btn-hover-border-shade-amount),
-          $active-background: shade-color($value, $btn-active-bg-shade-amount),
-          $active-border: shade-color($value, $btn-active-border-shade-amount)
-        );
-      } @else if $color == "dark" {
-        @include button-variant(
-          $value,
-          $value,
-          $hover-background: tint-color($value, $btn-hover-bg-tint-amount),
-          $hover-border: tint-color($value, $btn-hover-border-tint-amount),
-          $active-background: tint-color($value, $btn-active-bg-tint-amount),
-          $active-border: tint-color($value, $btn-active-border-tint-amount)
-        );
-      } @else {
-        @include button-variant($value, $value);
-      }
+      @include theme-tokens($color);
+      @include button-variant("solid", $hover-l, $active-l);
     }
-  }
 
-  @each $color, $value in $theme-colors {
     .btn-outline-#{$color} {
-      @include button-outline-variant($value);
+      @include theme-tokens($color);
+      @include button-variant("outline", $hover-l, $active-l);
     }
-  }
 
-  @each $color, $value in $theme-colors {
     .btn-ghost-#{$color} {
-      @include button-ghost-variant($value);
+      @include theme-tokens($color);
+      @include button-variant("ghost", $hover-l, $active-l);
     }
   }
   // scss-docs-end btn-variant-loops
@@ -292,25 +361,4 @@ $btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
     @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-border-radius-sm);
   }
 
-  @if $enable-dark-mode {
-    @include color-mode(dark) {
-      @each $color, $value in $theme-colors-dark {
-        .btn-#{$color} {
-          @include button-variant($value, $value);
-        }
-      }
-
-      @each $color, $value in $theme-colors-dark {
-        .btn-outline-#{$color} {
-          @include button-outline-variant($value);
-        }
-      }
-
-      @each $color, $value in $theme-colors-dark {
-        .btn-ghost-#{$color} {
-          @include button-ghost-variant($value);
-        }
-      }
-    }
-  }
 }

@@ -230,7 +230,7 @@ Align terms and descriptions horizontally by using our grid system's predefined 
 
 ## Responsive font sizes
 
-In CoreUI for Bootstrap, we've enabled responsive font sizes by default, allowing text to scale more naturally across device and viewport sizes. Have a look at the [RFS page](/getting-started/rfs/) to find out how this works.
+Headings scale with the viewport: the larger sizes are written as `clamp()`, so they grow with the screen up to the size given as the ceiling and stop there.
 
 ## Customization
 
@@ -246,4 +246,4 @@ Miscellaneous typography elements covered here and in [Reboot](/content/reboot/)
 
 ### SASS Mixins
 
-There are no dedicated mixins for typography, but Bootstrap does use [Responsive Font Sizing (RFS)](/getting-started/rfs/).
+There are no dedicated mixins for typography. Fluid sizes are plain `clamp()` values in the heading and display variables.

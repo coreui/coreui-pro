@@ -67,6 +67,7 @@ $theme-colors-contrast: (
 // scss-docs-end theme-contrast-map
 
 $theme-colors-rgb-dark: null !default;
+$theme-colors-contrast-dark: null !default;
 $theme-colors-text-dark: null !default;
 $theme-colors-bg-subtle-dark: null !default;
 $theme-colors-border-subtle-dark: null !default;
@@ -75,6 +76,19 @@ $theme-colors-border-subtle-dark: null !default;
   // scss-docs-start theme-colors-rgb-dark
   $theme-colors-rgb-dark: map-loop($theme-colors-dark, to-rgb, "$value") !default;
   // scss-docs-end theme-colors-rgb-dark
+
+  // scss-docs-start theme-contrast-dark-map
+  $theme-colors-contrast-dark: (
+    "primary": color-contrast(map.get($theme-colors-dark, "primary")),
+    "secondary": color-contrast(map.get($theme-colors-dark, "secondary")),
+    "success": color-contrast(map.get($theme-colors-dark, "success")),
+    "info": color-contrast(map.get($theme-colors-dark, "info")),
+    "warning": color-contrast(map.get($theme-colors-dark, "warning")),
+    "danger": color-contrast(map.get($theme-colors-dark, "danger")),
+    "light": color-contrast(map.get($theme-colors-dark, "light")),
+    "dark": color-contrast(map.get($theme-colors-dark, "dark")),
+  ) !default;
+  // scss-docs-end theme-contrast-dark-map
 
   // scss-docs-start theme-text-dark-map
   $theme-colors-text-dark: (

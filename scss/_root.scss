@@ -227,6 +227,10 @@
         --#{$prefix}#{$color}-text-emphasis: #{$value};
       }
 
+      @each $color, $value in $theme-colors-contrast-dark {
+        --#{$prefix}#{$color}-contrast: #{$value};
+      }
+
       @each $color, $value in $theme-colors-bg-subtle-dark {
         --#{$prefix}#{$color}-bg-subtle: #{$value};
       }
