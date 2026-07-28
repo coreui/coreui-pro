@@ -54,6 +54,19 @@ describe('DateRangePickerV2', () => {
       expect(fixtureEl.querySelector('input[name="trip-end"]')).not.toBeNull()
     })
 
+    it('should render the LTR separator arrow by default', () => {
+      const picker = buildPicker()
+
+      expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIcon)
+    })
+
+    it('should render the mirrored separator arrow inside an RTL ancestor', () => {
+      const picker = buildPicker({}, '<div dir="rtl"><div id="picker"></div></div>')
+
+      expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIconRtl)
+      expect(fixtureEl.querySelector('.date-picker-separator svg')).not.toBeNull()
+    })
+
     it('should clone a ranges template into the dropdown body', () => {
       buildPicker({}, [
         '<div id="picker">',

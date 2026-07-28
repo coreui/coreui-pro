@@ -228,6 +228,10 @@ yours.
     </div>
   </div>`} />
 
+The separator between the two fields is a directional arrow, so the component
+renders its mirrored counterpart (`separatorIconRtl`) whenever the picker sits
+in an RTL context — the document direction or any `dir="rtl"` ancestor.
+
 ## Custom formats
 
 `inputDateFormat` and `inputOnChangeDelay` are gone — the mask defines the
@@ -285,7 +289,8 @@ attributes work on the picker element too.
 | `minDate` | date, string, null | `null` | Lower bound, enforced by both layers. |
 | `sanitize` | boolean | `true` | Sanitize the icon markup. |
 | `sanitizeFn` | function, null | `null` | Custom sanitizer. |
-| `separatorIcon` | string | arrow SVG | Inline SVG between the two fields. |
+| `separatorIcon` | string | arrow SVG | Inline SVG between the two fields (LTR). |
+| `separatorIconRtl` | string | mirrored arrow SVG | Inline SVG used when the picker renders in an RTL context. |
 | `size` | string, null | `null` | `'sm'` or `'lg'`. |
 | `startDate` | date, string, null | `null` | Initial start of the range. |
 | `startName` | string, null | `null` | Name of the start hidden input. |

@@ -93,6 +93,12 @@ the option-by-option migration map. Planned mapping:
   recolor them with plain CSS `color`. The corresponding
   `$date-picker-*-icon`/`-icon-size` Sass variables disappear with the v1
   shells.
+- **Directional icons are resolved in JavaScript, not CSS.** v1 swapped the
+  range separator with a second Sass variable
+  (`$date-picker-separator-icon-rtl`) applied through an RTL mask; v2 picks
+  between `separatorIcon` and `separatorIconRtl` when it renders, based on the
+  element's computed direction — so a `dir="rtl"` ancestor works, not just a
+  document-level direction.
 
 ### Sass & CSS
 
