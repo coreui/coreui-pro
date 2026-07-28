@@ -1,0 +1,94 @@
+---
+title: "Migrating to v6"
+description: "Track and review changes to the CoreUI for Bootstrap source files, documentation, and components to help you migrate from v5 to v6."
+---
+
+<Callout color="warning">
+  **Work in progress.** v6 is under active development on the `v6-dev` branch —
+  this page tracks every migration-relevant change as it lands, so nothing here
+  is final until a v6 release ships. The core promise does not change: **an
+  existing class or value never changes meaning; new behavior gets a new name.**
+</Callout>
+
+## v6.0.0 (unreleased)
+
+### Dependencies
+
+- **New peer dependency: `@floating-ui/dom`.** The new anchored-overlay
+  primitive (used by the rewritten pickers, and over time by autocomplete,
+  multi-select, and dropdown) positions with [Floating UI](https://floating-ui.com)
+  instead of Popper. During the transition **both** `@floating-ui/dom` and
+  `@popperjs/core` are peer dependencies — components not yet migrated keep
+  using Popper. Bundle builds (`coreui.bundle.*`) include both engines, so no
+  action is needed for CDN users; npm users installing peer dependencies
+  manually should add `@floating-ui/dom`.
+
+### Components
+
+#### Calendar
+
+- **Behavior change:** `update()` now **merges** the given options over the
+  current configuration instead of resolving them against the defaults. A
+  partial call like `calendar.update({ selectEndDate: true })` no longer resets
+  every other option (`range`, `calendars`, `locale`, …) — this aligns
+  `Calendar.update()` with `DateInput`/`TimeInput`/`DateTimeInput` `update()`
+  semantics. Callers that passed the complete configuration on every update are
+  unaffected.
+
+#### Date Picker v2 / Date Range Picker v2 (preview)
+
+The pickers are being rewritten as a composition of the section-based input
+fields ([date input](/forms/date-input/)), the [calendar](/components/calendar/),
+and a shared popup primitive — replacing the v1 monolith. Preview pages:
+[date picker v2](/forms/date-picker-v2/),
+[date range picker v2](/forms/date-range-picker-v2/). The v2 shells currently
+ship **alongside** the v1 pickers under new names; at release the rewrite takes
+over the existing `DatePicker`/`DateRangePicker` names, and this section becomes
+the option-by-option migration map. Planned mapping:
+
+- **Removed — projected regions replace button configuration.** `footer`,
+  `todayButton`, `todayButtonClasses`, `cancelButton`, `cancelButtonClasses`,
+  `confirmButton`, `confirmButtonClasses`, `ranges`, `rangesButtonsClasses` →
+  put a `<template data-coreui-template="footer">` /
+  `data-coreui-template="ranges"` child in the picker element. Zero-argument
+  actions bind with `data-coreui-picker-action="today|clear|reset|close"`;
+  actions with arguments (range presets) go through `picker.getContext()`
+  (`setDate`, `setRange`, `clear`, `reset`, `close` + read-only state).
+- **Removed — obsolete with section fields.** `inputDateFormat`,
+  `inputOnChangeDelay`, `inputReadOnly`, `placeholder` — the masked field is
+  always a valid partial date; there is no free-text parsing to debounce.
+  Section placeholders come from the input triad's `placeholders`.
+- **Changed.** `timepicker: true` is replaced by the upcoming standalone
+  `DateTimePicker` (DateTimeInput + calendar + time).
+- **Kept.** Calendar passthrough (`locale`, `minDate`/`maxDate`,
+  `disabledDates`, `selectionType`, custom cell renderers, …), `container`,
+  `startDate`/`endDate`/`date`, `startName`/`endName`/`name`, validation states,
+  and the imperative API (`show`/`hide`/`toggle`/`clear`/`reset`/`update`).
+
+#### Icons rendered by JavaScript
+
+- New components render their icons as **inline SVG on `currentColor`** (the
+  chips pattern) instead of CSS `mask` data-URIs: swap them with the
+  `indicatorIcon` / `separatorIcon` options (sanitized with the SVG allowlist),
+  recolor them with plain CSS `color`. The corresponding
+  `$date-picker-*-icon`/`-icon-size` Sass variables disappear with the v1
+  shells.
+
+### Sass & CSS
+
+- The v2 picker shell styling is a lean partial (`_date-picker-v2.scss`,
+  ~110 lines / 16 CSS-var tokens vs v1's 369 lines / 79 Sass variables per
+  picker): the shell styles only the dropdown panel, the input-group frame, the
+  footer/ranges layout, and the indicator. The field is styled by the date
+  input partial, the popup content by the calendar, projected footer/ranges
+  content is userland (style your own buttons). **Sass overrides targeting the
+  v1 input-layer classes** (`.date-picker-input`, `.date-picker-input-wrapper`,
+  `.date-picker-input-preview`, `.date-picker-cleaner`, `.date-picker-separator`
+  icon masks) **will not apply to the v2 markup** — those layers no longer
+  exist. Overrides on the surviving classes (`.date-picker-dropdown`,
+  `.date-picker-footer`, `.date-picker-indicator`, `.date-picker-ranges`) keep
+  working.
+- In v2 the **input group carries the form-control frame** (border, background,
+  focus ring); the section fields inside are borderless. In v1 the frame was on
+  the group as well, but the inner fake-inputs had their own styling hooks —
+  those are gone.

@@ -396,3 +396,8 @@
       to: /migration/v4/
     - title: v5
       to: /migration/v5/
+    - title: v6
+      to: /migration/v6/
+      badge:
+        color: warning
+        text: WIP
