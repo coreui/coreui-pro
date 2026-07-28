@@ -6,324 +6,326 @@
 @use "vendor/rfs" as *;
 @use "variables" as *;
 
-.calendar {
-  // scss-docs-start calendar-css-vars
-  --#{$prefix}calendar-table-margin: #{$calendar-table-margin};
-  --#{$prefix}calendar-table-cell-size: #{$calendar-table-cell-size};
-  --#{$prefix}calendar-nav-padding: #{$calendar-nav-padding};
-  --#{$prefix}calendar-nav-border-color: #{$calendar-nav-border-color};
-  --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid var(--#{$prefix}calendar-nav-border-color);
-  --#{$prefix}calendar-nav-btn-padding-x: #{$calendar-nav-btn-padding-x};
-  --#{$prefix}calendar-nav-btn-padding-y: #{$calendar-nav-btn-padding-y};
-  @include rfs($calendar-nav-btn-font-size, --#{$prefix}calendar-nav-btn-font-size);
-  --#{$prefix}calendar-nav-btn-bg: #{$calendar-nav-btn-bg};
-  --#{$prefix}calendar-nav-btn-border-width: #{$calendar-nav-btn-border-width};
-  --#{$prefix}calendar-nav-btn-border-color: #{$calendar-nav-btn-border-color};
-  --#{$prefix}calendar-nav-btn-border-radius: #{$calendar-nav-btn-border-radius};
-  --#{$prefix}calendar-nav-btn-hover-bg: #{$calendar-nav-btn-hover-bg};
-  --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color};
-  --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color};
-  --#{$prefix}calendar-nav-btn-focus-box-shadow: #{$calendar-nav-btn-focus-box-shadow};
-  --#{$prefix}calendar-nav-date-font-weight: #{$calendar-nav-date-font-weight};
-  --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color};
-  --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
-  --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};
-  --#{$prefix}calendar-nav-icon-height: #{$calendar-nav-icon-height};
-  --#{$prefix}calendar-nav-icon-color: #{$calendar-nav-icon-color};
-  --#{$prefix}calendar-nav-icon-hover-color: #{$calendar-nav-icon-hover-color};
-  --#{$prefix}calendar-cell-header-inner-font-weight: #{$calendar-cell-header-inner-font-weight};
-  --#{$prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color};
-  --#{$prefix}calendar-cell-week-number-font-weight: #{$calendar-cell-week-number-font-weight};
-  --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
-  --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color};
-  --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
-  --#{$prefix}calendar-cell-focus-box-shadow: #{$calendar-cell-focus-box-shadow};
-  --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
-  --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
-  --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg};
-  --#{$prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg};
-  --#{$prefix}calendar-cell-range-hover-bg: #{$calendar-cell-range-hover-bg};
-  --#{$prefix}calendar-cell-range-hover-border-color: #{$calendar-cell-range-hover-border-color};
-  --#{$prefix}calendar-cell-today-color: #{$calendar-cell-today-color};
-  --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
-  // scss-docs-end calendar-css-vars
+@layer components {
+  .calendar {
+    // scss-docs-start calendar-css-vars
+    --#{$prefix}calendar-table-margin: #{$calendar-table-margin};
+    --#{$prefix}calendar-table-cell-size: #{$calendar-table-cell-size};
+    --#{$prefix}calendar-nav-padding: #{$calendar-nav-padding};
+    --#{$prefix}calendar-nav-border-color: #{$calendar-nav-border-color};
+    --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid var(--#{$prefix}calendar-nav-border-color);
+    --#{$prefix}calendar-nav-btn-padding-x: #{$calendar-nav-btn-padding-x};
+    --#{$prefix}calendar-nav-btn-padding-y: #{$calendar-nav-btn-padding-y};
+    @include rfs($calendar-nav-btn-font-size, --#{$prefix}calendar-nav-btn-font-size);
+    --#{$prefix}calendar-nav-btn-bg: #{$calendar-nav-btn-bg};
+    --#{$prefix}calendar-nav-btn-border-width: #{$calendar-nav-btn-border-width};
+    --#{$prefix}calendar-nav-btn-border-color: #{$calendar-nav-btn-border-color};
+    --#{$prefix}calendar-nav-btn-border-radius: #{$calendar-nav-btn-border-radius};
+    --#{$prefix}calendar-nav-btn-hover-bg: #{$calendar-nav-btn-hover-bg};
+    --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color};
+    --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color};
+    --#{$prefix}calendar-nav-btn-focus-box-shadow: #{$calendar-nav-btn-focus-box-shadow};
+    --#{$prefix}calendar-nav-date-font-weight: #{$calendar-nav-date-font-weight};
+    --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color};
+    --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color};
+    --#{$prefix}calendar-nav-icon-width: #{$calendar-nav-icon-width};
+    --#{$prefix}calendar-nav-icon-height: #{$calendar-nav-icon-height};
+    --#{$prefix}calendar-nav-icon-color: #{$calendar-nav-icon-color};
+    --#{$prefix}calendar-nav-icon-hover-color: #{$calendar-nav-icon-hover-color};
+    --#{$prefix}calendar-cell-header-inner-font-weight: #{$calendar-cell-header-inner-font-weight};
+    --#{$prefix}calendar-cell-header-inner-color: #{$calendar-cell-header-inner-color};
+    --#{$prefix}calendar-cell-week-number-font-weight: #{$calendar-cell-week-number-font-weight};
+    --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
+    --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color};
+    --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg};
+    --#{$prefix}calendar-cell-focus-box-shadow: #{$calendar-cell-focus-box-shadow};
+    --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color};
+    --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color};
+    --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg};
+    --#{$prefix}calendar-cell-range-bg: #{$calendar-cell-range-bg};
+    --#{$prefix}calendar-cell-range-hover-bg: #{$calendar-cell-range-hover-bg};
+    --#{$prefix}calendar-cell-range-hover-border-color: #{$calendar-cell-range-hover-border-color};
+    --#{$prefix}calendar-cell-today-color: #{$calendar-cell-today-color};
+    --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color};
+    // scss-docs-end calendar-css-vars
 
-  font-weight: initial;
+    font-weight: initial;
 
-  table {
-    width: calc(var(--#{$prefix}calendar-table-cell-size) * 7); // stylelint-disable-line function-disallowed-list
-    margin: var(--#{$prefix}calendar-table-margin);
+    table {
+      width: calc(var(--#{$prefix}calendar-table-cell-size) * 7); // stylelint-disable-line function-disallowed-list
+      margin: var(--#{$prefix}calendar-table-margin);
 
-    th,
-    td {
-      width: var(--#{$prefix}calendar-table-cell-size);
+      th,
+      td {
+        width: var(--#{$prefix}calendar-table-cell-size);
+      }
+    }
+
+    &.months ~ .time-picker,
+    &.years ~ .time-picker {
+      display: none;
+    }
+
+    @include media-breakpoint-down(sm) {
+      &:not(:first-child) .calendar-nav {
+        border-top: var(--#{$prefix}calendar-nav-border);
+      }
     }
   }
 
-  &.months ~ .time-picker,
-  &.years ~ .time-picker {
-    display: none;
+  .show-week-numbers table {
+    width: calc(var(--#{$prefix}calendar-table-cell-size) * 8); // stylelint-disable-line function-disallowed-list
   }
 
-  @include media-breakpoint-down(sm) {
-    &:not(:first-child) .calendar-nav {
-      border-top: var(--#{$prefix}calendar-nav-border);
+  .calendars {
+    display: flex;
+    flex-basis: min-content;
+
+    @include media-breakpoint-down(sm) {
+      flex-wrap: wrap;
     }
   }
-}
 
-.show-week-numbers table {
-  width: calc(var(--#{$prefix}calendar-table-cell-size) * 8); // stylelint-disable-line function-disallowed-list
-}
-
-.calendars {
-  display: flex;
-  flex-basis: min-content;
-
-  @include media-breakpoint-down(sm) {
-    flex-wrap: wrap;
-  }
-}
-
-.calendar-nav {
-  display: flex;
-  align-items: baseline;
-  padding: var(--#{$prefix}calendar-nav-padding);
-  border-bottom: var(--#{$prefix}calendar-nav-border);
-}
-
-.calendar-nav-btn {
-  display: inline-block;
-  padding: var(--#{$prefix}calendar-nav-btn-padding-y) var(--#{$prefix}calendar-nav-btn-padding-x);
-  @include font-size(var(--#{$prefix}calendar-nav-btn-font-size));
-  text-align: center;
-  vertical-align: middle;
-  user-select: none;
-  background-color: var(--#{$prefix}calendar-nav-btn-bg);
-  border: var(--#{$prefix}calendar-nav-btn-border-width) solid var(--#{$prefix}calendar-nav-btn-border-color);
-  @include border-radius(var(--#{$prefix}calendar-nav-btn-border-radius));
-  @include transition($btn-transition);
-
-  &:hover {
-    background-color: var(--#{$prefix}calendar-nav-btn-hover-bg);
-    border-color: var(--#{$prefix}calendar-nav-btn-hover-border-color);
+  .calendar-nav {
+    display: flex;
+    align-items: baseline;
+    padding: var(--#{$prefix}calendar-nav-padding);
+    border-bottom: var(--#{$prefix}calendar-nav-border);
   }
 
-  &:focus-visible {
-    border-color: var(--#{$prefix}calendar-nav-btn-focus-border-color);
-    outline: 0;
-    box-shadow: var(--#{$prefix}calendar-nav-btn-focus-box-shadow);
-  }
-}
-
-.calendar-nav-date {
-  flex: 1;
-  text-align: center;
-
-  .calendar-nav-btn,
-  // TODO: remove .btn class when no longer needed in v6
-  .btn {
-    font-weight: var(--#{$prefix}calendar-nav-date-font-weight);
-    color: var(--#{$prefix}calendar-nav-date-color);
+  .calendar-nav-btn {
+    display: inline-block;
+    padding: var(--#{$prefix}calendar-nav-btn-padding-y) var(--#{$prefix}calendar-nav-btn-padding-x);
+    @include font-size(var(--#{$prefix}calendar-nav-btn-font-size));
+    text-align: center;
+    vertical-align: middle;
+    user-select: none;
+    background-color: var(--#{$prefix}calendar-nav-btn-bg);
+    border: var(--#{$prefix}calendar-nav-btn-border-width) solid var(--#{$prefix}calendar-nav-btn-border-color);
+    @include border-radius(var(--#{$prefix}calendar-nav-btn-border-radius));
+    @include transition($btn-transition);
 
     &:hover {
-      color: var(--#{$prefix}calendar-nav-date-hover-color);
+      background-color: var(--#{$prefix}calendar-nav-btn-hover-bg);
+      border-color: var(--#{$prefix}calendar-nav-btn-hover-border-color);
+    }
+
+    &:focus-visible {
+      border-color: var(--#{$prefix}calendar-nav-btn-focus-border-color);
+      outline: 0;
+      box-shadow: var(--#{$prefix}calendar-nav-btn-focus-box-shadow);
     }
   }
-}
 
-.calendar-nav-icon {
-  display: block;
-  width: var(--#{$prefix}calendar-nav-icon-width);
-  height: var(--#{$prefix}calendar-nav-icon-height);
-  color: var(--#{$prefix}calendar-nav-icon-color);
-  @include transition(color .15s ease-in-out);
+  .calendar-nav-date {
+    flex: 1;
+    text-align: center;
 
-  &:hover {
-    color: var(--#{$prefix}calendar-nav-icon-hover-color);
+    .calendar-nav-btn,
+    // TODO: remove .btn class when no longer needed in v6
+    .btn {
+      font-weight: var(--#{$prefix}calendar-nav-date-font-weight);
+      color: var(--#{$prefix}calendar-nav-date-color);
+
+      &:hover {
+        color: var(--#{$prefix}calendar-nav-date-hover-color);
+      }
+    }
   }
 
-  // the component renders the icon inline; it inherits color and fills the box
-  > svg {
+  .calendar-nav-icon {
     display: block;
-    width: 100%;
-    height: 100%;
-  }
-}
+    width: var(--#{$prefix}calendar-nav-icon-width);
+    height: var(--#{$prefix}calendar-nav-icon-height);
+    color: var(--#{$prefix}calendar-nav-icon-color);
+    @include transition(color .15s ease-in-out);
 
-.calendar-header-cell-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--#{$prefix}calendar-table-cell-size);
-  font-weight: var(--#{$prefix}calendar-cell-header-inner-font-weight);
-  color: var(--#{$prefix}calendar-cell-header-inner-color);
-}
+    &:hover {
+      color: var(--#{$prefix}calendar-nav-icon-hover-color);
+    }
 
-.calendar-cell-week-number {
-  font-weight: var(--#{$prefix}calendar-cell-week-number-font-weight);
-  color: var(--#{$prefix}calendar-cell-week-number-color);
-}
-
-.calendar-cell-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--#{$prefix}calendar-table-cell-size);
-}
-
-.calendar-row,
-.calendar-cell {
-  text-align: center;
-
-  &.disabled .calendar-cell-inner,
-  &.next .calendar-cell-inner,
-  &.previous .calendar-cell-inner {
-    color: var(--#{$prefix}calendar-cell-disabled-color);
-    cursor: not-allowed;
-  }
-
-  &.range .calendar-cell-inner {
-    position: relative;
-
-    &::after {
-      position: absolute;
+    // the component renders the icon inline; it inherits color and fills the box
+    > svg {
+      display: block;
       width: 100%;
       height: 100%;
-      content: "";
-      background: var(--#{$prefix}calendar-cell-range-bg);
     }
   }
 
-  &.range-hover .calendar-cell-inner {
+  .calendar-header-cell-inner {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--#{$prefix}calendar-table-cell-size);
+    font-weight: var(--#{$prefix}calendar-cell-header-inner-font-weight);
+    color: var(--#{$prefix}calendar-cell-header-inner-color);
+  }
 
-    &::before {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      content: "";
-      border-top: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-      border-bottom: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-      @include border-radius(0);
+  .calendar-cell-week-number {
+    font-weight: var(--#{$prefix}calendar-cell-week-number-font-weight);
+    color: var(--#{$prefix}calendar-cell-week-number-color);
+  }
+
+  .calendar-cell-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--#{$prefix}calendar-table-cell-size);
+  }
+
+  .calendar-row,
+  .calendar-cell {
+    text-align: center;
+
+    &.disabled .calendar-cell-inner,
+    &.next .calendar-cell-inner,
+    &.previous .calendar-cell-inner {
+      color: var(--#{$prefix}calendar-cell-disabled-color);
+      cursor: not-allowed;
+    }
+
+    &.range .calendar-cell-inner {
+      position: relative;
+
+      &::after {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        content: "";
+        background: var(--#{$prefix}calendar-cell-range-bg);
+      }
+    }
+
+    &.range-hover .calendar-cell-inner {
+      position: relative;
+
+      &::before {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        content: "";
+        border-top: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+        border-bottom: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+        @include border-radius(0);
+      }
+    }
+
+    &.selected:not(th, .next, .previous) .calendar-cell-inner {
+      color: var(--#{$prefix}calendar-cell-selected-color);
+      background-color: var(--#{$prefix}calendar-cell-selected-bg);
+    }
+
+    &.today .calendar-cell-inner {
+      color: var(--#{$prefix}calendar-cell-today-color);
     }
   }
 
-  &.selected:not(th, .next, .previous) .calendar-cell-inner {
-    color: var(--#{$prefix}calendar-cell-selected-color);
-    background-color: var(--#{$prefix}calendar-cell-selected-bg);
-  }
+  .calendar-cell {
+    padding: 1px 0;
 
-  &.today .calendar-cell-inner {
-    color: var(--#{$prefix}calendar-cell-today-color);
-  }
-}
-
-.calendar-cell {
-  padding: 1px 0;
-
-  .calendars:not(.select-week) &:not(.disabled, .next, .previous):hover,
-  .calendars:not(.select-week) &.clickable:hover {
-    .calendar-cell-inner {
-      color: var(--#{$prefix}calendar-cell-hover-color);
-      cursor: pointer;
-      background-color: var(--#{$prefix}calendar-cell-hover-bg);
-      @include border-radius($border-radius);
+    .calendars:not(.select-week) &:not(.disabled, .next, .previous):hover,
+    .calendars:not(.select-week) &.clickable:hover {
+      .calendar-cell-inner {
+        color: var(--#{$prefix}calendar-cell-hover-color);
+        cursor: pointer;
+        background-color: var(--#{$prefix}calendar-cell-hover-bg);
+        @include border-radius($border-radius);
+      }
     }
-  }
 
-  .calendars:not(.select-week) &.range:not(.range ~ *) .calendar-cell-inner::after {
-    @include border-start-radius($border-radius);
-  }
-
-  .calendars:not(.select-week) &.range:not(:has(~ .range)) .calendar-cell-inner::after {
-    @include border-end-radius($border-radius);
-  }
-
-  &.range-hover:first-of-type,
-  &:not(.range-hover) + &.range-hover {
-    .calendar-cell-inner::before {
-      border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+    .calendars:not(.select-week) &.range:not(.range ~ *) .calendar-cell-inner::after {
       @include border-start-radius($border-radius);
     }
-  }
 
-  &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner::before {
-    border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-    @include border-end-radius($border-radius);
-  }
+    .calendars:not(.select-week) &.range:not(:has(~ .range)) .calendar-cell-inner::after {
+      @include border-end-radius($border-radius);
+    }
 
-  // stylelint-disable-next-line at-rule-no-vendor-prefix
-  @-moz-document url-prefix() {
-    .calendars:not(.select-week) &:nth-last-child(1 of .range),
-    .calendars:not(.select-week) &:nth-last-child(1 of .available) {
-      .calendar-cell-inner::after {
+    &.range-hover:first-of-type,
+    &:not(.range-hover) + &.range-hover {
+      .calendar-cell-inner::before {
+        border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+        @include border-start-radius($border-radius);
+      }
+    }
+
+    &.range-hover:not(:has(~ .range-hover)) .calendar-cell-inner::before {
+      border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+      @include border-end-radius($border-radius);
+    }
+
+    // stylelint-disable-next-line at-rule-no-vendor-prefix
+    @-moz-document url-prefix() {
+      .calendars:not(.select-week) &:nth-last-child(1 of .range),
+      .calendars:not(.select-week) &:nth-last-child(1 of .available) {
+        .calendar-cell-inner::after {
+          @include border-end-radius($border-radius);
+        }
+      }
+
+      &:nth-last-child(1 of .range-hover) .calendar-cell-inner::before {
+        border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
         @include border-end-radius($border-radius);
       }
     }
 
-    &:nth-last-child(1 of .range-hover) .calendar-cell-inner::before {
-      border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-      @include border-end-radius($border-radius);
+    &.selected:not(th) .calendar-cell-inner {
+      @include border-radius($border-radius);
+    }
+
+    .calendars:not(.select-week) &:focus-visible {
+      outline: 0;
+
+      .calendar-cell-inner {
+        box-shadow: var(--#{$prefix}calendar-cell-focus-box-shadow);
+        @include border-radius($border-radius);
+      }
     }
   }
 
-  &.selected:not(th) .calendar-cell-inner {
-    @include border-radius($border-radius);
-  }
+  .calendar-row {
+    .calendars.select-week &:not(.disabled):hover,
+    .calendars.select-week &.clickable:hover {
+      .calendar-cell-inner {
+        color: var(--#{$prefix}calendar-cell-hover-color);
+        cursor: pointer;
+        background-color: var(--#{$prefix}calendar-cell-hover-bg);
+      }
+    }
 
-  .calendars:not(.select-week) &:focus-visible {
-    outline: 0;
+    .selected:not(th) .calendar-cell-inner {
+      @include border-radius($border-radius);
+    }
 
-    .calendar-cell-inner {
+    .calendar-cell:first-of-type .calendar-cell-inner {
+      @include border-start-radius($border-radius);
+      &::before,
+      &::after {
+        @include border-start-radius($border-radius);
+      }
+    }
+
+    .calendar-cell:last-of-type .calendar-cell-inner {
+      @include border-end-radius($border-radius);
+      &::before,
+      &::after {
+        @include border-end-radius($border-radius);
+      }
+    }
+
+    &.range-hover .calendar-cell:first-of-type .calendar-cell-inner::before {
+      border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+    }
+
+    &.range-hover .calendar-cell:last-of-type .calendar-cell-inner::before {
+      border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
+    }
+
+    &:focus-visible {
+      outline: 0;
       box-shadow: var(--#{$prefix}calendar-cell-focus-box-shadow);
       @include border-radius($border-radius);
     }
-  }
-}
-
-.calendar-row {
-  .calendars.select-week &:not(.disabled):hover,
-  .calendars.select-week &.clickable:hover {
-    .calendar-cell-inner {
-      color: var(--#{$prefix}calendar-cell-hover-color);
-      cursor: pointer;
-      background-color: var(--#{$prefix}calendar-cell-hover-bg);
-    }
-  }
-
-  .selected:not(th) .calendar-cell-inner {
-    @include border-radius($border-radius);
-  }
-
-  .calendar-cell:first-of-type .calendar-cell-inner {
-    @include border-start-radius($border-radius);
-    &::before,
-    &::after {
-      @include border-start-radius($border-radius);
-    }
-  }
-
-  .calendar-cell:last-of-type .calendar-cell-inner {
-    @include border-end-radius($border-radius);
-    &::before,
-    &::after {
-      @include border-end-radius($border-radius);
-    }
-  }
-
-  &.range-hover .calendar-cell:first-of-type .calendar-cell-inner::before {
-    border-inline-start: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-  }
-
-  &.range-hover .calendar-cell:last-of-type .calendar-cell-inner::before {
-    border-inline-end: 1px dashed var(--#{$prefix}calendar-cell-selected-bg);
-  }
-
-  &:focus-visible {
-    outline: 0;
-    box-shadow: var(--#{$prefix}calendar-cell-focus-box-shadow);
-    @include border-radius($border-radius);
   }
 }

@@ -3,108 +3,110 @@
 @use "../variables" as *;
 @use "sidebar" as *;
 
-.sidebar-narrow {
-  // scss-docs-start sidebar-narrow-css-vars
-  --#{$prefix}sidebar-narrow-width: #{$sidebar-narrow-width};
-  --#{$prefix}sidebar-padding-x: #{$sidebar-narrow-padding-x};
-  // scss-docs-end sidebar-narrow-css-vars
+@layer components {
+  .sidebar-narrow {
+    // scss-docs-start sidebar-narrow-css-vars
+    --#{$prefix}sidebar-narrow-width: #{$sidebar-narrow-width};
+    --#{$prefix}sidebar-padding-x: #{$sidebar-narrow-padding-x};
+    // scss-docs-end sidebar-narrow-css-vars
 
-  @include media-breakpoint-up($mobile-breakpoint) {
-    flex: 0 0 var(--#{$prefix}sidebar-narrow-width);
-    width: var(--#{$prefix}sidebar-narrow-width);
-    padding-bottom: var(--#{$prefix}sidebar-toggler-height);
-    overflow: visible;
+    @include media-breakpoint-up($mobile-breakpoint) {
+      flex: 0 0 var(--#{$prefix}sidebar-narrow-width);
+      width: var(--#{$prefix}sidebar-narrow-width);
+      padding-bottom: var(--#{$prefix}sidebar-toggler-height);
+      overflow: visible;
 
-    .sidebar-header {
-      justify-content: center;
-      padding-inline: 0;
+      .sidebar-header {
+        justify-content: center;
+        padding-inline: 0;
+      }
+
+      .sidebar-nav {
+        --#{$prefix}sidebar-nav-link-padding-x: #{$sidebar-narrow-nav-link-padding-x};
+        --#{$prefix}sidebar-nav-link-padding-y: #{$sidebar-narrow-nav-link-padding-y};
+      }
+
+      .nav-link {
+        overflow: hidden;
+      }
+
+      .nav-icon {
+        flex: 0 0 calc(var(--#{$prefix}sidebar-narrow-width) - (var(--#{$prefix}sidebar-nav-padding-x) * 2) - (var(--#{$prefix}sidebar-nav-link-padding-x) * 2)); // stylelint-disable-line function-disallowed-list
+      }
+
+      .nav-label,
+      .nav-title,
+      .nav-group-items,
+      .sidebar-form {
+        height: 0 !important; // stylelint-disable-line declaration-no-important
+        padding: 0 !important; // stylelint-disable-line declaration-no-important
+        margin: 0 !important; // stylelint-disable-line declaration-no-important
+        visibility: hidden;
+        opacity: 0;
+      }
+
+      .d-narrow-none, // deprecated, TODO: remove in v6.0.0
+      .sidebar-brand-full, // deprecated, TODO: remove in v6.0.0
+      .d-sidebar-narrow-none {
+        display: none !important // stylelint-disable-line declaration-no-important
+      }
+
+      .sidebar-toggler::before {
+        @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
+      }
+
+      &.sidebar-end .sidebar-toggler::before {
+        transform: rotate(0deg);
+      }
     }
+  }
 
-    .sidebar-nav {
-      --#{$prefix}sidebar-nav-link-padding-x: #{$sidebar-narrow-nav-link-padding-x};
-      --#{$prefix}sidebar-nav-link-padding-y: #{$sidebar-narrow-nav-link-padding-y};
-    }
+  .sidebar-narrow-unfoldable {
+    // scss-docs-start sidebar-narrow-unfoldable-css-vars
+    --#{$prefix}sidebar-narrow-unfoldable-box-shadow: #{$sidebar-narrow-unfoldable-box-shadow};
+    // scss-docs-end sidebar-narrow-unfoldable-css-vars
 
-    .nav-link {
-      overflow: hidden;
-    }
-
-    .nav-icon {
-      flex: 0 0 calc(var(--#{$prefix}sidebar-narrow-width) - (var(--#{$prefix}sidebar-nav-padding-x) * 2) - (var(--#{$prefix}sidebar-nav-link-padding-x) * 2)); // stylelint-disable-line function-disallowed-list
-    }
-
-    .nav-label,
-    .nav-title,
-    .nav-group-items,
-    .sidebar-form {
-      height: 0 !important; // stylelint-disable-line declaration-no-important
-      padding: 0 !important; // stylelint-disable-line declaration-no-important
-      margin: 0 !important; // stylelint-disable-line declaration-no-important
-      visibility: hidden;
-      opacity: 0;
-    }
-
-    .d-narrow-none, // deprecated, TODO: remove in v6.0.0
-    .sidebar-brand-full, // deprecated, TODO: remove in v6.0.0
-    .d-sidebar-narrow-none {
+    .d-sidebar-narrow-unfoldable-none {
       display: none !important // stylelint-disable-line declaration-no-important
     }
 
-    .sidebar-toggler::before {
-      @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
+    @extend .sidebar-fixed;
+
+    &:not(:hover) {
+      @extend .sidebar-narrow;
     }
 
-    &.sidebar-end .sidebar-toggler::before {
-      transform: rotate(0deg);
-    }
-  }
-}
+    &:hover {
+      box-shadow: var(--#{$prefix}sidebar-narrow-unfoldable-box-shadow);
 
-.sidebar-narrow-unfoldable {
-  // scss-docs-start sidebar-narrow-unfoldable-css-vars
-  --#{$prefix}sidebar-narrow-unfoldable-box-shadow: #{$sidebar-narrow-unfoldable-box-shadow};
-  // scss-docs-end sidebar-narrow-unfoldable-css-vars
+      .sidebar-toggler::before {
+        @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
+      }
 
-  .d-sidebar-narrow-unfoldable-none {
-    display: none !important // stylelint-disable-line declaration-no-important
-  }
-
-  @extend .sidebar-fixed;
-
-  &:not(:hover) {
-    @extend .sidebar-narrow;
-  }
-
-  &:hover {
-    box-shadow: var(--#{$prefix}sidebar-narrow-unfoldable-box-shadow);
-
-    .sidebar-toggler::before {
-      @include ltr-rtl("transform", rotate(-180deg), null, rotate(0deg));
-    }
-
-    &.sidebar-end .sidebar-toggler::before {
-      transform: rotate(0deg);
+      &.sidebar-end .sidebar-toggler::before {
+        transform: rotate(0deg);
+      }
     }
   }
-}
 
-.sidebar-narrow,
-.sidebar-narrow-unfoldable {
-  @include media-breakpoint-up($mobile-breakpoint) {
-    &:not(.sidebar-end):not(.hide) ~ * {
-      --#{$prefix}sidebar-occupy-start: #{$sidebar-narrow-width};
-    }
-    &.sidebar-end:not(.hide) ~ * {
-      --#{$prefix}sidebar-occupy-end: #{$sidebar-narrow-width};
+  .sidebar-narrow,
+  .sidebar-narrow-unfoldable {
+    @include media-breakpoint-up($mobile-breakpoint) {
+      &:not(.sidebar-end):not(.hide) ~ * {
+        --#{$prefix}sidebar-occupy-start: #{$sidebar-narrow-width};
+      }
+      &.sidebar-end:not(.hide) ~ * {
+        --#{$prefix}sidebar-occupy-end: #{$sidebar-narrow-width};
+      }
     }
   }
-}
 
-.sidebar:not(.sidebar-narrow) .sidebar-brand-narrow, // deprecated, TODO: remove in v6.0.0
-.sidebar:not(.sidebar-narrow) .d-sidebar-narrow {
-  display: none !important; // stylelint-disable-line declaration-no-important
-}
+  .sidebar:not(.sidebar-narrow) .sidebar-brand-narrow, // deprecated, TODO: remove in v6.0.0
+  .sidebar:not(.sidebar-narrow) .d-sidebar-narrow {
+    display: none !important; // stylelint-disable-line declaration-no-important
+  }
 
-.sidebar:not(.sidebar-narrow-unfoldable) .d-sidebar-narrow-unfoldable {
-  display: none !important; // stylelint-disable-line declaration-no-important
+  .sidebar:not(.sidebar-narrow-unfoldable) .d-sidebar-narrow-unfoldable {
+    display: none !important; // stylelint-disable-line declaration-no-important
+  }
 }

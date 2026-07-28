@@ -4,143 +4,59 @@
 @use "mixins/elevation" as *;
 @use "variables" as *;
 
-// Lean pickers-v2 shell styling (workspace: architecture/pickers-v2.md, "Styling
-// budget"). Compiled AFTER _date-picker.scss and replaces it once the v1 shell
-// retires. The shell styles only what it owns: the field is styled by
-// forms/_form-date-time.scss, the popup content by _calendar.scss, icons are
-// inline SVG rendered by the component (the chips pattern), projected footer
-// content is userland. Sass knobs reuse the existing $date-picker-* shell-layer
-// variables — no new configuration surface.
+@layer components {
+  // Lean pickers-v2 shell styling (workspace: architecture/pickers-v2.md, "Styling
+  // budget"). Compiled AFTER _date-picker.scss and replaces it once the v1 shell
+  // retires. The shell styles only what it owns: the field is styled by
+  // forms/_form-date-time.scss, the popup content by _calendar.scss, icons are
+  // inline SVG rendered by the component (the chips pattern), projected footer
+  // content is userland. Sass knobs reuse the existing $date-picker-* shell-layer
+  // variables — no new configuration surface.
 
-.date-picker,
-*:not(.date-picker) > .date-picker-dropdown {
-  // scss-docs-start date-picker-v2-css-vars
-  --#{$prefix}date-picker-zindex: #{$date-picker-zindex};
-  --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width};
-  --#{$prefix}date-picker-indicator-color: #{$date-picker-indicator-icon-color};
-  --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg};
-  --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width};
-  --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
-  --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
-  --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow};
-  --#{$prefix}date-picker-bg: #{$date-picker-bg};
-  --#{$prefix}date-picker-border-width: #{$date-picker-border-width};
-  --#{$prefix}date-picker-border-color: #{$date-picker-border-color};
-  --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius};
-  --#{$prefix}date-picker-focus-border-color: #{$date-picker-focus-border-color};
-  --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding};
-  --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width};
-  --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color};
-  // scss-docs-end date-picker-v2-css-vars
-}
-
-.date-picker {
-  position: relative;
-}
-
-.date-picker-input-group {
-  display: flex;
-  align-items: center;
-  padding: var(--#{$prefix}date-picker-padding-y) var(--#{$prefix}date-picker-padding-x);
-  @include font-size(var(--#{$prefix}date-picker-font-size));
-  background-color: var(--#{$prefix}date-picker-bg);
-  background-clip: padding-box;
-  border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
-  @include border-radius(var(--#{$prefix}date-picker-border-radius));
-
-  &:focus-within {
-    border-color: var(--#{$prefix}date-picker-focus-border-color);
+  .date-picker,
+  *:not(.date-picker) > .date-picker-dropdown {
+    // scss-docs-start date-picker-v2-css-vars
+    --#{$prefix}date-picker-zindex: #{$date-picker-zindex};
+    --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width};
+    --#{$prefix}date-picker-indicator-color: #{$date-picker-indicator-icon-color};
+    --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg};
+    --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width};
+    --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
+    --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
+    --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow};
+    --#{$prefix}date-picker-bg: #{$date-picker-bg};
+    --#{$prefix}date-picker-border-width: #{$date-picker-border-width};
+    --#{$prefix}date-picker-border-color: #{$date-picker-border-color};
+    --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius};
+    --#{$prefix}date-picker-focus-border-color: #{$date-picker-focus-border-color};
+    --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding};
+    --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width};
+    --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color};
+    // scss-docs-end date-picker-v2-css-vars
   }
 
-  // The group is the frame — the section field inside must not draw a second
-  // one, or the control ends up as tall as both boxes stacked. Sizing then
-  // follows the group's padding/font-size properties, which the existing
-  // .date-picker-sm/-lg classes already redefine.
-  .form-date-time {
-    flex: 1;
-    min-height: 0;
-    padding: 0;
-    font-size: inherit;
-    line-height: inherit;
-    background-color: transparent;
-    border: 0;
-    @include border-radius(0);
-    box-shadow: none;
+  .date-picker {
+    position: relative;
   }
-}
 
-.date-picker-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--#{$prefix}date-picker-indicator-width);
-  padding: 0;
-  color: var(--#{$prefix}date-picker-indicator-color);
-  background: transparent;
-  border: 0;
-
-  &:focus {
-    z-index: 5;
-    outline: 0;
-    box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
-    @include border-radius($border-radius);
-  }
-}
-
-// TRANSITIONAL (remove with _date-picker.scss / _time-picker.scss): the v1
-// partials paint the indicator and separator icons via ::before masks; the v2
-// shells render inline SVG, so the v1 pseudo-elements must not double them.
-.date-picker-v2 .date-picker-indicator::before,
-.date-picker-v2 .date-picker-separator::before,
-.time-picker-v2 .time-picker-indicator::before {
-  content: none;
-}
-
-.date-picker-dropdown {
-  position: absolute;
-  z-index: var(--#{$prefix}date-picker-zindex);
-  display: none;
-  width: min-content;
-  background-color: var(--#{$prefix}date-picker-dropdown-bg);
-  background-clip: padding-box;
-  border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
-  @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
-  @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
-  @include elevation(4);
-
-  .date-picker.show &,
-  &.show {
-    display: block;
-  }
-}
-
-.date-picker-body {
-  display: flex;
-}
-
-// The time picker shell mirrors the date picker's frame, but reads the
-// --#{$prefix}time-picker-* properties: its root carries `.time-picker`, so the
-// date picker's custom properties are not defined here.
-.time-picker-v2 {
-  position: relative;
-
-  .time-picker-input-group {
+  .date-picker-input-group {
     display: flex;
-    flex-wrap: nowrap;
-    gap: 0;
     align-items: center;
-    padding: var(--#{$prefix}time-picker-padding-y) var(--#{$prefix}time-picker-padding-x);
-    @include font-size(var(--#{$prefix}time-picker-font-size));
-    background-color: var(--#{$prefix}time-picker-bg);
+    padding: var(--#{$prefix}date-picker-padding-y) var(--#{$prefix}date-picker-padding-x);
+    @include font-size(var(--#{$prefix}date-picker-font-size));
+    background-color: var(--#{$prefix}date-picker-bg);
     background-clip: padding-box;
-    border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);
-    @include border-radius(var(--#{$prefix}time-picker-border-radius));
+    border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
+    @include border-radius(var(--#{$prefix}date-picker-border-radius));
 
     &:focus-within {
-      border-color: var(--#{$prefix}time-picker-focus-border-color);
+      border-color: var(--#{$prefix}date-picker-focus-border-color);
     }
 
-    // see .date-picker-input-group — the group is the frame
+    // The group is the frame — the section field inside must not draw a second
+    // one, or the control ends up as tall as both boxes stacked. Sizing then
+    // follows the group's padding/font-size properties, which the existing
+    // .date-picker-sm/-lg classes already redefine.
     .form-date-time {
       flex: 1;
       min-height: 0;
@@ -154,81 +70,167 @@
     }
   }
 
-  .time-picker-indicator {
+  .date-picker-indicator {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--#{$prefix}time-picker-indicator-width);
+    width: var(--#{$prefix}date-picker-indicator-width);
     padding: 0;
-    color: var(--#{$prefix}time-picker-indicator-icon-color);
+    color: var(--#{$prefix}date-picker-indicator-color);
     background: transparent;
     border: 0;
-  }
-}
 
-// the date-time picker puts the calendar and the time body side by side. The
-// time body's layout rules are global but read --#{$prefix}time-picker-* custom
-// properties that _time-picker.scss only defines on `.time-picker`; this shell's
-// root is a date picker, so the ones the body needs are declared here.
-.date-time-picker {
-  .date-picker-timepickers {
+    &:focus {
+      z-index: 5;
+      outline: 0;
+      box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+      @include border-radius($border-radius);
+    }
+  }
+
+  // TRANSITIONAL (remove with _date-picker.scss / _time-picker.scss): the v1
+  // partials paint the indicator and separator icons via ::before masks; the v2
+  // shells render inline SVG, so the v1 pseudo-elements must not double them.
+  .date-picker-v2 .date-picker-indicator::before,
+  .date-picker-v2 .date-picker-separator::before,
+  .time-picker-v2 .time-picker-indicator::before {
+    content: none;
+  }
+
+  .date-picker-dropdown {
+    position: absolute;
+    z-index: var(--#{$prefix}date-picker-zindex);
+    display: none;
+    width: min-content;
+    background-color: var(--#{$prefix}date-picker-dropdown-bg);
+    background-clip: padding-box;
+    border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
+    @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
+    @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
+    @include elevation(4);
+
+    .date-picker.show &,
+    &.show {
+      display: block;
+    }
+  }
+
+  .date-picker-body {
     display: flex;
-    border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
   }
 
-  .time-picker-body {
-    --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
-    --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height};
-    --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width};
-    --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
-    --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color};
-    --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
-    --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
-    --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg};
-    --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color};
-    --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
-    --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
-    --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color};
-    --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color};
-    --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
-    --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x};
-    --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
+  // The time picker shell mirrors the date picker's frame, but reads the
+  // --#{$prefix}time-picker-* properties: its root carries `.time-picker`, so the
+  // date picker's custom properties are not defined here.
+  .time-picker-v2 {
+    position: relative;
+
+    .time-picker-input-group {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0;
+      align-items: center;
+      padding: var(--#{$prefix}time-picker-padding-y) var(--#{$prefix}time-picker-padding-x);
+      @include font-size(var(--#{$prefix}time-picker-font-size));
+      background-color: var(--#{$prefix}time-picker-bg);
+      background-clip: padding-box;
+      border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);
+      @include border-radius(var(--#{$prefix}time-picker-border-radius));
+
+      &:focus-within {
+        border-color: var(--#{$prefix}time-picker-focus-border-color);
+      }
+
+      // see .date-picker-input-group — the group is the frame
+      .form-date-time {
+        flex: 1;
+        min-height: 0;
+        padding: 0;
+        font-size: inherit;
+        line-height: inherit;
+        background-color: transparent;
+        border: 0;
+        @include border-radius(0);
+        box-shadow: none;
+      }
+    }
+
+    .time-picker-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--#{$prefix}time-picker-indicator-width);
+      padding: 0;
+      color: var(--#{$prefix}time-picker-indicator-icon-color);
+      background: transparent;
+      border: 0;
+    }
   }
-}
 
-.date-picker-ranges {
-  display: flex;
-  flex-direction: column;
-  gap: .25rem;
-  align-items: flex-start;
-  padding: var(--#{$prefix}date-picker-footer-padding);
-  border-inline-end: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
-}
+  // the date-time picker puts the calendar and the time body side by side. The
+  // time body's layout rules are global but read --#{$prefix}time-picker-* custom
+  // properties that _time-picker.scss only defines on `.time-picker`; this shell's
+  // root is a date picker, so the ones the body needs are declared here.
+  .date-time-picker {
+    .date-picker-timepickers {
+      display: flex;
+      border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+    }
 
-.date-picker-separator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--#{$prefix}date-picker-indicator-width);
-  color: var(--#{$prefix}date-picker-indicator-color);
-}
-
-.date-picker-calendars {
-  display: flex;
-
-  .date-picker-calendar:not(:last-child) .calendar-navigation-next {
-    visibility: hidden;
+    .time-picker-body {
+      --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
+      --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height};
+      --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width};
+      --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
+      --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color};
+      --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
+      --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
+      --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg};
+      --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color};
+      --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
+      --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
+      --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color};
+      --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color};
+      --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
+      --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x};
+      --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
+    }
   }
 
-  .date-picker-calendar:not(:first-child) .calendar-navigation-prev {
-    visibility: hidden;
+  .date-picker-ranges {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    align-items: flex-start;
+    padding: var(--#{$prefix}date-picker-footer-padding);
+    border-inline-end: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
   }
-}
 
-.date-picker-footer {
-  display: flex;
-  gap: .5rem;
-  justify-content: flex-end;
-  padding: var(--#{$prefix}date-picker-footer-padding);
-  border-top: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+  .date-picker-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--#{$prefix}date-picker-indicator-width);
+    color: var(--#{$prefix}date-picker-indicator-color);
+  }
+
+  .date-picker-calendars {
+    display: flex;
+
+    .date-picker-calendar:not(:last-child) .calendar-navigation-next {
+      visibility: hidden;
+    }
+
+    .date-picker-calendar:not(:first-child) .calendar-navigation-prev {
+      visibility: hidden;
+    }
+  }
+
+  .date-picker-footer {
+    display: flex;
+    gap: .5rem;
+    justify-content: flex-end;
+    padding: var(--#{$prefix}date-picker-footer-padding);
+    border-top: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+  }
 }
