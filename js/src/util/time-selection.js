@@ -130,7 +130,7 @@ class TimeSelection extends Config {
       this._renderRoll()
     }
 
-    this._markSelected()
+    this._markSelected(true)
   }
 
   _parts() {
@@ -249,7 +249,13 @@ class TimeSelection extends Config {
     execute(this._config.onChange, [undefined, date])
   }
 
-  _markSelected() {
+  // v1 scrolls the selected cell into view — without it a value like 14:30 marks
+  // a minute cell that sits below the visible part of the column.
+  _scrollToSelected(column, cell, instant) {
+    column.scrollTo({ behavior: instant ? 'instant' : 'smooth', top: cell.offsetTop })
+  }
+
+  _markSelected(instant = false) {
     const selected = {
       hours: getSelectedHour(this._date, this._config.locale),
       meridiem: this._ampm,
@@ -276,6 +282,11 @@ class TimeSelection extends Config {
         const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value)
         cell.classList.toggle(CLASS_NAME_SELECTED, isSelected)
         cell.setAttribute('aria-selected', isSelected ? 'true' : 'false')
+        cell.tabIndex = isSelected ? 0 : -1
+
+        if (isSelected && cell.parentElement) {
+          this._scrollToSelected(cell.parentElement, cell, instant)
+        }
       }
     }
   }

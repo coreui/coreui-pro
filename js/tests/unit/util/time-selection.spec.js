@@ -165,6 +165,27 @@ describe('TimeSelection', () => {
       expect(cells('minutes').length).toBeGreaterThan(0)
     })
 
+    it('should scroll the selected cell to the top of its column', () => {
+      // the karma page carries no stylesheet, so the column cannot actually
+      // scroll — assert the request instead of the resulting scrollTop
+      const scrollSpy = spyOn(Element.prototype, 'scrollTo')
+      const selection = build({ time: new Date(2026, 0, 1, 2, 30, 0) })
+      const minuteCell = fixtureEl.querySelector('[data-coreui-minutes="30"]')
+
+      expect(minuteCell.classList.contains('selected')).toBeTrue()
+      expect(selection.getTime().getMinutes()).toEqual(30)
+      expect(scrollSpy).toHaveBeenCalledWith(
+        jasmine.objectContaining({ behavior: 'instant', top: minuteCell.offsetTop })
+      )
+    })
+
+    it('should make the selected cell the tabbable one', () => {
+      build({ time: new Date(2026, 0, 1, 2, 30, 0) })
+
+      expect(fixtureEl.querySelector('[data-coreui-minutes="30"]').tabIndex).toBe(0)
+      expect(fixtureEl.querySelector('[data-coreui-minutes="31"]').tabIndex).toBe(-1)
+    })
+
     it('should mark the selected cells after an update', () => {
       const selection = build()
 

@@ -277,9 +277,11 @@ class TimePickerV2 extends BaseComponent {
         EventHandler.trigger(this._element, EVENT_HIDE)
       },
       onShow: () => {
-        this._ensureSelection()
+        // the classes come first: the selection body scrolls the selected cell
+        // into view, which needs the dropdown to have layout
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
+        this._ensureSelection()
         this._element.setAttribute('aria-expanded', 'true')
         EventHandler.trigger(this._element, EVENT_SHOW)
       },

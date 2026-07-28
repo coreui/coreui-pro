@@ -128,20 +128,25 @@
   display: flex;
 }
 
-// the time picker shell reuses the date picker's frame and indicator rules
+// The time picker shell mirrors the date picker's frame, but reads the
+// --#{$prefix}time-picker-* properties: its root carries `.time-picker`, so the
+// date picker's custom properties are not defined here.
 .time-picker-v2 {
   position: relative;
 
   .time-picker-input-group {
     display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
     align-items: stretch;
-    background-color: var(--#{$prefix}date-picker-bg);
+    padding: 0;
+    background-color: var(--#{$prefix}time-picker-bg);
     background-clip: padding-box;
-    border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
-    @include border-radius(var(--#{$prefix}date-picker-border-radius));
+    border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);
+    @include border-radius(var(--#{$prefix}time-picker-border-radius));
 
     &:focus-within {
-      border-color: var(--#{$prefix}date-picker-focus-border-color);
+      border-color: var(--#{$prefix}time-picker-focus-border-color);
     }
 
     .form-date-time {
@@ -156,9 +161,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--#{$prefix}date-picker-indicator-width);
+    width: var(--#{$prefix}time-picker-indicator-width);
     padding: 0;
-    color: var(--#{$prefix}date-picker-indicator-color);
+    color: var(--#{$prefix}time-picker-indicator-icon-color);
     background: transparent;
     border: 0;
   }
