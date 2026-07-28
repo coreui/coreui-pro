@@ -529,14 +529,16 @@ class Calendar extends BaseComponent {
   _setEndDate(date) {
     this._endDate = setTimeFromDate(date, this._endDate)
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-      date: getDateBySelectionType(this._endDate, this._config.selectionType)
+      date: getDateBySelectionType(this._endDate, this._config.selectionType),
+      dateObject: this._endDate
     })
   }
 
   _setStartDate(date) {
     this._startDate = setTimeFromDate(date, this._startDate)
     EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-      date: getDateBySelectionType(this._startDate, this._config.selectionType)
+      date: getDateBySelectionType(this._startDate, this._config.selectionType),
+      dateObject: this._startDate
     })
   }
 

@@ -16,6 +16,7 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
+import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -25,6 +26,7 @@ import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
 const NAME = 'date-range-picker-v2'
 const DATA_KEY = 'coreui.date-range-picker-v2'
 const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
@@ -34,6 +36,7 @@ const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
@@ -50,6 +53,7 @@ const CLASS_NAME_RANGES = 'date-picker-ranges'
 const CLASS_NAME_SEPARATOR = 'date-picker-separator'
 const CLASS_NAME_SHOW = 'show'
 
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker-v2"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
@@ -75,6 +79,7 @@ const Default = {
   sanitize: true,
   sanitizeFn: null,
   separatorIcon: DEFAULT_SEPARATOR_ICON,
+  size: null,
   startDate: null,
   startName: null
 }
@@ -96,6 +101,7 @@ const DefaultType = {
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
   separatorIcon: 'string',
+  size: '(string|null)',
   startDate: '(date|string|null)'
 }
 
@@ -204,6 +210,32 @@ class DateRangePickerV2 extends BaseComponent {
   }
 
   // Private
+  // See DatePickerV2._forwardConfig — options the inner primitives know about
+  // are forwarded by name so data attributes reach them.
+  _forwardConfig(Component, overrides = {}, extra = {}) {
+    const forwarded = {}
+
+    for (const key of Object.keys(Component.Default)) {
+      if (key in this._config && this._config[key] !== Default[key]) {
+        forwarded[key] = this._config[key]
+      }
+    }
+
+    return { ...forwarded, ...overrides, ...extra }
+  }
+
+  // See DatePickerV2._resolveFormat — a date mask can only express the sections
+  // it has, so month/year selection get a narrower default mask.
+  _resolveFormat() {
+    if (this._config.format) {
+      return this._config.format
+    }
+
+    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+
+    return byType[this._config.selectionType] ?? null
+  }
+
   _setSelectEndDate(value) {
     if (this._selectEndDate === value) {
       return
@@ -220,21 +252,23 @@ class DateRangePickerV2 extends BaseComponent {
   _createInput(date, name) {
     const inputEl = document.createElement('div')
 
-    const input = new DateInput(inputEl, {
+    const input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date,
       disabled: this._config.disabled,
       locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
       name,
-      ...this._config.inputOptions
-    })
+      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
+    }, this._config.inputOptions))
 
     return { input, inputEl }
   }
 
   _createDateRangePicker() {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_PICKER_V2, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
+
+    if (this._config.size) {
+      this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
+    }
 
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
@@ -287,16 +321,13 @@ class DateRangePickerV2 extends BaseComponent {
     body.append(calendars)
     this._menu.append(body)
 
-    this._calendar = new Calendar(calendarEl, {
+    this._calendar = new Calendar(calendarEl, this._forwardConfig(Calendar, {
       calendars: this._config.calendars,
       endDate: this._config.endDate,
       locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
       range: true,
-      startDate: this._config.startDate,
-      ...this._config.calendarOptions
-    })
+      startDate: this._config.startDate
+    }, this._config.calendarOptions))
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')
@@ -354,17 +385,17 @@ class DateRangePickerV2 extends BaseComponent {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      const { date } = event
-      this._startInput.update({ date })
-      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date })
+      const { date, dateObject } = event
+      this._startInput.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date, dateObject })
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
-      const { date } = event
-      this._endInput.update({ date })
-      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date })
+      const { date, dateObject } = event
+      this._endInput.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date, dateObject })
 
-      if (date && this.getStartDate() && !this._footerTemplate) {
+      if (dateObject && this.getStartDate() && !this._footerTemplate) {
         this.hide()
       }
     })
@@ -379,5 +410,21 @@ class DateRangePickerV2 extends BaseComponent {
     })
   }
 }
+
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    DateRangePickerV2.getOrCreateInstance(element)
+  }
+})
+
+/**
+ * jQuery
+ */
+
+defineJQueryPlugin(DateRangePickerV2)
 
 export default DateRangePickerV2

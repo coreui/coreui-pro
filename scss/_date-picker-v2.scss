@@ -1,4 +1,5 @@
 @use "mixins/border-radius" as *;
+@use "vendor/rfs" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
 @use "variables" as *;
@@ -99,6 +100,26 @@
   .date-picker.show &,
   &.show {
     display: block;
+  }
+}
+
+.date-picker-sm {
+  --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius-sm};
+  --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width-sm};
+
+  .form-date-time {
+    @include font-size($date-picker-font-size-sm);
+    padding: $date-picker-padding-y-sm $date-picker-padding-x-sm;
+  }
+}
+
+.date-picker-lg {
+  --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius-lg};
+  --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width-lg};
+
+  .form-date-time {
+    @include font-size($date-picker-font-size-lg);
+    padding: $date-picker-padding-y-lg $date-picker-padding-x-lg;
   }
 }
 

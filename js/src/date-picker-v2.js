@@ -18,6 +18,7 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
+import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
 
 /**
@@ -27,6 +28,7 @@ import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
 const NAME = 'date-picker-v2'
 const DATA_KEY = 'coreui.date-picker-v2'
 const EVENT_KEY = `.${DATA_KEY}`
+const DATA_API_KEY = '.data-api'
 
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`
@@ -34,6 +36,7 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
@@ -47,6 +50,7 @@ const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_SHOW = 'show'
 
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker-v2"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
@@ -69,7 +73,8 @@ const Default = {
   minDate: null,
   name: null,
   sanitize: true,
-  sanitizeFn: null
+  sanitizeFn: null,
+  size: null
 }
 
 const DefaultType = {
@@ -86,7 +91,8 @@ const DefaultType = {
   minDate: '(date|string|null)',
   name: '(string|null)',
   sanitize: 'boolean',
-  sanitizeFn: '(function|null)'
+  sanitizeFn: '(function|null)',
+  size: '(string|null)'
 }
 
 /**
@@ -185,12 +191,45 @@ class DatePickerV2 extends BaseComponent {
   }
 
   // Private
+  // Options the inner primitives know about are forwarded by name, so
+  // `data-coreui-selection-type`, `data-coreui-format`, … work without the
+  // shell re-declaring the whole calendar/field surface. The dedicated
+  // *Options objects stay as the programmatic escape hatch.
+  _forwardConfig(Component, overrides = {}, extra = {}) {
+    const forwarded = {}
+
+    for (const key of Object.keys(Component.Default)) {
+      if (key in this._config && this._config[key] !== Default[key]) {
+        forwarded[key] = this._config[key]
+      }
+    }
+
+    return { ...forwarded, ...overrides, ...extra }
+  }
+
+  // A date mask can only express the sections it has: month/year selection get
+  // a narrower default mask, day (and the week/quarter types, whose value is the
+  // underlying day) keep the locale mask. An explicit `format` always wins.
+  _resolveFormat() {
+    if (this._config.format) {
+      return this._config.format
+    }
+
+    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+
+    return byType[this._config.selectionType] ?? null
+  }
+
   _sanitizeIcon(icon) {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
   _createDatePicker() {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_PICKER_V2, CLASS_NAME_PICKER)
+
+    if (this._config.size) {
+      this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
+    }
 
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
@@ -208,15 +247,13 @@ class DatePickerV2 extends BaseComponent {
 
     this._element.append(inputGroup)
 
-    this._input = new DateInput(inputEl, {
+    this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
       locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
       name: this._config.name,
-      ...this._config.inputOptions
-    })
+      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
+    }, this._config.inputOptions))
 
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_DROPDOWN)
@@ -233,13 +270,10 @@ class DatePickerV2 extends BaseComponent {
     body.append(calendars)
     this._menu.append(body)
 
-    this._calendar = new Calendar(calendarEl, {
+    this._calendar = new Calendar(calendarEl, this._forwardConfig(Calendar, {
       locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
-      startDate: this._config.date,
-      ...this._config.calendarOptions
-    })
+      startDate: this._config.date
+    }, this._config.calendarOptions))
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')
@@ -281,9 +315,11 @@ class DatePickerV2 extends BaseComponent {
     })
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      const { date } = event
-      this._input.update({ date })
-      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
+      // `date` is formatted per selectionType ("2026-01", "2026Q1", …);
+      // `dateObject` is the underlying Date the section field can hold
+      const { date, dateObject } = event
+      this._input.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, dateObject })
       this.hide()
     })
 
@@ -297,5 +333,21 @@ class DatePickerV2 extends BaseComponent {
     })
   }
 }
+
+/**
+ * Data API implementation
+ */
+
+EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    DatePickerV2.getOrCreateInstance(element)
+  }
+})
+
+/**
+ * jQuery
+ */
+
+defineJQueryPlugin(DatePickerV2)
 
 export default DatePickerV2
