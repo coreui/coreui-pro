@@ -1,9 +1,11 @@
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/gradients" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
+@use "vendor/rfs" as *;
 
 // scss-docs-start progress-variables
 $progress-height:                   1rem !default;
@@ -21,6 +23,23 @@ $progress-group-margin-bottom:         $spacer !default;
 $progress-group-header-margin-bottom:  $spacer * .25 !default;
 // scss-docs-end progress-variables
 
+$progress-tokens: () !default;
+
+// scss-docs-start progress-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$progress-tokens: defaults(
+  (
+    --#{$prefix}progress-height: #{$progress-height},
+    --#{$prefix}progress-bg: #{$progress-bg},
+    --#{$prefix}progress-border-radius: #{$progress-border-radius},
+    --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
+    --#{$prefix}progress-bar-color: #{$progress-bar-color},
+    --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
+    --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
+  ),
+  $progress-tokens
+);
+// scss-docs-end progress-css-vars
 @layer components {
   // Disable animation if transitions are disabled
 
@@ -34,16 +53,8 @@ $progress-group-header-margin-bottom:  $spacer * .25 !default;
 
   .progress,
   .progress-stacked {
-    // scss-docs-start progress-css-vars
-    --#{$prefix}progress-height: #{$progress-height};
+    @include tokens($progress-tokens);
     @include rfs($progress-font-size, --#{$prefix}progress-font-size);
-    --#{$prefix}progress-bg: #{$progress-bg};
-    --#{$prefix}progress-border-radius: #{$progress-border-radius};
-    --#{$prefix}progress-box-shadow: #{$progress-box-shadow};
-    --#{$prefix}progress-bar-color: #{$progress-bar-color};
-    --#{$prefix}progress-bar-bg: #{$progress-bar-bg};
-    --#{$prefix}progress-bar-transition: #{$progress-bar-transition};
-    // scss-docs-end progress-css-vars
 
     display: flex;
     height: var(--#{$prefix}progress-height);

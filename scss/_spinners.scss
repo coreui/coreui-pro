@@ -1,4 +1,8 @@
+@use "functions/defaults" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start spinner-variables
 $spinner-width:           2rem !default;
@@ -12,6 +16,52 @@ $spinner-height-sm:       $spinner-width-sm !default;
 $spinner-border-width-sm: .2em !default;
 // scss-docs-end spinner-variables
 
+$spinner-border-tokens: () !default;
+
+// scss-docs-start spinner-border-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$spinner-border-tokens: defaults(
+  (
+    --#{$prefix}spinner-width: #{$spinner-width},
+    --#{$prefix}spinner-height: #{$spinner-height},
+    --#{$prefix}spinner-vertical-align: #{$spinner-vertical-align},
+    --#{$prefix}spinner-border-width: #{$spinner-border-width},
+    --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
+    --#{$prefix}spinner-animation-name: spinner-border,
+  ),
+  $spinner-border-tokens
+);
+// scss-docs-end spinner-border-css-vars
+
+$spinner-border-sm-tokens: () !default;
+
+// scss-docs-start spinner-border-sm-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$spinner-border-sm-tokens: defaults(
+  (
+    --#{$prefix}spinner-width: #{$spinner-width-sm},
+    --#{$prefix}spinner-height: #{$spinner-height-sm},
+    --#{$prefix}spinner-border-width: #{$spinner-border-width-sm},
+  ),
+  $spinner-border-sm-tokens
+);
+// scss-docs-end spinner-border-sm-css-vars
+
+$spinner-grow-tokens: () !default;
+
+// scss-docs-start spinner-grow-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$spinner-grow-tokens: defaults(
+  (
+    --#{$prefix}spinner-width: #{$spinner-width},
+    --#{$prefix}spinner-height: #{$spinner-height},
+    --#{$prefix}spinner-vertical-align: #{$spinner-vertical-align},
+    --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed},
+    --#{$prefix}spinner-animation-name: spinner-grow,
+  ),
+  $spinner-grow-tokens
+);
+// scss-docs-end spinner-grow-css-vars
 @layer components {
   //
   // Rotating border
@@ -36,25 +86,14 @@ $spinner-border-width-sm: .2em !default;
   // scss-docs-end spinner-border-keyframes
 
   .spinner-border {
-    // scss-docs-start spinner-border-css-vars
-    --#{$prefix}spinner-width: #{$spinner-width};
-    --#{$prefix}spinner-height: #{$spinner-height};
-    --#{$prefix}spinner-vertical-align: #{$spinner-vertical-align};
-    --#{$prefix}spinner-border-width: #{$spinner-border-width};
-    --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed};
-    --#{$prefix}spinner-animation-name: spinner-border;
-    // scss-docs-end spinner-border-css-vars
+    @include tokens($spinner-border-tokens);
 
     border: var(--#{$prefix}spinner-border-width) solid currentcolor;
     border-right-color: transparent;
   }
 
   .spinner-border-sm {
-    // scss-docs-start spinner-border-sm-css-vars
-    --#{$prefix}spinner-width: #{$spinner-width-sm};
-    --#{$prefix}spinner-height: #{$spinner-height-sm};
-    --#{$prefix}spinner-border-width: #{$spinner-border-width-sm};
-    // scss-docs-end spinner-border-sm-css-vars
+    @include tokens($spinner-border-sm-tokens);
   }
 
   //
@@ -74,13 +113,7 @@ $spinner-border-width-sm: .2em !default;
   // scss-docs-end spinner-grow-keyframes
 
   .spinner-grow {
-    // scss-docs-start spinner-grow-css-vars
-    --#{$prefix}spinner-width: #{$spinner-width};
-    --#{$prefix}spinner-height: #{$spinner-height};
-    --#{$prefix}spinner-vertical-align: #{$spinner-vertical-align};
-    --#{$prefix}spinner-animation-speed: #{$spinner-animation-speed};
-    --#{$prefix}spinner-animation-name: spinner-grow;
-    // scss-docs-end spinner-grow-css-vars
+    @include tokens($spinner-grow-tokens);
 
     background-color: currentcolor;
     opacity: 0;

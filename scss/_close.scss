@@ -1,8 +1,10 @@
+@use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/color-mode" as *;
-@use "variables" as *;
+@use "mixins/tokens" as *;
 @use "variables-dark" as *;
+@use "variables" as *;
 
 // scss-docs-start close-variables
 $btn-close-width:            1em !default;
@@ -22,6 +24,23 @@ $btn-close-white-filter:     invert(1) grayscale(100%) brightness(200%) !default
 
 $btn-close-filter-dark:      $btn-close-white-filter !default;
 
+$close-tokens: () !default;
+
+// scss-docs-start close-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$close-tokens: defaults(
+  (
+    --#{$prefix}btn-close-color: #{$btn-close-color},
+    --#{$prefix}btn-close-bg: #{ escape-svg($btn-close-bg) },
+    --#{$prefix}btn-close-opacity: #{$btn-close-opacity},
+    --#{$prefix}btn-close-hover-opacity: #{$btn-close-hover-opacity},
+    --#{$prefix}btn-close-focus-shadow: #{$btn-close-focus-shadow},
+    --#{$prefix}btn-close-focus-opacity: #{$btn-close-focus-opacity},
+    --#{$prefix}btn-close-disabled-opacity: #{$btn-close-disabled-opacity},
+  ),
+  $close-tokens
+);
+// scss-docs-end close-css-vars
 @layer components {
   // Transparent background and border properties included for button version.
   // iOS requires the button element instead of an anchor tag.
@@ -29,15 +48,7 @@ $btn-close-filter-dark:      $btn-close-white-filter !default;
   // See https://developer.mozilla.org/en-US/docs/Web/Events/click#Safari_Mobile
 
   .btn-close {
-    // scss-docs-start close-css-vars
-    --#{$prefix}btn-close-color: #{$btn-close-color};
-    --#{$prefix}btn-close-bg: #{ escape-svg($btn-close-bg) };
-    --#{$prefix}btn-close-opacity: #{$btn-close-opacity};
-    --#{$prefix}btn-close-hover-opacity: #{$btn-close-hover-opacity};
-    --#{$prefix}btn-close-focus-shadow: #{$btn-close-focus-shadow};
-    --#{$prefix}btn-close-focus-opacity: #{$btn-close-focus-opacity};
-    --#{$prefix}btn-close-disabled-opacity: #{$btn-close-disabled-opacity};
-    // scss-docs-end close-css-vars
+    @include tokens($close-tokens);
 
     box-sizing: content-box;
     width: $btn-close-width;

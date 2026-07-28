@@ -1,6 +1,10 @@
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
-@use "vendor/rfs" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
+@use "vendor/rfs" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start toast-variables
 $toast-max-width:                   350px !default;
@@ -20,25 +24,34 @@ $toast-header-background-color:     rgba(var(--#{$prefix}body-bg-rgb), .85) !def
 $toast-header-border-color:         $toast-border-color !default;
 // scss-docs-end toast-variables
 
+$toast-tokens: () !default;
+
+// scss-docs-start toast-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$toast-tokens: defaults(
+  (
+    --#{$prefix}toast-zindex: #{$zindex-toast},
+    --#{$prefix}toast-padding-x: #{$toast-padding-x},
+    --#{$prefix}toast-padding-y: #{$toast-padding-y},
+    --#{$prefix}toast-spacing: #{$toast-spacing},
+    --#{$prefix}toast-max-width: #{$toast-max-width},
+    --#{$prefix}toast-color: #{$toast-color},
+    --#{$prefix}toast-bg: #{$toast-background-color},
+    --#{$prefix}toast-border-width: #{$toast-border-width},
+    --#{$prefix}toast-border-color: #{$toast-border-color},
+    --#{$prefix}toast-border-radius: #{$toast-border-radius},
+    --#{$prefix}toast-box-shadow: #{$toast-box-shadow},
+    --#{$prefix}toast-header-color: #{$toast-header-color},
+    --#{$prefix}toast-header-bg: #{$toast-header-background-color},
+    --#{$prefix}toast-header-border-color: #{$toast-header-border-color},
+  ),
+  $toast-tokens
+);
+// scss-docs-end toast-css-vars
 @layer components {
   .toast {
-    // scss-docs-start toast-css-vars
-    --#{$prefix}toast-zindex: #{$zindex-toast};
-    --#{$prefix}toast-padding-x: #{$toast-padding-x};
-    --#{$prefix}toast-padding-y: #{$toast-padding-y};
-    --#{$prefix}toast-spacing: #{$toast-spacing};
-    --#{$prefix}toast-max-width: #{$toast-max-width};
+    @include tokens($toast-tokens);
     @include rfs($toast-font-size, --#{$prefix}toast-font-size);
-    --#{$prefix}toast-color: #{$toast-color};
-    --#{$prefix}toast-bg: #{$toast-background-color};
-    --#{$prefix}toast-border-width: #{$toast-border-width};
-    --#{$prefix}toast-border-color: #{$toast-border-color};
-    --#{$prefix}toast-border-radius: #{$toast-border-radius};
-    --#{$prefix}toast-box-shadow: #{$toast-box-shadow};
-    --#{$prefix}toast-header-color: #{$toast-header-color};
-    --#{$prefix}toast-header-bg: #{$toast-header-background-color};
-    --#{$prefix}toast-header-border-color: #{$toast-header-border-color};
-    // scss-docs-end toast-css-vars
 
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;

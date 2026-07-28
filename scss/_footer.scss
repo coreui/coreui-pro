@@ -1,4 +1,6 @@
+@use "functions/defaults" as *;
 @use "mixins/elevation" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
 
 // Footer
@@ -12,17 +14,26 @@ $footer-border-width:  var(--#{$prefix}border-width) !default;
 $footer-border-color:  var(--#{$prefix}border-color) !default;
 // scss-docs-end footer-variables
 
+$footer-tokens: () !default;
+
+// scss-docs-start footer-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$footer-tokens: defaults(
+  (
+    --#{$prefix}footer-min-height: #{$footer-min-height},
+    --#{$prefix}footer-padding-x: #{$footer-padding-x},
+    --#{$prefix}footer-padding-y: #{$footer-padding-y},
+    --#{$prefix}footer-color: #{$footer-color},
+    --#{$prefix}footer-bg: #{$footer-bg},
+    --#{$prefix}footer-border-color: #{$footer-border-color},
+    --#{$prefix}footer-border: #{$footer-border-width} solid var(--#{$prefix}footer-border-color),
+  ),
+  $footer-tokens
+);
+// scss-docs-end footer-css-vars
 @layer components {
   .footer {
-    // scss-docs-start footer-css-vars
-    --#{$prefix}footer-min-height: #{$footer-min-height};
-    --#{$prefix}footer-padding-x: #{$footer-padding-x};
-    --#{$prefix}footer-padding-y: #{$footer-padding-y};
-    --#{$prefix}footer-color: #{$footer-color};
-    --#{$prefix}footer-bg: #{$footer-bg};
-    --#{$prefix}footer-border-color: #{$footer-border-color};
-    --#{$prefix}footer-border: #{$footer-border-width} solid var(--#{$prefix}footer-border-color);
-    // scss-docs-end footer-css-vars
+    @include tokens($footer-tokens);
 
     display: flex;
     flex-wrap: wrap; // allow us to do the line break for collapsing content

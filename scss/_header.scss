@@ -1,8 +1,10 @@
 @use "functions/color" as *;
+@use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/breakpoints" as *;
 @use "mixins/elevation" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
 @use "vendor/rfs" as *;
@@ -48,35 +50,44 @@ $header-divider-border-width:   var(--#{$prefix}border-width) !default;
 $header-divider-border-color:   var(--#{$prefix}border-color) !default;
 // scss-docs-end header-variables
 
+$header-tokens: () !default;
+
+// scss-docs-start header-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$header-tokens: defaults(
+  (
+    --#{$prefix}header-padding-x: #{$header-padding-x},
+    --#{$prefix}header-padding-y: #{$header-padding-y},
+    --#{$prefix}header-bg: #{$header-bg},
+    --#{$prefix}header-color: #{$header-color},
+    --#{$prefix}header-border-color: #{$header-border-color},
+    --#{$prefix}header-border: #{$header-border-width} solid var(--#{$prefix}header-border-color),
+    --#{$prefix}header-hover-color: #{$header-hover-color},
+    --#{$prefix}header-disabled-color: #{$header-disabled-color},
+    --#{$prefix}header-active-color: #{$header-active-color},
+    --#{$prefix}header-transition: #{$header-transition},
+    --#{$prefix}header-brand-padding-y: #{$header-brand-padding-y},
+    --#{$prefix}header-brand-color: #{$header-brand-color},
+    --#{$prefix}header-brand-hover-color: #{$header-brand-hover-color},
+    --#{$prefix}header-toggler-padding-x: #{$header-toggler-padding-x},
+    --#{$prefix}header-toggler-padding-y: #{$header-toggler-padding-y},
+    --#{$prefix}header-toggler-bg: #{$header-toggler-bg},
+    --#{$prefix}header-toggler-color: #{$header-toggler-color},
+    --#{$prefix}header-toggler-border-radius: #{$header-toggler-border-radius},
+    --#{$prefix}header-toggler-hover-color: #{$header-toggler-hover-color},
+    --#{$prefix}header-toggler-icon-bg: #{escape-svg($header-toggler-icon-bg)},
+    --#{$prefix}header-toggler-hover-icon-bg: #{escape-svg($header-toggler-hover-icon-bg)},
+    --#{$prefix}header-nav-link-padding-x: #{$header-nav-link-padding-x},
+    --#{$prefix}header-nav-link-padding-y: #{$header-nav-link-padding-y},
+    --#{$prefix}header-divider-border-color: #{$header-divider-border-color},
+    --#{$prefix}header-divider-border: #{$header-divider-border-width} solid var(--#{$prefix}header-divider-border-color),
+  ),
+  $header-tokens
+);
+// scss-docs-end header-css-vars
 @layer components {
   .header {
-    // scss-docs-start header-css-vars
-    --#{$prefix}header-padding-x: #{$header-padding-x};
-    --#{$prefix}header-padding-y: #{$header-padding-y};
-    --#{$prefix}header-bg: #{$header-bg};
-    --#{$prefix}header-color: #{$header-color};
-    --#{$prefix}header-border-color: #{$header-border-color};
-    --#{$prefix}header-border: #{$header-border-width} solid var(--#{$prefix}header-border-color);
-    --#{$prefix}header-hover-color: #{$header-hover-color};
-    --#{$prefix}header-disabled-color: #{$header-disabled-color};
-    --#{$prefix}header-active-color: #{$header-active-color};
-    --#{$prefix}header-transition: #{$header-transition};
-    --#{$prefix}header-brand-padding-y: #{$header-brand-padding-y};
-    --#{$prefix}header-brand-color: #{$header-brand-color};
-    --#{$prefix}header-brand-hover-color: #{$header-brand-hover-color};
-    --#{$prefix}header-toggler-padding-x: #{$header-toggler-padding-x};
-    --#{$prefix}header-toggler-padding-y: #{$header-toggler-padding-y};
-    --#{$prefix}header-toggler-bg: #{$header-toggler-bg};
-    --#{$prefix}header-toggler-color: #{$header-toggler-color};
-    --#{$prefix}header-toggler-border-radius: #{$header-toggler-border-radius};
-    --#{$prefix}header-toggler-hover-color: #{$header-toggler-hover-color};
-    --#{$prefix}header-toggler-icon-bg: #{escape-svg($header-toggler-icon-bg)};
-    --#{$prefix}header-toggler-hover-icon-bg: #{escape-svg($header-toggler-hover-icon-bg)};
-    --#{$prefix}header-nav-link-padding-x: #{$header-nav-link-padding-x};
-    --#{$prefix}header-nav-link-padding-y: #{$header-nav-link-padding-y};
-    --#{$prefix}header-divider-border-color: #{$header-divider-border-color};
-    --#{$prefix}header-divider-border: #{$header-divider-border-width} solid var(--#{$prefix}header-divider-border-color);
-    // scss-docs-end header-css-vars
+    @include tokens($header-tokens);
 
     position: relative;
     display: flex;

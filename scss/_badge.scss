@@ -1,6 +1,10 @@
+@use "functions/defaults" as *;
 @use "mixins/gradients" as *;
-@use "vendor/rfs" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
+@use "vendor/rfs" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start badge-variables
 $badge-font-size:                   .75em !default;
@@ -15,6 +19,21 @@ $badge-padding-y-sm:                .3em !default;
 $badge-padding-x-sm:                .5em !default;
 // scss-docs-end badge-variables
 
+$badge-tokens: () !default;
+
+// scss-docs-start badge-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$badge-tokens: defaults(
+  (
+    --#{$prefix}badge-padding-x: #{$badge-padding-x},
+    --#{$prefix}badge-padding-y: #{$badge-padding-y},
+    --#{$prefix}badge-font-weight: #{$badge-font-weight},
+    --#{$prefix}badge-color: #{$badge-color},
+    --#{$prefix}badge-border-radius: #{$badge-border-radius},
+  ),
+  $badge-tokens
+);
+// scss-docs-end badge-css-vars
 @layer components {
   // Base class
   //
@@ -22,14 +41,8 @@ $badge-padding-x-sm:                .5em !default;
   // `background-color`.
 
   .badge {
-    // scss-docs-start badge-css-vars
-    --#{$prefix}badge-padding-x: #{$badge-padding-x};
-    --#{$prefix}badge-padding-y: #{$badge-padding-y};
+    @include tokens($badge-tokens);
     @include rfs($badge-font-size, --#{$prefix}badge-font-size);
-    --#{$prefix}badge-font-weight: #{$badge-font-weight};
-    --#{$prefix}badge-color: #{$badge-color};
-    --#{$prefix}badge-border-radius: #{$badge-border-radius};
-    // scss-docs-end badge-css-vars
 
     display: inline-block;
     padding: var(--#{$prefix}badge-padding-y) var(--#{$prefix}badge-padding-x);

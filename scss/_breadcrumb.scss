@@ -1,9 +1,11 @@
 @use "sass:string";
+@use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/ltr-rtl" as *;
-@use "vendor/rfs" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
+@use "vendor/rfs" as *;
 
 // scss-docs-start breadcrumb-variables
 $breadcrumb-font-size:              null !default;
@@ -19,19 +21,28 @@ $breadcrumb-divider-flipped:        $breadcrumb-divider !default;
 $breadcrumb-border-radius:          null !default;
 // scss-docs-end breadcrumb-variables
 
+$breadcrumb-tokens: () !default;
+
+// scss-docs-start breadcrumb-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$breadcrumb-tokens: defaults(
+  (
+    --#{$prefix}breadcrumb-padding-x: #{$breadcrumb-padding-x},
+    --#{$prefix}breadcrumb-padding-y: #{$breadcrumb-padding-y},
+    --#{$prefix}breadcrumb-margin-bottom: #{$breadcrumb-margin-bottom},
+    --#{$prefix}breadcrumb-bg: #{$breadcrumb-bg},
+    --#{$prefix}breadcrumb-border-radius: #{$breadcrumb-border-radius},
+    --#{$prefix}breadcrumb-divider-color: #{$breadcrumb-divider-color},
+    --#{$prefix}breadcrumb-item-padding-x: #{$breadcrumb-item-padding-x},
+    --#{$prefix}breadcrumb-item-active-color: #{$breadcrumb-active-color},
+  ),
+  $breadcrumb-tokens
+);
+// scss-docs-end breadcrumb-css-vars
 @layer components {
   .breadcrumb {
-    // scss-docs-start breadcrumb-css-vars
-    --#{$prefix}breadcrumb-padding-x: #{$breadcrumb-padding-x};
-    --#{$prefix}breadcrumb-padding-y: #{$breadcrumb-padding-y};
-    --#{$prefix}breadcrumb-margin-bottom: #{$breadcrumb-margin-bottom};
+    @include tokens($breadcrumb-tokens);
     @include rfs($breadcrumb-font-size, --#{$prefix}breadcrumb-font-size);
-    --#{$prefix}breadcrumb-bg: #{$breadcrumb-bg};
-    --#{$prefix}breadcrumb-border-radius: #{$breadcrumb-border-radius};
-    --#{$prefix}breadcrumb-divider-color: #{$breadcrumb-divider-color};
-    --#{$prefix}breadcrumb-item-padding-x: #{$breadcrumb-item-padding-x};
-    --#{$prefix}breadcrumb-item-active-color: #{$breadcrumb-active-color};
-    // scss-docs-end breadcrumb-css-vars
 
     display: flex;
     flex-wrap: wrap;

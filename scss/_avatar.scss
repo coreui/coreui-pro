@@ -1,7 +1,11 @@
 @use "sass:map";
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // Avatars
 // scss-docs-start avatar-variables
@@ -56,17 +60,26 @@ $avatar-widths: (
 ) !default;
 // fusv-enable
 
+$avatar-tokens: () !default;
+
+// scss-docs-start avatar-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$avatar-tokens: defaults(
+  (
+    --#{$prefix}avatar-width: #{$avatar-width},
+    --#{$prefix}avatar-height: #{$avatar-height},
+    --#{$prefix}avatar-font-size: #{$avatar-font-size},
+    --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
+    --#{$prefix}avatar-status-width: #{$avatar-status-width},
+    --#{$prefix}avatar-status-height: #{$avatar-status-height},
+    --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
+  ),
+  $avatar-tokens
+);
+// scss-docs-end avatar-css-vars
 @layer components {
   .avatar {
-    // scss-docs-start avatar-css-vars
-    --#{$prefix}avatar-width: #{$avatar-width};
-    --#{$prefix}avatar-height: #{$avatar-height};
-    --#{$prefix}avatar-font-size: #{$avatar-font-size};
-    --#{$prefix}avatar-border-radius: #{$avatar-border-radius};
-    --#{$prefix}avatar-status-width: #{$avatar-status-width};
-    --#{$prefix}avatar-status-height: #{$avatar-status-height};
-    --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius};
-    // scss-docs-end avatar-css-vars
+    @include tokens($avatar-tokens);
 
     position: relative;
     display: inline-flex;
