@@ -2,6 +2,19 @@
 @use "vendor/rfs" as *;
 @use "variables" as *;
 
+// scss-docs-start badge-variables
+$badge-font-size:                   .75em !default;
+$badge-font-weight:                 $font-weight-bold !default;
+$badge-color:                       $white !default;
+$badge-padding-y:                   .35em !default;
+$badge-padding-x:                   .65em !default;
+$badge-border-radius:               var(--#{$prefix}border-radius) !default;
+
+$badge-font-size-sm:                .65em !default;
+$badge-padding-y-sm:                .3em !default;
+$badge-padding-x-sm:                .5em !default;
+// scss-docs-end badge-variables
+
 @layer components {
   // Base class
   //

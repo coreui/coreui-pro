@@ -1,6 +1,17 @@
 @use "mixins/elevation" as *;
 @use "variables" as *;
 
+// Footer
+// scss-docs-start footer-variables
+$footer-min-height:    3rem !default;
+$footer-padding-y:     $spacer * .5 !default;
+$footer-padding-x:     $spacer !default;
+$footer-bg:            var(--#{$prefix}tertiary-bg) !default;
+$footer-color:         var(--#{$prefix}body-color) !default;
+$footer-border-width:  var(--#{$prefix}border-width) !default;
+$footer-border-color:  var(--#{$prefix}border-color) !default;
+// scss-docs-end footer-variables
+
 @layer components {
   .footer {
     // scss-docs-start footer-css-vars
