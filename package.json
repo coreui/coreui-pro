@@ -84,6 +84,7 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "peerDependencies": {
+    "@floating-ui/dom": "^1.8.0",
     "@popperjs/core": "^2.11.8"
   },
   "devDependencies": {
@@ -92,6 +93,7 @@
     "@babel/preset-env": "^7.29.7",
     "@coreui/astro-docs": "0.1.1",
     "@eslint/markdown": "^7.5.1",
+    "@floating-ui/dom": "^1.8.0",
     "@popperjs/core": "^2.11.8",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
