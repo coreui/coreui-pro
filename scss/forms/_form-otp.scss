@@ -2,7 +2,6 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/transition" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 
 @layer forms {
@@ -16,7 +15,7 @@
     width: $form-otp-control-width;
     padding: $form-otp-control-padding-y $form-otp-control-padding-x;
     font-family: $form-otp-control-font-family;
-    @include font-size($form-otp-control-font-size);
+    font-size: $form-otp-control-font-size;
     font-weight: $form-otp-control-font-weight;
     line-height: $form-otp-control-line-height;
     color: $form-otp-control-color;
@@ -49,14 +48,14 @@
   .form-otp-sm .form-otp-control {
     width: $form-otp-control-width-sm;
     padding: $form-otp-control-padding-y-sm $form-otp-control-padding-x-sm;
-    @include font-size($form-otp-control-font-size-sm);
+    font-size: $form-otp-control-font-size-sm;
     @include border-radius($form-otp-control-border-radius-sm);
   }
 
   .form-otp-lg .form-otp-control{
     width: $form-otp-control-width-lg;
     padding: $form-otp-control-padding-y-lg $form-otp-control-padding-x-lg;
-    @include font-size($form-otp-control-font-size-lg);
+    font-size: $form-otp-control-font-size-lg;
     @include border-radius($form-otp-control-border-radius-lg);
   }
 }

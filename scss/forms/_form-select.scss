@@ -4,7 +4,6 @@
 @use "../mixins/color-mode" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/transition" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 @use "../variables-dark" as *;
 
@@ -24,7 +23,7 @@
     padding-top: $form-select-padding-y;
     padding-bottom: $form-select-padding-y;
     font-family: $form-select-font-family;
-    @include font-size($form-select-font-size);
+    font-size: $form-select-font-size;
     font-weight: $form-select-font-weight;
     line-height: $form-select-line-height;
     color: $form-select-color;
@@ -73,7 +72,7 @@
     padding-inline-start: $form-select-padding-x-sm;
     padding-top: $form-select-padding-y-sm;
     padding-bottom: $form-select-padding-y-sm;
-    @include font-size($form-select-font-size-sm);
+    font-size: $form-select-font-size-sm;
     @include border-radius($form-select-border-radius-sm);
   }
 
@@ -81,7 +80,7 @@
     padding-inline-start: $form-select-padding-x-lg;
     padding-top: $form-select-padding-y-lg;
     padding-bottom: $form-select-padding-y-lg;
-    @include font-size($form-select-font-size-lg);
+    font-size: $form-select-font-size-lg;
     @include border-radius($form-select-border-radius-lg);
   }
 

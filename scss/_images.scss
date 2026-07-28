@@ -1,7 +1,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/image" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer content {
@@ -44,7 +43,7 @@
   }
 
   .figure-caption {
-    @include font-size($figure-caption-font-size);
+    font-size: $figure-caption-font-size;
     color: var(--#{$prefix}figure-caption-color, $figure-caption-color);
   }
 }

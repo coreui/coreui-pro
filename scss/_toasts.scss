@@ -2,7 +2,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "variables" as *;
-@use "vendor/rfs" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 
@@ -44,6 +43,7 @@ $toast-tokens: defaults(
     --#{$prefix}toast-header-color: #{$toast-header-color},
     --#{$prefix}toast-header-bg: #{$toast-header-background-color},
     --#{$prefix}toast-header-border-color: #{$toast-header-border-color},
+    --#{$prefix}toast-font-size: $toast-font-size,
   ),
   $toast-tokens
 );
@@ -51,11 +51,10 @@ $toast-tokens: defaults(
 @layer components {
   .toast {
     @include tokens($toast-tokens);
-    @include rfs($toast-font-size, --#{$prefix}toast-font-size);
 
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
-    @include font-size(var(--#{$prefix}toast-font-size));
+    font-size: var(--#{$prefix}toast-font-size);
     color: var(--#{$prefix}toast-color);
     pointer-events: auto;
     background-color: var(--#{$prefix}toast-bg);

@@ -3,7 +3,6 @@
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer components {
@@ -148,7 +147,7 @@
     min-width: 0;
     padding: var(--#{$prefix}autocomplete-padding-y) var(--#{$prefix}autocomplete-padding-x);
     font-family: var(--#{$prefix}autocomplete-font-family);
-    @include font-size(var(--#{$prefix}autocomplete-font-size));
+    font-size: var(--#{$prefix}autocomplete-font-size);
     font-weight: var(--#{$prefix}autocomplete-font-weight);
     line-height: var(--#{$prefix}autocomplete-line-height);
     color: var(--#{$prefix}autocomplete-color);

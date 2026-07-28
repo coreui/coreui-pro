@@ -7,7 +7,6 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
-@use "vendor/rfs" as *;
 
 // Header
 // scss-docs-start header-variables
@@ -143,7 +142,7 @@ $header-tokens: defaults(
     padding-top: var(--#{$prefix}header-brand-padding-y);
     padding-bottom: var(--#{$prefix}header-brand-padding-y);
     margin-inline-end: $header-brand-margin-end;
-    @include font-size($header-brand-font-size);
+    font-size: $header-brand-font-size;
     color: var(--#{$prefix}header-brand-color);
     text-decoration: if(not sass($link-decoration == none): none);
     white-space: nowrap;
@@ -213,7 +212,7 @@ $header-tokens: defaults(
 
   .header-toggler {
     padding: var(--#{$prefix}header-toggler-padding-y) var(--#{$prefix}header-toggler-padding-x);
-    @include font-size($header-toggler-font-size);
+    font-size: $header-toggler-font-size;
     color: var(--#{$prefix}header-toggler-color);
     background-color: var(--#{$prefix}header-toggler-bg);
     border: 0; // remove default button style

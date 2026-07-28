@@ -5,7 +5,6 @@
 @use "mixins/color-mode" as *;
 @use "mixins/gradients" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 @use "variables-dark" as *;
 
@@ -19,7 +18,7 @@
     --#{$prefix}btn-padding-x: #{$btn-padding-x};
     --#{$prefix}btn-padding-y: #{$btn-padding-y};
     --#{$prefix}btn-font-family: #{$btn-font-family};
-    @include rfs($btn-font-size, --#{$prefix}btn-font-size);
+    --#{$prefix}btn-font-size: #{$btn-font-size};
     --#{$prefix}btn-font-weight: #{$btn-font-weight};
     --#{$prefix}btn-line-height: #{$btn-line-height};
     --#{$prefix}btn-color: #{$btn-color};
@@ -36,7 +35,7 @@
     display: inline-block;
     padding: var(--#{$prefix}btn-padding-y) var(--#{$prefix}btn-padding-x);
     font-family: var(--#{$prefix}btn-font-family);
-    @include font-size(var(--#{$prefix}btn-font-size));
+    font-size: var(--#{$prefix}btn-font-size);
     font-weight: var(--#{$prefix}btn-font-weight);
     line-height: var(--#{$prefix}btn-line-height);
     color: var(--#{$prefix}btn-color);

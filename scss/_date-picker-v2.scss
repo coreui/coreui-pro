@@ -1,5 +1,4 @@
 @use "mixins/border-radius" as *;
-@use "vendor/rfs" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
 @use "variables" as *;
@@ -43,7 +42,7 @@
     display: flex;
     align-items: center;
     padding: var(--#{$prefix}date-picker-padding-y) var(--#{$prefix}date-picker-padding-x);
-    @include font-size(var(--#{$prefix}date-picker-font-size));
+    font-size: var(--#{$prefix}date-picker-font-size);
     background-color: var(--#{$prefix}date-picker-bg);
     background-clip: padding-box;
     border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
@@ -131,7 +130,7 @@
       gap: 0;
       align-items: center;
       padding: var(--#{$prefix}time-picker-padding-y) var(--#{$prefix}time-picker-padding-x);
-      @include font-size(var(--#{$prefix}time-picker-font-size));
+      font-size: var(--#{$prefix}time-picker-font-size);
       background-color: var(--#{$prefix}time-picker-bg);
       background-clip: padding-box;
       border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);

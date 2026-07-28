@@ -3,7 +3,6 @@
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer components {
@@ -141,7 +140,7 @@
     min-width: 0;
     padding: 0;
     font-family: var(--#{$prefix}time-picker-font-family);
-    @include font-size(var(--#{$prefix}time-picker-font-size));
+    font-size: var(--#{$prefix}time-picker-font-size);
     font-weight: var(--#{$prefix}time-picker-font-weight);
     line-height: var(--#{$prefix}time-picker-line-height);
     color: var(--#{$prefix}time-picker-color);
@@ -252,13 +251,13 @@
 
   .time-picker-inline-select {
     padding: var(--#{$prefix}time-picker-inline-select-padding-y) var(--#{$prefix}time-picker-inline-select-padding-x);
+    font-size: var(--#{$prefix}time-picker-inline-select-font-size);
     color: var(--#{$prefix}time-picker-inline-select-color);
     text-align: end;
     appearance: none;
     scrollbar-width: none;  /* Firefox */
     background-color: transparent;
     border: 0;
-    @include font-size(var(--#{$prefix}time-picker-inline-select-font-size));
 
     -ms-overflow-style: none;  /* Internet Explorer 10+ */
 

@@ -1,5 +1,4 @@
 @use "../functions/math" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 
 @layer forms {
@@ -9,7 +8,7 @@
 
   .form-label {
     margin-bottom: $form-label-margin-bottom;
-    @include font-size($form-label-font-size);
+    font-size: $form-label-font-size;
     font-style: $form-label-font-style;
     font-weight: $form-label-font-weight;
     color: $form-label-color;
@@ -21,7 +20,7 @@
     padding-top: add($input-padding-y, $input-border-width);
     padding-bottom: add($input-padding-y, $input-border-width);
     margin-bottom: 0; // Override the `<legend>` default
-    @include font-size(inherit); // Override the `<legend>` default
+    font-size: inherit; // Override the `<legend>` default
     font-style: $form-label-font-style;
     font-weight: $form-label-font-weight;
     line-height: $input-line-height;
@@ -31,12 +30,12 @@
   .col-form-label-lg {
     padding-top: add($input-padding-y-lg, $input-border-width);
     padding-bottom: add($input-padding-y-lg, $input-border-width);
-    @include font-size($input-font-size-lg);
+    font-size: $input-font-size-lg;
   }
 
   .col-form-label-sm {
     padding-top: add($input-padding-y-sm, $input-border-width);
     padding-bottom: add($input-padding-y-sm, $input-border-width);
-    @include font-size($input-font-size-sm);
+    font-size: $input-font-size-sm;
   }
 }

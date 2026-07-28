@@ -3,7 +3,6 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/gradients" as *;
 @use "../mixins/transition" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 
 @layer forms {
@@ -16,7 +15,7 @@
     width: 100%;
     padding: $input-padding-y $input-padding-x;
     font-family: $input-font-family;
-    @include font-size($input-font-size);
+    font-size: $input-font-size;
     font-weight: $input-font-weight;
     line-height: $input-line-height;
     color: $input-color;
@@ -159,7 +158,7 @@
   .form-control-sm {
     min-height: $input-height-sm;
     padding: $input-padding-y-sm $input-padding-x-sm;
-    @include font-size($input-font-size-sm);
+    font-size: $input-font-size-sm;
     @include border-radius($input-border-radius-sm);
 
     &::file-selector-button {
@@ -172,7 +171,7 @@
   .form-control-lg {
     min-height: $input-height-lg;
     padding: $input-padding-y-lg $input-padding-x-lg;
-    @include font-size($input-font-size-lg);
+    font-size: $input-font-size-lg;
     @include border-radius($input-border-radius-lg);
 
     &::file-selector-button {

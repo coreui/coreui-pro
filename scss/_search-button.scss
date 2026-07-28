@@ -2,7 +2,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 
 // scss-docs-start search-button-variables
 $search-button-height:              $input-height !default;
@@ -73,7 +72,7 @@ $search-button-placeholder-margin-inline:  .55rem 2rem !default;
     height: var(--#{$prefix}search-button-height);
     padding-inline: var(--#{$prefix}search-button-padding-x);
     font-family: var(--#{$prefix}search-button-font-family);
-    @include font-size(var(--#{$prefix}search-button-font-size));
+    font-size: var(--#{$prefix}search-button-font-size);
     font-weight: var(--#{$prefix}search-button-font-weight);
     color: var(--#{$prefix}search-button-color);
     background-color: var(--#{$prefix}search-button-bg);

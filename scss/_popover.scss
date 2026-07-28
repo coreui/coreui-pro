@@ -4,7 +4,6 @@
 @use "mixins/reset-text" as *;
 @use "mixins/tokens" as *;
 @use "variables" as *;
-@use "vendor/rfs" as *;
 
 // scss-docs-start popover-variables
 $popover-font-size:                 $font-size-sm !default;
@@ -60,6 +59,8 @@ $popover-tokens: defaults(
     --#{$prefix}popover-arrow-width: #{$popover-arrow-width},
     --#{$prefix}popover-arrow-height: #{$popover-arrow-height},
     --#{$prefix}popover-arrow-border: var(--#{$prefix}popover-border-color),
+    --#{$prefix}popover-font-size: $popover-font-size,
+    --#{$prefix}popover-header-font-size: $popover-header-font-size,
   ),
   $popover-tokens
 );
@@ -67,8 +68,6 @@ $popover-tokens: defaults(
 @layer components {
   .popover {
     @include tokens($popover-tokens);
-    @include rfs($popover-font-size, --#{$prefix}popover-font-size);
-    @include rfs($popover-header-font-size, --#{$prefix}popover-header-font-size);
 
     z-index: var(--#{$prefix}popover-zindex);
     display: block;
@@ -76,7 +75,7 @@ $popover-tokens: defaults(
     // Our parent element can be arbitrary since tooltips are by default inserted as a sibling of their target element.
     // So reset our font and text properties to avoid inheriting weird values.
     @include reset-text();
-    @include font-size(var(--#{$prefix}popover-font-size));
+    font-size: var(--#{$prefix}popover-font-size);
     // Allow breaking very long words so they don't overflow the popover's bounds
     word-wrap: break-word;
     background-color: var(--#{$prefix}popover-bg);
@@ -227,7 +226,7 @@ $popover-tokens: defaults(
   .popover-header {
     padding: var(--#{$prefix}popover-header-padding-y) var(--#{$prefix}popover-header-padding-x);
     margin-bottom: 0; // Reset the default from Reboot
-    @include font-size(var(--#{$prefix}popover-header-font-size));
+    font-size: var(--#{$prefix}popover-header-font-size);
     color: var(--#{$prefix}popover-header-color);
     background-color: var(--#{$prefix}popover-header-bg);
     border-bottom: var(--#{$prefix}popover-border-width) solid var(--#{$prefix}popover-border-color);

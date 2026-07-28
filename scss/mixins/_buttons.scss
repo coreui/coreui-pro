@@ -2,7 +2,6 @@
 @use "../functions/color" as *;
 @use "../functions/color-contrast" as *;
 @use "../functions/to-rgb" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 
 // Button variants
@@ -97,7 +96,7 @@
 @mixin button-size($padding-y, $padding-x, $font-size, $border-radius) {
   --#{$prefix}btn-padding-y: #{$padding-y};
   --#{$prefix}btn-padding-x: #{$padding-x};
-  @include rfs($font-size, --#{$prefix}btn-font-size);
+  --#{$prefix}btn-font-size: #{$font-size};
   --#{$prefix}btn-border-radius: #{$border-radius};
 }
 // scss-docs-end btn-size-mixin

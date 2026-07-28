@@ -3,7 +3,6 @@
 @use "sass:meta";
 @use "sass:string";
 @use "../variables" as *;
-@use "../vendor/rfs" as *;
 @use "ltr-rtl" as *;
 
 // Generate selectors for theme variants
@@ -13,7 +12,7 @@
 
 // Utility generator
 // Used to generate utilities & print utilities
-@mixin generate-utility($utility, $infix: "", $is-rfs-media-query: false) {
+@mixin generate-utility($utility, $infix: "") {
   $values: map.get($utility, values);
 
   // If the values are a list or string, convert it into a map
@@ -49,20 +48,6 @@
     // Don't prefix if value key is null (e.g. with shadow class)
     // stylelint-disable-next-line scss/at-function-named-arguments
     $property-class-modifier: if(sass($key): if(sass($property-class == "" and $infix == ""): ""; else: "-") + $key; else: "");
-
-    @if map.get($utility, rfs) {
-      // Inside the media query
-      @if $is-rfs-media-query {
-        $val: rfs-value($value);
-
-        // Do not render anything if fluid and non fluid values are the same
-        // stylelint-disable-next-line scss/at-function-named-arguments
-        $value: if(sass($val == rfs-fluid-value($value)): null; else: $val);
-      }
-      @else {
-        $value: rfs-fluid-value($value);
-      }
-    }
 
     $is-css-var: map.get($utility, css-var);
     $is-dark-mode: map.get($utility, dark-mode);

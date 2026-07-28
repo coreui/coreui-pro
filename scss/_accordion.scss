@@ -7,7 +7,6 @@
 @use "mixins/transition" as *;
 @use "variables-dark" as *;
 @use "variables" as *;
-@use "vendor/rfs" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 
@@ -93,7 +92,7 @@ $accordion-tokens: defaults(
     align-items: center;
     width: 100%;
     padding: var(--#{$prefix}accordion-btn-padding-y) var(--#{$prefix}accordion-btn-padding-x);
-    @include font-size($font-size-base);
+    font-size: $font-size-base;
     color: var(--#{$prefix}accordion-btn-color);
     text-align: start; // Reset button style
     background-color: var(--#{$prefix}accordion-btn-bg);

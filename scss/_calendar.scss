@@ -3,7 +3,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer components {
@@ -16,7 +15,7 @@
     --#{$prefix}calendar-nav-border: #{$calendar-nav-border-width} solid var(--#{$prefix}calendar-nav-border-color);
     --#{$prefix}calendar-nav-btn-padding-x: #{$calendar-nav-btn-padding-x};
     --#{$prefix}calendar-nav-btn-padding-y: #{$calendar-nav-btn-padding-y};
-    @include rfs($calendar-nav-btn-font-size, --#{$prefix}calendar-nav-btn-font-size);
+    --#{$prefix}calendar-nav-btn-font-size: #{$calendar-nav-btn-font-size};
     --#{$prefix}calendar-nav-btn-bg: #{$calendar-nav-btn-bg};
     --#{$prefix}calendar-nav-btn-border-width: #{$calendar-nav-btn-border-width};
     --#{$prefix}calendar-nav-btn-border-color: #{$calendar-nav-btn-border-color};
@@ -96,7 +95,7 @@
   .calendar-nav-btn {
     display: inline-block;
     padding: var(--#{$prefix}calendar-nav-btn-padding-y) var(--#{$prefix}calendar-nav-btn-padding-x);
-    @include font-size(var(--#{$prefix}calendar-nav-btn-font-size));
+    font-size: var(--#{$prefix}calendar-nav-btn-font-size);
     text-align: center;
     vertical-align: middle;
     user-select: none;

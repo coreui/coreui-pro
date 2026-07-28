@@ -4,7 +4,6 @@
 @use "mixins/gradients" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer components {
@@ -169,7 +168,7 @@
 
   .range-slider-label {
     position: absolute;
-    @include font-size(var(--#{$prefix}range-slider-label-font-size));
+    font-size: var(--#{$prefix}range-slider-label-font-size);
     color: var(--#{$prefix}range-slider-label-color);
     @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
 
@@ -195,7 +194,7 @@
   .range-slider-tooltip-inner {
     max-width: var(--#{$prefix}range-slider-tooltip-max-width);
     padding: var(--#{$prefix}range-slider-tooltip-padding-y) var(--#{$prefix}range-slider-tooltip-padding-x);
-    @include font-size(var(--#{$prefix}range-slider-tooltip-font-size));
+    font-size: var(--#{$prefix}range-slider-tooltip-font-size);
     color: var(--#{$prefix}range-slider-tooltip-color);
     background-color: var(--#{$prefix}range-slider-tooltip-bg);
     @include border-radius(var(--#{$prefix}range-slider-tooltip-border-radius));

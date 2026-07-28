@@ -5,7 +5,6 @@
 @use "mixins/elevation" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer components {
@@ -145,7 +144,7 @@
     width: 100%;
     padding: 0;
     font-family: var(--#{$prefix}date-picker-font-family);
-    @include font-size(var(--#{$prefix}date-picker-font-size));
+    font-size: var(--#{$prefix}date-picker-font-size);
     font-weight: var(--#{$prefix}date-picker-font-weight);
     line-height: var(--#{$prefix}date-picker-line-height);
     color: var(--#{$prefix}date-picker-color);

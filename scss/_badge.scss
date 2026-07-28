@@ -2,7 +2,6 @@
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "variables" as *;
-@use "vendor/rfs" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 
@@ -30,6 +29,7 @@ $badge-tokens: defaults(
     --#{$prefix}badge-font-weight: #{$badge-font-weight},
     --#{$prefix}badge-color: #{$badge-color},
     --#{$prefix}badge-border-radius: #{$badge-border-radius},
+    --#{$prefix}badge-font-size: $badge-font-size,
   ),
   $badge-tokens
 );
@@ -42,11 +42,10 @@ $badge-tokens: defaults(
 
   .badge {
     @include tokens($badge-tokens);
-    @include rfs($badge-font-size, --#{$prefix}badge-font-size);
 
     display: inline-block;
     padding: var(--#{$prefix}badge-padding-y) var(--#{$prefix}badge-padding-x);
-    @include font-size(var(--#{$prefix}badge-font-size));
+    font-size: var(--#{$prefix}badge-font-size);
     font-weight: var(--#{$prefix}badge-font-weight);
     line-height: 1;
     color: var(--#{$prefix}badge-color);
@@ -75,6 +74,6 @@ $badge-tokens: defaults(
   .badge-sm {
     --#{$prefix}badge-padding-x: #{$badge-padding-x-sm};
     --#{$prefix}badge-padding-y: #{$badge-padding-y-sm};
-    @include font-size($badge-font-size-sm);
+    font-size: $badge-font-size-sm;
   }
 }

@@ -7,7 +7,6 @@
 @use "mixins/deprecate" as *;
 @use "mixins/gradients" as *;
 @use "mixins/transition" as *;
-@use "vendor/rfs" as *;
 @use "variables" as *;
 
 @layer components {
@@ -80,7 +79,7 @@
     padding-top: var(--#{$prefix}navbar-brand-padding-y);
     padding-bottom: var(--#{$prefix}navbar-brand-padding-y);
     margin-inline-end: var(--#{$prefix}navbar-brand-margin-end);
-    @include font-size(var(--#{$prefix}navbar-brand-font-size));
+    font-size: var(--#{$prefix}navbar-brand-font-size);
     color: var(--#{$prefix}navbar-brand-color);
     text-decoration: if(not sass($link-decoration == none): none);
     white-space: nowrap;
@@ -102,7 +101,7 @@
     // scss-docs-start navbar-nav-css-vars
     --#{$prefix}nav-link-padding-x: 0;
     --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y};
-    @include rfs($nav-link-font-size, --#{$prefix}nav-link-font-size);
+    --#{$prefix}nav-link-font-size: #{$nav-link-font-size};
     --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight};
     --#{$prefix}nav-link-color: var(--#{$prefix}navbar-color);
     --#{$prefix}nav-link-hover-color: var(--#{$prefix}navbar-hover-color);
@@ -164,7 +163,7 @@
   // Button for toggling the navbar when in its collapsed state
   .navbar-toggler {
     padding: var(--#{$prefix}navbar-toggler-padding-y) var(--#{$prefix}navbar-toggler-padding-x);
-    @include font-size(var(--#{$prefix}navbar-toggler-font-size));
+    font-size: var(--#{$prefix}navbar-toggler-font-size);
     line-height: 1;
     color: var(--#{$prefix}navbar-color);
     background-color: transparent; // remove default button style

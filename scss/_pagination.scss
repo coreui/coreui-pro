@@ -6,7 +6,6 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
-@use "vendor/rfs" as *;
 
 // scss-docs-start pagination-variables
 $pagination-padding-y:              .375rem !default;
@@ -73,6 +72,7 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-disabled-color: #{$pagination-disabled-color},
     --#{$prefix}pagination-disabled-bg: #{$pagination-disabled-bg},
     --#{$prefix}pagination-disabled-border-color: #{$pagination-disabled-border-color},
+    --#{$prefix}pagination-font-size: $pagination-font-size,
   ),
   $pagination-tokens
 );
@@ -80,7 +80,6 @@ $pagination-tokens: defaults(
 @layer components {
   .pagination {
     @include tokens($pagination-tokens);
-    @include rfs($pagination-font-size, --#{$prefix}pagination-font-size);
 
     display: flex;
     @include list-unstyled();
@@ -90,7 +89,7 @@ $pagination-tokens: defaults(
     position: relative;
     display: block;
     padding: var(--#{$prefix}pagination-padding-y) var(--#{$prefix}pagination-padding-x);
-    @include font-size(var(--#{$prefix}pagination-font-size));
+    font-size: var(--#{$prefix}pagination-font-size);
     color: var(--#{$prefix}pagination-color);
     text-decoration: if(not sass($link-decoration == none): none);
     background-color: var(--#{$prefix}pagination-bg);

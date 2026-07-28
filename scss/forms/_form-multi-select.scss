@@ -3,7 +3,6 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/elevation" as *;
 @use "../mixins/transition" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 
 @layer forms {
@@ -164,7 +163,7 @@
     align-items: stretch;
     width: 100%;
     font-family: var(--#{$prefix}form-multi-select-font-family);
-    @include font-size(var(--#{$prefix}form-multi-select-font-size));
+    font-size: var(--#{$prefix}form-multi-select-font-size);
     font-weight: var(--#{$prefix}form-multi-select-font-weight);
     line-height: var(--#{$prefix}form-multi-select-line-height);
     color: var(--#{$prefix}form-multi-select-color);

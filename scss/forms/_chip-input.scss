@@ -2,7 +2,6 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/transition" as *;
-@use "../vendor/rfs" as *;
 @use "../variables" as *;
 
 // scss-docs-start chip-input-variables
@@ -55,7 +54,7 @@ $chip-input-gap-lg:            .5rem !default;
     align-items: center;
     min-height: var(--#{$prefix}chip-input-min-height);
     padding: var(--#{$prefix}chip-input-padding-y) var(--#{$prefix}chip-input-padding-x);
-    @include font-size(var(--#{$prefix}chip-input-font-size));
+    font-size: var(--#{$prefix}chip-input-font-size);
     color: var(--#{$prefix}chip-input-color);
     background-color: var(--#{$prefix}chip-input-bg);
     border: var(--#{$prefix}chip-input-border-width) solid var(--#{$prefix}chip-input-border-color);
