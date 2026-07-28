@@ -22,6 +22,11 @@
   --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
   --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
   --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow};
+  --#{$prefix}date-picker-bg: #{$date-picker-bg};
+  --#{$prefix}date-picker-border-width: #{$date-picker-border-width};
+  --#{$prefix}date-picker-border-color: #{$date-picker-border-color};
+  --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius};
+  --#{$prefix}date-picker-focus-border-color: #{$date-picker-focus-border-color};
   --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding};
   --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width};
   --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color};
@@ -35,9 +40,21 @@
 .date-picker-input-group {
   display: flex;
   align-items: stretch;
+  background-color: var(--#{$prefix}date-picker-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
+  @include border-radius(var(--#{$prefix}date-picker-border-radius));
 
+  &:focus-within {
+    border-color: var(--#{$prefix}date-picker-focus-border-color);
+  }
+
+  // the group carries the form-control frame; the section fields inside stay bare
   .form-date-time {
     flex: 1;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
   }
 }
 
@@ -60,9 +77,10 @@
 }
 
 // TRANSITIONAL (remove with _date-picker.scss): the v1 partial paints the
-// indicator icon via a ::before mask; the v2 shell renders an inline SVG, so
-// the v1 pseudo-element must not double the icon on v2 markup.
-.date-picker-v2 .date-picker-indicator::before {
+// indicator and separator icons via ::before masks; the v2 shell renders
+// inline SVG, so the v1 pseudo-elements must not double the icons on v2 markup.
+.date-picker-v2 .date-picker-indicator::before,
+.date-picker-v2 .date-picker-separator::before {
   content: none;
 }
 
@@ -82,6 +100,27 @@
   &.show {
     display: block;
   }
+}
+
+.date-picker-body {
+  display: flex;
+}
+
+.date-picker-ranges {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  align-items: flex-start;
+  padding: var(--#{$prefix}date-picker-footer-padding);
+  border-inline-end: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+}
+
+.date-picker-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--#{$prefix}date-picker-indicator-width);
+  color: var(--#{$prefix}date-picker-indicator-color);
 }
 
 .date-picker-calendars {
