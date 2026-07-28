@@ -250,7 +250,7 @@ Our Bootstrap alerts utilize local CSS variables on `.alert` for improved real-t
 
 ### SASS variables
 
-<ScssDocs file="scss/_variables.scss" capture="alert-variables" />
+<ScssDocs file="scss/_alert.scss" capture="alert-variables" />
 
 ### SASS mixin
 
@@ -260,6 +260,6 @@ Used alongside `$alert-variants` to create contextual modifier classes for our a
 
 ### SASS loop
 
-Loop that creates the modifier classes with the `alert-variant()` mixin.
+Loop that creates the modifier classes, pointing each alert's tokens at the matching theme color.
 
 <ScssDocs file="scss/_alert.scss" capture="alert-modifiers" />
