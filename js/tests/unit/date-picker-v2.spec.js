@@ -42,6 +42,27 @@ describe('DatePickerV2', () => {
       expect(picker.getDate()).toEqual(new Date(2026, 5, 15))
     })
 
+    it('should render the indicator icon as inline SVG on currentColor', () => {
+      buildPicker()
+
+      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const svg = indicator.querySelector('svg')
+      expect(svg).not.toBeNull()
+      expect(svg.getAttribute('fill')).toEqual('currentColor')
+      expect(indicator.getAttribute('aria-label')).toEqual('Toggle the calendar')
+    })
+
+    it('should accept a custom indicator icon and sanitize it', () => {
+      buildPicker({
+        indicatorIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.hacked = true</script><circle r="8" /></svg>'
+      })
+
+      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      expect(indicator.querySelector('circle')).not.toBeNull()
+      expect(indicator.querySelector('script')).toBeNull()
+      expect(window.hacked).toBeUndefined()
+    })
+
     it('should not render a footer without a template child', () => {
       buildPicker()
 

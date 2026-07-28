@@ -18,6 +18,7 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
+import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -38,6 +39,7 @@ const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
+const CLASS_NAME_DATE_PICKER_V2 = 'date-picker-v2'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
 const CLASS_NAME_INDICATOR = 'date-picker-indicator'
@@ -48,28 +50,43 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
+// Icons live in JavaScript, not in CSS masks — the chips pattern: inline SVG on
+// currentColor, swappable through an option, sanitized like any user-provided
+// markup.
+const DEFAULT_INDICATOR_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
+
 const Default = {
+  allowList: SVGAllowlist,
+  ariaToggleLabel: 'Toggle the calendar',
   calendarOptions: {},
   container: false,
   date: null,
   disabled: false,
+  indicatorIcon: DEFAULT_INDICATOR_ICON,
   inputOptions: {},
   locale: navigator.language,
   maxDate: null,
   minDate: null,
-  name: null
+  name: null,
+  sanitize: true,
+  sanitizeFn: null
 }
 
 const DefaultType = {
+  allowList: 'object',
+  ariaToggleLabel: 'string',
   calendarOptions: 'object',
   container: '(string|element|boolean)',
   date: '(date|string|null)',
   disabled: 'boolean',
+  indicatorIcon: 'string',
   inputOptions: 'object',
   locale: 'string',
   maxDate: '(date|string|null)',
   minDate: '(date|string|null)',
-  name: '(string|null)'
+  name: '(string|null)',
+  sanitize: 'boolean',
+  sanitizeFn: '(function|null)'
 }
 
 /**
@@ -168,8 +185,12 @@ class DatePickerV2 extends BaseComponent {
   }
 
   // Private
+  _sanitizeIcon(icon) {
+    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
+  }
+
   _createDatePicker() {
-    this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_PICKER)
+    this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_PICKER_V2, CLASS_NAME_PICKER)
 
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
@@ -180,6 +201,8 @@ class DatePickerV2 extends BaseComponent {
     const indicator = document.createElement('button')
     indicator.classList.add(CLASS_NAME_INDICATOR)
     indicator.type = 'button'
+    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
+    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 

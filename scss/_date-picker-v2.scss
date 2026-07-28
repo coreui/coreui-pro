@@ -1,0 +1,105 @@
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/elevation" as *;
+@use "variables" as *;
+
+// Lean pickers-v2 shell styling (workspace: architecture/pickers-v2.md, "Styling
+// budget"). Compiled AFTER _date-picker.scss and replaces it once the v1 shell
+// retires. The shell styles only what it owns: the field is styled by
+// forms/_form-date-time.scss, the popup content by _calendar.scss, icons are
+// inline SVG rendered by the component (the chips pattern), projected footer
+// content is userland. Sass knobs reuse the existing $date-picker-* shell-layer
+// variables — no new configuration surface.
+
+.date-picker,
+*:not(.date-picker) > .date-picker-dropdown {
+  // scss-docs-start date-picker-v2-css-vars
+  --#{$prefix}date-picker-zindex: #{$date-picker-zindex};
+  --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width};
+  --#{$prefix}date-picker-indicator-color: #{$date-picker-indicator-icon-color};
+  --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg};
+  --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width};
+  --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
+  --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
+  --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow};
+  --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding};
+  --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width};
+  --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color};
+  // scss-docs-end date-picker-v2-css-vars
+}
+
+.date-picker {
+  position: relative;
+}
+
+.date-picker-input-group {
+  display: flex;
+  align-items: stretch;
+
+  .form-date-time {
+    flex: 1;
+  }
+}
+
+.date-picker-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--#{$prefix}date-picker-indicator-width);
+  padding: 0;
+  color: var(--#{$prefix}date-picker-indicator-color);
+  background: transparent;
+  border: 0;
+
+  &:focus {
+    z-index: 5;
+    outline: 0;
+    box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+    @include border-radius($border-radius);
+  }
+}
+
+// TRANSITIONAL (remove with _date-picker.scss): the v1 partial paints the
+// indicator icon via a ::before mask; the v2 shell renders an inline SVG, so
+// the v1 pseudo-element must not double the icon on v2 markup.
+.date-picker-v2 .date-picker-indicator::before {
+  content: none;
+}
+
+.date-picker-dropdown {
+  position: absolute;
+  z-index: var(--#{$prefix}date-picker-zindex);
+  display: none;
+  width: min-content;
+  background-color: var(--#{$prefix}date-picker-dropdown-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
+  @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
+  @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
+  @include elevation(4);
+
+  .date-picker.show &,
+  &.show {
+    display: block;
+  }
+}
+
+.date-picker-calendars {
+  display: flex;
+
+  .date-picker-calendar:not(:last-child) .calendar-navigation-next {
+    visibility: hidden;
+  }
+
+  .date-picker-calendar:not(:first-child) .calendar-navigation-prev {
+    visibility: hidden;
+  }
+}
+
+.date-picker-footer {
+  display: flex;
+  gap: .5rem;
+  justify-content: flex-end;
+  padding: var(--#{$prefix}date-picker-footer-padding);
+  border-top: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
+}
