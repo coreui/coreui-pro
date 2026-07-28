@@ -313,6 +313,33 @@ describe('DateInput', () => {
       expect(document.activeElement).toEqual(day)
     })
 
+    it('should mirror the arrow keys inside an RTL ancestor', () => {
+      // sections flow right-to-left, so the visual direction inverts
+      fixtureEl.innerHTML = '<div dir="rtl"><div id="mydateinput"></div></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('#mydateinput'), { format: 'dd.MM.yyyy' })
+      const [day, month] = getSections(dateInput._element)
+
+      day.focus()
+      pressKey(day, 'ArrowLeft')
+      expect(document.activeElement).toEqual(month)
+
+      pressKey(month, 'ArrowRight')
+      expect(document.activeElement).toEqual(day)
+    })
+
+    it('should mirror Home and End inside an RTL ancestor', () => {
+      fixtureEl.innerHTML = '<div dir="rtl"><div id="mydateinput"></div></div>'
+      const dateInput = new DateInput(fixtureEl.querySelector('#mydateinput'), { format: 'dd.MM.yyyy' })
+      const [day, , year] = getSections(dateInput._element)
+
+      year.focus()
+      pressKey(year, 'Home')
+      expect(document.activeElement).toEqual(year)
+
+      pressKey(year, 'End')
+      expect(document.activeElement).toEqual(day)
+    })
+
     it('should jump to the first and last section with Home and End', () => {
       const dateInput = createDateInput()
       const [day, , year] = getSections(dateInput._element)

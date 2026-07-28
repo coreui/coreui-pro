@@ -23,7 +23,7 @@ import {
   getSectionsFromString,
   setSectionsFromDate
 } from './util/date-sections.js'
-import { getNextActiveElement, isRTL } from './util/index.js'
+import { getNextActiveElement } from './util/index.js'
 
 /**
  * Constants
@@ -430,14 +430,23 @@ class SectionInput extends BaseComponent {
     return false
   }
 
+  // Arrow keys move by visual direction, so they mirror in RTL. The direction
+  // is read from the element's computed style rather than isRTL(): the document
+  // can be LTR while an ancestor sets dir="rtl" around the field.
+  _isRtl() {
+    return window.getComputedStyle(this._element).direction === 'rtl'
+  }
+
   _focusSectionByKey(sectionElement, key) {
     if (key === HOME_KEY || key === END_KEY) {
       const sections = this._getSectionElements()
-      sections[key === HOME_KEY ? 0 : sections.length - 1].focus()
+      const first = this._isRtl() ? sections.length - 1 : 0
+      const last = this._isRtl() ? 0 : sections.length - 1
+      sections[key === HOME_KEY ? first : last].focus()
       return
     }
 
-    const shouldMoveNext = key === (isRTL() ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
+    const shouldMoveNext = key === (this._isRtl() ? ARROW_LEFT_KEY : ARROW_RIGHT_KEY)
     this._focusSibling(sectionElement, shouldMoveNext)
   }
 

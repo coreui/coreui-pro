@@ -85,6 +85,14 @@ the option-by-option migration map. Planned mapping:
 - **Format comes from the mask.** `inputDateFormat` is replaced by `format`
   (forwarded to the field); `inputDateParse` still applies to pasted text.
 
+#### Date Input / Time Input / Date Time Input
+
+- **RTL keyboard navigation now follows the visual direction in nested RTL
+  contexts.** Arrow keys (and `Home`/`End`) mirror when the field renders
+  right-to-left; the direction is read from the element's computed style
+  instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
+  and not only a document-level direction.
+
 #### Icons rendered by JavaScript
 
 - New components render their icons as **inline SVG on `currentColor`** (the
