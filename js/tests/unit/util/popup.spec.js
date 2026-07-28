@@ -143,6 +143,20 @@ describe('Popup', () => {
       expect(popup.isShown).toBeTrue()
     })
 
+    it('should stay open when a click re-renders and detaches its target inside the content', () => {
+      const popup = buildPopup()
+      popup.show()
+
+      const content = fixtureEl.querySelector('#content')
+      const button = document.createElement('button')
+      button.addEventListener('click', () => button.remove())
+      content.append(button)
+
+      button.click()
+
+      expect(popup.isShown).toBeTrue()
+    })
+
     it('should hide on Escape', () => {
       const popup = buildPopup()
       popup.show()

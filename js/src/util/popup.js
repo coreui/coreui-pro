@@ -224,8 +224,11 @@ class Popup extends Config {
 
   _addDismissListeners() {
     this._clickListener = event => {
-      const { target } = event
-      if (this._anchor.contains(target) || this._content.contains(target)) {
+      // composedPath, not contains(): the click may re-render part of the
+      // content (calendar navigation) and detach the target before the event
+      // reaches document — the dispatch-time path still holds the ancestors
+      const path = event.composedPath()
+      if (path.includes(this._anchor) || path.includes(this._content)) {
         return
       }
 

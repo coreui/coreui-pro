@@ -132,6 +132,19 @@ describe('DatePickerV2', () => {
     })
   })
 
+  describe('calendar navigation', () => {
+    it('should keep the popup open when navigating months', () => {
+      const picker = buildPicker({ date: new Date(2026, 5, 15) })
+      const el = fixtureEl.querySelector('#picker')
+
+      picker.show()
+      el.querySelector('.btn-next').click()
+
+      expect(picker._popup.isShown).toBeTrue()
+      expect(el.classList.contains('show')).toBeTrue()
+    })
+  })
+
   describe('slot context', () => {
     it('should expose the contract actions and state', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15) })
