@@ -1,5 +1,6 @@
 @use "../mixins/breakpoints" as *;
 @use "../mixins/ltr-rtl" as *;
+@use "sidebar-nav" as *;
 @use "../variables" as *;
 @use "sidebar" as *;
 

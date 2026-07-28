@@ -979,13 +979,6 @@ $form-text-font-weight:                 null !default;
 $form-text-color:                       var(--#{$prefix}secondary-color) !default;
 // scss-docs-end form-text-variables
 
-// scss-docs-start form-label-variables
-$form-label-margin-bottom:              .5rem !default;
-$form-label-font-size:                  null !default;
-$form-label-font-style:                 null !default;
-$form-label-font-weight:                null !default;
-$form-label-color:                      null !default;
-// scss-docs-end form-label-variables
 
 // scss-docs-start form-input-variables
 $input-padding-y:                       $input-btn-padding-y !default;
@@ -1041,131 +1034,9 @@ $input-transition:                      border-color .15s ease-in-out, box-shado
 $form-color-width:                      3rem !default;
 // scss-docs-end form-input-variables
 
-// scss-docs-start form-check-variables
-$form-check-input-width:                  1em !default;
-$form-check-min-height:                   $font-size-base * $line-height-base !default;
-$form-check-padding-start:                $form-check-input-width + .5em !default;
-$form-check-margin-bottom:                .125rem !default;
-$form-check-label-color:                  null !default;
-$form-check-label-cursor:                 null !default;
-$form-check-transition:                   null !default;
-
-$form-check-input-active-filter:          brightness(90%) !default;
-
-$form-check-input-bg:                     $input-bg !default;
-$form-check-input-border:                 var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
-$form-check-input-border-radius:          .25em !default;
-$form-check-radio-border-radius:          50% !default;
-$form-check-input-focus-border:           $input-focus-border-color !default;
-$form-check-input-focus-box-shadow:       $focus-ring-box-shadow !default;
-
-$form-check-input-checked-color:          $component-active-color !default;
-$form-check-input-checked-bg-color:       $component-active-bg !default;
-$form-check-input-checked-border-color:   $form-check-input-checked-bg-color !default;
-$form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
-$form-check-radio-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$form-check-input-checked-color}'/></svg>") !default;
-
-$form-check-input-indeterminate-color:          $component-active-color !default;
-$form-check-input-indeterminate-bg-color:       $component-active-bg !default;
-$form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
-$form-check-input-indeterminate-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-indeterminate-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
-
-$form-check-input-disabled-opacity:        .5 !default;
-$form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;
-$form-check-btn-check-disabled-opacity:    $btn-disabled-opacity !default;
-
-$form-check-inline-margin-end:    1rem !default;
-// scss-docs-end form-check-variables
-
-// scss-docs-start form-switch-variables
-$form-switch-color:               rgba($black, .25) !default;
-$form-switch-width:               2em !default;
-$form-switch-padding-start:       $form-switch-width + .5em !default;
-$form-switch-bg-image:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color}'/></svg>") !default;
-$form-switch-border-radius:       $form-switch-width !default;
-$form-switch-transition:          background-position .15s ease-in-out !default;
-
-$form-switch-focus-color:         $input-focus-border-color !default;
-$form-switch-focus-bg-image:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-focus-color}'/></svg>") !default;
-
-$form-switch-checked-color:       $component-active-color !default;
-$form-switch-checked-bg-image:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-checked-color}'/></svg>") !default;
-$form-switch-checked-bg-position: right center !default;
-
-$form-switch-widths: (
-  lg: (
-    width: 2.5em,
-    height: 1.25em
-  ),
-  xl: (
-    width: 3em,
-    height: 1.5em
-  )
-) !default;
-// scss-docs-end form-switch-variables
 
 $form-check-inline-margin-end:    1rem !default;
 
-// scss-docs-start form-date-time-variables
-$form-date-time-placeholder-color:       $input-placeholder-color !default;
-$form-date-time-section-border-radius:   .25rem !default;
-$form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25) !default;
-// scss-docs-end form-date-time-variables
-
-// scss-docs-start form-otp-variables
-$form-otp-gap:                         .125rem !default;
-$form-otp-control-width:               2rem !default;
-$form-otp-control-padding-y:           $input-padding-y !default;
-$form-otp-control-padding-x:           0 !default;
-$form-otp-control-font-family:         $input-font-family !default;
-$form-otp-control-font-size:           $input-font-size !default;
-$form-otp-control-font-weight:         $input-font-weight !default;
-$form-otp-control-line-height:         $input-line-height !default;
-$form-otp-control-color:               $input-color !default;
-$form-otp-control-bg:                  $input-bg !default;
-$form-otp-control-border-width:        $input-border-width !default;
-$form-otp-control-border-color:        $input-border-color !default;
-$form-otp-control-border-radius:       $input-border-radius !default;
-$form-otp-control-box-shadow:          $input-box-shadow !default;
-$form-otp-control-transition:          $input-transition !default;
-$form-otp-control-focus-color:         $input-focus-color !default;
-$form-otp-control-focus-bg:            $input-focus-bg !default;
-$form-otp-control-focus-border-color:  $input-focus-border-color !default;
-$form-otp-control-focus-box-shadow:    $input-focus-box-shadow !default;
-
-$form-otp-control-width-sm:            1.5rem !default;
-$form-otp-control-padding-y-sm:        $input-padding-y-sm !default;
-$form-otp-control-padding-x-sm:        0 !default;
-$form-otp-control-font-size-sm:        $input-font-size-sm !default;
-$form-otp-control-border-radius-sm:    $input-border-radius-sm !default;
-
-$form-otp-control-width-lg:            2.5rem !default;
-$form-otp-control-padding-y-lg:        $input-padding-y-lg !default;
-$form-otp-control-padding-x-lg:        0 !default;
-$form-otp-control-font-size-lg:        $input-font-size-lg !default;
-$form-otp-control-border-radius-lg:    $input-border-radius-lg !default;
-// scss-docs-end form-otp-variables
-
-// scss-docs-start form-password-variables
-$form-password-action-bg:         transparent !default;
-$form-password-action-hover-bg:   var(--#{$prefix}tertiary-bg) !default;
-$form-password-icon-show:         url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cpath%20fill%3D%22var(--ci-primary-color%2C%20currentColor)%22%20d%3D%22M256%2C144.927A103.309%2C103.309%2C0%2C1%2C0%2C359.309%2C248.236%2C103.426%2C103.426%2C0%2C0%2C0%2C256%2C144.927Zm0%2C174.618a71.309%2C71.309%2C0%2C1%2C1%2C71.309-71.309A71.39%2C71.39%2C0%2C0%2C1%2C256%2C319.545Z%22%20class%3D%22ci-primary%22/%3E%3Cpath%20fill%3D%22var(--ci-primary-color%2C%20currentColor)%22%20d%3D%22M397.222%2C131.1l-.218-.223c-77.75-77.749-204.258-77.749-282.008%2C0L16%2C233.79v28.893l98.778%2C102.689.218.222a199.409%2C199.409%2C0%2C0%2C0%2C282.008%2C0l99-102.911V233.79ZM464%2C249.79l-89.732%2C93.285a167.409%2C167.409%2C0%2C0%2C1-236.536%2C0L48%2C249.79v-3.107L137.729%2C153.4c65.247-65.13%2C171.3-65.13%2C236.542%2C0L464%2C246.683Z%22%20class%3D%22ci-primary%22/%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20x%3D%22240%22%20y%3D%22232%22%20fill%3D%22var(--ci-primary-color%2C%20currentColor)%22%20class%3D%22ci-primary%22/%3E%3C/svg%3E") !default;
-$form-password-icon-hide:         url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cpath%20fill%3D%22var(--ci-primary-color%2C%20currentColor)%22%20d%3D%22M397.222%2C131.1l-.218-.223C333.831%2C67.707%2C238.47%2C55.862%2C163.228%2C95.346l23.938%2C23.939c61.571-27.691%2C136.573-16.327%2C187.105%2C34.115L464%2C246.683v3.107l-71.744%2C74.585%2C22.63%2C22.63L496%2C262.683V233.79Z%22%20class%3D%22ci-primary%22/%3E%3Cpath%20fill%3D%22var(--ci-primary-color%2C%20currentColor)%22%20d%3D%22M352.8%2C284.33A103.307%2C103.307%2C0%2C0%2C0%2C219.907%2C151.438L246.1%2C177.63a71.228%2C71.228%2C0%2C0%2C1%2C80.507%2C80.508Z%22%20class%3D%22ci-primary%22/%3E%3Cpath%20fill%3D%22var(--ci-primary-color%2C%20currentColor)%22%20d%3D%22M369.9%2C347.268l-33.831-33.831c.088-.108.179-.212.266-.32l-22.805-22.806c-.083.113-.169.222-.253.334l-99.681-99.681c.112-.083.221-.17.334-.253L191.12%2C167.906c-.108.087-.213.179-.321.266L38.627%2C16H16V38.627l95.689%2C95.689L16%2C233.79v28.893l98.778%2C102.689.218.222A199.732%2C199.732%2C0%2C0%2C0%2C367.372%2C390l106%2C106H496V473.373L392.537%2C369.911Zm-177.157-131.9L288.871%2C311.5a71.28%2C71.28%2C0%2C0%2C1-96.133-96.133ZM137.729%2C343.073%2C48%2C249.79v-3.107l86.319-89.737%2C35.065%2C35.064A103.248%2C103.248%2C0%2C0%2C0%2C312.226%2C334.853l32.007%2C32.007C279.723%2C406.875%2C193.711%2C398.955%2C137.729%2C343.073Z%22%20class%3D%22ci-primary%22/%3E%3C/svg%3E") !default;
-$form-password-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$form-password-icon-hover-color:  var(--#{$prefix}secondary-color) !default;
-$form-password-icon-size:         1.25rem !default;
-$form-password-icon-size-lg:      1.5rem !default;
-$form-password-icon-size-sm:      1rem !default;
-// scss-docs-end form-password-variables
-
-// scss-docs-start input-group-variables
-$input-group-addon-padding-y:           $input-padding-y !default;
-$input-group-addon-padding-x:           $input-padding-x !default;
-$input-group-addon-font-weight:         $input-font-weight !default;
-$input-group-addon-color:               $input-color !default;
-$input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
-$input-group-addon-border-color:        $input-border-color !default;
-// scss-docs-end input-group-variables
 
 // scss-docs-start form-select-variables
 $form-select-padding-y:             $input-padding-y !default;
@@ -1232,11 +1103,6 @@ $form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color) !def
 $form-range-thumb-transition:              background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 // scss-docs-end form-range-variables
 
-// scss-docs-start form-file-variables
-$form-file-button-color:          $input-color !default;
-$form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default;
-$form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
-// scss-docs-end form-file-variables
 
 // scss-docs-start form-floating-variables
 $form-floating-height:                  add(3.5rem, $input-height-border) !default;
@@ -1251,6 +1117,70 @@ $form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX
 $form-floating-label-disabled-color:    $gray-600 !default;
 $form-floating-transition:              opacity .1s ease-in-out, transform .1s ease-in-out !default;
 // scss-docs-end form-floating-variables
+
+// scss-docs-start form-check-variables
+$form-check-input-width:                  1em !default;
+$form-check-min-height:                   $font-size-base * $line-height-base !default;
+$form-check-padding-start:                $form-check-input-width + .5em !default;
+$form-check-margin-bottom:                .125rem !default;
+$form-check-label-color:                  null !default;
+$form-check-label-cursor:                 null !default;
+$form-check-transition:                   null !default;
+
+$form-check-input-active-filter:          brightness(90%) !default;
+
+$form-check-input-bg:                     $input-bg !default;
+$form-check-input-border:                 var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
+$form-check-input-border-radius:          .25em !default;
+$form-check-radio-border-radius:          50% !default;
+$form-check-input-focus-border:           $input-focus-border-color !default;
+$form-check-input-focus-box-shadow:       $focus-ring-box-shadow !default;
+
+$form-check-input-checked-color:          $component-active-color !default;
+$form-check-input-checked-bg-color:       $component-active-bg !default;
+$form-check-input-checked-border-color:   $form-check-input-checked-bg-color !default;
+$form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
+$form-check-radio-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$form-check-input-checked-color}'/></svg>") !default;
+
+$form-check-input-indeterminate-color:          $component-active-color !default;
+$form-check-input-indeterminate-bg-color:       $component-active-bg !default;
+$form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
+$form-check-input-indeterminate-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-indeterminate-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
+
+$form-check-input-disabled-opacity:        .5 !default;
+$form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;
+$form-check-btn-check-disabled-opacity:    $btn-disabled-opacity !default;
+
+$form-check-inline-margin-end:    1rem !default;
+// scss-docs-end form-check-variables
+
+// scss-docs-start form-switch-variables
+$form-switch-color:               rgba($black, .25) !default;
+$form-switch-width:               2em !default;
+$form-switch-padding-start:       $form-switch-width + .5em !default;
+$form-switch-bg-image:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color}'/></svg>") !default;
+$form-switch-border-radius:       $form-switch-width !default;
+$form-switch-transition:          background-position .15s ease-in-out !default;
+
+$form-switch-focus-color:         $input-focus-border-color !default;
+$form-switch-focus-bg-image:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-focus-color}'/></svg>") !default;
+
+$form-switch-checked-color:       $component-active-color !default;
+$form-switch-checked-bg-image:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-checked-color}'/></svg>") !default;
+$form-switch-checked-bg-position: right center !default;
+
+$form-switch-widths: (
+  lg: (
+    width: 2.5em,
+    height: 1.25em
+  ),
+  xl: (
+    width: 3em,
+    height: 1.5em
+  )
+) !default;
+// scss-docs-end form-switch-variables
+
 
 // Form validation
 
@@ -1410,71 +1340,8 @@ $navbar-light-brand-color:          $navbar-light-active-color !default;
 $navbar-light-brand-hover-color:    $navbar-light-active-color !default;
 // scss-docs-end navbar-variables
 
-// scss-docs-start navbar-dark-variables
-$navbar-dark-color:                 rgba($white, .55) !default;
-$navbar-dark-hover-color:           rgba($white, .75) !default;
-$navbar-dark-active-color:          $white !default;
-$navbar-dark-disabled-color:        rgba($white, .25) !default;
-$navbar-dark-icon-color:            $navbar-dark-color !default;
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
-$navbar-dark-toggler-border-color:  rgba($white, .1) !default;$navbar-dark-toggler-border-color:  rgba($white, .1) !default;
-$navbar-dark-brand-color:           $navbar-dark-active-color !default;
-$navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
-// scss-docs-end navbar-dark-variables
-
 
 // Dropdown menu container and contents.
-
-// scss-docs-start dropdown-variables
-$dropdown-min-width:                10rem !default;
-$dropdown-padding-x:                0 !default;
-$dropdown-padding-y:                .5rem !default;
-$dropdown-spacer:                   .125rem !default;
-$dropdown-font-size:                $font-size-base !default;
-$dropdown-color:                    var(--#{$prefix}body-color) !default;
-$dropdown-bg:                       var(--#{$prefix}body-bg) !default;
-$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
-$dropdown-border-radius:            var(--#{$prefix}border-radius) !default;
-$dropdown-border-width:             var(--#{$prefix}border-width) !default;
-$dropdown-inner-border-radius:      calc(#{$dropdown-border-radius} - #{$dropdown-border-width}) !default; // stylelint-disable-line function-disallowed-list
-$dropdown-divider-bg:               $dropdown-border-color !default;
-$dropdown-divider-margin-y:         $spacer * .5 !default;
-$dropdown-box-shadow:               var(--#{$prefix}box-shadow) !default;
-
-$dropdown-link-color:               var(--#{$prefix}body-color) !default;
-$dropdown-link-hover-color:         $dropdown-link-color !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-
-$dropdown-link-active-color:        $component-active-color !default;
-$dropdown-link-active-bg:           $component-active-bg !default;
-
-$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
-
-$dropdown-item-padding-y:           $spacer * .25 !default;
-$dropdown-item-padding-x:           $spacer !default;
-
-$dropdown-header-color:             $gray-600 !default;
-$dropdown-header-padding-x:         $dropdown-item-padding-x !default;
-$dropdown-header-padding-y:         $dropdown-padding-y !default;
-// fusv-disable
-$dropdown-header-padding:           $dropdown-header-padding-y $dropdown-header-padding-x !default; // Deprecated in v4.2.6
-// fusv-enable
-// scss-docs-end dropdown-variables
-
-// scss-docs-start dropdown-dark-variables
-$dropdown-dark-color:               $gray-300 !default;
-$dropdown-dark-bg:                  $gray-800 !default;
-$dropdown-dark-border-color:        $dropdown-border-color !default;
-$dropdown-dark-divider-bg:          $dropdown-divider-bg !default;
-$dropdown-dark-box-shadow:          null !default;
-$dropdown-dark-link-color:          $dropdown-dark-color !default;
-$dropdown-dark-link-hover-color:    $white !default;
-$dropdown-dark-link-hover-bg:       rgba($white, .15) !default;
-$dropdown-dark-link-active-color:   $dropdown-link-active-color !default;
-$dropdown-dark-link-active-bg:      $dropdown-link-active-bg !default;
-$dropdown-dark-link-disabled-color: $gray-500 !default;
-$dropdown-dark-header-color:        $gray-500 !default;
-// scss-docs-end dropdown-dark-variables
 
 
 // Placeholders
@@ -1527,22 +1394,8 @@ $alert-color-scale:             40% !default; // Deprecated in v4.2.0, to be rem
 
 // Image thumbnails
 
-// scss-docs-start thumbnail-variables
-$thumbnail-padding:                 .25rem !default;
-$thumbnail-bg:                      var(--#{$prefix}body-bg) !default;
-$thumbnail-border-width:            var(--#{$prefix}border-width) !default;
-$thumbnail-border-color:            var(--#{$prefix}border-color) !default;
-$thumbnail-border-radius:           var(--#{$prefix}border-radius) !default;
-$thumbnail-box-shadow:              var(--#{$prefix}box-shadow-sm) !default;
-// scss-docs-end thumbnail-variables
-
 
 // Figures
-
-// scss-docs-start figure-variables
-$figure-caption-font-size:          $small-font-size !default;
-$figure-caption-color:              var(--#{$prefix}secondary-color) !default;
-// scss-docs-end figure-variables
 
 
 // Carousel
@@ -1553,106 +1406,6 @@ $carousel-dark-caption-color:        $black !default; // Deprecated in v5.3.2
 $carousel-dark-control-icon-filter:  invert(1) grayscale(100) !default; // Deprecated in v5.3.2
 // scss-docs-end carousel-dark-variables
 
-
-// scss-docs-start sidebar-variables
-$sidebar-width:                            16rem !default;
-$sidebar-widths: (
-  sm: 12rem,
-  lg: 20rem,
-  xl: 24rem
-) !default;
-$sidebar-padding-y:                        $spacer !default;
-$sidebar-padding-x:                        $spacer !default;
-$sidebar-color:                            var(--#{$prefix}body-color) !default;
-$sidebar-bg:                               var(--#{$prefix}body-bg) !default;
-$sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;
-$sidebar-brand-color:                      var(--#{$prefix}body-color) !default;
-$sidebar-brand-bg:                         rgba($black, .2) !default;
-$sidebar-backdrop-bg:                      $black !default;
-$sidebar-backdrop-opacity:                 .5 !default;
-$sidebar-overlaid-box-shadow:              var(--#{$prefix}box-shadow) !default;
-
-$sidebar-narrow-width:                     4rem !default;
-$sidebar-narrow-padding-x:                 .5rem !default;
-$sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
-// scss-docs-end sidebar-variables
-
-// scss-docs-start sidebar-nav-variables
-$sidebar-nav-padding-y:                       $sidebar-padding-y * .5 !default;
-$sidebar-nav-padding-x:                       $sidebar-padding-x * .5 !default;
-$sidebar-nav-gap:                             1px !default;
-
-$sidebar-nav-title-padding-y:                 .75rem !default;
-$sidebar-nav-title-padding-x:                 1rem !default;
-$sidebar-nav-title-margin-top:                1rem !default;
-$sidebar-nav-title-color:                     var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-title-transition:                height .15s, margin .15s !default;
-
-$sidebar-nav-link-padding-y:                  .75rem !default;
-$sidebar-nav-link-padding-x:                  1rem !default;
-$sidebar-nav-link-color:                      var(--#{$prefix}body-color) !default;
-$sidebar-nav-link-bg:                         transparent !default;
-$sidebar-nav-link-border-width:               0 !default;
-$sidebar-nav-link-border-color:               transparent !default;
-$sidebar-nav-link-border-radius:              var(--#{$prefix}border-radius) !default;
-$sidebar-nav-link-transition:                 background .15s ease, color .15s ease, padding .15s ease !default;
-
-$sidebar-compact-nav-link-padding-y:          .5625rem !default;
-
-$sidebar-narrow-nav-link-padding-y:           .75rem !default;
-$sidebar-narrow-nav-link-padding-x:           .5rem !default;
-
-$sidebar-nav-link-icon-margin:                .75rem !default;
-$sidebar-nav-link-icon-color:                 var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-link-icon-width:                 1.25rem !default;
-$sidebar-nav-link-icon-height:                1.25rem !default;
-$sidebar-nav-link-icon-font-size:             $sidebar-nav-link-icon-height !default;
-
-$sidebar-nav-link-icon-bullet-size:           .3125rem !default;
-$sidebar-nav-link-icon-bullet-bg:             transparent !default;
-$sidebar-nav-link-icon-bullet-border-width:   1px !default;
-$sidebar-nav-link-icon-bullet-border-color:   var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-link-icon-bullet-border-radius:  50rem !default;
-
-$sidebar-nav-link-hover-color:                        var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-hover-bg:                           var(--#{$prefix}tertiary-bg-translucent) !default;
-$sidebar-nav-link-hover-icon-color:                   var(--#{$prefix}body-color) !default;
-$sidebar-nav-link-hover-icon-bullet-bg:               transparent !default;
-$sidebar-nav-link-hover-icon-bullet-border-color:     var(--#{$prefix}body-color) !default;
-
-$sidebar-nav-link-active-color:                       var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-active-bg:                          var(--#{$prefix}tertiary-bg-translucent) !default;
-$sidebar-nav-link-active-icon-color:                  var(--#{$prefix}emphasis-color) !default;
-$sidebar-nav-link-active-icon-bullet-bg:              transparent !default;
-$sidebar-nav-link-active-icon-bullet-border-color:    var(--#{$prefix}emphasis-color) !default;
-
-$sidebar-nav-link-disabled-color:                     var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-link-disabled-icon-color:                var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-link-disabled-icon-bullet-bg:            transparent !default;
-$sidebar-nav-link-disabled-icon-bullet-border-color:  var(--#{$prefix}tertiary-color) !default;
-
-$sidebar-nav-group-bg:                        transparent !default;
-$sidebar-nav-group-border-width:              0 !default;
-$sidebar-nav-group-border-color:              transparent !default;
-$sidebar-nav-group-border-radius:             var(--#{$prefix}border-radius) !default;
-$sidebar-nav-group-transition:                background .15s ease-in-out !default;
-$sidebar-nav-group-toggle-show-color:         $sidebar-nav-link-color !default;
-
-$sidebar-nav-group-items-padding-y:           0 !default;
-$sidebar-nav-group-items-padding-x:           0 !default;
-$sidebar-nav-group-items-transition:          height .15s ease !default;
-
-$sidebar-nav-group-indicator-color:           var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-group-indicator-icon:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>") !default;
-$sidebar-nav-group-indicator-hover-color:     $sidebar-nav-link-hover-color !default;
-$sidebar-nav-group-indicator-hover-icon:      $sidebar-nav-group-indicator-icon !default;
-$sidebar-nav-group-indicator-transition:      transform .15s !default;
-
-$sidebar-nav-tree-group-border-color:          var(--#{$prefix}border-color) !default;
-$sidebar-nav-tree-link-icon-bullet-bg:         var(--#{$prefix}border-color) !default;
-$sidebar-nav-tree-link-hover-icon-bullet-bg:   var(--#{$prefix}border-color) !default;
-$sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !default;
-// scss-docs-end sidebar-nav-variables
 
 // scss-docs-start sidebar-toggler
 $sidebar-toggler-width:             .5rem !default;
@@ -1686,423 +1439,8 @@ $pre-color:                         null !default;
 
 // Auto Complete
 
-// scss-docs-start autocomplete-variables
-$autocomplete-zindex:                    1000 !default;
-$autocomplete-font-family:               $input-font-family !default;
-$autocomplete-font-size:                 $input-font-size !default;
-$autocomplete-font-weight:               $input-font-weight !default;
-$autocomplete-line-height:               $input-line-height !default;
-$autocomplete-padding-y:                 $input-padding-y !default;
-$autocomplete-padding-x:                 $input-padding-x !default;
-$autocomplete-color:                     $input-color !default;
-$autocomplete-bg:                        $input-bg !default;
-$autocomplete-box-shadow:                $box-shadow-inset !default;
 
-$autocomplete-border-width:              $input-border-width !default;
-$autocomplete-border-color:              $input-border-color !default;
-$autocomplete-border-radius:             $input-border-radius !default;
-$autocomplete-border-radius-sm:          $input-border-radius-sm !default;
-$autocomplete-border-radius-lg:          $input-border-radius-lg !default;
-
-$autocomplete-disabled-color:            $input-disabled-color !default;
-$autocomplete-disabled-bg:               $input-disabled-bg !default;
-$autocomplete-disabled-border-color:     $input-disabled-border-color !default;
-
-$autocomplete-focus-color:               $input-focus-color !default;
-$autocomplete-focus-bg:                  $input-focus-bg !default;
-$autocomplete-focus-border-color:        $input-focus-border-color !default;
-$autocomplete-focus-box-shadow:          $input-btn-focus-box-shadow !default;
-
-$autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !default;
-
-$autocomplete-invalid-border-color:      $form-invalid-border-color !default;
-$autocomplete-valid-border-color:        $form-valid-border-color !default;
-
-$autocomplete-cleaner-width:             1.5rem !default;
-$autocomplete-cleaner-height:            1.5rem !default;
-$autocomplete-cleaner-padding-x:         0 !default;
-$autocomplete-cleaner-padding-y:         0 !default;
-$autocomplete-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#000'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$autocomplete-cleaner-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$autocomplete-cleaner-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$autocomplete-cleaner-icon-size:         .625rem !default;
-
-$autocomplete-indicator-width:             1.5rem !default;
-$autocomplete-indicator-height:            1.5rem !default;
-$autocomplete-indicator-padding-x:         0 !default;
-$autocomplete-indicator-padding-y:         0 !default;
-$autocomplete-indicator-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#000'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
-$autocomplete-indicator-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$autocomplete-indicator-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$autocomplete-indicator-icon-size:         .75rem !default;
-
-$autocomplete-dropdown-min-width:        100% !default;
-$autocomplete-dropdown-bg:               var(--#{$prefix}body-bg) !default;
-$autocomplete-dropdown-border-color:     var(--#{$prefix}border-color) !default;
-$autocomplete-dropdown-border-width:     var(--#{$prefix}border-width) !default;
-$autocomplete-dropdown-border-radius:    var(--#{$prefix}border-radius) !default;
-$autocomplete-dropdown-box-shadow:       var(--#{$prefix}box-shadow) !default;
-
-$autocomplete-options-padding-y:         .5rem !default;
-$autocomplete-options-padding-x:         .5rem !default;
-$autocomplete-options-font-size:         $font-size-base !default;
-$autocomplete-options-font-weight:       $font-weight-normal !default;
-$autocomplete-options-color:             var(--#{$prefix}body-color) !default;
-
-$autocomplete-optgroup-label-padding-y:       .5rem !default;
-$autocomplete-optgroup-label-padding-x:       .625rem !default;
-$autocomplete-optgroup-label-font-size:       80% !default;
-$autocomplete-optgroup-label-font-weight:     $font-weight-bold !default;
-$autocomplete-optgroup-label-color:           var(--#{$prefix}tertiary-color) !default;
-$autocomplete-optgroup-label-text-transform:  uppercase !default;
-
-$autocomplete-option-padding-y:               .5rem !default;
-$autocomplete-option-padding-x:               .75rem !default;
-$autocomplete-option-margin-y:                1px !default;
-$autocomplete-option-margin-x:                0 !default;
-$autocomplete-option-border-width:            $input-border-width !default;
-$autocomplete-option-border-color:            transparent !default;
-$autocomplete-option-border-radius:           var(--#{$prefix}border-radius) !default;
-$autocomplete-option-box-shadow:              $box-shadow-inset !default;
-
-$autocomplete-option-hover-color:             var(--#{$prefix}body-color) !default;
-$autocomplete-option-hover-bg:                var(--#{$prefix}tertiary-bg) !default;
-
-$autocomplete-option-focus-box-shadow:        $input-btn-focus-box-shadow !default;
-
-$autocomplete-option-indicator-width:          1em !default;
-$autocomplete-option-indicator-bg:             $form-check-input-bg !default;
-$autocomplete-option-indicator-border:         $form-check-input-border !default;
-$autocomplete-option-indicator-border-radius:  .25em !default;
-
-$autocomplete-option-selected-bg:                      var(--#{$prefix}secondary-bg) !default;
-$autocomplete-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
-$autocomplete-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
-$autocomplete-option-selected-indicator-border-color:  $autocomplete-option-selected-indicator-bg !default;
-
-$autocomplete-option-disabled-color:        var(--#{$prefix}secondary-color) !default;
-
-$autocomplete-font-size-lg:                 $input-font-size-lg !default;
-$autocomplete-padding-y-lg:                 $input-padding-y-lg !default;
-$autocomplete-padding-x-lg:                 $input-padding-x-lg !default;
-
-$autocomplete-font-size-sm:                 $input-font-size-sm !default;
-$autocomplete-padding-y-sm:                 $input-padding-y-sm !default;
-$autocomplete-padding-x-sm:                 $input-padding-x-sm !default;
-// scss-docs-end autocomplete-variables
-
-
-// Calendar
-// scss-docs-start calendar-variables
-$calendar-table-margin:                      .5rem !default;
-$calendar-table-cell-size:                   2.75rem !default;
-
-$calendar-nav-padding:                       .5rem !default;
-$calendar-nav-border-width:                  1px !default;
-$calendar-nav-border-color:                  var(--#{$prefix}border-color) !default;
-
-$calendar-nav-btn-padding-y:                 .25rem !default;
-$calendar-nav-btn-padding-x:                 .5rem !default;
-$calendar-nav-btn-font-size:                 $font-size-sm !default;
-$calendar-nav-btn-bg:                        transparent !default;
-$calendar-nav-btn-border-width:              1px !default;
-$calendar-nav-btn-border-color:              transparent !default;
-$calendar-nav-btn-border-radius:             $border-radius !default;
-
-$calendar-nav-btn-hover-bg:                  transparent !default;
-$calendar-nav-btn-hover-border-color:        transparent !default;
-
-$calendar-nav-btn-focus-border-color:        transparent !default;
-$calendar-nav-btn-focus-box-shadow:          $focus-ring-box-shadow !default;
-
-$calendar-nav-date-font-weight:              600 !default;
-$calendar-nav-date-color:                    var(--#{$prefix}body-color) !default;
-$calendar-nav-date-hover-color:              var(--#{$prefix}primary) !default;
-
-$calendar-nav-icon-width:                    1rem !default;
-$calendar-nav-icon-height:                   1rem !default;
-$calendar-nav-icon-color:                    var(--#{$prefix}tertiary-color) !default;
-$calendar-nav-icon-hover-color:              var(--#{$prefix}body-color) !default;
-
-$calendar-cell-header-inner-font-weight:     600 !default;
-$calendar-cell-header-inner-color:           var(--#{$prefix}secondary-color) !default;
-
-$calendar-cell-hover-color:                  var(--#{$prefix}body-color) !default;
-$calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
-$calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
-
-$calendar-cell-focus-box-shadow:             $focus-ring-box-shadow !default;
-
-$calendar-cell-selected-color:               $white !default;
-$calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
-
-$calendar-cell-range-bg:                     rgba(var(--#{$prefix}primary-rgb), .125) !default;
-$calendar-cell-range-hover-bg:               rgba(var(--#{$prefix}primary-rgb), .25) !default;
-$calendar-cell-range-hover-border-color:     var(--#{$prefix}primary) !default;
-
-$calendar-cell-today-color:                  var(--#{$prefix}danger) !default;
-
-$calendar-cell-week-number-font-weight:      600 !default;
-$calendar-cell-week-number-color:            var(--#{$prefix}secondary-color) !default;
-// scss-docs-end calendar-variables
-
-// Date Picker
-// scss-docs-start date-picker-variables
-$date-picker-zindex:                   1000 !default;
-$date-picker-font-family:              $input-font-family !default;
-$date-picker-font-size:                $input-font-size !default;
-$date-picker-font-size-sm:             $input-font-size-sm !default;
-$date-picker-font-size-lg:             $input-font-size-lg !default;
-$date-picker-font-weight:              $input-font-weight !default;
-$date-picker-line-height:              $input-line-height !default;
-$date-picker-color:                    $input-color !default;
-$date-picker-bg:                       $input-bg !default;
-$date-picker-box-shadow:               $box-shadow-inset !default;
-
-$date-picker-border-width:             $input-border-width !default;
-$date-picker-border-color:             $input-border-color !default;
-$date-picker-border-radius:            $border-radius !default;
-$date-picker-border-radius-sm:         $border-radius-sm !default;
-$date-picker-border-radius-lg:         $border-radius-lg !default;
-
-$date-picker-invalid-border-color:     $form-invalid-border-color !default;
-$date-picker-valid-border-color:       $form-valid-border-color !default;
-
-$date-picker-disabled-color:           $input-disabled-color !default;
-$date-picker-disabled-bg:              $input-disabled-bg !default;
-$date-picker-disabled-border-color:    $input-disabled-border-color !default;
-
-$date-picker-focus-color:              $input-focus-color !default;
-$date-picker-focus-bg:                 $input-focus-bg !default;
-$date-picker-focus-border-color:       $input-focus-border-color !default;
-$date-picker-focus-box-shadow:         $input-btn-focus-box-shadow !default;
-
-$date-picker-placeholder-color:        var(--#{$prefix}secondary-color) !default;
-
-$date-picker-padding-y:                $input-padding-y !default;
-$date-picker-padding-x:                $input-padding-x !default;
-$date-picker-gap:                      $input-padding-x !default;
-
-$date-picker-padding-y-sm:             $input-padding-y-sm !default;
-$date-picker-padding-x-sm:             $input-padding-x-sm !default;
-$date-picker-gap-sm:                   $input-padding-x-sm !default;
-
-$date-picker-padding-y-lg:             $input-padding-y-lg !default;
-$date-picker-padding-x-lg:             $input-padding-x-lg !default;
-$date-picker-gap-lg:                   $input-padding-x-lg !default;
-
-$date-picker-cleaner-width:             1.25rem !default;
-$date-picker-cleaner-icon-size:         1rem !default;
-$date-picker-cleaner-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$date-picker-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='306.912 214.461 256 265.373 205.088 214.461 182.461 237.088 233.373 288 182.461 338.912 205.088 361.539 256 310.627 306.912 361.539 329.539 338.912 278.627 288 329.539 237.088 306.912 214.461'></polygon><path fill='#000' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path></svg>") !default;
-$date-picker-cleaner-icon-hover-color:  var(--#{$prefix}body-color) !default;
-
-$date-picker-cleaner-width-sm:          1rem !default;
-$date-picker-cleaner-width-lg:          1.5rem !default;
-$date-picker-cleaner-icon-size-sm:      .875rem !default;
-$date-picker-cleaner-icon-size-lg:      1.25rem !default;
-
-$date-picker-indicator-width:               1.25rem !default;
-$date-picker-indicator-icon-size:           1rem !default;
-$date-picker-indicator-icon-color:          var(--#{$prefix}tertiary-color) !default;
-$date-picker-indicator-icon:                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><path fill='#000' d='M472,96H384V40H352V96H160V40H128V96H40a24.028,24.028,0,0,0-24,24V456a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V120A24.028,24.028,0,0,0,472,96Zm-8,352H48V128h80v40h32V128H352v40h32V128h80Z'></path><rect width='32' height='32' x='112' y='224' fill='#000'></rect><rect width='32' height='32' x='200' y='224' fill='#000'></rect><rect width='32' height='32' x='280' y='224' fill='#000'></rect><rect width='32' height='32' x='368' y='224' fill='#000'></rect><rect width='32' height='32' x='112' y='296' fill='#000'></rect><rect width='32' height='32' x='200' y='296' fill='#000'></rect><rect width='32' height='32' x='280' y='296' fill='#000'></rect><rect width='32' height='32' x='368' y='296' fill='#000'></rect><rect width='32' height='32' x='112' y='368' fill='#000'></rect><rect width='32' height='32' x='200' y='368' fill='#000'></rect><rect width='32' height='32' x='280' y='368' fill='#000'></rect><rect width='32' height='32' x='368' y='368' fill='#000'></rect></svg>") !default;
-$date-picker-indicator-invalid-icon:        $date-picker-indicator-icon !default;
-$date-picker-indicator-invalid-icon-color:  var(--#{$prefix}form-invalid-color) !default;
-$date-picker-indicator-valid-icon:          $date-picker-indicator-icon !default;
-$date-picker-indicator-valid-icon-color:    var(--#{$prefix}form-valid-color) !default;
-
-$date-picker-indicator-width-sm:            1rem !default;
-$date-picker-indicator-width-lg:            1.5rem !default;
-$date-picker-indicator-icon-size-sm:        .875rem !default;
-$date-picker-indicator-icon-size-lg:        1.25rem !default;
-
-$date-picker-separator-width:            1.25rem !default;
-$date-picker-separator-icon-size:        1rem !default;
-$date-picker-separator-icon-color:       var(--#{$prefix}tertiary-color) !default;
-$date-picker-separator-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='359.873 121.377 337.246 144.004 433.243 240.001 16 240.001 16 240.002 16 272.001 16 272.002 433.24 272.002 337.246 367.996 359.873 390.623 494.498 256 359.873 121.377'></polygon></svg>") !default;
-$date-picker-separator-icon-rtl:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' role='img'><polygon fill='#000' points='497.333 239.999 80.092 239.999 176.087 144.004 153.46 121.377 18.837 256 153.46 390.623 176.087 367.996 80.09 271.999 497.333 271.999 497.333 239.999'></polygon></svg>") !default;
-
-$date-picker-separator-width-sm:         1rem !default;
-$date-picker-separator-width-lg:         1.55rem !default;
-$date-picker-separator-icon-size-sm:     .875rem !default;
-$date-picker-separator-icon-size-lg:     1.25rem !default;
-
-$date-picker-dropdown-bg:                var(--#{$prefix}body-bg) !default;
-$date-picker-dropdown-border-color:      var(--#{$prefix}border-color) !default;
-$date-picker-dropdown-border-width:      var(--#{$prefix}border-width) !default;
-$date-picker-dropdown-border-radius:     var(--#{$prefix}border-radius) !default;
-$date-picker-dropdown-box-shadow:        var(--#{$prefix}box-shadow) !default;
-
-$date-picker-ranges-width:             10rem !default;
-$date-picker-ranges-padding:           $spacer * .5 !default;
-$date-picker-ranges-border-width:      1px !default;
-$date-picker-ranges-border-color:      var(--#{$prefix}border-color) !default;
-
-$date-picker-timepicker-width:         (7 * $calendar-table-cell-size) + (2 * $calendar-table-margin) !default;
-$date-picker-timepicker-border-width:  1px !default;
-$date-picker-timepicker-border-color:  var(--#{$prefix}border-color) !default;
-
-$date-picker-footer-padding:           .5rem !default;
-$date-picker-footer-border-width:      1px !default;
-$date-picker-footer-border-color:      var(--#{$prefix}border-color) !default;
-// scss-docs-end date-picker-variables
-
-// Multi Select
-// scss-docs-start form-multi-select-variables
-$form-multi-select-zindex:                    1000 !default;
-$form-multi-select-font-family:               $input-font-family !default;
-$form-multi-select-font-size:                 $input-font-size !default;
-$form-multi-select-font-weight:               $input-font-weight !default;
-$form-multi-select-line-height:               $input-line-height !default;
-$form-multi-select-color:                     $input-color !default;
-$form-multi-select-bg:                        $input-bg !default;
-$form-multi-select-box-shadow:                $box-shadow-inset !default;
-
-$form-multi-select-border-width:              $input-border-width !default;
-$form-multi-select-border-color:              $input-border-color !default;
-$form-multi-select-border-radius:             $input-border-radius !default;
-$form-multi-select-border-radius-sm:          $input-border-radius-sm !default;
-$form-multi-select-border-radius-lg:          $input-border-radius-lg !default;
-
-$form-multi-select-disabled-color:            $input-disabled-color !default;
-$form-multi-select-disabled-bg:               $input-disabled-bg !default;
-$form-multi-select-disabled-border-color:     $input-disabled-border-color !default;
-
-$form-multi-select-focus-color:               $input-focus-color !default;
-$form-multi-select-focus-bg:                  $input-focus-bg !default;
-$form-multi-select-focus-border-color:        $input-focus-border-color !default;
-$form-multi-select-focus-box-shadow:          $input-btn-focus-box-shadow !default;
-
-$form-multi-select-invalid-border-color:      $form-invalid-border-color !default;
-$form-multi-select-valid-border-color:        $form-valid-border-color !default;
-
-$form-multi-select-placeholder-color:         var(--#{$prefix}secondary-color) !default;
-
-$form-multi-select-selection-padding-y:       $input-padding-y !default;
-$form-multi-select-selection-padding-x:       $input-padding-x !default;
-$form-multi-select-selection-tags-gap:        .25rem !default;
-$form-multi-select-selection-tags-padding-y:  .25rem !default;
-$form-multi-select-selection-tags-padding-x:  .25rem !default;
-
-$form-multi-select-tag-bg:                    var(--#{$prefix}secondary-bg) !default;
-$form-multi-select-tag-border-width:          var(--#{$prefix}border-width) !default;
-$form-multi-select-tag-border-color:          var(--#{$prefix}border-color) !default;
-$form-multi-select-tag-border-radius:         .25rem !default;
-$form-multi-select-tag-border-radius-sm:      .125rem !default;
-$form-multi-select-tag-border-radius-lg:      .375rem !default;
-$form-multi-select-tag-padding-y:             .0625rem !default;
-$form-multi-select-tag-padding-x:             .5rem !default;
-
-$form-multi-select-tag-delete-width:             .75rem !default;
-$form-multi-select-tag-delete-height:            .75rem !default;
-$form-multi-select-tag-delete-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#000'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-tag-delete-icon-color:        var(--#{$prefix}secondary-color) !default;
-$form-multi-select-tag-delete-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$form-multi-select-tag-delete-icon-size:         .5rem !default;
-
-$form-multi-select-cleaner-width:             1.5rem !default;
-$form-multi-select-cleaner-height:            1.5rem !default;
-$form-multi-select-cleaner-padding-x:         0 !default;
-$form-multi-select-cleaner-padding-y:         0 !default;
-$form-multi-select-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#000'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-cleaner-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$form-multi-select-cleaner-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$form-multi-select-cleaner-icon-size:         .625rem !default;
-
-$form-multi-select-indicator-width:             1.5rem !default;
-$form-multi-select-indicator-height:            1.5rem !default;
-$form-multi-select-indicator-padding-x:         0 !default;
-$form-multi-select-indicator-padding-y:         0 !default;
-$form-multi-select-indicator-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='#000'><path d='M256.045 416.136.717 160.807l29.579-29.579 225.749 225.748 225.749-225.748 29.579 29.579-255.328 255.329z'/></svg>") !default;
-$form-multi-select-indicator-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$form-multi-select-indicator-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$form-multi-select-indicator-icon-size:         .75rem !default;
-
-$form-multi-select-dropdown-min-width:        100% !default;
-$form-multi-select-dropdown-bg:               var(--#{$prefix}body-bg) !default;
-$form-multi-select-dropdown-border-color:     var(--#{$prefix}border-color) !default;
-$form-multi-select-dropdown-border-width:     var(--#{$prefix}border-width) !default;
-$form-multi-select-dropdown-border-radius:    var(--#{$prefix}border-radius) !default;
-$form-multi-select-dropdown-box-shadow:       var(--#{$prefix}box-shadow) !default;
-
-$form-multi-select-select-all-padding-y:      .5rem !default;
-$form-multi-select-select-all-padding-x:      .75rem !default;
-$form-multi-select-select-all-color:          var(--#{$prefix}body-secondary-color) !default;
-$form-multi-select-select-all-bg:             transparent !default;
-$form-multi-select-select-all-hover-color:    var(--#{$prefix}body-color) !default;
-$form-multi-select-select-all-hover-bg:       var(--#{$prefix}tertiary-bg) !default;
-$form-multi-select-select-all-border-width:   0 !default;
-$form-multi-select-select-all-border-color:   transparent !default;
-$form-multi-select-select-all-border-radius:  var(--#{$prefix}border-radius) !default;
-
-$form-multi-select-dropdown-header-padding-y:    .375rem !default;
-$form-multi-select-dropdown-header-padding-x:    .375rem !default;
-$form-multi-select-dropdown-header-border-width: var(--#{$prefix}border-width) !default;
-$form-multi-select-dropdown-header-border-color: var(--#{$prefix}border-color) !default;
-
-$form-multi-select-options-gap:               .125rem !default;
-$form-multi-select-options-padding-y:         .375rem !default;
-$form-multi-select-options-padding-x:         .375rem !default;
-$form-multi-select-options-font-size:         $font-size-base !default;
-$form-multi-select-options-font-weight:       $font-weight-normal !default;
-$form-multi-select-options-color:             var(--#{$prefix}body-color) !default;
-
-$form-multi-select-optgroup-label-padding-y:       .5rem !default;
-$form-multi-select-optgroup-label-padding-x:       .625rem !default;
-$form-multi-select-optgroup-label-border-radius:   var(--#{$prefix}border-radius) !default;
-$form-multi-select-optgroup-label-font-size:       80% !default;
-$form-multi-select-optgroup-label-font-weight:     $font-weight-bold !default;
-$form-multi-select-optgroup-label-color:           var(--#{$prefix}tertiary-color) !default;
-$form-multi-select-optgroup-label-text-transform:  uppercase !default;
-
-$form-multi-select-option-padding-y:               .5rem !default;
-$form-multi-select-option-padding-x:               1.25rem !default;
-$form-multi-select-option-margin-y:                0 !default;
-$form-multi-select-option-margin-x:                0 !default;
-$form-multi-select-option-border-width:            $input-border-width !default;
-$form-multi-select-option-border-color:            transparent !default;
-$form-multi-select-option-border-radius:           var(--#{$prefix}border-radius) !default;
-$form-multi-select-option-box-shadow:              $box-shadow-inset !default;
-
-$form-multi-select-option-hover-color:             var(--#{$prefix}body-color) !default;
-$form-multi-select-option-hover-bg:                var(--#{$prefix}tertiary-bg) !default;
-
-$form-multi-select-option-focus-box-shadow:        $input-btn-focus-box-shadow !default;
-
-$form-multi-select-option-indicator-width:          1em !default;
-$form-multi-select-option-indicator-bg:             $form-check-input-bg !default;
-$form-multi-select-option-indicator-border:         $form-check-input-border !default;
-$form-multi-select-option-indicator-border-radius:  .25em !default;
-
-$form-multi-select-option-selected-bg:                      var(--#{$prefix}secondary-bg) !default;
-$form-multi-select-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
-$form-multi-select-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
-$form-multi-select-option-selected-indicator-border-color:  $form-multi-select-option-selected-indicator-bg !default;
-
-$form-multi-select-option-indeterminate-indicator-bg:           $form-check-input-indeterminate-bg-color !default;
-$form-multi-select-option-indeterminate-indicator-bg-image:     $form-check-input-indeterminate-bg-image !default;
-$form-multi-select-option-indeterminate-indicator-border-color: $form-multi-select-option-indeterminate-indicator-bg !default;
-
-$form-multi-select-option-disabled-color:        var(--#{$prefix}secondary-color) !default;
-
-$form-multi-select-font-size-lg:                 $input-font-size-lg !default;
-$form-multi-select-selection-padding-y-lg:       $input-padding-y-lg !default;
-$form-multi-select-selection-padding-x-lg:       $input-padding-x-lg !default;
-$form-multi-select-selection-tags-gap-lg:        .25rem !default;
-$form-multi-select-selection-tags-padding-y-lg:  .25rem !default;
-$form-multi-select-selection-tags-padding-x-lg:  .25rem !default;
-$form-multi-select-tag-padding-y-lg:             .175rem !default;
-$form-multi-select-tag-padding-x-lg:             .5rem !default;
-
-$form-multi-select-font-size-sm:                 $input-font-size-sm !default;
-$form-multi-select-selection-padding-y-sm:       $input-padding-y-sm !default;
-$form-multi-select-selection-padding-x-sm:       $input-padding-x-sm !default;
-$form-multi-select-selection-tags-gap-sm:        .125rem !default;
-$form-multi-select-selection-tags-padding-y-sm:  .0625rem !default;
-$form-multi-select-selection-tags-padding-x-sm:  .125rem !default;
-$form-multi-select-tag-padding-y-sm:             .075rem !default;
-$form-multi-select-tag-padding-x-sm:             .5rem !default;
-// scss-docs-end form-multi-select-variables
+// Time Picker
 
 // Time Picker
 // scss-docs-start time-picker-variables
@@ -2205,51 +1543,3 @@ $time-picker-inline-select-padding-y:       $input-padding-y-sm !default;
 $time-picker-inline-select-padding-x:       $input-padding-x-sm !default;
 $time-picker-inline-select-disabled-color:  $input-disabled-color !default;
 // scss-docs-end time-picker-variables
-
-// Range Slider
-// scss-docs-start range-slider-variables
-$range-slider-track-width:                 100% !default;
-$range-slider-track-height:                .5rem !default;
-$range-slider-track-cursor:                pointer !default;
-$range-slider-track-bg:                    var(--#{$prefix}secondary-bg) !default;
-$range-slider-track-border-radius:         1rem !default;
-$range-slider-track-box-shadow:            var(--#{$prefix}box-shadow-inset) !default;
-
-$range-slider-track-in-range-bg:           rgba(var(--#{$prefix}primary-rgb), .5) !default;
-$range-slider-disabled-track-in-range-bg:  rgba(var(--#{$prefix}secondary-rgb), .375) !default;
-
-$range-slider-label-padding-y:             0 !default;
-$range-slider-label-padding-x:             0 !default;
-$range-slider-label-font-size:             $font-size-sm !default;
-$range-slider-label-color:                 var(--#{$prefix}body-color) !default;
-
-$range-slider-thumb-width:                 1rem !default;
-$range-slider-thumb-height:                $range-slider-thumb-width !default;
-$range-slider-thumb-bg:                    $component-active-bg !default;
-$range-slider-thumb-border:                0 !default;
-$range-slider-thumb-border-radius:         1rem !default;
-$range-slider-thumb-box-shadow:            0 .1rem .25rem rgba($black, .1) !default;
-$range-slider-thumb-focus-box-shadow:      0 0 0 1px $body-bg, $input-focus-box-shadow !default;
-$range-slider-thumb-active-bg:             tint-color($primary, 70%) !default;
-$range-slider-thumb-disabled-bg:           rgba(var(--#{$prefix}secondary-rgb), 1) !default;
-$range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-
-$range-slider-tooltip-max-width:           200px !default;
-$range-slider-tooltip-padding-y:           $spacer * .25 !default;
-$range-slider-tooltip-padding-x:           $spacer * .5 !default;
-$range-slider-tooltip-margin-end:          .25rem !default;
-$range-slider-tooltip-margin-bottom:       .25rem !default;
-$range-slider-tooltip-font-size:           $font-size-sm !default;
-$range-slider-tooltip-color:               var(--#{$prefix}body-color) !default;
-$range-slider-tooltip-bg:                  var(--#{$prefix}secondary-bg) !default;
-$range-slider-tooltip-border-radius:       var(--#{$prefix}border-radius) !default;
-$range-slider-tooltip-box-shadow:          var(--#{$prefix}box-shadow) !default;
-$range-slider-tooltip-transition:          visibility .15s, opacity .15s ease !default;
-
-$range-slider-tooltip-arrow-width:         .8rem !default;
-$range-slider-tooltip-arrow-height:        .4rem !default;
-
-$range-slider-vertical-track-width:        .5rem !default;
-$range-slider-vertical-track-height:       10rem !default;
-// scss-docs-end range-slider-variables
-

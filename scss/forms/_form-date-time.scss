@@ -2,6 +2,12 @@
 @use "../mixins/box-shadow" as *;
 @use "../variables" as *;
 
+// scss-docs-start form-date-time-variables
+$form-date-time-placeholder-color:       $input-placeholder-color !default;
+$form-date-time-section-border-radius:   .25rem !default;
+$form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25) !default;
+// scss-docs-end form-date-time-variables
+
 @layer forms {
   // The component element carries `.form-control` for the base look, sizing
   // (`.form-control-sm`/`-lg`), validation states, and input group support.
