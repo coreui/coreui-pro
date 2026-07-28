@@ -38,6 +38,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-focus-color: #{$input-focus-color},
     --#{$prefix}control-focus-bg: #{$input-focus-bg},
     --#{$prefix}control-focus-border-color: #{$input-focus-border-color},
+    --#{$prefix}control-focus-box-shadow: #{$input-focus-box-shadow},
     --#{$prefix}control-disabled-color: #{$input-disabled-color},
     --#{$prefix}control-disabled-bg: #{$input-disabled-bg},
     --#{$prefix}control-disabled-border-color: #{$input-disabled-border-color},
@@ -93,10 +94,10 @@ $form-control-tokens: defaults(
       border-color: var(--#{$prefix}control-focus-border-color);
       outline: 0;
       @if $enable-shadows {
-        @include box-shadow($input-box-shadow, $input-focus-box-shadow);
+        @include box-shadow(var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow));
       } @else {
         // Avoid using mixin so we can pass custom focus shadow properly
-        box-shadow: $input-focus-box-shadow;
+        box-shadow: var(--#{$prefix}control-focus-box-shadow);
       }
     }
 
