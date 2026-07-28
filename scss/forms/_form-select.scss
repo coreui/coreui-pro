@@ -1,11 +1,47 @@
+@use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/color-mode" as *;
 @use "../mixins/ltr-rtl" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
 @use "../variables-dark" as *;
+
+// scss-docs-start form-select-tokens
+// Shared control tokens plus the select-only ones, so .form-select answers to
+// the same runtime knobs as .form-control.
+$form-select-tokens: () !default;
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-select-tokens: defaults(
+  (
+    --#{$prefix}control-padding-y: #{$form-select-padding-y},
+    --#{$prefix}control-padding-x: #{$form-select-padding-x},
+    --#{$prefix}control-font-family: #{$form-select-font-family},
+    --#{$prefix}control-font-size: #{$form-select-font-size},
+    --#{$prefix}control-font-weight: #{$form-select-font-weight},
+    --#{$prefix}control-line-height: #{$form-select-line-height},
+    --#{$prefix}control-color: #{$form-select-color},
+    --#{$prefix}control-bg: #{$form-select-bg},
+    --#{$prefix}control-border-width: #{$form-select-border-width},
+    --#{$prefix}control-border-color: #{$form-select-border-color},
+    --#{$prefix}control-border-radius: #{$form-select-border-radius},
+    --#{$prefix}control-box-shadow: #{$form-select-box-shadow},
+    --#{$prefix}control-transition: #{$form-select-transition},
+    --#{$prefix}control-focus-border-color: #{$form-select-focus-border-color},
+    --#{$prefix}control-disabled-color: #{$form-select-disabled-color},
+    --#{$prefix}control-disabled-bg: #{$form-select-disabled-bg},
+    --#{$prefix}control-disabled-border-color: #{$form-select-disabled-border-color},
+    --#{$prefix}form-select-bg-img: #{escape-svg($form-select-indicator)},
+    --#{$prefix}form-select-indicator-padding: #{$form-select-indicator-padding},
+    --#{$prefix}form-select-bg-size: #{$form-select-bg-size},
+  ),
+  $form-select-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end form-select-tokens
 
 @layer forms {
   // Select
@@ -14,32 +50,32 @@
   // https://primer.github.io/.
 
   .form-select {
-    --#{$prefix}form-select-bg-img: #{escape-svg($form-select-indicator)};
+    @include tokens($form-select-tokens);
 
     display: block;
     width: 100%;
-    padding-inline-start: $form-select-padding-x;
-    padding-inline-end: $form-select-indicator-padding;
-    padding-top: $form-select-padding-y;
-    padding-bottom: $form-select-padding-y;
-    font-family: $form-select-font-family;
-    font-size: $form-select-font-size;
-    font-weight: $form-select-font-weight;
-    line-height: $form-select-line-height;
-    color: $form-select-color;
+    padding-inline-start: var(--#{$prefix}control-padding-x);
+    padding-inline-end: var(--#{$prefix}form-select-indicator-padding);
+    padding-top: var(--#{$prefix}control-padding-y);
+    padding-bottom: var(--#{$prefix}control-padding-y);
+    font-family: var(--#{$prefix}control-font-family);
+    font-size: var(--#{$prefix}control-font-size);
+    font-weight: var(--#{$prefix}control-font-weight);
+    line-height: var(--#{$prefix}control-line-height);
+    color: var(--#{$prefix}control-color);
     appearance: none;
-    background-color: $form-select-bg;
+    background-color: var(--#{$prefix}control-bg);
     background-image: var(--#{$prefix}form-select-bg-img), var(--#{$prefix}form-select-bg-icon, none);
     background-repeat: no-repeat;
     @include ltr-rtl-value-only("background-position", $form-select-bg-position);
-    background-size: $form-select-bg-size;
-    border: $form-select-border-width solid $form-select-border-color;
-    @include border-radius($form-select-border-radius, 0);
-    @include box-shadow($form-select-box-shadow);
-    @include transition($form-select-transition);
+    background-size: var(--#{$prefix}form-select-bg-size);
+    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+    @include border-radius(var(--#{$prefix}control-border-radius), 0);
+    @include box-shadow(var(--#{$prefix}control-box-shadow));
+    @include transition(var(--#{$prefix}control-transition));
 
     &:focus {
-      border-color: $form-select-focus-border-color;
+      border-color: var(--#{$prefix}control-focus-border-color);
       outline: 0;
       @if $enable-shadows {
         @include box-shadow($form-select-box-shadow, $form-select-focus-box-shadow);
@@ -51,37 +87,47 @@
 
     &[multiple],
     &[size]:not([size="1"]) {
-      padding-inline-end: $form-select-padding-x;
+      padding-inline-end: var(--#{$prefix}control-padding-x);
       background-image: none;
     }
 
     &:disabled {
-      color: $form-select-disabled-color;
-      background-color: $form-select-disabled-bg;
-      border-color: $form-select-disabled-border-color;
+      color: var(--#{$prefix}control-disabled-color);
+      background-color: var(--#{$prefix}control-disabled-bg);
+      border-color: var(--#{$prefix}control-disabled-border-color);
     }
 
     // Remove outline from select box in FF
     &:-moz-focusring {
       color: transparent;
-      text-shadow: 0 0 0 $form-select-color;
+      text-shadow: 0 0 0 var(--#{$prefix}control-color);
     }
   }
 
   .form-select-sm {
-    padding-inline-start: $form-select-padding-x-sm;
-    padding-top: $form-select-padding-y-sm;
-    padding-bottom: $form-select-padding-y-sm;
-    font-size: $form-select-font-size-sm;
-    @include border-radius($form-select-border-radius-sm);
+    --#{$prefix}control-padding-y: #{$form-select-padding-y-sm};
+    --#{$prefix}control-padding-x: #{$form-select-padding-x-sm};
+    --#{$prefix}control-font-size: #{$form-select-font-size-sm};
+    --#{$prefix}control-border-radius: #{$form-select-border-radius-sm};
+
+    padding-inline-start: var(--#{$prefix}control-padding-x);
+    padding-top: var(--#{$prefix}control-padding-y);
+    padding-bottom: var(--#{$prefix}control-padding-y);
+    font-size: var(--#{$prefix}control-font-size);
+    @include border-radius(var(--#{$prefix}control-border-radius));
   }
 
   .form-select-lg {
-    padding-inline-start: $form-select-padding-x-lg;
-    padding-top: $form-select-padding-y-lg;
-    padding-bottom: $form-select-padding-y-lg;
-    font-size: $form-select-font-size-lg;
-    @include border-radius($form-select-border-radius-lg);
+    --#{$prefix}control-padding-y: #{$form-select-padding-y-lg};
+    --#{$prefix}control-padding-x: #{$form-select-padding-x-lg};
+    --#{$prefix}control-font-size: #{$form-select-font-size-lg};
+    --#{$prefix}control-border-radius: #{$form-select-border-radius-lg};
+
+    padding-inline-start: var(--#{$prefix}control-padding-x);
+    padding-top: var(--#{$prefix}control-padding-y);
+    padding-bottom: var(--#{$prefix}control-padding-y);
+    font-size: var(--#{$prefix}control-font-size);
+    @include border-radius(var(--#{$prefix}control-border-radius));
   }
 
   @if $enable-dark-mode {

@@ -1,3 +1,4 @@
+@use "buttons" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "functions/math" as *;
@@ -5,8 +6,8 @@
 @use "mixins/color-mode" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "variables-dark" as *;
 @use "variables" as *;
+@use "variables-dark" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 

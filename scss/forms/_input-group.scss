@@ -1,6 +1,8 @@
 @use "sass:map";
 @use "sass:string";
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/tokens" as *;
 @use "../variables" as *;
 
 // scss-docs-start input-group-variables
@@ -11,6 +13,31 @@ $input-group-addon-color:               $input-color !default;
 $input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
 $input-group-addon-border-color:        $input-border-color !default;
 // scss-docs-end input-group-variables
+
+// scss-docs-start input-group-tokens
+// The addon matches the text controls it sits next to, so its sizing lives in
+// the shared --#{$prefix}control-* namespace; only the addon-specific looks
+// keep the --#{$prefix}input-group-addon-* names.
+$input-group-tokens: () !default;
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$input-group-tokens: defaults(
+  (
+    --#{$prefix}control-padding-y: #{$input-group-addon-padding-y},
+    --#{$prefix}control-padding-x: #{$input-group-addon-padding-x},
+    --#{$prefix}control-font-size: #{$input-font-size},
+    --#{$prefix}control-line-height: #{$input-line-height},
+    --#{$prefix}control-border-width: #{$input-border-width},
+    --#{$prefix}control-border-radius: #{$input-border-radius},
+    --#{$prefix}input-group-addon-font-weight: #{$input-group-addon-font-weight},
+    --#{$prefix}input-group-addon-color: #{$input-group-addon-color},
+    --#{$prefix}input-group-addon-bg: #{$input-group-addon-bg},
+    --#{$prefix}input-group-addon-border-color: #{$input-group-addon-border-color},
+  ),
+  $input-group-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end input-group-tokens
 
 @layer forms {
   //
@@ -70,18 +97,20 @@ $input-group-addon-border-color:        $input-border-color !default;
   // to prepend or append to an input.
 
   .input-group-text {
+    @include tokens($input-group-tokens);
+
     display: flex;
     align-items: center;
-    padding: $input-group-addon-padding-y $input-group-addon-padding-x;
-    font-size: $input-font-size; // Match inputs
-    font-weight: $input-group-addon-font-weight;
-    line-height: $input-line-height;
-    color: var(--#{$prefix}input-group-addon-color, $input-group-addon-color);
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size); // Match inputs
+    font-weight: var(--#{$prefix}input-group-addon-font-weight);
+    line-height: var(--#{$prefix}control-line-height);
+    color: var(--#{$prefix}input-group-addon-color);
     text-align: center;
     white-space: nowrap;
-    background-color: var(--#{$prefix}input-group-addon-bg, $input-group-addon-bg);
-    border: $input-border-width solid var(--#{$prefix}input-group-addon-border-color, $input-group-addon-border-color);
-    @include border-radius($input-border-radius);
+    background-color: var(--#{$prefix}input-group-addon-bg);
+    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}input-group-addon-border-color);
+    @include border-radius(var(--#{$prefix}control-border-radius));
   }
 
 
@@ -94,18 +123,28 @@ $input-group-addon-border-color:        $input-border-color !default;
   .input-group-lg > .form-select,
   .input-group-lg > .input-group-text,
   .input-group-lg > .btn {
-    padding: $input-padding-y-lg $input-padding-x-lg;
-    font-size: $input-font-size-lg;
-    @include border-radius($input-border-radius-lg);
+    --#{$prefix}control-padding-y: #{$input-padding-y-lg};
+    --#{$prefix}control-padding-x: #{$input-padding-x-lg};
+    --#{$prefix}control-font-size: #{$input-font-size-lg};
+    --#{$prefix}control-border-radius: #{$input-border-radius-lg};
+
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size);
+    @include border-radius(var(--#{$prefix}control-border-radius));
   }
 
   .input-group-sm > .form-control,
   .input-group-sm > .form-select,
   .input-group-sm > .input-group-text,
   .input-group-sm > .btn {
-    padding: $input-padding-y-sm $input-padding-x-sm;
-    font-size: $input-font-size-sm;
-    @include border-radius($input-border-radius-sm);
+    --#{$prefix}control-padding-y: #{$input-padding-y-sm};
+    --#{$prefix}control-padding-x: #{$input-padding-x-sm};
+    --#{$prefix}control-font-size: #{$input-font-size-sm};
+    --#{$prefix}control-border-radius: #{$input-border-radius-sm};
+
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size);
+    @include border-radius(var(--#{$prefix}control-border-radius));
   }
 
   .input-group-lg > .form-select,

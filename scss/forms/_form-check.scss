@@ -1,10 +1,62 @@
 @use "sass:map";
+@use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/color-mode" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
 @use "../variables-dark" as *;
+
+// scss-docs-start form-check-tokens
+// Tokens the wrapper owns; the input reads them by inheritance.
+$form-check-tokens: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-check-tokens: defaults(
+  (
+    --#{$prefix}form-check-min-height: #{$form-check-min-height},
+    --#{$prefix}form-check-padding-start: #{$form-check-padding-start},
+    --#{$prefix}form-check-margin-bottom: #{$form-check-margin-bottom},
+    --#{$prefix}form-check-inline-margin-end: #{$form-check-inline-margin-end},
+    --#{$prefix}form-check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}form-switch-padding-start: #{$form-switch-padding-start},
+  ),
+  $form-check-tokens
+);
+// scss-docs-end form-check-tokens
+
+// scss-docs-start form-check-input-tokens
+// Tokens the input owns, so it still styles itself when used outside .form-check
+// — an input group, for instance. Keeping them off the wrapper means a wrapper
+// or :root override is not shadowed by the input's own declaration.
+$form-check-input-tokens: () !default;
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-check-input-tokens: defaults(
+  (
+    --#{$prefix}form-check-input-width: #{$form-check-input-width},
+    --#{$prefix}form-check-bg: #{$form-check-input-bg},
+    --#{$prefix}form-check-input-border: #{$form-check-input-border},
+    --#{$prefix}form-check-input-border-radius: #{$form-check-input-border-radius},
+    --#{$prefix}form-check-radio-border-radius: #{$form-check-radio-border-radius},
+    --#{$prefix}form-check-input-active-filter: #{$form-check-input-active-filter},
+    --#{$prefix}form-check-input-focus-border: #{$form-check-input-focus-border},
+    --#{$prefix}form-check-input-focus-box-shadow: #{$form-check-input-focus-box-shadow},
+    --#{$prefix}form-check-input-checked-bg-color: #{$form-check-input-checked-bg-color},
+    --#{$prefix}form-check-input-checked-border-color: #{$form-check-input-checked-border-color},
+    --#{$prefix}form-check-input-indeterminate-bg-color: #{$form-check-input-indeterminate-bg-color},
+    --#{$prefix}form-check-input-indeterminate-border-color: #{$form-check-input-indeterminate-border-color},
+    --#{$prefix}form-check-input-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}form-switch-width: #{$form-switch-width},
+    --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image)},
+    --#{$prefix}form-switch-border-radius: #{$form-switch-border-radius},
+    --#{$prefix}form-switch-transition: #{$form-switch-transition},
+    --#{$prefix}form-switch-checked-bg-position: #{$form-switch-checked-bg-position},
+  ),
+  $form-check-input-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end form-check-input-tokens
 
 @layer forms {
   //
@@ -12,33 +64,38 @@
   //
 
   .form-check {
+    @include tokens($form-check-tokens);
+
     display: block;
-    min-height: $form-check-min-height;
-    padding-inline-start: $form-check-padding-start;
-    margin-bottom: $form-check-margin-bottom;
+    min-height: var(--#{$prefix}form-check-min-height);
+    padding-inline-start: var(--#{$prefix}form-check-padding-start);
+    margin-bottom: var(--#{$prefix}form-check-margin-bottom);
 
     .form-check-input {
       float: inline-start;
-      margin-inline-start: $form-check-padding-start * -1;
+      // stylelint-disable-next-line function-disallowed-list
+      margin-inline-start: calc(var(--#{$prefix}form-check-padding-start) * -1);
     }
   }
 
   .form-check-reverse {
-    padding-inline: 0 $form-check-padding-start;
+    padding-inline: 0 var(--#{$prefix}form-check-padding-start);
     text-align: end;
 
     .form-check-input {
       float: inline-end;
-      margin-inline: 0 $form-check-padding-start * -1;
+      // stylelint-disable-next-line function-disallowed-list
+      margin-inline: 0 calc(var(--#{$prefix}form-check-padding-start) * -1);
     }
   }
 
   .form-check-input {
-    --#{$prefix}form-check-bg: #{$form-check-input-bg};
+    @include tokens($form-check-input-tokens);
+
 
     flex-shrink: 0;
-    width: $form-check-input-width;
-    height: $form-check-input-width;
+    width: var(--#{$prefix}form-check-input-width);
+    height: var(--#{$prefix}form-check-input-width);
     margin-top: ($line-height-base - $form-check-input-width) * .5; // line-height minus check height
     vertical-align: top;
     appearance: none;
@@ -47,32 +104,32 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
-    border: $form-check-input-border;
+    border: var(--#{$prefix}form-check-input-border);
     print-color-adjust: exact; // Keep themed appearance for print
     @include transition($form-check-transition);
 
     &[type="checkbox"] {
-      @include border-radius($form-check-input-border-radius);
+      @include border-radius(var(--#{$prefix}form-check-input-border-radius));
     }
 
     &[type="radio"] {
       // stylelint-disable-next-line property-disallowed-list
-      border-radius: $form-check-radio-border-radius;
+      border-radius: var(--#{$prefix}form-check-radio-border-radius);
     }
 
     &:active {
-      filter: $form-check-input-active-filter;
+      filter: var(--#{$prefix}form-check-input-active-filter);
     }
 
     &:focus {
-      border-color: $form-check-input-focus-border;
+      border-color: var(--#{$prefix}form-check-input-focus-border);
       outline: 0;
-      box-shadow: $form-check-input-focus-box-shadow;
+      box-shadow: var(--#{$prefix}form-check-input-focus-box-shadow);
     }
 
     &:checked {
-      background-color: var(--#{$prefix}form-check-input-checked-bg-color, $form-check-input-checked-bg-color);
-      border-color: var(--#{$prefix}form-check-input-checked-border-color, $form-check-input-checked-border-color);
+      background-color: var(--#{$prefix}form-check-input-checked-bg-color);
+      border-color: var(--#{$prefix}form-check-input-checked-border-color);
 
       &[type="checkbox"] {
         @if $enable-gradients {
@@ -92,8 +149,8 @@
     }
 
     &[type="checkbox"]:indeterminate {
-      background-color: $form-check-input-indeterminate-bg-color;
-      border-color: $form-check-input-indeterminate-border-color;
+      background-color: var(--#{$prefix}form-check-input-indeterminate-bg-color);
+      border-color: var(--#{$prefix}form-check-input-indeterminate-border-color);
 
       @if $enable-gradients {
         --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)}, var(--#{$prefix}gradient);
@@ -105,7 +162,7 @@
     &:disabled {
       pointer-events: none;
       filter: none;
-      opacity: $form-check-input-disabled-opacity;
+      opacity: var(--#{$prefix}form-check-input-disabled-opacity);
     }
 
     // Use disabled attribute in addition of :disabled pseudo-class
@@ -114,7 +171,7 @@
     &:disabled {
       ~ .form-check-label {
         cursor: default;
-        opacity: $form-check-label-disabled-opacity;
+        opacity: var(--#{$prefix}form-check-label-disabled-opacity);
       }
     }
   }
@@ -129,24 +186,23 @@
   //
 
   .form-switch {
-    padding-inline-start: $form-switch-padding-start;
+    padding-inline-start: var(--#{$prefix}form-switch-padding-start);
 
     .form-check-input {
-      --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image)};
-
-      width: $form-switch-width;
-      margin-inline-start: $form-switch-padding-start * -1;
+      width: var(--#{$prefix}form-switch-width);
+      // stylelint-disable-next-line function-disallowed-list
+      margin-inline-start: calc(var(--#{$prefix}form-switch-padding-start) * -1);
       background-image: var(--#{$prefix}form-switch-bg);
       background-position: left center;
-      @include border-radius($form-switch-border-radius, 0);
-      @include transition($form-switch-transition);
+      @include border-radius(var(--#{$prefix}form-switch-border-radius), 0);
+      @include transition(var(--#{$prefix}form-switch-transition));
 
       &:focus {
         --#{$prefix}form-switch-bg: #{escape-svg($form-switch-focus-bg-image)};
       }
 
       &:checked {
-        background-position: $form-switch-checked-bg-position;
+        background-position: var(--#{$prefix}form-switch-checked-bg-position);
 
         @if $enable-gradients {
           --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)}, var(--#{$prefix}gradient);
@@ -157,10 +213,11 @@
     }
 
     &.form-check-reverse {
-      padding-inline: 0 $form-switch-padding-start;
+      padding-inline: 0 var(--#{$prefix}form-switch-padding-start);
 
       .form-check-input {
-        margin-inline: 0 $form-switch-padding-start * -1;
+        // stylelint-disable-next-line function-disallowed-list
+        margin-inline: 0 calc(var(--#{$prefix}form-switch-padding-start) * -1);
       }
     }
   }
@@ -188,7 +245,7 @@
 
   .form-check-inline {
     display: inline-block;
-    margin-inline-end: $form-check-inline-margin-end;
+    margin-inline-end: var(--#{$prefix}form-check-inline-margin-end);
   }
 
   .btn-check {

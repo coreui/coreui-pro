@@ -44,6 +44,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},
     --#{$prefix}control-action-hover-bg: #{$form-file-button-hover-bg},
+    --#{$prefix}control-action-transition: var(--#{$prefix}btn-input-transition),
   ),
   $form-control-tokens
 );
@@ -161,7 +162,7 @@ $form-control-tokens: defaults(
       border-width: 0;
       border-inline-end-width: var(--#{$prefix}control-border-width);
       border-radius: 0; // stylelint-disable-line property-disallowed-list
-      @include transition(var(--#{$prefix}control-transition));
+      @include transition(var(--#{$prefix}control-action-transition));
     }
 
     &:hover:not(:disabled):not([readonly])::file-selector-button {
@@ -244,5 +245,46 @@ $form-control-tokens: defaults(
       margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
       margin-inline-end: var(--#{$prefix}control-padding-x);
     }
+  }
+
+  // Make sure textareas don't shrink too much when resized
+  // https://github.com/twbs/bootstrap/pull/29124
+  // stylelint-disable selector-no-qualifying-type
+  textarea {
+    &.form-control {
+      min-height: $input-height;
+    }
+
+    &.form-control-sm {
+      min-height: $input-height-sm;
+    }
+
+    &.form-control-lg {
+      min-height: $input-height-lg;
+    }
+  }
+  // stylelint-enable selector-no-qualifying-type
+
+  .form-control-color {
+    width: $form-color-width;
+    height: $input-height;
+    padding: var(--#{$prefix}control-padding-y);
+
+    &:not(:disabled):not([readonly]) {
+      cursor: pointer;
+    }
+
+    &::-moz-color-swatch {
+      border: 0 !important; // stylelint-disable-line declaration-no-important
+      @include border-radius(var(--#{$prefix}control-border-radius));
+    }
+
+    &::-webkit-color-swatch {
+      border: 0 !important; // stylelint-disable-line declaration-no-important
+      @include border-radius(var(--#{$prefix}control-border-radius));
+    }
+
+    &.form-control-sm { height: $input-height-sm; }
+    &.form-control-lg { height: $input-height-lg; }
   }
 }
