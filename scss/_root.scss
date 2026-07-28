@@ -6,6 +6,7 @@
 @use "mixins/color-mode" as *;
 @use "vendor/rfs" as *;
 @use "maps" as *;
+@use "theme" as *;
 @use "variables" as *;
 @use "variables-dark" as *;
 
@@ -258,3 +259,5 @@
     // scss-docs-end root-dark-mode-vars
   }
 }
+
+@include generate-theme-classes();

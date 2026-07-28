@@ -1,23 +1,36 @@
 @use "sass:map";
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/tokens" as *;
+@use "theme" as *;
 @use "variables" as *;
 
 //
 // Base styles
 //
 
+$alert-tokens: () !default;
+
+// scss-docs-start alert-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$alert-tokens: defaults(
+  (
+    --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, transparent),
+    --#{$prefix}alert-padding-x: #{$alert-padding-x},
+    --#{$prefix}alert-padding-y: #{$alert-padding-y},
+    --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom},
+    --#{$prefix}alert-color: var(--#{$prefix}theme-fg, inherit),
+    --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, transparent),
+    --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color),
+    --#{$prefix}alert-border-radius: #{$alert-border-radius},
+    --#{$prefix}alert-link-color: var(--#{$prefix}theme-fg, inherit),
+  ),
+  $alert-tokens
+);
+// scss-docs-end alert-css-vars
+
 .alert {
-  // scss-docs-start alert-css-vars
-  --#{$prefix}alert-bg: transparent;
-  --#{$prefix}alert-padding-x: #{$alert-padding-x};
-  --#{$prefix}alert-padding-y: #{$alert-padding-y};
-  --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom};
-  --#{$prefix}alert-color: inherit;
-  --#{$prefix}alert-border-color: transparent;
-  --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color);
-  --#{$prefix}alert-border-radius: #{$alert-border-radius};
-  --#{$prefix}alert-link-color: inherit;
-  // scss-docs-end alert-css-vars
+  @include tokens($alert-tokens);
 
   position: relative;
   padding: var(--#{$prefix}alert-padding-y) var(--#{$prefix}alert-padding-x);
@@ -63,10 +76,7 @@
 // Generate contextual modifier classes for colorizing the alert.
 @each $state in map.keys($theme-colors) {
   .alert-#{$state} {
-    --#{$prefix}alert-color: var(--#{$prefix}#{$state}-text-emphasis);
-    --#{$prefix}alert-bg: var(--#{$prefix}#{$state}-bg-subtle);
-    --#{$prefix}alert-border-color: var(--#{$prefix}#{$state}-border-subtle);
-    --#{$prefix}alert-link-color: var(--#{$prefix}#{$state}-text-emphasis);
+    @include theme-tokens($state);
   }
 }
 // scss-docs-end alert-modifiers
