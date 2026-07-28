@@ -129,6 +129,11 @@
       badge:
         color: warning
         text: PREVIEW
+    - title: Date Range Picker v2
+      to: /forms/date-range-picker-v2/
+      badge:
+        color: warning
+        text: PREVIEW
     - title: Date Range Picker
       to: /forms/date-range-picker/
       badge:
