@@ -40,7 +40,9 @@
 
 .date-picker-input-group {
   display: flex;
-  align-items: stretch;
+  align-items: center;
+  padding: var(--#{$prefix}date-picker-padding-y) var(--#{$prefix}date-picker-padding-x);
+  @include font-size(var(--#{$prefix}date-picker-font-size));
   background-color: var(--#{$prefix}date-picker-bg);
   background-clip: padding-box;
   border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
@@ -50,11 +52,19 @@
     border-color: var(--#{$prefix}date-picker-focus-border-color);
   }
 
-  // the group carries the form-control frame; the section fields inside stay bare
+  // The group is the frame — the section field inside must not draw a second
+  // one, or the control ends up as tall as both boxes stacked. Sizing then
+  // follows the group's padding/font-size properties, which the existing
+  // .date-picker-sm/-lg classes already redefine.
   .form-date-time {
     flex: 1;
+    min-height: 0;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
     background-color: transparent;
     border: 0;
+    @include border-radius(0);
     box-shadow: none;
   }
 }
@@ -104,26 +114,6 @@
   }
 }
 
-.date-picker-sm {
-  --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius-sm};
-  --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width-sm};
-
-  .form-date-time {
-    @include font-size($date-picker-font-size-sm);
-    padding: $date-picker-padding-y-sm $date-picker-padding-x-sm;
-  }
-}
-
-.date-picker-lg {
-  --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius-lg};
-  --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width-lg};
-
-  .form-date-time {
-    @include font-size($date-picker-font-size-lg);
-    padding: $date-picker-padding-y-lg $date-picker-padding-x-lg;
-  }
-}
-
 .date-picker-body {
   display: flex;
 }
@@ -138,8 +128,9 @@
     display: flex;
     flex-wrap: nowrap;
     gap: 0;
-    align-items: stretch;
-    padding: 0;
+    align-items: center;
+    padding: var(--#{$prefix}time-picker-padding-y) var(--#{$prefix}time-picker-padding-x);
+    @include font-size(var(--#{$prefix}time-picker-font-size));
     background-color: var(--#{$prefix}time-picker-bg);
     background-clip: padding-box;
     border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);
@@ -149,10 +140,16 @@
       border-color: var(--#{$prefix}time-picker-focus-border-color);
     }
 
+    // see .date-picker-input-group — the group is the frame
     .form-date-time {
       flex: 1;
+      min-height: 0;
+      padding: 0;
+      font-size: inherit;
+      line-height: inherit;
       background-color: transparent;
       border: 0;
+      @include border-radius(0);
       box-shadow: none;
     }
   }
