@@ -9,7 +9,10 @@
   $color: var(--#{$prefix}#{$identifier});
 
   @if $identifier == "body" {
-    $suffix: if(sass($target == "text"): "color"; else: "bg");
+    $suffix: "bg";
+    @if $target == "text" {
+      $suffix: "color";
+    }
     $color: var(--#{$prefix}#{$identifier}-#{$suffix});
   }
 

@@ -1,10 +1,8 @@
-@use "sass:color";
 @use "sass:map";
 @use "sass:math";
 @use "functions/color" as *;
-@use "functions/color-contrast" as *;
-@use "functions/contrast-ratio" as *;
 @use "mixins/breakpoints" as *;
+@use "theme" as *;
 @use "variables" as *;
 
 // scss-docs-start table-variables
@@ -33,7 +31,6 @@ $table-hover-color:           $table-color !default;
 $table-hover-bg-factor:       .075 !default;
 $table-hover-bg:              color-mix(in srgb, var(--#{$prefix}emphasis-color) math.percentage($table-hover-bg-factor), transparent) !default;
 
-$table-border-factor:         .2 !default;
 $table-border-width:          var(--#{$prefix}border-width) !default;
 $table-border-color:          var(--#{$prefix}border-color) !default;
 
@@ -44,43 +41,32 @@ $table-group-separator-color: currentcolor !default;
 
 $table-caption-color:         var(--#{$prefix}secondary-color) !default;
 
-$table-bg-scale:              -80% !default;
 // scss-docs-end table-variables
 
 // scss-docs-start table-loop
-$table-variants: (
-  "primary":    shift-color($primary, $table-bg-scale),
-  "secondary":  shift-color($secondary, $table-bg-scale),
-  "success":    shift-color($success, $table-bg-scale),
-  "info":       shift-color($info, $table-bg-scale),
-  "warning":    shift-color($warning, $table-bg-scale),
-  "danger":     shift-color($danger, $table-bg-scale),
-  "light":      $light,
-  "dark":       $dark,
-) !default;
+// Which theme colours get a .table-* variant. The values come from the theme
+// tokens now, so this is a list of names rather than a map of shifted colours.
+$table-variants: map.keys($theme-colors) !default;
 // scss-docs-end table-loop
 
 // scss-docs-start table-variant
-@mixin table-variant($state, $background) {
+// The variant sets the theme tokens and lets the base .table rules read them,
+// the way the button variants do. Nothing is computed at build time, so a theme
+// colour added by hand gets a table variant without compiling Sass.
+@mixin table-variant($state) {
   .table-#{$state} {
-    $color: color-contrast(opaque($body-bg, $background));
-    $hover-bg: color.mix($color, $background, math.percentage($table-hover-bg-factor));
-    $striped-bg: color.mix($color, $background, math.percentage($table-striped-bg-factor));
-    $active-bg: color.mix($color, $background, math.percentage($table-active-bg-factor));
-    $table-border-color: color.mix($color, $background, math.percentage($table-border-factor));
-    $striped-color: color-contrast($striped-bg);
-    $active-color: color-contrast($active-bg);
-    $hover-color: color-contrast($hover-bg);
+    @include theme-tokens($state);
 
-    --#{$prefix}table-color: #{$color};
-    --#{$prefix}table-bg: #{$background};
-    --#{$prefix}table-border-color: #{$table-border-color};
-    --#{$prefix}table-striped-bg: #{$striped-bg};
-    --#{$prefix}table-striped-color: #{$striped-color};
-    --#{$prefix}table-active-bg: #{$active-bg};
-    --#{$prefix}table-active-color: #{$active-color};
-    --#{$prefix}table-hover-bg: #{$hover-bg};
-    --#{$prefix}table-hover-color: #{$hover-color};
+    --#{$prefix}table-color: var(--#{$prefix}theme-fg);
+    --#{$prefix}table-bg: var(--#{$prefix}theme-bg-subtle);
+    --#{$prefix}table-border-color: var(--#{$prefix}theme-border);
+    --#{$prefix}table-striped-color: var(--#{$prefix}theme-fg);
+    --#{$prefix}table-striped-bg: color-mix(in srgb, var(--#{$prefix}theme-fg) #{math.percentage($table-striped-bg-factor)}, transparent);
+    --#{$prefix}table-active-color: var(--#{$prefix}theme-fg);
+    --#{$prefix}table-active-bg: color-mix(in srgb, var(--#{$prefix}theme-fg) #{math.percentage($table-active-bg-factor)}, transparent);
+    --#{$prefix}table-hover-color: var(--#{$prefix}theme-fg);
+    --#{$prefix}table-hover-bg: color-mix(in srgb, var(--#{$prefix}theme-fg) #{math.percentage($table-hover-bg-factor)}, transparent);
+
     color: var(--#{$prefix}table-color);
     border-color: var(--#{$prefix}table-border-color);
   }
@@ -240,8 +226,8 @@ $table-variants: (
   // Table variants set the table cell backgrounds, border colors
   // and the colors of the striped, hovered & active tables
 
-  @each $color, $value in $table-variants {
-    @include table-variant($color, $value);
+  @each $state in $table-variants {
+    @include table-variant($state);
   }
 
   // Responsive tables

@@ -50,35 +50,28 @@ $theme-colors-border-subtle: (
 // scss-docs-end theme-border-subtle-map
 
 // scss-docs-start theme-contrast-map
+// The colour that reads on top of each theme colour. Written rather than
+// computed: color-contrast() picked these by ratio, which made every theme
+// colour a Sass colour the compiler had to evaluate. Upstream v6 writes them
+// too — it keeps a "contrast" key per colour and never calls the function.
 $theme-colors-contrast: (
-  "primary": color-contrast($primary),
-  "secondary": color-contrast($secondary),
-  "success": color-contrast($success),
-  "info": color-contrast($info),
-  "warning": color-contrast($warning),
-  "danger": color-contrast($danger),
-  "light": color-contrast($light),
-  "dark": color-contrast($dark),
+  "primary": $white,
+  "secondary": $white,
+  "success": $black,
+  "info": $black,
+  "warning": $black,
+  "danger": $black,
+  "light": $black,
+  "dark": $white,
 ) !default;
 // scss-docs-end theme-contrast-map
 
-$theme-colors-contrast-dark: null !default;
+$theme-colors-contrast-dark: $theme-colors-contrast !default;
 $theme-colors-text-dark: null !default;
 $theme-colors-bg-subtle-dark: null !default;
 $theme-colors-border-subtle-dark: null !default;
 
 @if $enable-dark-mode {
-
-  // scss-docs-start theme-contrast-dark-map
-  // Built from whatever $theme-colors-dark holds, rather than a fixed key list:
-  // a theme is free to empty or reshape that map.
-  @if $theme-colors-contrast-dark == null {
-    $theme-colors-contrast-dark: ();
-    @each $color, $value in $theme-colors-dark {
-      $theme-colors-contrast-dark: map.merge($theme-colors-contrast-dark, ($color: color-contrast($value)));
-    }
-  }
-  // scss-docs-end theme-contrast-dark-map
 
   // scss-docs-start theme-text-dark-map
   $theme-colors-text-dark: (

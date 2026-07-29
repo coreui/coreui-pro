@@ -163,6 +163,31 @@ primary customization API — every component knob still works through
 `@use ... with()` — but several things below are breaking and are called out
 as such.
 
+#### Colour decisions are written, not computed
+
+v6 stops evaluating colours at build time, the way upstream v6 does — Sass
+assembles maps of CSS expressions and the browser resolves them.
+
+- **`$theme-colors-contrast` holds written values** instead of
+  `color-contrast()` results. The computed and written values are identical, so
+  nothing renders differently; the point is that a theme colour no longer has to
+  be a Sass colour for the contrast pass to run over it. Upstream keeps a
+  `"contrast"` key per colour and never calls the function either.
+- **Table variants read the theme tokens.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `.table-primary` and friends still exist, but they are generated the way
+  `.btn-primary` is: the class sets `--#{$prefix}theme-*` and the base `.table`
+  rules read it. `$table-variants` is now a **list of colour names**, not a map
+  of pre-shifted colours, and `$table-bg-scale` / `$table-border-factor` are
+  gone. A theme colour you add yourself now gets a table variant without
+  compiling Sass.
+  Two visible consequences: the variant background is the colour's
+  `bg-subtle` token rather than a `shift-color()` of the base, and striped /
+  hover / active are `color-mix()` overlays on the text colour rather than
+  opaque mixes — so they compose over the row's own background. Table variants
+  also follow colour modes now, where before they stayed on light-palette
+  values in dark mode.
+
 #### RGB channel tokens and the elevation system removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
