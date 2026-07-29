@@ -4,7 +4,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/breakpoints" as *;
-@use "mixins/elevation" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -378,7 +377,6 @@ $date-picker-tokens: defaults(
     border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
     @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
     @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
-    @include elevation(4);
 
     .date-picker.show &,
     &.show {

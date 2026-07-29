@@ -3,7 +3,6 @@
 @use "../mixins/backdrop" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/breakpoints" as *;
-@use "../mixins/elevation" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
@@ -119,7 +118,6 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
     top: 0;
     bottom: 0;
     z-index: var(--#{$prefix}sidebar-zindex);
-    @include elevation(2);
 
     &:not(.sidebar-end) {
       inset-inline-start: 0;
@@ -147,7 +145,6 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 
     &.show {
       box-shadow: var(--#{$prefix}sidebar-overlaid-box-shadow);
-      @include elevation(3);
 
       &:not(.sidebar-end) {
         margin-inline-start: 0;

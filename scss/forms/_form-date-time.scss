@@ -8,7 +8,7 @@
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       $input-placeholder-color !default;
 $form-date-time-section-border-radius:   .25rem !default;
-$form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25) !default;
+$form-date-time-section-focus-bg:        color-mix(in srgb, var(--#{$prefix}primary) 25%, transparent) !default;
 // scss-docs-end form-date-time-variables
 
 // scss-docs-start form-date-time-tokens

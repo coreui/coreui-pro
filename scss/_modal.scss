@@ -5,7 +5,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/breakpoints" as *;
-@use "mixins/elevation" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
@@ -127,7 +126,6 @@ $modal-backdrop-tokens: defaults(
     // We deliberately don't use `-webkit-overflow-scrolling: touch;` due to a
     // gnarly iOS Safari bug: https://bugs.webkit.org/show_bug.cgi?id=158342
     // See also https://github.com/twbs/bootstrap/issues/17695
-    @include elevation(24);
   }
 
   // Shell div to position the modal with bottom padding

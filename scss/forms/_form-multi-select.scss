@@ -2,7 +2,6 @@
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
-@use "../mixins/elevation" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
@@ -539,7 +538,6 @@ $form-multi-select-tokens: defaults(
     border: var(--#{$prefix}form-multi-select-dropdown-border-width) solid var(--#{$prefix}form-multi-select-dropdown-border-color);
     @include border-radius(var(--#{$prefix}form-multi-select-dropdown-border-radius));
     @include box-shadow(var(--#{$prefix}form-multi-select-dropdown-box-shadow));
-    @include elevation(4);
 
     .form-multi-select.show &,
     &.show {

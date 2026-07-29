@@ -6,13 +6,16 @@
 @use "../variables" as *;
 @use "../variables-dark" as *;
 
+// stylelint-disable function-disallowed-list
+// The opacity utilities scale a runtime var, so calc() is unavoidable here.
+
 @layer helpers {
   @each $color, $value in $theme-colors {
     .text-bg-#{$color} {
       // stylelint-disable-next-line scss/at-function-named-arguments
       color: color-contrast($value) if(sass($enable-important-utilities): !important);
       // stylelint-disable-next-line scss/at-function-named-arguments
-      background-color: rgba(var(--#{$prefix}#{$color}-rgb), var(--#{$prefix}bg-opacity, 1)) if(sass($enable-important-utilities): !important);
+      background-color: color-mix(in srgb, var(--#{$prefix}#{$color}) calc(var(--#{$prefix}bg-opacity, 1) * 100%), transparent) if(sass($enable-important-utilities): !important);
     }
   }
 
@@ -25,7 +28,7 @@
           // stylelint-disable-next-line scss/at-function-named-arguments
           color: color-contrast($value) if(sass($enable-important-utilities): !important);
           // stylelint-disable-next-line scss/at-function-named-arguments
-          background-color: rgba($color-rgb, var(--#{$prefix}bg-opacity, 1)) if(sass($enable-important-utilities): !important);
+          background-color: color-mix(in srgb, #{$value} calc(var(--#{$prefix}bg-opacity, 1) * 100%), transparent) if(sass($enable-important-utilities): !important);
         }
       }
 

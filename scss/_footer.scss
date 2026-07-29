@@ -1,5 +1,4 @@
 @use "functions/defaults" as *;
-@use "mixins/elevation" as *;
 @use "mixins/tokens" as *;
 @use "variables" as *;
 
@@ -50,6 +49,5 @@ $footer-tokens: defaults(
     position: sticky;
     bottom: 0;
     z-index: $zindex-fixed;
-    @include elevation(2, "top");
   }
 }

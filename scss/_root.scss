@@ -37,10 +37,6 @@
       --#{$prefix}#{$color}: #{color-scheme($value, map.get($theme-colors-dark, $color))};
     }
 
-    @each $color, $value in $theme-colors-rgb {
-      --#{$prefix}#{$color}-rgb: #{$value};
-    }
-
     @each $color, $value in $theme-colors-text {
       --#{$prefix}#{$color}-text-emphasis: #{color-scheme($value, map.get($theme-colors-text-dark, $color))};
     }
@@ -56,10 +52,6 @@
     @each $color, $value in $theme-colors-contrast {
       --#{$prefix}#{$color}-contrast: #{color-scheme($value, map.get($theme-colors-contrast-dark, $color))};
     }
-
-    --#{$prefix}white-rgb: #{to-rgb($white)};
-    --#{$prefix}black-rgb: #{to-rgb($black)};
-
 
     // Fonts
 
@@ -83,41 +75,27 @@
     }
 
     --#{$prefix}body-color: #{color-scheme($body-color, $body-color-dark)};
-    --#{$prefix}body-color-rgb: #{to-rgb($body-color)};
     --#{$prefix}body-bg: #{color-scheme($body-bg, $body-bg-dark)};
-    --#{$prefix}body-bg-rgb: #{to-rgb($body-bg)};
 
     --#{$prefix}emphasis-color: #{color-scheme($body-emphasis-color, $body-emphasis-color-dark)};
-    --#{$prefix}emphasis-color-rgb: #{to-rgb($body-emphasis-color)};
 
     --#{$prefix}secondary-color: #{color-scheme($body-secondary-color, $body-secondary-color-dark)};
-    --#{$prefix}secondary-color-rgb: #{to-rgb($body-secondary-color)};
     --#{$prefix}secondary-bg: #{color-scheme($body-secondary-bg, $body-secondary-bg-dark)};
-    --#{$prefix}secondary-bg-rgb: #{to-rgb($body-secondary-bg)};
 
     --#{$prefix}tertiary-color: #{color-scheme($body-tertiary-color, $body-tertiary-color-dark)};
-    --#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color)};
     --#{$prefix}tertiary-bg: #{color-scheme($body-tertiary-bg, $body-tertiary-bg-dark)};
-    --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg)};
     --#{$prefix}tertiary-bg-translucent: #{color-scheme(color-translucent($body-tertiary-bg), color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark))};
 
     --#{$prefix}body-color-dark: #{$body-color-dark};
-    --#{$prefix}body-color-rgb-dark: #{to-rgb($body-color-dark)};
     --#{$prefix}body-bg-dark: #{$body-bg-dark};
-    --#{$prefix}body-bg-rgb-dark: #{to-rgb($body-bg-dark)};
 
     --#{$prefix}emphasis-color-dark: #{$body-emphasis-color-dark};
-    --#{$prefix}emphasis-color-rgb-dark: #{to-rgb($body-emphasis-color-dark)};
 
     --#{$prefix}secondary-color-dark: #{$body-secondary-color-dark};
-    --#{$prefix}secondary-color-rgb-dark: #{to-rgb($body-secondary-color-dark)};
     --#{$prefix}secondary-bg-dark: #{$body-secondary-bg-dark};
-    --#{$prefix}secondary-bg-rgb-dark: #{to-rgb($body-secondary-bg-dark)};
 
     --#{$prefix}tertiary-color-dark: #{$body-tertiary-color-dark};
-    --#{$prefix}tertiary-color-rgb-dark: #{to-rgb($body-tertiary-color-dark)};
     --#{$prefix}tertiary-bg-dark: #{$body-tertiary-bg-dark};
-    --#{$prefix}tertiary-bg-rgb-dark: #{to-rgb($body-tertiary-bg-dark)};
 
     --#{$prefix}high-emphasis: #{color-scheme($high-emphasis, $high-emphasis-dark)}; // Deprecated in v5.0.0
     --#{$prefix}medium-emphasis: #{color-scheme($medium-emphasis, $medium-emphasis-dark)}; // Deprecated in v5.0.0
@@ -131,11 +109,9 @@
     --#{$prefix}heading-color: #{color-scheme($headings-color, $headings-color-dark)};
 
     --#{$prefix}link-color: #{color-scheme($link-color, $link-color-dark)};
-    --#{$prefix}link-color-rgb: #{to-rgb($link-color)};
     --#{$prefix}link-decoration: #{$link-decoration};
 
     --#{$prefix}link-hover-color: #{color-scheme($link-hover-color, $link-hover-color-dark)};
-    --#{$prefix}link-hover-color-rgb: #{to-rgb($link-hover-color)};
 
     @if $link-hover-decoration != null {
       --#{$prefix}link-hover-decoration: #{$link-hover-decoration};
@@ -164,8 +140,6 @@
     --#{$prefix}box-shadow-sm: #{$box-shadow-sm};
     --#{$prefix}box-shadow-lg: #{$box-shadow-lg};
     --#{$prefix}box-shadow-inset: #{$box-shadow-inset};
-
-    --#{$prefix}elevation-base-color: #{color-scheme($elevation-base-color, $elevation-base-color-dark)}; // Deprecated in v5.0.0 for consistency
 
     // Focus styles
     // scss-docs-start root-focus-variables
@@ -224,20 +198,6 @@
       color-scheme: dark;
 
       // scss-docs-start root-dark-mode-vars
-      --#{$prefix}body-color-rgb: #{to-rgb($body-color-dark)};
-      --#{$prefix}body-bg-rgb: #{to-rgb($body-bg-dark)};
-      --#{$prefix}emphasis-color-rgb: #{to-rgb($body-emphasis-color-dark)};
-      --#{$prefix}secondary-color-rgb: #{to-rgb($body-secondary-color-dark)};
-      --#{$prefix}secondary-bg-rgb: #{to-rgb($body-secondary-bg-dark)};
-      --#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color-dark)};
-      --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
-
-      @each $color, $value in $theme-colors-rgb-dark {
-        --#{$prefix}#{$color}-rgb: #{$value};
-      }
-      --#{$prefix}elevation-base-color: #{$elevation-base-color-dark}; // Deprecated in v5.0.0
-      --#{$prefix}link-color-rgb: #{to-rgb($link-color-dark)};
-      --#{$prefix}link-hover-color-rgb: #{to-rgb($link-hover-color-dark)};
       // scss-docs-end root-dark-mode-vars
     }
   }

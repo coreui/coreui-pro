@@ -7,7 +7,7 @@
 @use "functions/color-translucent" as *;
 @use "functions/math" as *;
 @use "functions/to-rgb" as *;
-
+@use "sass:math";
 
 // Color system
 
@@ -90,7 +90,6 @@ $min-contrast-ratio:   4.5 !default;
 // Customize the light and dark text colors for use in our color contrast function.
 $color-contrast-dark:      $black !default;
 $color-contrast-light:     $white !default;
-
 
 // fusv-disable
 $blue-100: tint-color($blue, 80%) !default;
@@ -373,7 +372,6 @@ $dark-border-subtle:       $gray-500 !default;
 
 // Gradients
 
-
 // Characters which are escaped by the escape-svg function
 $escaped-characters: (
   ("<", "%3c"),
@@ -400,7 +398,6 @@ $enable-validation-icons:     true !default;
 $enable-negative-margins:     false !default;
 $enable-deprecation-messages: true !default;
 $enable-important-utilities:  true !default;
-$enable-elevations:           false !default;
 $enable-ltr:                  true !default;
 $enable-rtl:                  false !default;
 $enable-container-queries:    false !default;
@@ -451,16 +448,6 @@ $position-values: (
 // scss-docs-end position-map
 
 // Define common box shadows
-$elevation-base-color: 60, 75, 100 !default;
-
-$elevations: (
-  0: string.unquote("none"),
-  1: string.unquote("0 1px 1px 0 rgba(var(--#{$prefix}elevation-base-color), .14), 0 2px 1px -1px rgba(var(--#{$prefix}elevation-base-color), .12), 0 1px 3px 0 rgba(var(--#{$prefix}elevation-base-color), .20)"),
-  2: string.unquote("0 2px 2px 0 rgba(var(--#{$prefix}elevation-base-color), .14), 0 3px 1px -2px rgba(var(--#{$prefix}elevation-base-color), .12), 0 1px 5px 0 rgba(var(--#{$prefix}elevation-base-color), .20)"),
-  3: string.unquote("0 6px 10px 0 rgba(var(--#{$prefix}elevation-base-color), .14), 0 1px 18px 0 rgba(var(--#{$prefix}elevation-base-color), .12), 0 3px 5px -1px rgba(var(--#{$prefix}elevation-base-color), .20)"),
-  4: string.unquote("0 8px 10px 1px rgba(var(--#{$prefix}elevation-base-color), .14), 0 3px 14px 2px rgba(var(--#{$prefix}elevation-base-color), .12), 0 5px 5px -3px rgba(var(--#{$prefix}elevation-base-color), .20)"),
-  5: string.unquote("0 12px 17px 2px rgba(var(--#{$prefix}elevation-base-color), .14), 0 5px 22px 4px rgba(var(--#{$prefix}elevation-base-color), .12), 0 7px 8px -4px rgba(var(--#{$prefix}elevation-base-color), .20)"),
-) !default;
 
 // Settings for the `<body>` element.
 
@@ -487,11 +474,9 @@ $link-hover-decoration:                   null !default;
 $stretched-link-pseudo-element:           after !default;
 $stretched-link-z-index:                  1 !default;
 
-
 // Style p element.
 
 $paragraph-margin-bottom:   1rem !default;
-
 
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
@@ -538,7 +523,6 @@ $container-max-widths: (
 
 @include assert-ascending($container-max-widths, "$container-max-widths");
 
-
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns:                12 !default;
@@ -548,7 +532,6 @@ $grid-row-columns:            6 !default;
 // Container padding
 
 $container-padding-x: $grid-gutter-width !default;
-
 
 // Define common padding and border radius sizes and more.
 
@@ -596,7 +579,6 @@ $focus-ring-color:      rgba($primary, $focus-ring-opacity) !default;
 $focus-ring-blur:       0 !default;
 $focus-ring-box-shadow: 0 0 $focus-ring-blur $focus-ring-width $focus-ring-color !default;
 // scss-docs-end focus-ring-variables
-
 
 $transition-base:             all .2s ease-in-out !default;
 $transition-fade:             opacity .15s linear !default;
@@ -746,9 +728,7 @@ $icon-size-lg:    $icon-size-base * 1.25 !default;
 $icon-size-xl:    $icon-size-base * 1.5 !default;
 $icon-size-xxl:   $icon-size-base * 2 !default;
 
-
 // Customizes the `.table` component with basic values, each used across all table variations.
-
 
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
@@ -788,9 +768,7 @@ $form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-
 // scss-docs-end control-state-variables
 // scss-docs-end input-btn-variables
 
-
 // For each of Bootstrap's buttons, define text, background, and border color.
-
 
 // Forms
 
@@ -801,7 +779,6 @@ $form-text-font-style:                  null !default;
 $form-text-font-weight:                 null !default;
 $form-text-color:                       var(--#{$prefix}secondary-color) !default;
 // scss-docs-end form-text-variables
-
 
 // scss-docs-start form-input-variables
 $input-padding-y:                       $input-btn-padding-y !default;
@@ -857,9 +834,7 @@ $input-transition:                      border-color .15s ease-in-out, box-shado
 $form-color-width:                      3rem !default;
 // scss-docs-end form-input-variables
 
-
 $form-check-inline-margin-end:    1rem !default;
-
 
 // Form validation
 
@@ -890,7 +865,7 @@ $form-validation-states: (
     "icon": $form-feedback-icon-valid,
     "tooltip-color": #fff,
     "tooltip-bg-color": var(--#{$prefix}success),
-    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width rgba(var(--#{$prefix}success-rgb), $input-btn-focus-color-opacity),
+    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, var(--#{$prefix}success) math.percentage($input-btn-focus-color-opacity), transparent),
     "border-color": var(--#{$prefix}form-valid-border-color),
   ),
   "invalid": (
@@ -898,7 +873,7 @@ $form-validation-states: (
     "icon": $form-feedback-icon-invalid,
     "tooltip-color": #fff,
     "tooltip-bg-color": var(--#{$prefix}danger),
-    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width rgba(var(--#{$prefix}danger-rgb), $input-btn-focus-color-opacity),
+    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, var(--#{$prefix}danger) math.percentage($input-btn-focus-color-opacity), transparent),
     "border-color": var(--#{$prefix}form-invalid-border-color),
   )
 ) !default;
@@ -932,15 +907,11 @@ $zindex-levels: (
 ) !default;
 // scss-docs-end zindex-levels-map
 
-
 // Navs
-
 
 // Navbar
 
-
 // Dropdown menu container and contents.
-
 
 // Placeholders
 
@@ -949,9 +920,7 @@ $placeholder-opacity-max:           .5 !default;
 $placeholder-opacity-min:           .2 !default;
 // scss-docs-end placeholders
 
-
 // Tooltips
-
 
 // Alerts
 
@@ -961,12 +930,9 @@ $alert-border-scale:            -70% !default; // Deprecated in v4.2.0, to be re
 $alert-color-scale:             40% !default; // Deprecated in v4.2.0, to be removed in v6
 // fusv-enable
 
-
 // Image thumbnails
 
-
 // Figures
-
 
 // Carousel
 
@@ -975,7 +941,6 @@ $carousel-dark-indicator-active-bg:  $black !default; // Deprecated in v5.3.2
 $carousel-dark-caption-color:        $black !default; // Deprecated in v5.3.2
 $carousel-dark-control-icon-filter:  invert(1) grayscale(100) !default; // Deprecated in v5.3.2
 // scss-docs-end carousel-dark-variables
-
 
 // scss-docs-start sidebar-toggler
 $sidebar-toggler-width:             .5rem !default;
@@ -991,7 +956,6 @@ $sidebar-toggler-focus-color:       var(--#{$prefix}secondary-color) !default;
 $sidebar-toggler-transition:        transform .15s !default;
 // scss-docs-end sidebar-toggler
 
-
 // Code
 
 $code-font-size:                    $small-font-size !default;
@@ -1006,9 +970,7 @@ $nested-kbd-font-weight:            null !default; // Deprecated in v4.2.6, remo
 
 $pre-color:                         null !default;
 
-
 // Auto Complete
-
 
 // Time Picker
 

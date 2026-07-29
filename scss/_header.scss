@@ -4,7 +4,6 @@
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/breakpoints" as *;
-@use "mixins/elevation" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "nav" as *;
@@ -16,13 +15,13 @@
 $header-padding-y:              $spacer * .5 !default;
 $header-padding-x:              $spacer * .5 !default;
 $header-brand-font-size:        $font-size-lg !default;
-$header-color:                  rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
+$header-color:                  color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-bg:                     var(--#{$prefix}body-bg) !default;
 $header-border-color:           var(--#{$prefix}border-color) !default;
 $header-border-width:           var(--#{$prefix}border-width) !default;
-$header-hover-color:            rgba(var(--#{$prefix}emphasis-color-rgb), .8) !default;
-$header-active-color:           rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
-$header-disabled-color:         rgba(var(--#{$prefix}emphasis-color-rgb), .3) !default;
+$header-hover-color:            color-mix(in srgb, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
+$header-active-color:           color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
+$header-disabled-color:         color-mix(in srgb, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
 $header-transition:             box-shadow .15s ease-in-out !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
@@ -36,10 +35,10 @@ $header-brand-hover-color:      shade-color($gray-900, 10%) !default;
 $header-toggler-padding-y:      .25rem !default;
 $header-toggler-padding-x:      .75rem !default;
 $header-toggler-font-size:      $font-size-lg !default;
-$header-toggler-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .65) !default;
+$header-toggler-color:          color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-toggler-bg:             transparent !default;
 $header-toggler-border-radius:  $btn-border-radius !default;
-$header-toggler-hover-color:    rgba(var(--#{$prefix}emphasis-color-rgb), 1) !default;
+$header-toggler-hover-color:    color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 
 $header-toggler-icon-bg:        url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !default;
 $header-toggler-hover-icon-bg:  url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-hover-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !default;
@@ -125,7 +124,6 @@ $header-tokens: defaults(
       position: sticky;
       top: 0;
       z-index: $zindex-sticky;
-      @include elevation(2);
     }
   }
 

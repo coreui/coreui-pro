@@ -1,6 +1,8 @@
 @use "../mixins/transition" as *;
 @use "../variables" as *;
 
+// stylelint-disable function-disallowed-list
+
 // Icon links
 // scss-docs-start icon-link-variables
 $icon-link-gap:               .375rem !default;
@@ -15,7 +17,7 @@ $icon-link-icon-transform:    translate3d(.25em, 0, 0) !default;
     display: inline-flex;
     gap: $icon-link-gap;
     align-items: center;
-    text-decoration-color: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-opacity, .5));
+    text-decoration-color: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-opacity, .5) * 100%), transparent);
     text-underline-offset: $icon-link-underline-offset;
     backface-visibility: hidden;
 

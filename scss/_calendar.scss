@@ -52,8 +52,8 @@ $calendar-cell-focus-box-shadow:             $focus-ring-box-shadow !default;
 $calendar-cell-selected-color:               $white !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
 
-$calendar-cell-range-bg:                     rgba(var(--#{$prefix}primary-rgb), .125) !default;
-$calendar-cell-range-hover-bg:               rgba(var(--#{$prefix}primary-rgb), .25) !default;
+$calendar-cell-range-bg:                     color-mix(in srgb, var(--#{$prefix}primary) 12.5%, transparent) !default;
+$calendar-cell-range-hover-bg:               color-mix(in srgb, var(--#{$prefix}primary) 25%, transparent) !default;
 $calendar-cell-range-hover-border-color:     var(--#{$prefix}primary) !default;
 
 $calendar-cell-today-color:                  var(--#{$prefix}danger) !default;

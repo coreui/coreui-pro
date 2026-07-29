@@ -3,7 +3,6 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/breakpoints" as *;
-@use "mixins/elevation" as *;
 @use "mixins/tokens" as *;
 @use "variables" as *;
 
@@ -20,7 +19,7 @@ $card-box-shadow:                   null !default;
 $card-inner-border-radius:          subtract($card-border-radius, $card-border-width) !default;
 $card-cap-padding-y:                $card-spacer-y * .5 !default;
 $card-cap-padding-x:                $card-spacer-x !default;
-$card-cap-bg:                       rgba(var(--#{$prefix}body-color-rgb), .03) !default;
+$card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}body-color) 3%, transparent) !default;
 $card-cap-color:                    null !default;
 $card-height:                       null !default;
 $card-color:                        null !default;
@@ -78,7 +77,6 @@ $card-tokens: defaults(
     border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
     @include border-radius(var(--#{$prefix}card-border-radius));
     @include box-shadow(var(--#{$prefix}card-box-shadow));
-    @include elevation(1);
 
     > hr {
       margin-right: 0;

@@ -43,7 +43,7 @@ $btn-active-box-shadow:       inset 0 3px 5px rgba($black, .125) !default;
 $btn-link-color:              var(--#{$prefix}link-color) !default;
 $btn-link-hover-color:        var(--#{$prefix}link-hover-color) !default;
 $btn-link-disabled-color:     $gray-600 !default;
-$btn-link-focus-shadow-rgb:   to-rgb(color.mix(color-contrast-variables($link-color, $color-contrast-dark, $color-contrast-light, $white, $black, $min-contrast-ratio), $link-color, 15%)) !default;
+$btn-link-focus-shadow:   color.mix(color-contrast-variables($link-color, $color-contrast-dark, $color-contrast-light, $white, $black, $min-contrast-ratio), $link-color, 15%) !default;
 
 // Allows for customizing button radius independently from global border radius
 $btn-border-radius:           var(--#{$prefix}border-radius) !default;
@@ -73,7 +73,7 @@ $btn-outline-disabled-border-color: var(--#{$prefix}border-color) !default;
 $btn-outline-hover-color: var(--#{$prefix}body-color) !default;
 $btn-outline-hover-bg: var(--#{$prefix}tertiary-bg) !default;
 $btn-outline-hover-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
+$btn-outline-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
 // scss-docs-end btn-outline-variables
 // Lightness applied to a theme color for the hover and active states. Upstream
 // uses .95/.9; these are tuned to land near the shade-color() amounts CoreUI
@@ -142,7 +142,7 @@ $button-variants: defaults(
   }
 
   --#{$prefix}btn-active-shadow: #{$btn-active-box-shadow};
-  --#{$prefix}btn-focus-shadow-rgb: var(--#{$prefix}theme-rgb);
+  --#{$prefix}btn-focus-shadow: var(--#{$prefix}theme-base);
 }
 // scss-docs-end btn-variant-mixin
 
@@ -162,7 +162,7 @@ $btn-ghost-active-bg: var(--#{$prefix}tertiary-bg) !default;
 $btn-ghost-disabled-color: var(--#{$prefix}secondary-color) !default;
 $btn-ghost-hover-color: var(--#{$prefix}body-color) !default;
 $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
+$btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
 // scss-docs-end btn-ghost-variables
 
 @layer components {
@@ -186,7 +186,7 @@ $btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
     --#{$prefix}btn-hover-border-color: transparent;
     --#{$prefix}btn-box-shadow: #{$btn-box-shadow};
     --#{$prefix}btn-disabled-opacity: #{$btn-disabled-opacity};
-    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} rgba(var(--#{$prefix}btn-focus-shadow-rgb), .5);
+    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} color-mix(in srgb, var(--#{$prefix}btn-focus-shadow) 50%, transparent);
     // scss-docs-end btn-css-vars
 
     display: inline-block;
@@ -311,7 +311,7 @@ $btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
     --#{$prefix}btn-hover-color: #{$btn-ghost-hover-color};
     --#{$prefix}btn-hover-bg: #{$btn-ghost-hover-bg};
     --#{$prefix}btn-hover-border-color: #{$btn-ghost-hover-bg};
-    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} rgba(#{$btn-outline-focus-shadow-rgb}, .5);
+    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} color-mix(in srgb, #{$btn-outline-focus-shadow} 50%, transparent);
     // scss-docs-end btn-ghost-css-vars
   }
 
@@ -327,7 +327,7 @@ $btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
     --#{$prefix}btn-hover-color: #{$btn-outline-hover-color};
     --#{$prefix}btn-hover-bg: #{$btn-outline-hover-bg};
     --#{$prefix}btn-hover-border-color: #{$btn-outline-hover-border-color};
-    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} rgba(#{$btn-ghost-focus-shadow-rgb}, .5);
+    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} color-mix(in srgb, #{$btn-ghost-focus-shadow} 50%, transparent);
     // scss-docs-end btn-outline-css-vars
   }
 
@@ -380,7 +380,7 @@ $btn-ghost-focus-shadow-rgb: var(--#{$prefix}tertiary-bg-rgb) !default;
     --#{$prefix}btn-disabled-color: #{$btn-link-disabled-color};
     --#{$prefix}btn-disabled-border-color: transparent;
     --#{$prefix}btn-box-shadow: none;
-    --#{$prefix}btn-focus-shadow-rgb: #{$btn-link-focus-shadow-rgb};
+    --#{$prefix}btn-focus-shadow: #{$btn-link-focus-shadow};
 
     text-decoration: $link-decoration;
     @if $enable-gradients {

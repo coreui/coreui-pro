@@ -1,0 +1,17 @@
+// Builds a translucent colour from a token plus an opacity token, for the
+// utilities that expose a `*-opacity` knob.
+//
+// Replaces rgba-css-var(), which needed a matching `--<prefix><name>-rgb`
+// channel triplet for every colour. color-mix() takes the colour itself, so
+// the triplets are gone.
+
+@function translucent-css-var($prefix, $identifier, $target) {
+  $color: var(--#{$prefix}#{$identifier});
+
+  @if $identifier == "body" {
+    $suffix: if(sass($target == "text"): "color"; else: "bg");
+    $color: var(--#{$prefix}#{$identifier}-#{$suffix});
+  }
+
+  @return color-mix(in srgb, #{$color} calc(var(--#{$prefix}#{$target}-opacity) * 100%), transparent);
+}

@@ -5,6 +5,8 @@
 @use "../mixins/transition" as *;
 @use "../variables" as *;
 
+// stylelint-disable function-disallowed-list
+
 // scss-docs-start form-floating-variables
 $form-floating-height:                  add(3.5rem, $input-height-border) !default;
 $form-floating-line-height:             1.25 !default;
@@ -63,7 +65,7 @@ $form-floating-tokens: defaults(
       height: 100%; // allow textareas
       padding: var(--#{$prefix}form-floating-padding-y) var(--#{$prefix}form-floating-padding-x);
       overflow: hidden;
-      color: rgba(var(--#{$prefix}body-color-rgb), var(--#{$prefix}form-floating-label-opacity));
+      color: color-mix(in srgb, var(--#{$prefix}body-color) calc(var(--#{$prefix}form-floating-label-opacity) * 100%), transparent);
       text-align: start;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -117,7 +119,6 @@ $form-floating-tokens: defaults(
     > textarea:not(:placeholder-shown) {
       ~ label::after {
         position: absolute;
-        // stylelint-disable-next-line function-disallowed-list
         inset: var(--#{$prefix}form-floating-padding-y) calc(var(--#{$prefix}form-floating-padding-x) * .5);
         z-index: -1;
         height: var(--#{$prefix}form-floating-label-height);

@@ -7,6 +7,8 @@
 @use "mixins/transition" as *;
 @use "variables" as *;
 
+// stylelint-disable function-disallowed-list
+
 // scss-docs-start chip-variables
 $chip-font-size:             .875rem !default;
 $chip-font-weight:           $font-weight-normal !default;
@@ -187,7 +189,7 @@ $chip-outline-tokens: defaults(
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    margin-inline-start: calc(var(--#{$prefix}chip-gap) * -.25); // stylelint-disable-line function-disallowed-list
+    margin-inline-start: calc(var(--#{$prefix}chip-gap) * -.25);
 
     > svg {
       display: block; // Prevents baseline alignment issues
@@ -208,7 +210,7 @@ $chip-outline-tokens: defaults(
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    margin-inline-start: calc(var(--#{$prefix}chip-gap) * -.25); // stylelint-disable-line function-disallowed-list
+    margin-inline-start: calc(var(--#{$prefix}chip-gap) * -.25);
 
     > svg {
       display: block; // Prevents baseline alignment issues
@@ -225,7 +227,7 @@ $chip-outline-tokens: defaults(
     width: var(--#{$prefix}chip-min-height);
     height: var(--#{$prefix}chip-min-height);
     padding: 0;
-    margin-inline-end: calc(var(--#{$prefix}chip-padding-x) * -.25); // stylelint-disable-line function-disallowed-list
+    margin-inline-end: calc(var(--#{$prefix}chip-padding-x) * -.25);
     color: inherit;
     cursor: pointer;
     background: transparent;
@@ -285,10 +287,9 @@ $chip-outline-tokens: defaults(
     .chip-#{$state} {
       --#{$prefix}bg-subtle: var(--#{$prefix}#{$state}-bg-subtle);
       --#{$prefix}color: var(--#{$prefix}#{$state});
-      --#{$prefix}color-rgb: var(--#{$prefix}#{$state}-rgb);
       --#{$prefix}contrast: var(--#{$prefix}#{$state}-contrast);
       --#{$prefix}text-emphasis: var(--#{$prefix}#{$state}-text-emphasis);
-      --#{$prefix}focus-ring-color: rgba(var(--#{$prefix}#{$state}-rgb), var(--#{$prefix}focus-ring-opacity));
+      --#{$prefix}focus-ring-color: color-mix(in srgb, var(--#{$prefix}#{$state}) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent);
     }
   }
   // scss-docs-end chip-modifiers

@@ -1,6 +1,8 @@
 @use "mixins/border-radius" as *;
 @use "variables" as *;
 
+// stylelint-disable function-disallowed-list
+
 // scss-docs-start reboot-table-variables
 // Reboot styles the raw HTML elements, so it owns these rather than borrowing
 // from the .table component's variables — that coupling is what kept the table
@@ -255,11 +257,10 @@ $th-font-weight:       null !default;
   // Links
 
   a {
-    color: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-opacity, 1));
+    color: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
     text-decoration: $link-decoration;
 
     &:hover {
-      --#{$prefix}link-color-rgb: var(--#{$prefix}link-hover-color-rgb);
       text-decoration: $link-hover-decoration;
     }
   }

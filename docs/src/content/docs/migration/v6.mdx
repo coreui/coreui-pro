@@ -163,6 +163,35 @@ primary customization API — every component knob still works through
 `@use ... with()` — but several things below are breaking and are called out
 as such.
 
+#### RGB channel tokens and the elevation system removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **Every `--#{$prefix}{name}-rgb` custom property is gone**, along with the
+  `$theme-colors-rgb` map, the `to-rgb()` function's role in `:root`, and the
+  `rgba-css-var()` helper (now `translucent-css-var()`). They existed only so
+  `rgba(var(--cui-primary-rgb), .5)` could apply an alpha to a token; that is
+  what `color-mix()` does directly:
+
+  ```diff
+  - background-color: rgba(var(--cui-primary-rgb), .5);
+  + background-color: color-mix(in srgb, var(--cui-primary) 50%, transparent);
+  ```
+
+  Upstream v6 carries no rgb triplets either. The opacity utilities
+  (`.text-opacity-50`, `.bg-opacity-25`, `.link-opacity-75`) are unchanged —
+  they now scale the token through `calc(var(--cui-bg-opacity) * 100%)`.
+- **The elevation system is gone**: `$elevations`, `$enable-elevations`,
+  `$elevation-base-color`, the `elevation()` mixin and the `.elevation-*`
+  utilities. It was disabled by default (`$enable-elevations: false`), so the
+  utilities were the only reachable part. Use the shadow utilities
+  (`.shadow`, `.shadow-sm`, `.shadow-lg`) or set `box-shadow` directly.
+- **Button focus rings take a colour, not channels.**
+  `--#{$prefix}btn-focus-shadow-rgb` becomes
+  `--#{$prefix}btn-focus-shadow`, and the Sass variables follow:
+  `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
+  the ghost and link variants.
+
 #### Theme gradients removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

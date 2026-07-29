@@ -102,11 +102,7 @@ Grayscale colors are also available as a Sass map. **This map is not used to gen
 
 <ScssDocs file="scss/_variables.scss" capture="gray-colors-map" />
 
-RGB colors are generated from a separate Sass map:
-
-<ScssDocs file="scss/_maps.scss" capture="theme-colors-rgb" />
-
-And background color opacities build on that with their own map that's consumed by the utilities API:
+Background color opacities are applied through a map consumed by the utilities API, which mixes each color with `transparent` at the requested amount:
 
 <ScssDocs file="scss/_maps.scss" capture="utilities-bg-colors" />
 

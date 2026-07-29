@@ -3,6 +3,9 @@
 @use "maps" as *;
 @use "variables" as *;
 
+// stylelint-disable function-disallowed-list
+// The opacity utilities scale a runtime var, so calc() is unavoidable here.
+
 // Utilities
 
 $utilities: () !default;
@@ -89,19 +92,12 @@ $utilities: map.merge(
       )
     ),
     // scss-docs-end utils-shadow
-    // scss-docs-start utils-elevation
-    "elevation": (
-      property: box-shadow,
-      class: elevation,
-      values: $elevations
-    ),
-    // scss-docs-end utils-elevation
     // scss-docs-start utils-focus-ring
     "focus-ring": (
       css-var: true,
       css-variable-name: focus-ring-color,
       class: focus-ring,
-      values: map-loop($theme-colors-rgb, rgba-css-var, "$prefix", "$key", "focus-ring")
+      values: map-loop($theme-colors, translucent-css-var, "$prefix", "$key", "focus-ring")
     ),
     // scss-docs-end utils-focus-ring
     // scss-docs-start utils-position
@@ -703,7 +699,7 @@ $utilities: map.merge(
       values: map.merge(
         $utilities-links-underline,
         (
-          null: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-underline-opacity, 1)),
+          null: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-underline-opacity, 1) * 100%), transparent),
         )
       )
     ),
@@ -733,8 +729,8 @@ $utilities: map.merge(
         $utilities-bg-colors,
         (
           "transparent": transparent,
-          "body-secondary": rgba(var(--#{$prefix}secondary-bg-rgb), var(--#{$prefix}bg-opacity)),
-          "body-tertiary": rgba(var(--#{$prefix}tertiary-bg-rgb), var(--#{$prefix}bg-opacity)),
+          "body-secondary": color-mix(in srgb, var(--#{$prefix}secondary-bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+          "body-tertiary": color-mix(in srgb, var(--#{$prefix}tertiary-bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
         )
       )
     ),
