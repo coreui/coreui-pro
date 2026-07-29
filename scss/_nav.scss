@@ -1,7 +1,11 @@
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/gradients" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start nav-variables
 $nav-link-padding-y:                .5rem !default;
@@ -53,6 +57,88 @@ $nav-enclosed-link-hover-box-shadow:     var(--#{$prefix}box-shadow-sm) !default
 $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !default;
 // scss-docs-end nav-variables
 
+$nav-tokens: () !default;
+
+// scss-docs-start nav-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$nav-tokens: defaults(
+  (
+    --#{$prefix}nav-link-padding-x: #{$nav-link-padding-x},
+    --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
+    --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
+    --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight},
+    --#{$prefix}nav-link-color: #{$nav-link-color},
+    --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color},
+    --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color},
+  ),
+  $nav-tokens
+);
+// scss-docs-end nav-css-vars
+
+$nav-tabs-tokens: () !default;
+
+// scss-docs-start nav-tabs-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$nav-tabs-tokens: defaults(
+  (
+    --#{$prefix}nav-tabs-border-width: #{$nav-tabs-border-width},
+    --#{$prefix}nav-tabs-border-color: #{$nav-tabs-border-color},
+    --#{$prefix}nav-tabs-border-radius: #{$nav-tabs-border-radius},
+    --#{$prefix}nav-tabs-link-hover-border-color: #{$nav-tabs-link-hover-border-color},
+    --#{$prefix}nav-tabs-link-active-color: #{$nav-tabs-link-active-color},
+    --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg},
+    --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color},
+  ),
+  $nav-tabs-tokens
+);
+// scss-docs-end nav-tabs-css-vars
+
+$nav-pills-tokens: () !default;
+
+// scss-docs-start nav-pills-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$nav-pills-tokens: defaults(
+  (
+    --#{$prefix}nav-pills-border-radius: #{$nav-pills-border-radius},
+    --#{$prefix}nav-pills-link-active-color: #{$nav-pills-link-active-color},
+    --#{$prefix}nav-pills-link-active-bg: #{$nav-pills-link-active-bg},
+  ),
+  $nav-pills-tokens
+);
+// scss-docs-end nav-pills-css-vars
+
+$nav-underline-tokens: () !default;
+
+// scss-docs-start nav-underline-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$nav-underline-tokens: defaults(
+  (
+    --#{$prefix}nav-underline-gap: #{$nav-underline-gap},
+    --#{$prefix}nav-underline-border-width: #{$nav-underline-border-width},
+    --#{$prefix}nav-underline-link-active-color: #{$nav-underline-link-active-color},
+  ),
+  $nav-underline-tokens
+);
+// scss-docs-end nav-underline-css-vars
+
+$nav-underline-border-tokens: () !default;
+
+// scss-docs-start nav-underline-border-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$nav-underline-border-tokens: defaults(
+  (
+    --#{$prefix}nav-underline-border-gap: #{$nav-underline-border-gap},
+    --#{$prefix}nav-underline-border-border-color: #{$nav-underline-border-border-color},
+    --#{$prefix}nav-underline-border-border-width: #{$nav-underline-border-border-width},
+    --#{$prefix}nav-underline-border-link-padding-x: #{$nav-underline-border-link-padding-x},
+    --#{$prefix}nav-underline-border-link-padding-y: #{$nav-underline-border-link-padding-y},
+    --#{$prefix}nav-underline-border-link-color: #{$nav-underline-border-link-color},
+    --#{$prefix}nav-underline-border-link-active-color: #{$nav-underline-border-link-active-color},
+    --#{$prefix}nav-underline-border-link-disabled-color: #{$nav-underline-border-link-disabled-color},
+  ),
+  $nav-underline-border-tokens
+);
+// scss-docs-end nav-underline-border-css-vars
 @layer components {
   // Base class
   //
@@ -60,15 +146,7 @@ $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !defau
   // `<nav>`s, `<ul>`s or `<ol>`s.
 
   .nav {
-    // scss-docs-start nav-css-vars
-    --#{$prefix}nav-link-padding-x: #{$nav-link-padding-x};
-    --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y};
-    --#{$prefix}nav-link-font-size: #{$nav-link-font-size};
-    --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight};
-    --#{$prefix}nav-link-color: #{$nav-link-color};
-    --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color};
-    --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color};
-    // scss-docs-end nav-css-vars
+    @include tokens($nav-tokens);
 
     display: flex;
     flex-wrap: wrap;
@@ -114,15 +192,7 @@ $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !defau
   //
 
   .nav-tabs {
-    // scss-docs-start nav-tabs-css-vars
-    --#{$prefix}nav-tabs-border-width: #{$nav-tabs-border-width};
-    --#{$prefix}nav-tabs-border-color: #{$nav-tabs-border-color};
-    --#{$prefix}nav-tabs-border-radius: #{$nav-tabs-border-radius};
-    --#{$prefix}nav-tabs-link-hover-border-color: #{$nav-tabs-link-hover-border-color};
-    --#{$prefix}nav-tabs-link-active-color: #{$nav-tabs-link-active-color};
-    --#{$prefix}nav-tabs-link-active-bg: #{$nav-tabs-link-active-bg};
-    --#{$prefix}nav-tabs-link-active-border-color: #{$nav-tabs-link-active-border-color};
-    // scss-docs-end nav-tabs-css-vars
+    @include tokens($nav-tabs-tokens);
 
     border-bottom: var(--#{$prefix}nav-tabs-border-width) solid var(--#{$prefix}nav-tabs-border-color);
 
@@ -160,11 +230,7 @@ $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !defau
   //
 
   .nav-pills {
-    // scss-docs-start nav-pills-css-vars
-    --#{$prefix}nav-pills-border-radius: #{$nav-pills-border-radius};
-    --#{$prefix}nav-pills-link-active-color: #{$nav-pills-link-active-color};
-    --#{$prefix}nav-pills-link-active-bg: #{$nav-pills-link-active-bg};
-    // scss-docs-end nav-pills-css-vars
+    @include tokens($nav-pills-tokens);
 
     .nav-link {
       @include border-radius(var(--#{$prefix}nav-pills-border-radius));
@@ -183,11 +249,7 @@ $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !defau
   //
 
   .nav-underline {
-    // scss-docs-start nav-underline-css-vars
-    --#{$prefix}nav-underline-gap: #{$nav-underline-gap};
-    --#{$prefix}nav-underline-border-width: #{$nav-underline-border-width};
-    --#{$prefix}nav-underline-link-active-color: #{$nav-underline-link-active-color};
-    // scss-docs-end nav-underline-css-vars
+    @include tokens($nav-underline-tokens);
 
     gap: var(--#{$prefix}nav-underline-gap);
 
@@ -216,16 +278,7 @@ $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !defau
   //
 
   .nav-underline-border {
-    // scss-docs-start nav-underline-border-css-vars
-    --#{$prefix}nav-underline-border-gap: #{$nav-underline-border-gap};
-    --#{$prefix}nav-underline-border-border-color: #{$nav-underline-border-border-color};
-    --#{$prefix}nav-underline-border-border-width: #{$nav-underline-border-border-width};
-    --#{$prefix}nav-underline-border-link-padding-x: #{$nav-underline-border-link-padding-x};
-    --#{$prefix}nav-underline-border-link-padding-y: #{$nav-underline-border-link-padding-y};
-    --#{$prefix}nav-underline-border-link-color: #{$nav-underline-border-link-color};
-    --#{$prefix}nav-underline-border-link-active-color: #{$nav-underline-border-link-active-color};
-    --#{$prefix}nav-underline-border-link-disabled-color: #{$nav-underline-border-link-disabled-color};
-    // scss-docs-end nav-underline-border-css-vars
+    @include tokens($nav-underline-border-tokens);
 
     --#{$prefix}nav-link-color: var(--#{$prefix}nav-underline-border-link-color);
     --#{$prefix}nav-link-disabled-color: var(--#{$prefix}nav-underline-border-link-disabled-color);

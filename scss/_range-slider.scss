@@ -1,12 +1,16 @@
 @use "sass:string";
 @use "forms/form-range" as *;
 @use "functions/color" as *;
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/gradients" as *;
 @use "mixins/ltr-rtl" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // Range Slider
 // scss-docs-start range-slider-variables
@@ -55,50 +59,68 @@ $range-slider-vertical-track-width:        .5rem !default;
 $range-slider-vertical-track-height:       10rem !default;
 // scss-docs-end range-slider-variables
 
+$range-slider-tokens: () !default;
+
+// scss-docs-start range-slider-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$range-slider-tokens: defaults(
+  (
+    --#{$prefix}range-slider-track-width: #{$range-slider-track-width},
+    --#{$prefix}range-slider-track-height: #{$range-slider-track-height},
+    --#{$prefix}range-slider-track-cursor: #{$range-slider-track-cursor},
+    --#{$prefix}range-slider-track-bg: #{$range-slider-track-bg},
+    --#{$prefix}range-slider-track-border-radius: #{$range-slider-track-border-radius},
+    --#{$prefix}range-slider-track-box-shadow: #{$range-slider-track-box-shadow},
+    --#{$prefix}range-slider-track-in-range-bg: #{$range-slider-track-in-range-bg},
+    --#{$prefix}range-slider-disabled-track-in-range-bg: #{$range-slider-disabled-track-in-range-bg},
+    --#{$prefix}range-slider-label-padding-y: #{$range-slider-label-padding-y},
+    --#{$prefix}range-slider-label-padding-x: #{$range-slider-label-padding-x},
+    --#{$prefix}range-slider-label-font-size: #{$range-slider-label-font-size},
+    --#{$prefix}range-slider-label-color: #{$range-slider-label-color},
+    --#{$prefix}range-slider-thumb-width: #{$range-slider-thumb-width},
+    --#{$prefix}range-slider-thumb-height: #{$range-slider-thumb-height},
+    --#{$prefix}range-slider-thumb-bg: #{$range-slider-thumb-bg},
+    --#{$prefix}range-slider-thumb-border: #{$range-slider-thumb-border},
+    --#{$prefix}range-slider-thumb-border-radius: #{$range-slider-thumb-border-radius},
+    --#{$prefix}range-slider-thumb-box-shadow: #{$range-slider-thumb-box-shadow},
+    --#{$prefix}range-slider-thumb-focus-box-shadow: #{$range-slider-thumb-focus-box-shadow},
+    --#{$prefix}range-slider-thumb-active-bg: #{$range-slider-thumb-active-bg},
+    --#{$prefix}range-slider-thumb-disabled-bg: #{$range-slider-thumb-disabled-bg},
+    --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition},
+    --#{$prefix}range-slider-tooltip-zindex: #{$zindex-tooltip},
+    --#{$prefix}range-slider-tooltip-max-width: #{$range-slider-tooltip-max-width},
+    --#{$prefix}range-slider-tooltip-padding-y: #{$range-slider-tooltip-padding-y},
+    --#{$prefix}range-slider-tooltip-padding-x: #{$range-slider-tooltip-padding-x},
+    --#{$prefix}range-slider-tooltip-margin-end: #{$range-slider-tooltip-margin-end},
+    --#{$prefix}range-slider-tooltip-margin-bottom: #{$range-slider-tooltip-margin-bottom},
+    --#{$prefix}range-slider-tooltip-font-size: #{$range-slider-tooltip-font-size},
+    --#{$prefix}range-slider-tooltip-color: #{$range-slider-tooltip-color},
+    --#{$prefix}range-slider-tooltip-bg: #{$range-slider-tooltip-bg},
+    --#{$prefix}range-slider-tooltip-border-radius: #{$range-slider-tooltip-border-radius},
+    --#{$prefix}range-slider-tooltip-box-shadow: #{$range-slider-tooltip-box-shadow},
+    --#{$prefix}range-slider-tooltip-transition: #{$range-slider-tooltip-transition},
+    --#{$prefix}range-slider-tooltip-arrow-width: #{$range-slider-tooltip-arrow-width},
+    --#{$prefix}range-slider-tooltip-arrow-height: #{$range-slider-tooltip-arrow-height},
+  ),
+  $range-slider-tokens
+);
+// scss-docs-end range-slider-css-vars
+
+$range-slider-vertical-tokens: () !default;
+
+// scss-docs-start range-slider-vertical-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$range-slider-vertical-tokens: defaults(
+  (
+    --#{$prefix}range-slider-vertical-track-width: #{$range-slider-vertical-track-width},
+    --#{$prefix}range-slider-vertical-track-height: #{$range-slider-vertical-track-height},
+  ),
+  $range-slider-vertical-tokens
+);
+// scss-docs-end range-slider-vertical-css-vars
 @layer components {
   .range-slider {
-    // scss-docs-start range-slider-css-vars
-    --#{$prefix}range-slider-track-width: #{$range-slider-track-width};
-    --#{$prefix}range-slider-track-height: #{$range-slider-track-height};
-    --#{$prefix}range-slider-track-cursor: #{$range-slider-track-cursor};
-    --#{$prefix}range-slider-track-bg: #{$range-slider-track-bg};
-    --#{$prefix}range-slider-track-border-radius: #{$range-slider-track-border-radius};
-    --#{$prefix}range-slider-track-box-shadow: #{$range-slider-track-box-shadow};
-    --#{$prefix}range-slider-track-in-range-bg: #{$range-slider-track-in-range-bg};
-    --#{$prefix}range-slider-disabled-track-in-range-bg: #{$range-slider-disabled-track-in-range-bg};
-
-    --#{$prefix}range-slider-label-padding-y: #{$range-slider-label-padding-y};
-    --#{$prefix}range-slider-label-padding-x: #{$range-slider-label-padding-x};
-    --#{$prefix}range-slider-label-font-size: #{$range-slider-label-font-size};
-    --#{$prefix}range-slider-label-color: #{$range-slider-label-color};
-
-    --#{$prefix}range-slider-thumb-width: #{$range-slider-thumb-width};
-    --#{$prefix}range-slider-thumb-height: #{$range-slider-thumb-height};
-    --#{$prefix}range-slider-thumb-bg: #{$range-slider-thumb-bg};
-    --#{$prefix}range-slider-thumb-border: #{$range-slider-thumb-border};
-    --#{$prefix}range-slider-thumb-border-radius: #{$range-slider-thumb-border-radius};
-    --#{$prefix}range-slider-thumb-box-shadow: #{$range-slider-thumb-box-shadow};
-    --#{$prefix}range-slider-thumb-focus-box-shadow: #{$range-slider-thumb-focus-box-shadow};
-    --#{$prefix}range-slider-thumb-active-bg: #{$range-slider-thumb-active-bg};
-    --#{$prefix}range-slider-thumb-disabled-bg: #{$range-slider-thumb-disabled-bg};
-    --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition};
-
-    --#{$prefix}range-slider-tooltip-zindex: #{$zindex-tooltip};
-    --#{$prefix}range-slider-tooltip-max-width: #{$range-slider-tooltip-max-width};
-    --#{$prefix}range-slider-tooltip-padding-y: #{$range-slider-tooltip-padding-y};
-    --#{$prefix}range-slider-tooltip-padding-x: #{$range-slider-tooltip-padding-x};
-    --#{$prefix}range-slider-tooltip-margin-end: #{$range-slider-tooltip-margin-end};
-    --#{$prefix}range-slider-tooltip-margin-bottom: #{$range-slider-tooltip-margin-bottom};
-    --#{$prefix}range-slider-tooltip-font-size: #{$range-slider-tooltip-font-size};
-    --#{$prefix}range-slider-tooltip-color: #{$range-slider-tooltip-color};
-    --#{$prefix}range-slider-tooltip-bg: #{$range-slider-tooltip-bg};
-    --#{$prefix}range-slider-tooltip-border-radius: #{$range-slider-tooltip-border-radius};
-    --#{$prefix}range-slider-tooltip-box-shadow: #{$range-slider-tooltip-box-shadow};
-    --#{$prefix}range-slider-tooltip-transition: #{$range-slider-tooltip-transition};
-
-    --#{$prefix}range-slider-tooltip-arrow-width: #{$range-slider-tooltip-arrow-width};
-    --#{$prefix}range-slider-tooltip-arrow-height: #{$range-slider-tooltip-arrow-height};
-    // scss-docs-end range-slider-css-vars
+    @include tokens($range-slider-tokens);
 
     position: relative;
     display: flex;
@@ -286,10 +308,7 @@ $range-slider-vertical-track-height:       10rem !default;
   }
 
   .range-slider-vertical {
-    // scss-docs-start range-slider-vertical-css-vars
-    --#{$prefix}range-slider-vertical-track-width: #{$range-slider-vertical-track-width};
-    --#{$prefix}range-slider-vertical-track-height: #{$range-slider-vertical-track-height};
-    // scss-docs-end range-slider-vertical-css-vars
+    @include tokens($range-slider-vertical-tokens);
 
     flex-direction: row;
     height: var(--#{$prefix}range-slider-vertical-track-height);

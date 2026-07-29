@@ -1,71 +1,84 @@
 @use "sass:color";
+@use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
 
+// stylelint-disable custom-property-no-missing-var-function
+
+$time-picker-tokens: () !default;
+
+// scss-docs-start time-picker-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$time-picker-tokens: defaults(
+  (
+    --#{$prefix}time-picker-zindex: #{$time-picker-zindex},
+    --#{$prefix}time-picker-font-family: #{$time-picker-font-family},
+    --#{$prefix}time-picker-font-size: #{$time-picker-font-size},
+    --#{$prefix}time-picker-font-weight: #{$time-picker-font-weight},
+    --#{$prefix}time-picker-line-height: #{$time-picker-line-height},
+    --#{$prefix}time-picker-color: #{$time-picker-color},
+    --#{$prefix}time-picker-bg: #{$time-picker-bg},
+    --#{$prefix}time-picker-box-shadow: #{$time-picker-box-shadow},
+    --#{$prefix}time-picker-border-width: #{$time-picker-border-width},
+    --#{$prefix}time-picker-border-color: #{$time-picker-border-color},
+    --#{$prefix}time-picker-border-radius: #{$time-picker-border-radius},
+    --#{$prefix}time-picker-disabled-color: #{$time-picker-disabled-color},
+    --#{$prefix}time-picker-disabled-bg: #{$time-picker-disabled-bg},
+    --#{$prefix}time-picker-disabled-border-color: #{$time-picker-disabled-border-color},
+    --#{$prefix}time-picker-focus-color: #{$time-picker-focus-color},
+    --#{$prefix}time-picker-focus-bg: #{$time-picker-focus-bg},
+    --#{$prefix}time-picker-focus-border-color: #{$time-picker-focus-border-color},
+    --#{$prefix}time-picker-focus-box-shadow: #{$time-picker-focus-box-shadow},
+    --#{$prefix}time-picker-placeholder-color: #{$time-picker-placeholder-color},
+    --#{$prefix}time-picker-padding-y: #{$time-picker-padding-y},
+    --#{$prefix}time-picker-padding-x: #{$time-picker-padding-x},
+    --#{$prefix}time-picker-gap: #{$time-picker-gap},
+    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width},
+    --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon)},
+    --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-icon-color},
+    --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size},
+    --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width},
+    --#{$prefix}time-picker-cleaner-icon: #{escape-svg($time-picker-cleaner-icon)},
+    --#{$prefix}time-picker-cleaner-icon-color: #{$time-picker-cleaner-icon-color},
+    --#{$prefix}time-picker-cleaner-icon-hover-color: #{$time-picker-cleaner-icon-hover-color},
+    --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size},
+    --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding},
+    --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width},
+    --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color},
+    --#{$prefix}time-picker-footer-padding: #{$time-picker-footer-padding},
+    --#{$prefix}time-picker-dropdown-bg: #{$time-picker-dropdown-bg},
+    --#{$prefix}time-picker-dropdown-border-width: #{$time-picker-dropdown-border-width},
+    --#{$prefix}time-picker-dropdown-border-color: #{$time-picker-dropdown-border-color},
+    --#{$prefix}time-picker-dropdown-border-radius: #{$time-picker-dropdown-border-radius},
+    --#{$prefix}time-picker-dropdown-box-shadow: #{$time-picker-dropdown-box-shadow},
+    --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width},
+    --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color},
+    --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width},
+    --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height},
+    --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color},
+    --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg},
+    --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color},
+    --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg},
+    --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color},
+    --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg},
+    --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size},
+    --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color},
+    --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y},
+    --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x},
+    --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color},
+  ),
+  $time-picker-tokens
+);
+// scss-docs-end time-picker-css-vars
 @layer components {
   .time-picker,
   *:not(.time-picker) > .time-picker-dropdown {
-    // scss-docs-start time-picker-css-vars
-    --#{$prefix}time-picker-zindex: #{$time-picker-zindex};
-    --#{$prefix}time-picker-font-family: #{$time-picker-font-family};
-    --#{$prefix}time-picker-font-size: #{$time-picker-font-size};
-    --#{$prefix}time-picker-font-weight: #{$time-picker-font-weight};
-    --#{$prefix}time-picker-line-height: #{$time-picker-line-height};
-    --#{$prefix}time-picker-color: #{$time-picker-color};
-    --#{$prefix}time-picker-bg: #{$time-picker-bg};
-    --#{$prefix}time-picker-box-shadow: #{$time-picker-box-shadow};
-    --#{$prefix}time-picker-border-width: #{$time-picker-border-width};
-    --#{$prefix}time-picker-border-color: #{$time-picker-border-color};
-    --#{$prefix}time-picker-border-radius: #{$time-picker-border-radius};
-    --#{$prefix}time-picker-disabled-color: #{$time-picker-disabled-color};
-    --#{$prefix}time-picker-disabled-bg: #{$time-picker-disabled-bg};
-    --#{$prefix}time-picker-disabled-border-color: #{$time-picker-disabled-border-color};
-    --#{$prefix}time-picker-focus-color: #{$time-picker-focus-color};
-    --#{$prefix}time-picker-focus-bg: #{$time-picker-focus-bg};
-    --#{$prefix}time-picker-focus-border-color: #{$time-picker-focus-border-color};
-    --#{$prefix}time-picker-focus-box-shadow: #{$time-picker-focus-box-shadow};
-    --#{$prefix}time-picker-placeholder-color: #{$time-picker-placeholder-color};
-    --#{$prefix}time-picker-padding-y: #{$time-picker-padding-y};
-    --#{$prefix}time-picker-padding-x: #{$time-picker-padding-x};
-    --#{$prefix}time-picker-gap: #{$time-picker-gap};
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width};
-    --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon)};
-    --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-icon-color};
-    --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size};
-    --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width};
-    --#{$prefix}time-picker-cleaner-icon: #{escape-svg($time-picker-cleaner-icon)};
-    --#{$prefix}time-picker-cleaner-icon-color: #{$time-picker-cleaner-icon-color};
-    --#{$prefix}time-picker-cleaner-icon-hover-color: #{$time-picker-cleaner-icon-hover-color};
-    --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size};
-    --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding};
-    --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width};
-    --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color};
-    --#{$prefix}time-picker-footer-padding: #{$time-picker-footer-padding};
-    --#{$prefix}time-picker-dropdown-bg: #{$time-picker-dropdown-bg};
-    --#{$prefix}time-picker-dropdown-border-width: #{$time-picker-dropdown-border-width};
-    --#{$prefix}time-picker-dropdown-border-color: #{$time-picker-dropdown-border-color};
-    --#{$prefix}time-picker-dropdown-border-radius: #{$time-picker-dropdown-border-radius};
-    --#{$prefix}time-picker-dropdown-box-shadow: #{$time-picker-dropdown-box-shadow};
-    --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width};
-    --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color};
-    --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width};
-    --#{$prefix}time-picker-roll-cell-height: #{$time-picker-roll-cell-height};
-    --#{$prefix}time-picker-roll-cell-hover-color: #{$time-picker-roll-cell-hover-color};
-    --#{$prefix}time-picker-roll-cell-hover-bg: #{$time-picker-roll-cell-hover-bg};
-    --#{$prefix}time-picker-roll-cell-selected-color: #{$time-picker-roll-cell-selected-color};
-    --#{$prefix}time-picker-roll-cell-selected-bg: #{$time-picker-roll-cell-selected-bg};
-    --#{$prefix}time-picker-roll-cell-selected-hover-color: #{$time-picker-roll-cell-selected-hover-color};
-    --#{$prefix}time-picker-roll-cell-selected-hover-bg: #{$time-picker-roll-cell-selected-hover-bg};
-    --#{$prefix}time-picker-inline-select-font-size: #{$time-picker-inline-select-font-size};
-    --#{$prefix}time-picker-inline-select-color: #{$time-picker-inline-select-color};
-    --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
-    --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x};
-    --#{$prefix}time-picker-inline-select-disabled-color: #{$time-picker-inline-select-disabled-color};
-    // scss-docs-end time-picker-css-vars
+    @include tokens($time-picker-tokens);
 
     &.is-invalid {
       $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($time-picker-invalid-border-color, $input-btn-focus-color-opacity);

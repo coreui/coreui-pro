@@ -1,9 +1,37 @@
 @use "date-picker" as *;
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
 
+$date-picker-v2-tokens: () !default;
+
+// scss-docs-start date-picker-v2-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$date-picker-v2-tokens: defaults(
+  (
+    --#{$prefix}date-picker-zindex: #{$date-picker-zindex},
+    --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width},
+    --#{$prefix}date-picker-indicator-color: #{$date-picker-indicator-icon-color},
+    --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg},
+    --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width},
+    --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color},
+    --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius},
+    --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow},
+    --#{$prefix}date-picker-bg: #{$date-picker-bg},
+    --#{$prefix}date-picker-border-width: #{$date-picker-border-width},
+    --#{$prefix}date-picker-border-color: #{$date-picker-border-color},
+    --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius},
+    --#{$prefix}date-picker-focus-border-color: #{$date-picker-focus-border-color},
+    --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding},
+    --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width},
+    --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color},
+  ),
+  $date-picker-v2-tokens
+);
+// scss-docs-end date-picker-v2-css-vars
 @layer components {
   // Lean pickers-v2 shell styling (workspace: architecture/pickers-v2.md, "Styling
   // budget"). Compiled AFTER _date-picker.scss and replaces it once the v1 shell
@@ -15,24 +43,7 @@
 
   .date-picker,
   *:not(.date-picker) > .date-picker-dropdown {
-    // scss-docs-start date-picker-v2-css-vars
-    --#{$prefix}date-picker-zindex: #{$date-picker-zindex};
-    --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width};
-    --#{$prefix}date-picker-indicator-color: #{$date-picker-indicator-icon-color};
-    --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg};
-    --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width};
-    --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color};
-    --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius};
-    --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow};
-    --#{$prefix}date-picker-bg: #{$date-picker-bg};
-    --#{$prefix}date-picker-border-width: #{$date-picker-border-width};
-    --#{$prefix}date-picker-border-color: #{$date-picker-border-color};
-    --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius};
-    --#{$prefix}date-picker-focus-border-color: #{$date-picker-focus-border-color};
-    --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding};
-    --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width};
-    --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color};
-    // scss-docs-end date-picker-v2-css-vars
+    @include tokens($date-picker-v2-tokens);
   }
 
   .date-picker {

@@ -1,9 +1,13 @@
+@use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/elevation" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
+
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start autocomplete-variables
 $autocomplete-zindex:                    1000 !default;
@@ -110,85 +114,94 @@ $autocomplete-padding-y-sm:                 $input-padding-y-sm !default;
 $autocomplete-padding-x-sm:                 $input-padding-x-sm !default;
 // scss-docs-end autocomplete-variables
 
+$autocomplete-tokens: () !default;
+
+// scss-docs-start autocomplete-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$autocomplete-tokens: defaults(
+  (
+    --#{$prefix}autocomplete-zindex: #{$autocomplete-zindex},
+    --#{$prefix}autocomplete-font-family: #{$autocomplete-font-family},
+    --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size},
+    --#{$prefix}autocomplete-font-weight: #{$autocomplete-font-weight},
+    --#{$prefix}autocomplete-line-height: #{$autocomplete-line-height},
+    --#{$prefix}autocomplete-color: #{$autocomplete-color},
+    --#{$prefix}autocomplete-bg: #{$autocomplete-bg},
+    --#{$prefix}autocomplete-box-shadow: #{$autocomplete-box-shadow},
+    --#{$prefix}autocomplete-border-width: #{$autocomplete-border-width},
+    --#{$prefix}autocomplete-border-color: #{$autocomplete-border-color},
+    --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius},
+    --#{$prefix}autocomplete-disabled-color: #{$autocomplete-disabled-color},
+    --#{$prefix}autocomplete-disabled-bg: #{$autocomplete-disabled-bg},
+    --#{$prefix}autocomplete-disabled-border-color: #{$autocomplete-disabled-border-color},
+    --#{$prefix}autocomplete-focus-color: #{$autocomplete-focus-color},
+    --#{$prefix}autocomplete-focus-bg: #{$autocomplete-focus-bg},
+    --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-focus-border-color},
+    --#{$prefix}autocomplete-focus-box-shadow: #{$autocomplete-focus-box-shadow},
+    --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color},
+    --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y},
+    --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x},
+    --#{$prefix}autocomplete-cleaner-width: #{$autocomplete-cleaner-width},
+    --#{$prefix}autocomplete-cleaner-height: #{$autocomplete-cleaner-height},
+    --#{$prefix}autocomplete-cleaner-padding-y: #{$autocomplete-cleaner-padding-y},
+    --#{$prefix}autocomplete-cleaner-padding-x: #{$autocomplete-cleaner-padding-x},
+    --#{$prefix}autocomplete-cleaner-icon: #{escape-svg($autocomplete-cleaner-icon)},
+    --#{$prefix}autocomplete-cleaner-icon-color: #{$autocomplete-cleaner-icon-color},
+    --#{$prefix}autocomplete-cleaner-icon-hover-color: #{$autocomplete-cleaner-icon-hover-color},
+    --#{$prefix}autocomplete-cleaner-icon-size: #{$autocomplete-cleaner-icon-size},
+    --#{$prefix}autocomplete-indicator-width: #{$autocomplete-indicator-width},
+    --#{$prefix}autocomplete-indicator-height: #{$autocomplete-indicator-height},
+    --#{$prefix}autocomplete-indicator-padding-y: #{$autocomplete-indicator-padding-y},
+    --#{$prefix}autocomplete-indicator-padding-x: #{$autocomplete-indicator-padding-x},
+    --#{$prefix}autocomplete-indicator-icon: #{escape-svg($autocomplete-indicator-icon)},
+    --#{$prefix}autocomplete-indicator-icon-color: #{$autocomplete-indicator-icon-color},
+    --#{$prefix}autocomplete-indicator-icon-hover-color: #{$autocomplete-indicator-icon-hover-color},
+    --#{$prefix}autocomplete-indicator-icon-size: #{$autocomplete-indicator-icon-size},
+    --#{$prefix}autocomplete-dropdown-min-width: #{$autocomplete-dropdown-min-width},
+    --#{$prefix}autocomplete-dropdown-bg: #{$autocomplete-dropdown-bg},
+    --#{$prefix}autocomplete-dropdown-border-width: #{$autocomplete-dropdown-border-width},
+    --#{$prefix}autocomplete-dropdown-border-color: #{$autocomplete-dropdown-border-color},
+    --#{$prefix}autocomplete-dropdown-border-radius: #{$autocomplete-dropdown-border-radius},
+    --#{$prefix}autocomplete-dropdown-box-shadow: #{$autocomplete-dropdown-box-shadow},
+    --#{$prefix}autocomplete-options-padding-y: #{$autocomplete-options-padding-y},
+    --#{$prefix}autocomplete-options-padding-x: #{$autocomplete-options-padding-x},
+    --#{$prefix}autocomplete-options-font-size: #{$autocomplete-options-font-size},
+    --#{$prefix}autocomplete-options-font-weight: #{$autocomplete-options-font-weight},
+    --#{$prefix}autocomplete-options-color: #{$autocomplete-options-color},
+    --#{$prefix}autocomplete-optgroup-label-padding-y: #{$autocomplete-optgroup-label-padding-y},
+    --#{$prefix}autocomplete-optgroup-label-padding-x: #{$autocomplete-optgroup-label-padding-x},
+    --#{$prefix}autocomplete-optgroup-label-font-size: #{$autocomplete-optgroup-label-font-size},
+    --#{$prefix}autocomplete-optgroup-label-font-weight: #{$autocomplete-optgroup-label-font-weight},
+    --#{$prefix}autocomplete-optgroup-label-color: #{$autocomplete-optgroup-label-color},
+    --#{$prefix}autocomplete-optgroup-label-text-transform: #{$autocomplete-optgroup-label-text-transform},
+    --#{$prefix}autocomplete-option-padding-y: #{$autocomplete-option-padding-y},
+    --#{$prefix}autocomplete-option-padding-x: #{$autocomplete-option-padding-x},
+    --#{$prefix}autocomplete-option-margin-y: #{$autocomplete-option-margin-y},
+    --#{$prefix}autocomplete-option-margin-x: #{$autocomplete-option-margin-x},
+    --#{$prefix}autocomplete-option-border-width: #{$autocomplete-option-border-width},
+    --#{$prefix}autocomplete-option-border-color: #{$autocomplete-option-border-color},
+    --#{$prefix}autocomplete-option-border-radius: #{$autocomplete-option-border-radius},
+    --#{$prefix}autocomplete-option-box-shadow: #{$autocomplete-option-box-shadow},
+    --#{$prefix}autocomplete-option-hover-color: #{$autocomplete-option-hover-color},
+    --#{$prefix}autocomplete-option-hover-bg: #{$autocomplete-option-hover-bg},
+    --#{$prefix}autocomplete-option-focus-box-shadow: #{$autocomplete-option-focus-box-shadow},
+    --#{$prefix}autocomplete-option-disabled-color: #{$autocomplete-option-disabled-color},
+    --#{$prefix}autocomplete-option-indicator-width: #{$autocomplete-option-indicator-width},
+    --#{$prefix}autocomplete-option-indicator-bg: #{$autocomplete-option-indicator-bg},
+    --#{$prefix}autocomplete-option-indicator-border: #{$autocomplete-option-indicator-border},
+    --#{$prefix}autocomplete-option-indicator-border-radius: #{$autocomplete-option-indicator-border-radius},
+    --#{$prefix}autocomplete-option-selected-bg: #{$autocomplete-option-selected-bg},
+    --#{$prefix}autocomplete-option-selected-indicator-bg: #{$autocomplete-option-selected-indicator-bg},
+    --#{$prefix}autocomplete-option-selected-indicator-bg-image: #{escape-svg($autocomplete-option-selected-indicator-bg-image)},
+    --#{$prefix}autocomplete-option-selected-indicator-border-color: #{$autocomplete-option-selected-indicator-border-color},
+  ),
+  $autocomplete-tokens
+);
+// scss-docs-end autocomplete-css-vars
 @layer components {
   .autocomplete,
   *:not(.autocomplete) > .autocomplete-dropdown {
-    // scss-docs-start autocomplete-css-vars
-    --#{$prefix}autocomplete-zindex: #{$autocomplete-zindex};
-    --#{$prefix}autocomplete-font-family: #{$autocomplete-font-family};
-    --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size};
-    --#{$prefix}autocomplete-font-weight: #{$autocomplete-font-weight};
-    --#{$prefix}autocomplete-line-height: #{$autocomplete-line-height};
-    --#{$prefix}autocomplete-color: #{$autocomplete-color};
-    --#{$prefix}autocomplete-bg: #{$autocomplete-bg};
-    --#{$prefix}autocomplete-box-shadow: #{$autocomplete-box-shadow};
-    --#{$prefix}autocomplete-border-width: #{$autocomplete-border-width};
-    --#{$prefix}autocomplete-border-color: #{$autocomplete-border-color};
-    --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius};
-    --#{$prefix}autocomplete-disabled-color: #{$autocomplete-disabled-color};
-    --#{$prefix}autocomplete-disabled-bg: #{$autocomplete-disabled-bg};
-    --#{$prefix}autocomplete-disabled-border-color: #{$autocomplete-disabled-border-color};
-    --#{$prefix}autocomplete-focus-color: #{$autocomplete-focus-color};
-    --#{$prefix}autocomplete-focus-bg: #{$autocomplete-focus-bg};
-    --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-focus-border-color};
-    --#{$prefix}autocomplete-focus-box-shadow: #{$autocomplete-focus-box-shadow};
-    --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color};
-    --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y};
-    --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x};
-    --#{$prefix}autocomplete-cleaner-width: #{$autocomplete-cleaner-width};
-    --#{$prefix}autocomplete-cleaner-height: #{$autocomplete-cleaner-height};
-    --#{$prefix}autocomplete-cleaner-padding-y: #{$autocomplete-cleaner-padding-y};
-    --#{$prefix}autocomplete-cleaner-padding-x: #{$autocomplete-cleaner-padding-x};
-    --#{$prefix}autocomplete-cleaner-icon: #{escape-svg($autocomplete-cleaner-icon)};
-    --#{$prefix}autocomplete-cleaner-icon-color: #{$autocomplete-cleaner-icon-color};
-    --#{$prefix}autocomplete-cleaner-icon-hover-color: #{$autocomplete-cleaner-icon-hover-color};
-    --#{$prefix}autocomplete-cleaner-icon-size: #{$autocomplete-cleaner-icon-size};
-    --#{$prefix}autocomplete-indicator-width: #{$autocomplete-indicator-width};
-    --#{$prefix}autocomplete-indicator-height: #{$autocomplete-indicator-height};
-    --#{$prefix}autocomplete-indicator-padding-y: #{$autocomplete-indicator-padding-y};
-    --#{$prefix}autocomplete-indicator-padding-x: #{$autocomplete-indicator-padding-x};
-    --#{$prefix}autocomplete-indicator-icon: #{escape-svg($autocomplete-indicator-icon)};
-    --#{$prefix}autocomplete-indicator-icon-color: #{$autocomplete-indicator-icon-color};
-    --#{$prefix}autocomplete-indicator-icon-hover-color: #{$autocomplete-indicator-icon-hover-color};
-    --#{$prefix}autocomplete-indicator-icon-size: #{$autocomplete-indicator-icon-size};
-    --#{$prefix}autocomplete-dropdown-min-width: #{$autocomplete-dropdown-min-width};
-    --#{$prefix}autocomplete-dropdown-bg: #{$autocomplete-dropdown-bg};
-    --#{$prefix}autocomplete-dropdown-border-width: #{$autocomplete-dropdown-border-width};
-    --#{$prefix}autocomplete-dropdown-border-color: #{$autocomplete-dropdown-border-color};
-    --#{$prefix}autocomplete-dropdown-border-radius: #{$autocomplete-dropdown-border-radius};
-    --#{$prefix}autocomplete-dropdown-box-shadow: #{$autocomplete-dropdown-box-shadow};
-    --#{$prefix}autocomplete-options-padding-y: #{$autocomplete-options-padding-y};
-    --#{$prefix}autocomplete-options-padding-x: #{$autocomplete-options-padding-x};
-    --#{$prefix}autocomplete-options-font-size: #{$autocomplete-options-font-size};
-    --#{$prefix}autocomplete-options-font-weight: #{$autocomplete-options-font-weight};
-    --#{$prefix}autocomplete-options-color: #{$autocomplete-options-color};
-    --#{$prefix}autocomplete-optgroup-label-padding-y: #{$autocomplete-optgroup-label-padding-y};
-    --#{$prefix}autocomplete-optgroup-label-padding-x: #{$autocomplete-optgroup-label-padding-x};
-    --#{$prefix}autocomplete-optgroup-label-font-size: #{$autocomplete-optgroup-label-font-size};
-    --#{$prefix}autocomplete-optgroup-label-font-weight: #{$autocomplete-optgroup-label-font-weight};
-    --#{$prefix}autocomplete-optgroup-label-color: #{$autocomplete-optgroup-label-color};
-    --#{$prefix}autocomplete-optgroup-label-text-transform: #{$autocomplete-optgroup-label-text-transform};
-    --#{$prefix}autocomplete-option-padding-y: #{$autocomplete-option-padding-y};
-    --#{$prefix}autocomplete-option-padding-x: #{$autocomplete-option-padding-x};
-    --#{$prefix}autocomplete-option-margin-y: #{$autocomplete-option-margin-y};
-    --#{$prefix}autocomplete-option-margin-x: #{$autocomplete-option-margin-x};
-    --#{$prefix}autocomplete-option-border-width: #{$autocomplete-option-border-width};
-    --#{$prefix}autocomplete-option-border-color: #{$autocomplete-option-border-color};
-    --#{$prefix}autocomplete-option-border-radius: #{$autocomplete-option-border-radius};
-    --#{$prefix}autocomplete-option-box-shadow: #{$autocomplete-option-box-shadow};
-    --#{$prefix}autocomplete-option-hover-color: #{$autocomplete-option-hover-color};
-    --#{$prefix}autocomplete-option-hover-bg: #{$autocomplete-option-hover-bg};
-    --#{$prefix}autocomplete-option-focus-box-shadow: #{$autocomplete-option-focus-box-shadow};
-    --#{$prefix}autocomplete-option-disabled-color: #{$autocomplete-option-disabled-color};
-    --#{$prefix}autocomplete-option-indicator-width: #{$autocomplete-option-indicator-width};
-    --#{$prefix}autocomplete-option-indicator-bg: #{$autocomplete-option-indicator-bg};
-    --#{$prefix}autocomplete-option-indicator-border: #{$autocomplete-option-indicator-border};
-    --#{$prefix}autocomplete-option-indicator-border-radius: #{$autocomplete-option-indicator-border-radius};
-    --#{$prefix}autocomplete-option-selected-bg: #{$autocomplete-option-selected-bg};
-    --#{$prefix}autocomplete-option-selected-indicator-bg: #{$autocomplete-option-selected-indicator-bg};
-    --#{$prefix}autocomplete-option-selected-indicator-bg-image: #{escape-svg($autocomplete-option-selected-indicator-bg-image)};
-    --#{$prefix}autocomplete-option-selected-indicator-border-color: #{$autocomplete-option-selected-indicator-border-color};
-    // scss-docs-end autocomplete-css-vars
+    @include tokens($autocomplete-tokens);
 
     position: relative;
 

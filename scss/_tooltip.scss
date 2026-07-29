@@ -1,25 +1,36 @@
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/deprecate" as *;
 @use "mixins/reset-text" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
 
+$tooltip-tokens: () !default;
+
+// scss-docs-start tooltip-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$tooltip-tokens: defaults(
+  (
+    --#{$prefix}tooltip-zindex: #{$zindex-tooltip},
+    --#{$prefix}tooltip-max-width: #{$tooltip-max-width},
+    --#{$prefix}tooltip-padding-x: #{$tooltip-padding-x},
+    --#{$prefix}tooltip-padding-y: #{$tooltip-padding-y},
+    --#{$prefix}tooltip-margin: #{$tooltip-margin},
+    --#{$prefix}tooltip-font-size: #{$tooltip-font-size},
+    --#{$prefix}tooltip-color: #{$tooltip-color},
+    --#{$prefix}tooltip-bg: #{$tooltip-bg},
+    --#{$prefix}tooltip-border-radius: #{$tooltip-border-radius},
+    --#{$prefix}tooltip-opacity: #{$tooltip-opacity},
+    --#{$prefix}tooltip-arrow-width: #{$tooltip-arrow-width},
+    --#{$prefix}tooltip-arrow-height: #{$tooltip-arrow-height},
+  ),
+  $tooltip-tokens
+);
+// scss-docs-end tooltip-css-vars
 @layer components {
   // Base class
   .tooltip {
-    // scss-docs-start tooltip-css-vars
-    --#{$prefix}tooltip-zindex: #{$zindex-tooltip};
-    --#{$prefix}tooltip-max-width: #{$tooltip-max-width};
-    --#{$prefix}tooltip-padding-x: #{$tooltip-padding-x};
-    --#{$prefix}tooltip-padding-y: #{$tooltip-padding-y};
-    --#{$prefix}tooltip-margin: #{$tooltip-margin};
-    --#{$prefix}tooltip-font-size: #{$tooltip-font-size};
-    --#{$prefix}tooltip-color: #{$tooltip-color};
-    --#{$prefix}tooltip-bg: #{$tooltip-bg};
-    --#{$prefix}tooltip-border-radius: #{$tooltip-border-radius};
-    --#{$prefix}tooltip-opacity: #{$tooltip-opacity};
-    --#{$prefix}tooltip-arrow-width: #{$tooltip-arrow-width};
-    --#{$prefix}tooltip-arrow-height: #{$tooltip-arrow-height};
-    // scss-docs-end tooltip-css-vars
+    @include tokens($tooltip-tokens);
 
     z-index: var(--#{$prefix}tooltip-zindex);
     display: block;

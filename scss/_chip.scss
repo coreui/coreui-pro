@@ -1,7 +1,9 @@
 @use "sass:map";
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/chip" as *;
 @use "mixins/focus-ring" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "variables" as *;
 
@@ -50,36 +52,61 @@ $chip-img-size-lg:           1.5rem !default;
 $chip-remove-size-lg:        1.25rem !default;
 // scss-docs-end chip-variables
 
+$chip-tokens: () !default;
+
+// scss-docs-start chip-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$chip-tokens: defaults(
+  (
+    --#{$prefix}chip-height: #{$chip-height},
+    --#{$prefix}chip-padding-x: #{$chip-padding-x},
+    --#{$prefix}chip-gap: #{$chip-gap},
+    --#{$prefix}chip-font-size: #{$chip-font-size},
+    --#{$prefix}chip-font-weight: #{$chip-font-weight},
+    --#{$prefix}chip-border-radius: #{$chip-border-radius},
+    --#{$prefix}chip-img-size: #{$chip-img-size},
+    --#{$prefix}chip-img-border-radius: #{$chip-img-border-radius},
+    --#{$prefix}chip-icon-size: #{$chip-icon-size},
+    --#{$prefix}chip-remove-size: #{$chip-remove-size},
+    --#{$prefix}chip-remove-opacity: #{$chip-remove-opacity},
+    --#{$prefix}chip-remove-hover-opacity: #{$chip-remove-hover-opacity},
+    --#{$prefix}chip-transition: #{$chip-transition},
+    --#{$prefix}chip-color: var(--#{$prefix}text-emphasis, #{$chip-color}),
+    --#{$prefix}chip-bg: var(--#{$prefix}bg-subtle, #{$chip-bg}),
+    --#{$prefix}chip-border-width: #{$chip-border-width},
+    --#{$prefix}chip-border-color: #{$chip-border-color},
+    --#{$prefix}chip-active-color: var(--#{$prefix}contrast, #{$chip-active-color}),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}color, #{$chip-active-bg}),
+    --#{$prefix}chip-active-border-color: #{$chip-active-border-color},
+    --#{$prefix}chip-hover-color: var(--#{$prefix}contrast, #{$chip-hover-color}),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}color, #{$chip-hover-bg}),
+    --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
+  ),
+  $chip-tokens
+);
+// scss-docs-end chip-css-vars
+
+$chip-outline-tokens: () !default;
+
+// scss-docs-start chip-outline-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$chip-outline-tokens: defaults(
+  (
+    --#{$prefix}chip-color: var(--#{$prefix}color, var(--#{$prefix}body-color)),
+    --#{$prefix}chip-bg: transparent,
+    --#{$prefix}chip-border-color: var(--#{$prefix}color, var(--#{$prefix}border-color)),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}bg-subtle, #{$chip-hover-bg}),
+    --#{$prefix}chip-hover-color: var(--#{$prefix}text-emphasis, #{$chip-color}),
+    --#{$prefix}chip-hover-border-color: var(--#{$prefix}color, var(--#{$prefix}border-color)),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}color, #{$chip-active-bg}),
+    --#{$prefix}chip-active-color: var(--#{$prefix}contrast, #{$chip-active-color}),
+  ),
+  $chip-outline-tokens
+);
+// scss-docs-end chip-outline-css-vars
 @layer components {
   .chip {
-    // scss-docs-start chip-css-vars
-    --#{$prefix}chip-height: #{$chip-height};
-    --#{$prefix}chip-padding-x: #{$chip-padding-x};
-    --#{$prefix}chip-gap: #{$chip-gap};
-    --#{$prefix}chip-font-size: #{$chip-font-size};
-    --#{$prefix}chip-font-weight: #{$chip-font-weight};
-    --#{$prefix}chip-border-radius: #{$chip-border-radius};
-    --#{$prefix}chip-img-size: #{$chip-img-size};
-    --#{$prefix}chip-img-border-radius: #{$chip-img-border-radius};
-    --#{$prefix}chip-icon-size: #{$chip-icon-size};
-    --#{$prefix}chip-remove-size: #{$chip-remove-size};
-    --#{$prefix}chip-remove-opacity: #{$chip-remove-opacity};
-    --#{$prefix}chip-remove-hover-opacity: #{$chip-remove-hover-opacity};
-    --#{$prefix}chip-transition: #{$chip-transition};
-
-    --#{$prefix}chip-color: var(--#{$prefix}text-emphasis, #{$chip-color});
-    --#{$prefix}chip-bg: var(--#{$prefix}bg-subtle, #{$chip-bg});
-    --#{$prefix}chip-border-width: #{$chip-border-width};
-    --#{$prefix}chip-border-color: #{$chip-border-color};
-
-    --#{$prefix}chip-active-color: var(--#{$prefix}contrast, #{$chip-active-color});
-    --#{$prefix}chip-active-bg: var(--#{$prefix}color, #{$chip-active-bg});
-    --#{$prefix}chip-active-border-color: #{$chip-active-border-color};
-
-    --#{$prefix}chip-hover-color: var(--#{$prefix}contrast, #{$chip-hover-color});
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}color, #{$chip-hover-bg});
-    --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color};
-    // scss-docs-end chip-css-vars
+    @include tokens($chip-tokens);
 
     display: inline-flex;
     gap: var(--#{$prefix}chip-gap);
@@ -126,16 +153,7 @@ $chip-remove-size-lg:        1.25rem !default;
   }
 
   .chip-outline {
-    // scss-docs-start chip-outline-css-vars
-    --#{$prefix}chip-color: var(--#{$prefix}color, var(--#{$prefix}body-color));
-    --#{$prefix}chip-bg: transparent;
-    --#{$prefix}chip-border-color: var(--#{$prefix}color, var(--#{$prefix}border-color));
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}bg-subtle, #{$chip-hover-bg});
-    --#{$prefix}chip-hover-color: var(--#{$prefix}text-emphasis, #{$chip-color});
-    --#{$prefix}chip-hover-border-color: var(--#{$prefix}color, var(--#{$prefix}border-color));
-    --#{$prefix}chip-active-bg: var(--#{$prefix}color, #{$chip-active-bg});
-    --#{$prefix}chip-active-color: var(--#{$prefix}contrast, #{$chip-active-color});
-    // scss-docs-end chip-outline-css-vars
+    @include tokens($chip-outline-tokens);
   }
 
   .chip-clickable {

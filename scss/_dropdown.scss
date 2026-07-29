@@ -1,10 +1,12 @@
 @use "sass:map";
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/breakpoints" as *;
 @use "mixins/caret" as *;
 @use "mixins/elevation" as *;
 @use "mixins/gradients" as *;
+@use "mixins/tokens" as *;
 @use "variables" as *;
 
 // scss-docs-start dropdown-variables
@@ -58,6 +60,65 @@ $dropdown-dark-link-disabled-color: $gray-500 !default;
 $dropdown-dark-header-color:        $gray-500 !default;
 // scss-docs-end dropdown-dark-variables
 
+$dropdown-tokens: () !default;
+
+// scss-docs-start dropdown-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$dropdown-tokens: defaults(
+  (
+    --#{$prefix}dropdown-zindex: #{$zindex-dropdown},
+    --#{$prefix}dropdown-min-width: #{$dropdown-min-width},
+    --#{$prefix}dropdown-padding-x: #{$dropdown-padding-x},
+    --#{$prefix}dropdown-padding-y: #{$dropdown-padding-y},
+    --#{$prefix}dropdown-spacer: #{$dropdown-spacer},
+    --#{$prefix}dropdown-font-size: #{$dropdown-font-size},
+    --#{$prefix}dropdown-color: #{$dropdown-color},
+    --#{$prefix}dropdown-bg: #{$dropdown-bg},
+    --#{$prefix}dropdown-border-color: #{$dropdown-border-color},
+    --#{$prefix}dropdown-border-radius: #{$dropdown-border-radius},
+    --#{$prefix}dropdown-border-width: #{$dropdown-border-width},
+    --#{$prefix}dropdown-inner-border-radius: #{$dropdown-inner-border-radius},
+    --#{$prefix}dropdown-divider-bg: #{$dropdown-divider-bg},
+    --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y},
+    --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow},
+    --#{$prefix}dropdown-link-color: #{$dropdown-link-color},
+    --#{$prefix}dropdown-link-hover-color: #{$dropdown-link-hover-color},
+    --#{$prefix}dropdown-link-hover-bg: #{$dropdown-link-hover-bg},
+    --#{$prefix}dropdown-link-active-color: #{$dropdown-link-active-color},
+    --#{$prefix}dropdown-link-active-bg: #{$dropdown-link-active-bg},
+    --#{$prefix}dropdown-link-disabled-color: #{$dropdown-link-disabled-color},
+    --#{$prefix}dropdown-item-padding-x: #{$dropdown-item-padding-x},
+    --#{$prefix}dropdown-item-padding-y: #{$dropdown-item-padding-y},
+    --#{$prefix}dropdown-header-color: #{$dropdown-header-color},
+    --#{$prefix}dropdown-header-padding-x: #{$dropdown-header-padding-x},
+    --#{$prefix}dropdown-header-padding-y: #{$dropdown-header-padding-y},
+  ),
+  $dropdown-tokens
+);
+// scss-docs-end dropdown-css-vars
+
+$dropdown-dark-tokens: () !default;
+
+// scss-docs-start dropdown-dark-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$dropdown-dark-tokens: defaults(
+  (
+    --#{$prefix}dropdown-color: #{$dropdown-dark-color},
+    --#{$prefix}dropdown-bg: #{$dropdown-dark-bg},
+    --#{$prefix}dropdown-border-color: #{$dropdown-dark-border-color},
+    --#{$prefix}dropdown-box-shadow: #{$dropdown-dark-box-shadow},
+    --#{$prefix}dropdown-link-color: #{$dropdown-dark-link-color},
+    --#{$prefix}dropdown-link-hover-color: #{$dropdown-dark-link-hover-color},
+    --#{$prefix}dropdown-divider-bg: #{$dropdown-dark-divider-bg},
+    --#{$prefix}dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg},
+    --#{$prefix}dropdown-link-active-color: #{$dropdown-dark-link-active-color},
+    --#{$prefix}dropdown-link-active-bg: #{$dropdown-dark-link-active-bg},
+    --#{$prefix}dropdown-link-disabled-color: #{$dropdown-dark-link-disabled-color},
+    --#{$prefix}dropdown-header-color: #{$dropdown-dark-header-color},
+  ),
+  $dropdown-dark-tokens
+);
+// scss-docs-end dropdown-dark-css-vars
 @layer components {
   // The dropdown wrapper (`<div>`)
   .dropup,
@@ -78,34 +139,7 @@ $dropdown-dark-header-color:        $gray-500 !default;
 
   // The dropdown menu
   .dropdown-menu {
-    // scss-docs-start dropdown-css-vars
-    --#{$prefix}dropdown-zindex: #{$zindex-dropdown};
-    --#{$prefix}dropdown-min-width: #{$dropdown-min-width};
-    --#{$prefix}dropdown-padding-x: #{$dropdown-padding-x};
-    --#{$prefix}dropdown-padding-y: #{$dropdown-padding-y};
-    --#{$prefix}dropdown-spacer: #{$dropdown-spacer};
-    --#{$prefix}dropdown-font-size: #{$dropdown-font-size};
-    --#{$prefix}dropdown-color: #{$dropdown-color};
-    --#{$prefix}dropdown-bg: #{$dropdown-bg};
-    --#{$prefix}dropdown-border-color: #{$dropdown-border-color};
-    --#{$prefix}dropdown-border-radius: #{$dropdown-border-radius};
-    --#{$prefix}dropdown-border-width: #{$dropdown-border-width};
-    --#{$prefix}dropdown-inner-border-radius: #{$dropdown-inner-border-radius};
-    --#{$prefix}dropdown-divider-bg: #{$dropdown-divider-bg};
-    --#{$prefix}dropdown-divider-margin-y: #{$dropdown-divider-margin-y};
-    --#{$prefix}dropdown-box-shadow: #{$dropdown-box-shadow};
-    --#{$prefix}dropdown-link-color: #{$dropdown-link-color};
-    --#{$prefix}dropdown-link-hover-color: #{$dropdown-link-hover-color};
-    --#{$prefix}dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
-    --#{$prefix}dropdown-link-active-color: #{$dropdown-link-active-color};
-    --#{$prefix}dropdown-link-active-bg: #{$dropdown-link-active-bg};
-    --#{$prefix}dropdown-link-disabled-color: #{$dropdown-link-disabled-color};
-    --#{$prefix}dropdown-item-padding-x: #{$dropdown-item-padding-x};
-    --#{$prefix}dropdown-item-padding-y: #{$dropdown-item-padding-y};
-    --#{$prefix}dropdown-header-color: #{$dropdown-header-color};
-    --#{$prefix}dropdown-header-padding-x: #{$dropdown-header-padding-x};
-    --#{$prefix}dropdown-header-padding-y: #{$dropdown-header-padding-y};
-    // scss-docs-end dropdown-css-vars
+    @include tokens($dropdown-tokens);
 
     position: absolute;
     z-index: var(--#{$prefix}dropdown-zindex);
@@ -297,19 +331,6 @@ $dropdown-dark-header-color:        $gray-500 !default;
 
   // Dark dropdowns
   .dropdown-menu-dark {
-    // scss-docs-start dropdown-dark-css-vars
-    --#{$prefix}dropdown-color: #{$dropdown-dark-color};
-    --#{$prefix}dropdown-bg: #{$dropdown-dark-bg};
-    --#{$prefix}dropdown-border-color: #{$dropdown-dark-border-color};
-    --#{$prefix}dropdown-box-shadow: #{$dropdown-dark-box-shadow};
-    --#{$prefix}dropdown-link-color: #{$dropdown-dark-link-color};
-    --#{$prefix}dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
-    --#{$prefix}dropdown-divider-bg: #{$dropdown-dark-divider-bg};
-    --#{$prefix}dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
-    --#{$prefix}dropdown-link-active-color: #{$dropdown-dark-link-active-color};
-    --#{$prefix}dropdown-link-active-bg: #{$dropdown-dark-link-active-bg};
-    --#{$prefix}dropdown-link-disabled-color: #{$dropdown-dark-link-disabled-color};
-    --#{$prefix}dropdown-header-color: #{$dropdown-dark-header-color};
-    // scss-docs-end dropdown-dark-css-vars
+    @include tokens($dropdown-dark-tokens);
   }
 }
