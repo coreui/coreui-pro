@@ -216,7 +216,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
     --#{$prefix}control-border-radius: #{$input-border-radius-sm};
 
-    min-height: $input-height-sm;
+    min-height: var(--#{$prefix}btn-input-sm-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     font-size: var(--#{$prefix}control-font-size);
     @include border-radius(var(--#{$prefix}control-border-radius));
@@ -235,7 +235,7 @@ $form-control-tokens: defaults(
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
     --#{$prefix}control-border-radius: #{$input-border-radius-lg};
 
-    min-height: $input-height-lg;
+    min-height: var(--#{$prefix}btn-input-lg-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     font-size: var(--#{$prefix}control-font-size);
     @include border-radius(var(--#{$prefix}control-border-radius));
@@ -253,22 +253,22 @@ $form-control-tokens: defaults(
   // stylelint-disable selector-no-qualifying-type
   textarea {
     &.form-control {
-      min-height: $input-height;
+      min-height: var(--#{$prefix}btn-input-min-height);
     }
 
     &.form-control-sm {
-      min-height: $input-height-sm;
+      min-height: var(--#{$prefix}btn-input-sm-min-height);
     }
 
     &.form-control-lg {
-      min-height: $input-height-lg;
+      min-height: var(--#{$prefix}btn-input-lg-min-height);
     }
   }
   // stylelint-enable selector-no-qualifying-type
 
   .form-control-color {
     width: $form-color-width;
-    height: $input-height;
+    height: var(--#{$prefix}btn-input-min-height);
     padding: var(--#{$prefix}control-padding-y);
 
     &:not(:disabled):not([readonly]) {
@@ -285,7 +285,7 @@ $form-control-tokens: defaults(
       @include border-radius(var(--#{$prefix}control-border-radius));
     }
 
-    &.form-control-sm { height: $input-height-sm; }
-    &.form-control-lg { height: $input-height-lg; }
+    &.form-control-sm { height: var(--#{$prefix}btn-input-sm-min-height); }
+    &.form-control-lg { height: var(--#{$prefix}btn-input-lg-min-height); }
   }
 }

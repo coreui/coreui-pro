@@ -6,7 +6,7 @@
 @use "variables" as *;
 
 // scss-docs-start search-button-variables
-$search-button-height:              $input-height !default;
+$search-button-height:              var(--#{$prefix}btn-input-min-height) !default;
 $search-button-padding-x:           $input-padding-x !default;
 $search-button-font-family:         $input-font-family !default;
 $search-button-font-size:           $input-font-size !default;

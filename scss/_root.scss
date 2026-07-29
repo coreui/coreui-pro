@@ -187,14 +187,17 @@
     --#{$prefix}btn-input-disabled-opacity: #{$input-btn-disabled-opacity};
     --#{$prefix}btn-input-color: #{$input-color};
     --#{$prefix}btn-input-bg: #{$input-bg};
+    --#{$prefix}btn-input-min-height: #{$input-height};
 
     --#{$prefix}btn-input-sm-padding-y: #{$input-btn-padding-y-sm};
     --#{$prefix}btn-input-sm-padding-x: #{$input-btn-padding-x-sm};
     --#{$prefix}btn-input-sm-font-size: #{$input-btn-font-size-sm};
+    --#{$prefix}btn-input-sm-min-height: #{$input-height-sm};
 
     --#{$prefix}btn-input-lg-padding-y: #{$input-btn-padding-y-lg};
     --#{$prefix}btn-input-lg-padding-x: #{$input-btn-padding-x-lg};
     --#{$prefix}btn-input-lg-font-size: #{$input-btn-font-size-lg};
+    --#{$prefix}btn-input-lg-min-height: #{$input-height-lg};
     // scss-docs-end root-btn-input-variables
 
     // scss-docs-start root-control-variables

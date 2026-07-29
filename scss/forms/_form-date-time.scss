@@ -41,15 +41,15 @@ $form-date-time-tokens: defaults(
     align-items: center;
     // Hold the final height before initialization — the sections are injected
     // by JS, so an empty container would collapse and flash on load.
-    min-height: $input-height;
+    min-height: var(--#{$prefix}btn-input-min-height);
     cursor: text;
 
     &.form-control-sm {
-      min-height: $input-height-sm;
+      min-height: var(--#{$prefix}btn-input-sm-min-height);
     }
 
     &.form-control-lg {
-      min-height: $input-height-lg;
+      min-height: var(--#{$prefix}btn-input-lg-min-height);
     }
 
     &:focus-within {
