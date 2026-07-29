@@ -20,11 +20,11 @@ $date-picker-v2-tokens: defaults(
     --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color},
     --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius},
     --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow},
-    --#{$prefix}date-picker-bg: #{$date-picker-bg},
-    --#{$prefix}date-picker-border-width: #{$date-picker-border-width},
-    --#{$prefix}date-picker-border-color: #{$date-picker-border-color},
-    --#{$prefix}date-picker-border-radius: #{$date-picker-border-radius},
-    --#{$prefix}date-picker-focus-border-color: #{$date-picker-focus-border-color},
+    --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-border-color: #{$input-border-color},
+    --#{$prefix}control-border-radius: #{$date-picker-border-radius},
+    --#{$prefix}control-focus-border-color: #{$input-focus-border-color},
     --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding},
     --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width},
     --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color},
@@ -53,15 +53,15 @@ $date-picker-v2-tokens: defaults(
   .date-picker-input-group {
     display: flex;
     align-items: center;
-    padding: var(--#{$prefix}date-picker-padding-y) var(--#{$prefix}date-picker-padding-x);
-    font-size: var(--#{$prefix}date-picker-font-size);
-    background-color: var(--#{$prefix}date-picker-bg);
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size);
+    background-color: var(--#{$prefix}control-bg);
     background-clip: padding-box;
-    border: var(--#{$prefix}date-picker-border-width) solid var(--#{$prefix}date-picker-border-color);
-    @include border-radius(var(--#{$prefix}date-picker-border-radius));
+    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+    @include border-radius(var(--#{$prefix}control-border-radius));
 
     &:focus-within {
-      border-color: var(--#{$prefix}date-picker-focus-border-color);
+      border-color: var(--#{$prefix}control-focus-border-color);
     }
 
     // The group is the frame — the section field inside must not draw a second
@@ -141,15 +141,15 @@ $date-picker-v2-tokens: defaults(
       flex-wrap: nowrap;
       gap: 0;
       align-items: center;
-      padding: var(--#{$prefix}time-picker-padding-y) var(--#{$prefix}time-picker-padding-x);
-      font-size: var(--#{$prefix}time-picker-font-size);
-      background-color: var(--#{$prefix}time-picker-bg);
+      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+      font-size: var(--#{$prefix}control-font-size);
+      background-color: var(--#{$prefix}control-bg);
       background-clip: padding-box;
-      border: var(--#{$prefix}time-picker-border-width) solid var(--#{$prefix}time-picker-border-color);
-      @include border-radius(var(--#{$prefix}time-picker-border-radius));
+      border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+      @include border-radius(var(--#{$prefix}control-border-radius));
 
       &:focus-within {
-        border-color: var(--#{$prefix}time-picker-focus-border-color);
+        border-color: var(--#{$prefix}control-focus-border-color);
       }
 
       // see .date-picker-input-group — the group is the frame

@@ -1247,17 +1247,9 @@ $pre-color:                         null !default;
 // Time Picker
 // scss-docs-start time-picker-variables
 $time-picker-zindex:                        1000 !default;
-$time-picker-font-family:                   $input-font-family !default;
-$time-picker-font-size:                     $input-font-size !default;
-$time-picker-font-size-sm:                  $input-font-size-sm !default;
-$time-picker-font-size-lg:                  $input-font-size-lg !default;
 $time-picker-font-weight:                   $input-font-weight !default;
-$time-picker-line-height:                   $input-line-height !default;
-$time-picker-color:                         $input-color !default;
-$time-picker-bg:                            $input-bg !default;
 $time-picker-box-shadow:                    $box-shadow-inset !default;
 
-$time-picker-border-width:                  $input-border-width !default;
 $time-picker-border-color:                  $input-border-color !default;
 $time-picker-border-radius:                 $input-border-radius !default;
 $time-picker-border-radius-sm:              $input-border-radius-sm !default;
@@ -1277,16 +1269,10 @@ $time-picker-focus-box-shadow:              $input-btn-focus-box-shadow !default
 
 $time-picker-placeholder-color:             var(--#{$prefix}secondary-color) !default;
 
-$time-picker-padding-y:                     $input-padding-y !default;
-$time-picker-padding-x:                     $input-padding-x !default;
 $time-picker-gap:                           $input-padding-x !default;
 
-$time-picker-padding-y-sm:                  $input-padding-y-sm !default;
-$time-picker-padding-x-sm:                  $input-padding-x-sm !default;
 $time-picker-gap-sm:                        $input-padding-x-sm !default;
 
-$time-picker-padding-y-lg:                  $input-padding-y-lg !default;
-$time-picker-padding-x-lg:                  $input-padding-x-lg !default;
 $time-picker-gap-lg:                        $input-padding-x-lg !default;
 
 $time-picker-cleaner-width:                 1.25rem !default;

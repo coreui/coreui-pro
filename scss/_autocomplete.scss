@@ -11,17 +11,9 @@
 
 // scss-docs-start autocomplete-variables
 $autocomplete-zindex:                    1000 !default;
-$autocomplete-font-family:               $input-font-family !default;
-$autocomplete-font-size:                 $input-font-size !default;
 $autocomplete-font-weight:               $input-font-weight !default;
-$autocomplete-line-height:               $input-line-height !default;
-$autocomplete-padding-y:                 $input-padding-y !default;
-$autocomplete-padding-x:                 $input-padding-x !default;
-$autocomplete-color:                     $input-color !default;
-$autocomplete-bg:                        $input-bg !default;
 $autocomplete-box-shadow:                $box-shadow-inset !default;
 
-$autocomplete-border-width:              $input-border-width !default;
 $autocomplete-border-color:              $input-border-color !default;
 $autocomplete-border-radius:             $input-border-radius !default;
 $autocomplete-border-radius-sm:          $input-border-radius-sm !default;
@@ -94,24 +86,13 @@ $autocomplete-option-hover-bg:                var(--#{$prefix}tertiary-bg) !defa
 $autocomplete-option-focus-box-shadow:        $input-btn-focus-box-shadow !default;
 
 $autocomplete-option-indicator-width:          1em !default;
-$autocomplete-option-indicator-bg:             $form-check-input-bg !default;
 $autocomplete-option-indicator-border:         $form-check-input-border !default;
 $autocomplete-option-indicator-border-radius:  .25em !default;
 
 $autocomplete-option-selected-bg:                      var(--#{$prefix}secondary-bg) !default;
-$autocomplete-option-selected-indicator-bg:            $form-check-input-checked-bg-color !default;
 $autocomplete-option-selected-indicator-bg-image:      $form-check-input-checked-bg-image !default;
-$autocomplete-option-selected-indicator-border-color:  $autocomplete-option-selected-indicator-bg !default;
 
 $autocomplete-option-disabled-color:        var(--#{$prefix}secondary-color) !default;
-
-$autocomplete-font-size-lg:                 $input-font-size-lg !default;
-$autocomplete-padding-y-lg:                 $input-padding-y-lg !default;
-$autocomplete-padding-x-lg:                 $input-padding-x-lg !default;
-
-$autocomplete-font-size-sm:                 $input-font-size-sm !default;
-$autocomplete-padding-y-sm:                 $input-padding-y-sm !default;
-$autocomplete-padding-x-sm:                 $input-padding-x-sm !default;
 // scss-docs-end autocomplete-variables
 
 $autocomplete-tokens: () !default;
@@ -121,26 +102,26 @@ $autocomplete-tokens: () !default;
 $autocomplete-tokens: defaults(
   (
     --#{$prefix}autocomplete-zindex: #{$autocomplete-zindex},
-    --#{$prefix}autocomplete-font-family: #{$autocomplete-font-family},
-    --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size},
-    --#{$prefix}autocomplete-font-weight: #{$autocomplete-font-weight},
-    --#{$prefix}autocomplete-line-height: #{$autocomplete-line-height},
-    --#{$prefix}autocomplete-color: #{$autocomplete-color},
-    --#{$prefix}autocomplete-bg: #{$autocomplete-bg},
-    --#{$prefix}autocomplete-box-shadow: #{$autocomplete-box-shadow},
-    --#{$prefix}autocomplete-border-width: #{$autocomplete-border-width},
-    --#{$prefix}autocomplete-border-color: #{$autocomplete-border-color},
-    --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius},
-    --#{$prefix}autocomplete-disabled-color: #{$autocomplete-disabled-color},
-    --#{$prefix}autocomplete-disabled-bg: #{$autocomplete-disabled-bg},
-    --#{$prefix}autocomplete-disabled-border-color: #{$autocomplete-disabled-border-color},
-    --#{$prefix}autocomplete-focus-color: #{$autocomplete-focus-color},
-    --#{$prefix}autocomplete-focus-bg: #{$autocomplete-focus-bg},
-    --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-focus-border-color},
-    --#{$prefix}autocomplete-focus-box-shadow: #{$autocomplete-focus-box-shadow},
+    --#{$prefix}control-font-family: var(--#{$prefix}btn-input-font-family),
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}control-font-weight: #{$autocomplete-font-weight},
+    --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
+    --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
+    --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}control-box-shadow: #{$autocomplete-box-shadow},
+    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-border-color: #{$autocomplete-border-color},
+    --#{$prefix}control-border-radius: #{$autocomplete-border-radius},
+    --#{$prefix}control-disabled-color: #{$autocomplete-disabled-color},
+    --#{$prefix}control-disabled-bg: #{$autocomplete-disabled-bg},
+    --#{$prefix}control-disabled-border-color: #{$autocomplete-disabled-border-color},
+    --#{$prefix}control-focus-color: #{$autocomplete-focus-color},
+    --#{$prefix}control-focus-bg: #{$autocomplete-focus-bg},
+    --#{$prefix}control-focus-border-color: #{$autocomplete-focus-border-color},
+    --#{$prefix}control-focus-box-shadow: #{$autocomplete-focus-box-shadow},
     --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color},
-    --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y},
-    --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x},
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-padding-x),
     --#{$prefix}autocomplete-cleaner-width: #{$autocomplete-cleaner-width},
     --#{$prefix}autocomplete-cleaner-height: #{$autocomplete-cleaner-height},
     --#{$prefix}autocomplete-cleaner-padding-y: #{$autocomplete-cleaner-padding-y},
@@ -187,13 +168,13 @@ $autocomplete-tokens: defaults(
     --#{$prefix}autocomplete-option-focus-box-shadow: #{$autocomplete-option-focus-box-shadow},
     --#{$prefix}autocomplete-option-disabled-color: #{$autocomplete-option-disabled-color},
     --#{$prefix}autocomplete-option-indicator-width: #{$autocomplete-option-indicator-width},
-    --#{$prefix}autocomplete-option-indicator-bg: #{$autocomplete-option-indicator-bg},
+    --#{$prefix}autocomplete-option-indicator-bg: var(--#{$prefix}btn-input-bg),
     --#{$prefix}autocomplete-option-indicator-border: #{$autocomplete-option-indicator-border},
     --#{$prefix}autocomplete-option-indicator-border-radius: #{$autocomplete-option-indicator-border-radius},
     --#{$prefix}autocomplete-option-selected-bg: #{$autocomplete-option-selected-bg},
-    --#{$prefix}autocomplete-option-selected-indicator-bg: #{$autocomplete-option-selected-indicator-bg},
+    --#{$prefix}autocomplete-option-selected-indicator-bg: var(--#{$prefix}control-checked-bg),
     --#{$prefix}autocomplete-option-selected-indicator-bg-image: #{escape-svg($autocomplete-option-selected-indicator-bg-image)},
-    --#{$prefix}autocomplete-option-selected-indicator-border-color: #{$autocomplete-option-selected-indicator-border-color},
+    --#{$prefix}autocomplete-option-selected-indicator-border-color: var(--#{$prefix}control-checked-border-color),
   ),
   $autocomplete-tokens
 );
@@ -209,9 +190,9 @@ $autocomplete-tokens: defaults(
     &.is-invalid {
       $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($autocomplete-invalid-border-color, $input-btn-focus-color-opacity);
 
-      --#{$prefix}autocomplete-border-color: #{$autocomplete-invalid-border-color};
-      --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-invalid-border-color};
-      --#{$prefix}autocomplete-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+      --#{$prefix}control-border-color: #{$autocomplete-invalid-border-color};
+      --#{$prefix}control-focus-border-color: #{$autocomplete-invalid-border-color};
+      --#{$prefix}control-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
 
     }
 
@@ -219,9 +200,9 @@ $autocomplete-tokens: defaults(
     &.is-valid {
       $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($autocomplete-valid-border-color, $input-btn-focus-color-opacity);
 
-      --#{$prefix}autocomplete-border-color: #{$autocomplete-valid-border-color};
-      --#{$prefix}autocomplete-focus-border-color: #{$autocomplete-valid-border-color};
-      --#{$prefix}autocomplete-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+      --#{$prefix}control-border-color: #{$autocomplete-valid-border-color};
+      --#{$prefix}control-focus-border-color: #{$autocomplete-valid-border-color};
+      --#{$prefix}control-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
     }
   }
 
@@ -231,29 +212,29 @@ $autocomplete-tokens: defaults(
     flex-wrap: wrap;
     align-items: stretch;
     width: 100%;
-    background-color: var(--#{$prefix}autocomplete-bg);
+    background-color: var(--#{$prefix}control-bg);
     background-clip: padding-box;
-    border: var(--#{$prefix}autocomplete-border-width) solid var(--#{$prefix}autocomplete-border-color);
-    @include border-radius(var(--#{$prefix}autocomplete-border-radius));
+    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+    @include border-radius(var(--#{$prefix}control-border-radius));
 
     .autocomplete & {
       @include transition($input-transition);
     }
 
     .autocomplete.disabled & {
-      background-color: var(--#{$prefix}autocomplete-disabled-bg);
+      background-color: var(--#{$prefix}control-disabled-bg);
       border-color: $input-disabled-border-color;
     }
 
     .autocomplete.show &,
     &:has(*:focus),
     &:focus {
-      background-color: var(--#{$prefix}autocomplete-focus-bg);
-      border-color: var(--#{$prefix}autocomplete-focus-border-color);
+      background-color: var(--#{$prefix}control-focus-bg);
+      border-color: var(--#{$prefix}control-focus-border-color);
       @if $enable-shadows {
-        box-shadow: var(--#{$prefix}autocomplete-box-shadow), var(--#{$prefix}autocomplete-focus-box-shadow);
+        box-shadow: var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow);
       } @else {
-        box-shadow: var(--#{$prefix}autocomplete-focus-box-shadow);
+        box-shadow: var(--#{$prefix}control-focus-box-shadow);
       }
     }
   }
@@ -263,26 +244,26 @@ $autocomplete-tokens: defaults(
     flex: 1 1 auto;
     width: 1%;
     min-width: 0;
-    padding: var(--#{$prefix}autocomplete-padding-y) var(--#{$prefix}autocomplete-padding-x);
-    font-family: var(--#{$prefix}autocomplete-font-family);
-    font-size: var(--#{$prefix}autocomplete-font-size);
-    font-weight: var(--#{$prefix}autocomplete-font-weight);
-    line-height: var(--#{$prefix}autocomplete-line-height);
-    color: var(--#{$prefix}autocomplete-color);
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-family: var(--#{$prefix}control-font-family);
+    font-size: var(--#{$prefix}control-font-size);
+    font-weight: var(--#{$prefix}control-font-weight);
+    line-height: var(--#{$prefix}control-line-height);
+    color: var(--#{$prefix}control-color);
     appearance: none;
     background-color: transparent;
     border: 0;
 
     .autocomplete.show & {
-      color: var(--#{$prefix}autocomplete-focus-color);
+      color: var(--#{$prefix}control-focus-color);
     }
 
     &:disabled {
-      color: var(--#{$prefix}autocomplete-disabled-color);
+      color: var(--#{$prefix}control-disabled-color);
     }
 
     &:focus {
-      color: var(--#{$prefix}autocomplete-focus-color);
+      color: var(--#{$prefix}control-focus-color);
       outline: 0;
     }
 
@@ -305,8 +286,8 @@ $autocomplete-tokens: defaults(
   .autocomplete-buttons {
     display: flex;
     align-items: center;
-    min-height: calc(2 * var(--#{$prefix}autocomplete-padding-y) + calc(var(--#{$prefix}autocomplete-font-size) * var(--#{$prefix}autocomplete-line-height)));  // stylelint-disable-line function-disallowed-list
-    padding: 0 var(--#{$prefix}autocomplete-padding-y);
+    min-height: calc(2 * var(--#{$prefix}control-padding-y) + calc(var(--#{$prefix}control-font-size) * var(--#{$prefix}control-line-height)));  // stylelint-disable-line function-disallowed-list
+    padding: 0 var(--#{$prefix}control-padding-y);
   }
 
   .autocomplete-cleaner,
@@ -419,9 +400,9 @@ $autocomplete-tokens: defaults(
       border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
       outline: 0;
       @if $enable-shadows {
-        box-shadow: var(--#{$prefix}autocomplete-box-shadow), var(--#{$prefix}autocomplete-focus-box-shadow);
+        box-shadow: var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow);
       } @else {
-        box-shadow: var(--#{$prefix}autocomplete-focus-box-shadow);
+        box-shadow: var(--#{$prefix}control-focus-box-shadow);
       }
     }
 
@@ -456,16 +437,16 @@ $autocomplete-tokens: defaults(
 
 
   .autocomplete-sm {
-    --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y-sm};
-    --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x-sm};
-    --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size-sm};
-    --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius-sm};
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
+    --#{$prefix}control-border-radius: #{$autocomplete-border-radius-sm};
   }
 
   .autocomplete-lg {
-    --#{$prefix}autocomplete-padding-y: #{$autocomplete-padding-y-lg};
-    --#{$prefix}autocomplete-padding-x: #{$autocomplete-padding-x-lg};
-    --#{$prefix}autocomplete-font-size: #{$autocomplete-font-size-lg};
-    --#{$prefix}autocomplete-border-radius: #{$autocomplete-border-radius-lg};
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
+    --#{$prefix}control-border-radius: #{$autocomplete-border-radius-lg};
   }
 }

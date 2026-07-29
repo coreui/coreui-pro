@@ -44,16 +44,16 @@ $chip-input-tokens: () !default;
 $chip-input-tokens: defaults(
   (
     --#{$prefix}chip-input-min-height: #{$chip-input-min-height},
-    --#{$prefix}chip-input-padding-y: #{$chip-input-padding-y},
-    --#{$prefix}chip-input-padding-x: #{$chip-input-padding-x},
-    --#{$prefix}chip-input-font-size: #{$chip-input-font-size},
-    --#{$prefix}chip-input-bg: #{$chip-input-bg},
-    --#{$prefix}chip-input-color: #{$chip-input-color},
-    --#{$prefix}chip-input-border-width: #{$chip-input-border-width},
-    --#{$prefix}chip-input-border-color: #{$chip-input-border-color},
-    --#{$prefix}chip-input-border-radius: #{$chip-input-border-radius},
+    --#{$prefix}control-padding-y: #{$chip-input-padding-y},
+    --#{$prefix}control-padding-x: #{$chip-input-padding-x},
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
+    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-border-color: #{$chip-input-border-color},
+    --#{$prefix}control-border-radius: #{$chip-input-border-radius},
     --#{$prefix}chip-input-gap: #{$chip-input-gap},
-    --#{$prefix}chip-input-transition: #{$chip-input-transition},
+    --#{$prefix}control-transition: #{$chip-input-transition},
   ),
   $chip-input-tokens
 );
@@ -69,13 +69,13 @@ $chip-input-tokens: defaults(
     gap: var(--#{$prefix}chip-input-gap);
     align-items: center;
     min-height: var(--#{$prefix}chip-input-min-height);
-    padding: var(--#{$prefix}chip-input-padding-y) var(--#{$prefix}chip-input-padding-x);
-    font-size: var(--#{$prefix}chip-input-font-size);
-    color: var(--#{$prefix}chip-input-color);
-    background-color: var(--#{$prefix}chip-input-bg);
-    border: var(--#{$prefix}chip-input-border-width) solid var(--#{$prefix}chip-input-border-color);
-    @include border-radius(var(--#{$prefix}chip-input-border-radius), 0);
-    @include transition(var(--#{$prefix}chip-input-transition));
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size);
+    color: var(--#{$prefix}control-color);
+    background-color: var(--#{$prefix}control-bg);
+    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+    @include border-radius(var(--#{$prefix}control-border-radius), 0);
+    @include transition(var(--#{$prefix}control-transition));
 
     // Focus state when ghost input is focused
     &:focus-within {
@@ -108,19 +108,19 @@ $chip-input-tokens: defaults(
   // Sizing variants
   .chip-input-lg {
     --#{$prefix}chip-input-min-height: #{$chip-input-min-height-lg};
-    --#{$prefix}chip-input-padding-y: #{$chip-input-padding-y-lg};
-    --#{$prefix}chip-input-padding-x: #{$chip-input-padding-x-lg};
-    --#{$prefix}chip-input-border-radius: #{$chip-input-border-radius-lg};
-    --#{$prefix}chip-input-font-size: #{$chip-input-font-size-lg};
+    --#{$prefix}control-padding-y: #{$chip-input-padding-y-lg};
+    --#{$prefix}control-padding-x: #{$chip-input-padding-x-lg};
+    --#{$prefix}control-border-radius: #{$chip-input-border-radius-lg};
+    --#{$prefix}control-font-size: #{$chip-input-font-size-lg};
     --#{$prefix}chip-input-gap: #{$chip-input-gap-lg};
   }
 
   .chip-input-sm {
     --#{$prefix}chip-input-min-height: #{$chip-input-min-height-sm};
-    --#{$prefix}chip-input-padding-y: #{$chip-input-padding-y-sm};
-    --#{$prefix}chip-input-padding-x: #{$chip-input-padding-x-sm};
-    --#{$prefix}chip-input-border-radius: #{$chip-input-border-radius-sm};
-    --#{$prefix}chip-input-font-size: #{$chip-input-font-size-sm};
+    --#{$prefix}control-padding-y: #{$chip-input-padding-y-sm};
+    --#{$prefix}control-padding-x: #{$chip-input-padding-x-sm};
+    --#{$prefix}control-border-radius: #{$chip-input-border-radius-sm};
+    --#{$prefix}control-font-size: #{$chip-input-font-size-sm};
     --#{$prefix}chip-input-gap: #{$chip-input-gap-sm};
   }
 }
