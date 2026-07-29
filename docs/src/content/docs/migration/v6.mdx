@@ -6,8 +6,10 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 <Callout color="warning">
   **Work in progress.** v6 is under active development on the `v6-dev` branch —
   this page tracks every migration-relevant change as it lands, so nothing here
-  is final until a v6 release ships. The core promise does not change: **an
-  existing class or value never changes meaning; new behavior gets a new name.**
+  is final until a v6 release ships. The **class API keeps its meaning** —
+  `.btn-primary`, `.alert-success` and friends render as before. Where the Sass
+  or CSS-variable surface does change, the entry below carries a
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span> badge.
 </Callout>
 
 ## v6.0.0 (unreleased)
@@ -151,6 +153,133 @@ the option-by-option migration map. Planned mapping:
   created — a detached element has no computed direction (the calendar falls
   back to the nearest `[dir]` ancestor, but placement first is the reliable
   path).
+
+### Sass architecture & design tokens
+
+v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
+design-token maps, one shared styling surface for every text control, and
+runtime color math in place of precompiled shades. Sass variables remain the
+primary customization API — every component knob still works through
+`@use ... with()` — but several things below are breaking and are called out
+as such.
+
+#### Cascade layers
+
+- **All library CSS now lives in cascade layers**, declared as
+  `@layer root, reboot, layout, content, forms, components, custom, helpers, utilities;`.
+  The `custom` layer is empty and reserved for you: put your own layered styles
+  there to slot between the library's components and helpers.
+- **Unlayered CSS wins over layered CSS regardless of specificity**, so your
+  existing stylesheets now override the library more easily, not less. No
+  action needed — selectors that worked before keep working, and low-specificity
+  overrides that used to lose on specificity now win.
+- If your build concatenates CoreUI with other CSS, make sure the layer
+  declaration (emitted at the top of the bundle) is not stripped by a minifier
+  that predates `@layer`.
+
+#### Design-token maps
+
+- **Every component that emits CSS custom properties now builds them from a
+  `$<component>-tokens` Sass map** merged over your overrides with the new
+  `defaults()` function. Override the whole surface at once:
+
+  ```scss
+  @use "@coreui/coreui-pro/scss/coreui" with (
+    $alert-tokens: (
+      --cui-alert-bg: hotpink,
+      --cui-alert-margin-bottom: null, // null removes the token entirely
+    )
+  );
+  ```
+
+  Classic per-variable overrides (`$alert-padding-y: 2rem`) keep working — the
+  map defaults are built from the same Sass variables.
+- **Component Sass variables moved from `_variables.scss` into their component
+  partials.** `@use ... with()` is unaffected — the entry point forwards every
+  module — but if you imported `scss/_variables.scss` directly for its
+  definitions, component blocks are no longer there.
+- Two silent duplicates were dropped along the way: `$nav-link-height` was
+  declared twice (navbar and header blocks — the header copy is gone) and the
+  calendar emitted `--cui-calendar-cell-week-number-color` twice.
+
+#### Theme tokens
+
+- New `--cui-theme-*` indirection plus generated `.theme-primary` …
+  `.theme-dark` classes: a themed container sets `--cui-theme-fg`,
+  `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
+  (alert, buttons) read them. Contextual classes like `.alert-success` are now
+  implemented through these tokens — same rendering, new mechanics.
+- **`--cui-{color}-contrast` custom properties now switch in dark mode.**
+  Previously only buttons computed their own dark-palette contrast; the root
+  tokens now carry it (new `$theme-colors-contrast-dark` map, derived from
+  `$theme-colors-dark` — themes that empty that map are handled).
+
+#### Buttons
+
+- **`button-variant()` changed signature** — it takes a variant name from the
+  new `$button-variants` map (`"solid"`, `"outline"`, `"ghost"`) instead of a
+  color pair, and reads the theme tokens.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `button-outline-variant()` and `button-ghost-variant()` mixins are **removed**
+  (replaced by map entries), and `scss/mixins/_buttons.scss` no longer exists —
+  the variant and size mixins live in `scss/_buttons.scss`.
+- **Hover and active shades are computed in CSS** with
+  `oklch(from var(--cui-theme-base) calc(l * …) c h)` instead of precompiled
+  `shade-color()`/`tint-color()`. Shades shift slightly (measured 8–23 per RGB
+  channel); `.btn-dark` keeps brightening on hover via the
+  `$btn-lightness-overrides` map. The win: a theme color you add yourself gets
+  correct hover/active states without compiling Sass.
+- **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
+  the root color tokens, which already switch in dark mode.
+- `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
+
+#### RFS removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **The RFS engine is gone** — no `vendor/rfs`, no `font-size()` / `rfs()`
+  mixins, no `$enable-rfs`, no `rfs` option in the utilities API. Fluid type is
+  written as literal `clamp()` values in `$h1-font-size`–`$h4-font-size`,
+  `$display-font-sizes` and `$legend-font-size`; rendering is unchanged at
+  every viewport width.
+- **Headings no longer derive from `$font-size-base`** — a `clamp()` cannot be
+  multiplied. Override the `$h*-font-size` variables directly.
+- A temporary `scss/vendor/_rfs.scss` shim (pass-through `font-size()`/`rfs()`
+  mixins) exists only for the docs engine and will be removed — do not depend
+  on it.
+
+#### One styling surface for all text controls
+
+- **Shared root knobs**: `:root` now carries the control frame
+  (`--cui-btn-input-padding-y/-x`, `-font-family/-size`, `-line-height`,
+  `-border-width`, `-transition`, `-color`, `-bg`, `-disabled-opacity`, plus
+  `-sm-*`/`-lg-*` size sets) and the selection state
+  (`--cui-control-checked-bg/-border-color`,
+  `--cui-control-indeterminate-bg/-border-color`). Restyle these once and
+  every control follows: inputs, selects, checks, switches, OTP, chip input,
+  autocomplete, multi select, and the pickers — including the checkbox-style
+  option indicators inside autocomplete and multi select.
+- **Every text control consumes per-element `--cui-control-*` tokens**
+  (padding, font, colors, border, radius, shadows, focus and disabled sets)
+  that default to those knobs. Override a single control on its element;
+  override everything at `:root`.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  The component-namespace custom properties that duplicated this frame are
+  **renamed**: `--cui-autocomplete-padding-y`, `--cui-date-picker-font-size`,
+  `--cui-time-picker-bg`, `--cui-form-multi-select-border-color`,
+  `--cui-chip-input-padding-x` and the rest of their frame sets are now
+  `--cui-control-*` on the same elements. Runtime overrides written against
+  the old names must be updated. Component-specific tokens (indicators,
+  dropdowns, tags, cells, cleaner buttons) keep their names.
+- **Component Sass variables survive with new defaults**: `$date-picker-bg`,
+  `$autocomplete-padding-y` and the rest now default to the shared knob
+  (`var(--cui-btn-input-bg)` …). Untouched, the control follows the shared
+  surface; overridden through `with()`, it detaches just that control —
+  exactly what reaching for a component knob means.
+- **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
+  `--cui-control-border-color`, `-focus-border-color` and `-focus-box-shadow`
+  instead of restating declarations, so state styling follows any control
+  automatically.
 
 ### Sass & CSS
 
