@@ -61,9 +61,10 @@
     --#{$prefix}black-rgb: #{to-rgb($black)};
 
     @each $color, $value in $theme-gradients {
-      $dark: map.get($theme-gradients-dark, $color);
-      --#{$prefix}#{$color}-start: #{color-scheme(map.get($value, "start"), if($dark, map.get($dark, "start"), null))};
-      --#{$prefix}#{$color}-stop: #{color-scheme(map.get($value, "stop"), if($dark, map.get($dark, "stop"), null))};
+      // map.get() walks nested keys and yields null when a level is missing,
+      // so a theme that drops the dark gradients needs no guard here.
+      --#{$prefix}#{$color}-start: #{color-scheme(map.get($value, "start"), map.get($theme-gradients-dark, $color, "start"))};
+      --#{$prefix}#{$color}-stop: #{color-scheme(map.get($value, "stop"), map.get($theme-gradients-dark, $color, "stop"))};
     }
 
     // Fonts
