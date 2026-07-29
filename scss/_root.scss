@@ -30,7 +30,7 @@
     }
 
     @each $color, $value in $grays {
-      --#{$prefix}gray-#{$color}: #{color-scheme($value, map.get($grays-dark, $color))};
+      --#{$prefix}gray-#{$color}: #{$value};
     }
 
     @each $color, $value in $theme-colors {
