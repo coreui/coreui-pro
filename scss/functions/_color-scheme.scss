@@ -1,0 +1,25 @@
+@use "sass:meta";
+@use "../variables" as *;
+
+// Pairs a light and a dark value into a single `light-dark()` declaration, so a
+// colour switches with the color scheme instead of being restated in a
+// `[data#{$data-infix}theme="dark"]` block.
+//
+// Returns the light value alone when dark mode is off, when there is no dark
+// counterpart, or when both sides are equal — no point emitting the function
+// then. Only works for colours: `light-dark()` resolves to a `<color>`, so
+// rgb triplets, `url()` icons and filters keep their own dark rules.
+
+@function color-scheme($light, $dark: null) {
+  @if not $enable-dark-mode or $dark == null or $dark == $light {
+    @return $light;
+  }
+
+  // light-dark() resolves to a <color>; anything else — an rgb triplet, a
+  // url(), a filter — has to keep its own dark rule.
+  @if meta.type-of($light) != "color" or meta.type-of($dark) != "color" {
+    @return $light;
+  }
+
+  @return light-dark(#{$light}, #{$dark});
+}
