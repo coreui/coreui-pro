@@ -9,6 +9,50 @@
 @use "../variables" as *;
 @use "../variables-dark" as *;
 
+// scss-docs-start form-select-variables
+$form-select-padding-y:             var(--#{$prefix}btn-input-padding-y) !default;
+$form-select-padding-x:             var(--#{$prefix}btn-input-padding-x) !default;
+$form-select-font-family:           var(--#{$prefix}btn-input-font-family) !default;
+$form-select-font-size:             var(--#{$prefix}btn-input-font-size) !default;
+$form-select-indicator-padding:     calc(var(--#{$prefix}control-padding-x) * 3) !default; // stylelint-disable-line function-disallowed-list
+$form-select-font-weight:           $input-font-weight !default;
+$form-select-line-height:           var(--#{$prefix}btn-input-line-height) !default;
+$form-select-color:                 var(--#{$prefix}btn-input-color) !default;
+$form-select-bg:                    var(--#{$prefix}btn-input-bg) !default;
+$form-select-disabled-color:        null !default;
+$form-select-disabled-bg:           $input-disabled-bg !default;
+$form-select-disabled-border-color: $input-disabled-border-color !default;
+$form-select-bg-position:           right var(--#{$prefix}control-padding-x) center !default;
+$form-select-bg-size:               16px 12px !default; // In pixels because image dimensions
+$form-select-indicator-color:       $gray-800 !default;
+$form-select-indicator:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+
+$form-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}form-select-indicator-padding)) !default; // stylelint-disable-line function-disallowed-list
+$form-select-feedback-icon-position:    center right var(--#{$prefix}form-select-indicator-padding) !default;
+$form-select-feedback-icon-size:        $input-height-inner-half $input-height-inner-half !default;
+
+$form-select-border-width:        var(--#{$prefix}btn-input-border-width) !default;
+$form-select-border-color:        $input-border-color !default;
+$form-select-border-radius:       $input-border-radius !default;
+$form-select-box-shadow:          var(--#{$prefix}box-shadow-inset) !default;
+
+$form-select-focus-border-color:  $input-focus-border-color !default;
+$form-select-focus-width:         $input-focus-width !default;
+$form-select-focus-box-shadow:    0 0 0 $form-select-focus-width $input-btn-focus-color !default;
+
+$form-select-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
+$form-select-padding-x-sm:        var(--#{$prefix}btn-input-sm-padding-x) !default;
+$form-select-font-size-sm:        var(--#{$prefix}btn-input-sm-font-size) !default;
+$form-select-border-radius-sm:    $input-border-radius-sm !default;
+
+$form-select-padding-y-lg:        var(--#{$prefix}btn-input-lg-padding-y) !default;
+$form-select-padding-x-lg:        var(--#{$prefix}btn-input-lg-padding-x) !default;
+$form-select-font-size-lg:        var(--#{$prefix}btn-input-lg-font-size) !default;
+$form-select-border-radius-lg:    $input-border-radius-lg !default;
+
+$form-select-transition:          $input-transition !default;
+// scss-docs-end form-select-variables
+
 // scss-docs-start form-select-tokens
 // Shared control tokens plus the select-only ones, so .form-select answers to
 // the same runtime knobs as .form-control.
@@ -37,6 +81,8 @@ $form-select-tokens: defaults(
     --#{$prefix}control-disabled-border-color: #{$form-select-disabled-border-color},
     --#{$prefix}form-select-bg-img: #{escape-svg($form-select-indicator)},
     --#{$prefix}form-select-indicator-padding: #{$form-select-indicator-padding},
+    --#{$prefix}form-select-feedback-icon-padding-end: #{$form-select-feedback-icon-padding-end},
+    --#{$prefix}form-select-feedback-icon-size: "#{$form-select-bg-size}, #{$form-select-feedback-icon-size}",
     --#{$prefix}form-select-bg-size: #{$form-select-bg-size},
   ),
   $form-select-tokens
@@ -71,6 +117,12 @@ $form-select-tokens: defaults(
     @include ltr-rtl-value-only("--#{$prefix}form-select-bg-position", $form-select-bg-position);
     background-position: var(--#{$prefix}form-select-bg-position);
     background-size: var(--#{$prefix}form-select-bg-size);
+
+    @if $enable-validation-icons {
+      // The validation state consumes this; declared here so the direction flip
+      // happens where the geometry lives.
+      @include ltr-rtl-value-only("--#{$prefix}form-select-validation-bg-position", #{$form-select-bg-position, $form-select-feedback-icon-position});
+    }
     border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
     @include border-radius(var(--#{$prefix}control-border-radius), 0);
     @include box-shadow(var(--#{$prefix}control-box-shadow));

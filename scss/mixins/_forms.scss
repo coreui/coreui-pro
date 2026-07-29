@@ -154,9 +154,9 @@ $form-feedback-tokens: defaults(
         &:not([multiple]):not([size]),
         &:not([multiple])[size="1"] {
           --#{$prefix}form-select-bg-icon: #{escape-svg($icon)};
-          padding-inline-end: $form-select-feedback-icon-padding-end;
-          @include ltr-rtl-value-only("background-position", #{$form-select-bg-position, $form-select-feedback-icon-position});
-          background-size: $form-select-bg-size, $form-select-feedback-icon-size;
+          padding-inline-end: var(--#{$prefix}form-select-feedback-icon-padding-end);
+          background-position: var(--#{$prefix}form-select-validation-bg-position);
+          background-size: var(--#{$prefix}form-select-feedback-icon-size);
         }
       }
 
