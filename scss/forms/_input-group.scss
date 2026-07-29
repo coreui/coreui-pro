@@ -149,7 +149,8 @@ $input-group-tokens: defaults(
 
   .input-group-lg > .form-select,
   .input-group-sm > .form-select {
-    padding-inline-end: $form-select-padding-x + $form-select-indicator-padding;
+    // stylelint-disable-next-line function-disallowed-list
+    padding-inline-end: calc(var(--#{$prefix}control-padding-x) + var(--#{$prefix}form-select-indicator-padding));
   }
 
 

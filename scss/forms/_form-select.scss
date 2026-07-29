@@ -68,7 +68,8 @@ $form-select-tokens: defaults(
     background-color: var(--#{$prefix}control-bg);
     background-image: var(--#{$prefix}form-select-bg-img), var(--#{$prefix}form-select-bg-icon, none);
     background-repeat: no-repeat;
-    @include ltr-rtl-value-only("background-position", $form-select-bg-position);
+    @include ltr-rtl-value-only("--#{$prefix}form-select-bg-position", $form-select-bg-position);
+    background-position: var(--#{$prefix}form-select-bg-position);
     background-size: var(--#{$prefix}form-select-bg-size);
     border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
     @include border-radius(var(--#{$prefix}control-border-radius), 0);

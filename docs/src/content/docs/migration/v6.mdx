@@ -276,6 +276,15 @@ as such.
   (`var(--cui-btn-input-bg)` …). Untouched, the control follows the shared
   surface; overridden through `with()`, it detaches just that control —
   exactly what reaching for a component knob means.
+- **The select's indicator geometry is computed at runtime.**
+  `$form-select-indicator-padding` and `$form-select-feedback-icon-padding-end`
+  are now `calc()` expressions over `var(--cui-control-padding-x)` instead of
+  Sass products, and `$form-select-bg-position` carries the `var()` inside it
+  (the RTL build still flips the `right`/`left` keyword at compile time).
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  Sass arithmetic on these variables in your own stylesheets no longer works —
+  they are CSS calc strings now, not numbers. Override them with your own
+  `calc()` or a plain length instead.
 - **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
   `--cui-control-border-color`, `-focus-border-color` and `-focus-box-shadow`
   instead of restating declarations, so state styling follows any control
