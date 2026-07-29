@@ -957,15 +957,15 @@ $form-check-inline-margin-end:    1rem !default;
 
 
 // scss-docs-start form-select-variables
-$form-select-padding-y:             $input-padding-y !default;
+$form-select-padding-y:             var(--#{$prefix}btn-input-padding-y) !default;
 $form-select-padding-x:             $input-padding-x !default;
-$form-select-font-family:           $input-font-family !default;
-$form-select-font-size:             $input-font-size !default;
+$form-select-font-family:           var(--#{$prefix}btn-input-font-family) !default;
+$form-select-font-size:             var(--#{$prefix}btn-input-font-size) !default;
 $form-select-indicator-padding:     $form-select-padding-x * 3 !default; // Extra padding for background-image
 $form-select-font-weight:           $input-font-weight !default;
-$form-select-line-height:           $input-line-height !default;
-$form-select-color:                 $input-color !default;
-$form-select-bg:                    $input-bg !default;
+$form-select-line-height:           var(--#{$prefix}btn-input-line-height) !default;
+$form-select-color:                 var(--#{$prefix}btn-input-color) !default;
+$form-select-bg:                    var(--#{$prefix}btn-input-bg) !default;
 $form-select-disabled-color:        null !default;
 $form-select-disabled-bg:           $input-disabled-bg !default;
 $form-select-disabled-border-color: $input-disabled-border-color !default;
@@ -978,7 +978,7 @@ $form-select-feedback-icon-padding-end: $form-select-padding-x * 2.5 + $form-sel
 $form-select-feedback-icon-position:    center right $form-select-indicator-padding !default;
 $form-select-feedback-icon-size:        $input-height-inner-half $input-height-inner-half !default;
 
-$form-select-border-width:        $input-border-width !default;
+$form-select-border-width:        var(--#{$prefix}btn-input-border-width) !default;
 $form-select-border-color:        $input-border-color !default;
 $form-select-border-radius:       $input-border-radius !default;
 $form-select-box-shadow:          var(--#{$prefix}box-shadow-inset) !default;
@@ -987,14 +987,14 @@ $form-select-focus-border-color:  $input-focus-border-color !default;
 $form-select-focus-width:         $input-focus-width !default;
 $form-select-focus-box-shadow:    0 0 0 $form-select-focus-width $input-btn-focus-color !default;
 
-$form-select-padding-y-sm:        $input-padding-y-sm !default;
-$form-select-padding-x-sm:        $input-padding-x-sm !default;
-$form-select-font-size-sm:        $input-font-size-sm !default;
+$form-select-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
+$form-select-padding-x-sm:        var(--#{$prefix}btn-input-sm-padding-x) !default;
+$form-select-font-size-sm:        var(--#{$prefix}btn-input-sm-font-size) !default;
 $form-select-border-radius-sm:    $input-border-radius-sm !default;
 
-$form-select-padding-y-lg:        $input-padding-y-lg !default;
-$form-select-padding-x-lg:        $input-padding-x-lg !default;
-$form-select-font-size-lg:        $input-font-size-lg !default;
+$form-select-padding-y-lg:        var(--#{$prefix}btn-input-lg-padding-y) !default;
+$form-select-padding-x-lg:        var(--#{$prefix}btn-input-lg-padding-x) !default;
+$form-select-font-size-lg:        var(--#{$prefix}btn-input-lg-font-size) !default;
 $form-select-border-radius-lg:    $input-border-radius-lg !default;
 
 $form-select-transition:          $input-transition !default;
