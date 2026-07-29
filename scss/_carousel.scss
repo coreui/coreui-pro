@@ -1,4 +1,3 @@
-@use "functions/color-scheme" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/clearfix" as *;
 @use "mixins/color-mode" as *;
@@ -8,7 +7,7 @@
 @use "variables-dark" as *;
 
 // scss-docs-start carousel-variables
-$carousel-control-color:             $white !default;
+$carousel-control-color:             light-dark($white, $black) !default;
 $carousel-control-width:             15% !default;
 $carousel-control-opacity:           .5 !default;
 $carousel-control-hover-opacity:     .9 !default;
@@ -20,12 +19,12 @@ $carousel-indicator-height:          3px !default;
 $carousel-indicator-hit-area-height: 10px !default;
 $carousel-indicator-spacer:          3px !default;
 $carousel-indicator-opacity:         .5 !default;
-$carousel-indicator-active-bg:       $white !default;
+$carousel-indicator-active-bg:       light-dark($white, $black) !default;
 $carousel-indicator-active-opacity:  1 !default;
 $carousel-indicator-transition:      opacity .6s ease !default;
 
 $carousel-caption-width:             70% !default;
-$carousel-caption-color:             $white !default;
+$carousel-caption-color:             light-dark($white, $black) !default;
 $carousel-caption-padding-y:         1.25rem !default;
 $carousel-caption-spacer:            1.25rem !default;
 
@@ -245,10 +244,18 @@ $carousel-transition:                transform $carousel-transition-duration eas
 
 // Dark mode carousel
 
+// The .carousel-dark opt-in is deliberately independent of the colour scheme,
+// so it pins the dark side of each pair rather than reading the token.
+// scss-docs-start carousel-dark-variables
+$carousel-dark-indicator-active-bg: $black !default;
+$carousel-dark-caption-color:       $black !default;
+$carousel-dark-control-color:       $black !default;
+// scss-docs-end carousel-dark-variables
+
 @mixin carousel-dark() {
-  --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg-dark};
-  --#{$prefix}carousel-caption-color: #{$carousel-caption-color-dark};
-  --#{$prefix}carousel-control-color: #{$carousel-control-color-dark};
+  --#{$prefix}carousel-indicator-active-bg: #{$carousel-dark-indicator-active-bg};
+  --#{$prefix}carousel-caption-color: #{$carousel-dark-caption-color};
+  --#{$prefix}carousel-control-color: #{$carousel-dark-control-color};
 }
 
 @layer components {
@@ -257,8 +264,8 @@ $carousel-transition:                transform $carousel-transition-duration eas
   }
 
   :root {
-    --#{$prefix}carousel-indicator-active-bg: #{color-scheme($carousel-indicator-active-bg, $carousel-indicator-active-bg-dark)};
-    --#{$prefix}carousel-caption-color: #{color-scheme($carousel-caption-color, $carousel-caption-color-dark)};
-    --#{$prefix}carousel-control-color: #{color-scheme($carousel-control-color, $carousel-control-color-dark)};
+    --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg};
+    --#{$prefix}carousel-caption-color: #{$carousel-caption-color};
+    --#{$prefix}carousel-control-color: #{$carousel-control-color};
   }
 }

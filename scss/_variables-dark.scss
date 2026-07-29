@@ -112,12 +112,4 @@ $form-invalid-color-dark:           $red-300 !default;
 $form-invalid-border-color-dark:    $red-300 !default;
 // scss-docs-end form-validation-colors-dark
 
-//
-// Carousel
-//
-
-$carousel-indicator-active-bg-dark:   $carousel-dark-indicator-active-bg !default;
-$carousel-caption-color-dark:         $carousel-dark-caption-color !default;
-$carousel-control-color-dark:         $black !default; // was invert(1) grayscale(100) over $white
-
 // scss-docs-end sass-dark-mode-vars
