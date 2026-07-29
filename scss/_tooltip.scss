@@ -5,6 +5,24 @@
 @use "mixins/tokens" as *;
 @use "variables" as *;
 
+// scss-docs-start tooltip-variables
+$tooltip-font-size:                 $font-size-sm !default;
+$tooltip-max-width:                 200px !default;
+$tooltip-color:                     var(--#{$prefix}body-bg) !default;
+$tooltip-bg:                        var(--#{$prefix}emphasis-color) !default;
+$tooltip-border-radius:             var(--#{$prefix}border-radius) !default;
+$tooltip-opacity:                   .9 !default;
+$tooltip-padding-y:                 $spacer * .25 !default;
+$tooltip-padding-x:                 $spacer * .5 !default;
+$tooltip-margin:                    null !default; // TODO: remove this in v6
+
+$tooltip-arrow-width:               .8rem !default;
+$tooltip-arrow-height:              .4rem !default;
+// fusv-disable
+$tooltip-arrow-color:               null !default; // Deprecated in 4.2.0 for CSS variables
+// fusv-enable
+// scss-docs-end tooltip-variables
+
 $tooltip-tokens: () !default;
 
 // scss-docs-start tooltip-css-vars

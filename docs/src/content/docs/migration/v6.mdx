@@ -285,6 +285,17 @@ as such.
   Sass arithmetic on these variables in your own stylesheets no longer works —
   they are CSS calc strings now, not numbers. Override them with your own
   `calc()` or a plain length instead.
+- **Form tooltips reuse the tooltip's runtime tokens.** Add the `.tooltip`
+  class to a feedback tooltip (`class="tooltip invalid-tooltip"`) and it
+  follows tooltip theming — `--cui-tooltip-padding-*`, `-font-size`,
+  `-border-radius` — the upstream v6 contract. Bare `.invalid-tooltip` markup
+  keeps rendering exactly as before through built-in fallbacks.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  The Sass-level derivation is gone: `$form-feedback-tooltip-*` no longer
+  default to `$tooltip-*`, so overriding `$tooltip-padding-y` alone no longer
+  moves feedback tooltips at compile time — use the runtime link (add the
+  class) or set `$form-feedback-tooltip-*` explicitly. The tooltip variables
+  moved to `scss/_tooltip.scss`, the feedback set to `scss/mixins/_forms.scss`.
 - **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
   `--cui-control-border-color`, `-focus-border-color` and `-focus-box-shadow`
   instead of restating declarations, so state styling follows any control

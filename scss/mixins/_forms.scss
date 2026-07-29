@@ -10,6 +10,19 @@
 // This mixin uses an `if()` technique to be compatible with Dart Sass
 // See https://github.com/sass/sass/issues/1873#issuecomment-152293725 for more details
 
+// Form tooltips reuse the tooltip's runtime tokens when the element also
+// carries the .tooltip class; these are the standalone fallbacks, matching the
+// tooltip's default formulas. The Sass-level derivation from $tooltip-* is
+// gone — the runtime link through var(--#{$prefix}tooltip-*) replaces it.
+// scss-docs-start tooltip-feedback-variables
+$form-feedback-tooltip-padding-y:     $spacer * .25 !default;
+$form-feedback-tooltip-padding-x:     $spacer * .5 !default;
+$form-feedback-tooltip-font-size:     $font-size-sm !default;
+$form-feedback-tooltip-line-height:   null !default;
+$form-feedback-tooltip-opacity:       .9 !default;
+$form-feedback-tooltip-border-radius: var(--#{$prefix}border-radius) !default;
+// scss-docs-end tooltip-feedback-variables
+
 // scss-docs-start form-feedback-tokens
 // Geometry of the feedback and tooltip elements. They are siblings of the
 // control rather than descendants, so they carry their own tokens.
@@ -64,6 +77,9 @@ $form-feedback-tokens: defaults(
     color: $color;
   }
 
+  // The compound variant outweighs .tooltip's own opacity: 0 (0,2,0 vs 0,1,0);
+  // the bare class keeps the standalone fallbacks working.
+  .tooltip.#{$state}-tooltip,
   .#{$state}-tooltip {
     @include tokens($form-feedback-tokens);
 
@@ -72,13 +88,14 @@ $form-feedback-tokens: defaults(
     z-index: 5;
     display: none;
     max-width: 100%; // Contain to parent when possible
-    padding: var(--#{$prefix}form-feedback-tooltip-padding-y) var(--#{$prefix}form-feedback-tooltip-padding-x);
+    padding: var(--#{$prefix}tooltip-padding-y, var(--#{$prefix}form-feedback-tooltip-padding-y)) var(--#{$prefix}tooltip-padding-x, var(--#{$prefix}form-feedback-tooltip-padding-x));
     margin-top: .1rem;
-    font-size: var(--#{$prefix}form-feedback-tooltip-font-size);
+    font-size: var(--#{$prefix}tooltip-font-size, var(--#{$prefix}form-feedback-tooltip-font-size));
     line-height: var(--#{$prefix}form-feedback-tooltip-line-height);
     color: $tooltip-color;
     background-color: $tooltip-bg-color;
-    @include border-radius(var(--#{$prefix}form-feedback-tooltip-border-radius));
+    opacity: 1;
+    @include border-radius(var(--#{$prefix}tooltip-border-radius, var(--#{$prefix}form-feedback-tooltip-border-radius)));
   }
 
   @include form-validation-state-selector($state) {
