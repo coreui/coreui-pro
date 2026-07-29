@@ -1,3 +1,4 @@
+@use "functions/color-scheme" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/clearfix" as *;
 @use "mixins/color-mode" as *;
@@ -255,16 +256,9 @@ $carousel-transition:                transform $carousel-transition-duration eas
     @include carousel-dark();
   }
 
-  :root,
-  [data#{$data-infix}theme="light"] {
-    --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg};
-    --#{$prefix}carousel-caption-color: #{$carousel-caption-color};
-    --#{$prefix}carousel-control-color: #{$carousel-control-color};
-  }
-
-  @if $enable-dark-mode {
-    @include color-mode(dark, true) {
-      @include carousel-dark();
-    }
+  :root {
+    --#{$prefix}carousel-indicator-active-bg: #{color-scheme($carousel-indicator-active-bg, $carousel-indicator-active-bg-dark)};
+    --#{$prefix}carousel-caption-color: #{color-scheme($carousel-caption-color, $carousel-caption-color-dark)};
+    --#{$prefix}carousel-control-color: #{color-scheme($carousel-control-color, $carousel-control-color-dark)};
   }
 }

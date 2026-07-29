@@ -281,6 +281,12 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
   }
 
   .sidebar-dark {
+    // The explicit overrides below pin the sidebar's own colours. Declaring the
+    // scheme as well means everything inside that is a light-dark() pair — and
+    // the native widgets — follow too, instead of staying on light values the
+    // sidebar never thought to override.
+    color-scheme: dark;
+
     --#{$prefix}body-color: #{$body-color-dark};
     --#{$prefix}body-bg: #{$body-bg-dark};
 
