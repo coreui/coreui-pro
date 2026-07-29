@@ -30,8 +30,8 @@ $carousel-caption-spacer:            1.25rem !default;
 
 $carousel-control-icon-width:        2rem !default;
 
-$carousel-control-prev-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$carousel-control-color}'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0'/></svg>") !default;
-$carousel-control-next-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$carousel-control-color}'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708'/></svg>") !default;
+$carousel-control-prev-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0'/></svg>") !default;
+$carousel-control-next-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708'/></svg>") !default;
 
 $carousel-transition-duration:       .6s !default;
 $carousel-transition:                transform $carousel-transition-duration ease-in-out !default; // Define transform transition first if using multiple transitions (e.g., `transform 2s ease, opacity .5s ease-out`)
@@ -134,10 +134,9 @@ $carousel-transition:                transform $carousel-transition-duration eas
     justify-content: center; // 3. horizontally center contents
     width: $carousel-control-width;
     padding: 0;
-    color: $carousel-control-color;
+    color: var(--#{$prefix}carousel-control-color);
     text-align: center;
     background: none;
-    filter: var(--#{$prefix}carousel-control-icon-filter);
     border: 0;
     opacity: $carousel-control-opacity;
     @include transition($carousel-control-transition);
@@ -145,7 +144,7 @@ $carousel-transition:                transform $carousel-transition-duration eas
     // Hover/focus state
     &:hover,
     &:focus {
-      color: $carousel-control-color;
+      color: var(--#{$prefix}carousel-control-color);
       text-decoration: none;
       outline: 0;
       opacity: $carousel-control-hover-opacity;
@@ -168,16 +167,19 @@ $carousel-transition:                transform $carousel-transition-duration eas
     display: inline-block;
     width: $carousel-control-icon-width;
     height: $carousel-control-icon-width;
-    background-repeat: no-repeat;
-    background-position: 50%;
-    background-size: 100% 100%;
+    // Painted through the mask, so the arrow follows the control's colour
+    // instead of carrying it inside the SVG and being inverted by a filter.
+    background-color: var(--#{$prefix}carousel-control-color);
+    mask-repeat: no-repeat;
+    mask-position: 50%;
+    mask-size: 100% 100%;
   }
 
   .carousel-control-prev-icon {
-    @include ltr-rtl-value-only("background-image", escape-svg($carousel-control-prev-icon-bg), escape-svg($carousel-control-next-icon-bg));
+    @include ltr-rtl-value-only("mask-image", escape-svg($carousel-control-prev-icon-bg), escape-svg($carousel-control-next-icon-bg));
   }
   .carousel-control-next-icon {
-    @include ltr-rtl-value-only("background-image", escape-svg($carousel-control-next-icon-bg), escape-svg($carousel-control-prev-icon-bg));
+    @include ltr-rtl-value-only("mask-image", escape-svg($carousel-control-next-icon-bg), escape-svg($carousel-control-prev-icon-bg));
   }
 
   // Optional indicator pips/controls
@@ -245,7 +247,7 @@ $carousel-transition:                transform $carousel-transition-duration eas
 @mixin carousel-dark() {
   --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg-dark};
   --#{$prefix}carousel-caption-color: #{$carousel-caption-color-dark};
-  --#{$prefix}carousel-control-icon-filter: #{$carousel-control-icon-filter-dark};
+  --#{$prefix}carousel-control-color: #{$carousel-control-color-dark};
 }
 
 @layer components {
@@ -257,7 +259,7 @@ $carousel-transition:                transform $carousel-transition-duration eas
   [data#{$data-infix}theme="light"] {
     --#{$prefix}carousel-indicator-active-bg: #{$carousel-indicator-active-bg};
     --#{$prefix}carousel-caption-color: #{$carousel-caption-color};
-    --#{$prefix}carousel-control-icon-filter: #{$carousel-control-icon-filter};
+    --#{$prefix}carousel-control-color: #{$carousel-control-color};
   }
 
   @if $enable-dark-mode {

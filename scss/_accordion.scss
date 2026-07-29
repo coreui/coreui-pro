@@ -9,7 +9,6 @@
 @use "variables" as *;
 @use "variables-dark" as *;
 
-// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start accordion-variables
 $accordion-padding-y:                     1rem !default;
@@ -38,13 +37,14 @@ $accordion-button-focus-border-color:     $input-focus-border-color !default; //
 $accordion-button-focus-box-shadow:       $btn-focus-box-shadow !default;
 
 $accordion-icon-width:                    1.25rem !default;
-$accordion-icon-color:                    $body-color !default;
-$accordion-icon-active-color:             $primary-text-emphasis !default;
+$accordion-icon-color:                    var(--#{$prefix}body-color) !default;
+$accordion-icon-active-color:             var(--#{$prefix}primary-text-emphasis) !default;
 $accordion-icon-transition:               transform .2s ease-in-out !default;
 $accordion-icon-transform:                rotate(-180deg) !default;
 
-$accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='#{$accordion-icon-color}' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
-$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='#{$accordion-icon-active-color}' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
+$accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
+// Painted through the mask by --#{$prefix}accordion-btn-icon-color, so the
+// stroke colour above is irrelevant — only the shape's alpha is used.
 // scss-docs-end accordion-variables
 
 $accordion-tokens: () !default;
@@ -66,9 +66,10 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-bg: #{$accordion-button-bg},
     --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
     --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width},
+    --#{$prefix}accordion-btn-icon-color: #{$accordion-icon-color},
+    --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
-    --#{$prefix}accordion-btn-active-icon: #{escape-svg($accordion-button-active-icon)},
     --#{$prefix}accordion-btn-focus-box-shadow: #{$accordion-button-focus-box-shadow},
     --#{$prefix}accordion-body-padding-x: #{$accordion-body-padding-x},
     --#{$prefix}accordion-body-padding-y: #{$accordion-body-padding-y},
@@ -108,7 +109,7 @@ $accordion-tokens: defaults(
       box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-border-color); // stylelint-disable-line function-disallowed-list
 
       &::after {
-        background-image: var(--#{$prefix}accordion-btn-active-icon);
+        background-color: var(--#{$prefix}accordion-btn-active-icon-color);
         transform: var(--#{$prefix}accordion-btn-icon-transform);
       }
     }
@@ -120,9 +121,10 @@ $accordion-tokens: defaults(
       height: var(--#{$prefix}accordion-btn-icon-width);
       margin-inline-start: auto;
       content: "";
-      background-image: var(--#{$prefix}accordion-btn-icon);
-      background-repeat: no-repeat;
-      background-size: var(--#{$prefix}accordion-btn-icon-width);
+      background-color: var(--#{$prefix}accordion-btn-icon-color);
+      mask-image: var(--#{$prefix}accordion-btn-icon);
+      mask-repeat: no-repeat;
+      mask-size: var(--#{$prefix}accordion-btn-icon-width);
       @include transition(var(--#{$prefix}accordion-btn-icon-transition));
     }
 
@@ -202,12 +204,4 @@ $accordion-tokens: defaults(
     }
   }
 
-  @if $enable-dark-mode {
-    @include color-mode(dark) {
-      .accordion-button::after {
-        --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon-dark)};
-        --#{$prefix}accordion-btn-active-icon: #{escape-svg($accordion-button-active-icon-dark)};
-      }
-    }
-  }
 }
