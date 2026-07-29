@@ -163,6 +163,21 @@ primary customization API — every component knob still works through
 `@use ... with()` — but several things below are breaking and are called out
 as such.
 
+#### Theme gradients removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **`.bg-{color}-gradient` and `.text-bg-{color}-gradient` are gone**, along
+  with the `$theme-gradients` / `$theme-gradients-dark` maps that generated
+  them and the `--cui-{color}-start` / `--cui-{color}-stop` custom properties
+  they read. These were CoreUI-only additions with no Bootstrap counterpart.
+  Replace a removed class with the base colour plus the generic gradient —
+  `class="bg-primary bg-gradient"` — or write the two-stop gradient yourself if
+  you need the exact 45° ramp.
+- **`.bg-gradient` itself stays**, as do `$gradient`, `--cui-gradient`,
+  `$enable-gradients` and the `gradient-bg()` mixin — that is the gradient
+  system Bootstrap has, and components keep using it.
+
 #### Cascade layers
 
 - **All library CSS now lives in cascade layers**, declared as

@@ -373,58 +373,6 @@ $dark-border-subtle:       $gray-500 !default;
 
 // Gradients
 
-// scss-docs-start theme-gradients
-$primary-gradient: (
-  "start":  #5856d6,
-  "stop":   #6f67db
-) !default;
-
-$secondary-gradient: (
-  "start":  #c8d2dc,
-  "stop":    $white
-) !default;
-
-$light-gradient: (
-  "start":  #e3e8ed,
-  "stop":    $white
-) !default;
-
-$dark-gradient: (
-  "start":  #3c4b64,
-  "stop":   #212333
-) !default;
-
-$danger-gradient: (
-  "start":  #e55353,
-  "stop":   #d93737
-) !default;
-
-$warning-gradient: (
-  "start":  #f9b115,
-  "stop":   #f6960b
-) !default;
-
-$success-gradient: (
-  "start":  #2eb85c,
-  "stop":   #1b9e3e
-) !default;
-
-$info-gradient: (
-  "start":  #39f,
-  "stop":   #2982cc
-) !default;
-
-$theme-gradients: (
-  "primary":    $primary-gradient,
-  "secondary":  $secondary-gradient,
-  "success":    $success-gradient,
-  "info":       $info-gradient,
-  "warning":    $warning-gradient,
-  "danger":     $danger-gradient,
-  "light":      $light-gradient,
-  "dark":       $dark-gradient
-) !default;
-// scss-docs-end theme-gradients
 
 // Characters which are escaped by the escape-svg function
 $escaped-characters: (

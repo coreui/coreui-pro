@@ -105,58 +105,6 @@ $dark-border-subtle-dark:           $gray-800-dark !default;
 
 // Gradients
 
-// scss-docs-start theme-gradients-dark-variables
-$primary-gradient-dark: (
-  "start":  color.scale(#5856d6, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale(#6f67db, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$secondary-gradient-dark: (
-  "start":  color.scale(#c8d2dc, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale($white, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$light-gradient-dark: (
-  "start":  color.scale(#e3e8ed, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale($white, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$dark-gradient-dark: (
-  "start":  color.scale(#3c4b64, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale(#212333, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$danger-gradient-dark: (
-  "start":  color.scale(#e55353, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale(#d93737, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$warning-gradient-dark: (
-  "start":  color.scale(#f9b115, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale(#f6960b, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$success-gradient-dark: (
-  "start":  color.scale(#2eb85c, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale(#1b9e3e, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$info-gradient-dark: (
-  "start":  color.scale(#39f, $saturation: -10%), // stylelint-disable-line scss/at-function-named-arguments
-  "stop":   color.scale(#2982cc, $saturation: -10%) // stylelint-disable-line scss/at-function-named-arguments
-) !default;
-
-$theme-gradients-dark: (
-  "primary":    $primary-gradient-dark,
-  "secondary":  $secondary-gradient-dark,
-  "success":    $success-gradient-dark,
-  "info":       $info-gradient-dark,
-  "warning":    $warning-gradient-dark,
-  "danger":     $danger-gradient-dark,
-  "light":      $light-gradient-dark,
-  "dark":       $dark-gradient-dark
-) !default;
-// scss-docs-end theme-gradients-dark-variables
 
 $body-color-dark:                   rgba($white, .87) !default;
 $body-bg-dark:                      $gray-900-dark !default;
