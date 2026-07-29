@@ -10,10 +10,10 @@
 $chip-input-min-height:        $input-height !default;
 $chip-input-padding-y:         .25rem !default;
 $chip-input-padding-x:         .75rem !default;
-$chip-input-font-size:         $input-font-size !default;
-$chip-input-bg:                var(--#{$prefix}body-bg) !default;
-$chip-input-color:             var(--#{$prefix}body-color) !default;
-$chip-input-border-width:      var(--#{$prefix}border-width) !default;
+$chip-input-font-size:         var(--#{$prefix}btn-input-font-size) !default;
+$chip-input-bg:                var(--#{$prefix}btn-input-bg) !default;
+$chip-input-color:             var(--#{$prefix}btn-input-color) !default;
+$chip-input-border-width:      var(--#{$prefix}btn-input-border-width) !default;
 $chip-input-border-color:      var(--#{$prefix}border-color) !default;
 $chip-input-border-radius:     var(--#{$prefix}border-radius) !default;
 $chip-input-gap:               .375rem !default;
@@ -46,10 +46,10 @@ $chip-input-tokens: defaults(
     --#{$prefix}chip-input-min-height: #{$chip-input-min-height},
     --#{$prefix}control-padding-y: #{$chip-input-padding-y},
     --#{$prefix}control-padding-x: #{$chip-input-padding-x},
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
-    --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
-    --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
-    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-font-size: #{$chip-input-font-size},
+    --#{$prefix}control-bg: #{$chip-input-bg},
+    --#{$prefix}control-color: #{$chip-input-color},
+    --#{$prefix}control-border-width: #{$chip-input-border-width},
     --#{$prefix}control-border-color: #{$chip-input-border-color},
     --#{$prefix}control-border-radius: #{$chip-input-border-radius},
     --#{$prefix}chip-input-gap: #{$chip-input-gap},

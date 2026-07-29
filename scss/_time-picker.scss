@@ -10,6 +10,28 @@
 
 // stylelint-disable custom-property-no-missing-var-function
 
+// Time Picker
+// scss-docs-start time-picker-frame-variables
+$time-picker-font-family:      var(--#{$prefix}btn-input-font-family) !default;
+$time-picker-font-size:        var(--#{$prefix}btn-input-font-size) !default;
+$time-picker-font-size-sm:     var(--#{$prefix}btn-input-sm-font-size) !default;
+$time-picker-font-size-lg:     var(--#{$prefix}btn-input-lg-font-size) !default;
+$time-picker-line-height:      var(--#{$prefix}btn-input-line-height) !default;
+$time-picker-color:            var(--#{$prefix}btn-input-color) !default;
+$time-picker-bg:               var(--#{$prefix}btn-input-bg) !default;
+
+$time-picker-border-width:     var(--#{$prefix}btn-input-border-width) !default;
+
+$time-picker-padding-y:        var(--#{$prefix}btn-input-padding-y) !default;
+$time-picker-padding-x:        var(--#{$prefix}btn-input-padding-x) !default;
+
+$time-picker-padding-y-sm:     var(--#{$prefix}btn-input-sm-padding-y) !default;
+$time-picker-padding-x-sm:     var(--#{$prefix}btn-input-sm-padding-x) !default;
+
+$time-picker-padding-y-lg:     var(--#{$prefix}btn-input-lg-padding-y) !default;
+$time-picker-padding-x-lg:     var(--#{$prefix}btn-input-lg-padding-x) !default;
+// scss-docs-end time-picker-frame-variables
+
 $time-picker-tokens: () !default;
 
 // scss-docs-start time-picker-css-vars
@@ -17,14 +39,14 @@ $time-picker-tokens: () !default;
 $time-picker-tokens: defaults(
   (
     --#{$prefix}time-picker-zindex: #{$time-picker-zindex},
-    --#{$prefix}control-font-family: var(--#{$prefix}btn-input-font-family),
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}control-font-family: #{$time-picker-font-family},
+    --#{$prefix}control-font-size: #{$time-picker-font-size},
     --#{$prefix}control-font-weight: #{$time-picker-font-weight},
-    --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
-    --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
-    --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}control-line-height: #{$time-picker-line-height},
+    --#{$prefix}control-color: #{$time-picker-color},
+    --#{$prefix}control-bg: #{$time-picker-bg},
     --#{$prefix}control-box-shadow: #{$time-picker-box-shadow},
-    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-border-width: #{$time-picker-border-width},
     --#{$prefix}control-border-color: #{$time-picker-border-color},
     --#{$prefix}control-border-radius: #{$time-picker-border-radius},
     --#{$prefix}control-disabled-color: #{$time-picker-disabled-color},
@@ -35,8 +57,8 @@ $time-picker-tokens: defaults(
     --#{$prefix}control-focus-border-color: #{$time-picker-focus-border-color},
     --#{$prefix}control-focus-box-shadow: #{$time-picker-focus-box-shadow},
     --#{$prefix}time-picker-placeholder-color: #{$time-picker-placeholder-color},
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-padding-x),
+    --#{$prefix}control-padding-y: #{$time-picker-padding-y},
+    --#{$prefix}control-padding-x: #{$time-picker-padding-x},
     --#{$prefix}time-picker-gap: #{$time-picker-gap},
     --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width},
     --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon)},
@@ -359,9 +381,9 @@ $time-picker-tokens: defaults(
   }
 
   .time-picker-sm {
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
+    --#{$prefix}control-padding-y: #{$time-picker-padding-y-sm};
+    --#{$prefix}control-padding-x: #{$time-picker-padding-x-sm};
+    --#{$prefix}control-font-size: #{$time-picker-font-size-sm};
     --#{$prefix}control-border-radius: #{$time-picker-border-radius-sm};
     --#{$prefix}time-picker-gap: #{$time-picker-gap-sm};
     --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width-sm};
@@ -371,9 +393,9 @@ $time-picker-tokens: defaults(
   }
 
   .time-picker-lg {
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
+    --#{$prefix}control-padding-y: #{$time-picker-padding-y-lg};
+    --#{$prefix}control-padding-x: #{$time-picker-padding-x-lg};
+    --#{$prefix}control-font-size: #{$time-picker-font-size-lg};
     --#{$prefix}control-border-radius: #{$time-picker-border-radius-lg};
     --#{$prefix}time-picker-gap: #{$time-picker-gap-lg};
     --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width-lg};
