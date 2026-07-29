@@ -1,5 +1,7 @@
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
+@use "../mixins/tokens" as *;
 @use "../variables" as *;
 @use "floating-labels" as *;
 
@@ -9,6 +11,23 @@ $form-date-time-section-border-radius:   .25rem !default;
 $form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25) !default;
 // scss-docs-end form-date-time-variables
 
+// scss-docs-start form-date-time-tokens
+// Only the section-level knobs live here. The frame is `.form-control` on the
+// same element, so its --#{$prefix}control-* tokens are already in scope and
+// must not be redeclared — that would shadow `.form-control` and validation
+// state overrides.
+$form-date-time-tokens: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-date-time-tokens: defaults(
+  (
+    --#{$prefix}form-date-time-placeholder-color: #{$form-date-time-placeholder-color},
+    --#{$prefix}form-date-time-section-border-radius: #{$form-date-time-section-border-radius},
+    --#{$prefix}form-date-time-section-focus-bg: #{$form-date-time-section-focus-bg},
+  ),
+  $form-date-time-tokens
+);
+// scss-docs-end form-date-time-tokens
+
 @layer forms {
   // The component element carries `.form-control` for the base look, sizing
   // (`.form-control-sm`/`-lg`), validation states, and input group support.
@@ -16,6 +35,8 @@ $form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25)
   // of it: `:focus`/`:disabled` don't apply to the wrapper, so their styles are
   // re-bound to `:focus-within` and the `.disabled` class.
   .form-date-time {
+    @include tokens($form-date-time-tokens);
+
     display: flex;
     align-items: center;
     // Hold the final height before initialization — the sections are injected
@@ -32,23 +53,23 @@ $form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25)
     }
 
     &:focus-within {
-      color: $input-focus-color;
-      background-color: $input-focus-bg;
-      border-color: $input-focus-border-color;
+      color: var(--#{$prefix}control-focus-color);
+      background-color: var(--#{$prefix}control-focus-bg);
+      border-color: var(--#{$prefix}control-focus-border-color);
       outline: 0;
       @if $enable-shadows {
-        @include box-shadow($input-box-shadow, $input-focus-box-shadow);
+        @include box-shadow(var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow));
       } @else {
         // Avoid using mixin so we can pass custom focus shadow properly
-        box-shadow: $input-focus-box-shadow;
+        box-shadow: var(--#{$prefix}control-focus-box-shadow);
       }
     }
 
     &.disabled {
-      color: $input-disabled-color;
+      color: var(--#{$prefix}control-disabled-color);
       cursor: default;
-      background-color: $input-disabled-bg;
-      border-color: $input-disabled-border-color;
+      background-color: var(--#{$prefix}control-disabled-bg);
+      border-color: var(--#{$prefix}control-disabled-border-color);
     }
   }
 
@@ -56,10 +77,10 @@ $form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25)
     white-space: pre;
     caret-color: transparent;
     outline: 0;
-    @include border-radius($form-date-time-section-border-radius, 0);
+    @include border-radius(var(--#{$prefix}form-date-time-section-border-radius), 0);
 
     &:focus {
-      background-color: $form-date-time-section-focus-bg;
+      background-color: var(--#{$prefix}form-date-time-section-focus-bg);
 
       &::selection {
         background-color: transparent;
@@ -68,13 +89,13 @@ $form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25)
   }
 
   .form-date-time-section-empty {
-    color: $form-date-time-placeholder-color;
+    color: var(--#{$prefix}form-date-time-placeholder-color);
   }
 
   .form-date-time-all-selected {
     .form-date-time-section,
     .form-date-time-separator {
-      background-color: $form-date-time-section-focus-bg;
+      background-color: var(--#{$prefix}form-date-time-section-focus-bg);
     }
   }
 
@@ -85,7 +106,7 @@ $form-date-time-section-focus-bg:        rgba(var(--#{$prefix}primary-rgb), .25)
   // While the whole field is empty the separators are part of the mask
   // placeholder, so they take the placeholder color too.
   .form-date-time:not(.form-date-time-filled) .form-date-time-separator {
-    color: $form-date-time-placeholder-color;
+    color: var(--#{$prefix}form-date-time-placeholder-color);
   }
 
   // `.form-floating` drives its label with `:placeholder-shown`, which never

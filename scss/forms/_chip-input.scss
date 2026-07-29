@@ -1,6 +1,8 @@
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/focus-ring" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
 
@@ -32,21 +34,35 @@ $chip-input-border-radius-lg:  var(--#{$prefix}border-radius-lg) !default;
 $chip-input-gap-lg:            .5rem !default;
 // scss-docs-end chip-input-variables
 
+// scss-docs-start chip-input-css-vars
+// The frame — padding, typography, colors, border, transition — is the shared
+// text-control appearance, so it goes in the --#{$prefix}control-* namespace;
+// min-height and gap are the only chip-input-specific knobs.
+$chip-input-tokens: () !default;
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$chip-input-tokens: defaults(
+  (
+    --#{$prefix}chip-input-min-height: #{$chip-input-min-height},
+    --#{$prefix}chip-input-padding-y: #{$chip-input-padding-y},
+    --#{$prefix}chip-input-padding-x: #{$chip-input-padding-x},
+    --#{$prefix}chip-input-font-size: #{$chip-input-font-size},
+    --#{$prefix}chip-input-bg: #{$chip-input-bg},
+    --#{$prefix}chip-input-color: #{$chip-input-color},
+    --#{$prefix}chip-input-border-width: #{$chip-input-border-width},
+    --#{$prefix}chip-input-border-color: #{$chip-input-border-color},
+    --#{$prefix}chip-input-border-radius: #{$chip-input-border-radius},
+    --#{$prefix}chip-input-gap: #{$chip-input-gap},
+    --#{$prefix}chip-input-transition: #{$chip-input-transition},
+  ),
+  $chip-input-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end chip-input-css-vars
+
 @layer forms {
   .chip-input {
-    // scss-docs-start chip-input-css-vars
-    --#{$prefix}chip-input-min-height: #{$chip-input-min-height};
-    --#{$prefix}chip-input-padding-y: #{$chip-input-padding-y};
-    --#{$prefix}chip-input-padding-x: #{$chip-input-padding-x};
-    --#{$prefix}chip-input-font-size: #{$chip-input-font-size};
-    --#{$prefix}chip-input-bg: #{$chip-input-bg};
-    --#{$prefix}chip-input-color: #{$chip-input-color};
-    --#{$prefix}chip-input-border-width: #{$chip-input-border-width};
-    --#{$prefix}chip-input-border-color: #{$chip-input-border-color};
-    --#{$prefix}chip-input-border-radius: #{$chip-input-border-radius};
-    --#{$prefix}chip-input-gap: #{$chip-input-gap};
-    --#{$prefix}chip-input-transition: #{$chip-input-transition};
-    // scss-docs-end chip-input-css-vars
+    @include tokens($chip-input-tokens);
 
     display: flex;
     flex-wrap: wrap;
