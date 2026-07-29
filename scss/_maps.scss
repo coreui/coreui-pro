@@ -78,16 +78,14 @@ $theme-colors-border-subtle-dark: null !default;
   // scss-docs-end theme-colors-rgb-dark
 
   // scss-docs-start theme-contrast-dark-map
-  $theme-colors-contrast-dark: (
-    "primary": color-contrast(map.get($theme-colors-dark, "primary")),
-    "secondary": color-contrast(map.get($theme-colors-dark, "secondary")),
-    "success": color-contrast(map.get($theme-colors-dark, "success")),
-    "info": color-contrast(map.get($theme-colors-dark, "info")),
-    "warning": color-contrast(map.get($theme-colors-dark, "warning")),
-    "danger": color-contrast(map.get($theme-colors-dark, "danger")),
-    "light": color-contrast(map.get($theme-colors-dark, "light")),
-    "dark": color-contrast(map.get($theme-colors-dark, "dark")),
-  ) !default;
+  // Built from whatever $theme-colors-dark holds, rather than a fixed key list:
+  // a theme is free to empty or reshape that map.
+  @if $theme-colors-contrast-dark == null {
+    $theme-colors-contrast-dark: ();
+    @each $color, $value in $theme-colors-dark {
+      $theme-colors-contrast-dark: map.merge($theme-colors-contrast-dark, ($color: color-contrast($value)));
+    }
+  }
   // scss-docs-end theme-contrast-dark-map
 
   // scss-docs-start theme-text-dark-map
