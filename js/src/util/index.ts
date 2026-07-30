@@ -285,7 +285,9 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
  * @param isCycleAllowed
  * @return {Element|elem} The proper element
  */
-const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boolean, isCycleAllowed: boolean): T => {
+// `isCycleAllowed` is optional here where upstream requires it: our callers
+// omit it, and adding the argument to match would change the emitted code.
+const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boolean, isCycleAllowed?: boolean): T => {
   const listLength = list.length
   let index = list.indexOf(activeElement)
 

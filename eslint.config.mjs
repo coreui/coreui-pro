@@ -171,7 +171,10 @@ export default [
       ...tseslint.configs.recommended.find(config => config.name === 'typescript-eslint/eslint-recommended')?.rules,
       ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
       // The config objects are intentionally loose — see util/config
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      // Fires on `.ts` but not on byte-identical `.js`: the rule misreads arrows
+      // that close over `this`, which by definition cannot move to outer scope.
+      'unicorn/consistent-function-scoping': 'off'
     }
   },
   {

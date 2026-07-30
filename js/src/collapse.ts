@@ -277,14 +277,14 @@ class Collapse extends BaseComponent {
     }
 
     return this.each(function (this: HTMLElement) {
-      const data = Collapse.getOrCreateInstance(this, _config)
+      const data: any = Collapse.getOrCreateInstance(this, _config)
 
       if (typeof config === 'string') {
-        if (typeof (data as any)[config as string] === 'undefined') {
+        if (typeof data[config as string] === 'undefined') {
           throw new TypeError(`No method named "${config}"`)
         }
 
-        (data as any)[config as string]()
+        data[config as string]()
       }
     })
   }

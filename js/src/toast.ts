@@ -153,7 +153,7 @@ class Toast extends BaseComponent {
   }
 
   // Private
-  protected _maybeScheduleHide(): void {
+  _maybeScheduleHide(): void {
     if (!this._config.autohide) {
       return
     }
@@ -167,7 +167,7 @@ class Toast extends BaseComponent {
     }, this._config.delay)
   }
 
-  protected _onInteraction(event: CoreUIEvent, isInteracting: boolean): void {
+  _onInteraction(event: CoreUIEvent, isInteracting: boolean): void {
     switch (event.type) {
       case 'mouseover':
       case 'mouseout': {
@@ -199,14 +199,14 @@ class Toast extends BaseComponent {
     this._maybeScheduleHide()
   }
 
-  protected _setListeners(): void {
+  _setListeners(): void {
     EventHandler.on(this._element, EVENT_MOUSEOVER, event => this._onInteraction(event, true))
     EventHandler.on(this._element, EVENT_MOUSEOUT, event => this._onInteraction(event, false))
     EventHandler.on(this._element, EVENT_FOCUSIN, event => this._onInteraction(event, true))
     EventHandler.on(this._element, EVENT_FOCUSOUT, event => this._onInteraction(event, false))
   }
 
-  protected _clearTimeout(): void {
+  _clearTimeout(): void {
     clearTimeout(this._timeout!)
     this._timeout = null
   }
@@ -214,14 +214,14 @@ class Toast extends BaseComponent {
   // Static
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
-      const data = Toast.getOrCreateInstance(this, config)
+      const data: any = Toast.getOrCreateInstance(this, config)
 
       if (typeof config === 'string') {
-        if (typeof (data as any)[config as string] === 'undefined') {
+        if (typeof data[config as string] === 'undefined') {
           throw new TypeError(`No method named "${config}"`)
         }
 
-        (data as any)[config as string](this)
+        data[config as string](this)
       }
     })
   }

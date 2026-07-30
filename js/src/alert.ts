@@ -60,17 +60,17 @@ class Alert extends BaseComponent {
   // Static
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
-      const data = Alert.getOrCreateInstance(this)
+      const data: any = Alert.getOrCreateInstance(this)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if ((data as any)[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      (data as any)[config as string](this)
+      data[config as string](this)
     })
   }
 }

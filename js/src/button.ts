@@ -44,10 +44,10 @@ class Button extends BaseComponent {
   // Static
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
-      const data = Button.getOrCreateInstance(this)
+      const data: any = Button.getOrCreateInstance(this)
 
       if (config === 'toggle') {
-        (data as any)[config as string]()
+        data[config as string]()
       }
     })
   }
@@ -61,7 +61,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
   event.preventDefault()
 
   const button = (event.target as Element).closest(SELECTOR_DATA_TOGGLE)
-  const data = Button.getOrCreateInstance(button)
+  const data: any = Button.getOrCreateInstance(button)
 
   data.toggle()
 })

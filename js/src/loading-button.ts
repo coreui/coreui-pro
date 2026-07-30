@@ -6,6 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import { defineJQueryPlugin } from './util/index.js'
@@ -48,7 +49,11 @@ const DefaultType = {
  */
 
 class LoadingButton extends BaseComponent {
-  constructor(element, config) {
+  protected declare _timeout: ReturnType<typeof setTimeout> | null
+  protected declare _spinner: HTMLElement | null
+  protected declare _state: string
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
     this._config = this._getConfig(config)
@@ -57,7 +62,7 @@ class LoadingButton extends BaseComponent {
     this._state = 'idle'
 
     if (this._element) {
-      Data.set(element, DATA_KEY, this)
+      Data.set(element as Element, DATA_KEY, this)
     }
 
     this._createButton()
@@ -65,21 +70,21 @@ class LoadingButton extends BaseComponent {
 
   // Getters
 
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
 
-  start() {
+  start(): void {
     if (this._state !== 'loading') {
       this._createSpinner()
       this._state = 'loading'
@@ -89,7 +94,7 @@ class LoadingButton extends BaseComponent {
         EventHandler.trigger(this._element, EVENT_START)
 
         if (this._config.disabledOnLoading) {
-          this._element.setAttribute('disabled', true)
+          this._element.setAttribute('disabled', true as unknown as string)
         }
       }, 1)
 
@@ -101,7 +106,7 @@ class LoadingButton extends BaseComponent {
     }
   }
 
-  stop() {
+  stop(): void {
     this._element.classList.remove(CLASS_NAME_IS_LOADING)
     const stoped = () => {
       this._removeSpinner()
@@ -122,11 +127,11 @@ class LoadingButton extends BaseComponent {
     stoped()
   }
 
-  _createButton() {
+  _createButton(): void {
     this._element.classList.add(CLASS_NAME_LOADING_BUTTON)
   }
 
-  _createSpinner() {
+  _createSpinner(): void {
     if (this._config.spinner) {
       const spinner = document.createElement('span')
       const type = this._config.spinnerType
@@ -138,29 +143,29 @@ class LoadingButton extends BaseComponent {
     }
   }
 
-  _removeSpinner() {
+  _removeSpinner(): any {
     if (this._config.spinner) {
-      this._spinner.remove()
+      this._spinner!.remove()
       this._spinner = null
     }
   }
 
   // Static
 
-  static loadingButtonInterface(element, config) {
-    const data = LoadingButton.getOrCreateInstance(element, config)
+  static loadingButtonInterface(element: string | Element | null, config: any): any {
+    const data: any = LoadingButton.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
       LoadingButton.loadingButtonInterface(this, config)
     })
   }
@@ -171,8 +176,8 @@ class LoadingButton extends BaseComponent {
  */
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
-  const button = event.target.closest(SELECTOR_DATA_TOGGLE)
-  const data = LoadingButton.getOrCreateInstance(button)
+  const button = (event.target as HTMLElement).closest(SELECTOR_DATA_TOGGLE)
+  const data: any = LoadingButton.getOrCreateInstance(button)
 
   data.start()
 })

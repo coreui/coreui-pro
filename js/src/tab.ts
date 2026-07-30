@@ -106,7 +106,7 @@ class Tab extends BaseComponent {
   }
 
   // Private
-  protected _activate(element: HTMLElement | null, relatedElem?: HTMLElement | null): void {
+  _activate(element: HTMLElement | null, relatedElem?: HTMLElement | null): void {
     if (!element) {
       return
     }
@@ -132,7 +132,7 @@ class Tab extends BaseComponent {
     this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
   }
 
-  protected _deactivate(element: HTMLElement | null, relatedElem?: HTMLElement | null): void {
+  _deactivate(element: HTMLElement | null, relatedElem?: HTMLElement | null): void {
     if (!element) {
       return
     }
@@ -157,7 +157,7 @@ class Tab extends BaseComponent {
     this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
   }
 
-  protected _keydown(event: CoreUIEvent): void {
+  _keydown(event: CoreUIEvent): void {
     if (!([ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key))) {
       return
     }
@@ -181,15 +181,15 @@ class Tab extends BaseComponent {
     }
   }
 
-  protected _getChildren(): HTMLElement[] { // collection of inner elements
+  _getChildren(): HTMLElement[] { // collection of inner elements
     return SelectorEngine.find(SELECTOR_INNER_ELEM, this._parent!)
   }
 
-  protected _getActiveElem(): HTMLElement | null {
+  _getActiveElem(): HTMLElement | null {
     return this._getChildren().find(child => this._elemIsActive(child)) || null
   }
 
-  protected _setInitialAttributes(parent: Element, children: HTMLElement[]): void {
+  _setInitialAttributes(parent: Element, children: HTMLElement[]): void {
     this._setAttributeIfNotExists(parent, 'role', 'tablist')
 
     for (const child of children) {
@@ -197,7 +197,7 @@ class Tab extends BaseComponent {
     }
   }
 
-  protected _setInitialAttributesOnChild(child: HTMLElement): void {
+  _setInitialAttributesOnChild(child: HTMLElement): void {
     child = this._getInnerElement(child)!
     const isActive = this._elemIsActive(child)
     const outerElem = this._getOuterElement(child)
@@ -217,7 +217,7 @@ class Tab extends BaseComponent {
     this._setInitialAttributesOnTargetPanel(child)
   }
 
-  protected _setInitialAttributesOnTargetPanel(child: HTMLElement): void {
+  _setInitialAttributesOnTargetPanel(child: HTMLElement): void {
     const target = SelectorEngine.getElementFromSelector(child)
 
     if (!target) {
@@ -249,40 +249,40 @@ class Tab extends BaseComponent {
     outerElem.setAttribute('aria-expanded', open as unknown as string)
   }
 
-  protected _setAttributeIfNotExists(element: Element, attribute: string, value: string): void {
+  _setAttributeIfNotExists(element: Element, attribute: string, value: string): void {
     if (!element.hasAttribute(attribute)) {
       element.setAttribute(attribute, value)
     }
   }
 
-  protected _elemIsActive(elem: HTMLElement): boolean {
+  _elemIsActive(elem: HTMLElement): boolean {
     return elem.classList.contains(CLASS_NAME_ACTIVE)
   }
 
   // Try to get the inner element (usually the .nav-link)
-  protected _getInnerElement(elem: HTMLElement): HTMLElement | null {
+  _getInnerElement(elem: HTMLElement): HTMLElement | null {
     return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine.findOne(SELECTOR_INNER_ELEM, elem)
   }
 
   // Try to get the outer element (usually the .nav-item)
-  protected _getOuterElement(elem: HTMLElement): Element {
+  _getOuterElement(elem: HTMLElement): Element {
     return elem.closest(SELECTOR_OUTER) || elem
   }
 
   // Static
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
-      const data = Tab.getOrCreateInstance(this)
+      const data: any = Tab.getOrCreateInstance(this)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if ((data as any)[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      (data as any)[config as string]()
+      data[config as string]()
     })
   }
 }

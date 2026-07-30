@@ -30,19 +30,22 @@ const SELECTOR_DATA_TOGGLE = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ ${SELEC
  */
 
 class PasswordInput extends BaseComponent {
+  // The component only ever binds to an <input>
+  protected declare _element: HTMLInputElement
+
   // Getters
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  toggle() {
+  toggle(): any {
     this._element.type = this._element.type === 'password' ? 'text' : 'password'
     this._updateToggleState()
   }
 
   // Private
-  _updateToggleState() {
+  _updateToggleState(): any {
     if (!this._element.parentNode) {
       return
     }
@@ -55,11 +58,11 @@ class PasswordInput extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = PasswordInput.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = PasswordInput.getOrCreateInstance(this)
 
-      data[config](this)
+      data[config as string](this)
     })
   }
 }
@@ -71,8 +74,8 @@ class PasswordInput extends BaseComponent {
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
   event.preventDefault()
 
-  const toggler = event.target.closest(SELECTOR_DATA_TOGGLE)
-  PasswordInput.getOrCreateInstance(SelectorEngine.findOne(SELECTOR_FORM_CONTROL, toggler.parentNode)).toggle()
+  const toggler = (event.target as HTMLElement).closest(SELECTOR_DATA_TOGGLE)
+  PasswordInput.getOrCreateInstance(SelectorEngine.findOne(SELECTOR_FORM_CONTROL, toggler!.parentNode as ParentNode)).toggle()
 })
 
 /**

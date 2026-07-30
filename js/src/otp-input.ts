@@ -34,8 +34,27 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const SELECTOR_FORM_OTP_CONTROL = '.form-otp-control'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="otp"]'
 
-const Default = {
-  ariaLabel: (index, total) => `Digit ${index + 1} of ${total}`,
+/**
+ * Types
+ */
+
+type OtpInputConfig = {
+  ariaLabel: (index: number, total: number) => string
+  autoSubmit: boolean
+  disabled: boolean
+  id: string | null
+  linear: boolean
+  masked: boolean
+  name: string | null
+  placeholder: string | null
+  readonly: boolean
+  required: boolean
+  type: string
+  value: string | null
+}
+
+const Default: OtpInputConfig = {
+  ariaLabel: (index: number, total: number) => `Digit ${index + 1} of ${total}`,
   autoSubmit: false,
   disabled: false,
   id: null,
@@ -69,7 +88,9 @@ const DefaultType = {
  */
 
 class OTPInput extends BaseComponent {
-  constructor(element, config) {
+  protected declare _inputElement: HTMLInputElement | null
+
+  constructor(element?: string | Element | null, config?: Partial<OtpInputConfig> | null) {
     super(element, config)
 
     this._config = this._getConfig(config)
@@ -83,20 +104,20 @@ class OTPInput extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  clear() {
+  clear(): void {
     const inputs = this._getInputs()
     for (const input of inputs) {
       input.value = ''
@@ -106,7 +127,7 @@ class OTPInput extends BaseComponent {
     this._setInputsTabIndexes()
   }
 
-  reset() {
+  reset(): void {
     const inputs = this._getInputs()
     for (const [index, input] of inputs.entries()) {
       const valueString = String(this._config.value || '')
@@ -118,7 +139,7 @@ class OTPInput extends BaseComponent {
     this._setInputsTabIndexes()
   }
 
-  update(config) {
+  update(config: any): void {
     if (typeof config !== 'object') {
       return
     }
@@ -128,18 +149,18 @@ class OTPInput extends BaseComponent {
 
     this._setInputsAttributes()
     this._setInputsTabIndexes()
-    this._inputElement.remove()
+    this._inputElement!.remove()
     this._createHiddenInput()
   }
 
   // Private
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_FOCUS, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { target } = event
+      const { target } = event as unknown as { target: HTMLInputElement }
 
-      if (target.value) {
+      if (target!.value) {
         setTimeout(() => {
-          target.select()
+          target!.select()
         }, 0)
 
         return
@@ -147,7 +168,7 @@ class OTPInput extends BaseComponent {
 
       if (this._config.linear) {
         const inputs = this._getInputs()
-        const firstEmptyInput = inputs.find(input => !input.value)
+        const firstEmptyInput = inputs.find((input: HTMLInputElement) => !input.value)
         if (firstEmptyInput && firstEmptyInput !== target) {
           firstEmptyInput.focus()
         }
@@ -155,25 +176,25 @@ class OTPInput extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { target } = event
+      const { target } = event as unknown as { target: HTMLInputElement }
 
-      if (target.value.length === 1 && !this._isValidInput(target.value)) {
-        target.value = ''
+      if (target!.value.length === 1 && !this._isValidInput(target!.value)) {
+        target!.value = ''
         return
       }
 
-      if (target.value.length === 1) {
+      if (target!.value.length === 1) {
         const inputs = this._getInputs()
 
         if (!inputs.length) {
           return
         }
 
-        const currentValue = inputs.map(input => input.value).join('')
+        const currentValue = inputs.map((input: HTMLInputElement) => input.value).join('')
 
         this._setHiddenInputValue(currentValue)
 
-        const nextInput = getNextActiveElement(inputs, target, true)
+        const nextInput = getNextActiveElement(inputs, target as HTMLInputElement, true)
         if (nextInput) {
           nextInput.focus()
         }
@@ -184,18 +205,18 @@ class OTPInput extends BaseComponent {
     })
 
     EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_FORM_OTP_CONTROL, event => {
-      const { key, target } = event
+      const { key, target } = event as unknown as { key: string, target: HTMLInputElement }
 
-      if (key === BACKSPACE_KEY && target.value === '') {
+      if (key === BACKSPACE_KEY && target!.value === '') {
         const inputs = this._getInputs()
 
         if (!inputs.length) {
           return
         }
 
-        getNextActiveElement(inputs, target, false).focus()
+        getNextActiveElement(inputs, target as HTMLInputElement, false).focus()
 
-        const currentValue = inputs.map(input => input.value).join('')
+        const currentValue = inputs.map((input: HTMLInputElement) => input.value).join('')
 
         this._setHiddenInputValue(currentValue)
         this._setInputsTabIndexes()
@@ -203,7 +224,7 @@ class OTPInput extends BaseComponent {
       }
 
       if (key === ARROW_RIGHT_KEY) {
-        if (this._config.linear && target.value === '') {
+        if (this._config.linear && target!.value === '') {
           return
         }
 
@@ -243,7 +264,7 @@ class OTPInput extends BaseComponent {
       }
 
       const inputs = this._getInputs()
-      const currentIndex = inputs.indexOf(event.target)
+      const currentIndex = inputs.indexOf(event.target as HTMLInputElement)
 
       for (let i = 0; i < validChars.length && (currentIndex + i) < inputs.length; i++) {
         inputs[currentIndex + i].value = validChars[i]
@@ -263,13 +284,13 @@ class OTPInput extends BaseComponent {
     })
   }
 
-  _checkAutoSubmit(inputs) {
+  _checkAutoSubmit(inputs: HTMLInputElement[]): void {
     if (!this._config.autoSubmit) {
       return
     }
 
     // Check if all inputs are filled
-    const allFilled = inputs.every(input => input.value.length === 1)
+    const allFilled = inputs.every((input: HTMLInputElement) => input.value.length === 1)
 
     if (allFilled) {
       // Find the closest form element
@@ -280,11 +301,11 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _getInputs() {
-    return SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element)
+  _getInputs(): HTMLInputElement[] {
+    return SelectorEngine.find<HTMLInputElement>(SELECTOR_FORM_OTP_CONTROL, this._element)
   }
 
-  _createHiddenInput() {
+  _createHiddenInput(): void {
     const hiddenInput = document.createElement('input')
     hiddenInput.type = 'hidden'
 
@@ -306,7 +327,7 @@ class OTPInput extends BaseComponent {
     this._inputElement = hiddenInput
   }
 
-  _extractValidChars(text) {
+  _extractValidChars(text: string): string {
     switch (this._config.type) {
       case 'number': {
         return text.replace(/\D/g, '')
@@ -318,7 +339,7 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _isValidInput(value) {
+  _isValidInput(value: string): boolean {
     if (value.length !== 1) {
       return false
     }
@@ -334,7 +355,7 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setHiddenInputValue(value) {
+  _setHiddenInputValue(value: string | null): void {
     if (this._inputElement) {
       this._inputElement.value = value || ''
     }
@@ -346,8 +367,8 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setInputsAttributes() {
-    const inputs = SelectorEngine.find(SELECTOR_FORM_OTP_CONTROL, this._element)
+  _setInputsAttributes(): void {
+    const inputs = SelectorEngine.find<HTMLInputElement>(SELECTOR_FORM_OTP_CONTROL, this._element)
     for (const [index, input] of inputs.entries()) {
       input.type = this._config.masked ? 'password' : 'text'
 
@@ -360,7 +381,7 @@ class OTPInput extends BaseComponent {
       }
 
       if (this._config.required !== null) {
-        input.setAttribute('required', true)
+        input.setAttribute('required', true as unknown as string)
       }
 
       switch (this._config.type) {
@@ -400,12 +421,12 @@ class OTPInput extends BaseComponent {
 
       if (typeof this._config.ariaLabel === 'function') {
         const ariaLabel = this._config.ariaLabel(index, inputs.length)
-        input.setAttribute('aria-label', ariaLabel)
+        input.setAttribute('aria-label', ariaLabel as unknown as string)
       }
     }
   }
 
-  _setInputsTabIndexes() {
+  _setInputsTabIndexes(): void {
     if (!this._config.linear) {
       return
     }
@@ -428,33 +449,33 @@ class OTPInput extends BaseComponent {
     }
   }
 
-  _setRoleAttribute() {
+  _setRoleAttribute(): any {
     this._element.setAttribute('role', 'group')
   }
 
   // Static
-  static otpInputInterface(element, config) {
-    const data = OTPInput.getOrCreateInstance(element, config)
+  static otpInputInterface(element: string | Element | null, config?: any): void {
+    const data: any = OTPInput.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = OTPInput.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = OTPInput.getOrCreateInstance(this)
 
       if (typeof config === 'string') {
-        if (typeof data[config] === 'undefined') {
+        if (typeof data[config as string] === 'undefined') {
           throw new TypeError(`No method named "${config}"`)
         }
 
-        data[config]()
+        data[config as string]()
       }
     })
   }
@@ -477,3 +498,4 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
 defineJQueryPlugin(OTPInput)
 
 export default OTPInput
+export type { OtpInputConfig }
