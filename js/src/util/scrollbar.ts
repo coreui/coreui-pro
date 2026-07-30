@@ -26,18 +26,20 @@ const PROPERTY_MARGIN = 'margin-right'
  */
 
 class ScrollBarHelper {
+  private declare _element: HTMLElement
+
   constructor() {
     this._element = document.body
   }
 
   // Public
-  getWidth() {
+  getWidth(): number {
     // https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth#usage_notes
     const documentWidth = document.documentElement.clientWidth
     return Math.abs(window.innerWidth - documentWidth)
   }
 
-  hide() {
+  hide(): void {
     const width = this.getWidth()
     this._disableOverFlow()
     // give padding to element to balance the hidden scrollbar width
@@ -47,26 +49,26 @@ class ScrollBarHelper {
     this._setElementAttributes(SELECTOR_STICKY_CONTENT, PROPERTY_MARGIN, calculatedValue => calculatedValue - width)
   }
 
-  reset() {
+  reset(): void {
     this._resetElementAttributes(this._element, 'overflow')
     this._resetElementAttributes(this._element, PROPERTY_PADDING)
     this._resetElementAttributes(SELECTOR_FIXED_CONTENT, PROPERTY_PADDING)
     this._resetElementAttributes(SELECTOR_STICKY_CONTENT, PROPERTY_MARGIN)
   }
 
-  isOverflowing() {
+  isOverflowing(): boolean {
     return this.getWidth() > 0
   }
 
   // Private
-  _disableOverFlow() {
+  _disableOverFlow(): void {
     this._saveInitialAttribute(this._element, 'overflow')
     this._element.style.overflow = 'hidden'
   }
 
-  _setElementAttributes(selector, styleProperty, callback) {
+  _setElementAttributes(selector: string | HTMLElement, styleProperty: string, callback: (calculatedValue: number) => number): void {
     const scrollbarWidth = this.getWidth()
-    const manipulationCallBack = element => {
+    const manipulationCallBack = (element: HTMLElement) => {
       if (element !== this._element && window.innerWidth > element.clientWidth + scrollbarWidth) {
         return
       }
@@ -79,15 +81,15 @@ class ScrollBarHelper {
     this._applyManipulationCallback(selector, manipulationCallBack)
   }
 
-  _saveInitialAttribute(element, styleProperty) {
+  _saveInitialAttribute(element: HTMLElement, styleProperty: string): void {
     const actualValue = element.style.getPropertyValue(styleProperty)
     if (actualValue) {
       Manipulator.setDataAttribute(element, styleProperty, actualValue)
     }
   }
 
-  _resetElementAttributes(selector, styleProperty) {
-    const manipulationCallBack = element => {
+  _resetElementAttributes(selector: string | HTMLElement, styleProperty: string): void {
+    const manipulationCallBack = (element: HTMLElement) => {
       const value = Manipulator.getDataAttribute(element, styleProperty)
       // We only want to remove the property if the value is `null`; the value can also be zero
       if (value === null) {
@@ -96,13 +98,13 @@ class ScrollBarHelper {
       }
 
       Manipulator.removeDataAttribute(element, styleProperty)
-      element.style.setProperty(styleProperty, value)
+      element.style.setProperty(styleProperty, value as string)
     }
 
     this._applyManipulationCallback(selector, manipulationCallBack)
   }
 
-  _applyManipulationCallback(selector, callBack) {
+  _applyManipulationCallback(selector: string | HTMLElement, callBack: (element: HTMLElement) => void): void {
     if (isElement(selector)) {
       callBack(selector)
       return

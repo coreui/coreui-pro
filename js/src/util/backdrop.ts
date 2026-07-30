@@ -1,15 +1,15 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI util/backdrop.js
+ * CoreUI util/backdrop.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This is a modified version of the Bootstrap's util/backdrop.js
+ * This is a modified version of the Bootstrap's util/backdrop.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import EventHandler from '../dom/event-handler.js'
-import Config from './config.js'
+import Config, { type ComponentConfig } from './config.js'
 import {
   execute, executeAfterTransition, getElement, reflow
 } from './index.js'
@@ -23,7 +23,7 @@ const CLASS_NAME_FADE = 'fade'
 const CLASS_NAME_SHOW = 'show'
 const EVENT_MOUSEDOWN = `mousedown.coreui.${NAME}`
 
-const Default = {
+const Default: BackdropConfig = {
   className: 'modal-backdrop',
   clickCallback: null,
   isAnimated: false,
@@ -40,32 +40,52 @@ const DefaultType = {
 }
 
 /**
+ * Types
+ */
+
+type BackdropConfig = {
+  className: string
+  clickCallback: (() => void) | null
+  isAnimated: boolean
+  isVisible: boolean
+  // _configAfterMerge() resolves this through getElement(), so by the time
+  // anything reads it the value is an element. Typed loosely because the
+  // default is the string 'body' and narrowing it at the use site would need a
+  // parenthesised cast, which collides with ASI on the line above.
+  rootElement: any
+}
+
+/**
  * Class definition
  */
 
 class Backdrop extends Config {
-  constructor(config) {
+  protected declare _config: BackdropConfig
+  protected declare _isAppended: boolean
+  protected declare _element: HTMLElement | null
+
+  constructor(config?: Partial<BackdropConfig> | null) {
     super()
-    this._config = this._getConfig(config)
+    this._config = this._getConfig(config) as BackdropConfig
     this._isAppended = false
     this._element = null
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): BackdropConfig {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): Record<string, string> {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  show(callback) {
+  show(callback?: () => void): void {
     if (!this._config.isVisible) {
       execute(callback)
       return
@@ -85,7 +105,7 @@ class Backdrop extends Config {
     })
   }
 
-  hide(callback) {
+  hide(callback?: () => void): void {
     if (!this._config.isVisible) {
       execute(callback)
       return
@@ -99,19 +119,19 @@ class Backdrop extends Config {
     })
   }
 
-  dispose() {
+  dispose(): void {
     if (!this._isAppended) {
       return
     }
 
     EventHandler.off(this._element, EVENT_MOUSEDOWN)
 
-    this._element.remove()
+    this._element!.remove()
     this._isAppended = false
   }
 
   // Private
-  _getElement() {
+  _getElement(): HTMLElement {
     if (!this._element) {
       const backdrop = document.createElement('div')
       backdrop.className = this._config.className
@@ -125,13 +145,13 @@ class Backdrop extends Config {
     return this._element
   }
 
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: ComponentConfig): ComponentConfig {
     // use getElement() with the default "body" to get a fresh Element on each instantiation
     config.rootElement = getElement(config.rootElement)
     return config
   }
 
-  _append() {
+  _append(): void {
     if (this._isAppended) {
       return
     }
@@ -146,8 +166,8 @@ class Backdrop extends Config {
     this._isAppended = true
   }
 
-  _emulateAnimation(callback) {
-    executeAfterTransition(callback, this._getElement(), this._config.isAnimated)
+  _emulateAnimation(callback?: () => void): void {
+    executeAfterTransition(callback as () => void, this._getElement(), this._config.isAnimated)
   }
 }
 

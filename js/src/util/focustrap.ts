@@ -1,14 +1,14 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI util/focustrap.js
+ * CoreUI util/focustrap.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This is a modified version of the Bootstrap's util/focustrap.js
+ * This is a modified version of the Bootstrap's util/focustrap.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
-import EventHandler from '../dom/event-handler.js'
+import EventHandler, { type CoreUIEvent } from '../dom/event-handler.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 
@@ -26,7 +26,7 @@ const TAB_KEY = 'Tab'
 const TAB_NAV_FORWARD = 'forward'
 const TAB_NAV_BACKWARD = 'backward'
 
-const Default = {
+const Default: FocusTrapConfig = {
   additionalElement: null,
   autofocus: true,
   trapElement: null // The element to trap focus inside of
@@ -39,38 +39,52 @@ const DefaultType = {
 }
 
 /**
+ * Types
+ */
+
+type FocusTrapConfig = {
+  additionalElement: HTMLElement | null
+  autofocus: boolean
+  trapElement: HTMLElement | null
+}
+
+/**
  * Class definition
  */
 
 class FocusTrap extends Config {
-  constructor(config) {
+  protected declare _config: FocusTrapConfig
+  protected declare _isActive: boolean
+  protected declare _lastTabNavDirection: string | null
+
+  constructor(config?: Partial<FocusTrapConfig> | null) {
     super()
-    this._config = this._getConfig(config)
+    this._config = this._getConfig(config) as FocusTrapConfig
     this._isActive = false
     this._lastTabNavDirection = null
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): FocusTrapConfig {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): Record<string, string> {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  activate() {
+  activate(): void {
     if (this._isActive) {
       return
     }
 
     if (this._config.autofocus) {
-      this._config.trapElement.focus()
+      this._config.trapElement!.focus()
     }
 
     EventHandler.off(document, EVENT_KEY) // guard against infinite focus loop
@@ -80,7 +94,7 @@ class FocusTrap extends Config {
     this._isActive = true
   }
 
-  deactivate() {
+  deactivate(): void {
     if (!this._isActive) {
       return
     }
@@ -90,21 +104,21 @@ class FocusTrap extends Config {
   }
 
   // Private
-  _handleFocusin(event) {
+  _handleFocusin(event: CoreUIEvent): void {
     const { additionalElement, trapElement } = this._config
 
-    if (event.target === document || event.target === trapElement || trapElement.contains(event.target)) {
+    if (event.target === document || event.target === trapElement || trapElement!.contains(event.target as Node)) {
       return
     }
 
-    if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target))) {
+    if (additionalElement && (event.target === additionalElement || additionalElement.contains(event.target as Node))) {
       return
     }
 
-    const elements = SelectorEngine.focusableChildren(trapElement)
+    const elements = SelectorEngine.focusableChildren(trapElement!)
 
     if (elements.length === 0) {
-      trapElement.focus()
+      trapElement!.focus()
     } else if (this._lastTabNavDirection === TAB_NAV_BACKWARD) {
       elements[elements.length - 1].focus()
     } else {
@@ -112,7 +126,7 @@ class FocusTrap extends Config {
     }
   }
 
-  _handleKeydown(event) {
+  _handleKeydown(event: CoreUIEvent): void {
     if (event.key !== TAB_KEY) {
       return
     }
@@ -125,7 +139,7 @@ class FocusTrap extends Config {
       return
     }
 
-    const trapElements = SelectorEngine.focusableChildren(trapElement)
+    const trapElements = SelectorEngine.focusableChildren(trapElement!)
     const additionalElements = SelectorEngine.focusableChildren(additionalElement)
 
     if (trapElements.length === 0 || additionalElements.length === 0) {
@@ -134,22 +148,22 @@ class FocusTrap extends Config {
 
     event.preventDefault()
 
-    if (trapElements.indexOf(event.target) === trapElements.length - 1 && !event.shiftKey) {
+    if (trapElements.indexOf(event.target as HTMLElement) === trapElements.length - 1 && !event.shiftKey) {
       additionalElements[0].focus()
       return
     }
 
-    if (trapElements.indexOf(event.target) === 0 && event.shiftKey) {
+    if (trapElements.indexOf(event.target as HTMLElement) === 0 && event.shiftKey) {
       additionalElements[additionalElements.length - 1].focus()
       return
     }
 
-    if (additionalElements.indexOf(event.target) === additionalElements.length - 1 && !event.shiftKey) {
+    if (additionalElements.indexOf(event.target as HTMLElement) === additionalElements.length - 1 && !event.shiftKey) {
       trapElements[0].focus()
       return
     }
 
-    if (additionalElements.indexOf(event.target) === 0 && event.shiftKey) {
+    if (additionalElements.indexOf(event.target as HTMLElement) === 0 && event.shiftKey) {
       trapElements[trapElements.length - 1].focus()
     }
   }
