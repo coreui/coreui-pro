@@ -193,8 +193,9 @@ assembles maps of CSS expressions and the browser resolves them.
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
 - **Every `--#{$prefix}{name}-rgb` custom property is gone**, along with the
-  `$theme-colors-rgb` map, the `to-rgb()` function's role in `:root`, and the
-  `rgba-css-var()` helper (now `translucent-css-var()`). They existed only so
+  `$theme-colors-rgb` and `$theme-colors-rgb-dark` maps, the `to-rgb()`
+  function's role in `:root`, and the `rgba-css-var()` helper (now
+  `translucent-css-var()`). They existed only so
   `rgba(var(--cui-primary-rgb), .5)` could apply an alpha to a token; that is
   what `color-mix()` does directly:
 
@@ -223,8 +224,9 @@ assembles maps of CSS expressions and the browser resolves them.
 
 - **`.bg-{color}-gradient` and `.text-bg-{color}-gradient` are gone**, along
   with the `$theme-gradients` / `$theme-gradients-dark` maps that generated
-  them and the `--cui-{color}-start` / `--cui-{color}-stop` custom properties
-  they read. These were CoreUI-only additions with no Bootstrap counterpart.
+  them, the per-colour `$primary-gradient` … `$dark-gradient` variables (and
+  their `-dark` twins), and the `--cui-{color}-start` / `--cui-{color}-stop`
+  custom properties they read. These were CoreUI-only additions with no Bootstrap counterpart.
   Replace a removed class with the base colour plus the generic gradient —
   `class="bg-primary bg-gradient"` — or write the two-stop gradient yourself if
   you need the exact 45° ramp.
@@ -330,9 +332,14 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   (an 80% tint rather than ~70%) and emphasis text a shade darker; borders are
   unchanged for practical purposes. Emphasis-on-subtle contrast improves in every
   colour — the weakest pair goes from 6.03:1 to 7.57:1.
+- **The dark grey palette is gone**: `$gray-100-dark` … `$gray-900-dark` and the
+  `$grays-dark` map. Every one of them was defined as exactly its light
+  counterpart, so they generated nothing — read `$gray-*` directly. The bundled
+  Bootstrap theme no longer passes `$grays-dark: ()` through its `with()` block.
 - **`$theme-colors-dark` is gone**, along with `$theme-colors-text-dark`,
   `$theme-colors-bg-subtle-dark`, `$theme-colors-border-subtle-dark` and
-  `$theme-colors-contrast-dark`. Theme colours themselves no longer change
+  `$theme-colors-contrast-dark`, and the eight `$primary-dark` … `$dark-dark`
+  variables behind them. Theme colours themselves no longer change
   between colour modes — the old dark variants were a 10% desaturation, which
   upstream does not do either. Consequence: the eight
   `[data#{$data-infix}theme="dark"] .text-bg-*` overrides are gone.
@@ -354,6 +361,51 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   declares `color-scheme: light` and nothing ever declares `dark`, so every
   `light-dark()` pair resolves to its light side.
 
+#### Component icons render through CSS masks
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The accordion chevron and the carousel arrows were `background-image` SVGs with
+the colour written inside the markup, which is why each needed a dark-mode rule —
+the accordion swapped in a second SVG, the carousel inverted the first with a
+`filter`. They are now painted through a CSS `mask`, so the colour lives on
+`background-color` as an ordinary token and follows the root colours by itself.
+Upstream v6 does the same, with a `mask-icon()` mixin.
+
+- **The accordion's two icons collapse into one.**
+  `$accordion-button-active-icon` and the `--#{$prefix}accordion-btn-active-icon`
+  custom property are **removed**; the active state changes
+  `--#{$prefix}accordion-btn-active-icon-color` instead of the whole image. New
+  tokens: `--#{$prefix}accordion-btn-icon-color` and
+  `--#{$prefix}accordion-btn-active-icon-color`.
+- **A custom icon is now a shape, not a coloured image.** Whatever colour you put
+  inside `$accordion-button-icon` or `$carousel-control-prev-icon-bg` /
+  `$carousel-control-next-icon-bg` is ignored — only the alpha of the SVG is used.
+  Set the colour through the token (`--#{$prefix}accordion-btn-icon-color`,
+  `--#{$prefix}carousel-control-color`).
+- **`$accordion-icon-color` and `$accordion-icon-active-color` are `var()`
+  references now** (`var(--#{$prefix}body-color)`,
+  `var(--#{$prefix}primary-text-emphasis)`), not Sass colours — Sass colour
+  functions on them no longer work.
+- **`$carousel-control-icon-filter` is removed**, with its
+  `--#{$prefix}carousel-control-icon-filter` custom property and its two dark
+  companions (`$carousel-control-icon-filter-dark`,
+  `$carousel-dark-control-icon-filter`), along with the four accordion
+  dark variables (`$accordion-icon-color-dark`,
+  `$accordion-icon-active-color-dark`, `$accordion-button-icon-dark`,
+  `$accordion-button-active-icon-dark`). The accordion's dark-mode block is gone
+  entirely.
+- **The carousel's colours are tokens.** `--#{$prefix}carousel-control-color` is
+  new; `.carousel-dark` pins the dark side of each pair through
+  `$carousel-dark-control-color`, `$carousel-dark-indicator-active-bg` and
+  `$carousel-dark-caption-color` (previously `$carousel-*-dark` in
+  `_variables-dark.scss`). RTL still swaps the two arrows, now through
+  `mask-image`.
+- **Visible in dark mode**: the old dark accordion chevron was a *filled* glyph
+  where the light one was *stroked*. Both modes now use the stroked shape — same
+  colour, same size, slightly different drawing. Worth knowing if you diff
+  screenshots.
+
 #### Buttons
 
 - **`button-variant()` changed signature** — it takes a variant name from the
@@ -369,6 +421,12 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   channel); `.btn-dark` keeps brightening on hover via the
   `$btn-lightness-overrides` map. The win: a theme color you add yourself gets
   correct hover/active states without compiling Sass.
+- **The eight shade/tint amount knobs are removed**:
+  `$btn-hover-bg-shade-amount`, `$btn-hover-bg-tint-amount`,
+  `$btn-hover-border-shade-amount`, `$btn-hover-border-tint-amount` and the four
+  `$btn-active-*` counterparts. They fed the Sass mixes that no longer happen.
+  The runtime equivalents are `$btn-hover-lightness`, `$btn-active-lightness` and
+  the per-colour `$btn-lightness-overrides` map.
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
 - `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
@@ -378,7 +436,9 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
 - **The RFS engine is gone** — no `vendor/rfs`, no `font-size()` / `rfs()`
-  mixins, no `$enable-rfs`, no `rfs` option in the utilities API. Fluid type is
+  mixins, no `$enable-rfs`, no `rfs` option in the utilities API, and none of
+  the `$rfs-*` knobs (`$rfs-base-value`, `$rfs-breakpoint`, `$rfs-factor`,
+  `$rfs-mode`, `$rfs-unit`, `$rfs-two-dimensional`, `$rfs-class`, …). Fluid type is
   written as literal `clamp()` values in `$h1-font-size`–`$h4-font-size`,
   `$display-font-sizes` and `$legend-font-size`; rendering is unchanged at
   every viewport width.
