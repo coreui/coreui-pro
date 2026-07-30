@@ -501,6 +501,42 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   instead of restating declarations, so state styling follows any control
   automatically.
 
+#### Sass file layout follows Bootstrap v6
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Upstream's directories mirror the cascade layers, so partials now live in the
+directory named after the layer they emit into. **Every old path still resolves
+through a thin `@forward` shim**, for `@use` and the deprecated `@import` alike —
+nothing to change unless you want to.
+
+| Was | Is |
+| --- | --- |
+| `scss/_variables.scss` | `scss/_config.scss` |
+| `scss/_grid.scss`, `scss/_containers.scss` | `scss/layout/` |
+| `scss/mixins/_breakpoints.scss` | `scss/layout/_breakpoints.scss` |
+| `scss/_reboot.scss`, `scss/_type.scss`, `scss/_images.scss`, `scss/_tables.scss` | `scss/content/` |
+| `scss/_buttons.scss` | `scss/buttons/_button.scss` |
+| `scss/_button-group.scss`, `scss/_close.scss`, `scss/_loading-button.scss`, `scss/_search-button.scss` | `scss/buttons/` |
+| `scss/_spinners.scss` | `scss/_spinner.scss` |
+| `scss/_placeholders.scss` | `scss/_placeholder.scss` |
+| `scss/_mixins.scss`, `scss/_helpers.scss`, `scss/_forms.scss` | `scss/mixins/index.scss`, `scss/helpers/index.scss`, `scss/forms/index.scss` |
+| `scss/forms/_form-check.scss` | `scss/forms/_check.scss` |
+| `scss/forms/_form-otp.scss` | `scss/forms/_otp-input.scss` |
+
+The list rules from `_type.scss` moved to `content/_lists.scss` and the blockquote
+rules to `content/_blockquote.scss`, matching upstream's filenames.
+
+The three aggregators need no shim: Sass resolves `@use "mixins"` to
+`mixins/index.scss` on its own once the sibling file is gone.
+
+**What we deliberately did not copy.** Upstream renamed three components *and their
+classes* — `.modal`, `.offcanvas`, `.dropdown`, `.dropdown-menu` and
+`.dropdown-item` are gone from Bootstrap v6, replaced by `.dialog`, `.drawer`,
+`.menu` and `.menu-item`. Those are three of the most-used components in any
+Bootstrap app, so `_modal.scss`, `_offcanvas.scss` and `_dropdown.scss` keep their
+names and their classes here.
+
 ### Sass & CSS
 
 - The v2 picker shell styling is a lean partial (`_date-picker-v2.scss`,
