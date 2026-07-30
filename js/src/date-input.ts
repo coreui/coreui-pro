@@ -7,8 +7,8 @@
 
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import SectionInput from './section-input.js'
-import { getSectionsFromLocale } from './util/date-sections.js'
+import SectionInput, { type SectionInputConfig } from './section-input.js'
+import { type DateSection, getSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -24,7 +24,7 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_DATE_INPUT = '[data-coreui-date-input]'
 
-const Default = {
+const Default: SectionInputConfig = {
   ...SectionInput.Default,
   ariaLabel: 'Date input'
 }
@@ -35,23 +35,23 @@ const Default = {
 
 class DateInput extends SectionInput {
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Private
-  _getDefaultSections(locale) {
+  override _getDefaultSections(locale: string): DateSection[] {
     return getSectionsFromLocale(locale)
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = DateInput.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
+      const data: any = DateInput.getOrCreateInstance(this)
 
       if (typeof config === 'string') {
         if (typeof data[config] === 'undefined') {

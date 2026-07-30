@@ -54,7 +54,28 @@ const CLASS_NAME_SEPARATOR = 'form-date-time-separator'
 
 const SELECTOR_SECTION = '.form-date-time-section'
 
-const Default = {
+export type SectionInputConfig = {
+  ariaLabel: string
+  autofocus: boolean
+  date: Date | number | string | null
+  disabled: boolean
+  disabledDates: any
+  format: ((locale: string) => DateSection[]) | string | null
+  inputDateParse: ((value: string) => Date | null) | null
+  invalid: boolean
+  locale: string
+  maxDate: Date | number | string | null
+  minDate: Date | number | string | null
+  monthNames: string[] | null
+  name: string | null
+  placeholders: Record<string, string> | null
+  readonly: boolean
+  required: boolean
+  sectionLabels: Record<string, string> | null
+  valid: boolean
+}
+
+const Default: SectionInputConfig = {
   ariaLabel: 'Date input',
   autofocus: false,
   date: null,
@@ -75,7 +96,7 @@ const Default = {
   valid: false
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ariaLabel: 'string',
   autofocus: 'boolean',
   date: '(date|number|string|null)',
@@ -211,6 +232,9 @@ class SectionInput extends BaseComponent {
   }
 
   // Private
+  // The stub takes no parameter at runtime; subclasses read the locale. The
+  // overload keeps both shapes typed without changing the emitted arity.
+  _getDefaultSections(locale?: string): DateSection[]
   _getDefaultSections(): DateSection[] {
     throw new Error('Method "_getDefaultSections" must be implemented.')
   }
@@ -230,8 +254,6 @@ class SectionInput extends BaseComponent {
       return getSectionsFromFormat(format, locale, monthNames)
     }
 
-    // @ts-expect-error -- the call passes an argument the stub ignores; subclasses
-    // read it. Dropping it is a behaviour change, so it is flagged rather than typed away.
     return this._getDefaultSections(locale)
   }
 

@@ -7,9 +7,9 @@
 
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import SectionInput from './section-input.js'
+import SectionInput, { type SectionInputConfig } from './section-input.js'
 import { convertToDateObject } from './util/calendar.js'
-import { getTimeSectionsFromLocale } from './util/date-sections.js'
+import { type DateSection, getTimeSectionsFromLocale } from './util/date-sections.js'
 import { convert12hTo24h } from './util/time.js'
 import { defineJQueryPlugin } from './util/index.js'
 
@@ -26,13 +26,13 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_TIME_INPUT = '[data-coreui-time-input]'
 
-const Default = {
+const Default: SectionInputConfig & { seconds: boolean } = {
   ...SectionInput.Default,
   ariaLabel: 'Time input',
   seconds: false
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ...SectionInput.DefaultType,
   seconds: 'boolean'
 }
@@ -43,15 +43,15 @@ const DefaultType = {
 
 class TimeInput extends SectionInput {
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
@@ -60,7 +60,7 @@ class TimeInput extends SectionInput {
   }
 
   // Private
-  _convertDate(value) {
+  override _convertDate(value: any): Date | null {
     if (typeof value === 'string') {
       // Parse time strings without relying on `Date.parse`, whose support for
       // non-ISO strings differs between engines (e.g. Safari).
@@ -79,14 +79,14 @@ class TimeInput extends SectionInput {
     return convertToDateObject(value, 'day', this._config.locale, true)
   }
 
-  _getDefaultSections(locale) {
+  override _getDefaultSections(locale: string): DateSection[] {
     return getTimeSectionsFromLocale(locale, this._config.seconds)
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = TimeInput.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
+      const data: any = TimeInput.getOrCreateInstance(this)
 
       if (typeof config === 'string') {
         if (typeof data[config] === 'undefined') {

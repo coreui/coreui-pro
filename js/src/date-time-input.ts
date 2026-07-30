@@ -7,9 +7,9 @@
 
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import SectionInput from './section-input.js'
+import SectionInput, { type SectionInputConfig } from './section-input.js'
 import { convertToDateObject } from './util/calendar.js'
-import { getDateTimeSectionsFromLocale } from './util/date-sections.js'
+import { type DateSection, getDateTimeSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -25,13 +25,13 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const SELECTOR_DATA_DATE_TIME_INPUT = '[data-coreui-date-time-input]'
 
-const Default = {
+const Default: SectionInputConfig & { seconds: boolean } = {
   ...SectionInput.Default,
   ariaLabel: 'Date and time input',
   seconds: false
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ...SectionInput.DefaultType,
   seconds: 'boolean'
 }
@@ -42,20 +42,20 @@ const DefaultType = {
 
 class DateTimeInput extends SectionInput {
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Private
-  _convertDate(value) {
+  override _convertDate(value: any): Date | null {
     const date = convertToDateObject(value, 'day', this._config.locale, true)
 
     if (date instanceof Date && !Number.isNaN(date.getTime())) {
@@ -70,14 +70,14 @@ class DateTimeInput extends SectionInput {
     return null
   }
 
-  _getDefaultSections(locale) {
+  override _getDefaultSections(locale: string): DateSection[] {
     return getDateTimeSectionsFromLocale(locale, this._config.seconds)
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = DateTimeInput.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
+      const data: any = DateTimeInput.getOrCreateInstance(this)
 
       if (typeof config === 'string') {
         if (typeof data[config] === 'undefined') {
