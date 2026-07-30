@@ -1,9 +1,9 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI alert.js
+ * CoreUI alert.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This component is a modified version of the Bootstrap's alert.js
+ * This component is a modified version of the Bootstrap's alert.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
@@ -32,15 +32,15 @@ const CLASS_NAME_SHOW = 'show'
 
 class Alert extends BaseComponent {
   // Getters
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  close() {
+  close(): void {
     const closeEvent = EventHandler.trigger(this._element, EVENT_CLOSE)
 
-    if (closeEvent.defaultPrevented) {
+    if (closeEvent!.defaultPrevented) {
       return
     }
 
@@ -51,26 +51,26 @@ class Alert extends BaseComponent {
   }
 
   // Private
-  _destroyElement() {
+  _destroyElement(): void {
     this._element.remove()
     EventHandler.trigger(this._element, EVENT_CLOSED)
     this.dispose()
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
       const data = Alert.getOrCreateInstance(this)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if ((data as any)[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](this)
+      (data as any)[config as string](this)
     })
   }
 }
