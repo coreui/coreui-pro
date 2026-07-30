@@ -2,6 +2,7 @@
 @use "mixins/clearfix" as *;
 @use "mixins/color-mode" as *;
 @use "mixins/ltr-rtl" as *;
+@use "mixins/mask-icon" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
 
@@ -168,9 +169,7 @@ $carousel-transition:                transform $carousel-transition-duration eas
     // Painted through the mask, so the arrow follows the control's colour
     // instead of carrying it inside the SVG and being inverted by a filter.
     background-color: var(--#{$prefix}carousel-control-color);
-    mask-repeat: no-repeat;
-    mask-position: 50%;
-    mask-size: 100% 100%;
+    @include mask-icon($size: 100% 100%, $position: 50%);
   }
 
   .carousel-control-prev-icon {

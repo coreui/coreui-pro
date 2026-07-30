@@ -3,6 +3,7 @@
 @use "functions/escape-svg" as *;
 @use "functions/math" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/mask-icon" as *;
 @use "mixins/color-mode" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -121,9 +122,7 @@ $accordion-tokens: defaults(
       margin-inline-start: auto;
       content: "";
       background-color: var(--#{$prefix}accordion-btn-icon-color);
-      mask-image: var(--#{$prefix}accordion-btn-icon);
-      mask-repeat: no-repeat;
-      mask-size: var(--#{$prefix}accordion-btn-icon-width);
+      @include mask-icon(var(--#{$prefix}accordion-btn-icon), var(--#{$prefix}accordion-btn-icon-width), null);
       @include transition(var(--#{$prefix}accordion-btn-icon-transition));
     }
 

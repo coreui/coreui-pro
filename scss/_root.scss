@@ -6,9 +6,14 @@
 @use "maps" as *;
 @use "mixins/color-mode" as *;
 @use "theme" as *;
+@use "colors" as *;
 @use "config" as *;
 
-@layer root, reboot, layout, content, forms, components, custom, helpers, utilities;
+// `colors` and `config` are reserved and empty, matching upstream's declaration:
+// two slots below `root` for a palette or a configuration sheet of your own, so
+// yours loses to nothing but still beats the library. `custom` is the same idea
+// between components and helpers.
+@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
 @layer root {
   :root,
@@ -19,51 +24,7 @@
     // than inheriting the initial `normal`, and so native widgets match.
     color-scheme: light;
 
-    // Colors
-    //
-    // Generate palettes for full colors, grays, and theme colors
-
-    @each $color, $value in $colors {
-      --#{$prefix}#{$color}: #{$value};
-    }
-
-    @each $color, $value in $grays {
-      --#{$prefix}gray-#{$color}: #{$value};
-    }
-
-    @each $color, $value in $theme-colors {
-      --#{$prefix}#{$color}: #{$value};
-    }
-
-    // A 100-900 scale per theme color, mixed at runtime from the color's own
-    // token so overriding the token retints the whole family. The subtle
-    // backgrounds, borders and emphasis text below are `light-dark()` pairs of
-    // these stops (see $color-tints / $color-shades).
-    @each $color, $value in $theme-colors {
-      @each $stop, $weight in $color-tints {
-        --#{$prefix}#{$color}-#{$stop}: #{color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color}))};
-      }
-      --#{$prefix}#{$color}-500: var(--#{$prefix}#{$color});
-      @each $stop, $weight in $color-shades {
-        --#{$prefix}#{$color}-#{$stop}: #{color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color}))};
-      }
-    }
-
-    @each $color, $value in $theme-colors-text {
-      --#{$prefix}#{$color}-text-emphasis: #{$value};
-    }
-
-    @each $color, $value in $theme-colors-bg-subtle {
-      --#{$prefix}#{$color}-bg-subtle: #{$value};
-    }
-
-    @each $color, $value in $theme-colors-border-subtle {
-      --#{$prefix}#{$color}-border-subtle: #{$value};
-    }
-
-    @each $color, $value in $theme-colors-contrast {
-      --#{$prefix}#{$color}-contrast: #{$value};
-    }
+    @include color-tokens();
 
     // Fonts
 

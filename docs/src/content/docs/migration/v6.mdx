@@ -237,9 +237,10 @@ assembles maps of CSS expressions and the browser resolves them.
 #### Cascade layers
 
 - **All library CSS now lives in cascade layers**, declared as
-  `@layer root, reboot, layout, content, forms, components, custom, helpers, utilities;`.
-  The `custom` layer is empty and reserved for you: put your own layered styles
-  there to slot between the library's components and helpers.
+  `@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;`.
+  Three of those are empty and reserved for you: `colors` and `config` sit below
+  everything, for a palette or a configuration sheet that should lose to nothing
+  but still beat the library, and `custom` slots between components and helpers.
 - **Unlayered CSS wins over layered CSS regardless of specificity**, so your
   existing stylesheets now override the library more easily, not less. No
   action needed — selectors that worked before keep working, and low-specificity
