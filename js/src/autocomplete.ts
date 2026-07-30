@@ -10,7 +10,10 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, escapeHtml, sanitizeHtml } from './util/sanitizer.js'
+import type { ComponentConfig } from './util/config.js'
+import {
+  DefaultAllowlist, escapeHtml, sanitizeHtml, type SanitizerAllowList
+} from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
@@ -85,7 +88,7 @@ const SELECTOR_OPTIONS_EMPTY = '.autocomplete-options-empty'
 const SELECTOR_VISIBLE_ITEMS = '.autocomplete-options .autocomplete-option:not(.disabled):not(:disabled)'
 
 const Default = {
-  allowList: DefaultAllowlist,
+  allowList: DefaultAllowlist as SanitizerAllowList,
   allowOnlyDefinedOptions: false,
   ariaCleanerLabel: 'Clear selection',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
@@ -113,7 +116,7 @@ const Default = {
   value: null
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   allowList: 'object',
   allowOnlyDefinedOptions: 'boolean',
   ariaCleanerLabel: 'string',
@@ -149,7 +152,20 @@ const DefaultType = {
  */
 
 class Autocomplete extends BaseComponent {
-  constructor(element, config) {
+  protected declare _uniqueId: any
+  protected declare _indicatorElement: any
+  protected declare _cleanerElement: any
+  protected declare _inputElement: any
+  protected declare _inputHintElement: any
+  protected declare _togglerElement: any
+  protected declare _optionsElement: any
+  protected declare _menu: any
+  protected declare _selected: any
+  protected declare _options: any
+  protected declare _popper: any
+  protected declare _search: any
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(`${this.constructor.NAME}`)
@@ -173,25 +189,25 @@ class Autocomplete extends BaseComponent {
 
   // Getters
 
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
 
-  toggle() {
+  toggle(): void {
     return this._isShown() ? this.hide() : this.show()
   }
 
-  show() {
+  show(): void {
     if (this._config.disabled || this._isShown()) {
       return
     }
@@ -216,7 +232,7 @@ class Autocomplete extends BaseComponent {
     this._createPopper()
   }
 
-  hide() {
+  hide(): void {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
     if (this._popper) {
@@ -237,7 +253,7 @@ class Autocomplete extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
-  dispose() {
+  override dispose(): void {
     if (this._popper) {
       this._popper.destroy()
     }
@@ -245,7 +261,7 @@ class Autocomplete extends BaseComponent {
     super.dispose()
   }
 
-  clear() {
+  clear(): void {
     this.deselectAll()
     this.search('')
     this._filterOptionsList()
@@ -254,7 +270,7 @@ class Autocomplete extends BaseComponent {
     this._triggerChangeEvent(null)
   }
 
-  search(label) {
+  search(label: string): void {
     this._search = label.length > 0 ? label.toLowerCase() : ''
     if (!this._isExternalSearch()) {
       this._filterOptionsList()
@@ -265,7 +281,7 @@ class Autocomplete extends BaseComponent {
     })
   }
 
-  update(config) {
+  update(config: any): void {
     if (config.value) {
       this.deselectAll()
     }
@@ -276,7 +292,7 @@ class Autocomplete extends BaseComponent {
     this._createOptions(this._optionsElement, this._options)
   }
 
-  deselectAll(options = this._selected) {
+  deselectAll(options: any[] = this._selected): void {
     if (this._selected.length === 0) {
       return
     }
@@ -298,13 +314,13 @@ class Autocomplete extends BaseComponent {
 
   // Helpers
 
-  _triggerChangeEvent(value) {
+  _triggerChangeEvent(value: any): void {
     EventHandler.trigger(this._element, EVENT_CHANGED, {
       value
     })
   }
 
-  _flattenOptions(options = this._options, flat = []) {
+  _flattenOptions(options: any[] = this._options, flat: any[] = []): any[] {
     for (const opt of options) {
       if (opt && Array.isArray(opt.options)) {
         this._flattenOptions(opt.options, flat)
@@ -317,11 +333,11 @@ class Autocomplete extends BaseComponent {
     return flat
   }
 
-  _getClassNames() {
+  _getClassNames(): string[] {
     return this._element.classList.value.split(' ')
   }
 
-  _highlightOption(label) {
+  _highlightOption(label: string): string {
     if (!this._search) {
       return escapeHtml(label)
     }
@@ -334,33 +350,33 @@ class Autocomplete extends BaseComponent {
       .join('')
   }
 
-  _isExternalSearch() {
+  _isExternalSearch(): boolean {
     return Array.isArray(this._config.search) && this._config.search.includes('external')
   }
 
-  _isGlobalSearch() {
+  _isGlobalSearch(): boolean {
     return Array.isArray(this._config.search) && this._config.search.includes('global')
   }
 
-  _isVisible(element) {
+  _isVisible(element: HTMLElement): boolean {
     const style = window.getComputedStyle(element)
     return (style.display !== 'none')
   }
 
-  _isShown() {
+  _isShown(): boolean {
     return this._element.classList.contains(CLASS_NAME_SHOW)
   }
 
   // Private
 
-  _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK, event => {
+  _addEventListeners(): void {
+    EventHandler.on(this._element, EVENT_CLICK, (event: any) => {
       if (!this._config.disabled && !event.target.closest(SELECTOR_INDICATOR)) {
         this.show()
       }
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
         if (this._config.allowOnlyDefinedOptions && this._selected.length === 0) {
@@ -376,13 +392,13 @@ class Autocomplete extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
       if (this._isGlobalSearch() && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._inputElement.focus()
       }
     })
 
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, (event: any) => {
       if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
         event.preventDefault()
         this.show()
@@ -395,7 +411,7 @@ class Autocomplete extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
+    EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
       this.toggle()
     })
@@ -423,7 +439,7 @@ class Autocomplete extends BaseComponent {
       this._triggerChangeEvent(inputValue)
     })
 
-    EventHandler.on(this._inputElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._inputElement, EVENT_KEYDOWN, (event: any) => {
       if (!this._isShown() && event.key !== TAB_KEY) {
         this.show()
       }
@@ -472,7 +488,7 @@ class Autocomplete extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._inputElement, EVENT_KEYUP, event => {
+    EventHandler.on(this._inputElement, EVENT_KEYUP, (event: any) => {
       if (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY) {
         const { value } = event.target
         this.search(value)
@@ -490,19 +506,19 @@ class Autocomplete extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, event => {
+    EventHandler.on(this._optionsElement, EVENT_MOUSEDOWN, (event: any) => {
       // Keep focus on the input so its blur handler doesn't clear the search
       // (and re-render the list) before the click selects the option.
       event.preventDefault()
     })
 
-    EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
+    EventHandler.on(this._optionsElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
       event.stopPropagation()
       this._onOptionsClick(event.target)
     })
 
-    EventHandler.on(this._cleanerElement, EVENT_CLICK, event => {
+    EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
       if (!this._config.disabled) {
         event.preventDefault()
         event.stopPropagation()
@@ -510,7 +526,7 @@ class Autocomplete extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._cleanerElement, EVENT_KEYDOWN, (event: any) => {
       if (!this._config.disabled && event.key === ENTER_KEY) {
         event.preventDefault()
         event.stopPropagation()
@@ -518,7 +534,7 @@ class Autocomplete extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._optionsElement, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ENTER_KEY) {
         this._onOptionsClick(event.target)
       }
@@ -535,7 +551,7 @@ class Autocomplete extends BaseComponent {
     })
   }
 
-  _getOptionsFromConfig(options = this._config.options) {
+  _getOptionsFromConfig(options: any = this._config.options): any[] {
     if (!options || !Array.isArray(options)) {
       return []
     }
@@ -587,7 +603,7 @@ class Autocomplete extends BaseComponent {
     return _options
   }
 
-  _createAutocomplete() {
+  _createAutocomplete(): void {
     this._element.classList.add(CLASS_NAME_AUTOCOMPLETE)
     this._element.classList.toggle('is-invalid', this._config.invalid)
     this._element.classList.toggle('is-valid', this._config.valid)
@@ -606,7 +622,7 @@ class Autocomplete extends BaseComponent {
     this._updateOptionsList()
   }
 
-  _createInputGroup() {
+  _createInputGroup(): void {
     const togglerEl = document.createElement('div')
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
@@ -622,7 +638,7 @@ class Autocomplete extends BaseComponent {
       inputHintEl.autocomplete = 'off'
       inputHintEl.readOnly = true
       inputHintEl.tabIndex = -1
-      inputHintEl.setAttribute('aria-hidden', true)
+      inputHintEl.setAttribute('aria-hidden', true as any)
 
       togglerEl.append(inputHintEl)
       this._inputHintElement = inputHintEl
@@ -641,12 +657,12 @@ class Autocomplete extends BaseComponent {
     inputEl.setAttribute('aria-controls', `${this._uniqueId}-listbox`)
 
     if (this._config.disabled) {
-      inputEl.setAttribute('disabled', true)
+      inputEl.setAttribute('disabled', true as any)
       inputEl.tabIndex = -1
     }
 
     if (this._config.required) {
-      inputEl.setAttribute('required', true)
+      inputEl.setAttribute('required', true as any)
     }
 
     togglerEl.append(inputEl)
@@ -655,7 +671,7 @@ class Autocomplete extends BaseComponent {
     this._element.append(togglerEl)
   }
 
-  _createButtons() {
+  _createButtons(): void {
     if (!this._config.cleaner && !this._config.indicator) {
       return
     }
@@ -693,7 +709,7 @@ class Autocomplete extends BaseComponent {
     this._updateCleaner()
   }
 
-  _createPopper() {
+  _createPopper(): void {
     if (typeof Popper === 'undefined') {
       throw new TypeError('CoreUI\'s Auto Complete component require Popper (https://popper.js.org)')
     }
@@ -714,10 +730,10 @@ class Autocomplete extends BaseComponent {
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
     }
 
-    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
+    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig as Partial<Popper.Options>)
   }
 
-  _createOptionsContainer() {
+  _createOptionsContainer(): void {
     const dropdownDiv = document.createElement('div')
     dropdownDiv.classList.add(CLASS_NAME_DROPDOWN)
     dropdownDiv.role = 'listbox'
@@ -748,7 +764,7 @@ class Autocomplete extends BaseComponent {
     this._menu = dropdownDiv
   }
 
-  _createOptions(parentElement, options) {
+  _createOptions(parentElement: HTMLElement, options: any[]): void {
     for (const option of options) {
       if (Array.isArray(option.options)) {
         const optgroup = document.createElement('div')
@@ -778,7 +794,7 @@ class Autocomplete extends BaseComponent {
       optionDiv.setAttribute('role', 'option')
       optionDiv.setAttribute(
         'aria-selected',
-        this._selected.some(selected => selected.value === option.value) ? 'true' : 'false'
+        this._selected.some((selected: any) => selected.value === option.value) ? 'true' : 'false'
       )
 
       if (option.disabled) {
@@ -802,7 +818,7 @@ class Autocomplete extends BaseComponent {
     }
   }
 
-  _onOptionsClick(element) {
+  _onOptionsClick(element: any): void {
     if (element.classList.contains(CLASS_NAME_LABEL)) {
       return
     }
@@ -824,7 +840,7 @@ class Autocomplete extends BaseComponent {
     }
   }
 
-  _findOptionByValue(value, options = this._options) {
+  _findOptionByValue(value: any, options: any[] = this._options): any {
     for (const option of options) {
       if (option.value === value) {
         return option
@@ -841,17 +857,17 @@ class Autocomplete extends BaseComponent {
     return null
   }
 
-  _selectOption(option) {
+  _selectOption(option: any): void {
     this.deselectAll()
 
-    if (this._selected.filter(selectedOption => selectedOption.value === option.value).length === 0) {
+    if (this._selected.filter((selectedOption: any) => selectedOption.value === option.value).length === 0) {
       this._selected.push(option)
     }
 
     const foundOption = SelectorEngine.findOne(`[data-value="${option.value}"]`, this._optionsElement)
     if (foundOption) {
       foundOption.classList.add(CLASS_NAME_SELECTED)
-      foundOption.setAttribute('aria-selected', true)
+      foundOption.setAttribute('aria-selected', true as any)
     }
 
     this._triggerChangeEvent(option)
@@ -871,17 +887,17 @@ class Autocomplete extends BaseComponent {
     this._updateCleaner()
   }
 
-  _deselectOption(value) {
-    this._selected = this._selected.filter(option => option.value !== value)
+  _deselectOption(value: any): void {
+    this._selected = this._selected.filter((option: any) => option.value !== value)
 
     const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
     if (option) {
       option.classList.remove(CLASS_NAME_SELECTED)
-      option.setAttribute('aria-selected', false)
+      option.setAttribute('aria-selected', false as any)
     }
   }
 
-  _updateCleaner() {
+  _updateCleaner(): void {
     if (!this._config.cleaner || this._cleanerElement === null) {
       return
     }
@@ -894,7 +910,7 @@ class Autocomplete extends BaseComponent {
     this._cleanerElement.style.display = 'none'
   }
 
-  _updateOptionsList(options = this._options) {
+  _updateOptionsList(options: any[] = this._options): void {
     for (const option of options) {
       if (Array.isArray(option.options)) {
         this._updateOptionsList(option.options)
@@ -907,7 +923,7 @@ class Autocomplete extends BaseComponent {
     }
   }
 
-  _filterOptionsList() {
+  _filterOptionsList(): void {
     const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
     let visibleOptions = 0
 
@@ -924,10 +940,10 @@ class Autocomplete extends BaseComponent {
         visibleOptions++
       }
 
-      const optgroup = option.closest(SELECTOR_OPTGROUP)
+      const optgroup = option.closest(SELECTOR_OPTGROUP) as HTMLElement
       if (optgroup) {
         // eslint-disable-next-line  unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isVisible(element)).length > 0) {
+        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter((element: HTMLElement) => this._isVisible(element)).length > 0) {
           optgroup.style.removeProperty('display')
         } else {
           optgroup.style.display = 'none'
@@ -937,7 +953,7 @@ class Autocomplete extends BaseComponent {
 
     if (visibleOptions > 0) {
       if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu).remove()
+        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)!.remove()
       }
 
       return
@@ -951,7 +967,7 @@ class Autocomplete extends BaseComponent {
         placeholder.textContent = this._config.searchNoResultsLabel
 
         if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
+          SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu)!.append(placeholder)
         }
 
         return
@@ -961,7 +977,7 @@ class Autocomplete extends BaseComponent {
     }
   }
 
-  _selectMenuItem({ key, target }) {
+  _selectMenuItem({ key, target }: any): void {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
@@ -973,7 +989,7 @@ class Autocomplete extends BaseComponent {
     getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
   }
 
-  _selectFirstOrLastMenuItem(first) {
+  _selectFirstOrLastMenuItem(first: boolean): void {
     const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
@@ -984,7 +1000,7 @@ class Autocomplete extends BaseComponent {
     item.focus()
   }
 
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: any): any {
     if (config.container === true) {
       config.container = document.body
     }
@@ -1006,8 +1022,8 @@ class Autocomplete extends BaseComponent {
 
   // Static
 
-  static autocompleteInterface(element, config) {
-    const data = Autocomplete.getOrCreateInstance(element, config)
+  static autocompleteInterface(element: string | Element | null, config?: any): void {
+    const data: any = Autocomplete.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {
@@ -1018,13 +1034,13 @@ class Autocomplete extends BaseComponent {
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
       Autocomplete.autocompleteInterface(this, config)
     })
   }
 
-  static clearMenus(event) {
+  static clearMenus(event: any): void {
     if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
       return
     }
@@ -1046,7 +1062,7 @@ class Autocomplete extends BaseComponent {
         continue
       }
 
-      const relatedTarget = { relatedTarget: context._element }
+      const relatedTarget: any = { relatedTarget: context._element }
 
       if (event.type === 'click') {
         relatedTarget.clickEvent = event
