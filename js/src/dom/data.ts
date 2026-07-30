@@ -33,9 +33,12 @@ export default {
     instanceMap.set(key, instance)
   },
 
-  get(element: Element, key: string): any {
-    if (elementMap.has(element)) {
-      return elementMap.get(element)!.get(key) || null
+  // Callers pass the result of getElement(), which can be null; Map.has(null)
+  // is simply false at runtime, so the parameter is widened without adding a
+  // guard that would change the emitted code.
+  get(element: Element | null, key: string): any {
+    if (elementMap.has(element as Element)) {
+      return elementMap.get(element as Element)!.get(key) || null
     }
 
     return null
