@@ -1,12 +1,28 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI util/index.js
+ * CoreUI util/index.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This is a modified version of the Bootstrap's util/index.js
+ * This is a modified version of the Bootstrap's util/index.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
+
+/**
+ * Types
+ */
+
+// The jQuery bridge is untyped on purpose: jQuery is optional at runtime and we
+// only ever touch `.jquery`, index 0, and the plugin registration surface.
+type JQueryLike = { jquery?: unknown, [index: number]: HTMLElement }
+type JQueryStatic = Record<string, any> & { fn: Record<string, any> }
+type JQueryPlugin = { NAME: string, jQueryInterface: (...args: any[]) => unknown }
+
+declare global {
+  interface Window {
+    jQuery?: JQueryStatic
+  }
+}
 
 const MAX_UID = 1_000_000
 const MILLISECONDS_MULTIPLIER = 1000
@@ -17,29 +33,31 @@ const TRANSITION_END = 'transitionend'
  * @param {string} selector
  * @returns {string}
  */
-const parseSelector = selector => {
-  if (selector && window.CSS && window.CSS.escape) {
+const parseSelector = (selector: string): string => {
+  // The `window.CSS` checks guard against ancient browsers, so check them as
+  // untyped values instead of letting tsc call them always-defined
+  if (selector && (window as any).CSS && (window as any).CSS.escape) {
     // document.querySelector needs escaping to handle IDs (html5+) containing for instance /
-    selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`)
+    selector = selector.replace(/#([^\s"#']+)/g, (match, id: string) => `#${CSS.escape(id)}`)
   }
 
   return selector
 }
 
 // Shout-out Angus Croll (https://goo.gl/pxwQGp)
-const toType = object => {
+const toType = (object: unknown): string => {
   if (object === null || object === undefined) {
     return `${object}`
   }
 
-  return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)[1].toLowerCase()
+  return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)![1].toLowerCase()
 }
 
 /**
  * Public Util API
  */
 
-const getUID = prefix => {
+const getUID = (prefix: string): string => {
   do {
     prefix += Math.floor(Math.random() * MAX_UID)
   } while (document.getElementById(prefix))
@@ -47,7 +65,7 @@ const getUID = prefix => {
   return prefix
 }
 
-const getTransitionDurationFromElement = element => {
+const getTransitionDurationFromElement = (element: Element | null): number => {
   if (!element) {
     return 0
   }
@@ -70,26 +88,26 @@ const getTransitionDurationFromElement = element => {
   return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER
 }
 
-const triggerTransitionEnd = element => {
+const triggerTransitionEnd = (element: Element): void => {
   element.dispatchEvent(new Event(TRANSITION_END))
 }
 
-const isElement = object => {
+const isElement = (object: unknown): object is Element => {
   if (!object || typeof object !== 'object') {
     return false
   }
 
-  if (typeof object.jquery !== 'undefined') {
-    object = object[0]
+  if (typeof (object as JQueryLike).jquery !== 'undefined') {
+    object = (object as JQueryLike)[0]
   }
 
-  return typeof object.nodeType !== 'undefined'
+  return typeof (object as Element).nodeType !== 'undefined'
 }
 
-const getElement = object => {
+const getElement = (object: unknown): HTMLElement | null => {
   // it's a jQuery object or a node element
   if (isElement(object)) {
-    return object.jquery ? object[0] : object
+    return (object as unknown as JQueryLike).jquery ? (object as unknown as JQueryLike)[0] : object as HTMLElement
   }
 
   if (typeof object === 'string' && object.length > 0) {
@@ -99,7 +117,7 @@ const getElement = object => {
   return null
 }
 
-const isVisible = element => {
+const isVisible = (element: unknown): boolean => {
   if (!isElement(element) || element.getClientRects().length === 0) {
     return false
   }
@@ -126,7 +144,7 @@ const isVisible = element => {
   return elementIsVisible
 }
 
-const isDisabled = element => {
+const isDisabled = (element: Element | null | undefined): boolean => {
   if (!element || element.nodeType !== Node.ELEMENT_NODE) {
     return true
   }
@@ -135,14 +153,14 @@ const isDisabled = element => {
     return true
   }
 
-  if (typeof element.disabled !== 'undefined') {
-    return element.disabled
+  if (typeof (element as HTMLInputElement).disabled !== 'undefined') {
+    return (element as HTMLInputElement).disabled
   }
 
   return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false'
 }
 
-const findShadowRoot = element => {
+const findShadowRoot = (element: Node): ShadowRoot | null => {
   if (!document.documentElement.attachShadow) {
     return null
   }
@@ -165,7 +183,7 @@ const findShadowRoot = element => {
   return findShadowRoot(element.parentNode)
 }
 
-const noop = () => {}
+const noop = (): void => {}
 
 /**
  * Trick to restart an element's animation
@@ -175,11 +193,11 @@ const noop = () => {}
  *
  * @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
  */
-const reflow = element => {
-  element.offsetHeight // eslint-disable-line no-unused-expressions
+const reflow = (element: HTMLElement): void => {
+  element.offsetHeight // eslint-disable-line @typescript-eslint/no-unused-expressions
 }
 
-const getjQuery = () => {
+const getjQuery = (): JQueryStatic | null => {
   if (window.jQuery && !document.body.hasAttribute('data-coreui-no-jquery')) {
     return window.jQuery
   }
@@ -187,9 +205,9 @@ const getjQuery = () => {
   return null
 }
 
-const DOMContentLoadedCallbacks = []
+const DOMContentLoadedCallbacks: Array<() => void> = []
 
-const onDOMContentLoaded = callback => {
+const onDOMContentLoaded = (callback: () => void): void => {
   if (document.readyState === 'loading') {
     // add listener on the first call when the document is in loading state
     if (!DOMContentLoadedCallbacks.length) {
@@ -206,9 +224,9 @@ const onDOMContentLoaded = callback => {
   }
 }
 
-const isRTL = () => document.documentElement.dir === 'rtl'
+const isRTL = (): boolean => document.documentElement.dir === 'rtl'
 
-const defineJQueryPlugin = plugin => {
+const defineJQueryPlugin = (plugin: JQueryPlugin): void => {
   onDOMContentLoaded(() => {
     const $ = getjQuery()
     /* istanbul ignore if */
@@ -225,11 +243,11 @@ const defineJQueryPlugin = plugin => {
   })
 }
 
-const execute = (possibleCallback, args = [], defaultValue = possibleCallback) => {
-  return typeof possibleCallback === 'function' ? possibleCallback.call(...args) : defaultValue
+const execute = <T = any>(possibleCallback: T | ((...functionArgs: any[]) => T), args: any[] = [], defaultValue: T | ((...functionArgs: any[]) => T) = possibleCallback): T => {
+  return typeof possibleCallback === 'function' ? (possibleCallback as (...functionArgs: any[]) => T).call(...args as [any, ...any[]]) : defaultValue as T
 }
 
-const executeAfterTransition = (callback, transitionElement, waitForTransition = true) => {
+const executeAfterTransition = (callback: () => void, transitionElement: Element, waitForTransition = true): void => {
   if (!waitForTransition) {
     execute(callback)
     return
@@ -240,7 +258,7 @@ const executeAfterTransition = (callback, transitionElement, waitForTransition =
 
   let called = false
 
-  const handler = ({ target }) => {
+  const handler = ({ target }: Event): void => {
     if (target !== transitionElement) {
       return
     }
@@ -267,7 +285,7 @@ const executeAfterTransition = (callback, transitionElement, waitForTransition =
  * @param isCycleAllowed
  * @return {Element|elem} The proper element
  */
-const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed) => {
+const getNextActiveElement = <T>(list: T[], activeElement: T, shouldGetNext: boolean, isCycleAllowed: boolean): T => {
   const listLength = list.length
   let index = list.indexOf(activeElement)
 
