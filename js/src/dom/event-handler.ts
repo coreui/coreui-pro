@@ -341,3 +341,4 @@ function hydrateObj<T extends object>(obj: T, meta: Record<string, unknown> = {}
 }
 
 export default EventHandler
+export type { CoreUIEvent, EventCallable }
