@@ -244,7 +244,7 @@ document.querySelectorAll('.btn').forEach(buttonElement => {
 
 Buttons use local CSS variables on `.btn` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 
-<ScssDocs file="scss/_buttons.scss" capture="btn-css-vars" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-css-vars" />
 
 Each `.btn-*` modifier class updates the appropriate CSS variables to minimize additional CSS rules with our `button-variant()` and `button-size()` mixins.
 
@@ -256,7 +256,7 @@ Here's an example of building a custom `.btn-*` modifier class like we do for th
 
 ### SASS variables
 
-<ScssDocs file="scss/_buttons.scss" capture="btn-variables" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-variables" />
 
 ### SASS mixins
 
@@ -266,14 +266,14 @@ There are two mixins for buttons: a variant mixin and a size mixin. Both live in
 
 `button-variant()` takes a variant name rather than colors. It reads that variant's entry from `$button-variants`, which maps each button token to a `--#{$prefix}theme-*` token, and derives the hover and active states from the same token in CSS. That is what lets a theme color you add yourself get correct states without compiling Sass.
 
-<ScssDocs file="scss/_buttons.scss" capture="btn-variants" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-variants" />
 
-<ScssDocs file="scss/_buttons.scss" capture="btn-variant-mixin" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-variant-mixin" />
 
-<ScssDocs file="scss/_buttons.scss" capture="btn-size-mixin" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-size-mixin" />
 
 ### SASS loops
 
 Button variants pair the `button-variant()` mixin with our `$theme-colors` map to generate the modifier classes in `scss/_buttons.scss`. Each class sets the theme tokens for its color and then the variant's token mapping, so `.btn-primary` and `.theme-primary` stay in step.
 
-<ScssDocs file="scss/_buttons.scss" capture="btn-variant-loops" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-variant-loops" />

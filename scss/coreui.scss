@@ -12,10 +12,10 @@
 @forward "content";
 @forward "layout";
 @forward "forms";
-@forward "buttons";
+@forward "buttons/button";
 @forward "transitions";
 @forward "dropdown";
-@forward "button-group";
+@forward "buttons/button-group";
 @forward "nav";
 @forward "navbar";
 @forward "card";
@@ -26,7 +26,7 @@
 @forward "alert";
 @forward "progress";
 @forward "list-group";
-@forward "close";
+@forward "buttons/close";
 @forward "toasts";
 @forward "modal";
 @forward "tooltip";
@@ -47,10 +47,10 @@
 @forward "footer";
 @forward "header";
 @forward "icon";
-@forward "loading-button";
+@forward "buttons/loading-button";
 @forward "range-slider";
 @forward "rating";
-@forward "search-button";
+@forward "buttons/search-button";
 @forward "sidebar";
 @forward "stepper";
 @forward "time-picker";

@@ -1,5 +1,5 @@
 @use "sass:map";
-@use "buttons" as *;
+@use "buttons/button" as *;
 @use "functions/color" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
