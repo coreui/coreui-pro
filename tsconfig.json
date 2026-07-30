@@ -15,7 +15,7 @@
     // package goes ESM-only.
     "module": "preserve",
     "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": ["ES2022", "ES2023.Array", "DOM", "DOM.Iterable"],
     // Library sources run in a browser: without this, @types/node leaks in from
     // node_modules and setTimeout resolves to Node's Timeout instead of number.
     "types": [],

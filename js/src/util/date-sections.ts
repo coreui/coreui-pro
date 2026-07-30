@@ -8,7 +8,17 @@
 import { parseYearSmart } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
-const TOKEN_TYPES = {
+export type DateSection = {
+  type: string
+  value: any
+  length?: number
+  padded?: boolean
+  cycle?: string
+  names?: string[]
+  placeholder?: string
+}
+
+const TOKEN_TYPES: Record<string, string> = {
   d: 'day',
   D: 'day',
   M: 'month',
@@ -30,11 +40,11 @@ const TOKEN_TYPES = {
  * @param {('short' | 'long')} width The month name width.
  * @returns {string[]} The twelve month names.
  */
-export const getFormatMonthNames = (locale, width) => {
+export const getFormatMonthNames = (locale: string, width: 'long' | 'short'): string[] => {
   const formatter = new Intl.DateTimeFormat(locale, { year: 'numeric', month: width, day: 'numeric' })
 
   return Array.from({ length: 12 }, (_, index) =>
-    formatter.formatToParts(new Date(2000, index, 15)).find(part => part.type === 'month').value)
+    formatter.formatToParts(new Date(2000, index, 15)).find(part => part.type === 'month')!.value)
 }
 
 /**
@@ -42,7 +52,7 @@ export const getFormatMonthNames = (locale, width) => {
  * @param {string} locale The locale to use.
  * @returns {string[]} The two day period names.
  */
-export const getDayPeriodNames = locale => {
+export const getDayPeriodNames = (locale: string): string[] => {
   const formatter = new Intl.DateTimeFormat(locale, { hour: 'numeric', hour12: true })
 
   return [new Date(2000, 0, 1, 9), new Date(2000, 0, 1, 21)].map(date => {
@@ -59,7 +69,7 @@ export const getDayPeriodNames = locale => {
  * @param {string[] | null} [monthNames] Custom month names overriding the locale-derived ones.
  * @returns {object} The section descriptor with `type`, `length`, `padded` and an empty `value`.
  */
-const createSection = (char, tokenLength, locale = 'default', monthNames = null) => {
+const createSection = (char: string, tokenLength: number, locale = 'default', monthNames: string[] | null = null): DateSection => {
   const type = TOKEN_TYPES[char]
 
   if (type === 'year') {
@@ -104,7 +114,7 @@ const createSection = (char, tokenLength, locale = 'default', monthNames = null)
  * @param {object} section The section descriptor (or an object with `type` and, for hours, `cycle`).
  * @returns {{min: number, max: number}} The inclusive bounds.
  */
-export const getSectionBounds = section => {
+export const getSectionBounds = (section: DateSection): { min: number, max: number } => {
   switch (section.type) {
     case 'day': {
       return { min: 1, max: 31 }
@@ -144,7 +154,7 @@ export const getSectionBounds = section => {
  * @param {string[] | null} [monthNames] Custom month names overriding the locale-derived ones.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-export const getSectionsFromFormat = (format, locale = 'default', monthNames = null) => {
+export const getSectionsFromFormat = (format: string, locale = 'default', monthNames: string[] | null = null): DateSection[] => {
   const sections = []
   let literal = ''
   let index = 0
@@ -179,7 +189,7 @@ export const getSectionsFromFormat = (format, locale = 'default', monthNames = n
   return sections
 }
 
-const PART_TOKENS = {
+const PART_TOKENS: Record<string, string> = {
   year: 'y',
   month: 'M',
   day: 'd',
@@ -194,7 +204,7 @@ const PART_TOKENS = {
  * @param {string} locale The locale used to resolve names.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-const getSectionsFromParts = (formatter, locale) => {
+const getSectionsFromParts = (formatter: Intl.DateTimeFormat, locale: string): DateSection[] => {
   const { hourCycle } = formatter.resolvedOptions()
   const hourChar = hourCycle === 'h11' || hourCycle === 'h12' ? 'h' : 'H'
   const sections = []
@@ -224,7 +234,7 @@ const getSectionsFromParts = (formatter, locale) => {
  * @param {string} locale The locale to use.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-export const getSectionsFromLocale = locale =>
+export const getSectionsFromLocale = (locale: string): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: '2-digit',
@@ -237,7 +247,7 @@ export const getSectionsFromLocale = locale =>
  * @param {boolean} [seconds] Whether to include a seconds section.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-export const getTimeSectionsFromLocale = (locale, seconds = false) =>
+export const getTimeSectionsFromLocale = (locale: string, seconds = false): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
     hour: '2-digit',
     minute: '2-digit',
@@ -250,7 +260,7 @@ export const getTimeSectionsFromLocale = (locale, seconds = false) =>
  * @param {boolean} [seconds] Whether to include a seconds section.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-export const getDateTimeSectionsFromLocale = (locale, seconds = false) =>
+export const getDateTimeSectionsFromLocale = (locale: string, seconds = false): DateSection[] =>
   getSectionsFromParts(new Intl.DateTimeFormat(locale, {
     year: 'numeric',
     month: '2-digit',
@@ -267,7 +277,7 @@ export const getDateTimeSectionsFromLocale = (locale, seconds = false) =>
  * @param {string[] | null} [monthNames] Custom month names for text month sections.
  * @returns {Array} The ordered list of section and literal descriptors.
  */
-export const getDateSections = (format, locale, monthNames = null) => {
+export const getDateSections = (format: string | ((locale: string) => DateSection[]) | null, locale: string, monthNames: string[] | null = null): DateSection[] => {
   if (typeof format === 'function') {
     return format(locale)
   }
@@ -288,8 +298,8 @@ export const getDateSections = (format, locale, monthNames = null) => {
  * @param {number} [max] The upper bound, e.g. the day count of the selected month.
  * @returns {{draft: string, value: number, completed: boolean}} The next draft, numeric value and whether the section is complete.
  */
-export const applyDigitToSection = (section, draft, digit, max = getSectionBounds(section).max) => {
-  const length = section.type === 'year' ? section.length : 2
+export const applyDigitToSection = (section: DateSection, draft: string, digit: string, max: number = getSectionBounds(section).max): { draft: string, value: number, completed: boolean } => {
+  const length = (section.type === 'year' ? section.length : 2) as number
   let next = `${draft || ''}${digit}`.slice(-length)
 
   if (Number.parseInt(next, 10) > max) {
@@ -316,7 +326,7 @@ export const applyDigitToSection = (section, draft, digit, max = getSectionBound
  * @param {string} letter The newly typed letter.
  * @returns {{draft: string, value: number, completed: boolean} | null} The next draft, section value and completion state, or null when nothing matches.
  */
-export const applyLetterToSection = (section, draft, letter) => {
+export const applyLetterToSection = (section: DateSection, draft: string, letter: string): any => {
   if (!section.names) {
     return null
   }
@@ -352,7 +362,7 @@ export const applyLetterToSection = (section, draft, letter) => {
  * @param {number} [max] The upper bound, e.g. the day count of the selected month.
  * @returns {number} The next section value.
  */
-export const getIncrementedSectionValue = (section, delta, max = getSectionBounds(section).max) => {
+export const getIncrementedSectionValue = (section: DateSection, delta: number, max: number = getSectionBounds(section).max): number => {
   const { min } = getSectionBounds(section)
 
   if (section.value === null) {
@@ -377,7 +387,7 @@ export const getIncrementedSectionValue = (section, delta, max = getSectionBound
  * @param {number} month The 1-based month.
  * @returns {number} The number of days.
  */
-export const getDaysInMonth = (year, month) => {
+export const getDaysInMonth = (year: number, month: number): number => {
   const date = new Date(2000, 0, 1)
   date.setFullYear(year, month, 0)
   return date.getDate()
@@ -391,7 +401,7 @@ export const getDaysInMonth = (year, month) => {
  * @param {Array} sections The section and literal descriptors.
  * @returns {number} The day count of the selected month.
  */
-export const getDaySectionMax = sections => {
+export const getDaySectionMax = (sections: DateSection[]): number => {
   let month = null
   let year = null
 
@@ -406,7 +416,7 @@ export const getDaySectionMax = sections => {
   }
 
   if (month === null) {
-    return getSectionBounds({ type: 'day' }).max
+    return getSectionBounds({ type: 'day' } as DateSection).max
   }
 
   return getDaysInMonth(year === null ? 2000 : year, month)
@@ -418,7 +428,7 @@ export const getDaySectionMax = sections => {
  * @param {object} section The year section descriptor.
  * @returns {number | null} The full year or null when empty.
  */
-export const getFullYearFromSection = section => {
+export const getFullYearFromSection = (section: DateSection): number | null => {
   if (section.value === null) {
     return null
   }
@@ -438,8 +448,8 @@ export const getFullYearFromSection = section => {
  * @param {Array} sections The section and literal descriptors.
  * @returns {Date | null} The date or null when incomplete.
  */
-export const getDateFromSections = sections => {
-  const values = {}
+export const getDateFromSections = (sections: DateSection[]): Date | null => {
+  const values: Record<string, any> = {}
   let hourCycle = null
 
   for (const section of sections) {
@@ -479,7 +489,7 @@ export const getDateFromSections = sections => {
  * @param {Date | null} date The date to read values from, or null to clear.
  * @returns {Array} The updated sections.
  */
-export const setSectionsFromDate = (sections, date) => sections.map(section => {
+export const setSectionsFromDate = (sections: DateSection[], date: Date | null): DateSection[] => sections.map(section => {
   if (section.type === 'literal') {
     return section
   }
@@ -527,7 +537,7 @@ export const setSectionsFromDate = (sections, date) => sections.map(section => {
  * @param {string} placeholder The placeholder to show when the section is empty.
  * @returns {string} The display string.
  */
-export const formatSectionValue = (section, placeholder = '') => {
+export const formatSectionValue = (section: DateSection, placeholder = ''): string => {
   if (section.value === null) {
     return placeholder
   }
@@ -538,7 +548,7 @@ export const formatSectionValue = (section, placeholder = '') => {
 
   const value = section.type === 'year' && section.length === 2 ? section.value % 100 : section.value
 
-  return section.padded === false ? String(value) : String(value).padStart(section.length, '0')
+  return section.padded === false ? String(value) : String(value).padStart(section.length as number, '0')
 }
 
 /**
@@ -546,7 +556,7 @@ export const formatSectionValue = (section, placeholder = '') => {
  * @param {Array} sections The section and literal descriptors.
  * @returns {string} The formatted string.
  */
-export const formatSections = sections =>
+export const formatSections = (sections: DateSection[]): string =>
   sections.map(section => (section.type === 'literal' ? section.value : formatSectionValue(section))).join('')
 
 /**
@@ -557,7 +567,7 @@ export const formatSections = sections =>
  * @param {Array} sections The section and literal descriptors.
  * @returns {Array | null} The filled sections or null.
  */
-export const getSectionsFromString = (text, sections) => {
+export const getSectionsFromString = (text: string, sections: DateSection[]): DateSection[] | null => {
   let normalizedText = text
 
   for (const section of sections) {
