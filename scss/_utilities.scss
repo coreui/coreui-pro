@@ -96,6 +96,9 @@ $utilities: map.merge(
     "focus-ring": (
       css-var: true,
       css-variable-name: focus-ring-color,
+      // Writes the global :root token, so it stays inheriting — see
+      // generate-utility-at-properties().
+      at-property: false,
       class: focus-ring,
       values: map-loop($theme-colors, translucent-css-var, "$prefix", "$key", "focus-ring")
     ),

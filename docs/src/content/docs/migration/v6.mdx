@@ -502,6 +502,39 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   instead of restating declarations, so state styling follows any control
   automatically.
 
+#### Opacity utilities no longer cascade to descendants
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The opacity utilities compose through custom properties — `.text-opacity-50` sets
+`--#{$prefix}text-opacity` and the colour utilities read it. Custom properties
+inherit, so the value leaked into every descendant. The colour utilities that
+restate their own opacity (`.text-primary` declares
+`--#{$prefix}text-opacity: 1`) were immune; the ones reading it through a
+`var(…, 1)` fallback were not.
+
+Reachable consequences in v5: `.bg-opacity-25` on a container faded every nested
+`.text-bg-*`, and `.link-opacity-50` faded every nested link — including bare
+`<a>` elements, which read `--#{$prefix}link-opacity` too.
+
+Five names are now registered with
+[`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) as
+`inherits: false`, so each utility is scoped to the element it is applied to:
+`--#{$prefix}text-opacity`, `--#{$prefix}bg-opacity`,
+`--#{$prefix}border-opacity`, `--#{$prefix}link-opacity`,
+`--#{$prefix}link-underline-opacity`. Upstream v6 does the same.
+
+- **If you relied on the leak** — one `.link-opacity-*` on a wrapper fading a
+  whole block of links — put the utility on each element, or set the custom
+  property yourself in your own CSS (a hand-written declaration still inherits;
+  only the registration changes how *utilities* behave).
+- `.focus-ring-*` is deliberately **not** registered: it writes
+  `--#{$prefix}focus-ring-color`, which is a global `:root` token, and components
+  read it without a fallback. A custom utility that writes a `:root` token name
+  must opt out the same way, with `at-property: false` in its `$utilities` entry.
+- Compiled output is otherwise byte-identical — the five `@property` blocks are
+  the whole diff.
+
 #### Sass file layout follows Bootstrap v6
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
