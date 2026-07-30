@@ -12,7 +12,8 @@ import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
+import type { ComponentConfig } from './util/config.js'
+import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
 import {
   defineJQueryPlugin,
   getNextActiveElement,
@@ -101,7 +102,7 @@ const CLASS_NAME_TAG = 'form-multi-select-tag'
 const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 
 const Default = {
-  allowList: DefaultAllowlist,
+  allowList: DefaultAllowlist as SanitizerAllowList,
   ariaCleanerLabel: 'Clear all selections',
   ariaIndicatorLabel: 'Toggle visibility of options menu',
   ariaSearchLabel: 'Search',
@@ -143,7 +144,7 @@ const Default = {
   value: null
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaCleanerLabel: 'string',
   ariaIndicatorLabel: 'string',
@@ -193,11 +194,29 @@ const DefaultType = {
  */
 
 class MultiSelect extends BaseComponent {
-  constructor(element, config) {
+  protected declare _uniqueId: any
+  protected declare _uniqueName: any
+  protected declare _indicatorElement: any
+  protected declare _selectAllElement: any
+  protected declare _dropdownHeaderElement: any
+  protected declare _headerElement: any
+  protected declare _selectionElement: any
+  protected declare _selectionCleanerElement: any
+  protected declare _searchElement: any
+  protected declare _togglerElement: any
+  protected declare _optionsElement: any
+  protected declare _wrapperElement: any
+  protected declare _menu: any
+  protected declare _selected: any
+  protected declare _options: any
+  protected declare _popper: any
+  protected declare _search: any
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._uniqueId = this._config.id || this._element.id || getUID(`${this.constructor.NAME}`)
-    this._uniqueName = this._config.name || this._element.name || this._uniqueId
+    this._uniqueName = this._config.name || (this._element as HTMLSelectElement).name || this._uniqueId
     this._configureNativeSelect()
     this._indicatorElement = null
     this._selectAllElement = null
@@ -227,24 +246,24 @@ class MultiSelect extends BaseComponent {
 
   // Getters
 
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  toggle() {
+  toggle(): void {
     return this._isShown() ? this.hide() : this.show()
   }
 
-  show() {
+  show(): void {
     if (this._config.disabled || this._isShown()) {
       return
     }
@@ -263,11 +282,11 @@ class MultiSelect extends BaseComponent {
     this._createPopper()
 
     if (this._config.search) {
-      SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement).focus()
+      SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)!.focus()
     }
   }
 
-  hide() {
+  hide(): void {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
     const refocusFromInside = this._wrapperElement.contains(document.activeElement) ||
@@ -299,7 +318,7 @@ class MultiSelect extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
-  dispose() {
+  override dispose(): void {
     if (this._popper) {
       this._popper.destroy()
     }
@@ -334,13 +353,13 @@ class MultiSelect extends BaseComponent {
     super.dispose()
   }
 
-  search(text) {
+  search(text: string): void {
     this._search = text.length > 0 ? text.toLowerCase() : text
     this._filterOptionsList()
     EventHandler.trigger(this._element, EVENT_SEARCH)
   }
 
-  update(config) {
+  update(config: any): void {
     if (config.value) {
       this.deselectAll()
     }
@@ -358,7 +377,7 @@ class MultiSelect extends BaseComponent {
     this._addEventListeners()
   }
 
-  selectAll(options = this._options) {
+  selectAll(options: any[] = this._options): void {
     const limitReached = this._selectAllOptions(options)
     this._refreshAfterSelectionChange()
 
@@ -367,12 +386,12 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  deselectAll(options = this._options) {
+  deselectAll(options: any[] = this._options): void {
     this._deselectAllOptions(options)
     this._refreshAfterSelectionChange()
   }
 
-  selectFiltered() {
+  selectFiltered(): void {
     const items = this._getDisplayedItems()
 
     let limitReached = false
@@ -384,7 +403,7 @@ class MultiSelect extends BaseComponent {
 
       const value = String(item.dataset.value)
       const option = this._findOptionByValue(value)
-      if (option && !this._selected.some(selected => selected.value === value)) {
+      if (option && !this._selected.some((selected: any) => selected.value === value)) {
         this._selectOption(value, option.text, { refresh: false })
       }
     }
@@ -396,12 +415,12 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  deselectFiltered() {
+  deselectFiltered(): void {
     const items = this._getDisplayedItems()
 
     for (const item of items) {
       const value = String(item.dataset.value)
-      if (this._selected.some(selected => selected.value === value)) {
+      if (this._selected.some((selected: any) => selected.value === value)) {
         this._deselectOption(value, { refresh: false })
       }
     }
@@ -409,14 +428,14 @@ class MultiSelect extends BaseComponent {
     this._refreshAfterSelectionChange()
   }
 
-  getValue() {
+  getValue(): any {
     return this._selected
   }
 
   // Private
 
-  _addEventListeners() {
-    EventHandler.on(this._selectionElement, EVENT_CLICK, SELECTOR_TAG_DELETE, event => {
+  _addEventListeners(): void {
+    EventHandler.on(this._selectionElement, EVENT_CLICK, SELECTOR_TAG_DELETE, (event: any) => {
       event.preventDefault()
       event.stopPropagation()
 
@@ -426,7 +445,7 @@ class MultiSelect extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, event => {
+    EventHandler.on(this._togglerElement, EVENT_CLICK, SELECTOR_CLEANER, (event: any) => {
       if (!this._config.disabled) {
         event.preventDefault()
         event.stopPropagation()
@@ -440,7 +459,7 @@ class MultiSelect extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._wrapperElement, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
         return
@@ -451,13 +470,13 @@ class MultiSelect extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._menu, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._menu, EVENT_KEYDOWN, (event: any) => {
       if (this._config.search === 'global' && (event.key.length === 1 || event.key === BACKSPACE_KEY || event.key === DELETE_KEY)) {
         this._searchElement.focus()
       }
     })
 
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, (event: any) => {
       if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
         event.preventDefault()
         this.show()
@@ -471,7 +490,7 @@ class MultiSelect extends BaseComponent {
     })
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
-    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (event.key === TAB_KEY || event.key === ESCAPE_KEY) {
         return
       }
@@ -499,7 +518,7 @@ class MultiSelect extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._indicatorElement, EVENT_CLICK, event => {
+    EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
       event.stopPropagation()
       this.toggle()
@@ -509,7 +528,7 @@ class MultiSelect extends BaseComponent {
       this._onSearchChange(this._searchElement)
     })
 
-    EventHandler.on(this._searchElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._searchElement, EVENT_KEYDOWN, (event: any) => {
       if ((!this._isShown() && event.key.length === 1 && !event.ctrlKey && !event.metaKey) || event.key === ARROW_DOWN_KEY) {
         this.show()
       }
@@ -527,7 +546,7 @@ class MultiSelect extends BaseComponent {
     })
 
     if (this._selectAllElement) {
-      EventHandler.on(this._selectAllElement, EVENT_CLICK, event => {
+      EventHandler.on(this._selectAllElement, EVENT_CLICK, (event: any) => {
         if (this._selectAllElement.disabled) {
           return
         }
@@ -541,7 +560,7 @@ class MultiSelect extends BaseComponent {
       // The select all button lives in the header, outside the options list, so it
       // needs its own arrow-key handler to join the navigation flow (Enter/Space
       // already toggle via the native button click above).
-      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN, event => {
+      EventHandler.on(this._selectAllElement, EVENT_KEYDOWN, (event: any) => {
         if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
           event.preventDefault()
           this._selectMenuItem(event)
@@ -554,13 +573,13 @@ class MultiSelect extends BaseComponent {
       })
     }
 
-    EventHandler.on(this._optionsElement, EVENT_CLICK, event => {
+    EventHandler.on(this._optionsElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
       event.stopPropagation()
       this._onOptionsClick(event.target)
     })
 
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._optionsElement, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
         // Space would otherwise scroll the options list.
         event.preventDefault()
@@ -579,7 +598,7 @@ class MultiSelect extends BaseComponent {
     })
   }
 
-  _getOptions() {
+  _getOptions(): any[] {
     if (this._config.options) {
       return this._getOptionsFromConfig()
     }
@@ -587,7 +606,7 @@ class MultiSelect extends BaseComponent {
     return this._getOptionsFromElement()
   }
 
-  _getOptionsFromConfig(options = this._config.options) {
+  _getOptionsFromConfig(options: any = this._config.options): any[] {
     const _options = []
     for (const option of options) {
       if (this._isOptionGroup(option)) {
@@ -633,9 +652,9 @@ class MultiSelect extends BaseComponent {
     return _options
   }
 
-  _getOptionsFromElement(node = this._element) {
-    const nodes = Array.from(node.childNodes).filter(element => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP')
-    const options = []
+  _getOptionsFromElement(node: any = this._element): any[] {
+    const nodes = Array.from(node.childNodes).filter((element: any) => element.nodeName === 'OPTION' || element.nodeName === 'OPTGROUP') as any[]
+    const options: any[] = []
 
     for (const node of nodes) {
       if (node.nodeName === 'OPTION' && node.value) {
@@ -672,24 +691,24 @@ class MultiSelect extends BaseComponent {
     return options
   }
 
-  _configureNativeSelect() {
+  _configureNativeSelect(): void {
     this._element.classList.add(CLASS_NAME_SELECT)
 
     // Set or clear so update() can flip these on or off.
     if (this._config.multiple) {
-      this._element.setAttribute('multiple', true)
+      this._element.setAttribute('multiple', true as any)
     } else {
       this._element.removeAttribute('multiple')
     }
 
     if (this._config.required) {
-      this._element.setAttribute('required', true)
+      this._element.setAttribute('required', true as any)
     } else {
       this._element.removeAttribute('required')
     }
   }
 
-  _createNativeOptions(parentElement, options) {
+  _createNativeOptions(parentElement: HTMLElement, options: any[]): void {
     for (const option of options) {
       if (this._isOptionGroup(option)) {
         const optgroup = document.createElement('optgroup')
@@ -697,7 +716,7 @@ class MultiSelect extends BaseComponent {
         this._createNativeOptions(optgroup, option.options)
         parentElement.append(optgroup)
       } else {
-        const opt = document.createElement('OPTION')
+        const opt = document.createElement('OPTION') as HTMLOptionElement
         opt.value = option.value
 
         if (option.disabled === true) {
@@ -714,11 +733,11 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _hideNativeSelect() {
-    this._element.tabIndex = '-1'
+  _hideNativeSelect(): void {
+    this._element.tabIndex = '-1' as any
   }
 
-  _createSelect() {
+  _createSelect(): void {
     const wrapper = document.createElement('div')
     wrapper.classList.add(CLASS_NAME_SELECT)
     wrapper.classList.toggle('is-invalid', this._config.invalid)
@@ -735,7 +754,7 @@ class MultiSelect extends BaseComponent {
     this._wrapperElement = wrapper
     // The wrapper takes the native select's place, then the select moves inside it
     // as an invisible overlay so native `required` validation anchors over the control.
-    this._element.parentNode.insertBefore(wrapper, this._element)
+    this._element.parentNode!.insertBefore(wrapper, this._element)
     wrapper.prepend(this._element)
     this._createSelection()
     this._createButtons()
@@ -753,7 +772,7 @@ class MultiSelect extends BaseComponent {
     this._selectInitialOptions()
   }
 
-  _createSelection() {
+  _createSelection(): void {
     const togglerEl = document.createElement('div')
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     togglerEl.setAttribute('role', 'combobox')
@@ -785,7 +804,7 @@ class MultiSelect extends BaseComponent {
     this._selectionElement = selectionEl
   }
 
-  _createButtons() {
+  _createButtons(): void {
     const buttons = document.createElement('div')
     buttons.classList.add(CLASS_NAME_BUTTONS)
 
@@ -805,7 +824,7 @@ class MultiSelect extends BaseComponent {
     this._updateSelectionCleaner()
   }
 
-  _createSelectionCleaner() {
+  _createSelectionCleaner(): HTMLElement {
     const cleaner = document.createElement('button')
     cleaner.type = 'button'
     cleaner.classList.add(CLASS_NAME_CLEANER)
@@ -814,7 +833,7 @@ class MultiSelect extends BaseComponent {
     return cleaner
   }
 
-  _createPopper() {
+  _createPopper(): void {
     if (typeof Popper === 'undefined') {
       throw new TypeError('CoreUI\'s multi select require Popper (https://popper.js.org)')
     }
@@ -835,10 +854,10 @@ class MultiSelect extends BaseComponent {
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
     }
 
-    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
+    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig as Partial<Popper.Options>)
   }
 
-  _createSearchInput() {
+  _createSearchInput(): void {
     const input = document.createElement('input')
     input.classList.add(CLASS_NAME_SEARCH)
 
@@ -858,7 +877,7 @@ class MultiSelect extends BaseComponent {
     this._selectionElement.append(input)
   }
 
-  _createOptionsContainer() {
+  _createOptionsContainer(): void {
     const dropdownDiv = document.createElement('div')
     dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
 
@@ -875,7 +894,7 @@ class MultiSelect extends BaseComponent {
 
         // Keep interactions with custom controls from closing the dropdown,
         // mirroring the built-in button's stopPropagation behavior.
-        EventHandler.on(headerContent, EVENT_CLICK, event => {
+        EventHandler.on(headerContent, EVENT_CLICK, (event: any) => {
           event.stopPropagation()
         })
 
@@ -928,7 +947,7 @@ class MultiSelect extends BaseComponent {
     this._updateMasterCheckbox()
   }
 
-  _createOptions(parentElement, options) {
+  _createOptions(parentElement: HTMLElement, options: any[]): void {
     for (const option of options) {
       if (!this._isOptionGroup(option)) {
         const optionDiv = document.createElement('div')
@@ -984,7 +1003,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _createTag(value, text, disabled) {
+  _createTag(value: any, text: string, disabled: boolean): HTMLElement {
     const tag = document.createElement('div')
     tag.classList.add(CLASS_NAME_TAG)
     tag.dataset.value = value
@@ -1002,7 +1021,7 @@ class MultiSelect extends BaseComponent {
     return tag
   }
 
-  _updateTags(selection, search) {
+  _updateTags(selection: HTMLElement, search: HTMLElement | null): void {
     const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
     if (placeholder) {
       placeholder.remove()
@@ -1014,7 +1033,7 @@ class MultiSelect extends BaseComponent {
       existingTags.set(tag.dataset.value, tag)
     }
 
-    const selectedValues = new Set(this._selected.map(option => String(option.value)))
+    const selectedValues = new Set(this._selected.map((option: any) => String(option.value)))
 
     for (const [value, tag] of existingTags) {
       if (!selectedValues.has(value)) {
@@ -1035,7 +1054,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _onOptionsClick(element) {
+  _onOptionsClick(element: any): void {
     if (this._config.optionsGroupsSelectable) {
       const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
       if (groupLabel) {
@@ -1080,7 +1099,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _findOptionByValue(value, options = this._options) {
+  _findOptionByValue(value: any, options: any[] = this._options): any {
     for (const option of options) {
       if (String(option.value) === value) {
         return option
@@ -1097,7 +1116,7 @@ class MultiSelect extends BaseComponent {
     return null
   }
 
-  _selectAllOptions(options) {
+  _selectAllOptions(options: any[]): boolean {
     for (const option of options) {
       if (option.disabled) {
         continue
@@ -1121,7 +1140,7 @@ class MultiSelect extends BaseComponent {
     return false
   }
 
-  _deselectAllOptions(options) {
+  _deselectAllOptions(options: any[]): void {
     for (const option of options) {
       if (option.disabled) {
         continue
@@ -1136,35 +1155,35 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _getNativeOption(value) {
+  _getNativeOption(value: any): any {
     return SelectorEngine.findOne(`option[value="${CSS.escape(value)}"]`, this._element)
   }
 
-  _getOptionElement(value) {
+  _getOptionElement(value: any): any {
     return SelectorEngine.findOne(`[data-value="${CSS.escape(value)}"]`, this._optionsElement)
   }
 
-  _getDisplayedItems() {
+  _getDisplayedItems(): any[] {
     return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
       .filter(element => this._isOptionDisplayed(element))
   }
 
-  _maybeSanitize(content) {
+  _maybeSanitize(content: string): string {
     return this._config.sanitize ?
       sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
       content
   }
 
-  _isOptionGroup(option) {
+  _isOptionGroup(option: any): boolean {
     return Array.isArray(option.options)
   }
 
-  _selectOption(value, text, { refresh = true } = {}) {
+  _selectOption(value: any, text: string, { refresh = true }: { refresh?: boolean } = {}): void {
     if (!this._config.multiple) {
       this.deselectAll()
     }
 
-    const isSelected = this._selected.some(option => option.value === String(value))
+    const isSelected = this._selected.some((option: any) => option.value === String(value))
 
     if (!isSelected && this._isSelectionLimitReached()) {
       this._triggerSelectionLimit()
@@ -1202,8 +1221,8 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _deselectOption(value, { refresh = true } = {}) {
-    this._selected = this._selected.filter(option => option.value !== String(value))
+  _deselectOption(value: any, { refresh = true }: { refresh?: boolean } = {}): void {
+    this._selected = this._selected.filter((option: any) => option.value !== String(value))
 
     const nativeOption = this._getNativeOption(value)
     if (nativeOption) {
@@ -1225,16 +1244,16 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _deselectLastOption() {
+  _deselectLastOption(): void {
     if (this._selected.length > 0) {
-      const last = this._selected.findLast(option => option.disabled !== true)
+      const last = this._selected.findLast((option: any) => option.disabled !== true)
       if (last) {
         this._deselectOption(last.value)
       }
     }
   }
 
-  _refreshAfterSelectionChange() {
+  _refreshAfterSelectionChange(): void {
     this._updateSelection()
     this._updateSelectionCleaner()
     this._updateSearch()
@@ -1244,7 +1263,7 @@ class MultiSelect extends BaseComponent {
     this._updateMasterCheckbox()
   }
 
-  _toggleGroup(optgroupEl) {
+  _toggleGroup(optgroupEl: HTMLElement): void {
     if (!optgroupEl) {
       return
     }
@@ -1279,7 +1298,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _selectInitialOptions() {
+  _selectInitialOptions(): void {
     // `_selected` is already fully populated by `_getOptions()` before this runs,
     // so iterate it directly (no tree walk) and batch the DOM refresh into one call.
     for (const option of this._selected) {
@@ -1289,8 +1308,8 @@ class MultiSelect extends BaseComponent {
     this._refreshAfterSelectionChange()
   }
 
-  _updateSelection() {
-    const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement)
+  _updateSelection(): void {
+    const selection = SelectorEngine.findOne(SELECTOR_SELECTION, this._wrapperElement)!
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)
 
     if (this._selected.length === 0 && !this._config.search) {
@@ -1333,13 +1352,13 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateSelectionCleaner() {
+  _updateSelectionCleaner(): void {
     if (!this._config.cleaner || this._config.disabled) {
       return
     }
 
     if (this._selected.length > 0 && this._selectionCleanerElement === null) {
-      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._wrapperElement)
+      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._wrapperElement)!
       const selectionCleaner = this._createSelectionCleaner()
 
       buttons.insertBefore(selectionCleaner, this._indicatorElement)
@@ -1353,7 +1372,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateSearch() {
+  _updateSearch(): void {
     if (!this._config.search) {
       return
     }
@@ -1387,7 +1406,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateSearchSize(size = 2) {
+  _updateSearchSize(size = 2): void {
     if (!this._searchElement || !this._config.multiple) {
       return
     }
@@ -1402,7 +1421,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateHeader() {
+  _updateHeader(): void {
     if (this._headerElement) {
       this._renderHeader()
       return
@@ -1415,7 +1434,7 @@ class MultiSelect extends BaseComponent {
     this._selectAllElement.textContent = this._getSelectAllLabel()
   }
 
-  _getSelectAllLabel() {
+  _getSelectAllLabel(): string {
     const allSelected = this._isAllSelected()
 
     if (this._isFilteredScopeNarrowed()) {
@@ -1425,20 +1444,20 @@ class MultiSelect extends BaseComponent {
     return allSelected ? this._config.deselectAllLabel : this._config.selectAllLabel
   }
 
-  _isAllSelected() {
+  _isAllSelected(): boolean {
     const { selected, total } = this._getSelectAllScope()
     const target = this._getSelectableTarget(total)
     return target > 0 && selected >= target
   }
 
-  _getSelectAllScope() {
+  _getSelectAllScope(): any {
     const { selected, total, filtered, filteredSelected } = this._getSelectionState()
     return this._config.selectAllMode === 'filtered' ?
       { selected: filteredSelected, total: filtered } :
       { selected, total }
   }
 
-  _isFilteredScopeNarrowed() {
+  _isFilteredScopeNarrowed(): boolean {
     if (this._config.selectAllMode !== 'filtered') {
       return false
     }
@@ -1447,7 +1466,7 @@ class MultiSelect extends BaseComponent {
     return filtered < total
   }
 
-  _toggleSelectAll() {
+  _toggleSelectAll(): void {
     const filteredMode = this._config.selectAllMode === 'filtered'
 
     if (this._isAllSelected()) {
@@ -1467,11 +1486,11 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _getSelectableTarget(total) {
+  _getSelectableTarget(total: any): any {
     return this._hasSelectionLimit() ? Math.min(total, this._config.selectionLimit) : total
   }
 
-  _getCheckboxState(selected, total) {
+  _getCheckboxState(selected: number, total: number): string {
     if (total > 0 && selected >= total) {
       return 'all'
     }
@@ -1479,12 +1498,12 @@ class MultiSelect extends BaseComponent {
     return selected === 0 ? 'none' : 'indeterminate'
   }
 
-  _applyCheckboxState(element, state) {
+  _applyCheckboxState(element: any, state: string): void {
     element.classList.toggle(CLASS_NAME_SELECTED, state === 'all')
     element.classList.toggle(CLASS_NAME_INDETERMINATE, state === 'indeterminate')
   }
 
-  _updateGroupsState() {
+  _updateGroupsState(): void {
     if (!this._config.optionsGroupsSelectable) {
       return
     }
@@ -1502,7 +1521,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _updateMasterCheckbox() {
+  _updateMasterCheckbox(): void {
     if (this._config.selectAllStyle !== 'checkbox' || !this._selectAllElement) {
       return
     }
@@ -1511,7 +1530,7 @@ class MultiSelect extends BaseComponent {
     this._applyCheckboxState(this._selectAllElement, this._getCheckboxState(selected, this._getSelectableTarget(total)))
   }
 
-  _renderHeader() {
+  _renderHeader(): void {
     if (!this._headerElement || typeof this._config.headerTemplate !== 'function') {
       return
     }
@@ -1525,7 +1544,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _getSelectionState() {
+  _getSelectionState(): any {
     const allItems = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
     const filteredItems = allItems.filter(element => this._isOptionDisplayed(element))
 
@@ -1537,7 +1556,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _getSelectionActions() {
+  _getSelectionActions(): any {
     return {
       selectAll: () => this.selectAll(),
       deselectAll: () => this.deselectAll(),
@@ -1546,7 +1565,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _onSearchChange(element) {
+  _onSearchChange(element: any): void {
     if (element) {
       this.search(element.value)
 
@@ -1556,30 +1575,30 @@ class MultiSelect extends BaseComponent {
 
   // Checks only `display` (unlike the imported `isVisible`) so it still works while
   // the menu is closed, e.g. when called from the constructor.
-  _isOptionDisplayed(element) {
+  _isOptionDisplayed(element: any): boolean {
     const style = window.getComputedStyle(element)
     return (style.display !== 'none')
   }
 
-  _isShown() {
+  _isShown(): boolean {
     return this._wrapperElement.classList.contains(CLASS_NAME_SHOW)
   }
 
-  _hasSelectionLimit() {
+  _hasSelectionLimit(): boolean {
     return this._config.multiple && this._config.selectionLimit !== null
   }
 
-  _isSelectionLimitReached() {
+  _isSelectionLimitReached(): boolean {
     return this._hasSelectionLimit() && this._selected.length >= this._config.selectionLimit
   }
 
-  _triggerSelectionLimit() {
+  _triggerSelectionLimit(): void {
     EventHandler.trigger(this._element, EVENT_SELECTION_LIMIT, {
       selectionLimit: this._config.selectionLimit
     })
   }
 
-  _filterOptionsList() {
+  _filterOptionsList(): void {
     const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
     let visibleOptions = 0
 
@@ -1592,10 +1611,10 @@ class MultiSelect extends BaseComponent {
         visibleOptions++
       }
 
-      const optgroup = option.closest(SELECTOR_OPTGROUP)
+      const optgroup = option.closest(SELECTOR_OPTGROUP) as HTMLElement
       if (optgroup) {
         // eslint-disable-next-line  unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter(element => this._isOptionDisplayed(element)).length > 0) {
+        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter((element: HTMLElement) => this._isOptionDisplayed(element)).length > 0) {
           optgroup.style.removeProperty('display')
         } else {
           optgroup.style.display = 'none'
@@ -1623,11 +1642,11 @@ class MultiSelect extends BaseComponent {
       placeholder.setAttribute('role', 'status')
       placeholder.textContent = this._config.searchNoResultsLabel
 
-      SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu).append(placeholder)
+      SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu)!.append(placeholder)
     }
   }
 
-  _updateSelectAllVisibility(visibleOptions) {
+  _updateSelectAllVisibility(visibleOptions: number): void {
     if (!this._dropdownHeaderElement || !this._selectAllElement) {
       return
     }
@@ -1639,7 +1658,7 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _selectMenuItem({ key, target }) {
+  _selectMenuItem({ key, target }: any): void {
     const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
@@ -1651,7 +1670,7 @@ class MultiSelect extends BaseComponent {
     getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
   }
 
-  _selectFirstOrLastMenuItem(first) {
+  _selectFirstOrLastMenuItem(first: boolean): void {
     const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
@@ -1662,7 +1681,7 @@ class MultiSelect extends BaseComponent {
     item.focus()
   }
 
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: any): any {
     if (config.container === true) {
       config.container = document.body
     }
@@ -1684,8 +1703,8 @@ class MultiSelect extends BaseComponent {
 
   // Static
 
-  static multiSelectInterface(element, config) {
-    const data = MultiSelect.getOrCreateInstance(element, config)
+  static multiSelectInterface(element: string | Element | null, config?: any): void {
+    const data: any = MultiSelect.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {
@@ -1696,13 +1715,13 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
       MultiSelect.multiSelectInterface(this, config)
     })
   }
 
-  static clearMenus(event) {
+  static clearMenus(event: any): void {
     if (event && (event.button === RIGHT_MOUSE_BUTTON ||
       (event.type === 'keyup' && event.key !== TAB_KEY))) {
       return
@@ -1712,7 +1731,7 @@ class MultiSelect extends BaseComponent {
 
     for (let i = 0, len = selects.length; i < len; i++) {
       const context = Data.get(selects[i], DATA_KEY)
-      const relatedTarget = {
+      const relatedTarget: any = {
         relatedTarget: selects[i]
       }
 
