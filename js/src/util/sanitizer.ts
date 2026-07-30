@@ -1,17 +1,19 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI util/sanitizer.js
+ * CoreUI util/sanitizer.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This is a modified version of the Bootstrap's util/sanitizer.js
+ * This is a modified version of the Bootstrap's util/sanitizer.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
+type SanitizerAllowList = Record<string, Array<string | RegExp>>
+
 // js-docs-start allow-list
 const ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i
 
-export const DefaultAllowlist = {
+export const DefaultAllowlist: SanitizerAllowList = {
   // Global attributes allowed on any supplied element below.
   '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
   a: ['target', 'href', 'title', 'rel'],
@@ -50,7 +52,7 @@ export const DefaultAllowlist = {
 // js-docs-end allow-list
 
 // js-docs-start svg-allow-list
-export const SVGAllowlist = {
+export const SVGAllowlist: SanitizerAllowList = {
   ...DefaultAllowlist,
   svg: ['xmlns', 'version', 'baseprofile', 'width', 'height', 'viewbox', 'preserveaspectratio', 'aria-hidden', 'role', 'focusable', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
   g: ['id', 'class', 'transform', 'style'],
@@ -78,7 +80,7 @@ export const SVGAllowlist = {
 }
 // js-docs-end svg-allow-list
 
-const ESCAPE_HTML_MAP = {
+const ESCAPE_HTML_MAP: Record<string, string> = {
   '&': '&amp;',
   '<': '&lt;',
   '>': '&gt;',
@@ -86,7 +88,7 @@ const ESCAPE_HTML_MAP = {
   "'": '&#x27;'
 }
 
-export function escapeHtml(unsafeText) {
+export function escapeHtml(unsafeText: string): string {
   return String(unsafeText).replace(/[&<>"']/g, character => ESCAPE_HTML_MAP[character])
 }
 
@@ -109,12 +111,12 @@ const uriAttributes = new Set([
  */
 const SAFE_URL_PATTERN = /^(?!javascript:)(?:[a-z0-9+.-]+:|[^&:/?#]*(?:[/?#]|$))/i
 
-const allowedAttribute = (attribute, allowedAttributeList) => {
+const allowedAttribute = (attribute: Attr, allowedAttributeList: Array<string | RegExp>): boolean => {
   const attributeName = attribute.nodeName.toLowerCase()
 
   if (allowedAttributeList.includes(attributeName)) {
     if (uriAttributes.has(attributeName)) {
-      return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue))
+      return Boolean(SAFE_URL_PATTERN.test(attribute.nodeValue!))
     }
 
     return true
@@ -125,7 +127,7 @@ const allowedAttribute = (attribute, allowedAttributeList) => {
     .some(regex => regex.test(attributeName))
 }
 
-export function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
+export function sanitizeHtml(unsafeHtml: string, allowList: SanitizerAllowList, sanitizeFunction?: ((unsafeHtml: string) => string) | null): string {
   if (!unsafeHtml.length) {
     return unsafeHtml
   }
@@ -136,7 +138,7 @@ export function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
 
   const domParser = new window.DOMParser()
   const createdDocument = domParser.parseFromString(unsafeHtml, 'text/html')
-  const elements = [].concat(...createdDocument.body.querySelectorAll('*'))
+  const elements = ([] as Element[]).concat(...createdDocument.body.querySelectorAll('*'))
 
   for (const element of elements) {
     const elementName = element.nodeName.toLowerCase()
@@ -147,8 +149,8 @@ export function sanitizeHtml(unsafeHtml, allowList, sanitizeFunction) {
       continue
     }
 
-    const attributeList = [].concat(...element.attributes)
-    const allowedAttributes = [].concat(allowList['*'] || [], allowList[elementName] || [])
+    const attributeList = ([] as Attr[]).concat(...element.attributes)
+    const allowedAttributes = ([] as Array<string | RegExp>).concat(allowList['*'] || [], allowList[elementName] || [])
 
     for (const attribute of attributeList) {
       if (!allowedAttribute(attribute, allowedAttributes)) {
