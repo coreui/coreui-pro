@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI dom/data.js
+ * CoreUI dom/data.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
  * This is a modified version of the Bootstrap's dom/data.js
@@ -12,15 +12,15 @@
  * Constants
  */
 
-const elementMap = new Map()
+const elementMap = new Map<Element, Map<string, unknown>>()
 
 export default {
-  set(element, key, instance) {
+  set(element: Element, key: string, instance: unknown): void {
     if (!elementMap.has(element)) {
       elementMap.set(element, new Map())
     }
 
-    const instanceMap = elementMap.get(element)
+    const instanceMap = elementMap.get(element)!
 
     // make it clear we only want one instance per element
     // can be removed later when multiple key/instances are fine to be used
@@ -33,20 +33,20 @@ export default {
     instanceMap.set(key, instance)
   },
 
-  get(element, key) {
+  get(element: Element, key: string): any {
     if (elementMap.has(element)) {
-      return elementMap.get(element).get(key) || null
+      return elementMap.get(element)!.get(key) || null
     }
 
     return null
   },
 
-  remove(element, key) {
+  remove(element: Element, key: string): void {
     if (!elementMap.has(element)) {
       return
     }
 
-    const instanceMap = elementMap.get(element)
+    const instanceMap = elementMap.get(element)!
 
     instanceMap.delete(key)
 

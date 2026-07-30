@@ -5,6 +5,7 @@ import { babel } from '@rollup/plugin-babel'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 import banner from './banner.mjs'
+import tsResolve from './rollup-plugin-ts-resolve.cjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -15,9 +16,14 @@ const ESM = process.env.ESM === 'true'
 let destinationFile = BOOTSTRAP ? `bootstrap${ESM ? '.esm' : ''}` : `coreui${ESM ? '.esm' : ''}`
 const external = ['@floating-ui/dom', '@popperjs/core']
 const plugins = [
+  // Must run before the others: maps the `.js` specifiers our TS sources use
+  // onto the `.ts` files on disk
+  tsResolve(),
   babel({
     // Only transpile our source code
     exclude: 'node_modules/**',
+    // Transpile the TypeScript sources too
+    extensions: ['.js', '.mjs', '.ts'],
     // Include the helpers in the bundle, at most one copy of each
     babelHelpers: 'bundled'
   }),
