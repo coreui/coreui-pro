@@ -161,3 +161,5 @@ export function sanitizeHtml(unsafeHtml: string, allowList: SanitizerAllowList, 
 
   return createdDocument.body.innerHTML
 }
+
+export type { SanitizerAllowList }
