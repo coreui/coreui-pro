@@ -72,7 +72,7 @@
     "watch": "npm-run-all --parallel watch-*",
     "watch-css-main": "nodemon --watch scss/ --ext scss --exec \"npm-run-all css-lint css-compile css-prefix\"",
     "watch-css-test": "nodemon --watch scss/ --ext scss,js --exec \"npm run css-test\"",
-    "watch-js-main": "nodemon --watch js/src/ --ext js --exec \"npm-run-all js-lint js-compile\""
+    "watch-js-main": "nodemon --watch js/src/ --ext ts --exec \"npm-run-all js-lint js-compile\""
   },
   "style": "dist/css/coreui.css",
   "sass": "scss/coreui.scss",
