@@ -104,6 +104,12 @@
                 } @else {
                   @include ltr-rtl($property, $value, null, null, if(sass($enable-important-utilities): !important));
                 }
+              } @else if meta.type-of($value) == "map" {
+                // A property map: each property takes its own key from the value,
+                // so one class can set several related properties at once
+                // (.text-lg sets both font-size and line-height).
+                // stylelint-disable-next-line scss/at-function-named-arguments
+                #{$property}: map.get($value, $property) if(sass($enable-important-utilities): !important);
               } @else {
                 // stylelint-disable-next-line scss/at-function-named-arguments
                 #{$property}: $value if(sass($enable-important-utilities): !important);

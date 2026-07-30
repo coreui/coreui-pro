@@ -107,32 +107,32 @@ $th-font-weight:       null !default;
 
   h1 {
     @extend %heading;
-    font-size: $h1-font-size;
+    font-size: var(--#{$prefix}font-size-4xl);
   }
 
   h2 {
     @extend %heading;
-    font-size: $h2-font-size;
+    font-size: var(--#{$prefix}font-size-3xl);
   }
 
   h3 {
     @extend %heading;
-    font-size: $h3-font-size;
+    font-size: var(--#{$prefix}font-size-2xl);
   }
 
   h4 {
     @extend %heading;
-    font-size: $h4-font-size;
+    font-size: var(--#{$prefix}font-size-xl);
   }
 
   h5 {
     @extend %heading;
-    font-size: $h5-font-size;
+    font-size: var(--#{$prefix}font-size-lg);
   }
 
   h6 {
     @extend %heading;
-    font-size: $h6-font-size;
+    font-size: var(--#{$prefix}font-size-md);
   }
 
 

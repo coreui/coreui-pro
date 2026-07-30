@@ -7,6 +7,7 @@
 @use "functions/color-translucent" as *;
 @use "functions/math" as *;
 @use "functions/to-rgb" as *;
+@use "sass:map";
 @use "sass:math";
 
 // Prefix for :root CSS variables
@@ -678,17 +679,6 @@ $h5-font-size:                $font-size-base * 1.25 !default;
 $h6-font-size:                $font-size-base !default;
 // scss-docs-end font-variables
 
-// scss-docs-start font-sizes
-$font-sizes: (
-  1: $h1-font-size,
-  2: $h2-font-size,
-  3: $h3-font-size,
-  4: $h4-font-size,
-  5: $h5-font-size,
-  6: $h6-font-size
-) !default;
-// scss-docs-end font-sizes
-
 // scss-docs-start headings-variables
 $headings-margin-bottom:      $spacer * .5 !default;
 $headings-font-family:        null !default;
@@ -697,6 +687,42 @@ $headings-font-weight:        500 !default;
 $headings-line-height:        1.2 !default;
 $headings-color:              inherit !default;
 // scss-docs-end headings-variables
+
+// The type scale
+//
+// One named scale carries every font size the library renders, each stop with
+// the line height that belongs to it. Headings pick a stop rather than owning a
+// size, and `:root` gets a --#{$prefix}font-size-* / --#{$prefix}line-height-*
+// token per stop, so a stop can be restyled at runtime.
+//
+// The stop names follow upstream. The values are ours — the same sizes v5
+// rendered, so nothing moves on screen.
+
+// scss-docs-start font-sizes
+$font-sizes: (
+  "xs":  ("font-size": $font-size-base * .75, "line-height": $line-height-base),
+  "sm":  ("font-size": $font-size-sm,         "line-height": $line-height-base),
+  "md":  ("font-size": $h6-font-size,         "line-height": $line-height-base),
+  "lg":  ("font-size": $h5-font-size,         "line-height": $headings-line-height),
+  "xl":  ("font-size": $h4-font-size,         "line-height": $headings-line-height),
+  "2xl": ("font-size": $h3-font-size,         "line-height": $headings-line-height),
+  "3xl": ("font-size": $h2-font-size,         "line-height": $headings-line-height),
+  "4xl": ("font-size": $h1-font-size,         "line-height": $headings-line-height)
+) !default;
+// scss-docs-end font-sizes
+
+// scss-docs-start font-sizes-legacy
+// The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They
+// read the named scale, so overriding a stop moves both.
+$font-sizes-legacy: (
+  1: map.get($font-sizes, "4xl", "font-size"),
+  2: map.get($font-sizes, "3xl", "font-size"),
+  3: map.get($font-sizes, "2xl", "font-size"),
+  4: map.get($font-sizes, "xl", "font-size"),
+  5: map.get($font-sizes, "lg", "font-size"),
+  6: map.get($font-sizes, "md", "font-size")
+) !default;
+// scss-docs-end font-sizes-legacy
 
 // scss-docs-start display-headings
 $display-font-sizes: (

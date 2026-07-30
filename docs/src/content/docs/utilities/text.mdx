@@ -67,7 +67,32 @@ Quickly change the `font-size` of text. While our heading classes (e.g., `.h1`â€
   <p class="fs-5">.fs-5 text</p>
   <p class="fs-6">.fs-6 text</p>`} />
 
-Customize your available `font-size`s by modifying the `$font-sizes` Sass map.
+The same sizes are also available under named stops, which read better than a
+number once a scale has more than a handful of steps:
+
+<Example code={`<p class="fs-4xl">.fs-4xl text</p>
+  <p class="fs-2xl">.fs-2xl text</p>
+  <p class="fs-lg">.fs-lg text</p>
+  <p class="fs-xs">.fs-xs text</p>`} />
+
+`.fs-1` â€¦ `.fs-6` and the named stops are the same sizes: `.fs-1` is `.fs-4xl`,
+`.fs-2` is `.fs-3xl`, and so on down to `.fs-6`, which is `.fs-md`.
+
+### Font size with line height
+
+`.text-*` sets the `font-size` **and** the `line-height` that belongs to it, so a
+heading-sized stop comes with heading leading rather than body leading:
+
+<Example code={`<p class="text-3xl">.text-3xl text</p>
+  <p class="text-lg">.text-lg text</p>
+  <p class="text-sm">.text-sm text</p>`} />
+
+Customize the scale by modifying the `$font-sizes` Sass map. Each stop carries
+both values, and `:root` gets a `--#{$prefix}font-size-*` and
+`--#{$prefix}line-height-*` token per stop, so a stop can also be restyled at
+runtime:
+
+<ScssDocs file="scss/_root.scss" capture="root-font-size-loop" />
 
 ## Font weight and italics
 

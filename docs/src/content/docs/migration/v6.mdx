@@ -537,6 +537,39 @@ classes* — `.modal`, `.offcanvas`, `.dropdown`, `.dropdown-menu` and
 Bootstrap app, so `_modal.scss`, `_offcanvas.scss` and `_dropdown.scss` keep their
 names and their classes here.
 
+#### The type scale is one named map
+
+One scale now carries every font size the library renders, each stop with the
+line height that belongs to it — upstream's mechanic, with our values, so
+**nothing moves on screen**:
+
+```scss
+$font-sizes: (
+  "xs":  ("font-size": .75rem,        "line-height": 1.5),
+  ...
+  "4xl": ("font-size": $h1-font-size, "line-height": 1.2)
+);
+```
+
+- **`$font-sizes` changed shape** — it was `(1: $h1-font-size, … 6: $h6-font-size)`
+  and is now keyed `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, with a nested
+  map per stop.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  If you overrode `$font-sizes`, move your values into the new shape. The numeric
+  keys live on in `$font-sizes-legacy`, which is derived from the named scale.
+- **`:root` gets `--#{$prefix}font-size-*` and `--#{$prefix}line-height-*` per
+  stop**, and `h1`–`h6` read the tokens instead of the Sass variables. Restyling a
+  stop at runtime now moves every heading and utility that uses it.
+  `$h1-font-size` … `$h6-font-size` are unchanged and still feed the scale.
+- **New: `.fs-{stop}`** alongside `.fs-1` … `.fs-6`, which keep working and render
+  identically — `.fs-1` is `.fs-4xl`, down to `.fs-6`, which is `.fs-md`.
+- **New: `.text-{stop}`**, which sets `font-size` and `line-height` together.
+
+**We did not follow upstream's classes here.** Bootstrap v6 deletes `.fs-1` …
+`.fs-6`, every `.display-*` and `.lead`, and retunes the sizes — h1–h3 grow up to
+10px on small screens while h4–h6 shrink at every width. Those classes stay, at
+their current sizes.
+
 ### Sass & CSS
 
 - The v2 picker shell styling is a lean partial (`_date-picker-v2.scss`,

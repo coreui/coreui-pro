@@ -43,6 +43,18 @@
   @return $result;
 }
 
+// Pull one sub-key out of every entry of a nested map.
+// map-get-nested(("lg": ("font-size": 1.25rem, ...)), "font-size") => ("lg": 1.25rem, ...)
+@function map-get-nested($map, $key) {
+  $result: ();
+  @each $name, $values in $map {
+    @if meta.type-of($values) == "map" and map.has-key($values, $key) {
+      $result: map.merge($result, ($name: map.get($values, $key)));
+    }
+  }
+  @return $result;
+}
+
 // Get multiple keys from a sass map
 @function map-get-multiple($map, $values) {
   $result: ();

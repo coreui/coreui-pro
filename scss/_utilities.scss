@@ -560,6 +560,12 @@ $utilities: map.merge(
     "font-size": (
       property: font-size,
       class: fs,
+      // The named stops, plus the numeric keys v5 shipped.
+      values: map.merge($font-sizes-legacy, map-get-nested($font-sizes, "font-size"))
+    ),
+    "text-size": (
+      property: (font-size, line-height),
+      class: text,
       values: $font-sizes
     ),
     "font-style": (

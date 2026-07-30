@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "sass:meta";
 @use "functions/color" as *;
 @use "functions/color-scheme" as *;
@@ -68,6 +69,15 @@
 
     // Note: Use `meta.inspect` for lists so that quoted items keep the quotes.
     // See https://github.com/sass/sass/issues/2383#issuecomment-336349172
+    // scss-docs-start root-font-size-loop
+    // One token pair per stop of the type scale, so a stop can be restyled at
+    // runtime and every heading and .text-* utility follows.
+    @each $name, $props in $font-sizes {
+      --#{$prefix}font-size-#{$name}: #{map.get($props, "font-size")};
+      --#{$prefix}line-height-#{$name}: #{map.get($props, "line-height")};
+    }
+    // scss-docs-end root-font-size-loop
+
     --#{$prefix}font-sans-serif: #{meta.inspect($font-family-sans-serif)};
     --#{$prefix}font-monospace: #{meta.inspect($font-family-monospace)};
     --#{$prefix}gradient: #{$gradient};
