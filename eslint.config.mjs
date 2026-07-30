@@ -5,10 +5,20 @@ import html from 'eslint-plugin-html'
 import eslintPluginImport from 'eslint-plugin-import'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import globals from 'globals'
-// eslint-disable-next-line import/no-unresolved -- resolved at runtime; the package has no CJS entry the resolver understands
 import tseslint from 'typescript-eslint'
 
 export default [
+  {
+    // The migration leaves the tree mixed: a `.js` module can import a sibling
+    // that is already `.ts`, written as the ESM-style `./x.js` specifier that
+    // tsc resolves. The default resolver takes that literally and reports
+    // no-unresolved, so hand resolution to the TypeScript-aware one.
+    settings: {
+      'import/resolver': {
+        typescript: { project: './tsconfig.json' }
+      }
+    }
+  },
   eslintPluginImport.flatConfigs.errors,
   eslintPluginImport.flatConfigs.warnings,
   eslintPluginUnicorn.configs.recommended,
@@ -131,6 +141,16 @@ export default [
     files: ['**/*.{js,mjs}'],
     languageOptions: {
       sourceType: 'module'
+    }
+  },
+  {
+    // Sources and specs use ESM-style `.js` specifiers that resolve to `.ts`
+    // files. import/extensions reads that literally and demands the `.ts`
+    // extension, which is exactly what tsc forbids — tsc enforces the
+    // specifier instead. Upstream disables the same rule for the same reason.
+    files: ['js/**'],
+    rules: {
+      'import/extensions': 'off'
     }
   },
   {
