@@ -63,7 +63,7 @@ $form-feedback-tokens: defaults(
   $icon,
   $tooltip-color: color-contrast($color, $color-contrast-dark, $color-contrast-light, $white, $black, $min-contrast-ratio),
   $tooltip-bg-color: rgba($color, $form-feedback-tooltip-opacity),
-  $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($color, $input-btn-focus-color-opacity),
+  $focus-ring: $input-focus-width solid rgba($color, $input-btn-focus-color-opacity),
   $border-color: $color
 ) {
   .#{$state}-feedback {
@@ -109,7 +109,7 @@ $form-feedback-tokens: defaults(
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-box-shadow: #{$focus-box-shadow};
+      --#{$prefix}control-focus-ring: #{$focus-ring};
 
       @if $enable-validation-icons {
         padding-inline-end: $input-height-inner;
@@ -128,12 +128,7 @@ $form-feedback-tokens: defaults(
 
       &:focus {
         border-color: $border-color;
-        @if $enable-shadows {
-          @include box-shadow($input-box-shadow, $focus-box-shadow);
-        } @else {
-          // Avoid using mixin so we can pass custom focus shadow properly
-          box-shadow: $focus-box-shadow;
-        }
+        outline: $focus-ring;
       }
     }
   }
@@ -165,7 +160,7 @@ $form-feedback-tokens: defaults(
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-box-shadow: #{$focus-box-shadow};
+      --#{$prefix}control-focus-ring: #{$focus-ring};
 
       @if $enable-validation-icons {
         &:not([multiple]):not([size]),
@@ -197,7 +192,7 @@ $form-feedback-tokens: defaults(
       }
 
       &:focus {
-        box-shadow: $focus-box-shadow;
+        outline: $focus-ring;
       }
 
       ~ .form-check-label {

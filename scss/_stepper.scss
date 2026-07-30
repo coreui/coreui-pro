@@ -31,7 +31,7 @@ $stepper-step-indicator-complete-border-color:  var(--#{$prefix}primary) !defaul
 $stepper-step-indicator-disabled-color:         var(--#{$prefix}secondary) !default;
 $stepper-step-indicator-disabled-bg:            transparent !default;
 $stepper-step-indicator-disabled-border-color:  var(--#{$prefix}border-color) !default;
-$stepper-step-indicator-focus-box-shadow:       $focus-ring-box-shadow !default;
+$stepper-step-indicator-focus-ring:       $focus-ring !default;
 $stepper-step-indicator-icon:                   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpolygon fill='var(--ci-primary-color, currentColor)' points='200.359 382.269 61.057 251.673 82.943 228.327 199.641 337.731 428.686 108.687 451.314 131.313 200.359 382.269' class='ci-primary'/%3E%3C/svg%3E") !default;
 $stepper-step-indicator-icon-color:             var(--#{$prefix}white) !default;
 $stepper-step-indicator-icon-size:              1rem !default;
@@ -74,7 +74,7 @@ $stepper-tokens: defaults(
     --#{$prefix}stepper-step-indicator-disabled-color: #{$stepper-step-indicator-disabled-color},
     --#{$prefix}stepper-step-indicator-disabled-bg: #{$stepper-step-indicator-disabled-bg},
     --#{$prefix}stepper-step-indicator-disabled-border-color: #{$stepper-step-indicator-disabled-border-color},
-    --#{$prefix}stepper-step-indicator-focus-box-shadow: #{$stepper-step-indicator-focus-box-shadow},
+    --#{$prefix}stepper-step-indicator-focus-ring: #{$stepper-step-indicator-focus-ring},
     --#{$prefix}stepper-step-indicator-icon: #{$stepper-step-indicator-icon},
     --#{$prefix}stepper-step-indicator-icon-color: #{$stepper-step-indicator-icon-color},
     --#{$prefix}stepper-step-indicator-icon-size: #{$stepper-step-indicator-icon-size},
@@ -179,10 +179,9 @@ $stepper-tokens: defaults(
     }
 
     &:focus {
-      outline: 0;
 
       .stepper-step-indicator {
-        box-shadow: var(--#{$prefix}stepper-step-indicator-focus-box-shadow);
+        outline: var(--#{$prefix}stepper-step-indicator-focus-ring);
       }
     }
   }

@@ -498,7 +498,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   class) or set `$form-feedback-tooltip-*` explicitly. The tooltip variables
   moved to `scss/_tooltip.scss`, the feedback set to `scss/mixins/_forms.scss`.
 - **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
-  `--cui-control-border-color`, `-focus-border-color` and `-focus-box-shadow`
+  `--cui-control-border-color`, `-focus-border-color` and `-focus-ring`
   instead of restating declarations, so state styling follows any control
   automatically.
 
@@ -570,6 +570,50 @@ $font-sizes: (
 `.fs-6`, every `.display-*` and `.lead`, and retunes the sizes — h1–h3 grow up to
 10px on small screens while h4–h6 shrink at every width. Those classes stay, at
 their current sizes.
+
+#### The focus ring is an outline
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Focus rings were drawn with `box-shadow` and are now drawn with `outline`,
+following upstream v6. The practical win is that an outline is **not clipped by an
+ancestor's `overflow`** — the ring stays visible inside scroll containers, where a
+box-shadow ring was cut off.
+
+- **Twelve `--#{$prefix}*-focus-box-shadow` custom properties are renamed to
+  `-focus-ring`**, and their values are an `outline` shorthand rather than a
+  box-shadow one: `--#{$prefix}btn-focus-ring`,
+  `--#{$prefix}control-focus-ring`, `--#{$prefix}pagination-focus-ring`,
+  `--#{$prefix}accordion-btn-focus-ring`, `--#{$prefix}form-check-input-focus-ring`,
+  `--#{$prefix}calendar-cell-focus-ring`, `--#{$prefix}calendar-nav-btn-focus-ring`,
+  `--#{$prefix}stepper-step-indicator-focus-ring`,
+  `--#{$prefix}range-slider-thumb-focus-ring`,
+  `--#{$prefix}search-button-focus-ring`,
+  `--#{$prefix}autocomplete-option-focus-ring`,
+  `--#{$prefix}form-multi-select-option-focus-ring`.
+
+  ```diff
+  - --cui-btn-focus-box-shadow: 0 0 0 .25rem rgba(88, 86, 214, .5);
+  + --cui-btn-focus-ring: .25rem solid rgba(88, 86, 214, .5);
+  ```
+
+  A runtime override written against an old name is now inert — there is no
+  fallback path, because the value goes to a different property.
+- **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`,
+  `$btn-focus-box-shadow` → `$btn-focus-ring`, and so on for every component.
+- **`$focus-ring-blur` is gone**, along with `--#{$prefix}focus-ring-x`,
+  `-y` and `-blur`. An outline has no blur or offset vector. **New:**
+  `$focus-ring-offset` / `--#{$prefix}focus-ring-offset` (defaults to `0`), which
+  pushes the ring away from the element, and `--#{$prefix}focus-ring`, the
+  composite shorthand the mixin reads.
+- **`focus-ring()` changed signature** to upstream's:
+  `focus-ring($offset: false, $color: null)`. It no longer emits `outline: 0`.
+- `$pagination-focus-outline` is gone — the outline is now the ring itself.
+
+**Sizes and colours are unchanged**, so the ring keeps its width
+(`$focus-ring-width`, `.25rem`) and its translucent theme colour. What changes is
+the property drawing it, which also means the ring no longer participates in a
+`box-shadow` transition.
 
 ### Sass & CSS
 

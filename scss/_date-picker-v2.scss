@@ -92,8 +92,7 @@ $date-picker-v2-tokens: defaults(
 
     &:focus {
       z-index: 5;
-      outline: 0;
-      box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+      outline: var(--#{$prefix}focus-ring);
       @include border-radius($border-radius);
     }
   }

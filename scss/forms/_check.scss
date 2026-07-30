@@ -23,7 +23,7 @@ $form-check-input-border:                 var(--#{$prefix}border-width) solid va
 $form-check-input-border-radius:          .25em !default;
 $form-check-radio-border-radius:          50% !default;
 $form-check-input-focus-border:           $input-focus-border-color !default;
-$form-check-input-focus-box-shadow:       $focus-ring-box-shadow !default;
+$form-check-input-focus-ring:       $focus-ring !default;
 
 $form-check-input-checked-color:          $component-active-color !default;
 $form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
@@ -106,7 +106,7 @@ $form-check-input-tokens: defaults(
     --#{$prefix}form-check-radio-border-radius: #{$form-check-radio-border-radius},
     --#{$prefix}form-check-input-active-filter: #{$form-check-input-active-filter},
     --#{$prefix}form-check-input-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}form-check-input-focus-box-shadow: #{$form-check-input-focus-box-shadow},
+    --#{$prefix}form-check-input-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}control-checked-bg),
     --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}form-check-input-indeterminate-bg-color: var(--#{$prefix}control-indeterminate-bg),
@@ -188,8 +188,7 @@ $form-check-input-tokens: defaults(
 
     &:focus {
       border-color: var(--#{$prefix}form-check-input-focus-border);
-      outline: 0;
-      box-shadow: var(--#{$prefix}form-check-input-focus-box-shadow);
+      outline: var(--#{$prefix}form-check-input-focus-ring);
     }
 
     &:checked {

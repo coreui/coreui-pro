@@ -56,13 +56,7 @@ $form-date-time-tokens: defaults(
       color: var(--#{$prefix}control-focus-color);
       background-color: var(--#{$prefix}control-focus-bg);
       border-color: var(--#{$prefix}control-focus-border-color);
-      outline: 0;
-      @if $enable-shadows {
-        @include box-shadow(var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow));
-      } @else {
-        // Avoid using mixin so we can pass custom focus shadow properly
-        box-shadow: var(--#{$prefix}control-focus-box-shadow);
-      }
+      outline: var(--#{$prefix}control-focus-ring);
     }
 
     &.disabled {

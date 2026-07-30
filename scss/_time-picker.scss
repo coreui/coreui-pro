@@ -55,7 +55,7 @@ $time-picker-tokens: defaults(
     --#{$prefix}control-focus-color: #{$time-picker-focus-color},
     --#{$prefix}control-focus-bg: #{$time-picker-focus-bg},
     --#{$prefix}control-focus-border-color: #{$time-picker-focus-border-color},
-    --#{$prefix}control-focus-box-shadow: #{$time-picker-focus-box-shadow},
+    --#{$prefix}control-focus-ring: #{$time-picker-focus-ring},
     --#{$prefix}time-picker-placeholder-color: #{$time-picker-placeholder-color},
     --#{$prefix}control-padding-y: #{$time-picker-padding-y},
     --#{$prefix}control-padding-x: #{$time-picker-padding-x},
@@ -103,23 +103,23 @@ $time-picker-tokens: defaults(
     @include tokens($time-picker-tokens);
 
     &.is-invalid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$time-picker-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
+      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$time-picker-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$time-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-invalid-icon)} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}control-focus-border-color: #{$time-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}control-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
     }
 
     &.is-valid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$time-picker-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
+      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$time-picker-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$time-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-valid-icon)} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}control-focus-border-color: #{$time-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}control-focus-box-shadow: #{$focus-box-shadow} !important; // stylelint-disable-line declaration-no-important
+      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
     }
   }
 
@@ -160,12 +160,7 @@ $time-picker-tokens: defaults(
     &:has(*:focus) {
       background-color: var(--#{$prefix}control-focus-bg);
       border-color: var(--#{$prefix}control-focus-border-color);
-      outline: 0;
-      @if $enable-shadows {
-        box-shadow: var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow);
-      } @else {
-        box-shadow: var(--#{$prefix}control-focus-box-shadow);
-      }
+      outline: var(--#{$prefix}control-focus-ring);
     }
   }
 
@@ -247,8 +242,7 @@ $time-picker-tokens: defaults(
 
     &:focus {
       z-index: 5;
-      outline: 0;
-      box-shadow: var(--#{$prefix}focus-ring-x, 0) var(--#{$prefix}focus-ring-y, 0) var(--#{$prefix}focus-ring-blur, 0) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+      outline: var(--#{$prefix}focus-ring);
       @include border-radius($border-radius);
     }
   }

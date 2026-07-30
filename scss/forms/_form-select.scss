@@ -37,7 +37,7 @@ $form-select-box-shadow:          var(--#{$prefix}box-shadow-inset) !default;
 
 $form-select-focus-border-color:  $input-focus-border-color !default;
 $form-select-focus-width:         $input-focus-width !default;
-$form-select-focus-box-shadow:    0 0 0 $form-select-focus-width $input-btn-focus-color !default;
+$form-select-focus-ring:    $form-select-focus-width solid $input-btn-focus-color !default;
 
 $form-select-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
 $form-select-padding-x-sm:        var(--#{$prefix}btn-input-sm-padding-x) !default;
@@ -81,7 +81,7 @@ $form-select-tokens: defaults(
     --#{$prefix}control-box-shadow: #{$form-select-box-shadow},
     --#{$prefix}control-transition: #{$form-select-transition},
     --#{$prefix}control-focus-border-color: #{$form-select-focus-border-color},
-    --#{$prefix}control-focus-box-shadow: #{$form-select-focus-box-shadow},
+    --#{$prefix}control-focus-ring: #{$form-select-focus-ring},
     --#{$prefix}control-disabled-color: #{$form-select-disabled-color},
     --#{$prefix}control-disabled-bg: #{$form-select-disabled-bg},
     --#{$prefix}control-disabled-border-color: #{$form-select-disabled-border-color},
@@ -136,13 +136,7 @@ $form-select-tokens: defaults(
 
     &:focus {
       border-color: var(--#{$prefix}control-focus-border-color);
-      outline: 0;
-      @if $enable-shadows {
-        @include box-shadow(var(--#{$prefix}control-box-shadow), var(--#{$prefix}control-focus-box-shadow));
-      } @else {
-        // Avoid using mixin so we can pass custom focus shadow properly
-        box-shadow: var(--#{$prefix}control-focus-box-shadow);
-      }
+      outline: var(--#{$prefix}control-focus-ring);
     }
 
     &[multiple],

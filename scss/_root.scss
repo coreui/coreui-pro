@@ -117,7 +117,8 @@
     --#{$prefix}focus-ring-width: #{$focus-ring-width};
     --#{$prefix}focus-ring-opacity: #{$focus-ring-opacity};
     --#{$prefix}focus-ring-color: #{$focus-ring-color};
-    --#{$prefix}focus-ring-blur: #{$focus-ring-blur};
+    --#{$prefix}focus-ring-offset: #{$focus-ring-offset};
+    --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color);
     // scss-docs-end root-focus-variables
 
     // scss-docs-start root-btn-input-variables

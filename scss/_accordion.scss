@@ -34,7 +34,7 @@ $accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis)
 // fusv-disable
 $accordion-button-focus-border-color:     $input-focus-border-color !default; // Deprecated in v5.0.0
 // fusv-enable
-$accordion-button-focus-box-shadow:       $btn-focus-box-shadow !default;
+$accordion-button-focus-ring:       $btn-focus-ring !default;
 
 $accordion-icon-width:                    1.25rem !default;
 $accordion-icon-color:                    var(--#{$prefix}body-color) !default;
@@ -70,7 +70,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
-    --#{$prefix}accordion-btn-focus-box-shadow: #{$accordion-button-focus-box-shadow},
+    --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
     --#{$prefix}accordion-body-padding-x: #{$accordion-body-padding-x},
     --#{$prefix}accordion-body-padding-y: #{$accordion-body-padding-y},
     --#{$prefix}accordion-active-color: #{$accordion-button-active-color},
@@ -132,8 +132,7 @@ $accordion-tokens: defaults(
 
     &:focus {
       z-index: 3;
-      outline: 0;
-      box-shadow: var(--#{$prefix}accordion-btn-focus-box-shadow);
+      outline: var(--#{$prefix}accordion-btn-focus-ring);
     }
   }
 

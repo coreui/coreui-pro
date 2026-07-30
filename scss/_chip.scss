@@ -240,7 +240,6 @@ $chip-outline-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: 0;
       opacity: 1;
       @include focus-ring();
     }

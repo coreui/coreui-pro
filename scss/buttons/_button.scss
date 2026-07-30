@@ -35,7 +35,7 @@ $btn-border-width:            $input-btn-border-width !default;
 $btn-font-weight:             $font-weight-normal !default;
 $btn-box-shadow:              inset 0 1px 0 rgba($white, .15), 0 1px 1px rgba($black, .075) !default;
 $btn-focus-width:             $input-btn-focus-width !default;
-$btn-focus-box-shadow:        $input-btn-focus-box-shadow !default;
+$btn-focus-ring:        $input-btn-focus-ring !default;
 $btn-disabled-opacity:        $input-btn-disabled-opacity !default;
 $btn-active-box-shadow:       inset 0 3px 5px rgba($black, .125) !default;
 
@@ -177,7 +177,7 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
     --#{$prefix}btn-hover-border-color: transparent;
     --#{$prefix}btn-box-shadow: #{$btn-box-shadow};
     --#{$prefix}btn-disabled-opacity: #{$btn-disabled-opacity};
-    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} color-mix(in srgb, var(--#{$prefix}btn-focus-shadow) 50%, transparent);
+    --#{$prefix}btn-focus-ring: #{$btn-focus-width} solid color-mix(in srgb, var(--#{$prefix}btn-focus-shadow) 50%, transparent);
     // scss-docs-end btn-css-vars
 
     display: inline-block;
@@ -219,24 +219,14 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
       color: var(--#{$prefix}btn-hover-color);
       @include gradient-bg(var(--#{$prefix}btn-hover-bg));
       border-color: var(--#{$prefix}btn-hover-border-color);
-      outline: 0;
       // Avoid using mixin so we can pass custom focus shadow properly
-      @if $enable-shadows {
-        box-shadow: var(--#{$prefix}btn-box-shadow), var(--#{$prefix}btn-focus-box-shadow);
-      } @else {
-        box-shadow: var(--#{$prefix}btn-focus-box-shadow);
-      }
+      outline: var(--#{$prefix}btn-focus-ring);
     }
 
     .btn-check:focus-visible + & {
       border-color: var(--#{$prefix}btn-hover-border-color);
-      outline: 0;
       // Avoid using mixin so we can pass custom focus shadow properly
-      @if $enable-shadows {
-        box-shadow: var(--#{$prefix}btn-box-shadow), var(--#{$prefix}btn-focus-box-shadow);
-      } @else {
-        box-shadow: var(--#{$prefix}btn-focus-box-shadow);
-      }
+      outline: var(--#{$prefix}btn-focus-ring);
     }
 
     .btn-check:checked + &,
@@ -254,21 +244,13 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
 
       &:focus-visible {
         // Avoid using mixin so we can pass custom focus shadow properly
-        @if $enable-shadows {
-          box-shadow: var(--#{$prefix}btn-active-shadow), var(--#{$prefix}btn-focus-box-shadow);
-        } @else {
-          box-shadow: var(--#{$prefix}btn-focus-box-shadow);
-        }
+        outline: var(--#{$prefix}btn-focus-ring);
       }
     }
 
     .btn-check:checked:focus-visible + & {
       // Avoid using mixin so we can pass custom focus shadow properly
-      @if $enable-shadows {
-        box-shadow: var(--#{$prefix}btn-active-shadow), var(--#{$prefix}btn-focus-box-shadow);
-      } @else {
-        box-shadow: var(--#{$prefix}btn-focus-box-shadow);
-      }
+      outline: var(--#{$prefix}btn-focus-ring);
     }
 
     &:disabled,
@@ -302,7 +284,7 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
     --#{$prefix}btn-hover-color: #{$btn-ghost-hover-color};
     --#{$prefix}btn-hover-bg: #{$btn-ghost-hover-bg};
     --#{$prefix}btn-hover-border-color: #{$btn-ghost-hover-bg};
-    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} color-mix(in srgb, #{$btn-outline-focus-shadow} 50%, transparent);
+    --#{$prefix}btn-focus-ring: #{$btn-focus-width} solid color-mix(in srgb, #{$btn-outline-focus-shadow} 50%, transparent);
     // scss-docs-end btn-ghost-css-vars
   }
 
@@ -318,7 +300,7 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
     --#{$prefix}btn-hover-color: #{$btn-outline-hover-color};
     --#{$prefix}btn-hover-bg: #{$btn-outline-hover-bg};
     --#{$prefix}btn-hover-border-color: #{$btn-outline-hover-border-color};
-    --#{$prefix}btn-focus-box-shadow: 0 0 0 #{$btn-focus-width} color-mix(in srgb, #{$btn-ghost-focus-shadow} 50%, transparent);
+    --#{$prefix}btn-focus-ring: #{$btn-focus-width} solid color-mix(in srgb, #{$btn-ghost-focus-shadow} 50%, transparent);
     // scss-docs-end btn-outline-css-vars
   }
 

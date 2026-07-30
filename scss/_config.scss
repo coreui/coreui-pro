@@ -618,8 +618,8 @@ $component-active-bg:         var(--#{$prefix}primary) !default;
 $focus-ring-width:      .25rem !default;
 $focus-ring-opacity:    .25 !default;
 $focus-ring-color:      rgba($primary, $focus-ring-opacity) !default;
-$focus-ring-blur:       0 !default;
-$focus-ring-box-shadow: 0 0 $focus-ring-blur $focus-ring-width $focus-ring-color !default;
+$focus-ring-offset:     0 !default;
+$focus-ring: $focus-ring-width solid $focus-ring-color !default;
 // scss-docs-end focus-ring-variables
 
 $transition-base:             all .2s ease-in-out !default;
@@ -809,8 +809,7 @@ $input-btn-line-height:       $line-height-base !default;
 $input-btn-focus-width:         $focus-ring-width !default;
 $input-btn-focus-color-opacity: $focus-ring-opacity !default;
 $input-btn-focus-color:         $focus-ring-color !default;
-$input-btn-focus-blur:          $focus-ring-blur !default;
-$input-btn-focus-box-shadow:    $focus-ring-box-shadow !default;
+$input-btn-focus-ring:    $focus-ring !default;
 
 $input-btn-padding-y-sm:      .25rem !default;
 $input-btn-padding-x-sm:      .5rem !default;
@@ -881,7 +880,7 @@ $input-focus-bg:                        $input-bg !default;
 $input-focus-border-color:              tint-color($primary, 50%) !default;
 $input-focus-color:                     $input-color !default;
 $input-focus-width:                     $input-btn-focus-width !default;
-$input-focus-box-shadow:                $input-btn-focus-box-shadow !default;
+$input-focus-ring:                $input-btn-focus-ring !default;
 
 $input-placeholder-color:               var(--#{$prefix}secondary-color) !default;
 $input-plaintext-color:                 var(--#{$prefix}body-color) !default;
@@ -932,7 +931,7 @@ $form-validation-states: (
     "icon": $form-feedback-icon-valid,
     "tooltip-color": #fff,
     "tooltip-bg-color": var(--#{$prefix}success),
-    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, var(--#{$prefix}success) math.percentage($input-btn-focus-color-opacity), transparent),
+    "focus-ring": $input-focus-width solid color-mix(in srgb, var(--#{$prefix}success) math.percentage($input-btn-focus-color-opacity), transparent),
     "border-color": var(--#{$prefix}form-valid-border-color),
   ),
   "invalid": (
@@ -940,7 +939,7 @@ $form-validation-states: (
     "icon": $form-feedback-icon-invalid,
     "tooltip-color": #fff,
     "tooltip-bg-color": var(--#{$prefix}danger),
-    "focus-box-shadow": 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, var(--#{$prefix}danger) math.percentage($input-btn-focus-color-opacity), transparent),
+    "focus-ring": $input-focus-width solid color-mix(in srgb, var(--#{$prefix}danger) math.percentage($input-btn-focus-color-opacity), transparent),
     "border-color": var(--#{$prefix}form-invalid-border-color),
   )
 ) !default;
@@ -1012,7 +1011,7 @@ $sidebar-toggler-padding-y:         .25rem !default;
 $sidebar-toggler-bg:                transparent !default;
 $sidebar-toggler-color:             var(--#{$prefix}tertiary-color) !default;
 $sidebar-toggler-icon:              url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cg xmlns='http://www.w3.org/2000/svg' transform='matrix(-1 0 0 -1 512 512)'%3E%3Cpath fill='%23000' d='M472,16H40A24.028,24.028,0,0,0,16,40V200H48V48H464V464H48V304H16V472a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V40A24.028,24.028,0,0,0,472,16Z'/%3E%3Cpolygon fill='%23000' points='209.377 363.306 232.004 385.933 366.627 251.31 232.004 116.687 209.377 139.313 305.374 235.311 16 235.311 16 267.311 305.372 267.311 209.377 363.306'/%3E%3C/g%3E%3C/svg%3E") !default;
-$sidebar-toggler-focus-shadow:      $focus-ring-box-shadow !default;
+$sidebar-toggler-focus-shadow:      $focus-ring !default;
 $sidebar-toggler-hover-color:       var(--#{$prefix}secondary-color) !default;
 $sidebar-toggler-focus-color:       var(--#{$prefix}secondary-color) !default;
 $sidebar-toggler-transition:        transform .15s !default;
@@ -1057,7 +1056,7 @@ $time-picker-disabled-border-color:         $input-disabled-border-color !defaul
 $time-picker-focus-color:                   $input-focus-color !default;
 $time-picker-focus-bg:                      $input-focus-bg !default;
 $time-picker-focus-border-color:            $input-focus-border-color !default;
-$time-picker-focus-box-shadow:              $input-btn-focus-box-shadow !default;
+$time-picker-focus-ring:              $input-btn-focus-ring !default;
 
 $time-picker-placeholder-color:             var(--#{$prefix}secondary-color) !default;
 
