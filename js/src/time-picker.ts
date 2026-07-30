@@ -10,6 +10,7 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import type { ComponentConfig } from './util/config.js'
 import {
   defineJQueryPlugin, getElement, getNextActiveElement, isRTL
 } from './util/index.js'
@@ -92,10 +93,10 @@ const Default = {
   ariaSelectMinutesLabel: 'Select minutes',
   ariaSelectSecondsLabel: 'Select seconds',
   cancelButton: 'Cancel',
-  cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'],
+  cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'] as string[],
   cleaner: true,
   confirmButton: 'OK',
-  confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'],
+  confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'] as string[],
   container: false,
   disabled: false,
   footer: true,
@@ -117,7 +118,7 @@ const Default = {
   variant: 'roll'
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ariaSelectHoursLabel: 'string',
   ariaSelectMeridiemLabel: 'string',
   ariaSelectMinutesLabel: 'string',
@@ -153,7 +154,20 @@ const DefaultType = {
  */
 
 class TimePicker extends BaseComponent {
-  constructor(element, config) {
+  protected declare _date: any
+  protected declare _initialDate: any
+  protected declare _ampm: any
+  protected declare _popper: any
+  protected declare _indicatorElement: any
+  protected declare _input: any
+  protected declare _menu: any
+  protected declare _timePickerBody: any
+  protected declare _inputTimeout: any
+  protected declare _localizedTimePartials: any
+  protected declare _focustrap: any
+  protected declare _togglerElement: HTMLElement
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
     this._config = this._getConfig(config)
@@ -172,7 +186,9 @@ class TimePicker extends BaseComponent {
 
     this._localizedTimePartials = getLocalizedTimePartials(
       this._config.locale,
-      this.ampm,
+      // The property does not exist, so `getLocalizedTimePartials` falls back to its
+      // `'auto'` default. Passing `_ampm` instead would change behaviour.
+      (this as any).ampm,
       this._config.hours,
       this._config.minutes,
       this._config.seconds
@@ -187,24 +203,24 @@ class TimePicker extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  toggle() {
+  toggle(): void {
     return this._isShown() ? this.hide() : this.show()
   }
 
-  show() {
+  show(): void {
     if (this._config.disabled || this._isShown()) {
       return
     }
@@ -213,7 +229,7 @@ class TimePicker extends BaseComponent {
 
     EventHandler.trigger(this._element, EVENT_SHOW)
     this._element.classList.add(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', true)
+    this._element.setAttribute('aria-expanded', true as any)
 
     if (this._config.container) {
       this._menu.classList.add(CLASS_NAME_SHOW)
@@ -225,7 +241,7 @@ class TimePicker extends BaseComponent {
     this._createPopper()
   }
 
-  hide() {
+  hide(): void {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
     if (this._popper) {
@@ -243,7 +259,7 @@ class TimePicker extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
-  dispose() {
+  override dispose(): void {
     if (this._popper) {
       this._popper.destroy()
     }
@@ -257,7 +273,7 @@ class TimePicker extends BaseComponent {
     super.dispose()
   }
 
-  cancel() {
+  cancel(): void {
     this._date = this._initialDate
     this._setInputValue(this._initialDate || '')
     this._timePickerBody.innerHTML = ''
@@ -266,15 +282,15 @@ class TimePicker extends BaseComponent {
     this._emitChangeEvent(this._date)
   }
 
-  clear() {
+  clear(): void {
     this._date = null
-    this._setInputValue('')
+    this._setInputValue('' as any)
     this._timePickerBody.innerHTML = ''
     this._createTimePickerSelection()
     this._emitChangeEvent(this._date)
   }
 
-  reset() {
+  reset(): void {
     this._date = this._convertStringToDate(this._config.time)
     this._setInputValue(this._config.time)
     this._timePickerBody.innerHTML = ''
@@ -282,7 +298,7 @@ class TimePicker extends BaseComponent {
     this._emitChangeEvent(this._date)
   }
 
-  update(config) {
+  update(config: any): void {
     this._config = this._getConfig(config)
     this._date = this._convertStringToDate(this._config.time)
     this._ampm = this._date ?
@@ -294,14 +310,14 @@ class TimePicker extends BaseComponent {
   }
 
   // Private
-  _initializeFocusTrap() {
+  _initializeFocusTrap(): FocusTrap {
     return new FocusTrap({
       additionalElement: this._config.container ? this._menu : null,
       trapElement: this._element
     })
   }
 
-  _moveFocusToNextColumn(event) {
+  _moveFocusToNextColumn(event: any): void {
     if (!this._timePickerBody) {
       return
     }
@@ -315,11 +331,11 @@ class TimePicker extends BaseComponent {
     if (currentColumnIndex < columns.length - 1) {
       const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex + 1])
 
-      firstFocusableCell.focus()
+      firstFocusableCell!.focus()
     }
   }
 
-  _moveFocusToPreviousColumn(event) {
+  _moveFocusToPreviousColumn(event: any): void {
     if (!this._timePickerBody) {
       return
     }
@@ -333,24 +349,24 @@ class TimePicker extends BaseComponent {
     if (currentColumnIndex > 0) {
       const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex - 1])
 
-      firstFocusableCell.focus()
+      firstFocusableCell!.focus()
     }
   }
 
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()
       }
     })
 
-    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, (event: any) => {
       if (!this._config.disabled && event.key === ENTER_KEY) {
         this.toggle()
       }
     })
 
-    EventHandler.on(this._togglerElement, EVENT_CLICK, event => {
+    EventHandler.on(this._togglerElement, EVENT_CLICK, (event: any) => {
       if (!this._config.disabled && event.target !== this._indicatorElement) {
         this.show()
 
@@ -365,13 +381,13 @@ class TimePicker extends BaseComponent {
     })
 
     if (this._config.variant === 'roll') {
-      EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, event => {
+      EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, (event: any) => {
         if (!event.delegateTarget.contains(event.relatedTarget)) {
           this._setUpRolls(false)
         }
       })
 
-      EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, event => {
+      EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, (event: any) => {
         if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
           event.preventDefault()
           const { key, target } = event
@@ -417,7 +433,7 @@ class TimePicker extends BaseComponent {
       })
     }
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, event => {
+    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
       }
@@ -437,7 +453,7 @@ class TimePicker extends BaseComponent {
       this.cancel()
     })
 
-    EventHandler.on(this._input, EVENT_INPUT, event => {
+    EventHandler.on(this._input, EVENT_INPUT, (event: any) => {
       if (this._inputTimeout) {
         clearTimeout(this._inputTimeout)
       }
@@ -472,7 +488,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _createTimePicker() {
+  _createTimePicker(): void {
     this._element.classList.add(CLASS_NAME_TIME_PICKER)
 
     Manipulator.setDataAttribute(
@@ -518,7 +534,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _createTimePickerInputGroup() {
+  _createTimePickerInputGroup(): HTMLElement {
     const inputGroupEl = document.createElement('div')
     inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP)
 
@@ -540,7 +556,7 @@ class TimePicker extends BaseComponent {
     const events = ['change', 'keyup', 'paste']
 
     for (const event of events) {
-      inputEl.addEventListener(event, ({ target }) => {
+      inputEl.addEventListener(event, ({ target }: any) => {
         if (target.closest(SELECTOR_WAS_VALIDATED)) {
           if (Number.isNaN(Date.parse(`1970-01-01 ${target.value}`))) {
             this._element.classList.add(CLASS_NAME_IS_INVALID)
@@ -592,7 +608,7 @@ class TimePicker extends BaseComponent {
     return inputGroupEl
   }
 
-  _createTimePickerSelection() {
+  _createTimePickerSelection(): void {
     if (this._config.variant === 'roll') {
       this._createTimePickerRoll()
     }
@@ -602,7 +618,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _createTimePickerBody() {
+  _createTimePickerBody(): HTMLElement {
     const timePickerBodyEl = document.createElement('div')
     timePickerBodyEl.classList.add(CLASS_NAME_BODY)
 
@@ -616,12 +632,12 @@ class TimePicker extends BaseComponent {
     return timePickerBodyEl
   }
 
-  _createTimePickerInlineSelect(className, options, ariaLabel) {
+  _createTimePickerInlineSelect(className: string, options: any[], ariaLabel: string): HTMLSelectElement {
     const selectEl = document.createElement('select')
     selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className)
     selectEl.disabled = this._config.disabled
     selectEl.setAttribute('aria-label', ariaLabel)
-    selectEl.addEventListener('change', event =>
+    selectEl.addEventListener('change', (event: any) =>
       this._handleTimeChange(className, event.target.value)
     )
 
@@ -636,7 +652,7 @@ class TimePicker extends BaseComponent {
     return selectEl
   }
 
-  _createTimePickerInlineSelects() {
+  _createTimePickerInlineSelects(): void {
     const timeSeparatorEl = document.createElement('div')
     timeSeparatorEl.innerHTML = ':'
 
@@ -685,7 +701,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _createTimePickerRoll() {
+  _createTimePickerRoll(): void {
     this._timePickerBody.append(
       this._createTimePickerRollCol(
         this._localizedTimePartials.listOfHours,
@@ -728,7 +744,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _createTimePickerRollCol(options, part, ariaLabel) {
+  _createTimePickerRollCol(options: any[], part: string, ariaLabel: string): HTMLElement {
     const timePickerRollColEl = document.createElement('div')
     timePickerRollColEl.classList.add(CLASS_NAME_ROLL_COL)
     timePickerRollColEl.setAttribute('role', 'listbox')
@@ -763,7 +779,7 @@ class TimePicker extends BaseComponent {
     return timePickerRollColEl
   }
 
-  _createTimePickerFooter() {
+  _createTimePickerFooter(): HTMLElement {
     const footerEl = document.createElement('div')
     footerEl.classList.add(CLASS_NAME_FOOTER)
 
@@ -798,7 +814,7 @@ class TimePicker extends BaseComponent {
     return footerEl
   }
 
-  _emitChangeEvent(date) {
+  _emitChangeEvent(date: Date | null): void {
     this._input.dispatchEvent(new Event('change'))
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
       timeString: date === null ? null : date.toTimeString(),
@@ -807,7 +823,7 @@ class TimePicker extends BaseComponent {
     })
   }
 
-  _setUpRolls(initial = false) {
+  _setUpRolls(initial = false): void {
     const parts = ['hours', 'minutes', 'seconds', 'meridiem']
 
     for (const part of parts) {
@@ -827,7 +843,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _selectRollElement(element, initial = false) {
+  _selectRollElement(element: any, initial = false): void {
     const { parentElement } = element
 
     const currentSelected = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, parentElement)
@@ -843,7 +859,7 @@ class TimePicker extends BaseComponent {
     this._scrollTo(parentElement, element, initial)
   }
 
-  _setInputValue(date, input = this._input) {
+  _setInputValue(date: Date | null, input: any = this._input): void {
     input.value = date instanceof Date ?
       date.toLocaleTimeString(this._config.locale, {
         hour12: this._localizedTimePartials.hour12,
@@ -854,25 +870,25 @@ class TimePicker extends BaseComponent {
       date
   }
 
-  _setUpSelects() {
+  _setUpSelects(): void {
     for (const part of Array.from(['hours', 'minutes', 'seconds', 'meridiem'])) {
       for (const element of SelectorEngine.find(
         `select.${part}`,
-        this._element
+        this._element as ParentNode
       )) {
         if (this._getPartOfTime(part)) {
-          element.value = this._getPartOfTime(part)
+          (element as HTMLSelectElement).value = this._getPartOfTime(part)
         }
       }
     }
   }
 
-  _updateTimePicker() {
+  _updateTimePicker(): void {
     this._element.innerHTML = ''
     this._createTimePicker()
   }
 
-  _convertStringToDate(date) {
+  _convertStringToDate(date: Date | string | null): Date | null {
     return date ?
       (date instanceof Date ?
         date :
@@ -880,7 +896,7 @@ class TimePicker extends BaseComponent {
       null
   }
 
-  _createPopper() {
+  _createPopper(): void {
     if (typeof Popper === 'undefined') {
       throw new TypeError(
         'CoreUI\'s time picker require Popper (https://popper.js.org)'
@@ -908,11 +924,11 @@ class TimePicker extends BaseComponent {
     this._popper = Popper.createPopper(
       this._togglerElement,
       this._menu,
-      popperConfig
+      popperConfig as Partial<Popper.Options>
     )
   }
 
-  _getButtonClasses(classes) {
+  _getButtonClasses(classes: string[] | string): string[] {
     if (typeof classes === 'string') {
       return classes.split(' ')
     }
@@ -920,7 +936,7 @@ class TimePicker extends BaseComponent {
     return classes
   }
 
-  _getPartOfTime(part) {
+  _getPartOfTime(part: string): any {
     if (this._date === null) {
       return null
     }
@@ -944,7 +960,7 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  _handleTimeChange = (set, value) => {
+  _handleTimeChange = (set: string, value: string): void => {
     const _date = this._date || new Date('1970-01-01')
 
     if (set === 'meridiem') {
@@ -997,18 +1013,18 @@ class TimePicker extends BaseComponent {
     })
   }
 
-  _isShown() {
+  _isShown(): boolean {
     return this._element.classList.contains(CLASS_NAME_SHOW)
   }
 
-  _scrollTo(parent, children, initial = false) {
+  _scrollTo(parent: HTMLElement, children: HTMLElement, initial = false): void {
     parent.scrollTo({
       top: children.offsetTop,
       behavior: initial ? 'instant' : 'smooth'
     })
   }
 
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: any): any {
     if (config.container === 'dropdown' || config.container === 'inline') {
       config.type = config.container
     }
@@ -1030,8 +1046,8 @@ class TimePicker extends BaseComponent {
   }
 
   // Static
-  static timePickerInterface(element, config) {
-    const data = TimePicker.getOrCreateInstance(element, config)
+  static timePickerInterface(element: string | Element | null, config?: any): void {
+    const data: any = TimePicker.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {
@@ -1042,9 +1058,9 @@ class TimePicker extends BaseComponent {
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = TimePicker.getOrCreateInstance(this, config)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = TimePicker.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
@@ -1062,7 +1078,7 @@ class TimePicker extends BaseComponent {
     })
   }
 
-  static clearMenus(event) {
+  static clearMenus(event: any): void {
     if (
       event.button === RIGHT_MOUSE_BUTTON ||
       (event.type === 'keyup' && event.key !== TAB_KEY)
@@ -1085,7 +1101,7 @@ class TimePicker extends BaseComponent {
         continue
       }
 
-      const relatedTarget = { relatedTarget: context._element }
+      const relatedTarget: any = { relatedTarget: context._element }
 
       if (event.type === 'click') {
         relatedTarget.clickEvent = event
