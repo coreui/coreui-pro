@@ -643,13 +643,12 @@ no output at all.
 `-inverse` counterparts, plus `--#{$prefix}border-radius-2xl` (use
 `--#{$prefix}border-radius-xxl`).
 
-**Classes** — thirteen, every one a CoreUI-only addition:
+**Classes** — ten, every one a CoreUI-only addition:
 
 | Removed | Use instead |
 | --- | --- |
 | `.text-high-emphasis`, `.text-medium-emphasis` | `.text-body`, `.text-body-secondary` |
 | `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | `.text-white` with an opacity utility |
-| `.sidebar-brand-full`, `.sidebar-brand-narrow`, `.d-narrow-none` | `.d-sidebar-narrow`, `.d-sidebar-narrow-none` |
 
 (The `.dark:` variants of the emphasis utilities go with them.)
 
@@ -658,6 +657,14 @@ and `.navbar-light` are all deprecated, and Bootstrap v6 deletes all four. They
 are Bootstrap heritage rather than CoreUI additions, and they are in the markup of
 a very large number of existing projects — so they stay, at their current
 rendering.
+
+`.sidebar-brand-full`, `.sidebar-brand-narrow` and `.d-narrow-none` stay too,
+though they are CoreUI's own. They are the brand pair every admin template ships
+in its sidebar header, and they are exact aliases of `.d-sidebar-narrow-none` /
+`.d-sidebar-narrow` — two extra selectors in a rule that already exists. Removing
+them would break the most recognisable piece of CoreUI markup, silently: both
+logos would render at once in the narrow state, with nothing to indicate why.
+Prefer the `.d-sidebar-narrow*` names in new markup.
 
 ### Sass & CSS
 
