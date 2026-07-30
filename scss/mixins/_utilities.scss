@@ -10,6 +10,63 @@
   @return #{"[data" + $data-infix + "theme="$theme + "] ." + $theme + "\\:" + $selector + ", [data" + $data-infix + "theme="$theme + "] ." + $theme + "\\:" + $selector + ":not([class*='#{$theme}:'])"};
 }
 
+// Registers every custom property a utility assigns to as non-inheriting.
+//
+// Utilities compose through custom properties — `.text-opacity-50` sets
+// `--#{$prefix}text-opacity` and the colour utilities read it. Custom properties
+// inherit by default, so setting one on an element leaked the value into every
+// descendant: `.bg-opacity-25` on a container faded every nested `.text-bg-*`,
+// and `.link-opacity-50` faded every nested link, including bare `<a>`. The
+// colour utilities that restate their own opacity were immune; the ones reading
+// it through a `var(…, 1)` fallback were not.
+//
+// `inherits: false` scopes each one to the element it is applied to. `syntax: "*"`
+// keeps the values unconstrained — they are `color-mix()` and `light-dark()`
+// expressions that cannot be registered — which also means no `initial-value` is
+// allowed, so an unset property falls back through `var(…, 1)` as before.
+//
+// Emitted outside the cascade layer: `@property` registration is global.
+//
+// A utility that writes a name `:root` also declares — `.focus-ring-*` sets the
+// global `--#{$prefix}focus-ring-color` — must opt out with `at-property: false`.
+// Registering one of those breaks it: the `:root` declaration would stop
+// inheriting, and the rules reading it have no fallback to land on.
+@function append-unique($list, $name) {
+  @if list.index($list, $name) == null {
+    @return list.append($list, $name);
+  }
+  @return $list;
+}
+
+@mixin generate-utility-at-properties($utilities) {
+  $names: ();
+
+  @each $key, $utility in $utilities {
+    @if meta.type-of($utility) == "map" and map.get($utility, at-property) != false {
+      @if map.get($utility, css-var) {
+        // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
+        $name: if(sass(map.has-key($utility, css-variable-name)): map.get($utility, css-variable-name); else: map.get($utility, class));
+        @if $name != null {
+          $names: append-unique($names, $name);
+        }
+      }
+
+      @if map.has-key($utility, local-vars) {
+        @each $local-var, $value in map.get($utility, local-vars) {
+          $names: append-unique($names, $local-var);
+        }
+      }
+    }
+  }
+
+  @each $name in $names {
+    @property --#{$prefix}#{$name} {
+      syntax: "*";
+      inherits: false;
+    }
+  }
+}
+
 // Utility generator
 // Used to generate utilities & print utilities
 @mixin generate-utility($utility, $infix: "") {
