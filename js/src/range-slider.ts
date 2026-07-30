@@ -9,8 +9,9 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin, isRTL } from './util/index.js'
-import { DefaultAllowlist, sanitizeHtml } from './util/sanitizer.js'
+import { DefaultAllowlist, type SanitizerAllowList, sanitizeHtml } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -49,7 +50,29 @@ const SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER = '.range-slider-inputs-container'
 const SELECTOR_RANGE_SLIDER_LABEL = '.range-slider-label'
 const SELECTOR_RANGE_SLIDER_LABELS_CONTAINER = '.range-slider-labels-container'
 
-const Default = {
+type RangeSliderLabel = string | { class?: string | string[], label?: string, style?: Record<string, string>, value?: number }
+
+type RangeSliderConfig = {
+  allowList: SanitizerAllowList
+  ariaLabels: string[] | null
+  clickableLabels: boolean
+  disabled: boolean
+  distance: number
+  labels: RangeSliderLabel[] | boolean | string
+  max: number
+  min: number
+  name: string[] | string | null
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  step: number | string
+  tooltips: boolean
+  tooltipsFormat: ((value: number | string) => string) | null
+  track: boolean | string
+  value: number[] | number
+  vertical: boolean
+}
+
+const Default: RangeSliderConfig = {
   allowList: DefaultAllowlist,
   ariaLabels: null,
   clickableLabels: true,
@@ -69,7 +92,7 @@ const Default = {
   vertical: false
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaLabels: '(array|null)',
   clickableLabels: 'boolean',
@@ -94,7 +117,15 @@ const DefaultType = {
  */
 
 class RangeSlider extends BaseComponent {
-  constructor(element, config) {
+  protected declare _currentValue: number[]
+  protected declare _dragIndex: number
+  protected declare _inputs: HTMLInputElement[]
+  protected declare _isDragging: boolean
+  protected declare _sliderTrack: any
+  protected declare _thumbSize: any
+  protected declare _tooltips: HTMLElement[]
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
     this._config = this._getConfig(config)
@@ -111,20 +142,20 @@ class RangeSlider extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  update(config) {
+  update(config: any): void {
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
     this._element.innerHTML = ''
@@ -132,12 +163,12 @@ class RangeSlider extends BaseComponent {
   }
 
   // Private
-  _addEventListeners() {
+  _addEventListeners(): void {
     if (this._config.disabled) {
       return
     }
 
-    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RANGE_SLIDER_INPUT, event => {
+    EventHandler.on(this._element, EVENT_INPUT, SELECTOR_RANGE_SLIDER_INPUT, (event: any) => {
       const { target } = event
       this._isDragging = false
       const children = SelectorEngine.children(target.parentElement, SELECTOR_RANGE_SLIDER_INPUT)
@@ -150,16 +181,16 @@ class RangeSlider extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._currentValue })
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_LABEL, event => {
+    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_LABEL, (event: any) => {
       if (!this._config.clickableLabels || event.button !== 0) {
         return
       }
 
       const value = Manipulator.getDataAttribute(event.target, 'value')
-      this._updateNearestValue(value)
+      this._updateNearestValue(value as number)
     })
 
-    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, event => {
+    EventHandler.on(this._element, EVENT_MOUSEDOWN, SELECTOR_RANGE_SLIDER_INPUTS_CONTAINER, (event: any) => {
       if (event.button !== 0) {
         return
       }
@@ -181,7 +212,7 @@ class RangeSlider extends BaseComponent {
       this._isDragging = false
     })
 
-    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, event => {
+    EventHandler.on(document.documentElement, EVENT_MOUSEMOVE, (event: any) => {
       if (!this._isDragging) {
         return
       }
@@ -196,7 +227,7 @@ class RangeSlider extends BaseComponent {
     })
   }
 
-  _initializeRangeSlider() {
+  _initializeRangeSlider(): void {
     this._element.classList.add(CLASS_NAME_RANGE_SLIDER)
 
     if (this._config.vertical) {
@@ -216,13 +247,13 @@ class RangeSlider extends BaseComponent {
     this._addEventListeners()
   }
 
-  _createSliderTrack() {
+  _createSliderTrack(): HTMLElement {
     const sliderTrackElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TRACK)
 
     return sliderTrackElement
   }
 
-  _createInputs() {
+  _createInputs(): void {
     const container = this._createElement('div', CLASS_NAME_RANGE_SLIDER_INPUTS_CONTAINER)
 
     for (const [index, value] of this._currentValue.entries()) {
@@ -236,7 +267,7 @@ class RangeSlider extends BaseComponent {
     this._element.append(container)
   }
 
-  _createInput(index, value) {
+  _createInput(index: number, value: number): HTMLInputElement {
     const inputElement = this._createElement('input', CLASS_NAME_RANGE_SLIDER_INPUT)
     inputElement.type = 'range'
     inputElement.min = this._config.min
@@ -270,7 +301,7 @@ class RangeSlider extends BaseComponent {
     return inputElement
   }
 
-  _getAriaLabel(index) {
+  _getAriaLabel(index: number): string {
     if (Array.isArray(this._config.ariaLabels) && this._config.ariaLabels[index]) {
       return this._config.ariaLabels[index]
     }
@@ -282,11 +313,11 @@ class RangeSlider extends BaseComponent {
     return `Value ${index + 1}`
   }
 
-  _getValueText(value) {
+  _getValueText(value: number): string | null {
     return typeof this._config.tooltipsFormat === 'function' ? `${this._config.tooltipsFormat(value)}` : null
   }
 
-  _createLabels() {
+  _createLabels(): void {
     const { clickableLabels, disabled, labels, min, max, vertical } = this._config
 
     if (!labels || !Array.isArray(labels) || labels.length === 0) {
@@ -324,6 +355,8 @@ class RangeSlider extends BaseComponent {
       labelElement.textContent = typeof label === 'object' ? label.label : label
 
       // Calculate and set position
+      // @ts-expect-error -- the call passes an argument the method ignores.
+      // Dropping it is a behaviour change, so it is flagged rather than typed away.
       const position = this._calculateLabelPosition(label, index, percentage)
       if (vertical) {
         labelElement.style.bottom = position
@@ -337,7 +370,7 @@ class RangeSlider extends BaseComponent {
     this._element.append(labelsContainer)
   }
 
-  _calculateLabelPosition(label, index) {
+  _calculateLabelPosition(label: RangeSliderLabel, index: number): string {
     // Check if label is an object with a specific value
     if (typeof label === 'object' && label.value !== undefined) {
       return `${((label.value - this._config.min) / (this._config.max - this._config.min)) * 100}%`
@@ -347,14 +380,14 @@ class RangeSlider extends BaseComponent {
     return `${(index / (this._config.labels.length - 1)) * 100}%`
   }
 
-  _updateLabelsContainerSize() {
-    const labelsContainer = SelectorEngine.findOne(SELECTOR_RANGE_SLIDER_LABELS_CONTAINER, this._element)
+  _updateLabelsContainerSize(): void {
+    const labelsContainer = SelectorEngine.findOne(SELECTOR_RANGE_SLIDER_LABELS_CONTAINER, this._element as ParentNode)
 
     if (!this._config.labels || !labelsContainer) {
       return
     }
 
-    const labels = SelectorEngine.find(SELECTOR_RANGE_SLIDER_LABEL, this._element)
+    const labels = SelectorEngine.find(SELECTOR_RANGE_SLIDER_LABEL, this._element as ParentNode)
     if (labels.length === 0) {
       return
     }
@@ -364,12 +397,12 @@ class RangeSlider extends BaseComponent {
     labelsContainer.style[this._config.vertical ? 'width' : 'height'] = `${maxSize}px`
   }
 
-  _createTooltips() {
+  _createTooltips(): void {
     if (!this._config.tooltips) {
       return
     }
 
-    const inputs = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)
+    const inputs = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element as ParentNode) as HTMLInputElement[]
     this._thumbSize = this._getThumbSize()
 
     for (const input of inputs) {
@@ -382,13 +415,13 @@ class RangeSlider extends BaseComponent {
         input.value
       tooltipElement.append(tooltipInnerElement, tooltipArrowElement)
 
-      input.parentNode.insertBefore(tooltipElement, input.nextSibling)
+      input.parentNode!.insertBefore(tooltipElement, input.nextSibling)
       this._positionTooltip(tooltipElement, input)
       this._tooltips.push(tooltipElement)
     }
   }
 
-  _getThumbSize() {
+  _getThumbSize(): any {
     const value = window
     .getComputedStyle(this._element, null)
     .getPropertyValue(
@@ -408,9 +441,9 @@ class RangeSlider extends BaseComponent {
     return '1rem'
   }
 
-  _positionTooltip(tooltip, input) {
+  _positionTooltip(tooltip: HTMLElement, input: HTMLInputElement): void {
     const thumbSize = this._thumbSize
-    const percent = (input.value - this._config.min) / (this._config.max - this._config.min)
+    const percent = ((input.value as any) - this._config.min) / (this._config.max - this._config.min)
     const margin = percent > 0.5 ?
       `-${(percent - 0.5) * thumbSize.value}${thumbSize.unit}` :
       `${(0.5 - percent) * thumbSize.value}${thumbSize.unit}`
@@ -427,7 +460,7 @@ class RangeSlider extends BaseComponent {
     Object.assign(tooltip.style, { insetInlineStart: `${percent * 100}%`, marginInlineStart: margin })
   }
 
-  _updateTooltip(index, value) {
+  _updateTooltip(index: number, value: number): void {
     if (!this._config.tooltips) {
       return
     }
@@ -436,18 +469,18 @@ class RangeSlider extends BaseComponent {
       this._tooltips[index].children[0].innerHTML = this._config.tooltipsFormat ?
         (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(value)) :
         value
-      const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element)[index]
+      const input = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element as ParentNode)[index] as HTMLInputElement
       this._positionTooltip(this._tooltips[index], input)
     }
   }
 
-  _calculateClickValue(event) {
+  _calculateClickValue(event: any): number {
     const clickPosition = this._getClickPosition(event)
     const value = this._config.min + (clickPosition * (this._config.max - this._config.min))
     return this._roundToStep(value, this._config.step)
   }
 
-  _calculateMoveValue(event) {
+  _calculateMoveValue(event: any): number {
     const trackRect = this._sliderTrack.getBoundingClientRect()
     const position = this._config.vertical ?
       this._calculateVerticalPosition(event.clientY, trackRect) :
@@ -462,7 +495,7 @@ class RangeSlider extends BaseComponent {
     return this._roundToStep(value, this._config.step)
   }
 
-  _calculateVerticalPosition(mouseY, rect) {
+  _calculateVerticalPosition(mouseY: number, rect: DOMRect): number | string {
     if (mouseY < rect.top) {
       return 'max'
     }
@@ -474,7 +507,7 @@ class RangeSlider extends BaseComponent {
     return Math.min(Math.max((rect.bottom - mouseY) / rect.height, 0), 1)
   }
 
-  _calculateHorizontalPosition(mouseX, rect) {
+  _calculateHorizontalPosition(mouseX: number, rect: DOMRect): number | string {
     if (mouseX < rect.left) {
       return isRTL() ? 'max' : 'min'
     }
@@ -487,13 +520,13 @@ class RangeSlider extends BaseComponent {
     return Math.min(Math.max(relativeX / rect.width, 0), 1)
   }
 
-  _createElement(tag, className) {
+  _createElement(tag: string, className: string): any {
     const element = document.createElement(tag)
     element.classList.add(className)
     return element
   }
 
-  _getClickPosition(event) {
+  _getClickPosition(event: any): number {
     const { offsetX, offsetY } = event
     const { offsetWidth, offsetHeight } = this._sliderTrack
 
@@ -504,7 +537,7 @@ class RangeSlider extends BaseComponent {
     return isRTL() ? 1 - (offsetX / offsetWidth) : offsetX / offsetWidth
   }
 
-  _getNearestValueIndex(value) {
+  _getNearestValueIndex(value: number): number {
     const values = this._currentValue
     const valuesLength = values.length
 
@@ -523,7 +556,7 @@ class RangeSlider extends BaseComponent {
     return value < values[firstIndex] ? firstIndex : distances.lastIndexOf(min)
   }
 
-  _updateGradient() {
+  _updateGradient(): void {
     if (!this._config.track) {
       return
     }
@@ -555,12 +588,12 @@ class RangeSlider extends BaseComponent {
     )`
   }
 
-  _updateNearestValue(value) {
+  _updateNearestValue(value: number): void {
     const nearestIndex = this._getNearestValueIndex(value)
     this._updateValue(value, nearestIndex)
   }
 
-  _updateValue(value, index) {
+  _updateValue(value: number, index: number): void {
     const _value = this._validateValue(value, index)
     this._currentValue[index] = _value
     this._updateInput(index, _value)
@@ -568,11 +601,11 @@ class RangeSlider extends BaseComponent {
     this._updateTooltip(index, _value)
   }
 
-  _updateInput(index, value) {
+  _updateInput(index: number, value: number): void {
     const input = this._inputs[index]
 
-    input.value = value
-    input.setAttribute('aria-valuenow', value)
+    input.value = value as any
+    input.setAttribute('aria-valuenow', value as any)
 
     const valueText = this._getValueText(value)
     if (valueText !== null) {
@@ -584,7 +617,7 @@ class RangeSlider extends BaseComponent {
     })
   }
 
-  _validateValue(value, index) {
+  _validateValue(value: number, index: number): number {
     const { distance } = this._config
     const { length } = this._currentValue
 
@@ -612,12 +645,12 @@ class RangeSlider extends BaseComponent {
     return value
   }
 
-  _roundToStep(number, step) {
+  _roundToStep(number: number, step: number): number {
     const _step = step === 0 ? 1 : step
     return Math.round(number / _step) * _step
   }
 
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: any): any {
     if (typeof config.labels === 'string') {
       config.labels = config.labels.split(/,\s*/)
     }
@@ -637,7 +670,7 @@ class RangeSlider extends BaseComponent {
     return config
   }
 
-  _getConfig(config) {
+  override _getConfig(config: any): any {
     const dataAttributes = Manipulator.getDataAttributes(this._element)
 
     for (const dataAttribute of Object.keys(dataAttributes)) {
@@ -658,8 +691,8 @@ class RangeSlider extends BaseComponent {
   }
 
   // Static
-  static rangeSliderInterface(element, config) {
-    const data = RangeSlider.getOrCreateInstance(element, config)
+  static rangeSliderInterface(element: string | Element | null, config?: any): void {
+    const data: any = RangeSlider.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {
@@ -670,9 +703,9 @@ class RangeSlider extends BaseComponent {
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = RangeSlider.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
+      const data: any = RangeSlider.getOrCreateInstance(this)
 
       if (typeof config !== 'string') {
         return
