@@ -165,6 +165,10 @@ export default [
       '@typescript-eslint': tseslint.plugin
     },
     rules: {
+      // `eslint-recommended` disables the base rules that misread TypeScript —
+      // no-undef fires on DOM types like ParentNode, which live in type
+      // position and are not runtime identifiers.
+      ...tseslint.configs.recommended.find(config => config.name === 'typescript-eslint/eslint-recommended')?.rules,
       ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
       // The config objects are intentionally loose — see util/config
       '@typescript-eslint/no-explicit-any': 'off'

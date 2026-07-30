@@ -31,7 +31,13 @@
     // build/tsconfig.dts.json.
     "declaration": true,
     "isolatedDeclarations": true,
-    "useDefineForClassFields": true,
+    // Babel runs with `loose: true`, which gives class fields SET (assignment)
+    // semantics. Upstream forces DEFINE semantics on both sides instead, but
+    // they can: none of their classes has a real field. Ours do — time-picker
+    // assigns `_handleTimeChange` as one — and switching them to define changes
+    // both behaviour and output (verified: the minified bundle grows a
+    // Symbol.toPrimitive helper chain). So tsc is told what Babel actually does.
+    "useDefineForClassFields": false,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
