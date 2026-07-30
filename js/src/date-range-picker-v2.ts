@@ -129,7 +129,8 @@ const DefaultType: Record<string, string> = {
   separatorIcon: 'string',
   separatorIconRtl: 'string',
   size: '(string|null)',
-  startDate: '(date|string|null)'
+  startDate: '(date|string|null)',
+  startName: '(string|null)'
 }
 
 /**

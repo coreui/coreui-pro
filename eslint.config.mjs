@@ -156,7 +156,7 @@ export default [
   {
     // The library sources are migrating to TypeScript file by file, so this
     // block only applies where a `.ts` file already exists.
-    files: ['js/src/**/*.ts'],
+    files: ['js/src/**/*.ts', 'js/tests/types/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       sourceType: 'module'
