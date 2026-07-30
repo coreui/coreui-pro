@@ -15,7 +15,7 @@
 // The jQuery bridge is untyped on purpose: jQuery is optional at runtime and we
 // only ever touch `.jquery`, index 0, and the plugin registration surface.
 type JQueryLike = { jquery?: unknown, [index: number]: HTMLElement }
-type JQueryStatic = Record<string, any> & { fn: Record<string, any> }
+type JQueryStatic = ((selector: unknown) => any) & Record<string, any> & { fn: Record<string, any> }
 type JQueryPlugin = { NAME: string, jQueryInterface: (...args: any[]) => unknown }
 
 declare global {
