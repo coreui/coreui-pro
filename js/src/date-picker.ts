@@ -36,7 +36,7 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]:not(.disabled):not(:disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
 
-const Default = {
+const Default: typeof DateRangePicker.Default = {
   ...DateRangePicker.Default,
   calendars: 1,
   placeholder: ['Select date'],
@@ -44,7 +44,7 @@ const Default = {
   separator: false
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ...DateRangePicker.DefaultType,
   date: '(date|number|string|null)'
 }
@@ -55,23 +55,23 @@ const DefaultType = {
 
 class DatePicker extends DateRangePicker {
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Overrides
-  _addEventListeners() {
+  override _addEventListeners(): void {
     super._addEventListeners()
 
-    EventHandler.on(this._element, 'startDateChange.coreui.date-range-picker', event => {
+    EventHandler.on(this._element, 'startDateChange.coreui.date-range-picker', (event: any) => {
       EventHandler.trigger(this._element, EVENT_DATE_CHANGE, {
         date: event.date
       })
@@ -95,8 +95,8 @@ class DatePicker extends DateRangePicker {
   }
 
   // Static
-  static datePickerInterface(element, config) {
-    const data = DatePicker.getOrCreateInstance(element, config)
+  static datePickerInterface(element: string | Element | null, config?: any): void {
+    const data: any = DatePicker.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
       if (typeof data[config] === 'undefined') {
@@ -107,9 +107,9 @@ class DatePicker extends DateRangePicker {
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = DatePicker.getOrCreateInstance(this, config)
+  static override jQueryInterface(this: any, config: any): any {
+    return this.each(function (this: HTMLElement) {
+      const data: any = DatePicker.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
@@ -123,7 +123,7 @@ class DatePicker extends DateRangePicker {
     })
   }
 
-  static clearMenus(event) {
+  static override clearMenus(event: any): void {
     if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
       return
     }
@@ -145,7 +145,7 @@ class DatePicker extends DateRangePicker {
         continue
       }
 
-      const relatedTarget = { relatedTarget: context._element }
+      const relatedTarget: any = { relatedTarget: context._element }
 
       if (event.type === 'click') {
         relatedTarget.clickEvent = event
