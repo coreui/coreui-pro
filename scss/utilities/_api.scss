@@ -1,7 +1,7 @@
 @use "sass:map";
 @use "sass:meta";
 @use "../utilities" as *;
-@use "../mixins/breakpoints" as *;
+@use "../layout/breakpoints" as *;
 @use "../mixins/utilities" as *;
 @use "../variables" as *;
 

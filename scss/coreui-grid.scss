@@ -3,8 +3,7 @@
 );
 
 @forward "variables";
-@forward "containers";
-@forward "grid" with (
+@forward "layout" with (
   $include-column-box-sizing: true !default,
 );
 @use "utilities" as *;

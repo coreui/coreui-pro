@@ -1,5 +1,5 @@
 @use "sass:map";
-@use "../mixins/breakpoints" as *;
+@use "../layout/breakpoints" as *;
 @use "../variables" as *;
 
 @layer helpers {
