@@ -16,6 +16,9 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // Library sources run in a browser: without this, @types/node leaks in from
+    // node_modules and setTimeout resolves to Node's Timeout instead of number.
+    "types": [],
     "strict": true,
     "noEmit": true,
     // Babel compiles each file in isolation (type stripping only), so the
