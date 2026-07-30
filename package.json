@@ -27,6 +27,7 @@
     "css-prefix": "npm-run-all --aggregate-output --parallel css-prefix-*",
     "css-prefix-main": "postcss --config build/postcss.config.mjs --replace \"dist/css/**/*.css\" \"!dist/css/**/*.rtl*.css\" \"!dist/css/**/*.min.css\"",
     "css-test": "jasmine --config=scss/tests/jasmine.js",
+    "css-test-class-api": "node build/check-class-api.mjs",
     "js": "npm-run-all js-compile js-minify",
     "js-compile": "npm-run-all --aggregate-output --parallel js-compile-*",
     "js-compile-standalone": "rollup --environment BUNDLE:false --config build/rollup.config.mjs --sourcemap",
