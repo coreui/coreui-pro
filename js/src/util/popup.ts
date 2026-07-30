@@ -6,7 +6,7 @@
  */
 
 import {
-  autoUpdate, computePosition, flip, offset, shift
+  autoUpdate, computePosition, flip, offset, type Placement, shift
 } from '@floating-ui/dom'
 import EventHandler from '../dom/event-handler.js'
 import Config from './config.js'
@@ -26,14 +26,30 @@ const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
 const ESCAPE_KEY = 'Escape'
 
-const Default = {
+type PopupConfig = {
+  anchor: HTMLElement | null
+  container: Element | boolean | string
+  content: HTMLElement | null
+  fallbackPlacements: Placement[] | null
+  focusTrap: boolean
+  mobileBreakpoint: number
+  offset: [number, number]
+  onHidden: (() => void) | null
+  onHide: (() => void) | null
+  onShow: (() => void) | null
+  onShown: (() => void) | null
+  placement: string
+  returnFocus: boolean
+}
+
+const Default: PopupConfig = {
   anchor: null,
   container: false,
   content: null,
   fallbackPlacements: null, // null → mirror of placement via flip()
   focusTrap: true,
   mobileBreakpoint: 768,
-  offset: [0, 2] as [number, number],
+  offset: [0, 2],
   onHidden: null,
   onHide: null,
   onShow: null,
@@ -68,9 +84,6 @@ const DefaultType = {
  * Lifecycle notifications are callbacks — public events belong to the owning
  * component, so the primitive never emits on its own.
  */
-
-// Derived from the actual defaults, so the key set cannot drift from runtime.
-type PopupConfig = typeof Default
 
 class Popup extends Config {
   protected declare _anchor: HTMLElement | null
