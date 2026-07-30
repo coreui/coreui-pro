@@ -1,3 +1,40 @@
+export type DisabledDate = ((date: Date) => boolean) | Date | Date[]
+
+export type SelectionTypes = 'day' | 'week' | 'month' | 'quarter' | 'year'
+
+export type ViewTypes = 'days' | 'months' | 'quarters' | 'years'
+
+export type BaseGroups = {
+  year: string
+  month: string
+  day: string
+}
+
+export type WeekGroups = {
+  year: string
+  week: string
+}
+
+export type MonthGroups = {
+  year: string
+  month: string
+}
+
+export type YearGroups = {
+  year: string
+}
+
+type TimeGroups = {
+  hour: string
+  minute?: string
+  second?: string
+  ampm?: string
+}
+
+type DateOnlyGroups = BaseGroups
+type DateTimeGroups = BaseGroups & TimeGroups
+type AnyGroups = DateOnlyGroups | DateTimeGroups | WeekGroups | MonthGroups | YearGroups
+
 /**
  * Converts an ISO week string to a Date object representing the Monday of that week.
  * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
@@ -8,7 +45,7 @@
  * @param year - The year to calculate for.
  * @returns The Monday of ISO week 1.
  */
-const getMondayOfISOWeek1 = year => {
+const getMondayOfISOWeek1 = (year: number) : Date => {
   const jan4 = new Date(year, 0, 4)
   const jan4DayOfWeek = jan4.getDay()
   const daysFromMonday = jan4DayOfWeek === 0 ? 6 : jan4DayOfWeek - 1 // Sunday = 6 days from Monday
@@ -23,7 +60,7 @@ const getMondayOfISOWeek1 = year => {
  * @param week - The ISO week number.
  * @returns The Monday of the specified ISO week.
  */
-const getMondayOfISOWeek = (year, week) => {
+const getMondayOfISOWeek = (year: number, week: number) : Date => {
   const mondayOfWeek1 = getMondayOfISOWeek1(year)
   const weekStart = new Date(mondayOfWeek1)
   // prettier-ignore
@@ -36,7 +73,7 @@ const getMondayOfISOWeek = (year, week) => {
  * @param date - The date to convert.
  * @returns A number representing year*12 + month for easy comparison.
  */
-const dateToMonthNumber = date => {
+const dateToMonthNumber = (date: Date) : number => {
   // prettier-ignore
   return (date.getFullYear() * 12) + date.getMonth()
 }
@@ -46,7 +83,7 @@ const dateToMonthNumber = date => {
  * @param date - The date to convert.
  * @returns A number representing year*4 + quarter for easy comparison.
  */
-const dateToQuarterNumber = date => {
+const dateToQuarterNumber = (date: Date) : number => {
   const quarter = Math.floor(date.getMonth() / 3)
   return (date.getFullYear() * 4) + quarter
 }
@@ -58,7 +95,7 @@ const dateToQuarterNumber = date => {
  * @param max - Maximum allowed value (null means no maximum).
  * @returns True if the value is outside the range, false if within range.
  */
-const isOutsideRange = (value, min, max) => {
+const isOutsideRange = (value: number, min: number | null, max: number | null) : boolean => {
   if (min !== null && value < min) {
     return true
   }
@@ -75,7 +112,7 @@ const isOutsideRange = (value, min, max) => {
  * @param isoWeek - The ISO week string (e.g., "2023W05" or "2023w05").
  * @returns The Date object for the Monday of the specified week.
  */
-export const convertIsoWeekToDate = isoWeek => {
+export const convertIsoWeekToDate = (isoWeek: string) : Date => {
   const [year, week] = isoWeek.split(/[Ww]/)
   const parsedYear = parseYearSmart(year)
   const parsedWeek = Number.parseInt(week, 10)
@@ -89,7 +126,7 @@ export const convertIsoWeekToDate = isoWeek => {
  * @param dateString - The week string to parse.
  * @returns The Date object for the Monday of the week, or null if invalid.
  */
-const parseWeekString = dateString => {
+const parseWeekString = (dateString: string) : Date | null => {
   const weekPatterns = [
     /^(\d{4})-W(\d{1,2})$/, // 2023-W05, 2023-W5
     /^(\d{4})W(\d{1,2})$/, // 2023W05, 2023W5
@@ -116,7 +153,7 @@ const parseWeekString = dateString => {
  * @param dateString - The quarter string to parse.
  * @returns The Date object for the first day of the quarter, or null if invalid.
  */
-const parseQuarterString = dateString => {
+const parseQuarterString = (dateString: string) : Date | null => {
   const quarterPatterns = [
     /^(\d{4})-Q(\d{1})$/, // 2023-Q1, 2023-Q4
     /^(\d{4})Q(\d{1})$/, // 2023Q1, 2023Q4
@@ -146,7 +183,7 @@ const parseQuarterString = dateString => {
  * @param dateString - The month string to parse.
  * @returns The Date object for the first day of the month, or null if invalid.
  */
-const parseMonthString = dateString => {
+const parseMonthString = (dateString: string) : Date | null => {
   const monthPatterns = [
     /^(\d{2,4})[-/.\s](\d{1,2})$/, // 2023-12, 23-12, 2023/12, 23/12, 2023 12, etc.
     /^(\d{1,2})[-/.\s](\d{2,4})$/ // 12-2023, 12-23, 12/2023, 12/23, 12 2023, etc.
@@ -207,7 +244,7 @@ const parseMonthString = dateString => {
  * @param dateString - The year string or number to parse.
  * @returns The Date object for January 1st of the year, or null if invalid.
  */
-const parseYearString = dateString => {
+const parseYearString = (dateString: string | number) : Date | null => {
   const yearString = String(dateString)
   const yearPattern = /^(\d{2,4})$/
   const match = yearString.trim().match(yearPattern)
@@ -226,7 +263,7 @@ const parseYearString = dateString => {
  * @param includeTime - Whether to include time in the patterns.
  * @returns Array of date format patterns.
  */
-const generateDatePatterns = (locale, includeTime) => {
+const generateDatePatterns = (locale: string, includeTime: boolean) : string[] => {
   const referenceDate = new Date(2013, 11, 31, 17, 19, 22)
   const patterns = []
 
@@ -283,7 +320,7 @@ const generateDatePatterns = (locale, includeTime) => {
  * @param includeTime - Whether to include time patterns.
  * @returns The regex pattern string.
  */
-const buildDateRegexPattern = (formatString, includeTime) => {
+const buildDateRegexPattern = (formatString: string, includeTime: boolean) : string => {
   // First escape special regex characters
 
   let regexPattern = formatString.replaceAll(/[.*+?^${}()|[\\]\\]/g, "\\$&")
@@ -312,14 +349,14 @@ const buildDateRegexPattern = (formatString, includeTime) => {
  * @param includeTime - Whether time parsing is included.
  * @returns Parsed groups or null if no match.
  */
-const tryParseWithPatterns = (dateString, patterns, includeTime) => {
+const tryParseWithPatterns = (dateString: string, patterns: string[], includeTime: boolean) : AnyGroups | null => {
   for (const pattern of patterns) {
     const regexPattern = buildDateRegexPattern(pattern, includeTime)
     const regex = new RegExp(`^${regexPattern}$`)
     const match = dateString.trim().match(regex)
 
     if (match?.groups) {
-      return match.groups
+      return match.groups as AnyGroups
     }
   }
 
@@ -332,7 +369,7 @@ const tryParseWithPatterns = (dateString, patterns, includeTime) => {
  * @param ampm - AM/PM indicator.
  * @returns Hour in 24-hour format.
  */
-const convertTo24Hour = (hour, ampm) => {
+const convertTo24Hour = (hour: string, ampm?: string) : number => {
   const parsedHour = Number.parseInt(hour, 10)
 
   if (!ampm) {
@@ -359,7 +396,7 @@ const convertTo24Hour = (hour, ampm) => {
  * @param second - Second value.
  * @returns True if time components are valid.
  */
-const validateTimeComponents = (hour, minute, second) => {
+const validateTimeComponents = (hour: number, minute: number, second: number) : boolean => {
   return (
     hour >= 0 &&
     hour <= 23 &&
@@ -376,7 +413,7 @@ const validateTimeComponents = (hour, minute, second) => {
  * @param day - Day string.
  * @returns True if date components are valid.
  */
-const validateDateComponents = (month, day) => {
+const validateDateComponents = (month: string, day: string) : boolean => {
   const parsedMonth = Number.parseInt(month, 10) - 1
   const parsedDay = Number.parseInt(day, 10)
 
@@ -390,7 +427,7 @@ const validateDateComponents = (month, day) => {
  * @param groups - Parsed date and time groups.
  * @returns Date object or null if invalid.
  */
-const createDateWithTime = groups => {
+const createDateWithTime = (groups: DateTimeGroups) : Date | null => {
   const { year, month, day, hour, minute, second, ampm } = groups
 
   const parsedYear = parseYearSmart(year)
@@ -419,7 +456,7 @@ const createDateWithTime = groups => {
  * @param groups - Parsed date groups.
  * @returns Date object or null if invalid.
  */
-const createDateOnly = groups => {
+const createDateOnly = (groups: DateOnlyGroups) : Date | null => {
   const { year, month, day } = groups
 
   if (!validateDateComponents(month, day)) {
@@ -438,7 +475,7 @@ const createDateOnly = groups => {
  * @param patterns - Array of date format patterns.
  * @returns Expected number of parts for a complete date.
  */
-const getExpectedPartsCount = patterns => {
+const getExpectedPartsCount = (patterns: string[]) : number => {
   if (patterns.length === 0) {
     return 3
   }
@@ -456,7 +493,7 @@ const getExpectedPartsCount = patterns => {
  * @param includeTime - Whether to include time parsing.
  * @returns Date object or null if invalid.
  */
-const parseDayString = (dateString, locale, includeTime) => {
+const parseDayString = (dateString: string, locale: string, includeTime: boolean) : Date | null => {
   const patterns = generateDatePatterns(locale, includeTime)
   const groups = tryParseWithPatterns(dateString, patterns, includeTime)
 
@@ -489,7 +526,7 @@ const parseDayString = (dateString, locale, includeTime) => {
   }
 
   // Create and return appropriate date object
-  return includeTime ? createDateWithTime(groups) : createDateOnly(groups)
+  return includeTime ? createDateWithTime(groups as DateTimeGroups) : createDateOnly(groups as DateOnlyGroups)
 }
 
 /**
@@ -497,7 +534,7 @@ const parseDayString = (dateString, locale, includeTime) => {
  * @param dateString - The date string to parse.
  * @returns The Date object in local timezone, or null if invalid.
  */
-const parseLocalDateString = dateString => {
+const parseLocalDateString = (dateString: string) : Date | null => {
   // Date.parse treats date-only ISO strings ("2026-07-14") as UTC midnight,
   // which shifts the date one day back in negative-offset timezones — append
   // a time part so the string parses in the local timezone instead.
@@ -519,12 +556,7 @@ const parseLocalDateString = dateString => {
  * @param includeTime - Whether to include time parsing (for day parsing).
  * @returns The corresponding Date object or null if invalid.
  */
-export const convertToDateObject = (
-  date,
-  selectionType,
-  locale = "en-US",
-  includeTime = false
-) => {
+export const convertToDateObject = (date: Date | string, selectionType?: SelectionTypes, locale: string = 'en-US', includeTime: boolean = false) : Date | null => {
   if (date === null) {
     return null
   }
@@ -567,12 +599,7 @@ export const convertToDateObject = (
  * @param selectionType - The selection type ('day', 'week', 'month', 'quarter', 'year').
  * @returns A Date object if parsing succeeds, null if parsing fails.
  */
-export const getLocalDateFromString = (
-  dateString,
-  locale = "en-US",
-  includeTime = false,
-  selectionType = "day"
-) => {
+export const getLocalDateFromString = (dateString: string, locale: string = 'en-US', includeTime: boolean = false, selectionType: SelectionTypes = 'day') : Date | null => {
   // Input validation
   if (!dateString || typeof dateString !== "string") {
     return null
@@ -587,7 +614,7 @@ export const getLocalDateFromString = (
  * @param numberOfGroups - Number of groups to create.
  * @returns An array of grouped arrays.
  */
-export const createGroupsInArray = (arr, numberOfGroups) => {
+export const createGroupsInArray = <T>(arr: T[], numberOfGroups: number) : T[][] => {
   const perGroup = Math.ceil(arr.length / numberOfGroups)
   return Array.from({ length: numberOfGroups })
     .fill("")
@@ -601,7 +628,7 @@ export const createGroupsInArray = (arr, numberOfGroups) => {
  * @param view - The current view type.
  * @returns The adjusted Date object.
  */
-export const getCalendarDate = (calendarDate, order, view) => {
+export const getCalendarDate = (calendarDate: Date, order: number, view: ViewTypes) : Date => {
   if (order !== 0 && view === "days") {
     return new Date(
       calendarDate.getFullYear(),
@@ -632,7 +659,7 @@ export const getCalendarDate = (calendarDate, order, view) => {
  * @param selectionType - The type of selection ('day', 'week', 'month', 'quarter', 'year').
  * @returns A formatted date string or the original Date object.
  */
-export const getDateBySelectionType = (date, selectionType) => {
+export const getDateBySelectionType = (date: Date | null, selectionType: SelectionTypes) : string | Date | null => {
   if (date === null) {
     return null
   }
@@ -668,13 +695,7 @@ export const getDateBySelectionType = (date, selectionType) => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns The first available Date object or null if none found.
  */
-export const getFirstAvailableDateInRange = (
-  startDate,
-  endDate,
-  min,
-  max,
-  disabledDates
-) => {
+export const getFirstAvailableDateInRange = (startDate: Date, endDate: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : Date | null => {
   const _min = min ?
     new Date(Math.max(startDate.getTime(), min.getTime())) :
     startDate
@@ -706,7 +727,7 @@ export const getFirstAvailableDateInRange = (
  * @param format - The format of the month names ('short' or 'long').
  * @returns An array of month names.
  */
-export const getMonthsNames = (locale, format = "short") => {
+export const getMonthsNames = (locale: string, format: 'long' | 'narrow' | 'short' | 'numeric' | '2-digit' = 'short') : string[] => {
   return Array.from({ length: 12 }, (_, i) => {
     return new Date(2000, i, 1).toLocaleString(locale, { month: format })
   })
@@ -718,10 +739,7 @@ export const getMonthsNames = (locale, format = "short") => {
  * @param selector - The CSS selector used to identify selectable dates. Defaults to 'tr[tabindex="0"], td[tabindex="0"]'.
  * @returns An array of HTMLElements representing the selectable dates.
  */
-export const getSelectableDates = (
-  element,
-  selector = 'tr[tabindex="0"], td[tabindex="0"]'
-) => {
+export const getSelectableDates = (element: HTMLElement, selector: string = 'tr[tabindex="0"], td[tabindex="0"]'): Element[] => {
   return [...Element.prototype.querySelectorAll.call(element, selector)]
 }
 
@@ -731,7 +749,7 @@ export const getSelectableDates = (
  * @param range - The number of years before and after the central year.
  * @returns An array of years.
  */
-export const getYears = (year, range = 6) => {
+export const getYears = (year: number, range: number = 6) : number[] => {
   return Array.from({ length: range * 2 }, (_, i) => year - range + i)
 }
 
@@ -742,7 +760,7 @@ export const getYears = (year, range = 6) => {
  * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
  * @returns An array of leading day objects.
  */
-const getLeadingDays = (year, month, firstDayOfWeek) => {
+const getLeadingDays = (year: number, month: number, firstDayOfWeek: number) : { date: Date; month: string }[] => {
   // 0: sunday
   // 1: monday
   const dates = []
@@ -772,7 +790,7 @@ const getLeadingDays = (year, month, firstDayOfWeek) => {
  * @param month - The month (0-11).
  * @returns An array of day objects.
  */
-const getMonthDays = (year, month) => {
+const getMonthDays = (year: number, month: number) : { date: Date; month: string }[] => {
   const dates = []
   const lastDay = new Date(year, month + 1, 0).getDate()
   for (let i = 1; i <= lastDay; i++) {
@@ -793,7 +811,7 @@ const getMonthDays = (year, month) => {
  * @param monthDays - Array of current month day objects.
  * @returns An array of trailing day objects.
  */
-const getTrailingDays = (year, month, leadingDays, monthDays) => {
+const getTrailingDays = (year: number, month: number, leadingDays: { date: Date; month: string }[], monthDays: { date: Date; month: string }[]) => {
   const dates = []
   const days = 42 - (leadingDays.length + monthDays.length)
   for (let i = 1; i <= days; i++) {
@@ -819,7 +837,7 @@ const getTrailingDays = (year, month, leadingDays, monthDays) => {
  *   - `weekNumber`: the ISO week number (1–53),
  *   - `year`: the ISO year (may differ from the calendar year of the date).
  */
-export const getISOWeekNumberAndYear = date => {
+export const getISOWeekNumberAndYear = (date: Date) : { weekNumber: number; year: number } => {
   const tempDate = new Date(date)
   tempDate.setHours(0, 0, 0, 0)
 
@@ -842,7 +860,7 @@ export const getISOWeekNumberAndYear = date => {
  * @param firstDayOfWeek - The first day of the week (0-6, where 0 is Sunday).
  * @returns An array of week objects containing week numbers and day details.
  */
-export const getMonthDetails = (year, month, firstDayOfWeek) => {
+export const getMonthDetails = (year: number, month: number, firstDayOfWeek: number) : { week: { number: number; year: number }; days: { date: Date; month: string }[] }[] => {
   const daysPrevMonth = getLeadingDays(year, month, firstDayOfWeek)
   const daysThisMonth = getMonthDays(year, month)
   const daysNextMonth = getTrailingDays(
@@ -852,7 +870,7 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
     daysThisMonth
   )
   const days = [...daysPrevMonth, ...daysThisMonth, ...daysNextMonth]
-  const weeks = []
+  const weeks: { week: { number: number, year: number }, days: { date: Date, month: string }[] }[] = []
 
   for (const [index, day] of days.entries()) {
     if (index % 7 === 0 || weeks.length === 0) {
@@ -887,7 +905,7 @@ export const getMonthDetails = (year, month, firstDayOfWeek) => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns True if the date is disabled, false otherwise.
  */
-export const isDateDisabled = (date, min, max, disabledDates) => {
+export const isDateDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
   if (min && date < min) {
     return true
   }
@@ -934,7 +952,7 @@ export const isDateDisabled = (date, min, max, disabledDates) => {
  * @param end - End date of the range.
  * @returns True if the date is within the range, false otherwise.
  */
-export const isDateInRange = (date, start, end) => {
+export const isDateInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const _date = removeTimeFromDate(date)
   const _start = start ? removeTimeFromDate(start) : null
   const _end = end ? removeTimeFromDate(end) : null
@@ -949,7 +967,7 @@ export const isDateInRange = (date, start, end) => {
  * @param end - End date.
  * @returns True if the date is selected, false otherwise.
  */
-export const isDateSelected = (date, start, end) => {
+export const isDateSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
   if (start !== null && isSameDateAs(start, date)) {
     return true
   }
@@ -968,7 +986,7 @@ export const isDateSelected = (date, start, end) => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns True if any date in the range is disabled, false otherwise.
  */
-export const isDisableDateInRange = (startDate, endDate, disabledDates) => {
+export const isDisableDateInRange = (startDate?: Date | null, endDate?: Date | null, disabledDates?: DisabledDate | DisabledDate[]) : boolean => {
   if (startDate && endDate) {
     const date = new Date(startDate)
     let disabled = false
@@ -996,7 +1014,7 @@ export const isDisableDateInRange = (startDate, endDate, disabledDates) => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns True if the month is disabled, false otherwise.
  */
-export const isMonthDisabled = (date, min, max, disabledDates) => {
+export const isMonthDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
   const current = dateToMonthNumber(date)
   const _min = min ? dateToMonthNumber(min) : null
   const _max = max ? dateToMonthNumber(max) : null
@@ -1036,7 +1054,7 @@ export const isMonthDisabled = (date, min, max, disabledDates) => {
  * @param end - End date.
  * @returns True if the month is selected, false otherwise.
  */
-export const isMonthSelected = (date, start, end) => {
+export const isMonthSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const year = date.getFullYear()
   const month = date.getMonth()
 
@@ -1062,7 +1080,7 @@ export const isMonthSelected = (date, start, end) => {
  * @param end - End date.
  * @returns True if the month is within the range, false otherwise.
  */
-export const isMonthInRange = (date, start, end) => {
+export const isMonthInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const _start = start ? dateToMonthNumber(start) : null
   const _end = end ? dateToMonthNumber(end) : null
   const _date = dateToMonthNumber(date)
@@ -1078,7 +1096,7 @@ export const isMonthInRange = (date, start, end) => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns True if the quarter is disabled, false otherwise.
  */
-export const isQuarterDisabled = (date, min, max, disabledDates) => {
+export const isQuarterDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
   const current = dateToQuarterNumber(date)
   const _min = min ? dateToQuarterNumber(min) : null
   const _max = max ? dateToQuarterNumber(max) : null
@@ -1127,7 +1145,7 @@ export const isQuarterDisabled = (date, min, max, disabledDates) => {
  * @param end - End date.
  * @returns True if the quarter is selected, false otherwise.
  */
-export const isQuarterSelected = (date, start, end) => {
+export const isQuarterSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const year = date.getFullYear()
   const quarter = Math.floor(date.getMonth() / 3)
 
@@ -1157,7 +1175,7 @@ export const isQuarterSelected = (date, start, end) => {
  * @param end - End date.
  * @returns True if the quarter is within the range, false otherwise.
  */
-export const isQuarterInRange = (date, start, end) => {
+export const isQuarterInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const _start = start ? dateToQuarterNumber(start) : null
   const _end = end ? dateToQuarterNumber(end) : null
   const _date = dateToQuarterNumber(date)
@@ -1171,7 +1189,7 @@ export const isQuarterInRange = (date, start, end) => {
  * @param date2 - Second date.
  * @returns True if both dates are the same, false otherwise.
  */
-export const isSameDateAs = (date, date2) => {
+export const isSameDateAs = (date: Date | null, date2: Date | null) : boolean => {
   if (date instanceof Date && date2 instanceof Date) {
     return (
       date.getDate() === date2.getDate() &&
@@ -1192,7 +1210,7 @@ export const isSameDateAs = (date, date2) => {
  * @param date - The date to check.
  * @returns True if the date is today, false otherwise.
  */
-export const isToday = date => {
+export const isToday = (date: Date) : boolean => {
   const today = new Date()
   return isSameDateAs(date, today)
 }
@@ -1205,7 +1223,7 @@ export const isToday = date => {
  * @param disabledDates - Criteria for disabled dates.
  * @returns True if the year is disabled, false otherwise.
  */
-export const isYearDisabled = (date, min, max, disabledDates) => {
+export const isYearDisabled = (date: Date, min?: Date | null, max?: Date | null, disabledDates?: DisabledDate | DisabledDate[]): boolean => {
   const year = date.getFullYear()
   const minYear = min ? min.getFullYear() : null
   const maxYear = max ? max.getFullYear() : null
@@ -1245,7 +1263,7 @@ export const isYearDisabled = (date, min, max, disabledDates) => {
  * @param end - End date.
  * @returns True if the year matches the start's or end's year, false otherwise.
  */
-export const isYearSelected = (date, start, end) => {
+export const isYearSelected = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const year = date.getFullYear()
 
   if (start !== null && year === start.getFullYear()) {
@@ -1266,7 +1284,7 @@ export const isYearSelected = (date, start, end) => {
  * @param end - End date.
  * @returns True if the year's value lies between start's year and end's year, false otherwise.
  */
-export const isYearInRange = (date, start, end) => {
+export const isYearInRange = (date: Date, start: Date | null, end: Date | null) : boolean => {
   const year = date.getFullYear()
   const _start = start ? start.getFullYear() : null
   const _end = end ? end.getFullYear() : null
@@ -1279,7 +1297,7 @@ export const isYearInRange = (date, start, end) => {
  * @param date - The original date.
  * @returns A new Date object with the time set to 00:00:00.
  */
-export const removeTimeFromDate = date => {
+export const removeTimeFromDate = (date: Date) : Date => {
   const clearedDate = new Date(date)
   clearedDate.setHours(0, 0, 0, 0)
   return clearedDate
@@ -1292,7 +1310,7 @@ export const removeTimeFromDate = date => {
  * @param {Date | null} source - The date to copy the time from.
  * @returns {Date} A new Date instance with the date from `target` and time from `source`.
  */
-export const setTimeFromDate = (target, source) => {
+export const setTimeFromDate = (target: Date | null, source: Date | null) : Date | null => {
   if (target === null) {
     return null
   }
@@ -1317,7 +1335,7 @@ export const setTimeFromDate = (target, source) => {
  * @param yearString - The year string to parse.
  * @returns The parsed year as a number with intelligent century assignment.
  */
-export const parseYearSmart = yearString => {
+export const parseYearSmart = (yearString: string) : number => {
   let parsedYear = Number.parseInt(yearString, 10)
 
   // Handle 2-digit years with intelligent century assignment
@@ -1342,7 +1360,7 @@ export const parseYearSmart = yearString => {
  * @param groups - The year groups containing year string.
  * @returns A Date object for January 1st of the year.
  */
-export const createDateFromYear = groups => {
+export const createDateFromYear = (groups: YearGroups) : Date => {
   const { year } = groups
   const parsedYear = parseYearSmart(year)
   return new Date(parsedYear, 0, 1)
@@ -1353,7 +1371,7 @@ export const createDateFromYear = groups => {
  * @param groups - The month groups containing year and month strings.
  * @returns A Date object for the first day of the month.
  */
-export const createDateFromMonth = groups => {
+export const createDateFromMonth = (groups: MonthGroups) : Date => {
   const { year, month } = groups
   const parsedYear = parseYearSmart(year)
   const parsedMonth = Number.parseInt(month, 10) - 1
@@ -1365,7 +1383,7 @@ export const createDateFromMonth = groups => {
  * @param groups - The week groups containing year and week strings.
  * @returns A Date object for the Monday of the specified week.
  */
-export const createDateFromWeek = groups => {
+export const createDateFromWeek = (groups: WeekGroups) : Date => {
   const { year, week } = groups
   const parsedYear = parseYearSmart(year)
   const parsedWeek = Number.parseInt(week, 10)
