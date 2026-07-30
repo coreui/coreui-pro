@@ -1,0 +1,34 @@
+@use "sass:map";
+@use "config" as *;
+
+// Contextual theme tokens
+//
+// Components consume colors through the --#{$prefix}theme-* indirection so a
+// single set of component styles works with every theme color. Each token maps
+// to the per-color custom properties generated in _root.scss.
+
+// scss-docs-start theme-token-refs
+$theme-token-refs: (
+  "base": "",
+  "contrast": "-contrast",
+  "fg": "-text-emphasis",
+  "bg-subtle": "-bg-subtle",
+  "border": "-border-subtle"
+) !default;
+// scss-docs-end theme-token-refs
+
+@mixin theme-tokens($state) {
+  @each $token, $suffix in $theme-token-refs {
+    --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
+  }
+}
+
+// scss-docs-start theme-classes
+@mixin generate-theme-classes() {
+  @each $state in map.keys($theme-colors) {
+    .theme-#{$state} {
+      @include theme-tokens($state);
+    }
+  }
+}
+// scss-docs-end theme-classes

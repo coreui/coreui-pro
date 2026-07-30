@@ -2,8 +2,7 @@
   $file: "Reboot"
 );
 
-@forward "variables";
-@forward "variables-dark";
+@forward "config";
 
 @forward "root";
-@forward "reboot";
+@forward "content/reboot";

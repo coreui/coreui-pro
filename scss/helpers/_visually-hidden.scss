@@ -1,10 +1,12 @@
 @use "../mixins/visually-hidden" as *;
 
-//
-// Visually hidden
-//
+@layer helpers {
+  //
+  // Visually hidden
+  //
 
-.visually-hidden,
-.visually-hidden-focusable:not(:focus):not(:focus-within) {
-  @include visually-hidden();
+  .visually-hidden,
+  .visually-hidden-focusable:not(:focus):not(:focus-within) {
+    @include visually-hidden();
+  }
 }

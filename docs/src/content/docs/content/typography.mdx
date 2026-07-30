@@ -14,7 +14,7 @@ CoreUI for Bootstrap sets basic global display, typography, and link styles. Whe
 - Set the global link color via `$link-color`.
 - Use `$body-bg` to set a `background-color` on the `<body>` (`#fff` by default).
 
-These styles can be found within `_reboot.scss`, and the global variables are defined in `_variables.scss`. Make sure to set `$font-size-base` in `rem`.
+These styles can be found within `content/_reboot.scss`, and the global variables are defined in `_config.scss`. Make sure to set `$font-size-base` in `rem`.
 
 ## Headings
 
@@ -73,7 +73,7 @@ Traditional heading elements are designed to work best in the meat of your page 
 
 Display headings are configured via the `$display-font-sizes` Sass map and two variables, `$display-font-weight` and `$display-line-height`.
 
-<ScssDocs file="scss/_variables.scss" capture="display-headings" />
+<ScssDocs file="scss/_config.scss" capture="display-headings" />
 
 ## Lead
 
@@ -230,7 +230,7 @@ Align terms and descriptions horizontally by using our grid system's predefined 
 
 ## Responsive font sizes
 
-In CoreUI for Bootstrap, we've enabled responsive font sizes by default, allowing text to scale more naturally across device and viewport sizes. Have a look at the [RFS page](/getting-started/rfs/) to find out how this works.
+Headings scale with the viewport: the larger sizes are written as `clamp()`, so they grow with the screen up to the size given as the ceiling and stop there.
 
 ## Customization
 
@@ -238,12 +238,12 @@ In CoreUI for Bootstrap, we've enabled responsive font sizes by default, allowin
 
 Headings have some dedicated variables for sizing and spacing.
 
-<ScssDocs file="scss/_variables.scss" capture="headings-variables" />
+<ScssDocs file="scss/_config.scss" capture="headings-variables" />
 
 Miscellaneous typography elements covered here and in [Reboot](/content/reboot/) also have dedicated variables.
 
-<ScssDocs file="scss/_variables.scss" capture="type-variables" />
+<ScssDocs file="scss/_config.scss" capture="type-variables" />
 
 ### SASS Mixins
 
-There are no dedicated mixins for typography, but Bootstrap does use [Responsive Font Sizing (RFS)](/getting-started/rfs/).
+There are no dedicated mixins for typography. Fluid sizes are plain `clamp()` values in the heading and display variables.

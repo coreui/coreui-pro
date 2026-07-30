@@ -1,18 +1,10 @@
 @use "sass:map";
-@use "functions/color" as *;
-@use "functions/color-contrast" as *;
 @use "functions/maps" as *;
-@use "functions/to-rgb" as *;
-@use "variables" as *;
-@use "variables-dark" as *;
+@use "config" as *;
 
 // Re-assigned maps
 //
 // Placed here so that others can override the default Sass maps and see automatic updates to utilities and more.
-
-// scss-docs-start theme-colors-rgb
-$theme-colors-rgb: map-loop($theme-colors, to-rgb, "$value") !default;
-// scss-docs-end theme-colors-rgb
 
 // scss-docs-start theme-text-map
 $theme-colors-text: (
@@ -54,67 +46,21 @@ $theme-colors-border-subtle: (
 // scss-docs-end theme-border-subtle-map
 
 // scss-docs-start theme-contrast-map
+// The colour that reads on top of each theme colour. Written rather than
+// computed: color-contrast() picked these by ratio, which made every theme
+// colour a Sass colour the compiler had to evaluate. Upstream v6 writes them
+// too — it keeps a "contrast" key per colour and never calls the function.
 $theme-colors-contrast: (
-  "primary": color-contrast($primary),
-  "secondary": color-contrast($secondary),
-  "success": color-contrast($success),
-  "info": color-contrast($info),
-  "warning": color-contrast($warning),
-  "danger": color-contrast($danger),
-  "light": color-contrast($light),
-  "dark": color-contrast($dark),
+  "primary": $white,
+  "secondary": $white,
+  "success": $black,
+  "info": $black,
+  "warning": $black,
+  "danger": $black,
+  "light": $black,
+  "dark": $white,
 ) !default;
 // scss-docs-end theme-contrast-map
-
-$theme-colors-rgb-dark: null !default;
-$theme-colors-text-dark: null !default;
-$theme-colors-bg-subtle-dark: null !default;
-$theme-colors-border-subtle-dark: null !default;
-
-@if $enable-dark-mode {
-  // scss-docs-start theme-colors-rgb-dark
-  $theme-colors-rgb-dark: map-loop($theme-colors-dark, to-rgb, "$value") !default;
-  // scss-docs-end theme-colors-rgb-dark
-
-  // scss-docs-start theme-text-dark-map
-  $theme-colors-text-dark: (
-    "primary": $primary-text-emphasis-dark,
-    "secondary": $secondary-text-emphasis-dark,
-    "success": $success-text-emphasis-dark,
-    "info": $info-text-emphasis-dark,
-    "warning": $warning-text-emphasis-dark,
-    "danger": $danger-text-emphasis-dark,
-    "light": $light-text-emphasis-dark,
-    "dark": $dark-text-emphasis-dark,
-  ) !default;
-  // scss-docs-end theme-text-dark-map
-
-  // scss-docs-start theme-bg-subtle-dark-map
-  $theme-colors-bg-subtle-dark: (
-    "primary": $primary-bg-subtle-dark,
-    "secondary": $secondary-bg-subtle-dark,
-    "success": $success-bg-subtle-dark,
-    "info": $info-bg-subtle-dark,
-    "warning": $warning-bg-subtle-dark,
-    "danger": $danger-bg-subtle-dark,
-    "light": $light-bg-subtle-dark,
-    "dark": $dark-bg-subtle-dark,
-  ) !default;
-  // scss-docs-end theme-bg-subtle-dark-map
-
-  // scss-docs-start theme-border-subtle-dark-map
-  $theme-colors-border-subtle-dark: (
-    "primary": $primary-border-subtle-dark,
-    "secondary": $secondary-border-subtle-dark,
-    "success": $success-border-subtle-dark,
-    "info": $info-border-subtle-dark,
-    "warning": $warning-border-subtle-dark,
-    "danger": $danger-border-subtle-dark,
-    "light": $light-border-subtle-dark,
-    "dark": $dark-border-subtle-dark,
-  ) !default;
-  // scss-docs-end theme-border-subtle-dark-map
-}
 
 // Utilities maps
 //
@@ -122,19 +68,19 @@ $theme-colors-border-subtle-dark: null !default;
 
 // Come v6, we'll de-dupe these variables. Until then, for backward compatibility, we keep them to reassign.
 // scss-docs-start utilities-colors
-$utilities-colors: $theme-colors-rgb !default;
+$utilities-colors: $theme-colors !default;
 // scss-docs-end utilities-colors
 
 // scss-docs-start utilities-text-colors
 $utilities-text: map.merge(
   $utilities-colors,
   (
-    "black": to-rgb($black),
-    "white": to-rgb($white),
-    "body": to-rgb($body-color)
+    "black": $black,
+    "white": $white,
+    "body": $body-color
   )
 ) !default;
-$utilities-text-colors: map-loop($utilities-text, rgba-css-var, "$prefix", "$key", "text") !default;
+$utilities-text-colors: map-loop($utilities-text, translucent-css-var, "$prefix", "$key", "text") !default;
 
 $utilities-text-emphasis-colors: (
   "primary-emphasis": var(--#{$prefix}primary-text-emphasis),
@@ -152,12 +98,12 @@ $utilities-text-emphasis-colors: (
 $utilities-bg: map.merge(
   $utilities-colors,
   (
-    "black": to-rgb($black),
-    "white": to-rgb($white),
-    "body": to-rgb($body-bg)
+    "black": $black,
+    "white": $white,
+    "body": $body-bg
   )
 ) !default;
-$utilities-bg-colors: map-loop($utilities-bg, rgba-css-var, "$prefix", "$key", "bg") !default;
+$utilities-bg-colors: map-loop($utilities-bg, translucent-css-var, "$prefix", "$key", "bg") !default;
 
 $utilities-bg-subtle: (
   "primary-subtle": var(--#{$prefix}primary-bg-subtle),
@@ -175,11 +121,11 @@ $utilities-bg-subtle: (
 $utilities-border: map.merge(
   $utilities-colors,
   (
-    "black": to-rgb($black),
-    "white": to-rgb($white)
+    "black": $black,
+    "white": $white
   )
 ) !default;
-$utilities-border-colors: map-loop($utilities-border, rgba-css-var, "$prefix", "$key", "border") !default;
+$utilities-border-colors: map-loop($utilities-border, translucent-css-var, "$prefix", "$key", "border") !default;
 
 $utilities-border-subtle: (
   "primary-subtle": var(--#{$prefix}primary-border-subtle),
@@ -193,7 +139,7 @@ $utilities-border-subtle: (
 ) !default;
 // scss-docs-end utilities-border-colors
 
-$utilities-links-underline: map-loop($utilities-colors, rgba-css-var, "$prefix", "$key", "link-underline") !default;
+$utilities-links-underline: map-loop($utilities-colors, translucent-css-var, "$prefix", "$key", "link-underline") !default;
 
 // stylelint-disable-next-line scss/at-function-named-arguments
 $negative-spacers: if(sass($enable-negative-margins): negativify-map($spacers)) !default;

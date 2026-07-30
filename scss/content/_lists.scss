@@ -1,0 +1,20 @@
+@use "../mixins/lists" as *;
+@use "../config" as *;
+
+@layer content {
+  .list-unstyled {
+    @include list-unstyled();
+  }
+
+  // Inline turns list items into inline-block
+  .list-inline {
+    @include list-unstyled();
+  }
+  .list-inline-item {
+    display: inline-block;
+
+    &:not(:last-child) {
+      margin-inline-end: $list-inline-padding;
+    }
+  }
+}

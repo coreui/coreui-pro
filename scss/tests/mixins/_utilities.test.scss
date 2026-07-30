@@ -1,5 +1,5 @@
 // Important: Do not import rfs to check that the mixin just calls the appropriate functions from it
-@use "../../variables" as * with (
+@use "../../config" as * with (
   $prefix: cui-,
   $enable-dark-mode: true,
   $enable-important-utilities: false,

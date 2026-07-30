@@ -1,163 +1,213 @@
 @use "sass:map";
 @use "sass:string";
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
-@use "../vendor/rfs" as *;
-@use "../variables" as *;
+@use "../mixins/tokens" as *;
+@use "../config" as *;
 
-//
-// Base styles
-//
+// scss-docs-start input-group-variables
+$input-group-addon-padding-y:           var(--#{$prefix}btn-input-padding-y) !default;
+$input-group-addon-padding-x:           var(--#{$prefix}btn-input-padding-x) !default;
+$input-group-addon-font-weight:         $input-font-weight !default;
+$input-group-addon-color:               $input-color !default;
+$input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
+$input-group-addon-border-color:        $input-border-color !default;
+// scss-docs-end input-group-variables
 
-.input-group {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap; // For form validation feedback
-  align-items: stretch;
-  width: 100%;
+// scss-docs-start input-group-tokens
+// The addon matches the text controls it sits next to, so its sizing lives in
+// the shared --#{$prefix}control-* namespace; only the addon-specific looks
+// keep the --#{$prefix}input-group-addon-* names.
+$input-group-tokens: () !default;
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$input-group-tokens: defaults(
+  (
+    --#{$prefix}control-padding-y: #{$input-group-addon-padding-y},
+    --#{$prefix}control-padding-x: #{$input-group-addon-padding-x},
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
+    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-border-radius: #{$input-border-radius},
+    --#{$prefix}input-group-addon-font-weight: #{$input-group-addon-font-weight},
+    --#{$prefix}input-group-addon-color: #{$input-group-addon-color},
+    --#{$prefix}input-group-addon-bg: #{$input-group-addon-bg},
+    --#{$prefix}input-group-addon-border-color: #{$input-group-addon-border-color},
+  ),
+  $input-group-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end input-group-tokens
 
-  > .autocomplete,
-  > .date-picker,
-  > .time-picker,
-  > .form-control,
-  > .form-multi-select,
-  > .form-password,
-  > .form-select,
-  > .form-floating {
-    position: relative; // For focus state's z-index
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0; // https://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size
-  }
+@layer forms {
+  //
+  // Base styles
+  //
 
-  // Bring the "active" form control to the top of surrounding elements
-  > .autocomplete:focus-within,
-  > .date-picker:focus-within,
-  > .time-picker:focus-within,
-  > .form-multi-select:focus-within,
-  > .form-control:focus,
-  > .form-select:focus,
-  > .form-floating:focus-within,
-  > .form-password:focus-within {
-    z-index: 5;
-  }
-
-  // Ensure buttons are always above inputs for more visually pleasing borders.
-  // This isn't needed for `.input-group-text` since it shares the same border-color
-  // as our inputs.
-  .btn {
+  .input-group {
     position: relative;
-    z-index: 2;
+    display: flex;
+    flex-wrap: wrap; // For form validation feedback
+    align-items: stretch;
+    width: 100%;
 
-    &:focus {
+    > .autocomplete,
+    > .date-picker,
+    > .time-picker,
+    > .form-control,
+    > .form-multi-select,
+    > .form-password,
+    > .form-select,
+    > .form-floating {
+      position: relative; // For focus state's z-index
+      flex: 1 1 auto;
+      width: 1%;
+      min-width: 0; // https://stackoverflow.com/questions/36247140/why-dont-flex-items-shrink-past-content-size
+    }
+
+    // Bring the "active" form control to the top of surrounding elements
+    > .autocomplete:focus-within,
+    > .date-picker:focus-within,
+    > .time-picker:focus-within,
+    > .form-multi-select:focus-within,
+    > .form-control:focus,
+    > .form-select:focus,
+    > .form-floating:focus-within,
+    > .form-password:focus-within {
       z-index: 5;
     }
-  }
-}
 
+    // Ensure buttons are always above inputs for more visually pleasing borders.
+    // This isn't needed for `.input-group-text` since it shares the same border-color
+    // as our inputs.
+    .btn {
+      position: relative;
+      z-index: 2;
 
-// Textual addons
-//
-// Serves as a catch-all element for any text or radio/checkbox input you wish
-// to prepend or append to an input.
-
-.input-group-text {
-  display: flex;
-  align-items: center;
-  padding: $input-group-addon-padding-y $input-group-addon-padding-x;
-  @include font-size($input-font-size); // Match inputs
-  font-weight: $input-group-addon-font-weight;
-  line-height: $input-line-height;
-  color: var(--#{$prefix}input-group-addon-color, $input-group-addon-color);
-  text-align: center;
-  white-space: nowrap;
-  background-color: var(--#{$prefix}input-group-addon-bg, $input-group-addon-bg);
-  border: $input-border-width solid var(--#{$prefix}input-group-addon-border-color, $input-group-addon-border-color);
-  @include border-radius($input-border-radius);
-}
-
-
-// Sizing
-//
-// Remix the default form control sizing classes into new ones for easier
-// manipulation.
-
-.input-group-lg > .form-control,
-.input-group-lg > .form-select,
-.input-group-lg > .input-group-text,
-.input-group-lg > .btn {
-  padding: $input-padding-y-lg $input-padding-x-lg;
-  @include font-size($input-font-size-lg);
-  @include border-radius($input-border-radius-lg);
-}
-
-.input-group-sm > .form-control,
-.input-group-sm > .form-select,
-.input-group-sm > .input-group-text,
-.input-group-sm > .btn {
-  padding: $input-padding-y-sm $input-padding-x-sm;
-  @include font-size($input-font-size-sm);
-  @include border-radius($input-border-radius-sm);
-}
-
-.input-group-lg > .form-select,
-.input-group-sm > .form-select {
-  padding-inline-end: $form-select-padding-x + $form-select-indicator-padding;
-}
-
-
-// Rounded corners
-//
-// These rulesets must come after the sizing ones to properly override sm and lg
-// border-radius values when extending. They're more specific than we'd like
-// with the `.input-group >` part, but without it, we cannot override the sizing.
-
-// stylelint-disable-next-line no-duplicate-selectors
-.input-group {
-  &:not(.has-validation) {
-    > .autocomplete:not(:last-child) > .autocomplete-input-group,
-    > .date-picker:not(:last-child) > .date-picker-input-group,
-    > .time-picker:not(:last-child) > .time-picker-input-group,
-    > .form-multi-select:not(:last-child) > .form-multi-select-input-group,
-    > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
-    > .dropdown-toggle:nth-last-child(n + 3),
-    > .form-floating:not(:last-child) > .form-control,
-    > .form-floating:not(:last-child) > .form-select,
-    > .form-password:not(:last-child) > .form-control {
-      @include border-end-radius(0);
+      &:focus {
+        z-index: 5;
+      }
     }
   }
 
-  &.has-validation {
-    > .autocomplete > .autocomplete-input-group,
-    > .date-picker > .date-picker-input-group,
-    > .time-picker > .time-picker-input-group,
-    > .form-multi-select > .form-multi-select-input-group,
-    > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
-    > .dropdown-toggle:nth-last-child(n + 4),
-    > .form-floating:nth-last-child(n + 3) > .form-control,
-    > .form-floating:nth-last-child(n + 3) > .form-select,
-    > .form-password:nth-last-child(n + 3) > .form-control {
-      @include border-end-radius(0);
+
+  // Textual addons
+  //
+  // Serves as a catch-all element for any text or radio/checkbox input you wish
+  // to prepend or append to an input.
+
+  .input-group-text {
+    @include tokens($input-group-tokens);
+
+    display: flex;
+    align-items: center;
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size); // Match inputs
+    font-weight: var(--#{$prefix}input-group-addon-font-weight);
+    line-height: var(--#{$prefix}control-line-height);
+    color: var(--#{$prefix}input-group-addon-color);
+    text-align: center;
+    white-space: nowrap;
+    background-color: var(--#{$prefix}input-group-addon-bg);
+    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}input-group-addon-border-color);
+    @include border-radius(var(--#{$prefix}control-border-radius));
+  }
+
+
+  // Sizing
+  //
+  // Remix the default form control sizing classes into new ones for easier
+  // manipulation.
+
+  .input-group-lg > .form-control,
+  .input-group-lg > .form-select,
+  .input-group-lg > .input-group-text,
+  .input-group-lg > .btn {
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
+    --#{$prefix}control-border-radius: #{$input-border-radius-lg};
+
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size);
+    @include border-radius(var(--#{$prefix}control-border-radius));
+  }
+
+  .input-group-sm > .form-control,
+  .input-group-sm > .form-select,
+  .input-group-sm > .input-group-text,
+  .input-group-sm > .btn {
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
+    --#{$prefix}control-border-radius: #{$input-border-radius-sm};
+
+    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+    font-size: var(--#{$prefix}control-font-size);
+    @include border-radius(var(--#{$prefix}control-border-radius));
+  }
+
+  .input-group-lg > .form-select,
+  .input-group-sm > .form-select {
+    // stylelint-disable-next-line function-disallowed-list
+    padding-inline-end: calc(var(--#{$prefix}control-padding-x) + var(--#{$prefix}form-select-indicator-padding));
+  }
+
+
+  // Rounded corners
+  //
+  // These rulesets must come after the sizing ones to properly override sm and lg
+  // border-radius values when extending. They're more specific than we'd like
+  // with the `.input-group >` part, but without it, we cannot override the sizing.
+
+  // stylelint-disable-next-line no-duplicate-selectors
+  .input-group {
+    &:not(.has-validation) {
+      > .autocomplete:not(:last-child) > .autocomplete-input-group,
+      > .date-picker:not(:last-child) > .date-picker-input-group,
+      > .time-picker:not(:last-child) > .time-picker-input-group,
+      > .form-multi-select:not(:last-child) > .form-multi-select-input-group,
+      > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
+      > .dropdown-toggle:nth-last-child(n + 3),
+      > .form-floating:not(:last-child) > .form-control,
+      > .form-floating:not(:last-child) > .form-select,
+      > .form-password:not(:last-child) > .form-control {
+        @include border-end-radius(0);
+      }
     }
-  }
 
-  $validation-messages: "";
-  @each $state in map.keys($form-validation-states) {
-    $validation-messages: $validation-messages + ":not(." + string.unquote($state) + "-tooltip)" + ":not(." + string.unquote($state) + "-feedback)";
-  }
+    &.has-validation {
+      > .autocomplete > .autocomplete-input-group,
+      > .date-picker > .date-picker-input-group,
+      > .time-picker > .time-picker-input-group,
+      > .form-multi-select > .form-multi-select-input-group,
+      > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
+      > .dropdown-toggle:nth-last-child(n + 4),
+      > .form-floating:nth-last-child(n + 3) > .form-control,
+      > .form-floating:nth-last-child(n + 3) > .form-select,
+      > .form-password:nth-last-child(n + 3) > .form-control {
+        @include border-end-radius(0);
+      }
+    }
 
-  > :not(:first-child):not(.dropdown-menu)#{$validation-messages} {
-    margin-inline-start: calc(-1 * #{$input-border-width}); // stylelint-disable-line function-disallowed-list
-    @include border-start-radius(0);
-  }
+    $validation-messages: "";
+    @each $state in map.keys($form-validation-states) {
+      $validation-messages: $validation-messages + ":not(." + string.unquote($state) + "-tooltip)" + ":not(." + string.unquote($state) + "-feedback)";
+    }
 
-  > .autocomplete:not(:first-child) > .autocomplete-input-group,
-  > .date-picker:not(:first-child) > .date-picker-input-group,
-  > .time-picker:not(:first-child) > .time-picker-input-group,
-  > .form-multi-select:not(:first-child) + .form-multi-select > .form-multi-select-input-group,
-  > .form-floating:not(:first-child) > .form-control,
-  > .form-floating:not(:first-child) > .form-select,
-  > .form-password:not(:first-child) > .form-control {
-    @include border-start-radius(0);
+    > :not(:first-child):not(.dropdown-menu)#{$validation-messages} {
+      margin-inline-start: calc(-1 * #{$input-border-width}); // stylelint-disable-line function-disallowed-list
+      @include border-start-radius(0);
+    }
+
+    > .autocomplete:not(:first-child) > .autocomplete-input-group,
+    > .date-picker:not(:first-child) > .date-picker-input-group,
+    > .time-picker:not(:first-child) > .time-picker-input-group,
+    > .form-multi-select:not(:first-child) + .form-multi-select > .form-multi-select-input-group,
+    > .form-floating:not(:first-child) > .form-control,
+    > .form-floating:not(:first-child) > .form-select,
+    > .form-password:not(:first-child) > .form-control {
+      @include border-start-radius(0);
+    }
   }
 }

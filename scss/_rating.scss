@@ -1,104 +1,132 @@
+@use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "variables" as *;
+@use "config" as *;
 
-.rating {
-  // scss-docs-start rating-css-vars
-  --#{$prefix}rating-gap: #{$rating-gap};
-  --#{$prefix}rating-transition: #{$rating-transition};
-  --#{$prefix}rating-item-height: #{$rating-item-height};
-  --#{$prefix}rating-item-color: #{$rating-item-color};
-  --#{$prefix}rating-item-scale-transform: #{$rating-item-scale-transform};
-  --#{$prefix}rating-item-active-color: #{$rating-item-active-color};
-  --#{$prefix}rating-item-icon: #{escape-svg($rating-item-icon)};
-  // scss-docs-end rating-css-vars
+// stylelint-disable custom-property-no-missing-var-function
 
-  display: flex;
-  gap: var(--#{$prefix}rating-gap);
+// Rating
+// scss-docs-start rating-variables
+$rating-gap:                   .0625rem !default;
+$rating-transition:            color .15s ease-out, transform .15s ease-out !default;
+$rating-item-height-sm:        1rem !default;
+$rating-item-height:           1.25rem !default;
+$rating-item-height-lg:        1.5rem !default;
+$rating-item-color:            var(--#{$prefix}tertiary-color) !default;
+$rating-item-scale-transform:  scale(1.2) !default;
+$rating-item-active-color:     var(--#{$prefix}warning) !default;
+$rating-item-icon:             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='currentColor' d='M470.935,194.043,333.8,171.757,270.227,48.22a16,16,0,0,0-28.454,0L178.2,171.757,41.065,194.043A16,16,0,0,0,32.273,221.1l97.845,98.636L108.936,457.051a16,16,0,0,0,23.02,16.724L256,411.2l124.044,62.576a16,16,0,0,0,23.02-16.724L381.882,319.74,479.727,221.1A16,16,0,0,0,470.935,194.043Z'%3E%3C/path%3E%3C/svg%3E") !default;
+// scss-docs-end rating-variables
 
-  &.disabled {
-    opacity: 50%;
-  }
+$rating-tokens: () !default;
 
-  &:not(.disabled):not(.readonly) {
-    .rating-item:hover {
-      transform: var(--#{$prefix}rating-item-scale-transform);
+// scss-docs-start rating-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$rating-tokens: defaults(
+  (
+    --#{$prefix}rating-gap: #{$rating-gap},
+    --#{$prefix}rating-transition: #{$rating-transition},
+    --#{$prefix}rating-item-height: #{$rating-item-height},
+    --#{$prefix}rating-item-color: #{$rating-item-color},
+    --#{$prefix}rating-item-scale-transform: #{$rating-item-scale-transform},
+    --#{$prefix}rating-item-active-color: #{$rating-item-active-color},
+    --#{$prefix}rating-item-icon: #{escape-svg($rating-item-icon)},
+  ),
+  $rating-tokens
+);
+// scss-docs-end rating-css-vars
+@layer components {
+  .rating {
+    @include tokens($rating-tokens);
+
+    display: flex;
+    gap: var(--#{$prefix}rating-gap);
+
+    &.disabled {
+      opacity: 50%;
     }
 
-    .rating-item-icon,
-    .rating-item-label {
-      cursor: pointer;
+    &:not(.disabled):not(.readonly) {
+      .rating-item:hover {
+        transform: var(--#{$prefix}rating-item-scale-transform);
+      }
+
+      .rating-item-icon,
+      .rating-item-label {
+        cursor: pointer;
+      }
     }
   }
-}
 
-.rating-item {
-  position: relative;
-  line-height: 0;
-  @include transition(var(--#{$prefix}rating-transition));
-}
-
-.rating-item-input {
-  position: absolute;
-  left: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  appearance: none;
-
-}
-
-.rating-item-label {
-  font-size: var(--#{$prefix}rating-item-height);
-  line-height: 0;
-  color: var(--#{$prefix}rating-item-color);
-
-  * {
-    pointer-events: none;
+  .rating-item {
+    position: relative;
+    line-height: 0;
+    @include transition(var(--#{$prefix}rating-transition));
   }
 
-  svg {
-    height: var(--#{$prefix}rating-item-height);
-    pointer-events: none;
+  .rating-item-input {
+    position: absolute;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    appearance: none;
+
+  }
+
+  .rating-item-label {
+    font-size: var(--#{$prefix}rating-item-height);
+    line-height: 0;
+    color: var(--#{$prefix}rating-item-color);
 
     * {
       pointer-events: none;
     }
+
+    svg {
+      height: var(--#{$prefix}rating-item-height);
+      pointer-events: none;
+
+      * {
+        pointer-events: none;
+      }
+    }
+
+    &.active {
+      color: var(--#{$prefix}rating-item-active-color);
+      opacity: 1 !important; // stylelint-disable-line declaration-no-important
+
+      .rating-item-icon {
+        background-color: var(--#{$prefix}rating-item-active-color);
+      }
+
+      .rating-item-custom-icon:has(+ .rating-item-custom-icon-active) {
+        display: none;
+      }
+
+      .rating-item-custom-icon-active {
+        display: initial;
+      }
+    }
   }
 
-  &.active {
-    color: var(--#{$prefix}rating-item-active-color);
-    opacity: 1 !important; // stylelint-disable-line declaration-no-important
-
-    .rating-item-icon {
-      background-color: var(--#{$prefix}rating-item-active-color);
-    }
-
-    .rating-item-custom-icon:has(+ .rating-item-custom-icon-active) {
-      display: none;
-    }
-
-    .rating-item-custom-icon-active {
-      display: initial;
-    }
+  .rating-item-icon {
+    width: var(--#{$prefix}rating-item-height);
+    height: var(--#{$prefix}rating-item-height);
+    background-color: var(--#{$prefix}rating-item-color);
+    mask: var(--#{$prefix}rating-item-icon) center / var(--#{$prefix}rating-item-height) no-repeat;
   }
-}
 
-.rating-item-icon {
-  width: var(--#{$prefix}rating-item-height);
-  height: var(--#{$prefix}rating-item-height);
-  background-color: var(--#{$prefix}rating-item-color);
-  mask: var(--#{$prefix}rating-item-icon) center / var(--#{$prefix}rating-item-height) no-repeat;
-}
+  .rating-item-custom-icon-active {
+    display: none;
+  }
 
-.rating-item-custom-icon-active {
-  display: none;
-}
+  .rating-sm {
+    --#{$prefix}rating-item-height: #{$rating-item-height-sm};
+  }
 
-.rating-sm {
-  --#{$prefix}rating-item-height: #{$rating-item-height-sm};
-}
-
-.rating-lg {
-  --#{$prefix}rating-item-height: #{$rating-item-height-lg};
+  .rating-lg {
+    --#{$prefix}rating-item-height: #{$rating-item-height-lg};
+  }
 }

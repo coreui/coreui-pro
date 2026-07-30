@@ -6,8 +6,10 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 <Callout color="warning">
   **Work in progress.** v6 is under active development on the `v6-dev` branch —
   this page tracks every migration-relevant change as it lands, so nothing here
-  is final until a v6 release ships. The core promise does not change: **an
-  existing class or value never changes meaning; new behavior gets a new name.**
+  is final until a v6 release ships. The **class API keeps its meaning** —
+  `.btn-primary`, `.alert-success` and friends render as before. Where the Sass
+  or CSS-variable surface does change, the entry below carries a
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span> badge.
 </Callout>
 
 ## v6.0.0 (unreleased)
@@ -151,6 +153,551 @@ the option-by-option migration map. Planned mapping:
   created — a detached element has no computed direction (the calendar falls
   back to the nearest `[dir]` ancestor, but placement first is the reliable
   path).
+
+### Sass architecture & design tokens
+
+v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
+design-token maps, one shared styling surface for every text control, and
+runtime color math in place of precompiled shades. Sass variables remain the
+primary customization API — every component knob still works through
+`@use ... with()` — but several things below are breaking and are called out
+as such.
+
+#### Colour decisions are written, not computed
+
+v6 stops evaluating colours at build time, the way upstream v6 does — Sass
+assembles maps of CSS expressions and the browser resolves them.
+
+- **`$theme-colors-contrast` holds written values** instead of
+  `color-contrast()` results. The computed and written values are identical, so
+  nothing renders differently; the point is that a theme colour no longer has to
+  be a Sass colour for the contrast pass to run over it. Upstream keeps a
+  `"contrast"` key per colour and never calls the function either.
+- **Table variants read the theme tokens.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `.table-primary` and friends still exist, but they are generated the way
+  `.btn-primary` is: the class sets `--#{$prefix}theme-*` and the base `.table`
+  rules read it. `$table-variants` is now a **list of colour names**, not a map
+  of pre-shifted colours, and `$table-bg-scale` / `$table-border-factor` are
+  gone. A theme colour you add yourself now gets a table variant without
+  compiling Sass.
+  Two visible consequences: the variant background is the colour's
+  `bg-subtle` token rather than a `shift-color()` of the base, and striped /
+  hover / active are `color-mix()` overlays on the text colour rather than
+  opaque mixes — so they compose over the row's own background. Table variants
+  also follow colour modes now, where before they stayed on light-palette
+  values in dark mode.
+
+#### RGB channel tokens and the elevation system removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **Every `--#{$prefix}{name}-rgb` custom property is gone**, along with the
+  `$theme-colors-rgb` and `$theme-colors-rgb-dark` maps, the `to-rgb()`
+  function's role in `:root`, and the `rgba-css-var()` helper (now
+  `translucent-css-var()`). They existed only so
+  `rgba(var(--cui-primary-rgb), .5)` could apply an alpha to a token; that is
+  what `color-mix()` does directly:
+
+  ```diff
+  - background-color: rgba(var(--cui-primary-rgb), .5);
+  + background-color: color-mix(in srgb, var(--cui-primary) 50%, transparent);
+  ```
+
+  Upstream v6 carries no rgb triplets either. The opacity utilities
+  (`.text-opacity-50`, `.bg-opacity-25`, `.link-opacity-75`) are unchanged —
+  they now scale the token through `calc(var(--cui-bg-opacity) * 100%)`.
+- **The elevation system is gone**: `$elevations`, `$enable-elevations`,
+  `$elevation-base-color`, the `elevation()` mixin and the `.elevation-*`
+  utilities. It was disabled by default (`$enable-elevations: false`), so the
+  utilities were the only reachable part. Use the shadow utilities
+  (`.shadow`, `.shadow-sm`, `.shadow-lg`) or set `box-shadow` directly.
+- **Button focus rings take a colour, not channels.**
+  `--#{$prefix}btn-focus-shadow-rgb` becomes
+  `--#{$prefix}btn-focus-shadow`, and the Sass variables follow:
+  `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
+  the ghost and link variants.
+
+#### Theme gradients removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **`.bg-{color}-gradient` and `.text-bg-{color}-gradient` are gone**, along
+  with the `$theme-gradients` / `$theme-gradients-dark` maps that generated
+  them, the per-colour `$primary-gradient` … `$dark-gradient` variables (and
+  their `-dark` twins), and the `--cui-{color}-start` / `--cui-{color}-stop`
+  custom properties they read. These were CoreUI-only additions with no Bootstrap counterpart.
+  Replace a removed class with the base colour plus the generic gradient —
+  `class="bg-primary bg-gradient"` — or write the two-stop gradient yourself if
+  you need the exact 45° ramp.
+- **`.bg-gradient` itself stays**, as do `$gradient`, `--cui-gradient`,
+  `$enable-gradients` and the `gradient-bg()` mixin — that is the gradient
+  system Bootstrap has, and components keep using it.
+
+#### Cascade layers
+
+- **All library CSS now lives in cascade layers**, declared as
+  `@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;`.
+  Three of those are empty and reserved for you: `colors` and `config` sit below
+  everything, for a palette or a configuration sheet that should lose to nothing
+  but still beat the library, and `custom` slots between components and helpers.
+- **Unlayered CSS wins over layered CSS regardless of specificity**, so your
+  existing stylesheets now override the library more easily, not less. No
+  action needed — selectors that worked before keep working, and low-specificity
+  overrides that used to lose on specificity now win.
+- If your build concatenates CoreUI with other CSS, make sure the layer
+  declaration (emitted at the top of the bundle) is not stripped by a minifier
+  that predates `@layer`.
+
+#### Design-token maps
+
+- **Every component that emits CSS custom properties now builds them from a
+  `$<component>-tokens` Sass map** merged over your overrides with the new
+  `defaults()` function. Override the whole surface at once:
+
+  ```scss
+  @use "@coreui/coreui-pro/scss/coreui" with (
+    $alert-tokens: (
+      --cui-alert-bg: hotpink,
+      --cui-alert-margin-bottom: null, // null removes the token entirely
+    )
+  );
+  ```
+
+  Classic per-variable overrides (`$alert-padding-y: 2rem`) keep working — the
+  map defaults are built from the same Sass variables.
+- **Component Sass variables moved from `_config.scss` into their component
+  partials.** `@use ... with()` is unaffected — the entry point forwards every
+  module — but if you imported `scss/_config.scss` directly for its
+  definitions, component blocks are no longer there.
+- Two silent duplicates were dropped along the way: `$nav-link-height` was
+  declared twice (navbar and header blocks — the header copy is gone) and the
+  calendar emitted `--cui-calendar-cell-week-number-color` twice.
+
+#### Theme tokens
+
+- New `--cui-theme-*` indirection plus generated `.theme-primary` …
+  `.theme-dark` classes: a themed container sets `--cui-theme-fg`,
+  `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
+  (alert, buttons) read them. Contextual classes like `.alert-success` are now
+  implemented through these tokens — same rendering, new mechanics.
+- **`--cui-{color}-contrast` custom properties are new root tokens.** Previously
+  only buttons computed their own contrast colour; the root tokens now carry it,
+  written in `$theme-colors-contrast`. `.text-bg-*` reads the token instead of
+  calling `color-contrast()`.
+
+#### Colour scales, and `_variables-dark.scss` removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Dark mode no longer has a second set of Sass variables. Every colour is declared
+once, as a native
+[`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark)
+pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
+
+- **`scss/_variables-dark.scss` is gone.** All 59 `$*-dark` variables it held are
+  gone with it; do not `@import "variables-dark"` any more. The values live
+  inline in the light variable:
+
+  ```diff
+  - $body-color:      rgba(shift-color($gray-base, +26%), .95);
+  - $body-color-dark: rgba($white, .87); // in _variables-dark.scss
+  + $body-color:      light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87));
+  ```
+
+  Two exceptions remain, because `light-dark()` resolves to a `<color>` and these
+  are not colours: `$body-bg-dark` and `$body-tertiary-bg-dark` still exist (the
+  `color-translucent()` helper has to run in Sass), and the colours baked into the
+  select chevron and switch knob SVGs keep a dark counterpart next to their
+  component (`$form-select-indicator-dark`, `$form-switch-bg-image-dark`).
+- **Every theme colour gets a 100–900 scale of tokens in `:root`**, mixed at
+  runtime from the colour's own token: `--#{$prefix}primary-100` …
+  `--#{$prefix}primary-900`, for each key of `$theme-colors`. Knobs:
+  `$color-tints`, `$color-shades`, `$color-mix-space` (`lab`), `$tint-color`,
+  `$shade-color`. Override `$primary` — or the `--#{$prefix}primary` token at
+  runtime — and the whole family retints.
+- **`-bg-subtle`, `-border-subtle` and `-text-emphasis` are pairs of those
+  stops** rather than hand-picked hexes:
+
+  ```scss
+  $primary-bg-subtle:     light-dark(var(--cui-primary-100), var(--cui-primary-900));
+  $primary-border-subtle: light-dark(var(--cui-primary-300), var(--cui-primary-600));
+  $primary-text-emphasis: light-dark(var(--cui-primary-800), var(--cui-primary-200));
+  ```
+
+  **This fixes a real dark-mode bug.** Only `light` and `dark` had genuine dark
+  variants before; for the six chromatic colours `$primary-bg-subtle-dark` was an
+  alias of the light value, so `.alert-success`, `.list-group-item-info` and
+  `.table-warning` rendered a pale light-mode surface in dark mode. They now
+  darken. Light mode shifts slightly too: subtle backgrounds are a shade lighter
+  (an 80% tint rather than ~70%) and emphasis text a shade darker; borders are
+  unchanged for practical purposes. Emphasis-on-subtle contrast improves in every
+  colour — the weakest pair goes from 6.03:1 to 7.57:1.
+- **The dark grey palette is gone**: `$gray-100-dark` … `$gray-900-dark` and the
+  `$grays-dark` map. Every one of them was defined as exactly its light
+  counterpart, so they generated nothing — read `$gray-*` directly. The bundled
+  Bootstrap theme no longer passes `$grays-dark: ()` through its `with()` block.
+- **`$theme-colors-dark` is gone**, along with `$theme-colors-text-dark`,
+  `$theme-colors-bg-subtle-dark`, `$theme-colors-border-subtle-dark` and
+  `$theme-colors-contrast-dark`, and the eight `$primary-dark` … `$dark-dark`
+  variables behind them. Theme colours themselves no longer change
+  between colour modes — the old dark variants were a 10% desaturation, which
+  upstream does not do either. Consequence: the eight
+  `[data#{$data-infix}theme="dark"] .text-bg-*` overrides are gone.
+- **The `--#{$prefix}{name}-dark` root tokens are gone**
+  (`--#{$prefix}body-color-dark`, `--#{$prefix}body-bg-dark`,
+  `--#{$prefix}emphasis-color-dark`, `--#{$prefix}secondary-color-dark`,
+  `--#{$prefix}secondary-bg-dark`, `--#{$prefix}tertiary-color-dark`,
+  `--#{$prefix}tertiary-bg-dark`). They existed so a component could pin the dark
+  palette while the page stayed light; declare `color-scheme: dark` instead and
+  the `light-dark()` pairs follow — which is exactly what `.sidebar-dark` now
+  does, having dropped its eight token overrides.
+- **`$link-shade-percentage` no longer drives `$link-hover-color`**, which is now
+  `light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400))`. The
+  variable still exists and still drives the `.link-*-*` hover helpers.
+- **Two dead table knobs were removed**: `$table-th-font-weight` and
+  `$table-caption-color`. Reboot owns those declarations, so use `$th-font-weight`
+  and `$caption-color`.
+- Setting `$enable-dark-mode: false` still yields a light-only page: `:root`
+  declares `color-scheme: light` and nothing ever declares `dark`, so every
+  `light-dark()` pair resolves to its light side.
+
+#### Component icons render through CSS masks
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The accordion chevron and the carousel arrows were `background-image` SVGs with
+the colour written inside the markup, which is why each needed a dark-mode rule —
+the accordion swapped in a second SVG, the carousel inverted the first with a
+`filter`. They are now painted through a CSS `mask`, so the colour lives on
+`background-color` as an ordinary token and follows the root colours by itself.
+Upstream v6 does the same, with a `mask-icon()` mixin.
+
+- **The accordion's two icons collapse into one.**
+  `$accordion-button-active-icon` and the `--#{$prefix}accordion-btn-active-icon`
+  custom property are **removed**; the active state changes
+  `--#{$prefix}accordion-btn-active-icon-color` instead of the whole image. New
+  tokens: `--#{$prefix}accordion-btn-icon-color` and
+  `--#{$prefix}accordion-btn-active-icon-color`.
+- **A custom icon is now a shape, not a coloured image.** Whatever colour you put
+  inside `$accordion-button-icon` or `$carousel-control-prev-icon-bg` /
+  `$carousel-control-next-icon-bg` is ignored — only the alpha of the SVG is used.
+  Set the colour through the token (`--#{$prefix}accordion-btn-icon-color`,
+  `--#{$prefix}carousel-control-color`).
+- **`$accordion-icon-color` and `$accordion-icon-active-color` are `var()`
+  references now** (`var(--#{$prefix}body-color)`,
+  `var(--#{$prefix}primary-text-emphasis)`), not Sass colours — Sass colour
+  functions on them no longer work.
+- **`$carousel-control-icon-filter` is removed**, with its
+  `--#{$prefix}carousel-control-icon-filter` custom property and its two dark
+  companions (`$carousel-control-icon-filter-dark`,
+  `$carousel-dark-control-icon-filter`), along with the four accordion
+  dark variables (`$accordion-icon-color-dark`,
+  `$accordion-icon-active-color-dark`, `$accordion-button-icon-dark`,
+  `$accordion-button-active-icon-dark`). The accordion's dark-mode block is gone
+  entirely.
+- **The carousel's colours are tokens.** `--#{$prefix}carousel-control-color` is
+  new; `.carousel-dark` pins the dark side of each pair through
+  `$carousel-dark-control-color`, `$carousel-dark-indicator-active-bg` and
+  `$carousel-dark-caption-color` (previously `$carousel-*-dark` in
+  `_variables-dark.scss`). RTL still swaps the two arrows, now through
+  `mask-image`.
+- **Visible in dark mode**: the old dark accordion chevron was a *filled* glyph
+  where the light one was *stroked*. Both modes now use the stroked shape — same
+  colour, same size, slightly different drawing. Worth knowing if you diff
+  screenshots.
+
+#### Buttons
+
+- **`button-variant()` changed signature** — it takes a variant name from the
+  new `$button-variants` map (`"solid"`, `"outline"`, `"ghost"`) instead of a
+  color pair, and reads the theme tokens.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `button-outline-variant()` and `button-ghost-variant()` mixins are **removed**
+  (replaced by map entries), and `scss/mixins/_buttons.scss` no longer exists —
+  the variant and size mixins live in `scss/_buttons.scss`.
+- **Hover and active shades are computed in CSS** with
+  `oklch(from var(--cui-theme-base) calc(l * …) c h)` instead of precompiled
+  `shade-color()`/`tint-color()`. Shades shift slightly (measured 8–23 per RGB
+  channel); `.btn-dark` keeps brightening on hover via the
+  `$btn-lightness-overrides` map. The win: a theme color you add yourself gets
+  correct hover/active states without compiling Sass.
+- **The eight shade/tint amount knobs are removed**:
+  `$btn-hover-bg-shade-amount`, `$btn-hover-bg-tint-amount`,
+  `$btn-hover-border-shade-amount`, `$btn-hover-border-tint-amount` and the four
+  `$btn-active-*` counterparts. They fed the Sass mixes that no longer happen.
+  The runtime equivalents are `$btn-hover-lightness`, `$btn-active-lightness` and
+  the per-colour `$btn-lightness-overrides` map.
+- **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
+  the root color tokens, which already switch in dark mode.
+- `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
+
+#### RFS removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **The RFS engine is gone** — no `vendor/rfs`, no `font-size()` / `rfs()`
+  mixins, no `$enable-rfs`, no `rfs` option in the utilities API, and none of
+  the `$rfs-*` knobs (`$rfs-base-value`, `$rfs-breakpoint`, `$rfs-factor`,
+  `$rfs-mode`, `$rfs-unit`, `$rfs-two-dimensional`, `$rfs-class`, …). Fluid type is
+  written as literal `clamp()` values in `$h1-font-size`–`$h4-font-size`,
+  `$display-font-sizes` and `$legend-font-size`; rendering is unchanged at
+  every viewport width.
+- **Headings no longer derive from `$font-size-base`** — a `clamp()` cannot be
+  multiplied. Override the `$h*-font-size` variables directly.
+- A temporary `scss/vendor/_rfs.scss` shim (pass-through `font-size()`/`rfs()`
+  mixins) exists only for the docs engine and will be removed — do not depend
+  on it.
+
+#### One styling surface for all text controls
+
+- **Shared root knobs**: `:root` now carries the control frame
+  (`--cui-btn-input-padding-y/-x`, `-font-family/-size`, `-line-height`,
+  `-border-width`, `-transition`, `-color`, `-bg`, `-disabled-opacity`, plus
+  `-sm-*`/`-lg-*` size sets) and the selection state
+  (`--cui-control-checked-bg/-border-color`,
+  `--cui-control-indeterminate-bg/-border-color`). Restyle these once and
+  every control follows: inputs, selects, checks, switches, OTP, chip input,
+  autocomplete, multi select, and the pickers — including the checkbox-style
+  option indicators inside autocomplete and multi select.
+- **Every text control consumes per-element `--cui-control-*` tokens**
+  (padding, font, colors, border, radius, shadows, focus and disabled sets)
+  that default to those knobs. Override a single control on its element;
+  override everything at `:root`.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  The component-namespace custom properties that duplicated this frame are
+  **renamed**: `--cui-autocomplete-padding-y`, `--cui-date-picker-font-size`,
+  `--cui-time-picker-bg`, `--cui-form-multi-select-border-color`,
+  `--cui-chip-input-padding-x` and the rest of their frame sets are now
+  `--cui-control-*` on the same elements. Runtime overrides written against
+  the old names must be updated. Component-specific tokens (indicators,
+  dropdowns, tags, cells, cleaner buttons) keep their names.
+- **Component Sass variables survive with new defaults**: `$date-picker-bg`,
+  `$autocomplete-padding-y` and the rest now default to the shared knob
+  (`var(--cui-btn-input-bg)` …). Untouched, the control follows the shared
+  surface; overridden through `with()`, it detaches just that control —
+  exactly what reaching for a component knob means.
+- **The select's indicator geometry is computed at runtime.**
+  `$form-select-indicator-padding` and `$form-select-feedback-icon-padding-end`
+  are now `calc()` expressions over `var(--cui-control-padding-x)` instead of
+  Sass products, and `$form-select-bg-position` carries the `var()` inside it
+  (the RTL build still flips the `right`/`left` keyword at compile time).
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  Sass arithmetic on these variables in your own stylesheets no longer works —
+  they are CSS calc strings now, not numbers. Override them with your own
+  `calc()` or a plain length instead.
+- **Form tooltips reuse the tooltip's runtime tokens.** Add the `.tooltip`
+  class to a feedback tooltip (`class="tooltip invalid-tooltip"`) and it
+  follows tooltip theming — `--cui-tooltip-padding-*`, `-font-size`,
+  `-border-radius` — the upstream v6 contract. Bare `.invalid-tooltip` markup
+  keeps rendering exactly as before through built-in fallbacks.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  The Sass-level derivation is gone: `$form-feedback-tooltip-*` no longer
+  default to `$tooltip-*`, so overriding `$tooltip-padding-y` alone no longer
+  moves feedback tooltips at compile time — use the runtime link (add the
+  class) or set `$form-feedback-tooltip-*` explicitly. The tooltip variables
+  moved to `scss/_tooltip.scss`, the feedback set to `scss/mixins/_forms.scss`.
+- **Validation composes through the tokens**: `.is-invalid` / `.is-valid` set
+  `--cui-control-border-color`, `-focus-border-color` and `-focus-ring`
+  instead of restating declarations, so state styling follows any control
+  automatically.
+
+#### Opacity utilities no longer cascade to descendants
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The opacity utilities compose through custom properties — `.text-opacity-50` sets
+`--#{$prefix}text-opacity` and the colour utilities read it. Custom properties
+inherit, so the value leaked into every descendant. The colour utilities that
+restate their own opacity (`.text-primary` declares
+`--#{$prefix}text-opacity: 1`) were immune; the ones reading it through a
+`var(…, 1)` fallback were not.
+
+Reachable consequences in v5: `.bg-opacity-25` on a container faded every nested
+`.text-bg-*`, and `.link-opacity-50` faded every nested link — including bare
+`<a>` elements, which read `--#{$prefix}link-opacity` too.
+
+Five names are now registered with
+[`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) as
+`inherits: false`, so each utility is scoped to the element it is applied to:
+`--#{$prefix}text-opacity`, `--#{$prefix}bg-opacity`,
+`--#{$prefix}border-opacity`, `--#{$prefix}link-opacity`,
+`--#{$prefix}link-underline-opacity`. Upstream v6 does the same.
+
+- **If you relied on the leak** — one `.link-opacity-*` on a wrapper fading a
+  whole block of links — put the utility on each element, or set the custom
+  property yourself in your own CSS (a hand-written declaration still inherits;
+  only the registration changes how *utilities* behave).
+- `.focus-ring-*` is deliberately **not** registered: it writes
+  `--#{$prefix}focus-ring-color`, which is a global `:root` token, and components
+  read it without a fallback. A custom utility that writes a `:root` token name
+  must opt out the same way, with `at-property: false` in its `$utilities` entry.
+- Compiled output is otherwise byte-identical — the five `@property` blocks are
+  the whole diff.
+
+#### Sass file layout follows Bootstrap v6
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Upstream's directories mirror the cascade layers, so partials now live in the
+directory named after the layer they emit into. **Every old path still resolves
+through a thin `@forward` shim**, for `@use` and the deprecated `@import` alike —
+nothing to change unless you want to.
+
+| Was | Is |
+| --- | --- |
+| `scss/_variables.scss` | `scss/_config.scss` |
+| `scss/_grid.scss`, `scss/_containers.scss` | `scss/layout/` |
+| `scss/mixins/_breakpoints.scss` | `scss/layout/_breakpoints.scss` |
+| `scss/_reboot.scss`, `scss/_type.scss`, `scss/_images.scss`, `scss/_tables.scss` | `scss/content/` |
+| `scss/_buttons.scss` | `scss/buttons/_button.scss` |
+| `scss/_button-group.scss`, `scss/_close.scss`, `scss/_loading-button.scss`, `scss/_search-button.scss` | `scss/buttons/` |
+| `scss/_spinners.scss` | `scss/_spinner.scss` |
+| `scss/_placeholders.scss` | `scss/_placeholder.scss` |
+| `scss/_mixins.scss`, `scss/_helpers.scss`, `scss/_forms.scss` | `scss/mixins/index.scss`, `scss/helpers/index.scss`, `scss/forms/index.scss` |
+| `scss/forms/_form-check.scss` | `scss/forms/_check.scss` |
+| `scss/forms/_form-otp.scss` | `scss/forms/_otp-input.scss` |
+
+The list rules from `_type.scss` moved to `content/_lists.scss` and the blockquote
+rules to `content/_blockquote.scss`, matching upstream's filenames.
+
+The three aggregators need no shim: Sass resolves `@use "mixins"` to
+`mixins/index.scss` on its own once the sibling file is gone.
+
+**What we deliberately did not copy.** Upstream renamed three components *and their
+classes* — `.modal`, `.offcanvas`, `.dropdown`, `.dropdown-menu` and
+`.dropdown-item` are gone from Bootstrap v6, replaced by `.dialog`, `.drawer`,
+`.menu` and `.menu-item`. Those are three of the most-used components in any
+Bootstrap app, so `_modal.scss`, `_offcanvas.scss` and `_dropdown.scss` keep their
+names and their classes here.
+
+#### The type scale is one named map
+
+One scale now carries every font size the library renders, each stop with the
+line height that belongs to it — upstream's mechanic, with our values, so
+**nothing moves on screen**:
+
+```scss
+$font-sizes: (
+  "xs":  ("font-size": .75rem,        "line-height": 1.5),
+  ...
+  "4xl": ("font-size": $h1-font-size, "line-height": 1.2)
+);
+```
+
+- **`$font-sizes` changed shape** — it was `(1: $h1-font-size, … 6: $h6-font-size)`
+  and is now keyed `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, with a nested
+  map per stop.
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  If you overrode `$font-sizes`, move your values into the new shape. The numeric
+  keys live on in `$font-sizes-legacy`, which is derived from the named scale.
+- **`:root` gets `--#{$prefix}font-size-*` and `--#{$prefix}line-height-*` per
+  stop**, and `h1`–`h6` read the tokens instead of the Sass variables. Restyling a
+  stop at runtime now moves every heading and utility that uses it.
+  `$h1-font-size` … `$h6-font-size` are unchanged and still feed the scale.
+- **New: `.fs-{stop}`** alongside `.fs-1` … `.fs-6`, which keep working and render
+  identically — `.fs-1` is `.fs-4xl`, down to `.fs-6`, which is `.fs-md`.
+- **New: `.text-{stop}`**, which sets `font-size` and `line-height` together.
+
+**We did not follow upstream's classes here.** Bootstrap v6 deletes `.fs-1` …
+`.fs-6`, every `.display-*` and `.lead`, and retunes the sizes — h1–h3 grow up to
+10px on small screens while h4–h6 shrink at every width. Those classes stay, at
+their current sizes.
+
+#### The focus ring is an outline
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Focus rings were drawn with `box-shadow` and are now drawn with `outline`,
+following upstream v6. The practical win is that an outline is **not clipped by an
+ancestor's `overflow`** — the ring stays visible inside scroll containers, where a
+box-shadow ring was cut off.
+
+- **Twelve `--#{$prefix}*-focus-box-shadow` custom properties are renamed to
+  `-focus-ring`**, and their values are an `outline` shorthand rather than a
+  box-shadow one: `--#{$prefix}btn-focus-ring`,
+  `--#{$prefix}control-focus-ring`, `--#{$prefix}pagination-focus-ring`,
+  `--#{$prefix}accordion-btn-focus-ring`, `--#{$prefix}form-check-input-focus-ring`,
+  `--#{$prefix}calendar-cell-focus-ring`, `--#{$prefix}calendar-nav-btn-focus-ring`,
+  `--#{$prefix}stepper-step-indicator-focus-ring`,
+  `--#{$prefix}range-slider-thumb-focus-ring`,
+  `--#{$prefix}search-button-focus-ring`,
+  `--#{$prefix}autocomplete-option-focus-ring`,
+  `--#{$prefix}form-multi-select-option-focus-ring`.
+
+  ```diff
+  - --cui-btn-focus-box-shadow: 0 0 0 .25rem rgba(88, 86, 214, .5);
+  + --cui-btn-focus-ring: .25rem solid rgba(88, 86, 214, .5);
+  ```
+
+  A runtime override written against an old name is now inert — there is no
+  fallback path, because the value goes to a different property.
+- **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`,
+  `$btn-focus-box-shadow` → `$btn-focus-ring`, and so on for every component.
+- **`$focus-ring-blur` is gone**, along with `--#{$prefix}focus-ring-x`,
+  `-y` and `-blur`. An outline has no blur or offset vector. **New:**
+  `$focus-ring-offset` / `--#{$prefix}focus-ring-offset` (defaults to `0`), which
+  pushes the ring away from the element, and `--#{$prefix}focus-ring`, the
+  composite shorthand the mixin reads.
+- **`focus-ring()` changed signature** to upstream's:
+  `focus-ring($offset: false, $color: null)`. It no longer emits `outline: 0`.
+- `$pagination-focus-outline` is gone — the outline is now the ring itself.
+
+**Sizes and colours are unchanged**, so the ring keeps its width
+(`$focus-ring-width`, `.25rem`) and its translucent theme colour. What changes is
+the property drawing it, which also means the ring no longer participates in a
+`box-shadow` transition.
+
+#### Everything deprecated before v6 is removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Some of these carried a "to be removed in v6" note since v4.2. This is v6.
+
+**Sass mixins** — all three were already unreachable, forwarded from nothing:
+`alert-variant()`, `list-group-item-variant()`, `avatar()`. The contextual classes
+they used to build are generated by a Sass loop over the theme tokens instead.
+
+**Sass variables** — `$variable-prefix` (use `$prefix`), `$border-radius-2xl` (use
+`$border-radius-xxl`), `$text-muted`, `$hr-bg-color`, `$hr-height`,
+`$alert-bg-scale`, `$alert-border-scale`, `$alert-color-scale`,
+`$list-group-item-bg-scale`, `$list-group-item-color-scale`,
+`$tooltip-arrow-color`, `$accordion-button-focus-border-color`,
+`$dropdown-header-padding` (use `-padding-y` / `-padding-x`),
+`$nested-kbd-font-weight`, `$btn-close-white-filter` (use `$btn-close-filter-dark`),
+`$high-emphasis`, `$medium-emphasis`, `$disabled`, `$high-emphasis-inverse`,
+`$medium-emphasis-inverse`, `$disabled-inverse`.
+
+Eleven of those were already dead — nothing read them, so removing them changed
+no output at all.
+
+**CSS custom properties** — `--#{$prefix}high-emphasis`,
+`--#{$prefix}medium-emphasis`, `--#{$prefix}disabled`, and the three
+`-inverse` counterparts, plus `--#{$prefix}border-radius-2xl` (use
+`--#{$prefix}border-radius-xxl`).
+
+**Classes** — ten, every one a CoreUI-only addition:
+
+| Removed | Use instead |
+| --- | --- |
+| `.text-high-emphasis`, `.text-medium-emphasis` | `.text-body`, `.text-body-secondary` |
+| `.text-high-emphasis-inverse`, `.text-medium-emphasis-inverse`, `.text-disabled-inverse` | `.text-white` with an opacity utility |
+
+(The `.dark:` variants of the emphasis utilities go with them.)
+
+**What we deliberately kept.** `.text-muted`, `.text-black-50`, `.text-white-50`
+and `.navbar-light` are all deprecated, and Bootstrap v6 deletes all four. They
+are Bootstrap heritage rather than CoreUI additions, and they are in the markup of
+a very large number of existing projects — so they stay, at their current
+rendering.
+
+`.sidebar-brand-full`, `.sidebar-brand-narrow` and `.d-narrow-none` stay too,
+though they are CoreUI's own. They are the brand pair every admin template ships
+in its sidebar header, and they are exact aliases of `.d-sidebar-narrow-none` /
+`.d-sidebar-narrow` — two extra selectors in a rule that already exists. Removing
+them would break the most recognisable piece of CoreUI markup, silently: both
+logos would render at once in the narrow state, with nothing to indicate why.
+Prefer the `.d-sidebar-narrow*` names in new markup.
 
 ### Sass & CSS
 

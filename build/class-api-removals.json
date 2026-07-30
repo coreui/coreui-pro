@@ -1,0 +1,13 @@
+{
+  "bg-*-gradient": "Removed in v6 — a CoreUI-only addition. Use the base colour plus Bootstrap's generic gradient: class=\"bg-primary bg-gradient\".",
+  "text-bg-*-gradient": "Removed in v6 — a CoreUI-only addition. Use class=\"text-bg-primary bg-gradient\".",
+  "elevation-*": "Removed in v6 with the elevation system, which was disabled by default ($enable-elevations: false). Use the shadow utilities: .shadow, .shadow-sm, .shadow-lg.",
+  "calendar-nav-icon-*": "Removed in v6 — the calendar navigation icons render in JavaScript now. Customize them with the navIconPrev / navIconNext / navIconDoublePrev / navIconDoubleNext options.",
+  "text-high-emphasis": "Removed in v6 — a CoreUI-only addition, deprecated since v5.0.0. Use .text-body.",
+  "text-medium-emphasis": "Removed in v6 — a CoreUI-only addition, deprecated since v5.0.0. Use .text-body-secondary.",
+  "text-high-emphasis-inverse": "Removed in v6 — a CoreUI-only addition, deprecated since v5.0.0. Use .text-white with an opacity utility.",
+  "text-medium-emphasis-inverse": "Removed in v6 — a CoreUI-only addition, deprecated since v5.0.0. Use .text-white with an opacity utility.",
+  "text-disabled-inverse": "Removed in v6 — a CoreUI-only addition, deprecated since v5.0.0. Use .text-white with an opacity utility.",
+  "dark\\:text-*emphasis*": "Removed in v6 with the emphasis utilities they varied — see .text-high-emphasis and friends above.",
+  "dark\\:text-disabled-inverse": "Removed in v6 with the emphasis utilities — see .text-disabled-inverse above."
+}

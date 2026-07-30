@@ -1,260 +1,170 @@
 @use "sass:map";
 @use "sass:meta";
 @use "functions/color" as *;
+@use "functions/color-scheme" as *;
 @use "functions/color-translucent" as *;
-@use "functions/to-rgb" as *;
-@use "mixins/color-mode" as *;
-@use "vendor/rfs" as *;
 @use "maps" as *;
-@use "variables" as *;
-@use "variables-dark" as *;
+@use "mixins/color-mode" as *;
+@use "theme" as *;
+@use "colors" as *;
+@use "config" as *;
 
-:root,
-[data#{$data-infix}theme="light"] {
-  // Note: Custom variable values only support SassScript inside `#{}`.
+// `colors` and `config` are reserved and empty, matching upstream's declaration:
+// two slots below `root` for a palette or a configuration sheet of your own, so
+// yours loses to nothing but still beats the library. `custom` is the same idea
+// between components and helpers.
+@layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
-  // Colors
-  //
-  // Generate palettes for full colors, grays, and theme colors
+@layer root {
+  :root,
+  [data#{$data-infix}theme="light"] {
+    // Note: Custom variable values only support SassScript inside `#{}`.
 
-  @each $color, $value in $colors {
-    --#{$prefix}#{$color}: #{$value};
-  }
+    // Declared explicitly so light-dark() resolves deterministically rather
+    // than inheriting the initial `normal`, and so native widgets match.
+    color-scheme: light;
 
-  @each $color, $value in $grays {
-    --#{$prefix}gray-#{$color}: #{$value};
-  }
+    @include color-tokens();
 
-  @each $color, $value in $theme-colors {
-    --#{$prefix}#{$color}: #{$value};
-  }
+    // Fonts
 
-  @each $color, $value in $theme-colors-rgb {
-    --#{$prefix}#{$color}-rgb: #{$value};
-  }
+    // Note: Use `meta.inspect` for lists so that quoted items keep the quotes.
+    // See https://github.com/sass/sass/issues/2383#issuecomment-336349172
+    // scss-docs-start root-font-size-loop
+    // One token pair per stop of the type scale, so a stop can be restyled at
+    // runtime and every heading and .text-* utility follows.
+    @each $name, $props in $font-sizes {
+      --#{$prefix}font-size-#{$name}: #{map.get($props, "font-size")};
+      --#{$prefix}line-height-#{$name}: #{map.get($props, "line-height")};
+    }
+    // scss-docs-end root-font-size-loop
 
-  @each $color, $value in $theme-colors-text {
-    --#{$prefix}#{$color}-text-emphasis: #{$value};
-  }
+    --#{$prefix}font-sans-serif: #{meta.inspect($font-family-sans-serif)};
+    --#{$prefix}font-monospace: #{meta.inspect($font-family-monospace)};
+    --#{$prefix}gradient: #{$gradient};
 
-  @each $color, $value in $theme-colors-bg-subtle {
-    --#{$prefix}#{$color}-bg-subtle: #{$value};
-  }
-
-  @each $color, $value in $theme-colors-border-subtle {
-    --#{$prefix}#{$color}-border-subtle: #{$value};
-  }
-
-  @each $color, $value in $theme-colors-contrast {
-    --#{$prefix}#{$color}-contrast: #{$value};
-  }
-
-  --#{$prefix}white-rgb: #{to-rgb($white)};
-  --#{$prefix}black-rgb: #{to-rgb($black)};
-
-  @each $color, $value in $theme-gradients {
-    --#{$prefix}#{$color}-start: #{map.get($value, "start")};
-    --#{$prefix}#{$color}-stop: #{map.get($value, "stop")};
-  }
-
-  // Fonts
-
-  // Note: Use `meta.inspect` for lists so that quoted items keep the quotes.
-  // See https://github.com/sass/sass/issues/2383#issuecomment-336349172
-  --#{$prefix}font-sans-serif: #{meta.inspect($font-family-sans-serif)};
-  --#{$prefix}font-monospace: #{meta.inspect($font-family-monospace)};
-  --#{$prefix}gradient: #{$gradient};
-
-  // Root and body
-  // scss-docs-start root-body-variables
-  @if $font-size-root != null {
-    --#{$prefix}root-font-size: #{$font-size-root};
-  }
-  --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
-  @include rfs($font-size-base, --#{$prefix}body-font-size);
-  --#{$prefix}body-font-weight: #{$font-weight-base};
-  --#{$prefix}body-line-height: #{$line-height-base};
-  @if $body-text-align != null {
-    --#{$prefix}body-text-align: #{$body-text-align};
-  }
-
-  --#{$prefix}body-color: #{$body-color};
-  --#{$prefix}body-color-rgb: #{to-rgb($body-color)};
-  --#{$prefix}body-bg: #{$body-bg};
-  --#{$prefix}body-bg-rgb: #{to-rgb($body-bg)};
-
-  --#{$prefix}emphasis-color: #{$body-emphasis-color};
-  --#{$prefix}emphasis-color-rgb: #{to-rgb($body-emphasis-color)};
-
-  --#{$prefix}secondary-color: #{$body-secondary-color};
-  --#{$prefix}secondary-color-rgb: #{to-rgb($body-secondary-color)};
-  --#{$prefix}secondary-bg: #{$body-secondary-bg};
-  --#{$prefix}secondary-bg-rgb: #{to-rgb($body-secondary-bg)};
-
-  --#{$prefix}tertiary-color: #{$body-tertiary-color};
-  --#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color)};
-  --#{$prefix}tertiary-bg: #{$body-tertiary-bg};
-  --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg)};
-  --#{$prefix}tertiary-bg-translucent: #{color-translucent($body-tertiary-bg)};
-
-  --#{$prefix}body-color-dark: #{$body-color-dark};
-  --#{$prefix}body-color-rgb-dark: #{to-rgb($body-color-dark)};
-  --#{$prefix}body-bg-dark: #{$body-bg-dark};
-  --#{$prefix}body-bg-rgb-dark: #{to-rgb($body-bg-dark)};
-
-  --#{$prefix}emphasis-color-dark: #{$body-emphasis-color-dark};
-  --#{$prefix}emphasis-color-rgb-dark: #{to-rgb($body-emphasis-color-dark)};
-
-  --#{$prefix}secondary-color-dark: #{$body-secondary-color-dark};
-  --#{$prefix}secondary-color-rgb-dark: #{to-rgb($body-secondary-color-dark)};
-  --#{$prefix}secondary-bg-dark: #{$body-secondary-bg-dark};
-  --#{$prefix}secondary-bg-rgb-dark: #{to-rgb($body-secondary-bg-dark)};
-
-  --#{$prefix}tertiary-color-dark: #{$body-tertiary-color-dark};
-  --#{$prefix}tertiary-color-rgb-dark: #{to-rgb($body-tertiary-color-dark)};
-  --#{$prefix}tertiary-bg-dark: #{$body-tertiary-bg-dark};
-  --#{$prefix}tertiary-bg-rgb-dark: #{to-rgb($body-tertiary-bg-dark)};
-
-  --#{$prefix}high-emphasis: #{$high-emphasis}; // Deprecated in v5.0.0
-  --#{$prefix}medium-emphasis: #{$medium-emphasis}; // Deprecated in v5.0.0
-  --#{$prefix}disabled: #{$disabled}; // Deprecated in v5.0.0
-
-  --#{$prefix}high-emphasis-inverse: #{$high-emphasis-inverse}; // Deprecated in v5.0.0
-  --#{$prefix}medium-emphasis-inverse: #{$medium-emphasis-inverse}; // Deprecated in v5.0.0
-  --#{$prefix}disabled-inverse: #{$disabled-inverse}; // Deprecated in v5.0.0
-  // scss-docs-end root-body-variables
-
-  --#{$prefix}heading-color: #{$headings-color};
-
-  --#{$prefix}link-color: #{$link-color};
-  --#{$prefix}link-color-rgb: #{to-rgb($link-color)};
-  --#{$prefix}link-decoration: #{$link-decoration};
-
-  --#{$prefix}link-hover-color: #{$link-hover-color};
-  --#{$prefix}link-hover-color-rgb: #{to-rgb($link-hover-color)};
-
-  @if $link-hover-decoration != null {
-    --#{$prefix}link-hover-decoration: #{$link-hover-decoration};
-  }
-
-  --#{$prefix}code-color: #{$code-color};
-  --#{$prefix}highlight-color: #{$mark-color};
-  --#{$prefix}highlight-bg: #{$mark-bg};
-
-  // scss-docs-start root-border-var
-  --#{$prefix}border-width: #{$border-width};
-  --#{$prefix}border-style: #{$border-style};
-  --#{$prefix}border-color: #{$border-color};
-  --#{$prefix}border-color-translucent: #{$border-color-translucent};
-
-  --#{$prefix}border-radius: #{$border-radius};
-  --#{$prefix}border-radius-sm: #{$border-radius-sm};
-  --#{$prefix}border-radius-lg: #{$border-radius-lg};
-  --#{$prefix}border-radius-xl: #{$border-radius-xl};
-  --#{$prefix}border-radius-xxl: #{$border-radius-xxl};
-  --#{$prefix}border-radius-2xl: var(--#{$prefix}border-radius-xxl); // Deprecated in v5.0.0 for consistency
-  --#{$prefix}border-radius-pill: #{$border-radius-pill};
-  // scss-docs-end root-border-var
-
-  --#{$prefix}box-shadow: #{$box-shadow};
-  --#{$prefix}box-shadow-sm: #{$box-shadow-sm};
-  --#{$prefix}box-shadow-lg: #{$box-shadow-lg};
-  --#{$prefix}box-shadow-inset: #{$box-shadow-inset};
-
-  --#{$prefix}elevation-base-color: #{$elevation-base-color}; // Deprecated in v5.0.0 for consistency
-
-  // Focus styles
-  // scss-docs-start root-focus-variables
-  --#{$prefix}focus-ring-width: #{$focus-ring-width};
-  --#{$prefix}focus-ring-opacity: #{$focus-ring-opacity};
-  --#{$prefix}focus-ring-color: #{$focus-ring-color};
-  --#{$prefix}focus-ring-blur: #{$focus-ring-blur};
-  // scss-docs-end root-focus-variables
-
-  // scss-docs-start root-form-validation-variables
-  --#{$prefix}form-valid-color: #{$form-valid-color};
-  --#{$prefix}form-valid-border-color: #{$form-valid-border-color};
-  --#{$prefix}form-invalid-color: #{$form-invalid-color};
-  --#{$prefix}form-invalid-border-color: #{$form-invalid-border-color};
-  // scss-docs-end root-form-validation-variables
-}
-
-@if $enable-dark-mode {
-  @include color-mode(dark, true) {
-    color-scheme: dark;
-
-    // scss-docs-start root-dark-mode-vars
-    --#{$prefix}body-color: #{$body-color-dark};
-    --#{$prefix}body-color-rgb: #{to-rgb($body-color-dark)};
-    --#{$prefix}body-bg: #{$body-bg-dark};
-    --#{$prefix}body-bg-rgb: #{to-rgb($body-bg-dark)};
-
-    --#{$prefix}emphasis-color: #{$body-emphasis-color-dark};
-    --#{$prefix}emphasis-color-rgb: #{to-rgb($body-emphasis-color-dark)};
-
-    --#{$prefix}secondary-color: #{$body-secondary-color-dark};
-    --#{$prefix}secondary-color-rgb: #{to-rgb($body-secondary-color-dark)};
-    --#{$prefix}secondary-bg: #{$body-secondary-bg-dark};
-    --#{$prefix}secondary-bg-rgb: #{to-rgb($body-secondary-bg-dark)};
-
-    --#{$prefix}tertiary-color: #{$body-tertiary-color-dark};
-    --#{$prefix}tertiary-color-rgb: #{to-rgb($body-tertiary-color-dark)};
-    --#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
-    --#{$prefix}tertiary-bg-rgb: #{to-rgb($body-tertiary-bg-dark)};
-    --#{$prefix}tertiary-bg-translucent: #{color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark)};
-
-    --#{$prefix}elevation-base-color: #{$elevation-base-color-dark}; // Deprecated in v5.0.0
-    --#{$prefix}high-emphasis: #{$high-emphasis-dark}; // Deprecated in v5.0.0
-    --#{$prefix}medium-emphasis: #{$medium-emphasis-dark}; // Deprecated in v5.0.0
-    --#{$prefix}disabled: #{$disabled-dark}; // Deprecated in v5.0.0
-
-    @each $color, $value in $theme-colors-dark {
-      --#{$prefix}#{$color}: #{$value};
+    // Root and body
+    // scss-docs-start root-body-variables
+    @if $font-size-root != null {
+      --#{$prefix}root-font-size: #{$font-size-root};
+    }
+    --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
+    --#{$prefix}body-font-size: #{$font-size-base};
+    --#{$prefix}body-font-weight: #{$font-weight-base};
+    --#{$prefix}body-line-height: #{$line-height-base};
+    @if $body-text-align != null {
+      --#{$prefix}body-text-align: #{$body-text-align};
     }
 
-    @each $color, $value in $grays-dark {
-      --#{$prefix}gray-#{$color}: #{$value};
+    --#{$prefix}body-color: #{$body-color};
+    --#{$prefix}body-bg: #{color-scheme($body-bg, $body-bg-dark)};
+
+    --#{$prefix}emphasis-color: #{$body-emphasis-color};
+
+    --#{$prefix}secondary-color: #{$body-secondary-color};
+    --#{$prefix}secondary-bg: #{$body-secondary-bg};
+
+    --#{$prefix}tertiary-color: #{$body-tertiary-color};
+    --#{$prefix}tertiary-bg: #{color-scheme($body-tertiary-bg, $body-tertiary-bg-dark)};
+    --#{$prefix}tertiary-bg-translucent: #{color-scheme(color-translucent($body-tertiary-bg), color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark))};
+    // scss-docs-end root-body-variables
+
+    --#{$prefix}heading-color: #{$headings-color};
+
+    --#{$prefix}link-color: #{$link-color};
+    --#{$prefix}link-decoration: #{$link-decoration};
+
+    --#{$prefix}link-hover-color: #{$link-hover-color};
+
+    @if $link-hover-decoration != null {
+      --#{$prefix}link-hover-decoration: #{$link-hover-decoration};
     }
 
-    @each $color, $value in $theme-colors-rgb-dark {
-      --#{$prefix}#{$color}-rgb: #{$value};
-    }
+    --#{$prefix}code-color: #{$code-color};
+    --#{$prefix}highlight-color: #{$mark-color};
+    --#{$prefix}highlight-bg: #{$mark-bg};
 
-    @each $color, $value in $theme-colors-text-dark {
-      --#{$prefix}#{$color}-text-emphasis: #{$value};
-    }
+    // scss-docs-start root-border-var
+    --#{$prefix}border-width: #{$border-width};
+    --#{$prefix}border-style: #{$border-style};
+    --#{$prefix}border-color: #{$border-color};
+    --#{$prefix}border-color-translucent: #{$border-color-translucent};
 
-    @each $color, $value in $theme-colors-bg-subtle-dark {
-      --#{$prefix}#{$color}-bg-subtle: #{$value};
-    }
+    --#{$prefix}border-radius: #{$border-radius};
+    --#{$prefix}border-radius-sm: #{$border-radius-sm};
+    --#{$prefix}border-radius-lg: #{$border-radius-lg};
+    --#{$prefix}border-radius-xl: #{$border-radius-xl};
+    --#{$prefix}border-radius-xxl: #{$border-radius-xxl};
+    --#{$prefix}border-radius-2xl: var(--#{$prefix}border-radius-xxl); // Deprecated in v5.0.0 for consistency
+    --#{$prefix}border-radius-pill: #{$border-radius-pill};
+    // scss-docs-end root-border-var
 
-    @each $color, $value in $theme-colors-border-subtle-dark {
-      --#{$prefix}#{$color}-border-subtle: #{$value};
-    }
+    --#{$prefix}box-shadow: #{$box-shadow};
+    --#{$prefix}box-shadow-sm: #{$box-shadow-sm};
+    --#{$prefix}box-shadow-lg: #{$box-shadow-lg};
+    --#{$prefix}box-shadow-inset: #{$box-shadow-inset};
 
-    @each $color, $value in $theme-gradients-dark {
-      --#{$prefix}#{$color}-start: #{map.get($value, "start")};
-      --#{$prefix}#{$color}-stop: #{map.get($value, "stop")};
-    }
+    // Focus styles
+    // scss-docs-start root-focus-variables
+    --#{$prefix}focus-ring-width: #{$focus-ring-width};
+    --#{$prefix}focus-ring-opacity: #{$focus-ring-opacity};
+    --#{$prefix}focus-ring-color: #{$focus-ring-color};
+    --#{$prefix}focus-ring-offset: #{$focus-ring-offset};
+    --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color);
+    // scss-docs-end root-focus-variables
 
-    --#{$prefix}heading-color: #{$headings-color-dark};
+    // scss-docs-start root-btn-input-variables
+    // Sizing shared by buttons and form controls, so neither has to reach for
+    // the other's Sass variables to line up.
+    --#{$prefix}btn-input-padding-y: #{$input-btn-padding-y};
+    --#{$prefix}btn-input-padding-x: #{$input-btn-padding-x};
+    --#{$prefix}btn-input-font-family: #{$input-btn-font-family};
+    --#{$prefix}btn-input-font-size: #{$input-btn-font-size};
+    --#{$prefix}btn-input-line-height: #{$input-btn-line-height};
+    --#{$prefix}btn-input-border-width: #{$input-btn-border-width};
+    --#{$prefix}btn-input-transition: #{$input-btn-transition};
+    --#{$prefix}btn-input-disabled-opacity: #{$input-btn-disabled-opacity};
+    --#{$prefix}btn-input-color: #{$input-color};
+    --#{$prefix}btn-input-bg: #{$input-bg};
+    --#{$prefix}btn-input-min-height: #{$input-height};
 
-    --#{$prefix}link-color: #{$link-color-dark};
-    --#{$prefix}link-hover-color: #{$link-hover-color-dark};
-    --#{$prefix}link-color-rgb: #{to-rgb($link-color-dark)};
-    --#{$prefix}link-hover-color-rgb: #{to-rgb($link-hover-color-dark)};
+    --#{$prefix}btn-input-sm-padding-y: #{$input-btn-padding-y-sm};
+    --#{$prefix}btn-input-sm-padding-x: #{$input-btn-padding-x-sm};
+    --#{$prefix}btn-input-sm-font-size: #{$input-btn-font-size-sm};
+    --#{$prefix}btn-input-sm-min-height: #{$input-height-sm};
 
-    --#{$prefix}code-color: #{$code-color-dark};
-    --#{$prefix}highlight-color: #{$mark-color-dark};
-    --#{$prefix}highlight-bg: #{$mark-bg-dark};
+    --#{$prefix}btn-input-lg-padding-y: #{$input-btn-padding-y-lg};
+    --#{$prefix}btn-input-lg-padding-x: #{$input-btn-padding-x-lg};
+    --#{$prefix}btn-input-lg-font-size: #{$input-btn-font-size-lg};
+    --#{$prefix}btn-input-lg-min-height: #{$input-height-lg};
+    // scss-docs-end root-btn-input-variables
 
-    --#{$prefix}border-color: #{$border-color-dark};
-    --#{$prefix}border-color-translucent: #{$border-color-translucent-dark};
+    // scss-docs-start root-control-variables
+    // State colors shared by every control that can be checked or selected —
+    // checkboxes, radios, switches, and the option indicators the autocomplete
+    // and multi select draw. Restyle them here once.
+    --#{$prefix}control-checked-bg: #{$form-check-input-checked-bg-color};
+    --#{$prefix}control-checked-border-color: #{$form-check-input-checked-border-color};
+    --#{$prefix}control-indeterminate-bg: #{$form-check-input-indeterminate-bg-color};
+    --#{$prefix}control-indeterminate-border-color: #{$form-check-input-indeterminate-border-color};
+    // scss-docs-end root-control-variables
 
-    --#{$prefix}form-valid-color: #{$form-valid-color-dark};
-    --#{$prefix}form-valid-border-color: #{$form-valid-border-color-dark};
-    --#{$prefix}form-invalid-color: #{$form-invalid-color-dark};
-    --#{$prefix}form-invalid-border-color: #{$form-invalid-border-color-dark};
-    // scss-docs-end root-dark-mode-vars
+    // scss-docs-start root-form-validation-variables
+    --#{$prefix}form-valid-color: #{$form-valid-color};
+    --#{$prefix}form-valid-border-color: #{$form-valid-border-color};
+    --#{$prefix}form-invalid-color: #{$form-invalid-color};
+    --#{$prefix}form-invalid-border-color: #{$form-invalid-border-color};
+    // scss-docs-end root-form-validation-variables
   }
+
+  @if $enable-dark-mode {
+    @include color-mode(dark, true) {
+      color-scheme: dark;
+
+      // scss-docs-start root-dark-mode-vars
+      // scss-docs-end root-dark-mode-vars
+    }
+  }
+
+  @include generate-theme-classes();
 }

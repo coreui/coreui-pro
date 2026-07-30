@@ -1,101 +1,145 @@
+@use "../functions/defaults" as *;
+@use "../functions/math" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
-.form-floating {
-  position: relative;
+// stylelint-disable function-disallowed-list
 
-  > .form-control,
-  > .form-control-plaintext,
-  > .form-select {
-    height: $form-floating-height;
-    min-height: $form-floating-height;
-    line-height: $form-floating-line-height;
-  }
+// scss-docs-start form-floating-variables
+$form-floating-height:                  add(3.5rem, $input-height-border) !default;
+$form-floating-line-height:             1.25 !default;
+$form-floating-padding-x:               $input-padding-x !default;
+$form-floating-padding-y:               1rem !default;
+$form-floating-input-padding-t:         1.625rem !default;
+$form-floating-input-padding-b:         .625rem !default;
+$form-floating-label-height:            1.5em !default;
+$form-floating-label-opacity:           .65 !default;
+$form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX(.15rem) !default;
+$form-floating-label-disabled-color:    $gray-600 !default;
+$form-floating-transition:              opacity .1s ease-in-out, transform .1s ease-in-out !default;
+// scss-docs-end form-floating-variables
 
-  > label {
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0;
-    z-index: 2;
-    max-width: 100%;
-    height: 100%; // allow textareas
-    padding: $form-floating-padding-y $form-floating-padding-x;
-    overflow: hidden;
-    color: rgba(var(--#{$prefix}body-color-rgb), #{$form-floating-label-opacity});
-    text-align: start;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    pointer-events: none;
-    border: $input-border-width solid transparent; // Required for aligning label's text with the input as it affects inner box model
-    transform-origin: 0 0;
-    @include transition($form-floating-transition);
-  }
+// scss-docs-start form-floating-tokens
+$form-floating-tokens: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-floating-tokens: defaults(
+  (
+    --#{$prefix}form-floating-height: #{$form-floating-height},
+    --#{$prefix}form-floating-line-height: #{$form-floating-line-height},
+    --#{$prefix}form-floating-padding-x: #{$form-floating-padding-x},
+    --#{$prefix}form-floating-padding-y: #{$form-floating-padding-y},
+    --#{$prefix}form-floating-input-padding-t: #{$form-floating-input-padding-t},
+    --#{$prefix}form-floating-input-padding-b: #{$form-floating-input-padding-b},
+    --#{$prefix}form-floating-label-height: #{$form-floating-label-height},
+    --#{$prefix}form-floating-label-opacity: #{$form-floating-label-opacity},
+    --#{$prefix}form-floating-label-transform: #{$form-floating-label-transform},
+    --#{$prefix}form-floating-label-disabled-color: #{$form-floating-label-disabled-color},
+    --#{$prefix}form-floating-transition: "#{$form-floating-transition}",
+  ),
+  $form-floating-tokens
+);
+// scss-docs-end form-floating-tokens
 
-  > .form-control,
-  > .form-control-plaintext {
-    padding: $form-floating-padding-y $form-floating-padding-x;
+@layer forms {
+  .form-floating {
+    @include tokens($form-floating-tokens);
 
-    &::placeholder {
-      color: transparent;
+    position: relative;
+
+    > .form-control,
+    > .form-control-plaintext,
+    > .form-select {
+      height: var(--#{$prefix}form-floating-height);
+      min-height: var(--#{$prefix}form-floating-height);
+      line-height: var(--#{$prefix}form-floating-line-height);
     }
 
-    &:focus,
-    &:not(:placeholder-shown) {
-      padding-top: $form-floating-input-padding-t;
-      padding-bottom: $form-floating-input-padding-b;
+    > label {
+      position: absolute;
+      inset-inline-start: 0;
+      top: 0;
+      z-index: 2;
+      max-width: 100%;
+      height: 100%; // allow textareas
+      padding: var(--#{$prefix}form-floating-padding-y) var(--#{$prefix}form-floating-padding-x);
+      overflow: hidden;
+      color: color-mix(in srgb, var(--#{$prefix}body-color) calc(var(--#{$prefix}form-floating-label-opacity) * 100%), transparent);
+      text-align: start;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      pointer-events: none;
+      border: $input-border-width solid transparent; // Required for aligning label's text with the input as it affects inner box model
+      transform-origin: 0 0;
+      @include transition(var(--#{$prefix}form-floating-transition));
+    }
+
+    > .form-control,
+    > .form-control-plaintext {
+      padding: var(--#{$prefix}form-floating-padding-y) var(--#{$prefix}form-floating-padding-x);
+
+      &::placeholder {
+        color: transparent;
+      }
+
+      &:focus,
+      &:not(:placeholder-shown) {
+        padding-top: var(--#{$prefix}form-floating-input-padding-t);
+        padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+      }
+      // Duplicated because `:-webkit-autofill` invalidates other selectors when grouped
+      &:-webkit-autofill {
+        padding-top: var(--#{$prefix}form-floating-input-padding-t);
+        padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+      }
+    }
+
+    > .form-select {
+      padding-inline-start: var(--#{$prefix}form-floating-padding-x);
+      padding-top: var(--#{$prefix}form-floating-input-padding-t);
+      padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
+    }
+
+    > .form-control:focus,
+    > .form-control:not(:placeholder-shown),
+    > .form-control-plaintext,
+    > .form-select {
+      ~ label {
+        transform: var(--#{$prefix}form-floating-label-transform);
+      }
     }
     // Duplicated because `:-webkit-autofill` invalidates other selectors when grouped
-    &:-webkit-autofill {
-      padding-top: $form-floating-input-padding-t;
-      padding-bottom: $form-floating-input-padding-b;
+    > .form-control:-webkit-autofill {
+      ~ label {
+        transform: var(--#{$prefix}form-floating-label-transform);
+      }
     }
-  }
+    > textarea:focus,
+    > textarea:not(:placeholder-shown) {
+      ~ label::after {
+        position: absolute;
+        inset: var(--#{$prefix}form-floating-padding-y) calc(var(--#{$prefix}form-floating-padding-x) * .5);
+        z-index: -1;
+        height: var(--#{$prefix}form-floating-label-height);
+        content: "";
+        background-color: $input-bg;
+        @include border-radius($input-border-radius);
+      }
+    }
+    > textarea:disabled ~ label::after {
+      background-color: $input-disabled-bg;
+    }
 
-  > .form-select {
-    padding-inline-start: $form-floating-padding-x;
-    padding-top: $form-floating-input-padding-t;
-    padding-bottom: $form-floating-input-padding-b;
-  }
+    > .form-control-plaintext {
+      ~ label {
+        border-width: $input-border-width 0; // Required to properly position label text - as explained above
+      }
+    }
 
-  > .form-control:focus,
-  > .form-control:not(:placeholder-shown),
-  > .form-control-plaintext,
-  > .form-select {
-    ~ label {
-      transform: $form-floating-label-transform;
+    > :disabled ~ label,
+    > .form-control:disabled ~ label { // Required for `.form-control`s because of specificity
+      color: var(--#{$prefix}form-floating-label-disabled-color);
     }
-  }
-  // Duplicated because `:-webkit-autofill` invalidates other selectors when grouped
-  > .form-control:-webkit-autofill {
-    ~ label {
-      transform: $form-floating-label-transform;
-    }
-  }
-  > textarea:focus,
-  > textarea:not(:placeholder-shown) {
-    ~ label::after {
-      position: absolute;
-      inset: $form-floating-padding-y ($form-floating-padding-x * .5);
-      z-index: -1;
-      height: $form-floating-label-height;
-      content: "";
-      background-color: $input-bg;
-      @include border-radius($input-border-radius);
-    }
-  }
-  > textarea:disabled ~ label::after {
-    background-color: $input-disabled-bg;
-  }
-
-  > .form-control-plaintext {
-    ~ label {
-      border-width: $input-border-width 0; // Required to properly position label text - as explained above
-    }
-  }
-
-  > :disabled ~ label,
-  > .form-control:disabled ~ label { // Required for `.form-control`s because of specificity
-    color: $form-floating-label-disabled-color;
   }
 }

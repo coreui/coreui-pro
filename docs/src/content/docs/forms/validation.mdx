@@ -4,6 +4,8 @@ name: "Validation"
 description: "Provide valuable, actionable feedback to your users with HTML5 form validation, via browser default behaviors or custom styles and JavaScript."
 ---
 
+import validateForms from './snippets/validate-forms.js?raw'
+
 <Callout color="warning">
 We are aware that currently the client-side custom validation styles and tooltips are not accessible, since they are not exposed to assistive technologies. While we work on a solution, we'd recommend either using the server-side option or the default browser validation method.
 </Callout>
@@ -92,30 +94,9 @@ Custom feedback styles apply custom colors, borders, focus styles, and backgroun
     <div class="col-12">
       <button class="btn btn-primary" type="submit">Submit form</button>
     </div>
-  </form>`} />
+  </form>`} sandboxJs={validateForms} />
 
-```js
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function () {
-  'use strict'
-
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  const forms = document.querySelectorAll('.needs-validation')
-
-  // Loop over them and prevent submission
-  Array.prototype.slice.call(forms)
-    .forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
-```
+<Code code={validateForms} lang="js" />
 
 ## Browser defaults
 
@@ -349,13 +330,13 @@ If your form layout allows it, you can swap the `.{valid|invalid}-feedback` clas
     <div class="col-12">
       <button class="btn btn-primary" type="submit">Submit form</button>
     </div>
-  </form>`} />
+  </form>`} sandboxJs={validateForms} />
 
 ## Sass
 
 ### Variables
 
-<ScssDocs file="scss/_variables.scss" capture="form-feedback-variables" />
+<ScssDocs file="scss/_config.scss" capture="form-feedback-variables" />
 
 ### Mixins
 
@@ -365,9 +346,9 @@ Two mixins are combined together, through our [loop](#loop), to generate our for
 
 ### Map
 
-This is the validation Sass map from `_variables.scss`. Override or extend this to generate different or additional states.
+This is the validation Sass map from `_config.scss`. Override or extend this to generate different or additional states.
 
-<ScssDocs file="scss/_variables.scss" capture="form-validation-states" />
+<ScssDocs file="scss/_config.scss" capture="form-validation-states" />
 
 Maps of `$form-validation-states` can contain three optional parameters to override tooltips and focus styles.
 
@@ -379,4 +360,4 @@ Used to iterate over `$form-validation-states` map values to generate our valida
 
 ### Customizing
 
-Validation states can be customized via Sass with the `$form-validation-states` map. Located in our `_variables.scss` file, this Sass map is how we generate the default `valid`/`invalid` validation states. Included is a nested map for customizing each state's color, icon, tooltip color, and focus shadow. While no other states are supported by browsers, those using custom styles can easily add more complex form feedback.
+Validation states can be customized via Sass with the `$form-validation-states` map. Located in our `_config.scss` file, this Sass map is how we generate the default `valid`/`invalid` validation states. Included is a nested map for customizing each state's color, icon, tooltip color, and focus shadow. While no other states are supported by browsers, those using custom styles can easily add more complex form feedback.

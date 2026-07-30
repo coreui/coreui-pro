@@ -1,0 +1,69 @@
+@use "../mixins/lists" as *;
+@use "reboot" as *;
+@use "../config" as *;
+
+@layer content {
+  //
+  // Headings
+  //
+  .h1 {
+    @extend h1;
+  }
+
+  .h2 {
+    @extend h2;
+  }
+
+  .h3 {
+    @extend h3;
+  }
+
+  .h4 {
+    @extend h4;
+  }
+
+  .h5 {
+    @extend h5;
+  }
+
+  .h6 {
+    @extend h6;
+  }
+
+  .lead {
+    font-size: $lead-font-size;
+    font-weight: $lead-font-weight;
+  }
+
+  // Type display classes
+  @each $display, $font-size in $display-font-sizes {
+    .display-#{$display} {
+      font-family: $display-font-family;
+      font-size: $font-size;
+      font-style: $display-font-style;
+      font-weight: $display-font-weight;
+      line-height: $display-line-height;
+    }
+  }
+
+  //
+  // Emphasis
+  //
+  .small {
+    @extend small;
+  }
+
+  .mark {
+    @extend mark;
+  }
+
+  //
+  // Misc
+  //
+
+  // Builds on `abbr`
+  .initialism {
+    font-size: $initialism-font-size;
+    text-transform: uppercase;
+  }
+}

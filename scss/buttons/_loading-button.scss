@@ -1,0 +1,27 @@
+@use "../mixins/transition" as *;
+@use "../config" as *;
+
+@layer components {
+  //
+  // Loading button
+  //
+
+  .btn-loading {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-loading-spinner {
+    margin-inline: ($spacer * -2) $spacer;
+    opacity: 0;
+    @include transition(margin .15s, opacity .15s, border .15s);
+  }
+
+  .btn-loading.is-loading {
+    .btn-loading-spinner {
+      width: 1rem;
+      margin-inline-start: 0;
+      opacity: 1;
+    }
+  }
+}

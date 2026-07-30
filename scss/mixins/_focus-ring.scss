@@ -1,9 +1,16 @@
-@use "../variables" as *;
+@use "../config" as *;
 
-@mixin focus-ring($color: null) {
+// Draws the focus ring as an `outline` rather than a `box-shadow`, following
+// upstream v6. An outline is not clipped by an ancestor's `overflow`, so the
+// ring stays visible inside scroll containers, where a box-shadow was cut off.
+
+@mixin focus-ring($offset: false, $color: null) {
   @if $color != null {
-    --#{$prefix}focus-ring-color: #{$color};
+    outline: var(--#{$prefix}focus-ring-width) solid #{$color};
+  } @else {
+    outline: var(--#{$prefix}focus-ring);
   }
-  outline: 0;
-  box-shadow: 0 0 var(--#{$prefix}focus-ring-blur) var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+  @if $offset {
+    outline-offset: var(--#{$prefix}focus-ring-offset);
+  }
 }

@@ -1,31 +1,67 @@
+@use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
-@use "variables" as *;
+@use "mixins/tokens" as *;
+@use "config" as *;
 
-.callout {
-  // scss-docs-start callout-css-vars
-  --#{$prefix}callout-padding-x: #{$callout-padding-x};
-  --#{$prefix}callout-padding-y: #{$callout-padding-y};
-  --#{$prefix}callout-margin-x: #{$callout-margin-x};
-  --#{$prefix}callout-margin-y: #{$callout-margin-y};
-  --#{$prefix}callout-border-width: #{$callout-border-width};
-  --#{$prefix}callout-border-color: #{$callout-border-color};
-  --#{$prefix}callout-border-left-width: #{$callout-border-left-width};
-  --#{$prefix}callout-border-radius: #{$callout-border-radius};
-  // scss-docs-end callout-css-vars
+// Callouts
+// scss-docs-start callout-variables
+$callout-padding-y:                 $spacer !default;
+$callout-padding-x:                 $spacer !default;
+$callout-margin-y:                  $spacer !default;
+$callout-margin-x:                  0 !default;
+$callout-border-radius:             var(--#{$prefix}border-radius) !default;
+$callout-border-width:              var(--#{$prefix}border-width) !default;
+$callout-border-color:              var(--#{$prefix}border-color) !default;
+$callout-border-left-width:         calc(#{$callout-border-width} * 4) !default; // stylelint-disable-line function-disallowed-list
 
-  padding: var(--#{$prefix}callout-padding-y) var(--#{$prefix}callout-padding-x);
-  margin: var(--#{$prefix}callout-margin-y) var(--#{$prefix}callout-margin-x);
-  border: var(--#{$prefix}callout-border-width) solid var(--#{$prefix}callout-border-color);
-  border-inline-start-color: var(--#{$prefix}callout-border-left-color);
-  border-inline-start-width: var(--#{$prefix}callout-border-left-width);
-  @include border-radius(var(--#{$prefix}callout-border-radius));
-}
+$callout-variants: (
+  "primary":    $primary,
+  "secondary":  $secondary,
+  "success":    $success,
+  "danger":     $danger,
+  "warning":    $warning,
+  "info":       $info,
+  "light":      $light,
+  "dark":       $dark
+) !default;
+// scss-docs-end callout-variables
 
-// scss-docs-start callout-modifiers
-// Generate contextual modifier classes for colorizing the collor.
-@each $state, $value in $callout-variants {
-  .callout-#{$state} {
-    --#{$prefix}callout-border-left-color: #{$value};
+$callout-tokens: () !default;
+
+// scss-docs-start callout-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$callout-tokens: defaults(
+  (
+    --#{$prefix}callout-padding-x: #{$callout-padding-x},
+    --#{$prefix}callout-padding-y: #{$callout-padding-y},
+    --#{$prefix}callout-margin-x: #{$callout-margin-x},
+    --#{$prefix}callout-margin-y: #{$callout-margin-y},
+    --#{$prefix}callout-border-width: #{$callout-border-width},
+    --#{$prefix}callout-border-color: #{$callout-border-color},
+    --#{$prefix}callout-border-left-width: #{$callout-border-left-width},
+    --#{$prefix}callout-border-radius: #{$callout-border-radius},
+  ),
+  $callout-tokens
+);
+// scss-docs-end callout-css-vars
+@layer components {
+  .callout {
+    @include tokens($callout-tokens);
+
+    padding: var(--#{$prefix}callout-padding-y) var(--#{$prefix}callout-padding-x);
+    margin: var(--#{$prefix}callout-margin-y) var(--#{$prefix}callout-margin-x);
+    border: var(--#{$prefix}callout-border-width) solid var(--#{$prefix}callout-border-color);
+    border-inline-start-color: var(--#{$prefix}callout-border-left-color);
+    border-inline-start-width: var(--#{$prefix}callout-border-left-width);
+    @include border-radius(var(--#{$prefix}callout-border-radius));
   }
+
+  // scss-docs-start callout-modifiers
+  // Generate contextual modifier classes for colorizing the collor.
+  @each $state, $value in $callout-variants {
+    .callout-#{$state} {
+      --#{$prefix}callout-border-left-color: #{$value};
+    }
+  }
+  // scss-docs-end callout-modifiers
 }
-// scss-docs-end callout-modifiers

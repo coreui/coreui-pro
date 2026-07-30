@@ -2,24 +2,20 @@
 
 // scss-docs-start import-stack
 // Configuration
-@forward "variables";
-@forward "variables-dark";
+@forward "config";
 @forward "functions";
 @forward "mixins";
+@forward "theme";
 
 // Layout & components
 @forward "root";
-@forward "reboot";
-@forward "type";
-@forward "images";
-@forward "containers";
-@forward "grid";
-@forward "tables";
+@forward "content";
+@forward "layout";
 @forward "forms";
-@forward "buttons";
+@forward "buttons/button";
 @forward "transitions";
 @forward "dropdown";
-@forward "button-group";
+@forward "buttons/button-group";
 @forward "nav";
 @forward "navbar";
 @forward "card";
@@ -30,15 +26,15 @@
 @forward "alert";
 @forward "progress";
 @forward "list-group";
-@forward "close";
+@forward "buttons/close";
 @forward "toasts";
 @forward "modal";
 @forward "tooltip";
 @forward "popover";
 @forward "carousel";
-@forward "spinners";
+@forward "spinner";
 @forward "offcanvas";
-@forward "placeholders";
+@forward "placeholder";
 @forward "chip";
 @forward "chip-set";
 
@@ -51,10 +47,10 @@
 @forward "footer";
 @forward "header";
 @forward "icon";
-@forward "loading-button";
+@forward "buttons/loading-button";
 @forward "range-slider";
 @forward "rating";
-@forward "search-button";
+@forward "buttons/search-button";
 @forward "sidebar";
 @forward "stepper";
 @forward "time-picker";
@@ -64,5 +60,4 @@
 
 // Utilities
 @forward "utilities/api";
-@forward "utilities/bg-gradients";
 // scss-docs-end import-stack

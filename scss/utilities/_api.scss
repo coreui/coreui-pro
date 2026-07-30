@@ -1,55 +1,39 @@
 @use "sass:map";
 @use "sass:meta";
 @use "../utilities" as *;
-@use "../mixins/breakpoints" as *;
+@use "../layout/breakpoints" as *;
 @use "../mixins/utilities" as *;
-@use "../vendor/rfs" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
-// Loop over each breakpoint
-@each $breakpoint in map.keys($grid-breakpoints) {
+@include generate-utility-at-properties($utilities);
 
-  // Generate media query if needed
-  @include media-breakpoint-up($breakpoint) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-    // Loop over each utility property
-    @each $key, $utility in $utilities {
-      // The utility can be disabled with `false`, thus check if the utility is a map first
-      // Only proceed if responsive media queries are enabled or if it's the base media query
-      @if meta.type-of($utility) == "map" and (map.get($utility, responsive) or $infix == "") {
-        @include generate-utility($utility, $infix);
-      }
-    }
-  }
-}
-
-// RFS rescaling
-@media (min-width: $rfs-mq-value) {
+@layer utilities {
+  // Loop over each breakpoint
   @each $breakpoint in map.keys($grid-breakpoints) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
-    @if (map.get($grid-breakpoints, $breakpoint) < $rfs-breakpoint) {
+    // Generate media query if needed
+    @include media-breakpoint-up($breakpoint) {
+      $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
       // Loop over each utility property
       @each $key, $utility in $utilities {
         // The utility can be disabled with `false`, thus check if the utility is a map first
         // Only proceed if responsive media queries are enabled or if it's the base media query
-        @if meta.type-of($utility) == "map" and map.get($utility, rfs) and (map.get($utility, responsive) or $infix == "") {
-          @include generate-utility($utility, $infix, true);
+        @if meta.type-of($utility) == "map" and (map.get($utility, responsive) or $infix == "") {
+          @include generate-utility($utility, $infix);
         }
       }
     }
   }
-}
 
-
-// Print utilities
-@media print {
-  @each $key, $utility in $utilities {
-    // The utility can be disabled with `false`, thus check if the utility is a map first
-    // Then check if the utility needs print styles
-    @if meta.type-of($utility) == "map" and map.get($utility, print) == true {
-      @include generate-utility($utility, "-print");
+  // Print utilities
+  @media print {
+    @each $key, $utility in $utilities {
+      // The utility can be disabled with `false`, thus check if the utility is a map first
+      // Then check if the utility needs print styles
+      @if meta.type-of($utility) == "map" and map.get($utility, print) == true {
+        @include generate-utility($utility, "-print");
+      }
     }
   }
 }

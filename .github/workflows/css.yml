@@ -40,3 +40,6 @@ jobs:
 
       - name: Run CSS tests
         run: npm run css-test
+
+      - name: Check the class API
+        run: npm run css-test-class-api

@@ -2,9 +2,9 @@
 @use "sass:map";
 @use "sass:meta";
 @use "color" as *;
-@use "rgba-css-var" as *;
+@use "translucent-css-var" as *;
 @use "to-rgb" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // stylelint-disable scss/dollar-variable-pattern
 @function map-loop($map, $func, $args...) {
@@ -38,6 +38,18 @@
   @each $key, $value in $map {
     @if $key != 0 {
       $result: map.merge($result, ("n" + $key: (-$value)));
+    }
+  }
+  @return $result;
+}
+
+// Pull one sub-key out of every entry of a nested map.
+// map-get-nested(("lg": ("font-size": 1.25rem, ...)), "font-size") => ("lg": 1.25rem, ...)
+@function map-get-nested($map, $key) {
+  $result: ();
+  @each $name, $values in $map {
+    @if meta.type-of($values) == "map" and map.has-key($values, $key) {
+      $result: map.merge($result, ($name: map.get($values, $key)));
     }
   }
   @return $result;

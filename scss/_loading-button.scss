@@ -1,25 +1,2 @@
-@use "mixins/transition" as *;
-@use "variables" as *;
-
-//
-// Loading button
-//
-
-.btn-loading {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-loading-spinner {
-  margin-inline: ($spacer * -2) $spacer;
-  opacity: 0;
-  @include transition(margin .15s, opacity .15s, border .15s);
-}
-
-.btn-loading.is-loading {
-  .btn-loading-spinner {
-    width: 1rem;
-    margin-inline-start: 0;
-    opacity: 1;
-  }
-}
+// Moved to buttons/_loading-button.scss in v6. Kept so an existing `@use "loading-button"` resolves.
+@forward "buttons/loading-button";

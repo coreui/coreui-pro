@@ -1,7 +1,10 @@
 @use "sass:map";
 @use "functions/maps" as *;
 @use "maps" as *;
-@use "variables" as *;
+@use "config" as *;
+
+// stylelint-disable function-disallowed-list
+// The opacity utilities scale a runtime var, so calc() is unavoidable here.
 
 // Utilities
 
@@ -89,19 +92,15 @@ $utilities: map.merge(
       )
     ),
     // scss-docs-end utils-shadow
-    // scss-docs-start utils-elevation
-    "elevation": (
-      property: box-shadow,
-      class: elevation,
-      values: $elevations
-    ),
-    // scss-docs-end utils-elevation
     // scss-docs-start utils-focus-ring
     "focus-ring": (
       css-var: true,
       css-variable-name: focus-ring-color,
+      // Writes the global :root token, so it stays inheriting — see
+      // generate-utility-at-properties().
+      at-property: false,
       class: focus-ring,
-      values: map-loop($theme-colors-rgb, rgba-css-var, "$prefix", "$key", "focus-ring")
+      values: map-loop($theme-colors, translucent-css-var, "$prefix", "$key", "focus-ring")
     ),
     // scss-docs-end utils-focus-ring
     // scss-docs-start utils-position
@@ -562,9 +561,14 @@ $utilities: map.merge(
       values: (monospace: var(--#{$prefix}font-monospace))
     ),
     "font-size": (
-      rfs: true,
       property: font-size,
       class: fs,
+      // The named stops, plus the numeric keys v5 shipped.
+      values: map.merge($font-sizes-legacy, map-get-nested($font-sizes, "font-size"))
+    ),
+    "text-size": (
+      property: (font-size, line-height),
+      class: text,
       values: $font-sizes
     ),
     "font-style": (
@@ -647,11 +651,6 @@ $utilities: map.merge(
           "body-tertiary": var(--#{$prefix}tertiary-color),
           "body-emphasis": var(--#{$prefix}emphasis-color),
           "reset": inherit,
-          "high-emphasis-inverse": var(--#{$prefix}high-emphasis-inverse), // deprecated
-          "medium-emphasis-inverse": var(--#{$prefix}medium-emphasis-inverse), // deprecated
-          "disabled-inverse": var(--#{$prefix}disabled-inverse), // deprecated
-          "high-emphasis": var(--#{$prefix}high-emphasis), // deprecated
-          "medium-emphasis": var(--#{$prefix}medium-emphasis), // deprecated
           "disabled": var(--#{$prefix}disabled)
         )
       )
@@ -704,7 +703,7 @@ $utilities: map.merge(
       values: map.merge(
         $utilities-links-underline,
         (
-          null: rgba(var(--#{$prefix}link-color-rgb), var(--#{$prefix}link-underline-opacity, 1)),
+          null: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-underline-opacity, 1) * 100%), transparent),
         )
       )
     ),
@@ -734,8 +733,8 @@ $utilities: map.merge(
         $utilities-bg-colors,
         (
           "transparent": transparent,
-          "body-secondary": rgba(var(--#{$prefix}secondary-bg-rgb), var(--#{$prefix}bg-opacity)),
-          "body-tertiary": rgba(var(--#{$prefix}tertiary-bg-rgb), var(--#{$prefix}bg-opacity)),
+          "body-secondary": color-mix(in srgb, var(--#{$prefix}secondary-bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+          "body-tertiary": color-mix(in srgb, var(--#{$prefix}tertiary-bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
         )
       )
     ),

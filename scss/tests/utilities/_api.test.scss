@@ -1,6 +1,6 @@
 @use "sass:map";
 
-@use "../../variables" with (
+@use "../../config" with (
   $grid-breakpoints: (
     xs: 0,
     sm: 333px,
@@ -35,35 +35,38 @@ $utilities: (
       }
 
       @include expect() {
-        // margin is not set to responsive
-        .margin-auto {
-          margin: auto !important;
-        }
+        // The API emits into the utilities cascade layer.
+        @layer utilities {
+          // margin is not set to responsive
+          .margin-auto {
+            margin: auto !important;
+          }
 
-        // padding is, though
-        .padding-1rem {
-          padding: 1rem !important;
-        }
-
-        .font-size-large {
-          font-size: 1.25rem !important;
-        }
-
-        @media (min-width: 333px) {
-          .padding-sm-1rem {
+          // padding is, though
+          .padding-1rem {
             padding: 1rem !important;
           }
-        }
 
-        @media (min-width: 666px) {
-          .padding-md-1rem {
-            padding: 1rem !important;
-          }
-        }
-
-        @media print {
-          .font-size-print-large {
+          .font-size-large {
             font-size: 1.25rem !important;
+          }
+
+          @media (min-width: 333px) {
+            .padding-sm-1rem {
+              padding: 1rem !important;
+            }
+          }
+
+          @media (min-width: 666px) {
+            .padding-md-1rem {
+              padding: 1rem !important;
+            }
+          }
+
+          @media print {
+            .font-size-print-large {
+              font-size: 1.25rem !important;
+            }
           }
         }
       }

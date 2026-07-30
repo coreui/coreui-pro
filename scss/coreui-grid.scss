@@ -2,10 +2,8 @@
   $file: "Grid"
 );
 
-@forward "variables";
-@forward "variables-dark";
-@forward "containers";
-@forward "grid" with (
+@forward "config";
+@forward "layout" with (
   $include-column-box-sizing: true !default,
 );
 @use "utilities" as *;

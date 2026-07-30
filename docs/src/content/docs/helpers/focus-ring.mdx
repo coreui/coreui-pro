@@ -24,7 +24,7 @@ Modify the styling of a focus ring with our CSS variables, Sass variables, utili
 
 Modify the `--cui-focus-ring-*` CSS variables as needed to change the default appearance.
 
-<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2" style="--cui-focus-ring-color: rgba(var(--cui-success-rgb), .25)">
+<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2" style="--cui-focus-ring-color: color-mix(in srgb, var(--cui-success) 25%, transparent)">
     Green focus ring
   </a>`} />
 
@@ -32,17 +32,20 @@ Modify the `--cui-focus-ring-*` CSS variables as needed to change the default ap
 
 <ScssDocs file="scss/_root.scss" capture="root-focus-variables" />
 
-By default, there is no `--cui-focus-ring-x`, `--cui-focus-ring-y`, or `--cui-focus-ring-blur`, but we provide CSS variables with fallbacks to initial `0` values. Modify them to change the default appearance.
+The ring is an `outline`, so it is never clipped by an ancestor's `overflow` —
+it stays visible inside scroll containers, where a `box-shadow` ring was cut off.
+Push it away from the element with `--cui-focus-ring-offset`, which defaults to
+`0`:
 
-<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2" style="--cui-focus-ring-x: 10px; --cui-focus-ring-y: 10px; --cui-focus-ring-blur: 4px">
-    Blurry offset focus ring
+<Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2" style="--cui-focus-ring-offset: 4px">
+    Offset focus ring
   </a>`} />
 
 ### Sass variables
 
 Customize the focus ring Sass variables to modify all usage of the focus ring styles across your Bootstrap-powered project.
 
-<ScssDocs file="scss/_variables.scss" capture="focus-ring-variables" />
+<ScssDocs file="scss/_config.scss" capture="focus-ring-variables" />
 
 ### Sass utilities API
 

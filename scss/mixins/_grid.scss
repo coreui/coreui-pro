@@ -1,10 +1,10 @@
 @use "sass:map";
 @use "sass:math";
 @use "sass:meta";
-@use "breakpoints" as *;
 @use "../functions/math" as *;
 @use "../maps" as *;
-@use "../variables" as *;
+@use "../config" as *;
+@use "breakpoints" as *;
 
 // Grid system
 //
