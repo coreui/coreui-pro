@@ -1,11 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI search-button.js
+ * CoreUI search-button.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import { defineJQueryPlugin } from './util/index.js'
 
@@ -33,6 +34,12 @@ const SELECTOR_EDITABLE_TARGET = 'input, textarea, select, [contenteditable=""],
 const SELECTOR_PLACEHOLDER = '.search-button-placeholder'
 const SELECTOR_SHORTCUT_KEY = '.search-button-key'
 const SELECTOR_SHORTCUT_KEYS = '.search-button-keys'
+
+type ParsedShortcut = {
+  key: string
+  modifiers: Record<string, boolean>
+  shortcut: string
+}
 
 const Default = {
   preventDefault: true,
@@ -70,7 +77,11 @@ const KEY_LABELS = {
  */
 
 class SearchButton extends BaseComponent {
-  constructor(element, config) {
+  protected declare _shortcutTriggered: boolean
+  protected declare _shortcuts: ParsedShortcut[]
+  protected declare _preferredShortcut: ParsedShortcut | null
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._shortcutTriggered = false
@@ -80,25 +91,25 @@ class SearchButton extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  trigger() {
+  trigger(): void {
     this._triggerEvent('api')
   }
 
   // Private
-  _triggerEvent(trigger) {
+  _triggerEvent(trigger: any): void {
     if (this._isDisabled()) {
       return
     }
@@ -106,8 +117,8 @@ class SearchButton extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_TRIGGER, { trigger })
   }
 
-  _handleShortcut(event) {
-    if (this._isDisabled() || event.defaultPrevented || event.repeat || this._shouldIgnoreShortcut(event)) {
+  _handleShortcut(event: any): boolean | null {
+    if (this._isDisabled() || event!.defaultPrevented || event.repeat || this._shouldIgnoreShortcut(event)) {
       return false
     }
 
@@ -132,13 +143,13 @@ class SearchButton extends BaseComponent {
     return true
   }
 
-  _isDisabled() {
+  _isDisabled(): any {
     return this._element.classList.contains('disabled') ||
       this._element.getAttribute('aria-disabled') === 'true' ||
-      this._element.disabled
+      (this._element as HTMLButtonElement).disabled
   }
 
-  _ensureShortcutKeys() {
+  _ensureShortcutKeys(): any {
     const existingShortcutKeys = this._element.querySelector(SELECTOR_SHORTCUT_KEYS)
 
     if (existingShortcutKeys) {
@@ -159,7 +170,7 @@ class SearchButton extends BaseComponent {
     return shortcutKeys
   }
 
-  _syncShortcutKeys() {
+  _syncShortcutKeys(): void {
     const shortcutKeys = this._ensureShortcutKeys()
     const shortcutTokens = this._formatShortcutTokens(this._preferredShortcut?.shortcut || '')
       .filter(Boolean)
@@ -175,31 +186,31 @@ class SearchButton extends BaseComponent {
     }
   }
 
-  _syncActiveKeys(event) {
+  _syncActiveKeys(event: any): void {
     const pressedKeys = this._getPressedKeys(event)
 
     for (const shortcutKey of this._element.querySelectorAll(SELECTOR_SHORTCUT_KEY)) {
-      shortcutKey.classList.toggle(CLASS_NAME_ACTIVE, pressedKeys.has(shortcutKey.dataset.coreuiSearchButtonKey))
+      shortcutKey.classList.toggle(CLASS_NAME_ACTIVE, pressedKeys.has((shortcutKey as HTMLElement).dataset.coreuiSearchButtonKey!))
     }
   }
 
-  _clearActiveKeys() {
+  _clearActiveKeys(): void {
     for (const shortcutKey of this._element.querySelectorAll(SELECTOR_SHORTCUT_KEY)) {
       shortcutKey.classList.remove(CLASS_NAME_ACTIVE)
     }
   }
 
-  _consumeShortcutTrigger() {
+  _consumeShortcutTrigger(): boolean {
     const shortcutTriggered = this._shortcutTriggered
     this._shortcutTriggered = false
     return shortcutTriggered
   }
 
-  _shouldIgnoreShortcut(event) {
+  _shouldIgnoreShortcut(event: any): boolean {
     return this._isEditableTarget(event.target) && !event.ctrlKey && !event.metaKey
   }
 
-  _isEditableTarget(target) {
+  _isEditableTarget(target: any): any {
     if (!(target instanceof Element)) {
       return false
     }
@@ -207,11 +218,11 @@ class SearchButton extends BaseComponent {
     return target.matches(SELECTOR_EDITABLE_TARGET) || target.closest(SELECTOR_EDITABLE_TARGET)
   }
 
-  _normalizeKey(key) {
-    return KEY_ALIASES[key.toLowerCase()] || key.toLowerCase()
+  _normalizeKey(key: string): string {
+    return (KEY_ALIASES as Record<string, string>)[key.toLowerCase()] || key.toLowerCase()
   }
 
-  _parseShortcut(shortcut) {
+  _parseShortcut(shortcut: string): any {
     return shortcut
       .split(',')
       .map(value => value.trim())
@@ -229,7 +240,7 @@ class SearchButton extends BaseComponent {
 
         for (const part of keys) {
           if (MODIFIER_KEYS.has(part)) {
-            modifiers[part] = true
+            (modifiers as Record<string, boolean>)[part] = true
             continue
           }
 
@@ -244,7 +255,7 @@ class SearchButton extends BaseComponent {
       })
   }
 
-  _matchesShortcut(shortcut, event) {
+  _matchesShortcut(shortcut: ParsedShortcut, event: any): boolean {
     if (!shortcut.key || this._normalizeKey(event.key) !== shortcut.key) {
       return false
     }
@@ -255,32 +266,32 @@ class SearchButton extends BaseComponent {
       shortcut.modifiers.shift === event.shiftKey
   }
 
-  _formatShortcutTokens(shortcut) {
+  _formatShortcutTokens(shortcut: string): any {
     return shortcut
       .split('+')
       .map(part => this._normalizeKey(part.trim()))
       .map(part => this._getKeyLabel(part))
   }
 
-  _getPlatform() {
-    return window.navigator.userAgentData?.platform ||
+  _getPlatform(): string {
+    return (window.navigator as any).userAgentData?.platform ||
       window.navigator.platform ||
       window.navigator.userAgent ||
       ''
   }
 
-  _isMacOS() {
+  _isMacOS(): any {
     return /Mac|iPhone|iPad|iPod|macOS|Macintosh/.test(this._getPlatform())
   }
 
-  _getPreferredShortcut(shortcuts) {
+  _getPreferredShortcut(shortcuts: ParsedShortcut[]): any {
     return shortcuts.find(shortcut => {
       return this._isMacOS() ? shortcut.modifiers.meta : shortcut.modifiers.ctrl
     }) || shortcuts[0] || null
   }
 
-  _getPressedKeys(event) {
-    const pressedKeys = new Set()
+  _getPressedKeys(event: any): Set<string> {
+    const pressedKeys = new Set<string>()
 
     if (event.altKey) {
       pressedKeys.add(KEY_LABELS.alt)
@@ -308,40 +319,40 @@ class SearchButton extends BaseComponent {
     return pressedKeys
   }
 
-  _getKeyLabel(key) {
-    return KEY_LABELS[key] || (key.length === 1 ? key.toUpperCase() : `${key.charAt(0).toUpperCase()}${key.slice(1)}`)
+  _getKeyLabel(key: string): string {
+    return (KEY_LABELS as Record<string, string>)[key] || (key.length === 1 ? key.toUpperCase() : `${key.charAt(0).toUpperCase()}${key.slice(1)}`)
   }
 
   // Static
-  static searchButtonInterface(element, config) {
-    const data = SearchButton.getOrCreateInstance(element, config)
+  static searchButtonInterface(element: string | Element | null, config?: any): void {
+    const data: any = SearchButton.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (config.startsWith('_') || typeof data[config] !== 'function') {
+      if (config.startsWith('_') || typeof data[config as string] !== 'function') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
       SearchButton.searchButtonInterface(this, config)
     })
   }
 
-  static _initializeDataApi() {
+  static _initializeDataApi(): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
       SearchButton.getOrCreateInstance(button)
     }
   }
 
-  static _handleDataApiClick(event) {
+  static _handleDataApiClick(event: any): void {
     event.preventDefault()
 
-    const button = event.target.closest(SELECTOR_DATA_TOGGLE)
-    const data = SearchButton.getOrCreateInstance(button)
+    const button = (event.target as HTMLElement).closest(SELECTOR_DATA_TOGGLE)
+    const data: any = SearchButton.getOrCreateInstance(button)
     const shortcutTriggered = data._consumeShortcutTrigger()
 
     if (shortcutTriggered) {
@@ -352,9 +363,9 @@ class SearchButton extends BaseComponent {
     data._triggerEvent('click')
   }
 
-  static _handleDataApiKeydown(event) {
+  static _handleDataApiKeydown(event: any): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
-      const data = SearchButton.getOrCreateInstance(button)
+      const data: any = SearchButton.getOrCreateInstance(button)
       data._syncActiveKeys(event)
 
       if (data._handleShortcut(event)) {
@@ -363,13 +374,13 @@ class SearchButton extends BaseComponent {
     }
   }
 
-  static _handleDataApiKeyup(event) {
+  static _handleDataApiKeyup(event: any): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
       SearchButton.getOrCreateInstance(button)._syncActiveKeys(event)
     }
   }
 
-  static _handleDataApiBlur() {
+  static _handleDataApiBlur(): void {
     for (const button of document.querySelectorAll(SELECTOR_DATA_TOGGLE)) {
       SearchButton.getOrCreateInstance(button)._clearActiveKeys()
     }
@@ -384,15 +395,15 @@ EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   SearchButton._initializeDataApi()
 })
 
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
+EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, (event: any) => {
   SearchButton._handleDataApiClick(event)
 })
 
-EventHandler.on(document, EVENT_KEYDOWN_DATA_API, event => {
+EventHandler.on(document, EVENT_KEYDOWN_DATA_API, (event: any) => {
   SearchButton._handleDataApiKeydown(event)
 })
 
-EventHandler.on(document, EVENT_KEYUP_DATA_API, event => {
+EventHandler.on(document, EVENT_KEYUP_DATA_API, (event: any) => {
   SearchButton._handleDataApiKeyup(event)
 })
 

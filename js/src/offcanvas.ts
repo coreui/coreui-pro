@@ -1,14 +1,15 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI offcanvas.js
+ * CoreUI offcanvas.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This component is a modified version of the Bootstrap's offcanvas.js
+ * This component is a modified version of the Bootstrap's offcanvas.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Backdrop from './util/backdrop.js'
@@ -66,7 +67,11 @@ const DefaultType = {
  */
 
 class Offcanvas extends BaseComponent {
-  constructor(element, config) {
+  protected declare _isShown: boolean
+  protected declare _backdrop: Backdrop
+  protected declare _focustrap: FocusTrap
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._isShown = false
@@ -76,31 +81,31 @@ class Offcanvas extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  toggle(relatedTarget) {
+  toggle(relatedTarget?: HTMLElement | null): any {
     return this._isShown ? this.hide() : this.show(relatedTarget)
   }
 
-  show(relatedTarget) {
+  show(relatedTarget?: HTMLElement | null): void {
     if (this._isShown) {
       return
     }
 
     const showEvent = EventHandler.trigger(this._element, EVENT_SHOW, { relatedTarget })
 
-    if (showEvent.defaultPrevented) {
+    if (showEvent!.defaultPrevented) {
       return
     }
 
@@ -111,7 +116,7 @@ class Offcanvas extends BaseComponent {
       new ScrollBarHelper().hide()
     }
 
-    this._element.setAttribute('aria-modal', true)
+    this._element.setAttribute('aria-modal', true as unknown as string)
     this._element.setAttribute('role', 'dialog')
     this._element.classList.add(CLASS_NAME_SHOWING)
 
@@ -128,14 +133,14 @@ class Offcanvas extends BaseComponent {
     this._queueCallback(completeCallBack, this._element, true)
   }
 
-  hide() {
+  hide(): void {
     if (!this._isShown) {
       return
     }
 
     const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE)
 
-    if (hideEvent.defaultPrevented) {
+    if (hideEvent!.defaultPrevented) {
       return
     }
 
@@ -160,14 +165,14 @@ class Offcanvas extends BaseComponent {
     this._queueCallback(completeCallback, this._element, true)
   }
 
-  dispose() {
+  dispose(): any {
     this._backdrop.dispose()
     this._focustrap.deactivate()
     super.dispose()
   }
 
   // Private
-  _initializeBackDrop() {
+  _initializeBackDrop(): any {
     const clickCallback = () => {
       if (this._config.backdrop === 'static') {
         EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED)
@@ -189,13 +194,13 @@ class Offcanvas extends BaseComponent {
     })
   }
 
-  _initializeFocusTrap() {
+  _initializeFocusTrap(): any {
     return new FocusTrap({
       trapElement: this._element
     })
   }
 
-  _addEventListeners() {
+  _addEventListeners(): any {
     EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS, event => {
       if (event.key !== ESCAPE_KEY) {
         return
@@ -211,19 +216,19 @@ class Offcanvas extends BaseComponent {
   }
 
   // Static
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Offcanvas.getOrCreateInstance(this, config)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = Offcanvas.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](this)
+      data[config as string](this)
     })
   }
 }
@@ -253,10 +258,10 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   // avoid conflict when clicking a toggler of an offcanvas, while another is open
   const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR)
   if (alreadyOpen && alreadyOpen !== target) {
-    Offcanvas.getInstance(alreadyOpen).hide()
+    Offcanvas.getInstance(alreadyOpen)!.hide()
   }
 
-  const data = Offcanvas.getOrCreateInstance(target)
+  const data: any = Offcanvas.getOrCreateInstance(target)
   data.toggle(this)
 })
 

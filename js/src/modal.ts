@@ -1,14 +1,15 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI modal.js
+ * CoreUI modal.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
- * This component is a modified version of the Bootstrap's modal.js
+ * This component is a modified version of the Bootstrap's modal.ts
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Backdrop from './util/backdrop.js'
@@ -67,10 +68,17 @@ const DefaultType = {
  */
 
 class Modal extends BaseComponent {
-  constructor(element, config) {
+  protected declare _dialog: HTMLElement | null
+  protected declare _backdrop: Backdrop
+  protected declare _focustrap: FocusTrap
+  protected declare _isShown: boolean
+  protected declare _isTransitioning: boolean
+  protected declare _scrollBar: ScrollBarHelper
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
-    this._dialog = SelectorEngine.findOne(SELECTOR_DIALOG, this._element)
+    this._dialog = SelectorEngine.findOne(SELECTOR_DIALOG, this._element as ParentNode)
     this._backdrop = this._initializeBackDrop()
     this._focustrap = this._initializeFocusTrap()
     this._isShown = false
@@ -81,24 +89,24 @@ class Modal extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  toggle(relatedTarget) {
+  toggle(relatedTarget?: HTMLElement | null): any {
     return this._isShown ? this.hide() : this.show(relatedTarget)
   }
 
-  show(relatedTarget) {
+  show(relatedTarget?: HTMLElement | null): void {
     if (this._isShown || this._isTransitioning) {
       return
     }
@@ -107,7 +115,7 @@ class Modal extends BaseComponent {
       relatedTarget
     })
 
-    if (showEvent.defaultPrevented) {
+    if (showEvent!.defaultPrevented) {
       return
     }
 
@@ -123,14 +131,14 @@ class Modal extends BaseComponent {
     this._backdrop.show(() => this._showElement(relatedTarget))
   }
 
-  hide() {
+  hide(): void {
     if (!this._isShown || this._isTransitioning) {
       return
     }
 
     const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE)
 
-    if (hideEvent.defaultPrevented) {
+    if (hideEvent!.defaultPrevented) {
       return
     }
 
@@ -143,9 +151,9 @@ class Modal extends BaseComponent {
     this._queueCallback(() => this._hideModal(), this._element, this._isAnimated())
   }
 
-  dispose() {
+  dispose(): any {
     EventHandler.off(window, EVENT_KEY)
-    EventHandler.off(this._dialog, EVENT_KEY)
+    EventHandler.off(this._dialog!, EVENT_KEY)
 
     this._backdrop.dispose()
     this._focustrap.deactivate()
@@ -153,25 +161,25 @@ class Modal extends BaseComponent {
     super.dispose()
   }
 
-  handleUpdate() {
+  handleUpdate(): any {
     this._adjustDialog()
   }
 
   // Private
-  _initializeBackDrop() {
+  _initializeBackDrop(): any {
     return new Backdrop({
       isVisible: Boolean(this._config.backdrop), // 'static' option will be translated to true, and booleans will keep their value,
       isAnimated: this._isAnimated()
     })
   }
 
-  _initializeFocusTrap() {
+  _initializeFocusTrap(): any {
     return new FocusTrap({
       trapElement: this._element
     })
   }
 
-  _showElement(relatedTarget) {
+  _showElement(relatedTarget?: HTMLElement | null): void {
     // try to append dynamic modal
     if (!document.body.contains(this._element)) {
       document.body.append(this._element)
@@ -179,11 +187,11 @@ class Modal extends BaseComponent {
 
     this._element.style.display = 'block'
     this._element.removeAttribute('aria-hidden')
-    this._element.setAttribute('aria-modal', true)
+    this._element.setAttribute('aria-modal', true as unknown as string)
     this._element.setAttribute('role', 'dialog')
     this._element.scrollTop = 0
 
-    const modalBody = SelectorEngine.findOne(SELECTOR_MODAL_BODY, this._dialog)
+    const modalBody = SelectorEngine.findOne(SELECTOR_MODAL_BODY, this._dialog as ParentNode)
     if (modalBody) {
       modalBody.scrollTop = 0
     }
@@ -203,10 +211,10 @@ class Modal extends BaseComponent {
       })
     }
 
-    this._queueCallback(transitionComplete, this._dialog, this._isAnimated())
+    this._queueCallback(transitionComplete, this._dialog!, this._isAnimated())
   }
 
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._element, EVENT_KEYDOWN_DISMISS, event => {
       if (event.key !== ESCAPE_KEY) {
         return
@@ -245,9 +253,9 @@ class Modal extends BaseComponent {
     })
   }
 
-  _hideModal() {
+  _hideModal(): any {
     this._element.style.display = 'none'
-    this._element.setAttribute('aria-hidden', true)
+    this._element.setAttribute('aria-hidden', true as unknown as string)
     this._element.removeAttribute('aria-modal')
     this._element.removeAttribute('role')
     this._isTransitioning = false
@@ -260,13 +268,13 @@ class Modal extends BaseComponent {
     })
   }
 
-  _isAnimated() {
+  _isAnimated(): any {
     return this._element.classList.contains(CLASS_NAME_FADE)
   }
 
-  _triggerBackdropTransition() {
+  _triggerBackdropTransition(): void {
     const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE_PREVENTED)
-    if (hideEvent.defaultPrevented) {
+    if (hideEvent!.defaultPrevented) {
       return
     }
 
@@ -286,8 +294,8 @@ class Modal extends BaseComponent {
       this._element.classList.remove(CLASS_NAME_STATIC)
       this._queueCallback(() => {
         this._element.style.overflowY = initialOverflowY
-      }, this._dialog)
-    }, this._dialog)
+      }, this._dialog!)
+    }, this._dialog!)
 
     this._element.focus()
   }
@@ -296,7 +304,7 @@ class Modal extends BaseComponent {
    * The following methods are used to handle overflowing modals
    */
 
-  _adjustDialog() {
+  _adjustDialog(): any {
     const isModalOverflowing = this._element.scrollHeight > document.documentElement.clientHeight
     const scrollbarWidth = this._scrollBar.getWidth()
     const isBodyOverflowing = scrollbarWidth > 0
@@ -312,25 +320,25 @@ class Modal extends BaseComponent {
     }
   }
 
-  _resetAdjustments() {
+  _resetAdjustments(): any {
     this._element.style.paddingLeft = ''
     this._element.style.paddingRight = ''
   }
 
   // Static
-  static jQueryInterface(config, relatedTarget) {
-    return this.each(function () {
-      const data = Modal.getOrCreateInstance(this, config)
+  static jQueryInterface(this: any, config?: any, relatedTarget?: HTMLElement | null): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = Modal.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](relatedTarget)
+      data[config as string](relatedTarget)
     })
   }
 }
@@ -347,7 +355,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   }
 
   EventHandler.one(target, EVENT_SHOW, showEvent => {
-    if (showEvent.defaultPrevented) {
+    if (showEvent!.defaultPrevented) {
       // only register focus restorer if modal will actually get shown
       return
     }
@@ -362,10 +370,10 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   // avoid conflict when clicking modal toggler while another one is open
   const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR)
   if (alreadyOpen) {
-    Modal.getInstance(alreadyOpen).hide()
+    Modal.getInstance(alreadyOpen)!.hide()
   }
 
-  const data = Modal.getOrCreateInstance(target)
+  const data: any = Modal.getOrCreateInstance(target)
 
   data.toggle(this)
 })

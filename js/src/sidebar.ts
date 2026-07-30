@@ -1,11 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI sidebar.js
+ * CoreUI sidebar.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import { defineJQueryPlugin } from './util/index.js'
@@ -54,7 +55,14 @@ const SELECTOR_SIDEBAR = '.sidebar'
  */
 
 class Sidebar extends BaseComponent {
-  constructor(element, config) {
+  protected declare _show: boolean
+  protected declare _mobile: boolean
+  protected declare _overlaid: boolean
+  protected declare _narrow: boolean
+  protected declare _unfoldable: boolean
+  protected declare _backdrop: Backdrop
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
     this._config = this._getConfig(config)
@@ -69,21 +77,21 @@ class Sidebar extends BaseComponent {
 
   // Getters
 
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
 
-  show() {
+  show(): void {
     EventHandler.trigger(this._element, EVENT_SHOW)
 
     if (this._element.classList.contains(CLASS_NAME_HIDE)) {
@@ -114,7 +122,7 @@ class Sidebar extends BaseComponent {
     this._queueCallback(complete, this._element, true)
   }
 
-  hide() {
+  hide(): void {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
     if (this._element.classList.contains(CLASS_NAME_SHOW)) {
@@ -144,7 +152,7 @@ class Sidebar extends BaseComponent {
     this._queueCallback(complete, this._element, true)
   }
 
-  toggle() {
+  toggle(): void {
     if (this._isVisible()) {
       this.hide()
       return
@@ -153,21 +161,21 @@ class Sidebar extends BaseComponent {
     this.show()
   }
 
-  narrow() {
+  narrow(): void {
     if (!this._isMobile()) {
       this._element.classList.add(CLASS_NAME_SIDEBAR_NARROW)
       this._narrow = true
     }
   }
 
-  unfoldable() {
+  unfoldable(): void {
     if (!this._isMobile()) {
       this._element.classList.add(CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE)
       this._unfoldable = true
     }
   }
 
-  reset() {
+  reset(): void {
     if (!this._isMobile()) {
       if (this._narrow) {
         this._element.classList.remove(CLASS_NAME_SIDEBAR_NARROW)
@@ -181,7 +189,7 @@ class Sidebar extends BaseComponent {
     }
   }
 
-  toggleNarrow() {
+  toggleNarrow(): any {
     if (this._narrow) {
       this.reset()
       return
@@ -190,7 +198,7 @@ class Sidebar extends BaseComponent {
     this.narrow()
   }
 
-  toggleUnfoldable() {
+  toggleUnfoldable(): any {
     if (this._unfoldable) {
       this.reset()
       return
@@ -201,7 +209,7 @@ class Sidebar extends BaseComponent {
 
   // Private
 
-  _initializeBackDrop() {
+  _initializeBackDrop(): any {
     return new Backdrop({
       className: CLASS_NAME_BACKDROP,
       isVisible: this._isMobile(),
@@ -211,49 +219,49 @@ class Sidebar extends BaseComponent {
     })
   }
 
-  _isMobile() {
+  _isMobile(): any {
     return Boolean(window.getComputedStyle(this._element, null).getPropertyValue('--cui-is-mobile'))
   }
 
-  _isNarrow() {
+  _isNarrow(): any {
     return this._element.classList.contains(CLASS_NAME_SIDEBAR_NARROW)
   }
 
-  _isOverlaid() {
+  _isOverlaid(): any {
     return this._element.classList.contains(CLASS_NAME_SIDEBAR_OVERLAID)
   }
 
-  _isUnfoldable() {
+  _isUnfoldable(): any {
     return this._element.classList.contains(CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE)
   }
 
-  _isVisible() {
+  _isVisible(): any {
     const rect = this._element.getBoundingClientRect()
     return (
       rect.top >= 0 && rect.left >= 0 && Math.floor(rect.bottom) <= (window.innerHeight || document.documentElement.clientHeight) && Math.floor(rect.right) <= (window.innerWidth || document.documentElement.clientWidth)
     )
   }
 
-  _clickOutListener(event) {
-    if (event.target.closest(SELECTOR_SIDEBAR) === null) {
+  _clickOutListener(event: any): void {
+    if ((event.target as HTMLElement).closest(SELECTOR_SIDEBAR) === null) {
       event.preventDefault()
       event.stopPropagation()
       this.hide()
     }
   }
 
-  _addClickOutListener() {
+  _addClickOutListener(): void {
     EventHandler.on(document, EVENT_CLICK_DATA_API, event => {
       this._clickOutListener(event)
     })
   }
 
-  _removeClickOutListener() {
+  _removeClickOutListener(): void {
     EventHandler.off(document, EVENT_CLICK_DATA_API)
   }
 
   // Sidebar navigation
-  _addEventListeners() {
+  _addEventListeners(): void {
     if (this._mobile && this._show) {
       this._addClickOutListener()
     }
@@ -264,7 +272,7 @@ class Sidebar extends BaseComponent {
 
     EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
       event.preventDefault()
-      const toggle = Manipulator.getDataAttribute(event.target.closest(SELECTOR_DATA_TOGGLE), 'toggle')
+      const toggle = Manipulator.getDataAttribute((event.target as HTMLElement).closest(SELECTOR_DATA_TOGGLE)!, 'toggle')
 
       if (toggle === 'narrow') {
         this.toggleNarrow()
@@ -290,20 +298,20 @@ class Sidebar extends BaseComponent {
 
   // Static
 
-  static sidebarInterface(element, config) {
-    const data = Sidebar.getOrCreateInstance(element, config)
+  static sidebarInterface(element: string | Element | null, config?: any): void {
+    const data: any = Sidebar.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
       Sidebar.sidebarInterface(this, config)
     })
   }
