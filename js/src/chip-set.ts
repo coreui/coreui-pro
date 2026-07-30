@@ -1,11 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI chip-set.js
+ * CoreUI chip-set.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import Chip from './chip.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
@@ -43,10 +44,24 @@ const CLASS_NAME_DISABLED = 'disabled'
 
 const SELECTION_MODE_SINGLE = 'single'
 
-const DEFAULT_REMOVE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
-const DEFAULT_SELECTED_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
+const DEFAULT_REMOVE_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
+const DEFAULT_SELECTED_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
 
-const Default = {
+type ChipSetConfig = {
+  ariaRemoveLabel: string
+  chipClassName: string | ((value: string) => string) | null
+  disabled: boolean
+  filter: boolean
+  maxChips: number | null
+  removable: boolean
+  removeIcon: string
+  selectable: boolean
+  selectedIcon: string
+  selectionMode: string
+  unique: boolean
+}
+
+const Default: ChipSetConfig = {
   ariaRemoveLabel: 'Remove',
   chipClassName: null,
   disabled: false,
@@ -79,7 +94,12 @@ const DefaultType = {
  */
 
 class ChipSet extends BaseComponent {
-  constructor(element, config) {
+  protected declare _disabled: boolean
+  protected declare _pendingFocus: HTMLElement | null
+  protected declare _chips: string[]
+  protected declare _input: HTMLElement | null
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
@@ -91,20 +111,20 @@ class ChipSet extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  add(chip) {
+  add(chip: HTMLElement | string): HTMLElement | null {
     if (!this._canModify()) {
       return null
     }
@@ -129,7 +149,7 @@ class ChipSet extends BaseComponent {
       relatedTarget: this._input ?? null
     })
 
-    if (addEvent.defaultPrevented) {
+    if (addEvent!.defaultPrevented) {
       return null
     }
 
@@ -145,13 +165,13 @@ class ChipSet extends BaseComponent {
     return element
   }
 
-  remove(chipOrValue) {
+  remove(chipOrValue: HTMLElement | string): boolean {
     if (!this._canModify()) {
       return false
     }
 
-    let chip
-    let value
+    let chip: HTMLElement | undefined
+    let value: string | undefined
 
     if (typeof chipOrValue === 'string') {
       value = chipOrValue
@@ -171,7 +191,7 @@ class ChipSet extends BaseComponent {
       relatedTarget: this._input ?? null
     })
 
-    if (removeEvent.defaultPrevented) {
+    if (removeEvent!.defaultPrevented) {
       return false
     }
 
@@ -186,19 +206,19 @@ class ChipSet extends BaseComponent {
     return !chip.isConnected
   }
 
-  removeSelected() {
+  removeSelected(): void {
     for (const chip of this.getSelected()) {
       this.remove(chip)
     }
   }
 
-  clear() {
+  clear(): void {
     for (const chip of this._getChipElements()) {
       this.remove(chip)
     }
   }
 
-  selectChip(chip) {
+  selectChip(chip: HTMLElement): void {
     if (!this._getChipElements().includes(chip)) {
       return
     }
@@ -206,7 +226,7 @@ class ChipSet extends BaseComponent {
     Chip.getInstance(chip)?.select()
   }
 
-  selectAll() {
+  selectAll(): void {
     if (!this._config.selectable) {
       return
     }
@@ -216,38 +236,38 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  deselectAll() {
+  deselectAll(): void {
     for (const chip of this.getSelected()) {
       Chip.getInstance(chip)?.deselect()
     }
   }
 
-  clearSelection() {
+  clearSelection(): void {
     this.deselectAll()
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
       selected: this.getSelectedValues()
     })
   }
 
-  getSelected() {
-    return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element)
+  getSelected(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_CHIP_ACTIVE, this._element as ParentNode)
   }
 
-  getValues() {
+  getValues(): string[] {
     return [...this._chips]
   }
 
-  getSelectedValues() {
+  getSelectedValues(): string[] {
     return this.getSelected().map(chip => this._getChipValue(chip))
   }
 
-  dispose() {
+  override dispose(): void {
     EventHandler.off(this._element, Chip.EVENT_KEY)
     super.dispose()
   }
 
   // Private
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: any): any {
     // Filter chips are selectable by definition.
     if (config.filter) {
       config.selectable = true
@@ -256,29 +276,29 @@ class ChipSet extends BaseComponent {
     return config
   }
 
-  _canModify() {
+  _canModify(): boolean {
     return !this._disabled
   }
 
-  _appendChip(chip) {
+  _appendChip(chip: HTMLElement): void {
     this._element.append(chip)
   }
 
-  _getChipElements() {
-    return SelectorEngine.find(SELECTOR_CHIP, this._element)
+  _getChipElements(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_CHIP, this._element as ParentNode)
   }
 
-  _findChipByValue(value) {
+  _findChipByValue(value: string): HTMLElement | undefined {
     return this._getChipElements().find(chip => this._getChipValue(chip) === value)
   }
 
-  _getChipValue(chip) {
+  _getChipValue(chip: HTMLElement): string {
     if (chip.dataset.coreuiChipValue) {
       return chip.dataset.coreuiChipValue
     }
 
     const clone = chip.cloneNode(true)
-    const remove = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, clone)
+    const remove = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, clone as ParentNode)
     if (remove) {
       remove.remove()
     }
@@ -286,11 +306,11 @@ class ChipSet extends BaseComponent {
     return clone.textContent?.trim() || ''
   }
 
-  _getFocusableChips() {
-    return SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS, this._element)
+  _getFocusableChips(): HTMLElement[] {
+    return SelectorEngine.find(SELECTOR_FOCUSABLE_ITEMS, this._element as ParentNode)
   }
 
-  _initChips() {
+  _initChips(): void {
     for (const chip of this._getChipElements()) {
       const value = this._getChipValue(chip)
       if (value) {
@@ -302,11 +322,11 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _setupChip(chip) {
+  _setupChip(chip: HTMLElement): void {
     Chip.getOrCreateInstance(chip, this._getChipConfig(chip))
   }
 
-  _getChipConfig(chip) {
+  _getChipConfig(chip: HTMLElement): Record<string, any> {
     // A chip's own data attributes override the set's options.
     return {
       ariaRemoveLabel: this._config.ariaRemoveLabel,
@@ -320,7 +340,7 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _createChip(value) {
+  _createChip(value: string): HTMLElement {
     const chip = document.createElement('span')
     chip.className = CLASS_NAME_CHIP
     chip.dataset.coreuiChipValue = value
@@ -329,7 +349,7 @@ class ChipSet extends BaseComponent {
     return chip
   }
 
-  _applyChipClassName(chip, value) {
+  _applyChipClassName(chip: HTMLElement, value: string): void {
     const className = this._resolveChipClassName(value)
     if (!className) {
       return
@@ -338,7 +358,7 @@ class ChipSet extends BaseComponent {
     chip.classList.add(...className.split(/\s+/).filter(Boolean))
   }
 
-  _resolveChipClassName(value) {
+  _resolveChipClassName(value: string): string {
     const { chipClassName } = this._config
     if (!chipClassName) {
       return ''
@@ -352,7 +372,7 @@ class ChipSet extends BaseComponent {
     return typeof chipClassName === 'string' ? chipClassName : ''
   }
 
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._element, this.constructor.eventName(EVENT_KEYDOWN), SELECTOR_CHIP, event => this._handleKeydown(event))
 
     EventHandler.on(this._element, EVENT_CHIP_SELECTED, SELECTOR_CHIP, event => this._handleSelectionChange(event))
@@ -361,8 +381,8 @@ class ChipSet extends BaseComponent {
     EventHandler.on(this._element, EVENT_CHIP_REMOVED, SELECTOR_CHIP, event => this._handleChipRemoved(event))
   }
 
-  _handleKeydown(event) {
-    const chip = event.target.closest(SELECTOR_CHIP)
+  _handleKeydown(event: any): void {
+    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
     if (!chip || chip.classList.contains(CLASS_NAME_DISABLED)) {
       return
     }
@@ -371,13 +391,13 @@ class ChipSet extends BaseComponent {
       case 'ArrowLeft': {
         event.preventDefault()
         // In RTL the visual direction is mirrored, so ArrowLeft moves to the next chip.
-        this._focusSibling(chip, isRTL())
+        this._focusSibling(chip as HTMLElement, isRTL())
         break
       }
 
       case 'ArrowRight': {
         event.preventDefault()
-        this._focusSibling(chip, !isRTL())
+        this._focusSibling(chip as HTMLElement, !isRTL())
         break
       }
 
@@ -397,7 +417,7 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _focusSibling(chip, shouldGetNext) {
+  _focusSibling(chip: HTMLElement, shouldGetNext: boolean): void {
     const chips = this._getFocusableChips()
     if (chips.length === 0) {
       return
@@ -410,7 +430,7 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _getRemovalNeighbor(chip) {
+  _getRemovalNeighbor(chip: HTMLElement): HTMLElement | null {
     const chips = this._getFocusableChips()
     if (chips.length === 0) {
       return null
@@ -426,15 +446,15 @@ class ChipSet extends BaseComponent {
     return previous && previous !== chip ? previous : null
   }
 
-  _navigateToEdge(targetIndex) {
+  _navigateToEdge(targetIndex: number): void {
     const chips = this._getFocusableChips()
     chips[targetIndex < 0 ? chips.length + targetIndex : targetIndex]?.focus()
   }
 
-  _handleSelectionChange(event) {
-    const chip = event.target.closest(SELECTOR_CHIP)
+  _handleSelectionChange(event: any): void {
+    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
     if (this._config.selectionMode === SELECTION_MODE_SINGLE && chip?.matches(SELECTOR_CHIP_ACTIVE)) {
-      this._enforceSingleSelection(chip)
+      this._enforceSingleSelection(chip as HTMLElement)
     }
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_SELECT), {
@@ -442,7 +462,7 @@ class ChipSet extends BaseComponent {
     })
   }
 
-  _enforceSingleSelection(selectedChip) {
+  _enforceSingleSelection(selectedChip: HTMLElement): void {
     for (const chip of this.getSelected()) {
       if (chip !== selectedChip) {
         Chip.getInstance(chip)?.deselect()
@@ -450,21 +470,21 @@ class ChipSet extends BaseComponent {
     }
   }
 
-  _handleChipRemove(event) {
-    const chip = event.target.closest(SELECTOR_CHIP)
-    this._pendingFocus = chip ? this._getRemovalNeighbor(chip) : null
+  _handleChipRemove(event: any): void {
+    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
+    this._pendingFocus = chip ? this._getRemovalNeighbor(chip as HTMLElement) : null
   }
 
-  _handleChipRemoved(event) {
-    const chip = event.target.closest(SELECTOR_CHIP)
+  _handleChipRemoved(event: any): void {
+    const chip = (event.target as HTMLElement).closest(SELECTOR_CHIP)
 
     this._pendingFocus?.focus()
     this._pendingFocus = null
 
-    this._handleChipRemoval(chip, this._getChipValue(chip))
+    this._handleChipRemoval(chip as HTMLElement, this._getChipValue(chip as HTMLElement))
   }
 
-  _handleChipRemoval(chip, value) {
+  _handleChipRemoval(chip: HTMLElement, value: string): void {
     const index = this._chips.indexOf(value)
     if (index !== -1) {
       this._chips.splice(index, 1)
@@ -479,31 +499,31 @@ class ChipSet extends BaseComponent {
   }
 
   // Static
-  static chipSetInterface(element, config) {
-    const data = ChipSet.getOrCreateInstance(element, config)
+  static chipSetInterface(element: string | Element | null, config?: any): void {
+    const data: any = ChipSet.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = ChipSet.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = ChipSet.getOrCreateInstance(this)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](this)
+      data[config as string](this)
     })
   }
 }

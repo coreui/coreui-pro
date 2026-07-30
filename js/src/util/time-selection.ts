@@ -71,58 +71,64 @@ const DefaultType = {
  */
 
 class TimeSelection extends Config {
-  constructor(element, config) {
+  protected declare _element: HTMLElement | null
+  protected declare _config: typeof Default
+  protected declare _partials: any
+  protected declare _date: Date | null
+  protected declare _ampm: string
+
+  constructor(element?: string | Element | null, config?: Partial<typeof Default> | null) {
     super()
-    this._element = element
-    this._config = this._getConfig(config)
-    this._date = this._config.time
+    this._element = element as HTMLElement
+    this._config = this._getConfig(config) as typeof Default
+    this._date = this._config.time as Date | null
     this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'
 
     this._render()
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  getTime() {
+  getTime(): Date | null {
     return this._date
   }
 
-  update(config) {
-    this._config = this._getConfig({ ...this._config, ...config })
-    this._date = this._config.time
+  update(config: any): void {
+    this._config = this._getConfig({ ...this._config, ...config }) as typeof Default
+    this._date = this._config.time as Date | null
     this._ampm = this._date ? (this._date.getHours() >= 12 ? 'pm' : 'am') : 'am'
     this._render()
   }
 
-  dispose() {
-    this._element.innerHTML = ''
+  dispose(): void {
+    this._element!.innerHTML = ''
     this._element = null
   }
 
   // Private
-  _render() {
+  _render(): void {
     this._partials = getLocalizedTimePartials(
       this._config.locale,
       'auto',
-      this._config.hours,
-      this._config.minutes,
-      this._config.seconds
+      this._config.hours as any,
+      this._config.minutes as any,
+      this._config.seconds as any
     )
 
-    this._element.innerHTML = ''
-    this._element.classList.toggle(CLASS_NAME_ROLL, this._config.variant === 'roll')
+    this._element!.innerHTML = ''
+    this._element!.classList.toggle(CLASS_NAME_ROLL, this._config.variant === 'roll')
 
     if (this._config.variant === 'select') {
       this._renderSelects()
@@ -133,7 +139,7 @@ class TimeSelection extends Config {
     this._markSelected(true)
   }
 
-  _parts() {
+  _parts(): { ariaLabel: string, name: string, options: any[] }[] {
     const parts = [
       { ariaLabel: this._config.ariaSelectHoursLabel, name: 'hours', options: this._partials.listOfHours }
     ]
@@ -157,7 +163,7 @@ class TimeSelection extends Config {
     return parts
   }
 
-  _renderRoll() {
+  _renderRoll(): void {
     for (const part of this._parts()) {
       const column = document.createElement('div')
       column.classList.add(CLASS_NAME_ROLL_COL)
@@ -172,48 +178,48 @@ class TimeSelection extends Config {
         cell.setAttribute('aria-selected', 'false')
         cell.tabIndex = index === 0 ? 0 : -1
         cell.textContent = option.label
-        Manipulator.setDataAttribute(cell, part.name, option.value)
+        Manipulator.setDataAttribute(cell, part.name, (option as HTMLSelectElement).value)
 
-        cell.addEventListener('click', () => this._change(part.name, option.value))
+        cell.addEventListener('click', () => this._change(part.name, (option as HTMLSelectElement).value))
         cell.addEventListener('keydown', event => {
           if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
             event.preventDefault()
-            this._change(part.name, option.value)
+            this._change(part.name, (option as HTMLSelectElement).value)
           }
         })
 
         column.append(cell)
       }
 
-      this._element.append(column)
+      this._element!.append(column)
     }
   }
 
-  _renderSelects() {
+  _renderSelects(): void {
     for (const [index, part] of this._parts().entries()) {
       if (index > 0 && part.name !== 'meridiem') {
         const separator = document.createElement('span')
         separator.textContent = ':'
-        this._element.append(separator)
+        this._element!.append(separator)
       }
 
       const select = document.createElement('select')
       select.classList.add(CLASS_NAME_INLINE_SELECT, part.name)
       select.setAttribute('aria-label', part.ariaLabel)
-      select.addEventListener('change', event => this._change(part.name, event.target.value))
+      select.addEventListener('change', event => this._change(part.name, (event.target as HTMLSelectElement).value))
 
       for (const option of part.options) {
         const optionEl = document.createElement('option')
-        optionEl.value = option.value
+        optionEl.value = (option as HTMLSelectElement).value
         optionEl.textContent = option.label
         select.append(optionEl)
       }
 
-      this._element.append(select)
+      this._element!.append(select)
     }
   }
 
-  _change(part, value) {
+  _change(part: string, value: any): void {
     const date = this._date ? new Date(this._date) : new Date('1970-01-01T00:00:00')
 
     if (part === 'meridiem') {
@@ -251,11 +257,11 @@ class TimeSelection extends Config {
 
   // v1 scrolls the selected cell into view — without it a value like 14:30 marks
   // a minute cell that sits below the visible part of the column.
-  _scrollToSelected(column, cell, instant) {
+  _scrollToSelected(column: any, cell: any, instant?: boolean): void {
     column.scrollTo({ behavior: instant ? 'instant' : 'smooth', top: cell.offsetTop })
   }
 
-  _markSelected(instant = false) {
+  _markSelected(instant = false): void {
     const selected = {
       hours: getSelectedHour(this._date, this._config.locale),
       meridiem: this._ampm,
@@ -269,16 +275,16 @@ class TimeSelection extends Config {
       }
 
       if (this._config.variant === 'select') {
-        const select = SelectorEngine.findOne(`select.${part}`, this._element)
+        const select = SelectorEngine.findOne(`select.${part}`, this._element as ParentNode)
 
         if (select) {
-          select.value = value
+          (select as HTMLSelectElement).value = value as string
         }
 
         continue
       }
 
-      for (const cell of SelectorEngine.find(`[data-coreui-${part}]`, this._element)) {
+      for (const cell of SelectorEngine.find(`[data-coreui-${part}]`, this._element as ParentNode)) {
         const isSelected = String(Manipulator.getDataAttribute(cell, part)) === String(value)
         cell.classList.toggle(CLASS_NAME_SELECTED, isSelected)
         cell.setAttribute('aria-selected', isSelected ? 'true' : 'false')

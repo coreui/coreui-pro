@@ -6,10 +6,11 @@
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
 import Tooltip from './tooltip.js'
 
@@ -47,11 +48,30 @@ const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="rating"]'
 const SELECTOR_RATING_ITEM_INPUT = '.rating-item-input'
 const SELECTOR_RATING_ITEM_LABEL = '.rating-item-label'
 
-const Default = {
+type RatingConfig = {
+  activeIcon: string | null
+  allowClear: boolean
+  allowList: SanitizerAllowList
+  ariaLabel: (value: number, itemCount: number) => string
+  disabled: boolean
+  highlightOnlySelected: boolean
+  icon: string | null
+  itemCount: number
+  name: string | null
+  precision: number
+  readOnly: boolean
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  size: string | null
+  tooltips: boolean | string[] | Record<string, string>
+  value: number | null
+}
+
+const Default: RatingConfig = {
   activeIcon: null,
   allowClear: false,
   allowList: SVGAllowlist,
-  ariaLabel: (value, itemCount) => `${value} of ${itemCount}`,
+  ariaLabel: (value: number, itemCount: number) => `${value} of ${itemCount}`,
   disabled: false,
   highlightOnlySelected: false,
   icon: null,
@@ -90,7 +110,11 @@ const DefaultType = {
  */
 
 class Rating extends BaseComponent {
-  constructor(element, config) {
+  protected declare _currentValue: number | string | null
+  protected declare _name: string
+  protected declare _tooltip: any
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
 
     this._config = this._getConfig(config)
@@ -103,20 +127,20 @@ class Rating extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  update(config) {
+  update(config: any): void {
     this._config = this._getConfig(config)
     this._currentValue = this._config.value
 
@@ -125,7 +149,7 @@ class Rating extends BaseComponent {
     this._addEventListeners()
   }
 
-  reset(value = null) {
+  reset(value: number | null = null): void {
     this._currentValue = value
 
     this._element.innerHTML = ''
@@ -138,8 +162,8 @@ class Rating extends BaseComponent {
   }
 
   // Private
-  _addEventListeners() {
-    EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, ({ target }) => {
+  _addEventListeners(): void {
+    EventHandler.on(this._element, EVENT_CLICK, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
       if (this._config.disabled || this._config.readOnly) {
         return
       }
@@ -156,7 +180,7 @@ class Rating extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RATING_ITEM_INPUT, ({ target }) => {
+    EventHandler.on(this._element, EVENT_CHANGE, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
       if (this._config.disabled || this._config.readOnly) {
         return
       }
@@ -167,20 +191,20 @@ class Rating extends BaseComponent {
         value: target.value
       })
 
-      const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element)
+      const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
       this._resetLabels()
 
       if (this._config.highlightOnlySelected) {
-        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, target.parentElement)
-        label.classList.add(CLASS_NAME_ACTIVE)
+        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, target.parentElement as ParentNode)
+        label!.classList.add(CLASS_NAME_ACTIVE)
 
         return
       }
 
       for (const input of inputs) {
-        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement)
+        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement as ParentNode)
 
-        label.classList.add(CLASS_NAME_ACTIVE)
+        label!.classList.add(CLASS_NAME_ACTIVE)
 
         if (input === target) {
           break
@@ -193,20 +217,20 @@ class Rating extends BaseComponent {
         return
       }
 
-      const label = target.closest(SELECTOR_RATING_ITEM_LABEL)
-      const labels = SelectorEngine.find(SELECTOR_RATING_ITEM_LABEL, this._element)
+      const label = (target as HTMLElement).closest(SELECTOR_RATING_ITEM_LABEL)
+      const labels = SelectorEngine.find(SELECTOR_RATING_ITEM_LABEL, this._element as ParentNode)
       this._resetLabels()
 
-      const input = SelectorEngine.findOne(SELECTOR_RATING_ITEM_INPUT, label.parentElement)
+      const input = SelectorEngine.findOne(SELECTOR_RATING_ITEM_INPUT, label!.parentElement as ParentNode)
 
       EventHandler.trigger(this._element, EVENT_HOVER, {
-        value: input.value
+        value: (input as HTMLInputElement).value
       })
 
-      this._createTooltip(label.parentElement, input.value)
+      this._createTooltip(label!.parentElement, (input as HTMLInputElement).value)
 
       if (this._config.highlightOnlySelected) {
-        label.classList.add(CLASS_NAME_ACTIVE)
+        label!.classList.add(CLASS_NAME_ACTIVE)
 
         return
       }
@@ -228,7 +252,7 @@ class Rating extends BaseComponent {
         this._tooltip.hide()
       }
 
-      const checkedInput = SelectorEngine.findOne(`${SELECTOR_RATING_ITEM_INPUT}[value="${this._currentValue}"]`, this._element)
+      const checkedInput = SelectorEngine.findOne(`${SELECTOR_RATING_ITEM_INPUT}[value="${this._currentValue}"]`, this._element as ParentNode)
       this._resetLabels()
 
       EventHandler.trigger(this._element, EVENT_HOVER, {
@@ -236,19 +260,19 @@ class Rating extends BaseComponent {
       })
 
       if (checkedInput && this._config.highlightOnlySelected) {
-        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, checkedInput.parentElement)
-        label.classList.add(CLASS_NAME_ACTIVE)
+        const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, checkedInput.parentElement as ParentNode)
+        label!.classList.add(CLASS_NAME_ACTIVE)
 
         return
       }
 
       if (checkedInput) {
-        const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element)
+        const inputs = SelectorEngine.find(SELECTOR_RATING_ITEM_INPUT, this._element as ParentNode)
         this._resetLabels()
 
         for (const input of inputs) {
-          const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement)
-          label.classList.add(CLASS_NAME_ACTIVE)
+          const label = SelectorEngine.findOne(SELECTOR_RATING_ITEM_LABEL, input.parentElement as ParentNode)
+          label!.classList.add(CLASS_NAME_ACTIVE)
 
           if (input === checkedInput) {
             break
@@ -257,7 +281,7 @@ class Rating extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._element, EVENT_FOCUSIN, SELECTOR_RATING_ITEM_INPUT, ({ target }) => {
+    EventHandler.on(this._element, EVENT_FOCUSIN, SELECTOR_RATING_ITEM_INPUT, ({ target }: any) => {
       EventHandler.trigger(this._element, EVENT_HOVER, {
         value: target.value
       })
@@ -276,7 +300,7 @@ class Rating extends BaseComponent {
     })
   }
 
-  _createTooltip(selector, value) {
+  _createTooltip(selector: any, value: any): void {
     if (this._config.tooltips === false) {
       return
     }
@@ -304,7 +328,7 @@ class Rating extends BaseComponent {
     })
   }
 
-  _configAfterMerge(config) {
+  override _configAfterMerge(config: any): any {
     if (typeof config.tooltips === 'string') {
       config.tooltips = config.tooltips.split(',')
     }
@@ -312,15 +336,15 @@ class Rating extends BaseComponent {
     return config
   }
 
-  _resetLabels() {
-    const labels = SelectorEngine.find(SELECTOR_RATING_ITEM_LABEL, this._element)
+  _resetLabels(): void {
+    const labels = SelectorEngine.find(SELECTOR_RATING_ITEM_LABEL, this._element as ParentNode)
 
     for (const label of labels) {
       label.classList.remove(CLASS_NAME_ACTIVE)
     }
   }
 
-  _createRating() {
+  _createRating(): void {
     this._element.classList.add(CLASS_NAME_RATING)
 
     if (this._config.size) {
@@ -339,7 +363,7 @@ class Rating extends BaseComponent {
     Array.from({ length: this._config.itemCount }, (_, index) => this._createRatingItem(index))
   }
 
-  _createRatingItem(index) {
+  _createRatingItem(index: number): void {
     const ratingItemElement = document.createElement('div')
     ratingItemElement.classList.add(CLASS_NAME_RATING_ITEM)
 
@@ -361,16 +385,16 @@ class Rating extends BaseComponent {
         ratingItemLabelElement.classList.add(CLASS_NAME_ACTIVE)
       }
 
-      if (!this._config.highlightOnlySelected && this._currentValue >= value) {
+      if (!this._config.highlightOnlySelected && (this._currentValue as number) >= value) {
         ratingItemLabelElement.classList.add(CLASS_NAME_ACTIVE)
       }
 
       if (isNotLastItem) {
-        ratingItemLabelElement.style.zIndex = (1 / this._config.precision) - _index
+        ratingItemLabelElement.style.zIndex = ((1 / this._config.precision) - _index) as any
         ratingItemLabelElement.style.position = 'absolute'
         ratingItemLabelElement.style.width = `${this._config.precision * (_index + 1) * 100}%`
         ratingItemLabelElement.style.overflow = 'hidden'
-        ratingItemLabelElement.style.opacity = 0
+        ratingItemLabelElement.style.opacity = 0 as any
       }
 
       if (this._config.icon) {
@@ -399,7 +423,7 @@ class Rating extends BaseComponent {
       ratingItemInputElement.classList.add(CLASS_NAME_RATING_ITEM_INPUT)
       ratingItemInputElement.id = ratingItemId
       ratingItemInputElement.type = 'radio'
-      ratingItemInputElement.value = value
+      ratingItemInputElement.value = value as any
       ratingItemInputElement.name = this._name
 
       if (typeof this._config.ariaLabel === 'function') {
@@ -407,7 +431,7 @@ class Rating extends BaseComponent {
       }
 
       if (this._config.disabled || this._config.readOnly) {
-        ratingItemInputElement.setAttribute('disabled', true)
+        ratingItemInputElement.setAttribute('disabled', true as any)
       }
 
       if (this._currentValue === value) {
@@ -430,11 +454,11 @@ class Rating extends BaseComponent {
     this._element.append(ratingItemElement)
   }
 
-  _sanitizeIcon(icon) {
+  _sanitizeIcon(icon: any): any {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
-  _getConfig(config) {
+  override _getConfig(config?: any): ComponentConfig {
     const dataAttributes = Manipulator.getDataAttributes(this._element)
 
     for (const dataAttribute of Object.keys(dataAttributes)) {
@@ -455,31 +479,31 @@ class Rating extends BaseComponent {
   }
 
   // Static
-  static ratingInterface(element, config) {
-    const data = Rating.getOrCreateInstance(element, config)
+  static ratingInterface(element: string | Element | null, config?: any): void {
+    const data: any = Rating.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Rating.getOrCreateInstance(this, config)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = Rating.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](this)
+      data[config as string](this)
     })
   }
 }
