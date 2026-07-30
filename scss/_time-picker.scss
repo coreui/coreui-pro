@@ -1,4 +1,5 @@
 @use "sass:color";
+@use "sass:math";
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
@@ -102,7 +103,7 @@ $time-picker-tokens: defaults(
     @include tokens($time-picker-tokens);
 
     &.is-invalid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($time-picker-invalid-border-color, $input-btn-focus-color-opacity);
+      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$time-picker-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$time-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
@@ -112,7 +113,7 @@ $time-picker-tokens: defaults(
     }
 
     &.is-valid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($time-picker-valid-border-color, $input-btn-focus-color-opacity);
+      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$time-picker-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$time-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important

@@ -9,6 +9,14 @@
 @use "functions/to-rgb" as *;
 @use "sass:math";
 
+// Prefix for :root CSS variables
+//
+// Declared before the color system because the theme color variables below
+// reference the tokens generated from it.
+
+$variable-prefix:             cui- !default; // Deprecated in v4.2.6 for the shorter `$prefix`
+$prefix:                      $variable-prefix !default;
+
 // Color system
 
 // scss-docs-start gray-color-variables
@@ -43,9 +51,9 @@ $grays: (
 // fusv-enable
 
 // fusv-disable
-$high-emphasis:            rgba(shift-color($gray-base, +26%), .95) !default; // Deprecated in 5.0.0
-$medium-emphasis:          rgba(shift-color($gray-base, +26%), .681) !default; // Deprecated in 5.0.0
-$disabled:                 rgba(shift-color($gray-base, +26%), .38) !default; // Deprecated in 5.0.0
+$high-emphasis:            light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default; // Deprecated in 5.0.0
+$medium-emphasis:          light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default; // Deprecated in 5.0.0
+$disabled:                 light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default; // Deprecated in 5.0.0
 
 $high-emphasis-inverse:    rgba($white, .87) !default; // Deprecated in 5.0.0
 $medium-emphasis-inverse:  rgba($white, .6) !default; // Deprecated in 5.0.0
@@ -337,37 +345,69 @@ $theme-colors: (
 ) !default;
 // scss-docs-end theme-colors-map
 
+// Color scales
+//
+// Every theme color gets a 100–900 scale of `color-mix()` tokens in `:root`,
+// mixed at runtime from the color's own token. Override `--#{$prefix}primary`
+// (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis
+// text — follows, in both color schemes.
+
+// scss-docs-start color-scale-variables
+$color-mix-space: lab !default;
+$tint-color:      var(--#{$prefix}white) !default;
+$shade-color:     var(--#{$prefix}black) !default;
+
+$color-tints: (
+  "100": 80%,
+  "200": 60%,
+  "300": 40%,
+  "400": 20%
+) !default;
+
+$color-shades: (
+  "600": 20%,
+  "700": 40%,
+  "800": 60%,
+  "900": 80%
+) !default;
+// scss-docs-end color-scale-variables
+
+// The three families below read the scales through `light-dark()`, so a theme
+// color reads correctly in both schemes without a second set of variables.
+// `light` and `dark` point at the gray scale instead: their own scales would
+// be a scale of a gray, which is what `$grays` already is.
+
 // scss-docs-start theme-text-variables
-$primary-text-emphasis:    #3634a3 !default;
-$secondary-text-emphasis:  #212233 !default;
-$success-text-emphasis:    #0f5722 !default;
-$info-text-emphasis:       #184c77 !default;
-$warning-text-emphasis:    #764705 !default;
-$danger-text-emphasis:     #671414 !default;
-$light-text-emphasis:      $gray-700 !default;
-$dark-text-emphasis:       $gray-800 !default;
+$primary-text-emphasis:    light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)) !default;
+$secondary-text-emphasis:  light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)) !default;
+$success-text-emphasis:    light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)) !default;
+$info-text-emphasis:       light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)) !default;
+$warning-text-emphasis:    light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)) !default;
+$danger-text-emphasis:     light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)) !default;
+$light-text-emphasis:      light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)) !default;
+$dark-text-emphasis:       light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)) !default;
 // scss-docs-end theme-text-variables
 
 // scss-docs-start theme-bg-subtle-variables
-$primary-bg-subtle:    #cfc7f3 !default;
-$secondary-bg-subtle:  #ced2d8 !default;
-$success-bg-subtle:    #cbedd6 !default;
-$info-bg-subtle:       #c0e6ff !default;
-$warning-bg-subtle:    #feecc5 !default;
-$danger-bg-subtle:     #f9d4d4 !default;
-$light-bg-subtle:      color.mix($gray-100, $white) !default;
-$dark-bg-subtle:       $gray-400 !default;
+$primary-bg-subtle:    light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)) !default;
+$secondary-bg-subtle:  light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)) !default;
+$success-bg-subtle:    light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)) !default;
+$info-bg-subtle:       light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)) !default;
+$warning-bg-subtle:    light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)) !default;
+$danger-bg-subtle:     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)) !default;
+$light-bg-subtle:      light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)) !default;
+$dark-bg-subtle:       light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)) !default;
 // scss-docs-end theme-bg-subtle-variables
 
 // scss-docs-start theme-border-subtle-variables
-$primary-border-subtle:    #9d92e6 !default;
-$secondary-border-subtle:  #9da5b1 !default;
-$success-border-subtle:    #96dbad !default;
-$info-border-subtle:       #80c6ff !default;
-$warning-border-subtle:    #fcd88a !default;
-$danger-border-subtle:     #f2a9a9 !default;
-$light-border-subtle:      $gray-200 !default;
-$dark-border-subtle:       $gray-500 !default;
+$primary-border-subtle:    light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)) !default;
+$secondary-border-subtle:  light-dark(var(--#{$prefix}secondary-300), var(--#{$prefix}secondary-600)) !default;
+$success-border-subtle:    light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)) !default;
+$info-border-subtle:       light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)) !default;
+$warning-border-subtle:    light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)) !default;
+$danger-border-subtle:     light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)) !default;
+$light-border-subtle:      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !default;
+$dark-border-subtle:       light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-800)) !default;
 // scss-docs-end theme-border-subtle-variables
 
 // Gradients
@@ -404,11 +444,6 @@ $enable-container-queries:    false !default;
 
 $enable-dark-mode:            true !default;
 $color-mode-type:             data !default; // `data` or `media-query`
-
-// Prefix for :root CSS variables
-
-$variable-prefix:             cui- !default; // Deprecated in v4.2.6 for the shorter `$prefix`
-$prefix:                      $variable-prefix !default;
 
 // Prefix for data attributes
 
@@ -452,23 +487,29 @@ $position-values: (
 // Settings for the `<body>` element.
 
 $body-text-align:           null !default;
-$body-color:                rgba(shift-color($gray-base, +26%), .95) !default;
+$body-color:                light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
 $body-bg:                   $white !default;
 
-$body-secondary-color:      rgba(shift-color($gray-base, +26%), .681) !default;
-$body-secondary-bg:         $gray-200 !default;
+$body-secondary-color:      light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default;
+$body-secondary-bg:         light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
 
-$body-tertiary-color:       rgba(shift-color($gray-base, +26%), .38) !default;
+$body-tertiary-color:       light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
 $body-tertiary-bg:          $gray-100 !default;
 
-$body-emphasis-color:       $black !default;
+$body-emphasis-color:       light-dark($black, $white) !default;
+
+// `color-translucent()` un-blends a color against a background, so both sides
+// have to stay Sass colors — `light-dark()` would hand it a string. These two
+// are the only dark counterparts left; everything else pairs inline above.
+$body-bg-dark:              $gray-900 !default;
+$body-tertiary-bg-dark:     color.mix($gray-800, $gray-900) !default;
 
 // Style anchor elements.
 
 $link-color:                              $primary !default;
 $link-decoration:                         underline !default;
 $link-shade-percentage:                   20% !default;
-$link-hover-color:                        shift-color($link-color, $link-shade-percentage) !default;
+$link-hover-color:                        light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)) !default;
 $link-hover-decoration:                   null !default;
 
 $stretched-link-pseudo-element:           after !default;
@@ -546,8 +587,8 @@ $border-widths: (
 ) !default;
 
 $border-style:                solid !default;
-$border-color:                $gray-300 !default;
-$border-color-translucent:    color-translucent($gray-300, .175) !default;
+$border-color:                light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800)) !default;
+$border-color-translucent:    light-dark(color-translucent($gray-300, .175), color-translucent($gray-800, .175, $body-bg-dark)) !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
@@ -718,7 +759,7 @@ $list-inline-padding:         .5rem !default;
 
 $mark-padding:                .1875em !default;
 $mark-color:                  $body-color !default;
-$mark-bg:                     $yellow-100 !default;
+$mark-bg:                     light-dark($yellow-100, $yellow-800) !default;
 // scss-docs-end type-variables
 
 // Icons
@@ -852,10 +893,10 @@ $form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://w
 // scss-docs-end form-feedback-variables
 
 // scss-docs-start form-validation-colors
-$form-valid-color:                  $form-feedback-valid-color !default;
-$form-valid-border-color:           $form-feedback-valid-color !default;
-$form-invalid-color:                $form-feedback-invalid-color !default;
-$form-invalid-border-color:         $form-feedback-invalid-color !default;
+$form-valid-color:                  light-dark($form-feedback-valid-color, $green-300) !default;
+$form-valid-border-color:           light-dark($form-feedback-valid-color, $green-300) !default;
+$form-invalid-color:                light-dark($form-feedback-invalid-color, $red-300) !default;
+$form-invalid-border-color:         light-dark($form-feedback-invalid-color, $red-300) !default;
 // scss-docs-end form-validation-colors
 
 // scss-docs-start form-validation-states
@@ -954,7 +995,7 @@ $sidebar-toggler-transition:        transform .15s !default;
 // Code
 
 $code-font-size:                    $small-font-size !default;
-$code-color:                        $pink !default;
+$code-color:                        light-dark($pink, tint-color($pink, 40%)) !default;
 
 $kbd-padding-y:                     .1875rem !default;
 $kbd-padding-x:                     .375rem !default;
@@ -980,8 +1021,8 @@ $time-picker-border-radius:                 $input-border-radius !default;
 $time-picker-border-radius-sm:              $input-border-radius-sm !default;
 $time-picker-border-radius-lg:              $input-border-radius-lg !default;
 
-$time-picker-invalid-border-color:          $form-invalid-border-color !default;
-$time-picker-valid-border-color:            $form-valid-border-color !default;
+$time-picker-invalid-border-color:          var(--#{$prefix}form-invalid-border-color) !default;
+$time-picker-valid-border-color:            var(--#{$prefix}form-valid-border-color) !default;
 
 $time-picker-disabled-color:                $input-disabled-color !default;
 $time-picker-disabled-bg:                   $input-disabled-bg !default;

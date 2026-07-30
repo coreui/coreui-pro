@@ -7,7 +7,6 @@
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
-@use "../variables-dark" as *;
 
 // scss-docs-start form-select-variables
 $form-select-padding-y:             var(--#{$prefix}btn-input-padding-y) !default;
@@ -52,6 +51,13 @@ $form-select-border-radius-lg:    $input-border-radius-lg !default;
 
 $form-select-transition:          $input-transition !default;
 // scss-docs-end form-select-variables
+// The chevron is an inline SVG, so its colour lives inside the image and cannot
+// be a light-dark() pair — the dark scheme gets its own rule below.
+// scss-docs-start form-select-dark-variables
+$form-select-indicator-color-dark:  rgba($white, .87) !default;
+$form-select-indicator-dark:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+// scss-docs-end form-select-dark-variables
+
 
 // scss-docs-start form-select-tokens
 // Shared control tokens plus the select-only ones, so .form-select answers to

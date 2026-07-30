@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "buttons" as *;
+@use "functions/color" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
@@ -39,7 +40,7 @@ $navbar-light-color:                color-mix(in srgb, var(--#{$prefix}emphasis-
 $navbar-light-hover-color:          color-mix(in srgb, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
 $navbar-light-active-color:         color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 $navbar-light-disabled-color:       color-mix(in srgb, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
-$navbar-light-icon-color:           rgba($body-color, .75) !default;
+$navbar-light-icon-color:           rgba(shift-color($gray-base, +26%), .75) !default;
 $navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 $navbar-light-toggler-border-color: color-mix(in srgb, var(--#{$prefix}emphasis-color) 15%, transparent) !default;
 $navbar-light-brand-color:          $navbar-light-active-color !default;

@@ -278,10 +278,81 @@ assembles maps of CSS expressions and the browser resolves them.
   `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
   (alert, buttons) read them. Contextual classes like `.alert-success` are now
   implemented through these tokens — same rendering, new mechanics.
-- **`--cui-{color}-contrast` custom properties now switch in dark mode.**
-  Previously only buttons computed their own dark-palette contrast; the root
-  tokens now carry it (new `$theme-colors-contrast-dark` map, derived from
-  `$theme-colors-dark` — themes that empty that map are handled).
+- **`--cui-{color}-contrast` custom properties are new root tokens.** Previously
+  only buttons computed their own contrast colour; the root tokens now carry it,
+  written in `$theme-colors-contrast`. `.text-bg-*` reads the token instead of
+  calling `color-contrast()`.
+
+#### Colour scales, and `_variables-dark.scss` removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Dark mode no longer has a second set of Sass variables. Every colour is declared
+once, as a native
+[`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark)
+pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
+
+- **`scss/_variables-dark.scss` is gone.** All 59 `$*-dark` variables it held are
+  gone with it; do not `@import "variables-dark"` any more. The values live
+  inline in the light variable:
+
+  ```diff
+  - $body-color:      rgba(shift-color($gray-base, +26%), .95);
+  - $body-color-dark: rgba($white, .87); // in _variables-dark.scss
+  + $body-color:      light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87));
+  ```
+
+  Two exceptions remain, because `light-dark()` resolves to a `<color>` and these
+  are not colours: `$body-bg-dark` and `$body-tertiary-bg-dark` still exist (the
+  `color-translucent()` helper has to run in Sass), and the colours baked into the
+  select chevron and switch knob SVGs keep a dark counterpart next to their
+  component (`$form-select-indicator-dark`, `$form-switch-bg-image-dark`).
+- **Every theme colour gets a 100–900 scale of tokens in `:root`**, mixed at
+  runtime from the colour's own token: `--#{$prefix}primary-100` …
+  `--#{$prefix}primary-900`, for each key of `$theme-colors`. Knobs:
+  `$color-tints`, `$color-shades`, `$color-mix-space` (`lab`), `$tint-color`,
+  `$shade-color`. Override `$primary` — or the `--#{$prefix}primary` token at
+  runtime — and the whole family retints.
+- **`-bg-subtle`, `-border-subtle` and `-text-emphasis` are pairs of those
+  stops** rather than hand-picked hexes:
+
+  ```scss
+  $primary-bg-subtle:     light-dark(var(--cui-primary-100), var(--cui-primary-900));
+  $primary-border-subtle: light-dark(var(--cui-primary-300), var(--cui-primary-600));
+  $primary-text-emphasis: light-dark(var(--cui-primary-800), var(--cui-primary-200));
+  ```
+
+  **This fixes a real dark-mode bug.** Only `light` and `dark` had genuine dark
+  variants before; for the six chromatic colours `$primary-bg-subtle-dark` was an
+  alias of the light value, so `.alert-success`, `.list-group-item-info` and
+  `.table-warning` rendered a pale light-mode surface in dark mode. They now
+  darken. Light mode shifts slightly too: subtle backgrounds are a shade lighter
+  (an 80% tint rather than ~70%) and emphasis text a shade darker; borders are
+  unchanged for practical purposes. Emphasis-on-subtle contrast improves in every
+  colour — the weakest pair goes from 6.03:1 to 7.57:1.
+- **`$theme-colors-dark` is gone**, along with `$theme-colors-text-dark`,
+  `$theme-colors-bg-subtle-dark`, `$theme-colors-border-subtle-dark` and
+  `$theme-colors-contrast-dark`. Theme colours themselves no longer change
+  between colour modes — the old dark variants were a 10% desaturation, which
+  upstream does not do either. Consequence: the eight
+  `[data#{$data-infix}theme="dark"] .text-bg-*` overrides are gone.
+- **The `--#{$prefix}{name}-dark` root tokens are gone**
+  (`--#{$prefix}body-color-dark`, `--#{$prefix}body-bg-dark`,
+  `--#{$prefix}emphasis-color-dark`, `--#{$prefix}secondary-color-dark`,
+  `--#{$prefix}secondary-bg-dark`, `--#{$prefix}tertiary-color-dark`,
+  `--#{$prefix}tertiary-bg-dark`). They existed so a component could pin the dark
+  palette while the page stayed light; declare `color-scheme: dark` instead and
+  the `light-dark()` pairs follow — which is exactly what `.sidebar-dark` now
+  does, having dropped its eight token overrides.
+- **`$link-shade-percentage` no longer drives `$link-hover-color`**, which is now
+  `light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400))`. The
+  variable still exists and still drives the `.link-*-*` hover helpers.
+- **Two dead table knobs were removed**: `$table-th-font-weight` and
+  `$table-caption-color`. Reboot owns those declarations, so use `$th-font-weight`
+  and `$caption-color`.
+- Setting `$enable-dark-mode: false` still yields a light-only page: `:root`
+  declares `color-scheme: light` and nothing ever declares `dark`, so every
+  `light-dark()` pair resolves to its light side.
 
 #### Buttons
 

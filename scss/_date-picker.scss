@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "calendar" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
@@ -30,8 +31,8 @@ $date-picker-border-radius:            $border-radius !default;
 $date-picker-border-radius-sm:         $border-radius-sm !default;
 $date-picker-border-radius-lg:         $border-radius-lg !default;
 
-$date-picker-invalid-border-color:     $form-invalid-border-color !default;
-$date-picker-valid-border-color:       $form-valid-border-color !default;
+$date-picker-invalid-border-color:     var(--#{$prefix}form-invalid-border-color) !default;
+$date-picker-valid-border-color:       var(--#{$prefix}form-valid-border-color) !default;
 
 $date-picker-disabled-color:           $input-disabled-color !default;
 $date-picker-disabled-bg:              $input-disabled-bg !default;
@@ -178,7 +179,7 @@ $date-picker-tokens: defaults(
     @include tokens($date-picker-tokens);
 
     &.is-invalid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($date-picker-invalid-border-color, $input-btn-focus-color-opacity);
+      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$date-picker-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$date-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}date-picker-indicator-icon-color: #{$date-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
@@ -188,7 +189,7 @@ $date-picker-tokens: defaults(
     }
 
     &.is-valid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($date-picker-valid-border-color, $input-btn-focus-color-opacity);
+      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$date-picker-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$date-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
       --#{$prefix}date-picker-indicator-icon-color: #{$date-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important

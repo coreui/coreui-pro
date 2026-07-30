@@ -1,10 +1,6 @@
 @use "sass:map";
-@use "functions/color" as *;
-@use "functions/color-contrast" as *;
 @use "functions/maps" as *;
-@use "functions/to-rgb" as *;
 @use "variables" as *;
-@use "variables-dark" as *;
 
 // Re-assigned maps
 //
@@ -66,53 +62,6 @@ $theme-colors-contrast: (
 ) !default;
 // scss-docs-end theme-contrast-map
 
-$theme-colors-contrast-dark: $theme-colors-contrast !default;
-$theme-colors-text-dark: null !default;
-$theme-colors-bg-subtle-dark: null !default;
-$theme-colors-border-subtle-dark: null !default;
-
-@if $enable-dark-mode {
-
-  // scss-docs-start theme-text-dark-map
-  $theme-colors-text-dark: (
-    "primary": $primary-text-emphasis-dark,
-    "secondary": $secondary-text-emphasis-dark,
-    "success": $success-text-emphasis-dark,
-    "info": $info-text-emphasis-dark,
-    "warning": $warning-text-emphasis-dark,
-    "danger": $danger-text-emphasis-dark,
-    "light": $light-text-emphasis-dark,
-    "dark": $dark-text-emphasis-dark,
-  ) !default;
-  // scss-docs-end theme-text-dark-map
-
-  // scss-docs-start theme-bg-subtle-dark-map
-  $theme-colors-bg-subtle-dark: (
-    "primary": $primary-bg-subtle-dark,
-    "secondary": $secondary-bg-subtle-dark,
-    "success": $success-bg-subtle-dark,
-    "info": $info-bg-subtle-dark,
-    "warning": $warning-bg-subtle-dark,
-    "danger": $danger-bg-subtle-dark,
-    "light": $light-bg-subtle-dark,
-    "dark": $dark-bg-subtle-dark,
-  ) !default;
-  // scss-docs-end theme-bg-subtle-dark-map
-
-  // scss-docs-start theme-border-subtle-dark-map
-  $theme-colors-border-subtle-dark: (
-    "primary": $primary-border-subtle-dark,
-    "secondary": $secondary-border-subtle-dark,
-    "success": $success-border-subtle-dark,
-    "info": $info-border-subtle-dark,
-    "warning": $warning-border-subtle-dark,
-    "danger": $danger-border-subtle-dark,
-    "light": $light-border-subtle-dark,
-    "dark": $dark-border-subtle-dark,
-  ) !default;
-  // scss-docs-end theme-border-subtle-dark-map
-}
-
 // Utilities maps
 //
 // Extends the default `$theme-colors` maps to help create our utilities.
@@ -126,9 +75,9 @@ $utilities-colors: $theme-colors !default;
 $utilities-text: map.merge(
   $utilities-colors,
   (
-    "black": to-rgb($black),
-    "white": to-rgb($white),
-    "body": to-rgb($body-color)
+    "black": $black,
+    "white": $white,
+    "body": $body-color
   )
 ) !default;
 $utilities-text-colors: map-loop($utilities-text, translucent-css-var, "$prefix", "$key", "text") !default;
@@ -149,9 +98,9 @@ $utilities-text-emphasis-colors: (
 $utilities-bg: map.merge(
   $utilities-colors,
   (
-    "black": to-rgb($black),
-    "white": to-rgb($white),
-    "body": to-rgb($body-bg)
+    "black": $black,
+    "white": $white,
+    "body": $body-bg
   )
 ) !default;
 $utilities-bg-colors: map-loop($utilities-bg, translucent-css-var, "$prefix", "$key", "bg") !default;
@@ -172,8 +121,8 @@ $utilities-bg-subtle: (
 $utilities-border: map.merge(
   $utilities-colors,
   (
-    "black": to-rgb($black),
-    "white": to-rgb($white)
+    "black": $black,
+    "white": $white
   )
 ) !default;
 $utilities-border-colors: map-loop($utilities-border, translucent-css-var, "$prefix", "$key", "border") !default;

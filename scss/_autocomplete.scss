@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "forms/form-check" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
@@ -38,8 +39,8 @@ $autocomplete-focus-box-shadow:          $input-btn-focus-box-shadow !default;
 
 $autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !default;
 
-$autocomplete-invalid-border-color:      $form-invalid-border-color !default;
-$autocomplete-valid-border-color:        $form-valid-border-color !default;
+$autocomplete-invalid-border-color:      var(--#{$prefix}form-invalid-border-color) !default;
+$autocomplete-valid-border-color:        var(--#{$prefix}form-valid-border-color) !default;
 
 $autocomplete-cleaner-width:             1.5rem !default;
 $autocomplete-cleaner-height:            1.5rem !default;
@@ -207,7 +208,7 @@ $autocomplete-tokens: defaults(
 
     .was-validated .autocomplete:invalid + &,
     &.is-invalid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($autocomplete-invalid-border-color, $input-btn-focus-color-opacity);
+      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$autocomplete-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$autocomplete-invalid-border-color};
       --#{$prefix}control-focus-border-color: #{$autocomplete-invalid-border-color};
@@ -217,7 +218,7 @@ $autocomplete-tokens: defaults(
 
     .was-validated .autocomplete:valid + &,
     &.is-valid {
-      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width rgba($autocomplete-valid-border-color, $input-btn-focus-color-opacity);
+      $focus-box-shadow: 0 0 $input-btn-focus-blur $input-focus-width color-mix(in srgb, #{$autocomplete-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
       --#{$prefix}control-border-color: #{$autocomplete-valid-border-color};
       --#{$prefix}control-focus-border-color: #{$autocomplete-valid-border-color};

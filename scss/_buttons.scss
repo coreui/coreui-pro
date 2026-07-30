@@ -12,7 +12,6 @@
 @use "mixins/transition" as *;
 @use "theme" as *;
 @use "variables" as *;
-@use "variables-dark" as *;
 
 // scss-docs-start btn-variables
 $btn-color:                   var(--#{$prefix}body-color) !default;
@@ -52,14 +51,6 @@ $btn-border-radius-lg:        var(--#{$prefix}border-radius-lg) !default;
 
 $btn-transition:              $input-btn-transition !default;
 
-$btn-hover-bg-shade-amount:       15% !default;
-$btn-hover-bg-tint-amount:        15% !default;
-$btn-hover-border-shade-amount:   20% !default;
-$btn-hover-border-tint-amount:    10% !default;
-$btn-active-bg-shade-amount:      20% !default;
-$btn-active-bg-tint-amount:       20% !default;
-$btn-active-border-shade-amount:  25% !default;
-$btn-active-border-tint-amount:   10% !default;
 // scss-docs-end btn-variables
 
 // scss-docs-start btn-outline-variables

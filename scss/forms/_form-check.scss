@@ -6,7 +6,6 @@
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
-@use "../variables-dark" as *;
 
 // scss-docs-start form-check-variables
 $form-check-input-width:                  1em !default;
@@ -66,6 +65,13 @@ $form-switch-widths: (
   )
 ) !default;
 // scss-docs-end form-switch-variables
+
+// The knob is an inline SVG, so its colour lives inside the image and cannot be
+// a light-dark() pair — the dark scheme gets its own rule below.
+// scss-docs-start form-switch-dark-variables
+$form-switch-color-dark:            rgba($white, .25) !default;
+$form-switch-bg-image-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color-dark}'/></svg>") !default;
+// scss-docs-end form-switch-dark-variables
 
 // scss-docs-start form-check-tokens
 // Tokens the wrapper owns; the input reads them by inheritance.

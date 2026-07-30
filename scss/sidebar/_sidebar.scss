@@ -6,7 +6,6 @@
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/transition" as *;
 @use "../variables" as *;
-@use "../variables-dark" as *;
 
 // scss-docs-start sidebar-variables
 $sidebar-width:                            16rem !default;
@@ -278,24 +277,10 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
   }
 
   .sidebar-dark {
-    // The explicit overrides below pin the sidebar's own colours. Declaring the
-    // scheme as well means everything inside that is a light-dark() pair — and
-    // the native widgets — follow too, instead of staying on light values the
-    // sidebar never thought to override.
+    // Every color the sidebar would otherwise pin is a light-dark() pair on
+    // :root, so declaring the scheme is enough — the tokens and the native
+    // widgets both follow.
     color-scheme: dark;
-
-    --#{$prefix}body-color: #{$body-color-dark};
-    --#{$prefix}body-bg: #{$body-bg-dark};
-
-    --#{$prefix}emphasis-color: #{$body-emphasis-color-dark};
-
-    --#{$prefix}secondary-color: #{$body-secondary-color-dark};
-    --#{$prefix}secondary-bg: #{$body-secondary-bg-dark};
-
-    --#{$prefix}tertiary-color: #{$body-tertiary-color-dark};
-    --#{$prefix}tertiary-bg: #{$body-tertiary-bg-dark};
-
-    --#{$prefix}border-color: #{$border-color-dark};
 
     .sidebar-toggler {
       filter: var(--#{$prefix}sidebar-toggler-white-filter);

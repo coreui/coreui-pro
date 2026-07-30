@@ -3,7 +3,6 @@
 );
 
 @forward "variables";
-@forward "variables-dark";
 @forward "containers";
 @forward "grid" with (
   $include-column-box-sizing: true !default,
