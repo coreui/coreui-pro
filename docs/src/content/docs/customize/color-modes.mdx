@@ -322,7 +322,7 @@ Do the same in your own color modes: declare `color-scheme` and override only th
 
 Each theme color gets a 100–900 scale of `color-mix()` tokens in `:root`, mixed at runtime from the color's own token. The subtle backgrounds, borders and emphasis text are `light-dark()` pairs of those stops, so overriding `$primary` (or the `--cui-primary` token at runtime) retints the whole family in both color modes:
 
-<ScssDocs file="scss/_variables.scss" capture="color-scale-variables" />
+<ScssDocs file="scss/_config.scss" capture="color-scale-variables" />
 
 The two values that cannot be a `light-dark()` pair — the colors baked into the select chevron and the switch knob SVGs — keep a dark counterpart next to the component they belong to:
 

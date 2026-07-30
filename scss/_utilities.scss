@@ -1,7 +1,7 @@
 @use "sass:map";
 @use "functions/maps" as *;
 @use "maps" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // stylelint-disable function-disallowed-list
 // The opacity utilities scale a runtime var, so calc() is unavoidable here.

@@ -4,7 +4,7 @@
 @use "mixins/border-radius" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start breadcrumb-variables
 $breadcrumb-font-size:              null !default;

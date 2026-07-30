@@ -2,7 +2,7 @@
 @use "sass:map";
 @use "sass:meta";
 @use "sass:string";
-@use "../variables" as *;
+@use "../config" as *;
 @use "ltr-rtl" as *;
 
 // Generate selectors for theme variants

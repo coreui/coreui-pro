@@ -5,7 +5,7 @@
 @use "maps" as *;
 @use "mixins/color-mode" as *;
 @use "theme" as *;
-@use "variables" as *;
+@use "config" as *;
 
 @layer root, reboot, layout, content, forms, components, custom, helpers, utilities;
 

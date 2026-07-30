@@ -6,7 +6,7 @@
 @use "mixins/caret" as *;
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start dropdown-variables
 $dropdown-min-width:                10rem !default;

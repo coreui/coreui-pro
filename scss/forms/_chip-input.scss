@@ -4,7 +4,7 @@
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start chip-input-variables
 $chip-input-min-height:        var(--#{$prefix}btn-input-min-height) !default;

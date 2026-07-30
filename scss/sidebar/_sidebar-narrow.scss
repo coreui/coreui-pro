@@ -1,7 +1,7 @@
 @use "../layout/breakpoints" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "sidebar-nav" as *;
-@use "../variables" as *;
+@use "../config" as *;
 @use "sidebar" as *;
 
 @layer components {

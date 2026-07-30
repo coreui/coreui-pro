@@ -11,7 +11,7 @@
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../theme" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start btn-variables
 $btn-color:                   var(--#{$prefix}body-color) !default;

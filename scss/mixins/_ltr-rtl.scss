@@ -1,6 +1,6 @@
 @use "sass:string";
 @use "../functions/str-replace" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // Applies styles only when LTR is enabled and the HTML does NOT have the "rtl"
 // attribute (i.e., left-to-right contexts).

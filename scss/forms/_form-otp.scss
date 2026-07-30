@@ -4,7 +4,7 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start form-otp-variables
 $form-otp-gap:                         .125rem !default;

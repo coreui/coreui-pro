@@ -1,6 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start chip-set-variables
 $chip-set-gap: .25rem !default;

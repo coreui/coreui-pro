@@ -6,7 +6,7 @@
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start form-select-variables
 $form-select-padding-y:             var(--#{$prefix}btn-input-padding-y) !default;

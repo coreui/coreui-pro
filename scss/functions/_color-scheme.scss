@@ -1,5 +1,5 @@
 @use "sass:meta";
-@use "../variables" as *;
+@use "../config" as *;
 
 // Pairs a light and a dark value into a single `light-dark()` declaration, so a
 // colour switches with the color scheme instead of being restated in a

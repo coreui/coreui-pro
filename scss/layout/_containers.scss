@@ -1,6 +1,6 @@
 @use "../layout/breakpoints" as *;
 @use "../mixins/container" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 @layer layout {
   // Container widths

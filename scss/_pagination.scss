@@ -5,7 +5,7 @@
 @use "mixins/pagination" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start pagination-variables
 $pagination-padding-y:              .375rem !default;

@@ -361,7 +361,7 @@ These new colors are accessible via CSS variables and utility classes—like `--
 
 ## Theme colors
 
-We use a subset of all colors to create a smaller color palette for generating color schemes, also available as Sass variables and a Sass map in CoreUI for Bootstrap's `scss/_variables.scss` file.
+We use a subset of all colors to create a smaller color palette for generating color schemes, also available as Sass variables and a Sass map in CoreUI for Bootstrap's `scss/_config.scss` file.
 
 <div class="row">
   {getData('theme-colors').map((c) => (
@@ -373,13 +373,13 @@ We use a subset of all colors to create a smaller color palette for generating c
 
 All these colors are available as a Sass map, `$theme-colors`.
 
-<ScssDocs file="scss/_variables.scss" capture="theme-colors-map" />
+<ScssDocs file="scss/_config.scss" capture="theme-colors-map" />
 
 Check out [our Sass maps and loops docs](/customize/sass/#maps-and-loops) for how to modify these colors.
 
 ## All colors
 
-All CoreUI for Bootstrap colors are available as Sass variables and a Sass map in `scss/_variables.scss` file. To avoid increased file sizes, we don't create text or background color classes for each of these variables. Instead, we choose a subset of these colors for a [theme palette](#theme-colors).
+All CoreUI for Bootstrap colors are available as Sass variables and a Sass map in `scss/_config.scss` file. To avoid increased file sizes, we don't create text or background color classes for each of these variables. Instead, we choose a subset of these colors for a [theme palette](#theme-colors).
 
 Be sure to monitor contrast ratios as you customize colors. As shown below, we've added three contrast ratios to each of the main colors—one for the swatch's current colors, one for against white, and one for against black.
 
@@ -428,7 +428,7 @@ Sass cannot programmatically generate variables, so we manually created variable
 
 Using `mix()` is not the same as `lighten()` and `darken()`—the former blends the specified color with white or black, while the latter only adjusts the lightness value of each color. The result is a much more complete suite of colors, as [shown in this CodePen demo](https://codepen.io/emdeoh/pen/zYOQOPB).
 
-Our `tint-color()` and `shade-color()` functions use `mix()` alongside our `$theme-color-interval` variable, which specifies a stepped percentage value for each mixed color we produce. See the `scss/_functions.scss` and `scss/_variables.scss` files for the full source code.
+Our `tint-color()` and `shade-color()` functions use `mix()` alongside our `$theme-color-interval` variable, which specifies a stepped percentage value for each mixed color we produce. See the `scss/_functions.scss` and `scss/_config.scss` files for the full source code.
 
 ## Color Sass maps
 
@@ -438,9 +438,9 @@ CoreUI for Bootstrap's source Sass files include three maps to help you quickly 
 - `$theme-colors` lists all semantically named theme colors (shown below)
 - `$grays` lists all tints and shades of gray
 
-Within `scss/_variables.scss`, you'll find CoreUI for Bootstrap's color variables and Sass map. Here's an example of the `$colors` Sass map:
+Within `scss/_config.scss`, you'll find CoreUI for Bootstrap's color variables and Sass map. Here's an example of the `$colors` Sass map:
 
-<ScssDocs file="scss/_variables.scss" capture="colors-map" />
+<ScssDocs file="scss/_config.scss" capture="colors-map" />
 
 Add, remove, or modify values within the map to update how they're used in many other components. Unfortunately at this time, not _every_ component utilizes this Sass map. Future updates will strive to improve upon this. Until then, plan on making use of the `${color}` variables and this Sass map.
 

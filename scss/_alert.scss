@@ -3,7 +3,7 @@
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "theme" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start alert-variables
 $alert-padding-y:               $spacer !default;

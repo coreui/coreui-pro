@@ -3,7 +3,7 @@
 @use "../utilities" as *;
 @use "../layout/breakpoints" as *;
 @use "../mixins/utilities" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 @layer utilities {
   // Loop over each breakpoint

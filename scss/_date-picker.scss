@@ -8,7 +8,7 @@
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 

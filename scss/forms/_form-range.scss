@@ -4,7 +4,7 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/gradients" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start form-range-variables
 $form-range-track-width:          100% !default;

@@ -1,5 +1,5 @@
 @use "mixins/icon" as *;
-@use "variables" as *;
+@use "config" as *;
 
 @layer components {
   .icon {

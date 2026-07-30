@@ -1,7 +1,7 @@
 @use "../functions/color" as *;
 @use "../functions/color-contrast" as *;
 @use "../functions/to-rgb" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // stylelint-disable function-disallowed-list
 // The opacity utilities scale a runtime var, so calc() is unavoidable here.

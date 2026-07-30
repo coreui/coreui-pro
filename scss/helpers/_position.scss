@@ -1,6 +1,6 @@
 @use "sass:map";
 @use "../layout/breakpoints" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 @layer helpers {
   // Shorthand

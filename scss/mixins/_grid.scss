@@ -3,7 +3,7 @@
 @use "sass:meta";
 @use "../functions/math" as *;
 @use "../maps" as *;
-@use "../variables" as *;
+@use "../config" as *;
 @use "breakpoints" as *;
 
 // Grid system

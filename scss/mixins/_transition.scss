@@ -1,6 +1,6 @@
 // stylelint-disable property-disallowed-list
 @use "sass:list";
-@use "../variables" as *;
+@use "../config" as *;
 
 @mixin transition($transition...) {
   @if list.length($transition) == 0 {

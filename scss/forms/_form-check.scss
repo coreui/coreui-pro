@@ -5,7 +5,7 @@
 @use "../mixins/color-mode" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start form-check-variables
 $form-check-input-width:                  1em !default;

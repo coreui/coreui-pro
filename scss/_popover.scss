@@ -3,7 +3,7 @@
 @use "mixins/box-shadow" as *;
 @use "mixins/reset-text" as *;
 @use "mixins/tokens" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start popover-variables
 $popover-font-size:                 $font-size-sm !default;

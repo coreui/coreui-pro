@@ -5,7 +5,7 @@
 @use "../layout/breakpoints" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start sidebar-variables
 $sidebar-width:                            16rem !default;

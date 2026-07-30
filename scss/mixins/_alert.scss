@@ -1,5 +1,5 @@
 @use "../mixins/deprecate" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 @include deprecate("`alert-variant()`", "v4.3.0", "v6.0.0");
 

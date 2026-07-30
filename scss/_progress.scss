@@ -4,7 +4,7 @@
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start progress-variables
 $progress-height:                   1rem !default;

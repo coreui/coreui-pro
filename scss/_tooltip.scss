@@ -3,7 +3,7 @@
 @use "mixins/deprecate" as *;
 @use "mixins/reset-text" as *;
 @use "mixins/tokens" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start tooltip-variables
 $tooltip-font-size:                 $font-size-sm !default;

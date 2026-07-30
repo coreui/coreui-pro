@@ -3,7 +3,7 @@
 @use "mixins/color-mode" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/transition" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start carousel-variables
 $carousel-control-color:             light-dark($white, $black) !default;

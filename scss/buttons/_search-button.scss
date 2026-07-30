@@ -3,7 +3,7 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start search-button-variables
 $search-button-height:              var(--#{$prefix}btn-input-min-height) !default;

@@ -3,7 +3,7 @@
 @use "../functions/color" as *;
 @use "../layout/breakpoints" as *;
 @use "../theme" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start table-variables
 $table-cell-padding-y:        .5rem !default;

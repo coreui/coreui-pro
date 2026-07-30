@@ -1,6 +1,6 @@
 @use "../mixins/lists" as *;
 @use "reboot" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 @layer content {
   //

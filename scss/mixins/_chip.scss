@@ -1,4 +1,4 @@
-@use "../variables" as *;
+@use "../config" as *;
 
 // scss-docs-start chip-mixin
 @mixin chip-size($height, $padding-x, $chip-gap, $font-size, $img-size, $icon-size, $dismiss-size) {

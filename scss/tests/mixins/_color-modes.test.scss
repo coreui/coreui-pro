@@ -1,6 +1,6 @@
 // stylelint-disable selector-attribute-quotes
 
-@use "../../variables" as *;
+@use "../../config" as *;
 @use "../../mixins/color-mode" as *;
 
 @include describe("global $color-mode-type: data") {

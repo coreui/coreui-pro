@@ -4,7 +4,7 @@
 @use "color" as *;
 @use "translucent-css-var" as *;
 @use "to-rgb" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 // stylelint-disable scss/dollar-variable-pattern
 @function map-loop($map, $func, $args...) {

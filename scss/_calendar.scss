@@ -5,7 +5,7 @@
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
-@use "variables" as *;
+@use "config" as *;
 // stylelint-disable selector-max-class
 
 // Calendar

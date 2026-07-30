@@ -5,7 +5,7 @@
 @use "../mixins/box-shadow" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
-@use "../variables" as *;
+@use "../config" as *;
 @use "form-check" as *;
 
 // Multi Select

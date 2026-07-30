@@ -1,5 +1,5 @@
 @use "../mixins/lists" as *;
-@use "../variables" as *;
+@use "../config" as *;
 
 @layer content {
   .list-unstyled {

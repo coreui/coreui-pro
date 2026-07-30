@@ -4,7 +4,7 @@
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
-@use "variables" as *;
+@use "config" as *;
 
 // scss-docs-start card-variables
 $card-spacer-y:                     $spacer !default;

@@ -265,9 +265,9 @@ assembles maps of CSS expressions and the browser resolves them.
 
   Classic per-variable overrides (`$alert-padding-y: 2rem`) keep working — the
   map defaults are built from the same Sass variables.
-- **Component Sass variables moved from `_variables.scss` into their component
+- **Component Sass variables moved from `_config.scss` into their component
   partials.** `@use ... with()` is unaffected — the entry point forwards every
-  module — but if you imported `scss/_variables.scss` directly for its
+  module — but if you imported `scss/_config.scss` directly for its
   definitions, component blocks are no longer there.
 - Two silent duplicates were dropped along the way: `$nav-link-height` was
   declared twice (navbar and header blocks — the header copy is gone) and the

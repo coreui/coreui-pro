@@ -2,7 +2,7 @@
   $file: "Grid"
 );
 
-@forward "variables";
+@forward "config";
 @forward "layout" with (
   $include-column-box-sizing: true !default,
 );
