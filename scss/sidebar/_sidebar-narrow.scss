@@ -46,8 +46,6 @@
         opacity: 0;
       }
 
-      .d-narrow-none, // deprecated, TODO: remove in v6.0.0
-      .sidebar-brand-full, // deprecated, TODO: remove in v6.0.0
       .d-sidebar-narrow-none {
         display: none !important // stylelint-disable-line declaration-no-important
       }
@@ -102,7 +100,6 @@
     }
   }
 
-  .sidebar:not(.sidebar-narrow) .sidebar-brand-narrow, // deprecated, TODO: remove in v6.0.0
   .sidebar:not(.sidebar-narrow) .d-sidebar-narrow {
     display: none !important; // stylelint-disable-line declaration-no-important
   }

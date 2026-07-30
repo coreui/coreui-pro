@@ -409,14 +409,9 @@ List groups use local CSS variables on `.list-group` for enhanced real-time cust
 
 <ScssDocs file="scss/_list-group.scss" capture="list-group-variables" />
 
-### SASS mixins
-
-Used in combination with `$theme-colors` to generate the [contextual variant classes](#contextual-classes) for `.list-group-item`s.
-
-<ScssDocs file="scss/mixins/_list-group.scss" capture="list-group-mixin" />
-
 ### SASS loop
 
-Loop that generates the modifier classes with the `list-group-item-variant()` mixin.
+Loop that generates the [contextual variant classes](#contextual-classes) for
+`.list-group-item`s, pointing each one's tokens at the matching theme color.
 
 <ScssDocs file="scss/_list-group.scss" capture="list-group-modifiers" />

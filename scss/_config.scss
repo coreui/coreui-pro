@@ -15,8 +15,7 @@
 // Declared before the color system because the theme color variables below
 // reference the tokens generated from it.
 
-$variable-prefix:             cui- !default; // Deprecated in v4.2.6 for the shorter `$prefix`
-$prefix:                      $variable-prefix !default;
+$prefix:                      cui- !default;
 
 // Color system
 
@@ -49,16 +48,6 @@ $grays: (
   "900": $gray-900
 ) !default;
 // scss-docs-end gray-colors-map
-// fusv-enable
-
-// fusv-disable
-$high-emphasis:            light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default; // Deprecated in 5.0.0
-$medium-emphasis:          light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default; // Deprecated in 5.0.0
-$disabled:                 light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default; // Deprecated in 5.0.0
-
-$high-emphasis-inverse:    rgba($white, .87) !default; // Deprecated in 5.0.0
-$medium-emphasis-inverse:  rgba($white, .6) !default; // Deprecated in 5.0.0
-$disabled-inverse:         rgba($white, .38) !default; // Deprecated in 5.0.0
 // fusv-enable
 
 // scss-docs-start color-variables
@@ -601,7 +590,6 @@ $border-radius-xxl:           2rem !default;
 $border-radius-pill:          50rem !default;
 // scss-docs-end border-radius-variables
 // fusv-disable
-$border-radius-2xl:           $border-radius-xxl !default; // Deprecated in v5.0.0
 // fusv-enable
 
 // scss-docs-start box-shadow-variables
@@ -749,7 +737,6 @@ $small-font-size:               .875em !default;
 $sub-sup-font-size:             .75em !default;
 
 // fusv-disable
-$text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.0.0
 // fusv-enable
 
 $initialism-font-size:        $small-font-size !default;
@@ -763,8 +750,6 @@ $hr-margin-y:                 $spacer !default;
 $hr-color:                    inherit !default;
 
 // fusv-disable
-$hr-bg-color:                 null !default; // Deprecated in v4.2.6
-$hr-height:                   null !default; // Deprecated in v4.2.6
 // fusv-enable
 
 $hr-border-color:             null !default; // Allows for inherited colors
@@ -991,9 +976,6 @@ $placeholder-opacity-min:           .2 !default;
 // Alerts
 
 // fusv-disable
-$alert-bg-scale:                -80% !default; // Deprecated in v4.2.0, to be removed in v6
-$alert-border-scale:            -70% !default; // Deprecated in v4.2.0, to be removed in v6
-$alert-color-scale:             40% !default; // Deprecated in v4.2.0, to be removed in v6
 // fusv-enable
 
 // Image thumbnails
@@ -1027,7 +1009,6 @@ $kbd-padding-x:                     .375rem !default;
 $kbd-font-size:                     $code-font-size !default;
 $kbd-color:                         var(--#{$prefix}body-bg) !default;
 $kbd-bg:                            var(--#{$prefix}body-color) !default;
-$nested-kbd-font-weight:            null !default; // Deprecated in v4.2.6, removing in v6
 
 $pre-color:                         null !default;
 

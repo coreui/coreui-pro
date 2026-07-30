@@ -32,7 +32,6 @@ $accordion-button-active-bg:              var(--#{$prefix}primary-bg-subtle) !de
 $accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis) !default;
 
 // fusv-disable
-$accordion-button-focus-border-color:     $input-focus-border-color !default; // Deprecated in v5.0.0
 // fusv-enable
 $accordion-button-focus-ring:       $btn-focus-ring !default;
 

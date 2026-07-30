@@ -67,14 +67,6 @@
     --#{$prefix}tertiary-color: #{$body-tertiary-color};
     --#{$prefix}tertiary-bg: #{color-scheme($body-tertiary-bg, $body-tertiary-bg-dark)};
     --#{$prefix}tertiary-bg-translucent: #{color-scheme(color-translucent($body-tertiary-bg), color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark))};
-
-    --#{$prefix}high-emphasis: #{$high-emphasis}; // Deprecated in v5.0.0
-    --#{$prefix}medium-emphasis: #{$medium-emphasis}; // Deprecated in v5.0.0
-    --#{$prefix}disabled: #{$disabled}; // Deprecated in v5.0.0
-
-    --#{$prefix}high-emphasis-inverse: #{$high-emphasis-inverse}; // Deprecated in v5.0.0
-    --#{$prefix}medium-emphasis-inverse: #{$medium-emphasis-inverse}; // Deprecated in v5.0.0
-    --#{$prefix}disabled-inverse: #{$disabled-inverse}; // Deprecated in v5.0.0
     // scss-docs-end root-body-variables
 
     --#{$prefix}heading-color: #{$headings-color};

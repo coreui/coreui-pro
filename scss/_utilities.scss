@@ -648,11 +648,6 @@ $utilities: map.merge(
           "body-tertiary": var(--#{$prefix}tertiary-color),
           "body-emphasis": var(--#{$prefix}emphasis-color),
           "reset": inherit,
-          "high-emphasis-inverse": var(--#{$prefix}high-emphasis-inverse), // deprecated
-          "medium-emphasis-inverse": var(--#{$prefix}medium-emphasis-inverse), // deprecated
-          "disabled-inverse": var(--#{$prefix}disabled-inverse), // deprecated
-          "high-emphasis": var(--#{$prefix}high-emphasis), // deprecated
-          "medium-emphasis": var(--#{$prefix}medium-emphasis), // deprecated
           "disabled": var(--#{$prefix}disabled)
         )
       )
