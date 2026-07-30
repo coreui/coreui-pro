@@ -172,6 +172,17 @@ export default [
       ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
       // The config objects are intentionally loose — see util/config
       '@typescript-eslint/no-explicit-any': 'off',
+      // The TS-aware rule replaces the base one, so it has to repeat its
+      // options — otherwise `_` placeholders that pass in .js fail in .ts.
+      '@typescript-eslint/no-unused-vars': ['error', {
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_$',
+        ignoreRestSiblings: true,
+        vars: 'all',
+        varsIgnorePattern: '^_'
+      }],
       // Fires on `.ts` but not on byte-identical `.js`: the rule misreads arrows
       // that close over `this`, which by definition cannot move to outer scope.
       'unicorn/consistent-function-scoping': 'off'
