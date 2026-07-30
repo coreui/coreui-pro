@@ -16,8 +16,9 @@ import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
+import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin } from './util/index.js'
-import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -59,11 +60,34 @@ const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern.
-const DEFAULT_INDICATOR_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
-const DEFAULT_SEPARATOR_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m359.873 121.377-22.627 22.627 95.997 95.997H16v32.001h417.24l-95.994 95.994 22.627 22.627L494.498 256z"/></svg>'
-const DEFAULT_SEPARATOR_ICON_RTL = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m152.127 121.377 22.627 22.627L78.757 240H496v32.001H78.76l95.994 95.994-22.627 22.627L17.502 256z"/></svg>'
+const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
+const DEFAULT_SEPARATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m359.873 121.377-22.627 22.627 95.997 95.997H16v32.001h417.24l-95.994 95.994 22.627 22.627L494.498 256z"/></svg>'
+const DEFAULT_SEPARATOR_ICON_RTL: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m152.127 121.377 22.627 22.627L78.757 240H496v32.001H78.76l95.994 95.994-22.627 22.627L17.502 256z"/></svg>'
 
-const Default = {
+type DateRangePickerV2Config = {
+  allowList: SanitizerAllowList
+  ariaToggleLabel: string
+  calendarOptions: Record<string, any>
+  container: Element | boolean | string
+  disabled: boolean
+  indicatorIcon: string
+  inputOptions: Record<string, any>
+  locale: string
+  maxDate: Date | string | null
+  minDate: Date | string | null
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  size: string | null
+  calendars: number
+  endDate: Date | string | null
+  endName: string | null
+  separatorIcon: string
+  separatorIconRtl: string
+  startDate: Date | string | null
+  startName: string | null
+}
+
+const Default: DateRangePickerV2Config = {
   allowList: SVGAllowlist,
   ariaToggleLabel: 'Toggle the calendar',
   calendarOptions: {},
@@ -86,7 +110,7 @@ const Default = {
   startName: null
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaToggleLabel: 'string',
   calendarOptions: 'object',
@@ -113,7 +137,22 @@ const DefaultType = {
  */
 
 class DateRangePickerV2 extends BaseComponent {
-  constructor(element, config) {
+  protected declare _footerTemplate: any
+  protected declare _indicatorElement: HTMLElement
+  protected declare _startInputElement: HTMLElement
+  protected declare _endInputElement: HTMLElement
+  protected declare _rangesTemplate: any
+  protected declare _startInput: any
+  protected declare _endInput: any
+  protected declare _calendar: any
+  protected declare _calendarElement: any
+  protected declare _menu: any
+  protected declare _popup: any
+  protected declare _selectEndDate: any
+  protected declare _initialStartDate: any
+  protected declare _initialEndDate: any
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
@@ -135,20 +174,20 @@ class DateRangePickerV2 extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  show() {
+  show(): void {
     if (this._config.disabled) {
       return
     }
@@ -156,23 +195,23 @@ class DateRangePickerV2 extends BaseComponent {
     this._popup.show()
   }
 
-  hide() {
+  hide(): void {
     this._popup.hide()
   }
 
-  toggle() {
+  toggle(): void {
     return this._popup.isShown ? this.hide() : this.show()
   }
 
-  getStartDate() {
+  getStartDate(): Date | null {
     return this._startInput.getDate()
   }
 
-  getEndDate() {
+  getEndDate(): Date | null {
     return this._endInput.getDate()
   }
 
-  setRange(startDate, endDate) {
+  setRange(startDate: Date | null, endDate: Date | null): void {
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
     this._selectEndDate = false
@@ -181,27 +220,27 @@ class DateRangePickerV2 extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
   }
 
-  clear() {
+  clear(): void {
     this.setRange(null, null)
   }
 
-  reset() {
+  reset(): void {
     this.setRange(this._initialStartDate, this._initialEndDate)
   }
 
-  getContext() {
+  getContext(): Record<string, any> {
     return {
       clear: () => this.clear(),
       close: () => this.hide(),
       disabled: this._config.disabled,
       endDate: this.getEndDate(),
       reset: () => this.reset(),
-      setRange: (startDate, endDate) => this.setRange(startDate, endDate),
+      setRange: (startDate: Date | null, endDate: Date | null) => this.setRange(startDate, endDate),
       startDate: this.getStartDate()
     }
   }
 
-  dispose() {
+  override dispose(): void {
     this._popup.dispose()
     this._startInput.dispose()
     this._endInput.dispose()
@@ -212,11 +251,11 @@ class DateRangePickerV2 extends BaseComponent {
   // Private
   // See DatePickerV2._forwardConfig — options the inner primitives know about
   // are forwarded by name so data attributes reach them.
-  _forwardConfig(Component, overrides = {}, extra = {}) {
-    const forwarded = {}
+  _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
+    const forwarded: Record<string, any> = {}
 
     for (const key of Object.keys(Component.Default)) {
-      if (key in this._config && this._config[key] !== Default[key]) {
+      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
         forwarded[key] = this._config[key]
       }
     }
@@ -226,17 +265,17 @@ class DateRangePickerV2 extends BaseComponent {
 
   // See DatePickerV2._resolveFormat — a date mask can only express the sections
   // it has, so month/year selection get a narrower default mask.
-  _resolveFormat() {
+  _resolveFormat(): any {
     if (this._config.format) {
       return this._config.format
     }
 
     const byType = { month: 'MM/yyyy', year: 'yyyy' }
 
-    return byType[this._config.selectionType] ?? null
+    return (byType as Record<string, string>)[this._config.selectionType] ?? null
   }
 
-  _setSelectEndDate(value) {
+  _setSelectEndDate(value: boolean): void {
     if (this._selectEndDate === value) {
       return
     }
@@ -245,7 +284,7 @@ class DateRangePickerV2 extends BaseComponent {
     this._calendar?.update({ selectEndDate: value })
   }
 
-  _sanitizeIcon(icon) {
+  _sanitizeIcon(icon: string): string {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
@@ -253,13 +292,13 @@ class DateRangePickerV2 extends BaseComponent {
   // the same with two icon variables, swapped in CSS). Read the element's
   // computed direction rather than isRTL(): the document can be LTR while an
   // ancestor sets dir="rtl" around the picker.
-  _resolveSeparatorIcon() {
+  _resolveSeparatorIcon(): string {
     const isRtl = window.getComputedStyle(this._element).direction === 'rtl'
 
     return isRtl ? this._config.separatorIconRtl : this._config.separatorIcon
   }
 
-  _createInput(date, name) {
+  _createInput(date: Date | null, name: string): any {
     const inputEl = document.createElement('div')
 
     const input = new DateInput(inputEl, this._forwardConfig(DateInput, {
@@ -273,7 +312,7 @@ class DateRangePickerV2 extends BaseComponent {
     return { input, inputEl }
   }
 
-  _createDateRangePicker() {
+  _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_PICKER_V2, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
     if (this._config.size) {
@@ -342,7 +381,7 @@ class DateRangePickerV2 extends BaseComponent {
 
   // See DatePickerV2._ensureCalendar — the calendar is built on first show,
   // seeded from the shell's own state (the fields plus _selectEndDate).
-  _ensureCalendar() {
+  _ensureCalendar(): void {
     if (this._calendar) {
       return
     }
@@ -377,7 +416,7 @@ class DateRangePickerV2 extends BaseComponent {
     })
   }
 
-  _createPopup() {
+  _createPopup(): void {
     this._popup = new Popup({
       anchor: this._element,
       container: this._config.container,
@@ -400,7 +439,7 @@ class DateRangePickerV2 extends BaseComponent {
     })
   }
 
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()
@@ -419,7 +458,7 @@ class DateRangePickerV2 extends BaseComponent {
       this._setSelectEndDate(true)
     })
 
-    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, event => {
+    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, (event: any) => {
       const action = event.target.closest(SELECTOR_ACTION).dataset.coreuiPickerAction
       const context = this.getContext()
 
@@ -444,6 +483,8 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
  * jQuery
  */
 
-defineJQueryPlugin(DateRangePickerV2)
+// The v2 pickers define no `jQueryInterface`, so the plugin registers as
+// `undefined` — preserved as-is; fixing it is a behaviour change.
+defineJQueryPlugin(DateRangePickerV2 as any)
 
 export default DateRangePickerV2

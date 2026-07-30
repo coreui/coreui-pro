@@ -1,31 +1,33 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI PRO date-time-picker-v2.js
+ * CoreUI PRO date-picker-v2.js
  * License (https://coreui.io/pro/license/)
  *
- * Pickers v2 prototype (workspace: plans/pickers-v2-rewrite.md): the product
- * that replaces v1's `timepicker: true` flag on the date picker. A DateTimeInput
- * section field plus a popup holding a Calendar and the TimeSelection body —
- * the date and the time halves are independent primitives, composed here.
+ * Pickers v2 prototype (workspace: plans/pickers-v2-rewrite.md). The shell is
+ * a composition of existing primitives — DateInput (section field), Calendar,
+ * and the Popup anchored-overlay util — instead of the v1 monolith. Projected
+ * regions (footer) come from a <template> child and act through the slot
+ * context, not through configuration props. Not exported from the bundle
+ * until the API is reviewed.
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
-import DateTimeInput from './date-time-input.js'
+import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
-import TimeSelection from './util/time-selection.js'
-import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
+import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin } from './util/index.js'
+import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
  */
 
-const NAME = 'date-time-picker-v2'
-const DATA_KEY = 'coreui.date-time-picker-v2'
+const NAME = 'date-picker-v2'
+const DATA_KEY = 'coreui.date-picker-v2'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
@@ -33,33 +35,50 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_DATE_CHANGE = `dateChange${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_PICKER_V2 = 'date-picker-v2'
-const CLASS_NAME_DATE_TIME_PICKER = 'date-time-picker'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
 const CLASS_NAME_INDICATOR = 'date-picker-indicator'
 const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_SHOW = 'show'
-const CLASS_NAME_TIME_BODY = 'time-picker-body'
-const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
-const SELECTOR_ACTION = '[data-coreui-picker-action]'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-time-picker-v2"]'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker-v2"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
+const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
-// Icons live in JavaScript, not in CSS masks — the chips pattern.
-const DEFAULT_INDICATOR_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
+// Icons live in JavaScript, not in CSS masks — the chips pattern: inline SVG on
+// currentColor, swappable through an option, sanitized like any user-provided
+// markup.
+const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
 
-const Default = {
+type DatePickerV2Config = {
+  allowList: SanitizerAllowList
+  ariaToggleLabel: string
+  calendarOptions: Record<string, any>
+  container: Element | boolean | string
+  disabled: boolean
+  indicatorIcon: string
+  inputOptions: Record<string, any>
+  locale: string
+  maxDate: Date | string | null
+  minDate: Date | string | null
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  size: string | null
+  date: Date | string | null
+  name: string | null
+}
+
+const Default: DatePickerV2Config = {
   allowList: SVGAllowlist,
   ariaToggleLabel: 'Toggle the calendar',
   calendarOptions: {},
@@ -74,12 +93,10 @@ const Default = {
   name: null,
   sanitize: true,
   sanitizeFn: null,
-  selectionOptions: {},
-  size: null,
-  variant: 'roll'
+  size: null
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   allowList: 'object',
   ariaToggleLabel: 'string',
   calendarOptions: 'object',
@@ -94,50 +111,56 @@ const DefaultType = {
   name: '(string|null)',
   sanitize: 'boolean',
   sanitizeFn: '(function|null)',
-  selectionOptions: 'object',
-  size: '(string|null)',
-  variant: 'string'
+  size: '(string|null)'
 }
 
 /**
  * Class definition
  */
 
-class DateTimePickerV2 extends BaseComponent {
-  constructor(element, config) {
+class DatePickerV2 extends BaseComponent {
+  protected declare _footerTemplate: any
+  protected declare _indicatorElement: HTMLElement
+  protected declare _initialDate: any
+  protected declare _input: any
+  protected declare _calendar: any
+  protected declare _calendarElement: any
+  protected declare _menu: any
+  protected declare _popup: any
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
-    // see DatePickerV2 — the shell owns the initial value for reset()
+    // setDate() goes through the field's update(), which rewrites its config —
+    // so the shell keeps the initial value for reset() itself
     this._initialDate = config?.date ?? this._config.date
     this._input = null
     this._calendar = null
     this._calendarElement = null
-    this._selection = null
-    this._selectionElement = null
     this._menu = null
     this._popup = null
 
-    this._createDateTimePicker()
+    this._createDatePicker()
     this._createPopup()
     this._addEventListeners()
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  show() {
+  show(): void {
     if (this._config.disabled) {
       return
     }
@@ -145,66 +168,67 @@ class DateTimePickerV2 extends BaseComponent {
     this._popup.show()
   }
 
-  hide() {
+  hide(): void {
     this._popup.hide()
   }
 
-  toggle() {
+  toggle(): void {
     return this._popup.isShown ? this.hide() : this.show()
   }
 
-  getDate() {
+  getDate(): Date | null {
     return this._input.getDate()
   }
 
-  setDate(date) {
+  setDate(date: Date | null): void {
     this._input.update({ date })
     this._calendar?.update({ startDate: date })
-    this._selection?.update({ time: date })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
   }
 
-  today() {
-    this.setDate(new Date())
-  }
-
-  clear() {
+  clear(): void {
     this._input.clear()
     this._calendar?.update({ startDate: null })
-    this._selection?.update({ time: null })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
-  reset() {
+  reset(): void {
     this.setDate(this._initialDate)
   }
 
-  getContext() {
+  today(): void {
+    this.setDate(new Date())
+  }
+
+  getContext(): Record<string, any> {
     return {
       clear: () => this.clear(),
       close: () => this.hide(),
       date: this.getDate(),
       disabled: this._config.disabled,
       reset: () => this.reset(),
-      setDate: date => this.setDate(date),
+      setDate: (date: Date | null) => this.setDate(date),
       today: () => this.today()
     }
   }
 
-  dispose() {
+  override dispose(): void {
     this._popup.dispose()
     this._input.dispose()
     this._calendar?.dispose()
-    this._selection?.dispose()
     super.dispose()
   }
 
   // Private
-  _forwardConfig(Component, overrides = {}, extra = {}) {
-    const forwarded = {}
+  // Options the inner primitives know about are forwarded by name, so
+  // `data-coreui-selection-type`, `data-coreui-format`, … work without the
+  // shell re-declaring the whole calendar/field surface. The dedicated
+  // *Options objects stay as the programmatic escape hatch.
+  _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
+    const forwarded: Record<string, any> = {}
 
     for (const key of Object.keys(Component.Default)) {
-      if (key in this._config && this._config[key] !== Default[key]) {
+      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
         forwarded[key] = this._config[key]
       }
     }
@@ -212,14 +236,25 @@ class DateTimePickerV2 extends BaseComponent {
     return { ...forwarded, ...overrides, ...extra }
   }
 
-  _sanitizeIcon(icon) {
+  // A date mask can only express the sections it has: month/year selection get
+  // a narrower default mask, day (and the week/quarter types, whose value is the
+  // underlying day) keep the locale mask. An explicit `format` always wins.
+  _resolveFormat(): any {
+    if (this._config.format) {
+      return this._config.format
+    }
+
+    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+
+    return (byType as Record<string, string>)[this._config.selectionType] ?? null
+  }
+
+  _sanitizeIcon(icon: string): string {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
-  _createDateTimePicker() {
-    this._element.classList.add(
-      CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_PICKER_V2, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
-    )
+  _createDatePicker(): void {
+    this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_PICKER_V2, CLASS_NAME_PICKER)
 
     if (this._config.size) {
       this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
@@ -241,11 +276,12 @@ class DateTimePickerV2 extends BaseComponent {
 
     this._element.append(inputGroup)
 
-    this._input = new DateTimeInput(inputEl, this._forwardConfig(DateTimeInput, {
+    this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
       locale: this._config.locale,
-      name: this._config.name
+      name: this._config.name,
+      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
     }, this._config.inputOptions))
 
     this._menu = document.createElement('div')
@@ -256,19 +292,13 @@ class DateTimePickerV2 extends BaseComponent {
 
     const calendars = document.createElement('div')
     calendars.classList.add(CLASS_NAME_CALENDARS)
+
     this._calendarElement = document.createElement('div')
     this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
     calendars.append(this._calendarElement)
     body.append(calendars)
-
-    const timePickers = document.createElement('div')
-    timePickers.classList.add(CLASS_NAME_TIME_PICKERS)
-    this._selectionElement = document.createElement('div')
-    this._selectionElement.classList.add(CLASS_NAME_TIME_BODY)
-    timePickers.append(this._selectionElement)
-    body.append(timePickers)
-
     this._menu.append(body)
+    this._element.append(this._menu)
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')
@@ -276,12 +306,12 @@ class DateTimePickerV2 extends BaseComponent {
       footer.append(this._footerTemplate.content.cloneNode(true))
       this._menu.append(footer)
     }
-
-    this._element.append(this._menu)
   }
 
-  // Both popup bodies are built on first open — see DatePickerV2._ensureCalendar.
-  _ensureBodies() {
+  // The calendar is ~83% of the picker's DOM and construction cost, and it is
+  // not observable before the popup opens — so it is built on first show, in
+  // its final DOM position (which is also where it can resolve its direction).
+  _ensureCalendar(): void {
     if (this._calendar) {
       return
     }
@@ -291,52 +321,17 @@ class DateTimePickerV2 extends BaseComponent {
       startDate: this.getDate()
     }, this._config.calendarOptions))
 
-    this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
-      locale: this._config.locale,
-      onChange: time => this._applyTime(time),
-      time: this.getDate(),
-      variant: this._config.variant
-    }, this._config.selectionOptions))
-
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
-      this._applyDate(event.dateObject)
+      // `date` is formatted per selectionType ("2026-01", "2026Q1", …);
+      // `dateObject` is the underlying Date the section field can hold
+      const { date, dateObject } = event
+      this._input.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, dateObject })
+      this.hide()
     })
   }
 
-  // The date and the time halves each own part of the value, so a change in one
-  // must not discard the other.
-  _applyDate(date) {
-    if (!date) {
-      return
-    }
-
-    const current = this.getDate()
-    const merged = new Date(date)
-
-    if (current) {
-      merged.setHours(current.getHours(), current.getMinutes(), current.getSeconds())
-    }
-
-    this._input.update({ date: merged })
-    this._selection?.update({ time: merged })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: merged })
-  }
-
-  _applyTime(time) {
-    if (!time) {
-      return
-    }
-
-    const current = this.getDate()
-    const merged = current ? new Date(current) : new Date()
-    merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
-
-    this._input.update({ date: merged })
-    this._calendar?.update({ startDate: merged })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: merged })
-  }
-
-  _createPopup() {
+  _createPopup(): void {
     this._popup = new Popup({
       anchor: this._element,
       container: this._config.container,
@@ -349,11 +344,9 @@ class DateTimePickerV2 extends BaseComponent {
         EventHandler.trigger(this._element, EVENT_HIDE)
       },
       onShow: () => {
-        // the classes come first: the selection body scrolls the selected cell
-        // into view, which needs the dropdown to have layout
+        this._ensureCalendar()
         this._menu.classList.add(CLASS_NAME_SHOW)
         this._element.classList.add(CLASS_NAME_SHOW)
-        this._ensureBodies()
         this._element.setAttribute('aria-expanded', 'true')
         EventHandler.trigger(this._element, EVENT_SHOW)
       },
@@ -361,14 +354,14 @@ class DateTimePickerV2 extends BaseComponent {
     })
   }
 
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()
       }
     })
 
-    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, event => {
+    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, (event: any) => {
       const action = event.target.closest(SELECTOR_ACTION).dataset.coreuiPickerAction
       const context = this.getContext()
 
@@ -385,7 +378,7 @@ class DateTimePickerV2 extends BaseComponent {
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
-    DateTimePickerV2.getOrCreateInstance(element)
+    DatePickerV2.getOrCreateInstance(element)
   }
 })
 
@@ -393,6 +386,8 @@ EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
  * jQuery
  */
 
-defineJQueryPlugin(DateTimePickerV2)
+// The v2 pickers define no `jQueryInterface`, so the plugin registers as
+// `undefined` — preserved as-is; fixing it is a behaviour change.
+defineJQueryPlugin(DatePickerV2 as any)
 
-export default DateTimePickerV2
+export default DatePickerV2
