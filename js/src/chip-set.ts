@@ -47,7 +47,7 @@ const SELECTION_MODE_SINGLE = 'single'
 const DEFAULT_REMOVE_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
 const DEFAULT_SELECTED_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
 
-type ChipSetConfig = {
+export type ChipSetConfig = {
   ariaRemoveLabel: string
   chipClassName: string | ((value: string) => string) | null
   disabled: boolean
@@ -75,7 +75,7 @@ const Default: ChipSetConfig = {
   unique: false
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ariaRemoveLabel: 'string',
   chipClassName: '(string|function|null)',
   disabled: 'boolean',

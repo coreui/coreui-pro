@@ -8,9 +8,10 @@
  * --------------------------------------------------------------------------
  */
 
-import ChipSet from './chip-set.js'
+import ChipSet, { type ChipSetConfig } from './chip-set.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import type { ComponentConfig } from './util/config.js'
 import { getUID, isRTL } from './util/index.js'
 
 /**
@@ -32,7 +33,16 @@ const SELECTOR_CHIP_REMOVE = '.chip-remove'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
 
-const Default = {
+type ChipInputConfig = ChipSetConfig & {
+  createOnBlur: boolean
+  id: string | null
+  name: string | null
+  placeholder: string
+  readonly: boolean
+  separator: string | null
+}
+
+const Default: ChipInputConfig = {
   ...ChipSet.Default,
   createOnBlur: true,
   id: null,
@@ -44,7 +54,7 @@ const Default = {
   unique: true
 }
 
-const DefaultType = {
+const DefaultType: Record<string, string> = {
   ...ChipSet.DefaultType,
   createOnBlur: 'boolean',
   id: '(string|null)',
@@ -64,13 +74,17 @@ const DefaultType = {
  */
 
 class ChipInput extends ChipSet {
-  constructor(element, config) {
+  protected declare _uniqueId: string
+  protected declare _hiddenInput: HTMLInputElement | null
+  protected declare _input: HTMLInputElement
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(NAME)
     this._hiddenInput = null
 
-    this._input = SelectorEngine.findOne('input', this._element)
+    this._input = SelectorEngine.findOne('input', this._element as ParentNode) as HTMLInputElement
     if (this._input) {
       this._setInputSize()
     } else {
@@ -83,21 +97,21 @@ class ChipInput extends ChipSet {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
   // Keep the inherited add behavior and mirror the new value into the form input.
-  add(value) {
+  override add(value: HTMLElement | string): HTMLElement | null {
     const chip = super.add(value)
     if (chip) {
       this._syncHiddenInput()
@@ -106,23 +120,23 @@ class ChipInput extends ChipSet {
     return chip
   }
 
-  focus() {
+  focus(): void {
     this._input?.focus()
   }
 
   // Private
-  _canModify() {
+  override _canModify(): boolean {
     return !this._disabled && !this._config.readonly
   }
 
   // Chips live before the text field, not at the end of the set.
-  _appendChip(chip) {
+  override _appendChip(chip: HTMLElement): void {
     this._element.insertBefore(chip, this._input)
   }
 
   // Per-chip configuration based on the chip value and the input's
   // disabled/readonly state.
-  _getChipConfig(chip) {
+  override _getChipConfig(chip: HTMLElement): Record<string, any> {
     return {
       ariaRemoveLabel: `Remove ${this._getChipValue(chip)}`,
       disabled: this._disabled,
@@ -133,30 +147,30 @@ class ChipInput extends ChipSet {
   }
 
   // Keep the inherited chip instantiation and sync the remove button.
-  _setupChip(chip) {
+  override _setupChip(chip: HTMLElement): void {
     super._setupChip(chip)
 
-    const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip)
+    const removeButton = SelectorEngine.findOne(SELECTOR_CHIP_REMOVE, chip) as HTMLButtonElement
     if (removeButton) {
       removeButton.disabled = this._disabled || this._config.readonly
     }
   }
 
   // Sync the form mirror and refocus the text field after a chip is removed.
-  _handleChipRemoved(event) {
+  override _handleChipRemoved(event: any): void {
     super._handleChipRemoved(event)
     this._syncHiddenInput()
     this._input?.focus()
   }
 
-  _syncHiddenInput() {
+  _syncHiddenInput(): void {
     if (this._hiddenInput) {
       this._hiddenInput.value = this.getValues().join(',')
     }
   }
 
-  _addInputEventListeners() {
-    EventHandler.on(this._element, 'keydown', event => {
+  _addInputEventListeners(): void {
+    EventHandler.on(this._element, 'keydown', (event: any) => {
       if (event.target === this._input) {
         return
       }
@@ -166,7 +180,7 @@ class ChipInput extends ChipSet {
       // direction is mirrored in RTL.
       if (event.key === (isRTL() ? 'ArrowLeft' : 'ArrowRight')) {
         const chips = this._getFocusableChips()
-        if (chips.length > 0 && chips[chips.length - 1].contains(event.target)) {
+        if (chips.length > 0 && chips[chips.length - 1].contains(event.target as Node)) {
           event.preventDefault()
           this._input.focus()
           return
@@ -183,7 +197,7 @@ class ChipInput extends ChipSet {
     EventHandler.on(this._input, 'focus', () => this.clearSelection())
 
     if (this._config.createOnBlur) {
-      EventHandler.on(this._input, 'blur', event => {
+      EventHandler.on(this._input, 'blur', (event: any) => {
         // Don't create chip if clicking on a chip
         if (!event.relatedTarget?.closest(SELECTOR_CHIP)) {
           this._createChipFromInput()
@@ -192,16 +206,16 @@ class ChipInput extends ChipSet {
     }
 
     // Focus input when clicking container background
-    EventHandler.on(this._element, 'click', event => {
+    EventHandler.on(this._element, 'click', (event: any) => {
       if (event.target === this._element) {
         this._input?.focus()
       }
     })
   }
 
-  _createInput() {
+  _createInput(): void {
     const input = document.createElement('input')
-    const label = SelectorEngine.findOne(SELECTOR_CHIP_INPUT_LABEL, this._element)
+    const label = SelectorEngine.findOne(SELECTOR_CHIP_INPUT_LABEL, this._element as ParentNode)
     const labelFor = label?.getAttribute('for')
     const generatedInputId = labelFor || getUID(`${NAME}-input`)
 
@@ -221,7 +235,7 @@ class ChipInput extends ChipSet {
     this._element.append(input)
   }
 
-  _createHiddenInput() {
+  _createHiddenInput(): void {
     const hiddenInput = document.createElement('input')
     hiddenInput.type = 'hidden'
     hiddenInput.id = this._uniqueId
@@ -232,7 +246,7 @@ class ChipInput extends ChipSet {
     this._hiddenInput.value = this.getValues().join(',')
   }
 
-  _createChipFromInput() {
+  _createChipFromInput(): void {
     if (!this._canModify()) {
       return
     }
@@ -245,7 +259,7 @@ class ChipInput extends ChipSet {
     }
   }
 
-  _applyInteractionState() {
+  _applyInteractionState(): void {
     const { readonly } = this._config
     this._element.classList.toggle(CLASS_NAME_DISABLED, this._disabled)
     this._input.disabled = this._disabled
@@ -254,7 +268,7 @@ class ChipInput extends ChipSet {
     this._element.setAttribute('aria-readonly', readonly ? 'true' : 'false')
   }
 
-  _handleInputKeydown(event) {
+  _handleInputKeydown(event: any): void {
     const { key } = event
 
     switch (key) {
@@ -309,7 +323,7 @@ class ChipInput extends ChipSet {
     }
   }
 
-  _handleInput(event) {
+  _handleInput(event: any): void {
     if (!this._canModify()) {
       return
     }
@@ -333,7 +347,7 @@ class ChipInput extends ChipSet {
     })
   }
 
-  _handlePaste(event) {
+  _handlePaste(event: any): void {
     if (!this._canModify()) {
       return
     }
@@ -343,7 +357,7 @@ class ChipInput extends ChipSet {
       return
     }
 
-    const pastedData = (event.clipboardData || window.clipboardData).getData('text')
+    const pastedData = (event.clipboardData || (window as any).clipboardData).getData('text')
     if (pastedData.includes(separator)) {
       event.preventDefault()
 
@@ -354,7 +368,7 @@ class ChipInput extends ChipSet {
     }
   }
 
-  _setInputSize() {
+  _setInputSize(): void {
     if (!this._input) {
       return
     }
