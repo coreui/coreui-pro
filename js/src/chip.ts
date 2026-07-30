@@ -1,15 +1,16 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI chip.js
+ * CoreUI chip.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { sanitizeHtml, SVGAllowlist } from './util/sanitizer.js'
+import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -38,12 +39,26 @@ const CLASS_NAME_CHIP_REMOVE = 'chip-remove'
 const CLASS_NAME_ACTIVE = 'active'
 const CLASS_NAME_DISABLED = 'disabled'
 
-const DEFAULT_REMOVE_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
-const DEFAULT_SELECTED_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
+const DEFAULT_REMOVE_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="4" x2="12" y2="12"/><line x1="12" y1="4" x2="4" y2="12"/></svg>'
+const DEFAULT_SELECTED_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
 
 const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
-const Default = {
+type ChipConfig = {
+  allowList: SanitizerAllowList
+  ariaRemoveLabel: string
+  disabled: boolean
+  filter: boolean
+  removable: boolean
+  removeIcon: string
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  selectable: boolean
+  selected: boolean
+  selectedIcon: string
+}
+
+const Default: ChipConfig = {
   allowList: SVGAllowlist,
   ariaRemoveLabel: 'Remove',
   disabled: false,
@@ -76,7 +91,10 @@ const DefaultType = {
  */
 
 class Chip extends BaseComponent {
-  constructor(element, config) {
+  protected declare _disabled: any
+  protected declare _selected: any
+
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
@@ -93,30 +111,30 @@ class Chip extends BaseComponent {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Public
-  remove() {
+  remove(): void {
     const removeEvent = EventHandler.trigger(this._element, EVENT_REMOVE)
 
-    if (removeEvent.defaultPrevented) {
+    if (removeEvent!.defaultPrevented) {
       return
     }
 
     this._destroyElement()
   }
 
-  toggle() {
+  toggle(): void {
     if (!this._config.selectable) {
       return
     }
@@ -129,7 +147,7 @@ class Chip extends BaseComponent {
     this.select()
   }
 
-  select() {
+  select(): void {
     if (!this._config.selectable) {
       return
     }
@@ -139,7 +157,7 @@ class Chip extends BaseComponent {
     }
 
     const selectEvent = EventHandler.trigger(this._element, EVENT_SELECT)
-    if (selectEvent.defaultPrevented) {
+    if (selectEvent!.defaultPrevented) {
       return
     }
 
@@ -149,7 +167,7 @@ class Chip extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_SELECTED)
   }
 
-  deselect() {
+  deselect(): any {
     if (!this._config.selectable) {
       return
     }
@@ -159,7 +177,7 @@ class Chip extends BaseComponent {
     }
 
     const deselectEvent = EventHandler.trigger(this._element, EVENT_DESELECT)
-    if (deselectEvent.defaultPrevented) {
+    if (deselectEvent!.defaultPrevented) {
       return
     }
 
@@ -170,7 +188,7 @@ class Chip extends BaseComponent {
   }
 
   // Private
-  _configAfterMerge(config) {
+  _configAfterMerge(config: any): any {
     // A filter chip is selectable by definition.
     if (config.filter) {
       config.selectable = true
@@ -179,7 +197,7 @@ class Chip extends BaseComponent {
     return config
   }
 
-  _addEventListeners() {
+  _addEventListeners(): void {
     EventHandler.on(this._element, 'keydown', event => this._handleKeydown(event))
 
     EventHandler.on(this._element, 'click', event => {
@@ -187,7 +205,7 @@ class Chip extends BaseComponent {
         return
       }
 
-      if (event.target.closest(SELECTOR_CHIP_REMOVE)) {
+      if ((event.target as HTMLElement).closest(SELECTOR_CHIP_REMOVE)) {
         return
       }
 
@@ -200,7 +218,7 @@ class Chip extends BaseComponent {
     })
   }
 
-  _applyState() {
+  _applyState(): void {
     if (!this._disabled && (this._config.clickable || this._config.selectable)) {
       this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE)
     }
@@ -234,7 +252,7 @@ class Chip extends BaseComponent {
     }
   }
 
-  _ensureCheckIcon() {
+  _ensureCheckIcon(): any {
     if (SelectorEngine.findOne(SELECTOR_CHIP_CHECK, this._element)) {
       return
     }
@@ -246,7 +264,7 @@ class Chip extends BaseComponent {
     this._element.prepend(check)
   }
 
-  _createRemoveButton() {
+  _createRemoveButton(): any {
     const button = document.createElement('button')
     button.type = 'button'
     button.className = CLASS_NAME_CHIP_REMOVE
@@ -256,7 +274,7 @@ class Chip extends BaseComponent {
     return button
   }
 
-  _ensureRemoveButton() {
+  _ensureRemoveButton(): void {
     // A disabled chip is not interactive, so it never shows a remove button.
     if (!this._config.removable || this._disabled) {
       return
@@ -269,7 +287,7 @@ class Chip extends BaseComponent {
     this._element.append(this._createRemoveButton())
   }
 
-  _makeFocusable() {
+  _makeFocusable(): void {
     if (this._element.hasAttribute('tabindex') || this._disabled) {
       return
     }
@@ -277,7 +295,7 @@ class Chip extends BaseComponent {
     this._element.setAttribute('tabindex', '0')
   }
 
-  _handleKeydown(event) {
+  _handleKeydown(event: any): void {
     const { key } = event
     if (this._disabled) {
       return
@@ -310,17 +328,17 @@ class Chip extends BaseComponent {
     }
   }
 
-  _destroyElement() {
+  _destroyElement(): void {
     EventHandler.trigger(this._element, EVENT_REMOVED)
     this._element.remove()
     this.dispose()
   }
 
-  _sanitizeIcon(icon) {
+  _sanitizeIcon(icon: string): string {
     return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
   }
 
-  _getConfig(config) {
+  _getConfig(config: any): any {
     const dataAttributes = Manipulator.getDataAttributes(this._element)
 
     for (const dataAttribute of Object.keys(dataAttributes)) {
@@ -341,31 +359,31 @@ class Chip extends BaseComponent {
   }
 
   // Static
-  static chipInterface(element, config) {
-    const data = Chip.getOrCreateInstance(element, config)
+  static chipInterface(element: string | Element | null, config?: any): void {
+    const data: any = Chip.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
-      const data = Chip.getOrCreateInstance(this)
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
+      const data: any = Chip.getOrCreateInstance(this)
 
       if (typeof config !== 'string') {
         return
       }
 
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+      if (data[config as string] === undefined || config.startsWith('_') || config === 'constructor') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config](this)
+      data[config as string](this)
     })
   }
 }
@@ -387,3 +405,4 @@ EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
 defineJQueryPlugin(Chip)
 
 export default Chip
+export type { ChipConfig }

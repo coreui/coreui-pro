@@ -33,7 +33,7 @@ const Default = {
   fallbackPlacements: null, // null → mirror of placement via flip()
   focusTrap: true,
   mobileBreakpoint: 768,
-  offset: [0, 2],
+  offset: [0, 2] as [number, number],
   onHidden: null,
   onHide: null,
   onShow: null,
@@ -69,11 +69,25 @@ const DefaultType = {
  * component, so the primitive never emits on its own.
  */
 
+// Derived from the actual defaults, so the key set cannot drift from runtime.
+type PopupConfig = typeof Default
+
 class Popup extends Config {
-  constructor(config) {
+  protected declare _anchor: HTMLElement | null
+  protected declare _content: HTMLElement | null
+  protected declare _container: HTMLElement | null
+  protected declare _cleanupAutoUpdate: (() => void) | null
+  protected declare _isShown: boolean
+  protected declare _previouslyFocused: HTMLElement | null
+  protected declare _clickListener: any
+  protected declare _keydownListener: any
+  protected declare _focustrap: any
+  protected declare _config: PopupConfig
+
+  constructor(config?: Partial<PopupConfig> | null) {
     super()
-    this._config = this._getConfig(config)
-    this._anchor = this._config.anchor
+    this._config = this._getConfig(config) as PopupConfig
+    this._anchor = this._config.anchor as HTMLElement | null
     this._content = this._config.content
     this._container = this._config.container ? getElement(this._config.container) : null
     this._cleanupAutoUpdate = null
@@ -90,38 +104,38 @@ class Popup extends Config {
   }
 
   // Getters
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
-  get isShown() {
+  get isShown(): any {
     return this._isShown
   }
 
-  get isMobile() {
+  get isMobile(): any {
     return window.matchMedia(`(max-width: ${this._config.mobileBreakpoint - 1}px)`).matches
   }
 
   // Public
-  show() {
+  show(): void {
     if (this._isShown) {
       return
     }
 
     execute(this._config.onShow)
     this._isShown = true
-    this._previouslyFocused = document.activeElement
+    this._previouslyFocused = document.activeElement as HTMLElement | null
 
     if (this._container) {
-      this._container.append(this._content)
+      this._container.append(this._content!)
     }
 
     if (!this.isMobile) {
@@ -137,7 +151,7 @@ class Popup extends Config {
     execute(this._config.onShown)
   }
 
-  hide() {
+  hide(): any {
     if (!this._isShown) {
       return
     }
@@ -159,37 +173,37 @@ class Popup extends Config {
     execute(this._config.onHidden)
   }
 
-  toggle() {
+  toggle(): any {
     return this._isShown ? this.hide() : this.show()
   }
 
-  update() {
+  update(): void {
     if (this._isShown && !this.isMobile) {
       this._updatePosition()
     }
   }
 
-  dispose() {
+  dispose(): void {
     this.hide()
     this._focustrap = null
-    this._anchor = null
+    this._anchor = null as HTMLElement | null
     this._content = null
     this._container = null
   }
 
   // Private
-  _startPositioning() {
-    this._cleanupAutoUpdate = autoUpdate(this._anchor, this._content, () => this._updatePosition())
+  _startPositioning(): void {
+    this._cleanupAutoUpdate = autoUpdate(this._anchor!, this._content, () => this._updatePosition())
   }
 
-  _stopPositioning() {
+  _stopPositioning(): void {
     if (this._cleanupAutoUpdate) {
       this._cleanupAutoUpdate()
       this._cleanupAutoUpdate = null
     }
   }
 
-  _updatePosition() {
+  _updatePosition(): any {
     const [skidding, distance] = this._config.offset
     const middleware = [
       offset({ crossAxis: skidding, mainAxis: distance }),
@@ -197,12 +211,12 @@ class Popup extends Config {
       shift()
     ]
 
-    computePosition(this._anchor, this._content, {
+    computePosition(this._anchor!, this._content!, {
       middleware,
-      placement: this._resolvePlacement(),
+      placement: this._resolvePlacement() as any,
       strategy: 'absolute'
     }).then(({ x, y }) => {
-      Object.assign(this._content.style, {
+      Object.assign(this._content!.style, {
         insetInlineStart: '0',
         left: `${x}px`,
         position: 'absolute',
@@ -211,7 +225,7 @@ class Popup extends Config {
     })
   }
 
-  _resolvePlacement() {
+  _resolvePlacement(): any {
     const { placement } = this._config
     if (!isRTL()) {
       return placement
@@ -222,20 +236,20 @@ class Popup extends Config {
       (placement.endsWith('-end') ? placement.replace('-end', '-start') : placement)
   }
 
-  _addDismissListeners() {
-    this._clickListener = event => {
+  _addDismissListeners(): void {
+    this._clickListener = (event: Event) => {
       // composedPath, not contains(): the click may re-render part of the
       // content (calendar navigation) and detach the target before the event
       // reaches document — the dispatch-time path still holds the ancestors
       const path = event.composedPath()
-      if (path.includes(this._anchor) || path.includes(this._content)) {
+      if (path.includes(this._anchor!) || path.includes(this._content!)) {
         return
       }
 
       this.hide()
     }
 
-    this._keydownListener = event => {
+    this._keydownListener = (event: KeyboardEvent) => {
       if (event.key === ESCAPE_KEY) {
         this.hide()
       }
@@ -245,7 +259,7 @@ class Popup extends Config {
     EventHandler.on(document, EVENT_KEYDOWN, this._keydownListener)
   }
 
-  _removeDismissListeners() {
+  _removeDismissListeners(): void {
     EventHandler.off(document, EVENT_CLICK, this._clickListener)
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
     this._clickListener = null
@@ -254,3 +268,4 @@ class Popup extends Config {
 }
 
 export default Popup
+export type { PopupConfig }

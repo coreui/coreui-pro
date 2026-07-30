@@ -1,11 +1,12 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI navigation.js
+ * CoreUI navigation.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
+import type { ComponentConfig } from './util/config.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
@@ -54,35 +55,35 @@ const SELECTOR_DATA_NAVIGATION = '[data-coreui-navigation], [data-coreui="naviga
  */
 
 class Navigation extends BaseComponent {
-  constructor(element, config) {
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element)
     this._config = this._getConfig(config)
     this._setActiveLink()
     this._addEventListeners()
 
-    Data.set(element, DATA_KEY, this)
+    Data.set(element as Element, DATA_KEY, this)
   }
   // Getters
 
-  static get Default() {
+  static override get Default(): typeof Default {
     return Default
   }
 
-  static get DATA_KEY() {
+  static override get DATA_KEY(): string {
     return DATA_KEY
   }
 
-  static get DefaultType() {
+  static override get DefaultType(): typeof DefaultType {
     return DefaultType
   }
 
-  static get NAME() {
+  static override get NAME(): string {
     return NAME
   }
 
   // Private
 
-  _setActiveLink() {
+  _setActiveLink(): void {
     for (const element of Array.from(this._element.querySelectorAll(SELECTOR_NAV_LINK))) {
       if (element.classList.contains(CLASS_NAME_NAV_GROUP_TOGGLE)) {
         continue
@@ -102,29 +103,29 @@ class Navigation extends BaseComponent {
         currentUrl = currentUrl.split('#')[0]
       }
 
-      if (this._config.activeLinksExact && element.href === currentUrl) {
+      if (this._config.activeLinksExact && (element as HTMLAnchorElement).href === currentUrl) {
         element.classList.add(CLASS_NAME_ACTIVE)
         // eslint-disable-next-line unicorn/no-array-for-each
-        Array.from(this._getParents(element, SELECTOR_NAV_GROUP)).forEach(element => {
+        Array.from(this._getParents(element as HTMLElement, SELECTOR_NAV_GROUP)).forEach(element => {
           element.classList.add(CLASS_NAME_SHOW)
-          element.setAttribute('aria-expanded', true)
+          element.setAttribute('aria-expanded', true as unknown as string)
         })
       }
 
-      if (!this._config.activeLinksExact && currentUrl.startsWith(element.href)) {
+      if (!this._config.activeLinksExact && currentUrl.startsWith((element as HTMLAnchorElement).href)) {
         element.classList.add(CLASS_NAME_ACTIVE)
         // eslint-disable-next-line unicorn/no-array-for-each
-        Array.from(this._getParents(element, SELECTOR_NAV_GROUP)).forEach(element => {
+        Array.from(this._getParents(element as HTMLElement, SELECTOR_NAV_GROUP)).forEach(element => {
           element.classList.add(CLASS_NAME_SHOW)
-          element.setAttribute('aria-expanded', true)
+          element.setAttribute('aria-expanded', true as unknown as string)
         })
       }
     }
   }
 
-  _getParents(element, selector) {
+  _getParents(element: any, selector: string): HTMLElement[] {
     // Setup parents array
-    const parents = []
+    const parents: HTMLElement[] = []
 
     // Get matching parent elements
     for (; element && element !== document; element = element.parentNode) {
@@ -141,8 +142,8 @@ class Navigation extends BaseComponent {
     return parents
   }
 
-  _getAllSiblings(element, filter) {
-    const siblings = []
+  _getAllSiblings(element: any, filter: (element: any) => boolean): HTMLElement[] {
+    const siblings: HTMLElement[] = []
     element = element.parentNode.firstChild
     do {
       if (element.nodeType === 3) {
@@ -163,7 +164,7 @@ class Navigation extends BaseComponent {
     return siblings
   }
 
-  _getChildren(n, skipMe) {
+  _getChildren(n: any, skipMe: any): HTMLElement[] {
     const children = []
     for (; n; n = n.nextSibling) {
       if (n.nodeType === 1 && n !== skipMe) {
@@ -174,12 +175,12 @@ class Navigation extends BaseComponent {
     return children
   }
 
-  _getSiblings(element, filter) {
+  _getSiblings(element: any, filter: (element: any) => boolean): HTMLElement[] {
     const siblings = this._getChildren(element.parentNode.firstChild, element).filter(filter)
     return siblings
   }
 
-  _slideDown(element) {
+  _slideDown(element: HTMLElement): void {
     element.style.height = 'auto'
     const height = element.clientHeight
     element.style.height = '0px'
@@ -192,7 +193,7 @@ class Navigation extends BaseComponent {
     }, element, true)
   }
 
-  _slideUp(element, callback) {
+  _slideUp(element: any, callback: (...args: any[]) => void): void {
     const height = element.clientHeight
     element.style.height = `${height}px`
     setTimeout(() => {
@@ -206,20 +207,20 @@ class Navigation extends BaseComponent {
     }, element, true)
   }
 
-  _toggleGroupItems(event) {
+  _toggleGroupItems(event: any): void {
     let toggler = event.target
     if (!toggler.classList.contains(CLASS_NAME_NAV_GROUP_TOGGLE)) {
       toggler = toggler.closest(SELECTOR_NAV_GROUP_TOGGLE)
     }
 
-    const filter = element => Boolean(element.classList.contains(CLASS_NAME_NAV_GROUP) && element.classList.contains(CLASS_NAME_SHOW))
+    const filter = (element: HTMLElement) => Boolean(element.classList.contains(CLASS_NAME_NAV_GROUP) && element.classList.contains(CLASS_NAME_SHOW))
 
     // Close other groups
     if (this._config.groupsAutoCollapse === true) {
       for (const element of this._getSiblings(toggler.parentNode, filter)) {
         this._slideUp(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, element), () => {
           element.classList.remove(CLASS_NAME_SHOW)
-          element.setAttribute('aria-expanded', false)
+          element.setAttribute('aria-expanded', false as unknown as string)
         })
       }
     }
@@ -227,39 +228,41 @@ class Navigation extends BaseComponent {
     if (toggler.parentNode.classList.contains(CLASS_NAME_SHOW)) {
       this._slideUp(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, toggler.parentNode), () => {
         toggler.parentNode.classList.remove(CLASS_NAME_SHOW)
-        toggler.parentNode.setAttribute('aria-expanded', false)
+        toggler.parentNode.setAttribute('aria-expanded', false as unknown as string)
       })
       return
     }
 
     toggler.parentNode.classList.add(CLASS_NAME_SHOW)
-    toggler.parentNode.setAttribute('aria-expanded', true)
-    this._slideDown(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, toggler.parentNode))
+    toggler.parentNode.setAttribute('aria-expanded', true as unknown as string)
+    this._slideDown(SelectorEngine.findOne(SELECTOR_NAV_GROUP_ITEMS, toggler.parentNode as ParentNode)!)
   }
 
-  _addEventListeners() {
+  _addEventListeners(): any {
     EventHandler.on(this._element, EVENT_CLICK_DATA_API, SELECTOR_NAV_GROUP_TOGGLE, event => {
       event.preventDefault()
+      // @ts-expect-error -- the call passes an argument the method ignores.
+      // Dropping it is a behaviour change, so it is flagged rather than typed away.
       this._toggleGroupItems(event, this)
     })
   }
 
   // Static
 
-  static navigationInterface(element, config) {
-    const data = Navigation.getOrCreateInstance(element, config)
+  static navigationInterface(element: string | Element | null, config?: any): void {
+    const data: any = Navigation.getOrCreateInstance(element, config)
 
     if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
+      if (typeof data[config as string] === 'undefined') {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config]()
+      data[config as string]()
     }
   }
 
-  static jQueryInterface(config) {
-    return this.each(function () {
+  static jQueryInterface(this: any, config: any): void {
+    return this.each(function (this: HTMLElement) {
       Navigation.navigationInterface(this, config)
     })
   }
