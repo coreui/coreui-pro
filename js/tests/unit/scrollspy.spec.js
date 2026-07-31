@@ -272,7 +272,6 @@ describe('ScrollSpy', () => {
 
         const contentEl = fixtureEl.querySelector('.content')
         const scrollSpy = new ScrollSpy(contentEl, {
-          offset: 0,
           target: '.navbar'
         })
 
@@ -351,7 +350,6 @@ describe('ScrollSpy', () => {
 
         const contentEl = fixtureEl.querySelector('.content')
         const scrollSpy = new ScrollSpy(contentEl, {
-          offset: 0,
           target: '.navbar'
         })
 
@@ -390,7 +388,6 @@ describe('ScrollSpy', () => {
 
         const contentEl = fixtureEl.querySelector('.content')
         const scrollSpy = new ScrollSpy(contentEl, {
-          offset: 0,
           target: '.navbar'
         })
 
@@ -429,7 +426,6 @@ describe('ScrollSpy', () => {
 
         const contentEl = fixtureEl.querySelector('.content')
         const scrollSpy = new ScrollSpy(contentEl, {
-          offset: 0,
           target: '.navbar'
         })
 
@@ -566,7 +562,6 @@ describe('ScrollSpy', () => {
 
         const contentEl = fixtureEl.querySelector('.content')
         const scrollSpy = new ScrollSpy(contentEl, {
-          offset: 0,
           target: '.navbar'
         })
 

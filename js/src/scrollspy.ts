@@ -43,7 +43,6 @@ const SELECTOR_DROPDOWN = '.dropdown'
 const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle'
 
 const Default: ScrollSpyConfig = {
-  offset: null, // TODO: v6 @deprecated, keep it for backwards compatibility reasons
   rootMargin: '0px 0px -25%',
   smoothScroll: false,
   target: null,
@@ -51,7 +50,6 @@ const Default: ScrollSpyConfig = {
 }
 
 const DefaultType = {
-  offset: '(number|null)', // TODO v6 @deprecated, keep it for backwards compatibility reasons
   rootMargin: 'string',
   smoothScroll: 'boolean',
   target: 'element',
@@ -63,7 +61,6 @@ const DefaultType = {
  */
 
 type ScrollSpyConfig = {
-  offset: number | null
   rootMargin: string
   smoothScroll: boolean
   target: string | Element | null
@@ -136,9 +133,6 @@ class ScrollSpy extends BaseComponent {
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
     // TODO: on v6 target should be given explicitly & remove the {target: 'ss-target'} case
     config.target = getElement(config.target) || document.body
-
-    // TODO: v6 Only for backwards compatibility reasons. Use rootMargin only
-    config.rootMargin = config.offset ? `${config.offset}px 0px -30%` : config.rootMargin
 
     if (typeof config.threshold === 'string') {
       config.threshold = config.threshold.split(',').map(value => Number.parseFloat(value))
