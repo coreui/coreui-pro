@@ -25,6 +25,72 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
   action is needed for CDN users; npm users installing peer dependencies
   manually should add `@floating-ui/dom`.
 
+### JavaScript
+
+v6's JavaScript is written in TypeScript. The published behaviour is unchanged —
+the sources were converted module by module against a gate that required the
+minified bundles to stay byte-identical — but the package now carries types, and
+what it ships from `js/` has changed.
+
+#### Type declarations ship with the package
+
+`@coreui/coreui-pro` now ships `.d.ts` files and points `types` at
+`js/dist/index.d.ts`, so TypeScript consumers get the full API without
+`@types` packages or hand-written module declarations:
+
+```ts
+import { Modal, MultiSelect } from '@coreui/coreui-pro'
+
+const modal = new Modal('#example', { backdrop: 'static', keyboard: false })
+const version: string = Modal.VERSION
+```
+
+Each component also exports its config type, so an options object can be typed
+and reused. Declarations are generated from the sources, not maintained by hand,
+and CI type-checks a consumer file against the **emitted** declarations, so the
+shipped types cannot drift from the code.
+
+#### The `js/src` sources ship as TypeScript
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The package used to ship `js/src/**/*.js`; it now ships `js/src/**/*.ts`. The
+documented per-plugin path is unaffected — **`js/dist/*.js` still ships,
+unchanged and UMD-ready**, and that is what the [Webpack](/getting-started/webpack/),
+[Vite](/getting-started/vite/) and [Parcel](/getting-started/parcel/)
+guides tell you to import:
+
+```js
+import Alert from '@coreui/coreui-pro/js/dist/alert'
+```
+
+Only imports that reached into the raw sources are affected:
+
+```diff
+- import Alert from '@coreui/coreui-pro/js/src/alert.js'
++ import Alert from '@coreui/coreui-pro/js/dist/alert.js'
+```
+
+If your toolchain compiles TypeScript, you can import `js/src/*.ts` directly and
+get types and tree-shaking together. The per-plugin files are typed as well —
+`js/dist/alert.js` ships next to `js/dist/alert.d.ts`.
+
+#### `js/index.esm.js` and `js/index.umd.js` are no longer published
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+These two files are the bundler's entry points, and they import the sources —
+which are now TypeScript, so the files could not resolve for a consumer anyway.
+They are no longer part of the published package. Use the built bundle instead:
+
+```diff
+- import { Tooltip } from '@coreui/coreui-pro/js/index.esm.js'
++ import { Tooltip } from '@coreui/coreui-pro/dist/js/coreui.esm.js'
+```
+
+or, if you are already resolving the package by name, `import { Tooltip } from
+'@coreui/coreui-pro'` — `module` points at the same ESM bundle.
+
 ### Components
 
 #### Calendar
