@@ -48,7 +48,9 @@ const DEFAULT_REMOVE_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" wid
 const DEFAULT_SELECTED_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M425.373 89.373 196 318.745 86.627 209.373l-45.254 45.254L196 409.255l274.627-274.628z"/></svg>'
 
 export type ChipSetConfig = {
+  ariaAddedAnnouncement: string
   ariaRemoveLabel: string
+  ariaRemovedAnnouncement: string
   chipClassName: string | ((value: string) => string) | null
   disabled: boolean
   filter: boolean
@@ -62,7 +64,9 @@ export type ChipSetConfig = {
 }
 
 const Default: ChipSetConfig = {
+  ariaAddedAnnouncement: 'added',
   ariaRemoveLabel: 'Remove',
+  ariaRemovedAnnouncement: 'removed',
   chipClassName: null,
   disabled: false,
   filter: false,
@@ -76,7 +80,9 @@ const Default: ChipSetConfig = {
 }
 
 const DefaultType: Record<string, string> = {
+  ariaAddedAnnouncement: 'string',
   ariaRemoveLabel: 'string',
+  ariaRemovedAnnouncement: 'string',
   chipClassName: '(string|function|null)',
   disabled: 'boolean',
   filter: 'boolean',
@@ -98,6 +104,7 @@ class ChipSet extends BaseComponent {
   protected declare _pendingFocus: HTMLElement | null
   protected declare _chips: string[]
   protected declare _input: HTMLElement | null
+  protected declare _liveRegion: HTMLElement | null
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -105,8 +112,11 @@ class ChipSet extends BaseComponent {
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._pendingFocus = null
     this._chips = []
+    this._liveRegion = null
 
+    this._applyAccessibilityRoles()
     this._initChips()
+    this._createLiveRegion()
     this._addEventListeners()
   }
 
@@ -157,6 +167,7 @@ class ChipSet extends BaseComponent {
     this._appendChip(element)
     this._setupChip(element)
     this._chips.push(value)
+    this._announce(`${value} ${this._config.ariaAddedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
       values: this.getValues()
@@ -263,6 +274,12 @@ class ChipSet extends BaseComponent {
 
   override dispose(): void {
     EventHandler.off(this._element, Chip.EVENT_KEY)
+
+    if (this._liveRegion) {
+      this._liveRegion.remove()
+      this._liveRegion = null
+    }
+
     super.dispose()
   }
 
@@ -322,7 +339,46 @@ class ChipSet extends BaseComponent {
     }
   }
 
+  // A selectable set is a horizontal listbox: the set element gets the
+  // listbox role and each chip becomes an option, so the chips' selection and
+  // disabled states are expressed on roles that allow them. A non-selectable
+  // set is a plain group (which also legitimizes the documented aria-label).
+  _applyAccessibilityRoles(): void {
+    if (!this._element.hasAttribute('role')) {
+      this._element.setAttribute('role', this._config.selectable ? 'listbox' : 'group')
+    }
+
+    if (this._config.selectable && this._element.getAttribute('role') === 'listbox') {
+      this._element.setAttribute('aria-orientation', 'horizontal')
+
+      if (this._config.selectionMode === 'multiple') {
+        this._element.setAttribute('aria-multiselectable', 'true')
+      }
+    }
+  }
+
+  // Announce add/remove without moving focus. The region lives NEXT TO the
+  // set element: a role=status child inside a listbox would violate the
+  // listbox's required children.
+  _createLiveRegion(): void {
+    const region = document.createElement('span')
+    region.classList.add('visually-hidden')
+    region.setAttribute('role', 'status')
+    this._element.after(region)
+    this._liveRegion = region
+  }
+
+  _announce(message: string): void {
+    if (this._liveRegion) {
+      this._liveRegion.textContent = message
+    }
+  }
+
   _setupChip(chip: HTMLElement): void {
+    if (this._element.getAttribute('role') === 'listbox' && !chip.hasAttribute('role')) {
+      chip.setAttribute('role', 'option')
+    }
+
     Chip.getOrCreateInstance(chip, this._getChipConfig(chip))
   }
 
@@ -489,6 +545,8 @@ class ChipSet extends BaseComponent {
     if (index !== -1) {
       this._chips.splice(index, 1)
     }
+
+    this._announce(`${value} ${this._config.ariaRemovedAnnouncement}`)
 
     EventHandler.trigger(this._element, this.constructor.eventName(EVENT_CHANGE), {
       values: this.getValues()

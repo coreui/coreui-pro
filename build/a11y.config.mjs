@@ -172,13 +172,43 @@ export const a11yComponents = [
       },
       {
         criterion: '4.1.3',
-        status: 'author',
-        note: 'GAP: adding/removing chips is not announced — there is no aria-live region around the chip list.'
+        status: 'built-in',
+        note: 'Adding and removing chips is announced through the inherited visually hidden role=status region next to the container. Verified here: typing a value and pressing Enter updates the region.'
+      }
+    ],
+    html: `<div class="chip-input" id="a11yChipInput" data-coreui-chip-input>
+    <label class="chip-input-label">Tags</label>
+  </div>`,
+    assertions: [
+      {
+        criterion: '4.1.3',
+        label: 'adding a chip is announced in the status region',
+        steps: [
+          { click: '#a11yChipInput input' },
+          { type: 'News' },
+          { press: 'Enter' },
+          { wait: 100 }
+        ],
+        run: 'const region = document.querySelector(\'.chip-input + [role="status"]\'); return Boolean(region && region.textContent.includes(\'added\'))'
       }
     ]
   },
   {
     component: 'components/chip-set',
+    // Audit a representative labelled, selectable, removable set — that is
+    // what exercises the component's own role/announcement wiring.
+    html: `<div class="chip-set" aria-label="Applied filters" data-coreui-chip-set data-coreui-selectable="true" data-coreui-removable="true">
+    <span class="chip">Alpha</span>
+    <span class="chip">Beta</span>
+  </div>`,
+    assertions: [
+      {
+        criterion: '4.1.3',
+        label: 'removing a chip is announced in the status region',
+        steps: [{ click: '.chip .chip-remove' }, { wait: 100 }],
+        run: 'const region = document.querySelector(\'.chip-set + [role="status"]\'); return Boolean(region && region.textContent.includes(\'removed\'))'
+      }
+    ],
     criteria: [
       {
         criterion: '2.1.1',
@@ -187,13 +217,18 @@ export const a11yComponents = [
       },
       {
         criterion: '4.1.2',
-        status: 'author',
-        note: 'GAP: chips are focusable <span>s with no role, yet selectable chips get aria-selected and disabled chips aria-disabled — both invalid on a generic element. The set should expose listbox/option (or toggle-button) semantics.'
+        status: 'built-in',
+        note: 'A selectable set is exposed as a horizontal listbox of role=option chips (aria-selected/aria-disabled valid there); a standalone selectable chip is a toggle button with aria-pressed; a non-selectable set is a role=group, which also legitimizes the documented aria-label.'
+      },
+      {
+        criterion: '1.3.1',
+        status: 'built-in',
+        note: 'The listbox contains only option children — the add/remove live region lives next to the set, not inside it.'
       },
       {
         criterion: '4.1.3',
-        status: 'author',
-        note: 'GAP: selection and removal are not announced; no live region is rendered.'
+        status: 'built-in',
+        note: 'Adding and removing chips is announced through a visually hidden role=status region (labels configurable via ariaAddedAnnouncement/ariaRemovedAnnouncement). Verified here: removing a chip updates the region.'
       }
     ]
   },

@@ -125,6 +125,12 @@ class ChipInput extends ChipSet {
   }
 
   // Private
+
+  // The container mixes a label, the text input and chips — it is neither a
+  // listbox nor a plain group, so no container role is stamped and the chips
+  // stay generic (their remove buttons carry the actions).
+  override _applyAccessibilityRoles(): void {}
+
   override _canModify(): boolean {
     return !this._disabled && !this._config.readonly
   }

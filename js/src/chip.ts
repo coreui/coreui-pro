@@ -100,6 +100,7 @@ class Chip extends BaseComponent {
     this._disabled = this._config.disabled || this._element.classList.contains(CLASS_NAME_DISABLED)
     this._selected = this._config.selected || this._element.classList.contains(CLASS_NAME_ACTIVE)
 
+    this._applyRole()
     this._ensureRemoveButton()
     this._applyState()
 
@@ -218,24 +219,52 @@ class Chip extends BaseComponent {
     })
   }
 
+  // A selectable chip needs a role its selection state is valid on: inside a
+  // selectable chip set the set stamps role="option" (listbox pattern) before
+  // initializing the chip; a standalone selectable chip is a toggle button.
+  _applyRole(): void {
+    if (this._config.selectable && !this._element.hasAttribute('role')) {
+      this._element.setAttribute('role', 'button')
+    }
+  }
+
+  // aria-selected is only valid on role="option"; a toggle button reflects its
+  // state via aria-pressed instead.
+  _selectionStateAttribute(): string {
+    return this._element.getAttribute('role') === 'option' ? 'aria-selected' : 'aria-pressed'
+  }
+
   _applyState(): void {
     if (!this._disabled && (this._config.clickable || this._config.selectable)) {
       this._element.classList.add(CLASS_NAME_CHIP_CLICKABLE)
     }
 
+    // aria-disabled is not allowed on a generic element — only stamp it when
+    // the chip carries a role; a role-less chip conveys the state through the
+    // disabled class and the removed interactivity.
+    const hasRole = this._element.hasAttribute('role')
+
     if (this._disabled) {
       this._element.classList.add(CLASS_NAME_DISABLED)
-      this._element.setAttribute('aria-disabled', 'true')
+      if (hasRole) {
+        this._element.setAttribute('aria-disabled', 'true')
+      } else {
+        this._element.removeAttribute('aria-disabled')
+      }
     } else {
       this._element.classList.remove(CLASS_NAME_DISABLED)
-      if (this._element.getAttribute('aria-disabled') === 'true') {
-        this._element.setAttribute('aria-disabled', 'false')
+      if (this._element.hasAttribute('aria-disabled')) {
+        if (hasRole) {
+          this._element.setAttribute('aria-disabled', 'false')
+        } else {
+          this._element.removeAttribute('aria-disabled')
+        }
       }
     }
 
     if (this._config.selectable) {
       this._element.classList.toggle(CLASS_NAME_ACTIVE, this._selected)
-      this._element.setAttribute('aria-selected', this._selected ? 'true' : 'false')
+      this._element.setAttribute(this._selectionStateAttribute(), this._selected ? 'true' : 'false')
 
       if (this._config.filter) {
         if (this._selected) {
@@ -246,8 +275,10 @@ class Chip extends BaseComponent {
       }
     } else {
       this._element.classList.remove(CLASS_NAME_ACTIVE)
-      if (this._element.getAttribute('aria-selected') === 'true') {
+      if (this._element.getAttribute('role') === 'option') {
         this._element.setAttribute('aria-selected', 'false')
+      } else {
+        this._element.removeAttribute('aria-selected')
       }
     }
   }

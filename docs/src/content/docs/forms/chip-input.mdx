@@ -281,7 +281,7 @@ The Bootstrap Chip Input component follows WAI-ARIA patterns to ensure the chip 
 - Associate a `<label>` with the ghost input for screen readers.
 - Chips are focusable and keyboard navigable when initialized by the plugin.
 - Remove buttons include `aria-label="Remove"` by default.
-- Selected chips are reflected via `.active` and `aria-selected`.
+- Adding and removing chips is announced through a visually hidden `role="status"` region rendered next to the container.
 - Use a descriptive `aria-label` or `<label>` on the chip input container to communicate its purpose (e.g., "Add skills" or "Recipients").
 
 ## Customizing
