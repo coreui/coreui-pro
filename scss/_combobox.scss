@@ -1,0 +1,310 @@
+@use "functions/defaults" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/tokens" as *;
+@use "config" as *;
+@use "forms/form-check" as *;
+
+// The shared options menu rendered by the internal combobox engine
+// (js/src/combobox.ts) for Autocomplete and Multi Select. The components keep
+// their own field/selection classes — everything below the field (dropdown,
+// options, groups, checkbox indicators, select-all header) is one surface.
+
+// scss-docs-start combobox-variables
+$combobox-zindex:                     1000 !default;
+
+$combobox-popup-min-width:         100% !default;
+$combobox-popup-bg:                var(--#{$prefix}body-bg) !default;
+$combobox-popup-border-color:      var(--#{$prefix}border-color) !default;
+$combobox-popup-border-width:      var(--#{$prefix}border-width) !default;
+$combobox-popup-border-radius:     var(--#{$prefix}border-radius) !default;
+$combobox-popup-box-shadow:        var(--#{$prefix}box-shadow) !default;
+
+$combobox-header-padding-y:    .375rem !default;
+$combobox-header-padding-x:    .375rem !default;
+$combobox-header-border-width: var(--#{$prefix}border-width) !default;
+$combobox-header-border-color: var(--#{$prefix}border-color) !default;
+
+$combobox-select-all-padding-y:       .5rem !default;
+$combobox-select-all-padding-x:       .75rem !default;
+$combobox-select-all-color:           var(--#{$prefix}body-secondary-color) !default;
+$combobox-select-all-bg:              transparent !default;
+$combobox-select-all-hover-color:     var(--#{$prefix}body-color) !default;
+$combobox-select-all-hover-bg:        var(--#{$prefix}tertiary-bg) !default;
+$combobox-select-all-border-width:    0 !default;
+$combobox-select-all-border-color:    transparent !default;
+$combobox-select-all-border-radius:   var(--#{$prefix}border-radius) !default;
+
+$combobox-options-gap:                .125rem !default;
+$combobox-options-padding-y:          .375rem !default;
+$combobox-options-padding-x:          .375rem !default;
+$combobox-options-font-size:          $font-size-base !default;
+$combobox-options-font-weight:        $font-weight-normal !default;
+$combobox-options-color:              var(--#{$prefix}body-color) !default;
+
+$combobox-optgroup-label-padding-y:      .5rem !default;
+$combobox-optgroup-label-padding-x:      .625rem !default;
+$combobox-optgroup-label-border-radius:  var(--#{$prefix}border-radius) !default;
+$combobox-optgroup-label-font-size:      80% !default;
+$combobox-optgroup-label-font-weight:    $font-weight-bold !default;
+$combobox-optgroup-label-color:          var(--#{$prefix}tertiary-color) !default;
+$combobox-optgroup-label-text-transform: uppercase !default;
+
+$combobox-option-padding-y:           .5rem !default;
+$combobox-option-padding-x:           1.25rem !default;
+$combobox-option-margin-y:            0 !default;
+$combobox-option-margin-x:            0 !default;
+$combobox-option-border-width:        $input-border-width !default;
+$combobox-option-border-color:        transparent !default;
+$combobox-option-border-radius:       var(--#{$prefix}border-radius) !default;
+$combobox-option-hover-color:         var(--#{$prefix}body-color) !default;
+$combobox-option-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
+$combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
+$combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
+
+$combobox-option-indicator-width:         1em !default;
+$combobox-option-indicator-bg:            var(--#{$prefix}btn-input-bg) !default;
+$combobox-option-indicator-border:        $form-check-input-border !default;
+$combobox-option-indicator-border-radius: .25em !default;
+
+$combobox-option-selected-indicator-bg:           var(--#{$prefix}control-checked-bg) !default;
+$combobox-option-selected-indicator-bg-image:     $form-check-input-checked-bg-image !default;
+$combobox-option-selected-indicator-border-color: var(--#{$prefix}control-checked-border-color) !default;
+
+$combobox-option-indeterminate-indicator-bg:           var(--#{$prefix}control-indeterminate-bg) !default;
+$combobox-option-indeterminate-indicator-bg-image:     $form-check-input-indeterminate-bg-image !default;
+$combobox-option-indeterminate-indicator-border-color: var(--#{$prefix}control-indeterminate-border-color) !default;
+// scss-docs-end combobox-variables
+
+$combobox-tokens: () !default;
+
+// scss-docs-start combobox-css-vars
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$combobox-tokens: defaults(
+  (
+    --#{$prefix}combobox-zindex: #{$combobox-zindex},
+    --#{$prefix}combobox-popup-min-width: #{$combobox-popup-min-width},
+    --#{$prefix}combobox-popup-bg: #{$combobox-popup-bg},
+    --#{$prefix}combobox-popup-border-color: #{$combobox-popup-border-color},
+    --#{$prefix}combobox-popup-border-width: #{$combobox-popup-border-width},
+    --#{$prefix}combobox-popup-border-radius: #{$combobox-popup-border-radius},
+    --#{$prefix}combobox-popup-box-shadow: #{$combobox-popup-box-shadow},
+    --#{$prefix}combobox-header-padding-y: #{$combobox-header-padding-y},
+    --#{$prefix}combobox-header-padding-x: #{$combobox-header-padding-x},
+    --#{$prefix}combobox-header-border-width: #{$combobox-header-border-width},
+    --#{$prefix}combobox-header-border-color: #{$combobox-header-border-color},
+    --#{$prefix}combobox-select-all-padding-y: #{$combobox-select-all-padding-y},
+    --#{$prefix}combobox-select-all-padding-x: #{$combobox-select-all-padding-x},
+    --#{$prefix}combobox-select-all-color: #{$combobox-select-all-color},
+    --#{$prefix}combobox-select-all-bg: #{$combobox-select-all-bg},
+    --#{$prefix}combobox-select-all-hover-color: #{$combobox-select-all-hover-color},
+    --#{$prefix}combobox-select-all-hover-bg: #{$combobox-select-all-hover-bg},
+    --#{$prefix}combobox-select-all-border-width: #{$combobox-select-all-border-width},
+    --#{$prefix}combobox-select-all-border-color: #{$combobox-select-all-border-color},
+    --#{$prefix}combobox-select-all-border-radius: #{$combobox-select-all-border-radius},
+    --#{$prefix}combobox-options-gap: #{$combobox-options-gap},
+    --#{$prefix}combobox-options-padding-y: #{$combobox-options-padding-y},
+    --#{$prefix}combobox-options-padding-x: #{$combobox-options-padding-x},
+    --#{$prefix}combobox-options-font-size: #{$combobox-options-font-size},
+    --#{$prefix}combobox-options-font-weight: #{$combobox-options-font-weight},
+    --#{$prefix}combobox-options-color: #{$combobox-options-color},
+    --#{$prefix}combobox-optgroup-label-padding-y: #{$combobox-optgroup-label-padding-y},
+    --#{$prefix}combobox-optgroup-label-padding-x: #{$combobox-optgroup-label-padding-x},
+    --#{$prefix}combobox-optgroup-label-border-radius: #{$combobox-optgroup-label-border-radius},
+    --#{$prefix}combobox-optgroup-label-font-size: #{$combobox-optgroup-label-font-size},
+    --#{$prefix}combobox-optgroup-label-font-weight: #{$combobox-optgroup-label-font-weight},
+    --#{$prefix}combobox-optgroup-label-color: #{$combobox-optgroup-label-color},
+    --#{$prefix}combobox-optgroup-label-text-transform: #{$combobox-optgroup-label-text-transform},
+    --#{$prefix}combobox-option-padding-y: #{$combobox-option-padding-y},
+    --#{$prefix}combobox-option-padding-x: #{$combobox-option-padding-x},
+    --#{$prefix}combobox-option-margin-y: #{$combobox-option-margin-y},
+    --#{$prefix}combobox-option-margin-x: #{$combobox-option-margin-x},
+    --#{$prefix}combobox-option-border-width: #{$combobox-option-border-width},
+    --#{$prefix}combobox-option-border-color: #{$combobox-option-border-color},
+    --#{$prefix}combobox-option-border-radius: #{$combobox-option-border-radius},
+    --#{$prefix}combobox-option-hover-color: #{$combobox-option-hover-color},
+    --#{$prefix}combobox-option-hover-bg: #{$combobox-option-hover-bg},
+    --#{$prefix}combobox-option-disabled-color: #{$combobox-option-disabled-color},
+    --#{$prefix}combobox-option-selected-bg: #{$combobox-option-selected-bg},
+    --#{$prefix}combobox-option-indicator-width: #{$combobox-option-indicator-width},
+    --#{$prefix}combobox-option-indicator-bg: #{$combobox-option-indicator-bg},
+    --#{$prefix}combobox-option-indicator-border: #{$combobox-option-indicator-border},
+    --#{$prefix}combobox-option-indicator-border-radius: #{$combobox-option-indicator-border-radius},
+    --#{$prefix}combobox-option-selected-indicator-bg: #{$combobox-option-selected-indicator-bg},
+    --#{$prefix}combobox-option-selected-indicator-bg-image: #{$combobox-option-selected-indicator-bg-image},
+    --#{$prefix}combobox-option-selected-indicator-border-color: #{$combobox-option-selected-indicator-border-color},
+    --#{$prefix}combobox-option-indeterminate-indicator-bg: #{$combobox-option-indeterminate-indicator-bg},
+    --#{$prefix}combobox-option-indeterminate-indicator-bg-image: #{$combobox-option-indeterminate-indicator-bg-image},
+    --#{$prefix}combobox-option-indeterminate-indicator-border-color: #{$combobox-option-indeterminate-indicator-border-color},
+  ),
+  $combobox-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end combobox-css-vars
+
+@layer components {
+  .combobox-popup {
+    @include tokens($combobox-tokens);
+
+    position: absolute;
+    z-index: var(--#{$prefix}combobox-zindex);
+    display: none; // none by default, but block on "open" of the menu
+    min-width: var(--#{$prefix}combobox-popup-min-width);
+    background-color: var(--#{$prefix}combobox-popup-bg);
+    background-clip: padding-box;
+    border: var(--#{$prefix}combobox-popup-border-width) solid var(--#{$prefix}combobox-popup-border-color);
+    @include border-radius(var(--#{$prefix}combobox-popup-border-radius));
+    @include box-shadow(var(--#{$prefix}combobox-popup-box-shadow));
+
+    .autocomplete.show &,
+    .form-multi-select.show &,
+    &.show {
+      display: block;
+    }
+  }
+
+  .combobox-header {
+    padding: var(--#{$prefix}combobox-header-padding-y) var(--#{$prefix}combobox-header-padding-x);
+    border-bottom: var(--#{$prefix}combobox-header-border-width) solid var(--#{$prefix}combobox-header-border-color);
+  }
+
+  .combobox-all {
+    display: block;
+    width: 100%;
+    padding: var(--#{$prefix}combobox-select-all-padding-y) var(--#{$prefix}combobox-select-all-padding-x);
+    color: var(--#{$prefix}combobox-select-all-color);
+    text-align: start;
+    background-color: var(--#{$prefix}combobox-select-all-bg);
+    border: var(--#{$prefix}combobox-select-all-border-width) solid var(--#{$prefix}combobox-select-all-border-color);
+    @include border-radius(var(--#{$prefix}combobox-select-all-border-radius));
+
+    &:hover {
+      color: var(--#{$prefix}combobox-select-all-hover-color);
+      background-color: var(--#{$prefix}combobox-select-all-hover-bg);
+    }
+
+    &:focus-visible {
+      z-index: 5;
+      border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+      outline: var(--#{$prefix}control-focus-ring);
+    }
+  }
+
+  .combobox-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}combobox-options-gap);
+    padding: var(--#{$prefix}combobox-options-padding-y) var(--#{$prefix}combobox-options-padding-x);
+    font-size: var(--#{$prefix}combobox-options-font-size);
+    font-weight: var(--#{$prefix}combobox-options-font-weight);
+    color: var(--#{$prefix}combobox-options-color);
+  }
+
+  .combobox-option {
+    position: relative;
+    z-index: 2;
+    padding: var(--#{$prefix}combobox-option-padding-y) var(--#{$prefix}combobox-option-padding-x);
+    margin: var(--#{$prefix}combobox-option-margin-y) var(--#{$prefix}combobox-option-margin-x);
+    cursor: pointer;
+    border: var(--#{$prefix}combobox-option-border-width) solid var(--#{$prefix}combobox-option-border-color);
+    @include border-radius(var(--#{$prefix}combobox-option-border-radius), 0);
+
+    &:hover,
+    &:focus {
+      color: var(--#{$prefix}combobox-option-hover-color);
+      text-decoration: none;
+      background-color: var(--#{$prefix}combobox-option-hover-bg);
+    }
+
+    &:focus-visible {
+      z-index: 5;
+      border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+      outline: var(--#{$prefix}control-focus-ring);
+    }
+
+    &.disabled {
+      color: var(--#{$prefix}combobox-option-disabled-color);
+      pointer-events: none;
+      background-color: transparent;
+    }
+
+    &.selected {
+      background-color: var(--#{$prefix}combobox-option-selected-bg);
+    }
+  }
+
+  .combobox-optgroup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}combobox-options-gap);
+  }
+
+  .combobox-optgroup-label {
+    padding: var(--#{$prefix}combobox-optgroup-label-padding-y) var(--#{$prefix}combobox-optgroup-label-padding-x);
+    font-size: var(--#{$prefix}combobox-optgroup-label-font-size);
+    font-weight: var(--#{$prefix}combobox-optgroup-label-font-weight);
+    color: var(--#{$prefix}combobox-optgroup-label-color);
+    text-transform: var(--#{$prefix}combobox-optgroup-label-text-transform);
+    @include border-radius(var(--#{$prefix}combobox-optgroup-label-border-radius), 0);
+
+    &.combobox-optgroup-label-with-checkbox {
+      // The group label uses a reduced font-size, so keep the indicator sized
+      // against the base options font-size to match the option checkboxes.
+      --#{$prefix}combobox-option-indicator-width: var(--#{$prefix}combobox-options-font-size);
+      cursor: pointer;
+
+      &:focus,
+      &:hover {
+        background-color: var(--#{$prefix}combobox-option-hover-bg);
+      }
+
+      &:focus-visible {
+        z-index: 5;
+        border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+        outline: var(--#{$prefix}control-focus-ring);
+      }
+    }
+  }
+
+  .combobox-all-with-checkbox,
+  .combobox-option-with-checkbox,
+  .combobox-optgroup-label-with-checkbox {
+    position: relative;
+    padding-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) + var(--#{$prefix}combobox-option-indicator-width)); // stylelint-disable-line function-disallowed-list
+
+    &::before {
+      position: absolute;
+      inset-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
+      top: 50%;
+      display: block;
+      width: var(--#{$prefix}combobox-option-indicator-width);
+      height: var(--#{$prefix}combobox-option-indicator-width);
+      pointer-events: none;
+      content: "";
+      background-color: var(--#{$prefix}combobox-option-indicator-bg);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      border: var(--#{$prefix}combobox-option-indicator-border);
+      transform: translateY(-50%);
+      @include border-radius(var(--#{$prefix}combobox-option-indicator-border-radius));
+    }
+
+    &.selected::before {
+      background-color: var(--#{$prefix}combobox-option-selected-indicator-bg);
+      background-image: var(--#{$prefix}combobox-option-selected-indicator-bg-image);
+      border-color: var(--#{$prefix}combobox-option-selected-indicator-border-color);
+    }
+
+    &.indeterminate::before {
+      background-color: var(--#{$prefix}combobox-option-indeterminate-indicator-bg);
+      background-image: var(--#{$prefix}combobox-option-indeterminate-indicator-bg-image);
+      border-color: var(--#{$prefix}combobox-option-indeterminate-indicator-border-color);
+    }
+  }
+
+  .combobox-options-empty {
+    padding: var(--#{$prefix}combobox-option-padding-y) var(--#{$prefix}combobox-option-padding-x);
+  }
+}

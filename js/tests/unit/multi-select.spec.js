@@ -359,7 +359,7 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect._selectAllElement).not.toBeNull()
-      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-all')).toBe(true)
+      expect(multiSelect._selectAllElement.classList.contains('combobox-all')).toBe(true)
     })
 
     it('should wrap select all in a dropdown header', () => {
@@ -371,7 +371,7 @@ describe('MultiSelect', () => {
         selectAll: true
       })
 
-      const header = multiSelect._selectAllElement.closest('.form-multi-select-dropdown-header')
+      const header = multiSelect._selectAllElement.closest('.combobox-header')
       expect(header).not.toBeNull()
       expect(header.parentNode).toBe(multiSelect._menu)
     })
@@ -583,8 +583,8 @@ describe('MultiSelect', () => {
         optionsStyle: 'checkbox'
       })
 
-      const optionEl = multiSelect._optionsElement.querySelector('.form-multi-select-option')
-      expect(optionEl.classList.contains('form-multi-select-option-with-checkbox')).toBe(true)
+      const optionEl = multiSelect._optionsElement.querySelector('.combobox-option')
+      expect(optionEl.classList.contains('combobox-option-with-checkbox')).toBe(true)
     })
 
     it('should handle optionsTemplate function', () => {
@@ -595,7 +595,7 @@ describe('MultiSelect', () => {
         optionsTemplate: option => `<span>${option.text}</span>`
       })
 
-      const optionEl = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const optionEl = multiSelect._optionsElement.querySelector('.combobox-option')
       expect(optionEl.querySelector('span')).not.toBeNull()
     })
 
@@ -608,7 +608,7 @@ describe('MultiSelect', () => {
         sanitize: false
       })
 
-      const optionEl = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const optionEl = multiSelect._optionsElement.querySelector('.combobox-option')
       expect(optionEl.querySelector('span')).not.toBeNull()
     })
 
@@ -623,7 +623,7 @@ describe('MultiSelect', () => {
         optionsGroupsTemplate: group => `<strong>${group.label}</strong>`
       })
 
-      const groupLabel = multiSelect._optionsElement.querySelector('.form-multi-select-optgroup-label')
+      const groupLabel = multiSelect._optionsElement.querySelector('.combobox-optgroup-label')
       expect(groupLabel.querySelector('strong')).not.toBeNull()
     })
 
@@ -639,7 +639,7 @@ describe('MultiSelect', () => {
         sanitize: false
       })
 
-      const groupLabel = multiSelect._optionsElement.querySelector('.form-multi-select-optgroup-label')
+      const groupLabel = multiSelect._optionsElement.querySelector('.combobox-optgroup-label')
       expect(groupLabel.querySelector('strong')).not.toBeNull()
     })
 
@@ -674,7 +674,7 @@ describe('MultiSelect', () => {
         container: containerEl
       })
 
-      expect(containerEl.querySelector('.form-multi-select-dropdown')).not.toBeNull()
+      expect(containerEl.querySelector('.combobox-popup')).not.toBeNull()
       expect(multiSelect._menu.parentElement).toBe(containerEl)
     })
 
@@ -1585,7 +1585,7 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect._headerElement.tagName).toBe('DIV')
-      expect(multiSelect._headerElement.closest('.form-multi-select-dropdown-header')).not.toBeNull()
+      expect(multiSelect._headerElement.closest('.combobox-header')).not.toBeNull()
     })
 
     it('should render even when selectAll is false', () => {
@@ -1840,12 +1840,12 @@ describe('MultiSelect', () => {
       multiSelect._selectAllElement.click()
 
       // all filtered (2/2) selected -> 'all' state + deselect-filtered label
-      expect(multiSelect._selectAllElement.classList.contains('form-multi-selected')).toBe(true)
+      expect(multiSelect._selectAllElement.classList.contains('selected')).toBe(true)
       expect(multiSelect._selectAllElement.textContent).toBe('Deselect filtered')
 
       // clearing the filter widens the set to all 3, only 2 selected -> indeterminate
       multiSelect.search('')
-      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-indeterminate')).toBe(true)
+      expect(multiSelect._selectAllElement.classList.contains('indeterminate')).toBe(true)
       expect(multiSelect._selectAllElement.textContent).toBe('Select all')
     })
 
@@ -1902,8 +1902,8 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: groupedOptions })
 
-      const label = multiSelect._menu.querySelector('.form-multi-select-optgroup-label')
-      expect(label.classList.contains('form-multi-select-optgroup-label-with-checkbox')).toBe(false)
+      const label = multiSelect._menu.querySelector('.combobox-optgroup-label')
+      expect(label.classList.contains('combobox-optgroup-label-with-checkbox')).toBe(false)
     })
 
     it('should add the checkbox class to group labels when enabled', () => {
@@ -1911,7 +1911,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
 
-      const label = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      const label = multiSelect._menu.querySelector('.combobox-optgroup-label-with-checkbox')
       expect(label).not.toBeNull()
     })
 
@@ -1920,7 +1920,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true, optionsGroupsStyle: 'text' })
 
-      const label = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      const label = multiSelect._menu.querySelector('.combobox-optgroup-label-with-checkbox')
       expect(label).toBeNull()
     })
 
@@ -1929,11 +1929,11 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: groupedOptions, optionsGroupsSelectable: true })
 
-      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      const groupLabel = multiSelect._menu.querySelector('.combobox-optgroup-label-with-checkbox')
 
       groupLabel.click()
       expect(multiSelect._selected.length).toBe(2)
-      expect(groupLabel.classList.contains('form-multi-selected')).toBe(true)
+      expect(groupLabel.classList.contains('selected')).toBe(true)
 
       groupLabel.click()
       expect(multiSelect._selected.length).toBe(0)
@@ -1946,9 +1946,9 @@ describe('MultiSelect', () => {
 
       multiSelect._selectOption('1', 'A1')
 
-      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
-      expect(groupLabel.classList.contains('form-multi-select-indeterminate')).toBe(true)
-      expect(groupLabel.classList.contains('form-multi-selected')).toBe(false)
+      const groupLabel = multiSelect._menu.querySelector('.combobox-optgroup-label-with-checkbox')
+      expect(groupLabel.classList.contains('indeterminate')).toBe(true)
+      expect(groupLabel.classList.contains('selected')).toBe(false)
     })
 
     it('should respect selectionLimit when toggling a group', () => {
@@ -1960,7 +1960,7 @@ describe('MultiSelect', () => {
         selectionLimit: 1
       })
 
-      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
+      const groupLabel = multiSelect._menu.querySelector('.combobox-optgroup-label-with-checkbox')
       groupLabel.click()
 
       expect(multiSelect._selected.length).toBe(1)
@@ -1973,8 +1973,8 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const groupLabel = multiSelect._menu.querySelector('.form-multi-select-optgroup-label-with-checkbox')
-      const firstOption = multiSelect._menu.querySelector('.form-multi-select-option')
+      const groupLabel = multiSelect._menu.querySelector('.combobox-optgroup-label-with-checkbox')
+      const firstOption = multiSelect._menu.querySelector('.combobox-option')
 
       // Arrow up from the first option lands on the group label above it.
       multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
@@ -1989,10 +1989,10 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const firstOption = multiSelect._menu.querySelector('.form-multi-select-option')
+      const firstOption = multiSelect._menu.querySelector('.combobox-option')
       multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
 
-      expect(document.activeElement.classList.contains('form-multi-select-optgroup-label')).toBe(false)
+      expect(document.activeElement.classList.contains('combobox-optgroup-label')).toBe(false)
     })
   })
 
@@ -2008,7 +2008,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options })
 
-      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-all-with-checkbox')).toBe(true)
+      expect(multiSelect._selectAllElement.classList.contains('combobox-all-with-checkbox')).toBe(true)
     })
 
     it('should not add the checkbox class when disabled', () => {
@@ -2016,7 +2016,7 @@ describe('MultiSelect', () => {
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options, selectAllStyle: 'text' })
 
-      expect(multiSelect._selectAllElement.classList.contains('form-multi-select-all-with-checkbox')).toBe(false)
+      expect(multiSelect._selectAllElement.classList.contains('combobox-all-with-checkbox')).toBe(false)
     })
 
     it('should reflect none / indeterminate / all states', () => {
@@ -2025,16 +2025,16 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options, selectAllStyle: 'checkbox' })
       const master = multiSelect._selectAllElement
 
-      expect(master.classList.contains('form-multi-select-all-with-checkbox')).toBe(true)
-      expect(master.classList.contains('form-multi-selected')).toBe(false)
-      expect(master.classList.contains('form-multi-select-indeterminate')).toBe(false)
+      expect(master.classList.contains('combobox-all-with-checkbox')).toBe(true)
+      expect(master.classList.contains('selected')).toBe(false)
+      expect(master.classList.contains('indeterminate')).toBe(false)
 
       multiSelect._selectOption('1', 'Apple')
-      expect(master.classList.contains('form-multi-select-indeterminate')).toBe(true)
+      expect(master.classList.contains('indeterminate')).toBe(true)
 
       multiSelect.selectAll()
-      expect(master.classList.contains('form-multi-selected')).toBe(true)
-      expect(master.classList.contains('form-multi-select-indeterminate')).toBe(false)
+      expect(master.classList.contains('selected')).toBe(true)
+      expect(master.classList.contains('indeterminate')).toBe(false)
     })
 
     it('should toggle selection on click', () => {
@@ -2102,7 +2102,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect.search('app')
 
-      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option'))
+      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions.length).toBe(1)
@@ -2121,7 +2121,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect.search('APPLE')
 
-      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option'))
+      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions.length).toBe(1)
@@ -2141,7 +2141,7 @@ describe('MultiSelect', () => {
       multiSelect.search('app')
       multiSelect.search('')
 
-      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option'))
+      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions.length).toBe(3)
@@ -2163,7 +2163,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect.search('xyz')
 
-      const emptyMessage = multiSelect._menu.querySelector('.form-multi-select-options-empty')
+      const emptyMessage = multiSelect._menu.querySelector('.combobox-options-empty')
       expect(emptyMessage).not.toBeNull()
       expect(emptyMessage.textContent).toBe('No results found')
       expect(emptyMessage.getAttribute('role')).toBe('status')
@@ -2185,12 +2185,12 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect.search('xyz')
 
-      let emptyMessage = multiSelect._menu.querySelector('.form-multi-select-options-empty')
+      let emptyMessage = multiSelect._menu.querySelector('.combobox-options-empty')
       expect(emptyMessage).not.toBeNull()
 
       multiSelect.search('app')
 
-      emptyMessage = multiSelect._menu.querySelector('.form-multi-select-options-empty')
+      emptyMessage = multiSelect._menu.querySelector('.combobox-options-empty')
       expect(emptyMessage).toBeNull()
     })
 
@@ -2262,7 +2262,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect.search('app')
 
-      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option'))
+      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions.length).toBe(1)
@@ -2292,8 +2292,8 @@ describe('MultiSelect', () => {
       multiSelect.show()
       multiSelect.search('app')
 
-      const vegetablesGroup = Array.from(multiSelect._optionsElement.querySelectorAll('.form-multi-select-optgroup'))
-        .find(g => g.querySelector('.form-multi-select-optgroup-label').textContent === 'Vegetables')
+      const vegetablesGroup = Array.from(multiSelect._optionsElement.querySelectorAll('.combobox-optgroup'))
+        .find(g => g.querySelector('.combobox-optgroup-label').textContent === 'Vegetables')
 
       expect(vegetablesGroup.style.display).toBe('none')
     })
@@ -2482,7 +2482,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
     })
 
-    it('should add form-multi-selected class on selected option', () => {
+    it('should add selected class on selected option', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -2496,11 +2496,11 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       multiSelect._onOptionsClick(option)
 
-      expect(option.classList.contains('form-multi-selected')).toBe(true)
+      expect(option.classList.contains('selected')).toBe(true)
       expect(option.getAttribute('aria-selected')).toBe('true')
     })
 
-    it('should remove form-multi-selected class on deselected option', () => {
+    it('should remove selected class on deselected option', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -2513,7 +2513,7 @@ describe('MultiSelect', () => {
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       multiSelect._onOptionsClick(option)
 
-      expect(option.classList.contains('form-multi-selected')).toBe(false)
+      expect(option.classList.contains('selected')).toBe(false)
       expect(option.getAttribute('aria-selected')).toBe('false')
     })
 
@@ -2873,7 +2873,7 @@ describe('MultiSelect', () => {
       multiSelect._togglerElement.dispatchEvent(event)
 
       // Should not throw and should handle navigation
-      expect(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option').length).toBe(2)
+      expect(multiSelect._optionsElement.querySelectorAll('.combobox-option').length).toBe(2)
     })
 
     it('should focus the first/last navigable item on Home/End keys', () => {
@@ -2890,7 +2890,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const items = multiSelect._optionsElement.querySelectorAll('.form-multi-select-option')
+      const items = multiSelect._optionsElement.querySelectorAll('.combobox-option')
 
       const endEvent = new KeyboardEvent('keydown', { key: 'End', bubbles: true })
       multiSelect._optionsElement.dispatchEvent(endEvent)
@@ -2913,7 +2913,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const firstOption = multiSelect._optionsElement.querySelector('.combobox-option')
 
       // Arrow up from the first option lands on the select all button above the list.
       multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
@@ -2933,7 +2933,7 @@ describe('MultiSelect', () => {
 
       multiSelect.show()
 
-      const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const firstOption = multiSelect._optionsElement.querySelector('.combobox-option')
       const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
       multiSelect._selectAllElement.dispatchEvent(event)
 
@@ -2957,7 +2957,7 @@ describe('MultiSelect', () => {
       // The button stays enabled with a limit, so it joins the navigation flow.
       expect(multiSelect._selectAllElement.disabled).toBe(false)
 
-      const firstOption = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const firstOption = multiSelect._optionsElement.querySelector('.combobox-option')
       multiSelect._selectMenuItem({ key: 'ArrowUp', target: firstOption })
 
       expect(document.activeElement).toBe(multiSelect._selectAllElement)
@@ -3543,7 +3543,7 @@ describe('MultiSelect', () => {
       // At the limit the toggle flips to "deselect all" and the checkbox reads as full.
       expect(multiSelect._isAllSelected()).toBe(true)
       expect(multiSelect._selectAllElement.textContent).toBe('Deselect all')
-      expect(multiSelect._selectAllElement.classList.contains('form-multi-selected')).toBe(true)
+      expect(multiSelect._selectAllElement.classList.contains('selected')).toBe(true)
 
       multiSelect._selectAllElement.click()
       expect(multiSelect._selected.length).toBe(0)
@@ -4589,7 +4589,7 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }]
       })
 
-      const optionEl = multiSelect._optionsElement.querySelector('.form-multi-select-option')
+      const optionEl = multiSelect._optionsElement.querySelector('.combobox-option')
       expect(optionEl.getAttribute('role')).toBe('option')
     })
 
@@ -4653,7 +4653,7 @@ describe('MultiSelect', () => {
       const keyupEvent = new KeyboardEvent('keyup', { bubbles: true })
       multiSelect._searchElement.dispatchEvent(keyupEvent)
 
-      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.form-multi-select-option'))
+      const visibleOptions = Array.from(multiSelect._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions.length).toBe(1)

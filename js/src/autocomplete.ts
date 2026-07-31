@@ -49,27 +49,15 @@ const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
 const CLASS_NAME_BUTTONS = 'autocomplete-buttons'
 const CLASS_NAME_CLEANER = 'autocomplete-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_DROPDOWN = 'autocomplete-dropdown'
 const CLASS_NAME_INDICATOR = 'autocomplete-indicator'
 const CLASS_NAME_INPUT = 'autocomplete-input'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'autocomplete-input-group'
-const CLASS_NAME_LABEL = 'label'
-const CLASS_NAME_OPTGROUP = 'autocomplete-optgroup'
-const CLASS_NAME_OPTGROUP_LABEL = 'autocomplete-optgroup-label'
-const CLASS_NAME_OPTION = 'autocomplete-option'
-const CLASS_NAME_OPTIONS = 'autocomplete-options'
-const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="autocomplete"]:not(.disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
 const SELECTOR_INDICATOR = '.autocomplete-indicator'
-const SELECTOR_OPTGROUP = '.autocomplete-optgroup'
-const SELECTOR_OPTION = '.autocomplete-option'
-const SELECTOR_OPTIONS = '.autocomplete-options'
-const SELECTOR_OPTIONS_EMPTY = '.autocomplete-options-empty'
-const SELECTOR_VISIBLE_ITEMS = '.autocomplete-options .autocomplete-option:not(.disabled):not(:disabled)'
 
 const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
@@ -176,16 +164,6 @@ class Autocomplete extends Combobox {
 
   static override get NAME(): string {
     return NAME
-  }
-
-  static override get selectors(): any {
-    return {
-      option: SELECTOR_OPTION,
-      optgroup: SELECTOR_OPTGROUP,
-      options: SELECTOR_OPTIONS,
-      optionsEmpty: SELECTOR_OPTIONS_EMPTY,
-      navigableItems: SELECTOR_VISIBLE_ITEMS
-    }
   }
 
   // Public
@@ -612,101 +590,37 @@ class Autocomplete extends Combobox {
     this._updateCleaner()
   }
 
-  _createOptionsContainer(): void {
-    const dropdownDiv = document.createElement('div')
-    dropdownDiv.classList.add(CLASS_NAME_DROPDOWN)
-    dropdownDiv.role = 'listbox'
-    dropdownDiv.setAttribute('aria-labelledby', this._uniqueId)
-    dropdownDiv.setAttribute('id', `${this._uniqueId}-listbox`)
+  override _decorateListbox(optionsDiv: HTMLElement): void {
+    optionsDiv.setAttribute('aria-labelledby', this._uniqueId)
+  }
 
-    const optionsDiv = document.createElement('div')
-    optionsDiv.classList.add(CLASS_NAME_OPTIONS)
-
-    if (this._config.optionsMaxHeight !== 'auto') {
-      optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
-      optionsDiv.style.overflow = 'auto'
-    }
-
-    dropdownDiv.append(optionsDiv)
-
-    const { container } = this._config
-    if (container) {
+  override _afterMenuCreated(): void {
+    if (this._config.container) {
       this._inputElement.setAttribute('aria-owns', `${this._uniqueId}-listbox`)
-      dropdownDiv.id = `${this._uniqueId}-listbox`
-      container.append(dropdownDiv)
+    }
+  }
+
+  override _decorateOption(optionDiv: HTMLElement, option: any): void {
+    if (option.disabled) {
+      optionDiv.setAttribute('aria-disabled', 'true')
+    }
+  }
+
+  override _isOptionSelectedInitially(option: any): boolean {
+    return this._selected.some((selected: any) => selected.value === option.value)
+  }
+
+  override _renderOptionContent(optionDiv: HTMLElement, option: any): void {
+    if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
+      optionDiv.innerHTML = this._highlightOption(option.label)
+    } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
+      optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
     } else {
-      this._element.append(dropdownDiv)
-    }
-
-    this._createOptions(optionsDiv, this._options)
-    this._optionsElement = optionsDiv
-    this._menu = dropdownDiv
-  }
-
-  _createOptions(parentElement: HTMLElement, options: any[]): void {
-    for (const option of options) {
-      if (Array.isArray(option.options)) {
-        const optgroup = document.createElement('div')
-        optgroup.classList.add(CLASS_NAME_OPTGROUP)
-        optgroup.setAttribute('role', 'group')
-
-        const optgrouplabel = document.createElement('div')
-        if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
-          optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option))
-        } else {
-          optgrouplabel.textContent = option.label
-        }
-
-        optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
-        optgroup.append(optgrouplabel)
-
-        this._createOptions(optgroup, option.options)
-        parentElement.append(optgroup)
-
-        continue
-      }
-
-      const optionDiv = document.createElement('div')
-      optionDiv.classList.add(CLASS_NAME_OPTION)
-      optionDiv.setAttribute('role', 'option')
-      optionDiv.setAttribute(
-        'aria-selected',
-        this._selected.some((selected: any) => selected.value === option.value) ? 'true' : 'false'
-      )
-
-      if (option.disabled) {
-        optionDiv.classList.add(CLASS_NAME_DISABLED)
-        optionDiv.setAttribute('aria-disabled', 'true')
-      }
-
-      optionDiv.dataset.value = option.value
-      optionDiv.tabIndex = 0
-      if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
-        optionDiv.innerHTML = this._highlightOption(option.label)
-      } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
-        optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
-      } else {
-        optionDiv.textContent = option.label
-      }
-
-      parentElement.append(optionDiv)
+      optionDiv.textContent = option.label
     }
   }
 
-  _onOptionsClick(element: any): void {
-    if (element.classList.contains(CLASS_NAME_LABEL)) {
-      return
-    }
-
-    if (!element.classList.contains(CLASS_NAME_OPTION)) {
-      element = element.closest(SELECTOR_OPTION)
-
-      if (!element) {
-        return
-      }
-    }
-
-    const { value } = element.dataset
+  override _onOptionActivate(value: string, element: HTMLElement): void { // eslint-disable-line @typescript-eslint/no-unused-vars
     const foundOption = this._findOptionByValue(value)
 
     if (foundOption) {
@@ -722,11 +636,7 @@ class Autocomplete extends Combobox {
       this._selected.push(option)
     }
 
-    const foundOption = SelectorEngine.findOne(`[data-value="${option.value}"]`, this._optionsElement)
-    if (foundOption) {
-      foundOption.classList.add(CLASS_NAME_SELECTED)
-      foundOption.setAttribute('aria-selected', true as any)
-    }
+    this._syncOptionElementState(option.value, true)
 
     this._triggerChangeEvent(option)
 
@@ -748,11 +658,7 @@ class Autocomplete extends Combobox {
   _deselectOption(value: any): void {
     this._selected = this._selected.filter((option: any) => option.value !== value)
 
-    const option = SelectorEngine.findOne(`[data-value="${value}"]`, this._optionsElement)
-    if (option) {
-      option.classList.remove(CLASS_NAME_SELECTED)
-      option.setAttribute('aria-selected', false as any)
-    }
+    this._syncOptionElementState(value, false)
   }
 
   _updateCleaner(): void {

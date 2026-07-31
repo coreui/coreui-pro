@@ -108,7 +108,7 @@ describe('Autocomplete', () => {
         options: [{ value: 1, label: 'One' }, { value: 2, label: 'Two' }]
       })
 
-      const optionEls = autocomplete._optionsElement.querySelectorAll('.autocomplete-option')
+      const optionEls = autocomplete._optionsElement.querySelectorAll('.combobox-option')
       expect(optionEls.length).toBe(2)
       for (const optionEl of optionEls) {
         expect(optionEl.getAttribute('role')).toBe('option')
@@ -145,7 +145,7 @@ describe('Autocomplete', () => {
 
       expect(autocomplete._options).toEqual(options)
       expect(autocomplete._optionsElement).toBeTruthy()
-      expect(autocomplete._optionsElement.classList.contains('autocomplete-options')).toBe(true)
+      expect(autocomplete._optionsElement.classList.contains('combobox-options')).toBe(true)
     })
 
     it('should create disabled autocomplete', () => {
@@ -507,7 +507,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'nonexistent'
       autocomplete._filterOptionsList()
 
-      const placeholder = autocomplete._menu.querySelector('.autocomplete-options-empty')
+      const placeholder = autocomplete._menu.querySelector('.combobox-options-empty')
       expect(placeholder.getAttribute('role')).toBe('status')
     })
 
@@ -523,7 +523,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'nonexistent'
       autocomplete._filterOptionsList()
 
-      const placeholder = autocomplete._menu.querySelector('.autocomplete-options-empty')
+      const placeholder = autocomplete._menu.querySelector('.combobox-options-empty')
       expect(placeholder.querySelector('img')).toBeNull()
       expect(placeholder.textContent).toBe('<img src=x onerror="window.xss = true">')
     })
@@ -794,7 +794,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const optionElements = autocomplete._optionsElement.querySelectorAll('.autocomplete-option')
+      const optionElements = autocomplete._optionsElement.querySelectorAll('.combobox-option')
       expect(optionElements.length).toBe(3)
       expect(optionElements[0].textContent).toBe('A')
       expect(optionElements[1].textContent).toBe('B')
@@ -1079,7 +1079,7 @@ describe('Autocomplete', () => {
         })
 
         autocompleteEl.addEventListener('shown.coreui.autocomplete', () => {
-          const options = autocomplete._optionsElement.querySelectorAll('.autocomplete-option')
+          const options = autocomplete._optionsElement.querySelectorAll('.combobox-option')
 
           const endEvent = createEvent('keydown')
           endEvent.key = 'End'
@@ -1443,7 +1443,7 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+        const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
         const keydownEvent = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
         optionEl.dispatchEvent(keydownEvent)
       })
@@ -1703,7 +1703,7 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+        const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
         const clickEvent = new Event('click', { bubbles: true })
         optionEl.dispatchEvent(clickEvent)
       })
@@ -1742,7 +1742,7 @@ describe('Autocomplete', () => {
           resolve()
         })
 
-        const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+        const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
         const childEl = document.createElement('span')
         childEl.textContent = 'inner text'
         optionEl.append(childEl)
@@ -1828,7 +1828,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions).toHaveSize(1)
@@ -1850,7 +1850,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'xyz'
       autocomplete._filterOptionsList()
 
-      const emptyMessage = autocomplete._menu.querySelector('.autocomplete-options-empty')
+      const emptyMessage = autocomplete._menu.querySelector('.combobox-options-empty')
       expect(emptyMessage).toBeTruthy()
       expect(emptyMessage.innerHTML).toBe('No results found')
     })
@@ -1888,12 +1888,12 @@ describe('Autocomplete', () => {
       // First filter to show no results
       autocomplete._search = 'xyz'
       autocomplete._filterOptionsList()
-      expect(autocomplete._menu.querySelector('.autocomplete-options-empty')).toBeTruthy()
+      expect(autocomplete._menu.querySelector('.combobox-options-empty')).toBeTruthy()
 
       // Then filter to show results
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
-      expect(autocomplete._menu.querySelector('.autocomplete-options-empty')).toBeNull()
+      expect(autocomplete._menu.querySelector('.combobox-options-empty')).toBeNull()
     })
 
     it('should not duplicate no results message when filtering multiple times', () => {
@@ -1912,7 +1912,7 @@ describe('Autocomplete', () => {
       autocomplete._filterOptionsList()
       autocomplete._filterOptionsList()
 
-      const emptyMessages = autocomplete._menu.querySelectorAll('.autocomplete-options-empty')
+      const emptyMessages = autocomplete._menu.querySelectorAll('.combobox-options-empty')
       expect(emptyMessages.length).toBe(1)
     })
 
@@ -1931,7 +1931,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
         .find(option => option.style.display !== 'none')
 
       expect(visibleOption.innerHTML).toContain('<strong>')
@@ -1953,7 +1953,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
         .find(option => option.style.display !== 'none')
 
       // Should not highlight since optionsTemplate is set
@@ -1985,7 +1985,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'carr'
       autocomplete._filterOptionsList()
 
-      const optgroups = autocomplete._menu.querySelectorAll('.autocomplete-optgroup')
+      const optgroups = autocomplete._menu.querySelectorAll('.combobox-optgroup')
       // Fruits group should be hidden, Vegetables should be visible
       expect(optgroups[0].style.display).toBe('none')
       expect(optgroups[1].style.display).not.toBe('none')
@@ -2010,7 +2010,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const optgroup = autocomplete._menu.querySelector('.autocomplete-optgroup')
+      const optgroup = autocomplete._menu.querySelector('.combobox-optgroup')
       expect(optgroup.style.display).not.toBe('none')
     })
   })
@@ -2331,7 +2331,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'vue'
       autocomplete._filterOptionsList()
 
-      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+      const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
         .find(option => option.style.display !== 'none')
       expect(visibleOption.textContent).toBe('Vue.js')
 
@@ -2358,7 +2358,7 @@ describe('Autocomplete', () => {
         autocomplete._search = 'vue'
         autocomplete._filterOptionsList()
 
-        const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+        const visibleOption = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
           .find(option => option.style.display !== 'none')
 
         autocompleteEl.addEventListener('changed.coreui.autocomplete', event => {
@@ -2611,7 +2611,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
       expect(optionEl.innerHTML).toContain('<span class="custom">Option 1</span>')
     })
 
@@ -2623,7 +2623,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
       expect(optionEl.innerHTML).not.toContain('<script>')
     })
 
@@ -2636,7 +2636,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
       expect(optionEl.innerHTML).toContain('onerror')
     })
 
@@ -2655,7 +2655,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.autocomplete-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
       expect(groupLabel.innerHTML).toContain('<strong class="group-title">Fruits</strong>')
     })
 
@@ -2674,7 +2674,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.autocomplete-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
       expect(groupLabel.innerHTML).not.toContain('<script>')
     })
 
@@ -2694,7 +2694,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.autocomplete-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
       expect(groupLabel.innerHTML).toContain('onerror')
     })
 
@@ -2712,7 +2712,7 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const groupLabel = autocomplete._optionsElement.querySelector('.autocomplete-optgroup-label')
+      const groupLabel = autocomplete._optionsElement.querySelector('.combobox-optgroup-label')
       expect(groupLabel.textContent).toBe('Fruits')
     })
 
@@ -2729,7 +2729,7 @@ describe('Autocomplete', () => {
       autocomplete._optionsElement.innerHTML = ''
       autocomplete._createOptions(autocomplete._optionsElement, autocomplete._options)
 
-      const optionEl = autocomplete._optionsElement.querySelector('.autocomplete-option')
+      const optionEl = autocomplete._optionsElement.querySelector('.combobox-option')
       expect(optionEl.innerHTML).toContain('<strong>')
     })
   })
@@ -2756,13 +2756,13 @@ describe('Autocomplete', () => {
         ]
       })
 
-      const optgroups = autocomplete._optionsElement.querySelectorAll('.autocomplete-optgroup')
+      const optgroups = autocomplete._optionsElement.querySelectorAll('.combobox-optgroup')
       expect(optgroups.length).toBe(2)
 
-      const firstGroupLabel = optgroups[0].querySelector('.autocomplete-optgroup-label')
+      const firstGroupLabel = optgroups[0].querySelector('.combobox-optgroup-label')
       expect(firstGroupLabel.textContent).toBe('Fruits')
 
-      const firstGroupOptions = optgroups[0].querySelectorAll('.autocomplete-option')
+      const firstGroupOptions = optgroups[0].querySelectorAll('.combobox-option')
       expect(firstGroupOptions.length).toBe(2)
     })
 
@@ -2812,7 +2812,7 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      expect(containerEl.querySelector('.autocomplete-dropdown')).toBeTruthy()
+      expect(containerEl.querySelector('.combobox-popup')).toBeTruthy()
       expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeTruthy()
     })
 
@@ -3200,7 +3200,7 @@ describe('Autocomplete', () => {
       autocomplete._search = 'app'
       autocomplete._filterOptionsList()
 
-      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.autocomplete-option'))
+      const visibleOptions = Array.from(autocomplete._optionsElement.querySelectorAll('.combobox-option'))
         .filter(option => option.style.display !== 'none')
 
       expect(visibleOptions).toHaveSize(1)

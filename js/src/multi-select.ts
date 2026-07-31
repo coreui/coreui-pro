@@ -41,10 +41,8 @@ const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button
 
 const SELECTOR_CHIP = '.chip'
 const SELECTOR_CLEANER = '.form-multi-select-cleaner'
-const SELECTOR_OPTGROUP = '.form-multi-select-optgroup'
-const SELECTOR_OPTION = '.form-multi-select-option'
-const SELECTOR_OPTIONS = '.form-multi-select-options'
-const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
+const SELECTOR_OPTGROUP = '.combobox-optgroup'
+const SELECTOR_OPTION = '.combobox-option'
 const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 // The class-based selector stays alongside the data attribute: pages relying
@@ -53,8 +51,8 @@ const SELECTOR_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_TAG = '.form-multi-select-tag'
 const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
-const SELECTOR_VISIBLE_ITEMS = '.form-multi-select-options .form-multi-select-option:not(.disabled):not(:disabled)'
-const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .form-multi-select-options .form-multi-select-optgroup-label-with-checkbox`
+const SELECTOR_VISIBLE_ITEMS = '.combobox-options .combobox-option:not(.disabled):not(:disabled)'
+const SELECTOR_NAVIGABLE_ITEMS = `.combobox-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .combobox-options .combobox-optgroup-label-with-checkbox`
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
@@ -72,22 +70,16 @@ const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_DROPDOWN_HEADER = 'form-multi-select-dropdown-header'
+const CLASS_NAME_HEADER = 'combobox-header'
 const CLASS_NAME_INPUT_GROUP = 'form-multi-select-input-group'
-const CLASS_NAME_LABEL = 'label'
 const CLASS_NAME_SELECT = 'form-multi-select'
-const CLASS_NAME_SELECT_DROPDOWN = 'form-multi-select-dropdown'
-const CLASS_NAME_SELECT_ALL = 'form-multi-select-all'
-const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'form-multi-select-all-with-checkbox'
-const CLASS_NAME_OPTGROUP = 'form-multi-select-optgroup'
-const CLASS_NAME_OPTGROUP_LABEL = 'form-multi-select-optgroup-label'
-const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'form-multi-select-optgroup-label-with-checkbox'
-const CLASS_NAME_OPTION = 'form-multi-select-option'
-const CLASS_NAME_OPTION_WITH_CHECKBOX = 'form-multi-select-option-with-checkbox'
-const CLASS_NAME_OPTIONS = 'form-multi-select-options'
+const CLASS_NAME_SELECT_ALL = 'combobox-all'
+const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'combobox-all-with-checkbox'
+const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'combobox-optgroup-label-with-checkbox'
+const CLASS_NAME_OPTION_WITH_CHECKBOX = 'combobox-option-with-checkbox'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
-const CLASS_NAME_SELECTED = 'form-multi-selected'
-const CLASS_NAME_INDETERMINATE = 'form-multi-select-indeterminate'
+const CLASS_NAME_SELECTED = 'selected'
+const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
@@ -245,14 +237,8 @@ class MultiSelect extends Combobox {
     return NAME
   }
 
-  static override get selectors(): any {
-    return {
-      option: SELECTOR_OPTION,
-      optgroup: SELECTOR_OPTGROUP,
-      options: SELECTOR_OPTIONS,
-      optionsEmpty: SELECTOR_OPTIONS_EMPTY,
-      navigableItems: SELECTOR_NAVIGABLE_ITEMS
-    }
+  static override get navigableItemsSelector(): string {
+    return SELECTOR_NAVIGABLE_ITEMS
   }
 
   static override get activationKeys(): string[] {
@@ -836,129 +822,80 @@ class MultiSelect extends Combobox {
     this._selectionElement.append(input)
   }
 
-  _createOptionsContainer(): void {
-    const dropdownDiv = document.createElement('div')
-    dropdownDiv.classList.add(CLASS_NAME_SELECT_DROPDOWN)
-
+  override _buildMenuHeader(popupDiv: HTMLElement): void {
     const hasHeaderTemplate = typeof this._config.headerTemplate === 'function'
     const showSelectAll = this._config.selectAll && this._config.multiple
 
-    if (hasHeaderTemplate || showSelectAll) {
-      const header = document.createElement('div')
-      header.classList.add(CLASS_NAME_DROPDOWN_HEADER)
-      this._dropdownHeaderElement = header
-
-      if (hasHeaderTemplate) {
-        const headerContent = document.createElement('div')
-
-        // Keep interactions with custom controls from closing the dropdown,
-        // mirroring the built-in button's stopPropagation behavior.
-        EventHandler.on(headerContent, EVENT_CLICK, (event: any) => {
-          event.stopPropagation()
-        })
-
-        this._headerElement = headerContent
-        header.append(headerContent)
-      } else {
-        const selectAllButton = document.createElement('button')
-        selectAllButton.type = 'button'
-        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
-
-        if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
-          selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX)
-        }
-
-        this._selectAllElement = selectAllButton
-        header.append(selectAllButton)
-      }
-
-      dropdownDiv.append(header)
+    if (!hasHeaderTemplate && !showSelectAll) {
+      return
     }
 
-    const optionsDiv = document.createElement('div')
-    optionsDiv.classList.add(CLASS_NAME_OPTIONS)
-    optionsDiv.setAttribute('role', 'listbox')
-    optionsDiv.setAttribute('id', `${this._uniqueId}-listbox`)
+    const header = document.createElement('div')
+    header.classList.add(CLASS_NAME_HEADER)
+    this._dropdownHeaderElement = header
 
+    if (hasHeaderTemplate) {
+      const headerContent = document.createElement('div')
+
+      // Keep interactions with custom controls from closing the dropdown,
+      // mirroring the built-in button's stopPropagation behavior.
+      EventHandler.on(headerContent, EVENT_CLICK, (event: any) => {
+        event.stopPropagation()
+      })
+
+      this._headerElement = headerContent
+      header.append(headerContent)
+    } else {
+      const selectAllButton = document.createElement('button')
+      selectAllButton.type = 'button'
+      selectAllButton.classList.add(CLASS_NAME_SELECT_ALL)
+
+      if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
+        selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX)
+      }
+
+      this._selectAllElement = selectAllButton
+      header.append(selectAllButton)
+    }
+
+    popupDiv.append(header)
+  }
+
+  override _decorateListbox(optionsDiv: HTMLElement): void {
     if (this._config.multiple) {
       optionsDiv.setAttribute('aria-multiselectable', 'true')
     }
+  }
 
-    if (this._config.optionsMaxHeight !== 'auto') {
-      optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
-      optionsDiv.style.overflow = 'auto'
-    }
-
-    dropdownDiv.append(optionsDiv)
-
-    const { container } = this._config
-    if (container) {
-      container.append(dropdownDiv)
-    } else {
-      this._wrapperElement.append(dropdownDiv)
-    }
-
-    this._createOptions(optionsDiv, this._options)
-    this._optionsElement = optionsDiv
-    this._menu = dropdownDiv
+  override _afterMenuCreated(): void {
     this._updateHeader()
     this._updateGroupsState()
     this._updateMasterCheckbox()
   }
 
-  _createOptions(parentElement: HTMLElement, options: any[]): void {
-    for (const option of options) {
-      if (!this._isOptionGroup(option)) {
-        const optionDiv = document.createElement('div')
-        optionDiv.classList.add(CLASS_NAME_OPTION)
+  override _decorateOption(optionDiv: HTMLElement, _option: any): void {
+    if (this._config.optionsStyle === 'checkbox') {
+      optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX)
+    }
+  }
 
-        if (option.disabled) {
-          optionDiv.classList.add(CLASS_NAME_DISABLED)
-        }
+  override _isOptionSelectedInitially(option: any): boolean {
+    return option.selected === true
+  }
 
-        if (this._config.optionsStyle === 'checkbox') {
-          optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX)
-        }
+  override _renderOptionContent(optionDiv: HTMLElement, option: any): void {
+    if (typeof this._config.optionsTemplate === 'function') {
+      optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
+    } else {
+      optionDiv.textContent = option.text
+    }
+  }
 
-        optionDiv.dataset.value = String(option.value)
-        optionDiv.tabIndex = 0
-        optionDiv.setAttribute('role', 'option')
-        optionDiv.setAttribute('aria-selected', option.selected === true ? 'true' : 'false')
-
-        if (typeof this._config.optionsTemplate === 'function') {
-          optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
-        } else {
-          optionDiv.textContent = option.text
-        }
-
-        parentElement.append(optionDiv)
-      }
-
-      if (this._isOptionGroup(option)) {
-        const optgroup = document.createElement('div')
-        optgroup.classList.add(CLASS_NAME_OPTGROUP)
-
-        const optgrouplabel = document.createElement('div')
-
-        if (typeof this._config.optionsGroupsTemplate === 'function') {
-          optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option))
-        } else {
-          optgrouplabel.textContent = option.label
-        }
-
-        optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
-
-        if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
-          optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
-          optgrouplabel.tabIndex = 0
-          optgrouplabel.setAttribute('role', 'button')
-        }
-
-        optgroup.append(optgrouplabel)
-
-        this._createOptions(optgroup, option.options)
-        parentElement.append(optgroup)
-      }
+  override _decorateOptgroupLabel(label: HTMLElement, _option: any): void {
+    if (this._config.optionsGroupsSelectable && this._config.optionsGroupsStyle === 'checkbox' && this._config.multiple) {
+      label.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
+      label.tabIndex = 0
+      label.setAttribute('role', 'button')
     }
   }
 
@@ -1062,28 +999,21 @@ class MultiSelect extends Combobox {
     }
   }
 
-  _onOptionsClick(element: any): void {
-    if (this._config.optionsGroupsSelectable) {
-      const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
-      if (groupLabel) {
-        this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
-        return
-      }
+  override _interceptOptionsClick(element: any): boolean {
+    if (!this._config.optionsGroupsSelectable) {
+      return false
     }
 
-    if (element.classList.contains(CLASS_NAME_LABEL)) {
-      return
+    const groupLabel = element.closest(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`)
+    if (groupLabel) {
+      this._toggleGroup(groupLabel.closest(SELECTOR_OPTGROUP))
+      return true
     }
 
-    if (!element.classList.contains(CLASS_NAME_OPTION)) {
-      element = element.closest(SELECTOR_OPTION)
+    return false
+  }
 
-      if (!element) {
-        return
-      }
-    }
-
-    const value = String(element.dataset.value)
+  override _onOptionActivate(value: string, element: HTMLElement): void {
     const { text } = this._findOptionByValue(value)
 
     if (this._config.multiple && element.classList.contains(CLASS_NAME_SELECTED)) {
@@ -1188,11 +1118,7 @@ class MultiSelect extends Combobox {
       nativeOption.selected = true
     }
 
-    const option = this._getOptionElement(value)
-    if (option) {
-      option.classList.add(CLASS_NAME_SELECTED)
-      option.setAttribute('aria-selected', 'true')
-    }
+    this._syncOptionElementState(value, true)
 
     EventHandler.trigger(this._element, EVENT_CHANGED, {
       value: this._selected
@@ -1214,11 +1140,7 @@ class MultiSelect extends Combobox {
       nativeOption.selected = false
     }
 
-    const option = this._getOptionElement(value)
-    if (option) {
-      option.classList.remove(CLASS_NAME_SELECTED)
-      option.setAttribute('aria-selected', 'false')
-    }
+    this._syncOptionElementState(value, false)
 
     EventHandler.trigger(this._element, EVENT_CHANGED, {
       value: this._selected
@@ -1506,7 +1428,7 @@ class MultiSelect extends Combobox {
       return
     }
 
-    for (const optgroup of SelectorEngine.find(`.${CLASS_NAME_OPTGROUP}`, this._menu)) {
+    for (const optgroup of SelectorEngine.find(SELECTOR_OPTGROUP, this._menu)) {
       const label = SelectorEngine.findOne(`.${CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX}`, optgroup)
       if (!label) {
         continue

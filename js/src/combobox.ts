@@ -33,14 +33,21 @@ const ENTER_KEY = 'Enter'
 const HOME_KEY = 'Home'
 
 const CLASS_NAME_SHOW = 'show'
+const CLASS_NAME_POPUP = 'combobox-popup'
+const CLASS_NAME_OPTIONS = 'combobox-options'
+const CLASS_NAME_OPTIONS_EMPTY = 'combobox-options-empty'
+const CLASS_NAME_OPTION = 'combobox-option'
+const CLASS_NAME_OPTGROUP = 'combobox-optgroup'
+const CLASS_NAME_OPTGROUP_LABEL = 'combobox-optgroup-label'
+const CLASS_NAME_DISABLED = 'disabled'
+const CLASS_NAME_SELECTED = 'selected'
+const CLASS_NAME_LABEL = 'label'
 
-type ComboboxSelectors = {
-  option: string
-  optgroup: string
-  options: string
-  optionsEmpty: string
-  navigableItems: string
-}
+const SELECTOR_OPTION = '.combobox-option'
+const SELECTOR_OPTGROUP = '.combobox-optgroup'
+const SELECTOR_OPTIONS = '.combobox-options'
+const SELECTOR_OPTIONS_EMPTY = '.combobox-options-empty'
+const SELECTOR_VISIBLE_ITEMS = '.combobox-options .combobox-option:not(.disabled):not(:disabled)'
 
 class Combobox extends BaseComponent {
   declare ['constructor']: typeof Combobox
@@ -56,19 +63,15 @@ class Combobox extends BaseComponent {
 
   // Statics — the subclass seam
 
-  static get selectors(): ComboboxSelectors {
-    throw new Error('Combobox subclasses must define the static "selectors" getter.')
+  // Focus targets for listbox keyboard navigation; MultiSelect widens this to
+  // include the select-all button and selectable group labels.
+  static get navigableItemsSelector(): string {
+    return SELECTOR_VISIBLE_ITEMS
   }
 
   // Keys that activate the focused option in the options list.
   static get activationKeys(): string[] {
     return [ENTER_KEY]
-  }
-
-  // Shorthand resolving the static through the live constructor
-
-  get _selectors(): ComboboxSelectors {
-    return this.constructor.selectors
   }
 
   // Show / hide lifecycle — one event contract for every combobox surface.
@@ -181,8 +184,140 @@ class Combobox extends BaseComponent {
     })
   }
 
+  // Options menu — one render path for every combobox surface
+
+  _createOptionsContainer(): void {
+    const popupDiv = document.createElement('div')
+    popupDiv.classList.add(CLASS_NAME_POPUP)
+
+    this._buildMenuHeader(popupDiv)
+
+    const optionsDiv = document.createElement('div')
+    optionsDiv.classList.add(CLASS_NAME_OPTIONS)
+    optionsDiv.setAttribute('role', 'listbox')
+    optionsDiv.setAttribute('id', `${this._uniqueId}-listbox`)
+
+    this._decorateListbox(optionsDiv)
+
+    if (this._config.optionsMaxHeight !== 'auto') {
+      optionsDiv.style.maxHeight = `${this._config.optionsMaxHeight}px`
+      optionsDiv.style.overflow = 'auto'
+    }
+
+    popupDiv.append(optionsDiv)
+
+    const { container } = this._config
+    if (container) {
+      container.append(popupDiv)
+    } else {
+      this._getShowTarget().append(popupDiv)
+    }
+
+    this._createOptions(optionsDiv, this._options)
+    this._optionsElement = optionsDiv
+    this._menu = popupDiv
+    this._afterMenuCreated()
+  }
+
+  // Hooks: dropdown header (MultiSelect select-all / header template),
+  // listbox decoration (aria-multiselectable, labelling) and post-create work.
+  _buildMenuHeader(popupDiv: HTMLElement): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  _decorateListbox(optionsDiv: HTMLElement): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  _afterMenuCreated(): void {}
+
+  _createOptions(parentElement: HTMLElement, options: any[]): void {
+    for (const option of options) {
+      if (Array.isArray(option.options)) {
+        const optgroup = document.createElement('div')
+        optgroup.classList.add(CLASS_NAME_OPTGROUP)
+
+        const optgrouplabel = document.createElement('div')
+        if (typeof this._config.optionsGroupsTemplate === 'function') {
+          optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option))
+        } else {
+          optgrouplabel.textContent = option.label
+        }
+
+        optgrouplabel.classList.add(CLASS_NAME_OPTGROUP_LABEL)
+        this._decorateOptgroupLabel(optgrouplabel, option)
+        optgroup.append(optgrouplabel)
+
+        this._createOptions(optgroup, option.options)
+        parentElement.append(optgroup)
+
+        continue
+      }
+
+      const optionDiv = document.createElement('div')
+      optionDiv.classList.add(CLASS_NAME_OPTION)
+      optionDiv.setAttribute('role', 'option')
+      optionDiv.setAttribute('aria-selected', this._isOptionSelectedInitially(option) ? 'true' : 'false')
+
+      if (option.disabled) {
+        optionDiv.classList.add(CLASS_NAME_DISABLED)
+      }
+
+      optionDiv.dataset.value = String(option.value)
+      optionDiv.tabIndex = 0
+
+      this._decorateOption(optionDiv, option)
+      this._renderOptionContent(optionDiv, option)
+
+      parentElement.append(optionDiv)
+    }
+  }
+
+  // Hooks: per-surface option decoration and content rendering.
+  _decorateOption(optionDiv: HTMLElement, option: any): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  _decorateOptgroupLabel(label: HTMLElement, option: any): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  _renderOptionContent(optionDiv: HTMLElement, option: any): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  _isOptionSelectedInitially(option: any): boolean { // eslint-disable-line @typescript-eslint/no-unused-vars
+    return false
+  }
+
+  // Click resolution shared by every surface; activation is per surface.
+  _onOptionsClick(element: any): void {
+    if (this._interceptOptionsClick(element)) {
+      return
+    }
+
+    if (element.classList.contains(CLASS_NAME_LABEL)) {
+      return
+    }
+
+    if (!element.classList.contains(CLASS_NAME_OPTION)) {
+      element = element.closest(SELECTOR_OPTION)
+
+      if (!element) {
+        return
+      }
+    }
+
+    this._onOptionActivate(String(element.dataset.value), element)
+  }
+
+  // Hook: consume the click before option resolution (e.g. group toggles).
+  _interceptOptionsClick(element: any): boolean { // eslint-disable-line @typescript-eslint/no-unused-vars
+    return false
+  }
+
   // Subclasses implement option activation.
-  _onOptionsClick(element: any): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+  _onOptionActivate(value: string, element: HTMLElement): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  // Reflect the selection state on a rendered option element.
+  _syncOptionElementState(value: any, selected: boolean): void {
+    const option = SelectorEngine.findOne(`[data-value="${CSS.escape(String(value))}"]`, this._optionsElement)
+
+    if (option) {
+      option.classList.toggle(CLASS_NAME_SELECTED, selected)
+      option.setAttribute('aria-selected', selected ? 'true' : 'false')
+    }
+  }
 
   // Option model
 
@@ -238,8 +373,7 @@ class Combobox extends BaseComponent {
   // Filtering
 
   _filterOptionsList(): void {
-    const { option: optionSelector, optgroup: optgroupSelector } = this._selectors
-    const options = SelectorEngine.find(optionSelector, this._menu)
+    const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
     let visibleOptions = 0
 
     for (const option of options) {
@@ -253,10 +387,10 @@ class Combobox extends BaseComponent {
         visibleOptions++
       }
 
-      const optgroup = option.closest(optgroupSelector) as HTMLElement
+      const optgroup = option.closest(SELECTOR_OPTGROUP) as HTMLElement
       if (optgroup) {
         // eslint-disable-next-line unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, optionSelector).filter((element: Element) => this._isOptionDisplayed(element)).length > 0) {
+        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter((element: Element) => this._isOptionDisplayed(element)).length > 0) {
           optgroup.style.removeProperty('display')
         } else {
           optgroup.style.display = 'none'
@@ -277,8 +411,7 @@ class Combobox extends BaseComponent {
   }
 
   _syncNoResultsPlaceholder(visibleOptions: number): void {
-    const { options: optionsSelector, optionsEmpty: optionsEmptySelector } = this._selectors
-    const emptyMessage = SelectorEngine.findOne(optionsEmptySelector, this._menu)
+    const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)
 
     if (visibleOptions > 0) {
       if (emptyMessage) {
@@ -290,11 +423,11 @@ class Combobox extends BaseComponent {
 
     if (!emptyMessage) {
       const placeholder = document.createElement('div')
-      placeholder.classList.add(optionsEmptySelector.slice(1))
+      placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
       placeholder.setAttribute('role', 'status')
       placeholder.textContent = this._config.searchNoResultsLabel
 
-      SelectorEngine.findOne(optionsSelector, this._menu)!.append(placeholder)
+      SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu)!.append(placeholder)
     }
   }
 
@@ -308,7 +441,7 @@ class Combobox extends BaseComponent {
   // Listbox keyboard navigation
 
   _selectMenuItem({ key, target }: any): void {
-    const items = SelectorEngine.find(this._selectors.navigableItems, this._menu).filter(element => isVisible(element))
+    const items = SelectorEngine.find(this.constructor.navigableItemsSelector, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
       return
@@ -320,7 +453,7 @@ class Combobox extends BaseComponent {
   }
 
   _selectFirstOrLastMenuItem(first: boolean): void {
-    const items = SelectorEngine.find(this._selectors.navigableItems, this._menu).filter(element => isVisible(element))
+    const items = SelectorEngine.find(this.constructor.navigableItemsSelector, this._menu).filter(element => isVisible(element))
 
     if (!items.length) {
       return
