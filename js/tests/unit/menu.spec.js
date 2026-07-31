@@ -4609,6 +4609,5 @@ describe('Menu', () => {
         menuEl.dispatchEvent(keydown)
       })
     })
-
   })
 })
