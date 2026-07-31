@@ -1,0 +1,51 @@
+name: A11y
+
+on:
+  push:
+    branches:
+      - main
+      - v6-dev
+  pull_request:
+    branches:
+      - main
+      - v6-dev
+  workflow_dispatch:
+
+env:
+  FORCE_COLOR: 2
+  NODE: 22
+
+permissions:
+  contents: read
+
+jobs:
+  a11y:
+    name: WCAG conformance
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: ${{ env.NODE }}
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build CSS
+        run: npm run css-compile
+
+      - name: Build JS bundle
+        run: npm run js-compile-bundle
+
+      - name: Run WCAG conformance checks
+        run: npm run js-test-a11y
