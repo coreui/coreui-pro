@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - v6-dev
   pull_request:
     branches:
       - main
+      - v6-dev
   workflow_dispatch:
 
 env:
