@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    // Deviation from upstream, forced by a precondition they do not share.
+    // They use `nodenext`, which requires `"type": "module"` in package.json —
+    // fine for them because v6 dropped UMD. We still ship a UMD
+    // `dist/js/coreui.js` as `main`, so flagging the package ESM would break
+    // `require()` for CommonJS consumers. That is a product decision about
+    // dropping UMD, not a TypeScript one.
+    //
+    // `bundler` gives the same discipline (verbatimModuleSyntax,
+    // erasableSyntaxOnly) and still accepts the `.js` specifiers our sources
+    // already carry, which rollup maps back to `.ts` — see
+    // build/rollup-plugin-ts-resolve.cjs. Switch to `nodenext` if and when the
+    // package goes ESM-only.
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    // Babel compiles each file in isolation (type stripping only), so the
+    // syntax has to be erasable and type imports/exports must be explicit.
+    // `verbatimModuleSyntax` already implies `isolatedModules`.
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
+    // Every export needs an explicit type, so declarations can be emitted per
+    // file without whole-program inference — and so the public API is written
+    // down rather than inferred.
+    // `declaration` is required for isolatedDeclarations to be checkable; with
+    // `noEmit` nothing is written — the real .d.ts come from
+    // build/tsconfig.dts.json.
+    "declaration": true,
+    "isolatedDeclarations": true,
+    "useDefineForClassFields": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["js/src/**/*.ts"]
+}

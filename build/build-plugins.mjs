@@ -17,19 +17,20 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const sourcePath = path.resolve(__dirname, '../js/src/').replace(/\\/g, '/')
-const jsFiles = await globby(`${sourcePath}/**/*.js`)
+const jsFiles = await globby(`${sourcePath}/**/*.{js,ts}`)
 
 // Array which holds the resolved plugins
 const resolvedPlugins = []
 
-// Trims the "js" extension and uppercases => first letter, hyphens, backslashes & slashes
-const filenameToEntity = filename => filename.replace('.js', '')
+// Trims the extension and uppercases => first letter, hyphens, backslashes & slashes
+const filenameToEntity = filename => filename.replace(/\.[jt]s$/, '')
   .replace(/(?:^|-|\/|\\)[a-z]/g, str => str.slice(-1).toUpperCase())
 
 for (const file of jsFiles) {
   resolvedPlugins.push({
     src: file,
-    dist: file.replace('src', 'dist'),
+    // TypeScript sources still emit a `.js` plugin
+    dist: file.replace('src', 'dist').replace(/\.ts$/, '.js'),
     fileName: path.basename(file),
     className: filenameToEntity(path.basename(file))
     // safeClassName: filenameToEntity(path.relative(sourcePath, file))
@@ -48,6 +49,8 @@ const build = async plugin => {
       babel({
         // Only transpile our source code
         exclude: 'node_modules/**',
+        // Transpile the TypeScript sources too
+        extensions: ['.js', '.mjs', '.ts'],
         // Include the helpers in each file, at most one copy of each
         babelHelpers: 'bundled'
       })
@@ -62,8 +65,11 @@ const build = async plugin => {
         return true
       }
 
+      // Our sources import siblings with the ESM-style `.js` extension, which
+      // for a converted module points at a `.ts` file on disk
+      const target = source.replace(pattern, '').replace(/\.js$/, '')
       const usedPlugin = resolvedPlugins.find(plugin => {
-        return plugin.src.includes(source.replace(pattern, ''))
+        return plugin.src.replace(/\.[jt]s$/, '').endsWith(target)
       })
 
       if (!usedPlugin) {

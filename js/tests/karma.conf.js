@@ -6,6 +6,7 @@ const { babel } = require('@rollup/plugin-babel')
 const istanbul = require('rollup-plugin-istanbul')
 const { nodeResolve } = require('@rollup/plugin-node-resolve')
 const replace = require('@rollup/plugin-replace')
+const tsResolve = require('../../build/rollup-plugin-ts-resolve.cjs')
 const { browsers } = require('./browsers.js')
 
 const ENV = process.env
@@ -70,6 +71,7 @@ const config = {
   },
   rollupPreprocessor: {
     plugins: [
+      tsResolve(),
       replace({
         'process.env.NODE_ENV': '"dev"',
         preventAssignment: true
@@ -79,11 +81,33 @@ const config = {
           'node_modules/**',
           'js/tests/unit/**/*.spec.js',
           'js/tests/helpers/**/*.js'
-        ]
+        ],
+        // Istanbul instruments the raw sources with its own Babel parser, ahead
+        // of the transpile step, so it needs to be told about TypeScript syntax
+        // — otherwise a generic like `new Map<K, V>()` fails to parse. Coverage
+        // then keeps mapping to the lines we author.
+        instrumenterConfig: {
+          parserPlugins: [
+            'asyncGenerators',
+            'bigInt',
+            'classProperties',
+            'classPrivateProperties',
+            'classPrivateMethods',
+            'dynamicImport',
+            'importMeta',
+            'numericSeparator',
+            'objectRestSpread',
+            'optionalCatchBinding',
+            'topLevelAwait',
+            'typescript'
+          ]
+        }
       }),
       babel({
         // Only transpile our source code
         exclude: 'node_modules/**',
+        // Transpile the TypeScript sources too
+        extensions: ['.js', '.mjs', '.ts'],
         // Inline the required helpers in each file
         babelHelpers: 'inline'
       }),

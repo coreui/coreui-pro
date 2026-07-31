@@ -5,8 +5,20 @@ import html from 'eslint-plugin-html'
 import eslintPluginImport from 'eslint-plugin-import'
 import eslintPluginUnicorn from 'eslint-plugin-unicorn'
 import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 export default [
+  {
+    // The migration leaves the tree mixed: a `.js` module can import a sibling
+    // that is already `.ts`, written as the ESM-style `./x.js` specifier that
+    // tsc resolves. The default resolver takes that literally and reports
+    // no-unresolved, so hand resolution to the TypeScript-aware one.
+    settings: {
+      'import/resolver': {
+        typescript: { project: './tsconfig.json' }
+      }
+    }
+  },
   eslintPluginImport.flatConfigs.errors,
   eslintPluginImport.flatConfigs.warnings,
   eslintPluginUnicorn.configs.recommended,
@@ -132,6 +144,33 @@ export default [
     }
   },
   {
+    // Sources and specs use ESM-style `.js` specifiers that resolve to `.ts`
+    // files. import/extensions reads that literally and demands the `.ts`
+    // extension, which is exactly what tsc forbids — tsc enforces the
+    // specifier instead. Upstream disables the same rule for the same reason.
+    files: ['js/**'],
+    rules: {
+      'import/extensions': 'off'
+    }
+  },
+  {
+    // The library sources are migrating to TypeScript file by file, so this
+    // block only applies where a `.ts` file already exists.
+    files: ['js/src/**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      sourceType: 'module'
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin
+    },
+    rules: {
+      ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
+      // The config objects are intentionally loose — see util/config
+      '@typescript-eslint/no-explicit-any': 'off'
+    }
+  },
+  {
     files: ['build/**'],
     languageOptions: {
       globals: {
@@ -142,6 +181,17 @@ export default [
     rules: {
       'no-console': 'off',
       'unicorn/prefer-top-level-await': 'off'
+    }
+  },
+  {
+    // CommonJS holdouts (the vendored rollup resolver); must come after the
+    // `build/**` block, which would otherwise claim them as ES modules
+    files: ['**/*.cjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      },
+      sourceType: 'commonjs'
     }
   },
   {
