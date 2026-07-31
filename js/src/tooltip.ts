@@ -527,11 +527,30 @@ class Tooltip extends BaseComponent {
     const middleware = this._getFloatingMiddleware(arrowElement)
     const floatingConfig = this._getFloatingConfig(placement, middleware)
 
-    const { x, y, placement: finalPlacement, middlewareData } = await computePosition(
+    // The placement attribute drives the arrow's CSS (which edge it sits on
+    // AND its width/height, which swap between vertical and horizontal
+    // placements). The arrow middleware measures the arrow during
+    // computePosition, so the attribute must reflect the placement BEFORE the
+    // measurement — stamping it afterwards leaves the arrow centred with the
+    // other orientation's dimensions, visibly off-centre on left/right tips.
+    // Stamp the requested placement up front; when flip() lands elsewhere,
+    // restamp and measure once more with the right dimensions.
+    Manipulator.setDataAttribute(tip, 'placement', floatingConfig.placement)
+
+    let { x, y, placement: finalPlacement, middlewareData } = await computePosition(
       this._element,
       tip,
       floatingConfig
     )
+
+    if (finalPlacement !== floatingConfig.placement) {
+      Manipulator.setDataAttribute(tip, 'placement', finalPlacement);
+      ({ x, y, placement: finalPlacement, middlewareData } = await computePosition(
+        this._element,
+        tip,
+        { ...floatingConfig, placement: finalPlacement }
+      ))
+    }
 
     // Apply position to tooltip
     Object.assign(tip.style, {
@@ -544,9 +563,6 @@ class Tooltip extends BaseComponent {
     if (arrowElement) {
       arrowElement.style.position = 'absolute'
     }
-
-    // Set placement attribute for CSS arrow styling
-    Manipulator.setDataAttribute(tip, 'placement', finalPlacement)
 
     // Position arrow along the edge (center it) if present
     // The CSS handles which edge to place it on via data-coreui-placement
