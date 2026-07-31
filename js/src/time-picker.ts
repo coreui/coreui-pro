@@ -5,14 +5,12 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  autoUpdate, computePosition, flip, offset, shift
-} from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import { createAnchoredPosition } from './util/floating-ui.js'
 import {
   defineJQueryPlugin, getElement, getNextActiveElement, isRTL
 } from './util/index.js'
@@ -160,6 +158,7 @@ class TimePicker extends BaseComponent {
   protected declare _initialDate: any
   protected declare _ampm: any
   protected declare _floatingCleanup: (() => void) | null
+  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
   protected declare _indicatorElement: any
   protected declare _input: any
   protected declare _menu: any
@@ -179,6 +178,7 @@ class TimePicker extends BaseComponent {
       getAmPm(new Date(this._date), this._config.locale) :
       'am'
     this._floatingCleanup = null
+    this._anchoredPosition = null
 
     this._indicatorElement = null
     this._input = null
@@ -895,44 +895,19 @@ class TimePicker extends BaseComponent {
   }
 
   _createFloating(): void {
-    this._updateFloatingPosition()
-
-    this._floatingCleanup = autoUpdate(
-      this._togglerElement,
-      this._menu,
-      () => this._updateFloatingPosition()
-    )
+    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
+    this._floatingCleanup = this._anchoredPosition.destroy
   }
 
   async _updateFloatingPosition(): Promise<void> {
-    if (!this._menu || !this._menu.isConnected) {
-      return
-    }
-
-    const { x, y } = await computePosition(this._togglerElement, this._menu, {
-      middleware: [
-        offset({ mainAxis: 2 }),
-        flip(),
-        shift({ boundary: 'clippingAncestors' })
-      ],
-      placement: isRTL() ? 'bottom-end' : 'bottom-start'
-    })
-
-    if (!this._menu || !this._menu.isConnected) {
-      return
-    }
-
-    Object.assign(this._menu.style, {
-      position: 'absolute',
-      left: `${x}px`,
-      top: `${y}px`
-    })
+    await this._anchoredPosition?.update()
   }
 
   _disposeFloating(): void {
     if (this._floatingCleanup) {
       this._floatingCleanup()
       this._floatingCleanup = null
+      this._anchoredPosition = null
     }
   }
 

@@ -8,6 +8,9 @@
  * --------------------------------------------------------------------------
  */
 
+import {
+  autoUpdate, computePosition, flip, offset, shift
+} from '@floating-ui/dom'
 import { isRTL } from './index.js'
 
 /**
@@ -168,6 +171,56 @@ type FloatingOffsetValue = Exclude<FloatingOffsetInput, number[]>
  */
 export const toFloatingOffset = (value: FloatingOffsetInput): FloatingOffsetValue => {
   return Array.isArray(value) ? { mainAxis: value[1] || 0, crossAxis: value[0] || 0 } : value
+}
+
+/**
+ * The dropdown-shaped anchored panel: bottom-start placement (mirrored in
+ * RTL), a 2px main-axis offset, flip and shift within the clipping ancestors.
+ * Autocomplete, multi-select and the v1 pickers all position exactly this way,
+ * so the wiring — initial position, autoUpdate resubscription and the
+ * disconnect guards on both sides of the await — lives here once.
+ *
+ * `destroy()` also acts as the in-flight guard: a computePosition resolving
+ * after teardown must not touch the content's styles.
+ */
+export const createAnchoredPosition = (anchor: Element, content: HTMLElement): { update: () => Promise<void>, destroy: () => void } => {
+  let disposed = false
+
+  const update = async (): Promise<void> => {
+    if (disposed || !content || !content.isConnected) {
+      return
+    }
+
+    const { x, y } = await computePosition(anchor, content, {
+      middleware: [
+        offset({ mainAxis: 2 }),
+        flip(),
+        shift({ boundary: 'clippingAncestors' })
+      ],
+      placement: isRTL() ? 'bottom-end' : 'bottom-start'
+    })
+
+    if (disposed || !content.isConnected) {
+      return
+    }
+
+    Object.assign(content.style, {
+      position: 'absolute',
+      left: `${x}px`,
+      top: `${y}px`
+    })
+  }
+
+  update()
+  const cleanup = autoUpdate(anchor, content, update)
+
+  return {
+    update,
+    destroy(): void {
+      disposed = true
+      cleanup()
+    }
+  }
 }
 
 export type {
