@@ -26,28 +26,21 @@ const DATA_KEY = 'coreui.autocomplete'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
 const BACKSPACE_KEY = 'Backspace'
 const DELETE_KEY = 'Delete'
-const END_KEY = 'End'
 const ENTER_KEY = 'Enter'
 const ESCAPE_KEY = 'Escape'
-const HOME_KEY = 'Home'
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
-const EVENT_HIDE = `hide${EVENT_KEY}`
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_MOUSEDOWN = `mousedown${EVENT_KEY}`
-const EVENT_SHOW = `show${EVENT_KEY}`
-const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -197,52 +190,19 @@ class Autocomplete extends Combobox {
 
   // Public
 
-  toggle(): void {
-    return this._isShown() ? this.hide() : this.show()
+  override _canShow(): boolean {
+    return Boolean(this._config.searchNoResultsLabel) ||
+      this._flattenOptions().some(option => option.label.toLowerCase().includes(this._search.toLowerCase()))
   }
 
-  show(): void {
-    if (this._config.disabled || this._isShown()) {
-      return
-    }
-
-    if (
-      !this._config.searchNoResultsLabel &&
-      this._flattenOptions().filter(option => option.label.toLowerCase().includes(this._search.toLowerCase())).length === 0) {
-      return
-    }
-
-    EventHandler.trigger(this._element, EVENT_SHOW)
-    this._element.classList.add(CLASS_NAME_SHOW)
-    this._inputElement.setAttribute('aria-expanded', 'true')
-
-    if (this._config.container) {
-      this._menu.style.minWidth = `${this._element.offsetWidth}px`
-      this._menu.classList.add(CLASS_NAME_SHOW)
-    }
-
-    EventHandler.trigger(this._element, EVENT_SHOWN)
-
-    this._createFloating()
+  override _getAriaExpandedTarget(): HTMLElement {
+    return this._inputElement
   }
 
-  hide(): void {
-    EventHandler.trigger(this._element, EVENT_HIDE)
-
-    this._disposeFloating()
-
-    this._element.classList.remove(CLASS_NAME_SHOW)
-    this._inputElement.setAttribute('aria-expanded', 'false')
-
-    if (this._config.container) {
-      this._menu.classList.remove(CLASS_NAME_SHOW)
-    }
-
+  override _onHideEnd(): void {
     if (this._inputHintElement) {
       this._inputHintElement.value = ''
     }
-
-    EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
   override dispose(): void {
@@ -335,10 +295,6 @@ class Autocomplete extends Combobox {
     return Array.isArray(this._config.search) && this._config.search.includes('global')
   }
 
-  _isShown(): boolean {
-    return this._element.classList.contains(CLASS_NAME_SHOW)
-  }
-
   // Private
 
   _addEventListeners(): void {
@@ -370,18 +326,7 @@ class Autocomplete extends Combobox {
       }
     })
 
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
-        event.preventDefault()
-        this.show()
-        return
-      }
-
-      if (this._isShown() && event.key === ARROW_DOWN_KEY) {
-        event.preventDefault()
-        this._selectMenuItem(event)
-      }
-    })
+    this._addTogglerKeydownListeners()
 
     EventHandler.on(this._indicatorElement, EVENT_CLICK, (event: any) => {
       event.preventDefault()
@@ -506,21 +451,7 @@ class Autocomplete extends Combobox {
       }
     })
 
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN, (event: any) => {
-      if (event.key === ENTER_KEY) {
-        this._onOptionsClick(event.target)
-      }
-
-      if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
-        event.preventDefault()
-        this._selectMenuItem(event)
-      }
-
-      if ([HOME_KEY, END_KEY].includes(event.key)) {
-        event.preventDefault()
-        this._selectFirstOrLastMenuItem(event.key === HOME_KEY)
-      }
-    })
+    this._addOptionsKeydownListeners()
   }
 
   _getOptionsFromConfig(options: any = this._config.options): any[] {

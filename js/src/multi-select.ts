@@ -58,14 +58,11 @@ const SELECTOR_NAVIGABLE_ITEMS = `.form-multi-select-all:not(.disabled):not(:dis
 
 const EVENT_CHANGED = `changed${EVENT_KEY}`
 const EVENT_CLICK = `click${EVENT_KEY}`
-const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 const EVENT_KEYUP = `keyup${EVENT_KEY}`
 const EVENT_SEARCH = `search${EVENT_KEY}`
 const EVENT_SELECTION_LIMIT = `selectionLimit${EVENT_KEY}`
-const EVENT_SHOW = `show${EVENT_KEY}`
-const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -199,6 +196,7 @@ class MultiSelect extends Combobox {
   protected declare _selectionCleanerElement: any
   protected declare _searchElement: any
   protected declare _wrapperElement: any
+  protected declare _refocusOnHide: boolean
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -257,62 +255,42 @@ class MultiSelect extends Combobox {
     }
   }
 
-  // Public
-  toggle(): void {
-    return this._isShown() ? this.hide() : this.show()
+  static override get activationKeys(): string[] {
+    return [ENTER_KEY, SPACE_KEY]
   }
 
-  show(): void {
-    if (this._config.disabled || this._isShown()) {
-      return
-    }
+  // Public
 
-    EventHandler.trigger(this._element, EVENT_SHOW)
-    this._wrapperElement.classList.add(CLASS_NAME_SHOW)
-    this._togglerElement.setAttribute('aria-expanded', 'true')
+  override _getShowTarget(): HTMLElement {
+    return this._wrapperElement
+  }
 
-    if (this._config.container) {
-      this._menu.style.minWidth = `${this._wrapperElement.offsetWidth}px`
-      this._menu.classList.add(CLASS_NAME_SHOW)
-    }
-
-    EventHandler.trigger(this._element, EVENT_SHOWN)
-
-    this._createFloating()
-
+  override _afterShow(): void {
     if (this._config.search) {
       SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)!.focus()
     }
   }
 
-  hide(): void {
-    EventHandler.trigger(this._element, EVENT_HIDE)
-
-    const refocusFromInside = this._wrapperElement.contains(document.activeElement) ||
+  override _onHideStart(): void {
+    this._refocusOnHide = this._wrapperElement.contains(document.activeElement) ||
       this._menu.contains(document.activeElement)
+  }
 
-    this._disposeFloating()
-
+  override _afterHideDispose(): void {
     if (this._config.search) {
       this._searchElement.value = ''
     }
 
     this._onSearchChange(this._searchElement)
-    this._wrapperElement.classList.remove(CLASS_NAME_SHOW)
-    this._togglerElement.setAttribute('aria-expanded', 'false')
+  }
 
-    if (this._config.container) {
-      this._menu.classList.remove(CLASS_NAME_SHOW)
-    }
-
-    if (refocusFromInside && !this._config.disabled) {
+  override _onHideEnd(): void {
+    if (this._refocusOnHide && !this._config.disabled) {
       const refocusTarget = this._config.search ? this._searchElement : this._togglerElement
       if (refocusTarget) {
         refocusTarget.focus()
       }
     }
-
-    EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
   override dispose(): void {
@@ -482,18 +460,7 @@ class MultiSelect extends Combobox {
       }
     })
 
-    EventHandler.on(this._togglerElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
-        event.preventDefault()
-        this.show()
-        return
-      }
-
-      if (this._isShown() && event.key === ARROW_DOWN_KEY) {
-        event.preventDefault()
-        this._selectMenuItem(event)
-      }
-    })
+    this._addTogglerKeydownListeners()
 
     // Validation focuses the overlay select; hand its keystrokes to the custom control.
     EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
@@ -585,23 +552,7 @@ class MultiSelect extends Combobox {
       this._onOptionsClick(event.target)
     })
 
-    EventHandler.on(this._optionsElement, EVENT_KEYDOWN, (event: any) => {
-      if (event.key === ENTER_KEY || event.key === SPACE_KEY) {
-        // Space would otherwise scroll the options list.
-        event.preventDefault()
-        this._onOptionsClick(event.target)
-      }
-
-      if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
-        event.preventDefault()
-        this._selectMenuItem(event)
-      }
-
-      if ([HOME_KEY, END_KEY].includes(event.key)) {
-        event.preventDefault()
-        this._selectFirstOrLastMenuItem(event.key === HOME_KEY)
-      }
-    })
+    this._addOptionsKeydownListeners()
   }
 
   _getOptions(): any[] {
@@ -1618,10 +1569,6 @@ class MultiSelect extends Combobox {
 
       this._updateSearchSize(element.value.length + 1)
     }
-  }
-
-  _isShown(): boolean {
-    return this._wrapperElement.classList.contains(CLASS_NAME_SHOW)
   }
 
   _hasSelectionLimit(): boolean {
