@@ -6,6 +6,7 @@
  */
 
 import BaseComponent from './base-component.js'
+import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
 import { sanitizeHtml } from './util/sanitizer.js'
@@ -17,15 +18,21 @@ import { getElement, getNextActiveElement, isVisible } from './util/index.js'
  * surfaces stay the subclasses, which keep their own markup, class names,
  * events and options.
  *
- * The seam mirrors Menu/Dropdown: subclasses override the static `selectors`
- * and `optionLabelKey` getters, and the engine reads them through
+ * The seam mirrors Menu/Dropdown: subclasses override the static getters
+ * (`selectors`, `activationKeys`) and the engine reads them through
  * `this.constructor`, so every shared behavior operates on the subclass's own
  * class names. Anchored positioning composes `createAnchoredPosition()`
  * directly (the util extracted from these very components) rather than a Menu
  * instance, which would impose menu interaction semantics on a listbox.
  */
 
+const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
+const END_KEY = 'End'
+const ENTER_KEY = 'Enter'
+const HOME_KEY = 'Home'
+
+const CLASS_NAME_SHOW = 'show'
 
 type ComboboxSelectors = {
   option: string
@@ -53,11 +60,129 @@ class Combobox extends BaseComponent {
     throw new Error('Combobox subclasses must define the static "selectors" getter.')
   }
 
+  // Keys that activate the focused option in the options list.
+  static get activationKeys(): string[] {
+    return [ENTER_KEY]
+  }
+
   // Shorthand resolving the static through the live constructor
 
   get _selectors(): ComboboxSelectors {
     return this.constructor.selectors
   }
+
+  // Show / hide lifecycle — one event contract for every combobox surface.
+  // Subclasses adjust behavior through the hooks below, never by overriding
+  // the template methods, so the event order stays identical across surfaces.
+
+  toggle(): void {
+    return this._isShown() ? this.hide() : this.show()
+  }
+
+  show(): void {
+    if (this._config.disabled || this._isShown() || !this._canShow()) {
+      return
+    }
+
+    EventHandler.trigger(this._element, this.constructor.eventName('show'))
+    const showTarget = this._getShowTarget()
+    showTarget.classList.add(CLASS_NAME_SHOW)
+    this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
+
+    if (this._config.container) {
+      this._menu.style.minWidth = `${showTarget.offsetWidth}px`
+      this._menu.classList.add(CLASS_NAME_SHOW)
+    }
+
+    EventHandler.trigger(this._element, this.constructor.eventName('shown'))
+
+    this._createFloating()
+    this._afterShow()
+  }
+
+  hide(): void {
+    EventHandler.trigger(this._element, this.constructor.eventName('hide'))
+    this._onHideStart()
+
+    this._disposeFloating()
+    this._afterHideDispose()
+
+    this._getShowTarget().classList.remove(CLASS_NAME_SHOW)
+    this._getAriaExpandedTarget().setAttribute('aria-expanded', 'false')
+
+    if (this._config.container) {
+      this._menu.classList.remove(CLASS_NAME_SHOW)
+    }
+
+    this._onHideEnd()
+    EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
+  }
+
+  _isShown(): boolean {
+    return this._getShowTarget().classList.contains(CLASS_NAME_SHOW)
+  }
+
+  // Lifecycle hooks
+
+  _canShow(): boolean {
+    return true
+  }
+
+  _afterShow(): void {}
+
+  _onHideStart(): void {}
+
+  _afterHideDispose(): void {}
+
+  _onHideEnd(): void {}
+
+  _getShowTarget(): HTMLElement {
+    return this._element
+  }
+
+  _getAriaExpandedTarget(): HTMLElement {
+    return this._togglerElement
+  }
+
+  // Shared keyboard wiring
+
+  _addTogglerKeydownListeners(): void {
+    EventHandler.on(this._togglerElement, this.constructor.eventName('keydown'), (event: any) => {
+      if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
+        event.preventDefault()
+        this.show()
+        return
+      }
+
+      if (this._isShown() && event.key === ARROW_DOWN_KEY) {
+        event.preventDefault()
+        this._selectMenuItem(event)
+      }
+    })
+  }
+
+  _addOptionsKeydownListeners(): void {
+    EventHandler.on(this._optionsElement, this.constructor.eventName('keydown'), (event: any) => {
+      if (this.constructor.activationKeys.includes(event.key)) {
+        // Space would otherwise scroll the options list.
+        event.preventDefault()
+        this._onOptionsClick(event.target)
+      }
+
+      if ([ARROW_UP_KEY, ARROW_DOWN_KEY].includes(event.key)) {
+        event.preventDefault()
+        this._selectMenuItem(event)
+      }
+
+      if ([HOME_KEY, END_KEY].includes(event.key)) {
+        event.preventDefault()
+        this._selectFirstOrLastMenuItem(event.key === HOME_KEY)
+      }
+    })
+  }
+
+  // Subclasses implement option activation.
+  _onOptionsClick(element: any): void {} // eslint-disable-line @typescript-eslint/no-unused-vars
 
   // Option model
 
