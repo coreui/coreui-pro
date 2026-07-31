@@ -156,7 +156,7 @@ export default [
   {
     // The library sources are migrating to TypeScript file by file, so this
     // block only applies where a `.ts` file already exists.
-    files: ['js/src/**/*.ts', 'js/tests/types/**/*.ts'],
+    files: ['js/src/**/*.ts'],
     languageOptions: {
       parser: tseslint.parser,
       sourceType: 'module'
@@ -186,6 +186,23 @@ export default [
       // Fires on `.ts` but not on byte-identical `.js`: the rule misreads arrows
       // that close over `this`, which by definition cannot move to outer scope.
       'unicorn/consistent-function-scoping': 'off'
+    }
+  },
+  {
+    // The consumer type test imports the emitted declarations on purpose, so it
+    // resolves only after a build — and the lint job runs before one.
+    files: ['js/tests/types/**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      sourceType: 'module'
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin
+    },
+    rules: {
+      ...tseslint.configs.recommended.find(config => config.name === 'typescript-eslint/eslint-recommended')?.rules,
+      ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
+      'import/no-unresolved': 'off'
     }
   },
   {
