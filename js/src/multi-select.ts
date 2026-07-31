@@ -48,7 +48,8 @@ const SELECTOR_OPTIONS = '.form-multi-select-options'
 const SELECTOR_OPTIONS_EMPTY = '.form-multi-select-options-empty'
 const SELECTOR_SEARCH = '.form-multi-select-search'
 const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
-// TODO: remove the class-based selector in v6, use the data attribute instead
+// The class-based selector stays alongside the data attribute: pages relying
+// on class-only auto-init keep working (the v6 bet).
 const SELECTOR_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
 const SELECTOR_TAG = '.form-multi-select-tag'

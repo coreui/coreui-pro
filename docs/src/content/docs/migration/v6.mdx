@@ -246,6 +246,23 @@ the option-by-option migration map. Planned mapping:
   back to the nearest `[dir]` ancestor, but placement first is the reliable
   path).
 
+#### ScrollSpy
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The deprecated `offset` option is removed** — it has been a thin alias
+  since the IntersectionObserver rewrite. Use `rootMargin` instead; the exact
+  equivalence is `offset: 100` &rarr; `rootMargin: '100px 0px -30%'`.
+
+#### Tab
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Constructing a Tab outside a tab-panel parent now throws a `TypeError`**
+  instead of silently returning a half-initialized instance, matching upstream.
+  The silent variant hid real markup mistakes: the instance existed but never
+  activated anything.
+- The `data-coreui-toggle="pill"` and `"list"` toggles **stay** — they are
+  documented markup, and v6 keeps documented markup working.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component

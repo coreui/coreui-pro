@@ -80,7 +80,7 @@ const Default = {
 }
 
 const DefaultType = {
-  interval: '(number|boolean)', // TODO:v6 remove boolean support
+  interval: '(number|boolean)', // `interval: false` is documented API; the v6 bet keeps it
   keyboard: 'boolean',
   pause: '(string|boolean)',
   ride: '(boolean|string)',
