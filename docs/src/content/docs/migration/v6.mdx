@@ -38,6 +38,21 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
     Code that read the tip's coordinates synchronously right after `show()`
     should wait for the `shown` event.
 
+### Browser support
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+**The minimum supported browsers are now Chrome 123, Edge 123, Firefox 120,
+Safari 17.5 and iOS 17.5** — the first versions with native `light-dark()`
+support. This is the floor the v6 color system already required in practice:
+theme decisions resolve in the browser via `light-dark()` and `color-mix()`
+with no fallback, so on older browsers dark mode did not work regardless of
+what the previous `.browserslistrc` claimed (Chrome 60 / Safari 12). v6 makes
+the declaration honest and takes the wins: the compiled CSS drops legacy
+vendor prefixes (about 8&nbsp;kB gzip off `coreui.min.css`) and the JavaScript
+ships modern syntax un-transpiled. If you must support older browsers, stay
+on v5.
+
 ### JavaScript
 
 v6's JavaScript is written in TypeScript. The published behaviour is unchanged —
