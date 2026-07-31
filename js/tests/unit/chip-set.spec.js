@@ -592,4 +592,96 @@ describe('ChipSet', () => {
       expect(el.querySelector('.chip').textContent).toContain('First')
     })
   })
+
+  describe('accessibility roles', () => {
+    it('should expose a selectable set as a horizontal multiselectable listbox of options', () => {
+      const el = setMarkup(['First', 'Second'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true })
+
+      expect(el.getAttribute('role')).toEqual('listbox')
+      expect(el.getAttribute('aria-orientation')).toEqual('horizontal')
+      expect(el.getAttribute('aria-multiselectable')).toEqual('true')
+
+      for (const chip of el.querySelectorAll('.chip')) {
+        expect(chip.getAttribute('role')).toEqual('option')
+        expect(chip.getAttribute('aria-selected')).toEqual('false')
+      }
+    })
+
+    it('should not set aria-multiselectable in single selection mode', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el, { selectable: true, selectionMode: 'single' })
+
+      expect(el.getAttribute('role')).toEqual('listbox')
+      expect(el.hasAttribute('aria-multiselectable')).toBeFalse()
+    })
+
+    it('should expose a non-selectable set as a group', () => {
+      const el = setMarkup(['First'])
+      // eslint-disable-next-line no-new
+      new ChipSet(el)
+
+      expect(el.getAttribute('role')).toEqual('group')
+      expect(el.querySelector('.chip').hasAttribute('role')).toBeFalse()
+    })
+
+    it('should keep an author-provided role on the set element', () => {
+      const el = setMarkup(['First'], ' role="list"')
+      // eslint-disable-next-line no-new
+      new ChipSet(el)
+
+      expect(el.getAttribute('role')).toEqual('list')
+    })
+
+    it('should stamp role option on chips added to a selectable set', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, { selectable: true })
+
+      const chip = chipSet.add('Fresh')
+
+      expect(chip.getAttribute('role')).toEqual('option')
+    })
+  })
+
+  describe('live region', () => {
+    it('should announce added and removed chips in a status region next to the set', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, { removable: true })
+
+      const region = el.nextElementSibling
+      expect(region.getAttribute('role')).toEqual('status')
+      expect(region).toHaveClass('visually-hidden')
+
+      chipSet.add('Alpha')
+      expect(region.textContent).toEqual('Alpha added')
+
+      chipSet.remove('Alpha')
+      expect(region.textContent).toEqual('Alpha removed')
+    })
+
+    it('should use the configured announcement labels', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el, {
+        ariaAddedAnnouncement: 'dodano',
+        ariaRemovedAnnouncement: 'usuni\u0119to'
+      })
+
+      chipSet.add('Alfa')
+
+      expect(el.nextElementSibling.textContent).toEqual('Alfa dodano')
+    })
+
+    it('should remove the live region on dispose', () => {
+      const el = setMarkup([])
+      const chipSet = new ChipSet(el)
+
+      expect(el.nextElementSibling.getAttribute('role')).toEqual('status')
+
+      chipSet.dispose()
+
+      expect(el.nextElementSibling).toBeNull()
+    })
+  })
 })

@@ -348,8 +348,8 @@ When chips are grouped in a [Chip set](/components/chip-set/), the arrow keys, <
 The Bootstrap Chip component follows WAI-ARIA patterns for interactive widgets, ensuring the chip component is fully usable with keyboards and assistive technologies.
 
 - Chips become focusable when `selectable` or `removable` is enabled.
-- `aria-selected` is kept in sync with `.active` on selectable chips.
-- `aria-disabled="true"` is applied to disabled chips.
+- A standalone selectable chip is exposed as a toggle button (`role="button"`) with `aria-pressed` kept in sync with `.active`. Inside a selectable [Chip set](/components/chip-set/) the set exposes a listbox and each chip becomes a `role="option"` with `aria-selected` instead.
+- `aria-disabled="true"` is applied to disabled chips that carry a role; a role-less chip conveys the state through the `disabled` class and its removed interactivity.
 - Each `.chip-remove` button includes an accessible label via `ariaRemoveLabel`.
 - Use descriptive `aria-label` attributes on chip containers when the chip component group has a meaningful role (e.g., "Applied filters").
 

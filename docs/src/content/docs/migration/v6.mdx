@@ -287,12 +287,22 @@ the option-by-option migration map. Planned mapping:
   renders at full opacity. The token still works — override it and only the
   background alpha changes.
 
-#### Chip input
+#### Chip / Chip set / Chip input
 
-- **`aria-disabled`/`aria-readonly` are no longer stamped on the container.**
-  The container is a generic element, so those attributes were invalid on it
-  (axe `aria-allowed-attr`); the native `disabled`/`readonly` states on the
-  inner `<input>` carry the semantics.
+- **Chips expose real roles now.** A selectable chip set is a horizontal
+  `role="listbox"` (with `aria-multiselectable` in multiple mode) whose chips
+  are `role="option"` elements carrying `aria-selected`; a standalone
+  selectable chip is a toggle button (`role="button"`) reflecting its state
+  via **`aria-pressed` instead of `aria-selected`**; a non-selectable set is a
+  `role="group"`. `aria-disabled` is only stamped on chips that carry a role —
+  on a role-less chip the attribute was invalid and is now removed.
+- **Adding and removing chips is announced.** Chip set and Chip input render a
+  visually hidden `role="status"` region next to the container; the wording is
+  configurable via `ariaAddedAnnouncement`/`ariaRemovedAnnouncement`.
+- **Chip input: `aria-disabled`/`aria-readonly` are no longer stamped on the
+  container.** The container is a generic element, so those attributes were
+  invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`
+  states on the inner `<input>` carry the semantics.
 
 ### Sass architecture & design tokens
 

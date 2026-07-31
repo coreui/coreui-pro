@@ -181,6 +181,19 @@ describe('ChipInput', () => {
       expect(el.getAttribute('aria-readonly')).toBeNull()
     })
 
+    it('should not stamp a role on the container and announce added chips', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+
+      const el = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(el)
+
+      chipInput.add('News')
+
+      expect(el.hasAttribute('role')).toBe(false)
+      expect(el.nextElementSibling.getAttribute('role')).toEqual('status')
+      expect(el.nextElementSibling.textContent).toEqual('News added')
+    })
+
     it('should set label for attribute when label has no for', () => {
       fixtureEl.innerHTML = [
         '<div class="chip-input">',

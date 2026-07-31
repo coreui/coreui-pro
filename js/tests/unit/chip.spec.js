@@ -398,7 +398,7 @@ describe('Chip', () => {
   })
 
   describe('select', () => {
-    it('should add active class and set aria-selected when selected', () => {
+    it('should add active class and set aria-pressed when selected', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
@@ -407,7 +407,19 @@ describe('Chip', () => {
       chip.select()
 
       expect(chipEl).toHaveClass('active')
+      expect(chipEl.getAttribute('aria-pressed')).toEqual('true')
+    })
+
+    it('should set aria-selected when selected inside a listbox (role option)', () => {
+      fixtureEl.innerHTML = '<span class="chip" role="option">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      const chip = new Chip(chipEl, { selectable: true })
+
+      chip.select()
+
       expect(chipEl.getAttribute('aria-selected')).toEqual('true')
+      expect(chipEl.hasAttribute('aria-pressed')).toBe(false)
     })
 
     it('should trigger select and selected events', () => {
@@ -481,7 +493,7 @@ describe('Chip', () => {
   })
 
   describe('deselect', () => {
-    it('should remove active class and set aria-selected to false when deselected', () => {
+    it('should remove active class and set aria-pressed to false when deselected', () => {
       fixtureEl.innerHTML = '<span class="chip active">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
@@ -490,7 +502,7 @@ describe('Chip', () => {
       chip.deselect()
 
       expect(chipEl).not.toHaveClass('active')
-      expect(chipEl.getAttribute('aria-selected')).toEqual('false')
+      expect(chipEl.getAttribute('aria-pressed')).toEqual('false')
     })
 
     it('should trigger deselect and deselected events', () => {
@@ -723,7 +735,7 @@ describe('Chip', () => {
       expect(chipEl).toHaveClass('chip-clickable')
     })
 
-    it('should add disabled class and aria-disabled when disabled', () => {
+    it('should add disabled class but no aria-disabled on a role-less chip', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
@@ -731,31 +743,65 @@ describe('Chip', () => {
       new Chip(chipEl, { disabled: true })
 
       expect(chipEl).toHaveClass('disabled')
+      expect(chipEl.getAttribute('aria-disabled')).toBeNull()
+    })
+
+    it('should set aria-disabled on a disabled selectable chip (role button)', () => {
+      fixtureEl.innerHTML = '<span class="chip">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { disabled: true, selectable: true })
+
+      expect(chipEl.getAttribute('role')).toEqual('button')
       expect(chipEl.getAttribute('aria-disabled')).toEqual('true')
     })
 
-    it('should set aria-selected when selectable', () => {
+    it('should expose a standalone selectable chip as a toggle button', () => {
       fixtureEl.innerHTML = '<span class="chip">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
       new Chip(chipEl, { selectable: true })
 
+      expect(chipEl.getAttribute('role')).toEqual('button')
+      expect(chipEl.getAttribute('aria-pressed')).toEqual('false')
+      expect(chipEl.hasAttribute('aria-selected')).toBe(false)
+    })
+
+    it('should keep an author-provided role and use aria-selected on role option', () => {
+      fixtureEl.innerHTML = '<span class="chip" role="option">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl, { selectable: true })
+
+      expect(chipEl.getAttribute('role')).toEqual('option')
       expect(chipEl.getAttribute('aria-selected')).toEqual('false')
     })
 
-    it('should reset a stale aria-disabled attribute when not disabled', () => {
+    it('should drop a stale aria-disabled attribute from a role-less chip', () => {
       fixtureEl.innerHTML = '<span class="chip" aria-disabled="true">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
       new Chip(chipEl)
 
-      expect(chipEl.getAttribute('aria-disabled')).toEqual('false')
+      expect(chipEl.getAttribute('aria-disabled')).toBeNull()
     })
 
-    it('should reset a stale aria-selected attribute when not selectable', () => {
+    it('should drop a stale aria-selected attribute from a role-less chip', () => {
       fixtureEl.innerHTML = '<span class="chip" aria-selected="true">Tag</span>'
+
+      const chipEl = fixtureEl.querySelector('.chip')
+      // eslint-disable-next-line no-new
+      new Chip(chipEl)
+
+      expect(chipEl.getAttribute('aria-selected')).toBeNull()
+    })
+
+    it('should reset a stale aria-selected attribute on a non-selectable option chip', () => {
+      fixtureEl.innerHTML = '<span class="chip" role="option" aria-selected="true">Tag</span>'
 
       const chipEl = fixtureEl.querySelector('.chip')
       // eslint-disable-next-line no-new
