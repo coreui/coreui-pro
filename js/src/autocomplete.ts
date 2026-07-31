@@ -5,24 +5,17 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  autoUpdate, computePosition, flip, offset, shift
-} from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
+import { createAnchoredPosition } from './util/floating-ui.js'
 import {
   DefaultAllowlist, escapeHtml, sanitizeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
 import {
-  defineJQueryPlugin,
-  getNextActiveElement,
-  getElement,
-  getUID,
-  isVisible,
-  isRTL
+  defineJQueryPlugin, getNextActiveElement, getElement, getUID, isVisible
 } from './util/index.js'
 
 /**
@@ -165,6 +158,7 @@ class Autocomplete extends BaseComponent {
   protected declare _selected: any
   protected declare _options: any
   protected declare _floatingCleanup: (() => void) | null
+  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
   protected declare _search: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -181,6 +175,7 @@ class Autocomplete extends BaseComponent {
     this._selected = []
     this._options = this._getOptionsFromConfig()
     this._floatingCleanup = null
+    this._anchoredPosition = null
     this._search = ''
 
     this._createAutocomplete()
@@ -708,44 +703,19 @@ class Autocomplete extends BaseComponent {
   }
 
   _createFloating(): void {
-    this._updateFloatingPosition()
-
-    this._floatingCleanup = autoUpdate(
-      this._togglerElement,
-      this._menu,
-      () => this._updateFloatingPosition()
-    )
+    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
+    this._floatingCleanup = this._anchoredPosition.destroy
   }
 
   async _updateFloatingPosition(): Promise<void> {
-    if (!this._menu || !this._menu.isConnected) {
-      return
-    }
-
-    const { x, y } = await computePosition(this._togglerElement, this._menu, {
-      middleware: [
-        offset({ mainAxis: 2 }),
-        flip(),
-        shift({ boundary: 'clippingAncestors' })
-      ],
-      placement: isRTL() ? 'bottom-end' : 'bottom-start'
-    })
-
-    if (!this._menu || !this._menu.isConnected) {
-      return
-    }
-
-    Object.assign(this._menu.style, {
-      position: 'absolute',
-      left: `${x}px`,
-      top: `${y}px`
-    })
+    await this._anchoredPosition?.update()
   }
 
   _disposeFloating(): void {
     if (this._floatingCleanup) {
       this._floatingCleanup()
       this._floatingCleanup = null
+      this._anchoredPosition = null
     }
   }
 

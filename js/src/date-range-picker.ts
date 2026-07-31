@@ -5,9 +5,6 @@
  * --------------------------------------------------------------------------
  */
 
-import {
-  autoUpdate, computePosition, flip, offset, shift
-} from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
 import TimePicker from './time-picker.js'
@@ -15,11 +12,12 @@ import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin, getElement, isRTL } from './util/index.js'
+import { defineJQueryPlugin, getElement } from './util/index.js'
 import {
   convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
 } from './util/calendar.js'
 import type { ComponentConfig } from './util/config.js'
+import { createAnchoredPosition } from './util/floating-ui.js'
 import FocusTrap from './util/focustrap.js'
 
 /**
@@ -219,6 +217,7 @@ class DateRangePicker extends BaseComponent {
   protected declare _initialEndDate: any
   protected declare _mobile: any
   protected declare _floatingCleanup: (() => void) | null
+  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
   protected declare _selectEndDate: any
   protected declare _calendar: any
   protected declare _calendars: any
@@ -247,6 +246,7 @@ class DateRangePicker extends BaseComponent {
     this._initialEndDate = null
     this._mobile = window.innerWidth < 768
     this._floatingCleanup = null
+    this._anchoredPosition = null
     this._selectEndDate = this._config.selectEndDate
 
     this._calendar = null
@@ -1004,44 +1004,19 @@ class DateRangePicker extends BaseComponent {
   }
 
   _createFloating(): void {
-    this._updateFloatingPosition()
-
-    this._floatingCleanup = autoUpdate(
-      this._togglerElement,
-      this._menu,
-      () => this._updateFloatingPosition()
-    )
+    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
+    this._floatingCleanup = this._anchoredPosition.destroy
   }
 
   async _updateFloatingPosition(): Promise<void> {
-    if (!this._menu || !this._menu.isConnected) {
-      return
-    }
-
-    const { x, y } = await computePosition(this._togglerElement, this._menu, {
-      middleware: [
-        offset({ mainAxis: 2 }),
-        flip(),
-        shift({ boundary: 'clippingAncestors' })
-      ],
-      placement: isRTL() ? 'bottom-end' : 'bottom-start'
-    })
-
-    if (!this._menu || !this._menu.isConnected) {
-      return
-    }
-
-    Object.assign(this._menu.style, {
-      position: 'absolute',
-      left: `${x}px`,
-      top: `${y}px`
-    })
+    await this._anchoredPosition?.update()
   }
 
   _disposeFloating(): void {
     if (this._floatingCleanup) {
       this._floatingCleanup()
       this._floatingCleanup = null
+      this._anchoredPosition = null
     }
   }
 
