@@ -49,6 +49,11 @@ $tooltip-tokens: defaults(
   .tooltip {
     @include tokens($tooltip-tokens);
 
+    // Fold `--#{$prefix}tooltip-opacity` into the surface colour instead of the
+    // element: element-level opacity also faded the label text, compositing it
+    // below the WCAG 1.4.3 contrast minimum.
+    --#{$prefix}tooltip-surface-bg: color-mix(in srgb, var(--#{$prefix}tooltip-bg) calc(var(--#{$prefix}tooltip-opacity) * 100%), transparent); // stylelint-disable-line function-disallowed-list
+
     z-index: var(--#{$prefix}tooltip-zindex);
     display: block;
     margin: var(--#{$prefix}tooltip-margin);
@@ -61,7 +66,7 @@ $tooltip-tokens: defaults(
     word-wrap: break-word;
     opacity: 0;
 
-    &.show { opacity: var(--#{$prefix}tooltip-opacity); }
+    &.show { opacity: 1; }
 
     .tooltip-arrow {
       display: block;
@@ -83,7 +88,7 @@ $tooltip-tokens: defaults(
     &::before {
       top: -1px;
       border-width: var(--#{$prefix}tooltip-arrow-height) calc(var(--#{$prefix}tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
-      border-top-color: var(--#{$prefix}tooltip-bg);
+      border-top-color: var(--#{$prefix}tooltip-surface-bg);
     }
   }
 
@@ -96,7 +101,7 @@ $tooltip-tokens: defaults(
     &::before {
       right: -1px;
       border-width: calc(var(--#{$prefix}tooltip-arrow-width) * .5) var(--#{$prefix}tooltip-arrow-height) calc(var(--#{$prefix}tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
-      border-right-color: var(--#{$prefix}tooltip-bg);
+      border-right-color: var(--#{$prefix}tooltip-surface-bg);
     }
   }
 
@@ -108,7 +113,7 @@ $tooltip-tokens: defaults(
     &::before {
       bottom: -1px;
       border-width: 0 calc(var(--#{$prefix}tooltip-arrow-width) * .5) var(--#{$prefix}tooltip-arrow-height); // stylelint-disable-line function-disallowed-list
-      border-bottom-color: var(--#{$prefix}tooltip-bg);
+      border-bottom-color: var(--#{$prefix}tooltip-surface-bg);
     }
   }
 
@@ -121,7 +126,7 @@ $tooltip-tokens: defaults(
     &::before {
       left: -1px;
       border-width: calc(var(--#{$prefix}tooltip-arrow-width) * .5) 0 calc(var(--#{$prefix}tooltip-arrow-width) * .5) var(--#{$prefix}tooltip-arrow-height); // stylelint-disable-line function-disallowed-list
-      border-left-color: var(--#{$prefix}tooltip-bg);
+      border-left-color: var(--#{$prefix}tooltip-surface-bg);
     }
   }
 
@@ -148,7 +153,7 @@ $tooltip-tokens: defaults(
     padding: var(--#{$prefix}tooltip-padding-y) var(--#{$prefix}tooltip-padding-x);
     color: var(--#{$prefix}tooltip-color);
     text-align: center;
-    background-color: var(--#{$prefix}tooltip-bg);
+    background-color: var(--#{$prefix}tooltip-surface-bg);
     @include border-radius(var(--#{$prefix}tooltip-border-radius));
   }
 }
