@@ -76,10 +76,6 @@ const RIGHT_MOUSE_BUTTON = 2
 
 const SUBMENU_CLOSE_DELAY = 100
 
-const EVENT_HIDE = `hide${EVENT_KEY}`
-const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_SHOW = `show${EVENT_KEY}`
-const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYDOWN_DATA_API = `keydown${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
@@ -251,7 +247,7 @@ class Menu extends BaseComponent {
       relatedTarget: this._element
     }
 
-    const showEvent = EventHandler.trigger(this._element, EVENT_SHOW, relatedTarget)
+    const showEvent = EventHandler.trigger(this._element, this.constructor.eventName('show'), relatedTarget)
 
     if (showEvent!.defaultPrevented) {
       return
@@ -277,7 +273,7 @@ class Menu extends BaseComponent {
     }
 
     Menu._openInstances.add(this)
-    EventHandler.trigger(this._element, EVENT_SHOWN, relatedTarget)
+    EventHandler.trigger(this._element, this.constructor.eventName('shown'), relatedTarget)
   }
 
   hide(): void {
@@ -328,7 +324,7 @@ class Menu extends BaseComponent {
   }
 
   protected _completeHide(relatedTarget: Record<string, unknown>): void {
-    const hideEvent = EventHandler.trigger(this._element, EVENT_HIDE, relatedTarget)
+    const hideEvent = EventHandler.trigger(this._element, this.constructor.eventName('hide'), relatedTarget)
     if (hideEvent!.defaultPrevented) {
       return
     }
@@ -352,10 +348,16 @@ class Menu extends BaseComponent {
     }
 
     this._element.setAttribute('aria-expanded', 'false')
+    this._removeMenuAttributes()
+    Menu._openInstances.delete(this)
+    EventHandler.trigger(this._element, this.constructor.eventName('hidden'), relatedTarget)
+  }
+
+  // Everything the engine stamped on the menu; Dropdown extends this with its
+  // own data-coreui-popper hook.
+  protected _removeMenuAttributes(): void {
     Manipulator.removeDataAttribute(this._menu, 'placement')
     Manipulator.removeDataAttribute(this._menu, 'display')
-    Menu._openInstances.delete(this)
-    EventHandler.trigger(this._element, EVENT_HIDDEN, relatedTarget)
   }
 
   override _getConfig(config?: ComponentConfig | null): ComponentConfig {
