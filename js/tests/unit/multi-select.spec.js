@@ -923,7 +923,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._menu.classList.contains('show')).toBe(true)
     })
 
-    it('should create popper instance', () => {
+    it('should start positioning on show', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -931,7 +931,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._popper).not.toBeNull()
+      expect(multiSelect._floatingCleanup).not.toBeNull()
     })
   })
 
@@ -990,7 +990,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._togglerElement.getAttribute('aria-expanded')).toBe('false')
     })
 
-    it('should destroy popper', () => {
+    it('should dispose the positioning cleanup on hide', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -998,11 +998,10 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._popper).not.toBeNull()
+      expect(multiSelect._floatingCleanup).not.toBeNull()
 
-      const spy = spyOn(multiSelect._popper, 'destroy')
       multiSelect.hide()
-      expect(spy).toHaveBeenCalled()
+      expect(multiSelect._floatingCleanup).toBeNull()
     })
 
     it('should clear search input on hide', () => {
@@ -3737,7 +3736,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._element).toBeNull()
     })
 
-    it('should destroy popper when disposing', () => {
+    it('should dispose the positioning cleanup when disposing', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -3745,21 +3744,20 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      expect(multiSelect._popper).not.toBeNull()
+      expect(multiSelect._floatingCleanup).not.toBeNull()
 
-      const spy = spyOn(multiSelect._popper, 'destroy')
       multiSelect.dispose()
 
-      expect(spy).toHaveBeenCalled()
+      expect(multiSelect._floatingCleanup).toBeNull()
     })
 
-    it('should handle dispose when popper is null', () => {
+    it('should handle dispose when positioning never started', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
-      // popper is null since we never showed it
-      expect(multiSelect._popper).toBeNull()
+      // positioning never started since we never showed it
+      expect(multiSelect._floatingCleanup).toBeNull()
 
       // Should not throw
       multiSelect.dispose()
@@ -4313,20 +4311,20 @@ describe('MultiSelect', () => {
     })
   })
 
-  describe('popper', () => {
-    it('should create popper on show', () => {
+  describe('positioning', () => {
+    it('should create the positioning cleanup on show', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
         options: [{ value: '1', text: 'Opt 1' }]
       })
 
-      expect(multiSelect._popper).toBeNull()
+      expect(multiSelect._floatingCleanup).toBeNull()
       multiSelect.show()
-      expect(multiSelect._popper).not.toBeNull()
+      expect(multiSelect._floatingCleanup).not.toBeNull()
     })
 
-    it('should update popper when selection changes and popper exists', () => {
+    it('should reposition when selection changes while shown', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -4337,7 +4335,7 @@ describe('MultiSelect', () => {
       })
 
       multiSelect.show()
-      const spy = spyOn(multiSelect._popper, 'update')
+      const spy = spyOn(multiSelect, '_updateFloatingPosition')
 
       multiSelect._selectOption('1', 'Opt 1')
 
