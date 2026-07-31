@@ -101,7 +101,7 @@ Blur and saturate the background of menus to create a translucent effect with `.
     <a class="menu-item" href="#">Menu item</a>
     <a class="menu-item" href="#">Menu item</a>
     <hr class="menu-divider">
-    <a class="menu-item theme-danger" href="#">Danger menu item</a>
+    <a class="menu-item text-danger" href="#">Danger menu item</a>
   </div>`} />
 
 ## Placement
@@ -213,19 +213,19 @@ Add `.disabled` to items in the menu to style them as disabled.
 
 ### Variants
 
-You can use the `theme-` prefix to apply a theme color to a menu item.
+Use our color utilities to tint individual menu items - the classic CoreUI idiom, with no extra component API involved.
 
 <Example class="hstack gap-3" code={`<div class="menu show position-static">
-    <a class="menu-item theme-primary" href="#">Primary link</a>
-    <a class="menu-item theme-secondary" href="#">Secondary link</a>
-    <a class="menu-item theme-success" href="#">Success link</a>
-    <a class="menu-item theme-danger" href="#">Danger link</a>
+    <a class="menu-item text-primary" href="#">Primary link</a>
+    <a class="menu-item text-secondary" href="#">Secondary link</a>
+    <a class="menu-item text-success" href="#">Success link</a>
+    <a class="menu-item text-danger" href="#">Danger link</a>
   </div>
   <div class="menu show position-static">
-    <a class="menu-item active theme-primary" href="#">Primary link</a>
-    <a class="menu-item active theme-secondary" href="#">Secondary link</a>
-    <a class="menu-item active theme-success" href="#">Success link</a>
-    <a class="menu-item active theme-danger" href="#">Danger link</a>
+    <a class="menu-item active text-primary" href="#">Primary link</a>
+    <a class="menu-item active text-secondary" href="#">Secondary link</a>
+    <a class="menu-item active text-success" href="#">Success link</a>
+    <a class="menu-item active text-danger" href="#">Danger link</a>
   </div>`} />
 
 ### Icons
@@ -246,7 +246,7 @@ Add `.menu-item-icon` directly to an `<svg>` to add an icon slot to menu items.
       Cut
     </button>
     <hr class="menu-divider">
-    <button class="menu-item theme-danger" type="button">
+    <button class="menu-item text-danger" type="button">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-item-icon" viewBox="0 0 16 16">
         <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
       </svg>
@@ -280,17 +280,17 @@ Add `.selected` to a `.menu-item` to indicate the current selection.
 <Example code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">Select status</button>
   <div class="menu">
     <button class="menu-item selected" type="button">
-      <div class="menu-item-content">
+      <span class="menu-item-content">
         Selected menu item
         <small class="menu-item-description">Currently visible to users</small>
-      </div>
+      </span>
       <svg class="menu-item-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 16 16"><path d="m2 7 4 5 8-8"/></svg>
     </button>
     <button class="menu-item" type="button">
-      <div class="menu-item-content">
+      <span class="menu-item-content">
         Default menu item
         <small class="menu-item-description">Not yet published</small>
-      </div>
+      </span>
       <svg class="menu-item-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 16 16"><path d="m2 7 4 5 8-8"/></svg>
     </button>
   </div>
@@ -371,8 +371,8 @@ Put a form within a menu, or make it into a menu, and use [spacing utilities](/u
       </div>
       <div class="vstack gap-2">
         <button type="submit" class="btn btn-primary">Sign in</button>
-        <a class="btn-ghost theme-secondary" href="#">New around here? Sign up</a>
-        <a class="btn-ghost theme-secondary" href="#">Forgot password?</a>
+        <a class="btn btn-ghost-secondary" href="#">New around here? Sign up</a>
+        <a class="btn btn-ghost-secondary" href="#">Forgot password?</a>
       </div>
     </form>
   </div>`} />
