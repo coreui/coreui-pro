@@ -4691,4 +4691,106 @@ describe('MultiSelect', () => {
       el.remove()
     })
   })
+
+  describe('accessibility of the replaced select', () => {
+    it('should hide the native select from assistive technologies', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      // eslint-disable-next-line no-new
+      new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      expect(selectEl.getAttribute('aria-hidden')).toBe('true')
+      expect(selectEl.tabIndex).toBe(-1)
+    })
+
+    it('should name the toggler from an associated label', () => {
+      fixtureEl.innerHTML = [
+        '<label for="myMultiSelect">Choose fruits</label>',
+        '<select id="myMultiSelect"></select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      const label = fixtureEl.querySelector('label')
+      expect(label.id).not.toBe('')
+      expect(multiSelect._togglerElement.getAttribute('aria-labelledby')).toBe(label.id)
+    })
+
+    it('should copy an aria-label from the native select to the toggler', () => {
+      fixtureEl.innerHTML = '<select aria-label="Fruits"></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      expect(multiSelect._togglerElement.getAttribute('aria-label')).toBe('Fruits')
+    })
+  })
+
+  describe('selectionType chips', () => {
+    it('should render selected options as chips with a labelled remove button', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Apple' },
+          { value: '2', text: 'Banana' }
+        ],
+        selectionType: 'chips',
+        value: '1'
+      })
+
+      const chip = multiSelect._selectionElement.querySelector('.chip')
+
+      expect(chip).not.toBeNull()
+      expect(chip.dataset.value).toBe('1')
+      expect(chip.textContent).toContain('Apple')
+
+      const removeButton = chip.querySelector('.chip-remove')
+      expect(removeButton).not.toBeNull()
+      expect(removeButton.getAttribute('aria-label')).toBe('Remove Apple')
+    })
+
+    it('should deselect the option when its chip is removed', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [
+          { value: '1', text: 'Apple' },
+          { value: '2', text: 'Banana' }
+        ],
+        selectionType: 'chips',
+        value: '1'
+      })
+
+      const chip = multiSelect._selectionElement.querySelector('.chip')
+      chip.querySelector('.chip-remove').click()
+
+      expect(multiSelect.getValue()).toHaveLength(0)
+      expect(multiSelect._selectionElement.querySelector('.chip')).toBeNull()
+      expect(selectEl.querySelector('option[value="1"]').selected).toBe(false)
+    })
+
+    it('should not render a remove button on chips for disabled options', () => {
+      fixtureEl.innerHTML = [
+        '<select multiple>',
+        '  <option value="1" selected disabled>Apple</option>',
+        '  <option value="2">Banana</option>',
+        '</select>'
+      ].join('')
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        selectionType: 'chips'
+      })
+
+      const chip = multiSelect._selectionElement.querySelector('.chip')
+
+      expect(chip).not.toBeNull()
+      expect(chip.querySelector('.chip-remove')).toBeNull()
+    })
+  })
 })

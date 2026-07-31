@@ -120,11 +120,20 @@ export const a11yComponents = [
   },
   {
     component: 'forms/multi-select',
+    // Docs examples are unlabeled fragments, so audit a representative,
+    // correctly labelled instance — that is what exercises the component's own
+    // wiring (label association, hidden native select) rather than the docs.
+    html: `<label for="a11yMultiSelect">Choose technologies</label>
+  <select id="a11yMultiSelect" multiple data-coreui-multi-select>
+    <option value="angular">Angular</option>
+    <option value="react" selected>React.js</option>
+    <option value="vue">Vue.js</option>
+  </select>`,
     criteria: [
       {
         criterion: '4.1.2',
-        status: 'author',
-        note: 'The toggler gets role=combobox with aria-expanded, aria-haspopup and aria-controls; options render as a role=listbox with aria-multiselectable and role=option items; the search input carries aria-label and aria-autocomplete. GAP: _hideNativeSelect() only sets tabindex=-1, so the replaced (unlabelled) <select> stays in the accessibility tree, and the role=combobox toggler <div> has no accessible name — it should be wired to an associated <label> via aria-labelledby.'
+        status: 'built-in',
+        note: 'The toggler gets role=combobox named from the associated <label> via aria-labelledby (or the select\'s aria-label), with aria-expanded, aria-haspopup and aria-controls; options render as a role=listbox with aria-multiselectable and role=option items; the replaced native <select> is removed from the accessibility tree (aria-hidden, tabindex=-1).'
       },
       {
         criterion: '4.1.3',

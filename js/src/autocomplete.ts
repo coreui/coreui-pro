@@ -5,18 +5,15 @@
  * --------------------------------------------------------------------------
  */
 
-import BaseComponent from './base-component.js'
+import Combobox from './combobox.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
-import { createAnchoredPosition } from './util/floating-ui.js'
 import {
-  DefaultAllowlist, escapeHtml, sanitizeHtml, type SanitizerAllowList
+  DefaultAllowlist, escapeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
-import {
-  defineJQueryPlugin, getNextActiveElement, getElement, getUID, isVisible
-} from './util/index.js'
+import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -69,7 +66,6 @@ const CLASS_NAME_OPTGROUP = 'autocomplete-optgroup'
 const CLASS_NAME_OPTGROUP_LABEL = 'autocomplete-optgroup-label'
 const CLASS_NAME_OPTION = 'autocomplete-option'
 const CLASS_NAME_OPTIONS = 'autocomplete-options'
-const CLASS_NAME_OPTIONS_EMPTY = 'autocomplete-options-empty'
 const CLASS_NAME_SELECTED = 'selected'
 const CLASS_NAME_SHOW = 'show'
 
@@ -146,20 +142,11 @@ const DefaultType: Record<string, string> = {
  * ------------------------------------------------------------------------
  */
 
-class Autocomplete extends BaseComponent {
-  protected declare _uniqueId: any
+class Autocomplete extends Combobox {
   protected declare _indicatorElement: any
   protected declare _cleanerElement: any
   protected declare _inputElement: any
   protected declare _inputHintElement: any
-  protected declare _togglerElement: any
-  protected declare _optionsElement: any
-  protected declare _menu: any
-  protected declare _selected: any
-  protected declare _options: any
-  protected declare _floatingCleanup: (() => void) | null
-  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
-  protected declare _search: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -196,6 +183,16 @@ class Autocomplete extends BaseComponent {
 
   static override get NAME(): string {
     return NAME
+  }
+
+  static override get selectors(): any {
+    return {
+      option: SELECTOR_OPTION,
+      optgroup: SELECTOR_OPTGROUP,
+      options: SELECTOR_OPTIONS,
+      optionsEmpty: SELECTOR_OPTIONS_EMPTY,
+      navigableItems: SELECTOR_VISIBLE_ITEMS
+    }
   }
 
   // Public
@@ -313,19 +310,6 @@ class Autocomplete extends BaseComponent {
     })
   }
 
-  _flattenOptions(options: any[] = this._options, flat: any[] = []): any[] {
-    for (const opt of options) {
-      if (opt && Array.isArray(opt.options)) {
-        this._flattenOptions(opt.options, flat)
-        continue
-      }
-
-      flat.push(opt)
-    }
-
-    return flat
-  }
-
   _getClassNames(): string[] {
     return this._element.classList.value.split(' ')
   }
@@ -349,11 +333,6 @@ class Autocomplete extends BaseComponent {
 
   _isGlobalSearch(): boolean {
     return Array.isArray(this._config.search) && this._config.search.includes('global')
-  }
-
-  _isVisible(element: HTMLElement): boolean {
-    const style = window.getComputedStyle(element)
-    return (style.display !== 'none')
   }
 
   _isShown(): boolean {
@@ -702,23 +681,6 @@ class Autocomplete extends BaseComponent {
     this._updateCleaner()
   }
 
-  _createFloating(): void {
-    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
-    this._floatingCleanup = this._anchoredPosition.destroy
-  }
-
-  async _updateFloatingPosition(): Promise<void> {
-    await this._anchoredPosition?.update()
-  }
-
-  _disposeFloating(): void {
-    if (this._floatingCleanup) {
-      this._floatingCleanup()
-      this._floatingCleanup = null
-      this._anchoredPosition = null
-    }
-  }
-
   _createOptionsContainer(): void {
     const dropdownDiv = document.createElement('div')
     dropdownDiv.classList.add(CLASS_NAME_DROPDOWN)
@@ -759,9 +721,7 @@ class Autocomplete extends BaseComponent {
 
         const optgrouplabel = document.createElement('div')
         if (this._config.optionsGroupsTemplate && typeof this._config.optionsGroupsTemplate === 'function') {
-          optgrouplabel.innerHTML = this._config.sanitize ?
-            sanitizeHtml(this._config.optionsGroupsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
-            this._config.optionsGroupsTemplate(option)
+          optgrouplabel.innerHTML = this._maybeSanitize(this._config.optionsGroupsTemplate(option))
         } else {
           optgrouplabel.textContent = option.label
         }
@@ -793,9 +753,7 @@ class Autocomplete extends BaseComponent {
       if (this._isExternalSearch() && this._config.highlightOptionsOnSearch && this._search) {
         optionDiv.innerHTML = this._highlightOption(option.label)
       } else if (this._config.optionsTemplate && typeof this._config.optionsTemplate === 'function') {
-        optionDiv.innerHTML = this._config.sanitize ?
-          sanitizeHtml(this._config.optionsTemplate(option), this._config.allowList, this._config.sanitizeFn) :
-          this._config.optionsTemplate(option)
+        optionDiv.innerHTML = this._maybeSanitize(this._config.optionsTemplate(option))
       } else {
         optionDiv.textContent = option.label
       }
@@ -824,23 +782,6 @@ class Autocomplete extends BaseComponent {
       this._selectOption(foundOption)
       this._inputElement.focus()
     }
-  }
-
-  _findOptionByValue(value: any, options: any[] = this._options): any {
-    for (const option of options) {
-      if (option.value === value) {
-        return option
-      }
-
-      if (option.options && Array.isArray(option.options)) {
-        const found = this._findOptionByValue(value, option.options)
-        if (found) {
-          return found
-        }
-      }
-    }
-
-    return null
   }
 
   _selectOption(option: any): void {
@@ -909,91 +850,23 @@ class Autocomplete extends BaseComponent {
     }
   }
 
-  _filterOptionsList(): void {
-    const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
-    let visibleOptions = 0
-
-    for (const option of options) {
-      // eslint-disable-next-line unicorn/prefer-includes
-      if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
-        option.style.display = 'none'
-      } else {
-        if (this._config.highlightOptionsOnSearch && !this._config.optionsTemplate) {
-          option.innerHTML = this._highlightOption(option.textContent)
-        }
-
-        option.style.removeProperty('display')
-        visibleOptions++
-      }
-
-      const optgroup = option.closest(SELECTOR_OPTGROUP) as HTMLElement
-      if (optgroup) {
-        // eslint-disable-next-line  unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter((element: HTMLElement) => this._isVisible(element)).length > 0) {
-          optgroup.style.removeProperty('display')
-        } else {
-          optgroup.style.display = 'none'
-        }
-      }
-    }
-
-    if (visibleOptions > 0) {
-      if (SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-        SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)!.remove()
-      }
-
-      return
-    }
-
-    if (visibleOptions === 0) {
-      if (this._config.searchNoResultsLabel) {
-        const placeholder = document.createElement('div')
-        placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-        placeholder.setAttribute('role', 'status')
-        placeholder.textContent = this._config.searchNoResultsLabel
-
-        if (!SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)) {
-          SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu)!.append(placeholder)
-        }
-
-        return
-      }
-
-      this.hide()
+  override _decorateFilteredOption(option: HTMLElement): void {
+    if (this._config.highlightOptionsOnSearch && !this._config.optionsTemplate) {
+      option.innerHTML = this._highlightOption(option.textContent!)
     }
   }
 
-  _selectMenuItem({ key, target }: any): void {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
-
-    if (!items.length) {
+  override _afterFilter(visibleOptions: number): void {
+    if (visibleOptions > 0 || this._config.searchNoResultsLabel) {
+      this._syncNoResultsPlaceholder(visibleOptions)
       return
     }
 
-    // if target isn't included in items (e.g. when expanding the dropdown)
-    // allow cycling to get the last item in case key equals ARROW_UP_KEY
-    getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
-  }
-
-  _selectFirstOrLastMenuItem(first: boolean): void {
-    const items = SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu).filter(element => isVisible(element))
-
-    if (!items.length) {
-      return
-    }
-
-    const item = first ? items[0] : items[items.length - 1]
-    item.focus()
+    this.hide()
   }
 
   override _configAfterMerge(config: any): any {
-    if (config.container === true) {
-      config.container = document.body
-    }
-
-    if (typeof config.container === 'object' || typeof config.container === 'string') {
-      config.container = getElement(config.container)
-    }
+    config = this._normalizeContainerConfig(config)
 
     if (typeof config.options === 'string') {
       config.options = config.options.split(/,\s*/).map(String)

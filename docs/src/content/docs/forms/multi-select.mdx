@@ -157,6 +157,22 @@ If you want to display selected options as tags, add the `data-coreui-selection-
     </optgroup>
   </select>`} />
 
+### Chips
+
+Add `data-coreui-selection-type="chips"` to render selected options as [Chip](/components/chip/) components — each selection becomes a real chip with the standard chip styling and a labelled remove button. <AddedIn version="6.0.0" />
+
+<Example pro code={`<select id="multiple-select-chips" data-coreui-multi-select multiple data-coreui-selection-type="chips" data-coreui-search="true">
+    <option value="0">Angular</option>
+    <option value="1">Bootstrap</option>
+    <option value="2">React.js</option>
+    <option value="3">Vue.js</option>
+    <optgroup label="backend">
+      <option value="4">Django</option>
+      <option value="5">Laravel</option>
+      <option value="6">Node.js</option>
+    </optgroup>
+  </select>`} />
+
 ### Counter
 
 If you prefer to show a counter indicating the number of selected options, add the `data-coreui-selection-type="counter"`. This helps users keep track of their selections and includes search functionality for filtering options.
@@ -497,7 +513,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectAllStyle` | string | `'checkbox'` | Sets the select all button style: `'checkbox'` or `'text'`. With `'checkbox'` (and `multiple`), the built-in select all button shows a tri-state checkbox indicator (`none` / `all` / `indeterminate`) reflecting the overall selection, and clicking it toggles between selecting and deselecting all. |
 | `selectionLimit` | number, null | `null` | Sets the maximum number of selectable options. The select all button stays enabled and selects up to the limit (firing the `selectionLimit` event), then toggles to deselect all once the limit is reached. |
 | `selectFilteredLabel` | string | `'Select filtered'` | Label shown instead of `selectAllLabel` when `selectAllMode: 'filtered'` and a search filter narrows the list, so the button reads as acting on the filtered options rather than the whole list. |
-| `selectionType` | string | `'tag'` | Sets the selection style.	 |
+| `selectionType` | string | `'tags'` | Sets the selection style: `'chips'`, `'counter'`, `'tags'` or `'text'`. `'chips'` renders selections as [Chip](/components/chip/) components. |
 | `selectionTypeCounterText` | string | `'item(s) selected'` | Sets the counter selection label.	|
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
 | `value` | boolean | `null` | Sets the initially selected values for the multi-select component. |
