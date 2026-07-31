@@ -263,6 +263,8 @@
       badge:
         color: danger
         text: PRO
+    - title: Menu
+      to: /components/menu/
     - title: Modal
       to: /components/modal/
     - title: Navbar
