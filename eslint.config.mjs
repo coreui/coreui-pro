@@ -165,9 +165,44 @@ export default [
       '@typescript-eslint': tseslint.plugin
     },
     rules: {
+      // `eslint-recommended` disables the base rules that misread TypeScript —
+      // no-undef fires on DOM types like ParentNode, which live in type
+      // position and are not runtime identifiers.
+      ...tseslint.configs.recommended.find(config => config.name === 'typescript-eslint/eslint-recommended')?.rules,
       ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
       // The config objects are intentionally loose — see util/config
-      '@typescript-eslint/no-explicit-any': 'off'
+      '@typescript-eslint/no-explicit-any': 'off',
+      // The TS-aware rule replaces the base one, so it has to repeat its
+      // options — otherwise `_` placeholders that pass in .js fail in .ts.
+      '@typescript-eslint/no-unused-vars': ['error', {
+        args: 'after-used',
+        argsIgnorePattern: '^_',
+        caughtErrors: 'all',
+        caughtErrorsIgnorePattern: '^_$',
+        ignoreRestSiblings: true,
+        vars: 'all',
+        varsIgnorePattern: '^_'
+      }],
+      // Fires on `.ts` but not on byte-identical `.js`: the rule misreads arrows
+      // that close over `this`, which by definition cannot move to outer scope.
+      'unicorn/consistent-function-scoping': 'off'
+    }
+  },
+  {
+    // The consumer type test imports the emitted declarations on purpose, so it
+    // resolves only after a build — and the lint job runs before one.
+    files: ['js/tests/types/**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      sourceType: 'module'
+    },
+    plugins: {
+      '@typescript-eslint': tseslint.plugin
+    },
+    rules: {
+      ...tseslint.configs.recommended.find(config => config.name === 'typescript-eslint/eslint-recommended')?.rules,
+      ...tseslint.configs.recommended.find(config => config.rules && config.name === 'typescript-eslint/recommended')?.rules,
+      'import/no-unresolved': 'off'
     }
   },
   {

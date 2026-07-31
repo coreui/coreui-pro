@@ -45,6 +45,9 @@ jobs:
       - name: Run dist
         run: npm run js
 
+      - name: Type-check the shipped declarations
+        run: npm run js-typecheck-dist
+
       - name: Run JS tests
         run: npm run js-test
 
