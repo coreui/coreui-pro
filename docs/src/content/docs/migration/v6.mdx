@@ -278,6 +278,22 @@ the option-by-option migration map. Planned mapping:
 - The `data-coreui-toggle="pill"` and `"list"` toggles **stay** — they are
   documented markup, and v6 keeps documented markup working.
 
+#### Tooltip
+
+- **`--cui-tooltip-opacity` now blends into the background colour instead of
+  fading the whole element.** The old element-level `opacity: .9` also faded the
+  label text, compositing it below the WCAG 1.4.3 contrast minimum (about
+  3.5&#8758;1). The surface and arrow keep the same translucent look; the text
+  renders at full opacity. The token still works — override it and only the
+  background alpha changes.
+
+#### Chip input
+
+- **`aria-disabled`/`aria-readonly` are no longer stamped on the container.**
+  The container is a generic element, so those attributes were invalid on it
+  (axe `aria-allowed-attr`); the native `disabled`/`readonly` states on the
+  inner `<input>` carry the semantics.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component

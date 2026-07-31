@@ -170,15 +170,15 @@ describe('ChipInput', () => {
       expect(chipInput.getValues()).toEqual(['First', 'Second'])
     })
 
-    it('should set aria attributes on element', () => {
+    it('should not set aria attributes on the container element', () => {
       fixtureEl.innerHTML = '<div class="chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
       new ChipInput(el)
 
-      expect(el.getAttribute('aria-disabled')).toEqual('false')
-      expect(el.getAttribute('aria-readonly')).toEqual('false')
+      expect(el.getAttribute('aria-disabled')).toBeNull()
+      expect(el.getAttribute('aria-readonly')).toBeNull()
     })
 
     it('should set label for attribute when label has no for', () => {
