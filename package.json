@@ -160,7 +160,6 @@
     "dist/{css,js}/**/*.{css,js,map}",
     "js/dist/**/*.{js,map,d.ts}",
     "js/src/**/*.ts",
-    "js/index.{esm,umd}.js",
     "scss/**/*.scss",
     "!scss/tests/**"
   ],
