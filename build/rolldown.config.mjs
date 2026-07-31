@@ -1,11 +1,9 @@
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
-import { babel } from '@rollup/plugin-babel'
-import { nodeResolve } from '@rollup/plugin-node-resolve'
 import replace from '@rollup/plugin-replace'
 import banner from './banner.mjs'
-import tsResolve from './rollup-plugin-ts-resolve.cjs'
+import browserTargets from './browser-targets.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -16,17 +14,6 @@ const ESM = process.env.ESM === 'true'
 let destinationFile = BOOTSTRAP ? `bootstrap${ESM ? '.esm' : ''}` : `coreui${ESM ? '.esm' : ''}`
 const external = ['@floating-ui/dom', '@popperjs/core']
 const plugins = [
-  // Must run before the others: maps the `.js` specifiers our TS sources use
-  // onto the `.ts` files on disk
-  tsResolve(),
-  babel({
-    // Only transpile our source code
-    exclude: 'node_modules/**',
-    // Transpile the TypeScript sources too
-    extensions: ['.js', '.mjs', '.ts'],
-    // Include the helpers in the bundle, at most one copy of each
-    babelHelpers: 'bundled'
-  }),
   BOOTSTRAP && replace({
     preventAssignment: false,
     delimiters: ['', ''],
@@ -41,6 +28,7 @@ const globals = {
   '@floating-ui/dom': 'FloatingUIDOM',
   '@popperjs/core': 'Popper'
 }
+const define = {}
 
 if (BUNDLE) {
   destinationFile += '.bundle'
@@ -48,30 +36,30 @@ if (BUNDLE) {
   external.length = 0
   delete globals['@floating-ui/dom']
   delete globals['@popperjs/core']
-  plugins.push(
-    replace({
-      'process.env.NODE_ENV': '"production"',
-      preventAssignment: true
-    }),
-    nodeResolve()
-  )
+  define['process.env.NODE_ENV'] = '"production"'
 }
 
-const rollupConfig = {
+const rolldownConfig = {
   input: path.resolve(__dirname, `../js/index.${ESM ? 'esm' : 'umd'}.js`),
+  // oxc strips the types and lowers the syntax, so the dist path carries no
+  // Babel. The targets come from .browserslistrc, the same source Babel read.
+  transform: {
+    define,
+    target: browserTargets()
+  },
   output: {
     banner: banner(),
     file: path.resolve(__dirname, `../dist/js/${destinationFile}.js`),
     format: ESM ? 'esm' : 'umd',
     globals,
-    generatedCode: 'es2015'
+    generatedCode: { preset: 'es2015' }
   },
   external,
   plugins
 }
 
 if (!ESM) {
-  rollupConfig.output.name = BOOTSTRAP ? 'bootstrap' : 'coreui'
+  rolldownConfig.output.name = BOOTSTRAP ? 'bootstrap' : 'coreui'
 }
 
-export default rollupConfig
+export default rolldownConfig
