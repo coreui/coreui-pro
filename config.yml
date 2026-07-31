@@ -16,9 +16,11 @@ cdn:
   js_hash: "sha384-gf1tanjsJUdqpGpiHABhWprM/7/k8itp69MQWhJGblqf0/0EhOcPA5GPZZE83Br9"
   js_bundle: "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.9.0/dist/js/coreui.bundle.min.js"
   js_bundle_hash: "sha384-FTek6QoTuxz6Bb078pS0kYQ0qH2LZVB5LWwZl8944mluH+TCk0q3OP4PqA+dHJRl"
-  popper: "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-  popper_hash: "sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-  popper_esm: "https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/esm/popper.min.js"
+  floating_ui_core: "https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js"
+  floating_ui_core_hash: "sha384-HNCdK6HYLs4EKIDg2Ml3NdfNMVD/LcFbGXnagRABpWmpJjiEuhrtSIckScRnqDOD"
+  floating_ui_dom: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js"
+  floating_ui_dom_hash: "sha384-h02fHnOrZRtL8NvKyMkr2vfTxUr0lTnQdZexzrbPfME4nd74qGfOZ97tbiroJo1Y"
+  floating_ui_esm: "https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/+esm"
 
 cdn_themes:
   css_bs: "https://cdn.jsdelivr.net/npm/@coreui/coreui@5.9.0/dist/css/themes/bootstrap/bootstrap.min.css"

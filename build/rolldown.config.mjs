@@ -12,7 +12,7 @@ const BOOTSTRAP = process.env.BOOTSTRAP === 'true'
 const ESM = process.env.ESM === 'true'
 
 let destinationFile = BOOTSTRAP ? `bootstrap${ESM ? '.esm' : ''}` : `coreui${ESM ? '.esm' : ''}`
-const external = ['@floating-ui/dom', '@popperjs/core']
+const external = ['@floating-ui/core', '@floating-ui/dom']
 const plugins = [
   BOOTSTRAP && replace({
     preventAssignment: false,
@@ -25,8 +25,8 @@ const plugins = [
   })
 ]
 const globals = {
-  '@floating-ui/dom': 'FloatingUIDOM',
-  '@popperjs/core': 'Popper'
+  '@floating-ui/core': 'FloatingUICore',
+  '@floating-ui/dom': 'FloatingUIDOM'
 }
 const define = {}
 
@@ -34,8 +34,8 @@ if (BUNDLE) {
   destinationFile += '.bundle'
   // Bundle the positioning engines instead of treating them as externals
   external.length = 0
+  delete globals['@floating-ui/core']
   delete globals['@floating-ui/dom']
-  delete globals['@popperjs/core']
   define['process.env.NODE_ENV'] = '"production"'
 }
 

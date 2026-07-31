@@ -372,7 +372,7 @@ Add `.disabled` to items in the dropdown to **style them as disabled**.
 By default, a dropdown menu is automatically positioned 100% from the top and along the left side of its parent. Add `.dropdown-menu-end` to a `.dropdown-menu` to right align the dropdown menu.
 
 <Callout color="info">
-**Heads up!** Dropdowns are positioned thanks to Popper except when they are contained in a navbar.
+**Heads up!** Dropdowns are positioned thanks to Floating UI except when they are contained in a navbar.
 </Callout>
 
 <Example code={`<div class="btn-group">
@@ -416,7 +416,7 @@ To align **left** the dropdown menu with the given breakpoint or larger, add `.d
     </ul>
   </div>`} />
 
-Note that you don't need to add a `data-coreui-display="static"` attribute to dropdown buttons in navbars, since Popper isn't used in navbars.
+Note that you don't need to add a `data-coreui-display="static"` attribute to dropdown buttons in navbars, since Floating UI isn't used in navbars.
 
 ### Alignment options
 
@@ -716,7 +716,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | --- | --- | --- | --- |
 | `autoClose` | boolean, string | `true` | Configure the auto close behavior of the dropdown: <ul class="my-2"><li>`true` - the dropdown will be closed by clicking outside or inside the dropdown menu.</li><li>`false` - the dropdown will be closed by clicking the toggle button and manually calling `hide` or `toggle` method. (Also will not be closed by pressing <kbd>esc</kbd> key)</li><li>`'inside'` - the dropdown will be closed (only) by clicking inside the dropdown menu.</li>  <li>`'outside'` - the dropdown will be closed (only) by clicking outside the dropdown menu.</li></ul> Note: the dropdown can always be closed with the <kbd>ESC</kbd> key |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the dropdown menu. By default it's `clippingParents` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI's [detectOverflow docs](https://floating-ui.com/docs/detectOverflow/#boundary). |
-| `display` | string | `'dynamic'` | By default, we use Popper for dynamic positioning. Disable this with `static`. |
+| `display` | string | `'dynamic'` | By default, we use Floating UI for dynamic positioning. Disable this with `static`. |
 | `offset` | array, string, function | `[0, 2]` |  Offset of the dropdown relative to its target. You can pass a string in data attributes with comma separated values like: `data-coreui-offset="10,20"`. When a function is used to determine the offset, it is called with an object containing the placement, the reference, and floating rects as its first argument. The triggering element DOM node is passed as the second argument. The function must return an array with two numbers: skidding (along the edge) and distance (away from it). For more information refer to Floating UI's [offset docs](https://floating-ui.com/docs/offset/#options). |
 | `floatingConfig` | null, object, function | `null` | To change CoreUI's default Floating UI config, see Floating UI's [computePosition docs](https://floating-ui.com/docs/computePosition/#options). When a function is used to create the configuration, it's called with an object that contains the default configuration. It helps you use and merge the default with your own configuration. The function must return a configuration object for Floating UI. |
 | `reference` | string, element, object | `'toggle'` | Reference element of the dropdown menu. Accepts the values of `'toggle'`, `'parent'`, an HTMLElement reference or an object providing `getBoundingClientRect`. For more information refer to Floating UI's [virtual elements docs](https://floating-ui.com/docs/virtual-elements/). |

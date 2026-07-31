@@ -16,14 +16,27 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 ### Dependencies
 
-- **New peer dependency: `@floating-ui/dom`.** The new anchored-overlay
-  primitive (used by the rewritten pickers, and over time by autocomplete,
-  multi-select, and dropdown) positions with [Floating UI](https://floating-ui.com)
-  instead of Popper. During the transition **both** `@floating-ui/dom` and
-  `@popperjs/core` are peer dependencies — components not yet migrated keep
-  using Popper. Bundle builds (`coreui.bundle.*`) include both engines, so no
-  action is needed for CDN users; npm users installing peer dependencies
-  manually should add `@floating-ui/dom`.
+- **Popper is gone; `@floating-ui/dom` replaces it.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  Every positioned component — tooltips, popovers, dropdowns, autocomplete,
+  multi-select, and the pickers — now positions with
+  [Floating UI](https://floating-ui.com). `@popperjs/core` is no longer a peer
+  dependency and the bundle builds (`coreui.bundle.*`) no longer include it.
+  What to change:
+  - npm: replace `@popperjs/core` with `@floating-ui/dom` in your dependencies.
+  - CDN (non-bundle builds): replace the `popper.min.js` script tag with the
+    two Floating UI files, in this order: `floating-ui.core.umd.min.js`, then
+    `floating-ui.dom.umd.min.js`.
+  - The `popperConfig` option (tooltip, popover, dropdown) is now
+    `floatingConfig` and receives a Floating UI
+    [computePosition](https://floating-ui.com/docs/computePosition) config —
+    Popper's `modifiers` array does not translate; use Floating UI middleware.
+  - The tip and menu carry `data-coreui-placement` instead of Popper's
+    `data-popper-placement`; CSS or JS keying on the old attribute needs the
+    new name.
+  - Positioning is now asynchronous (`computePosition` is promise-based).
+    Code that read the tip's coordinates synchronously right after `show()`
+    should wait for the `shown` event.
 
 ### JavaScript
 

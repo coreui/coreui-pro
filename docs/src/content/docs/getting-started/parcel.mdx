@@ -20,16 +20,16 @@ We're building a Parcel project with CoreUI from scratch, so there are some prer
    npm i --save-dev parcel
    ```
 
-3. **Install CoreUI.** Now we can install CoreUI. We'll also install Popper since our dropdowns, popovers, and tooltips depend on it for their positioning. If you don't plan on using those components, you can omit Popper here.
+3. **Install CoreUI.** Now we can install CoreUI. We'll also install Floating UI since our dropdowns, popovers, and tooltips depend on it for their positioning. If you don't plan on using those components, you can omit Floating UI here.
 
    ```sh
-   npm i --save @coreui/coreui @popperjs/core
+   npm i --save @coreui/coreui @floating-ui/dom
    ```
 
    **For PRO users**
 
    ```sh
-   npm i --save @coreui/coreui-pro @popperjs/core
+   npm i --save @coreui/coreui-pro @floating-ui/dom
    ```
 
 Now that we have all the necessary dependencies installed, we can get to work creating the project files and importing CoreUI.
@@ -137,7 +137,7 @@ Importing CoreUI into Parcel requires two imports, one into our `styles.scss` an
 
    *You can also import our stylesheets individually if you want. [Read our Sass import docs](/customize/sass/#importing) for details.*
 
-2. **Import CoreUI's JS.** Add the following to `src/js/main.js` to import all of CoreUI's JS. Popper will be imported automatically through CoreUI.
+2. **Import CoreUI's JS.** Add the following to `src/js/main.js` to import all of CoreUI's JS. Floating UI will be imported automatically through CoreUI.
 
    ```js
    // Import all of CoreUI's JS
