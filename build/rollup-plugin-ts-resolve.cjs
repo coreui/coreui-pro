@@ -7,6 +7,10 @@
  * bundles straight from `js/src`, a specifier like `./util/index.js` must be
  * mapped to the `./util/index.ts` file on disk.
  *
+ * The dist build no longer needs this — rolldown resolves the mapping itself —
+ * so the remaining consumers are karma and the per-plugin build, both of which
+ * are still on Rollup.
+ *
  * Rollup has no `resolve.extensionAlias`, so this hook is what makes a mixed
  * `.js`/`.ts` tree work: when no `.ts` sibling exists it returns null and the
  * `.js` file resolves normally, which is what lets the migration convert one
