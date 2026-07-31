@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import DatePicker from '../../src/date-picker.js'
 import EventHandler from '../../src/dom/event-handler.js'

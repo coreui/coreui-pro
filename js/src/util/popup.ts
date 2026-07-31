@@ -229,7 +229,12 @@ class Popup extends Config {
       placement: this._resolvePlacement() as any,
       strategy: 'absolute'
     }).then(({ x, y }) => {
-      Object.assign(this._content!.style, {
+      // dispose() can null the content while computePosition is in flight
+      if (!this._content || !this._content.isConnected) {
+        return
+      }
+
+      Object.assign(this._content.style, {
         insetInlineStart: '0',
         left: `${x}px`,
         position: 'absolute',

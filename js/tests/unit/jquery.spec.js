@@ -1,4 +1,3 @@
-/* eslint-env jquery */
 
 import Alert from '../../src/alert.js'
 import Button from '../../src/button.js'

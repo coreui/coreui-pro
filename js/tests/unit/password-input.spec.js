@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import PasswordInput from '../../src/password-input.js'
 import SelectorEngine from '../../src/dom/selector-engine.js'

@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import LoadingButton from '../../src/loading-button.js'
 import Data from '../../src/dom/data.js'

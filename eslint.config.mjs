@@ -156,7 +156,7 @@ export default [
   {
     // The library sources are migrating to TypeScript file by file, so this
     // block only applies where a `.ts` file already exists.
-    files: ['js/src/**/*.ts'],
+    files: ['js/src/**/*.ts', 'js/tests/vitest.config.mts'],
     languageOptions: {
       parser: tseslint.parser,
       sourceType: 'module'
@@ -230,13 +230,15 @@ export default [
     }
   },
   {
-    files: ['js/tests/*.js', 'js/tests/integration/rollup*.js'],
+    // The Vitest setup files and the integration configs are ES modules that
+    // run under Node/Vite, not in the spec sandbox
+    files: ['js/tests/*.js', 'js/tests/*.mts', 'js/tests/integration/rolldown*.mjs'],
     languageOptions: {
       globals: {
+        ...globals.browser,
         ...globals.jquery,
         ...globals.node
-      },
-      sourceType: 'commonjs' // change to 'commonjs' to avoid the error: 'Use the function form of 'use strict''
+      }
     }
   },
   {
