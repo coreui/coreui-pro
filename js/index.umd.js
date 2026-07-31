@@ -23,6 +23,7 @@ import DateTimePickerV2 from './src/date-time-picker-v2.js'
 import DateTimeInput from './src/date-time-input.js'
 import Dropdown from './src/dropdown.js'
 import LoadingButton from './src/loading-button.js'
+import Menu from './src/menu.js'
 import Modal from './src/modal.js'
 import MultiSelect from './src/multi-select.js'
 import Navigation from './src/navigation.js'
@@ -62,6 +63,7 @@ export default {
   DateTimeInput,
   Dropdown,
   LoadingButton,
+  Menu,
   Modal,
   MultiSelect,
   Navigation,

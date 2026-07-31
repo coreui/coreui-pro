@@ -106,6 +106,19 @@ or, if you are already resolving the package by name, `import { Tooltip } from
 
 ### Components
 
+#### Menu (new) and Dropdown
+
+- **New component: Menu** — contextual overlays with submenus, container
+  teleport, responsive placement and logical (`start`/`end`) placements,
+  ported from Bootstrap v6 with CoreUI's class conventions. See the
+  [Menu docs](/components/menu/).
+- **Dropdown is now a compatibility layer over Menu.** The v5 markup, classes
+  and `*.coreui.dropdown` events keep working unchanged — the plugin shares
+  Menu's engine underneath. Where their options overlap, Dropdown also
+  understands Menu's additions (for example `container`). **Deprecation
+  notice: Dropdown may be removed in v7** — prefer Menu for new work.
+
+
 #### Calendar
 
 - **Behavior change:** `update()` now **merges** the given options over the

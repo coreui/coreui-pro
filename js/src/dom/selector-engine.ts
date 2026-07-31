@@ -48,6 +48,10 @@ const SelectorEngine = {
     return ([] as T[]).concat(...element.children as unknown as T[][]).filter(child => child.matches(selector))
   },
 
+  closest<T extends Element = HTMLElement>(element: Element, selector: string): T | null {
+    return Element.prototype.closest.call(element, selector) as T | null
+  },
+
   parents(element: Element, selector: string): Element[] {
     const parents = []
     let ancestor = (element.parentNode as Element).closest(selector)

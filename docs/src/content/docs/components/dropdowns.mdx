@@ -8,6 +8,10 @@ otherFrameworks:
 
 ## Overview
 
+<Callout color="warning">
+**Built on Menu — and heading for retirement.** Since v6 the Dropdown plugin is a compatibility layer over the new [Menu](/components/menu/) component — same engine, keyboard handling and dismissal, with the v5 markup, classes and `*.coreui.dropdown` events preserved. Existing dropdown markup keeps working unchanged throughout v6, but **Dropdown may be removed in v7** — we recommend using Menu for new work and migrating when convenient.
+</Callout>
+
 Dropdowns are toggleable, contextual overlays for displaying lists of links and more. They're made interactive with the included Bootstrap dropdown JavaScript plugin. They're toggled by clicking, not by hovering.
 
 Dropdowns are built on a third party library, [Floating UI](https://floating-ui.com/), which provides dynamic positioning and viewport detection. Be sure to include [floating-ui.core.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/core@1.8.0/dist/floating-ui.core.umd.min.js) and [floating-ui.dom.umd.min.js](https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.8.0/dist/floating-ui.dom.umd.min.js) (in this order) before CoreUI's JavaScript or use `coreui.bundle.min.js` / `coreui.bundle.js` which contains Floating UI. Floating UI isn't used to position dropdowns in navbars though as dynamic positioning isn't required.
