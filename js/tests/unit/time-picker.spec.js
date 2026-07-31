@@ -1245,17 +1245,16 @@ describe('TimePicker', () => {
       expect(div.classList.contains('show')).toBeFalse()
     })
 
-    it('should destroy popper on hide', () => {
+    it('should dispose the positioning cleanup on hide', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const tp = new TimePicker(div)
 
       tp.show()
-      expect(tp._popper).not.toBeNull()
+      expect(tp._floatingCleanup).not.toBeNull()
 
-      const destroySpy = spyOn(tp._popper, 'destroy')
       tp.hide()
-      expect(destroySpy).toHaveBeenCalled()
+      expect(tp._floatingCleanup).toBeNull()
     })
 
     it('should remove show class from menu when container is used', () => {
@@ -1489,16 +1488,17 @@ describe('TimePicker', () => {
       expect(TimePicker.getInstance(div)).toBeNull()
     })
 
-    it('should destroy popper if it exists', () => {
+    it('should dispose the positioning cleanup if it exists', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const tp = new TimePicker(div)
 
       tp.show()
-      const destroySpy = spyOn(tp._popper, 'destroy').and.callThrough()
+      expect(tp._floatingCleanup).not.toBeNull()
+
       tp.dispose()
 
-      expect(destroySpy).toHaveBeenCalled()
+      expect(tp._floatingCleanup).toBeNull()
     })
 
     it('should clear input timeout if it exists', () => {

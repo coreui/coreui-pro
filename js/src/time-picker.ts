@@ -5,7 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
-import * as Popper from '@popperjs/core'
+import {
+  autoUpdate, computePosition, flip, offset, shift
+} from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
@@ -157,7 +159,7 @@ class TimePicker extends BaseComponent {
   protected declare _date: any
   protected declare _initialDate: any
   protected declare _ampm: any
-  protected declare _popper: any
+  protected declare _floatingCleanup: (() => void) | null
   protected declare _indicatorElement: any
   protected declare _input: any
   protected declare _menu: any
@@ -176,7 +178,7 @@ class TimePicker extends BaseComponent {
     this._ampm = this._date ?
       getAmPm(new Date(this._date), this._config.locale) :
       'am'
-    this._popper = null
+    this._floatingCleanup = null
 
     this._indicatorElement = null
     this._input = null
@@ -238,15 +240,13 @@ class TimePicker extends BaseComponent {
     this._focustrap.activate()
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
-    this._createPopper()
+    this._createFloating()
   }
 
   hide(): void {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._disposeFloating()
 
     this._element.classList.remove(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', 'false')
@@ -260,9 +260,7 @@ class TimePicker extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._disposeFloating()
 
     if (this._inputTimeout) {
       clearTimeout(this._inputTimeout)
@@ -896,36 +894,46 @@ class TimePicker extends BaseComponent {
       null
   }
 
-  _createPopper(): void {
-    if (typeof Popper === 'undefined') {
-      throw new TypeError(
-        'CoreUI\'s time picker require Popper (https://popper.js.org)'
-      )
-    }
+  _createFloating(): void {
+    this._updateFloatingPosition()
 
-    const popperConfig = {
-      modifiers: [
-        {
-          name: 'preventOverflow',
-          options: {
-            boundary: 'clippingParents'
-          }
-        },
-        {
-          name: 'offset',
-          options: {
-            offset: [0, 2]
-          }
-        }
-      ],
-      placement: isRTL() ? 'bottom-end' : 'bottom-start'
-    }
-
-    this._popper = Popper.createPopper(
+    this._floatingCleanup = autoUpdate(
       this._togglerElement,
       this._menu,
-      popperConfig as Partial<Popper.Options>
+      () => this._updateFloatingPosition()
     )
+  }
+
+  async _updateFloatingPosition(): Promise<void> {
+    if (!this._menu || !this._menu.isConnected) {
+      return
+    }
+
+    const { x, y } = await computePosition(this._togglerElement, this._menu, {
+      middleware: [
+        offset({ mainAxis: 2 }),
+        flip(),
+        shift({ boundary: 'clippingAncestors' })
+      ],
+      placement: isRTL() ? 'bottom-end' : 'bottom-start'
+    })
+
+    if (!this._menu || !this._menu.isConnected) {
+      return
+    }
+
+    Object.assign(this._menu.style, {
+      position: 'absolute',
+      left: `${x}px`,
+      top: `${y}px`
+    })
+  }
+
+  _disposeFloating(): void {
+    if (this._floatingCleanup) {
+      this._floatingCleanup()
+      this._floatingCleanup = null
+    }
   }
 
   _getButtonClasses(classes: string[] | string): string[] {
