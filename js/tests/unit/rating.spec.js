@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import Rating from '../../src/rating.js'
 import {

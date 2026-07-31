@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import TimePicker from '../../src/time-picker.js'
 import {

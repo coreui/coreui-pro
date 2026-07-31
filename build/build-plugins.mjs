@@ -8,16 +8,16 @@
 
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { babel } from '@rollup/plugin-babel'
 import { globby } from 'globby'
-import { rollup } from 'rollup'
+import { rolldown } from 'rolldown'
 import banner from './banner.mjs'
+import browserTargets from './browser-targets.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const sourcePath = path.resolve(__dirname, '../js/src/').replace(/\\/g, '/')
-const jsFiles = await globby(`${sourcePath}/**/*.{js,ts}`)
+const tsFiles = await globby(`${sourcePath}/**/*.{js,ts}`)
 
 // Array which holds the resolved plugins
 const resolvedPlugins = []
@@ -26,60 +26,59 @@ const resolvedPlugins = []
 const filenameToEntity = filename => filename.replace(/\.[jt]s$/, '')
   .replace(/(?:^|-|\/|\\)[a-z]/g, str => str.slice(-1).toUpperCase())
 
-for (const file of jsFiles) {
+for (const file of tsFiles) {
   resolvedPlugins.push({
     src: file,
     // TypeScript sources still emit a `.js` plugin
     dist: file.replace('src', 'dist').replace(/\.ts$/, '.js'),
     fileName: path.basename(file),
     className: filenameToEntity(path.basename(file))
-    // safeClassName: filenameToEntity(path.relative(sourcePath, file))
   })
 }
 
+// The browser global a specifier resolves to in the UMD wrapper. Local files
+// map to their class name (`./util/index.js` → `Index`); packages keep the
+// same globals the dist bundles use.
+const PACKAGE_GLOBALS = {
+  '@floating-ui/core': 'FloatingUICore',
+  '@floating-ui/dom': 'FloatingUIDOM'
+}
+
+// Rolldown hands the globals function resolved ids: absolute paths for local
+// files, bare specifiers for packages.
+const globalFor = source => {
+  if (!path.isAbsolute(source) && !source.startsWith('.')) {
+    const known = PACKAGE_GLOBALS[source]
+    if (!known) {
+      throw new Error(`Package ${source} has no UMD global mapped!`)
+    }
+
+    return known
+  }
+
+  const target = source.replace(/^\.{1,2}\//, '').replace(/\.[jt]s$/, '')
+  const usedPlugin = resolvedPlugins.find(plugin => {
+    return plugin.src.replace(/\.[jt]s$/, '').endsWith(target)
+  })
+
+  if (!usedPlugin) {
+    throw new Error(`Source ${source} is not mapped!`)
+  }
+
+  return usedPlugin.className
+}
+
 const build = async plugin => {
-  /**
-   * @type {import('rollup').GlobalsOption}
-   */
-  const globals = {}
-
-  const bundle = await rollup({
+  const bundle = await rolldown({
     input: plugin.src,
-    plugins: [
-      babel({
-        // Only transpile our source code
-        exclude: 'node_modules/**',
-        // Transpile the TypeScript sources too
-        extensions: ['.js', '.mjs', '.ts'],
-        // Include the helpers in each file, at most one copy of each
-        babelHelpers: 'bundled'
-      })
-    ],
-    external(source) {
-      // Pattern to identify local files
-      const pattern = /^(\.{1,2})\//
-
-      // It's not a local file, e.g a Node.js package
-      if (!pattern.test(source)) {
-        globals[source] = source
-        return true
-      }
-
-      // Our sources import siblings with the ESM-style `.js` extension, which
-      // for a converted module points at a `.ts` file on disk
-      const target = source.replace(pattern, '').replace(/\.js$/, '')
-      const usedPlugin = resolvedPlugins.find(plugin => {
-        return plugin.src.replace(/\.[jt]s$/, '').endsWith(target)
-      })
-
-      if (!usedPlugin) {
-        throw new Error(`Source ${source} is not mapped!`)
-      }
-
-      // We can change `Index` with `UtilIndex` etc if we use
-      // `safeClassName` instead of `className` everywhere
-      globals[path.normalize(usedPlugin.src)] = usedPlugin.className
-      return true
+    // Keep every import external, so each plugin file mirrors its source module
+    external: () => true,
+    resolve: {
+      // Map ESM-style `.js` specifiers to the `.ts` sources on disk
+      extensionAlias: { '.js': ['.ts', '.js'] }
+    },
+    transform: {
+      target: browserTargets()
     }
   })
 
@@ -88,10 +87,12 @@ const build = async plugin => {
     format: 'umd',
     name: plugin.className,
     sourcemap: true,
-    globals,
-    generatedCode: 'es2015',
+    globals: globalFor,
+    generatedCode: { preset: 'es2015' },
     file: plugin.dist
   })
+
+  await bundle.close()
 
   console.log(`Built ${plugin.className}`)
 }

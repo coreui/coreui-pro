@@ -159,7 +159,7 @@ describe('DateRangePickerV2', () => {
 
       expect(picker.getStartDate()).not.toBeNull()
       expect(picker.getEndDate()).not.toBeNull()
-      expect(picker.getEndDate()).toBeGreaterThan(picker.getStartDate())
+      expect(picker.getEndDate().getTime()).toBeGreaterThan(picker.getStartDate().getTime())
     })
 
     it('should keep the popup open when navigating months', () => {

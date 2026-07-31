@@ -222,27 +222,29 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#content').style.position).toEqual('')
     })
 
-    it('should absolutely position the content after show', done => {
-      const popup = buildPopup({ mobileBreakpoint: 0 })
-      const content = fixtureEl.querySelector('#content')
-      popup.show()
+    it('should absolutely position the content after show', () => {
+      return new Promise((resolve, reject) => {
+        const popup = buildPopup({ mobileBreakpoint: 0 })
+        const content = fixtureEl.querySelector('#content')
+        popup.show()
 
-      const waitForPosition = deadline => {
-        if (content.style.position === 'absolute') {
-          expect(content.style.position).toEqual('absolute')
-          done()
-          return
+        const waitForPosition = deadline => {
+          if (content.style.position === 'absolute') {
+            expect(content.style.position).toEqual('absolute')
+            resolve()
+            return
+          }
+
+          if (Date.now() > deadline) {
+            reject(new Error(`content was never positioned (position="${content.style.position}", innerWidth=${window.innerWidth}, isMobile=${popup.isMobile})`))
+            return
+          }
+
+          setTimeout(() => waitForPosition(deadline), 25)
         }
 
-        if (Date.now() > deadline) {
-          done.fail(`content was never positioned (position="${content.style.position}", innerWidth=${window.innerWidth}, isMobile=${popup.isMobile})`)
-          return
-        }
-
-        setTimeout(() => waitForPosition(deadline), 25)
-      }
-
-      waitForPosition(Date.now() + 2000)
+        waitForPosition(Date.now() + 2000)
+      })
     })
   })
 })

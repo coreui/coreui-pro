@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import MultiSelect from '../../src/multi-select.js'
 import EventHandler from '../../src/dom/event-handler.js'

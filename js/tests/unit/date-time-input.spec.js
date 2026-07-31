@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import DateTimeInput from '../../src/date-time-input.js'
 import { clearFixture, getFixture, jQueryMock } from '../helpers/fixture.js'

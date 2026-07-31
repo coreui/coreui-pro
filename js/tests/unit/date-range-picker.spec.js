@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import DateRangePicker from '../../src/date-range-picker.js'
 import {

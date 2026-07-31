@@ -1,4 +1,3 @@
-/* eslint-env jasmine */
 
 import Calendar from '../../src/calendar.js'
 import {
