@@ -9,7 +9,10 @@
  */
 
 import Tooltip, { type TooltipConfig } from './tooltip.js'
+import type { ComponentConfig } from './util/config.js'
 import { defineJQueryPlugin } from './util/index.js'
+import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
+import type { TemplateContentEntry } from './util/template-factory.js'
 
 /**
  * Constants
@@ -19,8 +22,17 @@ const NAME = 'popover'
 
 const SELECTOR_TITLE = '.popover-header'
 const SELECTOR_CONTENT = '.popover-body'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="popover"]'
 
-const Default: TooltipConfig & { content: string } = {
+const EVENT_CLICK = 'click'
+const EVENT_FOCUSIN = 'focusin'
+const EVENT_MOUSEENTER = 'mouseenter'
+
+type PopoverConfig = TooltipConfig & {
+  content: string | Element | ((...args: any[]) => string | Element) | null
+}
+
+const Default: PopoverConfig = {
   ...Tooltip.Default,
   content: '',
   offset: [0, 8],
@@ -33,7 +45,7 @@ const Default: TooltipConfig & { content: string } = {
   trigger: 'click'
 }
 
-const DefaultType: Record<string, string> = {
+const DefaultType = {
   ...Tooltip.DefaultType,
   content: '(null|string|element|function)'
 }
@@ -43,8 +55,15 @@ const DefaultType: Record<string, string> = {
  */
 
 class Popover extends Tooltip {
+  protected declare _config: PopoverConfig
+
+  // eslint-disable-next-line no-useless-constructor -- narrows the config param type
+  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
+    super(element, config)
+  }
+
   // Getters
-  static override get Default(): TooltipConfig & { content: string } {
+  static override get Default(): PopoverConfig {
     return Default
   }
 
@@ -57,19 +76,19 @@ class Popover extends Tooltip {
   }
 
   // Overrides
-  override _isWithContent(): any {
-    return this._getTitle() || this._getContent()
+  protected override _isWithContent(): boolean {
+    return Boolean(this._getTitle() || this._getContent()) || this._hasNewContent()
   }
 
   // Private
-  override _getContentForTemplate(): Record<string, any> {
+  protected override _getContentForTemplate(): Record<string, TemplateContentEntry> {
     return {
       [SELECTOR_TITLE]: this._getTitle(),
       [SELECTOR_CONTENT]: this._getContent()
     }
   }
 
-  _getContent(): string | Element | null {
+  protected _getContent(): string | Element | null {
     return this._resolvePossibleFunction(this._config.content)
   }
 
@@ -92,9 +111,37 @@ class Popover extends Tooltip {
 }
 
 /**
+ * Data API implementation - auto-initialize popovers
+ */
+
+const initPopover = (event: CoreUIEvent): void => {
+  const target = (event.target as Element).closest(SELECTOR_DATA_TOGGLE)
+  if (!target) {
+    return
+  }
+
+  // Prevent default for click events to avoid navigation (e.g. <a href="#">)
+  if (event.type === 'click') {
+    event.preventDefault()
+  }
+
+  // Lazily create the instance. The instance's own `_setListeners()` registers
+  // the appropriate listeners on the element for the configured triggers
+  // (click/focus/hover), so we don't toggle or call `_enter` here — doing so
+  // would duplicate handlers and leave stale state on `_activeTrigger`.
+  Popover.getOrCreateInstance(target)
+}
+
+// Auto-initialize popovers on first interaction for click, hover, and focus triggers
+EventHandler.on(document, EVENT_CLICK, SELECTOR_DATA_TOGGLE, initPopover)
+EventHandler.on(document, EVENT_FOCUSIN, SELECTOR_DATA_TOGGLE, initPopover)
+EventHandler.on(document, EVENT_MOUSEENTER, SELECTOR_DATA_TOGGLE, initPopover)
+
+/**
  * jQuery
  */
 
 defineJQueryPlugin(Popover)
 
 export default Popover
+export type { PopoverConfig }
