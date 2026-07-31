@@ -3429,7 +3429,7 @@ describe('Autocomplete', () => {
     })
   })
 
-  describe('_isVisible', () => {
+  describe('_isOptionDisplayed', () => {
     it('should return true for visible elements', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
@@ -3437,7 +3437,7 @@ describe('Autocomplete', () => {
 
       const el = document.createElement('div')
       document.body.append(el)
-      expect(autocomplete._isVisible(el)).toBe(true)
+      expect(autocomplete._isOptionDisplayed(el)).toBe(true)
       el.remove()
     })
 
@@ -3449,7 +3449,7 @@ describe('Autocomplete', () => {
       const el = document.createElement('div')
       el.style.display = 'none'
       document.body.append(el)
-      expect(autocomplete._isVisible(el)).toBe(false)
+      expect(autocomplete._isOptionDisplayed(el)).toBe(false)
       el.remove()
     })
   })

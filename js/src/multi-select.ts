@@ -7,16 +7,14 @@
  * --------------------------------------------------------------------------
  */
 
-import BaseComponent from './base-component.js'
+import Chip from './chip.js'
+import Combobox from './combobox.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
-import { createAnchoredPosition } from './util/floating-ui.js'
-import { DefaultAllowlist, sanitizeHtml, type SanitizerAllowList } from './util/sanitizer.js'
-import {
-  defineJQueryPlugin, getNextActiveElement, getElement, getUID, isVisible
-} from './util/index.js'
+import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
+import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
  * ------------------------------------------------------------------------
@@ -41,6 +39,7 @@ const SPACE_KEY = ' '
 const TAB_KEY = 'Tab'
 const RIGHT_MOUSE_BUTTON = 2 // MouseEvent.button value for the secondary button, usually the right button
 
+const SELECTOR_CHIP = '.chip'
 const SELECTOR_CLEANER = '.form-multi-select-cleaner'
 const SELECTOR_OPTGROUP = '.form-multi-select-optgroup'
 const SELECTOR_OPTION = '.form-multi-select-option'
@@ -70,8 +69,10 @@ const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 
 const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
+const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_CLEANER = 'form-multi-select-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_DROPDOWN_HEADER = 'form-multi-select-dropdown-header'
@@ -87,7 +88,6 @@ const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'form-multi-select-optgroup-labe
 const CLASS_NAME_OPTION = 'form-multi-select-option'
 const CLASS_NAME_OPTION_WITH_CHECKBOX = 'form-multi-select-option-with-checkbox'
 const CLASS_NAME_OPTIONS = 'form-multi-select-options'
-const CLASS_NAME_OPTIONS_EMPTY = 'form-multi-select-options-empty'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'form-multi-selected'
 const CLASS_NAME_INDETERMINATE = 'form-multi-select-indeterminate'
@@ -189,8 +189,7 @@ const DefaultType: Record<string, string> = {
  * ------------------------------------------------------------------------
  */
 
-class MultiSelect extends BaseComponent {
-  protected declare _uniqueId: any
+class MultiSelect extends Combobox {
   protected declare _uniqueName: any
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
@@ -199,15 +198,7 @@ class MultiSelect extends BaseComponent {
   protected declare _selectionElement: any
   protected declare _selectionCleanerElement: any
   protected declare _searchElement: any
-  protected declare _togglerElement: any
-  protected declare _optionsElement: any
   protected declare _wrapperElement: any
-  protected declare _menu: any
-  protected declare _selected: any
-  protected declare _options: any
-  protected declare _floatingCleanup: (() => void) | null
-  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
-  protected declare _search: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
@@ -254,6 +245,16 @@ class MultiSelect extends BaseComponent {
 
   static override get NAME(): string {
     return NAME
+  }
+
+  static override get selectors(): any {
+    return {
+      option: SELECTOR_OPTION,
+      optgroup: SELECTOR_OPTGROUP,
+      options: SELECTOR_OPTIONS,
+      optionsEmpty: SELECTOR_OPTIONS_EMPTY,
+      navigableItems: SELECTOR_NAVIGABLE_ITEMS
+    }
   }
 
   // Public
@@ -436,6 +437,17 @@ class MultiSelect extends BaseComponent {
       const tag = event.target.closest(SELECTOR_TAG)
       if (tag) {
         this._deselectOption(String(tag.dataset.value))
+      }
+    })
+
+    // Chips-mode selections are real Chip instances: cancel the chip's own
+    // removal and route it through the selection model, which re-renders.
+    EventHandler.on(this._selectionElement, EVENT_CHIP_REMOVE, SELECTOR_CHIP, (event: any) => {
+      event.preventDefault()
+
+      const chip = event.target.closest(SELECTOR_CHIP)
+      if (chip) {
+        this._deselectOption(String(chip.dataset.value))
       }
     })
 
@@ -728,7 +740,32 @@ class MultiSelect extends BaseComponent {
   }
 
   _hideNativeSelect(): void {
+    // The custom control carries the semantics; hide the replaced select from
+    // assistive tech (tabindex -1 keeps it out of the tab order, so the
+    // aria-hidden-focus rule is satisfied even though validation can still
+    // focus it programmatically).
     this._element.tabIndex = '-1' as any
+    this._element.setAttribute('aria-hidden', 'true')
+  }
+
+  // Name the combobox toggler from a <label for> pointing at the native
+  // select, so the replacement control keeps the accessible name.
+  _wireTogglerAccessibleName(): void {
+    const nativeLabel = (this._element as HTMLSelectElement).labels?.[0]
+
+    if (nativeLabel) {
+      if (!nativeLabel.id) {
+        nativeLabel.id = `${this._uniqueId}-label`
+      }
+
+      this._togglerElement.setAttribute('aria-labelledby', nativeLabel.id)
+      return
+    }
+
+    const ariaLabel = this._element.getAttribute('aria-label')
+    if (ariaLabel) {
+      this._togglerElement.setAttribute('aria-label', ariaLabel)
+    }
   }
 
   _createSelect(): void {
@@ -760,6 +797,7 @@ class MultiSelect extends BaseComponent {
 
     this._element.setAttribute('id', this._uniqueId)
     this._element.setAttribute('name', this._uniqueName)
+    this._wireTogglerAccessibleName()
 
     this._createOptionsContainer()
     this._hideNativeSelect()
@@ -787,7 +825,7 @@ class MultiSelect extends BaseComponent {
     selectionEl.classList.add(CLASS_NAME_SELECTION)
     selectionEl.setAttribute('aria-live', 'polite')
 
-    if (this._config.multiple && this._config.selectionType === 'tags') {
+    if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
       selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS)
     }
 
@@ -825,23 +863,6 @@ class MultiSelect extends BaseComponent {
     cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
 
     return cleaner
-  }
-
-  _createFloating(): void {
-    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
-    this._floatingCleanup = this._anchoredPosition.destroy
-  }
-
-  async _updateFloatingPosition(): Promise<void> {
-    await this._anchoredPosition?.update()
-  }
-
-  _disposeFloating(): void {
-    if (this._floatingCleanup) {
-      this._floatingCleanup()
-      this._floatingCleanup = null
-      this._anchoredPosition = null
-    }
   }
 
   _createSearchInput(): void {
@@ -990,6 +1011,55 @@ class MultiSelect extends BaseComponent {
     }
   }
 
+  _createChip(value: any, text: string, disabled: boolean): HTMLElement {
+    const chip = document.createElement('div')
+    chip.classList.add(CLASS_NAME_CHIP)
+    chip.dataset.value = value
+    chip.textContent = text
+
+    // eslint-disable-next-line no-new
+    new Chip(chip, {
+      ariaRemoveLabel: `${this._config.ariaTagDeleteLabel} ${text}`.trim(),
+      removable: !this._config.disabled && disabled !== true
+    })
+
+    return chip
+  }
+
+  _updateChips(selection: HTMLElement, search: HTMLElement | null): void {
+    const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
+    if (placeholder) {
+      placeholder.remove()
+    }
+
+    const existingChips = new Map()
+
+    for (const chip of SelectorEngine.children(selection, SELECTOR_CHIP)) {
+      existingChips.set((chip as HTMLElement).dataset.value, chip)
+    }
+
+    const selectedValues = new Set(this._selected.map((option: any) => String(option.value)))
+
+    for (const [value, chip] of existingChips) {
+      if (!selectedValues.has(value)) {
+        Chip.getInstance(chip)?.dispose()
+        chip.remove()
+        existingChips.delete(value)
+      }
+    }
+
+    for (const option of this._selected) {
+      const value = String(option.value)
+      const chip = existingChips.get(value) || this._createChip(option.value, option.text, option.disabled)
+
+      if (search) {
+        search.before(chip)
+      } else {
+        selection.append(chip)
+      }
+    }
+  }
+
   _createTag(value: any, text: string, disabled: boolean): HTMLElement {
     const tag = document.createElement('div')
     tag.classList.add(CLASS_NAME_TAG)
@@ -1086,23 +1156,6 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _findOptionByValue(value: any, options: any[] = this._options): any {
-    for (const option of options) {
-      if (String(option.value) === value) {
-        return option
-      }
-
-      if (this._isOptionGroup(option)) {
-        const found = this._findOptionByValue(value, option.options)
-        if (found) {
-          return found
-        }
-      }
-    }
-
-    return null
-  }
-
   _selectAllOptions(options: any[]): boolean {
     for (const option of options) {
       if (option.disabled) {
@@ -1153,12 +1206,6 @@ class MultiSelect extends BaseComponent {
   _getDisplayedItems(): any[] {
     return SelectorEngine.find(SELECTOR_VISIBLE_ITEMS, this._menu)
       .filter(element => this._isOptionDisplayed(element))
-  }
-
-  _maybeSanitize(content: string): string {
-    return this._config.sanitize ?
-      sanitizeHtml(content, this._config.allowList, this._config.sanitizeFn) :
-      content
   }
 
   _isOptionGroup(option: any): boolean {
@@ -1300,11 +1347,7 @@ class MultiSelect extends BaseComponent {
     const search = SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)
 
     if (this._selected.length === 0 && !this._config.search) {
-      const placeholder = document.createElement('span')
-      placeholder.classList.add('form-multi-select-placeholder')
-      placeholder.textContent = this._config.placeholder
-      selection.innerHTML = ''
-      selection.append(placeholder)
+      this._renderEmptySelection(selection)
       return
     }
 
@@ -1314,6 +1357,10 @@ class MultiSelect extends BaseComponent {
 
     if (this._config.multiple && this._config.selectionType === 'tags') {
       this._updateTags(selection, search)
+    }
+
+    if (this._config.multiple && this._config.selectionType === 'chips') {
+      this._updateChips(selection, search)
     }
 
     if (this._config.multiple && this._config.selectionType === 'text') {
@@ -1337,6 +1384,19 @@ class MultiSelect extends BaseComponent {
     if (this._floatingCleanup) {
       this._updateFloatingPosition()
     }
+  }
+
+  _renderEmptySelection(selection: HTMLElement): void {
+    const placeholder = document.createElement('span')
+    placeholder.classList.add('form-multi-select-placeholder')
+    placeholder.textContent = this._config.placeholder
+
+    for (const chip of SelectorEngine.find(SELECTOR_CHIP, selection)) {
+      Chip.getInstance(chip)?.dispose()
+    }
+
+    selection.innerHTML = ''
+    selection.append(placeholder)
   }
 
   _updateSelectionCleaner(): void {
@@ -1398,12 +1458,12 @@ class MultiSelect extends BaseComponent {
       return
     }
 
-    if (this._selected.length > 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+    if (this._selected.length > 0 && ['chips', 'tags', 'text'].includes(this._config.selectionType)) {
       this._searchElement.size = size
       return
     }
 
-    if (this._selected.length === 0 && (this._config.selectionType === 'tags' || this._config.selectionType === 'text')) {
+    if (this._selected.length === 0 && ['chips', 'tags', 'text'].includes(this._config.selectionType)) {
       this._searchElement.removeAttribute('size')
     }
   }
@@ -1560,13 +1620,6 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  // Checks only `display` (unlike the imported `isVisible`) so it still works while
-  // the menu is closed, e.g. when called from the constructor.
-  _isOptionDisplayed(element: any): boolean {
-    const style = window.getComputedStyle(element)
-    return (style.display !== 'none')
-  }
-
   _isShown(): boolean {
     return this._wrapperElement.classList.contains(CLASS_NAME_SHOW)
   }
@@ -1585,52 +1638,11 @@ class MultiSelect extends BaseComponent {
     })
   }
 
-  _filterOptionsList(): void {
-    const options = SelectorEngine.find(SELECTOR_OPTION, this._menu)
-    let visibleOptions = 0
-
-    for (const option of options) {
-      // eslint-disable-next-line unicorn/prefer-includes
-      if (option.textContent.toLowerCase().indexOf(this._search) === -1) {
-        option.style.display = 'none'
-      } else {
-        option.style.removeProperty('display')
-        visibleOptions++
-      }
-
-      const optgroup = option.closest(SELECTOR_OPTGROUP) as HTMLElement
-      if (optgroup) {
-        // eslint-disable-next-line  unicorn/prefer-array-some
-        if (SelectorEngine.children(optgroup, SELECTOR_OPTION).filter((element: HTMLElement) => this._isOptionDisplayed(element)).length > 0) {
-          optgroup.style.removeProperty('display')
-        } else {
-          optgroup.style.display = 'none'
-        }
-      }
-    }
-
+  override _afterFilter(visibleOptions: number): void {
     this._updateHeader()
     this._updateMasterCheckbox()
     this._updateSelectAllVisibility(visibleOptions)
-
-    const emptyMessage = SelectorEngine.findOne(SELECTOR_OPTIONS_EMPTY, this._menu)
-
-    if (visibleOptions > 0) {
-      if (emptyMessage) {
-        emptyMessage.remove()
-      }
-
-      return
-    }
-
-    if (visibleOptions === 0 && !emptyMessage) {
-      const placeholder = document.createElement('div')
-      placeholder.classList.add(CLASS_NAME_OPTIONS_EMPTY)
-      placeholder.setAttribute('role', 'status')
-      placeholder.textContent = this._config.searchNoResultsLabel
-
-      SelectorEngine.findOne(SELECTOR_OPTIONS, this._menu)!.append(placeholder)
-    }
+    this._syncNoResultsPlaceholder(visibleOptions)
   }
 
   _updateSelectAllVisibility(visibleOptions: number): void {
@@ -1645,37 +1657,8 @@ class MultiSelect extends BaseComponent {
     }
   }
 
-  _selectMenuItem({ key, target }: any): void {
-    const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
-
-    if (!items.length) {
-      return
-    }
-
-    // if target isn't included in items (e.g. when expanding the dropdown)
-    // allow cycling to get the last item in case key equals ARROW_UP_KEY
-    getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target)).focus()
-  }
-
-  _selectFirstOrLastMenuItem(first: boolean): void {
-    const items = SelectorEngine.find(SELECTOR_NAVIGABLE_ITEMS, this._menu).filter(element => isVisible(element))
-
-    if (!items.length) {
-      return
-    }
-
-    const item = first ? items[0] : items[items.length - 1]
-    item.focus()
-  }
-
   override _configAfterMerge(config: any): any {
-    if (config.container === true) {
-      config.container = document.body
-    }
-
-    if (typeof config.container === 'object' || typeof config.container === 'string') {
-      config.container = getElement(config.container)
-    }
+    config = this._normalizeContainerConfig(config)
 
     if (typeof config.value === 'number') {
       config.value = [String(config.value)]
