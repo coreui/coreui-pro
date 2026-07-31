@@ -5,7 +5,9 @@
  * --------------------------------------------------------------------------
  */
 
-import * as Popper from '@popperjs/core'
+import {
+  autoUpdate, computePosition, flip, offset, shift
+} from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
 import TimePicker from './time-picker.js'
@@ -216,7 +218,7 @@ class DateRangePicker extends BaseComponent {
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
   protected declare _mobile: any
-  protected declare _popper: any
+  protected declare _floatingCleanup: (() => void) | null
   protected declare _selectEndDate: any
   protected declare _calendar: any
   protected declare _calendars: any
@@ -244,7 +246,7 @@ class DateRangePicker extends BaseComponent {
     this._initialStartDate = null
     this._initialEndDate = null
     this._mobile = window.innerWidth < 768
-    this._popper = null
+    this._floatingCleanup = null
     this._selectEndDate = this._config.selectEndDate
 
     this._calendar = null
@@ -307,15 +309,13 @@ class DateRangePicker extends BaseComponent {
     this._focustrap.activate()
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
-    this._createPopper()
+    this._createFloating()
   }
 
   hide(): void {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._disposeFloating()
 
     this._element.classList.remove(CLASS_NAME_SHOW)
     this._element.setAttribute('aria-expanded', 'false')
@@ -329,9 +329,7 @@ class DateRangePicker extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._disposeFloating()
 
     if (this._startInputTimeout) {
       clearTimeout(this._startInputTimeout)
@@ -1005,28 +1003,46 @@ class DateRangePicker extends BaseComponent {
     return inputEl
   }
 
-  _createPopper(): void {
-    if (typeof Popper === 'undefined') {
-      throw new TypeError('CoreUI\'s date picker require Popper (https://popper.js.org)')
+  _createFloating(): void {
+    this._updateFloatingPosition()
+
+    this._floatingCleanup = autoUpdate(
+      this._togglerElement,
+      this._menu,
+      () => this._updateFloatingPosition()
+    )
+  }
+
+  async _updateFloatingPosition(): Promise<void> {
+    if (!this._menu || !this._menu.isConnected) {
+      return
     }
 
-    const popperConfig = {
-      modifiers: [{
-        name: 'preventOverflow',
-        options: {
-          boundary: 'clippingParents'
-        }
-      },
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 2]
-        }
-      }],
+    const { x, y } = await computePosition(this._togglerElement, this._menu, {
+      middleware: [
+        offset({ mainAxis: 2 }),
+        flip(),
+        shift({ boundary: 'clippingAncestors' })
+      ],
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
+    })
+
+    if (!this._menu || !this._menu.isConnected) {
+      return
     }
 
-    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig as Partial<Popper.Options>)
+    Object.assign(this._menu.style, {
+      position: 'absolute',
+      left: `${x}px`,
+      top: `${y}px`
+    })
+  }
+
+  _disposeFloating(): void {
+    if (this._floatingCleanup) {
+      this._floatingCleanup()
+      this._floatingCleanup = null
+    }
   }
 
   _parseDate(str: any): Date | null {

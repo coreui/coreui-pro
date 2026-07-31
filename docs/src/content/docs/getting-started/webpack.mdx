@@ -20,16 +20,16 @@ We're building a Webpack project with CoreUI from scratch, so there are some pre
    npm i --save-dev webpack webpack-cli webpack-dev-server
    ```
 
-3. **Install CoreUI.** Now we can install CoreUI. We'll also install Popper since our dropdowns, popovers, and tooltips depend on it for their positioning. If you don't plan on using those components, you can omit Popper here.
+3. **Install CoreUI.** Now we can install CoreUI. We'll also install Floating UI since our dropdowns, popovers, and tooltips depend on it for their positioning. If you don't plan on using those components, you can omit Floating UI here.
 
    ```sh
-   npm i --save @coreui/coreui @popperjs/core
+   npm i --save @coreui/coreui @floating-ui/dom
    ```
 
    **For PRO users**
 
    ```sh
-   npm i --save @coreui/coreui-pro @popperjs/core
+   npm i --save @coreui/coreui-pro @floating-ui/dom
    ```
 
 4. **Install additional dependencies.** In addition to Webpack and CoreUI, we need a few more dependencies to properly import and bundle CoreUI's CSS and JS with Webpack. These include Sass, some loaders, and Autoprefixer.
@@ -210,7 +210,7 @@ Importing CoreUI into Webpack requires the loaders we installed in the first sec
 
    *You can also import our stylesheets individually if you want. [Read our Sass import docs](/customize/sass/#importing) for details.*
 
-3. **Next we load the CSS and import CoreUI's JavaScript.** Add the following to `src/js/main.js` to load the CSS and import all of CoreUI's JS. Popper will be imported automatically through CoreUI.
+3. **Next we load the CSS and import CoreUI's JavaScript.** Add the following to `src/js/main.js` to load the CSS and import all of CoreUI's JS. Floating UI will be imported automatically through CoreUI.
 
    ```js
    // Import our custom CSS

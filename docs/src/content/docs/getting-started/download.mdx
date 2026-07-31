@@ -10,7 +10,7 @@ Download ready-to-use compiled code for **CoreUI for Bootstrap v5.8.0** to easil
 - Compiled and minified CSS bundles (see [CSS files comparison](/getting-started/contents/#css-files))
 - Compiled and minified JavaScript plugins (see [JS files comparison](/getting-started/contents/#js-files))
 
-This doesn't include documentation, source files, or any optional JavaScript dependencies like Popper.
+This doesn't include documentation, source files, or any optional JavaScript dependencies like Floating UI.
 
 <a href="https://github.com/coreui/coreui/releases/download/v5.8.0/coreui-5.8.0-dist.zip" class="btn btn-primary" onclick="ga('send', 'event', 'Getting started', 'Download', 'Download Bootstrap');">Download</a>
 
@@ -34,10 +34,11 @@ Skip the download with [jsDelivr](https://www.jsdelivr.com/) to deliver cached v
 <script src="[[config:cdn.js_bundle]]" integrity="[[config:cdn.js_bundle_hash]]" crossorigin="anonymous"></script>
 ```
 
-If you're using our compiled JavaScript and prefer to include Popper separately, add Popper before our JS, via a CDN preferably.
+If you're using our compiled JavaScript and prefer to include Floating UI separately, add its two files (core, then dom) before our JS, via a CDN preferably.
 
 ```html
-<script src="[[config:cdn.popper]]" integrity="[[config:cdn.popper_hash]]" crossorigin="anonymous"></script>
+<script src="[[config:cdn.floating_ui_core]]" integrity="[[config:cdn.floating_ui_core_hash]]" crossorigin="anonymous"></script>
+<script src="[[config:cdn.floating_ui_dom]]" integrity="[[config:cdn.floating_ui_dom_hash]]" crossorigin="anonymous"></script>
 <script src="[[config:cdn.js]]" integrity="[[config:cdn.js_hash]]" crossorigin="anonymous"></script>
 ```
 
@@ -49,7 +50,8 @@ If you're using our compiled JavaScript and prefer to include Popper separately,
 ```
 
 ```html
-<script src="[[config:cdn.popper]]" integrity="[[config:cdn.popper_hash]]" crossorigin="anonymous"></script>
+<script src="[[config:cdn.floating_ui_core]]" integrity="[[config:cdn.floating_ui_core_hash]]" crossorigin="anonymous"></script>
+<script src="[[config:cdn.floating_ui_dom]]" integrity="[[config:cdn.floating_ui_dom_hash]]" crossorigin="anonymous"></script>
 <script src="[[config:cdn_pro.js_pro]]" integrity="[[config:cdn_pro.js_pro_hash]]" crossorigin="anonymous"></script>
 ```
 

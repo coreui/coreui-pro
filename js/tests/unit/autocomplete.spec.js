@@ -602,14 +602,14 @@ describe('Autocomplete', () => {
       expect(autocomplete._inputHintElement.value).toBe('')
     })
 
-    it('should hide without popper if popper is null', () => {
+    it('should hide without positioning if it was never created', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
-      autocomplete._popper = null
+      autocomplete._floatingCleanup = null
       autocomplete._element.classList.add('show')
       autocomplete.hide()
       expect(autocomplete._isShown()).toBe(false)
@@ -2212,7 +2212,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._element).toBeNull()
     })
 
-    it('should destroy popper when disposing', () => {
+    it('should dispose the positioning cleanup when disposing', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -2220,20 +2220,19 @@ describe('Autocomplete', () => {
       })
 
       autocomplete.show()
-      expect(autocomplete._popper).not.toBeNull()
+      expect(autocomplete._floatingCleanup).not.toBeNull()
 
-      const spy = spyOn(autocomplete._popper, 'destroy')
       autocomplete.dispose()
 
-      expect(spy).toHaveBeenCalled()
+      expect(autocomplete._floatingCleanup).toBeNull()
     })
 
-    it('should dispose without popper if popper is null', () => {
+    it('should dispose without positioning if it was never created', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, { options: [] })
 
-      autocomplete._popper = null
+      autocomplete._floatingCleanup = null
       autocomplete.dispose()
 
       expect(autocomplete._element).toBeNull()

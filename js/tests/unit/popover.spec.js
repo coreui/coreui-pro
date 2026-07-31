@@ -1,7 +1,7 @@
 import EventHandler from '../../src/dom/event-handler.js'
 import Popover from '../../src/popover.js'
 import {
-  clearFixture, getFixture, jQueryMock, createEvent
+  clearFixture, createEvent, getFixture, jQueryMock
 } from '../helpers/fixture.js'
 
 describe('Popover', () => {
@@ -193,6 +193,27 @@ describe('Popover', () => {
       })
     })
 
+    it('should show a popover whose content was set only via setContent()', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<a href="#">Nice link</a>'
+
+        const popoverEl = fixtureEl.querySelector('a')
+        const popover = new Popover(popoverEl, {})
+
+        popover.setContent({ '.popover-header': 'Late header', '.popover-body': 'Late content' })
+
+        popoverEl.addEventListener('shown.coreui.popover', () => {
+          const popoverDisplayed = document.querySelector('.popover')
+
+          expect(popoverDisplayed).not.toBeNull()
+          expect(popoverDisplayed.querySelector('.popover-body').textContent).toEqual('Late content')
+          resolve()
+        })
+
+        popover.show()
+      })
+    })
+
     it('should show a popover with just title without having body', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<a href="#">Nice link</a>'
@@ -315,27 +336,27 @@ describe('Popover', () => {
         popover.show()
       })
     })
-  })
 
-  it('should keep popover open when mouse leaves after click trigger', () => {
-    return new Promise(resolve => {
-      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap" data-coreui-trigger="hover click">BS X</a>'
+    it('should keep popover open when mouse leaves after click trigger', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap" data-coreui-trigger="hover click">BS X</a>'
 
-      const popoverEl = fixtureEl.querySelector('a')
-      new Popover(popoverEl) // eslint-disable-line no-new
+        const popoverEl = fixtureEl.querySelector('a')
+        new Popover(popoverEl) // eslint-disable-line no-new
 
-      popoverEl.addEventListener('shown.coreui.popover', () => {
-        popoverEl.dispatchEvent(createEvent('mouseout'))
+        popoverEl.addEventListener('shown.coreui.popover', () => {
+          popoverEl.dispatchEvent(createEvent('mouseout'))
 
-        popoverEl.addEventListener('hide.coreui.popover', () => {
-          throw new Error('Popover should not hide when mouse leaves after click')
+          popoverEl.addEventListener('hide.coreui.popover', () => {
+            throw new Error('Popover should not hide when mouse leaves after click')
+          })
+
+          expect(document.querySelector('.popover')).not.toBeNull()
+          resolve()
         })
 
-        expect(document.querySelector('.popover')).not.toBeNull()
-        resolve()
+        popoverEl.click()
       })
-
-      popoverEl.click()
     })
   })
 
@@ -358,80 +379,6 @@ describe('Popover', () => {
 
         popover.show()
       })
-    })
-  })
-
-  describe('jQueryInterface', () => {
-    it('should create a popover', () => {
-      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
-
-      const popoverEl = fixtureEl.querySelector('a')
-
-      jQueryMock.fn.popover = Popover.jQueryInterface
-      jQueryMock.elements = [popoverEl]
-
-      jQueryMock.fn.popover.call(jQueryMock)
-
-      expect(Popover.getInstance(popoverEl)).not.toBeNull()
-    })
-
-    it('should create a popover with a config object', () => {
-      fixtureEl.innerHTML = '<a href="#" title="Popover">BS X</a>'
-
-      const popoverEl = fixtureEl.querySelector('a')
-
-      jQueryMock.fn.popover = Popover.jQueryInterface
-      jQueryMock.elements = [popoverEl]
-
-      jQueryMock.fn.popover.call(jQueryMock, {
-        content: 'Popover content'
-      })
-
-      expect(Popover.getInstance(popoverEl)).not.toBeNull()
-    })
-
-    it('should not re create a popover', () => {
-      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
-
-      const popoverEl = fixtureEl.querySelector('a')
-      const popover = new Popover(popoverEl)
-
-      jQueryMock.fn.popover = Popover.jQueryInterface
-      jQueryMock.elements = [popoverEl]
-
-      jQueryMock.fn.popover.call(jQueryMock)
-
-      expect(Popover.getInstance(popoverEl)).toEqual(popover)
-    })
-
-    it('should throw error on undefined method', () => {
-      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
-
-      const popoverEl = fixtureEl.querySelector('a')
-      const action = 'undefinedMethod'
-
-      jQueryMock.fn.popover = Popover.jQueryInterface
-      jQueryMock.elements = [popoverEl]
-
-      expect(() => {
-        jQueryMock.fn.popover.call(jQueryMock, action)
-      }).toThrowError(TypeError, `No method named "${action}"`)
-    })
-
-    it('should should call show method', () => {
-      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
-
-      const popoverEl = fixtureEl.querySelector('a')
-      const popover = new Popover(popoverEl)
-
-      jQueryMock.fn.popover = Popover.jQueryInterface
-      jQueryMock.elements = [popoverEl]
-
-      const spy = spyOn(popover, 'show')
-
-      jQueryMock.fn.popover.call(jQueryMock, 'show')
-
-      expect(spy).toHaveBeenCalled()
     })
   })
 
@@ -506,6 +453,135 @@ describe('Popover', () => {
       expect(popover2).toEqual(popover)
 
       expect(popover2._config.placement).toEqual('top')
+    })
+  })
+
+  describe('data-api', () => {
+    it('should toggle popover on click via data-api', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<a href="#" data-coreui-toggle="popover" title="Popover Title" data-coreui-content="Popover content">Click me</a>'
+
+        const popoverEl = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
+
+        popoverEl.addEventListener('shown.coreui.popover', () => {
+          expect(document.querySelector('.popover')).not.toBeNull()
+          resolve()
+        })
+
+        popoverEl.click()
+      })
+    })
+
+    it('should do nothing when clicking on element without data-coreui-toggle', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Not a popover">Click me</a>'
+
+      const linkEl = fixtureEl.querySelector('a')
+      linkEl.click()
+
+      expect(document.querySelector('.popover')).toBeNull()
+      expect(Popover.getInstance(linkEl)).toBeNull()
+    })
+
+    it('should show popover on focusin via data-api', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<button data-coreui-toggle="popover" data-coreui-trigger="focus" title="Popover Title" data-coreui-content="Popover content">Focus me</button>'
+
+        const popoverEl = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
+
+        popoverEl.addEventListener('shown.coreui.popover', () => {
+          expect(document.querySelector('.popover')).not.toBeNull()
+          resolve()
+        })
+
+        const focusEvent = createEvent('focusin')
+        popoverEl.dispatchEvent(focusEvent)
+      })
+    })
+
+    it('should prevent default on click via data-api', () => {
+      fixtureEl.innerHTML = '<a href="#test" data-coreui-toggle="popover" title="Popover Title" data-coreui-content="Popover content">Click me</a>'
+
+      const popoverEl = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
+      const clickEvent = createEvent('click')
+      const preventDefaultSpy = spyOn(clickEvent, 'preventDefault').and.callThrough()
+
+      popoverEl.dispatchEvent(clickEvent)
+
+      expect(preventDefaultSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('jQueryInterface', () => {
+    it('should create a popover', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+
+      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.elements = [popoverEl]
+
+      jQueryMock.fn.popover.call(jQueryMock)
+
+      expect(Popover.getInstance(popoverEl)).not.toBeNull()
+    })
+
+    it('should create a popover with a config object', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Popover">BS X</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+
+      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.elements = [popoverEl]
+
+      jQueryMock.fn.popover.call(jQueryMock, {
+        content: 'Popover content'
+      })
+
+      expect(Popover.getInstance(popoverEl)).not.toBeNull()
+    })
+
+    it('should not re create a popover', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const popover = new Popover(popoverEl)
+
+      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.elements = [popoverEl]
+
+      jQueryMock.fn.popover.call(jQueryMock)
+
+      expect(Popover.getInstance(popoverEl)).toEqual(popover)
+    })
+
+    it('should throw error on undefined method', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const action = 'undefinedMethod'
+
+      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.elements = [popoverEl]
+
+      expect(() => {
+        jQueryMock.fn.popover.call(jQueryMock, action)
+      }).toThrowError(TypeError, `No method named "${action}"`)
+    })
+
+    it('should should call show method', () => {
+      fixtureEl.innerHTML = '<a href="#" title="Popover" data-coreui-content="https://x.com/getbootstrap">BS X</a>'
+
+      const popoverEl = fixtureEl.querySelector('a')
+      const popover = new Popover(popoverEl)
+
+      jQueryMock.fn.popover = Popover.jQueryInterface
+      jQueryMock.elements = [popoverEl]
+
+      const spy = spyOn(popover, 'show')
+
+      jQueryMock.fn.popover.call(jQueryMock, 'show')
+
+      expect(spy).toHaveBeenCalled()
     })
   })
 })

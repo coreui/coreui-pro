@@ -91,8 +91,7 @@
   },
   "license": "SEE LICENSE IN LICENSE",
   "peerDependencies": {
-    "@floating-ui/dom": "^1.8.0",
-    "@popperjs/core": "^2.11.8"
+    "@floating-ui/dom": "^1.8.0"
   },
   "devDependencies": {
     "@astrojs/mdx": "^7.0.3",
@@ -102,7 +101,6 @@
     "@coreui/astro-docs": "0.1.1",
     "@eslint/markdown": "^7.5.1",
     "@floating-ui/dom": "^1.8.0",
-    "@popperjs/core": "^2.11.8",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -172,13 +170,13 @@
     "shim": {
       "js/coreui": {
         "deps": [
-          "@popperjs/core"
+          "@floating-ui/dom"
         ]
       }
     },
     "dependencies": {},
     "peerDependencies": {
-      "@popperjs/core": "^2.11.8"
+      "@floating-ui/dom": "^1.8.0"
     }
   }
 }

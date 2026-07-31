@@ -13,7 +13,7 @@ If you're not using a component, comment it out or delete it entirely. For examp
 
 ## Lean JavaScript
 
-CoreUI for Bootstrap's JavaScript includes every component in our primary dist files (`coreui.js` and `coreui.min.js`), and even our primary dependency (Popper) with our bundle files (`coreui.bundle.js` and `coreui.bundle.min.js`). While you're customizing via Sass, be sure to remove related JavaScript.
+CoreUI for Bootstrap's JavaScript includes every component in our primary dist files (`coreui.js` and `coreui.min.js`), and even our primary dependency (Floating UI) with our bundle files (`coreui.bundle.js` and `coreui.bundle.min.js`). While you're customizing via Sass, be sure to remove related JavaScript.
 
 For instance, assuming you're using your own JavaScript bundler like Webpack, Parcel, or Vite, you'd only import the JavaScript you plan on using. In the example below, we show how to just include our modal JavaScript:
 
@@ -33,7 +33,7 @@ import '@coreui/coreui/js/dist/modal';
 // import '@coreui/coreui/js/dist/tooltip';
 ```
 
-This way, you're not including any JavaScript you don't intend to use for components like buttons, carousels, and tooltips. If you're importing dropdowns, tooltips or popovers, be sure to list the Popper dependency in your `package.json` file.
+This way, you're not including any JavaScript you don't intend to use for components like buttons, carousels, and tooltips. If you're importing dropdowns, tooltips or popovers, be sure to list the `@floating-ui/dom` dependency in your `package.json` file.
 
 <Callout color="info">
 ### Default Exports

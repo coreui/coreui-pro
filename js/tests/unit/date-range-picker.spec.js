@@ -605,16 +605,17 @@ describe('DateRangePicker', () => {
       expect(dateRangePicker._element).toBeNull()
     })
 
-    it('should destroy popper if it exists', () => {
+    it('should dispose the positioning cleanup if it exists', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const dateRangePicker = new DateRangePicker(div)
 
       dateRangePicker.show()
-      const popperSpy = spyOn(dateRangePicker._popper, 'destroy')
+      expect(dateRangePicker._floatingCleanup).not.toBeNull()
+
       dateRangePicker.dispose()
 
-      expect(popperSpy).toHaveBeenCalled()
+      expect(dateRangePicker._floatingCleanup).toBeNull()
     })
 
     it('should clear startInputTimeout if set', () => {
@@ -652,12 +653,12 @@ describe('DateRangePicker', () => {
       expect(spy).toHaveBeenCalled()
     })
 
-    it('should handle dispose when popper is null', () => {
+    it('should handle dispose when positioning never started', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')
       const dateRangePicker = new DateRangePicker(div)
 
-      dateRangePicker._popper = null
+      dateRangePicker._floatingCleanup = null
       expect(() => dateRangePicker.dispose()).not.toThrow()
     })
 

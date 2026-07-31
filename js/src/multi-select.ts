@@ -7,7 +7,9 @@
  * --------------------------------------------------------------------------
  */
 
-import * as Popper from '@popperjs/core'
+import {
+  autoUpdate, computePosition, flip, offset, shift
+} from '@floating-ui/dom'
 import BaseComponent from './base-component.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
@@ -209,7 +211,7 @@ class MultiSelect extends BaseComponent {
   protected declare _menu: any
   protected declare _selected: any
   protected declare _options: any
-  protected declare _popper: any
+  protected declare _floatingCleanup: (() => void) | null
   protected declare _search: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -232,7 +234,7 @@ class MultiSelect extends BaseComponent {
     this._menu = null
     this._selected = []
     this._options = this._getOptions()
-    this._popper = null
+    this._floatingCleanup = null
     this._search = ''
 
     if (this._config.options.length > 0) {
@@ -279,7 +281,7 @@ class MultiSelect extends BaseComponent {
 
     EventHandler.trigger(this._element, EVENT_SHOWN)
 
-    this._createPopper()
+    this._createFloating()
 
     if (this._config.search) {
       SelectorEngine.findOne(SELECTOR_SEARCH, this._wrapperElement)!.focus()
@@ -292,9 +294,7 @@ class MultiSelect extends BaseComponent {
     const refocusFromInside = this._wrapperElement.contains(document.activeElement) ||
       this._menu.contains(document.activeElement)
 
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._disposeFloating()
 
     if (this._config.search) {
       this._searchElement.value = ''
@@ -319,9 +319,7 @@ class MultiSelect extends BaseComponent {
   }
 
   override dispose(): void {
-    if (this._popper) {
-      this._popper.destroy()
-    }
+    this._disposeFloating()
 
     for (const element of [
       this._wrapperElement,
@@ -833,28 +831,46 @@ class MultiSelect extends BaseComponent {
     return cleaner
   }
 
-  _createPopper(): void {
-    if (typeof Popper === 'undefined') {
-      throw new TypeError('CoreUI\'s multi select require Popper (https://popper.js.org)')
+  _createFloating(): void {
+    this._updateFloatingPosition()
+
+    this._floatingCleanup = autoUpdate(
+      this._togglerElement,
+      this._menu,
+      () => this._updateFloatingPosition()
+    )
+  }
+
+  async _updateFloatingPosition(): Promise<void> {
+    if (!this._menu || !this._menu.isConnected) {
+      return
     }
 
-    const popperConfig = {
-      modifiers: [{
-        name: 'preventOverflow',
-        options: {
-          boundary: 'clippingParents'
-        }
-      },
-      {
-        name: 'offset',
-        options: {
-          offset: [0, 2]
-        }
-      }],
+    const { x, y } = await computePosition(this._togglerElement, this._menu, {
+      middleware: [
+        offset({ mainAxis: 2 }),
+        flip(),
+        shift({ boundary: 'clippingAncestors' })
+      ],
       placement: isRTL() ? 'bottom-end' : 'bottom-start'
+    })
+
+    if (!this._menu || !this._menu.isConnected) {
+      return
     }
 
-    this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig as Partial<Popper.Options>)
+    Object.assign(this._menu.style, {
+      position: 'absolute',
+      left: `${x}px`,
+      top: `${y}px`
+    })
+  }
+
+  _disposeFloating(): void {
+    if (this._floatingCleanup) {
+      this._floatingCleanup()
+      this._floatingCleanup = null
+    }
   }
 
   _createSearchInput(): void {
@@ -1347,8 +1363,8 @@ class MultiSelect extends BaseComponent {
       selection.append(search)
     }
 
-    if (this._popper) {
-      this._popper.update()
+    if (this._floatingCleanup) {
+      this._updateFloatingPosition()
     }
   }
 

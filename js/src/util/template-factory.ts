@@ -179,3 +179,4 @@ class TemplateFactory extends Config {
 }
 
 export default TemplateFactory
+export type { TemplateContentEntry }

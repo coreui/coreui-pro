@@ -82,38 +82,38 @@ describe('Dropdown', () => {
       })
     })
 
-    it('should create offset modifier correctly when offset option is a function', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = [
-          '<div class="dropdown">',
-          '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
-          '  <div class="dropdown-menu">',
-          '    <a class="dropdown-item" href="#">Secondary link</a>',
-          '  </div>',
-          '</div>'
-        ].join('')
+    it('should create offset modifier correctly when offset option is a function', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="dropdown">',
+        '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
+        '  <div class="dropdown-menu">',
+        '    <a class="dropdown-item" href="#">Secondary link</a>',
+        '  </div>',
+        '</div>'
+      ].join('')
 
-        const getOffset = jasmine.createSpy('getOffset').and.returnValue([10, 20])
-        const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
-        const dropdown = new Dropdown(btnDropdown, {
-          offset: getOffset,
-          popperConfig: {
-            onFirstUpdate(state) {
-              expect(getOffset).toHaveBeenCalledWith({
-                popper: state.rects.popper,
-                reference: state.rects.reference,
-                placement: state.placement
-              }, btnDropdown)
-              resolve()
-            }
-          }
-        })
-        const offset = dropdown._getOffset()
-
-        expect(typeof offset).toEqual('function')
-
-        dropdown.show()
+      const getOffset = jasmine.createSpy('getOffset').and.returnValue([10, 20])
+      const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
+      const dropdown = new Dropdown(btnDropdown, {
+        offset: getOffset
       })
+
+      const offset = dropdown._getOffset()
+
+      expect(typeof offset).toEqual('function')
+
+      const shownPromise = new Promise(resolve => {
+        btnDropdown.addEventListener('shown.coreui.dropdown', resolve)
+      })
+
+      dropdown.show()
+      await shownPromise
+
+      // Floating UI calls offset functions asynchronously during positioning
+      await new Promise(resolve => {
+        setTimeout(resolve, 20)
+      })
+      expect(getOffset).toHaveBeenCalled()
     })
 
     it('should create offset modifier correctly when offset option is a string into data attribute', () => {
@@ -132,7 +132,7 @@ describe('Dropdown', () => {
       expect(dropdown._getOffset()).toEqual([10, 20])
     })
 
-    it('should allow to pass config to Popper with `popperConfig`', () => {
+    it('should allow to pass config to Floating UI with `floatingConfig`', () => {
       fixtureEl.innerHTML = [
         '<div class="dropdown">',
         '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
@@ -144,17 +144,17 @@ describe('Dropdown', () => {
 
       const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
       const dropdown = new Dropdown(btnDropdown, {
-        popperConfig: {
+        floatingConfig: {
           placement: 'left'
         }
       })
 
-      const popperConfig = dropdown._getPopperConfig()
+      const floatingConfig = dropdown._getFloatingConfig('bottom-start', [])
 
-      expect(popperConfig.placement).toEqual('left')
+      expect(floatingConfig.placement).toEqual('left')
     })
 
-    it('should allow to pass config to Popper with `popperConfig` as a function', () => {
+    it('should allow to pass config to Floating UI with `floatingConfig` as a function', () => {
       fixtureEl.innerHTML = [
         '<div class="dropdown">',
         '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" data-coreui-placement="right">Dropdown</button>',
@@ -165,18 +165,18 @@ describe('Dropdown', () => {
       ].join('')
 
       const btnDropdown = fixtureEl.querySelector('[data-coreui-toggle="dropdown"]')
-      const getPopperConfig = jasmine.createSpy('getPopperConfig').and.returnValue({ placement: 'left' })
+      const getFloatingConfig = jasmine.createSpy('getFloatingConfig').and.returnValue({ placement: 'left' })
       const dropdown = new Dropdown(btnDropdown, {
-        popperConfig: getPopperConfig
+        floatingConfig: getFloatingConfig
       })
 
-      const popperConfig = dropdown._getPopperConfig()
+      const floatingConfig = dropdown._getFloatingConfig('bottom-start', [])
 
       // Ensure that the function was called with the default config.
-      expect(getPopperConfig).toHaveBeenCalledWith(jasmine.objectContaining({
+      expect(getFloatingConfig).toHaveBeenCalledWith(jasmine.objectContaining({
         placement: jasmine.any(String)
       }))
-      expect(popperConfig.placement).toEqual('left')
+      expect(floatingConfig.placement).toEqual('left')
     })
   })
 
@@ -205,7 +205,7 @@ describe('Dropdown', () => {
       })
     })
 
-    it('should destroy old popper references on toggle', () => {
+    it('should dispose the old positioning cleanup on toggle', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<div class="first dropdown">',
@@ -230,12 +230,12 @@ describe('Dropdown', () => {
 
         firstDropdownEl.addEventListener('shown.coreui.dropdown', () => {
           expect(btnDropdown1).toHaveClass('show')
-          spyOn(dropdown1._popper, 'destroy')
+          expect(dropdown1._floatingCleanup).not.toBeNull()
           btnDropdown2.click()
         })
 
         secondDropdownEl.addEventListener('shown.coreui.dropdown', () => setTimeout(() => {
-          expect(dropdown1._popper.destroy).toHaveBeenCalled()
+          expect(dropdown1._floatingCleanup).toBeNull()
           resolve()
         }))
 
@@ -570,20 +570,19 @@ describe('Dropdown', () => {
           }
         })).toThrowError(TypeError, 'DROPDOWN: Option "reference" provided type "object" without a required "getBoundingClientRect" method.')
 
-        // use onFirstUpdate as Poppers internal update is executed async
         const dropdown = new Dropdown(btnDropdown, {
-          reference: virtualElement,
-          popperConfig: {
-            onFirstUpdate() {
-              expect(spy).toHaveBeenCalled()
-              expect(btnDropdown).toHaveClass('show')
-              expect(btnDropdown.getAttribute('aria-expanded')).toEqual('true')
-              resolve()
-            }
-          }
+          reference: virtualElement
         })
 
         const spy = spyOn(virtualElement, 'getBoundingClientRect').and.callThrough()
+
+        // Floating UI positions asynchronously, so assert after shown + a tick
+        btnDropdown.addEventListener('shown.coreui.dropdown', () => setTimeout(() => {
+          expect(spy).toHaveBeenCalled()
+          expect(btnDropdown).toHaveClass('show')
+          expect(btnDropdown.getAttribute('aria-expanded')).toEqual('true')
+          resolve()
+        }, 20))
 
         dropdown.toggle()
       })
@@ -865,7 +864,7 @@ describe('Dropdown', () => {
       })
     })
 
-    it('should hide a dropdown and destroy popper', () => {
+    it('should hide a dropdown and dispose the positioning cleanup', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<div class="dropdown">',
@@ -880,12 +879,12 @@ describe('Dropdown', () => {
         const dropdown = new Dropdown(btnDropdown)
 
         btnDropdown.addEventListener('shown.coreui.dropdown', () => {
-          spyOn(dropdown._popper, 'destroy')
+          expect(dropdown._floatingCleanup).not.toBeNull()
           dropdown.hide()
         })
 
         btnDropdown.addEventListener('hidden.coreui.dropdown', () => {
-          expect(dropdown._popper.destroy).toHaveBeenCalled()
+          expect(dropdown._floatingCleanup).toBeNull()
           resolve()
         })
 
@@ -1059,7 +1058,7 @@ describe('Dropdown', () => {
 
       const dropdown = new Dropdown(btnDropdown)
 
-      expect(dropdown._popper).toBeNull()
+      expect(dropdown._floatingCleanup).toBeNull()
       expect(dropdown._menu).not.toBeNull()
       expect(dropdown._element).not.toBeNull()
       const spy = spyOn(EventHandler, 'off')
@@ -1071,7 +1070,7 @@ describe('Dropdown', () => {
       expect(spy).toHaveBeenCalledWith(btnDropdown, Dropdown.EVENT_KEY)
     })
 
-    it('should dispose dropdown with Popper', () => {
+    it('should dispose dropdown with active positioning', () => {
       fixtureEl.innerHTML = [
         '<div class="dropdown">',
         '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
@@ -1086,20 +1085,20 @@ describe('Dropdown', () => {
 
       dropdown.toggle()
 
-      expect(dropdown._popper).not.toBeNull()
+      expect(dropdown._floatingCleanup).not.toBeNull()
       expect(dropdown._menu).not.toBeNull()
       expect(dropdown._element).not.toBeNull()
 
       dropdown.dispose()
 
-      expect(dropdown._popper).toBeNull()
+      expect(dropdown._floatingCleanup).toBeNull()
       expect(dropdown._menu).toBeNull()
       expect(dropdown._element).toBeNull()
     })
   })
 
   describe('update', () => {
-    it('should call Popper and detect navbar on update', () => {
+    it('should reposition and detect navbar on update', () => {
       fixtureEl.innerHTML = [
         '<div class="dropdown">',
         '  <button class="btn dropdown-toggle" data-coreui-toggle="dropdown">Dropdown</button>',
@@ -1114,9 +1113,9 @@ describe('Dropdown', () => {
 
       dropdown.toggle()
 
-      expect(dropdown._popper).not.toBeNull()
+      expect(dropdown._floatingCleanup).not.toBeNull()
 
-      const spyUpdate = spyOn(dropdown._popper, 'update')
+      const spyUpdate = spyOn(dropdown, '_updateFloatingPosition')
       const spyDetect = spyOn(dropdown, '_detectNavbar')
 
       dropdown.update()
@@ -1142,7 +1141,7 @@ describe('Dropdown', () => {
 
       dropdown.update()
 
-      expect(dropdown._popper).toBeNull()
+      expect(dropdown._floatingCleanup).toBeNull()
       expect(spy).toHaveBeenCalled()
     })
   })
@@ -1209,7 +1208,8 @@ describe('Dropdown', () => {
         const dropdown = new Dropdown(btnDropdown)
 
         btnDropdown.addEventListener('shown.coreui.dropdown', () => {
-          expect(dropdown._popper).not.toBeNull()
+          // In a navbar the CSS positions the menu; the engine stays out of it
+          expect(dropdown._floatingCleanup).toBeNull()
           expect(dropdownMenu.getAttribute('data-coreui-popper')).toEqual('static')
           resolve()
         })

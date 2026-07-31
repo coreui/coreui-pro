@@ -208,16 +208,16 @@ $popover-tokens: defaults(
   /* rtl:end:ignore */
 
   .bs-popover-auto {
-    &[data-popper-placement^="top"] {
+    &[data-coreui-placement^="top"] {
       @extend .bs-popover-top;
     }
-    &[data-popper-placement^="right"] {
+    &[data-coreui-placement^="right"] {
       @extend .bs-popover-end;
     }
-    &[data-popper-placement^="bottom"] {
+    &[data-coreui-placement^="bottom"] {
       @extend .bs-popover-bottom;
     }
-    &[data-popper-placement^="left"] {
+    &[data-coreui-placement^="left"] {
       @extend .bs-popover-start;
     }
   }
