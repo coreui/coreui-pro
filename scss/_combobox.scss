@@ -63,7 +63,7 @@ $combobox-option-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
 $combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
 $combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
 
-$combobox-option-indicator-width:         1em !default;
+$combobox-option-indicator-width:         var(--#{$prefix}form-check-input-width, 1em) !default;
 
 
 // scss-docs-end combobox-variables
@@ -269,6 +269,9 @@ $combobox-tokens: defaults(
     margin: 0;
     pointer-events: none;
     transform: translateY(-50%);
+    // A span never matches the [type="checkbox"] radius selector of the
+    // form-check surface, so apply the same token here.
+    @include border-radius(var(--#{$prefix}form-check-input-border-radius));
   }
 
   .selected > .combobox-option-indicator {
