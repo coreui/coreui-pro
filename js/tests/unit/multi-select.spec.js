@@ -3581,7 +3581,7 @@ describe('MultiSelect', () => {
         selectAllLabel: 'Choose All'
       })
 
-      expect(multiSelect._selectAllElement.innerHTML).toBe('Choose All')
+      expect(multiSelect._selectAllElement.textContent).toBe('Choose All')
     })
   })
 
@@ -4791,6 +4791,38 @@ describe('MultiSelect', () => {
 
       expect(chip).not.toBeNull()
       expect(chip.querySelector('.chip-remove')).toBeNull()
+    })
+  })
+
+  describe('checkbox indicators reuse the form-check surface', () => {
+    it('should render a decorative form-check-input indicator in checkbox options', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Apple' }]
+      })
+
+      const indicator = multiSelect._optionsElement.querySelector('.combobox-option .combobox-option-indicator')
+
+      expect(indicator).not.toBeNull()
+      expect(indicator.tagName).toBe('SPAN')
+      expect(indicator).toHaveClass('form-check-input')
+      expect(indicator.getAttribute('aria-hidden')).toBe('true')
+    })
+
+    it('should render the indicator inside the select all button before its label', () => {
+      fixtureEl.innerHTML = '<select multiple></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Apple' }],
+        selectAll: true,
+        selectAllLabel: 'Select all'
+      })
+
+      const button = multiSelect._selectAllElement
+
+      expect(button.firstElementChild).toHaveClass('combobox-option-indicator')
+      expect(button.textContent).toBe('Select all')
     })
   })
 })

@@ -76,6 +76,7 @@ const CLASS_NAME_SELECT = 'form-multi-select'
 const CLASS_NAME_SELECT_ALL = 'combobox-all'
 const CLASS_NAME_SELECT_ALL_WITH_CHECKBOX = 'combobox-all-with-checkbox'
 const CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX = 'combobox-optgroup-label-with-checkbox'
+const CLASS_NAME_OPTION_INDICATOR = 'combobox-option-indicator'
 const CLASS_NAME_OPTION_WITH_CHECKBOX = 'combobox-option-with-checkbox'
 const CLASS_NAME_SEARCH = 'form-multi-select-search'
 const CLASS_NAME_SELECTED = 'selected'
@@ -182,6 +183,7 @@ class MultiSelect extends Combobox {
   protected declare _uniqueName: any
   protected declare _indicatorElement: any
   protected declare _selectAllElement: any
+  protected declare _selectAllLabelElement: any
   protected declare _dropdownHeaderElement: any
   protected declare _headerElement: any
   protected declare _selectionElement: any
@@ -852,8 +854,12 @@ class MultiSelect extends Combobox {
 
       if (this._config.selectAllStyle === 'checkbox' && this._config.multiple) {
         selectAllButton.classList.add(CLASS_NAME_SELECT_ALL_WITH_CHECKBOX)
+        selectAllButton.append(this._createCheckboxIndicator())
       }
 
+      const selectAllLabel = document.createElement('span')
+      selectAllButton.append(selectAllLabel)
+      this._selectAllLabelElement = selectAllLabel
       this._selectAllElement = selectAllButton
       header.append(selectAllButton)
     }
@@ -873,6 +879,17 @@ class MultiSelect extends Combobox {
     this._updateMasterCheckbox()
   }
 
+  _createCheckboxIndicator(): HTMLElement {
+    // Decorative reuse of the form-check surface: a span (valid inside the
+    // select-all <button>) styled as .form-check-input; the host's
+    // selected/indeterminate classes drive its state, aria-selected carries
+    // the semantics.
+    const indicator = document.createElement('span')
+    indicator.classList.add('form-check-input', CLASS_NAME_OPTION_INDICATOR)
+    indicator.setAttribute('aria-hidden', 'true')
+    return indicator
+  }
+
   override _decorateOption(optionDiv: HTMLElement, _option: any): void {
     if (this._config.optionsStyle === 'checkbox') {
       optionDiv.classList.add(CLASS_NAME_OPTION_WITH_CHECKBOX)
@@ -889,6 +906,10 @@ class MultiSelect extends Combobox {
     } else {
       optionDiv.textContent = option.text
     }
+
+    if (this._config.optionsStyle === 'checkbox') {
+      optionDiv.prepend(this._createCheckboxIndicator())
+    }
   }
 
   override _decorateOptgroupLabel(label: HTMLElement, _option: any): void {
@@ -896,6 +917,7 @@ class MultiSelect extends Combobox {
       label.classList.add(CLASS_NAME_OPTGROUP_LABEL_WITH_CHECKBOX)
       label.tabIndex = 0
       label.setAttribute('role', 'button')
+      label.prepend(this._createCheckboxIndicator())
     }
   }
 
@@ -1351,7 +1373,7 @@ class MultiSelect extends Combobox {
       return
     }
 
-    this._selectAllElement.textContent = this._getSelectAllLabel()
+    this._selectAllLabelElement.textContent = this._getSelectAllLabel()
   }
 
   _getSelectAllLabel(): string {

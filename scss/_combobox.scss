@@ -1,4 +1,5 @@
 @use "functions/defaults" as *;
+@use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/tokens" as *;
@@ -63,17 +64,8 @@ $combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
 $combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
 
 $combobox-option-indicator-width:         1em !default;
-$combobox-option-indicator-bg:            var(--#{$prefix}btn-input-bg) !default;
-$combobox-option-indicator-border:        $form-check-input-border !default;
-$combobox-option-indicator-border-radius: .25em !default;
 
-$combobox-option-selected-indicator-bg:           var(--#{$prefix}control-checked-bg) !default;
-$combobox-option-selected-indicator-bg-image:     $form-check-input-checked-bg-image !default;
-$combobox-option-selected-indicator-border-color: var(--#{$prefix}control-checked-border-color) !default;
 
-$combobox-option-indeterminate-indicator-bg:           var(--#{$prefix}control-indeterminate-bg) !default;
-$combobox-option-indeterminate-indicator-bg-image:     $form-check-input-indeterminate-bg-image !default;
-$combobox-option-indeterminate-indicator-border-color: var(--#{$prefix}control-indeterminate-border-color) !default;
 // scss-docs-end combobox-variables
 
 $combobox-tokens: () !default;
@@ -128,15 +120,6 @@ $combobox-tokens: defaults(
     --#{$prefix}combobox-option-disabled-color: #{$combobox-option-disabled-color},
     --#{$prefix}combobox-option-selected-bg: #{$combobox-option-selected-bg},
     --#{$prefix}combobox-option-indicator-width: #{$combobox-option-indicator-width},
-    --#{$prefix}combobox-option-indicator-bg: #{$combobox-option-indicator-bg},
-    --#{$prefix}combobox-option-indicator-border: #{$combobox-option-indicator-border},
-    --#{$prefix}combobox-option-indicator-border-radius: #{$combobox-option-indicator-border-radius},
-    --#{$prefix}combobox-option-selected-indicator-bg: #{$combobox-option-selected-indicator-bg},
-    --#{$prefix}combobox-option-selected-indicator-bg-image: #{$combobox-option-selected-indicator-bg-image},
-    --#{$prefix}combobox-option-selected-indicator-border-color: #{$combobox-option-selected-indicator-border-color},
-    --#{$prefix}combobox-option-indeterminate-indicator-bg: #{$combobox-option-indeterminate-indicator-bg},
-    --#{$prefix}combobox-option-indeterminate-indicator-bg-image: #{$combobox-option-indeterminate-indicator-bg-image},
-    --#{$prefix}combobox-option-indeterminate-indicator-border-color: #{$combobox-option-indeterminate-indicator-border-color},
   ),
   $combobox-tokens
 );
@@ -272,36 +255,34 @@ $combobox-tokens: defaults(
   .combobox-optgroup-label-with-checkbox {
     position: relative;
     padding-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) + var(--#{$prefix}combobox-option-indicator-width)); // stylelint-disable-line function-disallowed-list
+  }
 
-    &::before {
-      position: absolute;
-      inset-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
-      top: 50%;
-      display: block;
-      width: var(--#{$prefix}combobox-option-indicator-width);
-      height: var(--#{$prefix}combobox-option-indicator-width);
-      pointer-events: none;
-      content: "";
-      background-color: var(--#{$prefix}combobox-option-indicator-bg);
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      border: var(--#{$prefix}combobox-option-indicator-border);
-      transform: translateY(-50%);
-      @include border-radius(var(--#{$prefix}combobox-option-indicator-border-radius));
-    }
+  // The indicator is a decorative .form-check-input (span), so the checkbox
+  // visuals come from the form-check surface itself; only the placement and
+  // the class-driven states (a span never matches :checked) live here.
+  .combobox-option-indicator {
+    position: absolute;
+    inset-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
+    top: 50%;
+    width: var(--#{$prefix}combobox-option-indicator-width);
+    height: var(--#{$prefix}combobox-option-indicator-width);
+    margin: 0;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
 
-    &.selected::before {
-      background-color: var(--#{$prefix}combobox-option-selected-indicator-bg);
-      background-image: var(--#{$prefix}combobox-option-selected-indicator-bg-image);
-      border-color: var(--#{$prefix}combobox-option-selected-indicator-border-color);
-    }
+  .selected > .combobox-option-indicator {
+    --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-checked-bg-image)};
 
-    &.indeterminate::before {
-      background-color: var(--#{$prefix}combobox-option-indeterminate-indicator-bg);
-      background-image: var(--#{$prefix}combobox-option-indeterminate-indicator-bg-image);
-      border-color: var(--#{$prefix}combobox-option-indeterminate-indicator-border-color);
-    }
+    background-color: var(--#{$prefix}form-check-input-checked-bg-color);
+    border-color: var(--#{$prefix}form-check-input-checked-border-color);
+  }
+
+  .indeterminate > .combobox-option-indicator {
+    --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)};
+
+    background-color: var(--#{$prefix}form-check-input-indeterminate-bg-color);
+    border-color: var(--#{$prefix}form-check-input-indeterminate-border-color);
   }
 
   .combobox-options-empty {
