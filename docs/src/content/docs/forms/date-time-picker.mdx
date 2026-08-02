@@ -1,8 +1,8 @@
 ---
 pro: true
-title: "Bootstrap 5 Date Time Picker v2 (preview)"
-name: "Date Time Picker v2"
-description: "Preview of the v6 date time picker: a masked date-time field composed with a calendar and the time selection body. Replaces the timepicker flag of the v1 date picker."
+title: "Bootstrap 5 Date Time Picker"
+name: "Date Time Picker"
+description: "The v6 date time picker: a masked date-time field composed with a calendar and the time selection body. Replaces the timepicker flag of the v1 date picker."
 ---
 
 <Callout color="warning">
@@ -22,7 +22,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6 mb-3">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>
   <div class="row">
@@ -30,7 +30,7 @@ keeps the day — so the popup does not auto-close.
       <div
         data-coreui-date="2026/03/15 14:30:00"
         data-coreui-locale="en-US"
-        data-coreui-toggle="date-time-picker-v2"></div>
+        data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -38,7 +38,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="en-US" data-coreui-variant="select" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -46,7 +46,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker-v2">
+      <div data-coreui-locale="en-US" data-coreui-toggle="date-time-picker">
         <template data-coreui-template="footer">
           <button type="button" class="btn btn-sm btn-ghost-danger me-auto" data-coreui-picker-action="today">Today</button>
           <button type="button" class="btn btn-sm btn-ghost-primary" data-coreui-picker-action="clear">Clear</button>
@@ -60,12 +60,12 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="lg" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="en-US" data-coreui-size="sm" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -73,7 +73,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-disabled="true" data-coreui-locale="en-US" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -81,7 +81,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="en-US" data-coreui-seconds="false" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -89,12 +89,12 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row mb-3">
     <div class="col-lg-6">
-      <div data-coreui-locale="ja" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="ja" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-6">
-      <div data-coreui-locale="ko" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="ko" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -102,7 +102,7 @@ keeps the day — so the popup does not auto-close.
 
 <Example pro code={`<div class="row" dir="rtl">
     <div class="col-lg-6">
-      <div data-coreui-locale="he-IL" data-coreui-toggle="date-time-picker-v2"></div>
+      <div data-coreui-locale="he-IL" data-coreui-toggle="date-time-picker"></div>
     </div>
   </div>`} />
 
@@ -111,13 +111,13 @@ keeps the day — so the popup does not auto-close.
 ### Via data attributes
 
 ```html
-<div data-coreui-toggle="date-time-picker-v2"></div>
+<div data-coreui-toggle="date-time-picker"></div>
 ```
 
 ### Via JavaScript
 
 ```js
-const picker = new coreui.DateTimePickerV2(element, { locale: 'en-US' })
+const picker = new coreui.DateTimePicker(element, { locale: 'en-US' })
 ```
 
 ### Options
@@ -160,14 +160,14 @@ Options belonging to the inner [calendar](/components/calendar/#options) or
 
 | Event | Description |
 | --- | --- |
-| `dateChange.coreui.date-time-picker-v2` | Fired when either half changes the value. `event.date` carries the merged `Date`. |
-| `show/shown/hide/hidden.coreui.date-time-picker-v2` | Popup lifecycle. |
+| `dateChange.coreui.date-time-picker` | Fired when either half changes the value. `event.date` carries the merged `Date`. |
+| `show/shown/hide/hidden.coreui.date-time-picker` | Popup lifecycle. |
 
 ## Customizing
 
 ### CSS variables
 
-<ScssDocs file="scss/_date-picker-v2.scss" capture="date-picker-v2-css-vars" />
+<ScssDocs file="scss/_date-picker.scss" capture="date-picker-css-vars" />
 
 ### SASS variables
 

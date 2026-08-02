@@ -1,7 +1,7 @@
-import DateTimePickerV2 from '../../src/date-time-picker-v2.js'
+import DateTimePicker from '../../src/date-time-picker.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
-describe('DateTimePickerV2', () => {
+describe('DateTimePicker', () => {
   let fixtureEl
   const pickers = []
 
@@ -20,7 +20,7 @@ describe('DateTimePickerV2', () => {
 
   const buildPicker = (config = {}, html = '<div id="picker"></div>') => {
     fixtureEl.innerHTML = html
-    const picker = new DateTimePickerV2(fixtureEl.querySelector('#picker'), { locale: 'en-US', ...config })
+    const picker = new DateTimePicker(fixtureEl.querySelector('#picker'), { locale: 'en-US', ...config })
     pickers.push(picker)
     return picker
   }
@@ -84,7 +84,7 @@ describe('DateTimePickerV2', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 10, 0, 0) })
       const el = fixtureEl.querySelector('#picker')
       const emitted = []
-      el.addEventListener('dateChange.coreui.date-time-picker-v2', event => emitted.push(event.date))
+      el.addEventListener('dateChange.coreui.date-time-picker', event => emitted.push(event.date))
 
       picker.show()
       el.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()

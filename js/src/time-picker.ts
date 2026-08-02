@@ -2,27 +2,21 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO time-picker.js
  * License (https://coreui.io/pro/license/)
+ *
+ * Composed from a TimeInput section field, the TimeSelection popup body and the
+ * Popup primitive.
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
+import TimeInput from './time-input.js'
+import Popup from './util/popup.js'
+import TimeSelection from './util/time-selection.js'
+import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
-import { createAnchoredPosition } from './util/floating-ui.js'
-import {
-  defineJQueryPlugin, getElement, getNextActiveElement, isRTL
-} from './util/index.js'
-import FocusTrap from './util/focustrap.js'
-import {
-  convert12hTo24h,
-  convert24hTo12h,
-  getAmPm,
-  getLocalizedTimePartials,
-  isAmPm,
-  isValidTime
-} from './util/time.js'
+import { defineJQueryPlugin } from './util/index.js'
 
 /**
  * Constants
@@ -33,119 +27,78 @@ const DATA_KEY = 'coreui.time-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const END_KEY = 'End'
-const ENTER_KEY = 'Enter'
-const ESCAPE_KEY = 'Escape'
-const HOME_KEY = 'Home'
-const SPACE_KEY = 'Space'
-const TAB_KEY = 'Tab'
-const ARROW_UP_KEY = 'ArrowUp'
-const ARROW_DOWN_KEY = 'ArrowDown'
-const ARROW_LEFT_KEY = 'ArrowLeft'
-const ARROW_RIGHT_KEY = 'ArrowRight'
-const RIGHT_MOUSE_BUTTON = 2
-
 const EVENT_CLICK = `click${EVENT_KEY}`
-const EVENT_FOCUSOUT = `focusout${EVENT_KEY}`
-const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_INPUT = `input${EVENT_KEY}`
-const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+const EVENT_HIDE = `hide${EVENT_KEY}`
+const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_SUBMIT = 'submit'
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_BODY = 'time-picker-body'
-const CLASS_NAME_CLEANER = 'time-picker-cleaner'
-const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_DROPDOWN = 'time-picker-dropdown'
 const CLASS_NAME_FOOTER = 'time-picker-footer'
 const CLASS_NAME_INDICATOR = 'time-picker-indicator'
-const CLASS_NAME_INLINE_ICON = 'time-picker-inline-icon'
-const CLASS_NAME_INLINE_SELECT = 'time-picker-inline-select'
-const CLASS_NAME_INPUT = 'time-picker-input'
 const CLASS_NAME_INPUT_GROUP = 'time-picker-input-group'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
-const CLASS_NAME_ROLL = 'time-picker-roll'
-const CLASS_NAME_ROLL_COL = 'time-picker-roll-col'
-const CLASS_NAME_ROLL_CELL = 'time-picker-roll-cell'
-const CLASS_NAME_SELECTED = 'selected'
+const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
-const CLASS_NAME_WAS_VALIDATED = 'was-validated'
 
-const SELECTOR_DATA_TOGGLE =
-  '[data-coreui-toggle="time-picker"]:not(.disabled):not(:disabled)'
-const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
-const SELECTOR_ROLL_CELL = '.time-picker-roll-cell'
-const SELECTOR_ROLL_CELL_FOCUSABLE = '.time-picker-roll-cell[tabindex="0"]'
-const SELECTOR_ROLL_COL = '.time-picker-roll-col'
-const SELECTOR_WAS_VALIDATED = 'form.was-validated'
+const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]'
+const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
-const Default = {
-  ariaSelectHoursLabel: 'Select hours',
-  ariaSelectMeridiemLabel: 'Select AM/PM',
-  ariaSelectMinutesLabel: 'Select minutes',
-  ariaSelectSecondsLabel: 'Select seconds',
-  cancelButton: 'Cancel',
-  cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'] as string[],
-  cleaner: true,
-  confirmButton: 'OK',
-  confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'] as string[],
+// Icons live in JavaScript, not in CSS masks — the chips pattern.
+const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16Zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208Z"/><path d="M272 128h-32v139.314l84.686 84.687 22.628-22.628L272 254.059V128Z"/></svg>'
+
+type TimePickerConfig = {
+  allowList: SanitizerAllowList
+  ariaToggleLabel: string
+  container: Element | boolean | string
+  disabled: boolean
+  indicatorIcon: string
+  inputOptions: Record<string, any>
+  locale: string
+  name: string | null
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  selectionOptions: Record<string, any>
+  size: string | null
+  time: Date | string | null
+  variant: string
+}
+
+const Default: TimePickerConfig = {
+  allowList: SVGAllowlist,
+  ariaToggleLabel: 'Toggle the time selection',
   container: false,
   disabled: false,
-  footer: true,
-  hours: null,
-  indicator: true,
-  inputOnChangeDelay: 750,
-  inputReadOnly: false,
-  invalid: false,
-  locale: 'default',
-  minutes: true,
+  indicatorIcon: DEFAULT_INDICATOR_ICON,
+  inputOptions: {},
+  locale: navigator.language,
   name: null,
-  placeholder: 'Select time',
-  required: true,
-  seconds: true,
+  sanitize: true,
+  sanitizeFn: null,
+  selectionOptions: {},
   size: null,
   time: null,
-  type: 'dropdown',
-  valid: false,
   variant: 'roll'
 }
 
 const DefaultType: Record<string, string> = {
-  ariaSelectHoursLabel: 'string',
-  ariaSelectMeridiemLabel: 'string',
-  ariaSelectMinutesLabel: 'string',
-  ariaSelectSecondsLabel: 'string',
-  cancelButton: '(boolean|string)',
-  cancelButtonClasses: '(array|string)',
-  cleaner: 'boolean',
-  confirmButton: '(boolean|string)',
-  confirmButtonClasses: '(array|string)',
+  allowList: 'object',
+  ariaToggleLabel: 'string',
   container: '(string|element|boolean)',
   disabled: 'boolean',
-  footer: 'boolean',
-  hours: '(array|function|null)',
-  indicator: 'boolean',
-  inputOnChangeDelay: 'number',
-  inputReadOnly: 'boolean',
-  invalid: 'boolean',
+  indicatorIcon: 'string',
+  inputOptions: 'object',
   locale: 'string',
-  minutes: '(array|boolean|function)',
   name: '(string|null)',
-  placeholder: 'string',
-  required: 'boolean',
-  seconds: '(array|boolean|function)',
+  sanitize: 'boolean',
+  sanitizeFn: '(function|null)',
+  selectionOptions: 'object',
   size: '(string|null)',
   time: '(date|string|null)',
-  type: 'string',
-  valid: 'boolean',
   variant: 'string'
 }
 
@@ -154,54 +107,30 @@ const DefaultType: Record<string, string> = {
  */
 
 class TimePicker extends BaseComponent {
-  protected declare _date: any
-  protected declare _initialDate: any
-  protected declare _ampm: any
-  protected declare _floatingCleanup: (() => void) | null
-  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
-  protected declare _indicatorElement: any
+  protected declare _footerTemplate: any
+  protected declare _indicatorElement: HTMLElement
+  protected declare _initialTime: any
   protected declare _input: any
+  protected declare _selection: any
+  protected declare _selectionElement: any
   protected declare _menu: any
-  protected declare _timePickerBody: any
-  protected declare _inputTimeout: any
-  protected declare _localizedTimePartials: any
-  protected declare _focustrap: any
-  protected declare _togglerElement: HTMLElement
+  protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
-    super(element)
+    super(element, config)
 
-    this._config = this._getConfig(config)
-    this._date = this._convertStringToDate(this._config.time)
-    this._initialDate = null
-    this._ampm = this._date ?
-      getAmPm(new Date(this._date), this._config.locale) :
-      'am'
-    this._floatingCleanup = null
-    this._anchoredPosition = null
-
-    this._indicatorElement = null
+    this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
+    // see DatePicker — the shell owns the initial value for reset()
+    this._initialTime = config?.time ?? this._config.time
     this._input = null
+    this._selection = null
+    this._selectionElement = null
     this._menu = null
-    this._timePickerBody = null
-    this._inputTimeout = null
-
-    this._localizedTimePartials = getLocalizedTimePartials(
-      this._config.locale,
-      // The property does not exist, so `getLocalizedTimePartials` falls back to its
-      // `'auto'` default. Passing `_ampm` instead would change behaviour.
-      (this as any).ampm,
-      this._config.hours,
-      this._config.minutes,
-      this._config.seconds
-    )
+    this._popup = null
 
     this._createTimePicker()
-    this._createTimePickerSelection()
+    this._createPopup()
     this._addEventListeners()
-    this._setUpSelects()
-
-    this._focustrap = this._initializeFocusTrap()
   }
 
   // Getters
@@ -218,137 +147,171 @@ class TimePicker extends BaseComponent {
   }
 
   // Public
-  toggle(): void {
-    return this._isShown() ? this.hide() : this.show()
-  }
-
   show(): void {
-    if (this._config.disabled || this._isShown()) {
+    if (this._config.disabled) {
       return
     }
 
-    this._initialDate = new Date(this._date)
-
-    EventHandler.trigger(this._element, EVENT_SHOW)
-    this._element.classList.add(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', true as any)
-
-    if (this._config.container) {
-      this._menu.classList.add(CLASS_NAME_SHOW)
-    }
-
-    this._focustrap.activate()
-    EventHandler.trigger(this._element, EVENT_SHOWN)
-
-    this._createFloating()
+    this._popup.show()
   }
 
   hide(): void {
-    EventHandler.trigger(this._element, EVENT_HIDE)
-
-    this._disposeFloating()
-
-    this._element.classList.remove(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', 'false')
-
-    if (this._config.container) {
-      this._menu.classList.remove(CLASS_NAME_SHOW)
-    }
-
-    this._focustrap.deactivate()
-    EventHandler.trigger(this._element, EVENT_HIDDEN)
+    this._popup.hide()
   }
 
-  override dispose(): void {
-    this._disposeFloating()
-
-    if (this._inputTimeout) {
-      clearTimeout(this._inputTimeout)
-    }
-
-    this._focustrap.deactivate()
-
-    super.dispose()
+  toggle(): void {
+    return this._popup.isShown ? this.hide() : this.show()
   }
 
-  cancel(): void {
-    this._date = this._initialDate
-    this._setInputValue(this._initialDate || '')
-    this._timePickerBody.innerHTML = ''
-    this.hide()
-    this._createTimePickerSelection()
-    this._emitChangeEvent(this._date)
+  getTime(): Date | null {
+    return this._input.getDate()
+  }
+
+  setTime(time: Date | null): void {
+    this._input.update({ date: time })
+    this._selection?.update({ time })
+    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
+  }
+
+  now(): void {
+    this.setTime(new Date())
   }
 
   clear(): void {
-    this._date = null
-    this._setInputValue('' as any)
-    this._timePickerBody.innerHTML = ''
-    this._createTimePickerSelection()
-    this._emitChangeEvent(this._date)
+    this._input.clear()
+    this._selection?.update({ time: null })
+    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: null })
   }
 
   reset(): void {
-    this._date = this._convertStringToDate(this._config.time)
-    this._setInputValue(this._config.time)
-    this._timePickerBody.innerHTML = ''
-    this._createTimePickerSelection()
-    this._emitChangeEvent(this._date)
+    this.setTime(this._initialTime)
   }
 
-  update(config: any): void {
-    this._config = this._getConfig(config)
-    this._date = this._convertStringToDate(this._config.time)
-    this._ampm = this._date ?
-      getAmPm(new Date(this._date), this._config.locale) :
-      'am'
-    this._timePickerBody.innerHTML = ''
-    this._createTimePickerSelection()
-    this._setUpSelects()
+  getContext(): Record<string, any> {
+    return {
+      clear: () => this.clear(),
+      close: () => this.hide(),
+      disabled: this._config.disabled,
+      now: () => this.now(),
+      reset: () => this.reset(),
+      setTime: (time: Date | null) => this.setTime(time),
+      time: this.getTime()
+    }
+  }
+
+  override dispose(): void {
+    this._popup.dispose()
+    this._input.dispose()
+    this._selection?.dispose()
+    super.dispose()
   }
 
   // Private
-  _initializeFocusTrap(): FocusTrap {
-    return new FocusTrap({
-      additionalElement: this._config.container ? this._menu : null,
-      trapElement: this._element
+  // Options the inner primitives know about are forwarded by name, so their
+  // data attributes work on the picker element.
+  _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
+    const forwarded: Record<string, any> = {}
+
+    for (const key of Object.keys(Component.Default)) {
+      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
+        forwarded[key] = this._config[key]
+      }
+    }
+
+    return { ...forwarded, ...overrides, ...extra }
+  }
+
+  _sanitizeIcon(icon: string): string {
+    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
+  }
+
+  _createTimePicker(): void {
+    this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER)
+
+    if (this._config.size) {
+      this._element.classList.add(`${CLASS_NAME_TIME_PICKER}-${this._config.size}`)
+    }
+
+    const inputGroup = document.createElement('div')
+    inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+
+    const inputEl = document.createElement('div')
+    inputGroup.append(inputEl)
+
+    const indicator = document.createElement('button')
+    indicator.classList.add(CLASS_NAME_INDICATOR)
+    indicator.type = 'button'
+    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
+    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
+    inputGroup.append(indicator)
+    this._indicatorElement = indicator
+
+    this._element.append(inputGroup)
+
+    this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
+      date: this._config.time,
+      disabled: this._config.disabled,
+      locale: this._config.locale,
+      name: this._config.name
+    }, this._config.inputOptions))
+
+    this._menu = document.createElement('div')
+    this._menu.classList.add(CLASS_NAME_DROPDOWN)
+
+    this._selectionElement = document.createElement('div')
+    this._selectionElement.classList.add(CLASS_NAME_BODY)
+    this._menu.append(this._selectionElement)
+
+    if (this._footerTemplate) {
+      const footer = document.createElement('div')
+      footer.classList.add(CLASS_NAME_FOOTER)
+      footer.append(this._footerTemplate.content.cloneNode(true))
+      this._menu.append(footer)
+    }
+
+    this._element.append(this._menu)
+  }
+
+  // The selection body is built on first open, like the pickers' calendar.
+  _ensureSelection(): void {
+    if (this._selection) {
+      return
+    }
+
+    this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
+      locale: this._config.locale,
+      onChange: (time: Date | null) => {
+        this._input.update({ date: time })
+        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
+      },
+      time: this.getTime(),
+      variant: this._config.variant
+    }, this._config.selectionOptions))
+  }
+
+  _createPopup(): void {
+    this._popup = new Popup({
+      anchor: this._element,
+      container: this._config.container,
+      content: this._menu,
+      onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
+      onHide: () => {
+        this._menu.classList.remove(CLASS_NAME_SHOW)
+        this._element.classList.remove(CLASS_NAME_SHOW)
+        this._element.setAttribute('aria-expanded', 'false')
+        EventHandler.trigger(this._element, EVENT_HIDE)
+      },
+      onShow: () => {
+        // the classes come first: the selection body scrolls the selected cell
+        // into view, which needs the dropdown to have layout
+        this._menu.classList.add(CLASS_NAME_SHOW)
+        this._element.classList.add(CLASS_NAME_SHOW)
+        this._ensureSelection()
+        this._element.setAttribute('aria-expanded', 'true')
+        EventHandler.trigger(this._element, EVENT_SHOW)
+      },
+      onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })
-  }
-
-  _moveFocusToNextColumn(event: any): void {
-    if (!this._timePickerBody) {
-      return
-    }
-
-    const { target } = event
-    const columnElement = target.parentElement
-
-    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody)
-    const currentColumnIndex = columns.indexOf(columnElement)
-
-    if (currentColumnIndex < columns.length - 1) {
-      const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex + 1])
-
-      firstFocusableCell!.focus()
-    }
-  }
-
-  _moveFocusToPreviousColumn(event: any): void {
-    if (!this._timePickerBody) {
-      return
-    }
-
-    const { target } = event
-    const columnElement = target.parentElement
-
-    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._timePickerBody)
-    const currentColumnIndex = columns.indexOf(columnElement)
-
-    if (currentColumnIndex > 0) {
-      const firstFocusableCell = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[currentColumnIndex - 1])
-
-      firstFocusableCell!.focus()
-    }
   }
 
   _addEventListeners(): void {
@@ -358,740 +321,14 @@ class TimePicker extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._config.disabled && event.key === ENTER_KEY) {
-        this.toggle()
+    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, (event: any) => {
+      const action = event.target.closest(SELECTOR_ACTION).dataset.coreuiPickerAction
+      const context = this.getContext()
+
+      if (typeof context[action] === 'function') {
+        context[action]()
       }
     })
-
-    EventHandler.on(this._togglerElement, EVENT_CLICK, (event: any) => {
-      if (!this._config.disabled && event.target !== this._indicatorElement) {
-        this.show()
-
-        if (this._config.variant === 'roll') {
-          this._setUpRolls(true)
-        }
-
-        if (this._config.variant === 'select') {
-          this._setUpSelects()
-        }
-      }
-    })
-
-    if (this._config.variant === 'roll') {
-      EventHandler.on(this._timePickerBody, EVENT_FOCUSOUT, SELECTOR_ROLL_COL, (event: any) => {
-        if (!event.delegateTarget.contains(event.relatedTarget)) {
-          this._setUpRolls(false)
-        }
-      })
-
-      EventHandler.on(this._timePickerBody, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, (event: any) => {
-        if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
-          event.preventDefault()
-          const { key, target } = event
-          const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement)
-
-          if (!items.length) {
-            return
-          }
-
-          const nextElement = getNextActiveElement(items, target, key === ARROW_DOWN_KEY, !items.includes(target))
-          if (nextElement) {
-            nextElement.focus()
-          }
-
-          return
-        }
-
-        if (event.key === HOME_KEY || event.key === END_KEY) {
-          event.preventDefault()
-          const { key, target } = event
-          const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement)
-
-          if (!items.length) {
-            return
-          }
-
-          const index = key === HOME_KEY ? 0 : items.length - 1
-          items[index].focus()
-          return
-        }
-
-        if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
-          event.preventDefault()
-          const { key } = event
-          const isRtl = isRTL()
-          const shouldGoLeft = (key === ARROW_LEFT_KEY && !isRtl) || (key === ARROW_RIGHT_KEY && isRtl)
-          if (shouldGoLeft) {
-            this._moveFocusToPreviousColumn(event)
-          } else {
-            this._moveFocusToNextColumn(event)
-          }
-        }
-      })
-    }
-
-    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
-      if (event.key === ESCAPE_KEY) {
-        this.hide()
-      }
-    })
-
-    EventHandler.on(this._element, 'timeChange.coreui.time-picker', () => {
-      if (this._config.variant === 'roll') {
-        this._setUpRolls()
-      }
-
-      if (this._config.variant === 'select') {
-        this._setUpSelects()
-      }
-    })
-
-    EventHandler.on(this._element, 'onCancelClick.coreui.picker', () => {
-      this.cancel()
-    })
-
-    EventHandler.on(this._input, EVENT_INPUT, (event: any) => {
-      if (this._inputTimeout) {
-        clearTimeout(this._inputTimeout)
-      }
-
-      this._inputTimeout = setTimeout(() => {
-        if (isValidTime(event.target.value)) {
-          this._date = this._convertStringToDate(event.target.value)
-
-          EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-            timeString: this._date ? this._date.toTimeString() : null,
-            localeTimeString: this._date ? this._date.toLocaleTimeString() : null,
-            date: this._date
-          })
-        }
-      }, this._config.inputOnChangeDelay)
-    })
-
-    if (this._config.type === 'dropdown') {
-      EventHandler.on(this._input.form, EVENT_SUBMIT, () => {
-        if (this._input.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
-          if (Number.isNaN(Date.parse(`1970-01-01 ${this._input.value}`))) {
-            return this._element.classList.add(CLASS_NAME_IS_INVALID)
-          }
-
-          if (this._date instanceof Date) {
-            return this._element.classList.add(CLASS_NAME_IS_VALID)
-          }
-
-          this._element.classList.add(CLASS_NAME_IS_INVALID)
-        }
-      })
-    }
-  }
-
-  _createTimePicker(): void {
-    this._element.classList.add(CLASS_NAME_TIME_PICKER)
-
-    Manipulator.setDataAttribute(
-      this._element,
-      'meridiem',
-      CLASS_NAME_TIME_PICKER
-    )
-
-    if (this._config.size) {
-      this._element.classList.add(`time-picker-${this._config.size}`)
-    }
-
-    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-    }
-
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
-
-    if (this._config.type === 'dropdown') {
-      this._element.append(this._createTimePickerInputGroup())
-
-      const dropdownEl = document.createElement('div')
-      dropdownEl.classList.add(CLASS_NAME_DROPDOWN)
-
-      dropdownEl.append(this._createTimePickerBody())
-      if (this._config.footer || this._config.timepicker) {
-        dropdownEl.append(this._createTimePickerFooter())
-      }
-
-      const { container } = this._config
-      if (container) {
-        container.append(dropdownEl)
-      } else {
-        this._element.append(dropdownEl)
-      }
-
-      this._menu = dropdownEl
-    }
-
-    if (this._config.type === 'inline') {
-      this._element.append(this._createTimePickerBody())
-    }
-  }
-
-  _createTimePickerInputGroup(): HTMLElement {
-    const inputGroupEl = document.createElement('div')
-    inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP)
-
-    const inputEl = document.createElement('input')
-    inputEl.classList.add(CLASS_NAME_INPUT)
-    inputEl.autocomplete = 'off'
-    inputEl.disabled = this._config.disabled
-    inputEl.placeholder = this._config.placeholder
-    inputEl.readOnly = this._config.inputReadOnly
-    inputEl.required = this._config.required
-    inputEl.type = 'text'
-
-    this._setInputValue(this._date || '', inputEl)
-
-    if (this._config.name || this._element.id) {
-      inputEl.name = this._config.name || `time-picker-${this._element.id}`
-    }
-
-    const events = ['change', 'keyup', 'paste']
-
-    for (const event of events) {
-      inputEl.addEventListener(event, ({ target }: any) => {
-        if (target.closest(SELECTOR_WAS_VALIDATED)) {
-          if (Number.isNaN(Date.parse(`1970-01-01 ${target.value}`))) {
-            this._element.classList.add(CLASS_NAME_IS_INVALID)
-            this._element.classList.remove(CLASS_NAME_IS_VALID)
-            return
-          }
-
-          if (this._date instanceof Date) {
-            this._element.classList.add(CLASS_NAME_IS_VALID)
-            this._element.classList.remove(CLASS_NAME_IS_INVALID)
-            return
-          }
-
-          this._element.classList.add(CLASS_NAME_IS_INVALID)
-          this._element.classList.remove(CLASS_NAME_IS_VALID)
-        }
-      })
-    }
-
-    inputGroupEl.append(inputEl)
-
-    if (this._config.indicator) {
-      const inputGroupIndicatorEl = document.createElement('div')
-      inputGroupIndicatorEl.classList.add(CLASS_NAME_INDICATOR)
-
-      if (!this._config.disabled) {
-        inputGroupIndicatorEl.tabIndex = 0
-      }
-
-      inputGroupEl.append(inputGroupIndicatorEl)
-
-      this._indicatorElement = inputGroupIndicatorEl
-    }
-
-    if (this._config.cleaner) {
-      const inputGroupCleanerEl = document.createElement('div')
-      inputGroupCleanerEl.classList.add(CLASS_NAME_CLEANER)
-      inputGroupCleanerEl.addEventListener('click', event => {
-        event.stopPropagation()
-        this.clear()
-      })
-
-      inputGroupEl.append(inputGroupCleanerEl)
-    }
-
-    this._input = inputEl
-    this._togglerElement = inputGroupEl
-
-    return inputGroupEl
-  }
-
-  _createTimePickerSelection(): void {
-    if (this._config.variant === 'roll') {
-      this._createTimePickerRoll()
-    }
-
-    if (this._config.variant === 'select') {
-      this._createTimePickerInlineSelects()
-    }
-  }
-
-  _createTimePickerBody(): HTMLElement {
-    const timePickerBodyEl = document.createElement('div')
-    timePickerBodyEl.classList.add(CLASS_NAME_BODY)
-
-    if (this._config.variant === 'roll') {
-      timePickerBodyEl.classList.add(CLASS_NAME_ROLL)
-      timePickerBodyEl.setAttribute('role', 'group')
-    }
-
-    this._timePickerBody = timePickerBodyEl
-
-    return timePickerBodyEl
-  }
-
-  _createTimePickerInlineSelect(className: string, options: any[], ariaLabel: string): HTMLSelectElement {
-    const selectEl = document.createElement('select')
-    selectEl.classList.add(CLASS_NAME_INLINE_SELECT, className)
-    selectEl.disabled = this._config.disabled
-    selectEl.setAttribute('aria-label', ariaLabel)
-    selectEl.addEventListener('change', (event: any) =>
-      this._handleTimeChange(className, event.target.value)
-    )
-
-    for (const option of options) {
-      const optionEl = document.createElement('option')
-      optionEl.value = option.value
-      optionEl.innerHTML = option.label
-
-      selectEl.append(optionEl)
-    }
-
-    return selectEl
-  }
-
-  _createTimePickerInlineSelects(): void {
-    const timeSeparatorEl = document.createElement('div')
-    timeSeparatorEl.innerHTML = ':'
-
-    this._timePickerBody.innerHTML = `<span class="${CLASS_NAME_INLINE_ICON}"></span>`
-    this._timePickerBody.append(
-      this._createTimePickerInlineSelect(
-        'hours',
-        this._localizedTimePartials.listOfHours,
-        this._config.ariaSelectHoursLabel
-      )
-    )
-
-    if (this._config.minutes) {
-      this._timePickerBody.append(
-        timeSeparatorEl.cloneNode(true),
-        this._createTimePickerInlineSelect(
-          'minutes',
-          this._localizedTimePartials.listOfMinutes,
-          this._config.ariaSelectMinutesLabel
-        )
-      )
-    }
-
-    if (this._config.seconds) {
-      this._timePickerBody.append(
-        timeSeparatorEl,
-        this._createTimePickerInlineSelect(
-          'seconds',
-          this._localizedTimePartials.listOfSeconds,
-          this._config.ariaSelectSecondsLabel
-        )
-      )
-    }
-
-    if (this._localizedTimePartials.hour12) {
-      this._timePickerBody.append(
-        this._createTimePickerInlineSelect(
-          'meridiem',
-          [
-            { value: 'am', label: 'AM' },
-            { value: 'pm', label: 'PM' }
-          ],
-          this._config.ariaSelectMeridiemLabel
-        )
-      )
-    }
-  }
-
-  _createTimePickerRoll(): void {
-    this._timePickerBody.append(
-      this._createTimePickerRollCol(
-        this._localizedTimePartials.listOfHours,
-        'hours',
-        this._config.ariaSelectHoursLabel
-      )
-    )
-
-    if (this._config.minutes) {
-      this._timePickerBody.append(
-        this._createTimePickerRollCol(
-          this._localizedTimePartials.listOfMinutes,
-          'minutes',
-          this._config.ariaSelectMinutesLabel
-        )
-      )
-    }
-
-    if (this._config.seconds) {
-      this._timePickerBody.append(
-        this._createTimePickerRollCol(
-          this._localizedTimePartials.listOfSeconds,
-          'seconds',
-          this._config.ariaSelectSecondsLabel
-        )
-      )
-    }
-
-    if (this._localizedTimePartials.hour12) {
-      this._timePickerBody.append(
-        this._createTimePickerRollCol(
-          [
-            { value: 'am', label: 'AM' },
-            { value: 'pm', label: 'PM' }
-          ],
-          'meridiem',
-          this._config.ariaSelectMeridiemLabel
-        )
-      )
-    }
-  }
-
-  _createTimePickerRollCol(options: any[], part: string, ariaLabel: string): HTMLElement {
-    const timePickerRollColEl = document.createElement('div')
-    timePickerRollColEl.classList.add(CLASS_NAME_ROLL_COL)
-    timePickerRollColEl.setAttribute('role', 'listbox')
-    timePickerRollColEl.setAttribute('aria-label', ariaLabel)
-
-    for (const [index, option] of options.entries()) {
-      const timePickerRollCellEl = document.createElement('div')
-      timePickerRollCellEl.classList.add(CLASS_NAME_ROLL_CELL)
-
-      timePickerRollCellEl.setAttribute('role', 'option')
-      timePickerRollCellEl.tabIndex = index === 0 ? 0 : -1
-      timePickerRollCellEl.setAttribute('aria-label', option.label.toString())
-      timePickerRollCellEl.setAttribute('aria-selected', 'false')
-
-      timePickerRollCellEl.innerHTML = option.label
-      timePickerRollCellEl.addEventListener('click', () => {
-        this._handleTimeChange(part, option.value)
-      })
-      timePickerRollCellEl.addEventListener('keydown', event => {
-        if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
-          event.preventDefault()
-          this._handleTimeChange(part, option.value)
-          this._moveFocusToNextColumn(event)
-        }
-      })
-
-      Manipulator.setDataAttribute(timePickerRollCellEl, part, option.value)
-
-      timePickerRollColEl.append(timePickerRollCellEl)
-    }
-
-    return timePickerRollColEl
-  }
-
-  _createTimePickerFooter(): HTMLElement {
-    const footerEl = document.createElement('div')
-    footerEl.classList.add(CLASS_NAME_FOOTER)
-
-    if (this._config.cancelButton) {
-      const cancelButtonEl = document.createElement('button')
-      cancelButtonEl.classList.add(
-        ...this._getButtonClasses(this._config.cancelButtonClasses)
-      )
-      cancelButtonEl.type = 'button'
-      cancelButtonEl.textContent = this._config.cancelButton
-      cancelButtonEl.addEventListener('click', () => {
-        this.cancel()
-      })
-
-      footerEl.append(cancelButtonEl)
-    }
-
-    if (this._config.confirmButton) {
-      const confirmButtonEl = document.createElement('button')
-      confirmButtonEl.classList.add(
-        ...this._getButtonClasses(this._config.confirmButtonClasses)
-      )
-      confirmButtonEl.type = 'button'
-      confirmButtonEl.textContent = this._config.confirmButton
-      confirmButtonEl.addEventListener('click', () => {
-        this.hide()
-      })
-
-      footerEl.append(confirmButtonEl)
-    }
-
-    return footerEl
-  }
-
-  _emitChangeEvent(date: Date | null): void {
-    this._input.dispatchEvent(new Event('change'))
-    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-      timeString: date === null ? null : date.toTimeString(),
-      localeTimeString: date === null ? null : date.toLocaleTimeString(),
-      date
-    })
-  }
-
-  _setUpRolls(initial = false): void {
-    const parts = ['hours', 'minutes', 'seconds', 'meridiem']
-
-    for (const part of parts) {
-      const partValue = this._getPartOfTime(part)
-      if (partValue === null) {
-        continue
-      }
-
-      const elements = SelectorEngine.find(`[data-coreui-${part}]`, this._element)
-      const selectedElement = elements.find(element =>
-        partValue === Manipulator.getDataAttribute(element, part)
-      )
-
-      if (selectedElement) {
-        this._selectRollElement(selectedElement, initial)
-      }
-    }
-  }
-
-  _selectRollElement(element: any, initial = false): void {
-    const { parentElement } = element
-
-    const currentSelected = SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, parentElement)
-    if (currentSelected && currentSelected !== element) {
-      currentSelected.classList.remove(CLASS_NAME_SELECTED)
-      currentSelected.tabIndex = -1
-      currentSelected.setAttribute('aria-selected', 'false')
-    }
-
-    element.classList.add(CLASS_NAME_SELECTED)
-    element.tabIndex = 0
-    element.setAttribute('aria-selected', 'true')
-    this._scrollTo(parentElement, element, initial)
-  }
-
-  _setInputValue(date: Date | null, input: any = this._input): void {
-    input.value = date instanceof Date ?
-      date.toLocaleTimeString(this._config.locale, {
-        hour12: this._localizedTimePartials.hour12,
-        hour: 'numeric',
-        ...(this._config.minutes && { minute: 'numeric' }),
-        ...(this._config.seconds && { second: 'numeric' })
-      }) :
-      date
-  }
-
-  _setUpSelects(): void {
-    for (const part of Array.from(['hours', 'minutes', 'seconds', 'meridiem'])) {
-      for (const element of SelectorEngine.find(
-        `select.${part}`,
-        this._element as ParentNode
-      )) {
-        if (this._getPartOfTime(part)) {
-          (element as HTMLSelectElement).value = this._getPartOfTime(part)
-        }
-      }
-    }
-  }
-
-  _updateTimePicker(): void {
-    this._element.innerHTML = ''
-    this._createTimePicker()
-  }
-
-  _convertStringToDate(date: Date | string | null): Date | null {
-    return date ?
-      (date instanceof Date ?
-        date :
-        new Date(`1970-01-01 ${date}`)) :
-      null
-  }
-
-  _createFloating(): void {
-    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
-    this._floatingCleanup = this._anchoredPosition.destroy
-  }
-
-  async _updateFloatingPosition(): Promise<void> {
-    await this._anchoredPosition?.update()
-  }
-
-  _disposeFloating(): void {
-    if (this._floatingCleanup) {
-      this._floatingCleanup()
-      this._floatingCleanup = null
-      this._anchoredPosition = null
-    }
-  }
-
-  _getButtonClasses(classes: string[] | string): string[] {
-    if (typeof classes === 'string') {
-      return classes.split(' ')
-    }
-
-    return classes
-  }
-
-  _getPartOfTime(part: string): any {
-    if (this._date === null) {
-      return null
-    }
-
-    if (part === 'hours') {
-      return isAmPm(this._config.locale) ?
-        convert24hTo12h(this._date.getHours()) :
-        this._date.getHours()
-    }
-
-    if (part === 'minutes') {
-      return this._date.getMinutes()
-    }
-
-    if (part === 'seconds') {
-      return this._date.getSeconds()
-    }
-
-    if (part === 'meridiem') {
-      return getAmPm(new Date(this._date), this._config.locale)
-    }
-  }
-
-  _handleTimeChange = (set: string, value: string): void => {
-    const _date = this._date || new Date('1970-01-01')
-
-    if (set === 'meridiem') {
-      const currentHours = _date.getHours()
-
-      if (value === 'am') {
-        this._ampm = 'am'
-        // Convert PM hours (12-23) to AM hours (0-11)
-        if (currentHours >= 12) {
-          _date.setHours(currentHours - 12)
-        }
-      }
-
-      if (value === 'pm') {
-        this._ampm = 'pm'
-        // Convert AM hours (0-11) to PM hours (12-23)
-        if (currentHours < 12) {
-          _date.setHours(currentHours + 12)
-        }
-      }
-    }
-
-    if (set === 'hours') {
-      if (isAmPm(this._config.locale)) {
-        _date.setHours(convert12hTo24h(this._ampm, Number.parseInt(value, 10)))
-      } else {
-        _date.setHours(Number.parseInt(value, 10))
-      }
-    }
-
-    if (set === 'minutes') {
-      _date.setMinutes(Number.parseInt(value, 10))
-    }
-
-    if (set === 'seconds') {
-      _date.setSeconds(Number.parseInt(value, 10))
-    }
-
-    this._date = new Date(_date)
-
-    if (this._input) {
-      this._setInputValue(_date)
-      this._input.dispatchEvent(new Event('change'))
-    }
-
-    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, {
-      timeString: _date.toTimeString(),
-      localeTimeString: _date.toLocaleTimeString(),
-      date: _date
-    })
-  }
-
-  _isShown(): boolean {
-    return this._element.classList.contains(CLASS_NAME_SHOW)
-  }
-
-  _scrollTo(parent: HTMLElement, children: HTMLElement, initial = false): void {
-    parent.scrollTo({
-      top: children.offsetTop,
-      behavior: initial ? 'instant' : 'smooth'
-    })
-  }
-
-  override _configAfterMerge(config: any): any {
-    if (config.container === 'dropdown' || config.container === 'inline') {
-      config.type = config.container
-    }
-
-    if (config.container === true) {
-      config.container = document.body
-    }
-
-    if (
-      typeof config.container === 'object' ||
-      (typeof config.container === 'string' &&
-        config.container === 'dropdown' &&
-        config.container === 'inline')
-    ) {
-      config.container = getElement(config.container)
-    }
-
-    return config
-  }
-
-  // Static
-  static timePickerInterface(element: string | Element | null, config?: any): void {
-    const data: any = TimePicker.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config]()
-    }
-  }
-
-  static jQueryInterface(this: any, config: any): void {
-    return this.each(function (this: HTMLElement) {
-      const data: any = TimePicker.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (
-        data[config] === undefined ||
-        config.startsWith('_') ||
-        config === 'constructor'
-      ) {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](this)
-    })
-  }
-
-  static clearMenus(event: any): void {
-    if (
-      event.button === RIGHT_MOUSE_BUTTON ||
-      (event.type === 'keyup' && event.key !== TAB_KEY)
-    ) {
-      return
-    }
-
-    const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)
-
-    for (const toggle of openToggles) {
-      const context = TimePicker.getInstance(toggle)
-
-      if (!context) {
-        continue
-      }
-
-      const composedPath = event.composedPath()
-
-      if (composedPath.includes(context._element)) {
-        continue
-      }
-
-      const relatedTarget: any = { relatedTarget: context._element }
-
-      if (event.type === 'click') {
-        relatedTarget.clickEvent = event
-      }
-
-      context.hide()
-    }
   }
 }
 
@@ -1100,18 +337,17 @@ class TimePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const timePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
-  for (let i = 0, len = timePickers.length; i < len; i++) {
-    TimePicker.timePickerInterface(timePickers[i])
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    TimePicker.getOrCreateInstance(element)
   }
 })
-EventHandler.on(document, EVENT_CLICK_DATA_API, TimePicker.clearMenus)
-EventHandler.on(document, EVENT_KEYUP_DATA_API, TimePicker.clearMenus)
 
 /**
  * jQuery
  */
 
-defineJQueryPlugin(TimePicker)
+// The v2 pickers define no `jQueryInterface`, so the plugin registers as
+// `undefined` — preserved as-is; fixing it is a behaviour change.
+defineJQueryPlugin(TimePicker as any)
 
 export default TimePicker

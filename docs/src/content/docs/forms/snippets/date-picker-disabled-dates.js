@@ -1,16 +1,16 @@
 const myDatePickerDisabledDates = document.getElementById('myDatePickerDisabledDates')
 
-const optionsDatePickerDisabledDates = {
+const datePickerDisabledDates = new coreui.DatePicker(myDatePickerDisabledDates, {
   locale: 'en-US',
-  calendarDate: new Date(2022, 2, 1),
+  date: new Date(2026, 6, 10),
   disabledDates: [
-    [new Date(2022, 2, 4), new Date(2022, 2, 7)],
-    new Date(2022, 2, 16),
-    new Date(2022, 3, 16),
-    [new Date(2022, 4, 2), new Date(2022, 4, 8)]
+    [new Date(2026, 6, 4), new Date(2026, 6, 7)],
+    new Date(2026, 6, 16)
   ],
-  maxDate: new Date(2022, 5, 0),
-  minDate: new Date(2022, 1, 1)
-}
+  minDate: new Date(2026, 6, 1),
+  maxDate: new Date(2026, 6, 31)
+})
 
-new coreui.DatePicker(myDatePickerDisabledDates, optionsDatePickerDisabledDates)
+myDatePickerDisabledDates.addEventListener('dateChange.coreui.date-picker', event => {
+  console.log('dateChange', event.date)
+})

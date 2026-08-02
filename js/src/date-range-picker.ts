@@ -2,23 +2,22 @@
  * --------------------------------------------------------------------------
  * CoreUI PRO date-range-picker.js
  * License (https://coreui.io/pro/license/)
+ *
+ * Composed from two DateInput section fields and one multi-month Calendar in a
+ * Popup. The calendar owns the range mechanics (start/end, auto-advance); the
+ * shell wires fields, popup, and the projected footer/ranges regions.
  * --------------------------------------------------------------------------
  */
 
 import BaseComponent from './base-component.js'
 import Calendar from './calendar.js'
-import TimePicker from './time-picker.js'
+import DateInput from './date-input.js'
 import EventHandler from './dom/event-handler.js'
-import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
-import { defineJQueryPlugin, getElement } from './util/index.js'
-import {
-  convertToDateObject, getDateBySelectionType, getLocalDateFromString, isDateDisabled
-} from './util/calendar.js'
+import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
-import { createAnchoredPosition } from './util/floating-ui.js'
-import FocusTrap from './util/focustrap.js'
+import { defineJQueryPlugin } from './util/index.js'
+import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
 /**
  * Constants
@@ -28,181 +27,108 @@ const NAME = 'date-range-picker'
 const DATA_KEY = 'coreui.date-range-picker'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
-const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
-
-const ENTER_KEY = 'Enter'
-const ESCAPE_KEY = 'Escape'
-const TAB_KEY = 'Tab'
-const RIGHT_MOUSE_BUTTON = 2
 
 const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_END_DATE_CHANGE = `endDateChange${EVENT_KEY}`
-const EVENT_HIDE = `hide${EVENT_KEY}`
+const EVENT_FOCUSIN = `focusin${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_INPUT = `input${EVENT_KEY}`
-const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_RESIZE = `resize${EVENT_KEY}`
+const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_SUBMIT = 'submit'
 const EVENT_START_DATE_CHANGE = `startDateChange${EVENT_KEY}`
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
-const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_BODY = 'date-picker-body'
 const CLASS_NAME_CALENDAR = 'date-picker-calendar'
 const CLASS_NAME_CALENDARS = 'date-picker-calendars'
-const CLASS_NAME_CLEANER = 'date-picker-cleaner'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_RANGE_PICKER = 'date-range-picker'
-const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
-const CLASS_NAME_INDICATOR = 'date-picker-indicator'
-const CLASS_NAME_INPUT = 'date-picker-input'
-const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
-const CLASS_NAME_INPUT_PREVIEW = 'date-picker-input-preview'
-const CLASS_NAME_INPUT_WRAPPER = 'date-picker-input-wrapper'
-const CLASS_NAME_IS_INVALID = 'is-invalid'
-const CLASS_NAME_IS_VALID = 'is-valid'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
+const CLASS_NAME_INDICATOR = 'date-picker-indicator'
+const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
+const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
 const CLASS_NAME_SEPARATOR = 'date-picker-separator'
 const CLASS_NAME_SHOW = 'show'
-const CLASS_NAME_TIME_PICKER = 'time-picker'
-const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
-const CLASS_NAME_WAS_VALIDATED = 'was-validated'
 
-const SELECTOR_CALENDAR = '.calendars'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]:not(.disabled):not(:disabled)'
-const SELECTOR_DATA_TOGGLE_SHOWN = `${SELECTOR_DATA_TOGGLE}.${CLASS_NAME_SHOW}`
-const SELECTOR_INPUT = '.date-picker-input'
-const SELECTOR_WAS_VALIDATED = 'form.was-validated'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]'
+const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
+const SELECTOR_TEMPLATE_RANGES = 'template[data-coreui-template="ranges"]'
+const SELECTOR_ACTION = '[data-coreui-picker-action]'
 
-const Default = {
-  allowList: DefaultAllowlist as SanitizerAllowList,
-  ariaNavNextMonthLabel: 'Next month',
-  ariaNavNextYearLabel: 'Next year',
-  ariaNavPrevMonthLabel: 'Previous month',
-  ariaNavPrevYearLabel: 'Previous year',
-  calendarDate: null,
+// Icons live in JavaScript, not in CSS masks — the chips pattern.
+const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="M472 96h-88V40h-32v56H160V40h-32v56H40a24.03 24.03 0 0 0-24 24v336a24.03 24.03 0 0 0 24 24h432a24.03 24.03 0 0 0 24-24V120a24.03 24.03 0 0 0-24-24Zm-8 352H48V128h80v40h32v-40h192v40h32v-40h80Z"/><rect width="32" height="32" x="112" y="224"/><rect width="32" height="32" x="200" y="224"/><rect width="32" height="32" x="280" y="224"/><rect width="32" height="32" x="368" y="224"/><rect width="32" height="32" x="112" y="296"/><rect width="32" height="32" x="200" y="296"/><rect width="32" height="32" x="280" y="296"/><rect width="32" height="32" x="368" y="296"/><rect width="32" height="32" x="112" y="368"/><rect width="32" height="32" x="200" y="368"/><rect width="32" height="32" x="280" y="368"/><rect width="32" height="32" x="368" y="368"/></svg>'
+const DEFAULT_SEPARATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m359.873 121.377-22.627 22.627 95.997 95.997H16v32.001h417.24l-95.994 95.994 22.627 22.627L494.498 256z"/></svg>'
+const DEFAULT_SEPARATOR_ICON_RTL: string = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor"><path d="m152.127 121.377 22.627 22.627L78.757 240H496v32.001H78.76l95.994 95.994-22.627 22.627L17.502 256z"/></svg>'
+
+type DateRangePickerConfig = {
+  allowList: SanitizerAllowList
+  ariaToggleLabel: string
+  calendarOptions: Record<string, any>
+  container: Element | boolean | string
+  disabled: boolean
+  indicatorIcon: string
+  inputOptions: Record<string, any>
+  locale: string
+  maxDate: Date | string | null
+  minDate: Date | string | null
+  sanitize: boolean
+  sanitizeFn: ((unsafeHtml: string) => string) | null
+  size: string | null
+  calendars: number
+  endDate: Date | string | null
+  endName: string | null
+  separatorIcon: string
+  separatorIconRtl: string
+  startDate: Date | string | null
+  startName: string | null
+}
+
+const Default: DateRangePickerConfig = {
+  allowList: SVGAllowlist,
+  ariaToggleLabel: 'Toggle the calendar',
+  calendarOptions: {},
   calendars: 2,
-  cancelButton: 'Cancel',
-  cancelButtonClasses: ['btn', 'btn-sm', 'btn-ghost-primary'] as string[],
-  confirmButton: 'OK',
-  confirmButtonClasses: ['btn', 'btn-sm', 'btn-primary'] as string[],
-  cleaner: true,
   container: false,
-  date: null,
-  dayFormat: 'numeric',
   disabled: false,
-  disabledDates: null,
   endDate: null,
   endName: null,
-  firstDayOfWeek: 1,
-  footer: false,
-  inputDateFormat: null,
-  inputDateParse: null,
-  inputOnChangeDelay: 750,
-  inputReadOnly: false,
-  invalid: false,
-  indicator: true,
-  locale: 'default',
+  indicatorIcon: DEFAULT_INDICATOR_ICON,
+  inputOptions: {},
+  locale: navigator.language,
   maxDate: null,
   minDate: null,
-  monthFormat: 'short',
-  name: null,
-  placeholder: ['Start date', 'End date'] as string[],
-  previewDateOnHover: true,
-  range: true,
-  ranges: {},
-  rangesButtonsClasses: ['btn', 'btn-ghost-secondary'] as string[],
-  renderDayCell: null,
-  renderMonthCell: null,
-  renderQuarterCell: null,
-  renderYearCell: null,
-  required: true,
   sanitize: true,
   sanitizeFn: null,
-  separator: true,
+  separatorIcon: DEFAULT_SEPARATOR_ICON,
+  separatorIconRtl: DEFAULT_SEPARATOR_ICON_RTL,
   size: null,
   startDate: null,
-  startName: null,
-  selectAdjacementDays: false,
-  selectEndDate: false,
-  selectionType: 'day',
-  showAdjacementDays: true,
-  showWeekNumber: false,
-  timepicker: false,
-  todayButton: 'Today',
-  todayButtonClasses: ['btn', 'btn-sm', 'btn-primary', 'me-auto'] as string[],
-  valid: false,
-  weekdayFormat: 2,
-  weekNumbersLabel: null,
-  yearFormat: 'numeric'
+  startName: null
 }
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
-  ariaNavNextMonthLabel: 'string',
-  ariaNavNextYearLabel: 'string',
-  ariaNavPrevMonthLabel: 'string',
-  ariaNavPrevYearLabel: 'string',
-  calendarDate: '(date|number|string|null)',
+  ariaToggleLabel: 'string',
+  calendarOptions: 'object',
   calendars: 'number',
-  cancelButton: '(boolean|string)',
-  cancelButtonClasses: '(array|string)',
-  cleaner: 'boolean',
-  confirmButton: '(boolean|string)',
-  confirmButtonClasses: '(array|string)',
   container: '(string|element|boolean)',
-  date: '(date|number|string|null)',
-  dayFormat: 'string',
-  disabledDates: '(array|date|function|null)',
   disabled: 'boolean',
-  endDate: '(date|number|string|null)',
+  endDate: '(date|string|null)',
   endName: '(string|null)',
-  firstDayOfWeek: 'number',
-  footer: 'boolean',
-  indicator: 'boolean',
-  inputDateFormat: '(function|null)',
-  inputDateParse: '(function|null)',
-  inputOnChangeDelay: 'number',
-  inputReadOnly: 'boolean',
-  invalid: 'boolean',
+  indicatorIcon: 'string',
+  inputOptions: 'object',
   locale: 'string',
-  maxDate: '(date|number|string|null)',
-  minDate: '(date|number|string|null)',
-  monthFormat: 'string',
-  name: '(string|null)',
-  placeholder: '(array|string)',
-  previewDateOnHover: 'boolean',
-  range: 'boolean',
-  ranges: 'object',
-  rangesButtonsClasses: '(array|string)',
-  renderDayCell: '(function|null)',
-  renderMonthCell: '(function|null)',
-  renderQuarterCell: '(function|null)',
-  renderYearCell: '(function|null)',
-  required: 'boolean',
+  maxDate: '(date|string|null)',
+  minDate: '(date|string|null)',
   sanitize: 'boolean',
-  sanitizeFn: '(null|function)',
-  separator: 'boolean',
+  sanitizeFn: '(function|null)',
+  separatorIcon: 'string',
+  separatorIconRtl: 'string',
   size: '(string|null)',
-  startDate: '(date|number|string|null)',
-  startName: '(string|null)',
-  selectAdjacementDays: 'boolean',
-  selectEndDate: 'boolean',
-  selectionType: 'string',
-  showAdjacementDays: 'boolean',
-  showWeekNumber: 'boolean',
-  timepicker: 'boolean',
-  todayButton: '(boolean|string)',
-  todayButtonClasses: '(array|string)',
-  valid: 'boolean',
-  weekdayFormat: '(number|string)',
-  weekNumbersLabel: '(string|null)',
-  yearFormat: 'string'
+  startDate: '(date|string|null)',
+  startName: '(string|null)'
 }
 
 /**
@@ -210,66 +136,40 @@ const DefaultType: Record<string, string> = {
  */
 
 class DateRangePicker extends BaseComponent {
-  protected declare _calendarDate: any
-  protected declare _startDate: any
-  protected declare _endDate: any
+  protected declare _footerTemplate: any
+  protected declare _indicatorElement: HTMLElement
+  protected declare _startInputElement: HTMLElement
+  protected declare _endInputElement: HTMLElement
+  protected declare _rangesTemplate: any
+  protected declare _startInput: any
+  protected declare _endInput: any
+  protected declare _calendar: any
+  protected declare _calendarElement: any
+  protected declare _menu: any
+  protected declare _popup: any
+  protected declare _selectEndDate: any
   protected declare _initialStartDate: any
   protected declare _initialEndDate: any
-  protected declare _mobile: any
-  protected declare _floatingCleanup: (() => void) | null
-  protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
-  protected declare _selectEndDate: any
-  protected declare _calendar: any
-  protected declare _calendars: any
-  protected declare _endInput: any
-  protected declare _endInputTimeout: any
-  protected declare _endPreviewInput: any
-  protected declare _indicatorElement: any
-  protected declare _menu: any
-  protected declare _startInput: any
-  protected declare _startInputTimeout: any
-  protected declare _startPreviewInput: any
-  protected declare _timepickers: any
-  protected declare _timePickerEnd: any
-  protected declare _timePickerStart: any
-  protected declare _togglerElement: any
-  protected declare _focustrap: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
-    super(element)
+    super(element, config)
 
-    this._config = this._getConfig(config)
-    this._calendarDate = this._config.calendarDate
-    this._startDate = this._config.date || this._config.startDate
-    this._endDate = this._config.endDate
-    this._initialStartDate = null
-    this._initialEndDate = null
-    this._mobile = window.innerWidth < 768
-    this._floatingCleanup = null
-    this._anchoredPosition = null
-    this._selectEndDate = this._config.selectEndDate
-
-    this._calendar = null
-    this._calendars = null
-    this._endInput = null
-    this._endInputTimeout = null
-    this._endPreviewInput = null
-    this._indicatorElement = null
-    this._menu = null
+    this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
+    this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element)
     this._startInput = null
-    this._startInputTimeout = null
-    this._startPreviewInput = null
-    this._timepickers = null
-    this._timePickerEnd = null
-    this._timePickerStart = null
-    this._togglerElement = null
+    this._endInput = null
+    this._calendar = null
+    this._calendarElement = null
+    this._menu = null
+    this._popup = null
+    this._selectEndDate = false
+    // see DatePicker — the shell owns the initial range for reset()
+    this._initialStartDate = config?.startDate ?? this._config.startDate
+    this._initialEndDate = config?.endDate ?? this._config.endDate
 
     this._createDateRangePicker()
-    this._createDateRangePickerCalendars()
+    this._createPopup()
     this._addEventListeners()
-    this._addCalendarEventListeners()
-
-    this._focustrap = this._initializeFocusTrap()
   }
 
   // Getters
@@ -286,112 +186,255 @@ class DateRangePicker extends BaseComponent {
   }
 
   // Public
-  toggle(): void {
-    return this._isShown() ? this.hide() : this.show()
-  }
-
   show(): void {
-    if (this._config.disabled || this._isShown()) {
+    if (this._config.disabled) {
       return
     }
 
-    this._initialStartDate = this._startDate ? new Date(this._startDate) : null
-    this._initialEndDate = this._endDate ? new Date(this._endDate) : null
-
-    EventHandler.trigger(this._element, EVENT_SHOW)
-    this._element.classList.add(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', true as any)
-
-    if (this._config.container) {
-      this._menu.classList.add(CLASS_NAME_SHOW)
-    }
-
-    this._focustrap.activate()
-    EventHandler.trigger(this._element, EVENT_SHOWN)
-
-    this._createFloating()
+    this._popup.show()
   }
 
   hide(): void {
-    EventHandler.trigger(this._element, EVENT_HIDE)
-
-    this._disposeFloating()
-
-    this._element.classList.remove(CLASS_NAME_SHOW)
-    this._element.setAttribute('aria-expanded', 'false')
-
-    if (this._config.container) {
-      this._menu.classList.remove(CLASS_NAME_SHOW)
-    }
-
-    this._focustrap.deactivate()
-    EventHandler.trigger(this._element, EVENT_HIDDEN)
+    this._popup.hide()
   }
 
-  override dispose(): void {
-    EventHandler.off(window, EVENT_KEY)
-    this._disposeFloating()
-
-    if (this._startInputTimeout) {
-      clearTimeout(this._startInputTimeout)
-    }
-
-    if (this._endInputTimeout) {
-      clearTimeout(this._endInputTimeout)
-    }
-
-    this._focustrap.deactivate()
-
-    super.dispose()
+  toggle(): void {
+    return this._popup.isShown ? this.hide() : this.show()
   }
 
-  cancel(): void {
-    this.hide()
+  getStartDate(): Date | null {
+    return this._startInput.getDate()
+  }
 
-    if (this._initialStartDate) {
-      this._changeStartDate(this._initialStartDate)
-    }
+  getEndDate(): Date | null {
+    return this._endInput.getDate()
+  }
 
-    if (this._config.range && this._initialEndDate) {
-      this._changeEndDate(this._initialEndDate)
-    }
-
-    if (this._initialStartDate || this._initialEndDate) {
-      this._calendar.update(this._getCalendarConfig)
-    }
+  setRange(startDate: Date | null, endDate: Date | null): void {
+    this._startInput.update({ date: startDate })
+    this._endInput.update({ date: endDate })
+    this._selectEndDate = false
+    this._calendar?.update({ endDate, selectEndDate: false, startDate })
+    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
+    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
   }
 
   clear(): void {
-    this._changeStartDate(null)
-    this._changeEndDate(null)
-    this._calendar.update(this._getCalendarConfig())
+    this.setRange(null, null)
   }
 
   reset(): void {
-    this._changeStartDate(this._config.startDate)
-    this._changeEndDate(this._config.endDate)
-    this._calendar.update(this._getCalendarConfig())
+    this.setRange(this._initialStartDate, this._initialEndDate)
   }
 
-  update(config: any): void {
-    this._config = this._getConfig(config)
-    this._calendarDate = this._config.calendarDate
-    this._startDate = this._config.date || this._config.startDate
-    this._endDate = this._config.endDate
-    this._selectEndDate = this._config.selectEndDate
+  getContext(): Record<string, any> {
+    return {
+      clear: () => this.clear(),
+      close: () => this.hide(),
+      disabled: this._config.disabled,
+      endDate: this.getEndDate(),
+      reset: () => this.reset(),
+      setRange: (startDate: Date | null, endDate: Date | null) => this.setRange(startDate, endDate),
+      startDate: this.getStartDate()
+    }
+  }
 
-    this._element.innerHTML = ''
-    this._createDateRangePicker()
-    this._createDateRangePickerCalendars()
-    this._addEventListeners()
-    this._addCalendarEventListeners()
+  override dispose(): void {
+    this._popup.dispose()
+    this._startInput.dispose()
+    this._endInput.dispose()
+    this._calendar?.dispose()
+    super.dispose()
   }
 
   // Private
-  _initializeFocusTrap(): FocusTrap {
-    return new FocusTrap({
-      additionalElement: this._config.container ? this._menu : null,
-      trapElement: this._element
+  // See DatePicker._forwardConfig — options the inner primitives know about
+  // are forwarded by name so data attributes reach them.
+  _forwardConfig(Component: any, overrides: Record<string, any> = {}, extra: Record<string, any> = {}): Record<string, any> {
+    const forwarded: Record<string, any> = {}
+
+    for (const key of Object.keys(Component.Default)) {
+      if (key in this._config && this._config[key] !== (Default as Record<string, any>)[key]) {
+        forwarded[key] = this._config[key]
+      }
+    }
+
+    return { ...forwarded, ...overrides, ...extra }
+  }
+
+  // See DatePicker._resolveFormat — a date mask can only express the sections
+  // it has, so month/year selection get a narrower default mask.
+  _resolveFormat(): any {
+    if (this._config.format) {
+      return this._config.format
+    }
+
+    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+
+    return (byType as Record<string, string>)[this._config.selectionType] ?? null
+  }
+
+  _setSelectEndDate(value: boolean): void {
+    if (this._selectEndDate === value) {
+      return
+    }
+
+    this._selectEndDate = value
+    this._calendar?.update({ selectEndDate: value })
+  }
+
+  _sanitizeIcon(icon: string): string {
+    return this._config.sanitize ? sanitizeHtml(icon, this._config.allowList, this._config.sanitizeFn) : icon
+  }
+
+  // The separator is a directional arrow, so it has an RTL counterpart (v1 did
+  // the same with two icon variables, swapped in CSS). Read the element's
+  // computed direction rather than isRTL(): the document can be LTR while an
+  // ancestor sets dir="rtl" around the picker.
+  _resolveSeparatorIcon(): string {
+    const isRtl = window.getComputedStyle(this._element).direction === 'rtl'
+
+    return isRtl ? this._config.separatorIconRtl : this._config.separatorIcon
+  }
+
+  _createInput(date: Date | null, name: string): any {
+    const inputEl = document.createElement('div')
+
+    const input = new DateInput(inputEl, this._forwardConfig(DateInput, {
+      date,
+      disabled: this._config.disabled,
+      locale: this._config.locale,
+      name,
+      ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
+    }, this._config.inputOptions))
+
+    return { input, inputEl }
+  }
+
+  _createDateRangePicker(): void {
+    this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
+
+    if (this._config.size) {
+      this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
+    }
+
+    const inputGroup = document.createElement('div')
+    inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+
+    const start = this._createInput(this._config.startDate, this._config.startName)
+    this._startInput = start.input
+    this._startInputElement = start.inputEl
+    inputGroup.append(start.inputEl)
+
+    const separator = document.createElement('span')
+    separator.classList.add(CLASS_NAME_SEPARATOR)
+    separator.setAttribute('aria-hidden', 'true')
+    separator.innerHTML = this._sanitizeIcon(this._resolveSeparatorIcon())
+    inputGroup.append(separator)
+
+    const end = this._createInput(this._config.endDate, this._config.endName)
+    this._endInput = end.input
+    this._endInputElement = end.inputEl
+    inputGroup.append(end.inputEl)
+
+    const indicator = document.createElement('button')
+    indicator.classList.add(CLASS_NAME_INDICATOR)
+    indicator.type = 'button'
+    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
+    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
+    inputGroup.append(indicator)
+    this._indicatorElement = indicator
+
+    this._element.append(inputGroup)
+
+    this._menu = document.createElement('div')
+    this._menu.classList.add(CLASS_NAME_DROPDOWN)
+
+    const body = document.createElement('div')
+    body.classList.add(CLASS_NAME_BODY)
+
+    if (this._rangesTemplate) {
+      const ranges = document.createElement('div')
+      ranges.classList.add(CLASS_NAME_RANGES)
+      ranges.append(this._rangesTemplate.content.cloneNode(true))
+      body.append(ranges)
+    }
+
+    const calendars = document.createElement('div')
+    calendars.classList.add(CLASS_NAME_CALENDARS)
+
+    this._calendarElement = document.createElement('div')
+    this._calendarElement.classList.add(CLASS_NAME_CALENDAR)
+    calendars.append(this._calendarElement)
+    body.append(calendars)
+    this._menu.append(body)
+    this._element.append(this._menu)
+
+    if (this._footerTemplate) {
+      const footer = document.createElement('div')
+      footer.classList.add(CLASS_NAME_FOOTER)
+      footer.append(this._footerTemplate.content.cloneNode(true))
+      this._menu.append(footer)
+    }
+  }
+
+  // See DatePicker._ensureCalendar — the calendar is built on first show,
+  // seeded from the shell's own state (the fields plus _selectEndDate).
+  _ensureCalendar(): void {
+    if (this._calendar) {
+      return
+    }
+
+    this._calendar = new Calendar(this._calendarElement, this._forwardConfig(Calendar, {
+      calendars: this._config.calendars,
+      endDate: this.getEndDate(),
+      locale: this._config.locale,
+      range: true,
+      selectEndDate: this._selectEndDate,
+      startDate: this.getStartDate()
+    }, this._config.calendarOptions))
+
+    EventHandler.on(this._calendar._element, 'selectEndChange.coreui.calendar', event => {
+      this._selectEndDate = event.value
+    })
+
+    EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
+      const { date, dateObject } = event
+      this._startInput.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date, dateObject })
+    })
+
+    EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
+      const { date, dateObject } = event
+      this._endInput.update({ date: dateObject })
+      EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date, dateObject })
+
+      if (dateObject && this.getStartDate() && !this._footerTemplate) {
+        this.hide()
+      }
+    })
+  }
+
+  _createPopup(): void {
+    this._popup = new Popup({
+      anchor: this._element,
+      container: this._config.container,
+      content: this._menu,
+      onHidden: () => EventHandler.trigger(this._element, EVENT_HIDDEN),
+      onHide: () => {
+        this._menu.classList.remove(CLASS_NAME_SHOW)
+        this._element.classList.remove(CLASS_NAME_SHOW)
+        this._element.setAttribute('aria-expanded', 'false')
+        EventHandler.trigger(this._element, EVENT_HIDE)
+      },
+      onShow: () => {
+        this._ensureCalendar()
+        this._menu.classList.add(CLASS_NAME_SHOW)
+        this._element.classList.add(CLASS_NAME_SHOW)
+        this._element.setAttribute('aria-expanded', 'true')
+        EventHandler.trigger(this._element, EVENT_SHOW)
+      },
+      onShown: () => EventHandler.trigger(this._element, EVENT_SHOWN)
     })
   }
 
@@ -402,782 +445,26 @@ class DateRangePicker extends BaseComponent {
       }
     })
 
-    EventHandler.on(this._indicatorElement, EVENT_KEYDOWN, (event: any) => {
-      if (!this._config.disabled && event.key === ENTER_KEY) {
-        this.toggle()
-      }
+    // Focusing a field steers which end of the range the calendar selects —
+    // the v1 behavior of clicking the start/end input, on section fields. The
+    // guard matters: focusin fires per section, and an unguarded update would
+    // re-render the calendar on every keystroke-navigation between sections.
+    EventHandler.on(this._startInputElement, EVENT_FOCUSIN, () => {
+      this._setSelectEndDate(false)
     })
 
-    EventHandler.on(this._togglerElement, EVENT_CLICK, (event: any) => {
-      if (!this._config.disabled && event.target !== this._indicatorElement) {
-        this.show()
-      }
+    EventHandler.on(this._endInputElement, EVENT_FOCUSIN, () => {
+      this._setSelectEndDate(true)
     })
 
-    EventHandler.on(this._element, EVENT_KEYDOWN, (event: any) => {
-      if (event.key === ESCAPE_KEY) {
-        this.hide()
-        this._startInput.focus()
+    EventHandler.on(this._menu, EVENT_CLICK, SELECTOR_ACTION, (event: any) => {
+      const action = event.target.closest(SELECTOR_ACTION).dataset.coreuiPickerAction
+      const context = this.getContext()
+
+      if (typeof context[action] === 'function') {
+        context[action]()
       }
     })
-
-    EventHandler.on(this._startInput, EVENT_CLICK, () => {
-      this._selectEndDate = false
-      this._calendar.update(this._getCalendarConfig())
-    })
-
-    EventHandler.on(this._startInput, EVENT_INPUT, (event: any) => {
-      if (this._startInputTimeout) {
-        clearTimeout(this._startInputTimeout)
-      }
-
-      this._startInputTimeout = setTimeout(() => {
-        const date = this._parseDate(event.target.value)
-        let formatedDate = date
-
-        if (date instanceof Date && date.getTime()) {
-          if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-            return // Don't update if date is disabled
-          }
-
-          if (this._config.selectionType !== 'day') {
-            formatedDate = getDateBySelectionType(date, this._config.selectionType) as Date
-          }
-
-          this._calendarDate = formatedDate
-          this._startInput.value = this._setInputValue(formatedDate)
-        }
-
-        this._startDate = formatedDate
-        this._calendar.update(this._getCalendarConfig())
-
-        if (this._timePickerStart) {
-          this._timePickerStart.update(this._getTimePickerConfig(true))
-        }
-
-        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-          date: formatedDate
-        })
-      }, this._config.inputOnChangeDelay)
-    })
-
-    EventHandler.on(this._startInput.form, EVENT_SUBMIT, () => {
-      if (this._startInput.form.classList.contains(CLASS_NAME_WAS_VALIDATED)) {
-        if (this._config.range && (Number.isNaN(Date.parse(this._startInput.value)) || Number.isNaN(Date.parse(this._endInput.value)))) {
-          return this._element.classList.add(CLASS_NAME_IS_INVALID)
-        }
-
-        if (this._config.range && this._startDate instanceof Date && this._endDate instanceof Date) {
-          return this._element.classList.add(CLASS_NAME_IS_VALID)
-        }
-
-        if (!this._config.range && Number.isNaN(Date.parse(this._startInput.value))) {
-          return this._element.classList.add(CLASS_NAME_IS_INVALID)
-        }
-
-        if (!this._config.range && this._startDate instanceof Date) {
-          return this._element.classList.add(CLASS_NAME_IS_VALID)
-        }
-
-        this._element.classList.add(CLASS_NAME_IS_INVALID)
-      }
-    })
-
-    EventHandler.on(this._endInput, EVENT_CLICK, () => {
-      this._selectEndDate = true
-      this._calendar.update(this._getCalendarConfig())
-    })
-
-    EventHandler.on(this._endInput, EVENT_INPUT, (event: any) => {
-      if (this._endInputTimeout) {
-        clearTimeout(this._endInputTimeout)
-      }
-
-      this._endInputTimeout = setTimeout(() => {
-        const date = this._parseDate(event.target.value)
-        let formatedDate = date
-
-        if (date instanceof Date && date.getTime()) {
-          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-            return // Don't update if date is disabled
-          }
-
-          if (this._config.selectionType !== 'day') {
-            formatedDate = getDateBySelectionType(date, this._config.selectionType) as Date
-          }
-
-          this._calendarDate = formatedDate
-          this._endInput.value = this._setInputValue(formatedDate)
-        }
-
-        this._endDate = formatedDate
-        this._calendar.update(this._getCalendarConfig())
-
-        if (this._timePickerEnd) {
-          this._timePickerEnd.update(this._getTimePickerConfig(false))
-        }
-
-        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-          date: formatedDate
-        })
-      }, this._config.inputOnChangeDelay)
-    })
-
-    EventHandler.on(window, EVENT_RESIZE, () => {
-      this._mobile = window.innerWidth < 768
-    })
-  }
-
-  _addCalendarEventListeners(): void {
-    for (const calendar of SelectorEngine.find(SELECTOR_CALENDAR, this._menu)) {
-      EventHandler.on(calendar, 'startDateChange.coreui.calendar', event => {
-        this._changeStartDate(event.date)
-
-        if (!this._config.range && (!this._config.footer && !this._config.timepicker)) {
-          this.hide()
-        }
-      })
-
-      EventHandler.on(calendar, 'endDateChange.coreui.calendar', event => {
-        this._changeEndDate(event.date)
-
-        if (this._startDate && (!this._config.footer && !this._config.timepicker)) {
-          this.hide()
-        }
-      })
-
-      if (this._config.previewDateOnHover && !this._config.disabled) {
-        EventHandler.on(calendar, 'cellHover.coreui.calendar', event => {
-          if (this._selectEndDate) {
-            const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._endDate)
-            this._updatePreviewInputVisibility(this._endPreviewInput, event.date ? previewValue : '')
-
-            return
-          }
-
-          const previewValue = event.date ? this._setInputValue(event.date) : this._setInputValue(this._startDate)
-          this._updatePreviewInputVisibility(this._startPreviewInput, event.date ? previewValue : '')
-        })
-      }
-
-      EventHandler.on(calendar, 'selectEndChange.coreui.calendar', event => {
-        this._selectEndDate = event.value
-      })
-    }
-  }
-
-  _changeStartDate(value: Date | null, skipTimePickerUpdate = false): void {
-    this._startDate = value
-    this._startInput.value = this._setInputValue(value)
-    this._startInput.dispatchEvent(new Event('change'))
-
-    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, {
-      date: value
-    })
-
-    if (this._timePickerStart && !skipTimePickerUpdate) {
-      this._timePickerStart.update(this._getTimePickerConfig(true))
-    }
-  }
-
-  _changeEndDate(value: Date | null, skipTimePickerUpdate = false): void {
-    this._endDate = value
-    this._endInput.value = this._setInputValue(value)
-    this._endInput.dispatchEvent(new Event('change'))
-
-    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, {
-      date: value
-    })
-
-    if (this._timePickerEnd && !skipTimePickerUpdate) {
-      this._timePickerEnd.update(this._getTimePickerConfig(false))
-    }
-  }
-
-  _getCalendarConfig(): Record<string, any> {
-    return {
-      allowList: this._config.allowList,
-      ariaNavNextMonthLabel: this._config.ariaNavNextMonthLabel,
-      ariaNavNextYearLabel: this._config.ariaNavNextYearLabel,
-      ariaNavPrevMonthLabel: this._config.ariaNavPrevMonthLabel,
-      ariaNavPrevYearLabel: this._config.ariaNavPrevYearLabel,
-      calendarDate: this._calendarDate,
-      calendars: this._mobile ? 1 : this._config.calendars,
-      dayFormat: this._config.dayFormat,
-      disabledDates: this._config.disabledDates,
-      endDate: this._endDate,
-      firstDayOfWeek: this._config.firstDayOfWeek,
-      locale: this._config.locale,
-      maxDate: this._config.maxDate,
-      minDate: this._config.minDate,
-      monthFormat: this._config.monthFormat,
-      range: this._config.range,
-      renderDayCell: this._config.renderDayCell,
-      renderMonthCell: this._config.renderMonthCell,
-      renderQuarterCell: this._config.renderQuarterCell,
-      renderYearCell: this._config.renderYearCell,
-      sanitize: this._config.sanitize,
-      sanitizeFn: this._config.sanitizeFn,
-      selectAdjacementDays: this._config.selectAdjacementDays,
-      selectEndDate: this._selectEndDate,
-      selectionType: this._config.selectionType,
-      showAdjacementDays: this._config.showAdjacementDays,
-      showWeekNumber: this._config.showWeekNumber,
-      startDate: this._startDate,
-      weekdayFormat: this._config.weekdayFormat,
-      weekNumbersLabel: this._config.weekNumbersLabel,
-      yearFormat: this._config.yearFormat
-    }
-  }
-
-  _getTimePickerConfig(start: boolean): Record<string, any> {
-    return {
-      disabled: start ? !this._startDate : !this._endDate,
-      locale: this._config.locale,
-      time: start ? this._startDate && new Date(this._startDate) : this._endDate && new Date(this._endDate),
-      type: 'inline',
-      variant: 'select'
-    }
-  }
-
-  _createDateRangePicker(): void {
-    this._element.classList.add(CLASS_NAME_DATE_PICKER)
-
-    Manipulator.setDataAttribute(this._element, 'toggle', this._config.range ? CLASS_NAME_DATE_RANGE_PICKER : CLASS_NAME_DATE_PICKER)
-
-    if (this._config.size) {
-      this._element.classList.add(`date-picker-${this._config.size}`)
-    }
-
-    if (this._config.disabled) {
-      this._element.classList.add(CLASS_NAME_DISABLED)
-    }
-
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, this._config.invalid)
-    this._element.classList.toggle(CLASS_NAME_IS_VALID, this._config.valid)
-    this._element.append(this._createDateRangePickerInputGroup())
-
-    const dropdownEl = document.createElement('div')
-    dropdownEl.classList.add(CLASS_NAME_DROPDOWN)
-
-    dropdownEl.append(this._createDateRangePickerBody())
-    if (this._config.footer || this._config.timepicker) {
-      dropdownEl.append(this._createDateRangeFooter())
-    }
-
-    const { container } = this._config
-    if (container) {
-      container.append(dropdownEl)
-    } else {
-      this._element.append(dropdownEl)
-    }
-
-    this._menu = dropdownEl
-  }
-
-  _updatePreviewInputVisibility(previewInput: any, value: any): void {
-    if (!previewInput) {
-      return
-    }
-
-    if (value && value.trim() !== '') {
-      previewInput.style.display = 'block'
-      previewInput.value = value
-    } else {
-      previewInput.style.display = 'none'
-      previewInput.value = ''
-    }
-  }
-
-  _createInputWrapper(inputEl: HTMLElement, isStart = true): HTMLElement {
-    if (!this._config.previewDateOnHover || this._config.disabled) {
-      return inputEl
-    }
-
-    const wrapperEl = document.createElement('div')
-    wrapperEl.classList.add(CLASS_NAME_INPUT_WRAPPER)
-
-    wrapperEl.append(inputEl)
-
-    const previewInputEl = document.createElement('input')
-    previewInputEl.classList.add(CLASS_NAME_INPUT, CLASS_NAME_INPUT_PREVIEW)
-    previewInputEl.type = 'text'
-    previewInputEl.readOnly = true
-    previewInputEl.tabIndex = -1
-    previewInputEl.style.display = 'none'
-
-    if (isStart) {
-      this._startPreviewInput = previewInputEl
-    } else {
-      this._endPreviewInput = previewInputEl
-    }
-
-    wrapperEl.append(previewInputEl)
-
-    return wrapperEl
-  }
-
-  _createDateRangePickerInputGroup(): HTMLElement {
-    const inputGroupEl = document.createElement('div')
-    inputGroupEl.classList.add(CLASS_NAME_INPUT_GROUP)
-
-    let startInputName = null
-
-    if (this._config.name || this._config.startName || this._element.id) {
-      startInputName = this._config.name || this._config.startName || (this._config.range ? `date-range-picker-start-date-${this._element.id}` : `date-picker-${this._element.id}`)
-    }
-
-    const startInputEl = this._createInput(startInputName, this._getPlaceholder()[0], this._setInputValue(this._startDate))
-
-    let endInputName = null
-
-    if (this._config.endName || this._element.id) {
-      endInputName = this._config.endName || `date-range-picker-end-date-${this._element.id}`
-    }
-
-    const endInputEl = this._createInput(endInputName, this._getPlaceholder()[1], this._setInputValue(this._endDate))
-
-    const inputGroupTextSeparatorEl = document.createElement('div')
-    inputGroupTextSeparatorEl.classList.add(CLASS_NAME_SEPARATOR)
-
-    this._startInput = startInputEl
-    this._endInput = endInputEl
-
-    const startInputWrapper = this._createInputWrapper(startInputEl, true)
-    inputGroupEl.append(startInputWrapper)
-
-    if (this._config.separator) {
-      inputGroupEl.append(inputGroupTextSeparatorEl)
-    }
-
-    if (this._config.range) {
-      const endInputWrapper = this._createInputWrapper(endInputEl, false)
-      inputGroupEl.append(endInputWrapper)
-    }
-
-    if (this._config.indicator) {
-      const inputGroupIndicatorEl = document.createElement('div')
-      inputGroupIndicatorEl.classList.add(CLASS_NAME_INDICATOR)
-
-      if (!this._config.disabled) {
-        inputGroupIndicatorEl.tabIndex = 0
-      }
-
-      inputGroupEl.append(inputGroupIndicatorEl)
-
-      this._indicatorElement = inputGroupIndicatorEl
-    }
-
-    if (this._config.cleaner) {
-      const inputGroupCleanerEl = document.createElement('div')
-      inputGroupCleanerEl.classList.add(CLASS_NAME_CLEANER)
-      inputGroupCleanerEl.addEventListener('click', event => {
-        event.stopPropagation()
-        this.clear()
-      })
-
-      inputGroupEl.append(inputGroupCleanerEl)
-    }
-
-    this._togglerElement = inputGroupEl
-
-    return inputGroupEl
-  }
-
-  _createDateRangePickerBody(): HTMLElement {
-    const dateRangePickerBodyEl = document.createElement('div')
-    dateRangePickerBodyEl.classList.add(CLASS_NAME_BODY)
-
-    if (Object.keys(this._config.ranges).length) {
-      const dateRangePickerRangesEl = document.createElement('div')
-      dateRangePickerRangesEl.classList.add(CLASS_NAME_RANGES)
-
-      for (const key of Object.keys(this._config.ranges)) {
-        const buttonEl = document.createElement('button')
-        buttonEl.classList.add(...this._getButtonClasses(this._config.rangesButtonsClasses))
-        buttonEl.type = 'button'
-        buttonEl.addEventListener('click', () => {
-          this._changeStartDate(this._config.ranges[key][0])
-          this._changeEndDate(this._config.ranges[key][1])
-
-          this._calendar.update(this._getCalendarConfig())
-        })
-
-        buttonEl.textContent = key
-        dateRangePickerRangesEl.append(buttonEl)
-      }
-
-      dateRangePickerBodyEl.append(dateRangePickerRangesEl)
-    }
-
-    const calendarsEl = document.createElement('div')
-    calendarsEl.classList.add(CLASS_NAME_CALENDARS)
-
-    this._calendars = calendarsEl
-
-    dateRangePickerBodyEl.append(calendarsEl)
-
-    if (this._config.timepicker) {
-      const timepickersEl = document.createElement('div')
-      timepickersEl.classList.add(CLASS_NAME_TIME_PICKERS)
-
-      this._timepickers = timepickersEl
-      dateRangePickerBodyEl.append(timepickersEl)
-    }
-
-    return dateRangePickerBodyEl
-  }
-
-  _createDateRangePickerCalendars(): void {
-    const calendarEl = document.createElement('div')
-    calendarEl.classList.add(CLASS_NAME_CALENDAR)
-
-    this._calendars.append(calendarEl)
-
-    this._calendar = new Calendar(calendarEl, this._getCalendarConfig())
-
-    EventHandler.on(calendarEl, 'calendarDateChange.coreui.calendar', event => {
-      this._calendarDate = event.date
-    })
-
-    EventHandler.on(calendarEl, 'calendarMouseleave.coreui.calendar', () => {
-      this._updatePreviewInputVisibility(this._startPreviewInput, '')
-      this._updatePreviewInputVisibility(this._endPreviewInput, '')
-    })
-
-    if (this._config.timepicker) {
-      if ((this._mobile && this._config.range) || (this._config.range && this._config.calendars === 1)) {
-        const timePickerStartEl = document.createElement('div')
-        timePickerStartEl.classList.add(CLASS_NAME_TIME_PICKER)
-        this._timePickerStart = new TimePicker(timePickerStartEl, this._getTimePickerConfig(true))
-
-        this._timepickers.append(timePickerStartEl)
-
-        EventHandler.on(timePickerStartEl, 'timeChange.coreui.time-picker', event => {
-          this._changeStartDate(event.date, true)
-          this._calendar.update(this._getCalendarConfig())
-        })
-
-        const timePickerEndEl = document.createElement('div')
-        timePickerEndEl.classList.add(CLASS_NAME_TIME_PICKER)
-        this._timePickerEnd = new TimePicker(timePickerEndEl, this._getTimePickerConfig(false))
-
-        this._timepickers.append(timePickerEndEl)
-
-        EventHandler.on(timePickerEndEl, 'timeChange.coreui.time-picker', event => {
-          this._changeEndDate(event.date, true)
-          this._calendar.update(this._getCalendarConfig())
-        })
-      } else {
-        for (const [index, _] of Array.from({ length: this._config.calendars }).entries()) {
-          const timePickerEl = document.createElement('div')
-          timePickerEl.classList.add(CLASS_NAME_TIME_PICKER)
-
-          const _timepicker = new TimePicker(timePickerEl, this._getTimePickerConfig(index === 0))
-
-          if (index === 0) {
-            this._timePickerStart = _timepicker
-          } else {
-            this._timePickerEnd = _timepicker
-          }
-
-          this._timepickers.append(timePickerEl)
-
-          EventHandler.on(timePickerEl, 'timeChange.coreui.time-picker', event => {
-            if (index === 0) {
-              this._changeStartDate(event.date, true)
-            } else {
-              this._changeEndDate(event.date, true)
-            }
-
-            this._calendar.update(this._getCalendarConfig())
-          })
-        }
-      }
-    }
-  }
-
-  _createDateRangeFooter(): HTMLElement {
-    const footerEl = document.createElement('div')
-    footerEl.classList.add(CLASS_NAME_FOOTER)
-
-    if (this._config.todayButton) {
-      const todayButtonEl = document.createElement('button')
-      todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses))
-      todayButtonEl.type = 'button'
-      todayButtonEl.textContent = this._config.todayButton
-
-      if (isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
-        todayButtonEl.disabled = true
-      }
-
-      todayButtonEl.addEventListener('click', () => {
-        const date = new Date()
-        this._calendarDate = date
-        this._changeStartDate(date)
-
-        if (this._config.range) {
-          this._changeEndDate(date)
-        }
-
-        this._calendar.update(this._getCalendarConfig())
-      })
-
-      footerEl.append(todayButtonEl)
-    }
-
-    if (this._config.cancelButton) {
-      const cancelButtonEl = document.createElement('button')
-      cancelButtonEl.classList.add(...this._getButtonClasses(this._config.cancelButtonClasses))
-      cancelButtonEl.type = 'button'
-      cancelButtonEl.textContent = this._config.cancelButton
-      cancelButtonEl.addEventListener('click', () => {
-        this.cancel()
-      })
-
-      footerEl.append(cancelButtonEl)
-    }
-
-    if (this._config.confirmButton) {
-      const confirmButtonEl = document.createElement('button')
-      confirmButtonEl.classList.add(...this._getButtonClasses(this._config.confirmButtonClasses))
-      confirmButtonEl.type = 'button'
-      confirmButtonEl.textContent = this._config.confirmButton
-      confirmButtonEl.addEventListener('click', () => {
-        this.hide()
-      })
-
-      footerEl.append(confirmButtonEl)
-    }
-
-    return footerEl
-  }
-
-  _createInput(name: any, placeholder: any, value: any): HTMLInputElement {
-    const inputEl = document.createElement('input')
-    inputEl.classList.add(CLASS_NAME_INPUT)
-    inputEl.autocomplete = 'off'
-    inputEl.disabled = this._config.disabled
-    inputEl.placeholder = placeholder
-    inputEl.readOnly = this._config.inputReadOnly
-    inputEl.required = this._config.required
-    inputEl.type = 'text'
-    inputEl.value = value
-
-    if (name) {
-      inputEl.name = name
-    }
-
-    const events = ['change', 'keyup', 'paste']
-
-    for (const event of events) {
-      inputEl.addEventListener(event, ({ target }: any) => {
-        if (target.closest(SELECTOR_WAS_VALIDATED)) {
-          const inputs = SelectorEngine.find(SELECTOR_INPUT, this._element as ParentNode) as HTMLInputElement[]
-
-          for (const input of inputs) {
-            if (Number.isNaN(Date.parse(input.value))) {
-              this._element.classList.add(CLASS_NAME_IS_INVALID)
-              this._element.classList.remove(CLASS_NAME_IS_VALID)
-              return
-            }
-          }
-
-          if (this._config.range && this._startDate instanceof Date && this._endDate instanceof Date) {
-            this._element.classList.add(CLASS_NAME_IS_VALID)
-            this._element.classList.remove(CLASS_NAME_IS_INVALID)
-            return
-          }
-
-          if (!this._config.range && this._startDate instanceof Date) {
-            this._element.classList.add(CLASS_NAME_IS_VALID)
-            this._element.classList.remove(CLASS_NAME_IS_INVALID)
-            return
-          }
-
-          this._element.classList.add(CLASS_NAME_IS_INVALID)
-          this._element.classList.remove(CLASS_NAME_IS_VALID)
-        }
-      })
-    }
-
-    return inputEl
-  }
-
-  _createFloating(): void {
-    this._anchoredPosition = createAnchoredPosition(this._togglerElement, this._menu)
-    this._floatingCleanup = this._anchoredPosition.destroy
-  }
-
-  async _updateFloatingPosition(): Promise<void> {
-    await this._anchoredPosition?.update()
-  }
-
-  _disposeFloating(): void {
-    if (this._floatingCleanup) {
-      this._floatingCleanup()
-      this._floatingCleanup = null
-      this._anchoredPosition = null
-    }
-  }
-
-  _parseDate(str: any): Date | null {
-    if (!str) {
-      return null
-    }
-
-    if (this._config.inputDateParse) {
-      return this._config.inputDateParse(str)
-    }
-
-    if (this._config.selectionType === 'day') {
-      return getLocalDateFromString(str, this._config.locale, this._config.timepicker)
-    }
-
-    return convertToDateObject(str, this._config.selectionType)
-  }
-
-  _formatDate(date: Date): any {
-    if (!date) {
-      return ''
-    }
-
-    if (this._config.inputDateFormat) {
-      return this._config.inputDateFormat(
-        date instanceof Date ? new Date(date) : convertToDateObject(date, this._config.selectionType)
-      )
-    }
-
-    if (this._config.selectionType !== 'day') {
-      return date
-    }
-
-    const _date = new Date(date)
-
-    return this._config.timepicker ? _date.toLocaleString(this._config.locale) : _date.toLocaleDateString(this._config.locale)
-  }
-
-  _getButtonClasses(classes: string[] | string): string[] {
-    if (typeof classes === 'string') {
-      return classes.split(' ')
-    }
-
-    return classes
-  }
-
-  _getPlaceholder(): any {
-    const { placeholder } = this._config
-
-    if (typeof placeholder === 'string') {
-      return placeholder.split(',')
-    }
-
-    return placeholder
-  }
-
-  _isShown(): boolean {
-    return this._element.classList.contains(CLASS_NAME_SHOW)
-  }
-
-  _setInputValue(date: Date | null): string {
-    if (date) {
-      return this._formatDate(date)
-    }
-
-    return ''
-  }
-
-  override _getConfig(config: any): any {
-    const dataAttributes = Manipulator.getDataAttributes(this._element)
-
-    for (const dataAttribute of Object.keys(dataAttributes)) {
-      if (DISALLOWED_ATTRIBUTES.has(dataAttribute)) {
-        delete dataAttributes[dataAttribute]
-      }
-    }
-
-    config = {
-      ...dataAttributes,
-      ...(typeof config === 'object' && config ? config : {})
-    }
-    config = this._mergeConfigObj(config)
-    config = this._configAfterMerge(config)
-    this._typeCheckConfig(config)
-
-    return config
-  }
-
-  override _configAfterMerge(config: any): any {
-    if (config.container === true) {
-      config.container = document.body
-    }
-
-    if (typeof config.container === 'object' || typeof config.container === 'string') {
-      config.container = getElement(config.container)
-    }
-
-    return config
-  }
-
-  // Static
-  static dateRangePickerInterface(element: string | Element | null, config?: any): void {
-    const data: any = DateRangePicker.getOrCreateInstance(element, config)
-
-    if (typeof config === 'string') {
-      if (typeof data[config] === 'undefined') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config]()
-    }
-  }
-
-  static jQueryInterface(this: any, config: any): any {
-    return this.each(function (this: HTMLElement) {
-      const data: any = DateRangePicker.getOrCreateInstance(this, config)
-
-      if (typeof config !== 'string') {
-        return
-      }
-
-      if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
-        throw new TypeError(`No method named "${config}"`)
-      }
-
-      data[config](this)
-    })
-  }
-
-  static clearMenus(event: any): void {
-    if (event.button === RIGHT_MOUSE_BUTTON || (event.type === 'keyup' && event.key !== TAB_KEY)) {
-      return
-    }
-
-    const openToggles = SelectorEngine.find(SELECTOR_DATA_TOGGLE_SHOWN)
-
-    for (const toggle of openToggles) {
-      const context = DateRangePicker.getInstance(toggle)
-
-      if (!context) {
-        continue
-      }
-
-      const composedPath = event.composedPath()
-
-      if (
-        composedPath.includes(context._element) || composedPath.includes(context._menu)
-      ) {
-        continue
-      }
-
-      const relatedTarget: any = { relatedTarget: context._element }
-
-      if (event.type === 'click') {
-        relatedTarget.clickEvent = event
-      }
-
-      context.hide()
-    }
   }
 }
 
@@ -1186,18 +473,17 @@ class DateRangePicker extends BaseComponent {
  */
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
-  const dateRangePickers = SelectorEngine.find(SELECTOR_DATA_TOGGLE)
-  for (let i = 0, len = dateRangePickers.length; i < len; i++) {
-    DateRangePicker.dateRangePickerInterface(dateRangePickers[i])
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    DateRangePicker.getOrCreateInstance(element)
   }
 })
-EventHandler.on(document, EVENT_CLICK_DATA_API, DateRangePicker.clearMenus)
-EventHandler.on(document, EVENT_KEYUP_DATA_API, DateRangePicker.clearMenus)
 
 /**
  * jQuery
  */
 
-defineJQueryPlugin(DateRangePicker)
+// The v2 pickers define no `jQueryInterface`, so the plugin registers as
+// `undefined` — preserved as-is; fixing it is a behaviour change.
+defineJQueryPlugin(DateRangePicker as any)
 
 export default DateRangePicker

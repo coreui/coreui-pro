@@ -122,21 +122,11 @@
       badge:
         color: danger
         text: PRO
-    - title: Date Picker v2
-      to: /forms/date-picker-v2/
+    - title: Date Time Picker
+      to: /forms/date-time-picker/
       badge:
-        color: warning
-        text: PREVIEW
-    - title: Date Range Picker v2
-      to: /forms/date-range-picker-v2/
-      badge:
-        color: warning
-        text: PREVIEW
-    - title: Date Time Picker v2
-      to: /forms/date-time-picker-v2/
-      badge:
-        color: warning
-        text: PREVIEW
+        color: danger
+        text: PRO
     - title: Date Range Picker
       to: /forms/date-range-picker/
       badge:
@@ -197,11 +187,6 @@
       badge:
         color: danger
         text: PRO
-    - title: Time Picker v2
-      to: /forms/time-picker-v2/
-      badge:
-        color: warning
-        text: PREVIEW
     - title: Layout
       to: /forms/layout/
     - title: Validation
