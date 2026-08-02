@@ -495,6 +495,25 @@ assembles maps of CSS expressions and the browser resolves them.
 - Two silent duplicates were dropped along the way: `$nav-link-height` was
   declared twice (navbar and header blocks — the header copy is gone) and the
   calendar emitted `--cui-calendar-cell-week-number-color` twice.
+- **Time picker: the v1-only tokens are gone.** The rewritten shell has no
+  cleaner button and draws its indicator as an inline SVG on `currentColor`,
+  so nothing read them any more — `--cui-time-picker-cleaner-*` (5 tokens),
+  `--cui-time-picker-indicator-icon`, `--cui-time-picker-indicator-icon-size`,
+  `--cui-time-picker-gap` and `--cui-time-picker-placeholder-color`, together
+  with their Sass variables (`$time-picker-cleaner-icon-size-sm`/`-lg` were
+  also declared twice). `--cui-time-picker-indicator-icon-color` stays and now
+  carries the validation color as well. The validation state itself moved off
+  the root element: v1 recoloured the frame from `.time-picker.is-invalid` with
+  `!important` overrides, v2 reads it from the field inside the group, so
+  `$time-picker-invalid-border-color` / `$time-picker-valid-border-color` and
+  the matching indicator-icon variables are gone — theme the state through the
+  standard `$form-invalid-*` / `$form-valid-*` variables instead. Section
+  placeholders come from the field's `placeholders` option, not a colour token.
+- `$input-padding-x-lg` was removed: `.form-control-lg` reads
+  `--cui-btn-input-lg-padding-x` from the shared button/input token system, and
+  the time picker's dead `gap-lg` was the variable's last consumer.
+  `$input-padding-x`, `$input-padding-x-sm` and `$input-padding-y-*` are
+  unaffected.
 
 #### Theme tokens
 
