@@ -178,6 +178,20 @@ class OTPInput extends BaseComponent {
     EventHandler.on(this._element, EVENT_INPUT, SELECTOR_FORM_OTP_CONTROL, event => {
       const { target } = event as unknown as { target: HTMLInputElement }
 
+      // SMS autofill, password managers, dictation and IME commits insert the
+      // whole code at once and fire `input`, not `paste`. Spread it across the
+      // slots instead of leaving it in one of them.
+      if (target!.value.length > 1) {
+        const chars = this._extractValidChars(target!.value)
+        target!.value = ''
+
+        if (chars) {
+          this._distributeChars(target as HTMLInputElement, chars)
+        }
+
+        return
+      }
+
       if (target!.value.length === 1 && !this._isValidInput(target!.value)) {
         target!.value = ''
         return
@@ -263,25 +277,48 @@ class OTPInput extends BaseComponent {
         return
       }
 
-      const inputs = this._getInputs()
-      const currentIndex = inputs.indexOf(event.target as HTMLInputElement)
-
-      for (let i = 0; i < validChars.length && (currentIndex + i) < inputs.length; i++) {
-        inputs[currentIndex + i].value = validChars[i]
-      }
-
-      // Focus the next empty input or the last filled input
-      const nextEmptyIndex = currentIndex + validChars.length
-      if (nextEmptyIndex < inputs.length) {
-        inputs[nextEmptyIndex].focus()
-      } else {
-        inputs[inputs.length - 1].focus()
-      }
-
-      this._setHiddenInputValue(validChars)
-      this._setInputsTabIndexes()
-      this._checkAutoSubmit(inputs)
+      this._distributeChars(event.target as HTMLInputElement, validChars)
     })
+  }
+
+  // Write `chars` across the slots starting at `startInput`, then sync focus,
+  // the hidden form value and auto-submit. Shared by paste and by multi-character
+  // `input` events.
+  _distributeChars(startInput: HTMLInputElement, chars: string): void {
+    const inputs = this._getInputs()
+
+    if (!inputs.length) {
+      return
+    }
+
+    // A value at least as long as the field is a complete code: fill from the
+    // first slot, whichever slot happens to be focused.
+    const startIndex = chars.length >= inputs.length ? 0 : Math.max(inputs.indexOf(startInput), 0)
+
+    for (let i = 0; i < chars.length && (startIndex + i) < inputs.length; i++) {
+      inputs[startIndex + i].value = chars[i]
+    }
+
+    // Focus the next empty input or the last filled one
+    const nextEmptyIndex = startIndex + chars.length
+    inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus()
+
+    // Read the value back from the slots so already-filled ones are preserved.
+    this._setHiddenInputValue(inputs.map((input: HTMLInputElement) => input.value).join(''))
+    this._syncFirstInputMaxLength()
+    this._setInputsTabIndexes()
+    this._checkAutoSubmit(inputs)
+  }
+
+  // An empty first slot is where autofill lands, so it has to accept the whole
+  // code; once it holds a character it behaves like every other slot.
+  _syncFirstInputMaxLength(): void {
+    const inputs = this._getInputs()
+    const [first] = inputs
+
+    if (first) {
+      first.maxLength = first.value ? 1 : inputs.length
+    }
   }
 
   _checkAutoSubmit(inputs: HTMLInputElement[]): void {
@@ -373,7 +410,13 @@ class OTPInput extends BaseComponent {
       input.type = this._config.masked ? 'password' : 'text'
 
       input.maxLength = 1
-      input.autocomplete = 'one-time-code'
+      // Only the first slot advertises the one-time code, so SMS autofill and
+      // password managers target a single field instead of every slot.
+      input.autocomplete = index === 0 ? 'one-time-code' : 'off'
+      input.autocapitalize = 'off'
+      input.setAttribute('autocorrect', 'off')
+      input.spellcheck = false
+      input.enterKeyHint = index === inputs.length - 1 ? 'done' : 'next'
 
       if (this._config.placeholder !== null) {
         const placeholder = String(this._config.placeholder)
@@ -424,6 +467,8 @@ class OTPInput extends BaseComponent {
         input.setAttribute('aria-label', ariaLabel as unknown as string)
       }
     }
+
+    this._syncFirstInputMaxLength()
   }
 
   _setInputsTabIndexes(): void {
