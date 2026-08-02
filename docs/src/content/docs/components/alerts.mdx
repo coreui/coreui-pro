@@ -156,13 +156,14 @@ To create a solid alert, remove the `alert-*` contextual class (like alert-prima
 Using the JavaScript plugin, you can remove any alert.
 
 - Ensure that you've loaded the Bootstrap alert plugin or the compiled CoreUI JavaScript.
-- Add a [close button](/components/close-button//) along with the `.alert-dismissible` class, which provides extra padding to the right of the alert component and positions the `.close` button.
+- Add a [close button](/components/close-button//) as a child of the alert. The alert makes room for it and positions it on its own — the `.alert-dismissible` class is no longer required. <AddedIn version="6.0.0" />
+- Keep `.alert-dismissible` if the close button is added later by your own code, or if it sits inside a wrapper element rather than directly in the alert. The class keeps working and does exactly what it always did.
 - On the close button, include the `data-coreui-dismiss="alert"` attribute, which triggers the JavaScript functionality. You must use the `<button>` element with it for proper behavior across all devices.
 - To animate alerts during dismissal, you need to add the `.fade` and `.show` classes.
 
 You can observe this in action with a live demonstration:
 
-<Example code={`<div class="alert alert-warning alert-dismissible fade show" role="alert">
+<Example code={`<div class="alert alert-warning fade show" role="alert">
     Wow, you might want to take a look at some of the fields listed below.
     <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
   </div>`} />

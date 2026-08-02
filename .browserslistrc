@@ -1,12 +1,20 @@
 # https://github.com/browserslist/browserslist#readme
 #
-# The floor is native `light-dark()`: Chrome 123, Edge 123, Firefox 120,
-# Safari 17.5. The v6 color system resolves every theme decision in the
-# browser through `light-dark()` and `color-mix()`, ships no fallback, and
-# below these versions dark mode simply does not work — so declaring anything
-# lower would be fiction, and raising it further is a product choice we have
-# not made. The JS floor rides along (everything the sources use is older
-# than this line).
+# Each floor is set by the newest platform feature v6 already requires, since
+# the floor has to hold for the whole 6.x line:
+#
+#   light-dark()  Chrome 123, Edge 123, Safari 17.5 — the color system resolves
+#                 every theme decision through it, and color-mix(), with no
+#                 fallback, so below it dark mode simply does not work.
+#   :has()        Firefox 121 — validation and focus states on Multi Select and
+#                 Autocomplete, the sidebar navigation indicators, calendar
+#                 ranges and the rating icons are selected with it. An
+#                 unsupported :has() invalidates the entire rule it appears in,
+#                 so this is not a graceful degradation.
+#
+# Declaring anything lower would be fiction; raising it further is a product
+# choice we have not made. The JS floor rides along (everything the sources use
+# is older than this line).
 #
 # Run `npx browserslist --coverage` after any change and update the figure on
 # the browsers & devices docs page.
@@ -17,7 +25,7 @@ unreleased versions
 
 Chrome >= 123
 Edge >= 123
-Firefox >= 120
+Firefox >= 121
 iOS >= 17.5
 Safari >= 17.5
 

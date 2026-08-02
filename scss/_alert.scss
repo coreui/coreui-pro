@@ -67,12 +67,17 @@ $alert-tokens: defaults(
 
   // Dismissible alerts
   //
-  // Expand the right padding and account for the close button's positioning.
+  // Expand the inline-end padding and account for the close button's
+  // positioning. An alert that contains a close button gets this on its own —
+  // `.alert-dismissible` stays supported for markup that already carries it,
+  // and for the case where the button is rendered later.
 
+  .alert:has(> .btn-close),
   .alert-dismissible {
     padding-inline-end: $alert-dismissible-padding-r;
 
-    // Adjust close link position
+    // Adjust close link position (descendant, as before: the button may sit
+    // inside a wrapper in existing `.alert-dismissible` markup)
     .btn-close {
       position: absolute;
       inset-inline-end: 0;
