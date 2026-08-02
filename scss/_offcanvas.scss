@@ -178,6 +178,9 @@ $offcanvas-tokens: defaults(
   }
 
   .offcanvas-body {
+    // Contain absolutely positioned children (e.g. menus) so they scroll with
+    // the body instead of being clipped by the offcanvas' overflow.
+    position: relative;
     flex-grow: 1;
     padding: var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x);
     overflow-y: auto;

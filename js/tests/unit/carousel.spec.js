@@ -1569,4 +1569,61 @@ describe('Carousel', () => {
       expect().nothing()
     })
   })
+
+  // `mouseenter`/`mouseleave` are emulated with `mouseover`/`mouseout`, which also fire
+  // when the pointer moves between the carousel's own slides.
+  describe('custom mouse events', () => {
+    it('should stay paused while the pointer moves between slides', () => {
+      fixtureEl.innerHTML = [
+        '<div id="myCarousel" class="carousel slide" data-coreui-ride="carousel">',
+        '  <div class="carousel-inner">',
+        '    <div id="item1" class="carousel-item active">item 1</div>',
+        '    <div class="carousel-item">item 2</div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const carouselEl = fixtureEl.querySelector('#myCarousel')
+      const item = fixtureEl.querySelector('#item1')
+      const carousel = new Carousel(carouselEl)
+      const cycleSpy = spyOn(carousel, 'cycle')
+
+      carouselEl.dispatchEvent(new MouseEvent('mouseout', {
+        bubbles: true,
+        relatedTarget: item
+      }))
+
+      expect(cycleSpy).not.toHaveBeenCalled()
+
+      carouselEl.dispatchEvent(new MouseEvent('mouseout', {
+        bubbles: true,
+        relatedTarget: document.body
+      }))
+
+      expect(cycleSpy).toHaveBeenCalled()
+    })
+
+    it('should not pause again while the pointer moves between slides', () => {
+      fixtureEl.innerHTML = [
+        '<div id="myCarousel" class="carousel slide" data-coreui-ride="carousel">',
+        '  <div class="carousel-inner">',
+        '    <div id="item1" class="carousel-item active">item 1</div>',
+        '    <div class="carousel-item">item 2</div>',
+        '  </div>',
+        '</div>'
+      ].join('')
+
+      const carouselEl = fixtureEl.querySelector('#myCarousel')
+      const item = fixtureEl.querySelector('#item1')
+      const carousel = new Carousel(carouselEl)
+      const pauseSpy = spyOn(carousel, 'pause')
+
+      item.dispatchEvent(new MouseEvent('mouseover', {
+        bubbles: true,
+        relatedTarget: carouselEl
+      }))
+
+      expect(pauseSpy).not.toHaveBeenCalled()
+    })
+  })
 })
