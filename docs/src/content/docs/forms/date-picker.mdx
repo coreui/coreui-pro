@@ -59,11 +59,13 @@ order, and translations are yours.
 ### Weeks
 
 Add `data-coreui-selection-type="week"` to select week numbers, and
-`data-coreui-show-week-number="true"` to show them in the grid. The field mask
-narrows to a week and year section (`2026-W29` — the same wire format the
-native `<input type="week">` submits), where the year is the ISO
-week-numbering year, which can differ from the calendar year around January
-1st. The reported `Date` is the Monday of the selected week.
+`data-coreui-show-week-number="true"` to show them in the grid. The field
+renders the native `<input type="week">` presentation — a fixed, non-editable
+localized label followed by the week and year sections (`Week 29, 2026`,
+`Tydzień 29, 2026`, …). The year is the ISO week-numbering year, which can
+differ from the calendar year around January 1st, and the reported `Date` is
+the Monday of the selected week. Prefer the ISO wire format in the field?
+Set `data-coreui-format="yyyy-Www"`.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">

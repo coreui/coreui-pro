@@ -211,13 +211,17 @@ behaviour, v5 is the reference. Mapping:
   element. `calendarOptions` / `inputOptions` remain as the programmatic escape
   hatch.
 - **Every selection type has a matching mask.** Month and year selection narrow
-  the mask to `MM/yyyy` and `yyyy`, week selection to `yyyy-Www` (`2026-W29` —
-  the native `<input type="week">` wire format, with the ISO week-numbering
-  year), and quarter selection to `QQQ yyyy` (`Q4 2026`). The v1 text input
-  rendered `2026W27`/`2026Q1`; the submitted value now follows the mask, and
-  the event still carries the v1-formatted string (`event.date`) next to the
-  `Date` (`event.dateObject`). The format parser gained `ww` (ISO week) and
-  `q`/`QQQ` (quarter) tokens for custom masks.
+  the mask to `MM/yyyy` and `yyyy`. Week selection renders the native
+  `<input type="week">` presentation — a fixed localized label plus week and
+  year sections (`Week 29, 2026`, `Tydzień 29, 2026`), where the year is the
+  ISO week-numbering year. Quarter selection narrows to `QQQ yyyy`
+  (`Q4 2026`). The v1 text input rendered `2026W27`/`2026Q1`; the submitted
+  value now follows the mask (set `format="yyyy-Www"` for an ISO-style
+  field), and the event still carries the v1-formatted string (`event.date`)
+  next to the `Date` (`event.dateObject`). The format parser gained `ww`
+  (ISO week) and `q`/`QQQ` (quarter) tokens, plus quoted literals
+  (`'Week' ww` — fixed text that may contain token letters, `''` escapes a
+  quote).
 - **Format comes from the mask.** `inputDateFormat` is replaced by `format`
   (forwarded to the field); `inputDateParse` still applies to pasted text.
 - **The calendar is built on first open, not at construction.** It accounts for

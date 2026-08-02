@@ -175,7 +175,9 @@ export const getSectionBounds = (section: DateSection): { min: number, max: numb
  * Accepts both dayjs/moment-style (`DD.MM.YYYY`) and date-fns/Unicode-style
  * (`dd.MM.yyyy`) tokens, including text month tokens (`MMM`, `MMMM`) and time
  * tokens (`HH`/`H` for the 23-hour cycle, `hh`/`h` for the 12-hour cycle,
- * `mm`, `ss`, `A`/`a`); any other character becomes a literal.
+ * `mm`, `ss`, `A`/`a`); any other character becomes a literal. Text wrapped in
+ * single quotes is always a literal — even token letters (`'Week' ww` renders
+ * "Week 29") — and a doubled quote (`''`) escapes the quote character itself.
  * @param {string} format The format string.
  * @param {string} [locale] The locale used to resolve month and day period names.
  * @param {string[] | null} [monthNames] Custom month names overriding the locale-derived ones.
@@ -188,6 +190,28 @@ export const getSectionsFromFormat = (format: string, locale = 'default', monthN
 
   while (index < format.length) {
     const char = format[index]
+
+    if (char === '\'') {
+      if (format[index + 1] === '\'') {
+        literal += '\''
+        index += 2
+        continue
+      }
+
+      index++
+
+      while (index < format.length) {
+        if (format[index] === '\'' && format[index + 1] !== '\'') {
+          index++
+          break
+        }
+
+        literal += format[index]
+        index += format[index] === '\'' ? 2 : 1
+      }
+
+      continue
+    }
 
     if (TOKEN_TYPES[char]) {
       if (literal) {
@@ -267,6 +291,32 @@ export const getSectionsFromLocale = (locale: string): DateSection[] =>
     month: '2-digit',
     day: '2-digit'
   }), locale)
+
+/**
+ * Returns the localized week-of-year label, capitalized the way the native
+ * week input renders it ("Week", "Tydzień", "Woche"). Falls back to "Week"
+ * where `Intl.DisplayNames` has no data.
+ * @param {string} locale The locale to use.
+ * @returns {string} The label.
+ */
+export const getWeekLabel = (locale: string): string => {
+  try {
+    const label = new Intl.DisplayNames(locale, { type: 'dateTimeField' }).of('weekOfYear')
+    return label ? label.charAt(0).toLocaleUpperCase(locale) + label.slice(1) : 'Week'
+  } catch {
+    return 'Week'
+  }
+}
+
+/**
+ * Derives the week mask from the locale, mirroring the native week input's
+ * presentation ("Week 29, 2026"): a fixed localized label, the ISO week
+ * number, and the ISO week-numbering year.
+ * @param {string} locale The locale to use.
+ * @returns {Array} The ordered list of section and literal descriptors.
+ */
+export const getWeekSectionsFromLocale = (locale: string): DateSection[] =>
+  getSectionsFromFormat(`'${getWeekLabel(locale).replaceAll('\'', '\'\'')}' ww, yyyy`, locale)
 
 /**
  * Derives the list of sections and literals from the locale's time format.

@@ -155,15 +155,27 @@ describe('DatePicker', () => {
   })
 
   describe('selection types', () => {
-    it('should mask week selection in the input type="week" wire format', () => {
-      const picker = buildPicker({ selectionType: 'week', date: new Date(2026, 6, 14) })
+    it('should mask week selection like the native week input', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2026, 6, 14) })
 
-      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026-W29')
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Week 29, 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 6, 13))
     })
 
+    it('should localize the fixed week label', () => {
+      buildPicker({ locale: 'pl-PL', selectionType: 'week', date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Tydzień 29, 2026')
+    })
+
+    it('should let an explicit format override the week mask', () => {
+      buildPicker({ format: 'yyyy-Www', selectionType: 'week', date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026-W29')
+    })
+
     it('should fill the week sections when a calendar week is selected', () => {
-      const picker = buildPicker({ selectionType: 'week', date: new Date(2026, 6, 14) })
+      const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2026, 6, 14) })
       const el = fixtureEl.querySelector('#picker')
       let emitted = null
       el.addEventListener('dateChange.coreui.date-picker', event => {
@@ -174,13 +186,13 @@ describe('DatePicker', () => {
       el.querySelector('.calendar-row[tabindex="0"] .calendar-cell').click()
 
       expect(emitted).toMatch(/^\d{4}W\d{2}$/)
-      expect(el.querySelector('input[type="hidden"]').value).toEqual(emitted.replace('W', '-W'))
+      expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.slice(5)}, ${emitted.slice(0, 4)}`)
     })
 
     it('should keep the ISO week-numbering year around January 1st', () => {
-      const picker = buildPicker({ selectionType: 'week', date: new Date(2027, 0, 1) })
+      const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2027, 0, 1) })
 
-      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026-W53')
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Week 53, 2026')
       expect(picker.getDate()).toEqual(new Date(2026, 11, 28))
     })
 

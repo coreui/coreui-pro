@@ -16,6 +16,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
+import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -270,10 +271,10 @@ class DateRangePicker extends BaseComponent {
     }
 
     const byType = {
-      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: 'yyyy-Www', year: 'yyyy'
+      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: getWeekSectionsFromLocale, year: 'yyyy'
     }
 
-    return (byType as Record<string, string>)[this._config.selectionType] ?? null
+    return (byType as Record<string, any>)[this._config.selectionType] ?? null
   }
 
   _setSelectEndDate(value: boolean): void {

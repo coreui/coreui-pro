@@ -18,7 +18,9 @@ import {
   getSectionsFromLocale,
   getSectionsFromString,
   getTimeSectionsFromLocale,
+  getWeekLabel,
   getWeekSectionMax,
+  getWeekSectionsFromLocale,
   setSectionsFromDate
 } from '../../../src/util/date-sections.js'
 
@@ -156,6 +158,35 @@ describe('Date Sections Utilities', () => {
       expect(section.type).toBe('quarter')
       expect(section.names).toEqual(['Q1', 'Q2', 'Q3', 'Q4'])
       expect(section.placeholder).toBe('QQQ')
+    })
+
+    it('should keep quoted text as a literal even when it contains token letters', () => {
+      const sections = getSectionsFromFormat('\'Tydzień\' ww, yyyy')
+
+      expect(sections.map(section => section.type)).toEqual(['literal', 'week', 'literal', 'year'])
+      expect(sections[0].value).toBe('Tydzień ')
+      expect(sections[2].value).toBe(', ')
+    })
+
+    it('should unescape doubled quotes inside and outside quoted text', () => {
+      expect(getSectionsFromFormat('d\'\'M')[1].value).toBe('\'')
+      expect(getSectionsFromFormat('\'It\'\'s\' d')[0].value).toBe('It\'s ')
+    })
+  })
+
+  describe('getWeekLabel', () => {
+    it('should return the capitalized localized week label', () => {
+      expect(getWeekLabel('en-US')).toBe('Week')
+      expect(getWeekLabel('pl-PL')).toBe('Tydzień')
+    })
+  })
+
+  describe('getWeekSectionsFromLocale', () => {
+    it('should mirror the native week input presentation', () => {
+      const sections = setSectionsFromDate(getWeekSectionsFromLocale('en-US'), new Date(2026, 6, 14))
+
+      expect(sections.map(section => section.type)).toEqual(['literal', 'week', 'literal', 'year'])
+      expect(formatSections(sections)).toBe('Week 29, 2026')
     })
   })
 

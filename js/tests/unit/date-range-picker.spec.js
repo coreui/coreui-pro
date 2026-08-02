@@ -100,15 +100,16 @@ describe('DateRangePicker', () => {
   })
 
   describe('selection types', () => {
-    it('should mask a week range in the input type="week" wire format', () => {
+    it('should mask a week range like the native week input', () => {
       buildPicker({
+        locale: 'en-US',
         selectionType: 'week',
         startDate: new Date(2026, 6, 14),
         endDate: new Date(2026, 7, 5)
       })
 
       const values = [...fixtureEl.querySelectorAll('#picker input[type="hidden"]')].map(input => input.value)
-      expect(values).toEqual(['2026-W29', '2026-W32'])
+      expect(values).toEqual(['Week 29, 2026', 'Week 32, 2026'])
     })
 
     it('should mask a quarter range with the quarter names', () => {
