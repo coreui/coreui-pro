@@ -151,7 +151,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
     margin-bottom: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    list-style: none;
+    list-style-type: "";
 
     .nav-item + .nav-item,
     .nav-item + .nav-group,
@@ -321,7 +321,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
     .nav-group-items {
       padding: var(--#{$prefix}sidebar-nav-group-items-padding-y) var(--#{$prefix}sidebar-nav-group-items-padding-x);
       overflow: hidden;
-      list-style: none;
+      list-style-type: "";
       @include transition($sidebar-nav-group-items-transition);
 
       .nav-link {

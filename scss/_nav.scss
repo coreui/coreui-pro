@@ -152,7 +152,7 @@ $nav-underline-border-tokens: defaults(
     flex-wrap: wrap;
     padding-inline-start: 0;
     margin-bottom: 0;
-    list-style: none;
+    list-style-type: "";
   }
 
   .nav-link {
