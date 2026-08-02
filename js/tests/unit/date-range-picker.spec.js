@@ -861,6 +861,77 @@ describe('DateRangePicker', () => {
       expect(todayBtn.disabled).toBeFalse()
     })
 
+    it('should disable today button when maxDate is a string in the past', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+        footer: true,
+        todayButton: 'Today',
+        maxDate: `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
+      })
+
+      const footer = div.querySelector('.date-picker-footer')
+      const todayBtn = Array.from(footer.querySelectorAll('button')).find(b => b.innerHTML === 'Today')
+      expect(todayBtn.disabled).toBeTrue()
+    })
+
+    it('should not disable today button when maxDate is today', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const div = fixtureEl.querySelector('div')
+      const today = new Date()
+      const dateRangePicker = new DateRangePicker(div, { // eslint-disable-line no-unused-vars
+        footer: true,
+        todayButton: 'Today',
+        maxDate: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+      })
+
+      const footer = div.querySelector('.date-picker-footer')
+      const todayBtn = Array.from(footer.querySelectorAll('button')).find(b => b.innerHTML === 'Today')
+      expect(todayBtn.disabled).toBeFalse()
+    })
+
+    it('should not accept a typed date beyond a string maxDate', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        const dateRangePicker = new DateRangePicker(div, {
+          inputOnChangeDelay: 50,
+          locale: 'en-US',
+          maxDate: '2023-01-20'
+        })
+
+        dateRangePicker._startInput.value = '01/25/2023'
+        dateRangePicker._startInput.dispatchEvent(new Event('input', { bubbles: true }))
+
+        setTimeout(() => {
+          expect(dateRangePicker._startDate).toBeNull()
+          resolve()
+        }, 150)
+      })
+    })
+
+    it('should not accept a typed date before a string minDate', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        const dateRangePicker = new DateRangePicker(div, {
+          inputOnChangeDelay: 50,
+          locale: 'en-US',
+          minDate: '2023-01-10'
+        })
+
+        dateRangePicker._startInput.value = '01/05/2023'
+        dateRangePicker._startInput.dispatchEvent(new Event('input', { bubbles: true }))
+
+        setTimeout(() => {
+          expect(dateRangePicker._startDate).toBeNull()
+          resolve()
+        }, 150)
+      })
+    })
+
     it('should not set end date on today click when range is false', () => {
       fixtureEl.innerHTML = '<div></div>'
       const div = fixtureEl.querySelector('div')

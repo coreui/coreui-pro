@@ -412,7 +412,7 @@ class DateRangePicker extends BaseComponent {
         let formatedDate = date
 
         if (date instanceof Date && date.getTime()) {
-          if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+          if (isDateDisabled(date, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
             return // Don't update if date is disabled
           }
 
@@ -474,7 +474,7 @@ class DateRangePicker extends BaseComponent {
         let formatedDate = date
 
         if (date instanceof Date && date.getTime()) {
-          if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+          if (date && isDateDisabled(date, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
             return // Don't update if date is disabled
           }
 
@@ -883,7 +883,12 @@ class DateRangePicker extends BaseComponent {
       todayButtonEl.type = 'button'
       todayButtonEl.textContent = this._config.todayButton
 
-      if (isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+      // compare today at midnight — with the current time of day, a
+      // `maxDate` of today (converted to midnight) would disable the button
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      if (isDateDisabled(today, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
         todayButtonEl.disabled = true
       }
 
@@ -1002,6 +1007,18 @@ class DateRangePicker extends BaseComponent {
     }
 
     this._popper = Popper.createPopper(this._togglerElement, this._menu, popperConfig)
+  }
+
+  // `minDate`/`maxDate` may come from a data attribute as a string — the
+  // calendar converts its own copies, but every comparison made by the picker
+  // itself needs the same conversion (a Date compared to a string is always
+  // false).
+  _getMinDate() {
+    return convertToDateObject(this._config.minDate, this._config.selectionType)
+  }
+
+  _getMaxDate() {
+    return convertToDateObject(this._config.maxDate, this._config.selectionType)
   }
 
   _parseDate(str) {
