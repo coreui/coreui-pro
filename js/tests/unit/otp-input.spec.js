@@ -1138,5 +1138,33 @@ describe('OTPInput', () => {
       expect(inputs.map(input => input.value)).toEqual(['9', '8', '7', ''])
       expect(otpContainer.querySelector('input[type="hidden"]').value).toEqual('987')
     })
+
+    it('should let the first slot accept a code again after clear()', () => {
+      const otpContainer = markup(4)
+      const otpInput = new OTPInput(otpContainer, { type: 'number', name: 'code' })
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[0].value = '1234'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(inputs[0].maxLength).toBe(1)
+
+      otpInput.clear()
+
+      expect(inputs[0].maxLength).toBe(4)
+    })
+
+    it('should size the first slot to the value restored by reset()', () => {
+      const otpContainer = markup(4)
+      const otpInput = new OTPInput(otpContainer, { type: 'number', name: 'code', value: '1234' })
+
+      otpInput.clear()
+
+      expect(otpContainer.querySelector('.form-otp-control').maxLength).toBe(4)
+
+      otpInput.reset()
+
+      expect(otpContainer.querySelector('.form-otp-control').maxLength).toBe(1)
+    })
   })
 })

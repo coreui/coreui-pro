@@ -124,6 +124,7 @@ class OTPInput extends BaseComponent {
     }
 
     this._setHiddenInputValue(null)
+    this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
   }
 
@@ -136,6 +137,7 @@ class OTPInput extends BaseComponent {
     }
 
     this._setHiddenInputValue(null)
+    this._syncFirstInputMaxLength()
     this._setInputsTabIndexes()
   }
 
