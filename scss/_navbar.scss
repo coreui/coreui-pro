@@ -201,7 +201,7 @@ $navbar-dark-tokens: defaults(
     flex-direction: column; // cannot use `inherit` to get the `.navbar`s value
     padding-inline-start: 0;
     margin-bottom: 0;
-    list-style: none;
+    list-style-type: "";
 
     .nav-link {
       &.active,

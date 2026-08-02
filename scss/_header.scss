@@ -164,7 +164,7 @@ $header-tokens: defaults(
     flex-direction: row; // cannot use `inherit` to get the `.header`s value
     padding-inline-start: 0;
     margin-bottom: 0;
-    list-style: none;
+    list-style-type: "";
 
     .nav-link {
       padding: var(--#{$prefix}header-nav-link-padding-y) var(--#{$prefix}header-nav-link-padding-x);
