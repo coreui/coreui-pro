@@ -37,7 +37,7 @@ const CLASS_NAME_SIDEBAR_NARROW_UNFOLDABLE = 'sidebar-narrow-unfoldable'
 
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
-const EVENT_RESIZE = 'resize'
+const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
@@ -205,6 +205,12 @@ class Sidebar extends BaseComponent {
     }
 
     this.unfoldable()
+  }
+
+  override dispose(): void {
+    EventHandler.off(window, EVENT_KEY)
+
+    super.dispose()
   }
 
   // Private
