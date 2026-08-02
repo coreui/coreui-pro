@@ -178,7 +178,7 @@ describe('DateTimePicker', () => {
       const picker = buildPicker()
 
       expect(Object.keys(picker.getContext()).toSorted())
-        .toEqual(['clear', 'close', 'date', 'disabled', 'reset', 'setDate', 'today'])
+        .toEqual(['clear', 'close', 'date', 'disabled', 'isDateSelectable', 'reset', 'setDate', 'today'])
     })
 
     it('should clear through the context', () => {

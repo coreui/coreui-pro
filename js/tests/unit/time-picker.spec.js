@@ -116,7 +116,7 @@ describe('TimePicker', () => {
       const picker = buildPicker()
 
       expect(Object.keys(picker.getContext()).toSorted())
-        .toEqual(['clear', 'close', 'disabled', 'now', 'reset', 'setTime', 'time'])
+        .toEqual(['clear', 'close', 'disabled', 'isTimeSelectable', 'now', 'reset', 'setTime', 'time'])
     })
 
     it('should clear and set the time through the context', () => {

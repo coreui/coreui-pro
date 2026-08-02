@@ -192,6 +192,7 @@ class TimePicker extends BaseComponent {
       clear: () => this.clear(),
       close: () => this.hide(),
       disabled: this._config.disabled,
+      isTimeSelectable: (time: Date | null) => this._input.isDateSelectable(time),
       now: () => this.now(),
       reset: () => this.reset(),
       setTime: (time: Date | null) => this.setTime(time),

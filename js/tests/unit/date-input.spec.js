@@ -628,6 +628,27 @@ describe('DateInput', () => {
       expect(spy).toHaveBeenCalledTimes(3)
     })
 
+    it('should answer whether a date would pass validation', () => {
+      const dateInput = createDateInput({
+        disabledDates: [new Date(2026, 6, 15)],
+        maxDate: new Date(2026, 6, 20),
+        minDate: new Date(2026, 6, 10)
+      })
+
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 14))).toBeTrue()
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 15))).toBeFalse()
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 21))).toBeFalse()
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 9))).toBeFalse()
+      expect(dateInput.isDateSelectable(null)).toBeFalse()
+      expect(dateInput.isDateSelectable(new Date('invalid'))).toBeFalse()
+    })
+
+    it('should normalize the checked date through the mask', () => {
+      const dateInput = createDateInput({ maxDate: new Date(2026, 6, 14) })
+
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 14, 15, 30))).toBeTrue()
+    })
+
     it('should validate a date set through the constructor', () => {
       const dateInput = createDateInput({
         date: new Date(2026, 6, 20),

@@ -238,6 +238,7 @@ class DateRangePicker extends BaseComponent {
       close: () => this.hide(),
       disabled: this._config.disabled,
       endDate: this.getEndDate(),
+      isDateSelectable: (date: Date | null) => this._startInput.isDateSelectable(date),
       reset: () => this.reset(),
       setRange: (startDate: Date | null, endDate: Date | null) => this.setRange(startDate, endDate),
       startDate: this.getStartDate()

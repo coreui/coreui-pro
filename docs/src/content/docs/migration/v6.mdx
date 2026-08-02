@@ -231,7 +231,10 @@ behaviour, v5 is the reference. Mapping:
   (`setDate`, the `today` action, the initial `date` config) run through the
   same min/max validation as typed ones: out of range, the field turns
   `is-invalid`, `errorChange` fires, and `getDate()`/`dateChange` report
-  `null`. `dateChange` on the shells now always carries the validated value.
+  `null`. `dateChange` on the shells now always carries the validated value,
+  and the slot context exposes `isDateSelectable(date)` (`isTimeSelectable`
+  on the time picker) for computing a projected button's `disabled` in
+  userland.
 - **The calendar is built on first open, not at construction.** It accounts for
   ~83% of a date picker's DOM (and ~89% of a range picker's), and it is not
   observable before the popup opens, so the shells create it in `show()` and

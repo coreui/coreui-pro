@@ -218,6 +218,20 @@ class SectionInput extends BaseComponent {
     return this._date
   }
 
+  // Answers whether a date, expressed in this field's mask, would pass
+  // validation. The granularity follows the mask: a day mask checks the
+  // midnight date (so "now" passes with a maxDate of today), a week mask the
+  // week's Monday, a date-time mask the exact time.
+  isDateSelectable(date: Date | null): boolean {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return false
+    }
+
+    const normalized = getDateFromSections(setSectionsFromDate(this._sections, date))
+
+    return normalized !== null && this._getValidationError(normalized, true) === null
+  }
+
   update(config: any): void {
     if (typeof config !== 'object') {
       return

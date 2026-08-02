@@ -218,6 +218,7 @@ class DateTimePicker extends BaseComponent {
       close: () => this.hide(),
       date: this.getDate(),
       disabled: this._config.disabled,
+      isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
       reset: () => this.reset(),
       setDate: (date: Date | null) => this.setDate(date),
       today: () => this.today()

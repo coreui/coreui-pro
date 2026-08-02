@@ -204,7 +204,7 @@ describe('DateRangePicker', () => {
       const picker = buildPicker()
       const context = picker.getContext()
 
-      expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'disabled', 'endDate', 'reset', 'setRange', 'startDate'])
+      expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'disabled', 'endDate', 'isDateSelectable', 'reset', 'setRange', 'startDate'])
     })
 
     it('should set a range through the context and emit both events', () => {

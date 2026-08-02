@@ -285,7 +285,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15) })
       const context = picker.getContext()
 
-      expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'date', 'disabled', 'reset', 'setDate', 'today'])
+      expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'date', 'disabled', 'isDateSelectable', 'reset', 'setDate', 'today'])
       expect(context.date).toEqual(new Date(2026, 5, 15))
       expect(context.disabled).toBeFalse()
     })
@@ -296,6 +296,30 @@ describe('DatePicker', () => {
       picker.getContext().clear()
 
       expect(picker.getDate()).toBeNull()
+    })
+
+    it('should answer date selectability through the context', () => {
+      const picker = buildPicker({
+        disabledDates: [new Date(2026, 6, 15)],
+        maxDate: new Date(2026, 6, 20),
+        minDate: new Date(2026, 6, 10)
+      })
+      const { isDateSelectable } = picker.getContext()
+
+      expect(isDateSelectable(new Date(2026, 6, 14))).toBeTrue()
+      expect(isDateSelectable(new Date(2026, 6, 15))).toBeFalse()
+      expect(isDateSelectable(new Date(2026, 6, 21))).toBeFalse()
+      expect(isDateSelectable(new Date(2026, 6, 9))).toBeFalse()
+      expect(isDateSelectable(null)).toBeFalse()
+    })
+
+    it('should check selectability at the mask granularity', () => {
+      // a raw comparison of "now" against a midnight maxDate would fail here
+      const midnight = new Date()
+      midnight.setHours(0, 0, 0, 0)
+      const picker = buildPicker({ maxDate: midnight })
+
+      expect(picker.getContext().isDateSelectable(new Date())).toBeTrue()
     })
 
     it('should set today through the context', () => {
