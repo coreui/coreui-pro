@@ -402,6 +402,13 @@ describe('Date Sections Utilities', () => {
       expect(getISOWeeksInYear(2025)).toBe(52)
       expect(getISOWeeksInYear(2020)).toBe(53)
     })
+
+    it('should stay in bounds for the partial years of a section being typed', () => {
+      for (const year of [2, 20, 202]) {
+        expect(getISOWeeksInYear(year)).toBeGreaterThanOrEqual(52)
+        expect(getISOWeeksInYear(year)).toBeLessThanOrEqual(53)
+      }
+    })
   })
 
   describe('getDateOfISOWeek', () => {

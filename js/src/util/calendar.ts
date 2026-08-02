@@ -844,7 +844,11 @@ export const getISOWeekNumberAndYear = (date: Date) : { weekNumber: number; year
   // Thursday in current week decides the year
   tempDate.setDate(tempDate.getDate() + 3 - ((tempDate.getDay() + 6) % 7))
 
-  const week1 = new Date(tempDate.getFullYear(), 0, 4)
+  // copy + setMonth keeps the full year — new Date(year, 0, 4) would map
+  // years below 100 to 19xx and derail the week math while a year section
+  // is still being typed
+  const week1 = new Date(tempDate)
+  week1.setMonth(0, 4)
 
   // Calculate full weeks to the date
   const weekNumber =
