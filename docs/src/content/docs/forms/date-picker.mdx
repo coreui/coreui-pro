@@ -406,8 +406,8 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | `showWeekNumber` | boolean | `false` | Set whether to display week numbers in the calendar. |
 | `size` | `'sm'`, `'lg'` | `null` | Size the component small or large. |
 | `timepicker` | boolean | `false` | Provide an additional time selection by adding select boxes to choose times. |
-| `todayButton` | string | `'Today'` | Today button inner HTML |
-| `todayButtonClasses` | array, string | `['btn', 'btn-sm', 'me-2']` | CSS class names that will be added to the today button |
+| `todayButton` | boolean, string | `'Today'` | Toggle visibility or set the content of the today button. Set to `false` to hide it. |
+| `todayButtonClasses` | array, string | `['btn', 'btn-sm', 'btn-primary', 'me-auto']` | CSS class names that will be added to the today button |
 | `valid` | boolean | `false` | Toggle the valid state for the component. |
 | `weekdayFormat` | number, `'long'`, `'narrow'`, `'short'` | `2` | Set length or format of day name. |
 | `weekNumbersLabel` | string | `null` | Label displayed over week numbers in the calendar. |
