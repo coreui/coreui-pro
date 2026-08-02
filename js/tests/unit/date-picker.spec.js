@@ -154,6 +154,54 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('selection types', () => {
+    it('should mask week selection in the input type="week" wire format', () => {
+      const picker = buildPicker({ selectionType: 'week', date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026-W29')
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 13))
+    })
+
+    it('should fill the week sections when a calendar week is selected', () => {
+      const picker = buildPicker({ selectionType: 'week', date: new Date(2026, 6, 14) })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = null
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker.show()
+      el.querySelector('.calendar-row[tabindex="0"] .calendar-cell').click()
+
+      expect(emitted).toMatch(/^\d{4}W\d{2}$/)
+      expect(el.querySelector('input[type="hidden"]').value).toEqual(emitted.replace('W', '-W'))
+    })
+
+    it('should keep the ISO week-numbering year around January 1st', () => {
+      const picker = buildPicker({ selectionType: 'week', date: new Date(2027, 0, 1) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026-W53')
+      expect(picker.getDate()).toEqual(new Date(2026, 11, 28))
+    })
+
+    it('should mask quarter selection with the quarter name', () => {
+      const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Q4 2026')
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 1))
+    })
+
+    it('should fill the quarter sections when a calendar quarter is selected', () => {
+      const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
+      const el = fixtureEl.querySelector('#picker')
+
+      picker.show()
+      el.querySelector('.calendar-cell[tabindex="0"]').click()
+
+      expect(el.querySelector('input[type="hidden"]').value).toMatch(/^Q[1-4] \d{4}$/)
+    })
+  })
+
   describe('calendar navigation', () => {
     it('should keep the popup open when navigating months', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15) })

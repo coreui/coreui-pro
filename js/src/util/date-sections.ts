@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { parseYearSmart } from './calendar.js'
+import { getISOWeekNumberAndYear, parseYearSmart } from './calendar.js'
 import { convert12hTo24h, convert24hTo12h } from './time.js'
 
 export type DateSection = {
@@ -18,10 +18,15 @@ export type DateSection = {
   placeholder?: string
 }
 
+// Uppercase `W` is deliberately not a token, so masks can spell the ISO week
+// prefix as a literal: `yyyy-Www` renders "2026-W27".
 const TOKEN_TYPES: Record<string, string> = {
   d: 'day',
   D: 'day',
+  w: 'week',
   M: 'month',
+  q: 'quarter',
+  Q: 'quarter',
   y: 'year',
   Y: 'year',
   H: 'hour',
@@ -31,6 +36,8 @@ const TOKEN_TYPES: Record<string, string> = {
   A: 'meridiem',
   a: 'meridiem'
 }
+
+const QUARTER_NAMES = ['Q1', 'Q2', 'Q3', 'Q4']
 
 /**
  * Returns the localized month names in the grammatical form used inside a
@@ -104,6 +111,18 @@ const createSection = (char: string, tokenLength: number, locale = 'default', mo
     }
   }
 
+  if (type === 'quarter') {
+    if (tokenLength >= 3) {
+      return {
+        type, length: 1, padded: false, value: null, names: QUARTER_NAMES, placeholder: 'Q'.repeat(tokenLength)
+      }
+    }
+
+    return {
+      type, length: 1, padded: tokenLength > 1, value: null
+    }
+  }
+
   return {
     type, length: 2, padded: tokenLength > 1, value: null
   }
@@ -120,8 +139,16 @@ export const getSectionBounds = (section: DateSection): { min: number, max: numb
       return { min: 1, max: 31 }
     }
 
+    case 'week': {
+      return { min: 1, max: 53 }
+    }
+
     case 'month': {
       return { min: 1, max: 12 }
+    }
+
+    case 'quarter': {
+      return { min: 1, max: 4 }
     }
 
     case 'hour': {
@@ -394,6 +421,50 @@ export const getDaysInMonth = (year: number, month: number): number => {
 }
 
 /**
+ * Returns the number of ISO weeks in the given week-numbering year (52 or 53).
+ * @param {number} year The full week-numbering year.
+ * @returns {number} The week count.
+ */
+export const getISOWeeksInYear = (year: number): number => {
+  const date = new Date(2000, 0, 1)
+  // December 28th always belongs to the last ISO week of its year
+  date.setFullYear(year, 11, 28)
+  return getISOWeekNumberAndYear(date).weekNumber
+}
+
+/**
+ * Returns the Monday of the given ISO week.
+ * @param {number} year The full week-numbering year.
+ * @param {number} week The 1-based ISO week number.
+ * @returns {Date} The Monday starting the week.
+ */
+export const getDateOfISOWeek = (year: number, week: number): Date => {
+  const date = new Date(2000, 0, 1)
+  // January 4th always belongs to the first ISO week of its year
+  date.setFullYear(year, 0, 4)
+  date.setDate(date.getDate() - ((date.getDay() + 6) % 7) + ((week - 1) * 7))
+  return date
+}
+
+/**
+ * Returns the effective upper bound of the week section for the currently
+ * selected year. Falls back to 53 while the year is unknown (the year can
+ * still turn out to be a long one).
+ * @param {Array} sections The section and literal descriptors.
+ * @returns {number} The week count of the selected year.
+ */
+export const getWeekSectionMax = (sections: DateSection[]): number => {
+  const yearSection = sections.find(section => section.type === 'year')
+  const year = yearSection ? getFullYearFromSection(yearSection) : null
+
+  if (year === null) {
+    return getSectionBounds({ type: 'week' } as DateSection).max
+  }
+
+  return getISOWeeksInYear(year)
+}
+
+/**
  * Returns the effective upper bound of the day section for the currently
  * selected month and year. Falls back to 31 while the month is unknown and to
  * a leap year while the year is unknown (February can still turn out to have
@@ -442,9 +513,12 @@ export const getFullYearFromSection = (section: DateSection): number | null => {
 
 /**
  * Builds a Date from fully filled sections, clamping the day to the month's
- * length. Section types absent from the layout get defaults (1970-01-01 for
- * the date part — the `util/time.js` convention for time-only values — and
- * midnight for the time part). Returns null while any section is empty.
+ * length. A week section resolves to the Monday of the ISO week (the year
+ * section then holds the ISO week-numbering year) and a quarter section to
+ * the first day of the quarter. Section types absent from the layout get
+ * defaults (1970-01-01 for the date part — the `util/time.js` convention for
+ * time-only values — and midnight for the time part). Returns null while any
+ * section is empty.
  * @param {Array} sections The section and literal descriptors.
  * @returns {Date | null} The date or null when incomplete.
  */
@@ -469,7 +543,9 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
   }
 
   const year = values.year === undefined ? 1970 : values.year
-  const month = values.month === undefined ? 1 : values.month
+  const month = values.month === undefined ?
+    (values.quarter === undefined ? 1 : ((values.quarter - 1) * 3) + 1) :
+    values.month
   const day = values.day === undefined ? 1 : values.day
   let hour = values.hour === undefined ? 0 : values.hour
 
@@ -477,57 +553,75 @@ export const getDateFromSections = (sections: DateSection[]): Date | null => {
     hour = convert12hTo24h(values.meridiem === 2 ? 'pm' : 'am', hour)
   }
 
-  const date = new Date(2000, 0, 1)
-  date.setFullYear(year, month - 1, Math.min(day, getDaysInMonth(year, month)))
+  const date = values.week === undefined ? new Date(2000, 0, 1) : getDateOfISOWeek(year, Math.min(values.week, getISOWeeksInYear(year)))
+
+  if (values.week === undefined) {
+    date.setFullYear(year, month - 1, Math.min(day, getDaysInMonth(year, month)))
+  }
+
   date.setHours(hour, values.minute === undefined ? 0 : values.minute, values.second === undefined ? 0 : values.second, 0)
   return date
 }
 
 /**
- * Returns a copy of the sections with values taken from the given date.
+ * Returns a copy of the sections with values taken from the given date. In a
+ * layout with a week section the year section holds the ISO week-numbering
+ * year, which can differ from the calendar year around January 1st.
  * @param {Array} sections The section and literal descriptors.
  * @param {Date | null} date The date to read values from, or null to clear.
  * @returns {Array} The updated sections.
  */
-export const setSectionsFromDate = (sections: DateSection[], date: Date | null): DateSection[] => sections.map(section => {
-  if (section.type === 'literal') {
-    return section
-  }
+export const setSectionsFromDate = (sections: DateSection[], date: Date | null): DateSection[] => {
+  const weekInfo = date && sections.some(section => section.type === 'week') ? getISOWeekNumberAndYear(date) : null
 
-  if (!date) {
-    return { ...section, value: null }
-  }
-
-  switch (section.type) {
-    case 'day': {
-      return { ...section, value: date.getDate() }
+  return sections.map(section => {
+    if (section.type === 'literal') {
+      return section
     }
 
-    case 'month': {
-      return { ...section, value: date.getMonth() + 1 }
+    if (!date) {
+      return { ...section, value: null }
     }
 
-    case 'hour': {
-      return { ...section, value: section.cycle === 'h12' ? convert24hTo12h(date.getHours()) : date.getHours() }
-    }
+    switch (section.type) {
+      case 'day': {
+        return { ...section, value: date.getDate() }
+      }
 
-    case 'minute': {
-      return { ...section, value: date.getMinutes() }
-    }
+      case 'week': {
+        return { ...section, value: weekInfo!.weekNumber }
+      }
 
-    case 'second': {
-      return { ...section, value: date.getSeconds() }
-    }
+      case 'month': {
+        return { ...section, value: date.getMonth() + 1 }
+      }
 
-    case 'meridiem': {
-      return { ...section, value: date.getHours() >= 12 ? 2 : 1 }
-    }
+      case 'quarter': {
+        return { ...section, value: Math.floor(date.getMonth() / 3) + 1 }
+      }
 
-    default: {
-      return { ...section, value: date.getFullYear() }
+      case 'hour': {
+        return { ...section, value: section.cycle === 'h12' ? convert24hTo12h(date.getHours()) : date.getHours() }
+      }
+
+      case 'minute': {
+        return { ...section, value: date.getMinutes() }
+      }
+
+      case 'second': {
+        return { ...section, value: date.getSeconds() }
+      }
+
+      case 'meridiem': {
+        return { ...section, value: date.getHours() >= 12 ? 2 : 1 }
+      }
+
+      default: {
+        return { ...section, value: weekInfo ? weekInfo.year : date.getFullYear() }
+      }
     }
-  }
-})
+  })
+}
 
 /**
  * Formats a section value for display, padding with zeros when the section is

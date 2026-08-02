@@ -21,6 +21,7 @@ import {
   getSectionBounds,
   getSectionsFromFormat,
   getSectionsFromString,
+  getWeekSectionMax,
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
@@ -119,7 +120,9 @@ const DefaultType: Record<string, string> = {
 
 const DefaultPlaceholders = {
   day: 'DD',
+  week: 'WW',
   month: 'MM',
+  quarter: 'Q',
   year: 'YYYY',
   hour: 'HH',
   minute: 'mm',
@@ -129,7 +132,9 @@ const DefaultPlaceholders = {
 
 const DefaultSectionLabels = {
   day: 'Day',
+  week: 'Week',
   month: 'Month',
+  quarter: 'Quarter',
   year: 'Year',
   hour: 'Hour',
   minute: 'Minute',
@@ -567,11 +572,13 @@ class SectionInput extends BaseComponent {
   }
 
   _updateDate(): void {
-    const daySection = this._sections.find(section => section.type === 'day')
-
-    if (daySection && daySection.value !== null && daySection.value > this._getSectionMax(daySection)) {
-      daySection.value = this._getSectionMax(daySection)
-      this._syncSections()
+    // Sections whose bounds depend on other sections (the day on the month and
+    // year, the week on the year) are clamped when those sections change.
+    for (const section of this._sections) {
+      if ((section.type === 'day' || section.type === 'week') && section.value !== null && section.value > this._getSectionMax(section)) {
+        section.value = this._getSectionMax(section)
+        this._syncSections()
+      }
     }
 
     const date = getDateFromSections(this._sections)
@@ -779,7 +786,15 @@ class SectionInput extends BaseComponent {
   }
 
   _getSectionMax(section: DateSection): number {
-    return section.type === 'day' ? getDaySectionMax(this._sections) : getSectionBounds(section).max
+    if (section.type === 'day') {
+      return getDaySectionMax(this._sections)
+    }
+
+    if (section.type === 'week') {
+      return getWeekSectionMax(this._sections)
+    }
+
+    return getSectionBounds(section).max
   }
 
   _isEditable(): boolean {

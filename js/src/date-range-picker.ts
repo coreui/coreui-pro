@@ -263,13 +263,15 @@ class DateRangePicker extends BaseComponent {
   }
 
   // See DatePicker._resolveFormat — a date mask can only express the sections
-  // it has, so month/year selection get a narrower default mask.
+  // it has, so every non-day selection type gets a matching default mask.
   _resolveFormat(): any {
     if (this._config.format) {
       return this._config.format
     }
 
-    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+    const byType = {
+      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: 'yyyy-Www', year: 'yyyy'
+    }
 
     return (byType as Record<string, string>)[this._config.selectionType] ?? null
   }

@@ -30,7 +30,7 @@ By default, the section order and separators are derived from the user's locale,
 
 ## Formats
 
-Set an explicit format with the `data-coreui-format` attribute. The parser accepts both dayjs/moment-style tokens (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`, `yyyy`, `yy`), so you can reuse the format strings from the date library you already use. Any other character becomes a literal separator.
+Set an explicit format with the `data-coreui-format` attribute. The parser accepts both dayjs/moment-style tokens (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`, `yyyy`, `yy`), plus `ww` for ISO week numbers and `q` (numeric) or `QQQ` (`Q1`–`Q4`) for quarters, so you can reuse the format strings from the date library you already use. Any other character becomes a literal separator.
 
 <Example pro code={`<div class="mb-3">
     <label class="form-label">dd.MM.yyyy</label>
@@ -58,7 +58,16 @@ The format doesn't have to include every section — a month-and-year mask works
     <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="MMMM yyyy" data-coreui-locale="en-US"></div>
   </div>`} />
 
-For picking whole weeks, use the [date picker](/forms/date-picker/) with `selectionType="week"` — a masked week-number field has no native or MUI equivalent and isn't supported.
+Week and quarter masks work the same way. A week mask (`yyyy-Www` — the uppercase `W` is a literal, `ww` the section) edits the ISO week directly and reports the Monday of that week; its year section holds the ISO week-numbering year, which can differ from the calendar year around January 1st. A quarter mask reports the first day of the quarter:
+
+<Example pro code={`<div class="mb-3">
+    <label class="form-label">yyyy-Www</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="yyyy-Www"></div>
+  </div>
+  <div>
+    <label class="form-label">QQQ yyyy</label>
+    <div class="form-control form-date-time" data-coreui-date-input data-coreui-format="QQQ yyyy"></div>
+  </div>`} />
 
 ## Month names
 

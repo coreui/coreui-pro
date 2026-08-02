@@ -210,12 +210,14 @@ behaviour, v5 is the reference. Mapping:
   `data-coreui-show-week-number` and `data-coreui-format` work on the picker
   element. `calendarOptions` / `inputOptions` remain as the programmatic escape
   hatch.
-- **Week and quarter selection display the underlying date.** A section mask is
-  built from date sections, so it cannot render `2026W27` or `2026Q1` the way
-  the v1 text input did — the field shows the first day of the selected week or
-  quarter. The formatted value stays available on the event (`event.date`).
-  Dedicated week/quarter sections are an open design item. Month and year
-  selection **do** adapt: the mask narrows to `MM/yyyy` and `yyyy`.
+- **Every selection type has a matching mask.** Month and year selection narrow
+  the mask to `MM/yyyy` and `yyyy`, week selection to `yyyy-Www` (`2026-W29` —
+  the native `<input type="week">` wire format, with the ISO week-numbering
+  year), and quarter selection to `QQQ yyyy` (`Q4 2026`). The v1 text input
+  rendered `2026W27`/`2026Q1`; the submitted value now follows the mask, and
+  the event still carries the v1-formatted string (`event.date`) next to the
+  `Date` (`event.dateObject`). The format parser gained `ww` (ISO week) and
+  `q`/`QQQ` (quarter) tokens for custom masks.
 - **Format comes from the mask.** `inputDateFormat` is replaced by `format`
   (forwarded to the field); `inputDateParse` still applies to pasted text.
 - **The calendar is built on first open, not at construction.** It accounts for

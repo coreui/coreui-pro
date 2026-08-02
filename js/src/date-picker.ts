@@ -233,15 +233,18 @@ class DatePicker extends BaseComponent {
     return { ...forwarded, ...overrides, ...extra }
   }
 
-  // A date mask can only express the sections it has: month/year selection get
-  // a narrower default mask, day (and the week/quarter types, whose value is the
-  // underlying day) keep the locale mask. An explicit `format` always wins.
+  // A date mask can only express the sections it has: every non-day selection
+  // type gets a default mask matching its granularity (week mirrors the
+  // <input type="week"> wire format) and day keeps the locale mask. An
+  // explicit `format` always wins.
   _resolveFormat(): any {
     if (this._config.format) {
       return this._config.format
     }
 
-    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+    const byType = {
+      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: 'yyyy-Www', year: 'yyyy'
+    }
 
     return (byType as Record<string, string>)[this._config.selectionType] ?? null
   }

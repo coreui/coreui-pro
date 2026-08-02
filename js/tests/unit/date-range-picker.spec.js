@@ -99,6 +99,30 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('selection types', () => {
+    it('should mask a week range in the input type="week" wire format', () => {
+      buildPicker({
+        selectionType: 'week',
+        startDate: new Date(2026, 6, 14),
+        endDate: new Date(2026, 7, 5)
+      })
+
+      const values = [...fixtureEl.querySelectorAll('#picker input[type="hidden"]')].map(input => input.value)
+      expect(values).toEqual(['2026-W29', '2026-W32'])
+    })
+
+    it('should mask a quarter range with the quarter names', () => {
+      buildPicker({
+        selectionType: 'quarter',
+        startDate: new Date(2026, 1, 10),
+        endDate: new Date(2026, 10, 15)
+      })
+
+      const values = [...fixtureEl.querySelectorAll('#picker input[type="hidden"]')].map(input => input.value)
+      expect(values).toEqual(['Q1 2026', 'Q4 2026'])
+    })
+  })
+
   describe('range selection', () => {
     it('should update both fields, emit both events, and close after the end date', () => {
       const picker = buildPicker()
