@@ -166,6 +166,18 @@ class Offcanvas extends BaseComponent {
   }
 
   dispose(): any {
+    // Disposed while still open: release the scroll lock synchronously, or the
+    // body keeps `overflow: hidden` and the scrollbar padding forever.
+    if (this._isShown) {
+      this._element.classList.remove(CLASS_NAME_SHOW, CLASS_NAME_SHOWING, CLASS_NAME_HIDING)
+      this._element.removeAttribute('aria-modal')
+      this._element.removeAttribute('role')
+
+      if (!this._config.scroll) {
+        new ScrollBarHelper().reset()
+      }
+    }
+
     this._backdrop.dispose()
     this._focustrap.deactivate()
     super.dispose()
@@ -249,9 +261,10 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   }
 
   EventHandler.one(target, EVENT_HIDDEN, () => {
-    // focus on trigger when it is closed
+    // focus on trigger when it is closed; returning focus must not scroll the
+    // page back to the trigger
     if (isVisible(this)) {
-      this.focus()
+      this.focus({ preventScroll: true })
     }
   })
 

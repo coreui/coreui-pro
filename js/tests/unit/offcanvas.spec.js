@@ -922,4 +922,26 @@ describe('Offcanvas', () => {
       expect(offcanvas2._config.scroll).toBeTrue()
     })
   })
+
+  describe('dispose while open', () => {
+    it('should release the page scroll lock when disposed while shown', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+
+        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
+        const offCanvas = new Offcanvas(offCanvasEl)
+
+        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(document.body.style.overflow).toEqual('hidden')
+
+          offCanvas.dispose()
+
+          expect(document.body.style.overflow).not.toEqual('hidden')
+          resolve()
+        })
+
+        offCanvas.show()
+      })
+    })
+  })
 })

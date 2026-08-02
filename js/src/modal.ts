@@ -152,6 +152,20 @@ class Modal extends BaseComponent {
   }
 
   dispose(): any {
+    // Disposed while still open (e.g. an SPA tearing the component down
+    // mid-navigation): restore the page state synchronously, or `modal-open`
+    // (overflow: hidden) and the scrollbar padding stay stuck on the body.
+    if (this._isShown) {
+      this._element.style.display = 'none'
+      this._element.classList.remove(CLASS_NAME_SHOW)
+      this._element.setAttribute('aria-hidden', true as unknown as string)
+      this._element.removeAttribute('aria-modal')
+      this._element.removeAttribute('role')
+      document.body.classList.remove(CLASS_NAME_OPEN)
+      this._resetAdjustments()
+      this._scrollBar.reset()
+    }
+
     EventHandler.off(window, EVENT_KEY)
     EventHandler.off(this._dialog!, EVENT_KEY)
 
@@ -362,7 +376,8 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
 
     EventHandler.one(target, EVENT_HIDDEN, () => {
       if (isVisible(this)) {
-        this.focus()
+        // Returning focus must not scroll the page back to the trigger.
+        this.focus({ preventScroll: true })
       }
     })
   })

@@ -1326,4 +1326,27 @@ describe('Modal', () => {
       expect(modal2._config.backdrop).toBeTrue()
     })
   })
+
+  describe('dispose while open', () => {
+    it('should release the page scroll lock when disposed while shown', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="modal"><div class="modal-dialog"></div></div>'
+
+        const modalEl = fixtureEl.querySelector('.modal')
+        const modal = new Modal(modalEl)
+
+        modalEl.addEventListener('shown.coreui.modal', () => {
+          expect(document.body).toHaveClass('modal-open')
+
+          modal.dispose()
+
+          expect(document.body).not.toHaveClass('modal-open')
+          expect(document.body.style.overflow).not.toEqual('hidden')
+          resolve()
+        })
+
+        modal.show()
+      })
+    })
+  })
 })
