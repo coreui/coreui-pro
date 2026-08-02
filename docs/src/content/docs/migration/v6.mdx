@@ -42,9 +42,12 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
-**The minimum supported browsers are now Chrome 123, Edge 123, Firefox 120,
-Safari 17.5 and iOS 17.5** — the first versions with native `light-dark()`
-support. This is the floor the v6 color system already required in practice:
+**The minimum supported browsers are now Chrome 123, Edge 123, Firefox 121,
+Safari 17.5 and iOS 17.5.** `light-dark()` sets the Chrome/Edge/Safari floor;
+`:has()` sets Firefox 121, since validation and focus states on Multi Select
+and Autocomplete, the sidebar navigation indicators, calendar ranges and the
+rating icons are all selected with it — and an unsupported `:has()` invalidates
+the entire rule it appears in. This is the floor the v6 color system already required in practice:
 theme decisions resolve in the browser via `light-dark()` and `color-mix()`
 with no fallback, so on older browsers dark mode did not work regardless of
 what the previous `.browserslistrc` claimed (Chrome 60 / Safari 12). v6 makes
@@ -312,6 +315,14 @@ the option-by-option migration map. Planned mapping:
   the field, as a paste already was. Previously such a value stayed in one slot
   and the submitted value was empty. The slots also gained `enterkeyhint`,
   `autocorrect="off"` and `spellcheck="false"`.
+
+#### Alert
+
+- **`.alert-dismissible` is optional now.** An alert that contains a close
+  button as a direct child makes room for it and positions it on its own
+  (`.alert:has(> .btn-close)`). The class keeps working — and is still the way
+  to go when the button is injected later or sits inside a wrapper — so no
+  existing markup changes.
 
 #### Chip / Chip set / Chip input
 
