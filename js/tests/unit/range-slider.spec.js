@@ -1900,4 +1900,37 @@ describe('RangeSlider', () => {
       expect(input.value).toBe('60')
     })
   })
+
+  describe('dispose', () => {
+    it('should drop its window and documentElement listeners', () => {
+      fixtureEl.innerHTML = '<div id="mySlider"></div>'
+
+      const el = fixtureEl.querySelector('#mySlider')
+      const rangeSlider = new RangeSlider(el, { value: [10, 40] })
+
+      // Watch the prototype and match on the receiver: `dispose()` nulls the
+      // instance's own properties (an instance spy would be wiped), and other
+      // sliders in this file may still hold their own global listeners.
+      const original = RangeSlider.prototype._updateLabelsContainerSize
+      let calledOnDisposedInstance = false
+      RangeSlider.prototype._updateLabelsContainerSize = function (...args) {
+        if (this === rangeSlider) {
+          calledOnDisposedInstance = true
+        }
+
+        return original.apply(this, args)
+      }
+
+      try {
+        rangeSlider.dispose()
+        window.dispatchEvent(new Event('resize'))
+        document.documentElement.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+        document.documentElement.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+      } finally {
+        RangeSlider.prototype._updateLabelsContainerSize = original
+      }
+
+      expect(calledOnDisposedInstance).toBeFalse()
+    })
+  })
 })

@@ -661,4 +661,35 @@ describe('Sidebar', () => {
       expect(spySidebarInterface).toHaveBeenCalledWith(sidebarEl)
     })
   })
+
+  describe('dispose', () => {
+    it('should drop its window resize listener', () => {
+      fixtureEl.innerHTML = '<div class="sidebar"></div>'
+
+      const el = fixtureEl.querySelector('.sidebar')
+      const sidebar = new Sidebar(el)
+
+      // Watch the prototype and match on the receiver: `dispose()` nulls the
+      // instance's own properties (an instance spy would be wiped), and other
+      // sidebars in this file may still hold their own resize listeners.
+      const original = Sidebar.prototype._isMobile
+      let calledOnDisposedInstance = false
+      Sidebar.prototype._isMobile = function (...args) {
+        if (this === sidebar) {
+          calledOnDisposedInstance = true
+        }
+
+        return original.apply(this, args)
+      }
+
+      try {
+        sidebar.dispose()
+        window.dispatchEvent(new Event('resize'))
+      } finally {
+        Sidebar.prototype._isMobile = original
+      }
+
+      expect(calledOnDisposedInstance).toBeFalse()
+    })
+  })
 })

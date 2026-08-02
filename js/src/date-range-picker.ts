@@ -41,7 +41,7 @@ const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_INPUT = `input${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
-const EVENT_RESIZE = 'resize'
+const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_SUBMIT = 'submit'
@@ -329,6 +329,7 @@ class DateRangePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    EventHandler.off(window, EVENT_KEY)
     this._disposeFloating()
 
     if (this._startInputTimeout) {

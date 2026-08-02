@@ -162,6 +162,13 @@ class RangeSlider extends BaseComponent {
     this._initializeRangeSlider()
   }
 
+  override dispose(): void {
+    EventHandler.off(window, EVENT_KEY)
+    EventHandler.off(document.documentElement, EVENT_KEY)
+
+    super.dispose()
+  }
+
   // Private
   _addEventListeners(): void {
     if (this._config.disabled) {

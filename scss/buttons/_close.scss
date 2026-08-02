@@ -49,8 +49,12 @@ $close-tokens: defaults(
     @include tokens($close-tokens);
 
     box-sizing: content-box;
+    // Flex containers may shrink the button below its icon; a minimum keeps it
+    // square and clickable.
     width: $btn-close-width;
+    min-width: $btn-close-width;
     height: $btn-close-height;
+    min-height: $btn-close-height;
     padding: $btn-close-padding-y $btn-close-padding-x;
     color: var(--#{$prefix}btn-close-color);
     background: transparent var(--#{$prefix}btn-close-bg) center / $btn-close-width auto no-repeat; // include transparent for button elements
