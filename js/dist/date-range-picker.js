@@ -1,5 +1,5 @@
 /*!
-  * CoreUI date-range-picker.js v5.27.0 (https://coreui.io)
+  * CoreUI date-range-picker.js v5.27.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -385,7 +385,7 @@
           const date = this._parseDate(event.target.value);
           let formatedDate = date;
           if (date instanceof Date && date.getTime()) {
-            if (calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            if (calendar_js.isDateDisabled(date, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
               return; // Don't update if date is disabled
             }
             if (this._config.selectionType !== 'day') {
@@ -433,7 +433,7 @@
           const date = this._parseDate(event.target.value);
           let formatedDate = date;
           if (date instanceof Date && date.getTime()) {
-            if (date && calendar_js.isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            if (date && calendar_js.isDateDisabled(date, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
               return; // Don't update if date is disabled
             }
             if (this._config.selectionType !== 'day') {
@@ -755,7 +755,12 @@
         todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses));
         todayButtonEl.type = 'button';
         todayButtonEl.textContent = this._config.todayButton;
-        if (calendar_js.isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+
+        // compare today at midnight — with the current time of day, a
+        // `maxDate` of today (converted to midnight) would disable the button
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (calendar_js.isDateDisabled(today, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
           todayButtonEl.disabled = true;
         }
         todayButtonEl.addEventListener('click', () => {
@@ -854,6 +859,17 @@
         placement: index_js.isRTL() ? 'bottom-end' : 'bottom-start'
       };
       this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
+    }
+
+    // `minDate`/`maxDate` may come from a data attribute as a string — the
+    // calendar converts its own copies, but every comparison made by the picker
+    // itself needs the same conversion (a Date compared to a string is always
+    // false).
+    _getMinDate() {
+      return calendar_js.convertToDateObject(this._config.minDate, this._config.selectionType);
+    }
+    _getMaxDate() {
+      return calendar_js.convertToDateObject(this._config.maxDate, this._config.selectionType);
     }
     _parseDate(str) {
       if (!str) {

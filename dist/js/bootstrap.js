@@ -1,5 +1,5 @@
 /*!
-  * CoreUI v5.27.0 (https://coreui.io)
+  * CoreUI v5.27.1 (https://coreui.io)
   * Copyright 2026 The CoreUI Team (https://github.com/orgs/coreui/people)
   * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
   */
@@ -684,7 +684,7 @@
    * Constants
    */
 
-  const VERSION = '5.27.0';
+  const VERSION = '5.27.1';
 
   /**
    * Class definition
@@ -7425,7 +7425,7 @@
           const date = this._parseDate(event.target.value);
           let formatedDate = date;
           if (date instanceof Date && date.getTime()) {
-            if (isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            if (isDateDisabled(date, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
               return; // Don't update if date is disabled
             }
             if (this._config.selectionType !== 'day') {
@@ -7473,7 +7473,7 @@
           const date = this._parseDate(event.target.value);
           let formatedDate = date;
           if (date instanceof Date && date.getTime()) {
-            if (date && isDateDisabled(date, this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+            if (date && isDateDisabled(date, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
               return; // Don't update if date is disabled
             }
             if (this._config.selectionType !== 'day') {
@@ -7795,7 +7795,12 @@
         todayButtonEl.classList.add(...this._getButtonClasses(this._config.todayButtonClasses));
         todayButtonEl.type = 'button';
         todayButtonEl.textContent = this._config.todayButton;
-        if (isDateDisabled(new Date(), this._config.minDate, this._config.maxDate, this._config.disabledDates)) {
+
+        // compare today at midnight — with the current time of day, a
+        // `maxDate` of today (converted to midnight) would disable the button
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (isDateDisabled(today, this._getMinDate(), this._getMaxDate(), this._config.disabledDates)) {
           todayButtonEl.disabled = true;
         }
         todayButtonEl.addEventListener('click', () => {
@@ -7894,6 +7899,17 @@
         placement: isRTL() ? 'bottom-end' : 'bottom-start'
       };
       this._popper = Popper__namespace.createPopper(this._togglerElement, this._menu, popperConfig);
+    }
+
+    // `minDate`/`maxDate` may come from a data attribute as a string — the
+    // calendar converts its own copies, but every comparison made by the picker
+    // itself needs the same conversion (a Date compared to a string is always
+    // false).
+    _getMinDate() {
+      return convertToDateObject(this._config.minDate, this._config.selectionType);
+    }
+    _getMaxDate() {
+      return convertToDateObject(this._config.maxDate, this._config.selectionType);
     }
     _parseDate(str) {
       if (!str) {
@@ -11287,6 +11303,7 @@
         input.value = '';
       }
       this._setHiddenInputValue(null);
+      this._syncFirstInputMaxLength();
       this._setInputsTabIndexes();
     }
     reset() {
@@ -11296,6 +11313,7 @@
         input.value = valueString && valueString[index] ? valueString[index] : '';
       }
       this._setHiddenInputValue(null);
+      this._syncFirstInputMaxLength();
       this._setInputsTabIndexes();
     }
     update(config) {
@@ -11337,6 +11355,18 @@
         const {
           target
         } = event;
+
+        // SMS autofill, password managers, dictation and IME commits insert the
+        // whole code at once and fire `input`, not `paste`. Spread it across the
+        // slots instead of leaving it in one of them.
+        if (target.value.length > 1) {
+          const chars = this._extractValidChars(target.value);
+          target.value = '';
+          if (chars) {
+            this._distributeChars(target, chars);
+          }
+          return;
+        }
         if (target.value.length === 1 && !this._isValidInput(target.value)) {
           target.value = '';
           return;
@@ -11404,23 +11434,45 @@
         if (!validChars) {
           return;
         }
-        const inputs = this._getInputs();
-        const currentIndex = inputs.indexOf(event.target);
-        for (let i = 0; i < validChars.length && currentIndex + i < inputs.length; i++) {
-          inputs[currentIndex + i].value = validChars[i];
-        }
-
-        // Focus the next empty input or the last filled input
-        const nextEmptyIndex = currentIndex + validChars.length;
-        if (nextEmptyIndex < inputs.length) {
-          inputs[nextEmptyIndex].focus();
-        } else {
-          inputs[inputs.length - 1].focus();
-        }
-        this._setHiddenInputValue(validChars);
-        this._setInputsTabIndexes();
-        this._checkAutoSubmit(inputs);
+        this._distributeChars(event.target, validChars);
       });
+    }
+
+    // Write `chars` across the slots starting at `startInput`, then sync focus,
+    // the hidden form value and auto-submit. Shared by paste and by multi-character
+    // `input` events.
+    _distributeChars(startInput, chars) {
+      const inputs = this._getInputs();
+      if (!inputs.length) {
+        return;
+      }
+
+      // A value at least as long as the field is a complete code: fill from the
+      // first slot, whichever slot happens to be focused.
+      const startIndex = chars.length >= inputs.length ? 0 : Math.max(inputs.indexOf(startInput), 0);
+      for (let i = 0; i < chars.length && startIndex + i < inputs.length; i++) {
+        inputs[startIndex + i].value = chars[i];
+      }
+
+      // Focus the next empty input or the last filled one
+      const nextEmptyIndex = startIndex + chars.length;
+      inputs[nextEmptyIndex < inputs.length ? nextEmptyIndex : inputs.length - 1].focus();
+
+      // Read the value back from the slots so already-filled ones are preserved.
+      this._setHiddenInputValue(inputs.map(input => input.value).join(''));
+      this._syncFirstInputMaxLength();
+      this._setInputsTabIndexes();
+      this._checkAutoSubmit(inputs);
+    }
+
+    // An empty first slot is where autofill lands, so it has to accept the whole
+    // code; once it holds a character it behaves like every other slot.
+    _syncFirstInputMaxLength() {
+      const inputs = this._getInputs();
+      const [first] = inputs;
+      if (first) {
+        first.maxLength = first.value ? 1 : inputs.length;
+      }
     }
     _checkAutoSubmit(inputs) {
       if (!this._config.autoSubmit) {
@@ -11501,7 +11553,13 @@
       for (const [index, input] of inputs.entries()) {
         input.type = this._config.masked ? 'password' : 'text';
         input.maxLength = 1;
-        input.autocomplete = 'one-time-code';
+        // Only the first slot advertises the one-time code, so SMS autofill and
+        // password managers target a single field instead of every slot.
+        input.autocomplete = index === 0 ? 'one-time-code' : 'off';
+        input.autocapitalize = 'off';
+        input.setAttribute('autocorrect', 'off');
+        input.spellcheck = false;
+        input.enterKeyHint = index === inputs.length - 1 ? 'done' : 'next';
         if (this._config.placeholder !== null) {
           const placeholder = String(this._config.placeholder);
           input.placeholder = placeholder.length > 1 ? placeholder[index] || '' : placeholder;
@@ -11543,6 +11601,7 @@
           input.setAttribute('aria-label', ariaLabel);
         }
       }
+      this._syncFirstInputMaxLength();
     }
     _setInputsTabIndexes() {
       if (!this._config.linear) {
