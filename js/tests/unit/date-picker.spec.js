@@ -214,6 +214,59 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('min/max validation', () => {
+    it('should propagate field validation to a programmatic date beyond maxDate', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const picker = buildPicker({ maxDate: yesterday })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = 'not-fired'
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker.setDate(new Date())
+
+      expect(picker.getDate()).toBeNull()
+      expect(emitted).toBeNull()
+      expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should keep the projected today action consistent with validation', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const picker = buildPicker({ maxDate: yesterday }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+      const el = fixtureEl.querySelector('#picker')
+
+      picker.show()
+      el.querySelector('[data-coreui-picker-action="today"]').click()
+
+      expect(picker.getDate()).toBeNull()
+      expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should emit and select a programmatic date within range', () => {
+      const picker = buildPicker({ maxDate: new Date(2026, 6, 31) })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = null
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker.setDate(new Date(2026, 6, 14))
+
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 14))
+      expect(emitted).toEqual(new Date(2026, 6, 14))
+      expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeFalse()
+    })
+  })
+
   describe('calendar navigation', () => {
     it('should keep the popup open when navigating months', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15) })

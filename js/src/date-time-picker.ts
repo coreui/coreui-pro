@@ -187,11 +187,14 @@ class DateTimePicker extends BaseComponent {
     return this._input.getDate()
   }
 
+  // See DatePicker.setDate — the emitted value and the calendar/time selection
+  // follow the field's validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    this._calendar?.update({ startDate: date })
-    this._selection?.update({ time: date })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
+    const effectiveDate = this.getDate()
+    this._calendar?.update({ startDate: effectiveDate })
+    this._selection?.update({ time: effectiveDate })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   today(): void {
@@ -349,7 +352,7 @@ class DateTimePicker extends BaseComponent {
 
     this._input.update({ date: merged })
     this._selection?.update({ time: merged })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: merged })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
 
   _applyTime(time: Date | null): void {
@@ -363,7 +366,7 @@ class DateTimePicker extends BaseComponent {
 
     this._input.update({ date: merged })
     this._calendar?.update({ startDate: merged })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: merged })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
 
   _createPopup(): void {

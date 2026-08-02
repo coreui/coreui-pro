@@ -174,6 +174,7 @@ class SectionInput extends BaseComponent {
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 
     this._createSectionInput()
+    this._date = this._applyValidationState()
     this._addEventListeners()
 
     if (this._config.autofocus && !this._config.disabled) {
@@ -225,15 +226,19 @@ class SectionInput extends BaseComponent {
     this._config = { ...this._config, ...config }
     this._typeCheckConfig(this._config)
 
+    const previousDate = this._date
     this._date = this._config.date ? this._convertDate(this._config.date) : null
     this._minDate = this._convertDate(this._config.minDate)
     this._maxDate = this._convertDate(this._config.maxDate)
     this._sections = setSectionsFromDate(this._resolveSections(), this._date)
-    this._date = getDateFromSections(this._sections)
     this._draft = ''
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 
     this._createSectionInput()
+    // validate like any other value change — a programmatic date outside
+    // min/max must end up in the same state as a typed one
+    this._date = previousDate
+    this._updateDate()
   }
 
   // Private
@@ -572,6 +577,23 @@ class SectionInput extends BaseComponent {
   }
 
   _updateDate(): void {
+    const nextDate = this._applyValidationState()
+
+    if (this._isSameDate(nextDate, this._date)) {
+      return
+    }
+
+    this._date = nextDate
+
+    EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
+      date: nextDate
+    })
+  }
+
+  // Applies the validation outcome to the field (validity class, hidden input,
+  // `errorChange`) and returns the effective date — null when the value is
+  // invalid. Runs on every value change, whether typed or programmatic.
+  _applyValidationState(): Date | null {
     // Sections whose bounds depend on other sections (the day on the month and
     // year, the week on the year) are clamped when those sections change.
     for (const section of this._sections) {
@@ -585,10 +607,9 @@ class SectionInput extends BaseComponent {
     const isFilled = this._sections.some(section => section.type !== 'literal' && section.value !== null)
     const error = this._getValidationError(date, isFilled)
     const isDisabled = error !== null && error !== 'incomplete'
-    const nextDate = isDisabled ? null : date
 
     this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled)
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled || this._config.invalid)
     this._setHiddenInputValue()
 
     if (error !== this._error) {
@@ -599,15 +620,7 @@ class SectionInput extends BaseComponent {
       })
     }
 
-    if (this._isSameDate(nextDate, this._date)) {
-      return
-    }
-
-    this._date = nextDate
-
-    EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
-      date: nextDate
-    })
+    return isDisabled ? null : date
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {

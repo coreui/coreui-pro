@@ -42,7 +42,11 @@ parsing and no debounce: the field always holds a valid partial date.
 There is no `footer` option. Project a `<template data-coreui-template="footer">`
 child instead — its content is cloned into the dropdown. Buttons act through
 `data-coreui-picker-action` (`today`, `clear`, `reset`, `close`), so labels,
-order, and translations are yours.
+order, and translations are yours. Their state is yours too — the picker never
+disables a projected button. Instead, every programmatic date (the `today`
+action included) goes through the field's min/max validation: out of range, the
+field turns `is-invalid`, `errorChange` reports the reason, and
+`getDate()`/`dateChange` report `null` — the same outcome as typing that date.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">

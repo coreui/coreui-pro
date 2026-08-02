@@ -211,13 +211,17 @@ class DateRangePicker extends BaseComponent {
     return this._endInput.getDate()
   }
 
+  // See DatePicker.setDate — the emitted values and the calendar selection
+  // follow the fields' validation outcome, not the arguments.
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
+    const effectiveStartDate = this.getStartDate()
+    const effectiveEndDate = this.getEndDate()
     this._selectEndDate = false
-    this._calendar?.update({ endDate, selectEndDate: false, startDate })
-    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
-    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
+    this._calendar?.update({ endDate: effectiveEndDate, selectEndDate: false, startDate: effectiveStartDate })
+    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: effectiveStartDate })
+    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: effectiveEndDate })
   }
 
   clear(): void {

@@ -178,10 +178,13 @@ class DatePicker extends BaseComponent {
     return this._input.getDate()
   }
 
+  // The field validates the date against min/max — the emitted value and the
+  // calendar selection follow the validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    this._calendar?.update({ startDate: date })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
+    const effectiveDate = this.getDate()
+    this._calendar?.update({ startDate: effectiveDate })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   clear(): void {
