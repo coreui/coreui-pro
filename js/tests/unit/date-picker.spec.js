@@ -232,23 +232,42 @@ describe('DatePicker', () => {
       expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
     })
 
-    it('should keep the projected today action consistent with validation', () => {
+    it('should disable a projected today action when today is not selectable', () => {
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
-      const picker = buildPicker({ maxDate: yesterday }, [
+      buildPicker({ maxDate: yesterday }, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="today">Today</button>',
         '  </template>',
         '</div>'
       ].join(''))
-      const el = fixtureEl.querySelector('#picker')
 
-      picker.show()
-      el.querySelector('[data-coreui-picker-action="today"]').click()
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+    })
 
-      expect(picker.getDate()).toBeNull()
-      expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+    it('should keep a projected today action enabled when today is selectable', () => {
+      buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeFalse()
+    })
+
+    it('should not re-enable a today action disabled in the template', () => {
+      buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today" disabled>Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
     it('should emit and select a programmatic date within range', () => {

@@ -218,5 +218,29 @@ describe('TimePicker', () => {
 
       expect(picker.getTime()).toBeNull()
     })
+
+    it('should disable a projected now action when the current time is not selectable', () => {
+      buildPicker({ maxDate: new Date(1969, 11, 31) }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="now">Now</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="now"]').disabled).toBeTrue()
+    })
+
+    it('should keep a projected now action enabled when the current time is selectable', () => {
+      buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="now">Now</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="now"]').disabled).toBeFalse()
+    })
   })
 })

@@ -52,6 +52,7 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern: inline SVG on
 // currentColor, swappable through an option, sanitized like any user-provided
@@ -309,7 +310,23 @@ class DatePicker extends BaseComponent {
       const footer = document.createElement('div')
       footer.classList.add(CLASS_NAME_FOOTER)
       footer.append(this._footerTemplate.content.cloneNode(true))
+      this._disableUnselectableActions(footer)
       this._menu.append(footer)
+    }
+  }
+
+  // A button opting into the `today` action opts into its state too: it is
+  // disabled when today cannot be selected. One-way only — the picker never
+  // re-enables a projected button, so a `disabled` set in the template stays.
+  _disableUnselectableActions(container: HTMLElement): void {
+    if (this._input.isDateSelectable(new Date())) {
+      return
+    }
+
+    for (const button of SelectorEngine.find(SELECTOR_ACTION_TODAY, container)) {
+      if ('disabled' in button) {
+        (button as any).disabled = true
+      }
     }
   }
 
