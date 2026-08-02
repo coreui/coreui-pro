@@ -103,13 +103,37 @@ describe('OTPInput', () => {
       new OTPInput(otpContainer, { type: 'number' }) // eslint-disable-line no-new
 
       const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      for (const input of inputs) {
-        expect(input.maxLength).toBe(1)
-        expect(input.autocomplete).toBe('one-time-code')
+      for (const [index, input] of [...inputs].entries()) {
         expect(input.hasAttribute('required')).toBe(true)
         expect(input.inputMode).toBe('numeric')
         expect(input.pattern).toBe('[0-9]*')
+        expect(input.getAttribute('autocorrect')).toBe('off')
+        expect(input.spellcheck).toBe(false)
+        // Only the first slot advertises the code, so autofill targets one field
+        expect(input.autocomplete).toBe(index === 0 ? 'one-time-code' : 'off')
+        // The empty first slot has to fit a whole autofilled code
+        expect(input.maxLength).toBe(index === 0 ? inputs.length : 1)
       }
+    })
+
+    it('should shrink the first slot back to a single character once it is filled', () => {
+      fixtureEl.innerHTML = `
+        <div class="form-otp">
+          <input type="text" class="form-otp-control">
+          <input type="text" class="form-otp-control">
+        </div>
+      `
+
+      const otpContainer = fixtureEl.querySelector('.form-otp')
+      new OTPInput(otpContainer, { type: 'number' }) // eslint-disable-line no-new
+
+      const inputs = otpContainer.querySelectorAll('.form-otp-control')
+      expect(inputs[0].maxLength).toBe(2)
+
+      inputs[0].value = '12'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(inputs[0].maxLength).toBe(1)
     })
 
     it('should set aria-labels for inputs', () => {
@@ -1034,6 +1058,85 @@ describe('OTPInput', () => {
 
       expect(inputs[0].value).toBe('1')
       expect(inputs[1].value).toBe('2')
+    })
+  })
+
+  // SMS autofill, password managers, dictation and IME commits insert the whole
+  // code at once and fire `input`, never `paste`.
+  describe('autofill (multi-character input)', () => {
+    const markup = (count = 6) => {
+      fixtureEl.innerHTML = `<form><div class="form-otp">${'<input type="text" class="form-otp-control">'.repeat(count)}</div></form>`
+      return fixtureEl.querySelector('.form-otp')
+    }
+
+    it('should spread a code inserted into the first slot across every slot', () => {
+      const otpContainer = markup()
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[0].value = '424242'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(inputs.map(input => input.value)).toEqual(['4', '2', '4', '2', '4', '2'])
+      expect(otpContainer.querySelector('input[type="hidden"]').value).toEqual('424242')
+    })
+
+    it('should spread a full code even when another slot received it', () => {
+      const otpContainer = markup()
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[2].value = '424242'
+      inputs[2].dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(inputs.map(input => input.value)).toEqual(['4', '2', '4', '2', '4', '2'])
+    })
+
+    it('should trigger change and complete events', () => {
+      return new Promise(resolve => {
+        const otpContainer = markup()
+        new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+        otpContainer.addEventListener('complete.coreui.otp-input', event => {
+          expect(event.value).toEqual('424242')
+          resolve()
+        })
+
+        const first = otpContainer.querySelector('.form-otp-control')
+        first.value = '424242'
+        first.dispatchEvent(new Event('input', { bubbles: true }))
+      })
+    })
+
+    it('should filter invalid characters out of an inserted code', () => {
+      const otpContainer = markup(4)
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[0].value = 'a1b2c3d4'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(inputs.map(input => input.value)).toEqual(['1', '2', '3', '4'])
+    })
+
+    it('should keep already filled slots when a partial code is pasted', () => {
+      const otpContainer = markup(4)
+      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+
+      const inputs = [...otpContainer.querySelectorAll('.form-otp-control')]
+      inputs[0].value = '9'
+      inputs[0].dispatchEvent(new Event('input', { bubbles: true }))
+
+      const pasteEvent = new ClipboardEvent('paste', {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: new DataTransfer()
+      })
+      pasteEvent.clipboardData.setData('text', '87')
+      inputs[1].dispatchEvent(pasteEvent)
+
+      expect(inputs.map(input => input.value)).toEqual(['9', '8', '7', ''])
+      expect(otpContainer.querySelector('input[type="hidden"]').value).toEqual('987')
     })
   })
 })

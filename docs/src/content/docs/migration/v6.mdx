@@ -304,6 +304,15 @@ the option-by-option migration map. Planned mapping:
   renders at full opacity. The token still works — override it and only the
   background alpha changes.
 
+#### OTP input
+
+- **A code delivered by SMS autofill or a password manager now fills the whole
+  field.** Only the first slot carries `autocomplete="one-time-code"` (the rest
+  are `off`), and a multi-character value arriving in any slot is spread across
+  the field, as a paste already was. Previously such a value stayed in one slot
+  and the submitted value was empty. The slots also gained `enterkeyhint`,
+  `autocorrect="off"` and `spellcheck="false"`.
+
 #### Chip / Chip set / Chip input
 
 - **Chips expose real roles now.** A selectable chip set is a horizontal
