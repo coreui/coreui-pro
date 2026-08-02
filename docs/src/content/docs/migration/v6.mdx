@@ -44,9 +44,9 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 **The minimum supported browsers are now Chrome 123, Edge 123, Firefox 121,
 Safari 17.5 and iOS 17.5.** `light-dark()` sets the Chrome/Edge/Safari floor;
-`:has()` sets Firefox 121, since validation and focus states on Multi Select
-and Autocomplete, the sidebar navigation indicators, calendar ranges and the
-rating icons are all selected with it — and an unsupported `:has()` invalidates
+`:has()` sets Firefox 121, since validation and focus states on Multi Select,
+Autocomplete and the pickers, the sidebar navigation indicators, calendar
+ranges and the rating icons are all selected with it — and an unsupported `:has()` invalidates
 the entire rule it appears in. This is the floor the v6 color system already required in practice:
 theme decisions resolve in the browser via `light-dark()` and `color-mix()`
 with no fallback, so on older browsers dark mode did not work regardless of
