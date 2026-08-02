@@ -3,7 +3,7 @@
 const monthYearPickers = document.querySelectorAll('[data-coreui-format="MMMM yyyy"]')
 
 for (const element of monthYearPickers) {
-  element.addEventListener('dateChange.coreui.date-picker-v2', event => {
+  element.addEventListener('dateChange.coreui.date-picker', event => {
     console.log(event.date)
   })
 }

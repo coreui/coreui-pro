@@ -166,16 +166,18 @@ or, if you are already resolving the package by name, `import { Tooltip } from
   a string for week (`"2026W27"`), month (`"2026-01"`), quarter (`"2026Q1"`) and
   year (`"2026"`). Existing listeners are unaffected.
 
-#### Date Picker v2 / Date Range Picker v2 (preview)
+#### Date Picker / Date Range Picker
 
-The pickers are being rewritten as a composition of the section-based input
-fields ([date input](/forms/date-input/)), the [calendar](/components/calendar/),
-and a shared popup primitive — replacing the v1 monolith. Preview pages:
-[date picker v2](/forms/date-picker-v2/),
-[date range picker v2](/forms/date-range-picker-v2/). The v2 shells currently
-ship **alongside** the v1 pickers under new names; at release the rewrite takes
-over the existing `DatePicker`/`DateRangePicker` names, and this section becomes
-the option-by-option migration map. Planned mapping:
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+**The pickers are rewritten.** `DatePicker`, `DateRangePicker` and `TimePicker`
+are now a composition of the section-based input fields
+([date input](/forms/date-input/)), the [calendar](/components/calendar/) and a
+shared popup primitive, instead of the v1 monolith. The rewrite ships **under
+the existing names** — `DatePicker`, `data-coreui-toggle="date-picker"`,
+`.date-picker` — so no renaming is needed on your side, but the options below
+changed. The v1 shells are gone; if you need to compare against the old
+behaviour, v5 is the reference. Mapping:
 
 - **Removed — projected regions replace button configuration.** `footer`,
   `todayButton`, `todayButtonClasses`, `cancelButton`, `cancelButtonClasses`,
@@ -190,7 +192,7 @@ the option-by-option migration map. Planned mapping:
   always a valid partial date; there is no free-text parsing to debounce.
   Section placeholders come from the input triad's `placeholders`.
 - **Changed.** `timepicker: true` is replaced by the standalone
-  [date time picker](/forms/date-time-picker-v2/) — a DateTimeInput field with a
+  [date time picker](/forms/date-time-picker/) — a DateTimeInput field with a
   calendar and the time selection body side by side. Because the two halves own
   different parts of one value, that picker does not auto-close: picking a day
   keeps the time and picking a time keeps the day.
@@ -198,7 +200,7 @@ the option-by-option migration map. Planned mapping:
   `disabledDates`, `selectionType`, `showWeekNumber`, custom cell renderers, …),
   `container`, `startDate`/`endDate`/`date`, `startName`/`endName`/`name`,
   `size`, validation states, the data API
-  (`data-coreui-toggle="date-picker-v2"`), and the imperative API
+  (`data-coreui-toggle="date-picker"`), and the imperative API
   (`show`/`hide`/`toggle`/`clear`/`reset`).
 - **Passthrough is by name.** Options that belong to the inner calendar or date
   input are forwarded automatically, so `data-coreui-selection-type`,
@@ -230,13 +232,14 @@ the option-by-option migration map. Planned mapping:
   instead of `document.documentElement.dir`, so a `dir="rtl"` ancestor works
   and not only a document-level direction.
 
-#### Time Picker v2 / Date Time Picker v2 (preview)
+#### Time Picker / Date Time Picker (new)
 
 - The time selection body is now a shared primitive used by both pickers, so the
   `roll` and `select` variants, the `hours`/`minutes`/`seconds` filters and the
-  12/24-hour locale split behave identically in each. Preview pages:
-  [time picker v2](/forms/time-picker-v2/),
-  [date time picker v2](/forms/date-time-picker-v2/).
+  12/24-hour locale split behave identically in each. See
+  [time picker](/forms/time-picker/) and the new
+  [date time picker](/forms/date-time-picker/), which replaces v1's
+  `timepicker: true` flag on the date picker.
 - Same removals as the date pickers: `footer`/`cancelButton`/`confirmButton` and
   their class options give way to a projected
   `<template data-coreui-template="footer">` with
@@ -246,6 +249,20 @@ the option-by-option migration map. Planned mapping:
   shell remembers it: setting a value goes through the field's `update()`, which
   rewrites the field's own configuration, so the field can no longer restore the
   original on its own.
+
+#### The v1 picker shell classes are gone
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The rewritten pickers style the field through
+`forms/_form-date-time.scss` and render their icons as inline SVG, so the v1
+shell's own elements no longer exist: `.date-picker-input`,
+`.date-picker-input-wrapper`, `.date-picker-input-preview`,
+`.date-picker-cleaner`, `.time-picker-input`, `.time-picker-cleaner` and
+`.time-picker-inline-icon`. Custom CSS targeting those needs rewriting against
+the new structure; everything else (`.date-picker`, `.date-picker-dropdown`,
+`.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
+`.time-picker-roll*` bodies) keeps its name.
 
 #### Icons rendered by JavaScript
 
@@ -877,7 +894,7 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
 
 ### Sass & CSS
 
-- The v2 picker shell styling is a lean partial (`_date-picker-v2.scss`,
+- The picker shell styling is a lean partial (`_date-picker.scss`,
   ~110 lines / 16 CSS-var tokens vs v1's 369 lines / 79 Sass variables per
   picker): the shell styles only the dropdown panel, the input-group frame, the
   footer/ranges layout, and the indicator. The field is styled by the date

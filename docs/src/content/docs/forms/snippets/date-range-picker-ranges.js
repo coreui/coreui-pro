@@ -1,6 +1,6 @@
-const myDateRangePickerV2Ranges = document.getElementById('myDateRangePickerV2Ranges')
+const myDateRangePickerRanges = document.getElementById('myDateRangePickerRanges')
 
-const dateRangePickerV2Ranges = new coreui.DateRangePickerV2(myDateRangePickerV2Ranges, {
+const dateRangePickerRanges = new coreui.DateRangePicker(myDateRangePickerRanges, {
   locale: 'en-US',
   startName: 'report-start',
   endName: 'report-end'
@@ -8,7 +8,7 @@ const dateRangePickerV2Ranges = new coreui.DateRangePickerV2(myDateRangePickerV2
 
 // Projected ranges act through the slot context — labels, order, and the
 // date math are userland, the shell only exposes setRange.
-const context = () => dateRangePickerV2Ranges.getContext()
+const context = () => dateRangePickerRanges.getContext()
 const today = new Date()
 
 const presets = {
@@ -18,5 +18,5 @@ const presets = {
 }
 
 for (const [id, apply] of Object.entries(presets)) {
-  myDateRangePickerV2Ranges.querySelector(`#${id}`).addEventListener('click', apply)
+  myDateRangePickerRanges.querySelector(`#${id}`).addEventListener('click', apply)
 }

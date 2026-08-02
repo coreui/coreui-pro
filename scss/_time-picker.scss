@@ -123,127 +123,69 @@ $time-picker-tokens: defaults(
     }
   }
 
-  .time-picker-input-group {
+  // The shell mirrors the date picker's frame while reading the
+  // --#{$prefix}time-picker-* properties defined on `.time-picker` above.
+  .time-picker {
     position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--#{$prefix}time-picker-gap);
-    align-items: stretch;
-    width: 100%;
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    background-color: var(--#{$prefix}control-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-    @include border-radius(var(--#{$prefix}control-border-radius));
 
-    &:hover {
-      .time-picker-input:not(:placeholder-shown) {
-        ~ .time-picker-indicator:not(:last-child) {
-          display: none;
-        }
-        ~ .time-picker-cleaner {
-          display: flex;
+    .time-picker-input-group {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0;
+      align-items: center;
+      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+      font-size: var(--#{$prefix}control-font-size);
+      background-color: var(--#{$prefix}control-bg);
+      background-clip: padding-box;
+      border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+      @include border-radius(var(--#{$prefix}control-border-radius));
+
+      .time-picker & {
+        @include transition($input-transition);
+      }
+
+      .time-picker.disabled & {
+        --#{$prefix}control-border-color: var(--#{$prefix}control-disabled-border-color);
+        background-color: var(--#{$prefix}control-disabled-bg);
+      }
+
+      .time-picker.show &,
+      &:focus-within {
+        background-color: var(--#{$prefix}control-focus-bg);
+        border-color: var(--#{$prefix}control-focus-border-color);
+        outline: var(--#{$prefix}control-focus-ring);
+      }
+
+      // see .date-picker-input-group — the group is the frame
+      .form-date-time {
+        flex: 1;
+        min-height: 0;
+        padding: 0;
+        font-size: inherit;
+        line-height: inherit;
+        background-color: transparent;
+        border: 0;
+        @include border-radius(0);
+        box-shadow: none;
+
+        // The group is the frame, so it owns the focus treatment; without this
+        // the field's own :focus-within ring draws a second one inside it.
+        &:focus-within {
+          background-color: transparent;
+          outline: 0;
         }
       }
     }
 
-    .time-picker & {
-      @include transition($input-transition);
-    }
-
-    .time-picker.disabled & {
-      background-color: var(--#{$prefix}control-disabled-bg);
-      border-color: var(--#{$prefix}control-disabled-border-color);
-    }
-
-    .time-picker.show &,
-    &:has(*:focus) {
-      background-color: var(--#{$prefix}control-focus-bg);
-      border-color: var(--#{$prefix}control-focus-border-color);
-      outline: var(--#{$prefix}control-focus-ring);
-    }
-  }
-
-  .time-picker-input {
-    position: relative;
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0;
-    padding: 0;
-    font-family: var(--#{$prefix}control-font-family);
-    font-size: var(--#{$prefix}control-font-size);
-    font-weight: var(--#{$prefix}control-font-weight);
-    line-height: var(--#{$prefix}control-line-height);
-    color: var(--#{$prefix}control-color);
-    appearance: none;
-    background: transparent;
-    border: 0;
-
-    .time-picker.show & {
-      color: var(--#{$prefix}control-focus-color);
-    }
-
-    &:disabled {
-      color: var(--#{$prefix}control-disabled-color);
-    }
-
-    &:focus {
-      z-index: 5;
-      outline: 0;
-    }
-
-    &::placeholder {
-      color: var(--#{$prefix}time-picker-placeholder-color);
-      opacity: 1;
-    }
-
-    &.hover {
-      color: var(--#{$prefix}time-picker-placeholder-color);
-    }
-  }
-
-  .time-picker-cleaner,
-  .time-picker-indicator {
-    position: relative;
-    background-repeat: no-repeat;
-    background-position: center;
-
-    &::before {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      content: "";
-    }
-  }
-
-  .time-picker-cleaner {
-    display: none;
-    width: var(--#{$prefix}time-picker-cleaner-width);
-
-    &::before {
-      background-color: var(--#{$prefix}time-picker-cleaner-icon-color);
-      mask: var(--#{$prefix}time-picker-cleaner-icon) center / var(--#{$prefix}time-picker-cleaner-icon-size) no-repeat;
-    }
-
-    &:hover::before {
-      background-color: var(--#{$prefix}time-picker-cleaner-icon-hover-color);
-    }
-  }
-
-  .time-picker-indicator {
-    width: var(--#{$prefix}time-picker-indicator-width);
-
-    &::before {
-      background-color: var(--#{$prefix}time-picker-indicator-icon-color);
-      mask: var(--#{$prefix}time-picker-indicator-icon) center / var(--#{$prefix}time-picker-indicator-icon-size) no-repeat;
-    }
-
-    &:focus {
-      z-index: 5;
-      outline: var(--#{$prefix}focus-ring);
-      @include border-radius($border-radius);
+    .time-picker-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--#{$prefix}time-picker-indicator-width);
+      padding: 0;
+      color: var(--#{$prefix}time-picker-indicator-icon-color);
+      background: transparent;
+      border: 0;
     }
   }
 
@@ -268,14 +210,6 @@ $time-picker-tokens: defaults(
     display: flex;
     align-items: center;
     padding: var(--#{$prefix}time-picker-body-padding);
-  }
-
-  .time-picker-inline-icon {
-    display: block;
-    width: 2.5rem;
-    height: 1.25rem;
-    background-color: var(--#{$prefix}time-picker-indicator-icon-color);
-    mask: var(--#{$prefix}time-picker-indicator-icon) center / var(--#{$prefix}time-picker-indicator-icon-size) no-repeat;
   }
 
   .time-picker-inline-select {
