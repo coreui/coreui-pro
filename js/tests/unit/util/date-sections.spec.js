@@ -5,17 +5,22 @@ import {
   formatSections,
   formatSectionValue,
   getDateFromSections,
+  getDateOfISOWeek,
   getDateSections,
   getDateTimeSectionsFromLocale,
   getDaysInMonth,
   getDaySectionMax,
   getFullYearFromSection,
   getIncrementedSectionValue,
+  getISOWeeksInYear,
   getSectionBounds,
   getSectionsFromFormat,
   getSectionsFromLocale,
   getSectionsFromString,
   getTimeSectionsFromLocale,
+  getWeekLabel,
+  getWeekSectionMax,
+  getWeekSectionsFromLocale,
   setSectionsFromDate
 } from '../../../src/util/date-sections.js'
 
@@ -42,6 +47,11 @@ describe('Date Sections Utilities', () => {
       expect(getSectionBounds({ type: 'minute' })).toEqual({ min: 0, max: 59 })
       expect(getSectionBounds({ type: 'second' })).toEqual({ min: 0, max: 59 })
       expect(getSectionBounds({ type: 'meridiem' })).toEqual({ min: 1, max: 2 })
+    })
+
+    it('should return bounds for week and quarter', () => {
+      expect(getSectionBounds({ type: 'week' })).toEqual({ min: 1, max: 53 })
+      expect(getSectionBounds({ type: 'quarter' })).toEqual({ min: 1, max: 4 })
     })
   })
 
@@ -124,6 +134,59 @@ describe('Date Sections Utilities', () => {
 
       expect(sections.filter(section => section.type !== 'literal').map(section => section.type))
         .toEqual(['day', 'month', 'year', 'hour', 'minute'])
+    })
+
+    it('should parse week tokens and keep the uppercase W as a literal', () => {
+      const sections = getSectionsFromFormat('yyyy-Www')
+
+      expect(sections.map(section => section.type)).toEqual(['year', 'literal', 'week'])
+      expect(sections[1].value).toBe('-W')
+      expect(sections[2].padded).toBe(true)
+    })
+
+    it('should parse numeric quarter tokens', () => {
+      const sections = getSectionsFromFormat('q yyyy')
+
+      expect(sections.map(section => section.type)).toEqual(['quarter', 'literal', 'year'])
+      expect(sections[0].names).toBeUndefined()
+      expect(sections[0].padded).toBe(false)
+    })
+
+    it('should create text quarter sections with names', () => {
+      const section = getSectionsFromFormat('QQQ yyyy')[0]
+
+      expect(section.type).toBe('quarter')
+      expect(section.names).toEqual(['Q1', 'Q2', 'Q3', 'Q4'])
+      expect(section.placeholder).toBe('QQQ')
+    })
+
+    it('should keep quoted text as a literal even when it contains token letters', () => {
+      const sections = getSectionsFromFormat('\'Tydzień\' ww, yyyy')
+
+      expect(sections.map(section => section.type)).toEqual(['literal', 'week', 'literal', 'year'])
+      expect(sections[0].value).toBe('Tydzień ')
+      expect(sections[2].value).toBe(', ')
+    })
+
+    it('should unescape doubled quotes inside and outside quoted text', () => {
+      expect(getSectionsFromFormat('d\'\'M')[1].value).toBe('\'')
+      expect(getSectionsFromFormat('\'It\'\'s\' d')[0].value).toBe('It\'s ')
+    })
+  })
+
+  describe('getWeekLabel', () => {
+    it('should return the capitalized localized week label', () => {
+      expect(getWeekLabel('en-US')).toBe('Week')
+      expect(getWeekLabel('pl-PL')).toBe('Tydzień')
+    })
+  })
+
+  describe('getWeekSectionsFromLocale', () => {
+    it('should mirror the native week input presentation', () => {
+      const sections = setSectionsFromDate(getWeekSectionsFromLocale('en-US'), new Date(2026, 6, 14))
+
+      expect(sections.map(section => section.type)).toEqual(['literal', 'week', 'literal', 'year'])
+      expect(formatSections(sections)).toBe('Week 29, 2026')
     })
   })
 
@@ -333,6 +396,42 @@ describe('Date Sections Utilities', () => {
     })
   })
 
+  describe('getISOWeeksInYear', () => {
+    it('should return 52 or 53 depending on the year', () => {
+      expect(getISOWeeksInYear(2026)).toBe(53)
+      expect(getISOWeeksInYear(2025)).toBe(52)
+      expect(getISOWeeksInYear(2020)).toBe(53)
+    })
+
+    it('should stay in bounds for the partial years of a section being typed', () => {
+      for (const year of [2, 20, 202]) {
+        expect(getISOWeeksInYear(year)).toBeGreaterThanOrEqual(52)
+        expect(getISOWeeksInYear(year)).toBeLessThanOrEqual(53)
+      }
+    })
+  })
+
+  describe('getDateOfISOWeek', () => {
+    it('should return the Monday of the ISO week', () => {
+      expect(getDateOfISOWeek(2026, 1)).toEqual(new Date(2025, 11, 29))
+      expect(getDateOfISOWeek(2026, 53)).toEqual(new Date(2026, 11, 28))
+      expect(getDateOfISOWeek(2030, 20)).toEqual(new Date(2030, 4, 13))
+    })
+  })
+
+  describe('getWeekSectionMax', () => {
+    const layout = year => getSectionsFromFormat('yyyy-Www').map(section => (section.type === 'year' ? { ...section, value: year } : section))
+
+    it('should return 53 while the year is unknown', () => {
+      expect(getWeekSectionMax(layout(null))).toBe(53)
+    })
+
+    it('should return the week count of the selected year', () => {
+      expect(getWeekSectionMax(layout(2026))).toBe(53)
+      expect(getWeekSectionMax(layout(2025))).toBe(52)
+    })
+  })
+
   describe('getFullYearFromSection', () => {
     it('should return null for empty sections', () => {
       expect(getFullYearFromSection({ type: 'year', length: 4, value: null })).toBeNull()
@@ -388,6 +487,24 @@ describe('Date Sections Utilities', () => {
 
       expect(getDateFromSections(combined)).toEqual(new Date(2026, 6, 14, 9, 5))
     })
+
+    it('should resolve a week section to the Monday of the ISO week', () => {
+      const week = setSectionsFromDate(getSectionsFromFormat('yyyy-Www'), new Date(2026, 6, 14))
+
+      expect(getDateFromSections(week)).toEqual(new Date(2026, 6, 13))
+    })
+
+    it('should clamp the week to the week count of the year', () => {
+      const week = getSectionsFromFormat('yyyy-Www').map(section => ({ ...section, value: section.type === 'year' ? 2025 : (section.type === 'week' ? 53 : section.value) }))
+
+      expect(getDateFromSections(week)).toEqual(getDateOfISOWeek(2025, 52))
+    })
+
+    it('should resolve a quarter section to the first day of the quarter', () => {
+      const quarter = setSectionsFromDate(getSectionsFromFormat('QQQ yyyy'), new Date(2026, 10, 15))
+
+      expect(getDateFromSections(quarter)).toEqual(new Date(2026, 9, 1))
+    })
   })
 
   describe('setSectionsFromDate', () => {
@@ -401,6 +518,24 @@ describe('Date Sections Utilities', () => {
       const sections = setSectionsFromDate(setSectionsFromDate(getSectionsFromFormat('dd.MM.yyyy'), new Date(2026, 6, 14)), null)
 
       expect(sections.filter(section => section.type !== 'literal').every(section => section.value === null)).toBeTrue()
+    })
+
+    it('should fill the ISO week number and week-numbering year in week layouts', () => {
+      const sections = setSectionsFromDate(getSectionsFromFormat('yyyy-Www'), new Date(2027, 0, 1))
+
+      expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([2026, 53])
+    })
+
+    it('should keep the calendar year in layouts without a week section', () => {
+      const sections = setSectionsFromDate(getSectionsFromFormat('dd.MM.yyyy'), new Date(2027, 0, 1))
+
+      expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([1, 1, 2027])
+    })
+
+    it('should fill the quarter from the date', () => {
+      const sections = setSectionsFromDate(getSectionsFromFormat('QQQ yyyy'), new Date(2026, 10, 15))
+
+      expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([4, 2026])
     })
   })
 
@@ -438,6 +573,18 @@ describe('Date Sections Utilities', () => {
       const sections = setSectionsFromDate(getSectionsFromFormat('dd.MM.yyyy'), new Date(2026, 6, 4))
 
       expect(formatSections(sections)).toBe('04.07.2026')
+    })
+
+    it('should serialize week layouts in the input type="week" wire format', () => {
+      const sections = setSectionsFromDate(getSectionsFromFormat('yyyy-Www'), new Date(2026, 6, 14))
+
+      expect(formatSections(sections)).toBe('2026-W29')
+    })
+
+    it('should serialize text quarter layouts with the quarter name', () => {
+      const sections = setSectionsFromDate(getSectionsFromFormat('QQQ yyyy'), new Date(2026, 10, 15))
+
+      expect(formatSections(sections)).toBe('Q4 2026')
     })
   })
 
@@ -489,6 +636,18 @@ describe('Date Sections Utilities', () => {
       const sections = getSectionsFromString('2:30 PM', getSectionsFromFormat('hh:mm A', 'en-US'))
 
       expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([2, 30, 2])
+    })
+
+    it('should match week strings', () => {
+      const sections = getSectionsFromString('2026-W29', getSectionsFromFormat('yyyy-Www'))
+
+      expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([2026, 29])
+    })
+
+    it('should match quarter names in text quarter layouts', () => {
+      const sections = getSectionsFromString('Q4 2026', getSectionsFromFormat('QQQ yyyy'))
+
+      expect(sections.filter(section => section.type !== 'literal').map(section => section.value)).toEqual([4, 2026])
     })
   })
 })

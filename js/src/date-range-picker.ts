@@ -16,6 +16,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
+import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -210,13 +211,17 @@ class DateRangePicker extends BaseComponent {
     return this._endInput.getDate()
   }
 
+  // See DatePicker.setDate — the emitted values and the calendar selection
+  // follow the fields' validation outcome, not the arguments.
   setRange(startDate: Date | null, endDate: Date | null): void {
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
+    const effectiveStartDate = this.getStartDate()
+    const effectiveEndDate = this.getEndDate()
     this._selectEndDate = false
-    this._calendar?.update({ endDate, selectEndDate: false, startDate })
-    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: startDate })
-    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: endDate })
+    this._calendar?.update({ endDate: effectiveEndDate, selectEndDate: false, startDate: effectiveStartDate })
+    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: effectiveStartDate })
+    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: effectiveEndDate })
   }
 
   clear(): void {
@@ -233,6 +238,7 @@ class DateRangePicker extends BaseComponent {
       close: () => this.hide(),
       disabled: this._config.disabled,
       endDate: this.getEndDate(),
+      isDateSelectable: (date: Date | null) => this._startInput.isDateSelectable(date),
       reset: () => this.reset(),
       setRange: (startDate: Date | null, endDate: Date | null) => this.setRange(startDate, endDate),
       startDate: this.getStartDate()
@@ -263,15 +269,17 @@ class DateRangePicker extends BaseComponent {
   }
 
   // See DatePicker._resolveFormat — a date mask can only express the sections
-  // it has, so month/year selection get a narrower default mask.
+  // it has, so every non-day selection type gets a matching default mask.
   _resolveFormat(): any {
     if (this._config.format) {
       return this._config.format
     }
 
-    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+    const byType = {
+      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: getWeekSectionsFromLocale, year: 'yyyy'
+    }
 
-    return (byType as Record<string, string>)[this._config.selectionType] ?? null
+    return (byType as Record<string, any>)[this._config.selectionType] ?? null
   }
 
   _setSelectEndDate(value: boolean): void {

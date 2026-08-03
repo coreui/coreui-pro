@@ -7,6 +7,7 @@ description: "The v6 date picker: a section-based masked field composed with a c
 
 import datePickerFormats from './snippets/date-picker-formats.js?raw'
 import datePickerDisabledDates from './snippets/date-picker-disabled-dates.js?raw'
+import datePickerFooterToday from './snippets/date-picker-footer-today.js?raw'
 import datePickerWeekends from './snippets/date-picker-weekends.js?raw'
 
 <Callout color="warning">
@@ -42,7 +43,10 @@ parsing and no debounce: the field always holds a valid partial date.
 There is no `footer` option. Project a `<template data-coreui-template="footer">`
 child instead — its content is cloned into the dropdown. Buttons act through
 `data-coreui-picker-action` (`today`, `clear`, `reset`, `close`), so labels,
-order, and translations are yours.
+order, and translations are yours. A button opting into the `today` action
+opts into its state too: it is disabled at initialization when today falls
+outside `minDate`/`maxDate`/`disabledDates`. This is one-way — the picker only
+ever sets `disabled`, so a button you disable in the template stays disabled.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
@@ -56,10 +60,39 @@ order, and translations are yours.
     </div>
   </div>`} />
 
+Here `maxDate` is the end of last month, so the `today` button disables
+itself. The state of any other button is yours — the slot context exposes
+`isDateSelectable(date)`, which answers whether a date, expressed in the
+field's mask, passes the `minDate`/`maxDate`/`disabledDates` validation (a day
+mask checks the calendar day, so `new Date()` passes with a `maxDate` of
+today) — and every programmatic date still runs through the field's
+validation: out of range, the field turns `is-invalid`, `errorChange` reports
+the reason, and `getDate()`/`dateChange` report `null`, the same outcome as
+typing that date.
+
+<Example pro code={`<div class="row">
+    <div class="col-lg-5">
+      <div id="myDatePickerFooterToday">
+        <template data-coreui-template="footer">
+          <button type="button" class="btn btn-sm btn-ghost-danger me-auto" data-coreui-picker-action="today">Today</button>
+          <button type="button" class="btn btn-sm btn-primary" data-coreui-picker-action="close">OK</button>
+        </template>
+      </div>
+    </div>
+  </div>`} sandboxJs={datePickerFooterToday} />
+
+<Code code={datePickerFooterToday} lang="js" />
+
 ### Weeks
 
 Add `data-coreui-selection-type="week"` to select week numbers, and
-`data-coreui-show-week-number="true"` to show them in the grid.
+`data-coreui-show-week-number="true"` to show them in the grid. The field
+renders the native `<input type="week">` presentation — a fixed, non-editable
+localized label followed by the week and year sections (`Week 29, 2026`,
+`Tydzień 29, 2026`, …). The year is the ISO week-numbering year, which can
+differ from the calendar year around January 1st, and the reported `Date` is
+the Monday of the selected week. Prefer the ISO wire format in the field?
+Set `data-coreui-format="yyyy-Www"`.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
@@ -70,15 +103,6 @@ Add `data-coreui-selection-type="week"` to select week numbers, and
         data-coreui-toggle="date-picker"></div>
     </div>
   </div>`} />
-
-<Callout color="warning">
-  **Week and quarter selection display the underlying date.** A section mask is
-  built from date sections (day / month / year), so it cannot render `2026W27`
-  or `2026Q1` the way the v1 text input did — the field shows the first day of
-  the selected week or quarter instead. The formatted value is still available:
-  `event.date` carries `"2026W27"`, `event.dateObject` the `Date`. Dedicated
-  week/quarter sections are an open design item for the rewrite.
-</Callout>
 
 ### Months
 
@@ -96,7 +120,10 @@ narrows to month and year automatically.
 
 ### Quarters
 
-Add `data-coreui-selection-type="quarter"` to select quarters.
+Add `data-coreui-selection-type="quarter"` to select quarters — the equivalent
+of the `<input type="quarter">` that HTML never shipped. The field mask narrows
+to a quarter and year section (`Q4 2026`), and the reported `Date` is the
+first day of the selected quarter.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-5">
@@ -248,7 +275,8 @@ document direction.
 the format. Set it with `data-coreui-format` (or the `format` option), which the
 field forwards from the shell. The parser accepts both dayjs/moment-style tokens
 (`DD`, `MM`, `YYYY`, `YY`) and date-fns/Unicode-style tokens (`dd`, `MM`,
-`yyyy`, `yy`); any other character becomes a literal separator.
+`yyyy`, `yy`), plus `ww` for ISO week numbers and `q` (numeric) or `QQQ`
+(`Q1`–`Q4`) for quarters; any other character becomes a literal separator.
 
 <Example pro code={`<div class="row">
     <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">

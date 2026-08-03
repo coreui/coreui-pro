@@ -314,6 +314,16 @@ describe('Calendar Utilities', () => {
       const week = getISOWeekNumberAndYear(date)
       expect(week.weekNumber).toBe(23)
     })
+
+    it('should handle years below 100 without the 19xx date mapping', () => {
+      const date = new Date(2000, 0, 1)
+      date.setFullYear(22, 5, 15)
+
+      const week = getISOWeekNumberAndYear(date)
+      expect(week.weekNumber).toBeGreaterThanOrEqual(1)
+      expect(week.weekNumber).toBeLessThanOrEqual(53)
+      expect(week.year).toBe(22)
+    })
   })
 
   describe('isDateDisabled', () => {

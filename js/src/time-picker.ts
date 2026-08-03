@@ -45,6 +45,7 @@ const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
 
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_ACTION_NOW = '[data-coreui-picker-action="now"]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="time-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
@@ -192,6 +193,7 @@ class TimePicker extends BaseComponent {
       clear: () => this.clear(),
       close: () => this.hide(),
       disabled: this._config.disabled,
+      isTimeSelectable: (time: Date | null) => this._input.isDateSelectable(time),
       now: () => this.now(),
       reset: () => this.reset(),
       setTime: (time: Date | null) => this.setTime(time),
@@ -266,10 +268,26 @@ class TimePicker extends BaseComponent {
       const footer = document.createElement('div')
       footer.classList.add(CLASS_NAME_FOOTER)
       footer.append(this._footerTemplate.content.cloneNode(true))
+      this._disableUnselectableActions(footer)
       this._menu.append(footer)
     }
 
     this._element.append(this._menu)
+  }
+
+  // See DatePicker._disableUnselectableActions — a button opting into the
+  // `now` action is disabled (never re-enabled) when the current time cannot
+  // be selected.
+  _disableUnselectableActions(container: HTMLElement): void {
+    if (this._input.isDateSelectable(new Date())) {
+      return
+    }
+
+    for (const button of SelectorEngine.find(SELECTOR_ACTION_NOW, container)) {
+      if ('disabled' in button) {
+        (button as any).disabled = true
+      }
+    }
   }
 
   // The selection body is built on first open, like the pickers' calendar.

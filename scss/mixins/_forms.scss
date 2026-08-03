@@ -146,6 +146,30 @@ $form-feedback-tokens: defaults(
     }
   }
 
+  // In a picker the input group is the frame and the field inside draws no
+  // border of its own, so the state has to reach the group — custom properties
+  // set on the field would only inherit downwards. The indicator button sits
+  // where the validation icon would go, so the icon is suppressed and the
+  // indicator carries the color instead (see .form-password above).
+  .date-picker-input-group,
+  .time-picker-input-group {
+    &:has(.form-date-time.is-#{$state}) {
+      --#{$prefix}control-border-color: #{$border-color};
+      --#{$prefix}control-focus-border-color: #{$border-color};
+      --#{$prefix}control-focus-ring: #{$focus-ring};
+      --#{$prefix}date-picker-indicator-color: #{$color};
+      --#{$prefix}time-picker-indicator-icon-color: #{$color};
+    }
+
+    @if $enable-validation-icons {
+      .form-date-time {
+        @include form-validation-state-selector($state) {
+          background-image: none;
+        }
+      }
+    }
+  }
+
   // stylelint-disable-next-line selector-no-qualifying-type
   textarea.form-control {
     @include form-validation-state-selector($state) {

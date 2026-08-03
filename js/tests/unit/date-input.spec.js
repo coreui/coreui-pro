@@ -628,6 +628,67 @@ describe('DateInput', () => {
       expect(spy).toHaveBeenCalledTimes(3)
     })
 
+    it('should answer whether a date would pass validation', () => {
+      const dateInput = createDateInput({
+        disabledDates: [new Date(2026, 6, 15)],
+        maxDate: new Date(2026, 6, 20),
+        minDate: new Date(2026, 6, 10)
+      })
+
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 14))).toBeTrue()
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 15))).toBeFalse()
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 21))).toBeFalse()
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 9))).toBeFalse()
+      expect(dateInput.isDateSelectable(null)).toBeFalse()
+      expect(dateInput.isDateSelectable(new Date('invalid'))).toBeFalse()
+    })
+
+    it('should normalize the checked date through the mask', () => {
+      const dateInput = createDateInput({ maxDate: new Date(2026, 6, 14) })
+
+      expect(dateInput.isDateSelectable(new Date(2026, 6, 14, 15, 30))).toBeTrue()
+    })
+
+    it('should validate a date set through the constructor', () => {
+      const dateInput = createDateInput({
+        date: new Date(2026, 6, 20),
+        maxDate: new Date(2026, 6, 14)
+      })
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(dateInput.getDate()).toBeNull()
+    })
+
+    it('should validate a date set through update() like a typed one', () => {
+      const dateInput = createDateInput({ maxDate: new Date(2026, 6, 14) })
+      const changeSpy = jasmine.createSpy('dateChange')
+      const errorSpy = jasmine.createSpy('errorChange')
+      dateInput._element.addEventListener('dateChange.coreui.date-input', changeSpy)
+      dateInput._element.addEventListener('errorChange.coreui.date-input', errorSpy)
+
+      dateInput.update({ date: new Date(2026, 6, 20) })
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeTrue()
+      expect(dateInput.getDate()).toBeNull()
+      expect(errorSpy.calls.mostRecent().args[0].error).toEqual('maxDate')
+      expect(changeSpy).not.toHaveBeenCalled()
+    })
+
+    it('should clear the invalid state when update() sets a date back in range', () => {
+      const dateInput = createDateInput({
+        date: new Date(2026, 6, 20),
+        maxDate: new Date(2026, 6, 14)
+      })
+      const changeSpy = jasmine.createSpy('dateChange')
+      dateInput._element.addEventListener('dateChange.coreui.date-input', changeSpy)
+
+      dateInput.update({ date: new Date(2026, 6, 10) })
+
+      expect(dateInput._element.classList.contains('is-invalid')).toBeFalse()
+      expect(dateInput.getDate()).toEqual(new Date(2026, 6, 10))
+      expect(changeSpy.calls.mostRecent().args[0].date).toEqual(new Date(2026, 6, 10))
+    })
+
     it('should report disabled dates through errorChange', () => {
       const dateInput = createDateInput({
         date: new Date(2026, 6, 14),

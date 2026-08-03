@@ -52,6 +52,7 @@ const CLASS_NAME_TIME_BODY = 'time-picker-body'
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
 
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-time-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 
@@ -187,11 +188,14 @@ class DateTimePicker extends BaseComponent {
     return this._input.getDate()
   }
 
+  // See DatePicker.setDate — the emitted value and the calendar/time selection
+  // follow the field's validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    this._calendar?.update({ startDate: date })
-    this._selection?.update({ time: date })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
+    const effectiveDate = this.getDate()
+    this._calendar?.update({ startDate: effectiveDate })
+    this._selection?.update({ time: effectiveDate })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   today(): void {
@@ -215,6 +219,7 @@ class DateTimePicker extends BaseComponent {
       close: () => this.hide(),
       date: this.getDate(),
       disabled: this._config.disabled,
+      isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
       reset: () => this.reset(),
       setDate: (date: Date | null) => this.setDate(date),
       today: () => this.today()
@@ -304,10 +309,26 @@ class DateTimePicker extends BaseComponent {
       const footer = document.createElement('div')
       footer.classList.add(CLASS_NAME_FOOTER)
       footer.append(this._footerTemplate.content.cloneNode(true))
+      this._disableUnselectableActions(footer)
       this._menu.append(footer)
     }
 
     this._element.append(this._menu)
+  }
+
+  // See DatePicker._disableUnselectableActions — a button opting into the
+  // `today` action is disabled (never re-enabled) when today cannot be
+  // selected.
+  _disableUnselectableActions(container: HTMLElement): void {
+    if (this._input.isDateSelectable(new Date())) {
+      return
+    }
+
+    for (const button of SelectorEngine.find(SELECTOR_ACTION_TODAY, container)) {
+      if ('disabled' in button) {
+        (button as any).disabled = true
+      }
+    }
   }
 
   // Both popup bodies are built on first open — see DatePicker._ensureCalendar.
@@ -349,7 +370,7 @@ class DateTimePicker extends BaseComponent {
 
     this._input.update({ date: merged })
     this._selection?.update({ time: merged })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: merged })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
 
   _applyTime(time: Date | null): void {
@@ -363,7 +384,7 @@ class DateTimePicker extends BaseComponent {
 
     this._input.update({ date: merged })
     this._calendar?.update({ startDate: merged })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: merged })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
 
   _createPopup(): void {

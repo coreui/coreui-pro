@@ -17,6 +17,7 @@ import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
+import { getWeekSectionsFromLocale } from './util/date-sections.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -51,6 +52,7 @@ const CLASS_NAME_SHOW = 'show'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-picker"]'
 const SELECTOR_TEMPLATE_FOOTER = 'template[data-coreui-template="footer"]'
 const SELECTOR_ACTION = '[data-coreui-picker-action]'
+const SELECTOR_ACTION_TODAY = '[data-coreui-picker-action="today"]'
 
 // Icons live in JavaScript, not in CSS masks — the chips pattern: inline SVG on
 // currentColor, swappable through an option, sanitized like any user-provided
@@ -177,10 +179,13 @@ class DatePicker extends BaseComponent {
     return this._input.getDate()
   }
 
+  // The field validates the date against min/max — the emitted value and the
+  // calendar selection follow the validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    this._calendar?.update({ startDate: date })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date })
+    const effectiveDate = this.getDate()
+    this._calendar?.update({ startDate: effectiveDate })
+    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   clear(): void {
@@ -203,6 +208,7 @@ class DatePicker extends BaseComponent {
       close: () => this.hide(),
       date: this.getDate(),
       disabled: this._config.disabled,
+      isDateSelectable: (date: Date | null) => this._input.isDateSelectable(date),
       reset: () => this.reset(),
       setDate: (date: Date | null) => this.setDate(date),
       today: () => this.today()
@@ -233,17 +239,20 @@ class DatePicker extends BaseComponent {
     return { ...forwarded, ...overrides, ...extra }
   }
 
-  // A date mask can only express the sections it has: month/year selection get
-  // a narrower default mask, day (and the week/quarter types, whose value is the
-  // underlying day) keep the locale mask. An explicit `format` always wins.
+  // A date mask can only express the sections it has: every non-day selection
+  // type gets a default mask matching its granularity (week mirrors the
+  // native week input's presentation, "Week 29, 2026") and day keeps the
+  // locale mask. An explicit `format` always wins.
   _resolveFormat(): any {
     if (this._config.format) {
       return this._config.format
     }
 
-    const byType = { month: 'MM/yyyy', year: 'yyyy' }
+    const byType = {
+      month: 'MM/yyyy', quarter: 'QQQ yyyy', week: getWeekSectionsFromLocale, year: 'yyyy'
+    }
 
-    return (byType as Record<string, string>)[this._config.selectionType] ?? null
+    return (byType as Record<string, any>)[this._config.selectionType] ?? null
   }
 
   _sanitizeIcon(icon: string): string {
@@ -301,7 +310,23 @@ class DatePicker extends BaseComponent {
       const footer = document.createElement('div')
       footer.classList.add(CLASS_NAME_FOOTER)
       footer.append(this._footerTemplate.content.cloneNode(true))
+      this._disableUnselectableActions(footer)
       this._menu.append(footer)
+    }
+  }
+
+  // A button opting into the `today` action opts into its state too: it is
+  // disabled when today cannot be selected. One-way only — the picker never
+  // re-enables a projected button, so a `disabled` set in the template stays.
+  _disableUnselectableActions(container: HTMLElement): void {
+    if (this._input.isDateSelectable(new Date())) {
+      return
+    }
+
+    for (const button of SelectorEngine.find(SELECTOR_ACTION_TODAY, container)) {
+      if ('disabled' in button) {
+        (button as any).disabled = true
+      }
     }
   }
 

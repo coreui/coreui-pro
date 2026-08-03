@@ -21,6 +21,7 @@ import {
   getSectionBounds,
   getSectionsFromFormat,
   getSectionsFromString,
+  getWeekSectionMax,
   setSectionsFromDate
 } from './util/date-sections.js'
 import type { ComponentConfig } from './util/config.js'
@@ -119,7 +120,9 @@ const DefaultType: Record<string, string> = {
 
 const DefaultPlaceholders = {
   day: 'DD',
+  week: 'WW',
   month: 'MM',
+  quarter: 'Q',
   year: 'YYYY',
   hour: 'HH',
   minute: 'mm',
@@ -129,7 +132,9 @@ const DefaultPlaceholders = {
 
 const DefaultSectionLabels = {
   day: 'Day',
+  week: 'Week',
   month: 'Month',
+  quarter: 'Quarter',
   year: 'Year',
   hour: 'Hour',
   minute: 'Minute',
@@ -169,6 +174,7 @@ class SectionInput extends BaseComponent {
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 
     this._createSectionInput()
+    this._date = this._applyValidationState()
     this._addEventListeners()
 
     if (this._config.autofocus && !this._config.disabled) {
@@ -212,6 +218,20 @@ class SectionInput extends BaseComponent {
     return this._date
   }
 
+  // Answers whether a date, expressed in this field's mask, would pass
+  // validation. The granularity follows the mask: a day mask checks the
+  // midnight date (so "now" passes with a maxDate of today), a week mask the
+  // week's Monday, a date-time mask the exact time.
+  isDateSelectable(date: Date | null): boolean {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return false
+    }
+
+    const normalized = getDateFromSections(setSectionsFromDate(this._sections, date))
+
+    return normalized !== null && this._getValidationError(normalized, true) === null
+  }
+
   update(config: any): void {
     if (typeof config !== 'object') {
       return
@@ -220,15 +240,19 @@ class SectionInput extends BaseComponent {
     this._config = { ...this._config, ...config }
     this._typeCheckConfig(this._config)
 
+    const previousDate = this._date
     this._date = this._config.date ? this._convertDate(this._config.date) : null
     this._minDate = this._convertDate(this._config.minDate)
     this._maxDate = this._convertDate(this._config.maxDate)
     this._sections = setSectionsFromDate(this._resolveSections(), this._date)
-    this._date = getDateFromSections(this._sections)
     this._draft = ''
     this._monthFormatter = new Intl.DateTimeFormat(this._config.locale, { month: 'long' })
 
     this._createSectionInput()
+    // validate like any other value change — a programmatic date outside
+    // min/max must end up in the same state as a typed one
+    this._date = previousDate
+    this._updateDate()
   }
 
   // Private
@@ -567,30 +591,7 @@ class SectionInput extends BaseComponent {
   }
 
   _updateDate(): void {
-    const daySection = this._sections.find(section => section.type === 'day')
-
-    if (daySection && daySection.value !== null && daySection.value > this._getSectionMax(daySection)) {
-      daySection.value = this._getSectionMax(daySection)
-      this._syncSections()
-    }
-
-    const date = getDateFromSections(this._sections)
-    const isFilled = this._sections.some(section => section.type !== 'literal' && section.value !== null)
-    const error = this._getValidationError(date, isFilled)
-    const isDisabled = error !== null && error !== 'incomplete'
-    const nextDate = isDisabled ? null : date
-
-    this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
-    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled)
-    this._setHiddenInputValue()
-
-    if (error !== this._error) {
-      this._error = error
-
-      EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
-        error
-      })
-    }
+    const nextDate = this._applyValidationState()
 
     if (this._isSameDate(nextDate, this._date)) {
       return
@@ -601,6 +602,39 @@ class SectionInput extends BaseComponent {
     EventHandler.trigger(this._element, this.constructor.eventName(this.constructor.CHANGE_EVENT_NAME), {
       date: nextDate
     })
+  }
+
+  // Applies the validation outcome to the field (validity class, hidden input,
+  // `errorChange`) and returns the effective date — null when the value is
+  // invalid. Runs on every value change, whether typed or programmatic.
+  _applyValidationState(): Date | null {
+    // Sections whose bounds depend on other sections (the day on the month and
+    // year, the week on the year) are clamped when those sections change.
+    for (const section of this._sections) {
+      if ((section.type === 'day' || section.type === 'week') && section.value !== null && section.value > this._getSectionMax(section)) {
+        section.value = this._getSectionMax(section)
+        this._syncSections()
+      }
+    }
+
+    const date = getDateFromSections(this._sections)
+    const isFilled = this._sections.some(section => section.type !== 'literal' && section.value !== null)
+    const error = this._getValidationError(date, isFilled)
+    const isDisabled = error !== null && error !== 'incomplete'
+
+    this._element.classList.toggle(CLASS_NAME_FILLED, isFilled)
+    this._element.classList.toggle(CLASS_NAME_IS_INVALID, isDisabled || this._config.invalid)
+    this._setHiddenInputValue()
+
+    if (error !== this._error) {
+      this._error = error
+
+      EventHandler.trigger(this._element, this.constructor.eventName('errorChange'), {
+        error
+      })
+    }
+
+    return isDisabled ? null : date
   }
 
   _getValidationError(date: Date | null, isFilled: boolean): string | null {
@@ -779,7 +813,15 @@ class SectionInput extends BaseComponent {
   }
 
   _getSectionMax(section: DateSection): number {
-    return section.type === 'day' ? getDaySectionMax(this._sections) : getSectionBounds(section).max
+    if (section.type === 'day') {
+      return getDaySectionMax(this._sections)
+    }
+
+    if (section.type === 'week') {
+      return getWeekSectionMax(this._sections)
+    }
+
+    return getSectionBounds(section).max
   }
 
   _isEditable(): boolean {

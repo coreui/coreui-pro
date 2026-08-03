@@ -163,6 +163,20 @@ describe('DateTimePicker', () => {
       expect(picker._popup.isShown).toBeFalse()
     })
 
+    it('should disable a projected today action when today is not selectable', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      buildPicker({ maxDate: yesterday }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+    })
+
     it('should keep the value when the time half reports without a date set', () => {
       const picker = buildPicker()
 
@@ -178,7 +192,7 @@ describe('DateTimePicker', () => {
       const picker = buildPicker()
 
       expect(Object.keys(picker.getContext()).toSorted())
-        .toEqual(['clear', 'close', 'date', 'disabled', 'reset', 'setDate', 'today'])
+        .toEqual(['clear', 'close', 'date', 'disabled', 'isDateSelectable', 'reset', 'setDate', 'today'])
     })
 
     it('should clear through the context', () => {

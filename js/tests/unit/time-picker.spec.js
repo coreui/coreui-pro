@@ -116,7 +116,7 @@ describe('TimePicker', () => {
       const picker = buildPicker()
 
       expect(Object.keys(picker.getContext()).toSorted())
-        .toEqual(['clear', 'close', 'disabled', 'now', 'reset', 'setTime', 'time'])
+        .toEqual(['clear', 'close', 'disabled', 'isTimeSelectable', 'now', 'reset', 'setTime', 'time'])
     })
 
     it('should clear and set the time through the context', () => {
@@ -217,6 +217,30 @@ describe('TimePicker', () => {
       fixtureEl.querySelector('[data-coreui-picker-action="clear"]').click()
 
       expect(picker.getTime()).toBeNull()
+    })
+
+    it('should disable a projected now action when the current time is not selectable', () => {
+      buildPicker({ maxDate: new Date(1969, 11, 31) }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="now">Now</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="now"]').disabled).toBeTrue()
+    })
+
+    it('should keep a projected now action enabled when the current time is selectable', () => {
+      buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="now">Now</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="now"]').disabled).toBeFalse()
     })
   })
 })

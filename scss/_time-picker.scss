@@ -1,5 +1,3 @@
-@use "sass:color";
-@use "sass:math";
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
@@ -56,19 +54,10 @@ $time-picker-tokens: defaults(
     --#{$prefix}control-focus-bg: #{$time-picker-focus-bg},
     --#{$prefix}control-focus-border-color: #{$time-picker-focus-border-color},
     --#{$prefix}control-focus-ring: #{$time-picker-focus-ring},
-    --#{$prefix}time-picker-placeholder-color: #{$time-picker-placeholder-color},
     --#{$prefix}control-padding-y: #{$time-picker-padding-y},
     --#{$prefix}control-padding-x: #{$time-picker-padding-x},
-    --#{$prefix}time-picker-gap: #{$time-picker-gap},
     --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width},
-    --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-icon)},
     --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-icon-color},
-    --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size},
-    --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width},
-    --#{$prefix}time-picker-cleaner-icon: #{escape-svg($time-picker-cleaner-icon)},
-    --#{$prefix}time-picker-cleaner-icon-color: #{$time-picker-cleaner-icon-color},
-    --#{$prefix}time-picker-cleaner-icon-hover-color: #{$time-picker-cleaner-icon-hover-color},
-    --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size},
     --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding},
     --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width},
     --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color},
@@ -102,25 +91,6 @@ $time-picker-tokens: defaults(
   *:not(.time-picker) > .time-picker-dropdown {
     @include tokens($time-picker-tokens);
 
-    &.is-invalid {
-      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$time-picker-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
-
-      --#{$prefix}control-border-color: #{$time-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-invalid-icon-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-invalid-icon)} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}control-focus-border-color: #{$time-picker-invalid-border-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
-    }
-
-    &.is-valid {
-      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$time-picker-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
-
-      --#{$prefix}control-border-color: #{$time-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-valid-icon-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}time-picker-indicator-icon: #{escape-svg($time-picker-indicator-valid-icon)} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}control-focus-border-color: #{$time-picker-valid-border-color} !important; // stylelint-disable-line declaration-no-important
-      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
-    }
   }
 
   // The shell mirrors the date picker's frame while reading the
@@ -312,11 +282,7 @@ $time-picker-tokens: defaults(
     --#{$prefix}control-padding-x: #{$time-picker-padding-x-sm};
     --#{$prefix}control-font-size: #{$time-picker-font-size-sm};
     --#{$prefix}control-border-radius: #{$time-picker-border-radius-sm};
-    --#{$prefix}time-picker-gap: #{$time-picker-gap-sm};
-    --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width-sm};
-    --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size-sm};
     --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width-sm};
-    --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size-sm};
   }
 
   .time-picker-lg {
@@ -324,10 +290,6 @@ $time-picker-tokens: defaults(
     --#{$prefix}control-padding-x: #{$time-picker-padding-x-lg};
     --#{$prefix}control-font-size: #{$time-picker-font-size-lg};
     --#{$prefix}control-border-radius: #{$time-picker-border-radius-lg};
-    --#{$prefix}time-picker-gap: #{$time-picker-gap-lg};
-    --#{$prefix}time-picker-cleaner-width: #{$time-picker-cleaner-width-lg};
-    --#{$prefix}time-picker-cleaner-icon-size: #{$time-picker-cleaner-icon-size-lg};
     --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width-lg};
-    --#{$prefix}time-picker-indicator-icon-size: #{$time-picker-indicator-icon-size-lg};
   }
 }

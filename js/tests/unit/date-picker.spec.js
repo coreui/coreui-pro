@@ -154,6 +154,138 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('selection types', () => {
+    it('should mask week selection like the native week input', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Week 29, 2026')
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 13))
+    })
+
+    it('should localize the fixed week label', () => {
+      buildPicker({ locale: 'pl-PL', selectionType: 'week', date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Tydzień 29, 2026')
+    })
+
+    it('should let an explicit format override the week mask', () => {
+      buildPicker({ format: 'yyyy-Www', selectionType: 'week', date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('2026-W29')
+    })
+
+    it('should fill the week sections when a calendar week is selected', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2026, 6, 14) })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = null
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker.show()
+      el.querySelector('.calendar-row[tabindex="0"] .calendar-cell').click()
+
+      expect(emitted).toMatch(/^\d{4}W\d{2}$/)
+      expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.slice(5)}, ${emitted.slice(0, 4)}`)
+    })
+
+    it('should keep the ISO week-numbering year around January 1st', () => {
+      const picker = buildPicker({ locale: 'en-US', selectionType: 'week', date: new Date(2027, 0, 1) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Week 53, 2026')
+      expect(picker.getDate()).toEqual(new Date(2026, 11, 28))
+    })
+
+    it('should mask quarter selection with the quarter name', () => {
+      const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
+
+      expect(fixtureEl.querySelector('#picker input[type="hidden"]').value).toEqual('Q4 2026')
+      expect(picker.getDate()).toEqual(new Date(2026, 9, 1))
+    })
+
+    it('should fill the quarter sections when a calendar quarter is selected', () => {
+      const picker = buildPicker({ selectionType: 'quarter', date: new Date(2026, 10, 15) })
+      const el = fixtureEl.querySelector('#picker')
+
+      picker.show()
+      el.querySelector('.calendar-cell[tabindex="0"]').click()
+
+      expect(el.querySelector('input[type="hidden"]').value).toMatch(/^Q[1-4] \d{4}$/)
+    })
+  })
+
+  describe('min/max validation', () => {
+    it('should propagate field validation to a programmatic date beyond maxDate', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const picker = buildPicker({ maxDate: yesterday })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = 'not-fired'
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker.setDate(new Date())
+
+      expect(picker.getDate()).toBeNull()
+      expect(emitted).toBeNull()
+      expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should disable a projected today action when today is not selectable', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      buildPicker({ maxDate: yesterday }, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+    })
+
+    it('should keep a projected today action enabled when today is selectable', () => {
+      buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today">Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeFalse()
+    })
+
+    it('should not re-enable a today action disabled in the template', () => {
+      buildPicker({}, [
+        '<div id="picker">',
+        '  <template data-coreui-template="footer">',
+        '    <button type="button" data-coreui-picker-action="today" disabled>Today</button>',
+        '  </template>',
+        '</div>'
+      ].join(''))
+
+      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+    })
+
+    it('should emit and select a programmatic date within range', () => {
+      const picker = buildPicker({ maxDate: new Date(2026, 6, 31) })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = null
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker.setDate(new Date(2026, 6, 14))
+
+      expect(picker.getDate()).toEqual(new Date(2026, 6, 14))
+      expect(emitted).toEqual(new Date(2026, 6, 14))
+      expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeFalse()
+    })
+  })
+
   describe('calendar navigation', () => {
     it('should keep the popup open when navigating months', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15) })
@@ -172,7 +304,7 @@ describe('DatePicker', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15) })
       const context = picker.getContext()
 
-      expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'date', 'disabled', 'reset', 'setDate', 'today'])
+      expect(Object.keys(context).toSorted()).toEqual(['clear', 'close', 'date', 'disabled', 'isDateSelectable', 'reset', 'setDate', 'today'])
       expect(context.date).toEqual(new Date(2026, 5, 15))
       expect(context.disabled).toBeFalse()
     })
@@ -183,6 +315,30 @@ describe('DatePicker', () => {
       picker.getContext().clear()
 
       expect(picker.getDate()).toBeNull()
+    })
+
+    it('should answer date selectability through the context', () => {
+      const picker = buildPicker({
+        disabledDates: [new Date(2026, 6, 15)],
+        maxDate: new Date(2026, 6, 20),
+        minDate: new Date(2026, 6, 10)
+      })
+      const { isDateSelectable } = picker.getContext()
+
+      expect(isDateSelectable(new Date(2026, 6, 14))).toBeTrue()
+      expect(isDateSelectable(new Date(2026, 6, 15))).toBeFalse()
+      expect(isDateSelectable(new Date(2026, 6, 21))).toBeFalse()
+      expect(isDateSelectable(new Date(2026, 6, 9))).toBeFalse()
+      expect(isDateSelectable(null)).toBeFalse()
+    })
+
+    it('should check selectability at the mask granularity', () => {
+      // a raw comparison of "now" against a midnight maxDate would fail here
+      const midnight = new Date()
+      midnight.setHours(0, 0, 0, 0)
+      const picker = buildPicker({ maxDate: midnight })
+
+      expect(picker.getContext().isDateSelectable(new Date())).toBeTrue()
     })
 
     it('should set today through the context', () => {

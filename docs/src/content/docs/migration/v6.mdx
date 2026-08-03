@@ -44,9 +44,9 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
 
 **The minimum supported browsers are now Chrome 123, Edge 123, Firefox 121,
 Safari 17.5 and iOS 17.5.** `light-dark()` sets the Chrome/Edge/Safari floor;
-`:has()` sets Firefox 121, since validation and focus states on Multi Select
-and Autocomplete, the sidebar navigation indicators, calendar ranges and the
-rating icons are all selected with it — and an unsupported `:has()` invalidates
+`:has()` sets Firefox 121, since validation and focus states on Multi Select,
+Autocomplete and the pickers, the sidebar navigation indicators, calendar
+ranges and the rating icons are all selected with it — and an unsupported `:has()` invalidates
 the entire rule it appears in. This is the floor the v6 color system already required in practice:
 theme decisions resolve in the browser via `light-dark()` and `color-mix()`
 with no fallback, so on older browsers dark mode did not work regardless of
@@ -210,14 +210,32 @@ behaviour, v5 is the reference. Mapping:
   `data-coreui-show-week-number` and `data-coreui-format` work on the picker
   element. `calendarOptions` / `inputOptions` remain as the programmatic escape
   hatch.
-- **Week and quarter selection display the underlying date.** A section mask is
-  built from date sections, so it cannot render `2026W27` or `2026Q1` the way
-  the v1 text input did — the field shows the first day of the selected week or
-  quarter. The formatted value stays available on the event (`event.date`).
-  Dedicated week/quarter sections are an open design item. Month and year
-  selection **do** adapt: the mask narrows to `MM/yyyy` and `yyyy`.
+- **Every selection type has a matching mask.** Month and year selection narrow
+  the mask to `MM/yyyy` and `yyyy`. Week selection renders the native
+  `<input type="week">` presentation — a fixed localized label plus week and
+  year sections (`Week 29, 2026`, `Tydzień 29, 2026`), where the year is the
+  ISO week-numbering year. Quarter selection narrows to `QQQ yyyy`
+  (`Q4 2026`). The v1 text input rendered `2026W27`/`2026Q1`; the submitted
+  value now follows the mask (set `format="yyyy-Www"` for an ISO-style
+  field), and the event still carries the v1-formatted string (`event.date`)
+  next to the `Date` (`event.dateObject`). The format parser gained `ww`
+  (ISO week) and `q`/`QQQ` (quarter) tokens, plus quoted literals
+  (`'Week' ww` — fixed text that may contain token letters, `''` escapes a
+  quote).
 - **Format comes from the mask.** `inputDateFormat` is replaced by `format`
   (forwarded to the field); `inputDateParse` still applies to pasted text.
+- **Footer buttons are projected, `today`/`now` actions keep the v1 gating.**
+  A projected button opting into the `today` action (`now` on the time picker)
+  is disabled at initialization when its target falls outside
+  `minDate`/`maxDate`/`disabledDates` — matching the v1 built-in button. This
+  is one-way: the picker only ever sets `disabled`, never re-enables. The
+  state of any other projected button is yours — the slot context exposes
+  `isDateSelectable(date)` (`isTimeSelectable` on the time picker) for
+  computing it. Programmatic dates (`setDate`, actions, the initial `date`
+  config) run through the same min/max validation as typed ones: out of
+  range, the field turns `is-invalid`, `errorChange` fires, and
+  `getDate()`/`dateChange` report `null`. `dateChange` on the shells always
+  carries the validated value.
 - **The calendar is built on first open, not at construction.** It accounts for
   ~83% of a date picker's DOM (and ~89% of a range picker's), and it is not
   observable before the popup opens, so the shells create it in `show()` and
@@ -477,6 +495,25 @@ assembles maps of CSS expressions and the browser resolves them.
 - Two silent duplicates were dropped along the way: `$nav-link-height` was
   declared twice (navbar and header blocks — the header copy is gone) and the
   calendar emitted `--cui-calendar-cell-week-number-color` twice.
+- **Time picker: the v1-only tokens are gone.** The rewritten shell has no
+  cleaner button and draws its indicator as an inline SVG on `currentColor`,
+  so nothing read them any more — `--cui-time-picker-cleaner-*` (5 tokens),
+  `--cui-time-picker-indicator-icon`, `--cui-time-picker-indicator-icon-size`,
+  `--cui-time-picker-gap` and `--cui-time-picker-placeholder-color`, together
+  with their Sass variables (`$time-picker-cleaner-icon-size-sm`/`-lg` were
+  also declared twice). `--cui-time-picker-indicator-icon-color` stays and now
+  carries the validation color as well. The validation state itself moved off
+  the root element: v1 recoloured the frame from `.time-picker.is-invalid` with
+  `!important` overrides, v2 reads it from the field inside the group, so
+  `$time-picker-invalid-border-color` / `$time-picker-valid-border-color` and
+  the matching indicator-icon variables are gone — theme the state through the
+  standard `$form-invalid-*` / `$form-valid-*` variables instead. Section
+  placeholders come from the field's `placeholders` option, not a colour token.
+- `$input-padding-x-lg` was removed: `.form-control-lg` reads
+  `--cui-btn-input-lg-padding-x` from the shared button/input token system, and
+  the time picker's dead `gap-lg` was the variable's last consumer.
+  `$input-padding-x`, `$input-padding-x-sm` and `$input-padding-y-*` are
+  unaffected.
 
 #### Theme tokens
 

@@ -60,7 +60,10 @@ closing is the footer's job.
 ### Weeks
 
 Add `data-coreui-selection-type="week"` to select week ranges, and
-`data-coreui-show-week-number="true"` to show week numbers.
+`data-coreui-show-week-number="true"` to show week numbers. The fields render
+the native `<input type="week">` presentation (`Week 29, 2026`, with a
+localized fixed label) — see the [date picker](/forms/date-picker/#weeks)
+note on the ISO week-numbering year.
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
@@ -71,15 +74,6 @@ Add `data-coreui-selection-type="week"` to select week ranges, and
         data-coreui-toggle="date-range-picker"></div>
     </div>
   </div>`} />
-
-<Callout color="warning">
-  **Week and quarter selection display the underlying dates.** A section mask is
-  built from date sections, so it cannot render `2026W27` the way the v1 text
-  inputs did — the fields show the first day of the selected week or quarter.
-  The formatted value stays available on the event (`event.date`), alongside the
-  `Date` (`event.dateObject`). See the [date picker](/forms/date-picker/#weeks)
-  note.
-</Callout>
 
 ### Months
 
@@ -93,6 +87,8 @@ Add `data-coreui-selection-type="week"` to select week ranges, and
   </div>`} />
 
 ### Quarters
+
+The field masks narrow to quarter and year sections (`Q1 2026`).
 
 <Example pro code={`<div class="row">
     <div class="col-lg-7">
