@@ -995,6 +995,17 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   per-family variables were emulating. The families keep the variables for what
   they actually own (calendars, the time roll, listboxes, chips), and the ones
   that only aliased `$input-*` are gone.
+- **The floating panel of every field component is the `.popup` primitive.**
+  The pickers' dropdowns and the combobox listbox drew the same box three
+  times; the generated panel now carries `.popup` (alongside its structural
+  class), and the chrome lives in one place. Sass-wise,
+  `$date-picker-dropdown-*`, `$time-picker-dropdown-*`, the chrome half of
+  `$combobox-popup-*` and the per-family `-zindex` variables are replaced by
+  `$popup-zindex/-bg/-border-width/-border-color/-border-radius/-box-shadow`
+  and the `--#{$prefix}popup-*` custom properties — theme the popup once and
+  every field component's panel follows. The anchored presentation is
+  unchanged; a fullscreen mode for mobile is designed at this primitive and
+  lands separately.
 - **Validation and sizing ride the standard machinery.** `.is-invalid` /
   `.is-valid` on the group behave exactly as on a `.form-control`, and the
   state also propagates from the control inside it. The per-family

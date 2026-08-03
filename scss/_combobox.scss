@@ -12,14 +12,8 @@
 // options, groups, checkbox indicators, select-all header) is one surface.
 
 // scss-docs-start combobox-variables
-$combobox-zindex:                     1000 !default;
 
 $combobox-popup-min-width:         100% !default;
-$combobox-popup-bg:                var(--#{$prefix}body-bg) !default;
-$combobox-popup-border-color:      var(--#{$prefix}border-color) !default;
-$combobox-popup-border-width:      var(--#{$prefix}border-width) !default;
-$combobox-popup-border-radius:     var(--#{$prefix}border-radius) !default;
-$combobox-popup-box-shadow:        var(--#{$prefix}box-shadow) !default;
 
 $combobox-header-padding-y:    .375rem !default;
 $combobox-header-padding-x:    .375rem !default;
@@ -65,7 +59,6 @@ $combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
 
 $combobox-option-indicator-width:         var(--#{$prefix}form-check-input-width, 1em) !default;
 
-
 // scss-docs-end combobox-variables
 
 $combobox-tokens: () !default;
@@ -75,13 +68,7 @@ $combobox-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $combobox-tokens: defaults(
   (
-    --#{$prefix}combobox-zindex: #{$combobox-zindex},
     --#{$prefix}combobox-popup-min-width: #{$combobox-popup-min-width},
-    --#{$prefix}combobox-popup-bg: #{$combobox-popup-bg},
-    --#{$prefix}combobox-popup-border-color: #{$combobox-popup-border-color},
-    --#{$prefix}combobox-popup-border-width: #{$combobox-popup-border-width},
-    --#{$prefix}combobox-popup-border-radius: #{$combobox-popup-border-radius},
-    --#{$prefix}combobox-popup-box-shadow: #{$combobox-popup-box-shadow},
     --#{$prefix}combobox-header-padding-y: #{$combobox-header-padding-y},
     --#{$prefix}combobox-header-padding-x: #{$combobox-header-padding-x},
     --#{$prefix}combobox-header-border-width: #{$combobox-header-border-width},
@@ -127,22 +114,15 @@ $combobox-tokens: defaults(
 // scss-docs-end combobox-css-vars
 
 @layer components {
+  // The chrome comes from the `.popup` primitive the panel carries; the
+  // listbox keeps its width behaviour and the parent-driven open state.
   .combobox-popup {
     @include tokens($combobox-tokens);
 
-    position: absolute;
-    z-index: var(--#{$prefix}combobox-zindex);
-    display: none; // none by default, but block on "open" of the menu
     min-width: var(--#{$prefix}combobox-popup-min-width);
-    background-color: var(--#{$prefix}combobox-popup-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}combobox-popup-border-width) solid var(--#{$prefix}combobox-popup-border-color);
-    @include border-radius(var(--#{$prefix}combobox-popup-border-radius));
-    @include box-shadow(var(--#{$prefix}combobox-popup-box-shadow));
 
     .autocomplete.show &,
-    .form-multi-select.show &,
-    &.show {
+    .form-multi-select.show & {
       display: block;
     }
   }

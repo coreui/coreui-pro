@@ -1016,7 +1016,6 @@ $pre-color:                         null !default;
 
 // Time Picker
 // scss-docs-start time-picker-variables
-$time-picker-zindex:                        1000 !default;
 $time-picker-font-weight:                   $input-font-weight !default;
 $time-picker-box-shadow:                    $box-shadow-inset !default;
 
@@ -1031,12 +1030,6 @@ $time-picker-focus-color:                   $input-focus-color !default;
 $time-picker-focus-bg:                      $input-focus-bg !default;
 $time-picker-focus-border-color:            $input-focus-border-color !default;
 $time-picker-focus-ring:              $input-btn-focus-ring !default;
-
-$time-picker-dropdown-bg:                   var(--#{$prefix}body-bg) !default;
-$time-picker-dropdown-border-color:         var(--#{$prefix}border-color) !default;
-$time-picker-dropdown-border-width:         var(--#{$prefix}border-width) !default;
-$time-picker-dropdown-border-radius:        var(--#{$prefix}border-radius) !default;
-$time-picker-dropdown-box-shadow:           var(--#{$prefix}box-shadow) !default;
 
 $time-picker-body-padding:                  $spacer * .5 !default;
 

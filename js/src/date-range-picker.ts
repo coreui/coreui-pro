@@ -53,6 +53,7 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
+const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
 const CLASS_NAME_SEPARATOR = 'form-control-icon'
 const CLASS_NAME_SHOW = 'show'
@@ -377,7 +378,7 @@ class DateRangePicker extends BaseComponent {
     this._element.append(inputGroup)
 
     this._menu = document.createElement('div')
-    this._menu.classList.add(CLASS_NAME_DROPDOWN)
+    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)

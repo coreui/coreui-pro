@@ -13,7 +13,6 @@
 
 // Date Picker
 // scss-docs-start date-picker-variables
-$date-picker-zindex:                   1000 !default;
 $date-picker-bg:                       var(--#{$prefix}btn-input-bg) !default;
 
 $date-picker-border-width:             var(--#{$prefix}btn-input-border-width) !default;
@@ -21,12 +20,6 @@ $date-picker-border-color:             $input-border-color !default;
 $date-picker-border-radius:            $border-radius !default;
 
 $date-picker-focus-border-color:       $input-focus-border-color !default;
-
-$date-picker-dropdown-bg:                var(--#{$prefix}body-bg) !default;
-$date-picker-dropdown-border-color:      var(--#{$prefix}border-color) !default;
-$date-picker-dropdown-border-width:      var(--#{$prefix}border-width) !default;
-$date-picker-dropdown-border-radius:     var(--#{$prefix}border-radius) !default;
-$date-picker-dropdown-box-shadow:        var(--#{$prefix}box-shadow) !default;
 
 $date-picker-footer-padding:           .5rem !default;
 $date-picker-footer-border-width:      1px !default;
@@ -53,12 +46,6 @@ $date-picker-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $date-picker-tokens: defaults(
   (
-    --#{$prefix}date-picker-zindex: #{$date-picker-zindex},
-    --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg},
-    --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width},
-    --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color},
-    --#{$prefix}date-picker-dropdown-border-radius: #{$date-picker-dropdown-border-radius},
-    --#{$prefix}date-picker-dropdown-box-shadow: #{$date-picker-dropdown-box-shadow},
     --#{$prefix}control-font-family: #{$date-picker-font-family},
     --#{$prefix}control-font-size: #{$date-picker-font-size},
     --#{$prefix}control-font-weight: #{$date-picker-font-weight},
@@ -109,19 +96,12 @@ $date-picker-tokens: defaults(
     @include form-control-group-focus();
   }
 
+  // The chrome comes from the `.popup` primitive the panel carries; what is
+  // left here is the panel's own shape and the parent-driven open state.
   .date-picker-dropdown {
-    position: absolute;
-    z-index: var(--#{$prefix}date-picker-zindex);
-    display: none;
     width: min-content;
-    background-color: var(--#{$prefix}date-picker-dropdown-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}date-picker-dropdown-border-width) solid var(--#{$prefix}date-picker-dropdown-border-color);
-    @include border-radius(var(--#{$prefix}date-picker-dropdown-border-radius));
-    @include box-shadow(var(--#{$prefix}date-picker-dropdown-box-shadow));
 
-    .date-picker.show &,
-    &.show {
+    .date-picker.show & {
       display: block;
     }
   }

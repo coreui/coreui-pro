@@ -45,6 +45,7 @@ const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
+const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
 
@@ -279,7 +280,7 @@ class TimePicker extends BaseComponent {
     }, this._config.inputOptions))
 
     this._menu = document.createElement('div')
-    this._menu.classList.add(CLASS_NAME_DROPDOWN)
+    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
     this._selectionElement = document.createElement('div')
     this._selectionElement.classList.add(CLASS_NAME_BODY)

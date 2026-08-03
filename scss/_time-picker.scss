@@ -7,7 +7,6 @@
 @use "config" as *;
 @use "forms/form-control-group" as *;
 
-
 // Time Picker
 // scss-docs-start time-picker-frame-variables
 $time-picker-font-family:      var(--#{$prefix}btn-input-font-family) !default;
@@ -29,7 +28,6 @@ $time-picker-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $time-picker-tokens: defaults(
   (
-    --#{$prefix}time-picker-zindex: #{$time-picker-zindex},
     --#{$prefix}control-font-family: #{$time-picker-font-family},
     --#{$prefix}control-font-size: #{$time-picker-font-size},
     --#{$prefix}control-font-weight: #{$time-picker-font-weight},
@@ -53,11 +51,6 @@ $time-picker-tokens: defaults(
     --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width},
     --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color},
     --#{$prefix}time-picker-footer-padding: #{$time-picker-footer-padding},
-    --#{$prefix}time-picker-dropdown-bg: #{$time-picker-dropdown-bg},
-    --#{$prefix}time-picker-dropdown-border-width: #{$time-picker-dropdown-border-width},
-    --#{$prefix}time-picker-dropdown-border-color: #{$time-picker-dropdown-border-color},
-    --#{$prefix}time-picker-dropdown-border-radius: #{$time-picker-dropdown-border-radius},
-    --#{$prefix}time-picker-dropdown-box-shadow: #{$time-picker-dropdown-box-shadow},
     --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width},
     --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color},
     --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width},
@@ -96,19 +89,12 @@ $time-picker-tokens: defaults(
     @include form-control-group-focus();
   }
 
+  // See .date-picker-dropdown — chrome from `.popup`, shape and parent-driven
+  // open state here.
   .time-picker-dropdown {
-    position: absolute;
-    z-index: var(--#{$prefix}time-picker-zindex);
-    display: none;
     width: min-content;
-    background-color: var(--#{$prefix}time-picker-dropdown-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}time-picker-dropdown-border-width) solid var(--#{$prefix}time-picker-dropdown-border-color);
-    @include border-radius(var(--#{$prefix}time-picker-dropdown-border-radius));
-    @include box-shadow(var(--#{$prefix}time-picker-dropdown-box-shadow));
 
-    .time-picker.show &,
-    &.show {
+    .time-picker.show & {
       display: block;
     }
   }

@@ -1,0 +1,55 @@
+@use "functions/defaults" as *;
+@use "mixins/border-radius" as *;
+@use "mixins/box-shadow" as *;
+@use "mixins/tokens" as *;
+@use "config" as *;
+
+// scss-docs-start popup-variables
+$popup-zindex:          1000 !default;
+$popup-bg:              var(--#{$prefix}body-bg) !default;
+$popup-border-width:    var(--#{$prefix}border-width) !default;
+$popup-border-color:    var(--#{$prefix}border-color) !default;
+$popup-border-radius:   var(--#{$prefix}border-radius) !default;
+$popup-box-shadow:      var(--#{$prefix}box-shadow) !default;
+// scss-docs-end popup-variables
+
+// scss-docs-start popup-tokens
+$popup-tokens: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$popup-tokens: defaults(
+  (
+    --#{$prefix}popup-zindex: #{$popup-zindex},
+    --#{$prefix}popup-bg: #{$popup-bg},
+    --#{$prefix}popup-border-width: #{$popup-border-width},
+    --#{$prefix}popup-border-color: #{$popup-border-color},
+    --#{$prefix}popup-border-radius: #{$popup-border-radius},
+    --#{$prefix}popup-box-shadow: #{$popup-box-shadow},
+  ),
+  $popup-tokens
+);
+// scss-docs-end popup-tokens
+
+@layer components {
+  // The floating surface of the field components — one chrome for the pickers'
+  // dropdowns and the combobox listbox, whatever body it holds. This is the
+  // anchored presentation; the fullscreen/modal one (the v1 pickers' mobile
+  // mode, coming back at the primitive level) is designed but lands
+  // separately. The popup borrows the *look* of a menu, never its interaction
+  // semantics: the body inside owns those.
+  .popup {
+    @include tokens($popup-tokens);
+
+    position: absolute;
+    z-index: var(--#{$prefix}popup-zindex);
+    display: none;
+    background-color: var(--#{$prefix}popup-bg);
+    background-clip: padding-box;
+    border: var(--#{$prefix}popup-border-width) solid var(--#{$prefix}popup-border-color);
+    @include border-radius(var(--#{$prefix}popup-border-radius));
+    @include box-shadow(var(--#{$prefix}popup-box-shadow));
+
+    &.show {
+      display: block;
+    }
+  }
+}
