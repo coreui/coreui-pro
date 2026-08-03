@@ -9,7 +9,9 @@
  * --------------------------------------------------------------------------
  */
 
-// `cil-x` from the CoreUI set, so the cross is drawn on the same 512 grid as
-// the icons it stands next to — an action and a cleaner are the same kind of
-// button and render their icon at the same size.
-export const CLEANER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="m427.314 107.313-22.628-22.626L256 233.373 107.314 84.687l-22.628 22.626L233.373 256 84.686 404.687l22.628 22.626L256 278.627l148.686 148.686 22.628-22.626L278.627 256z"/></svg>'
+// `cil-x` from the CoreUI set, cropped so every adornment can share one icon
+// size. The artwork carries 85 units of built-in margin where the calendar and
+// clock carry 16, so untouched it would paint a third less ink; cropped to
+// their coverage it overshoots instead, because a cross reaching the corners
+// reads larger than an orthogonal glyph of the same box. This sits between.
+export const CLEANER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="39.15 39.15 433.71 433.71" fill="currentColor"><path d="m427.314 107.313-22.628-22.626L256 233.373 107.314 84.687l-22.628 22.626L233.373 256 84.686 404.687l22.628 22.626L256 278.627l148.686 148.686 22.628-22.626L278.627 256z"/></svg>'
