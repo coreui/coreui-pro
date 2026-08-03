@@ -8,6 +8,7 @@
  */
 
 import Chip from './chip.js'
+import ChipSet from './chip-set.js'
 import Combobox from './combobox.js'
 import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
@@ -175,6 +176,15 @@ const DefaultType: Record<string, string> = {
  * ------------------------------------------------------------------------
  */
 
+// The selection area rides ChipSet for what it owns — arrow-key navigation
+// across the chips and keyboard removal — while the selection model stays the
+// component's. The container mixes chips with the search input, so it carries
+// no role (the ChipInput precedent), and MultiSelect keeps managing the chips
+// itself: Chip.getOrCreateInstance makes both sides meet on one instance.
+class MultiSelectChipSet extends ChipSet {
+  override _applyAccessibilityRoles(): void {}
+}
+
 class MultiSelect extends Combobox {
   protected declare _uniqueName: any
   protected declare _indicatorElement: any
@@ -183,6 +193,7 @@ class MultiSelect extends Combobox {
   protected declare _dropdownHeaderElement: any
   protected declare _headerElement: any
   protected declare _selectionElement: any
+  protected declare _selectionChipSet: any
   protected declare _selectionCleanerElement: any
   protected declare _searchElement: any
   protected declare _wrapperElement: any
@@ -748,7 +759,6 @@ class MultiSelect extends Combobox {
 
     const selectionEl = document.createElement('div')
     selectionEl.classList.add(CLASS_NAME_SELECTION)
-    selectionEl.setAttribute('aria-live', 'polite')
 
     if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
       selectionEl.classList.add(CLASS_NAME_SELECTION_TAGS)
@@ -759,6 +769,10 @@ class MultiSelect extends Combobox {
 
     this._updateSelection()
     this._selectionElement = selectionEl
+
+    if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
+      this._selectionChipSet = new MultiSelectChipSet(selectionEl, { removable: !this._config.disabled })
+    }
   }
 
   // The group lays its adornments out itself — they are its children, not a
