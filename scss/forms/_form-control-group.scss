@@ -37,7 +37,7 @@ $form-control-group-tokens: defaults(
     --#{$prefix}control-group-action-bg: #{$form-control-group-action-bg},
     --#{$prefix}control-group-action-hover-bg: #{$form-control-group-action-hover-bg},
     --#{$prefix}control-group-action-border-radius: #{$input-border-radius-sm},
-    --#{$prefix}control-group-action-transition: var(--#{$prefix}btn-input-transition),
+    --#{$prefix}control-group-action-transition: #{var(--#{$prefix}btn-input-transition), transform .15s ease-in-out},
   ),
   $form-control-group-tokens
 );
