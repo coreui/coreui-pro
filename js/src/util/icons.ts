@@ -9,8 +9,7 @@
  * --------------------------------------------------------------------------
  */
 
-// The cross autocomplete and multi select already use, so every cleaner in the
-// library is the same mark. It is drawn on a 16-unit grid, which makes it
-// heavier than the 512-grid icons around it — hence the smaller rendered size
-// the primitive gives a cleaner (`--*-control-group-cleaner-icon-size`).
-export const CLEANER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414Z"/></svg>'
+// `cil-x` from the CoreUI set, so the cross is drawn on the same 512 grid as
+// the icons it stands next to — an action and a cleaner are the same kind of
+// button and render their icon at the same size.
+export const CLEANER_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="m427.314 107.313-22.628-22.626L256 233.373 107.314 84.687l-22.628 22.626L233.373 256 84.686 404.687l22.628 22.626L256 278.627l148.686 148.686 22.628-22.626L278.627 256z"/></svg>'
