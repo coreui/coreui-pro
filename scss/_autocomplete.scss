@@ -146,9 +146,13 @@ $autocomplete-tokens: defaults(
     --#{$prefix}control-focus-ring: #{$focus-ring};
   }
 
-  // Tags wrap; the popup keeps the frame lit; disabled lives on the root.
+  // Tags wrap onto their own rows, so the padding sits on the parts inside the
+  // frame rather than on the frame itself — a tag has to be able to reach its
+  // edge. The parts also stretch to the full height instead of centring.
   .autocomplete .form-control-group {
     flex-wrap: wrap;
+    align-items: stretch;
+    padding: 0;
   }
 
   .autocomplete.show .form-control-group {

@@ -192,9 +192,12 @@ $form-multi-select-tokens: defaults(
     --#{$prefix}control-focus-ring: #{$focus-ring};
   }
 
-  // Selected tags wrap; the popup keeps the frame lit; disabled lives on the root.
+  // See the autocomplete: the selection area inside carries the padding, so the
+  // frame itself has none and its parts stretch to the full height.
   .form-multi-select .form-control-group {
     flex-wrap: wrap;
+    align-items: stretch;
+    padding: 0;
   }
 
   .form-multi-select.show .form-control-group,
