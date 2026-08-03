@@ -350,6 +350,7 @@ class DateRangePicker extends BaseComponent {
     const indicator = document.createElement('button')
     indicator.classList.add(CLASS_NAME_INDICATOR)
     indicator.type = 'button'
+    indicator.disabled = this._config.disabled
     indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
     indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
     inputGroup.append(indicator)
