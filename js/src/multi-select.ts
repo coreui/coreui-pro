@@ -13,7 +13,7 @@ import Data from './dom/data.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import type { ComponentConfig } from './util/config.js'
-import { CLEANER_ICON } from './util/icons.js'
+import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
 import { DefaultAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
 
@@ -782,12 +782,10 @@ class MultiSelect extends Combobox {
 
     const indicator = document.createElement('button')
     indicator.type = 'button'
-    indicator.classList.add('form-multi-select-indicator')
+    indicator.classList.add('form-control-action')
+    indicator.disabled = this._config.disabled
     indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
-
-    if (this._config.disabled) {
-      indicator.tabIndex = -1
-    }
+    indicator.innerHTML = INDICATOR_ICON
 
     buttons.append(indicator)
 

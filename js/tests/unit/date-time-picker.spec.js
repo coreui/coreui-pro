@@ -187,6 +187,22 @@ describe('DateTimePicker', () => {
     })
   })
 
+  describe('cleaner', () => {
+    it('should clear the value when the cleaner is clicked', () => {
+      const picker = buildPicker({ date: new Date(2026, 5, 15, 10, 0) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getDate()).toBeNull()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, date: new Date(2026, 5, 15, 10, 0) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
+    })
+  })
+
   describe('slot context', () => {
     it('should expose the date contract', () => {
       const picker = buildPicker()

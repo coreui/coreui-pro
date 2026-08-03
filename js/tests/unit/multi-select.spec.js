@@ -3464,7 +3464,7 @@ describe('MultiSelect', () => {
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(true)
     })
 
-    it('should set tabIndex -1 on indicator when disabled', () => {
+    it('should disable the indicator when disabled', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -3472,7 +3472,7 @@ describe('MultiSelect', () => {
         disabled: true
       })
 
-      expect(multiSelect._indicatorElement.tabIndex).toBe(-1)
+      expect(multiSelect._indicatorElement.disabled).toBe(true)
     })
   })
 

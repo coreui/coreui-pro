@@ -13,7 +13,7 @@ import type { ComponentConfig } from './util/config.js'
 import {
   DefaultAllowlist, escapeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
-import { CLEANER_ICON } from './util/icons.js'
+import { CLEANER_ICON, INDICATOR_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
@@ -50,7 +50,7 @@ const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
 const CLASS_NAME_BUTTONS = 'autocomplete-buttons'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
-const CLASS_NAME_INDICATOR = 'autocomplete-indicator'
+const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_INPUT = 'autocomplete-input'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
@@ -58,7 +58,7 @@ const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="autocomplete"]:not(.disabled)'
 const SELECTOR_DATA_TOGGLE_SHOWN = `.autocomplete:not(.disabled).${CLASS_NAME_SHOW}`
-const SELECTOR_INDICATOR = '.autocomplete-indicator'
+const SELECTOR_INDICATOR = '.form-control-action'
 
 const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
@@ -577,14 +577,11 @@ class Autocomplete extends Combobox {
       const indicator = document.createElement('button')
       indicator.type = 'button'
       indicator.classList.add(CLASS_NAME_INDICATOR)
+      indicator.disabled = this._config.disabled
       indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
-
-      if (this._config.disabled) {
-        indicator.tabIndex = -1
-      }
+      indicator.innerHTML = INDICATOR_ICON
 
       buttons.append(indicator)
-      this._indicatorElement = indicator
       this._indicatorElement = indicator
     }
 

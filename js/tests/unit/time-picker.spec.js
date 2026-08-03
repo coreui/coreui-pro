@@ -203,6 +203,22 @@ describe('TimePicker', () => {
     })
   })
 
+  describe('cleaner', () => {
+    it('should clear the value when the cleaner is clicked', () => {
+      const picker = buildPicker({ time: new Date(2026, 0, 1, 14, 30) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getTime()).toBeNull()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, time: new Date(2026, 0, 1, 14, 30) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
+    })
+  })
+
   describe('footer actions', () => {
     it('should run context actions from data attributes', () => {
       const picker = buildPicker({ time: new Date(2026, 0, 1, 10, 0) }, [

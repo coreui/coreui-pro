@@ -963,7 +963,8 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   | v5 | v6 |
   | --- | --- |
   | `.date-picker-input-group`, `.time-picker-input-group`, `.autocomplete-input-group`, `.form-multi-select-input-group`, the frame on `.chip-input`, the `.form-password` wrapper | `.form-control-group` |
-  | `.date-picker-indicator`, `.time-picker-indicator`, `.form-password-action` | `.form-control-action` |
+  | `.date-picker-indicator`, `.time-picker-indicator`, `.autocomplete-indicator`, `.form-multi-select-indicator`, `.form-password-action` | `.form-control-action` |
+  | `.autocomplete-cleaner`, `.form-multi-select-cleaner` | `.form-control-cleaner` |
   | `.date-picker-separator` | `.form-control-icon` |
   | `.date-picker-sm/-lg`, `.time-picker-sm/-lg` | `.form-control-sm/-lg` on the group (the components apply it from `size` themselves) |
 
@@ -971,6 +972,12 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   (`<div class="form-control-group">` with a `.form-control-action` button) and
   the chip input (`<div class="form-control-group chip-input">`). The
   components that build their own DOM do it for you.
+
+  The adornment icons are inline SVG rendered by the component now, not CSS
+  masks, so they take their colour from the button (`currentColor`) and follow
+  it through hover, validation and disabled — the per-family icon, icon colour
+  and icon size variables are gone with them. Every adornment across the
+  library is the same mark at the same size.
 
   Sass overrides move with the classes. Because the group *is* the control
   frame, theming `.form-control` — or the `--#{$prefix}control-*` custom

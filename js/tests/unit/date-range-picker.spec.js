@@ -199,6 +199,23 @@ describe('DateRangePicker', () => {
     })
   })
 
+  describe('cleaner', () => {
+    it('should clear both dates when the cleaner is clicked', () => {
+      const picker = buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getStartDate()).toBeNull()
+      expect(picker.getEndDate()).toBeNull()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, startDate: new Date(2026, 5, 1) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
+    })
+  })
+
   describe('slot context', () => {
     it('should expose the range contract', () => {
       const picker = buildPicker()
