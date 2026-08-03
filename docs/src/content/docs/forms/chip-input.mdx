@@ -190,6 +190,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 | `selectable` | boolean | `false` | Enables selection behavior for chips managed by Chip Input. |
 | `removable` | boolean | `true` | Add remove buttons to created chips. |
 | `removeIcon` | string | SVG | HTML string for the remove button icon. |
+| `create` | boolean | `true` | Turns typed text into chips. Set to `false` for the controlled mode: chips come only from `add()` — a host component's selection, say — typing never creates one, and no hidden form input is rendered (the host owns the value). |
 | `createOnBlur` | boolean | `true` | Create a chip from the input value when the input loses focus. |
 
 ### Methods

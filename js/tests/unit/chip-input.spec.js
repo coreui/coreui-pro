@@ -1023,6 +1023,48 @@ describe('ChipInput', () => {
     })
   })
 
+  describe('controlled mode (create: false)', () => {
+    it('should not create a chip on Enter', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+      const input = fixtureEl.querySelector('input[type="text"]')
+
+      input.value = 'typed'
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(input.value).toBe('typed')
+    })
+
+    it('should not split typed separators into chips', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+      const input = fixtureEl.querySelector('input[type="text"]')
+
+      input.value = 'a,b,'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual([])
+    })
+
+    it('should not render a hidden form input', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false }) // eslint-disable-line no-unused-vars
+
+      expect(fixtureEl.querySelector('input[type="hidden"]')).toBeNull()
+    })
+
+    it('should still accept chips from the host', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+
+      chipInput.add('Bootstrap')
+
+      expect(chipInput.getValues()).toEqual(['Bootstrap'])
+      expect(fixtureEl.querySelectorAll('.chip')).toHaveSize(1)
+    })
+  })
+
   describe('keyboard navigation', () => {
     it('should move focus to the input on ArrowRight from the last chip', () => {
       fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
