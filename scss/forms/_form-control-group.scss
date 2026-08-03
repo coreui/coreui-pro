@@ -104,8 +104,11 @@ $form-control-group-tokens: defaults(
       @include form-control-group-focus();
     }
 
+    // A control that isn't a real input carries `.disabled` as a class, so both
+    // spellings have to reach the frame.
     &.disabled,
-    &:has(> .form-control:disabled) {
+    &:has(> .form-control:disabled),
+    &:has(> .form-control.disabled) {
       color: var(--#{$prefix}control-disabled-color);
       cursor: default;
       background-color: var(--#{$prefix}control-disabled-bg);
@@ -135,9 +138,11 @@ $form-control-group-tokens: defaults(
         outline: 0;
       }
 
-      &:disabled {
+      &:disabled,
+      &.disabled {
         color: inherit;
         background-color: transparent;
+        border-color: transparent;
       }
     }
   }
