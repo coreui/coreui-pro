@@ -29,6 +29,12 @@ $form-date-time-tokens: defaults(
 // scss-docs-end form-date-time-tokens
 
 @layer forms {
+  // A cleaner next to a section field only means something once the field
+  // holds a value — the field itself reports that with `.form-date-time-filled`.
+  .form-control-group:not(:has(> .form-date-time-filled)) > .form-control-cleaner {
+    display: none;
+  }
+
   // The component element carries `.form-control` for the base look, sizing
   // (`.form-control-sm`/`-lg`), validation states, and input group support.
   // This layer only covers what a div of contenteditable sections needs on top

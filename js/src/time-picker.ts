@@ -16,6 +16,8 @@ import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
+import { createControlGroupAction } from './util/form-control-group.js'
+import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -38,6 +40,7 @@ const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 const CLASS_NAME_BODY = 'time-picker-body'
 const CLASS_NAME_DROPDOWN = 'time-picker-dropdown'
 const CLASS_NAME_FOOTER = 'time-picker-footer'
+const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
@@ -55,7 +58,10 @@ const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" 
 
 type TimePickerConfig = {
   allowList: SanitizerAllowList
+  ariaCleanerLabel: string
   ariaToggleLabel: string
+  cleaner: boolean
+  cleanerIcon: string
   container: Element | boolean | string
   disabled: boolean
   indicatorIcon: string
@@ -72,7 +78,10 @@ type TimePickerConfig = {
 
 const Default: TimePickerConfig = {
   allowList: SVGAllowlist,
+  ariaCleanerLabel: 'Clear the value',
   ariaToggleLabel: 'Toggle the time selection',
+  cleaner: true,
+  cleanerIcon: CLEANER_ICON,
   container: false,
   disabled: false,
   indicatorIcon: DEFAULT_INDICATOR_ICON,
@@ -89,7 +98,10 @@ const Default: TimePickerConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
+  ariaCleanerLabel: 'string',
   ariaToggleLabel: 'string',
+  cleaner: 'boolean',
+  cleanerIcon: 'string',
   container: '(string|element|boolean)',
   disabled: 'boolean',
   indicatorIcon: 'string',
@@ -110,6 +122,7 @@ const DefaultType: Record<string, string> = {
 
 class TimePicker extends BaseComponent {
   protected declare _footerTemplate: any
+  protected declare _cleanerElement: HTMLElement | null
   protected declare _indicatorElement: HTMLElement
   protected declare _initialTime: any
   protected declare _input: any
@@ -124,6 +137,7 @@ class TimePicker extends BaseComponent {
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     // see DatePicker — the shell owns the initial value for reset()
     this._initialTime = config?.time ?? this._config.time
+    this._cleanerElement = null
     this._input = null
     this._selection = null
     this._selectionElement = null
@@ -242,12 +256,16 @@ class TimePicker extends BaseComponent {
     const inputEl = document.createElement('div')
     inputGroup.append(inputEl)
 
-    const indicator = document.createElement('button')
-    indicator.classList.add(CLASS_NAME_INDICATOR)
-    indicator.type = 'button'
-    indicator.disabled = this._config.disabled
-    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
-    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
+    const action = (className: string, icon: string, label: string) => createControlGroupAction({
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+    })
+
+    if (this._config.cleaner) {
+      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      inputGroup.append(this._cleanerElement)
+    }
+
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
@@ -336,6 +354,13 @@ class TimePicker extends BaseComponent {
   }
 
   _addEventListeners(): void {
+    if (this._cleanerElement) {
+      EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
+        event.stopPropagation()
+        this.clear()
+      })
+    }
+
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()

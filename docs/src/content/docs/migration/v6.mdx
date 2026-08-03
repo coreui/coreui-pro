@@ -495,8 +495,9 @@ assembles maps of CSS expressions and the browser resolves them.
 - Two silent duplicates were dropped along the way: `$nav-link-height` was
   declared twice (navbar and header blocks — the header copy is gone) and the
   calendar emitted `--cui-calendar-cell-week-number-color` twice.
-- **Time picker: the v1-only tokens are gone.** The rewritten shell has no
-  cleaner button and draws its indicator as an inline SVG on `currentColor`,
+- **Time picker: the v1-only tokens are gone.** The rewritten shell draws its
+  adornments as inline SVG on `currentColor` and styles them through
+  [`.form-control-action` / `.form-control-cleaner`](/forms/form-control-group/),
   so nothing read them any more — `--cui-time-picker-cleaner-*` (5 tokens),
   `--cui-time-picker-indicator-icon`, `--cui-time-picker-indicator-icon-size`,
   `--cui-time-picker-gap` and `--cui-time-picker-placeholder-color`, together

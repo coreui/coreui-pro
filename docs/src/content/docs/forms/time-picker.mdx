@@ -187,7 +187,10 @@ forwarded by name, so their data attributes work on the picker element too.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | `SVGAllowlist` | Allowlist used when sanitizing the icon markup. |
+| `ariaCleanerLabel` | string | `'Clear the value'` | Accessible label of the cleaner button. |
 | `ariaToggleLabel` | string | `'Toggle the time selection'` | Accessible label of the indicator button. |
+| `cleaner` | boolean | `true` | Renders a button that clears the value. It appears only once the field holds one. |
+| `cleanerIcon` | string | cross SVG | Inline SVG rendered by the component (sanitized). |
 | `container` | string, element, false | `false` | Teleport target for the dropdown. |
 | `disabled` | boolean | `false` | Disables the field and the popup. |
 | `hours` | array, function, null | `null` | Allowed hours — a list or a filter. |

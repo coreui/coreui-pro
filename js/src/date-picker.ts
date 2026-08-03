@@ -18,6 +18,8 @@ import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
+import { createControlGroupAction } from './util/form-control-group.js'
+import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -44,6 +46,7 @@ const CLASS_NAME_CALENDARS = 'date-picker-calendars'
 const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
+const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'
 const CLASS_NAME_FORM_CONTROL = 'form-control'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
@@ -62,7 +65,10 @@ const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" 
 
 type DatePickerConfig = {
   allowList: SanitizerAllowList
+  ariaCleanerLabel: string
   ariaToggleLabel: string
+  cleaner: boolean
+  cleanerIcon: string
   calendarOptions: Record<string, any>
   container: Element | boolean | string
   disabled: boolean
@@ -80,7 +86,10 @@ type DatePickerConfig = {
 
 const Default: DatePickerConfig = {
   allowList: SVGAllowlist,
+  ariaCleanerLabel: 'Clear the value',
   ariaToggleLabel: 'Toggle the calendar',
+  cleaner: true,
+  cleanerIcon: CLEANER_ICON,
   calendarOptions: {},
   container: false,
   date: null,
@@ -98,7 +107,10 @@ const Default: DatePickerConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
+  ariaCleanerLabel: 'string',
   ariaToggleLabel: 'string',
+  cleaner: 'boolean',
+  cleanerIcon: 'string',
   calendarOptions: 'object',
   container: '(string|element|boolean)',
   date: '(date|string|null)',
@@ -120,6 +132,7 @@ const DefaultType: Record<string, string> = {
 
 class DatePicker extends BaseComponent {
   protected declare _footerTemplate: any
+  protected declare _cleanerElement: HTMLElement | null
   protected declare _indicatorElement: HTMLElement
   protected declare _initialDate: any
   protected declare _input: any
@@ -135,6 +148,7 @@ class DatePicker extends BaseComponent {
     // setDate() goes through the field's update(), which rewrites its config —
     // so the shell keeps the initial value for reset() itself
     this._initialDate = config?.date ?? this._config.date
+    this._cleanerElement = null
     this._input = null
     this._calendar = null
     this._calendarElement = null
@@ -274,12 +288,16 @@ class DatePicker extends BaseComponent {
     const inputEl = document.createElement('div')
     inputGroup.append(inputEl)
 
-    const indicator = document.createElement('button')
-    indicator.classList.add(CLASS_NAME_INDICATOR)
-    indicator.type = 'button'
-    indicator.disabled = this._config.disabled
-    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
-    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
+    const action = (className: string, icon: string, label: string) => createControlGroupAction({
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+    })
+
+    if (this._config.cleaner) {
+      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      inputGroup.append(this._cleanerElement)
+    }
+
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
@@ -380,6 +398,13 @@ class DatePicker extends BaseComponent {
   }
 
   _addEventListeners(): void {
+    if (this._cleanerElement) {
+      EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
+        event.stopPropagation()
+        this.clear()
+      })
+    }
+
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()

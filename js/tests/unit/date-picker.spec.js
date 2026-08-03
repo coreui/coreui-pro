@@ -221,6 +221,51 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('cleaner', () => {
+    it('should clear the value when the cleaner is clicked', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getDate()).toBeNull()
+    })
+
+    it('should not open the popup when the cleaner is clicked', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker._popup.isShown).toBeFalse()
+    })
+
+    it('should hide the cleaner while the field is empty', () => {
+      buildPicker()
+
+      // the field reports emptiness; the rule that acts on it is CSS, so the
+      // hook itself is what the test can assert
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('form-date-time-filled')).toBeFalse()
+      expect(fixtureEl.querySelector('.form-control-cleaner')).not.toBeNull()
+    })
+
+    it('should mark the field filled once it holds a value', () => {
+      buildPicker({ date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('form-date-time-filled')).toBeTrue()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
+    })
+
+    it('should disable the cleaner when the picker is disabled', () => {
+      buildPicker({ date: new Date(2026, 6, 14), disabled: true })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner').disabled).toBeTrue()
+    })
+  })
+
   describe('min/max validation', () => {
     it('should propagate field validation to a programmatic date beyond maxDate', () => {
       const yesterday = new Date()
