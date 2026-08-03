@@ -1010,27 +1010,8 @@ $kbd-bg:                            var(--#{$prefix}body-color) !default;
 
 $pre-color:                         null !default;
 
-// Auto Complete
-
-// Time Picker
-
 // Time Picker
 // scss-docs-start time-picker-variables
-$time-picker-font-weight:                   $input-font-weight !default;
-$time-picker-box-shadow:                    $box-shadow-inset !default;
-
-$time-picker-border-color:                  $input-border-color !default;
-$time-picker-border-radius:                 $input-border-radius !default;
-
-$time-picker-disabled-color:                $input-disabled-color !default;
-$time-picker-disabled-bg:                   $input-disabled-bg !default;
-$time-picker-disabled-border-color:         $input-disabled-border-color !default;
-
-$time-picker-focus-color:                   $input-focus-color !default;
-$time-picker-focus-bg:                      $input-focus-bg !default;
-$time-picker-focus-border-color:            $input-focus-border-color !default;
-$time-picker-focus-ring:              $input-btn-focus-ring !default;
-
 $time-picker-body-padding:                  $spacer * .5 !default;
 
 $time-picker-footer-padding:                .5rem !default;

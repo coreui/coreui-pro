@@ -968,6 +968,8 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   | `.autocomplete-input` | plain `.form-control` — the group strips its frame, so the editable needs no class of its own |
   | `.autocomplete-buttons`, `.form-multi-select-buttons` | gone: the adornments are children of the group, which lays them out |
   | `.form-multi-select-tag`, `.form-multi-select-tag-delete` | `.chip`, `.chip-remove` |
+  | `.date-picker-separator` | `.form-control-icon` |
+  | `.date-picker-sm/-lg`, `.time-picker-sm/-lg`, `.autocomplete-sm/-lg`, `.form-multi-select-sm/-lg` | `.form-control-sm/-lg` on the group (the components apply it from `size` themselves) |
 
 - **Multi Select renders every selection as a Chip.** `selectionType: 'tags'`
   and `'chips'` used to be the same idea built twice, the default `'tags'`
@@ -975,8 +977,16 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   are still accepted and now produce the same markup, so a selection is a chip
   everywhere in the library — style it through the `--#{$prefix}chip-*`
   properties. The `$form-multi-select-tag-*` variables are gone with it.
-  | `.date-picker-separator` | `.form-control-icon` |
-  | `.date-picker-sm/-lg`, `.time-picker-sm/-lg` | `.form-control-sm/-lg` on the group (the components apply it from `size` themselves) |
+
+- **The per-family frame variables are gone.** `$autocomplete-font-size`,
+  `$date-picker-border-color`, `$time-picker-focus-bg`,
+  `$form-multi-select-padding-y` and the rest of each family's copy of the
+  input look mirrored the shared frame value for value — and since the frame
+  declares the `--#{$prefix}control-*` properties on itself, an override
+  through them never reached it. Theme the frame once through the `$input-*`
+  variables, or per instance through `--#{$prefix}control-*` on
+  `.form-control-group`. Each family keeps only the variables for what is
+  genuinely its own (placeholder colours, the pickers' footers, the tag row).
 
   Markup you write by hand has to be updated: the password input wrapper
   (`<div class="form-control-group">` with a `.form-control-action` button) and

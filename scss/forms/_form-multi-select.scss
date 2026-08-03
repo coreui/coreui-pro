@@ -1,104 +1,32 @@
 @use "sass:math";
 @use "../functions/defaults" as *;
-@use "../functions/escape-svg" as *;
-@use "../mixins/border-radius" as *;
-@use "../mixins/box-shadow" as *;
 @use "../mixins/tokens" as *;
-@use "../mixins/transition" as *;
 @use "../config" as *;
 @use "form-control-group" as *;
-@use "form-check" as *;
 
 // Multi Select
 // scss-docs-start form-multi-select-variables
-$form-multi-select-font-family:               var(--#{$prefix}btn-input-font-family) !default;
-$form-multi-select-font-size:                 var(--#{$prefix}btn-input-font-size) !default;
-$form-multi-select-font-weight:               $input-font-weight !default;
-$form-multi-select-line-height:               var(--#{$prefix}btn-input-line-height) !default;
-$form-multi-select-color:                     var(--#{$prefix}btn-input-color) !default;
-$form-multi-select-bg:                        var(--#{$prefix}btn-input-bg) !default;
-$form-multi-select-box-shadow:                $box-shadow-inset !default;
-
-$form-multi-select-border-width:              var(--#{$prefix}btn-input-border-width) !default;
-$form-multi-select-border-color:              $input-border-color !default;
-$form-multi-select-border-radius:             $input-border-radius !default;
-$form-multi-select-border-radius-sm:          $input-border-radius-sm !default;
-$form-multi-select-border-radius-lg:          $input-border-radius-lg !default;
-
-$form-multi-select-disabled-color:            $input-disabled-color !default;
-$form-multi-select-disabled-bg:               $input-disabled-bg !default;
-$form-multi-select-disabled-border-color:     $input-disabled-border-color !default;
-
-$form-multi-select-focus-color:               $input-focus-color !default;
-$form-multi-select-focus-bg:                  $input-focus-bg !default;
-$form-multi-select-focus-border-color:        $input-focus-border-color !default;
-$form-multi-select-focus-ring:          $input-btn-focus-ring !default;
-
 $form-multi-select-invalid-border-color:      var(--#{$prefix}form-invalid-border-color) !default;
 $form-multi-select-valid-border-color:        var(--#{$prefix}form-valid-border-color) !default;
 
 $form-multi-select-placeholder-color:         var(--#{$prefix}secondary-color) !default;
 
-$form-multi-select-selection-padding-y:       var(--#{$prefix}btn-input-padding-y) !default;
-$form-multi-select-selection-padding-x:       var(--#{$prefix}btn-input-padding-x) !default;
 $form-multi-select-selection-tags-gap:        .25rem !default;
 $form-multi-select-selection-tags-padding-y:  .25rem !default;
-$form-multi-select-selection-tags-padding-x:  .25rem !default;
-
-$form-multi-select-tag-delete-icon-color:        var(--#{$prefix}secondary-color) !default;
-$form-multi-select-tag-delete-icon-hover-color:  var(--#{$prefix}body-color) !default;
-
-$form-multi-select-font-size-lg:                 var(--#{$prefix}btn-input-lg-font-size) !default;
-$form-multi-select-selection-padding-y-lg:       var(--#{$prefix}btn-input-lg-padding-y) !default;
-$form-multi-select-selection-padding-x-lg:       var(--#{$prefix}btn-input-lg-padding-x) !default;
-$form-multi-select-selection-tags-gap-lg:        .25rem !default;
-$form-multi-select-selection-tags-padding-y-lg:  .25rem !default;
-$form-multi-select-selection-tags-padding-x-lg:  .25rem !default;
-
-$form-multi-select-font-size-sm:                 var(--#{$prefix}btn-input-sm-font-size) !default;
-$form-multi-select-selection-padding-y-sm:       var(--#{$prefix}btn-input-sm-padding-y) !default;
-$form-multi-select-selection-padding-x-sm:       var(--#{$prefix}btn-input-sm-padding-x) !default;
-$form-multi-select-selection-tags-gap-sm:        .125rem !default;
-$form-multi-select-selection-tags-padding-y-sm:  .0625rem !default;
-$form-multi-select-selection-tags-padding-x-sm:  .125rem !default;
 // scss-docs-end form-multi-select-variables
 
 $form-multi-select-tokens: () !default;
 
 // scss-docs-start form-multi-select-css-vars
-// stylelint-disable custom-property-no-missing-var-function
 // stylelint-disable-next-line scss/dollar-variable-default
 $form-multi-select-tokens: defaults(
   (
-    --#{$prefix}control-font-family: #{$form-multi-select-font-family},
-    --#{$prefix}control-font-size: #{$form-multi-select-font-size},
-    --#{$prefix}control-font-weight: #{$form-multi-select-font-weight},
-    --#{$prefix}control-line-height: #{$form-multi-select-line-height},
-    --#{$prefix}control-color: #{$form-multi-select-color},
-    --#{$prefix}control-bg: #{$form-multi-select-bg},
-    --#{$prefix}control-box-shadow: #{$form-multi-select-box-shadow},
-    --#{$prefix}control-border-width: #{$form-multi-select-border-width},
-    --#{$prefix}control-border-color: #{$form-multi-select-border-color},
-    --#{$prefix}control-border-radius: #{$form-multi-select-border-radius},
-    --#{$prefix}control-disabled-color: #{$form-multi-select-disabled-color},
-    --#{$prefix}control-disabled-bg: #{$form-multi-select-disabled-bg},
-    --#{$prefix}control-disabled-border-color: #{$form-multi-select-disabled-border-color},
-    --#{$prefix}control-focus-color: #{$form-multi-select-focus-color},
-    --#{$prefix}control-focus-bg: #{$form-multi-select-focus-bg},
-    --#{$prefix}control-focus-border-color: #{$form-multi-select-focus-border-color},
-    --#{$prefix}control-focus-ring: #{$form-multi-select-focus-ring},
     --#{$prefix}form-multi-select-placeholder-color: #{$form-multi-select-placeholder-color},
-    --#{$prefix}control-padding-y: #{$form-multi-select-selection-padding-y},
-    --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x},
-    --#{$prefix}form-multi-select-tag-delete-icon-color: #{$form-multi-select-tag-delete-icon-color},
-    --#{$prefix}form-multi-select-tag-delete-icon-hover-color: #{$form-multi-select-tag-delete-icon-hover-color},
     --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap},
     --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y},
-    --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x},
   ),
   $form-multi-select-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-multi-select-css-vars
 
 @layer forms {
@@ -220,23 +148,4 @@ $form-multi-select-tokens: defaults(
     transform: rotate(180deg);
   }
 
-  .form-multi-select-sm {
-    --#{$prefix}control-padding-y: #{$form-multi-select-selection-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x-sm};
-    --#{$prefix}control-font-size: #{$form-multi-select-font-size-sm};
-    --#{$prefix}control-border-radius: #{$form-multi-select-border-radius-sm};
-    --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-sm};
-    --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-sm};
-    --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-sm};
-  }
-
-  .form-multi-select-lg {
-    --#{$prefix}control-padding-y: #{$form-multi-select-selection-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x-lg};
-    --#{$prefix}control-font-size: #{$form-multi-select-font-size-lg};
-    --#{$prefix}control-border-radius: #{$form-multi-select-border-radius-lg};
-    --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-lg};
-    --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-lg};
-    --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
-  }
 }

@@ -1,54 +1,14 @@
 @use "sass:math";
-@use "forms/check" as *;
 @use "functions/defaults" as *;
-@use "functions/escape-svg" as *;
-@use "mixins/border-radius" as *;
-@use "mixins/box-shadow" as *;
 @use "mixins/tokens" as *;
-@use "mixins/transition" as *;
 @use "config" as *;
 @use "forms/form-control-group" as *;
 
-// stylelint-disable custom-property-no-missing-var-function
-
 // scss-docs-start autocomplete-variables
-$autocomplete-font-family:               var(--#{$prefix}btn-input-font-family) !default;
-$autocomplete-font-size:                 var(--#{$prefix}btn-input-font-size) !default;
-$autocomplete-font-weight:               $input-font-weight !default;
-$autocomplete-line-height:               var(--#{$prefix}btn-input-line-height) !default;
-$autocomplete-padding-y:                 var(--#{$prefix}btn-input-padding-y) !default;
-$autocomplete-padding-x:                 var(--#{$prefix}btn-input-padding-x) !default;
-$autocomplete-color:                     var(--#{$prefix}btn-input-color) !default;
-$autocomplete-bg:                        var(--#{$prefix}btn-input-bg) !default;
-$autocomplete-box-shadow:                $box-shadow-inset !default;
-
-$autocomplete-border-width:              var(--#{$prefix}btn-input-border-width) !default;
-$autocomplete-border-color:              $input-border-color !default;
-$autocomplete-border-radius:             $input-border-radius !default;
-$autocomplete-border-radius-sm:          $input-border-radius-sm !default;
-$autocomplete-border-radius-lg:          $input-border-radius-lg !default;
-
-$autocomplete-disabled-color:            $input-disabled-color !default;
-$autocomplete-disabled-bg:               $input-disabled-bg !default;
-$autocomplete-disabled-border-color:     $input-disabled-border-color !default;
-
-$autocomplete-focus-color:               $input-focus-color !default;
-$autocomplete-focus-bg:                  $input-focus-bg !default;
-$autocomplete-focus-border-color:        $input-focus-border-color !default;
-$autocomplete-focus-ring:          $input-btn-focus-ring !default;
-
 $autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !default;
 
 $autocomplete-invalid-border-color:      var(--#{$prefix}form-invalid-border-color) !default;
 $autocomplete-valid-border-color:        var(--#{$prefix}form-valid-border-color) !default;
-
-$autocomplete-font-size-lg:                 var(--#{$prefix}btn-input-lg-font-size) !default;
-$autocomplete-padding-y-lg:                 var(--#{$prefix}btn-input-lg-padding-y) !default;
-$autocomplete-padding-x-lg:                 var(--#{$prefix}btn-input-lg-padding-x) !default;
-
-$autocomplete-font-size-sm:                 var(--#{$prefix}btn-input-sm-font-size) !default;
-$autocomplete-padding-y-sm:                 var(--#{$prefix}btn-input-sm-padding-y) !default;
-$autocomplete-padding-x-sm:                 var(--#{$prefix}btn-input-sm-padding-x) !default;
 // scss-docs-end autocomplete-variables
 
 $autocomplete-tokens: () !default;
@@ -57,26 +17,7 @@ $autocomplete-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $autocomplete-tokens: defaults(
   (
-    --#{$prefix}control-font-family: #{$autocomplete-font-family},
-    --#{$prefix}control-font-size: #{$autocomplete-font-size},
-    --#{$prefix}control-font-weight: #{$autocomplete-font-weight},
-    --#{$prefix}control-line-height: #{$autocomplete-line-height},
-    --#{$prefix}control-color: #{$autocomplete-color},
-    --#{$prefix}control-bg: #{$autocomplete-bg},
-    --#{$prefix}control-box-shadow: #{$autocomplete-box-shadow},
-    --#{$prefix}control-border-width: #{$autocomplete-border-width},
-    --#{$prefix}control-border-color: #{$autocomplete-border-color},
-    --#{$prefix}control-border-radius: #{$autocomplete-border-radius},
-    --#{$prefix}control-disabled-color: #{$autocomplete-disabled-color},
-    --#{$prefix}control-disabled-bg: #{$autocomplete-disabled-bg},
-    --#{$prefix}control-disabled-border-color: #{$autocomplete-disabled-border-color},
-    --#{$prefix}control-focus-color: #{$autocomplete-focus-color},
-    --#{$prefix}control-focus-bg: #{$autocomplete-focus-bg},
-    --#{$prefix}control-focus-border-color: #{$autocomplete-focus-border-color},
-    --#{$prefix}control-focus-ring: #{$autocomplete-focus-ring},
     --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color},
-    --#{$prefix}control-padding-y: #{$autocomplete-padding-y},
-    --#{$prefix}control-padding-x: #{$autocomplete-padding-x},
   ),
   $autocomplete-tokens
 );
@@ -146,21 +87,5 @@ $autocomplete-tokens: defaults(
   // The chevron turns when the popup opens.
   .autocomplete.show .form-control-action {
     transform: rotate(180deg);
-  }
-
-  // The frame gives the control its height and padding now; these only need to
-  // sit together at the end of the row.
-  .autocomplete-sm {
-    --#{$prefix}control-padding-y: #{$autocomplete-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$autocomplete-padding-x-sm};
-    --#{$prefix}control-font-size: #{$autocomplete-font-size-sm};
-    --#{$prefix}control-border-radius: #{$autocomplete-border-radius-sm};
-  }
-
-  .autocomplete-lg {
-    --#{$prefix}control-padding-y: #{$autocomplete-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$autocomplete-padding-x-lg};
-    --#{$prefix}control-font-size: #{$autocomplete-font-size-lg};
-    --#{$prefix}control-border-radius: #{$autocomplete-border-radius-lg};
   }
 }

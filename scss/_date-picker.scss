@@ -1,43 +1,15 @@
 @use "sass:math";
 @use "calendar" as *;
 @use "functions/defaults" as *;
-@use "functions/escape-svg" as *;
-@use "mixins/border-radius" as *;
-@use "mixins/box-shadow" as *;
-@use "layout/breakpoints" as *;
-@use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
-@use "mixins/transition" as *;
 @use "config" as *;
 @use "forms/form-control-group" as *;
 
 // Date Picker
 // scss-docs-start date-picker-variables
-$date-picker-bg:                       var(--#{$prefix}btn-input-bg) !default;
-
-$date-picker-border-width:             var(--#{$prefix}btn-input-border-width) !default;
-$date-picker-border-color:             $input-border-color !default;
-$date-picker-border-radius:            $border-radius !default;
-
-$date-picker-focus-border-color:       $input-focus-border-color !default;
-
 $date-picker-footer-padding:           .5rem !default;
 $date-picker-footer-border-width:      1px !default;
 $date-picker-footer-border-color:      var(--#{$prefix}border-color) !default;
-$date-picker-font-family:              var(--#{$prefix}btn-input-font-family) !default;
-$date-picker-font-size:                var(--#{$prefix}btn-input-font-size) !default;
-$date-picker-font-weight:              $input-font-weight !default;
-$date-picker-line-height:              var(--#{$prefix}btn-input-line-height) !default;
-$date-picker-color:                    var(--#{$prefix}btn-input-color) !default;
-$date-picker-box-shadow:               $box-shadow-inset !default;
-$date-picker-padding-y:                var(--#{$prefix}btn-input-padding-y) !default;
-$date-picker-padding-x:                var(--#{$prefix}btn-input-padding-x) !default;
-$date-picker-disabled-color:           $input-disabled-color !default;
-$date-picker-disabled-bg:              $input-disabled-bg !default;
-$date-picker-disabled-border-color:    $input-disabled-border-color !default;
-$date-picker-focus-color:              $input-focus-color !default;
-$date-picker-focus-bg:                 $input-focus-bg !default;
-$date-picker-focus-ring:               $input-btn-focus-ring !default;
 // scss-docs-end date-picker-variables
 
 $date-picker-tokens: () !default;
@@ -46,25 +18,6 @@ $date-picker-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $date-picker-tokens: defaults(
   (
-    --#{$prefix}control-font-family: #{$date-picker-font-family},
-    --#{$prefix}control-font-size: #{$date-picker-font-size},
-    --#{$prefix}control-font-weight: #{$date-picker-font-weight},
-    --#{$prefix}control-line-height: #{$date-picker-line-height},
-    --#{$prefix}control-color: #{$date-picker-color},
-    --#{$prefix}control-bg: #{$date-picker-bg},
-    --#{$prefix}control-box-shadow: #{$date-picker-box-shadow},
-    --#{$prefix}control-padding-y: #{$date-picker-padding-y},
-    --#{$prefix}control-padding-x: #{$date-picker-padding-x},
-    --#{$prefix}control-disabled-color: #{$date-picker-disabled-color},
-    --#{$prefix}control-disabled-bg: #{$date-picker-disabled-bg},
-    --#{$prefix}control-disabled-border-color: #{$date-picker-disabled-border-color},
-    --#{$prefix}control-focus-color: #{$date-picker-focus-color},
-    --#{$prefix}control-focus-bg: #{$date-picker-focus-bg},
-    --#{$prefix}control-focus-ring: #{$date-picker-focus-ring},
-    --#{$prefix}control-border-width: #{$date-picker-border-width},
-    --#{$prefix}control-border-color: #{$date-picker-border-color},
-    --#{$prefix}control-border-radius: #{$date-picker-border-radius},
-    --#{$prefix}control-focus-border-color: #{$date-picker-focus-border-color},
     --#{$prefix}date-picker-footer-padding: #{$date-picker-footer-padding},
     --#{$prefix}date-picker-footer-border-width: #{$date-picker-footer-border-width},
     --#{$prefix}date-picker-footer-border-color: #{$date-picker-footer-border-color},
