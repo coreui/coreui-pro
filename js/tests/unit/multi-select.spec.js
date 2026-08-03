@@ -749,7 +749,7 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const tags = multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag')
+      const tags = multiSelect._wrapperElement.querySelectorAll('.chip')
       expect(tags.length).toBe(2)
     })
 
@@ -763,8 +763,8 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const tag = multiSelect._wrapperElement.querySelector('.form-multi-select-tag')
-      expect(tag.querySelector('.form-multi-select-tag-delete')).not.toBeNull()
+      const tag = multiSelect._wrapperElement.querySelector('.chip')
+      expect(tag.querySelector('.chip-remove')).not.toBeNull()
     })
 
     it('should not create tag delete buttons when disabled', () => {
@@ -778,8 +778,8 @@ describe('MultiSelect', () => {
         disabled: true
       })
 
-      const tag = multiSelect._wrapperElement.querySelector('.form-multi-select-tag')
-      expect(tag.querySelector('.form-multi-select-tag-delete')).toBeNull()
+      const tag = multiSelect._wrapperElement.querySelector('.chip')
+      expect(tag.querySelector('.chip-remove')).toBeNull()
     })
 
     it('should handle single select with selected option', () => {
@@ -2655,7 +2655,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._selected.length).toBe(2)
 
-      const tagDelete = multiSelect._wrapperElement.querySelector('.form-multi-select-tag-delete')
+      const tagDelete = multiSelect._wrapperElement.querySelector('.chip-remove')
       tagDelete.click()
 
       expect(multiSelect._selected.length).toBe(1)
@@ -2671,7 +2671,7 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
 
-      multiSelect._wrapperElement.querySelector('.form-multi-select-tag-delete').click()
+      multiSelect._wrapperElement.querySelector('.chip-remove').click()
 
       expect(multiSelect._selected.length).toBe(0)
       expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
@@ -2691,7 +2691,7 @@ describe('MultiSelect', () => {
       // This tag node did not exist when listeners were bound.
       multiSelect._selectOption('2', 'Opt 2')
       const newTagDelete = multiSelect._wrapperElement
-        .querySelector('.form-multi-select-tag[data-value="2"] .form-multi-select-tag-delete')
+        .querySelector('.chip[data-value="2"] .chip-remove')
 
       newTagDelete.click()
 
@@ -2734,10 +2734,10 @@ describe('MultiSelect', () => {
       })
 
       // The disabled option's tag should not have a delete button
-      const tags = multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag')
+      const tags = multiSelect._wrapperElement.querySelectorAll('.chip')
       const disabledTag = Array.from(tags).find(t => t.dataset.value === '1')
       if (disabledTag) {
-        expect(disabledTag.querySelector('.form-multi-select-tag-delete')).toBeNull()
+        expect(disabledTag.querySelector('.chip-remove')).toBeNull()
       }
     })
 
@@ -2751,7 +2751,7 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      let tagDelete = multiSelect._wrapperElement.querySelector('.form-multi-select-tag-delete')
+      let tagDelete = multiSelect._wrapperElement.querySelector('.chip-remove')
       expect(tagDelete.getAttribute('aria-label')).toBe('Remove Angular')
 
       multiSelect.dispose()
@@ -2763,7 +2763,7 @@ describe('MultiSelect', () => {
         ariaTagDeleteLabel: 'Usuń'
       })
 
-      tagDelete = multiSelect2._wrapperElement.querySelector('.form-multi-select-tag-delete')
+      tagDelete = multiSelect2._wrapperElement.querySelector('.chip-remove')
       expect(tagDelete.getAttribute('aria-label')).toBe('Usuń Angular')
     })
 
@@ -2779,13 +2779,13 @@ describe('MultiSelect', () => {
         selectionType: 'tags'
       })
 
-      const firstTag = multiSelect._wrapperElement.querySelector('.form-multi-select-tag[data-value="1"]')
+      const firstTag = multiSelect._wrapperElement.querySelector('.chip[data-value="1"]')
 
       multiSelect._selectOption('2', 'Opt 2')
 
       // The diff update keeps the already-rendered tag node instead of recreating it.
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-tag[data-value="1"]')).toBe(firstTag)
-      expect(multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag').length).toBe(2)
+      expect(multiSelect._wrapperElement.querySelector('.chip[data-value="1"]')).toBe(firstTag)
+      expect(multiSelect._wrapperElement.querySelectorAll('.chip').length).toBe(2)
     })
 
     it('should remove the placeholder when the first tag is added', () => {
@@ -2803,7 +2803,7 @@ describe('MultiSelect', () => {
       multiSelect._selectOption('1', 'Opt 1')
 
       expect(multiSelect._wrapperElement.querySelector('.form-multi-select-placeholder')).toBeNull()
-      expect(multiSelect._wrapperElement.querySelectorAll('.form-multi-select-tag').length).toBe(1)
+      expect(multiSelect._wrapperElement.querySelectorAll('.chip').length).toBe(1)
     })
 
     it('should keep tags ordered and before the search input', () => {

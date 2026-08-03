@@ -50,8 +50,6 @@ const SELECTOR_DATA_MULTI_SELECT = '[data-coreui-multi-select]'
 // on class-only auto-init keep working (the v6 bet).
 const SELECTOR_SELECT = 'select.form-multi-select'
 const SELECTOR_SELECTION = '.form-multi-select-selection'
-const SELECTOR_TAG = '.form-multi-select-tag'
-const SELECTOR_TAG_DELETE = '.form-multi-select-tag-delete'
 const SELECTOR_VISIBLE_ITEMS = '.combobox-options .combobox-option:not(.disabled):not(:disabled)'
 const SELECTOR_NAVIGABLE_ITEMS = `.combobox-all:not(.disabled):not(:disabled), ${SELECTOR_VISIBLE_ITEMS}, .combobox-options .combobox-optgroup-label-with-checkbox`
 
@@ -84,8 +82,6 @@ const CLASS_NAME_INDETERMINATE = 'indeterminate'
 const CLASS_NAME_SELECTION = 'form-multi-select-selection'
 const CLASS_NAME_SELECTION_TAGS = 'form-multi-select-selection-tags'
 const CLASS_NAME_SHOW = 'show'
-const CLASS_NAME_TAG = 'form-multi-select-tag'
-const CLASS_NAME_TAG_DELETE = 'form-multi-select-tag-delete'
 
 const Default = {
   allowList: DefaultAllowlist as SanitizerAllowList,
@@ -396,17 +392,7 @@ class MultiSelect extends Combobox {
   // Private
 
   _addEventListeners(): void {
-    EventHandler.on(this._selectionElement, EVENT_CLICK, SELECTOR_TAG_DELETE, (event: any) => {
-      event.preventDefault()
-      event.stopPropagation()
-
-      const tag = event.target.closest(SELECTOR_TAG)
-      if (tag) {
-        this._deselectOption(String(tag.dataset.value))
-      }
-    })
-
-    // Chips-mode selections are real Chip instances: cancel the chip's own
+    // Selections are real Chip instances: cancel the chip's own
     // removal and route it through the selection model, which re-renders.
     EventHandler.on(this._selectionElement, EVENT_CHIP_REMOVE, SELECTOR_CHIP, (event: any) => {
       event.preventDefault()
@@ -967,57 +953,6 @@ class MultiSelect extends Combobox {
     }
   }
 
-  _createTag(value: any, text: string, disabled: boolean): HTMLElement {
-    const tag = document.createElement('div')
-    tag.classList.add(CLASS_NAME_TAG)
-    tag.dataset.value = value
-    tag.textContent = text
-
-    if (!this._config.disabled && disabled !== true) {
-      const closeBtn = document.createElement('button')
-      closeBtn.type = 'button'
-      closeBtn.classList.add(CLASS_NAME_TAG_DELETE)
-      closeBtn.setAttribute('aria-label', `${this._config.ariaTagDeleteLabel} ${text}`.trim())
-
-      tag.append(closeBtn)
-    }
-
-    return tag
-  }
-
-  _updateTags(selection: HTMLElement, search: HTMLElement | null): void {
-    const placeholder = SelectorEngine.findOne('.form-multi-select-placeholder', selection)
-    if (placeholder) {
-      placeholder.remove()
-    }
-
-    const existingTags = new Map()
-
-    for (const tag of SelectorEngine.children(selection, SELECTOR_TAG)) {
-      existingTags.set(tag.dataset.value, tag)
-    }
-
-    const selectedValues = new Set(this._selected.map((option: any) => String(option.value)))
-
-    for (const [value, tag] of existingTags) {
-      if (!selectedValues.has(value)) {
-        tag.remove()
-        existingTags.delete(value)
-      }
-    }
-
-    for (const option of this._selected) {
-      const value = String(option.value)
-      const tag = existingTags.get(value) || this._createTag(option.value, option.text, option.disabled)
-
-      if (search) {
-        search.before(tag)
-      } else {
-        selection.append(tag)
-      }
-    }
-  }
-
   override _interceptOptionsClick(element: any): boolean {
     if (!this._config.optionsGroupsSelectable) {
       return false
@@ -1247,11 +1182,9 @@ class MultiSelect extends Combobox {
       selection.textContent = `${this._selected.length} ${this._config.selectionTypeCounterText}`
     }
 
-    if (this._config.multiple && this._config.selectionType === 'tags') {
-      this._updateTags(selection, search)
-    }
-
-    if (this._config.multiple && this._config.selectionType === 'chips') {
+    // `tags` and `chips` were the same idea built twice; both render the Chip
+    // component now, so a selection is a chip everywhere in the library.
+    if (this._config.multiple && ['chips', 'tags'].includes(this._config.selectionType)) {
       this._updateChips(selection, search)
     }
 

@@ -45,21 +45,8 @@ $form-multi-select-selection-tags-gap:        .25rem !default;
 $form-multi-select-selection-tags-padding-y:  .25rem !default;
 $form-multi-select-selection-tags-padding-x:  .25rem !default;
 
-$form-multi-select-tag-bg:                    var(--#{$prefix}secondary-bg) !default;
-$form-multi-select-tag-border-width:          var(--#{$prefix}border-width) !default;
-$form-multi-select-tag-border-color:          var(--#{$prefix}border-color) !default;
-$form-multi-select-tag-border-radius:         .25rem !default;
-$form-multi-select-tag-border-radius-sm:      .125rem !default;
-$form-multi-select-tag-border-radius-lg:      .375rem !default;
-$form-multi-select-tag-padding-y:             .0625rem !default;
-$form-multi-select-tag-padding-x:             .5rem !default;
-
-$form-multi-select-tag-delete-width:             .75rem !default;
-$form-multi-select-tag-delete-height:            .75rem !default;
-$form-multi-select-tag-delete-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#000'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
 $form-multi-select-tag-delete-icon-color:        var(--#{$prefix}secondary-color) !default;
 $form-multi-select-tag-delete-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$form-multi-select-tag-delete-icon-size:         .5rem !default;
 
 $form-multi-select-font-size-lg:                 var(--#{$prefix}btn-input-lg-font-size) !default;
 $form-multi-select-selection-padding-y-lg:       var(--#{$prefix}btn-input-lg-padding-y) !default;
@@ -67,8 +54,6 @@ $form-multi-select-selection-padding-x-lg:       var(--#{$prefix}btn-input-lg-pa
 $form-multi-select-selection-tags-gap-lg:        .25rem !default;
 $form-multi-select-selection-tags-padding-y-lg:  .25rem !default;
 $form-multi-select-selection-tags-padding-x-lg:  .25rem !default;
-$form-multi-select-tag-padding-y-lg:             .175rem !default;
-$form-multi-select-tag-padding-x-lg:             .5rem !default;
 
 $form-multi-select-font-size-sm:                 var(--#{$prefix}btn-input-sm-font-size) !default;
 $form-multi-select-selection-padding-y-sm:       var(--#{$prefix}btn-input-sm-padding-y) !default;
@@ -76,8 +61,6 @@ $form-multi-select-selection-padding-x-sm:       var(--#{$prefix}btn-input-sm-pa
 $form-multi-select-selection-tags-gap-sm:        .125rem !default;
 $form-multi-select-selection-tags-padding-y-sm:  .0625rem !default;
 $form-multi-select-selection-tags-padding-x-sm:  .125rem !default;
-$form-multi-select-tag-padding-y-sm:             .075rem !default;
-$form-multi-select-tag-padding-x-sm:             .5rem !default;
 // scss-docs-end form-multi-select-variables
 
 $form-multi-select-tokens: () !default;
@@ -107,18 +90,8 @@ $form-multi-select-tokens: defaults(
     --#{$prefix}form-multi-select-placeholder-color: #{$form-multi-select-placeholder-color},
     --#{$prefix}control-padding-y: #{$form-multi-select-selection-padding-y},
     --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x},
-    --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y},
-    --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x},
-    --#{$prefix}form-multi-select-tag-bg: #{$form-multi-select-tag-bg},
-    --#{$prefix}form-multi-select-tag-border-width: #{$form-multi-select-tag-border-width},
-    --#{$prefix}form-multi-select-tag-border-color: #{$form-multi-select-tag-border-color},
-    --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius},
-    --#{$prefix}form-multi-select-tag-delete-width: #{$form-multi-select-tag-delete-width},
-    --#{$prefix}form-multi-select-tag-delete-height: #{$form-multi-select-tag-delete-height},
-    --#{$prefix}form-multi-select-tag-delete-icon: #{escape-svg($form-multi-select-tag-delete-icon)},
     --#{$prefix}form-multi-select-tag-delete-icon-color: #{$form-multi-select-tag-delete-icon-color},
     --#{$prefix}form-multi-select-tag-delete-icon-hover-color: #{$form-multi-select-tag-delete-icon-hover-color},
-    --#{$prefix}form-multi-select-tag-delete-icon-size: #{$form-multi-select-tag-delete-icon-size},
     --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap},
     --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y},
     --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x},
@@ -247,51 +220,11 @@ $form-multi-select-tokens: defaults(
     transform: rotate(180deg);
   }
 
-  .form-multi-select-tag {
-    display: flex;
-    align-items: center;
-    padding: var(--#{$prefix}form-multi-select-tag-padding-y) var(--#{$prefix}form-multi-select-tag-padding-x);
-    background-color: var(--#{$prefix}form-multi-select-tag-bg);
-    border: var(--#{$prefix}form-multi-select-tag-border-width) solid var(--#{$prefix}form-multi-select-tag-border-color);
-    @include border-radius(var(--#{$prefix}form-multi-select-tag-border-radius));
-  }
-
-  .form-multi-select-tag-delete {
-    position: relative;
-    z-index: 2;
-    box-sizing: content-box;
-    width: var(--#{$prefix}form-multi-select-tag-delete-width);
-    height: var(--#{$prefix}form-multi-select-tag-delete-height);
-    padding: var(--#{$prefix}form-multi-select-tag-delete-padding-y) var(--#{$prefix}form-multi-select-tag-delete-padding-x);
-    margin-inline-start: $spacer * .5;
-    background-color: transparent;
-    border: 0;
-
-    &::before {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      content: "";
-      background-color: var(--#{$prefix}form-multi-select-tag-delete-icon-color);
-      mask: var(--#{$prefix}form-multi-select-tag-delete-icon) center / var(--#{$prefix}form-multi-select-tag-delete-icon-size) no-repeat;
-    }
-
-    &:focus::before,
-    &:hover::before {
-      background-color: var(--#{$prefix}form-multi-select-tag-delete-icon-hover-color);
-    }
-  }
-
   .form-multi-select-sm {
     --#{$prefix}control-padding-y: #{$form-multi-select-selection-padding-y-sm};
     --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x-sm};
     --#{$prefix}control-font-size: #{$form-multi-select-font-size-sm};
     --#{$prefix}control-border-radius: #{$form-multi-select-border-radius-sm};
-    --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-sm};
-    --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x-sm};
-    --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-sm};
     --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-sm};
     --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-sm};
     --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-sm};
@@ -302,9 +235,6 @@ $form-multi-select-tokens: defaults(
     --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x-lg};
     --#{$prefix}control-font-size: #{$form-multi-select-font-size-lg};
     --#{$prefix}control-border-radius: #{$form-multi-select-border-radius-lg};
-    --#{$prefix}form-multi-select-tag-padding-y: #{$form-multi-select-tag-padding-y-lg};
-    --#{$prefix}form-multi-select-tag-padding-x: #{$form-multi-select-tag-padding-x-lg};
-    --#{$prefix}form-multi-select-tag-border-radius: #{$form-multi-select-tag-border-radius-lg};
     --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap-lg};
     --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y-lg};
     --#{$prefix}form-multi-select-selection-tags-padding-x: #{$form-multi-select-selection-tags-padding-x-lg};
