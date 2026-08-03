@@ -122,7 +122,7 @@ describe('Autocomplete', () => {
       const autocomplete = new Autocomplete(autocompleteEl, { cleaner: true, options: [] })
 
       expect(autocomplete._cleanerElement).toBeTruthy()
-      expect(autocomplete._cleanerElement.classList.contains('autocomplete-cleaner')).toBe(true)
+      expect(autocomplete._cleanerElement.classList.contains('form-control-cleaner')).toBe(true)
     })
 
     it('should create autocomplete with indicator button when indicator option is true', () => {

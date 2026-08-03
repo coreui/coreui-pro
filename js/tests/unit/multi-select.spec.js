@@ -559,7 +559,7 @@ describe('MultiSelect', () => {
       })
 
       expect(multiSelect._selectionCleanerElement).not.toBeNull()
-      expect(multiSelect._selectionCleanerElement.classList.contains('form-multi-select-cleaner')).toBe(true)
+      expect(multiSelect._selectionCleanerElement.classList.contains('form-control-cleaner')).toBe(true)
     })
 
     it('should not create cleaner button when disabled', () => {
@@ -3325,7 +3325,7 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       expect(cleaner).not.toBeNull()
     })
 
@@ -3343,10 +3343,10 @@ describe('MultiSelect', () => {
 
       // Empty the selection so the cleaner is removed, then re-create it.
       multiSelect.deselectAll()
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
 
       multiSelect._selectOption('2', 'Opt 2')
-      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       expect(cleaner).not.toBeNull()
 
       cleaner.click()
@@ -3364,7 +3364,7 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       expect(cleaner).toBeNull()
     })
 
@@ -3377,11 +3377,11 @@ describe('MultiSelect', () => {
         multiple: true
       })
 
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
 
       multiSelect._selectOption('1', 'Opt 1')
 
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).not.toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).not.toBeNull()
     })
 
     it('should insert cleaner and clear selection for single select', () => {
@@ -3393,13 +3393,13 @@ describe('MultiSelect', () => {
         multiple: false
       })
 
-      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       expect(cleaner).not.toBeNull()
 
       cleaner.click()
 
       expect(multiSelect._selected.length).toBe(0)
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
     })
 
     it('should deselect all on cleaner click', () => {
@@ -3416,11 +3416,11 @@ describe('MultiSelect', () => {
 
       expect(multiSelect._selected.length).toBe(2)
 
-      const cleaner = multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')
+      const cleaner = multiSelect._wrapperElement.querySelector('.form-control-cleaner')
       cleaner.click()
 
       expect(multiSelect._selected.length).toBe(0)
-      expect(multiSelect._wrapperElement.querySelector('.form-multi-select-cleaner')).toBeNull()
+      expect(multiSelect._wrapperElement.querySelector('.form-control-cleaner')).toBeNull()
     })
 
     it('should not deselect on cleaner click when disabled', () => {

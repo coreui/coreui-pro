@@ -42,15 +42,6 @@ $autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !defau
 $autocomplete-invalid-border-color:      var(--#{$prefix}form-invalid-border-color) !default;
 $autocomplete-valid-border-color:        var(--#{$prefix}form-valid-border-color) !default;
 
-$autocomplete-cleaner-width:             1.5rem !default;
-$autocomplete-cleaner-height:            1.5rem !default;
-$autocomplete-cleaner-padding-x:         0 !default;
-$autocomplete-cleaner-padding-y:         0 !default;
-$autocomplete-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#000'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$autocomplete-cleaner-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$autocomplete-cleaner-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$autocomplete-cleaner-icon-size:         .625rem !default;
-
 $autocomplete-indicator-width:             1.5rem !default;
 $autocomplete-indicator-height:            1.5rem !default;
 $autocomplete-indicator-padding-x:         0 !default;
@@ -59,7 +50,6 @@ $autocomplete-indicator-icon:              url("data:image/svg+xml,<svg xmlns='h
 $autocomplete-indicator-icon-color:        var(--#{$prefix}tertiary-color) !default;
 $autocomplete-indicator-icon-hover-color:  var(--#{$prefix}body-color) !default;
 $autocomplete-indicator-icon-size:         .75rem !default;
-
 
 $autocomplete-font-size-lg:                 var(--#{$prefix}btn-input-lg-font-size) !default;
 $autocomplete-padding-y-lg:                 var(--#{$prefix}btn-input-lg-padding-y) !default;
@@ -96,14 +86,6 @@ $autocomplete-tokens: defaults(
     --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color},
     --#{$prefix}control-padding-y: #{$autocomplete-padding-y},
     --#{$prefix}control-padding-x: #{$autocomplete-padding-x},
-    --#{$prefix}autocomplete-cleaner-width: #{$autocomplete-cleaner-width},
-    --#{$prefix}autocomplete-cleaner-height: #{$autocomplete-cleaner-height},
-    --#{$prefix}autocomplete-cleaner-padding-y: #{$autocomplete-cleaner-padding-y},
-    --#{$prefix}autocomplete-cleaner-padding-x: #{$autocomplete-cleaner-padding-x},
-    --#{$prefix}autocomplete-cleaner-icon: #{escape-svg($autocomplete-cleaner-icon)},
-    --#{$prefix}autocomplete-cleaner-icon-color: #{$autocomplete-cleaner-icon-color},
-    --#{$prefix}autocomplete-cleaner-icon-hover-color: #{$autocomplete-cleaner-icon-hover-color},
-    --#{$prefix}autocomplete-cleaner-icon-size: #{$autocomplete-cleaner-icon-size},
     --#{$prefix}autocomplete-indicator-width: #{$autocomplete-indicator-width},
     --#{$prefix}autocomplete-indicator-height: #{$autocomplete-indicator-height},
     --#{$prefix}autocomplete-indicator-padding-y: #{$autocomplete-indicator-padding-y},
@@ -215,21 +197,18 @@ $autocomplete-tokens: defaults(
     padding: 0 var(--#{$prefix}control-padding-y);
   }
 
-  .autocomplete-cleaner,
   .autocomplete-indicator {
     position: relative;
     z-index: 2;
     box-sizing: content-box;
+    width: var(--#{$prefix}autocomplete-indicator-width);
+    height: var(--#{$prefix}autocomplete-indicator-height);
+    padding: var(--#{$prefix}autocomplete-indicator-padding-y) var(--#{$prefix}autocomplete-indicator-padding-x);
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
     border: 0;
-
-    &:focus {
-      z-index: 5;
-      outline: var(--#{$prefix}focus-ring);
-      @include border-radius($border-radius);
-    }
+    @include transition(transform .15s ease-in-out);
 
     &::before {
       position: absolute;
@@ -238,34 +217,14 @@ $autocomplete-tokens: defaults(
       width: 100%;
       height: 100%;
       content: "";
-    }
-  }
-
-  .autocomplete-cleaner {
-    width: var(--#{$prefix}autocomplete-cleaner-width);
-    height: var(--#{$prefix}autocomplete-cleaner-height);
-    padding: var(--#{$prefix}autocomplete-cleaner-padding-y) var(--#{$prefix}autocomplete-cleaner-padding-x);
-
-    &::before {
-      background-color: var(--#{$prefix}autocomplete-cleaner-icon-color);
-      mask: var(--#{$prefix}autocomplete-cleaner-icon) center / var(--#{$prefix}autocomplete-cleaner-icon-size) no-repeat;
-    }
-
-    &:focus::before,
-    &:hover::before {
-      background-color: var(--#{$prefix}autocomplete-cleaner-icon-hover-color);
-    }
-  }
-
-  .autocomplete-indicator {
-    width: var(--#{$prefix}autocomplete-indicator-width);
-    height: var(--#{$prefix}autocomplete-indicator-height);
-    padding: var(--#{$prefix}autocomplete-indicator-padding-y) var(--#{$prefix}autocomplete-indicator-padding-x);
-    @include transition(transform .15s ease-in-out);
-
-    &::before {
       background-color: var(--#{$prefix}autocomplete-indicator-icon-color);
       mask: var(--#{$prefix}autocomplete-indicator-icon) center / var(--#{$prefix}autocomplete-indicator-icon-size) no-repeat;
+    }
+
+    &:focus {
+      z-index: 5;
+      outline: var(--#{$prefix}focus-ring);
+      @include border-radius($border-radius);
     }
 
     &:focus::before,

@@ -61,15 +61,6 @@ $form-multi-select-tag-delete-icon-color:        var(--#{$prefix}secondary-color
 $form-multi-select-tag-delete-icon-hover-color:  var(--#{$prefix}body-color) !default;
 $form-multi-select-tag-delete-icon-size:         .5rem !default;
 
-$form-multi-select-cleaner-width:             1.5rem !default;
-$form-multi-select-cleaner-height:            1.5rem !default;
-$form-multi-select-cleaner-padding-x:         0 !default;
-$form-multi-select-cleaner-padding-y:         0 !default;
-$form-multi-select-cleaner-icon:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#000'><path d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/></svg>") !default;
-$form-multi-select-cleaner-icon-color:        var(--#{$prefix}tertiary-color) !default;
-$form-multi-select-cleaner-icon-hover-color:  var(--#{$prefix}body-color) !default;
-$form-multi-select-cleaner-icon-size:         .625rem !default;
-
 $form-multi-select-indicator-width:             1.5rem !default;
 $form-multi-select-indicator-height:            1.5rem !default;
 $form-multi-select-indicator-padding-x:         0 !default;
@@ -78,7 +69,6 @@ $form-multi-select-indicator-icon:              url("data:image/svg+xml,<svg xml
 $form-multi-select-indicator-icon-color:        var(--#{$prefix}tertiary-color) !default;
 $form-multi-select-indicator-icon-hover-color:  var(--#{$prefix}body-color) !default;
 $form-multi-select-indicator-icon-size:         .75rem !default;
-
 
 $form-multi-select-font-size-lg:                 var(--#{$prefix}btn-input-lg-font-size) !default;
 $form-multi-select-selection-padding-y-lg:       var(--#{$prefix}btn-input-lg-padding-y) !default;
@@ -126,14 +116,6 @@ $form-multi-select-tokens: defaults(
     --#{$prefix}form-multi-select-placeholder-color: #{$form-multi-select-placeholder-color},
     --#{$prefix}control-padding-y: #{$form-multi-select-selection-padding-y},
     --#{$prefix}control-padding-x: #{$form-multi-select-selection-padding-x},
-    --#{$prefix}form-multi-select-cleaner-width: #{$form-multi-select-cleaner-width},
-    --#{$prefix}form-multi-select-cleaner-height: #{$form-multi-select-cleaner-height},
-    --#{$prefix}form-multi-select-cleaner-padding-y: #{$form-multi-select-cleaner-padding-y},
-    --#{$prefix}form-multi-select-cleaner-padding-x: #{$form-multi-select-cleaner-padding-x},
-    --#{$prefix}form-multi-select-cleaner-icon: #{escape-svg($form-multi-select-cleaner-icon)},
-    --#{$prefix}form-multi-select-cleaner-icon-color: #{$form-multi-select-cleaner-icon-color},
-    --#{$prefix}form-multi-select-cleaner-icon-hover-color: #{$form-multi-select-cleaner-icon-hover-color},
-    --#{$prefix}form-multi-select-cleaner-icon-size: #{$form-multi-select-cleaner-icon-size},
     --#{$prefix}form-multi-select-indicator-width: #{$form-multi-select-indicator-width},
     --#{$prefix}form-multi-select-indicator-height: #{$form-multi-select-indicator-height},
     --#{$prefix}form-multi-select-indicator-padding-y: #{$form-multi-select-indicator-padding-y},
@@ -286,21 +268,18 @@ $form-multi-select-tokens: defaults(
     padding: 0 var(--#{$prefix}control-padding-y);
   }
 
-  .form-multi-select-cleaner,
   .form-multi-select-indicator {
     position: relative;
     z-index: 2;
     box-sizing: content-box;
+    width: var(--#{$prefix}form-multi-select-indicator-width);
+    height: var(--#{$prefix}form-multi-select-indicator-height);
+    padding: var(--#{$prefix}form-multi-select-indicator-padding-y) var(--#{$prefix}form-multi-select-indicator-padding-x);
     background-color: transparent;
     background-repeat: no-repeat;
     background-position: center;
     border: 0;
-
-    &:focus-visible {
-      z-index: 5;
-      outline: var(--#{$prefix}focus-ring);
-      @include border-radius($border-radius);
-    }
+    @include transition(transform .15s ease-in-out);
 
     &::before {
       position: absolute;
@@ -309,34 +288,14 @@ $form-multi-select-tokens: defaults(
       width: 100%;
       height: 100%;
       content: "";
-    }
-  }
-
-  .form-multi-select-cleaner {
-    width: var(--#{$prefix}form-multi-select-cleaner-width);
-    height: var(--#{$prefix}form-multi-select-cleaner-height);
-    padding: var(--#{$prefix}form-multi-select-cleaner-padding-y) var(--#{$prefix}form-multi-select-cleaner-padding-x);
-
-    &::before {
-      background-color: var(--#{$prefix}form-multi-select-cleaner-icon-color);
-      mask: var(--#{$prefix}form-multi-select-cleaner-icon) center / var(--#{$prefix}form-multi-select-cleaner-icon-size) no-repeat;
-    }
-
-    &:focus::before,
-    &:hover::before {
-      background-color: var(--#{$prefix}form-multi-select-cleaner-icon-hover-color);
-    }
-  }
-
-  .form-multi-select-indicator {
-    width: var(--#{$prefix}form-multi-select-indicator-width);
-    height: var(--#{$prefix}form-multi-select-indicator-height);
-    padding: var(--#{$prefix}form-multi-select-indicator-padding-y) var(--#{$prefix}form-multi-select-indicator-padding-x);
-    @include transition(transform .15s ease-in-out);
-
-    &::before {
       background-color: var(--#{$prefix}form-multi-select-indicator-icon-color);
       mask: var(--#{$prefix}form-multi-select-indicator-icon) center / var(--#{$prefix}form-multi-select-indicator-icon-size) no-repeat;
+    }
+
+    &:focus-visible {
+      z-index: 5;
+      outline: var(--#{$prefix}focus-ring);
+      @include border-radius($border-radius);
     }
 
     &:focus::before,

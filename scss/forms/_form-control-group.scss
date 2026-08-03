@@ -8,6 +8,7 @@
 // scss-docs-start form-control-group-variables
 $form-control-group-gap:              .5rem !default;
 $form-control-group-icon-size:        1rem !default;
+$form-control-group-cleaner-icon-size: .625rem !default;
 $form-control-group-icon-size-sm:     .875rem !default;
 $form-control-group-icon-size-lg:     1.25rem !default;
 $form-control-group-icon-color:       var(--#{$prefix}tertiary-color) !default;
@@ -30,6 +31,7 @@ $form-control-group-tokens: defaults(
   (
     --#{$prefix}control-group-gap: #{$form-control-group-gap},
     --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size},
+    --#{$prefix}control-group-cleaner-icon-size: #{$form-control-group-cleaner-icon-size},
     --#{$prefix}control-group-icon-color: #{$form-control-group-icon-color},
     --#{$prefix}control-group-action-size: #{$form-control-group-action-size},
     --#{$prefix}control-group-action-color: #{$form-control-group-action-color},
@@ -215,5 +217,12 @@ $form-control-group-tokens: defaults(
       pointer-events: none;
       opacity: .65;
     }
+  }
+
+  // The cross is drawn on a tighter grid than the glyph icons, so it carries
+  // more weight — it is rendered smaller to read as their equal.
+  .form-control-cleaner > svg {
+    width: var(--#{$prefix}control-group-cleaner-icon-size);
+    height: var(--#{$prefix}control-group-cleaner-icon-size);
   }
 }

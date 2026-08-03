@@ -13,6 +13,7 @@ import type { ComponentConfig } from './util/config.js'
 import {
   DefaultAllowlist, escapeHtml, type SanitizerAllowList
 } from './util/sanitizer.js'
+import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin, getUID } from './util/index.js'
 
 /**
@@ -47,7 +48,7 @@ const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
 const CLASS_NAME_BUTTONS = 'autocomplete-buttons'
-const CLASS_NAME_CLEANER = 'autocomplete-cleaner'
+const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDICATOR = 'autocomplete-indicator'
 const CLASS_NAME_INPUT = 'autocomplete-input'
@@ -566,6 +567,7 @@ class Autocomplete extends Combobox {
       cleaner.classList.add(CLASS_NAME_CLEANER)
       cleaner.style.display = 'none'
       cleaner.setAttribute('aria-label', this._config.ariaCleanerLabel)
+      cleaner.innerHTML = CLEANER_ICON
 
       buttons.append(cleaner)
       this._cleanerElement = cleaner
