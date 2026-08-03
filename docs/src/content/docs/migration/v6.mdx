@@ -965,6 +965,8 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   | `.date-picker-input-group`, `.time-picker-input-group`, `.autocomplete-input-group`, `.form-multi-select-input-group`, the frame on `.chip-input`, the `.form-password` wrapper | `.form-control-group` |
   | `.date-picker-indicator`, `.time-picker-indicator`, `.autocomplete-indicator`, `.form-multi-select-indicator`, `.form-password-action` | `.form-control-action` |
   | `.autocomplete-cleaner`, `.form-multi-select-cleaner` | `.form-control-cleaner` |
+  | `.autocomplete-input` | plain `.form-control` — the group strips its frame, so the editable needs no class of its own |
+  | `.autocomplete-buttons`, `.form-multi-select-buttons` | gone: the adornments are children of the group, which lays them out |
   | `.date-picker-separator` | `.form-control-icon` |
   | `.date-picker-sm/-lg`, `.time-picker-sm/-lg` | `.form-control-sm/-lg` on the group (the components apply it from `size` themselves) |
 

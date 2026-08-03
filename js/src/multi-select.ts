@@ -67,7 +67,6 @@ const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_CHIP_REMOVE = 'remove.coreui.chip'
 
-const CLASS_NAME_BUTTONS = 'form-multi-select-buttons'
 const CLASS_NAME_CHIP = 'chip'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
@@ -776,10 +775,9 @@ class MultiSelect extends Combobox {
     this._selectionElement = selectionEl
   }
 
+  // The group lays its adornments out itself — they are its children, not a
+  // wrapper's.
   _createButtons(): void {
-    const buttons = document.createElement('div')
-    buttons.classList.add(CLASS_NAME_BUTTONS)
-
     const indicator = document.createElement('button')
     indicator.type = 'button'
     indicator.classList.add('form-control-action')
@@ -787,10 +785,9 @@ class MultiSelect extends Combobox {
     indicator.setAttribute('aria-label', this._config.ariaIndicatorLabel)
     indicator.innerHTML = INDICATOR_ICON
 
-    buttons.append(indicator)
+    this._togglerElement.append(indicator)
 
     this._indicatorElement = indicator
-    this._togglerElement.append(buttons)
     this._updateSelectionCleaner()
   }
 
@@ -1300,10 +1297,9 @@ class MultiSelect extends Combobox {
     }
 
     if (this._selected.length > 0 && this._selectionCleanerElement === null) {
-      const buttons = SelectorEngine.findOne(`.${CLASS_NAME_BUTTONS}`, this._wrapperElement)!
       const selectionCleaner = this._createSelectionCleaner()
 
-      buttons.insertBefore(selectionCleaner, this._indicatorElement)
+      this._indicatorElement.before(selectionCleaner)
       this._selectionCleanerElement = selectionCleaner
       return
     }

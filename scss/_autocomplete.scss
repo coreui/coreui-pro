@@ -111,15 +111,6 @@ $autocomplete-tokens: defaults(
     --#{$prefix}control-focus-ring: #{$focus-ring};
   }
 
-  // Tags wrap onto their own rows, so the padding sits on the parts inside the
-  // frame rather than on the frame itself — a tag has to be able to reach its
-  // edge. The parts also stretch to the full height instead of centring.
-  .autocomplete .form-control-group {
-    flex-wrap: wrap;
-    align-items: stretch;
-    padding: 0;
-  }
-
   .autocomplete.show .form-control-group {
     @include form-control-group-focus();
   }
@@ -129,38 +120,17 @@ $autocomplete-tokens: defaults(
     border-color: var(--#{$prefix}control-disabled-border-color);
   }
 
-  .autocomplete-input {
-    position: relative;
-    flex: 1 1 auto;
-    width: 1%;
-    min-width: 0;
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-family: var(--#{$prefix}control-font-family);
-    font-size: var(--#{$prefix}control-font-size);
-    font-weight: var(--#{$prefix}control-font-weight);
-    line-height: var(--#{$prefix}control-line-height);
-    color: var(--#{$prefix}control-color);
-    appearance: none;
-    background-color: transparent;
-    border: 0;
-
-    .autocomplete.show & {
-      color: var(--#{$prefix}control-focus-color);
-    }
-
-    &:disabled {
-      color: var(--#{$prefix}control-disabled-color);
-    }
-
-    &:focus {
-      color: var(--#{$prefix}control-focus-color);
-      outline: 0;
-    }
-
+  // The editable is a `.form-control` inside the group. What is left here is
+  // the component's own: the colour while the popup is open, its placeholder,
+  // and the ghost hint drawn behind the text.
+  .autocomplete .form-control {
     &::placeholder {
       color: var(--#{$prefix}autocomplete-placeholder-color);
-      opacity: 1;
     }
+  }
+
+  .autocomplete.show .form-control {
+    color: var(--#{$prefix}control-focus-color);
   }
 
   .autocomplete-input-hint {
@@ -178,13 +148,8 @@ $autocomplete-tokens: defaults(
     transform: rotate(180deg);
   }
 
-  .autocomplete-buttons {
-    display: flex;
-    align-items: center;
-    min-height: calc(2 * var(--#{$prefix}control-padding-y) + calc(var(--#{$prefix}control-font-size) * var(--#{$prefix}control-line-height)));  // stylelint-disable-line function-disallowed-list
-    padding: 0 var(--#{$prefix}control-padding-y);
-  }
-
+  // The frame gives the control its height and padding now; these only need to
+  // sit together at the end of the row.
   .autocomplete-sm {
     --#{$prefix}control-padding-y: #{$autocomplete-padding-y-sm};
     --#{$prefix}control-padding-x: #{$autocomplete-padding-x-sm};

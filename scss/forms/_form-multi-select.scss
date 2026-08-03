@@ -157,12 +157,9 @@ $form-multi-select-tokens: defaults(
     --#{$prefix}control-focus-ring: #{$focus-ring};
   }
 
-  // See the autocomplete: the selection area inside carries the padding, so the
-  // frame itself has none and its parts stretch to the full height.
+  // Tags wrap onto their own rows inside the frame's padding, like chips do.
   .form-multi-select .form-control-group {
     flex-wrap: wrap;
-    align-items: stretch;
-    padding: 0;
   }
 
   .form-multi-select.show .form-control-group,
@@ -198,15 +195,16 @@ $form-multi-select-tokens: defaults(
     display: flex;
     flex: 1 1 auto;
     flex-wrap: wrap;
-    width: 1%;
     min-width: 0;
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
   }
 
+  // The frame carries the padding; tags only need their own spacing. They also
+  // sit a touch tighter than the text, hence the negative inline margin.
   .form-multi-select-selection-tags {
     gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
     align-content: center;
-    padding: var(--#{$prefix}form-multi-select-selection-tags-padding-y) var(--#{$prefix}form-multi-select-selection-tags-padding-x);
+    // stylelint-disable-next-line function-disallowed-list
+    margin: calc(var(--#{$prefix}form-multi-select-selection-tags-padding-y) * -1) 0;
   }
 
   .form-multi-select-search {
@@ -247,13 +245,6 @@ $form-multi-select-tokens: defaults(
   // The chevron turns when the popup opens.
   .form-multi-select.show .form-control-action {
     transform: rotate(180deg);
-  }
-
-  .form-multi-select-buttons {
-    display: flex;
-    align-items: center;
-    min-height: calc(2 * var(--#{$prefix}control-padding-y) + calc(var(--#{$prefix}control-font-size) * var(--#{$prefix}control-line-height)));  // stylelint-disable-line function-disallowed-list
-    padding: 0 var(--#{$prefix}control-padding-y);
   }
 
   .form-multi-select-tag {

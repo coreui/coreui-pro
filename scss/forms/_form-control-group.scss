@@ -107,8 +107,8 @@ $form-control-group-tokens: defaults(
     // A control that isn't a real input carries `.disabled` as a class, so both
     // spellings have to reach the frame.
     &.disabled,
-    &:has(> .form-control:disabled),
-    &:has(> .form-control.disabled) {
+    &:has(.form-control:disabled),
+    &:has(.form-control.disabled) {
       color: var(--#{$prefix}control-disabled-color);
       cursor: default;
       background-color: var(--#{$prefix}control-disabled-bg);
@@ -127,9 +127,10 @@ $form-control-group-tokens: defaults(
     }
 
     // The group is the frame: a control inside it must not draw a second one,
-    // or the result is as tall as both boxes stacked. This is deliberately a
-    // descendant rule so it also outranks a theme's own `.form-control` border.
-    > .form-control {
+    // or the result is as tall as both boxes stacked. Any depth — a component
+    // may wrap its editable in a layout of its own (tags, hints) — and the
+    // descendant selector also outranks a theme's own `.form-control` border.
+    .form-control {
       flex: 1 1 auto;
       width: auto;
       min-width: 0;

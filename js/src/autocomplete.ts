@@ -47,11 +47,10 @@ const EVENT_KEYUP_DATA_API = `keyup${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
 
 const CLASS_NAME_AUTOCOMPLETE = 'autocomplete'
-const CLASS_NAME_BUTTONS = 'autocomplete-buttons'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDICATOR = 'form-control-action'
-const CLASS_NAME_INPUT = 'autocomplete-input'
+const CLASS_NAME_INPUT = 'form-control'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
 const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
@@ -558,8 +557,9 @@ class Autocomplete extends Combobox {
       return
     }
 
-    const buttons = document.createElement('div')
-    buttons.classList.add(CLASS_NAME_BUTTONS)
+    // The group lays its adornments out itself — they are its children, not a
+    // wrapper's.
+    const buttons = this._togglerElement
 
     if (!this._config.disabled && this._config.cleaner) {
       const cleaner = document.createElement('button')
@@ -585,7 +585,6 @@ class Autocomplete extends Combobox {
       this._indicatorElement = indicator
     }
 
-    this._togglerElement.append(buttons)
     this._updateCleaner()
   }
 
