@@ -1022,8 +1022,6 @@ $time-picker-box-shadow:                    $box-shadow-inset !default;
 
 $time-picker-border-color:                  $input-border-color !default;
 $time-picker-border-radius:                 $input-border-radius !default;
-$time-picker-border-radius-sm:              $input-border-radius-sm !default;
-$time-picker-border-radius-lg:              $input-border-radius-lg !default;
 
 $time-picker-disabled-color:                $input-disabled-color !default;
 $time-picker-disabled-bg:                   $input-disabled-bg !default;
@@ -1033,12 +1031,6 @@ $time-picker-focus-color:                   $input-focus-color !default;
 $time-picker-focus-bg:                      $input-focus-bg !default;
 $time-picker-focus-border-color:            $input-focus-border-color !default;
 $time-picker-focus-ring:              $input-btn-focus-ring !default;
-
-$time-picker-indicator-width:               1.25rem !default;
-$time-picker-indicator-icon-color:          var(--#{$prefix}tertiary-color) !default;
-
-$time-picker-indicator-width-sm:            1rem !default;
-$time-picker-indicator-width-lg:            1.5rem !default;
 
 $time-picker-dropdown-bg:                   var(--#{$prefix}body-bg) !default;
 $time-picker-dropdown-border-color:         var(--#{$prefix}border-color) !default;

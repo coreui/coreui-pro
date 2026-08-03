@@ -38,8 +38,9 @@ const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 const CLASS_NAME_BODY = 'time-picker-body'
 const CLASS_NAME_DROPDOWN = 'time-picker-dropdown'
 const CLASS_NAME_FOOTER = 'time-picker-footer'
-const CLASS_NAME_INDICATOR = 'time-picker-indicator'
-const CLASS_NAME_INPUT_GROUP = 'time-picker-input-group'
+const CLASS_NAME_INDICATOR = 'form-control-action'
+const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_PICKER = 'time-picker'
@@ -230,12 +231,13 @@ class TimePicker extends BaseComponent {
   _createTimePicker(): void {
     this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER)
 
-    if (this._config.size) {
-      this._element.classList.add(`${CLASS_NAME_TIME_PICKER}-${this._config.size}`)
-    }
-
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+
+    // Sizing rides the standard control classes on the frame itself
+    if (this._config.size) {
+      inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
+    }
 
     const inputEl = document.createElement('div')
     inputGroup.append(inputEl)

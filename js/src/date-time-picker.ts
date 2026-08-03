@@ -44,8 +44,9 @@ const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_TIME_PICKER = 'date-time-picker'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
-const CLASS_NAME_INDICATOR = 'date-picker-indicator'
-const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
+const CLASS_NAME_INDICATOR = 'form-control-action'
+const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_BODY = 'time-picker-body'
@@ -256,12 +257,13 @@ class DateTimePicker extends BaseComponent {
       CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
     )
 
-    if (this._config.size) {
-      this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
-    }
-
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+
+    // Sizing rides the standard control classes on the frame itself
+    if (this._config.size) {
+      inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
+    }
 
     const inputEl = document.createElement('div')
     inputGroup.append(inputEl)

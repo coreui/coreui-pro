@@ -31,8 +31,8 @@ describe('DatePicker', () => {
 
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('date-picker')).toBeTrue()
-      expect(el.querySelector('.date-picker-input-group')).not.toBeNull()
-      expect(el.querySelector('.date-picker-indicator')).not.toBeNull()
+      expect(el.querySelector('.form-control-group')).not.toBeNull()
+      expect(el.querySelector('.form-control-action')).not.toBeNull()
       expect(el.querySelector('.date-picker-dropdown .date-picker-calendar')).not.toBeNull()
     })
 
@@ -67,7 +67,7 @@ describe('DatePicker', () => {
     it('should render the indicator icon as inline SVG on currentColor', () => {
       buildPicker()
 
-      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
       const svg = indicator.querySelector('svg')
       expect(svg).not.toBeNull()
       expect(svg.getAttribute('fill')).toEqual('currentColor')
@@ -79,7 +79,7 @@ describe('DatePicker', () => {
         indicatorIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.hacked = true</script><circle r="8" /></svg>'
       })
 
-      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
       expect(indicator.querySelector('circle')).not.toBeNull()
       expect(indicator.querySelector('script')).toBeNull()
       expect(window.hacked).toBeUndefined()
@@ -116,11 +116,11 @@ describe('DatePicker', () => {
         el.addEventListener(`${name}.coreui.date-picker`, () => calls.push(name))
       }
 
-      el.querySelector('.date-picker-indicator').click()
+      el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeTrue()
       expect(el.getAttribute('aria-expanded')).toEqual('true')
 
-      el.querySelector('.date-picker-indicator').click()
+      el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeFalse()
       expect(calls).toEqual(['show', 'shown', 'hide', 'hidden'])
       expect(picker._popup.isShown).toBeFalse()

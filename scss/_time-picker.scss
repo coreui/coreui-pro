@@ -5,15 +5,13 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
+@use "forms/form-control-group" as *;
 
-// stylelint-disable custom-property-no-missing-var-function
 
 // Time Picker
 // scss-docs-start time-picker-frame-variables
 $time-picker-font-family:      var(--#{$prefix}btn-input-font-family) !default;
 $time-picker-font-size:        var(--#{$prefix}btn-input-font-size) !default;
-$time-picker-font-size-sm:     var(--#{$prefix}btn-input-sm-font-size) !default;
-$time-picker-font-size-lg:     var(--#{$prefix}btn-input-lg-font-size) !default;
 $time-picker-line-height:      var(--#{$prefix}btn-input-line-height) !default;
 $time-picker-color:            var(--#{$prefix}btn-input-color) !default;
 $time-picker-bg:               var(--#{$prefix}btn-input-bg) !default;
@@ -23,11 +21,6 @@ $time-picker-border-width:     var(--#{$prefix}btn-input-border-width) !default;
 $time-picker-padding-y:        var(--#{$prefix}btn-input-padding-y) !default;
 $time-picker-padding-x:        var(--#{$prefix}btn-input-padding-x) !default;
 
-$time-picker-padding-y-sm:     var(--#{$prefix}btn-input-sm-padding-y) !default;
-$time-picker-padding-x-sm:     var(--#{$prefix}btn-input-sm-padding-x) !default;
-
-$time-picker-padding-y-lg:     var(--#{$prefix}btn-input-lg-padding-y) !default;
-$time-picker-padding-x-lg:     var(--#{$prefix}btn-input-lg-padding-x) !default;
 // scss-docs-end time-picker-frame-variables
 
 $time-picker-tokens: () !default;
@@ -56,8 +49,6 @@ $time-picker-tokens: defaults(
     --#{$prefix}control-focus-ring: #{$time-picker-focus-ring},
     --#{$prefix}control-padding-y: #{$time-picker-padding-y},
     --#{$prefix}control-padding-x: #{$time-picker-padding-x},
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width},
-    --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-icon-color},
     --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding},
     --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width},
     --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color},
@@ -97,66 +88,12 @@ $time-picker-tokens: defaults(
   // --#{$prefix}time-picker-* properties defined on `.time-picker` above.
   .time-picker {
     position: relative;
+  }
 
-    .time-picker-input-group {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 0;
-      align-items: center;
-      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      font-size: var(--#{$prefix}control-font-size);
-      background-color: var(--#{$prefix}control-bg);
-      background-clip: padding-box;
-      border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-      @include border-radius(var(--#{$prefix}control-border-radius));
-
-      .time-picker & {
-        @include transition($input-transition);
-      }
-
-      .time-picker.disabled & {
-        --#{$prefix}control-border-color: var(--#{$prefix}control-disabled-border-color);
-        background-color: var(--#{$prefix}control-disabled-bg);
-      }
-
-      .time-picker.show &,
-      &:focus-within {
-        background-color: var(--#{$prefix}control-focus-bg);
-        border-color: var(--#{$prefix}control-focus-border-color);
-        outline: var(--#{$prefix}control-focus-ring);
-      }
-
-      // see .date-picker-input-group — the group is the frame
-      .form-date-time {
-        flex: 1;
-        min-height: 0;
-        padding: 0;
-        font-size: inherit;
-        line-height: inherit;
-        background-color: transparent;
-        border: 0;
-        @include border-radius(0);
-        box-shadow: none;
-
-        // The group is the frame, so it owns the focus treatment; without this
-        // the field's own :focus-within ring draws a second one inside it.
-        &:focus-within {
-          background-color: transparent;
-          outline: 0;
-        }
-      }
-    }
-
-    .time-picker-indicator {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: var(--#{$prefix}time-picker-indicator-width);
-      padding: 0;
-      color: var(--#{$prefix}time-picker-indicator-icon-color);
-      background: transparent;
-      border: 0;
-    }
+  // The popup takes the focus away from the group, but the control is still
+  // active — so the frame keeps its focus treatment while it is open.
+  .time-picker.show .form-control-group {
+    @include form-control-group-focus();
   }
 
   .time-picker-dropdown {
@@ -277,19 +214,4 @@ $time-picker-tokens: defaults(
     }
   }
 
-  .time-picker-sm {
-    --#{$prefix}control-padding-y: #{$time-picker-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$time-picker-padding-x-sm};
-    --#{$prefix}control-font-size: #{$time-picker-font-size-sm};
-    --#{$prefix}control-border-radius: #{$time-picker-border-radius-sm};
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width-sm};
-  }
-
-  .time-picker-lg {
-    --#{$prefix}control-padding-y: #{$time-picker-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$time-picker-padding-x-lg};
-    --#{$prefix}control-font-size: #{$time-picker-font-size-lg};
-    --#{$prefix}control-border-radius: #{$time-picker-border-radius-lg};
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width-lg};
-  }
 }

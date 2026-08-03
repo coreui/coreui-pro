@@ -9,7 +9,7 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
-
+@use "forms/form-control-group" as *;
 
 // Date Picker
 // scss-docs-start date-picker-variables
@@ -20,13 +20,7 @@ $date-picker-border-width:             var(--#{$prefix}btn-input-border-width) !
 $date-picker-border-color:             $input-border-color !default;
 $date-picker-border-radius:            $border-radius !default;
 
-
 $date-picker-focus-border-color:       $input-focus-border-color !default;
-
-
-$date-picker-indicator-width:               1.25rem !default;
-$date-picker-indicator-icon-color:          var(--#{$prefix}tertiary-color) !default;
-
 
 $date-picker-dropdown-bg:                var(--#{$prefix}body-bg) !default;
 $date-picker-dropdown-border-color:      var(--#{$prefix}border-color) !default;
@@ -34,20 +28,9 @@ $date-picker-dropdown-border-width:      var(--#{$prefix}border-width) !default;
 $date-picker-dropdown-border-radius:     var(--#{$prefix}border-radius) !default;
 $date-picker-dropdown-box-shadow:        var(--#{$prefix}box-shadow) !default;
 
-
 $date-picker-footer-padding:           .5rem !default;
 $date-picker-footer-border-width:      1px !default;
 $date-picker-footer-border-color:      var(--#{$prefix}border-color) !default;
-$date-picker-font-size-sm:             var(--#{$prefix}btn-input-sm-font-size) !default;
-$date-picker-font-size-lg:             var(--#{$prefix}btn-input-lg-font-size) !default;
-$date-picker-border-radius-sm:         $border-radius-sm !default;
-$date-picker-border-radius-lg:         $border-radius-lg !default;
-$date-picker-padding-y-sm:             var(--#{$prefix}btn-input-sm-padding-y) !default;
-$date-picker-padding-x-sm:             var(--#{$prefix}btn-input-sm-padding-x) !default;
-$date-picker-padding-y-lg:             var(--#{$prefix}btn-input-lg-padding-y) !default;
-$date-picker-padding-x-lg:             var(--#{$prefix}btn-input-lg-padding-x) !default;
-$date-picker-indicator-width-sm:       1rem !default;
-$date-picker-indicator-width-lg:       1.5rem !default;
 $date-picker-font-family:              var(--#{$prefix}btn-input-font-family) !default;
 $date-picker-font-size:                var(--#{$prefix}btn-input-font-size) !default;
 $date-picker-font-weight:              $input-font-weight !default;
@@ -67,13 +50,10 @@ $date-picker-focus-ring:               $input-btn-focus-ring !default;
 $date-picker-tokens: () !default;
 
 // scss-docs-start date-picker-css-vars
-// stylelint-disable custom-property-no-missing-var-function
 // stylelint-disable-next-line scss/dollar-variable-default
 $date-picker-tokens: defaults(
   (
     --#{$prefix}date-picker-zindex: #{$date-picker-zindex},
-    --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width},
-    --#{$prefix}date-picker-indicator-color: #{$date-picker-indicator-icon-color},
     --#{$prefix}date-picker-dropdown-bg: #{$date-picker-dropdown-bg},
     --#{$prefix}date-picker-dropdown-border-width: #{$date-picker-dropdown-border-width},
     --#{$prefix}date-picker-dropdown-border-color: #{$date-picker-dropdown-border-color},
@@ -104,7 +84,6 @@ $date-picker-tokens: defaults(
   ),
   $date-picker-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end date-picker-css-vars
 @layer components {
   // Lean pickers-v2 shell styling (workspace: architecture/pickers-v2.md, "Styling
@@ -124,73 +103,10 @@ $date-picker-tokens: defaults(
     position: relative;
   }
 
-  .date-picker-input-group {
-    display: flex;
-    align-items: center;
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    background-color: var(--#{$prefix}control-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-    @include border-radius(var(--#{$prefix}control-border-radius));
-
-    .date-picker & {
-      @include transition($input-transition);
-    }
-
-    .date-picker.disabled & {
-      --#{$prefix}control-border-color: var(--#{$prefix}control-disabled-border-color);
-      background-color: var(--#{$prefix}control-disabled-bg);
-    }
-
-    // The frame carries the focus treatment for the sections inside it, and
-    // keeps it while the popup is open.
-    .date-picker.show &,
-    &:focus-within {
-      background-color: var(--#{$prefix}control-focus-bg);
-      border-color: var(--#{$prefix}control-focus-border-color);
-      outline: var(--#{$prefix}control-focus-ring);
-    }
-
-    // The group is the frame — the section field inside must not draw a second
-    // one, or the control ends up as tall as both boxes stacked. Sizing then
-    // follows the group's padding/font-size properties, which the existing
-    // .date-picker-sm/-lg classes already redefine.
-    .form-date-time {
-      flex: 1;
-      min-height: 0;
-      padding: 0;
-      font-size: inherit;
-      line-height: inherit;
-      background-color: transparent;
-      border: 0;
-      @include border-radius(0);
-      box-shadow: none;
-
-      // The group is the frame, so it owns the focus treatment; without this
-      // the field's own :focus-within ring draws a second one inside it.
-      &:focus-within {
-        background-color: transparent;
-        outline: 0;
-      }
-    }
-  }
-
-  .date-picker-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--#{$prefix}date-picker-indicator-width);
-    padding: 0;
-    color: var(--#{$prefix}date-picker-indicator-color);
-    background: transparent;
-    border: 0;
-
-    &:focus {
-      z-index: 5;
-      outline: var(--#{$prefix}focus-ring);
-      @include border-radius($border-radius);
-    }
+  // The popup takes the focus away from the group, but the control is still
+  // active — so the frame keeps its focus treatment while it is open.
+  .date-picker.show .form-control-group {
+    @include form-control-group-focus();
   }
 
   .date-picker-dropdown {
@@ -253,14 +169,6 @@ $date-picker-tokens: defaults(
     border-inline-end: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
   }
 
-  .date-picker-separator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--#{$prefix}date-picker-indicator-width);
-    color: var(--#{$prefix}date-picker-indicator-color);
-  }
-
   .date-picker-calendars {
     display: flex;
 
@@ -281,19 +189,4 @@ $date-picker-tokens: defaults(
     border-top: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
   }
 
-  .date-picker-sm {
-    --#{$prefix}control-padding-y: #{$date-picker-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$date-picker-padding-x-sm};
-    --#{$prefix}control-font-size: #{$date-picker-font-size-sm};
-    --#{$prefix}control-border-radius: #{$date-picker-border-radius-sm};
-    --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width-sm};
-  }
-
-  .date-picker-lg {
-    --#{$prefix}control-padding-y: #{$date-picker-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$date-picker-padding-x-lg};
-    --#{$prefix}control-font-size: #{$date-picker-font-size-lg};
-    --#{$prefix}control-border-radius: #{$date-picker-border-radius-lg};
-    --#{$prefix}date-picker-indicator-width: #{$date-picker-indicator-width-lg};
-  }
 }

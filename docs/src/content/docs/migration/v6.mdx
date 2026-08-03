@@ -952,9 +952,32 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `.date-picker-input-preview`, `.date-picker-cleaner`, `.date-picker-separator`
   icon masks) **will not apply to the v2 markup** — those layers no longer
   exist. Overrides on the surviving classes (`.date-picker-dropdown`,
-  `.date-picker-footer`, `.date-picker-indicator`, `.date-picker-ranges`) keep
-  working.
-- In v2 the **input group carries the form-control frame** (border, background,
-  focus ring); the section fields inside are borderless. In v1 the frame was on
-  the group as well, but the inner fake-inputs had their own styling hooks —
-  those are gone.
+  `.date-picker-footer`, `.date-picker-ranges`) keep working — but the frame
+  and the indicator now come from the shared primitive below.
+- **The frame of every field component is
+  [`.form-control-group`](/forms/form-control-group/).** Autocomplete, chip
+  input, multi select, password input and all four pickers each drew their own
+  copy of it before; they now share one. What this changes for you:
+
+  | v5 | v6 |
+  | --- | --- |
+  | `.date-picker-input-group`, `.time-picker-input-group`, `.autocomplete-input-group`, `.form-multi-select-input-group`, the frame on `.chip-input`, the `.form-password` wrapper | `.form-control-group` |
+  | `.date-picker-indicator`, `.time-picker-indicator`, `.form-password-action` | `.form-control-action` |
+  | `.date-picker-separator` | `.form-control-icon` |
+  | `.date-picker-sm/-lg`, `.time-picker-sm/-lg` | `.form-control-sm/-lg` on the group (the components apply it from `size` themselves) |
+
+  Markup you write by hand has to be updated: the password input wrapper
+  (`<div class="form-control-group">` with a `.form-control-action` button) and
+  the chip input (`<div class="form-control-group chip-input">`). The
+  components that build their own DOM do it for you.
+
+  Sass overrides move with the classes. Because the group *is* the control
+  frame, theming `.form-control` — or the `--#{$prefix}control-*` custom
+  properties — now reaches all of these components at once, which is what the
+  per-family variables were emulating. The families keep the variables for what
+  they actually own (calendars, the time roll, listboxes, chips), and the ones
+  that only aliased `$input-*` are gone.
+- **Validation and sizing ride the standard machinery.** `.is-invalid` /
+  `.is-valid` on the group behave exactly as on a `.form-control`, and the
+  state also propagates from the control inside it. The per-family
+  `!important` overrides that forced the invalid border in v5 are gone.

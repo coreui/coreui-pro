@@ -6,6 +6,7 @@
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
+@use "form-control-group" as *;
 @use "form-check" as *;
 
 // Multi Select
@@ -169,24 +170,42 @@ $form-multi-select-tokens: defaults(
 
     position: relative;
 
-    .was-validated .form-multi-select:has(> select:invalid),
-    &.is-invalid {
-      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$form-multi-select-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
+  }
 
-      --#{$prefix}control-border-color: #{$form-multi-select-invalid-border-color};
-      --#{$prefix}control-focus-border-color: #{$form-multi-select-invalid-border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
+  // See the autocomplete: the frame declares the control tokens itself, so the
+  // state is written onto the frame rather than inherited from the root.
+  .was-validated .form-multi-select:has(> select:invalid) .form-control-group,
+  .form-multi-select.is-invalid .form-control-group {
+    $focus-ring: $input-focus-width solid color-mix(in srgb, #{$form-multi-select-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
-    }
+    --#{$prefix}control-border-color: #{$form-multi-select-invalid-border-color};
+    --#{$prefix}control-focus-border-color: #{$form-multi-select-invalid-border-color};
+    --#{$prefix}control-focus-ring: #{$focus-ring};
+  }
 
-    .was-validated .form-multi-select:has(> select:valid),
-    &.is-valid {
-      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$form-multi-select-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
+  .was-validated .form-multi-select:has(> select:valid) .form-control-group,
+  .form-multi-select.is-valid .form-control-group {
+    $focus-ring: $input-focus-width solid color-mix(in srgb, #{$form-multi-select-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
 
-      --#{$prefix}control-border-color: #{$form-multi-select-valid-border-color};
-      --#{$prefix}control-focus-border-color: #{$form-multi-select-valid-border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
-    }
+    --#{$prefix}control-border-color: #{$form-multi-select-valid-border-color};
+    --#{$prefix}control-focus-border-color: #{$form-multi-select-valid-border-color};
+    --#{$prefix}control-focus-ring: #{$focus-ring};
+  }
+
+  // Selected tags wrap; the popup keeps the frame lit; disabled lives on the root.
+  .form-multi-select .form-control-group {
+    flex-wrap: wrap;
+  }
+
+  .form-multi-select.show .form-control-group,
+  .form-multi-select:has(> select:focus) .form-control-group {
+    @include form-control-group-focus();
+  }
+
+  .form-multi-select.disabled .form-control-group {
+    color: var(--#{$prefix}control-disabled-color);
+    background-color: var(--#{$prefix}control-disabled-bg);
+    border-color: var(--#{$prefix}control-disabled-border-color);
   }
 
   // The native select stays in the DOM as an invisible overlay covering the control
@@ -204,42 +223,6 @@ $form-multi-select-tokens: defaults(
     border: 0;
     outline: 0;
     opacity: 0;
-  }
-
-  .form-multi-select-input-group {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    width: 100%;
-    font-family: var(--#{$prefix}control-font-family);
-    font-size: var(--#{$prefix}control-font-size);
-    font-weight: var(--#{$prefix}control-font-weight);
-    line-height: var(--#{$prefix}control-line-height);
-    color: var(--#{$prefix}control-color);
-    background-color: var(--#{$prefix}control-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-    @include border-radius(var(--#{$prefix}control-border-radius));
-
-    .form-multi-select & {
-      @include transition($input-transition);
-    }
-
-    .form-multi-select.disabled & {
-      color: var(--#{$prefix}control-disabled-color);
-      background-color: var(--#{$prefix}control-disabled-bg);
-      border-color: $input-disabled-border-color;
-    }
-
-    .form-multi-select.show &,
-    .form-multi-select:has(> select:focus) &,
-    &:has(*:focus),
-    &:focus {
-      color: var(--#{$prefix}control-focus-color);
-      background-color: var(--#{$prefix}control-focus-bg);
-      border-color: var(--#{$prefix}control-focus-border-color);
-      outline: var(--#{$prefix}control-focus-ring);
-    }
   }
 
   .form-multi-select-selection {

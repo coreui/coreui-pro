@@ -52,7 +52,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_INDICATOR = 'autocomplete-indicator'
 const CLASS_NAME_INPUT = 'autocomplete-input'
 const CLASS_NAME_INPUT_HINT = 'autocomplete-input-hint'
-const CLASS_NAME_INPUT_GROUP = 'autocomplete-input-group'
+const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="autocomplete"]:not(.disabled)'

@@ -31,8 +31,8 @@ describe('TimePicker', () => {
 
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('time-picker')).toBeTrue()
-      expect(el.querySelector('.time-picker-input-group .form-date-time')).not.toBeNull()
-      expect(el.querySelector('.time-picker-indicator svg')).not.toBeNull()
+      expect(el.querySelector('.form-control-group .form-date-time')).not.toBeNull()
+      expect(el.querySelector('.form-control-action svg')).not.toBeNull()
     })
 
     it('should not build the selection body until the popup opens', () => {
@@ -142,13 +142,13 @@ describe('TimePicker', () => {
     it('should apply the size class', () => {
       buildPicker({ size: 'lg' })
 
-      expect(fixtureEl.querySelector('#picker').classList.contains('time-picker-lg')).toBeTrue()
+      expect(fixtureEl.querySelector('#picker .form-control-group').classList.contains('form-control-lg')).toBeTrue()
     })
 
     it('should skip sanitizing when sanitize is false', () => {
       buildPicker({ indicatorIcon: '<svg xmlns="http://www.w3.org/2000/svg"><circle r="3" /></svg>', sanitize: false })
 
-      expect(fixtureEl.querySelector('.time-picker-indicator circle')).not.toBeNull()
+      expect(fixtureEl.querySelector('.form-control-action circle')).not.toBeNull()
     })
 
     it('should set the time to now through the context', () => {
@@ -170,7 +170,7 @@ describe('TimePicker', () => {
 
     it('should toggle from the indicator button', () => {
       const picker = buildPicker()
-      const indicator = fixtureEl.querySelector('.time-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
 
       indicator.click()
       expect(picker._popup.isShown).toBeTrue()
@@ -182,7 +182,7 @@ describe('TimePicker', () => {
     it('should ignore indicator clicks when disabled', () => {
       const picker = buildPicker({ disabled: true })
 
-      fixtureEl.querySelector('.time-picker-indicator').click()
+      fixtureEl.querySelector('.form-control-action').click()
 
       expect(picker._popup.isShown).toBeFalse()
     })

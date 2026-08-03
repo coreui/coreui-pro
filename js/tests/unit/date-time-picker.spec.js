@@ -115,12 +115,12 @@ describe('DateTimePicker', () => {
     it('should apply the size class', () => {
       buildPicker({ size: 'sm' })
 
-      expect(fixtureEl.querySelector('#picker').classList.contains('date-picker-sm')).toBeTrue()
+      expect(fixtureEl.querySelector('#picker .form-control-group').classList.contains('form-control-sm')).toBeTrue()
     })
 
     it('should toggle from the indicator button', () => {
       const picker = buildPicker()
-      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
 
       indicator.click()
       expect(picker._popup.isShown).toBeTrue()
@@ -132,7 +132,7 @@ describe('DateTimePicker', () => {
     it('should ignore indicator clicks when disabled', () => {
       const picker = buildPicker({ disabled: true })
 
-      fixtureEl.querySelector('.date-picker-indicator').click()
+      fixtureEl.querySelector('.form-control-action').click()
 
       expect(picker._popup.isShown).toBeFalse()
     })

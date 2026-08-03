@@ -7,6 +7,7 @@
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
+@use "forms/form-control-group" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
 
@@ -122,53 +123,41 @@ $autocomplete-tokens: defaults(
 
     position: relative;
 
-    .was-validated .autocomplete:invalid + &,
-    &.is-invalid {
-      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$autocomplete-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
-
-      --#{$prefix}control-border-color: #{$autocomplete-invalid-border-color};
-      --#{$prefix}control-focus-border-color: #{$autocomplete-invalid-border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
-
-    }
-
-    .was-validated .autocomplete:valid + &,
-    &.is-valid {
-      $focus-ring: $input-focus-width solid color-mix(in srgb, #{$autocomplete-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
-
-      --#{$prefix}control-border-color: #{$autocomplete-valid-border-color};
-      --#{$prefix}control-focus-border-color: #{$autocomplete-valid-border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring} !important; // stylelint-disable-line declaration-no-important
-    }
   }
 
-  .autocomplete-input-group {
-    position: relative;
-    display: flex;
+  // The frame is a `.form-control-group`, which declares the control tokens on
+  // itself — so the state has to be written onto the frame, not inherited into
+  // it from the component root.
+  .was-validated .autocomplete:invalid + .autocomplete .form-control-group,
+  .autocomplete.is-invalid .form-control-group {
+    $focus-ring: $input-focus-width solid color-mix(in srgb, #{$autocomplete-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
+
+    --#{$prefix}control-border-color: #{$autocomplete-invalid-border-color};
+    --#{$prefix}control-focus-border-color: #{$autocomplete-invalid-border-color};
+    --#{$prefix}control-focus-ring: #{$focus-ring};
+  }
+
+  .was-validated .autocomplete:valid + .autocomplete .form-control-group,
+  .autocomplete.is-valid .form-control-group {
+    $focus-ring: $input-focus-width solid color-mix(in srgb, #{$autocomplete-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
+
+    --#{$prefix}control-border-color: #{$autocomplete-valid-border-color};
+    --#{$prefix}control-focus-border-color: #{$autocomplete-valid-border-color};
+    --#{$prefix}control-focus-ring: #{$focus-ring};
+  }
+
+  // Tags wrap; the popup keeps the frame lit; disabled lives on the root.
+  .autocomplete .form-control-group {
     flex-wrap: wrap;
-    align-items: stretch;
-    width: 100%;
-    background-color: var(--#{$prefix}control-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-    @include border-radius(var(--#{$prefix}control-border-radius));
+  }
 
-    .autocomplete & {
-      @include transition($input-transition);
-    }
+  .autocomplete.show .form-control-group {
+    @include form-control-group-focus();
+  }
 
-    .autocomplete.disabled & {
-      background-color: var(--#{$prefix}control-disabled-bg);
-      border-color: $input-disabled-border-color;
-    }
-
-    .autocomplete.show &,
-    &:has(*:focus),
-    &:focus {
-      background-color: var(--#{$prefix}control-focus-bg);
-      border-color: var(--#{$prefix}control-focus-border-color);
-      outline: var(--#{$prefix}control-focus-ring);
-    }
+  .autocomplete.disabled .form-control-group {
+    background-color: var(--#{$prefix}control-disabled-bg);
+    border-color: var(--#{$prefix}control-disabled-border-color);
   }
 
   .autocomplete-input {

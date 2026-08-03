@@ -1,0 +1,132 @@
+---
+title: "Bootstrap 5 Form Control Group"
+name: "Form Control Group"
+description: "Assemble an input, icons and action buttons into one control that looks and behaves like a single form field — the frame every CoreUI field component is built on."
+---
+
+## Example
+
+A control is often more than an input: it carries an icon, a clear button, a
+toggle. `.form-control-group` draws **one** frame around all of it, so the
+result reads as a single field rather than a row of parts.
+
+<Example code={`<div class="form-control-group">
+    <span class="form-control-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M479.6 399.716l-81.084-81.084-62.368-25.767A175.014 175.014 0 0 0 368 192c0-97.047-78.953-176-176-176S16 94.953 16 192s78.953 176 176 176a175.034 175.034 0 0 0 101.619-32.377l25.7 62.2L400.4 479.6a56 56 0 1 0 79.2-79.884ZM48 192c0-79.4 64.6-144 144-144s144 64.6 144 144-64.6 144-144 144S48 271.4 48 192Zm408.971 264.284a24.028 24.028 0 0 1-33.942 0l-76.572-76.572-23.894-57.835 57.835 23.894 76.573 76.572a24.028 24.028 0 0 1 0 33.941Z"/></svg>
+    </span>
+    <input type="search" class="form-control" placeholder="Search…" aria-label="Search">
+  </div>`} />
+
+## How it works
+
+- **The group is the frame.** `.form-control-group` looks exactly like
+  `.form-control` — same padding, typography, colours, border and transition,
+  from the same `--#{$prefix}control-*` custom properties — and lays its
+  children out in a row. Theme `.form-control` and the group follows.
+- **The control inside keeps its own class.** Put `.form-control` on the input:
+  inside a group it gives up its border, padding and background, so only the
+  group's frame is drawn. There is no separate "ghost" class to remember.
+- **Focus is answered by the group.** A `<div>` never fires `:focus`, so the
+  frame lights up on `:focus-within`.
+
+## Parts
+
+| Class | Use |
+| --- | --- |
+| `.form-control-group` | The frame. |
+| `.form-control` | The editable inside it. |
+| `.form-control-icon` | Decoration — an icon and nothing more. It ignores pointer events, and can sit in the group on its own or inside an action. |
+| `.form-control-action` | An interactive adornment: a real `<button>`. Give it an `aria-label`; it may hold a `.form-control-icon`. |
+| `.form-control-cleaner` | The action that clears the value. Styled like an action; showing and hiding it is the component's job, since only it knows whether the control holds a value. |
+
+Icons take their size from the group, so they follow `.form-control-sm` and
+`.form-control-lg` without being told. An icon inside an action follows the
+button's colour, which is how a validation state reaches it.
+
+<Example code={`<div class="form-control-group">
+    <input type="text" class="form-control" value="Ada Lovelace" aria-label="Name">
+    <button type="button" class="form-control-action" aria-label="Clear">
+      <span class="form-control-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/></svg>
+      </span>
+    </button>
+  </div>`} />
+
+## Sizing
+
+Add `.form-control-sm` or `.form-control-lg` to the group — the standard
+control sizing classes, no per-component variants.
+
+<Example code={`<div class="form-control-group form-control-sm mb-3">
+    <input type="text" class="form-control" placeholder="Small" aria-label="Small">
+  </div>
+  <div class="form-control-group mb-3">
+    <input type="text" class="form-control" placeholder="Default" aria-label="Default">
+  </div>
+  <div class="form-control-group form-control-lg">
+    <input type="text" class="form-control" placeholder="Large" aria-label="Large">
+  </div>`} />
+
+## Validation
+
+Put `.is-invalid` or `.is-valid` on the group. The state also reaches the frame
+from the control inside it, so a component that validates its own field lights
+the frame up without any extra wiring. The validation icon is suppressed inside
+a group — an action usually occupies that corner — and the actions carry the
+state colour instead.
+
+<Example code={`<div class="form-control-group is-invalid">
+    <input type="text" class="form-control" value="Not quite" aria-label="Invalid example">
+    <button type="button" class="form-control-action" aria-label="Clear">
+      <span class="form-control-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/></svg>
+      </span>
+    </button>
+  </div>
+  <div class="invalid-feedback d-block">Please pick a different value.</div>`} />
+
+## Disabled
+
+Disable the control inside the group and the frame follows; use `.disabled` on
+the group when there is no single control to disable.
+
+<Example code={`<div class="form-control-group">
+    <input type="text" class="form-control" value="Read only" aria-label="Disabled example" disabled>
+    <button type="button" class="form-control-action" aria-label="Clear" disabled>
+      <span class="form-control-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor"><path d="M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z"/></svg>
+      </span>
+    </button>
+  </div>`} />
+
+<Callout color="info">
+  **Not to be confused with [input group](/forms/input-group/).** An input group
+  joins *separate* controls and add-ons side by side — each keeps its own frame,
+  and the seams between them are visible. A form control group is *one* control
+  assembled from parts inside a single frame.
+</Callout>
+
+## Where it is used
+
+Every CoreUI field component builds on it, which is why they all size, focus
+and validate the same way: [autocomplete](/forms/autocomplete/),
+[chip input](/forms/chip-input/), [date picker](/forms/date-picker/),
+[date range picker](/forms/date-range-picker/),
+[date time picker](/forms/date-time-picker/),
+[multi select](/forms/multi-select/), [password input](/forms/password-input/)
+and [time picker](/forms/time-picker/). Reach for the group directly when you
+are assembling a field of your own.
+
+## CSS
+
+### Variables
+
+The frame runs on the shared `--#{$prefix}control-*` custom properties, so it
+is themed together with `.form-control`. The parts the group owns have their
+own:
+
+<ScssDocs file="scss/forms/_form-control-group.scss" capture="form-control-group-tokens" />
+
+### Sass variables
+
+<ScssDocs file="scss/forms/_form-control-group.scss" capture="form-control-group-variables" />

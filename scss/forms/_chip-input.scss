@@ -61,39 +61,20 @@ $chip-input-tokens: defaults(
 // scss-docs-end chip-input-css-vars
 
 @layer forms {
+  // The frame, the focus and the disabled treatment come from
+  // `.form-control-group`; chips need the row to wrap and their own spacing.
   .chip-input {
     @include tokens($chip-input-tokens);
 
-    display: flex;
     flex-wrap: wrap;
     gap: var(--#{$prefix}chip-input-gap);
-    align-items: center;
     min-height: var(--#{$prefix}chip-input-min-height);
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    color: var(--#{$prefix}control-color);
-    background-color: var(--#{$prefix}control-bg);
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-    @include border-radius(var(--#{$prefix}control-border-radius), 0);
-    @include transition(var(--#{$prefix}control-transition));
 
-    // Focus state when ghost input is focused
-    &:focus-within {
-      border-color: $input-focus-border-color;
-      @include focus-ring();
-    }
+    &.disabled > .chip {
+      opacity: .65;
 
-    // Disabled state
-    &.disabled {
-      background-color: $input-disabled-bg;
-      opacity: 1;
-
-      > .chip {
-        opacity: .65;
-
-        .chip-dismiss {
-          pointer-events: none;
-        }
+      .chip-dismiss {
+        pointer-events: none;
       }
     }
   }

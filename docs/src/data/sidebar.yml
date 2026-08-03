@@ -141,6 +141,11 @@
       to: /forms/floating-labels/
     - title: Form control
       to: /forms/form-control/
+    - title: Form Control Group
+      to: /forms/form-control-group/
+      badge:
+        color: success
+        text: NEW
     - title: Input group
       to: /forms/input-group/
     - title: Multi Select

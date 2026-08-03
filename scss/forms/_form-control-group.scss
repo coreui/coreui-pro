@@ -1,0 +1,204 @@
+@use "../functions/defaults" as *;
+@use "../mixins/border-radius" as *;
+@use "../mixins/tokens" as *;
+@use "../mixins/transition" as *;
+@use "../config" as *;
+@use "form-control" as *;
+
+// scss-docs-start form-control-group-variables
+$form-control-group-gap:              .5rem !default;
+$form-control-group-icon-size:        1rem !default;
+$form-control-group-icon-size-sm:     .875rem !default;
+$form-control-group-icon-size-lg:     1.25rem !default;
+$form-control-group-icon-color:       var(--#{$prefix}tertiary-color) !default;
+$form-control-group-action-size:      1.5rem !default;
+$form-control-group-action-size-sm:   1.25rem !default;
+$form-control-group-action-size-lg:   1.75rem !default;
+$form-control-group-action-color:     var(--#{$prefix}tertiary-color) !default;
+$form-control-group-action-hover-color: var(--#{$prefix}body-color) !default;
+$form-control-group-action-bg:        transparent !default;
+$form-control-group-action-hover-bg:  var(--#{$prefix}tertiary-bg) !default;
+// scss-docs-end form-control-group-variables
+
+// scss-docs-start form-control-group-tokens
+// The frame itself runs on the shared --#{$prefix}control-* namespace, so only
+// the parts the group owns get their own properties.
+$form-control-group-tokens: () !default;
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-control-group-tokens: defaults(
+  (
+    --#{$prefix}control-group-gap: #{$form-control-group-gap},
+    --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size},
+    --#{$prefix}control-group-icon-color: #{$form-control-group-icon-color},
+    --#{$prefix}control-group-action-size: #{$form-control-group-action-size},
+    --#{$prefix}control-group-action-color: #{$form-control-group-action-color},
+    --#{$prefix}control-group-action-hover-color: #{$form-control-group-action-hover-color},
+    --#{$prefix}control-group-action-bg: #{$form-control-group-action-bg},
+    --#{$prefix}control-group-action-hover-bg: #{$form-control-group-action-hover-bg},
+    --#{$prefix}control-group-action-border-radius: #{$input-border-radius-sm},
+    --#{$prefix}control-group-action-transition: var(--#{$prefix}btn-input-transition),
+  ),
+  $form-control-group-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end form-control-group-tokens
+
+// scss-docs-start form-control-group-focus-mixin
+// The focus treatment of the frame. A component whose focus leaves the group
+// while it is still active — a picker with an open popup, say — replays it on
+// its own open state.
+@mixin form-control-group-focus() {
+  color: var(--#{$prefix}control-focus-color);
+  background-color: var(--#{$prefix}control-focus-bg);
+  border-color: var(--#{$prefix}control-focus-border-color);
+  outline: var(--#{$prefix}control-focus-ring);
+}
+// scss-docs-end form-control-group-focus-mixin
+
+@layer forms {
+  // A control assembled from parts — an editable, icons and action buttons —
+  // that has to read as a single control. The group draws the frame; the
+  // control inside it gives its own frame up.
+  .form-control-group {
+    @include tokens($form-control-tokens);
+    @include tokens($form-control-group-tokens);
+    @include form-control-frame();
+
+    display: flex;
+    gap: var(--#{$prefix}control-group-gap);
+    align-items: center;
+    width: 100%;
+    min-height: var(--#{$prefix}btn-input-min-height);
+    cursor: text;
+
+    // The group declares the control tokens itself, so the sizing classes have
+    // to be answered here — their own declarations sit earlier in the cascade
+    // and would lose to the block above.
+    &.form-control-sm {
+      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
+      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
+      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
+      --#{$prefix}control-border-radius: #{$input-border-radius-sm};
+      --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-sm};
+      --#{$prefix}control-group-action-size: #{$form-control-group-action-size-sm};
+
+      min-height: var(--#{$prefix}btn-input-sm-min-height);
+    }
+
+    &.form-control-lg {
+      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
+      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
+      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
+      --#{$prefix}control-border-radius: #{$input-border-radius-lg};
+      --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-lg};
+      --#{$prefix}control-group-action-size: #{$form-control-group-action-size-lg};
+
+      min-height: var(--#{$prefix}btn-input-lg-min-height);
+    }
+
+    // A div never fires :focus, so the frame takes the focus treatment from
+    // whatever inside it is focused. Components with a popup add their own
+    // open state to this rule.
+    &:focus-within {
+      @include form-control-group-focus();
+    }
+
+    &.disabled,
+    &:has(> .form-control:disabled) {
+      color: var(--#{$prefix}control-disabled-color);
+      cursor: default;
+      background-color: var(--#{$prefix}control-disabled-bg);
+      border-color: var(--#{$prefix}control-disabled-border-color);
+      opacity: 1; // iOS fix for unreadable disabled content
+    }
+
+    // The group is the frame: a control inside it must not draw a second one,
+    // or the result is as tall as both boxes stacked. This is deliberately a
+    // descendant rule so it also outranks a theme's own `.form-control` border.
+    > .form-control {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      min-height: 0;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      background-color: transparent;
+      border: 0;
+      @include border-radius(0);
+      box-shadow: none;
+
+      &:focus,
+      &:focus-within {
+        background-color: transparent;
+        outline: 0;
+      }
+
+      &:disabled {
+        color: inherit;
+        background-color: transparent;
+      }
+    }
+  }
+
+  // An icon and nothing more: decoration on its own inside the group, or the
+  // visual of an action button.
+  .form-control-icon {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    color: var(--#{$prefix}control-group-icon-color);
+    pointer-events: none;
+
+    > svg {
+      width: var(--#{$prefix}control-group-icon-size);
+      height: var(--#{$prefix}control-group-icon-size);
+    }
+  }
+
+  // An interactive adornment: a real button that may hold a .form-control-icon.
+  // `.form-control-cleaner` is the value-clearing one; its visibility belongs
+  // to the component, which knows whether the control holds a value.
+  .form-control-action,
+  .form-control-cleaner {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: var(--#{$prefix}control-group-action-size);
+    height: var(--#{$prefix}control-group-action-size);
+    padding: 0;
+    color: var(--#{$prefix}control-group-action-color);
+    background-color: var(--#{$prefix}control-group-action-bg);
+    border: 0;
+    @include border-radius(var(--#{$prefix}control-group-action-border-radius));
+    @include transition(var(--#{$prefix}control-group-action-transition));
+
+    > svg {
+      width: var(--#{$prefix}control-group-icon-size);
+      height: var(--#{$prefix}control-group-icon-size);
+    }
+
+    // The icon inside an action follows the button, not the passive color.
+    .form-control-icon {
+      color: inherit;
+    }
+
+    &:hover:not(:disabled) {
+      color: var(--#{$prefix}control-group-action-hover-color);
+      background-color: var(--#{$prefix}control-group-action-hover-bg);
+    }
+
+    &:focus-visible {
+      z-index: 5;
+      outline: var(--#{$prefix}focus-ring);
+    }
+
+    &:disabled {
+      pointer-events: none;
+      opacity: .65;
+    }
+  }
+}

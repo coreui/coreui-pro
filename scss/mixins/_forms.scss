@@ -133,36 +133,23 @@ $form-feedback-tokens: defaults(
     }
   }
 
-  .form-password .form-control {
-    @include form-validation-state-selector($state) {
-
-      @if $enable-validation-icons {
-        background-image: none;
-      }
-
-      ~ .form-password-action .form-password-action-icon {
-        background-color: $border-color;
-      }
-    }
-  }
-
-  // In a picker the input group is the frame and the field inside draws no
-  // border of its own, so the state has to reach the group — custom properties
-  // set on the field would only inherit downwards. The indicator button sits
-  // where the validation icon would go, so the icon is suppressed and the
-  // indicator carries the color instead (see .form-password above).
-  .date-picker-input-group,
-  .time-picker-input-group {
-    &:has(.form-date-time.is-#{$state}) {
+  // The group is the frame and the control inside it draws no border of its
+  // own, so the state has to reach the group — custom properties set on the
+  // control would only inherit downwards. Actions sit where the validation
+  // icon would go, so the icon is suppressed and the actions carry the color
+  // instead (see .form-password above).
+  .form-control-group {
+    &.is-#{$state},
+    &:has(> .form-control.is-#{$state}) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
       --#{$prefix}control-focus-ring: #{$focus-ring};
-      --#{$prefix}date-picker-indicator-color: #{$color};
-      --#{$prefix}time-picker-indicator-icon-color: #{$color};
+      --#{$prefix}control-group-icon-color: #{$color};
+      --#{$prefix}control-group-action-color: #{$color};
     }
 
     @if $enable-validation-icons {
-      .form-date-time {
+      > .form-control {
         @include form-validation-state-selector($state) {
           background-image: none;
         }
