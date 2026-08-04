@@ -1,5 +1,6 @@
 @use "config" as *;
 @use "functions" as *;
+@use "mixins/ltr-rtl" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/tokens" as *;
@@ -290,11 +291,7 @@ $menu-tokens: defaults(
       border-color: currentcolor;
       border-style: solid;
       border-width: 0 .125em .125em 0;
-      transform: rotate(-45deg);
-
-      [dir="rtl"] & {
-        transform: rotate(135deg);
-      }
+      @include ltr-rtl("transform", rotate(-45deg), null, rotate(135deg));
     }
 
     > .menu {
