@@ -440,71 +440,77 @@ describe('OTPInput', () => {
       expect(input.value).toBe('')
     })
 
-    it('should move focus to next input after entering digit', done => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
+    it('should move focus to next input after entering digit', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+          </div>
+        `
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer) // eslint-disable-line no-new
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer) // eslint-disable-line no-new
 
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      inputs[0].value = '1'
-      const inputEvent = createEvent('input')
-      inputs[0].dispatchEvent(inputEvent)
+        const inputs = otpContainer.querySelectorAll('.form-otp-control')
+        inputs[0].value = '1'
+        const inputEvent = createEvent('input')
+        inputs[0].dispatchEvent(inputEvent)
 
-      setTimeout(() => {
-        expect(document.activeElement).toBe(inputs[1])
-        done()
-      }, 50)
+        setTimeout(() => {
+          expect(document.activeElement).toBe(inputs[1])
+          resolve()
+        }, 50)
+      })
     })
 
-    it('should trigger complete event when all inputs are filled', done => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control" value="1">
-          <input type="text" class="form-otp-control" value="2">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
+    it('should trigger complete event when all inputs are filled', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="form-otp">
+            <input type="text" class="form-otp-control" value="1">
+            <input type="text" class="form-otp-control" value="2">
+            <input type="text" class="form-otp-control">
+          </div>
+        `
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer) // eslint-disable-line no-new
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer) // eslint-disable-line no-new
 
-      otpContainer.addEventListener('complete.coreui.otp-input', event => {
-        expect(event.value).toBe('123')
-        done()
+        otpContainer.addEventListener('complete.coreui.otp-input', event => {
+          expect(event.value).toBe('123')
+          resolve()
+        })
+
+        const inputs = otpContainer.querySelectorAll('.form-otp-control')
+        inputs[2].value = '3'
+        const inputEvent = createEvent('input')
+        inputs[2].dispatchEvent(inputEvent)
       })
-
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      inputs[2].value = '3'
-      const inputEvent = createEvent('input')
-      inputs[2].dispatchEvent(inputEvent)
     })
 
-    it('should trigger change event with current value', done => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
+    it('should trigger change event with current value', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+          </div>
+        `
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer) // eslint-disable-line no-new
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer) // eslint-disable-line no-new
 
-      otpContainer.addEventListener('change.coreui.otp-input', event => {
-        expect(event.value).toBe('1')
-        done()
+        otpContainer.addEventListener('change.coreui.otp-input', event => {
+          expect(event.value).toBe('1')
+          resolve()
+        })
+
+        const inputs = otpContainer.querySelectorAll('.form-otp-control')
+        inputs[0].value = '1'
+        const inputEvent = createEvent('input')
+        inputs[0].dispatchEvent(inputEvent)
       })
-
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      inputs[0].value = '1'
-      const inputEvent = createEvent('input')
-      inputs[0].dispatchEvent(inputEvent)
     })
   })
 
@@ -645,30 +651,32 @@ describe('OTPInput', () => {
       expect(inputs[2].value).toBe('3')
     })
 
-    it('should trigger complete event after paste fills all inputs', done => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control">
-          <input type="text" class="form-otp-control">
-        </div>
-      `
+    it('should trigger complete event after paste fills all inputs', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="form-otp">
+            <input type="text" class="form-otp-control">
+            <input type="text" class="form-otp-control">
+          </div>
+        `
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer, { type: 'number' }) // eslint-disable-line no-new
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer, { type: 'number' }) // eslint-disable-line no-new
 
-      otpContainer.addEventListener('complete.coreui.otp-input', event => {
-        expect(event.value).toBe('12')
-        done()
+        otpContainer.addEventListener('complete.coreui.otp-input', event => {
+          expect(event.value).toBe('12')
+          resolve()
+        })
+
+        const inputs = otpContainer.querySelectorAll('.form-otp-control')
+        const pasteEvent = new ClipboardEvent('paste', {
+          clipboardData: new DataTransfer(),
+          bubbles: true
+        })
+        pasteEvent.clipboardData.setData('text', '12')
+
+        inputs[0].dispatchEvent(pasteEvent)
       })
-
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      const pasteEvent = new ClipboardEvent('paste', {
-        clipboardData: new DataTransfer(),
-        bubbles: true
-      })
-      pasteEvent.clipboardData.setData('text', '12')
-
-      inputs[0].dispatchEvent(pasteEvent)
     })
 
     it('should only fill from paste position onwards', () => {
@@ -699,26 +707,28 @@ describe('OTPInput', () => {
   })
 
   describe('focus behavior', () => {
-    it('should select input value on focus when input has value', done => {
-      fixtureEl.innerHTML = `
-        <div class="form-otp">
-          <input type="text" class="form-otp-control" value="1">
-        </div>
-      `
+    it('should select input value on focus when input has value', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="form-otp">
+            <input type="text" class="form-otp-control" value="1">
+          </div>
+        `
 
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer) // eslint-disable-line no-new
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer) // eslint-disable-line no-new
 
-      const input = otpContainer.querySelector('.form-otp-control')
-      spyOn(input, 'select')
+        const input = otpContainer.querySelector('.form-otp-control')
+        spyOn(input, 'select')
 
-      const focusEvent = createEvent('focus')
-      input.dispatchEvent(focusEvent)
+        const focusEvent = createEvent('focus')
+        input.dispatchEvent(focusEvent)
 
-      setTimeout(() => {
-        expect(input.select).toHaveBeenCalled()
-        done()
-      }, 10)
+        setTimeout(() => {
+          expect(input.select).toHaveBeenCalled()
+          resolve()
+        }, 10)
+      })
     })
 
     it('should focus first empty input in linear mode', () => {
@@ -742,58 +752,62 @@ describe('OTPInput', () => {
   })
 
   describe('autoSubmit', () => {
-    it('should submit form when autoSubmit is true and all fields filled', done => {
-      fixtureEl.innerHTML = `
-        <form>
-          <div class="form-otp">
-            <input type="text" class="form-otp-control" value="1">
-            <input type="text" class="form-otp-control">
-          </div>
-        </form>
-      `
+    it('should submit form when autoSubmit is true and all fields filled', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <form>
+            <div class="form-otp">
+              <input type="text" class="form-otp-control" value="1">
+              <input type="text" class="form-otp-control">
+            </div>
+          </form>
+        `
 
-      const form = fixtureEl.querySelector('form')
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer, { autoSubmit: true }) // eslint-disable-line no-new
+        const form = fixtureEl.querySelector('form')
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer, { autoSubmit: true }) // eslint-disable-line no-new
 
-      spyOn(form, 'requestSubmit')
+        spyOn(form, 'requestSubmit')
 
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      inputs[1].value = '2'
-      const inputEvent = createEvent('input')
-      inputs[1].dispatchEvent(inputEvent)
+        const inputs = otpContainer.querySelectorAll('.form-otp-control')
+        inputs[1].value = '2'
+        const inputEvent = createEvent('input')
+        inputs[1].dispatchEvent(inputEvent)
 
-      setTimeout(() => {
-        expect(form.requestSubmit).toHaveBeenCalled()
-        done()
-      }, 50)
+        setTimeout(() => {
+          expect(form.requestSubmit).toHaveBeenCalled()
+          resolve()
+        }, 50)
+      })
     })
 
-    it('should not submit form when autoSubmit is false', done => {
-      fixtureEl.innerHTML = `
-        <form>
-          <div class="form-otp">
-            <input type="text" class="form-otp-control" value="1">
-            <input type="text" class="form-otp-control">
-          </div>
-        </form>
-      `
+    it('should not submit form when autoSubmit is false', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <form>
+            <div class="form-otp">
+              <input type="text" class="form-otp-control" value="1">
+              <input type="text" class="form-otp-control">
+            </div>
+          </form>
+        `
 
-      const form = fixtureEl.querySelector('form')
-      const otpContainer = fixtureEl.querySelector('.form-otp')
-      new OTPInput(otpContainer, { autoSubmit: false }) // eslint-disable-line no-new
+        const form = fixtureEl.querySelector('form')
+        const otpContainer = fixtureEl.querySelector('.form-otp')
+        new OTPInput(otpContainer, { autoSubmit: false }) // eslint-disable-line no-new
 
-      spyOn(form, 'requestSubmit')
+        spyOn(form, 'requestSubmit')
 
-      const inputs = otpContainer.querySelectorAll('.form-otp-control')
-      inputs[1].value = '2'
-      const inputEvent = createEvent('input')
-      inputs[1].dispatchEvent(inputEvent)
+        const inputs = otpContainer.querySelectorAll('.form-otp-control')
+        inputs[1].value = '2'
+        const inputEvent = createEvent('input')
+        inputs[1].dispatchEvent(inputEvent)
 
-      setTimeout(() => {
-        expect(form.requestSubmit).not.toHaveBeenCalled()
-        done()
-      }, 50)
+        setTimeout(() => {
+          expect(form.requestSubmit).not.toHaveBeenCalled()
+          resolve()
+        }, 50)
+      })
     })
   })
 
@@ -1079,18 +1093,20 @@ describe('OTPInput', () => {
       expect(inputs.map(input => input.value)).toEqual(['4', '2', '4', '2', '4', '2'])
     })
 
-    it('should trigger change and complete events', done => {
-      const otpContainer = markup()
-      new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
+    it('should trigger change and complete events', () => {
+      return new Promise(resolve => {
+        const otpContainer = markup()
+        new OTPInput(otpContainer, { type: 'number', name: 'code' }) // eslint-disable-line no-new
 
-      otpContainer.addEventListener('complete.coreui.otp-input', event => {
-        expect(event.value).toEqual('424242')
-        done()
+        otpContainer.addEventListener('complete.coreui.otp-input', event => {
+          expect(event.value).toEqual('424242')
+          resolve()
+        })
+
+        const first = otpContainer.querySelector('.form-otp-control')
+        first.value = '424242'
+        first.dispatchEvent(new Event('input', { bubbles: true }))
       })
-
-      const first = otpContainer.querySelector('.form-otp-control')
-      first.value = '424242'
-      first.dispatchEvent(new Event('input', { bubbles: true }))
     })
 
     it('should filter invalid characters out of an inserted code', () => {

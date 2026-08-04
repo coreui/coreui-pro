@@ -390,17 +390,19 @@ describe('Stepper', () => {
       expect(buttons[0]).not.toHaveClass('active')
     })
 
-    it('should trigger stepChange event with correct index', done => {
-      fixtureEl.innerHTML = getThreeStepFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+    it('should trigger stepChange event with correct index', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getThreeStepFixture()
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      stepperElement.addEventListener('stepChange.coreui.stepper', event => {
-        expect(event.index).toEqual(2)
-        done()
+        stepperElement.addEventListener('stepChange.coreui.stepper', event => {
+          expect(event.index).toEqual(2)
+          resolve()
+        })
+
+        stepper.showStep(2)
       })
-
-      stepper.showStep(2)
     })
 
     it('should not advance if current step validation fails', () => {
@@ -487,19 +489,21 @@ describe('Stepper', () => {
       expect(buttons[1].getAttribute('tabIndex')).toBe('0')
     })
 
-    it('should handle stepContent elements with _animateHeight', done => {
-      fixtureEl.innerHTML = getStepContentFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement, { skipValidation: true })
+    it('should handle stepContent elements with _animateHeight', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getStepContentFixture()
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement, { skipValidation: true })
 
-      stepper.showStep(2)
+        stepper.showStep(2)
 
-      // Give time for animation frame
-      setTimeout(() => {
-        const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-        expect(buttons[1]).toHaveClass('active')
-        done()
-      }, 50)
+        // Give time for animation frame
+        setTimeout(() => {
+          const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+          expect(buttons[1]).toHaveClass('active')
+          resolve()
+        }, 50)
+      })
     })
   })
 
@@ -610,21 +614,23 @@ describe('Stepper', () => {
   })
 
   describe('finish()', () => {
-    it('should finish on the last step', done => {
-      fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+    it('should finish on the last step', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getThreeStepFixture({ activeStep: 3 })
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      stepperElement.addEventListener('finish.coreui.stepper', () => {
-        // Event fires before _isFinished is set, so check event was triggered
-        expect(true).toBeTrue()
-        setTimeout(() => {
-          expect(stepper._isFinished).toBeTrue()
-          done()
-        }, 0)
+        stepperElement.addEventListener('finish.coreui.stepper', () => {
+          // Event fires before _isFinished is set, so check event was triggered
+          expect(true).toBeTrue()
+          setTimeout(() => {
+            expect(stepper._isFinished).toBeTrue()
+            resolve()
+          }, 0)
+        })
+
+        stepper.finish()
       })
-
-      stepper.finish()
     })
 
     it('should move to next step if not on last step', () => {
@@ -713,78 +719,84 @@ describe('Stepper', () => {
       expect(buttons[2]).toHaveClass('complete')
     })
 
-    it('should handle stepContent (no pane) with animation on finish', done => {
-      fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
-          <ol class="stepper-steps">
-            <li class="stepper-step">
-              <button type="button" class="stepper-step-button active">
-                <span class="stepper-step-indicator">1</span>
-              </button>
-              <div class="stepper-step-content active show">
-                <p>Content</p>
-              </div>
-            </li>
-          </ol>
-        </div>
-      `
+    it('should handle stepContent (no pane) with animation on finish', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="stepper" data-coreui-toggle="stepper">
+            <ol class="stepper-steps">
+              <li class="stepper-step">
+                <button type="button" class="stepper-step-button active">
+                  <span class="stepper-step-indicator">1</span>
+                </button>
+                <div class="stepper-step-content active show">
+                  <p>Content</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        `
 
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      stepperElement.addEventListener('finish.coreui.stepper', () => {
-        setTimeout(() => {
-          expect(stepper._isFinished).toBeTrue()
-          done()
-        }, 0)
+        stepperElement.addEventListener('finish.coreui.stepper', () => {
+          setTimeout(() => {
+            expect(stepper._isFinished).toBeTrue()
+            resolve()
+          }, 0)
+        })
+
+        stepper.finish()
       })
-
-      stepper.finish()
     })
 
-    it('should call finishHandler directly when neither pane nor stepContent exist', done => {
-      fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
-          <ol class="stepper-steps">
-            <li class="stepper-step">
-              <button type="button" class="stepper-step-button active">
-                <span class="stepper-step-indicator">1</span>
-              </button>
-            </li>
-          </ol>
-        </div>
-      `
+    it('should call finishHandler directly when neither pane nor stepContent exist', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="stepper" data-coreui-toggle="stepper">
+            <ol class="stepper-steps">
+              <li class="stepper-step">
+                <button type="button" class="stepper-step-button active">
+                  <span class="stepper-step-indicator">1</span>
+                </button>
+              </li>
+            </ol>
+          </div>
+        `
 
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      stepperElement.addEventListener('finish.coreui.stepper', () => {
-        setTimeout(() => {
-          expect(stepper._isFinished).toBeTrue()
-          done()
-        }, 0)
+        stepperElement.addEventListener('finish.coreui.stepper', () => {
+          setTimeout(() => {
+            expect(stepper._isFinished).toBeTrue()
+            resolve()
+          }, 0)
+        })
+
+        stepper.finish()
       })
-
-      stepper.finish()
     })
   })
 
   describe('reset()', () => {
-    it('should reset to initial state', done => {
-      fixtureEl.innerHTML = getThreeStepFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+    it('should reset to initial state', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getThreeStepFixture()
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      stepper.showStep(2)
+        stepper.showStep(2)
 
-      stepperElement.addEventListener('reset.coreui.stepper', () => {
-        const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
-        expect(buttons[0]).toHaveClass('active')
-        expect(buttons[1]).not.toHaveClass('active')
-        done()
+        stepperElement.addEventListener('reset.coreui.stepper', () => {
+          const buttons = fixtureEl.querySelectorAll('.stepper-step-button')
+          expect(buttons[0]).toHaveClass('active')
+          expect(buttons[1]).not.toHaveClass('active')
+          resolve()
+        })
+
+        stepper.reset()
       })
-
-      stepper.reset()
     })
 
     it('should remove complete class from all steps', () => {
@@ -934,16 +946,18 @@ describe('Stepper', () => {
       stepper.reset()
     })
 
-    it('should trigger reset event', done => {
-      fixtureEl.innerHTML = getThreeStepFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+    it('should trigger reset event', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getThreeStepFixture()
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      stepperElement.addEventListener('reset.coreui.stepper', () => {
-        done()
+        stepperElement.addEventListener('reset.coreui.stepper', () => {
+          resolve()
+        })
+
+        stepper.reset()
       })
-
-      stepper.reset()
     })
   })
 
@@ -1268,44 +1282,46 @@ describe('Stepper', () => {
       expect(buttons[1]).toHaveClass('active')
     })
 
-    it('should trigger stepValidationComplete event', done => {
-      fixtureEl.innerHTML = `
-        <div class="stepper" data-coreui-toggle="stepper">
-          <ol class="stepper-steps">
-            <li class="stepper-step">
-              <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
-                <span class="stepper-step-indicator">1</span>
-              </button>
-            </li>
-            <li class="stepper-step">
-              <button type="button" class="stepper-step-button" data-coreui-target="#step2">
-                <span class="stepper-step-indicator">2</span>
-              </button>
-            </li>
-          </ol>
-          <div id="step1" class="stepper-pane active show">
-            <form novalidate>
-              <input type="text" required value="valid">
-            </form>
+    it('should trigger stepValidationComplete event', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = `
+          <div class="stepper" data-coreui-toggle="stepper">
+            <ol class="stepper-steps">
+              <li class="stepper-step">
+                <button type="button" class="stepper-step-button active" data-coreui-target="#step1">
+                  <span class="stepper-step-indicator">1</span>
+                </button>
+              </li>
+              <li class="stepper-step">
+                <button type="button" class="stepper-step-button" data-coreui-target="#step2">
+                  <span class="stepper-step-indicator">2</span>
+                </button>
+              </li>
+            </ol>
+            <div id="step1" class="stepper-pane active show">
+              <form novalidate>
+                <input type="text" required value="valid">
+              </form>
+            </div>
+            <div id="step2" class="stepper-pane"></div>
           </div>
-          <div id="step2" class="stepper-pane"></div>
-        </div>
-      `
+        `
 
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement)
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement)
 
-      let callCount = 0
-      stepperElement.addEventListener('stepValidationComplete.coreui.stepper', event => {
-        callCount++
-        if (callCount === 1) {
-          expect(event.stepIndex).toBe(1)
-          expect(event.isValid).toBeTrue()
-          done()
-        }
+        let callCount = 0
+        stepperElement.addEventListener('stepValidationComplete.coreui.stepper', event => {
+          callCount++
+          if (callCount === 1) {
+            expect(event.stepIndex).toBe(1)
+            expect(event.isValid).toBeTrue()
+            resolve()
+          }
+        })
+
+        stepper.next()
       })
-
-      stepper.next()
     })
 
     it('should validate forms in stepper-step-content', () => {
@@ -1774,27 +1790,31 @@ describe('Stepper', () => {
   })
 
   describe('_animateHeight', () => {
-    it('should set initial height and overflow on expand', done => {
-      fixtureEl.innerHTML = getStepContentFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement, { skipValidation: true })
-      const content = fixtureEl.querySelectorAll('.stepper-step-content')[1]
+    it('should set initial height and overflow on expand', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getStepContentFixture()
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement, { skipValidation: true })
+        const content = fixtureEl.querySelectorAll('.stepper-step-content')[1]
 
-      stepper._animateHeight(content, true, () => {
-        expect(content.style.height).toBe('auto')
-        done()
+        stepper._animateHeight(content, true, () => {
+          expect(content.style.height).toBe('auto')
+          resolve()
+        })
       })
     })
 
-    it('should collapse element', done => {
-      fixtureEl.innerHTML = getStepContentFixture()
-      const stepperElement = fixtureEl.querySelector('.stepper')
-      const stepper = new Stepper(stepperElement, { skipValidation: true })
-      const content = fixtureEl.querySelectorAll('.stepper-step-content')[0]
+    it('should collapse element', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = getStepContentFixture()
+        const stepperElement = fixtureEl.querySelector('.stepper')
+        const stepper = new Stepper(stepperElement, { skipValidation: true })
+        const content = fixtureEl.querySelectorAll('.stepper-step-content')[0]
 
-      stepper._animateHeight(content, false, () => {
-        expect(content.style.overflow).toBe('initial')
-        done()
+        stepper._animateHeight(content, false, () => {
+          expect(content.style.overflow).toBe('initial')
+          resolve()
+        })
       })
     })
   })
