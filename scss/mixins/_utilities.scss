@@ -37,26 +37,55 @@
 
   @each $key, $utility in $utilities {
     @if meta.type-of($utility) == "map" and map.get($utility, at-property) != false {
-      @if map.get($utility, css-var) {
-        // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
-        $name: if(sass(map.has-key($utility, css-variable-name)): map.get($utility, css-variable-name); else: map.get($utility, class));
-        @if $name != null {
-          $names: append-unique($names, $name);
-        }
-      }
+      $properties: map.get($utility, property);
 
-      @if map.has-key($utility, local-vars) {
-        @each $local-var, $value in map.get($utility, local-vars) {
-          $names: append-unique($names, $local-var);
+      @if meta.type-of($properties) == "map" {
+        @each $property, $declared in $properties {
+          @if string.slice($property, 1, 2) == "--" {
+            $names: append-unique($names, $property);
+          }
         }
       }
     }
   }
 
   @each $name in $names {
-    @property --#{$prefix}#{$name} {
+    @property #{$name} {
       syntax: "*";
       inherits: false;
+    }
+  }
+}
+
+// What a utility rule writes. With a `property` map the entries are taken in
+// order — a `null` entry receives the utility's value, anything else is written
+// as declared; otherwise every listed property takes the value, and a value map
+// lets one class set several related properties at once (`.text-lg` sets both
+// font-size and line-height).
+@mixin declarations($property-map, $properties, $value) {
+  @if $property-map {
+    @each $property, $declared in $property-map {
+      // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
+      $actual: if(sass(meta.type-of($value) == "map" and map.has-key($value, $property)): map.get($value, $property); else: if(sass($declared == null): $value; else: $declared));
+
+      @if $actual != null {
+        @if string.slice($property, 1, 2) == "--" {
+          #{$property}: #{$actual};
+        } @else {
+          // stylelint-disable-next-line scss/at-function-named-arguments
+          #{$property}: $actual if(sass($enable-important-utilities): !important);
+        }
+      }
+    }
+  } @else {
+    @each $property in $properties {
+      @if meta.type-of($value) == "map" {
+        // stylelint-disable-next-line scss/at-function-named-arguments
+        #{$property}: map.get($value, $property) if(sass($enable-important-utilities): !important);
+      } @else {
+        // stylelint-disable-next-line scss/at-function-named-arguments
+        #{$property}: $value if(sass($enable-important-utilities): !important);
+      }
     }
   }
 }
@@ -95,6 +124,14 @@
   @each $key, $value in $values {
     $properties: map.get($utility, property);
 
+    // `property` as a map declares exactly what the rule writes, in order: a
+    // `null` entry receives the utility's value, anything else is written
+    // literally. That is what lets a utility store its value in a custom
+    // property and consume it in the same rule, so the expression around it is
+    // written once here instead of once per value.
+    // stylelint-disable-next-line scss/at-function-named-arguments
+    $property-map: if(sass(meta.type-of($properties) == "map"): $properties; else: null);
+
     // Multiple properties are possible, for example with vertical or horizontal margins or paddings
     @if meta.type-of($properties) == "string" {
       $properties: list.append((), $properties);
@@ -102,13 +139,10 @@
 
     // Use custom class if present
     // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
-    $property-class: if(sass(map.has-key($utility, class)): map.get($utility, class); else: list.nth($properties, 1));
+    $property-class: if(sass(map.has-key($utility, class)): map.get($utility, class); else: if(sass($property-map): null; else: list.nth($properties, 1)));
     // stylelint-disable-next-line scss/at-function-named-arguments
     $property-class: if(sass($property-class == null): ""; else: $property-class);
 
-    // Use custom CSS variable name if present, otherwise default to `class`
-    // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
-    $css-variable-name: if(sass(map.has-key($utility, css-variable-name)): map.get($utility, css-variable-name); else: map.get($utility, class));
 
     // State params to generate pseudo-classes
     // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
@@ -121,8 +155,6 @@
     // stylelint-disable-next-line scss/at-function-named-arguments
     $property-class-modifier: if(sass($key): if(sass($property-class == "" and $infix == ""): ""; else: "-") + $key; else: "");
 
-    $is-css-var: map.get($utility, css-var);
-    $is-local-vars: map.get($utility, local-vars);
     $class-name: $property-class + $infix + $property-class-modifier;
 
     $selector: ".#{$class-name}";
@@ -137,49 +169,13 @@
     }
 
     @if $value != null {
-      @if $is-css-var {
-        #{$selector} {
-          --#{$prefix}#{$css-variable-name}: #{$value};
-        }
+      #{$selector} {
+        @include declarations($property-map, $properties, $value);
+      }
 
-        @each $pseudo in $state {
-          .#{$class-name}-#{$pseudo}:#{$pseudo} {
-            --#{$prefix}#{$css-variable-name}: #{$value};
-          }
-        }
-      } @else {
-        #{$selector} {
-          @each $property in $properties {
-            @if $is-local-vars {
-              @each $local-var, $variable in $is-local-vars {
-                --#{$prefix}#{$local-var}: #{$variable};
-              }
-            }
-            @if meta.type-of($value) == "map" {
-              // A property map: each property takes its own key from the value,
-              // so one class can set several related properties at once
-              // (.text-lg sets both font-size and line-height).
-              // stylelint-disable-next-line scss/at-function-named-arguments
-              #{$property}: map.get($value, $property) if(sass($enable-important-utilities): !important);
-            } @else {
-              // stylelint-disable-next-line scss/at-function-named-arguments
-              #{$property}: $value if(sass($enable-important-utilities): !important);
-            }
-          }
-        }
-
-        @each $pseudo in $state {
-          .#{$class-name}-#{$pseudo}:#{$pseudo} {
-            @each $property in $properties {
-              @if $is-local-vars {
-                @each $local-var, $variable in $is-local-vars {
-                  --#{$prefix}#{$local-var}: #{$variable};
-                }
-              }
-              // stylelint-disable-next-line scss/at-function-named-arguments
-              #{$property}: $value if(sass($enable-important-utilities): !important);
-            }
-          }
+      @each $pseudo in $state {
+        .#{$class-name}-#{$pseudo}:#{$pseudo} {
+          @include declarations($property-map, $properties, $value);
         }
       }
     }

@@ -1,0 +1,16 @@
+// The colour token a utility points at, without the translucency expression
+// around it. The utilities that expose an `*-opacity` knob write that
+// expression once, in their `property` map, so their values only have to name
+// the colour.
+
+@function color-var-ref($prefix, $identifier, $target) {
+  @if $identifier == "body" {
+    $suffix: "bg";
+    @if $target == "text" {
+      $suffix: "color";
+    }
+    @return var(--#{$prefix}#{$identifier}-#{$suffix});
+  }
+
+  @return var(--#{$prefix}#{$identifier});
+}

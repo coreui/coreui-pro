@@ -94,8 +94,7 @@ $utilities: map.merge(
     // scss-docs-end utils-shadow
     // scss-docs-start utils-focus-ring
     "focus-ring": (
-      css-var: true,
-      css-variable-name: focus-ring-color,
+      property: (--#{$prefix}focus-ring-color: null),
       // Writes the global :root token, so it stays inheriting — see
       // generate-utility-at-properties().
       at-property: false,
@@ -175,11 +174,12 @@ $utilities: map.merge(
       ),
     ),
     "border-color": (
-      property: border-color,
-      class: border,
-      local-vars: (
-        "border-opacity": 1
+      property: (
+        --#{$prefix}border: null,
+        --#{$prefix}border-opacity: 1,
+        border-color: color-mix(in srgb, var(--#{$prefix}border) calc(var(--#{$prefix}border-opacity) * 100%), transparent),
       ),
+      class: border,
       values: $utilities-border-colors
     ),
     "border-top-color": (
@@ -237,7 +237,7 @@ $utilities: map.merge(
       values: $utilities-border-subtle
     ),
     "border-opacity": (
-      css-var: true,
+      property: (--#{$prefix}border-opacity: null),
       class: border-opacity,
       values: (
         10: .1,
@@ -671,11 +671,12 @@ $utilities: map.merge(
     // scss-docs-end utils-text
     // scss-docs-start utils-color
     "color": (
-      property: color,
-      class: text,
-      local-vars: (
-        "text-opacity": 1
+      property: (
+        --#{$prefix}text: null,
+        --#{$prefix}text-opacity: 1,
+        color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
       ),
+      class: text,
       values: map.merge(
         $utilities-text-colors,
         (
@@ -691,7 +692,7 @@ $utilities: map.merge(
       )
     ),
     "text-opacity": (
-      css-var: true,
+      property: (--#{$prefix}text-opacity: null),
       class: text-opacity,
       values: (
         25: .25,
@@ -708,7 +709,7 @@ $utilities: map.merge(
     // scss-docs-end utils-color
     // scss-docs-start utils-links
     "link-opacity": (
-      css-var: true,
+      property: (--#{$prefix}link-opacity: null),
       class: link-opacity,
       state: hover,
       values: (
@@ -730,20 +731,21 @@ $utilities: map.merge(
       )
     ),
     "link-underline": (
-      property: text-decoration-color,
-      class: link-underline,
-      local-vars: (
-        "link-underline-opacity": 1
+      property: (
+        --#{$prefix}link-underline: null,
+        --#{$prefix}link-underline-opacity: 1,
+        text-decoration-color: color-mix(in srgb, var(--#{$prefix}link-underline) calc(var(--#{$prefix}link-underline-opacity) * 100%), transparent),
       ),
+      class: link-underline,
       values: map.merge(
         $utilities-links-underline,
         (
-          null: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-underline-opacity, 1) * 100%), transparent),
+          null: var(--#{$prefix}link-color),
         )
       )
     ),
     "link-underline-opacity": (
-      css-var: true,
+      property: (--#{$prefix}link-underline-opacity: null),
       class: link-underline-opacity,
       state: hover,
       values: (
@@ -758,22 +760,23 @@ $utilities: map.merge(
     // scss-docs-end utils-links
     // scss-docs-start utils-bg-color
     "background-color": (
-      property: background-color,
-      class: bg,
-      local-vars: (
-        "bg-opacity": 1
+      property: (
+        --#{$prefix}bg: null,
+        --#{$prefix}bg-opacity: 1,
+        background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
       ),
+      class: bg,
       values: map.merge(
         $utilities-bg-colors,
         (
           "transparent": transparent,
-          "body-secondary": color-mix(in srgb, var(--#{$prefix}secondary-bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
-          "body-tertiary": color-mix(in srgb, var(--#{$prefix}tertiary-bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
+          "body-secondary": var(--#{$prefix}secondary-bg),
+          "body-tertiary": var(--#{$prefix}tertiary-bg),
         )
       )
     ),
     "bg-opacity": (
-      css-var: true,
+      property: (--#{$prefix}bg-opacity: null),
       class: bg-opacity,
       values: (
         10: .1,

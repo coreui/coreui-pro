@@ -2,6 +2,7 @@
 @use "sass:map";
 @use "sass:meta";
 @use "color" as *;
+@use "color-var-ref" as *;
 @use "translucent-css-var" as *;
 @use "to-rgb" as *;
 @use "../config" as *;
