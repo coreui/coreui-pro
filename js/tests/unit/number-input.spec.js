@@ -151,27 +151,70 @@ describe('NumberInput', () => {
     })
   })
 
-  describe('without a group', () => {
-    it('should build no buttons and still step', () => {
+  describe('the frame', () => {
+    it('should wrap a bare input in a group', () => {
       fixtureEl.innerHTML = '<input type="number" class="form-control" value="1">'
+      const input = fixtureEl.querySelector('input')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+      const group = input.parentElement
+
+      expect(group.classList.contains('form-control-group')).toBe(true)
+      expect(group.classList.contains('number-input')).toBe(true)
+      expect(buttons().length).toBe(2)
+    })
+
+    it('should move a size written on the input onto the group', () => {
+      fixtureEl.innerHTML = '<input type="number" class="form-control form-control-lg" value="1">'
+      const input = fixtureEl.querySelector('input')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      expect(input.classList.contains('form-control-lg')).toBe(false)
+      expect(input.parentElement.classList.contains('form-control-lg')).toBe(true)
+    })
+
+    it('should use a group the author already wrote', () => {
+      const input = markup('value="1"')
+      const group = input.closest('.form-control-group')
+      const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+
+      expect(input.parentElement).toBe(group)
+    })
+
+    it('should unwrap only the group it created', () => {
+      fixtureEl.innerHTML = '<input type="number" class="form-control form-control-lg" value="1">'
       const input = fixtureEl.querySelector('input')
       const numberInput = new NumberInput(input)
 
-      expect(buttons().length).toBe(0)
+      numberInput.dispose()
 
-      numberInput.increment()
+      expect(fixtureEl.querySelector('.form-control-group')).toBeNull()
+      expect(input.parentElement).toBe(fixtureEl)
+      expect(input.classList.contains('form-control-lg')).toBe(true)
+    })
 
-      expect(input.value).toBe('2')
+    it('should leave an authored group in place on dispose', () => {
+      const input = markup('value="1"')
+      const group = input.closest('.form-control-group')
+      const numberInput = new NumberInput(input)
+
+      numberInput.dispose()
+
+      expect(group.isConnected).toBe(true)
+      expect(group.classList.contains('number-input')).toBe(false)
+      expect(input.parentElement).toBe(group)
     })
   })
 
   describe('dispose', () => {
-    it('should take its buttons with it', () => {
-      const numberInput = new NumberInput(markup('value="1"'))
+    it('should take its buttons and class with it', () => {
+      const input = markup('value="1"')
+      const numberInput = new NumberInput(input)
+      const group = input.closest('.form-control-group')
 
       numberInput.dispose()
 
       expect(buttons().length).toBe(0)
+      expect(group.classList.contains('number-input')).toBe(false)
     })
   })
 

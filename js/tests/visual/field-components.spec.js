@@ -310,10 +310,9 @@ const mountPassword = html => {
 // breaks onto three lines; the second is a regression lock for the corner
 // radius, which is too few pixels to trip the comparator on its own.
 describe('number input', () => {
-  const mountNumber = attributes => {
-    mount(`<div id="host" class="form-control-group">
-        <input type="number" class="form-control" aria-label="Quantity" ${attributes}>
-      </div>`)
+  // The component builds its own frame, so the markup is a bare control.
+  const mountNumber = (attributes, size = '') => {
+    mount(`<div id="host"><input type="number" class="form-control ${size}" aria-label="Quantity" ${attributes}></div>`)
     return new NumberInput(container.querySelector('input'))
   }
 
@@ -332,10 +331,7 @@ describe('number input', () => {
   })
 
   it('small', async () => {
-    mount(`<div id="host" class="form-control-group form-control-sm">
-        <input type="number" class="form-control" value="3" aria-label="Quantity">
-      </div>`)
-    const ni = new NumberInput(container.querySelector('input'))
+    const ni = mountNumber('value="3"', "form-control-sm")
     await shoot(frame(), 'number-input-sm')
     ni.dispose()
   })

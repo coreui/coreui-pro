@@ -29,6 +29,10 @@ const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_NUMBER_INPUT = 'number-input'
 
+// Sizing belongs to the frame, so a size written on the input moves to the
+// group the component builds around it.
+const SIZING_CLASS_NAMES = ['form-control-sm', 'form-control-lg']
+
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="number-input"]'
 
 // The repeat while a button is held: long enough that a single click never
@@ -81,6 +85,9 @@ class NumberInput extends BaseComponent {
   protected declare _config: NumberInputConfig
   private _decrementElement: HTMLButtonElement | null = null
   private _incrementElement: HTMLButtonElement | null = null
+  private _groupElement: HTMLElement | null = null
+  private _createdGroup = false
+  private _movedSizing: string[] = []
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
 
@@ -118,6 +125,19 @@ class NumberInput extends BaseComponent {
     this._stopRepeating()
     this._decrementElement?.remove()
     this._incrementElement?.remove()
+
+    if (this._groupElement) {
+      this._element.classList.add(...this._movedSizing)
+      this._groupElement.classList.remove(CLASS_NAME_NUMBER_INPUT, ...this._movedSizing)
+
+      // Only the wrapper this component put there goes; one the author wrote
+      // is theirs, and may hold more than this input.
+      if (this._createdGroup) {
+        this._groupElement.before(this._element)
+        this._groupElement.remove()
+      }
+    }
+
     super.dispose()
   }
 
@@ -145,14 +165,36 @@ class NumberInput extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._element.value })
   }
 
-  _createButtons(): void {
-    const group = this._element.closest(`.${CLASS_NAME_GROUP}`)
+  // The buttons are the component's, so the frame that lays them out can be
+  // too: an input on its own gets wrapped, and one already inside a group is
+  // left where the author put it.
+  _createGroup(): HTMLElement {
+    const existing = this._element.closest<HTMLElement>(`.${CLASS_NAME_GROUP}`)
 
-    if (!group) {
-      return
+    if (existing) {
+      this._groupElement = existing
+    } else {
+      const group = document.createElement('div')
+      group.classList.add(CLASS_NAME_GROUP)
+
+      this._movedSizing = SIZING_CLASS_NAMES.filter(name => this._element.classList.contains(name))
+      this._element.classList.remove(...this._movedSizing)
+      group.classList.add(...this._movedSizing)
+
+      this._element.before(group)
+      group.append(this._element)
+
+      this._groupElement = group
+      this._createdGroup = true
     }
 
-    group.classList.add(CLASS_NAME_NUMBER_INPUT)
+    this._groupElement.classList.add(CLASS_NAME_NUMBER_INPUT)
+
+    return this._groupElement
+  }
+
+  _createButtons(): void {
+    const group = this._createGroup()
 
     this._decrementElement = createControlGroupAction({
       className: CLASS_NAME_ACTION,
