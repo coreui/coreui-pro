@@ -285,6 +285,30 @@ the new structure; everything else (`.date-picker`, `.date-picker-dropdown`,
 `.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
 `.time-picker-roll*` bodies) keeps its name.
 
+#### Input group: one frame class instead of five
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`.input-group` squared off the frame of a field component by naming each
+family's wrapper — `.autocomplete-input-group`, `.date-picker-input-group`,
+`.time-picker-input-group`, `.form-multi-select-input-group` and
+`.form-password`. All five became `.form-control-group`, so the input group
+targets that one class:
+
+```diff
+- > .autocomplete:not(:last-child) > .autocomplete-input-group,
+- > .date-picker:not(:last-child) > .date-picker-input-group,
+- > .time-picker:not(:last-child) > .time-picker-input-group,
+- > .form-multi-select:not(:last-child) > .form-multi-select-input-group,
+- > .form-password:not(:last-child) > .form-control,
++ > :not(:last-child) > .form-control-group,
+```
+
+If you wrote CSS against those wrapper classes to adjust a field inside an
+input group, target `.form-control-group` instead. A hand-authored group — a
+password field, a chip input — is now a first-class child of `.input-group`
+and needs no wrapper of its own.
+
 #### Password Input: the toggle icon comes from JavaScript
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

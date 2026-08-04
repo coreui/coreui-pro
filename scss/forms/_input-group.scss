@@ -55,8 +55,8 @@ $input-group-tokens: defaults(
     > .date-picker,
     > .time-picker,
     > .form-control,
+    > .form-control-group,
     > .form-multi-select,
-    > .form-password,
     > .form-select,
     > .form-floating {
       position: relative; // For focus state's z-index
@@ -69,11 +69,11 @@ $input-group-tokens: defaults(
     > .autocomplete:focus-within,
     > .date-picker:focus-within,
     > .time-picker:focus-within,
+    > .form-control-group:focus-within,
     > .form-multi-select:focus-within,
     > .form-control:focus,
     > .form-select:focus,
-    > .form-floating:focus-within,
-    > .form-password:focus-within {
+    > .form-floating:focus-within {
       z-index: 5;
     }
 
@@ -163,29 +163,21 @@ $input-group-tokens: defaults(
   // stylelint-disable-next-line no-duplicate-selectors
   .input-group {
     &:not(.has-validation) {
-      > .autocomplete:not(:last-child) > .autocomplete-input-group,
-      > .date-picker:not(:last-child) > .date-picker-input-group,
-      > .time-picker:not(:last-child) > .time-picker-input-group,
-      > .form-multi-select:not(:last-child) > .form-multi-select-input-group,
+      > :not(:last-child) > .form-control-group,
       > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
       > .dropdown-toggle:nth-last-child(n + 3),
       > .form-floating:not(:last-child) > .form-control,
-      > .form-floating:not(:last-child) > .form-select,
-      > .form-password:not(:last-child) > .form-control {
+      > .form-floating:not(:last-child) > .form-select {
         @include border-end-radius(0);
       }
     }
 
     &.has-validation {
-      > .autocomplete > .autocomplete-input-group,
-      > .date-picker > .date-picker-input-group,
-      > .time-picker > .time-picker-input-group,
-      > .form-multi-select > .form-multi-select-input-group,
+      > :nth-last-child(n + 3) > .form-control-group,
       > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
       > .dropdown-toggle:nth-last-child(n + 4),
       > .form-floating:nth-last-child(n + 3) > .form-control,
-      > .form-floating:nth-last-child(n + 3) > .form-select,
-      > .form-password:nth-last-child(n + 3) > .form-control {
+      > .form-floating:nth-last-child(n + 3) > .form-select {
         @include border-end-radius(0);
       }
     }
@@ -200,13 +192,9 @@ $input-group-tokens: defaults(
       @include border-start-radius(0);
     }
 
-    > .autocomplete:not(:first-child) > .autocomplete-input-group,
-    > .date-picker:not(:first-child) > .date-picker-input-group,
-    > .time-picker:not(:first-child) > .time-picker-input-group,
-    > .form-multi-select:not(:first-child) + .form-multi-select > .form-multi-select-input-group,
+    > :not(:first-child) > .form-control-group,
     > .form-floating:not(:first-child) > .form-control,
-    > .form-floating:not(:first-child) > .form-select,
-    > .form-password:not(:first-child) > .form-control {
+    > .form-floating:not(:first-child) > .form-select {
       @include border-start-radius(0);
     }
   }
