@@ -2,6 +2,7 @@
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "mixins/tokens" as *;
+@use "mixins/transition" as *;
 @use "config" as *;
 
 // scss-docs-start popup-variables
@@ -11,6 +12,8 @@ $popup-border-width:    var(--#{$prefix}border-width) !default;
 $popup-border-color:    var(--#{$prefix}border-color) !default;
 $popup-border-radius:   var(--#{$prefix}border-radius) !default;
 $popup-box-shadow:      var(--#{$prefix}box-shadow) !default;
+$popup-transition-duration: .15s !default;
+$popup-transition-timing:   cubic-bezier(.22, 1, .36, 1) !default;
 // scss-docs-end popup-variables
 
 // scss-docs-start popup-tokens
@@ -24,6 +27,8 @@ $popup-tokens: defaults(
     --#{$prefix}popup-border-color: #{$popup-border-color},
     --#{$prefix}popup-border-radius: #{$popup-border-radius},
     --#{$prefix}popup-box-shadow: #{$popup-box-shadow},
+    --#{$prefix}popup-transition-duration: #{$popup-transition-duration},
+    --#{$prefix}popup-transition-timing: #{$popup-transition-timing},
   ),
   $popup-tokens
 );
@@ -46,10 +51,33 @@ $popup-tokens: defaults(
     background-clip: padding-box;
     border: var(--#{$prefix}popup-border-width) solid var(--#{$prefix}popup-border-color);
     @include border-radius(var(--#{$prefix}popup-border-radius));
+    opacity: 0;
     @include box-shadow(var(--#{$prefix}popup-box-shadow));
+
+    // `display` is what makes a popup appear, and it cannot be interpolated,
+    // so `allow-discrete` lets it flip at the right end of the transition while
+    // opacity and transform carry the motion. `@starting-style` supplies the
+    // state to animate FROM: the element does not exist to be styled before it
+    // is shown, so the base rule cannot express it.
+    //
+    // Opacity only, no scale. A popup carries no placement attribute, so a
+    // scale would need an origin we cannot know — and on a panel the size of a
+    // calendar even a 2% scale reads as the panel jumping rather than
+    // appearing. The combobox list hides it; the pickers do not.
+    @include transition(
+      opacity var(--#{$prefix}popup-transition-duration) var(--#{$prefix}popup-transition-timing),
+      display var(--#{$prefix}popup-transition-duration) allow-discrete
+    );
 
     &.show {
       display: block;
+      opacity: 1;
+    }
+  }
+
+  @starting-style {
+    .popup.show {
+      opacity: 0;
     }
   }
 }

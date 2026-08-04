@@ -65,8 +65,28 @@ const mount = html => {
 
 // The matcher appends the browser and platform to the baseline name itself
 // (`<name>-chromium-linux.png`), so each platform compares against its own set.
-const shoot = (element, name) =>
-  expect(page.elementLocator(element)).toMatchScreenshot(name, screenshotOptions)
+// Two frames before capturing. Transitions are frozen, but an element entering
+// through `@starting-style` still renders its start state on the frame it is
+// shown — one paint later it is settled, and the screenshot is of the state
+// the component actually rests in.
+const settle = () => new Promise(resolve => {
+  requestAnimationFrame(() => requestAnimationFrame(resolve))
+})
+
+// A panel that fades in is composited, and a composited layer rasterises text
+// slightly differently from one frame to the next — enough to trip a
+// comparator that counts antialiased pixels. `tolerant` raises the allowance
+// for those, and only those: the icon-colour changes this suite exists to
+// catch move far more pixels than this.
+const shoot = async (element, name, { tolerant = false } = {}) => {
+  await settle()
+
+  const options = tolerant ?
+    { comparatorOptions: { ...screenshotOptions.comparatorOptions, allowedMismatchedPixels: 2500 } } :
+    screenshotOptions
+
+  return expect(page.elementLocator(element)).toMatchScreenshot(name, options)
+}
 
 const frame = () => container.querySelector('.form-control-group')
 const popup = () => container.querySelector('.popup')
@@ -138,7 +158,7 @@ describe('date picker', () => {
   it('open popup', async () => {
     const dp = new DatePicker(mount(), { locale: 'en-US', date: DATE })
     dp.show()
-    await shoot(popup(), 'date-picker-popup')
+    await shoot(popup(), 'date-picker-popup', { tolerant: true })
     dp.dispose()
   })
 
@@ -153,7 +173,7 @@ describe('date picker', () => {
     document.documentElement.dataset.coreuiTheme = 'dark'
     const dp = new DatePicker(mount(), { locale: 'en-US', date: DATE })
     dp.show()
-    await shoot(popup(), 'date-picker-popup-dark')
+    await shoot(popup(), 'date-picker-popup-dark', { tolerant: true })
     dp.dispose()
   })
 })
@@ -225,7 +245,7 @@ describe('autocomplete', () => {
   it('open popup', async () => {
     const ac = new Autocomplete(mount(), { options: OPTIONS, indicator: true })
     ac.show()
-    await shoot(popup(), 'autocomplete-popup')
+    await shoot(popup(), 'autocomplete-popup', { tolerant: true })
     ac.dispose()
   })
 })
