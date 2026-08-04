@@ -285,6 +285,38 @@ the new structure; everything else (`.date-picker`, `.date-picker-dropdown`,
 `.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
 `.time-picker-roll*` bodies) keeps its name.
 
+#### Password Input: the toggle icon comes from JavaScript
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The toggle button carried `<span class="form-password-action-icon"></span>`,
+and CSS painted it as a mask that swapped through a sibling selector. The
+plugin renders it now — inline SVG on `currentColor`, like every other
+adornment in the library — so the button needs no icon markup at all:
+
+```diff
+  <div class="form-control-group">
+    <input type="password" class="form-control">
+-   <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle password visibility">
+-     <span class="form-password-action-icon"></span>
+-   </button>
++   <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle password visibility"></button>
+  </div>
+```
+
+- `.form-password-action-icon` is gone, and `scss/forms/_form-password.scss`
+  with it. That takes **2.5 kB of URL-encoded SVG out of the stylesheet** — it
+  was there for every page, whether or not one had a password field.
+- `$form-password-icon-show` / `$form-password-icon-hide` and the matching
+  `--cui-form-password-icon-*` properties are gone. Supply your own artwork
+  through the new `showIcon` / `hideIcon` options instead, the way the other
+  adornments already take theirs. Both are sanitized; `allowList`, `sanitize`
+  and `sanitizeFn` control that.
+- The plugin now initializes on `DOMContentLoaded` for markup carrying
+  `data-coreui-toggle="password"`, so the icon is present without any script of
+  your own — the same data-API pass Chip, Chip Set, Chip Input and Search
+  Button already make.
+
 #### Icons rendered by JavaScript
 
 - New components render their icons as **inline SVG on `currentColor`** (the
