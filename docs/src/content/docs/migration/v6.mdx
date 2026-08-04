@@ -309,6 +309,19 @@ input group, target `.form-control-group` instead. A hand-authored group — a
 password field, a chip input — is now a first-class child of `.input-group`
 and needs no wrapper of its own.
 
+#### Chip Input takes the frame class itself
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+```diff
+- <div class="form-control-group chip-input" data-coreui-chip-input>
++ <div class="chip-input" data-coreui-chip-input>
+```
+
+A chip input has no control to wrap — the element *is* the frame — so it adds
+`.form-control-group` to itself rather than asking you to write both. Writing
+both still works; the component only removes on `dispose()` a class it added.
+
 #### Password Input and Number Input build their own frame
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

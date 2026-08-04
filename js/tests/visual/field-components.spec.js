@@ -301,7 +301,7 @@ describe('multi select', () => {
 
 describe('chip input', () => {
   it('with chips', async () => {
-    mount('<div id="host" class="form-control-group chip-input"></div>')
+    mount('<div id="host" class="chip-input"></div>')
     const ci = new ChipInput(container.querySelector('#host'), {})
     ci.add('Angular')
     ci.add('Bootstrap')
