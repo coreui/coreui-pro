@@ -309,6 +309,37 @@ input group, target `.form-control-group` instead. A hand-authored group — a
 password field, a chip input — is now a first-class child of `.input-group`
 and needs no wrapper of its own.
 
+#### Password Input and Number Input build their own frame
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Both components supply their own buttons, so they supply the frame that lays
+them out. The markup is a plain form control carrying the toggle:
+
+```diff
+- <div class="form-control-group">
+-   <input type="password" class="form-control">
+-   <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle password visibility">
+-     <span class="form-password-action-icon"></span>
+-   </button>
+- </div>
++ <input type="password" class="form-control" data-coreui-toggle="password-input">
+```
+
+- **`data-coreui-toggle` moves from the button to the input**, and its value is
+  the component's name: `password-input` (and `number-input` for the new
+  [Number Input](/forms/number-input/)). The button no longer exists in your
+  markup, so there is nothing left to put it on.
+- **Classes you write on the input, other than `.form-control`, move onto the
+  frame** — size, spacing, width. They describe the field, and once the input is
+  wrapped the field is the frame; a margin left on the control would sit inside
+  the border. They move back on `dispose()`.
+- **An input already inside a `.form-control-group` is left where you put it**,
+  so a field can share a frame with other adornments, and only a frame the
+  component created is removed on `dispose()`.
+- The accessible name of the toggle is the `ariaToggleLabel` option now, since
+  the button is no longer yours to label.
+
 #### Password Input: the toggle icon comes from JavaScript
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

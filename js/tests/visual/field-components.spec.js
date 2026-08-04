@@ -290,10 +290,8 @@ describe('chip input', () => {
   })
 })
 
-const markup = disabled => `<div id="host" class="form-control-group">
-    <input type="password" class="form-control" value="secret123" aria-label="Password"${disabled ? ' disabled' : ''}>
-    <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"${disabled ? ' disabled' : ''}></button>
-  </div>`
+// The component builds the frame and the toggle, so the markup is a control.
+const markup = disabled => `<div id="host"><input type="password" class="form-control" value="secret123" aria-label="Password"${disabled ? ' disabled' : ''}></div>`
 
 // The plugin renders the toggle's icon, so every case initializes it rather
 // than relying on markup alone.
@@ -338,18 +336,19 @@ describe('number input', () => {
 })
 
 describe('input group', () => {
+  // A frame the author wrote, sitting between two input-group parts.
   it('with a hand-authored frame', async () => {
     mount(`<div id="host" class="input-group">
         <span class="input-group-text">@</span>
         <div class="form-control-group">
-          <input type="password" class="form-control" value="secret123" aria-label="Password">
-          <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"></button>
+          <input type="text" class="form-control" value="ada" aria-label="Name">
+          <span class="form-control-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="M464 240H272V48h-32v192H48v32h192v192h32V272h192z"/></svg>
+          </span>
         </div>
         <button class="btn btn-outline-secondary" type="button">Go</button>
       </div>`)
-    const pi = new PasswordInput(container.querySelector('input'))
     await shoot(container.querySelector('.input-group'), 'input-group-frame')
-    pi.dispose()
   })
 
   it('with a component that builds its own frame', async () => {
@@ -380,10 +379,7 @@ describe('password input', () => {
   // it — the state never lands on the group itself here.
   it('invalid under was-validated', async () => {
     mountPassword(`<div class="was-validated">
-        <div id="host" class="form-control-group">
-          <input type="password" class="form-control" required aria-label="Password">
-          <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"></button>
-        </div>
+        <input type="password" class="form-control" required aria-label="Password">
       </div>`)
     await shoot(frame(), 'password-was-validated')
   })
