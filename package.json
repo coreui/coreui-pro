@@ -17,7 +17,7 @@
     "start": "npm-run-all --parallel watch docs-serve",
     "bundlewatch": "bundlewatch --config .bundlewatch.config.json",
     "css": "npm-run-all css-compile css-prefix css-minify",
-    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css scss/:dist/css/",
+    "css-compile": "sass --style expanded --source-map --embed-sources --no-error-css scss/coreui.scss:dist/css/coreui.css scss/coreui-grid.scss:dist/css/coreui-grid.css scss/coreui-reboot.scss:dist/css/coreui-reboot.css scss/coreui-utilities.scss:dist/css/coreui-utilities.css scss/themes/bootstrap/bootstrap.scss:dist/css/themes/bootstrap/bootstrap.css",
     "css-lint": "npm-run-all --aggregate-output --continue-on-error --parallel css-lint-*",
     "css-lint-stylelint": "stylelint \"**/*.{css,scss}\" --cache --cache-location .cache/.stylelintcache",
     "css-lint-vars": "fusv scss/",
