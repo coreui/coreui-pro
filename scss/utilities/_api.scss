@@ -2,6 +2,7 @@
 @use "sass:meta";
 @use "../utilities" as *;
 @use "../layout/breakpoints" as *;
+@use "../mixins/ltr-rtl" as *;
 @use "../mixins/utilities" as *;
 @use "../config" as *;
 
@@ -32,13 +33,15 @@
   // other way to sit on that line. Tied to the utility itself, so disabling it
   // takes the override with it.
   @if meta.type-of(map.get($utilities, "translate-middle")) == "map" {
-    *[dir="rtl"] {
-      .translate-middle {
+    .translate-middle {
+      @include rtl() {
         // stylelint-disable-next-line scss/at-function-named-arguments
         transform: translate(50%, -50%) if(sass($enable-important-utilities): !important);
       }
+    }
 
-      .translate-middle-x {
+    .translate-middle-x {
+      @include rtl() {
         // stylelint-disable-next-line scss/at-function-named-arguments
         transform: translateX(50%) if(sass($enable-important-utilities): !important);
       }
