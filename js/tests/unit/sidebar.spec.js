@@ -526,6 +526,29 @@ describe('Sidebar', () => {
       })
     })
 
+    describe('_removeClickOutListener', () => {
+      it('should keep the click out listener of another instance', () => {
+        fixtureEl.innerHTML = [
+          '<div class="sidebar first"></div>',
+          '<div class="sidebar second"></div>',
+          '<div class="outside"></div>'
+        ].join('')
+        const first = new Sidebar('.first')
+        const second = new Sidebar('.second')
+        const outsideEl = fixtureEl.querySelector('.outside')
+        const spyFirstHide = spyOn(first, 'hide')
+        const spySecondHide = spyOn(second, 'hide')
+
+        first._addClickOutListener()
+        second._addClickOutListener()
+        second._removeClickOutListener()
+        outsideEl.click()
+
+        expect(spyFirstHide).toHaveBeenCalled()
+        expect(spySecondHide).not.toHaveBeenCalled()
+      })
+    })
+
     describe('_addEventListeners', () => {
       it('should add click out listener for mobile visible sidebar', () => {
         fixtureEl.innerHTML = '<div class="sidebar"></div>'
@@ -690,6 +713,32 @@ describe('Sidebar', () => {
       }
 
       expect(calledOnDisposedInstance).toBeFalse()
+    })
+
+    it('should remove the click out listener', () => {
+      fixtureEl.innerHTML = '<div class="sidebar"></div><input type="checkbox" class="outside">'
+      const sidebar = new Sidebar('.sidebar')
+      const outsideEl = fixtureEl.querySelector('.outside')
+      const spyHide = spyOn(sidebar, 'hide')
+
+      sidebar._addClickOutListener()
+      sidebar.dispose()
+      outsideEl.click()
+
+      expect(spyHide).not.toHaveBeenCalled()
+      expect(outsideEl.checked).toBeTrue()
+    })
+
+    it('should keep the window load data api handler', () => {
+      fixtureEl.innerHTML = '<div class="sidebar"></div>'
+      const sidebarEl = fixtureEl.querySelector('.sidebar')
+      const sidebar = new Sidebar(sidebarEl)
+      const spySidebarInterface = spyOn(Sidebar, 'sidebarInterface')
+
+      sidebar.dispose()
+      window.dispatchEvent(new Event('load'))
+
+      expect(spySidebarInterface).toHaveBeenCalledWith(sidebarEl)
     })
   })
 })
