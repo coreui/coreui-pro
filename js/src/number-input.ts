@@ -29,9 +29,11 @@ const CLASS_NAME_ACTION = 'form-control-action'
 const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_NUMBER_INPUT = 'number-input'
 
-// Sizing belongs to the frame, so a size written on the input moves to the
-// group the component builds around it.
-const SIZING_CLASS_NAMES = ['form-control-sm', 'form-control-lg']
+// Once the input sits inside a frame the component built, every class the
+// author wrote on it describes the field as a whole — its size, its spacing,
+// its width — and belongs to the outer box. Only `.form-control` itself stays,
+// because that is what the group neutralises.
+const CLASS_NAME_FORM_CONTROL = 'form-control'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="number-input"]'
 
@@ -87,7 +89,7 @@ class NumberInput extends BaseComponent {
   private _incrementElement: HTMLButtonElement | null = null
   private _groupElement: HTMLElement | null = null
   private _createdGroup = false
-  private _movedSizing: string[] = []
+  private _movedClassNames: string[] = []
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
 
@@ -127,8 +129,8 @@ class NumberInput extends BaseComponent {
     this._incrementElement?.remove()
 
     if (this._groupElement) {
-      this._element.classList.add(...this._movedSizing)
-      this._groupElement.classList.remove(CLASS_NAME_NUMBER_INPUT, ...this._movedSizing)
+      this._element.classList.add(...this._movedClassNames)
+      this._groupElement.classList.remove(CLASS_NAME_NUMBER_INPUT, ...this._movedClassNames)
 
       // Only the wrapper this component put there goes; one the author wrote
       // is theirs, and may hold more than this input.
@@ -177,9 +179,9 @@ class NumberInput extends BaseComponent {
       const group = document.createElement('div')
       group.classList.add(CLASS_NAME_GROUP)
 
-      this._movedSizing = SIZING_CLASS_NAMES.filter(name => this._element.classList.contains(name))
-      this._element.classList.remove(...this._movedSizing)
-      group.classList.add(...this._movedSizing)
+      this._movedClassNames = [...this._element.classList].filter(name => name !== CLASS_NAME_FORM_CONTROL)
+      this._element.classList.remove(...this._movedClassNames)
+      group.classList.add(...this._movedClassNames)
 
       this._element.before(group)
       group.append(this._element)

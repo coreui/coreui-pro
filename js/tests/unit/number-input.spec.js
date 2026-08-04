@@ -163,13 +163,20 @@ describe('NumberInput', () => {
       expect(buttons().length).toBe(2)
     })
 
-    it('should move a size written on the input onto the group', () => {
-      fixtureEl.innerHTML = '<input type="number" class="form-control form-control-lg" value="1">'
+    it('should move every class but form-control onto the group', () => {
+      fixtureEl.innerHTML = '<input type="number" class="form-control form-control-lg mb-3 w-50" value="1">'
       const input = fixtureEl.querySelector('input')
       const numberInput = new NumberInput(input) // eslint-disable-line no-unused-vars
+      const group = input.parentElement
 
-      expect(input.classList.contains('form-control-lg')).toBe(false)
-      expect(input.parentElement.classList.contains('form-control-lg')).toBe(true)
+      // Size, spacing and width describe the field, which is the frame now.
+      for (const name of ['form-control-lg', 'mb-3', 'w-50']) {
+        expect(input.classList.contains(name)).toBe(false)
+        expect(group.classList.contains(name)).toBe(true)
+      }
+
+      expect(input.classList.contains('form-control')).toBe(true)
+      expect(group.classList.contains('form-control')).toBe(false)
     })
 
     it('should use a group the author already wrote', () => {
@@ -181,7 +188,7 @@ describe('NumberInput', () => {
     })
 
     it('should unwrap only the group it created', () => {
-      fixtureEl.innerHTML = '<input type="number" class="form-control form-control-lg" value="1">'
+      fixtureEl.innerHTML = '<input type="number" class="form-control form-control-lg mb-3" value="1">'
       const input = fixtureEl.querySelector('input')
       const numberInput = new NumberInput(input)
 
@@ -189,7 +196,7 @@ describe('NumberInput', () => {
 
       expect(fixtureEl.querySelector('.form-control-group')).toBeNull()
       expect(input.parentElement).toBe(fixtureEl)
-      expect(input.classList.contains('form-control-lg')).toBe(true)
+      expect(input.className).toBe('form-control form-control-lg mb-3')
     })
 
     it('should leave an authored group in place on dispose', () => {
