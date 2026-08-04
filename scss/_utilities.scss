@@ -130,11 +130,10 @@ $utilities: map.merge(
       property: transform,
       class: translate-middle,
       values: (
-        null: ("ltr": translate(-50%, -50%), "rtl": translate(50%, -50%)),
-        x: ("ltr": translateX(-50%), "rtl": translateX(50%)),
+        null: translate(-50%, -50%),
+        x: translateX(-50%),
         y: translateY(-50%),
-      ),
-      rtl: true
+      )
     ),
     // scss-docs-end utils-position
     // scss-docs-start utils-borders
@@ -630,14 +629,12 @@ $utilities: map.merge(
       property: word-wrap word-break,
       class: text,
       values: (break: break-word),
-      rtl: false
     ),
     // scss-docs-end utils-text
     // scss-docs-start utils-color
     "color": (
       property: color,
       class: text,
-      dark-mode: true,
       local-vars: (
         "text-opacity": 1
       ),
@@ -725,7 +722,6 @@ $utilities: map.merge(
     "background-color": (
       property: background-color,
       class: bg,
-      dark-mode: true,
       local-vars: (
         "bg-opacity": 1
       ),
@@ -753,7 +749,6 @@ $utilities: map.merge(
     "subtle-background-color": (
       property: background-color,
       class: bg,
-      dark-mode: true,
       values: $utilities-bg-subtle
     ),
     // scss-docs-end utils-bg-color

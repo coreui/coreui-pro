@@ -674,6 +674,28 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   the root color tokens, which already switch in dark mode.
 - `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
 
+#### Utilities API: theme variants and the `rtl` key removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+- **The `dark:` theme-variant utilities are gone** (40 classes:
+  `.dark\:bg-*`, `.dark\:text-*`). They were generated for the colour
+  utilities only, duplicating every value under a `[data-coreui-theme=dark]`
+  selector, and were never documented. The palette already resolves per theme
+  through `light-dark()`, so `.bg-body`, `.text-body-secondary` and friends
+  follow the colour mode on their own. The `dark-mode` key of a `$utilities`
+  entry is no longer read.
+- **The `rtl` key of a `$utilities` entry is no longer read.** It did two
+  jobs: `rtl: false` wrapped the output in RTLCSS `/* rtl:remove */`
+  directives, and `rtl: true` accepted `("ltr": …, "rtl": …)` value maps that
+  emitted a `[dir="rtl"]` counterpart. Direction is expressed with logical
+  properties now (the position utilities are `inset-inline-start`/`-end`), so
+  the flag has nothing left to do. One behaviour change comes with it:
+  **`.translate-middle-x` and `.translate-middle` no longer flip under
+  `dir="rtl"`** — `transform` is not direction-aware and now matches Bootstrap.
+  If you center an element on a logical inset in an RTL document, write the
+  flip yourself.
+
 #### RFS removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
