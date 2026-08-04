@@ -18,6 +18,8 @@ import Popup from './util/popup.js'
 import TimeSelection from './util/time-selection.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 import type { ComponentConfig } from './util/config.js'
+import { createControlGroupAction } from './util/form-control-group.js'
+import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 
 /**
@@ -44,9 +46,12 @@ const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_TIME_PICKER = 'date-time-picker'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
-const CLASS_NAME_INDICATOR = 'date-picker-indicator'
-const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
+const CLASS_NAME_CLEANER = 'form-control-cleaner'
+const CLASS_NAME_INDICATOR = 'form-control-action'
+const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
+const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_TIME_BODY = 'time-picker-body'
 const CLASS_NAME_TIME_PICKERS = 'date-picker-timepickers'
@@ -61,7 +66,10 @@ const DEFAULT_INDICATOR_ICON: string = '<svg xmlns="http://www.w3.org/2000/svg" 
 
 type DateTimePickerConfig = {
   allowList: SanitizerAllowList
+  ariaCleanerLabel: string
   ariaToggleLabel: string
+  cleaner: boolean
+  cleanerIcon: string
   calendarOptions: Record<string, any>
   container: Element | boolean | string
   disabled: boolean
@@ -81,7 +89,10 @@ type DateTimePickerConfig = {
 
 const Default: DateTimePickerConfig = {
   allowList: SVGAllowlist,
+  ariaCleanerLabel: 'Clear the value',
   ariaToggleLabel: 'Toggle the calendar',
+  cleaner: true,
+  cleanerIcon: CLEANER_ICON,
   calendarOptions: {},
   container: false,
   date: null,
@@ -101,7 +112,10 @@ const Default: DateTimePickerConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
+  ariaCleanerLabel: 'string',
   ariaToggleLabel: 'string',
+  cleaner: 'boolean',
+  cleanerIcon: 'string',
   calendarOptions: 'object',
   container: '(string|element|boolean)',
   date: '(date|string|null)',
@@ -125,6 +139,7 @@ const DefaultType: Record<string, string> = {
 
 class DateTimePicker extends BaseComponent {
   protected declare _footerTemplate: any
+  protected declare _cleanerElement: HTMLElement | null
   protected declare _indicatorElement: HTMLElement
   protected declare _initialDate: any
   protected declare _input: any
@@ -141,6 +156,7 @@ class DateTimePicker extends BaseComponent {
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     // see DatePicker — the shell owns the initial value for reset()
     this._initialDate = config?.date ?? this._config.date
+    this._cleanerElement = null
     this._input = null
     this._calendar = null
     this._calendarElement = null
@@ -256,21 +272,27 @@ class DateTimePicker extends BaseComponent {
       CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
     )
 
-    if (this._config.size) {
-      this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
-    }
-
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+
+    // Sizing rides the standard control classes on the frame itself
+    if (this._config.size) {
+      inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
+    }
 
     const inputEl = document.createElement('div')
     inputGroup.append(inputEl)
 
-    const indicator = document.createElement('button')
-    indicator.classList.add(CLASS_NAME_INDICATOR)
-    indicator.type = 'button'
-    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
-    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
+    const action = (className: string, icon: string, label: string) => createControlGroupAction({
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+    })
+
+    if (this._config.cleaner) {
+      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      inputGroup.append(this._cleanerElement)
+    }
+
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
@@ -284,7 +306,7 @@ class DateTimePicker extends BaseComponent {
     }, this._config.inputOptions))
 
     this._menu = document.createElement('div')
-    this._menu.classList.add(CLASS_NAME_DROPDOWN)
+    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -413,6 +435,13 @@ class DateTimePicker extends BaseComponent {
   }
 
   _addEventListeners(): void {
+    if (this._cleanerElement) {
+      EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
+        event.stopPropagation()
+        this.clear()
+      })
+    }
+
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()

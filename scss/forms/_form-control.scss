@@ -52,6 +52,29 @@ $form-control-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-control-tokens
 
+// scss-docs-start form-control-frame-mixin
+// The visual frame of a control, without the layout. `.form-control` is one
+// consumer; `.form-control-group` — a group of parts that has to read as a
+// single control — is the other, so the frame is described once.
+@mixin form-control-frame() {
+  padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+  font-family: var(--#{$prefix}control-font-family);
+  font-size: var(--#{$prefix}control-font-size);
+  font-weight: var(--#{$prefix}control-font-weight);
+  line-height: var(--#{$prefix}control-line-height);
+  color: var(--#{$prefix}control-color);
+  background-color: var(--#{$prefix}control-bg);
+  background-clip: padding-box;
+  border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
+
+  // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
+  @include border-radius(var(--#{$prefix}control-border-radius), 0);
+
+  @include box-shadow(var(--#{$prefix}control-box-shadow));
+  @include transition(var(--#{$prefix}control-transition));
+}
+// scss-docs-end form-control-frame-mixin
+
 @layer forms {
   //
   // General form controls (plus a few specific high-level interventions)
@@ -59,25 +82,11 @@ $form-control-tokens: defaults(
 
   .form-control {
     @include tokens($form-control-tokens);
+    @include form-control-frame();
 
     display: block;
     width: 100%;
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-family: var(--#{$prefix}control-font-family);
-    font-size: var(--#{$prefix}control-font-size);
-    font-weight: var(--#{$prefix}control-font-weight);
-    line-height: var(--#{$prefix}control-line-height);
-    color: var(--#{$prefix}control-color);
     appearance: none; // Fix appearance for date inputs in Safari
-    background-color: var(--#{$prefix}control-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-
-    // Note: This has no effect on <select>s in some browsers, due to the limited stylability of `<select>`s in CSS.
-    @include border-radius(var(--#{$prefix}control-border-radius), 0);
-
-    @include box-shadow(var(--#{$prefix}control-box-shadow));
-    @include transition(var(--#{$prefix}control-transition));
 
     &[type="file"] {
       overflow: hidden; // prevent pseudo element button overlap

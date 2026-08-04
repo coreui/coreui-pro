@@ -34,6 +34,7 @@ const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
 
 type ChipInputConfig = ChipSetConfig & {
+  create: boolean
   createOnBlur: boolean
   id: string | null
   name: string | null
@@ -44,6 +45,7 @@ type ChipInputConfig = ChipSetConfig & {
 
 const Default: ChipInputConfig = {
   ...ChipSet.Default,
+  create: true,
   createOnBlur: true,
   id: null,
   name: null,
@@ -56,6 +58,7 @@ const Default: ChipInputConfig = {
 
 const DefaultType: Record<string, string> = {
   ...ChipSet.DefaultType,
+  create: 'boolean',
   createOnBlur: 'boolean',
   id: '(string|null)',
   name: '(string|null)',
@@ -92,7 +95,14 @@ class ChipInput extends ChipSet {
     }
 
     this._applyInteractionState()
-    this._createHiddenInput()
+
+    // In the controlled mode (`create: false`) the chips come from the host —
+    // a listbox selection, say — so typed text never becomes a chip and the
+    // host owns the form value; no hidden input is rendered.
+    if (this._config.create) {
+      this._createHiddenInput()
+    }
+
     this._addInputEventListeners()
   }
 
@@ -253,7 +263,7 @@ class ChipInput extends ChipSet {
   }
 
   _createChipFromInput(): void {
-    if (!this._canModify()) {
+    if (!this._canModify() || !this._config.create) {
       return
     }
 
@@ -337,7 +347,7 @@ class ChipInput extends ChipSet {
     const { value } = event.target
     const { separator } = this._config
 
-    if (separator && value.includes(separator)) {
+    if (this._config.create && separator && value.includes(separator)) {
       const parts = value.split(separator)
       for (const part of parts.slice(0, -1)) {
         this.add(part.trim())
@@ -359,7 +369,7 @@ class ChipInput extends ChipSet {
     }
 
     const { separator } = this._config
-    if (!separator) {
+    if (!separator || !this._config.create) {
       return
     }
 

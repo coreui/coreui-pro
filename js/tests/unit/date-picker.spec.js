@@ -31,8 +31,8 @@ describe('DatePicker', () => {
 
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('date-picker')).toBeTrue()
-      expect(el.querySelector('.date-picker-input-group')).not.toBeNull()
-      expect(el.querySelector('.date-picker-indicator')).not.toBeNull()
+      expect(el.querySelector('.form-control-group')).not.toBeNull()
+      expect(el.querySelector('.form-control-action')).not.toBeNull()
       expect(el.querySelector('.date-picker-dropdown .date-picker-calendar')).not.toBeNull()
     })
 
@@ -67,7 +67,7 @@ describe('DatePicker', () => {
     it('should render the indicator icon as inline SVG on currentColor', () => {
       buildPicker()
 
-      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
       const svg = indicator.querySelector('svg')
       expect(svg).not.toBeNull()
       expect(svg.getAttribute('fill')).toEqual('currentColor')
@@ -79,7 +79,7 @@ describe('DatePicker', () => {
         indicatorIcon: '<svg xmlns="http://www.w3.org/2000/svg"><script>window.hacked = true</script><circle r="8" /></svg>'
       })
 
-      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
       expect(indicator.querySelector('circle')).not.toBeNull()
       expect(indicator.querySelector('script')).toBeNull()
       expect(window.hacked).toBeUndefined()
@@ -116,14 +116,21 @@ describe('DatePicker', () => {
         el.addEventListener(`${name}.coreui.date-picker`, () => calls.push(name))
       }
 
-      el.querySelector('.date-picker-indicator').click()
+      el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeTrue()
       expect(el.getAttribute('aria-expanded')).toEqual('true')
 
-      el.querySelector('.date-picker-indicator').click()
+      el.querySelector('.form-control-action').click()
       expect(el.classList.contains('show')).toBeFalse()
       expect(calls).toEqual(['show', 'shown', 'hide', 'hidden'])
       expect(picker._popup.isShown).toBeFalse()
+    })
+
+    it('should disable the indicator button when the picker is disabled', () => {
+      buildPicker({ disabled: true })
+
+      const indicator = fixtureEl.querySelector('.form-control-action')
+      expect(indicator.disabled).toBeTrue()
     })
 
     it('should not open when disabled', () => {
@@ -211,6 +218,51 @@ describe('DatePicker', () => {
       el.querySelector('.calendar-cell[tabindex="0"]').click()
 
       expect(el.querySelector('input[type="hidden"]').value).toMatch(/^Q[1-4] \d{4}$/)
+    })
+  })
+
+  describe('cleaner', () => {
+    it('should clear the value when the cleaner is clicked', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getDate()).toBeNull()
+    })
+
+    it('should not open the popup when the cleaner is clicked', () => {
+      const picker = buildPicker({ date: new Date(2026, 6, 14) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker._popup.isShown).toBeFalse()
+    })
+
+    it('should hide the cleaner while the field is empty', () => {
+      buildPicker()
+
+      // the field reports emptiness; the rule that acts on it is CSS, so the
+      // hook itself is what the test can assert
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('form-date-time-filled')).toBeFalse()
+      expect(fixtureEl.querySelector('.form-control-cleaner')).not.toBeNull()
+    })
+
+    it('should mark the field filled once it holds a value', () => {
+      buildPicker({ date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('.form-date-time').classList.contains('form-date-time-filled')).toBeTrue()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, date: new Date(2026, 6, 14) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
+    })
+
+    it('should disable the cleaner when the picker is disabled', () => {
+      buildPicker({ date: new Date(2026, 6, 14), disabled: true })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner').disabled).toBeTrue()
     })
   })
 

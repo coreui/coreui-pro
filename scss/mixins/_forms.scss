@@ -57,6 +57,17 @@ $form-feedback-tokens: defaults(
   }
 }
 
+// The frame's share of a validation state. Every field component draws its
+// frame with `.form-control-group`, so the treatment is one and the same —
+// only the selector that spots the state differs from family to family.
+@mixin form-control-group-validation-state($color, $border-color, $focus-ring) {
+  --#{$prefix}control-border-color: #{$border-color};
+  --#{$prefix}control-focus-border-color: #{$border-color};
+  --#{$prefix}control-focus-ring: #{$focus-ring};
+  --#{$prefix}control-group-icon-color: #{$color};
+  --#{$prefix}control-group-action-color: #{$color};
+}
+
 @mixin form-validation-state(
   $state,
   $color,
@@ -133,39 +144,37 @@ $form-feedback-tokens: defaults(
     }
   }
 
-  .form-password .form-control {
-    @include form-validation-state-selector($state) {
+  // The group is the frame and the control inside it draws no border of its
+  // own, so the state has to reach the group — custom properties set on the
+  // control would only inherit downwards. Actions sit where the validation
+  // icon would go, so the icon is suppressed and the actions carry the color
+  // instead (see .form-password above).
+  //
+  // Which element carries the state differs from family to family: the group
+  // itself, the control inside it (the pickers' section field), or the
+  // component root — autocomplete and multi select keep it there. They all
+  // colour the same frame, so they share one rule.
+  .form-control-group.is-#{$state},
+  .form-control-group:has(> .form-control.is-#{$state}),
+  .autocomplete.is-#{$state} .form-control-group,
+  .form-multi-select.is-#{$state} .form-control-group {
+    @include form-control-group-validation-state($color, $border-color, $focus-ring);
+  }
 
-      @if $enable-validation-icons {
-        background-image: none;
-      }
-
-      ~ .form-password-action .form-password-action-icon {
-        background-color: $border-color;
-      }
+  @if $state == "valid" or $state == "invalid" {
+    // Native constraint validation reports through a real form control: the
+    // one inside the group (autocomplete's required input), or multi select's
+    // native select, which sits next to the group rather than inside it.
+    .was-validated .form-control-group:has(> .form-control:#{$state}),
+    .was-validated .form-multi-select:has(> select:#{$state}) .form-control-group {
+      @include form-control-group-validation-state($color, $border-color, $focus-ring);
     }
   }
 
-  // In a picker the input group is the frame and the field inside draws no
-  // border of its own, so the state has to reach the group — custom properties
-  // set on the field would only inherit downwards. The indicator button sits
-  // where the validation icon would go, so the icon is suppressed and the
-  // indicator carries the color instead (see .form-password above).
-  .date-picker-input-group,
-  .time-picker-input-group {
-    &:has(.form-date-time.is-#{$state}) {
-      --#{$prefix}control-border-color: #{$border-color};
-      --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring};
-      --#{$prefix}date-picker-indicator-color: #{$color};
-      --#{$prefix}time-picker-indicator-icon-color: #{$color};
-    }
-
-    @if $enable-validation-icons {
-      .form-date-time {
-        @include form-validation-state-selector($state) {
-          background-image: none;
-        }
+  @if $enable-validation-icons {
+    .form-control-group > .form-control {
+      @include form-validation-state-selector($state) {
+        background-image: none;
       }
     }
   }

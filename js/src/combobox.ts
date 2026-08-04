@@ -188,7 +188,7 @@ class Combobox extends BaseComponent {
 
   _createOptionsContainer(): void {
     const popupDiv = document.createElement('div')
-    popupDiv.classList.add(CLASS_NAME_POPUP)
+    popupDiv.classList.add('popup', CLASS_NAME_POPUP)
 
     this._buildMenuHeader(popupDiv)
 

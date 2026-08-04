@@ -32,7 +32,7 @@ describe('DateRangePicker', () => {
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('date-range-picker')).toBeTrue()
       expect(el.querySelectorAll('.form-date-time')).toHaveSize(2)
-      expect(el.querySelector('.date-picker-separator svg')).not.toBeNull()
+      expect(el.querySelector('.form-control-icon svg')).not.toBeNull()
       expect(el.querySelectorAll('.date-picker-calendar')).toHaveSize(1)
 
       // the calendar itself is built on first open
@@ -81,7 +81,7 @@ describe('DateRangePicker', () => {
       const picker = buildPicker({}, '<div dir="rtl"><div id="picker"></div></div>')
 
       expect(picker._resolveSeparatorIcon()).toEqual(picker._config.separatorIconRtl)
-      expect(fixtureEl.querySelector('.date-picker-separator svg')).not.toBeNull()
+      expect(fixtureEl.querySelector('.form-control-icon svg')).not.toBeNull()
     })
 
     it('should clone a ranges template into the dropdown body', () => {
@@ -196,6 +196,23 @@ describe('DateRangePicker', () => {
 
       expect(picker._popup.isShown).toBeTrue()
       picker.hide()
+    })
+  })
+
+  describe('cleaner', () => {
+    it('should clear both dates when the cleaner is clicked', () => {
+      const picker = buildPicker({ startDate: new Date(2026, 5, 1), endDate: new Date(2026, 5, 15) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getStartDate()).toBeNull()
+      expect(picker.getEndDate()).toBeNull()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, startDate: new Date(2026, 5, 1) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
     })
   })
 

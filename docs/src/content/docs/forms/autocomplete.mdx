@@ -370,16 +370,10 @@ The Autocomplete component includes several accessibility features:
 
 ### CSS variables
 
-Autocomplete components use local CSS variables on `.autocomplete` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported.
-
-<ScssDocs file="scss/_autocomplete.scss" capture="autocomplete-css-vars" />
-
-The options dropdown is the shared combobox surface and uses its own `--cui-combobox-*` variables:
+Autocomplete has no variables of its own: the field is a [`.form-control-group`](/forms/form-control-group/) and takes the `--cui-control-*` properties, and the options dropdown is the shared combobox surface with its own `--cui-combobox-*` ones.
 
 <ScssDocs file="scss/_combobox.scss" capture="combobox-css-vars" />
 
 ### SASS variables
-
-<ScssDocs file="scss/_autocomplete.scss" capture="autocomplete-variables" />
 
 <ScssDocs file="scss/_combobox.scss" capture="combobox-variables" />

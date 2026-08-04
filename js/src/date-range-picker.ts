@@ -17,6 +17,8 @@ import SelectorEngine from './dom/selector-engine.js'
 import Popup from './util/popup.js'
 import type { ComponentConfig } from './util/config.js'
 import { getWeekSectionsFromLocale } from './util/date-sections.js'
+import { createControlGroupAction } from './util/form-control-group.js'
+import { CLEANER_ICON } from './util/icons.js'
 import { defineJQueryPlugin } from './util/index.js'
 import { sanitizeHtml, type SanitizerAllowList, SVGAllowlist } from './util/sanitizer.js'
 
@@ -46,11 +48,14 @@ const CLASS_NAME_DATE_PICKER = 'date-picker'
 const CLASS_NAME_DATE_RANGE_PICKER = 'date-range-picker'
 const CLASS_NAME_DROPDOWN = 'date-picker-dropdown'
 const CLASS_NAME_FOOTER = 'date-picker-footer'
-const CLASS_NAME_INDICATOR = 'date-picker-indicator'
-const CLASS_NAME_INPUT_GROUP = 'date-picker-input-group'
+const CLASS_NAME_CLEANER = 'form-control-cleaner'
+const CLASS_NAME_INDICATOR = 'form-control-action'
+const CLASS_NAME_FORM_CONTROL = 'form-control'
+const CLASS_NAME_INPUT_GROUP = 'form-control-group'
 const CLASS_NAME_PICKER = 'picker'
+const CLASS_NAME_POPUP = 'popup'
 const CLASS_NAME_RANGES = 'date-picker-ranges'
-const CLASS_NAME_SEPARATOR = 'date-picker-separator'
+const CLASS_NAME_SEPARATOR = 'form-control-icon'
 const CLASS_NAME_SHOW = 'show'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="date-range-picker"]'
@@ -65,7 +70,10 @@ const DEFAULT_SEPARATOR_ICON_RTL: string = '<svg xmlns="http://www.w3.org/2000/s
 
 type DateRangePickerConfig = {
   allowList: SanitizerAllowList
+  ariaCleanerLabel: string
   ariaToggleLabel: string
+  cleaner: boolean
+  cleanerIcon: string
   calendarOptions: Record<string, any>
   container: Element | boolean | string
   disabled: boolean
@@ -88,7 +96,10 @@ type DateRangePickerConfig = {
 
 const Default: DateRangePickerConfig = {
   allowList: SVGAllowlist,
+  ariaCleanerLabel: 'Clear the value',
   ariaToggleLabel: 'Toggle the calendar',
+  cleaner: true,
+  cleanerIcon: CLEANER_ICON,
   calendarOptions: {},
   calendars: 2,
   container: false,
@@ -111,7 +122,10 @@ const Default: DateRangePickerConfig = {
 
 const DefaultType: Record<string, string> = {
   allowList: 'object',
+  ariaCleanerLabel: 'string',
   ariaToggleLabel: 'string',
+  cleaner: 'boolean',
+  cleanerIcon: 'string',
   calendarOptions: 'object',
   calendars: 'number',
   container: '(string|element|boolean)',
@@ -138,6 +152,7 @@ const DefaultType: Record<string, string> = {
 
 class DateRangePicker extends BaseComponent {
   protected declare _footerTemplate: any
+  protected declare _cleanerElement: HTMLElement | null
   protected declare _indicatorElement: HTMLElement
   protected declare _startInputElement: HTMLElement
   protected declare _endInputElement: HTMLElement
@@ -157,6 +172,7 @@ class DateRangePicker extends BaseComponent {
 
     this._footerTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_FOOTER, this._element)
     this._rangesTemplate = SelectorEngine.findOne(SELECTOR_TEMPLATE_RANGES, this._element)
+    this._cleanerElement = null
     this._startInput = null
     this._endInput = null
     this._calendar = null
@@ -322,12 +338,13 @@ class DateRangePicker extends BaseComponent {
   _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
-    if (this._config.size) {
-      this._element.classList.add(`${CLASS_NAME_DATE_PICKER}-${this._config.size}`)
-    }
-
     const inputGroup = document.createElement('div')
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
+
+    // Sizing rides the standard control classes on the frame itself
+    if (this._config.size) {
+      inputGroup.classList.add(`${CLASS_NAME_FORM_CONTROL}-${this._config.size}`)
+    }
 
     const start = this._createInput(this._config.startDate, this._config.startName)
     this._startInput = start.input
@@ -345,18 +362,23 @@ class DateRangePicker extends BaseComponent {
     this._endInputElement = end.inputEl
     inputGroup.append(end.inputEl)
 
-    const indicator = document.createElement('button')
-    indicator.classList.add(CLASS_NAME_INDICATOR)
-    indicator.type = 'button'
-    indicator.setAttribute('aria-label', this._config.ariaToggleLabel)
-    indicator.innerHTML = this._sanitizeIcon(this._config.indicatorIcon)
+    const action = (className: string, icon: string, label: string) => createControlGroupAction({
+      className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
+    })
+
+    if (this._config.cleaner) {
+      this._cleanerElement = action(CLASS_NAME_CLEANER, this._config.cleanerIcon, this._config.ariaCleanerLabel)
+      inputGroup.append(this._cleanerElement)
+    }
+
+    const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
     this._element.append(inputGroup)
 
     this._menu = document.createElement('div')
-    this._menu.classList.add(CLASS_NAME_DROPDOWN)
+    this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
     const body = document.createElement('div')
     body.classList.add(CLASS_NAME_BODY)
@@ -447,6 +469,13 @@ class DateRangePicker extends BaseComponent {
   }
 
   _addEventListeners(): void {
+    if (this._cleanerElement) {
+      EventHandler.on(this._cleanerElement, EVENT_CLICK, (event: any) => {
+        event.stopPropagation()
+        this.clear()
+      })
+    }
+
     EventHandler.on(this._indicatorElement, EVENT_CLICK, () => {
       if (!this._config.disabled) {
         this.toggle()

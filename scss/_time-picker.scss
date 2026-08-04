@@ -1,72 +1,20 @@
 @use "functions/defaults" as *;
-@use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
-@use "mixins/box-shadow" as *;
 @use "mixins/tokens" as *;
-@use "mixins/transition" as *;
 @use "config" as *;
-
-// stylelint-disable custom-property-no-missing-var-function
+@use "forms/form-control-group" as *;
 
 // Time Picker
-// scss-docs-start time-picker-frame-variables
-$time-picker-font-family:      var(--#{$prefix}btn-input-font-family) !default;
-$time-picker-font-size:        var(--#{$prefix}btn-input-font-size) !default;
-$time-picker-font-size-sm:     var(--#{$prefix}btn-input-sm-font-size) !default;
-$time-picker-font-size-lg:     var(--#{$prefix}btn-input-lg-font-size) !default;
-$time-picker-line-height:      var(--#{$prefix}btn-input-line-height) !default;
-$time-picker-color:            var(--#{$prefix}btn-input-color) !default;
-$time-picker-bg:               var(--#{$prefix}btn-input-bg) !default;
-
-$time-picker-border-width:     var(--#{$prefix}btn-input-border-width) !default;
-
-$time-picker-padding-y:        var(--#{$prefix}btn-input-padding-y) !default;
-$time-picker-padding-x:        var(--#{$prefix}btn-input-padding-x) !default;
-
-$time-picker-padding-y-sm:     var(--#{$prefix}btn-input-sm-padding-y) !default;
-$time-picker-padding-x-sm:     var(--#{$prefix}btn-input-sm-padding-x) !default;
-
-$time-picker-padding-y-lg:     var(--#{$prefix}btn-input-lg-padding-y) !default;
-$time-picker-padding-x-lg:     var(--#{$prefix}btn-input-lg-padding-x) !default;
-// scss-docs-end time-picker-frame-variables
-
 $time-picker-tokens: () !default;
 
 // scss-docs-start time-picker-css-vars
 // stylelint-disable-next-line scss/dollar-variable-default
 $time-picker-tokens: defaults(
   (
-    --#{$prefix}time-picker-zindex: #{$time-picker-zindex},
-    --#{$prefix}control-font-family: #{$time-picker-font-family},
-    --#{$prefix}control-font-size: #{$time-picker-font-size},
-    --#{$prefix}control-font-weight: #{$time-picker-font-weight},
-    --#{$prefix}control-line-height: #{$time-picker-line-height},
-    --#{$prefix}control-color: #{$time-picker-color},
-    --#{$prefix}control-bg: #{$time-picker-bg},
-    --#{$prefix}control-box-shadow: #{$time-picker-box-shadow},
-    --#{$prefix}control-border-width: #{$time-picker-border-width},
-    --#{$prefix}control-border-color: #{$time-picker-border-color},
-    --#{$prefix}control-border-radius: #{$time-picker-border-radius},
-    --#{$prefix}control-disabled-color: #{$time-picker-disabled-color},
-    --#{$prefix}control-disabled-bg: #{$time-picker-disabled-bg},
-    --#{$prefix}control-disabled-border-color: #{$time-picker-disabled-border-color},
-    --#{$prefix}control-focus-color: #{$time-picker-focus-color},
-    --#{$prefix}control-focus-bg: #{$time-picker-focus-bg},
-    --#{$prefix}control-focus-border-color: #{$time-picker-focus-border-color},
-    --#{$prefix}control-focus-ring: #{$time-picker-focus-ring},
-    --#{$prefix}control-padding-y: #{$time-picker-padding-y},
-    --#{$prefix}control-padding-x: #{$time-picker-padding-x},
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width},
-    --#{$prefix}time-picker-indicator-icon-color: #{$time-picker-indicator-icon-color},
     --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding},
     --#{$prefix}time-picker-footer-border-width: #{$time-picker-footer-border-width},
     --#{$prefix}time-picker-footer-border-color: #{$time-picker-footer-border-color},
     --#{$prefix}time-picker-footer-padding: #{$time-picker-footer-padding},
-    --#{$prefix}time-picker-dropdown-bg: #{$time-picker-dropdown-bg},
-    --#{$prefix}time-picker-dropdown-border-width: #{$time-picker-dropdown-border-width},
-    --#{$prefix}time-picker-dropdown-border-color: #{$time-picker-dropdown-border-color},
-    --#{$prefix}time-picker-dropdown-border-radius: #{$time-picker-dropdown-border-radius},
-    --#{$prefix}time-picker-dropdown-box-shadow: #{$time-picker-dropdown-box-shadow},
     --#{$prefix}time-picker-roll-col-border-width: #{$time-picker-roll-col-border-width},
     --#{$prefix}time-picker-roll-col-border-color: #{$time-picker-roll-col-border-color},
     --#{$prefix}time-picker-roll-cell-width: #{$time-picker-roll-cell-width},
@@ -97,81 +45,20 @@ $time-picker-tokens: defaults(
   // --#{$prefix}time-picker-* properties defined on `.time-picker` above.
   .time-picker {
     position: relative;
-
-    .time-picker-input-group {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 0;
-      align-items: center;
-      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      font-size: var(--#{$prefix}control-font-size);
-      background-color: var(--#{$prefix}control-bg);
-      background-clip: padding-box;
-      border: var(--#{$prefix}control-border-width) solid var(--#{$prefix}control-border-color);
-      @include border-radius(var(--#{$prefix}control-border-radius));
-
-      .time-picker & {
-        @include transition($input-transition);
-      }
-
-      .time-picker.disabled & {
-        --#{$prefix}control-border-color: var(--#{$prefix}control-disabled-border-color);
-        background-color: var(--#{$prefix}control-disabled-bg);
-      }
-
-      .time-picker.show &,
-      &:focus-within {
-        background-color: var(--#{$prefix}control-focus-bg);
-        border-color: var(--#{$prefix}control-focus-border-color);
-        outline: var(--#{$prefix}control-focus-ring);
-      }
-
-      // see .date-picker-input-group — the group is the frame
-      .form-date-time {
-        flex: 1;
-        min-height: 0;
-        padding: 0;
-        font-size: inherit;
-        line-height: inherit;
-        background-color: transparent;
-        border: 0;
-        @include border-radius(0);
-        box-shadow: none;
-
-        // The group is the frame, so it owns the focus treatment; without this
-        // the field's own :focus-within ring draws a second one inside it.
-        &:focus-within {
-          background-color: transparent;
-          outline: 0;
-        }
-      }
-    }
-
-    .time-picker-indicator {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: var(--#{$prefix}time-picker-indicator-width);
-      padding: 0;
-      color: var(--#{$prefix}time-picker-indicator-icon-color);
-      background: transparent;
-      border: 0;
-    }
   }
 
-  .time-picker-dropdown {
-    position: absolute;
-    z-index: var(--#{$prefix}time-picker-zindex);
-    display: none;
-    width: min-content;
-    background-color: var(--#{$prefix}time-picker-dropdown-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}time-picker-dropdown-border-width) solid var(--#{$prefix}time-picker-dropdown-border-color);
-    @include border-radius(var(--#{$prefix}time-picker-dropdown-border-radius));
-    @include box-shadow(var(--#{$prefix}time-picker-dropdown-box-shadow));
+  // The popup takes the focus away from the group, but the control is still
+  // active — so the frame keeps its focus treatment while it is open.
+  .time-picker.show .form-control-group {
+    @include form-control-group-focus();
+  }
 
-    .time-picker.show &,
-    &.show {
+  // See .date-picker-dropdown — chrome from `.popup`, shape and parent-driven
+  // open state here.
+  .time-picker-dropdown {
+    width: min-content;
+
+    .time-picker.show & {
       display: block;
     }
   }
@@ -277,19 +164,4 @@ $time-picker-tokens: defaults(
     }
   }
 
-  .time-picker-sm {
-    --#{$prefix}control-padding-y: #{$time-picker-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$time-picker-padding-x-sm};
-    --#{$prefix}control-font-size: #{$time-picker-font-size-sm};
-    --#{$prefix}control-border-radius: #{$time-picker-border-radius-sm};
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width-sm};
-  }
-
-  .time-picker-lg {
-    --#{$prefix}control-padding-y: #{$time-picker-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$time-picker-padding-x-lg};
-    --#{$prefix}control-font-size: #{$time-picker-font-size-lg};
-    --#{$prefix}control-border-radius: #{$time-picker-border-radius-lg};
-    --#{$prefix}time-picker-indicator-width: #{$time-picker-indicator-width-lg};
-  }
 }

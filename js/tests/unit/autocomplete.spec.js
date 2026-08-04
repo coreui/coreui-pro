@@ -122,7 +122,7 @@ describe('Autocomplete', () => {
       const autocomplete = new Autocomplete(autocompleteEl, { cleaner: true, options: [] })
 
       expect(autocomplete._cleanerElement).toBeTruthy()
-      expect(autocomplete._cleanerElement.classList.contains('autocomplete-cleaner')).toBe(true)
+      expect(autocomplete._cleanerElement.classList.contains('form-control-cleaner')).toBe(true)
     })
 
     it('should create autocomplete with indicator button when indicator option is true', () => {
@@ -131,7 +131,7 @@ describe('Autocomplete', () => {
       const autocomplete = new Autocomplete(autocompleteEl, { indicator: true, options: [] })
 
       expect(autocomplete._indicatorElement).toBeTruthy()
-      expect(autocomplete._indicatorElement.classList.contains('autocomplete-indicator')).toBe(true)
+      expect(autocomplete._indicatorElement.classList.contains('form-control-action')).toBe(true)
     })
 
     it('should create autocomplete with options', () => {
@@ -173,7 +173,7 @@ describe('Autocomplete', () => {
       expect(autocomplete._cleanerElement).toBeUndefined()
     })
 
-    it('should set indicator tabIndex to -1 when disabled', () => {
+    it('should disable the indicator when disabled', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')
       const autocomplete = new Autocomplete(autocompleteEl, {
@@ -182,7 +182,7 @@ describe('Autocomplete', () => {
         options: []
       })
 
-      expect(autocomplete._indicatorElement.tabIndex).toBe(-1)
+      expect(autocomplete._indicatorElement.disabled).toBe(true)
     })
 
     it('should use custom id when provided', () => {

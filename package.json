@@ -54,6 +54,7 @@
     "js-test-types": "npm-run-all js-emit-types js-typecheck-dist",
     "js-debug": "cross-env DEBUG=true vitest --config js/tests/vitest.config.mts",
     "js-test-unit": "vitest run --config js/tests/vitest.config.mts --coverage",
+    "js-test-visual": "vitest run --config js/tests/vitest-visual.config.mts",
     "js-test-integration-bundle": "rolldown --config js/tests/integration/rolldown.bundle.mjs",
     "js-test-integration-modularity": "rolldown --config js/tests/integration/rolldown.bundle-modularity.mjs",
     "js-test-jquery": "cross-env JQUERY=true vitest run --config js/tests/vitest.config.mts",

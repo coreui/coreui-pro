@@ -15,7 +15,7 @@ describe('ChipInput', () => {
   })
 
   it('should take care of element either passed as a CSS selector or DOM element', () => {
-    fixtureEl.innerHTML = '<div class="chip-input" data-coreui-chip-input="true"></div>'
+    fixtureEl.innerHTML = '<div class="form-control-group chip-input" data-coreui-chip-input="true"></div>'
 
     const el = fixtureEl.querySelector('.chip-input')
     const bySelector = new ChipInput('.chip-input')
@@ -63,7 +63,7 @@ describe('ChipInput', () => {
 
   describe('constructor', () => {
     it('should create an input element when none exists', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -74,7 +74,7 @@ describe('ChipInput', () => {
 
     it('should use existing input element', () => {
       fixtureEl.innerHTML = [
-        '<div class="chip-input">',
+        '<div class="form-control-group chip-input">',
         '  <input type="text" class="chip-input-field" id="my-input">',
         '</div>'
       ].join('')
@@ -87,7 +87,7 @@ describe('ChipInput', () => {
     })
 
     it('should create a hidden input for form submission', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -97,7 +97,7 @@ describe('ChipInput', () => {
     })
 
     it('should use custom name on hidden input', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -107,7 +107,7 @@ describe('ChipInput', () => {
     })
 
     it('should use custom id on hidden input', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -117,7 +117,7 @@ describe('ChipInput', () => {
     })
 
     it('should initialize as disabled via config', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { disabled: true })
@@ -137,7 +137,7 @@ describe('ChipInput', () => {
     })
 
     it('should initialize as readonly via config', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -147,7 +147,7 @@ describe('ChipInput', () => {
     })
 
     it('should set placeholder on text input', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -158,7 +158,7 @@ describe('ChipInput', () => {
 
     it('should initialize existing chips', () => {
       fixtureEl.innerHTML = [
-        '<div class="chip-input">',
+        '<div class="form-control-group chip-input">',
         '  <span class="chip">First</span>',
         '  <span class="chip">Second</span>',
         '</div>'
@@ -171,7 +171,7 @@ describe('ChipInput', () => {
     })
 
     it('should not set aria attributes on the container element', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       // eslint-disable-next-line no-new
@@ -182,7 +182,7 @@ describe('ChipInput', () => {
     })
 
     it('should not stamp a role on the container and announce added chips', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -196,7 +196,7 @@ describe('ChipInput', () => {
 
     it('should set label for attribute when label has no for', () => {
       fixtureEl.innerHTML = [
-        '<div class="chip-input">',
+        '<div class="form-control-group chip-input">',
         '  <label class="chip-input-label">Tags</label>',
         '</div>'
       ].join('')
@@ -213,7 +213,7 @@ describe('ChipInput', () => {
 
   describe('add', () => {
     it('should add a chip with the given value', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -225,7 +225,7 @@ describe('ChipInput', () => {
     })
 
     it('should return the created chip element', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -237,7 +237,7 @@ describe('ChipInput', () => {
     })
 
     it('should trim whitespace from value', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -248,7 +248,7 @@ describe('ChipInput', () => {
     })
 
     it('should not add empty value', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -260,7 +260,7 @@ describe('ChipInput', () => {
     })
 
     it('should not add duplicate values', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -273,7 +273,7 @@ describe('ChipInput', () => {
     })
 
     it('should not add when disabled', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { disabled: true })
@@ -285,7 +285,7 @@ describe('ChipInput', () => {
     })
 
     it('should not add when readonly', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { readonly: true })
@@ -297,7 +297,7 @@ describe('ChipInput', () => {
     })
 
     it('should not add more chips than maxChips allows', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { maxChips: 2 })
@@ -312,7 +312,7 @@ describe('ChipInput', () => {
 
     it('should trigger add event', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el)
@@ -328,7 +328,7 @@ describe('ChipInput', () => {
 
     it('should trigger change event after adding', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el)
@@ -343,7 +343,7 @@ describe('ChipInput', () => {
     })
 
     it('should not add chip if add event is prevented', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -359,7 +359,7 @@ describe('ChipInput', () => {
     })
 
     it('should update hidden input value after adding', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -371,7 +371,7 @@ describe('ChipInput', () => {
     })
 
     it('should apply chipClassName string to added chip', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { chipClassName: 'chip-primary' })
@@ -382,7 +382,7 @@ describe('ChipInput', () => {
     })
 
     it('should apply chipClassName function to added chip', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { chipClassName: value => `chip-${value.toLowerCase()}` })
@@ -395,7 +395,7 @@ describe('ChipInput', () => {
 
   describe('remove', () => {
     it('should remove a chip by value string', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -407,7 +407,7 @@ describe('ChipInput', () => {
     })
 
     it('should remove a chip by element reference', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -420,7 +420,7 @@ describe('ChipInput', () => {
     })
 
     it('should return false for non-existent value', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -429,7 +429,7 @@ describe('ChipInput', () => {
     })
 
     it('should return false when disabled', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { disabled: true })
@@ -438,7 +438,7 @@ describe('ChipInput', () => {
     })
 
     it('should return false when readonly', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { readonly: true })
@@ -448,7 +448,7 @@ describe('ChipInput', () => {
 
     it('should trigger remove event', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el)
@@ -465,7 +465,7 @@ describe('ChipInput', () => {
     })
 
     it('should not remove if remove event is prevented', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -482,7 +482,7 @@ describe('ChipInput', () => {
     })
 
     it('should update hidden input value after removing', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -497,7 +497,7 @@ describe('ChipInput', () => {
 
   describe('getValues', () => {
     it('should return empty array when no chips', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -506,7 +506,7 @@ describe('ChipInput', () => {
     })
 
     it('should return array of chip values', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -519,7 +519,7 @@ describe('ChipInput', () => {
     })
 
     it('should return a copy of the chips array', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -534,7 +534,7 @@ describe('ChipInput', () => {
 
   describe('clear', () => {
     it('should remove all chips', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -549,7 +549,7 @@ describe('ChipInput', () => {
     })
 
     it('should clear hidden input value', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -563,7 +563,7 @@ describe('ChipInput', () => {
 
   describe('getSelectedValues', () => {
     it('should return empty array when no chips are selected', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -575,7 +575,7 @@ describe('ChipInput', () => {
     })
 
     it('should return values of selected chips', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -592,7 +592,7 @@ describe('ChipInput', () => {
 
   describe('clearSelection', () => {
     it('should deselect all selected chips', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -611,7 +611,7 @@ describe('ChipInput', () => {
 
     it('should trigger select event with empty array', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el, { selectable: true })
@@ -632,7 +632,7 @@ describe('ChipInput', () => {
 
   describe('selectChip', () => {
     it('should select a chip element', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -647,7 +647,7 @@ describe('ChipInput', () => {
 
     it('should not select a chip not belonging to this input', () => {
       fixtureEl.innerHTML = [
-        '<div class="chip-input"></div>',
+        '<div class="form-control-group chip-input"></div>',
         '<span class="chip" tabindex="0">External</span>'
       ].join('')
 
@@ -665,7 +665,7 @@ describe('ChipInput', () => {
 
   describe('removeSelected', () => {
     it('should remove all selected chips', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { selectable: true })
@@ -686,7 +686,7 @@ describe('ChipInput', () => {
 
   describe('focus', () => {
     it('should focus the text input', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -697,7 +697,7 @@ describe('ChipInput', () => {
     })
 
     it('should focus the input when a character key is pressed on the container', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -709,7 +709,7 @@ describe('ChipInput', () => {
     })
 
     it('should focus the input when clicking the container background', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -723,7 +723,7 @@ describe('ChipInput', () => {
 
   describe('keyboard navigation - input', () => {
     it('should create chip on Enter key', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -736,7 +736,7 @@ describe('ChipInput', () => {
     })
 
     it('should focus last chip on Backspace when input is empty', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -750,7 +750,7 @@ describe('ChipInput', () => {
     })
 
     it('should not focus chip on Backspace when input has value', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -763,7 +763,7 @@ describe('ChipInput', () => {
     })
 
     it('should focus last chip on ArrowLeft when cursor is at start', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -777,7 +777,7 @@ describe('ChipInput', () => {
     })
 
     it('should clear input and blur on Escape key', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -792,7 +792,7 @@ describe('ChipInput', () => {
 
   describe('separator', () => {
     it('should create chip when separator character is typed', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -805,7 +805,7 @@ describe('ChipInput', () => {
     })
 
     it('should split pasted text by separator', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -823,7 +823,7 @@ describe('ChipInput', () => {
     })
 
     it('should not split paste when separator is null', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { separator: null })
@@ -841,7 +841,7 @@ describe('ChipInput', () => {
 
   describe('createOnBlur', () => {
     it('should create chip on blur when createOnBlur is true', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { createOnBlur: true })
@@ -853,7 +853,7 @@ describe('ChipInput', () => {
     })
 
     it('should not create chip on blur when createOnBlur is false', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el, { createOnBlur: false })
@@ -868,7 +868,7 @@ describe('ChipInput', () => {
   describe('input event', () => {
     it('should trigger input event on typing', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el)
@@ -887,7 +887,7 @@ describe('ChipInput', () => {
   describe('selection events', () => {
     it('should trigger select event when chip is selected', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el, { selectable: true })
@@ -905,7 +905,7 @@ describe('ChipInput', () => {
 
     it('should trigger select event when chip is deselected', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="chip-input"></div>'
+        fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
         const el = fixtureEl.querySelector('.chip-input')
         const chipInput = new ChipInput(el, { selectable: true })
@@ -930,7 +930,7 @@ describe('ChipInput', () => {
 
   describe('disabled state', () => {
     it('should prevent chip removal when disabled', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -947,7 +947,7 @@ describe('ChipInput', () => {
 
   describe('data-api', () => {
     it('should initialize via data attribute on DOMContentLoaded', () => {
-      fixtureEl.innerHTML = '<div class="chip-input" data-coreui-chip-input="true"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input" data-coreui-chip-input="true"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
 
@@ -959,7 +959,7 @@ describe('ChipInput', () => {
 
   describe('dispose', () => {
     it('should dispose a chip-input instance', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -972,7 +972,7 @@ describe('ChipInput', () => {
     })
 
     it('should be an instance of ChipSet', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -983,7 +983,7 @@ describe('ChipInput', () => {
 
   describe('getInstance', () => {
     it('should return chip-input instance', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -993,7 +993,7 @@ describe('ChipInput', () => {
     })
 
     it('should return null when there is no instance', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
 
@@ -1003,7 +1003,7 @@ describe('ChipInput', () => {
 
   describe('getOrCreateInstance', () => {
     it('should return existing instance', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -1014,7 +1014,7 @@ describe('ChipInput', () => {
     })
 
     it('should create new instance when none exists', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
 
@@ -1023,9 +1023,51 @@ describe('ChipInput', () => {
     })
   })
 
+  describe('controlled mode (create: false)', () => {
+    it('should not create a chip on Enter', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+      const input = fixtureEl.querySelector('input[type="text"]')
+
+      input.value = 'typed'
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual([])
+      expect(input.value).toBe('typed')
+    })
+
+    it('should not split typed separators into chips', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+      const input = fixtureEl.querySelector('input[type="text"]')
+
+      input.value = 'a,b,'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+
+      expect(chipInput.getValues()).toEqual([])
+    })
+
+    it('should not render a hidden form input', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false }) // eslint-disable-line no-unused-vars
+
+      expect(fixtureEl.querySelector('input[type="hidden"]')).toBeNull()
+    })
+
+    it('should still accept chips from the host', () => {
+      fixtureEl.innerHTML = '<div id="ci"></div>'
+      const chipInput = new ChipInput(fixtureEl.querySelector('#ci'), { create: false })
+
+      chipInput.add('Bootstrap')
+
+      expect(chipInput.getValues()).toEqual(['Bootstrap'])
+      expect(fixtureEl.querySelectorAll('.chip')).toHaveSize(1)
+    })
+  })
+
   describe('keyboard navigation', () => {
     it('should move focus to the input on ArrowRight from the last chip', () => {
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)
@@ -1046,7 +1088,7 @@ describe('ChipInput', () => {
     it('should move focus to the input on ArrowLeft from the last chip in RTL', () => {
       document.documentElement.dir = 'rtl'
 
-      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
 
       const el = fixtureEl.querySelector('.chip-input')
       const chipInput = new ChipInput(el)

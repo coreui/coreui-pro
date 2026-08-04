@@ -115,12 +115,12 @@ describe('DateTimePicker', () => {
     it('should apply the size class', () => {
       buildPicker({ size: 'sm' })
 
-      expect(fixtureEl.querySelector('#picker').classList.contains('date-picker-sm')).toBeTrue()
+      expect(fixtureEl.querySelector('#picker .form-control-group').classList.contains('form-control-sm')).toBeTrue()
     })
 
     it('should toggle from the indicator button', () => {
       const picker = buildPicker()
-      const indicator = fixtureEl.querySelector('.date-picker-indicator')
+      const indicator = fixtureEl.querySelector('.form-control-action')
 
       indicator.click()
       expect(picker._popup.isShown).toBeTrue()
@@ -132,7 +132,7 @@ describe('DateTimePicker', () => {
     it('should ignore indicator clicks when disabled', () => {
       const picker = buildPicker({ disabled: true })
 
-      fixtureEl.querySelector('.date-picker-indicator').click()
+      fixtureEl.querySelector('.form-control-action').click()
 
       expect(picker._popup.isShown).toBeFalse()
     })
@@ -184,6 +184,22 @@ describe('DateTimePicker', () => {
       fixtureEl.querySelectorAll('[data-coreui-minutes]')[10].click()
 
       expect(picker.getDate().getMinutes()).toEqual(10)
+    })
+  })
+
+  describe('cleaner', () => {
+    it('should clear the value when the cleaner is clicked', () => {
+      const picker = buildPicker({ date: new Date(2026, 5, 15, 10, 0) })
+
+      fixtureEl.querySelector('.form-control-cleaner').click()
+
+      expect(picker.getDate()).toBeNull()
+    })
+
+    it('should not render a cleaner when the option is off', () => {
+      buildPicker({ cleaner: false, date: new Date(2026, 5, 15, 10, 0) })
+
+      expect(fixtureEl.querySelector('.form-control-cleaner')).toBeNull()
     })
   })
 

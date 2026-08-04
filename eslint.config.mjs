@@ -235,7 +235,7 @@ export default [
     }
   },
   {
-    files: ['js/tests/unit/**'],
+    files: ['js/tests/unit/**', 'js/tests/visual/**'],
     languageOptions: {
       globals: {
         ...globals.jasmine,
