@@ -1,20 +1,34 @@
 # https://github.com/browserslist/browserslist#readme
 #
 # Each floor is set by the newest platform feature v6 already requires, since
-# the floor has to hold for the whole 6.x line:
+# the floor has to hold for the whole 6.x line — we cannot raise it in a minor.
+# Versions below are from MDN's browser-compat-data, not from memory; re-query
+# it when adding a feature rather than assuming caniuse tracks it (it does not
+# track @property, @starting-style or transition-behavior at all).
 #
-#   light-dark()  Chrome 123, Edge 123, Safari 17.5 — the color system resolves
-#                 every theme decision through it, and color-mix(), with no
-#                 fallback, so below it dark mode simply does not work.
-#   :has()        Firefox 121 — validation and focus states on Multi Select and
-#                 Autocomplete, the sidebar navigation indicators, calendar
-#                 ranges and the rating icons are selected with it. An
-#                 unsupported :has() invalidates the entire rule it appears in,
-#                 so this is not a graceful degradation.
+#   Feature                    Sets the floor for   Used by
+#   -------------------------  -------------------  ------------------------------
+#   light-dark()               Chrome 123           every theme decision resolves
+#                              Safari/iOS 17.5      through it, with no fallback
+#   @starting-style            Firefox 129          Menu's entry animation
+#   transition-behavior:       Firefox 129          the same rule
+#     allow-discrete
+#   @property                  Firefox 128          `inherits: false` on the nine
+#                                                   utility custom properties; the
+#                                                   colour and opacity utilities
+#                                                   leak into descendants without it
+#   :has()                     Firefox 121          validation and focus states,
+#                                                   sidebar indicators, calendar
+#                                                   ranges, rating icons
+#
+# :has() no longer sets the Firefox floor — @property and @starting-style
+# arrived after this file was first written and both sit above it. @property is
+# the one that matters: an unsupported @starting-style only drops an animation,
+# but an ignored `inherits: false` is a live bug.
 #
 # Declaring anything lower would be fiction; raising it further is a product
-# choice we have not made. The JS floor rides along (everything the sources use
-# is older than this line).
+# choice we have not made. Upstream Bootstrap v6 sits at Chrome 130 / Firefox 132
+# / Safari 18, so this line stays more permissive than theirs.
 #
 # Run `npx browserslist --coverage` after any change and update the figure on
 # the browsers & devices docs page.
@@ -25,7 +39,7 @@ unreleased versions
 
 Chrome >= 123
 Edge >= 123
-Firefox >= 121
+Firefox >= 129
 iOS >= 17.5
 Safari >= 17.5
 
