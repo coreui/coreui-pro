@@ -57,10 +57,6 @@ $time-picker-tokens: defaults(
   // open state here.
   .time-picker-dropdown {
     width: min-content;
-
-    .time-picker.show & {
-      display: block;
-    }
   }
 
   .time-picker-body {

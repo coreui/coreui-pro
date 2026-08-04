@@ -92,9 +92,13 @@ class Combobox extends BaseComponent {
     showTarget.classList.add(CLASS_NAME_SHOW)
     this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
 
+    // The panel carries its own open state, teleported or not: `.popup` keys
+    // both its display and its entry transition on it, so a panel shown only
+    // through an ancestor's class would be laid out and never fade in.
+    this._menu.classList.add(CLASS_NAME_SHOW)
+
     if (this._config.container) {
       this._menu.style.minWidth = `${showTarget.offsetWidth}px`
-      this._menu.classList.add(CLASS_NAME_SHOW)
     }
 
     EventHandler.trigger(this._element, this.constructor.eventName('shown'))
@@ -112,10 +116,7 @@ class Combobox extends BaseComponent {
 
     this._getShowTarget().classList.remove(CLASS_NAME_SHOW)
     this._getAriaExpandedTarget().setAttribute('aria-expanded', 'false')
-
-    if (this._config.container) {
-      this._menu.classList.remove(CLASS_NAME_SHOW)
-    }
+    this._menu.classList.remove(CLASS_NAME_SHOW)
 
     this._onHideEnd()
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'))

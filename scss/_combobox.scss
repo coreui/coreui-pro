@@ -119,11 +119,6 @@ $combobox-tokens: defaults(
     @include tokens($combobox-tokens);
 
     min-width: var(--#{$prefix}combobox-popup-min-width);
-
-    .autocomplete.show &,
-    .form-multi-select.show & {
-      display: block;
-    }
   }
 
   .combobox-header {
