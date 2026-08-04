@@ -26,6 +26,22 @@
     }
   }
 
+  // `transform` is not direction-aware, so the one utility that centres an
+  // element on a logical inset has to be flipped by hand: in an RTL document
+  // `inset-inline-start` resolves to `right`, and the element has to move the
+  // other way to sit on that line.
+  *[dir="rtl"] {
+    .translate-middle {
+      // stylelint-disable-next-line scss/at-function-named-arguments
+      transform: translate(50%, -50%) if(sass($enable-important-utilities): !important);
+    }
+
+    .translate-middle-x {
+      // stylelint-disable-next-line scss/at-function-named-arguments
+      transform: translateX(50%) if(sass($enable-important-utilities): !important);
+    }
+  }
+
   // Print utilities
   @media print {
     @each $key, $utility in $utilities {

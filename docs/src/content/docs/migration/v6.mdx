@@ -691,10 +691,10 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   emitted a `[dir="rtl"]` counterpart. Direction is expressed with logical
   properties now (the position utilities are `inset-inline-start`/`-end`), so
   the flag has nothing left to do. One behaviour change comes with it:
-  **`.translate-middle-x` and `.translate-middle` no longer flip under
-  `dir="rtl"`** — `transform` is not direction-aware and now matches Bootstrap.
-  If you center an element on a logical inset in an RTL document, write the
-  flip yourself.
+  the RTL behaviour of `.translate-middle` / `.translate-middle-x` is written
+  as a plain `[dir="rtl"]` rule instead of a generator option — `transform` is
+  not direction-aware, so centring on a logical inset still needs the flip, but
+  it is the only utility that does and it no longer costs the whole API a key.
 
 #### RFS removed
 
