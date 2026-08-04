@@ -147,8 +147,19 @@ another class.
     <a href="#">Third</a>
   </div>`} />
 
-Both are responsive (`.space-y-md-4`) and take the same `0`–`5` steps from the
-`$spacers` map as every other spacing utility.
+Both are responsive and take the same `0`–`5` steps from the `$spacers` map as
+every other spacing utility. Combining the two axes is the usual reason to reach
+for them: a stack on small screens that becomes a row further up needs the
+spacing to change axis with it.
+
+<Example code={`<div class="d-md-flex space-y-3 space-y-md-0 space-x-md-3">
+    <div class="p-2 border">First</div>
+    <div class="p-2 border">Second</div>
+    <div class="p-2 border">Third</div>
+  </div>`} />
+
+`space-y-3` spaces the stack, `space-y-md-0` drops that spacing once the items
+sit in a row, and `space-x-md-3` takes over along the inline axis.
 
 <Callout color="info">
   The generated rule is wrapped in `:where()`, so it adds **no specificity**: a

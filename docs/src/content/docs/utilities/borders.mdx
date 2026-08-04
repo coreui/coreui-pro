@@ -174,8 +174,20 @@ marking up the last item differently.
 
 The dividers take the global `--cui-border-width`, `--cui-border-style`
 and `--cui-border-color`, so they follow a theme like every other border.
-Both are responsive (`.divide-y-md`), and `.divide-x-0` / `.divide-y-0` remove
-the dividers at a breakpoint.
+
+Both are responsive, which is what makes a list that changes direction work: the
+dividers can switch axis at a breakpoint instead of being written twice.
+
+<Example code={`<div class="d-md-flex divide-y divide-y-md-0 divide-x-md border rounded">
+    <div class="p-2">First</div>
+    <div class="p-2">Second</div>
+    <div class="p-2">Third</div>
+  </div>`} />
+
+`divide-y` separates the stacked rows, `divide-y-md-0` removes those separators
+once the items line up, and `divide-x-md` draws them between the columns
+instead. The `-0` step exists for both axes at every breakpoint, so a divider
+can be dropped anywhere it stops making sense.
 
 <Callout color="info">
   The rule is wrapped in `:where()` and therefore adds no specificity — a child
