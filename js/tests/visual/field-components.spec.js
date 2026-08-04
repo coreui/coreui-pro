@@ -291,37 +291,40 @@ describe('chip input', () => {
 
 const markup = disabled => `<div id="host" class="form-control-group">
     <input type="password" class="form-control" value="secret123" aria-label="Password"${disabled ? ' disabled' : ''}>
-    <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"${disabled ? ' disabled' : ''}>
-      <span class="form-password-action-icon"></span>
-    </button>
+    <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"${disabled ? ' disabled' : ''}></button>
   </div>`
+
+// The plugin renders the toggle's icon, so every case initializes it rather
+// than relying on markup alone.
+const mountPassword = html => {
+  mount(html)
+  const input = container.querySelector('input')
+  return new PasswordInput(input)
+}
 
 describe('password input', () => {
   it('default', async () => {
-    mount(markup(false))
+    const pi = mountPassword(markup(false))
     await shoot(frame(), 'password-default')
+    pi.dispose()
   })
 
   it('disabled', async () => {
-    mount(markup(true))
+    const pi = mountPassword(markup(true))
     await shoot(frame(), 'password-disabled')
+    pi.dispose()
   })
 
   // Native constraint validation reaches the frame through the control inside
   // it — the state never lands on the group itself here.
   it('invalid under was-validated', async () => {
-    mount(`<div class="was-validated">
+    mountPassword(`<div class="was-validated">
         <div id="host" class="form-control-group">
           <input type="password" class="form-control" required aria-label="Password">
-          <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle">
-            <span class="form-password-action-icon"></span>
-          </button>
+          <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"></button>
         </div>
       </div>`)
     await shoot(frame(), 'password-was-validated')
   })
 })
 
-// PasswordInput initializes through the data API; importing it registers that
-// listener in the first place.
-expect(PasswordInput.NAME).toBe('password-input')

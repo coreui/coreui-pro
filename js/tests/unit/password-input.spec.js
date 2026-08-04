@@ -6,6 +6,49 @@ import {
 } from '../helpers/fixture.js'
 
 describe('PasswordInput', () => {
+  describe('icon', () => {
+    it('should render the show icon on initialization', () => {
+      fixtureEl.innerHTML = [
+        '<div class="form-control-group">',
+        '  <input type="password" class="form-control">',
+        '  <button type="button" class="form-control-action" data-coreui-toggle="password"></button>',
+        '</div>'
+      ].join('')
+
+      const passwordInput = new PasswordInput(fixtureEl.querySelector('input'))
+      const toggler = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+
+      expect(toggler.querySelector('svg')).not.toBeNull()
+      expect(toggler.getAttribute('aria-pressed')).toBe('false')
+
+      passwordInput.toggle()
+
+      expect(toggler.getAttribute('aria-pressed')).toBe('true')
+    })
+
+    it('should swap the icon when the password becomes visible', () => {
+      fixtureEl.innerHTML = [
+        '<div class="form-control-group">',
+        '  <input type="password" class="form-control">',
+        '  <button type="button" class="form-control-action" data-coreui-toggle="password"></button>',
+        '</div>'
+      ].join('')
+
+      const passwordInput = new PasswordInput(fixtureEl.querySelector('input'), {
+        hideIcon: '<svg viewBox="0 0 16 16"><path d="M0 0h16v16H0z"/></svg>',
+        showIcon: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8"/></svg>'
+      })
+      const toggler = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+
+      expect(toggler.querySelector('circle')).not.toBeNull()
+
+      passwordInput.toggle()
+
+      expect(toggler.querySelector('path')).not.toBeNull()
+      expect(toggler.querySelector('circle')).toBeNull()
+    })
+  })
+
   let fixtureEl
 
   beforeAll(() => {
