@@ -148,7 +148,7 @@ $form-feedback-tokens: defaults(
   // own, so the state has to reach the group — custom properties set on the
   // control would only inherit downwards. Actions sit where the validation
   // icon would go, so the icon is suppressed and the actions carry the color
-  // instead (see .form-password above).
+  // instead (see the password input example).
   //
   // Which element carries the state differs from family to family: the group
   // itself, the control inside it (the pickers' section field), or the
@@ -243,11 +243,11 @@ $form-feedback-tokens: defaults(
     > .autocomplete:focus-within,
     > .date-picker:focus-within,
     > .time-picker:focus-within,
+    > .form-control-group:focus-within,
     > .form-multi-select:focus-within,
     > .form-control:focus,
     > .form-select:focus,
-    > .form-floating:focus-within,
-    > .form-password:focus-within {
+    > .form-floating:focus-within {
       @include form-validation-state-selector($state) {
         @if $state == "valid" {
           z-index: 3;

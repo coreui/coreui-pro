@@ -302,6 +302,38 @@ const mountPassword = html => {
   return new PasswordInput(input)
 }
 
+// An input group squares off the frame of whatever field sits in it. Every
+// component's frame is one class now, so these lock the two halves of that: a
+// hand-authored group, and one a component builds for itself. The first case
+// carries the layout — without the rule the group never flexes and the row
+// breaks onto three lines; the second is a regression lock for the corner
+// radius, which is too few pixels to trip the comparator on its own.
+describe('input group', () => {
+  it('with a hand-authored frame', async () => {
+    mount(`<div id="host" class="input-group">
+        <span class="input-group-text">@</span>
+        <div class="form-control-group">
+          <input type="password" class="form-control" value="secret123" aria-label="Password">
+          <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle"></button>
+        </div>
+        <button class="btn btn-outline-secondary" type="button">Go</button>
+      </div>`)
+    const pi = new PasswordInput(container.querySelector('input'))
+    await shoot(container.querySelector('.input-group'), 'input-group-frame')
+    pi.dispose()
+  })
+
+  it('with a component that builds its own frame', async () => {
+    mount(`<div class="input-group">
+        <span class="input-group-text">When</span>
+        <div id="host"></div>
+      </div>`)
+    const dp = new DatePicker(container.querySelector('#host'), { locale: 'en-US', date: DATE })
+    await shoot(container.querySelector('.input-group'), 'input-group-picker')
+    dp.dispose()
+  })
+})
+
 describe('password input', () => {
   it('default', async () => {
     const pi = mountPassword(markup(false))
