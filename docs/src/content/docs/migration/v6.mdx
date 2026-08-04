@@ -285,9 +285,33 @@ shell's own elements no longer exist: `.date-picker-input`,
 `.date-picker-input-wrapper`, `.date-picker-input-preview`,
 `.date-picker-cleaner`, `.time-picker-input`, `.time-picker-cleaner` and
 `.time-picker-inline-icon`. Custom CSS targeting those needs rewriting against
-the new structure; everything else (`.date-picker`, `.date-picker-dropdown`,
+the new structure; everything else (`.date-picker`, `.date-picker-popup`,
 `.date-picker-body`, `.date-picker-footer`, the `-sm`/`-lg` size modifiers, the
 `.time-picker-roll*` bodies) keeps its name.
+
+#### The picker panel is `.date-picker-popup` / `.time-picker-popup`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`-dropdown` was the vocabulary of the per-family panels, and every other family
+lost it when the options menu became `.combobox-popup`. The pickers were the
+last holdout:
+
+| v5 | v6 |
+| --- | --- |
+| `.date-picker-dropdown` | `.date-picker-popup` |
+| `.time-picker-dropdown` | `.time-picker-popup` |
+
+The rename comes with the reason for it. **The panel declares its own tokens
+now** rather than inheriting them from the field's root through a
+`*:not(.date-picker) > …` patch, so nothing inside it depends on having a
+particular ancestor — it renders the same in place, teleported through the
+`container` option, or rendered into `document.body` by a framework port's
+portal.
+
+`width: min-content` went with it: an absolutely positioned panel already
+shrinks to its content, and both pickers measure identically without the
+declaration.
 
 #### Input group: one frame class instead of five
 
@@ -1151,7 +1175,7 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   v1 input-layer classes** (`.date-picker-input`, `.date-picker-input-wrapper`,
   `.date-picker-input-preview`, `.date-picker-cleaner`, `.date-picker-separator`
   icon masks) **will not apply to the v2 markup** — those layers no longer
-  exist. Overrides on the surviving classes (`.date-picker-dropdown`,
+  exist. Overrides on the surviving classes (`.date-picker-popup`,
   `.date-picker-footer`, `.date-picker-ranges`) keep working — but the frame
   and the indicator now come from the shared primitive below.
 - **The frame of every field component is

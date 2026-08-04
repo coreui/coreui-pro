@@ -38,7 +38,7 @@ const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_TIME_CHANGE = `timeChange${EVENT_KEY}`
 
 const CLASS_NAME_BODY = 'time-picker-body'
-const CLASS_NAME_DROPDOWN = 'time-picker-dropdown'
+const CLASS_NAME_DROPDOWN = 'time-picker-popup'
 const CLASS_NAME_FOOTER = 'time-picker-footer'
 const CLASS_NAME_CLEANER = 'form-control-cleaner'
 const CLASS_NAME_INDICATOR = 'form-control-action'

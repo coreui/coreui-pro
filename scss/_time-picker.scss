@@ -35,28 +35,20 @@ $time-picker-tokens: defaults(
 );
 // scss-docs-end time-picker-css-vars
 @layer components {
-  .time-picker,
-  *:not(.time-picker) > .time-picker-dropdown {
-    @include tokens($time-picker-tokens);
-
-  }
-
-  // The shell mirrors the date picker's frame while reading the
-  // --#{$prefix}time-picker-* properties defined on `.time-picker` above.
   .time-picker {
     position: relative;
+  }
+
+  // See .date-picker-popup: the panel owns its tokens so it survives being
+  // teleported or portaled away from the field.
+  .time-picker-popup {
+    @include tokens($time-picker-tokens);
   }
 
   // The popup takes the focus away from the group, but the control is still
   // active — so the frame keeps its focus treatment while it is open.
   .time-picker.show .form-control-group {
     @include form-control-group-focus();
-  }
-
-  // See .date-picker-dropdown — chrome from `.popup`, shape and parent-driven
-  // open state here.
-  .time-picker-dropdown {
-    width: min-content;
   }
 
   .time-picker-body {

@@ -33,7 +33,7 @@ describe('DatePicker', () => {
       expect(el.classList.contains('date-picker')).toBeTrue()
       expect(el.querySelector('.form-control-group')).not.toBeNull()
       expect(el.querySelector('.form-control-action')).not.toBeNull()
-      expect(el.querySelector('.date-picker-dropdown .date-picker-calendar')).not.toBeNull()
+      expect(el.querySelector('.date-picker-popup .date-picker-calendar')).not.toBeNull()
     })
 
     it('should not build the calendar until the popup opens', () => {
@@ -46,7 +46,7 @@ describe('DatePicker', () => {
       picker.show()
 
       expect(picker._calendar).not.toBeNull()
-      expect(el.querySelector('.date-picker-dropdown .calendar')).not.toBeNull()
+      expect(el.querySelector('.date-picker-popup .calendar')).not.toBeNull()
     })
 
     it('should seed the lazily built calendar with the current value', () => {
