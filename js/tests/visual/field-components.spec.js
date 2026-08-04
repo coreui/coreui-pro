@@ -23,6 +23,7 @@ import DatePicker from '../../src/date-picker.js'
 import DateRangePicker from '../../src/date-range-picker.js'
 import DateTimePicker from '../../src/date-time-picker.js'
 import MultiSelect from '../../src/multi-select.js'
+import NumberInput from '../../src/number-input.js'
 import PasswordInput from '../../src/password-input.js'
 import TimePicker from '../../src/time-picker.js'
 
@@ -308,6 +309,34 @@ const mountPassword = html => {
 // carries the layout — without the rule the group never flexes and the row
 // breaks onto three lines; the second is a regression lock for the corner
 // radius, which is too few pixels to trip the comparator on its own.
+describe('number input', () => {
+  // The component builds its own frame, so the markup is a bare control.
+  const mountNumber = (attributes, size = '') => {
+    mount(`<div id="host"><input type="number" class="form-control ${size}" aria-label="Quantity" ${attributes}></div>`)
+    return new NumberInput(container.querySelector('input'))
+  }
+
+  it('default', async () => {
+    const ni = mountNumber('value="3"')
+    await shoot(frame(), 'number-input-default')
+    ni.dispose()
+  })
+
+  // At a bound the button that cannot move the value is disabled, which is the
+  // frame's own muting rather than anything this component draws.
+  it('at its maximum', async () => {
+    const ni = mountNumber('value="10" min="0" max="10"')
+    await shoot(frame(), 'number-input-max')
+    ni.dispose()
+  })
+
+  it('small', async () => {
+    const ni = mountNumber('value="3"', "form-control-sm")
+    await shoot(frame(), 'number-input-sm')
+    ni.dispose()
+  })
+})
+
 describe('input group', () => {
   it('with a hand-authored frame', async () => {
     mount(`<div id="host" class="input-group">
