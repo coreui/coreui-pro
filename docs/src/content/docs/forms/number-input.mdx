@@ -1,0 +1,126 @@
+---
+pro: true
+title: "Bootstrap 5 Number Input"
+name: "Number Input"
+description: "Add accessible increment and decrement buttons to a Bootstrap number field, with min, max and step handled by the browser."
+---
+
+# Number Input
+
+A number field with a stepper you can actually hit. The browser's own spinner is
+tiny, appears only on hover in some engines and does not exist at all on iOS, so
+the component replaces it with two buttons sized like every other adornment in a
+[`form-control-group`](/forms/form-control-group/).
+
+## Example
+
+Add `data-coreui-toggle="number-input"` to an `<input type="number">` inside a
+group. The buttons are the component's; you write neither them nor their icons.
+
+<Example pro code={`<div class="form-control-group">
+    <input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
+  </div>`} />
+
+## Min, max and step
+
+`min`, `max` and `step` are the native attributes — the component does not
+reimplement them, it calls the browser's own stepping. **A button that cannot
+move the value any further is disabled**, so the bound is visible rather than
+just unresponsive.
+
+<Example pro code={`<div class="form-control-group">
+    <input type="number" class="form-control" value="10" min="0" max="10" aria-label="Quantity" data-coreui-toggle="number-input">
+  </div>`} />
+
+A fractional `step` works the same way:
+
+<Example pro code={`<div class="form-control-group">
+    <input type="number" class="form-control" value="2" step="0.5" aria-label="Amount" data-coreui-toggle="number-input">
+  </div>`} />
+
+When the field is empty, the first step starts from `min` — or from zero if
+there is no minimum.
+
+## Sizing
+
+Sizing belongs to the frame: put `.form-control-sm` or `.form-control-lg` on the
+group and the buttons follow.
+
+<Example pro code={`<div class="form-control-group form-control-sm mb-3">
+    <input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
+  </div>
+  <div class="form-control-group form-control-lg">
+    <input type="number" class="form-control" value="3" aria-label="Quantity" data-coreui-toggle="number-input">
+  </div>`} />
+
+## Disabled state
+
+<Example pro code={`<div class="form-control-group">
+    <input type="number" class="form-control" value="3" aria-label="Quantity" disabled data-coreui-toggle="number-input">
+  </div>`} />
+
+## Accessibility
+
+The buttons carry labels (`Increase` / `Decrease` by default, both
+configurable) but are **kept out of the tab order**: a number field already
+steps with <kbd>↑</kbd> and <kbd>↓</kbd>, so putting them in would add two tab
+stops per field for something the keyboard already reaches. Give the input an
+`aria-label` or a `<label>` as you would any other field.
+
+## Usage
+
+Holding a button repeats after a short delay. Set `repeat: false` to require a
+click per step.
+
+```js
+const numberInput = new coreui.NumberInput('#myNumberInput', {
+  repeat: false
+})
+
+numberInput.increment()
+numberInput.decrement()
+```
+
+### Options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `allowList` | object | `SVGAllowlist` | Allowlist the icons are sanitized against. |
+| `ariaDecrementLabel` | string | `'Decrease'` | Accessible label for the decrement button. |
+| `ariaIncrementLabel` | string | `'Increase'` | Accessible label for the increment button. |
+| `decrementIcon` | string | minus | Icon markup for the decrement button. |
+| `incrementIcon` | string | plus | Icon markup for the increment button. |
+| `repeat` | boolean | `true` | Repeat the step while a button is held. |
+| `sanitize` | boolean | `true` | Sanitize the icon markup. |
+| `sanitizeFn` | function \| null | `null` | Your own sanitizer. |
+
+### Events
+
+| Event | Description |
+| --- | --- |
+| `change.coreui.number-input` | Fires after the value changes through a button, carrying the new `value`. |
+
+The element also fires the native `input` and `change` events, so anything
+already listening to the field keeps working.
+
+<Callout color="info">
+  **Decimal separators.** `<input type="number">` accepts the dot as the decimal
+  separator regardless of locale, and a value the browser rejects is reported as
+  an empty string — the field cannot tell you what was typed. If you need
+  locale-aware separators, currency or grouping, that is a formatted-input
+  problem rather than a stepper one, and `type="number"` is the wrong base for
+  it.
+</Callout>
+
+## Customization options
+
+### CSS variables
+
+The frame, the buttons and their sizing are the group's, and read the shared
+`--cui-control-*` properties:
+
+<ScssDocs file="scss/forms/_form-control-group.scss" capture="form-control-group-tokens" />
+
+### Sass variables
+
+<ScssDocs file="scss/forms/_form-control-group.scss" capture="form-control-group-variables" />

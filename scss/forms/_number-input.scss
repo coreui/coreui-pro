@@ -1,0 +1,17 @@
+@use "../config" as *;
+
+@layer forms {
+  // The component supplies its own stepper buttons, so the native one has to
+  // go — and each engine hides it its own way. Chromium and WebKit paint it as
+  // a pseudo-element; Firefox has no such pseudo-element and answers only to
+  // `appearance`. Neither rule covers the other engine: verified in all three.
+  .number-input .form-control {
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+  }
+}
