@@ -32,6 +32,7 @@ const SELECTOR_CHIP_REMOVE = '.chip-remove'
 
 const CLASS_NAME_DISABLED = 'disabled'
 const CLASS_NAME_CHIP_INPUT_FIELD = 'chip-input-field'
+const CLASS_NAME_GROUP = 'form-control-group'
 
 type ChipInputConfig = ChipSetConfig & {
   create: boolean
@@ -80,12 +81,19 @@ class ChipInput extends ChipSet {
   protected declare _uniqueId: string
   protected declare _hiddenInput: HTMLInputElement | null
   protected declare _input: HTMLInputElement
+  private _addedGroupClass = false
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
     super(element, config)
 
     this._uniqueId = this._config.id ?? getUID(NAME)
     this._hiddenInput = null
+
+    // The element is the frame: unlike the components that wrap a control, a
+    // chip input has nothing to wrap, so it takes the frame class itself and
+    // the author writes only what the field is.
+    this._addedGroupClass = !this._element.classList.contains(CLASS_NAME_GROUP)
+    this._element.classList.add(CLASS_NAME_GROUP)
 
     this._input = SelectorEngine.findOne('input', this._element as ParentNode) as HTMLInputElement
     if (this._input) {
@@ -132,6 +140,14 @@ class ChipInput extends ChipSet {
 
   focus(): void {
     this._input?.focus()
+  }
+
+  override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_GROUP)
+    }
+
+    super.dispose()
   }
 
   // Private

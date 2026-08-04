@@ -4,6 +4,36 @@ import ChipSet from '../../src/chip-set.js'
 import { clearFixture, getFixture } from '../helpers/fixture.js'
 
 describe('ChipInput', () => {
+  describe('the frame', () => {
+    it('should take the frame class itself', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element) // eslint-disable-line no-unused-vars
+
+      expect(element.classList.contains('form-control-group')).toBe(true)
+    })
+
+    it('should give the class back on dispose', () => {
+      fixtureEl.innerHTML = '<div class="chip-input"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+
+      chipInput.dispose()
+
+      expect(element.classList.contains('form-control-group')).toBe(false)
+    })
+
+    it('should leave a class the author wrote', () => {
+      fixtureEl.innerHTML = '<div class="form-control-group chip-input"></div>'
+      const element = fixtureEl.querySelector('.chip-input')
+      const chipInput = new ChipInput(element)
+
+      chipInput.dispose()
+
+      expect(element.classList.contains('form-control-group')).toBe(true)
+    })
+  })
+
   let fixtureEl
 
   beforeAll(() => {

@@ -34,7 +34,7 @@ Use the Bootstrap Chip Input component when you need:
 
 Wrap chips and add `data-coreui-chip-input` to enable behavior.
 
-<Example code={`<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-name="chipInputBasicExample" data-coreui-placeholder="Add a skill...">
+<Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-name="chipInputBasicExample" data-coreui-placeholder="Add a skill...">
     <label class="chip-input-label" for="skillsInputBasic">Skills:</label>
     <span class="chip">JavaScript</span>
     <span class="chip">TypeScript</span>
@@ -46,7 +46,7 @@ Wrap chips and add `data-coreui-chip-input` to enable behavior.
 </Callout>
 
 ```html
-<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-placeholder="Add a skill...">
+<div class="chip-input" data-coreui-chip-input data-coreui-placeholder="Add a skill...">
   <label class="chip-input-label" for="skillsInputBasic">Skills:</label>
   <span class="chip">JavaScript</span>
   <span class="chip">TypeScript</span>
@@ -59,7 +59,7 @@ Wrap chips and add `data-coreui-chip-input` to enable behavior.
 
 Use contextual chip classes inside Bootstrap 5 Chip Input to represent categories, status, or priority.
 
-<Example code={`<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-name="issues" data-coreui-placeholder="Add label...">
+<Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-name="issues" data-coreui-placeholder="Add label...">
     <span class="chip chip-primary">Feature</span>
     <span class="chip chip-success">Approved</span>
     <span class="chip chip-warning">Needs review</span>
@@ -68,7 +68,7 @@ Use contextual chip classes inside Bootstrap 5 Chip Input to represent categorie
 
 In the example below, the chip color is assigned dynamically based on the chip text using the `chipClassName` callback. Each value (e.g., `Feature` or `Blocking`) maps to a contextual class, so chips remain visually consistent even when added programmatically.
 
-<Example code={`<div id="chipVariants" class="form-control-group chip-input"></div>`} sandboxJs={chipVariants} />
+<Example code={`<div id="chipVariants" class="chip-input"></div>`} sandboxJs={chipVariants} />
 
 The JavaScript below initializes the example:
 
@@ -78,17 +78,17 @@ The JavaScript below initializes the example:
 
 Use `chip-input-sm` and `chip-input-lg` to match surrounding form controls. Default size is provided by `.chip-input` without a size modifier.
 
-<Example code={`<div class="form-control-group chip-input chip-input-sm mb-3" data-coreui-chip-input data-coreui-placeholder="Add small tag...">
+<Example code={`<div class="chip-input chip-input-sm mb-3" data-coreui-chip-input data-coreui-placeholder="Add small tag...">
     <label class="chip-input-label" for="skillsInputSm">Small</label>
     <span class="chip">HTML</span>
   </div>
 
-  <div class="form-control-group chip-input mb-3" data-coreui-chip-input data-coreui-placeholder="Add default tag...">
+  <div class="chip-input mb-3" data-coreui-chip-input data-coreui-placeholder="Add default tag...">
     <label class="chip-input-label" for="skillsInputMd">Default</label>
     <span class="chip">JavaScript</span>
   </div>
 
-  <div class="form-control-group chip-input chip-input-lg" data-coreui-chip-input data-coreui-placeholder="Add large tag...">
+  <div class="chip-input chip-input-lg" data-coreui-chip-input data-coreui-placeholder="Add large tag...">
     <label class="chip-input-label" for="skillsInputLg">Large</label>
     <span class="chip">TypeScript</span>
   </div>`} />
@@ -97,7 +97,7 @@ Use `chip-input-sm` and `chip-input-lg` to match surrounding form controls. Defa
 
 Start with just the input and let users add chips as they type.
 
-<Example code={`<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-name="tags" data-coreui-placeholder="Start typing tags..."></div>`} />
+<Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-name="tags" data-coreui-placeholder="Start typing tags..."></div>`} />
 
 ## With label
 
@@ -105,7 +105,7 @@ Use a standard form label for accessibility.
 
 <Example code={`<div class="mb-3">
     <label class="form-label" for="techStackInput">Tech stack</label>
-    <div class="form-control-group chip-input" data-coreui-chip-input data-coreui-name="techStack" data-coreui-placeholder="Add package...">
+    <div class="chip-input" data-coreui-chip-input data-coreui-name="techStack" data-coreui-placeholder="Add package...">
       <span class="chip">Vue</span>
       <span class="chip">Vite</span>
     </div>
@@ -118,7 +118,7 @@ Set disabled state on the component to make the input and managed chips non-inte
 You can use either the `disabled` class or the `data-coreui-disabled="true"` option.
 For disabled, non-removable chips, combine it with `data-coreui-removable="false"`.
 
-<Example code={`<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-disabled="true" data-coreui-removable="false" data-coreui-placeholder="Input disabled">
+<Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-disabled="true" data-coreui-removable="false" data-coreui-placeholder="Input disabled">
     <span class="chip">Read only</span>
     <span class="chip">Locked</span>
   </div>`} />
@@ -128,7 +128,7 @@ For disabled, non-removable chips, combine it with `data-coreui-removable="false
 Use readonly state when chips should stay visible and focusable, but values must not change.
 Set `data-coreui-readonly="true"` (or `readonly: true` in JavaScript) to block adding and removing chips.
 
-<Example code={`<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-readonly="true" data-coreui-placeholder="Read-only values">
+<Example code={`<div class="chip-input" data-coreui-chip-input data-coreui-readonly="true" data-coreui-placeholder="Read-only values">
     <span class="chip">JavaScript</span>
     <span class="chip">TypeScript</span>
   </div>`} />
@@ -138,7 +138,7 @@ Set `data-coreui-readonly="true"` (or `readonly: true` in JavaScript) to block a
 Enable selection for chips managed by Chip Input.
 In this example, `select.coreui.chip-input` updates a live list of selected values below the field.
 
-<Example code={`<div id="chipSelectable" class="form-control-group chip-input">
+<Example code={`<div id="chipSelectable" class="chip-input">
     <span class="chip">Design</span>
     <span class="chip">Backend</span>
     <span class="chip active">QA</span>
@@ -155,7 +155,7 @@ Initialize the Bootstrap Chip Input component via data attributes or JavaScript.
 Add `data-coreui-chip-input` to initialize the chip input component. Options can be passed as `data-coreui-*` attributes.
 
 ```html
-<div class="form-control-group chip-input" data-coreui-chip-input data-coreui-name="skills" data-coreui-placeholder="Add tags..." data-coreui-separator=","></div>
+<div class="chip-input" data-coreui-chip-input data-coreui-name="skills" data-coreui-placeholder="Add tags..." data-coreui-separator=","></div>
 ```
 
 When initialized, Chip Input creates a hidden input to submit values with the form.  
