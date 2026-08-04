@@ -834,6 +834,22 @@ describe('MultiSelect', () => {
   })
 
   describe('show', () => {
+    // The panel keys its own display and entry transition on this class, so a
+    // panel opened only through an ancestor's class is laid out and invisible.
+    it('should mark the popup itself as shown', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const element = fixtureEl.querySelector('select')
+      const instance = new MultiSelect(element, { options: [] })
+
+      instance.show()
+
+      expect(instance._menu.classList.contains('show')).toBe(true)
+
+      instance.hide()
+
+      expect(instance._menu.classList.contains('show')).toBe(false)
+    })
+
     it('should show the multi select dropdown', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<select></select>'

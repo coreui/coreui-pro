@@ -409,6 +409,22 @@ describe('Autocomplete', () => {
   })
 
   describe('show', () => {
+    // The panel keys its own display and entry transition on this class, so a
+    // panel opened only through an ancestor's class is laid out and invisible.
+    it('should mark the popup itself as shown', () => {
+      fixtureEl.innerHTML = '<div></div>'
+      const element = fixtureEl.querySelector('div')
+      const instance = new Autocomplete(element, { options: [{ value: 1, label: 'One' }] })
+
+      instance.show()
+
+      expect(instance._menu.classList.contains('show')).toBe(true)
+
+      instance.hide()
+
+      expect(instance._menu.classList.contains('show')).toBe(false)
+    })
+
     it('should show the autocomplete dropdown', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div class="autocomplete"></div>'

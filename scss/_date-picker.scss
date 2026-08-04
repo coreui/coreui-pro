@@ -53,10 +53,6 @@ $date-picker-tokens: defaults(
   // left here is the panel's own shape and the parent-driven open state.
   .date-picker-dropdown {
     width: min-content;
-
-    .date-picker.show & {
-      display: block;
-    }
   }
 
   .date-picker-body {
