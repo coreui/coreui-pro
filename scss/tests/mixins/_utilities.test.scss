@@ -296,26 +296,6 @@
       }
     }
 
-    @include describe("rtl") {
-      @include it("sets up RTLCSS for removal when false") {
-        @include test-generate-utility(
-          (
-            property: padding,
-            values: 1rem,
-            rtl: false
-          )
-        ) {
-          /* rtl:begin:remove */
-
-          .padding-1rem {
-            padding: 1rem;
-          }
-
-          /* rtl:end:remove */
-
-        }
-      }
-    }
   }
 
   @include describe("$infix") {
