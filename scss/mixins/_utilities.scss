@@ -71,6 +71,27 @@
     $values: list.zip($values, $values);
   }
 
+  // A utility normally writes a class. `attr-starts` / `attr-includes` write an
+  // attribute selector instead, which lets one rule serve a whole family of
+  // classes; both need `class` to build the substring to match.
+  // stylelint-disable-next-line scss/at-function-named-arguments, @stylistic/function-whitespace-after
+  $selector-type: if(sass(map.has-key($utility, selector)): map.get($utility, selector); else: "class");
+  $valid-selectors: "class", "attr-starts", "attr-includes";
+
+  @if not list.index($valid-selectors, $selector-type) {
+    @error "Invalid `selector` value `#{$selector-type}`. Must be one of: #{$valid-selectors}.";
+  }
+
+  @if $selector-type != "class" and not map.has-key($utility, class) {
+    @error "Utility with `selector: #{$selector-type}` requires a `class` key.";
+  }
+
+  // A utility that styles the children of the element it is applied to, rather
+  // than the element itself — `.space-x-3 > :not(:last-child)`. Wrapped in
+  // `:where()` so it adds no specificity and anything the child carries itself
+  // still wins.
+  $child-selector: map.get($utility, child-selector);
+
   @each $key, $value in $values {
     $properties: map.get($utility, property);
 
@@ -102,20 +123,32 @@
 
     $is-css-var: map.get($utility, css-var);
     $is-local-vars: map.get($utility, local-vars);
+    $class-name: $property-class + $infix + $property-class-modifier;
+
+    $selector: ".#{$class-name}";
+    @if $selector-type == "attr-starts" {
+      $selector: "[class^=\"#{$property-class + $infix}\"]";
+    } @else if $selector-type == "attr-includes" {
+      $selector: "[class*=\"#{$property-class + $infix}\"]";
+    }
+
+    @if $child-selector {
+      $selector: ":where(#{$selector} #{$child-selector})";
+    }
 
     @if $value != null {
       @if $is-css-var {
-        .#{$property-class + $infix + $property-class-modifier} {
+        #{$selector} {
           --#{$prefix}#{$css-variable-name}: #{$value};
         }
 
         @each $pseudo in $state {
-          .#{$property-class + $infix + $property-class-modifier}-#{$pseudo}:#{$pseudo} {
+          .#{$class-name}-#{$pseudo}:#{$pseudo} {
             --#{$prefix}#{$css-variable-name}: #{$value};
           }
         }
       } @else {
-        .#{$property-class + $infix + $property-class-modifier} {
+        #{$selector} {
           @each $property in $properties {
             @if $is-local-vars {
               @each $local-var, $variable in $is-local-vars {
@@ -136,7 +169,7 @@
         }
 
         @each $pseudo in $state {
-          .#{$property-class + $infix + $property-class-modifier}-#{$pseudo}:#{$pseudo} {
+          .#{$class-name}-#{$pseudo}:#{$pseudo} {
             @each $property in $properties {
               @if $is-local-vars {
                 @each $local-var, $variable in $is-local-vars {

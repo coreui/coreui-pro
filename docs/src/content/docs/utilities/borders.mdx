@@ -151,6 +151,37 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
   <svg class="docs-placeholder-img rounded-circle" width="75" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Completely round image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Completely round image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
   <svg class="docs-placeholder-img rounded-pill" width="150" height="75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rounded pill image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Rounded pill image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>`} />
 
+## Divide
+
+`divide-x` and `divide-y` draw a border *between* children — every child except
+the first gets a border on its leading edge — so a list of rows or a row of
+actions gets its separators without a border on the outer edges and without
+marking up the last item differently.
+
+<Example code={`<div class="divide-y border rounded">
+    <div class="p-2">First</div>
+    <div class="p-2">Second</div>
+    <div class="p-2">Third</div>
+  </div>`} />
+
+`divide-x` separates along the inline axis and follows the writing direction.
+
+<Example code={`<div class="d-flex divide-x border rounded">
+    <div class="p-2">First</div>
+    <div class="p-2">Second</div>
+    <div class="p-2">Third</div>
+  </div>`} />
+
+The dividers take the global `--cui-border-width`, `--cui-border-style`
+and `--cui-border-color`, so they follow a theme like every other border.
+Both are responsive (`.divide-y-md`), and `.divide-x-0` / `.divide-y-0` remove
+the dividers at a breakpoint.
+
+<Callout color="info">
+  The rule is wrapped in `:where()` and therefore adds no specificity — a child
+  with its own border wins on its own.
+</Callout>
+
 ## Customizing
 
 ### CSS variables
@@ -172,5 +203,7 @@ Use the scaling classes for larger or smaller rounded corners. Sizes range from 
 Border utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
 
 <ScssDocs file="scss/_utilities.scss" capture="utils-borders" />
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-divide" />
 
 <ScssDocs file="scss/_utilities.scss" capture="utils-border-radius" />

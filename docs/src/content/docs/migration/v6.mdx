@@ -674,6 +674,28 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   the root color tokens, which already switch in dark mode.
 - `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
 
+#### Utilities API: child selectors and attribute selectors (new)
+
+Two keys join the `$utilities` API, ported from Bootstrap's v6 branch:
+
+- **`child-selector`** makes a utility style the children of the element it is
+  applied to instead of the element itself, wrapped in `:where()` so it adds no
+  specificity. This is what the new spacing and divider utilities are built on.
+- **`selector`** (`class`, `attr-starts`, `attr-includes`) writes an attribute
+  selector rather than a class, so one rule can serve a whole family of classes.
+
+They bring four new utilities with them, all responsive and direction-aware:
+
+| class | what it does |
+| --- | --- |
+| `.space-x-*`, `.space-y-*` | margin between children — `gap` without needing a flex or grid container |
+| `.divide-x`, `.divide-y` (+ `-0`) | a border between children, none on the outer edges |
+
+Nothing existing changes; these are additions. See
+[the utilities API](/utilities/api/#child-selector),
+[spacing](/utilities/spacing/#space-between) and
+[borders](/utilities/borders/#divide).
+
 #### Utilities API: theme variants and the `rtl` key removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
