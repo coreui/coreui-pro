@@ -502,6 +502,17 @@ describe('MultiSelect', () => {
       expect(multiSelect._searchElement).not.toBeNull()
     })
 
+    it('should mark the frame as disabled when disabled', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [],
+        disabled: true
+      })
+
+      expect(multiSelect._togglerElement.classList.contains('disabled')).toBe(true)
+    })
+
     it('should disable search input when disabled', () => {
       fixtureEl.innerHTML = '<select></select>'
       const selectEl = fixtureEl.querySelector('select')

@@ -6,8 +6,6 @@
 // Multi Select
 // scss-docs-start form-multi-select-variables
 
-$form-multi-select-placeholder-color:         var(--#{$prefix}secondary-color) !default;
-
 $form-multi-select-selection-tags-gap:        .25rem !default;
 $form-multi-select-selection-tags-padding-y:  .25rem !default;
 // scss-docs-end form-multi-select-variables
@@ -18,7 +16,6 @@ $form-multi-select-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $form-multi-select-tokens: defaults(
   (
-    --#{$prefix}form-multi-select-placeholder-color: #{$form-multi-select-placeholder-color},
     --#{$prefix}form-multi-select-selection-tags-gap: #{$form-multi-select-selection-tags-gap},
     --#{$prefix}form-multi-select-selection-tags-padding-y: #{$form-multi-select-selection-tags-padding-y},
   ),
@@ -27,12 +24,10 @@ $form-multi-select-tokens: defaults(
 // scss-docs-end form-multi-select-css-vars
 
 @layer forms {
-  .form-multi-select,
-  *:not(.form-multi-select) > .form-multi-select-dropdown {
+  .form-multi-select {
     @include tokens($form-multi-select-tokens);
 
     position: relative;
-
   }
 
   // Tags wrap onto their own rows inside the frame's padding, like chips do.
@@ -43,12 +38,6 @@ $form-multi-select-tokens: defaults(
   .form-multi-select.show .form-control-group,
   .form-multi-select:has(> select:focus) .form-control-group {
     @include form-control-group-focus();
-  }
-
-  .form-multi-select.disabled .form-control-group {
-    color: var(--#{$prefix}control-disabled-color);
-    background-color: var(--#{$prefix}control-disabled-bg);
-    border-color: var(--#{$prefix}control-disabled-border-color);
   }
 
   // The native select stays in the DOM as an invisible overlay covering the control
@@ -69,7 +58,6 @@ $form-multi-select-tokens: defaults(
   }
 
   .form-multi-select-selection {
-    position: relative;
     display: flex;
     flex: 1 1 auto;
     flex-wrap: wrap;
@@ -98,7 +86,7 @@ $form-multi-select-tokens: defaults(
     }
 
     &::placeholder {
-      color: var(--#{$prefix}form-multi-select-placeholder-color);
+      color: var(--#{$prefix}control-placeholder-color);
       opacity: 1;
     }
 
@@ -113,7 +101,7 @@ $form-multi-select-tokens: defaults(
   }
 
   .form-multi-select-placeholder {
-    color: var(--#{$prefix}form-multi-select-placeholder-color);
+    color: var(--#{$prefix}control-placeholder-color);
 
     .form-multi-select-selection-tags & {
       padding: calc(var(--#{$prefix}control-padding-y) - .25rem) calc(var(--#{$prefix}control-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list

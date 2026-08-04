@@ -750,6 +750,7 @@ class MultiSelect extends Combobox {
     this._togglerElement = togglerEl
 
     if (this._config.disabled) {
+      togglerEl.classList.add(CLASS_NAME_DISABLED)
       togglerEl.setAttribute('aria-disabled', 'true')
     }
 

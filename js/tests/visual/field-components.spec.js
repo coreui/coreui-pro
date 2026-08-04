@@ -206,6 +206,21 @@ describe('autocomplete', () => {
     ac.dispose()
   })
 
+  it('empty with placeholder', async () => {
+    const ac = new Autocomplete(mount(), { options: OPTIONS, placeholder: 'Pick a framework' })
+    await shoot(frame(), 'autocomplete-placeholder')
+    ac.dispose()
+  })
+
+  it('open', async () => {
+    const ac = new Autocomplete(mount(), {
+      options: OPTIONS, value: 'React', cleaner: true, indicator: true
+    })
+    ac.show()
+    await shoot(frame(), 'autocomplete-open')
+    ac.dispose()
+  })
+
   it('open popup', async () => {
     const ac = new Autocomplete(mount(), { options: OPTIONS, indicator: true })
     ac.show()
@@ -230,6 +245,22 @@ describe('multi select', () => {
   it('chips selection', async () => {
     const ms = new MultiSelect(mountSelect(), { cleaner: true })
     await shoot(frame(), 'multi-select-chips')
+    ms.dispose()
+  })
+
+  it('empty with placeholder', async () => {
+    container = document.createElement('div')
+    container.style.cssText = 'padding: 1rem; width: 480px;'
+    container.innerHTML = '<select id="host" multiple><option value="1">Angular</option></select>'
+    document.body.append(container)
+    const ms = new MultiSelect(container.querySelector('#host'), { placeholder: 'Pick frameworks' })
+    await shoot(frame(), 'multi-select-placeholder')
+    ms.dispose()
+  })
+
+  it('disabled', async () => {
+    const ms = new MultiSelect(mountSelect(), { cleaner: true, disabled: true })
+    await shoot(frame(), 'multi-select-disabled')
     ms.dispose()
   })
 

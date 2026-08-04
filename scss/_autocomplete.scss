@@ -1,55 +1,18 @@
-@use "functions/defaults" as *;
-@use "mixins/tokens" as *;
 @use "config" as *;
 @use "forms/form-control-group" as *;
 
-// scss-docs-start autocomplete-variables
-$autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !default;
-
-// scss-docs-end autocomplete-variables
-
-$autocomplete-tokens: () !default;
-
-// scss-docs-start autocomplete-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
-$autocomplete-tokens: defaults(
-  (
-    --#{$prefix}autocomplete-placeholder-color: #{$autocomplete-placeholder-color},
-  ),
-  $autocomplete-tokens
-);
-// scss-docs-end autocomplete-css-vars
 @layer components {
-  .autocomplete,
-  *:not(.autocomplete) > .autocomplete-dropdown {
-    @include tokens($autocomplete-tokens);
-
+  .autocomplete {
     position: relative;
-
   }
 
+  // The popup takes the focus away from the group, but the control is still
+  // active — so the frame keeps its focus treatment while it is open.
   .autocomplete.show .form-control-group {
     @include form-control-group-focus();
   }
 
-  .autocomplete.disabled .form-control-group {
-    background-color: var(--#{$prefix}control-disabled-bg);
-    border-color: var(--#{$prefix}control-disabled-border-color);
-  }
-
-  // The editable is a `.form-control` inside the group. What is left here is
-  // the component's own: the colour while the popup is open, its placeholder,
-  // and the ghost hint drawn behind the text.
-  .autocomplete .form-control {
-    &::placeholder {
-      color: var(--#{$prefix}autocomplete-placeholder-color);
-    }
-  }
-
-  .autocomplete.show .form-control {
-    color: var(--#{$prefix}control-focus-color);
-  }
-
+  // The ghost completion drawn behind the text.
   .autocomplete-input-hint {
     position: absolute;
     top: 0;
