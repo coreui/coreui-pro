@@ -1,4 +1,3 @@
-@use "sass:math";
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
@@ -7,8 +6,6 @@
 // scss-docs-start autocomplete-variables
 $autocomplete-placeholder-color:         var(--#{$prefix}secondary-color) !default;
 
-$autocomplete-invalid-border-color:      var(--#{$prefix}form-invalid-border-color) !default;
-$autocomplete-valid-border-color:        var(--#{$prefix}form-valid-border-color) !default;
 // scss-docs-end autocomplete-variables
 
 $autocomplete-tokens: () !default;
@@ -29,27 +26,6 @@ $autocomplete-tokens: defaults(
 
     position: relative;
 
-  }
-
-  // The frame is a `.form-control-group`, which declares the control tokens on
-  // itself — so the state has to be written onto the frame, not inherited into
-  // it from the component root.
-  .was-validated .autocomplete:invalid + .autocomplete .form-control-group,
-  .autocomplete.is-invalid .form-control-group {
-    $focus-ring: $input-focus-width solid color-mix(in srgb, #{$autocomplete-invalid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
-
-    --#{$prefix}control-border-color: #{$autocomplete-invalid-border-color};
-    --#{$prefix}control-focus-border-color: #{$autocomplete-invalid-border-color};
-    --#{$prefix}control-focus-ring: #{$focus-ring};
-  }
-
-  .was-validated .autocomplete:valid + .autocomplete .form-control-group,
-  .autocomplete.is-valid .form-control-group {
-    $focus-ring: $input-focus-width solid color-mix(in srgb, #{$autocomplete-valid-border-color} #{math.percentage($input-btn-focus-color-opacity)}, transparent);
-
-    --#{$prefix}control-border-color: #{$autocomplete-valid-border-color};
-    --#{$prefix}control-focus-border-color: #{$autocomplete-valid-border-color};
-    --#{$prefix}control-focus-ring: #{$focus-ring};
   }
 
   .autocomplete.show .form-control-group {

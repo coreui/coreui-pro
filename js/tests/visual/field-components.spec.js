@@ -15,6 +15,7 @@ import { page } from 'vitest/browser'
 // The whole point of the suite is what the CSS does, so it loads the Sass
 // source rather than a built file: no dist step to remember, and a regression
 // in scss/ shows up on the next run.
+// eslint-disable-next-line import/no-unassigned-import
 import '../../../scss/coreui.scss'
 import Autocomplete from '../../src/autocomplete.js'
 import ChipInput from '../../src/chip-input.js'
@@ -37,9 +38,17 @@ const OPTIONS = [
   { value: 4, label: 'Vue' }
 ]
 
+// Animations are frozen and baselines are per platform, so run-to-run noise is
+// a handful of antialiased pixels — anything above that is a real difference.
+// The 1% ratio this started with was worth ~170 pixels on a frame that size,
+// which quietly waved through an adornment icon changing colour.
 const screenshotOptions = {
   comparatorOptions: {
-    allowedMismatchedPixelRatio: 0.01
+    // pixelmatch discounts antialiased pixels by default, and a 16px icon's
+    // stroke is almost entirely those — a chevron going from grey to red
+    // scored as no difference at all.
+    includeAA: true,
+    allowedMismatchedPixels: 20
   }
 }
 
