@@ -14,15 +14,9 @@ There are two strict requirements for enabling RTL in Bootstrap-powered pages.
 1. Set `dir="rtl"` on the `<html>` element.
 2. Add an appropriate `lang` attribute, like `lang="ar"`, on the `<html>` element.
 
-From there, you'll need to include an RTL version of our CSS. For example, here's the stylesheet for our compiled and minified CSS with RTL enabled:
-
-```html tab={"label":"CoreUI"}
-<link rel="stylesheet" href="[[config:cdn.css_rtl]]" integrity="[[config:cdn.css_rtl_hash]]" crossorigin="anonymous">
-```
-
-```html tab={"label":"CoreUI PRO"}
-<link rel="stylesheet" href="[[config:cdn_pro.css_pro_rtl]]" integrity="[[config:cdn_pro.css_pro_rtl_hash]]" crossorigin="anonymous">
-```
+That is all. **There is no separate RTL stylesheet any more** — the compiled CSS
+carries both directions, so the same file you already ship reacts to
+`dir="rtl"`.
 
 ### Starter template
 
@@ -37,10 +31,10 @@ You can see the above requirements reflected in this modified RTL starter templa
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Option 1: CoreUI for Bootstrap CSS -->
-    <link rel="stylesheet" href="[[config:cdn.css_rtl]]" integrity="[[config:cdn.css_rtl_hash]]" crossorigin="anonymous">
+    <link rel="stylesheet" href="[[config:cdn.css]]" integrity="[[config:cdn.css_hash]]" crossorigin="anonymous">
 
     <!-- Option 2: CoreUI PRO for Bootstrap CSS -->
-    <link rel="stylesheet" href="[[config:cdn_pro.css_pro_rtl]]" integrity="[[config:cdn_pro.css_pro_rtl_hash]]" crossorigin="anonymous">
+    <link rel="stylesheet" href="[[config:cdn_pro.css_pro]]" integrity="[[config:cdn_pro.css_pro_hash]]" crossorigin="anonymous">
 
     <title>مرحبا بالعالم!</title>
   </head>
@@ -69,64 +63,53 @@ You can see the above requirements reflected in this modified RTL starter templa
 
 ## Approach
 
-Our approach to building RTL support into CoreUI comes with two important decisions that impact how we write and use our CSS:
+Direction support rests on two decisions:
 
-1. **First, as in CoreUI 3 we decided to build it with our own mixins** This gives us full control and allows us to generate LTR and RTL separately, or if needed one stylesheet with both versions without any style's duplicates.
+1. **Layout is written with logical properties.** `margin-inline-start` instead
+   of `margin-left`, `inset-inline-end` instead of `right`, `float: inline-start`
+   instead of `float: left` — and the same in the class names, so `.ms-3` and
+   `.start-50` mean "start" in whichever direction the document runs. The
+   browser mirrors them; nothing has to be generated twice.
 
-2. **Second, in CoreUI 3 we introduced a handful of directional classes ex. `mfs-auto`,  but in CoreUI 4 we've simplified them ex. `ms-auto`, and renamed all directional classes to adopt a logical properties approach.** Most of you have already interacted with logical properties thanks to our flex utilities—they replace direction properties like `left` and `right` in favor `start` and `end`. That makes the class names and values appropriate for LTR and RTL without any overhead.
+2. **The handful of properties CSS cannot mirror get an explicit rule.**
+   `transform` is not direction-aware, `background-position` has no logical
+   keyword, and swapping an icon means swapping an asset. Those cases — the
+   off-canvas panel, the range slider's label and tooltip, the select and
+   validation arrows, the carousel controls, the breadcrumb divider, the
+   narrow sidebar's toggler — are written once with the `ltr-rtl()` mixin,
+   which emits the base declaration plus a `[dir="rtl"]` override. There are
+   about twenty of them in the whole library.
 
-  For example, instead of `.ml-3` for `margin-left`, use `.ms-3`.
-
-Working with RTL, through our source Sass or compiled CSS, shouldn't be much different from our default LTR though.
+Together that is why **one stylesheet serves both directions**. Up to v5 we
+published a parallel `*.rtl.css` for every file; it is gone, and so is the
+`.rtl` half of the `dist/css` folder.
 
 ## Customize from source
 
 When it comes to [customization](/customize/sass/), the preferred way is to take advantage of variables, maps, and mixins.
 
-### LTR and RTL at the same time
+### LTR only
 
-Need both LTR and RTL on the same page? All you have to do is set following variables:
-
-<Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
+The RTL overrides are a couple of dozen rules, but if a project is
+left-to-right for good you can drop them:
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
-  $enable-ltr: true,
-  $enable-rtl: true
+  $enable-rtl: false
 );
 ```
 
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
-
-```scss
-$enable-ltr: true;
-$enable-rtl: true;
-
-@import "../node_modules/@coreui/coreui/scss/coreui";
-```
-
-After running Sass, each selector in your CSS files will be prepended by `html:not([dir=rtl])`, and `*[dir=rtl]` for RTL files. Now you're able to use both files on the same page.
-
 ### RTL only
 
-By default LTR is enable and RTL is disable, but you can easily change it and use only RTL.
-
-<Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
+The mirror image: the mirrored values become the base declarations and no
+`[dir="rtl"]` selector is emitted at all. Use it when the whole application is
+right-to-left.
 
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
   $enable-ltr: false,
   $enable-rtl: true
 );
-```
-
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
-
-```scss
-$enable-ltr: false;
-$enable-rtl: true;
-
-@import "../node_modules/@coreui/coreui/scss/coreui";
 ```
 
 ## Additional resources

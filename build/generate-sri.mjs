@@ -34,16 +34,8 @@ const files = [
     configPropertyName: 'css_pro_hash'
   },
   {
-    file: 'dist/css/coreui.rtl.min.css',
-    configPropertyName: 'css_pro_rtl_hash'
-  },
-  {
     file: 'dist/css/themes/bootstrap/bootstrap.min.css',
     configPropertyName: 'css_bs_pro_hash'
-  },
-  {
-    file: 'dist/css/themes/bootstrap/bootstrap.rtl.min.css',
-    configPropertyName: 'css_bs_pro_rtl_hash'
   },
   {
     file: 'dist/js/coreui.min.js',
