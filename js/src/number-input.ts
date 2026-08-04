@@ -9,7 +9,9 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import Manipulator from './dom/manipulator.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { createControlGroupAction } from './util/form-control-group.js'
+import {
+  createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
+} from './util/form-control-group.js'
 import { MINUS_ICON, PLUS_ICON } from './util/icons.js'
 import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
@@ -26,14 +28,7 @@ const DATA_API_KEY = '.data-api'
 const EVENT_CHANGE = `change${EVENT_KEY}`
 
 const CLASS_NAME_ACTION = 'form-control-action'
-const CLASS_NAME_GROUP = 'form-control-group'
 const CLASS_NAME_NUMBER_INPUT = 'number-input'
-
-// Once the input sits inside a frame the component built, every class the
-// author wrote on it describes the field as a whole — its size, its spacing,
-// its width — and belongs to the outer box. Only `.form-control` itself stays,
-// because that is what the group neutralises.
-const CLASS_NAME_FORM_CONTROL = 'form-control'
 
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="number-input"]'
 
@@ -87,9 +82,7 @@ class NumberInput extends BaseComponent {
   protected declare _config: NumberInputConfig
   private _decrementElement: HTMLButtonElement | null = null
   private _incrementElement: HTMLButtonElement | null = null
-  private _groupElement: HTMLElement | null = null
-  private _createdGroup = false
-  private _movedClassNames: string[] = []
+  private _group: ControlGroup | null = null
   private _repeatTimeout: ReturnType<typeof setTimeout> | null = null
   private _repeatInterval: ReturnType<typeof setInterval> | null = null
 
@@ -128,16 +121,9 @@ class NumberInput extends BaseComponent {
     this._decrementElement?.remove()
     this._incrementElement?.remove()
 
-    if (this._groupElement) {
-      this._element.classList.add(...this._movedClassNames)
-      this._groupElement.classList.remove(CLASS_NAME_NUMBER_INPUT, ...this._movedClassNames)
-
-      // Only the wrapper this component put there goes; one the author wrote
-      // is theirs, and may hold more than this input.
-      if (this._createdGroup) {
-        this._groupElement.before(this._element)
-        this._groupElement.remove()
-      }
+    if (this._group) {
+      this._group.element.classList.remove(CLASS_NAME_NUMBER_INPUT)
+      releaseControlGroup(this._element, this._group)
     }
 
     super.dispose()
@@ -167,36 +153,11 @@ class NumberInput extends BaseComponent {
     EventHandler.trigger(this._element, EVENT_CHANGE, { value: this._element.value })
   }
 
-  // The buttons are the component's, so the frame that lays them out can be
-  // too: an input on its own gets wrapped, and one already inside a group is
-  // left where the author put it.
-  _createGroup(): HTMLElement {
-    const existing = this._element.closest<HTMLElement>(`.${CLASS_NAME_GROUP}`)
-
-    if (existing) {
-      this._groupElement = existing
-    } else {
-      const group = document.createElement('div')
-      group.classList.add(CLASS_NAME_GROUP)
-
-      this._movedClassNames = [...this._element.classList].filter(name => name !== CLASS_NAME_FORM_CONTROL)
-      this._element.classList.remove(...this._movedClassNames)
-      group.classList.add(...this._movedClassNames)
-
-      this._element.before(group)
-      group.append(this._element)
-
-      this._groupElement = group
-      this._createdGroup = true
-    }
-
-    this._groupElement.classList.add(CLASS_NAME_NUMBER_INPUT)
-
-    return this._groupElement
-  }
-
   _createButtons(): void {
-    const group = this._createGroup()
+    this._group = ensureControlGroup(this._element)
+    const group = this._group.element
+
+    group.classList.add(CLASS_NAME_NUMBER_INPUT)
 
     this._decrementElement = createControlGroupAction({
       className: CLASS_NAME_ACTION,

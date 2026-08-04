@@ -8,6 +8,9 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
+import {
+  createControlGroupAction, ensureControlGroup, releaseControlGroup, type ControlGroup
+} from './util/form-control-group.js'
 import { PASSWORD_HIDE_ICON, PASSWORD_SHOW_ICON } from './util/icons.js'
 import { sanitizeHtml, SVGAllowlist, type SanitizerAllowList } from './util/sanitizer.js'
 import { defineJQueryPlugin } from './util/index.js'
@@ -21,15 +24,14 @@ const DATA_KEY = 'coreui.password-input'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const CLASS_NAME_ACTION = 'form-control-action'
+const CLASS_NAME_PASSWORD_INPUT = 'password-input'
 
-const SELECTOR_FORM_CONTROL = '.form-control'
-const SELECTOR_TOGGLE = '[data-coreui-toggle="password"]'
-const SELECTOR_DATA_TOGGLE = `${SELECTOR_FORM_CONTROL}:not([disabled]) ~ ${SELECTOR_TOGGLE}`
-const SELECTOR_DATA_INIT = `${SELECTOR_FORM_CONTROL} ~ ${SELECTOR_TOGGLE}`
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="password-input"]'
 
 interface PasswordInputConfig {
   allowList: SanitizerAllowList
+  ariaToggleLabel: string
   hideIcon: string
   sanitize: boolean
   sanitizeFn: ((unsafeHtml: string) => string) | null
@@ -38,6 +40,7 @@ interface PasswordInputConfig {
 
 const Default: PasswordInputConfig = {
   allowList: SVGAllowlist,
+  ariaToggleLabel: 'Toggle password visibility',
   hideIcon: PASSWORD_HIDE_ICON,
   sanitize: true,
   sanitizeFn: null,
@@ -46,6 +49,7 @@ const Default: PasswordInputConfig = {
 
 const DefaultType = {
   allowList: 'object',
+  ariaToggleLabel: 'string',
   hideIcon: 'string',
   sanitize: 'boolean',
   sanitizeFn: '(null|function)',
@@ -60,10 +64,13 @@ class PasswordInput extends BaseComponent {
   // The component only ever binds to an <input>
   protected declare _element: HTMLInputElement
   protected declare _config: PasswordInputConfig
+  private _group: ControlGroup | null = null
+  private _toggleElement: HTMLButtonElement | null = null
 
   constructor(element: string | Element, config?: Partial<PasswordInputConfig>) {
     super(element, config)
 
+    this._createToggle()
     this._updateToggleState()
   }
 
@@ -86,26 +93,47 @@ class PasswordInput extends BaseComponent {
     this._updateToggleState()
   }
 
-  // Private
-  // The toggle reflects the input's type: the pressed state for assistive
-  // technology, and the icon for everyone else. Both are written here rather
-  // than authored in the markup, so the button carries no icon markup of its
-  // own and an author who wants different artwork passes it as an option.
-  _updateToggleState(): any {
-    if (!this._element.parentNode) {
-      return
+  override dispose(): void {
+    this._toggleElement?.remove()
+
+    if (this._group) {
+      this._group.element.classList.remove(CLASS_NAME_PASSWORD_INPUT)
+      releaseControlGroup(this._element, this._group)
     }
 
-    const toggler = SelectorEngine.findOne(SELECTOR_TOGGLE, this._element.parentNode)
+    super.dispose()
+  }
 
-    if (!toggler) {
+  // Private
+  // The button is the component's, so the frame that lays it out can be too:
+  // the markup is a plain form control and the author writes neither.
+  _createToggle(): void {
+    this._group = ensureControlGroup(this._element)
+    this._group.element.classList.add(CLASS_NAME_PASSWORD_INPUT)
+
+    this._toggleElement = createControlGroupAction({
+      className: CLASS_NAME_ACTION,
+      disabled: this._element.disabled,
+      icon: this._config.showIcon,
+      label: this._config.ariaToggleLabel,
+      sanitizeIcon: (icon: string) => this._sanitizeIcon(icon)
+    })
+
+    EventHandler.on(this._toggleElement, 'click', () => this.toggle())
+    this._group.element.append(this._toggleElement)
+  }
+
+  // The toggle reflects the input's type: the pressed state for assistive
+  // technology, and the icon for everyone else.
+  _updateToggleState(): any {
+    if (!this._toggleElement) {
       return
     }
 
     const visible = this._element.type === 'text'
 
-    toggler.setAttribute('aria-pressed', visible ? 'true' : 'false')
-    toggler.innerHTML = this._sanitizeIcon(visible ? this._config.hideIcon : this._config.showIcon)
+    this._toggleElement.setAttribute('aria-pressed', visible ? 'true' : 'false')
+    this._toggleElement.innerHTML = this._sanitizeIcon(visible ? this._config.hideIcon : this._config.showIcon)
   }
 
   _sanitizeIcon(icon: string): string {
@@ -114,12 +142,8 @@ class PasswordInput extends BaseComponent {
 
   // Static
   static _initializeDataApi(): void {
-    for (const toggler of document.querySelectorAll(SELECTOR_DATA_INIT)) {
-      const input = SelectorEngine.findOne(SELECTOR_FORM_CONTROL, toggler.parentNode as ParentNode)
-
-      if (input) {
-        PasswordInput.getOrCreateInstance(input)
-      }
+    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+      PasswordInput.getOrCreateInstance(element)
     }
   }
 
@@ -139,13 +163,6 @@ class PasswordInput extends BaseComponent {
 
 EventHandler.on(document, `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`, () => {
   PasswordInput._initializeDataApi()
-})
-
-EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
-  event.preventDefault()
-
-  const toggler = (event.target as HTMLElement).closest(SELECTOR_DATA_TOGGLE)
-  PasswordInput.getOrCreateInstance(SelectorEngine.findOne(SELECTOR_FORM_CONTROL, toggler!.parentNode as ParentNode)).toggle()
 })
 
 /**

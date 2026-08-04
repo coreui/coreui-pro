@@ -1,6 +1,5 @@
 
 import PasswordInput from '../../src/password-input.js'
-import SelectorEngine from '../../src/dom/selector-engine.js'
 import {
   getFixture, clearFixture, createEvent, jQueryMock
 } from '../helpers/fixture.js'
@@ -9,14 +8,11 @@ describe('PasswordInput', () => {
   describe('icon', () => {
     it('should render the show icon on initialization', () => {
       fixtureEl.innerHTML = [
-        '<div class="form-control-group">',
-        '  <input type="password" class="form-control">',
-        '  <button type="button" class="form-control-action" data-coreui-toggle="password"></button>',
-        '</div>'
+        '<input type="password" class="form-control">'
       ].join('')
 
       const passwordInput = new PasswordInput(fixtureEl.querySelector('input'))
-      const toggler = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+      const toggler = fixtureEl.querySelector('.form-control-action')
 
       expect(toggler.querySelector('svg')).not.toBeNull()
       expect(toggler.getAttribute('aria-pressed')).toBe('false')
@@ -28,17 +24,14 @@ describe('PasswordInput', () => {
 
     it('should swap the icon when the password becomes visible', () => {
       fixtureEl.innerHTML = [
-        '<div class="form-control-group">',
-        '  <input type="password" class="form-control">',
-        '  <button type="button" class="form-control-action" data-coreui-toggle="password"></button>',
-        '</div>'
+        '<input type="password" class="form-control">'
       ].join('')
 
       const passwordInput = new PasswordInput(fixtureEl.querySelector('input'), {
         hideIcon: '<svg viewBox="0 0 16 16"><path d="M0 0h16v16H0z"/></svg>',
         showIcon: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="8"/></svg>'
       })
-      const toggler = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+      const toggler = fixtureEl.querySelector('.form-control-action')
 
       expect(toggler.querySelector('circle')).not.toBeNull()
 
@@ -261,299 +254,93 @@ describe('PasswordInput', () => {
   })
 
   describe('data-api', () => {
-    it('should toggle password visibility on toggle button click', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control">
-          <button data-coreui-toggle="password" type="button">Toggle</button>
-        </div>
-      `
-      const input = fixtureEl.querySelector('.form-control')
-      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+    const initialized = markup => {
+      fixtureEl.innerHTML = markup
+      PasswordInput._initializeDataApi()
+      return fixtureEl.querySelector('.form-control')
+    }
 
-      expect(input.type).toBe('password')
+    it('should build the frame and the toggle for a bare control', () => {
+      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const group = input.parentElement
 
-      const clickEvent = createEvent('click')
-      toggleButton.dispatchEvent(clickEvent)
-
-      expect(input.type).toBe('text')
+      expect(group.classList.contains('form-control-group')).toBe(true)
+      expect(group.classList.contains('password-input')).toBe(true)
+      expect(group.querySelector('.form-control-action')).not.toBeNull()
       expect(PasswordInput.getInstance(input)).toBeInstanceOf(PasswordInput)
     })
 
-    it('should reflect visibility state via aria-pressed on the toggle button', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control">
-          <button data-coreui-toggle="password" type="button">Toggle</button>
-        </div>
-      `
-      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+    it('should toggle visibility when its button is clicked', () => {
+      const input = initialized('<input type="password" class="form-control" data-coreui-toggle="password-input">')
+      const toggle = fixtureEl.querySelector('.form-control-action')
 
-      toggleButton.dispatchEvent(createEvent('click'))
-      expect(toggleButton.getAttribute('aria-pressed')).toBe('true')
+      expect(input.type).toBe('password')
 
-      toggleButton.dispatchEvent(createEvent('click'))
-      expect(toggleButton.getAttribute('aria-pressed')).toBe('false')
+      toggle.dispatchEvent(createEvent('click'))
+
+      expect(input.type).toBe('text')
+      expect(toggle.getAttribute('aria-pressed')).toBe('true')
+
+      toggle.dispatchEvent(createEvent('click'))
+
+      expect(input.type).toBe('password')
+      expect(toggle.getAttribute('aria-pressed')).toBe('false')
     })
 
-    it('should prevent default behavior on toggle button click', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control">
-          <button data-coreui-toggle="password" type="button">Toggle</button>
-        </div>
-      `
-      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
+    it('should disable its button for a disabled control', () => {
+      initialized('<input type="password" class="form-control" disabled data-coreui-toggle="password-input">')
 
-      const clickEvent = createEvent('click')
-      spyOn(clickEvent, 'preventDefault')
-      toggleButton.dispatchEvent(clickEvent)
-
-      expect(clickEvent.preventDefault).toHaveBeenCalled()
+      expect(fixtureEl.querySelector('.form-control-action').disabled).toBe(true)
     })
 
-    it('should work with nested toggle button elements', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control">
-          <button data-coreui-toggle="password" type="button">
-            <i class="icon"></i>
-          </button>
-        </div>
-      `
+    it('should handle several controls independently', () => {
+      fixtureEl.innerHTML = [
+        '<input type="password" class="form-control" data-coreui-toggle="password-input">',
+        '<input type="password" class="form-control" data-coreui-toggle="password-input">'
+      ].join('')
+      PasswordInput._initializeDataApi()
+
+      const inputs = fixtureEl.querySelectorAll('.form-control')
+      const toggles = fixtureEl.querySelectorAll('.form-control-action')
+
+      expect(toggles.length).toBe(2)
+
+      toggles[0].dispatchEvent(createEvent('click'))
+
+      expect(inputs[0].type).toBe('text')
+      expect(inputs[1].type).toBe('password')
+    })
+
+    it('should move the author\'s classes onto the frame and back on dispose', () => {
+      const input = initialized('<input type="password" class="form-control form-control-lg mb-3" data-coreui-toggle="password-input">')
+      const group = input.parentElement
+
+      expect(input.className).toBe('form-control')
+      expect(group.classList.contains('form-control-lg')).toBe(true)
+      expect(group.classList.contains('mb-3')).toBe(true)
+
+      PasswordInput.getInstance(input).dispose()
+
+      expect(input.className).toBe('form-control form-control-lg mb-3')
+      expect(fixtureEl.querySelector('.form-control-group')).toBeNull()
+    })
+
+    it('should keep a group the author wrote', () => {
+      fixtureEl.innerHTML = `<div class="form-control-group">
+          <span class="form-control-icon"></span>
+          <input type="password" class="form-control" data-coreui-toggle="password-input">
+        </div>`
+      PasswordInput._initializeDataApi()
+
       const input = fixtureEl.querySelector('.form-control')
-      const icon = fixtureEl.querySelector('.icon')
+      const group = fixtureEl.querySelector('.form-control-group')
 
-      expect(input.type).toBe('password')
+      expect(input.parentElement).toBe(group)
 
-      const clickEvent = createEvent('click')
-      icon.dispatchEvent(clickEvent)
+      PasswordInput.getInstance(input).dispose()
 
-      expect(input.type).toBe('text')
-    })
-
-    it('should not work with disabled inputs', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control" disabled>
-          <button data-coreui-toggle="password" type="button">Toggle</button>
-        </div>
-      `
-      const input = fixtureEl.querySelector('.form-control')
-      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
-
-      expect(input.type).toBe('password')
-
-      const clickEvent = createEvent('click')
-      toggleButton.dispatchEvent(clickEvent)
-
-      // Should remain password type because input is disabled
-      expect(input.type).toBe('password')
-      expect(PasswordInput.getInstance(input)).toBeNull()
-    })
-
-    it('should work with multiple password inputs', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control" id="pass1">
-          <button data-coreui-toggle="password" type="button" id="toggle1">Toggle</button>
-        </div>
-        <div class="input-group">
-          <input type="password" class="form-control" id="pass2">
-          <button data-coreui-toggle="password" type="button" id="toggle2">Toggle</button>
-        </div>
-      `
-      const input1 = fixtureEl.querySelector('#pass1')
-      const input2 = fixtureEl.querySelector('#pass2')
-      const toggleButton1 = fixtureEl.querySelector('#toggle1')
-      const toggleButton2 = fixtureEl.querySelector('#toggle2')
-
-      expect(input1.type).toBe('password')
-      expect(input2.type).toBe('password')
-
-      const clickEvent1 = createEvent('click')
-      toggleButton1.dispatchEvent(clickEvent1)
-
-      expect(input1.type).toBe('text')
-      expect(input2.type).toBe('password') // Should remain unchanged
-
-      const clickEvent2 = createEvent('click')
-      toggleButton2.dispatchEvent(clickEvent2)
-
-      expect(input1.type).toBe('text') // Should remain unchanged
-      expect(input2.type).toBe('text')
-    })
-
-    it('should find the correct input using SelectorEngine', () => {
-      fixtureEl.innerHTML = `
-        <div class="form-group">
-          <input type="password" class="form-control">
-          <span data-coreui-toggle="password">Toggle</span>
-        </div>
-      `
-      const input = fixtureEl.querySelector('.form-control')
-      const toggleSpan = fixtureEl.querySelector('[data-coreui-toggle="password"]')
-
-      spyOn(SelectorEngine, 'findOne').and.callThrough()
-
-      const clickEvent = createEvent('click')
-      toggleSpan.dispatchEvent(clickEvent)
-
-      expect(SelectorEngine.findOne).toHaveBeenCalledWith('.form-control', toggleSpan.parentNode)
-      expect(input.type).toBe('text')
-    })
-  })
-
-  describe('edge cases', () => {
-    it('should handle input without parent correctly', () => {
-      const input = document.createElement('input')
-      input.type = 'password'
-      input.className = 'form-control'
-
-      const passwordInput = new PasswordInput(input)
-      passwordInput.toggle()
-
-      expect(input.type).toBe('text')
-    })
-
-    it('should handle toggle on input that changes type attribute', () => {
-      fixtureEl.innerHTML = '<input type="password" class="form-control">'
-      const input = fixtureEl.querySelector('input')
-      const passwordInput = new PasswordInput(input)
-
-      // Manually change type
-      input.type = 'email'
-      passwordInput.toggle()
-
-      expect(input.type).toBe('password')
-    })
-
-    it('should work with inputs that have other attributes', () => {
-      fixtureEl.innerHTML = `
-        <input 
-          type="password" 
-          class="form-control" 
-          name="password" 
-          id="user-password" 
-          placeholder="Enter password"
-          autocomplete="current-password"
-          required
-        >`
-      const input = fixtureEl.querySelector('input')
-      const passwordInput = new PasswordInput(input)
-
-      expect(input.type).toBe('password')
-      expect(input.name).toBe('password')
-      expect(input.placeholder).toBe('Enter password')
-
-      passwordInput.toggle()
-
-      expect(input.type).toBe('text')
-      expect(input.name).toBe('password') // Other attributes should remain
-      expect(input.placeholder).toBe('Enter password')
-      expect(input.hasAttribute('required')).toBe(true)
-    })
-
-    it('should handle rapidly repeated toggle calls', () => {
-      fixtureEl.innerHTML = '<input type="password" class="form-control">'
-      const input = fixtureEl.querySelector('input')
-      const passwordInput = new PasswordInput(input)
-
-      expect(input.type).toBe('password')
-
-      // Rapid toggles
-      passwordInput.toggle()
-      passwordInput.toggle()
-      passwordInput.toggle()
-      passwordInput.toggle()
-
-      expect(input.type).toBe('password') // Should end up back to original state
-    })
-
-    it('should work with programmatically created elements', () => {
-      const container = document.createElement('div')
-      const input = document.createElement('input')
-      const button = document.createElement('button')
-
-      input.type = 'password'
-      input.className = 'form-control'
-      button.setAttribute('data-coreui-toggle', 'password')
-      button.textContent = 'Toggle'
-
-      container.append(input)
-      container.append(button)
-      fixtureEl.append(container)
-
-      const clickEvent = createEvent('click')
-      button.dispatchEvent(clickEvent)
-
-      expect(input.type).toBe('text')
-      expect(PasswordInput.getInstance(input)).toBeInstanceOf(PasswordInput)
-    })
-
-    it('should handle missing form-control input gracefully', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <button data-coreui-toggle="password" type="button">Toggle</button>
-        </div>
-      `
-      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
-
-      expect(() => {
-        const clickEvent = createEvent('click')
-        toggleButton.dispatchEvent(clickEvent)
-      }).not.toThrow()
-    })
-  })
-
-  describe('accessibility', () => {
-    it('should maintain input accessibility attributes when toggling', () => {
-      fixtureEl.innerHTML = `
-        <input 
-          type="password" 
-          class="form-control"
-          aria-label="User password"
-          aria-describedby="password-help"
-          role="textbox"
-        >`
-      const input = fixtureEl.querySelector('input')
-      const passwordInput = new PasswordInput(input)
-
-      expect(input.getAttribute('aria-label')).toBe('User password')
-      expect(input.getAttribute('aria-describedby')).toBe('password-help')
-      expect(input.getAttribute('role')).toBe('textbox')
-
-      passwordInput.toggle()
-
-      expect(input.type).toBe('text')
-      expect(input.getAttribute('aria-label')).toBe('User password')
-      expect(input.getAttribute('aria-describedby')).toBe('password-help')
-      expect(input.getAttribute('role')).toBe('textbox')
-    })
-
-    it('should work with screen reader friendly toggle buttons', () => {
-      fixtureEl.innerHTML = `
-        <div class="input-group">
-          <input type="password" class="form-control" aria-label="Password">
-          <button 
-            data-coreui-toggle="password" 
-            type="button"
-            aria-label="Show password"
-          >
-            <span aria-hidden="true">👁</span>
-          </button>
-        </div>
-      `
-      const input = fixtureEl.querySelector('.form-control')
-      const toggleButton = fixtureEl.querySelector('[data-coreui-toggle="password"]')
-
-      expect(input.type).toBe('password')
-
-      const clickEvent = createEvent('click')
-      toggleButton.dispatchEvent(clickEvent)
-
-      expect(input.type).toBe('text')
-      expect(toggleButton.getAttribute('aria-label')).toBe('Show password')
+      expect(group.isConnected).toBe(true)
+      expect(group.querySelector('.form-control-action')).toBeNull()
     })
   })
 })
