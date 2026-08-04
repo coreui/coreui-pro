@@ -4,7 +4,10 @@
   // The component supplies its own stepper buttons, so the native one has to
   // go — and each engine hides it its own way. Chromium and WebKit paint it as
   // a pseudo-element; Firefox has no such pseudo-element and answers only to
-  // `appearance`. Neither rule covers the other engine: verified in all three.
+  // `appearance`. Neither rule covers the other engine, so both are here:
+  // measured in Chromium and Firefox, where `appearance: textfield` alone
+  // leaves Chromium's spinner painted on hover and the pseudo-element rule
+  // alone leaves Firefox's painted at rest.
   .number-input .form-control {
     appearance: textfield;
 
