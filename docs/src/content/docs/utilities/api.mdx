@@ -9,16 +9,15 @@ The `$utilities` map contains all our utilities and is later merged with your cu
 
 | Option | Type | Default&nbsp;value | Description |
 | --- | --- | --- | --- |
-| [`property`](#property) | **Required** | – | Name of the property, this can be a string or an array of strings (e.g., horizontal paddings or margins). |
+| [`property`](#property) | **Required** | – | Name of the property, a space-separated list of them, or a [map](#property-map) spelling out every declaration the rule writes. |
 | [`values`](#values) | **Required** | – | List of values, or a map if you don't want the class name to be the same as the value. If `null` is used as map key, `class` is not prepended to the class name. |
 | [`class`](#class) | Optional | null | Name of the generated class. If not provided and `property` is an array of strings, `class` will default to the first element of the `property` array. If not provided and `property` is a string, the `values` keys are used for the `class` names. |
-| [`css-var`](#css-variable-utilities) | Optional | `false` | Boolean to generate CSS variables instead of CSS rules. |
-| [`css-variable-name`](#css-variable-utilities) | Optional | null | Custom un-prefixed name for the CSS variable inside the ruleset. |
-| [`local-vars`](#local-css-variables) | Optional | null | Map of local CSS variables to generate in addition to the CSS rules. |
+| [`child-selector`](#child-selector) | Optional | null | Selector for the children to style instead of the element itself, wrapped in `:where()`. |
+| [`selector`](#selector-type) | Optional | `class` | `class`, `attr-starts` or `attr-includes` — whether the rule is written as a class or as an attribute selector. |
 | [`state`](#states) | Optional | null | List of pseudo-class variants (e.g., `:hover` or `:focus`) to generate. |
 | [`responsive`](#responsive) | Optional | `false` | Boolean indicating if responsive classes should be generated. |
 | [`print`](#print) | Optional | `false` | Boolean indicating if print classes need to be generated. |
-| `rtl` | Optional | `true` | Boolean indicating if utility should be kept in RTL. |
+| `at-property` | Optional | `true` | Set to `false` to keep the utility's custom properties inheriting (see [property map](#property-map)). |
 
 ## API explained
 
@@ -215,55 +214,23 @@ Output:
 it also works when the utility is not the first class). Both require a `class`
 key — that is the string they match on.
 
-### CSS variable utilities
+### Property map
 
-Set the `css-var` boolean option to `true` and the API will generate local CSS variables for the given selector instead of the usual `property: value` rules. Add an optional `css-variable-name` to set a different CSS variable name than the class name.
-
-Consider our `.text-opacity-*` utilities. If we add the `css-variable-name` option, we'll get a custom output.
-
-```scss
-$utilities: (
-  "text-opacity": (
-    css-var: true,
-    css-variable-name: text-alpha,
-    class: text-opacity,
-    values: (
-      25: .25,
-      50: .5,
-      75: .75,
-      100: 1
-    )
-  ),
-);
-```
-
-Output:
-
-```css
-.text-opacity-25 { --cui-text-opacity: .25; }
-.text-opacity-50 { --cui-text-opacity: .5; }
-.text-opacity-75 { --cui-text-opacity: .75; }
-.text-opacity-100 { --cui-text-opacity: 1; }
-```
-
-### Local CSS variables
-
-Use the `local-vars` option to specify a Sass map that will generate local CSS variables within the utility class's ruleset. Please note that it may require additional work to consume those local CSS variables in the generated CSS rules. For example, consider our `.bg-*` utilities:
+`property` is usually one property name, or a space-separated list of them. It
+can also be a **map**, which spells out exactly what the rule writes and in what
+order. An entry whose value is `null` receives the utility's value; every other
+entry is written as declared:
 
 ```scss
 $utilities: (
   "background-color": (
-    property: background-color,
-    class: bg,
-    local-vars: (
-      "bg-opacity": 1
+    property: (
+      --#{$prefix}bg: null,
+      --#{$prefix}bg-opacity: 1,
+      background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
     ),
-    values: map-merge(
-      $utilities-bg-colors,
-      (
-        "transparent": transparent
-      )
-    )
+    class: bg,
+    values: $utilities-bg-colors
   )
 );
 ```
@@ -272,10 +239,47 @@ Output:
 
 ```css
 .bg-primary {
+  --cui-bg: var(--cui-primary);
   --cui-bg-opacity: 1;
-  background-color: rgba(var(--cui-primary-rgb), var(--cui-bg-opacity)) !important;
+  background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent) !important;
 }
 ```
+
+This is what lets a utility **store its value in a custom property and consume
+it in the same rule**. The gain is that the expression around the value — here
+the translucency formula — is written once, in the map, instead of being baked
+into every entry of `values`; the values only have to name a colour. A companion
+utility then modifies the result by setting the same custom property:
+
+```scss
+$utilities: (
+  "bg-opacity": (
+    property: (--#{$prefix}bg-opacity: null),
+    class: bg-opacity,
+    values: (25: .25, 50: .5, 75: .75)
+  )
+);
+```
+
+```css
+.bg-opacity-50 { --cui-bg-opacity: .5; }
+```
+
+Note what that composition does **not** rely on: the two rules touch different
+properties, so `.bg-primary.bg-opacity-50` works regardless of which one the
+stylesheet declares first, and `.bg-opacity-50` on its own simply sets a variable
+nobody reads rather than producing an invalid declaration.
+
+A map with only custom properties in it is the way to write a utility that sets
+no real property at all — which is what `bg-opacity` above is.
+
+<Callout color="info">
+  Every custom property a utility assigns to is registered with
+  `@property { inherits: false }`, so the value applies to the element that
+  carries the class and does not leak into its descendants. A utility that
+  deliberately writes an inheriting token — `.focus-ring-*` sets the global
+  `--cui-focus-ring-color` — opts out with `at-property: false`.
+</Callout>
 
 ### States
 

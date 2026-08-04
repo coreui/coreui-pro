@@ -674,6 +674,57 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   the root color tokens, which already switch in dark mode.
 - `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
 
+#### Utilities API: one `property` map replaces `css-var`, `css-variable-name` and `local-vars`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Three keys said one thing between them — *a utility may write custom
+properties, real properties, or both* — and `property` now says it alone. Give
+it a map: a `null` entry receives the utility's value, everything else is
+written as declared.
+
+```diff
+  "background-color": (
+-   property: background-color,
+-   local-vars: ("bg-opacity": 1),
++   property: (
++     --#{$prefix}bg: null,
++     --#{$prefix}bg-opacity: 1,
++     background-color: color-mix(in srgb, var(--#{$prefix}bg) calc(var(--#{$prefix}bg-opacity) * 100%), transparent),
++   ),
+    class: bg,
+    values: $utilities-bg-colors
+  )
+
+  "bg-opacity": (
+-   css-var: true,
++   property: (--#{$prefix}bg-opacity: null),
+    class: bg-opacity,
+    values: (25: .25, 50: .5, 75: .75)
+  )
+```
+
+The class API does not change — `.bg-primary` and `.bg-opacity-50` still exist
+and still compose. What changes is where the translucency expression lives:
+
+- **`$utilities-text-colors`, `$utilities-bg-colors`, `$utilities-border-colors`
+  and `$utilities-links-underline` now carry plain colour references**
+  (`var(--cui-primary)`) instead of a `color-mix()` expression per entry. The
+  expression is written once, in the utility's `property` map. If you built a
+  map of your own by calling `translucent-css-var()`, call the new
+  `color-var-ref()` instead — same arguments, without the wrapper.
+- **`.text-muted`, `.text-black-50`, `.text-white-50` and `.text-body-secondary`
+  now respond to `.text-opacity-*`.** They rendered the same colour before and
+  render the same colour now; they simply went through the plain value and so
+  ignored the opacity knob every other colour utility honoured.
+- Every custom property a utility assigns is registered
+  `@property { inherits: false }`, which now covers `--cui-bg`, `--cui-text`,
+  `--cui-border` and `--cui-link-underline` as well — so a colour set on a
+  container cannot leak into a descendant that only carries an opacity class.
+
+`at-property: false` still opts a utility out of that registration, for the one
+case that writes an inheriting global token (`.focus-ring-*`).
+
 #### Utilities API: child selectors and attribute selectors (new)
 
 Two keys join the `$utilities` API, ported from Bootstrap's v6 branch:

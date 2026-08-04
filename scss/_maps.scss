@@ -80,7 +80,7 @@ $utilities-text: map.merge(
     "body": $body-color
   )
 ) !default;
-$utilities-text-colors: map-loop($utilities-text, translucent-css-var, "$prefix", "$key", "text") !default;
+$utilities-text-colors: map-loop($utilities-text, color-var-ref, "$prefix", "$key", "text") !default;
 
 $utilities-text-emphasis-colors: (
   "primary-emphasis": var(--#{$prefix}primary-text-emphasis),
@@ -103,7 +103,7 @@ $utilities-bg: map.merge(
     "body": $body-bg
   )
 ) !default;
-$utilities-bg-colors: map-loop($utilities-bg, translucent-css-var, "$prefix", "$key", "bg") !default;
+$utilities-bg-colors: map-loop($utilities-bg, color-var-ref, "$prefix", "$key", "bg") !default;
 
 $utilities-bg-subtle: (
   "primary-subtle": var(--#{$prefix}primary-bg-subtle),
@@ -125,7 +125,7 @@ $utilities-border: map.merge(
     "white": $white
   )
 ) !default;
-$utilities-border-colors: map-loop($utilities-border, translucent-css-var, "$prefix", "$key", "border") !default;
+$utilities-border-colors: map-loop($utilities-border, color-var-ref, "$prefix", "$key", "border") !default;
 
 $utilities-border-subtle: (
   "primary-subtle": var(--#{$prefix}primary-border-subtle),
@@ -139,7 +139,7 @@ $utilities-border-subtle: (
 ) !default;
 // scss-docs-end utilities-border-colors
 
-$utilities-links-underline: map-loop($utilities-colors, translucent-css-var, "$prefix", "$key", "link-underline") !default;
+$utilities-links-underline: map-loop($utilities-colors, color-var-ref, "$prefix", "$key", "link-underline") !default;
 
 // stylelint-disable-next-line scss/at-function-named-arguments
 $negative-spacers: if(sass($enable-negative-margins): negativify-map($spacers)) !default;
