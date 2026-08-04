@@ -12,6 +12,10 @@
  */
 
 import { page } from 'vitest/browser'
+// The whole point of the suite is what the CSS does, so it loads the Sass
+// source rather than a built file: no dist step to remember, and a regression
+// in scss/ shows up on the next run.
+import '../../../scss/coreui.scss'
 import Autocomplete from '../../src/autocomplete.js'
 import ChipInput from '../../src/chip-input.js'
 import DatePicker from '../../src/date-picker.js'
@@ -185,6 +189,14 @@ describe('autocomplete', () => {
     ac.dispose()
   })
 
+  it('invalid', async () => {
+    const ac = new Autocomplete(mount(), {
+      options: OPTIONS, value: 'Vue', cleaner: true, indicator: true, invalid: true
+    })
+    await shoot(frame(), 'autocomplete-invalid')
+    ac.dispose()
+  })
+
   it('open popup', async () => {
     const ac = new Autocomplete(mount(), { options: OPTIONS, indicator: true })
     ac.show()
@@ -209,6 +221,12 @@ describe('multi select', () => {
   it('chips selection', async () => {
     const ms = new MultiSelect(mountSelect(), { cleaner: true })
     await shoot(frame(), 'multi-select-chips')
+    ms.dispose()
+  })
+
+  it('invalid', async () => {
+    const ms = new MultiSelect(mountSelect(), { cleaner: true, invalid: true })
+    await shoot(frame(), 'multi-select-invalid')
     ms.dispose()
   })
 
@@ -247,6 +265,20 @@ describe('password input', () => {
   it('disabled', async () => {
     mount(markup(true))
     await shoot(frame(), 'password-disabled')
+  })
+
+  // Native constraint validation reaches the frame through the control inside
+  // it — the state never lands on the group itself here.
+  it('invalid under was-validated', async () => {
+    mount(`<div class="was-validated">
+        <div id="host" class="form-control-group">
+          <input type="password" class="form-control" required aria-label="Password">
+          <button type="button" class="form-control-action" data-coreui-toggle="password" aria-label="Toggle">
+            <span class="form-password-action-icon"></span>
+          </button>
+        </div>
+      </div>`)
+    await shoot(frame(), 'password-was-validated')
   })
 })
 
