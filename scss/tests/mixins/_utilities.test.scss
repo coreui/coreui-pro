@@ -270,6 +270,55 @@
       }
     }
 
+    @include describe("child-selector") {
+      @include it("styles the children instead of the element, without adding specificity") {
+        @include test-generate-utility(
+          (
+            property: margin-inline-end,
+            class: space-x,
+            child-selector: "> :not(:last-child)",
+            values: 1rem
+          )
+        ) {
+          :where(.space-x-1rem > :not(:last-child)) {
+            margin-inline-end: 1rem;
+          }
+        }
+      }
+    }
+
+    @include describe("selector") {
+      @include it("writes an attribute selector that matches a family of classes") {
+        @include test-generate-utility(
+          (
+            property: aspect-ratio,
+            class: "ratio-",
+            selector: "attr-includes",
+            values: var(--cui-ratio)
+          )
+        ) {
+          [class*="ratio-"] {
+            aspect-ratio: var(--cui-ratio);
+          }
+        }
+      }
+
+      @include it("matches only where the class starts with the given name") {
+        @include test-generate-utility(
+          (
+            property: aspect-ratio,
+            class: "ratio-",
+            selector: "attr-starts",
+            values: var(--cui-ratio)
+          )
+        ) {
+          [class^="ratio-"] {
+            aspect-ratio: var(--cui-ratio);
+          }
+        }
+      }
+    }
+
     @include describe("css-var & state") {
       @include it("Generates a rule with for each state with a CSS variable") {
         @include test-generate-utility(
