@@ -40,7 +40,7 @@ if (BUNDLE) {
 }
 
 const rolldownConfig = {
-  input: path.resolve(__dirname, `../js/index.${ESM ? 'esm' : 'umd'}.js`),
+  input: path.resolve(__dirname, `../js/index.${ESM ? 'esm' : 'umd'}.ts`),
   // oxc strips the types and lowers the syntax, so the dist path carries no
   // Babel. The targets come from .browserslistrc, the same source Babel read.
   transform: {

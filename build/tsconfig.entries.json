@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // The bundle entries are rolldown inputs, not part of the published type
+    // surface (build/tsconfig.dts.json emits from js/src only), so the per-file
+    // declaration constraints that keep js/src emittable do not apply here. The
+    // UMD entry cannot satisfy them anyway: a default-exported object of
+    // component classes is not inferable under isolatedDeclarations, and the
+    // explicit-value workaround collides with object-shorthand.
+    "declaration": false,
+    "isolatedDeclarations": false
+  },
+  "include": ["../js/index.esm.ts", "../js/index.umd.ts"]
+}
