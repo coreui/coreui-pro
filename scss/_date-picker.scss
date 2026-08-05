@@ -36,12 +36,12 @@ $date-picker-tokens: defaults(
 
   .date-picker {
     position: relative;
-  }
 
-  // The popup takes the focus away from the group, but the control is still
-  // active — so the frame keeps its focus treatment while it is open.
-  .date-picker.show .form-control-group {
-    @include form-control-group-focus();
+    // The popup takes the focus away from the group, but the control is still
+    // active — so the frame keeps its focus treatment while it is open.
+    &.show .form-control-group {
+      @include form-control-group-focus();
+    }
   }
 
   // The panel declares its own tokens rather than inheriting them from the

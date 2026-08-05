@@ -4,12 +4,19 @@
 @layer components {
   .autocomplete {
     position: relative;
-  }
 
-  // The popup takes the focus away from the group, but the control is still
-  // active — so the frame keeps its focus treatment while it is open.
-  .autocomplete.show .form-control-group {
-    @include form-control-group-focus();
+    &.show {
+      // The popup takes the focus away from the group, but the control is
+      // still active, so the frame keeps its focus treatment while it is open.
+      .form-control-group {
+        @include form-control-group-focus();
+      }
+
+      // The chevron turns when the popup opens.
+      .form-control-action {
+        transform: rotate(180deg);
+      }
+    }
   }
 
   // The ghost completion drawn behind the text.
@@ -21,10 +28,5 @@
     height: 100%;
     pointer-events: none;
     opacity: .5;
-  }
-
-  // The chevron turns when the popup opens.
-  .autocomplete.show .form-control-action {
-    transform: rotate(180deg);
   }
 }
