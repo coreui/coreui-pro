@@ -52,17 +52,15 @@ $date-picker-tokens: defaults(
   // to its content.
   .date-picker-popup {
     @include tokens($date-picker-tokens);
-  }
 
-  .date-picker-body {
-    display: flex;
-  }
+    // The date-time picker puts the calendar and the time body side by side. The
+    // time body's layout rules are global but read --#{$prefix}time-picker-* custom
+    // properties that _time-picker.scss only defines on `.time-picker`, and this
+    // shell's root is a date picker — so the ones the body needs are declared here.
+    // They belong on the panel rather than on the field's root for the same reason
+    // the tokens above do; only the date-time picker's panel holds these elements,
+    // so the scope stays exact.
 
-  // the date-time picker puts the calendar and the time body side by side. The
-  // time body's layout rules are global but read --#{$prefix}time-picker-* custom
-  // properties that _time-picker.scss only defines on `.time-picker`; this shell's
-  // root is a date picker, so the ones the body needs are declared here.
-  .date-time-picker {
     .date-picker-timepickers {
       display: flex;
       border-inline-start: var(--#{$prefix}date-picker-footer-border-width) solid var(--#{$prefix}date-picker-footer-border-color);
@@ -86,6 +84,10 @@ $date-picker-tokens: defaults(
       --#{$prefix}time-picker-inline-select-padding-x: #{$time-picker-inline-select-padding-x};
       --#{$prefix}time-picker-inline-select-padding-y: #{$time-picker-inline-select-padding-y};
     }
+  }
+
+  .date-picker-body {
+    display: flex;
   }
 
   .date-picker-ranges {
