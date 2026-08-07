@@ -41,6 +41,15 @@ You can also use utilities to set the width and height relative to the viewport.
 <div class="vh-100">Height 100vh</div>
 ```
 
+A mobile browser resizes the viewport as it shows or hides its URL bar, so `vh-100` can end up taller than the visible area. The `dvh`/`dvw` units track that change instead of the largest possible viewport, so use `dvh-100`/`min-dvh-100` for full-screen mobile layouts.
+
+```html
+<div class="min-dvw-100">Min-width 100dvw</div>
+<div class="min-dvh-100">Min-height 100dvh</div>
+<div class="dvw-100">Width 100dvw</div>
+<div class="dvh-100">Height 100dvh</div>
+```
+
 ## Sass
 
 ### Utilities API
