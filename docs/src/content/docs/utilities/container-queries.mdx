@@ -1,0 +1,74 @@
+---
+title: "Bootstrap 5 Container Queries"
+name: "Container queries"
+description: "Turn an element into a query container so its descendants can respond to its size instead of the viewport."
+---
+
+Use the `.contains-*` utilities to set the `container-type` property, establishing an element as a [query container](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries). Once an element is a query container, its descendants can adapt their styles to the container's size rather than to the viewport.
+
+Apply `.contains-inline` to query on inline size (width in horizontal writing modes), or `.contains-size` to query on both inline and block size.
+
+```html
+<div class="contains-inline">
+  <div class="card">...</div>
+</div>
+```
+
+```scss
+// Classes
+.contains-inline {
+  container-type: inline-size;
+}
+.contains-size {
+  container-type: size;
+}
+```
+
+<Callout color="info">
+`.contains-size` queries the container's block size as well, so the element needs an explicit height for `size` containment to resolve. When in doubt, reach for `.contains-inline`.
+</Callout>
+
+<Callout color="warning">
+**`container-type` implies layout containment.** A query container becomes the containing block for absolutely and fixed-positioned descendants, so a `position: fixed` element inside it is positioned against the container rather than the viewport. Keep fixed markup outside your query containers.
+</Callout>
+
+Our [CSS Grid](/layout/css-grid/) uses this: every `.grid` is a query container, which is what makes `.g-col-md-*` respond to the width of the grid instead of the browser window.
+
+## Sass
+
+### Mixins
+
+Write your own container queries with the same breakpoint names the rest of the framework uses. Each mixin takes an optional container name, so you can target one specific container.
+
+```scss
+.sidebar {
+  @include set-container(); // container-type: inline-size
+
+  .card {
+    @include container-breakpoint-up(md) {
+      display: flex;
+    }
+  }
+}
+```
+
+```scss
+// Name a container, then query it by name from anywhere inside it
+.layout {
+  @include set-container(inline-size, layout);
+}
+
+.widget {
+  @include container-breakpoint-between(sm, lg, layout) {
+    flex-direction: column;
+  }
+}
+```
+
+<ScssDocs file="scss/layout/_breakpoints.scss" capture="container-query-mixins" />
+
+### Utilities API
+
+Container utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-container" />

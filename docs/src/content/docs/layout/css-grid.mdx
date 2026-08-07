@@ -6,21 +6,26 @@ description: "Learn how to enable, use, and customize our alternate layout syste
 
 CoreUI for Bootstrap's default grid system represents the culmination of over a decade of CSS layout techniques, tried and tested by millions of people. But, it was also created without many of the modern CSS features and techniques we're seeing in browsers like the new CSS Grid.
 
-<Callout color="warning">
-**Heads up—our CSS Grid system is experimental and opt-in as of v4.1.0!** We included it in our documentation's CSS to demonstrate it for you, but it's disabled by default. Keep reading to learn how to enable it in your projects.
+<Callout color="info">
+**The CSS Grid system ships enabled as of v6.** Its responsive classes are powered by
+[container queries](/utilities/container-queries/), so a `.grid` responds to its own
+width rather than to the viewport. Set `$enable-cssgrid: false` to leave it out of
+your build.
 </Callout>
 
 ## How it works
 
 With CoreUI, we've added the option to enable a separate grid system that's built on CSS Grid, but with a CoreUI twist. You still get classes you can apply on a whim to build responsive layouts, but with a different approach under the hood.
 
-- **CSS Grid is opt-in.** Disable the default grid system by setting `$enable-grid-classes: false` and enable the CSS Grid by setting `$enable-cssgrid: true`. Then, recompile your Sass.
+- **Both grid systems ship.** They are independent: set `$enable-grid-classes: false` to drop the default flexbox grid, or `$enable-cssgrid: false` to drop this one, then recompile your Sass.
 
 - **Replace instances of `.row` with `.grid`.** The `.grid` class sets `display: grid` and creates a `grid-template` that you build on with your HTML.
 
 - **Replace `.col-*` classes with `.g-col-*` classes.** This is because our CSS Grid columns use the `grid-column` property instead of `width`.
 
 - **Columns and gutter sizes are set via CSS variables.** Set these on the parent `.grid` and customize however you want, inline or in a stylesheet, with `--cui-columns` and `--cui-gap`.
+
+- **Responsive classes use container queries.** Each `.grid` is a query container (`container-type: inline-size`), so responsive `.g-col-*` and `.g-start-*` classes respond to the width of the `.grid` itself rather than the viewport.
 
 In the future, Bootstrap will likely shift to a hybrid solution as the `gap` property has achieved nearly full browser support for flexbox.
 
@@ -42,7 +47,7 @@ Compared to the default grid system:
 
 ### Three columns
 
-Three equal-width columns across all viewports and devices can be created by using the `.g-col-4` classes. Add [responsive classes](#responsive) to change the layout by viewport size.
+Three equal-width columns across all container sizes and devices can be created by using the `.g-col-4` classes. Add [responsive classes](#responsive) to change the layout by the `.grid` container's width.
 
 <Example class="docs-example-cssgrid" code={`<div class="grid text-center">
     <div class="g-col-4">.g-col-4</div>
@@ -52,7 +57,13 @@ Three equal-width columns across all viewports and devices can be created by usi
 
 ### Responsive
 
-Use responsive classes to adjust your layout across viewports. Here we start with two columns on the narrowest viewports, and then grow to three columns on medium viewports and above.
+Use responsive classes to adjust your layout across breakpoints. Here we start with two columns on the narrowest containers, and then grow to three columns on medium containers and above.
+
+Responsive `.g-col-*` and `.g-start-*` classes are powered by [container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_containment/Container_queries) rather than media queries. The `.grid` is a query container, so its items respond to the width of the `.grid` itself instead of the viewport — a `.grid` placed inside a narrow column switches layout based on that column's width, not on the size of the browser window.
+
+<Callout color="warning">
+**`container-type` implies layout containment**, which makes every `.grid` the containing block for absolutely and fixed-positioned descendants. A `position: fixed` element inside a `.grid` is therefore positioned against the grid, not the viewport. Our own floating panels are unaffected — they render through a portal, outside the grid — but your own fixed markup needs to live outside it.
+</Callout>
 
 <Example class="docs-example-cssgrid" code={`<div class="grid text-center">
     <div class="g-col-6 g-col-md-4">.g-col-6 .g-col-md-4</div>
@@ -60,7 +71,7 @@ Use responsive classes to adjust your layout across viewports. Here we start wit
     <div class="g-col-6 g-col-md-4">.g-col-6 .g-col-md-4</div>
   </div>`} />
 
-Compare that to this two column layout at all viewports.
+Compare that to this two column layout at all container sizes.
 
 <Example class="docs-example-cssgrid" code={`<div class="grid text-center">
     <div class="g-col-6">.g-col-6</div>
