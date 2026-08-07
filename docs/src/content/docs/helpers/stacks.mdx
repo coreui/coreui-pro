@@ -47,6 +47,32 @@ And with [vertical rules](/helpers/vertical-rule/):
     <div class="p-2">Third item</div>
   </div>`} />
 
+## Responsive
+
+`.hstack{-sm|-md|-lg|-xl|-xxl}` and `.vstack{-sm|-md|-lg|-xl|-xxl}` switch direction at a breakpoint — a stack that reads as a row on a wide layout and as a column on a narrow one, without writing the flex utilities twice.
+
+The breakpoint is measured on the **container**, not the viewport, so mark an ancestor with `.stack-container` (or the [`.contains-inline`](/utilities/container-queries/) utility) for the query to have something to read. Without it the direction never switches.
+
+<Example class="docs-example-flex" code={`<div class="stack-container">
+    <div class="hstack-md vstack gap-3">
+      <div class="p-2">First item</div>
+      <div class="p-2">Second item</div>
+      <div class="p-2">Third item</div>
+    </div>
+  </div>`} />
+
+```html
+<div class="stack-container">
+  <div class="hstack-md vstack gap-3">
+    <div class="p-2">First item</div>
+    <div class="p-2">Second item</div>
+    <div class="p-2">Third item</div>
+  </div>
+</div>
+```
+
+Because the width comes from the container, the same markup can be a column in a sidebar and a row in the main content area of the same page.
+
 ## Examples
 
 Use `.vstack` to stack buttons and other elements:

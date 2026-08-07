@@ -614,6 +614,15 @@ adornment in the library — so the button needs no icon markup at all:
   `.container`, `.container-fluid` or `.container-{breakpoint}` no longer gets
   them — wrap its content, the way every example in these docs does.
 
+#### Stacks
+
+- **New: `.hstack{-sm|-md|-lg|-xl|-xxl}` and `.vstack{-sm|-md|-lg|-xl|-xxl}`** switch
+  direction at a breakpoint. The breakpoint is the width of the nearest query
+  container, so mark an ancestor with the new `.stack-container` (or the
+  [`.contains-inline`](/utilities/container-queries/) utility) — without one the
+  direction never switches. Plain `.hstack` and `.vstack` are unchanged, including
+  `.hstack`'s vertical centring and its shrink-to-content width.
+
 #### Tables
 
 - **`.table-responsive*` is a query container.** It still scrolls horizontally
