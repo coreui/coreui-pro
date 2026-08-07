@@ -1243,3 +1243,11 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `.is-valid` on the group behave exactly as on a `.form-control`, and the
   state also propagates from the control inside it. The per-family
   `!important` overrides that forced the invalid border in v5 are gone.
+- **Transitions are emitted inside `prefers-reduced-motion: no-preference`.**
+  The `transition()` mixin used to emit a transition and then switch it off
+  again under `prefers-reduced-motion: reduce`, so every animated rule shipped
+  an override block. It now emits the transition inside a `no-preference` query
+  instead, which drops those blocks. The trade-off: a browser that does not
+  support the media feature gets no transition at all. Rules that force
+  `transition: none` stay outside the query — they disable motion on purpose,
+  so they have to reach every reader.
