@@ -1,0 +1,55 @@
+@use "../functions/defaults" as *;
+@use "../functions/escape-svg" as *;
+@use "check" as *;
+@use "../mixins/tokens" as *;
+@use "../config" as *;
+
+// The checkbox's own theming surface. `.form-check-input` carries one shared
+// implementation for all three controls; these tokens are what a consumer sets
+// to restyle checkboxes alone, and they feed that implementation at runtime —
+// no Sass, and radios and switches are left where they are.
+
+// scss-docs-start checkbox-variables
+$checkbox-size:                 $form-check-input-width !default;
+$checkbox-bg:                   $form-check-input-bg !default;
+$checkbox-border:               $form-check-input-border !default;
+$checkbox-border-radius:        $form-check-input-border-radius !default;
+$checkbox-checked-icon:         $form-check-input-checked-bg-image !default;
+$checkbox-indeterminate-icon:   $form-check-input-indeterminate-bg-image !default;
+// scss-docs-end checkbox-variables
+
+$checkbox-tokens: () !default;
+
+// scss-docs-start checkbox-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$checkbox-tokens: defaults(
+  (
+    --#{$prefix}checkbox-size: #{$checkbox-size},
+    --#{$prefix}checkbox-bg: #{$checkbox-bg},
+    --#{$prefix}checkbox-border: #{$checkbox-border},
+    --#{$prefix}checkbox-border-radius: #{$checkbox-border-radius},
+    --#{$prefix}checkbox-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}checkbox-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}checkbox-checked-icon: #{escape-svg($checkbox-checked-icon)},
+    --#{$prefix}checkbox-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
+    --#{$prefix}checkbox-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
+    --#{$prefix}checkbox-indeterminate-icon: #{escape-svg($checkbox-indeterminate-icon)},
+  ),
+  $checkbox-tokens
+);
+// scss-docs-end checkbox-css-vars
+
+@layer forms {
+  .form-check-input[type="checkbox"] {
+    @include tokens($checkbox-tokens);
+
+    --#{$prefix}form-check-input-width: var(--#{$prefix}checkbox-size);
+    --#{$prefix}form-check-bg: var(--#{$prefix}checkbox-bg);
+    --#{$prefix}form-check-input-border: var(--#{$prefix}checkbox-border);
+    --#{$prefix}form-check-input-border-radius: var(--#{$prefix}checkbox-border-radius);
+    --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}checkbox-checked-bg);
+    --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}checkbox-checked-border-color);
+    --#{$prefix}form-check-input-indeterminate-bg-color: var(--#{$prefix}checkbox-indeterminate-bg);
+    --#{$prefix}form-check-input-indeterminate-border-color: var(--#{$prefix}checkbox-indeterminate-border-color);
+  }
+}

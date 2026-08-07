@@ -161,7 +161,10 @@ $form-check-input-tokens: defaults(
     flex-shrink: 0;
     width: var(--#{$prefix}form-check-input-width);
     height: var(--#{$prefix}form-check-input-width);
-    margin-top: ($line-height-base - $form-check-input-width) * .5; // line-height minus check height
+    // Half the difference between the line box and the control, computed at
+    // runtime so the box stays on the text baseline when the size token changes.
+    // stylelint-disable-next-line function-disallowed-list
+    margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}form-check-input-width)) * .5);
     vertical-align: top;
     appearance: none;
     background-color: var(--#{$prefix}form-check-bg);
@@ -197,17 +200,17 @@ $form-check-input-tokens: defaults(
 
       &[type="checkbox"] {
         @if $enable-gradients {
-          --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-checked-bg-image)}, var(--#{$prefix}gradient);
+          --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-checked-icon), var(--#{$prefix}gradient);
         } @else {
-          --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-checked-bg-image)};
+          --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-checked-icon);
         }
       }
 
       &[type="radio"] {
         @if $enable-gradients {
-          --#{$prefix}form-check-bg-image: #{escape-svg($form-check-radio-checked-bg-image)}, var(--#{$prefix}gradient);
+          --#{$prefix}form-check-bg-image: var(--#{$prefix}radio-checked-icon), var(--#{$prefix}gradient);
         } @else {
-          --#{$prefix}form-check-bg-image: #{escape-svg($form-check-radio-checked-bg-image)};
+          --#{$prefix}form-check-bg-image: var(--#{$prefix}radio-checked-icon);
         }
       }
     }
@@ -217,9 +220,9 @@ $form-check-input-tokens: defaults(
       border-color: var(--#{$prefix}form-check-input-indeterminate-border-color);
 
       @if $enable-gradients {
-        --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)}, var(--#{$prefix}gradient);
+        --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-indeterminate-icon), var(--#{$prefix}gradient);
       } @else {
-        --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)};
+        --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-indeterminate-icon);
       }
     }
 
@@ -253,7 +256,13 @@ $form-check-input-tokens: defaults(
     padding-inline-start: var(--#{$prefix}form-switch-padding-start);
 
     .form-check-input {
+      // `.form-check-input` declares `--#{$prefix}form-switch-width` itself, so an
+      // inherited value from the wrapper would lose to it. Restate it here, where
+      // the selector is specific enough to win.
+      --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
+
       width: var(--#{$prefix}form-switch-width);
+      height: var(--#{$prefix}switch-height);
       // stylelint-disable-next-line function-disallowed-list
       margin-inline-start: calc(var(--#{$prefix}form-switch-padding-start) * -1);
       background-image: var(--#{$prefix}form-switch-bg);
@@ -262,16 +271,16 @@ $form-check-input-tokens: defaults(
       @include transition(var(--#{$prefix}form-switch-transition));
 
       &:focus {
-        --#{$prefix}form-switch-bg: #{escape-svg($form-switch-focus-bg-image)};
+        --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-focus);
       }
 
       &:checked {
         background-position: var(--#{$prefix}form-switch-checked-bg-position);
 
         @if $enable-gradients {
-          --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)}, var(--#{$prefix}gradient);
+          --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-checked), var(--#{$prefix}gradient);
         } @else {
-          --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)};
+          --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-checked);
         }
       }
     }
@@ -286,26 +295,6 @@ $form-check-input-tokens: defaults(
     }
   }
 
-  @each $size, $map in $form-switch-widths {
-    $width: map.get($map, "width");
-    $height: map.get($map, "height");
-
-    .form-switch-#{$size} {
-      min-height: $height;
-      padding-inline-start: $width + .5em;
-
-      .form-check-input {
-        width: $width;
-        height: $height;
-        margin-inline-start: ($width + .5em) * -1;
-      }
-
-      .form-check-label {
-        // stylelint-disable-next-line function-disallowed-list
-        padding-top: calc((#{$height} - #{$font-size-base}) / 2);
-      }
-    }
-  }
 
   .form-check-inline {
     display: inline-block;
@@ -330,7 +319,7 @@ $form-check-input-tokens: defaults(
   @if $enable-dark-mode {
     @include color-mode(dark) {
       .form-switch .form-check-input:not(:checked):not(:focus) {
-        --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image-dark)};
+        --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-dark);
       }
     }
   }

@@ -1,0 +1,46 @@
+@use "../functions/defaults" as *;
+@use "../functions/escape-svg" as *;
+@use "check" as *;
+@use "../mixins/tokens" as *;
+@use "../config" as *;
+
+// The radio's own theming surface — see the note in `_checkbox.scss`.
+
+// scss-docs-start radio-variables
+$radio-size:              $form-check-input-width !default;
+$radio-bg:                $form-check-input-bg !default;
+$radio-border:            $form-check-input-border !default;
+$radio-border-radius:     $form-check-radio-border-radius !default;
+$radio-checked-icon:      $form-check-radio-checked-bg-image !default;
+// scss-docs-end radio-variables
+
+$radio-tokens: () !default;
+
+// scss-docs-start radio-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$radio-tokens: defaults(
+  (
+    --#{$prefix}radio-size: #{$radio-size},
+    --#{$prefix}radio-bg: #{$radio-bg},
+    --#{$prefix}radio-border: #{$radio-border},
+    --#{$prefix}radio-border-radius: #{$radio-border-radius},
+    --#{$prefix}radio-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}radio-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}radio-checked-icon: #{escape-svg($radio-checked-icon)},
+  ),
+  $radio-tokens
+);
+// scss-docs-end radio-css-vars
+
+@layer forms {
+  .form-check-input[type="radio"] {
+    @include tokens($radio-tokens);
+
+    --#{$prefix}form-check-input-width: var(--#{$prefix}radio-size);
+    --#{$prefix}form-check-bg: var(--#{$prefix}radio-bg);
+    --#{$prefix}form-check-input-border: var(--#{$prefix}radio-border);
+    --#{$prefix}form-check-radio-border-radius: var(--#{$prefix}radio-border-radius);
+    --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}radio-checked-bg);
+    --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}radio-checked-border-color);
+  }
+}
