@@ -1,0 +1,79 @@
+---
+title: "Bootstrap 5 Switch"
+name: "Switch"
+description: "Render a checkbox as a toggle switch with CoreUI's switch component, in four sizes."
+otherFrameworks:
+  - switch
+---
+
+## Approach
+
+A switch has the markup of a [checkbox](/forms/checkbox/) with `.form-switch` added to the wrapper — it is a checkbox, drawn as a track and a thumb.
+
+Add `role="switch"` to convey the nature of the control to assistive technologies that support the role. Older ones announce it as a plain checkbox, which is a fair fallback. Switches support `disabled` like any checkbox.
+
+## Basic switch
+
+<Example code={`<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+    <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label>
+  </div>
+  <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+    <label class="form-check-label" for="flexSwitchCheckChecked">Checked switch checkbox input</label>
+  </div>`} />
+
+## Disabled
+
+<Example code={`<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDisabled" disabled>
+    <label class="form-check-label" for="flexSwitchCheckDisabled">Disabled switch checkbox input</label>
+  </div>
+  <div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
+    <label class="form-check-label" for="flexSwitchCheckCheckedDisabled">Disabled checked switch checkbox input</label>
+  </div>`} />
+
+## Sizes
+
+Add `.form-switch-lg` or `.form-switch-xl` next to `.form-switch` for a larger control. The label scales with it.
+
+<Example code={`<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckSizeDefault">
+    <label class="form-check-label" for="flexSwitchCheckSizeDefault">Default switch checkbox input</label>
+  </div>
+  <div class="form-check form-switch form-switch-lg">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefaultLg">
+    <label class="form-check-label" for="flexSwitchCheckDefaultLg">Large switch checkbox input</label>
+  </div>
+  <div class="form-check form-switch form-switch-xl">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefaultXl">
+    <label class="form-check-label" for="flexSwitchCheckDefaultXl">Extra large switch checkbox input</label>
+  </div>`} />
+
+## Reverse
+
+Put the switch on the opposite side with the `.form-check-reverse` modifier.
+
+<Example code={`<div class="form-check form-switch form-check-reverse">
+    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckReverse">
+    <label class="form-check-label" for="flexSwitchCheckReverse">Reverse switch checkbox input</label>
+  </div>`} />
+
+## With a form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example code={`<div class="form-field">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="fieldSwitch">
+      <label class="form-check-label" for="fieldSwitch">Email notifications</label>
+    </div>
+    <div class="form-text">Turn this off and we will only contact you about your account.</div>
+  </div>`} />
+
+## Customizing
+
+### SASS variables
+
+<ScssDocs file="scss/forms/_check.scss" capture="form-switch-variables" />

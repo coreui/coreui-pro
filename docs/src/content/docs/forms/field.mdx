@@ -1,0 +1,118 @@
+---
+title: "Bootstrap 5 Form Field"
+name: "Field"
+description: "A layout wrapper for a form control, its label, description and validation feedback, built on CSS grid."
+---
+
+`.form-field` gives a control the layout and spacing it needs alongside its label, description and validation feedback — so a form is spaced by the field itself rather than by margin utilities sprinkled over its parts.
+
+<Example code={`<div class="form-field">
+    <label for="fieldText" class="form-label">Email address</label>
+    <input type="email" class="form-control" id="fieldText" placeholder="name@example.com">
+    <div class="form-text">
+      We'll never share your email with anyone else.
+    </div>
+  </div>`} />
+
+## How it works
+
+- **Default layout** is a single-column grid: everything stacks vertically with one gap. Use it for text inputs, selects, textareas, ranges, input groups and any of the [PRO field components](/forms/form-control-group/).
+- **Two-column layout** switches on through `:has()` when a bare `.form-check-input` is a direct child — the control pins to the first column, the label and description stack in the second. A checkbox that keeps its `.form-check` wrapper does not need this: the wrapper already lays the control out next to its label.
+- **A field label** (`.form-label`) spans both columns and sits above the control row.
+- **Grouped controls** — nest a `.form-field` per control inside an outer one to put several radios or checkboxes under a shared label with a shared description.
+
+## Examples
+
+### Select
+
+<Example code={`<div class="form-field">
+    <label for="fieldSelect" class="form-label">Country</label>
+    <select class="form-select" id="fieldSelect">
+      <option selected>Choose one…</option>
+      <option value="1">United States</option>
+      <option value="2">Canada</option>
+      <option value="3">United Kingdom</option>
+    </select>
+  </div>`} />
+
+### Textarea
+
+<Example code={`<div class="form-field">
+    <label for="fieldTextarea" class="form-label">Message</label>
+    <textarea class="form-control" id="fieldTextarea" rows="3"></textarea>
+    <div class="form-text">
+      Be sure to include the relevant details.
+    </div>
+  </div>`} />
+
+### Checkbox
+
+A checkbox in its `.form-check` wrapper stacks with its description:
+
+<Example code={`<div class="form-field">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="fieldCheck">
+      <label class="form-check-label" for="fieldCheck">Subscribe to the newsletter</label>
+    </div>
+    <div class="form-text">We send one email a month, and never share your address.</div>
+  </div>`} />
+
+Written without the wrapper, the field lays the control out itself — this is the two-column mode:
+
+<Example code={`<div class="form-field">
+    <input class="form-check-input" type="checkbox" id="fieldCheckBare">
+    <label for="fieldCheckBare">Subscribe to the newsletter</label>
+    <div class="form-text">We send one email a month, and never share your address.</div>
+  </div>`} />
+
+### Grouped
+
+Nest one `.form-field` per control inside an outer one, and give the group its own `.form-label`.
+
+<Example code={`<div class="form-field">
+    <span class="form-label">Delivery</span>
+    <div class="form-field">
+      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio1" checked>
+      <label for="fieldRadio1">Standard</label>
+      <div class="form-text">Three to five working days.</div>
+    </div>
+    <div class="form-field">
+      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio2">
+      <label for="fieldRadio2">Express</label>
+      <div class="form-text">Next working day, where available.</div>
+    </div>
+  </div>`} />
+
+### Switch
+
+<Example code={`<div class="form-field">
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="fieldSwitch">
+      <label class="form-check-label" for="fieldSwitch">Email notifications</label>
+    </div>
+    <div class="form-text">Turn this off and we will only contact you about your account.</div>
+  </div>`} />
+
+## Validation
+
+Feedback elements are children of the field like any other, so they inherit its gap and land under the control.
+
+<Example code={`<div class="form-field">
+    <label for="fieldValidation" class="form-label">Username</label>
+    <input type="text" class="form-control is-invalid" id="fieldValidation" value="jan kowalski" aria-describedby="fieldValidationFeedback">
+    <div id="fieldValidationFeedback" class="invalid-feedback d-block">
+      A username cannot contain spaces.
+    </div>
+  </div>`} />
+
+See [validation](/forms/validation/) for the full picture, including the server-side and browser-native flavours.
+
+## Customizing
+
+### SASS variables
+
+<ScssDocs file="scss/forms/_form-field.scss" capture="form-field-variables" />
+
+### CSS variables
+
+<ScssDocs file="scss/forms/_form-field.scss" capture="form-field-css-vars" />

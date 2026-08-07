@@ -1,0 +1,158 @@
+---
+title: "Bootstrap 5 Checkbox"
+name: "Checkbox"
+description: "Create consistent cross-browser and cross-device checkboxes with CoreUI's custom checkbox component."
+otherFrameworks:
+  - checkbox
+---
+
+## Approach
+
+Browser default checkboxes are replaced with `.form-check`, a wrapper that improves the layout and behavior of the native `<input type="checkbox">`. Checkboxes are for selecting one or several options in a list; for one option out of many, reach for a [radio](/forms/radio/).
+
+Structurally, the `<input />` and its `<label>` are sibling elements rather than the input sitting inside the label. That is slightly more verbose — you have to relate them with `id` and `for` — but it lets us style the label from the input's state (`:checked`, `:disabled`) with the sibling selector.
+
+The checked and indeterminate marks are drawn as background images on the input itself, so there is no extra element in your markup.
+
+## Basic checkbox
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="checkDefault">
+    <label class="form-check-label" for="checkDefault">
+      Default checkbox
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="checkChecked" checked>
+    <label class="form-check-label" for="checkChecked">
+      Checked checkbox
+    </label>
+  </div>`} />
+
+## Indeterminate
+
+Checkboxes can use the `:indeterminate` pseudo-class when it is set from JavaScript — there is no HTML attribute for it.
+
+<Example class="docs-example-indeterminate" code={`<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="checkIndeterminate">
+    <label class="form-check-label" for="checkIndeterminate">
+      Indeterminate checkbox
+    </label>
+  </div>`} />
+
+## Disabled
+
+Add the `disabled` attribute; the associated `<label>` is styled to match, in a lighter color, to indicate the state.
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="checkDisabled" disabled>
+    <label class="form-check-label" for="checkDisabled">
+      Disabled checkbox
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="checkCheckedDisabled" checked disabled>
+    <label class="form-check-label" for="checkCheckedDisabled">
+      Disabled checked checkbox
+    </label>
+  </div>`} />
+
+## Stacked
+
+Any number of checkboxes that are immediate siblings stack vertically and are spaced by `.form-check`.
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+    <label class="form-check-label" for="defaultCheck1">
+      Default checkbox
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" disabled>
+    <label class="form-check-label" for="defaultCheck2">
+      Disabled checkbox
+    </label>
+  </div>`} />
+
+## Inline
+
+Put checkboxes on the same horizontal row by adding `.form-check-inline` to any `.form-check`.
+
+<Example code={`<div class="form-check form-check-inline">
+    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+    <label class="form-check-label" for="inlineCheckbox1">1</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+    <label class="form-check-label" for="inlineCheckbox2">2</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3" disabled>
+    <label class="form-check-label" for="inlineCheckbox3">3 (disabled)</label>
+  </div>`} />
+
+## Reverse
+
+Put the box on the opposite side with the `.form-check-reverse` modifier.
+
+<Example code={`<div class="form-check form-check-reverse">
+    <input class="form-check-input" type="checkbox" value="" id="reverseCheck1">
+    <label class="form-check-label" for="reverseCheck1">
+      Reverse checkbox
+    </label>
+  </div>
+  <div class="form-check form-check-reverse">
+    <input class="form-check-input" type="checkbox" value="" id="reverseCheck2" disabled>
+    <label class="form-check-label" for="reverseCheck2">
+      Disabled reverse checkbox
+    </label>
+  </div>`} />
+
+## Without a label
+
+Drop the wrapping `.form-check` for a checkbox with no label text. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
+
+<Example code={`<div>
+    <input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="...">
+  </div>`} />
+
+## With a form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+
+<Example code={`<div class="form-field">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" value="" id="fieldCheck">
+      <label class="form-check-label" for="fieldCheck">Subscribe to the newsletter</label>
+    </div>
+    <div class="form-text">We send one email a month, and never share your address.</div>
+  </div>`} />
+
+## Toggle buttons
+
+Create button-like checkboxes by putting `.btn` styles on the `<label>` instead of `.form-check-label`, and `.btn-check` on the input. They can be grouped in a [button group](/components/button-group/).
+
+<Example code={`<input type="checkbox" class="btn-check" id="btn-check" autocomplete="off">
+  <label class="btn btn-primary" for="btn-check">Single toggle</label>
+
+  <input type="checkbox" class="btn-check" id="btn-check-2" checked autocomplete="off">
+  <label class="btn btn-primary" for="btn-check-2">Checked</label>
+
+  <input type="checkbox" class="btn-check" id="btn-check-3" autocomplete="off" disabled>
+  <label class="btn btn-primary" for="btn-check-3">Disabled</label>`} />
+
+<Example code={`<input type="checkbox" class="btn-check" id="btn-check-outlined" autocomplete="off">
+  <label class="btn btn-outline-primary" for="btn-check-outlined">Single toggle</label>
+
+  <input type="checkbox" class="btn-check" id="btn-check-2-outlined" checked autocomplete="off">
+  <label class="btn btn-outline-secondary" for="btn-check-2-outlined">Checked</label>`} />
+
+<Callout color="info">
+Visually, these checkbox toggle buttons are identical to the [button plugin toggle buttons](/components/buttons/#button-plugin). However, they are conveyed differently by assistive technologies: the checkbox toggles will be announced by screen readers as "checked"/"not checked" (since, despite their appearance, they are fundamentally still checkboxes), whereas the button plugin toggle buttons will be announced as "button"/"button pressed". The choice between these two approaches will depend on the type of toggle you are creating, and whether or not the toggle will make sense to users when announced as a checkbox or as an actual button.
+</Callout>
+
+## Customizing
+
+### SASS variables
+
+<ScssDocs file="scss/forms/_check.scss" capture="form-check-variables" />

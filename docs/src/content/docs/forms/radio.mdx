@@ -1,0 +1,155 @@
+---
+title: "Bootstrap 5 Radio"
+name: "Radio"
+description: "Create consistent cross-browser and cross-device radio buttons with CoreUI's custom radio component."
+otherFrameworks:
+  - radio
+---
+
+## Approach
+
+Browser default radios are replaced with `.form-check`, a wrapper that improves the layout and behavior of the native `<input type="radio">`. Radios are for selecting one option out of many; to select several, reach for a [checkbox](/forms/checkbox/).
+
+Structurally, the `<input />` and its `<label>` are sibling elements rather than the input sitting inside the label. That is slightly more verbose — you have to relate them with `id` and `for` — but it lets us style the label from the input's state (`:checked`, `:disabled`) with the sibling selector.
+
+Radios in the same group share a `name` attribute; that is what makes them mutually exclusive.
+
+## Basic radio
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+    <label class="form-check-label" for="flexRadioDefault1">
+      Default radio
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+    <label class="form-check-label" for="flexRadioDefault2">
+      Default checked radio
+    </label>
+  </div>`} />
+
+## Disabled
+
+Add the `disabled` attribute; the associated `<label>` is styled to match, in a lighter color, to indicate the state.
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioDisabled" disabled>
+    <label class="form-check-label" for="flexRadioDisabled">
+      Disabled radio
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked disabled>
+    <label class="form-check-label" for="flexRadioCheckedDisabled">
+      Disabled checked radio
+    </label>
+  </div>`} />
+
+## Stacked
+
+Any number of radios that are immediate siblings stack vertically and are spaced by `.form-check`.
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+    <label class="form-check-label" for="exampleRadios1">
+      Default radio
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+    <label class="form-check-label" for="exampleRadios2">
+      Second default radio
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3" disabled>
+    <label class="form-check-label" for="exampleRadios3">
+      Disabled radio
+    </label>
+  </div>`} />
+
+## Inline
+
+Put radios on the same horizontal row by adding `.form-check-inline` to any `.form-check`.
+
+<Example code={`<div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+    <label class="form-check-label" for="inlineRadio1">1</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+    <label class="form-check-label" for="inlineRadio2">2</label>
+  </div>
+  <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled>
+    <label class="form-check-label" for="inlineRadio3">3 (disabled)</label>
+  </div>`} />
+
+## Reverse
+
+Put the dot on the opposite side with the `.form-check-reverse` modifier.
+
+<Example code={`<div class="form-check form-check-reverse">
+    <input class="form-check-input" type="radio" name="reverseRadio" id="reverseRadio1">
+    <label class="form-check-label" for="reverseRadio1">
+      Reverse radio
+    </label>
+  </div>
+  <div class="form-check form-check-reverse">
+    <input class="form-check-input" type="radio" name="reverseRadio" id="reverseRadio2" disabled>
+    <label class="form-check-label" for="reverseRadio2">
+      Disabled reverse radio
+    </label>
+  </div>`} />
+
+## Without a label
+
+Drop the wrapping `.form-check` for a radio with no label text. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
+
+<Example code={`<div>
+    <input class="form-check-input" type="radio" name="radioNoLabel" id="radioNoLabel1" value="" aria-label="...">
+  </div>`} />
+
+## With a form field
+
+Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place. Nest one `.form-field` per radio inside an outer one to give the whole group a shared label.
+
+<Example code={`<div class="form-field">
+    <span class="form-label">Delivery</span>
+    <div class="form-field">
+      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio1" checked>
+      <label for="fieldRadio1">Standard</label>
+      <div class="form-text">Three to five working days.</div>
+    </div>
+    <div class="form-field">
+      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio2">
+      <label for="fieldRadio2">Express</label>
+      <div class="form-text">Next working day, where available.</div>
+    </div>
+  </div>`} />
+
+## Toggle buttons
+
+Create button-like radios by putting `.btn` styles on the `<label>` instead of `.form-check-label`, and `.btn-check` on the input. They can be grouped in a [button group](/components/button-group/).
+
+<Example code={`<input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked>
+  <label class="btn btn-secondary" for="option1">Checked</label>
+
+  <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off">
+  <label class="btn btn-secondary" for="option2">Radio</label>
+
+  <input type="radio" class="btn-check" name="options" id="option3" autocomplete="off" disabled>
+  <label class="btn btn-secondary" for="option3">Disabled</label>`} />
+
+<Example code={`<input type="radio" class="btn-check" name="options-outlined" id="success-outlined" autocomplete="off" checked>
+  <label class="btn btn-outline-success" for="success-outlined">Checked success radio</label>
+
+  <input type="radio" class="btn-check" name="options-outlined" id="danger-outlined" autocomplete="off">
+  <label class="btn btn-outline-danger" for="danger-outlined">Danger radio</label>`} />
+
+## Customizing
+
+### SASS variables
+
+<ScssDocs file="scss/forms/_check.scss" capture="form-check-variables" />
