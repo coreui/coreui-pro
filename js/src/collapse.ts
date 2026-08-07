@@ -47,13 +47,11 @@ const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="collapse"]'
 
 const Default = {
-  parent: null,
-  toggle: true
+  parent: null
 }
 
 const DefaultType = {
-  parent: '(null|element)',
-  toggle: 'boolean'
+  parent: '(null|element)'
 }
 
 /**
@@ -62,7 +60,6 @@ const DefaultType = {
 
 type CollapseConfig = {
   parent: string | Element | null
-  toggle: boolean
 }
 
 /**
@@ -97,10 +94,6 @@ class Collapse extends BaseComponent {
     if (!this._config.parent) {
       this._addAriaAndCollapsedClass(this._triggerArray, this._isShown())
     }
-
-    if (this._config.toggle) {
-      this.toggle()
-    }
   }
 
   // Getters
@@ -132,7 +125,7 @@ class Collapse extends BaseComponent {
     if (this._config.parent) {
       activeChildren = this._getFirstLevelChildren(SELECTOR_ACTIVES)
         .filter(element => element !== this._element)
-        .map(element => Collapse.getOrCreateInstance(element, { toggle: false }))
+        .map(element => Collapse.getOrCreateInstance(element))
     }
 
     if (activeChildren.length && activeChildren[0]._isTransitioning) {
@@ -227,7 +220,6 @@ class Collapse extends BaseComponent {
   }
 
   override _configAfterMerge(config: ComponentConfig): ComponentConfig {
-    (config as any).toggle = Boolean((config as any).toggle) // Coerce string values
     config.parent = getElement(config.parent)
     return config
   }
@@ -271,13 +263,8 @@ class Collapse extends BaseComponent {
 
   // Static
   static jQueryInterface(this: any, config: any): void {
-    const _config: Record<string, unknown> = {}
-    if (typeof config === 'string' && /show|hide/.test(config)) {
-      _config.toggle = false
-    }
-
     return this.each(function (this: HTMLElement) {
-      const data: any = Collapse.getOrCreateInstance(this, _config)
+      const data: any = Collapse.getOrCreateInstance(this)
 
       if (typeof config === 'string') {
         if (typeof data[config as string] === 'undefined') {
@@ -301,7 +288,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
   }
 
   for (const element of SelectorEngine.getMultipleElementsFromSelector(this)) {
-    Collapse.getOrCreateInstance(element, { toggle: false }).toggle()
+    Collapse.getOrCreateInstance(element).toggle()
   }
 })
 

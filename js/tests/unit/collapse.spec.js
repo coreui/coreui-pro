@@ -123,9 +123,7 @@ describe('Collapse', () => {
       fixtureEl.innerHTML = '<div class="show"></div>'
 
       const collapseEl = fixtureEl.querySelector('.show')
-      const collapse = new Collapse(collapseEl, {
-        toggle: false
-      })
+      const collapse = new Collapse(collapseEl)
 
       const spy = spyOn(collapse, 'hide')
 
@@ -155,8 +153,7 @@ describe('Collapse', () => {
 
         const collapseList = [].concat(...fixtureEl.querySelectorAll('.collapse'))
           .map(el => new Collapse(el, {
-            parent,
-            toggle: false
+            parent
           }))
 
         collapseEl2.addEventListener('shown.coreui.collapse', () => {
@@ -177,9 +174,7 @@ describe('Collapse', () => {
       const spy = spyOn(EventHandler, 'trigger')
 
       const collapseEl = fixtureEl.querySelector('div')
-      const collapse = new Collapse(collapseEl, {
-        toggle: false
-      })
+      const collapse = new Collapse(collapseEl)
 
       collapse._isTransitioning = true
       collapse.show()
@@ -193,9 +188,7 @@ describe('Collapse', () => {
       const spy = spyOn(EventHandler, 'trigger')
 
       const collapseEl = fixtureEl.querySelector('div')
-      const collapse = new Collapse(collapseEl, {
-        toggle: false
-      })
+      const collapse = new Collapse(collapseEl)
 
       collapse.show()
 
@@ -207,9 +200,7 @@ describe('Collapse', () => {
         fixtureEl.innerHTML = '<div class="collapse" style="height: 0px;"></div>'
 
         const collapseEl = fixtureEl.querySelector('div')
-        const collapse = new Collapse(collapseEl, {
-          toggle: false
-        })
+        const collapse = new Collapse(collapseEl)
 
         collapseEl.addEventListener('show.coreui.collapse', () => {
           expect(collapseEl.style.height).toEqual('0px')
@@ -229,9 +220,7 @@ describe('Collapse', () => {
         fixtureEl.innerHTML = '<div class="collapse collapse-horizontal" style="width: 0px;"></div>'
 
         const collapseEl = fixtureEl.querySelector('div')
-        const collapse = new Collapse(collapseEl, {
-          toggle: false
-        })
+        const collapse = new Collapse(collapseEl)
 
         collapseEl.addEventListener('show.coreui.collapse', () => {
           expect(collapseEl.style.width).toEqual('0px')
@@ -259,9 +248,7 @@ describe('Collapse', () => {
 
         const el1 = fixtureEl.querySelector('#collapse1')
         const el2 = fixtureEl.querySelector('#collapse2')
-        const collapse = new Collapse(el1, {
-          toggle: false
-        })
+        const collapse = new Collapse(el1)
 
         el1.addEventListener('shown.coreui.collapse', () => {
           expect(el1).toHaveClass('show')
@@ -380,7 +367,8 @@ describe('Collapse', () => {
           collapse.hide()
         })
 
-        collapse.show()
+        // The element starts shown, so close it to begin the hide/show cycle
+        collapse.hide()
       })
     })
 
@@ -389,9 +377,7 @@ describe('Collapse', () => {
         fixtureEl.innerHTML = '<div class="collapse"></div>'
 
         const collapseEl = fixtureEl.querySelector('div')
-        const collapse = new Collapse(collapseEl, {
-          toggle: false
-        })
+        const collapse = new Collapse(collapseEl)
 
         const expectEnd = () => {
           setTimeout(() => {
@@ -421,9 +407,7 @@ describe('Collapse', () => {
       const spy = spyOn(EventHandler, 'trigger')
 
       const collapseEl = fixtureEl.querySelector('div')
-      const collapse = new Collapse(collapseEl, {
-        toggle: false
-      })
+      const collapse = new Collapse(collapseEl)
 
       collapse._isTransitioning = true
       collapse.hide()
@@ -437,9 +421,7 @@ describe('Collapse', () => {
       const spy = spyOn(EventHandler, 'trigger')
 
       const collapseEl = fixtureEl.querySelector('div')
-      const collapse = new Collapse(collapseEl, {
-        toggle: false
-      })
+      const collapse = new Collapse(collapseEl)
 
       collapse.hide()
 
@@ -451,9 +433,7 @@ describe('Collapse', () => {
         fixtureEl.innerHTML = '<div class="collapse show"></div>'
 
         const collapseEl = fixtureEl.querySelector('div')
-        const collapse = new Collapse(collapseEl, {
-          toggle: false
-        })
+        const collapse = new Collapse(collapseEl)
 
         collapseEl.addEventListener('hidden.coreui.collapse', () => {
           expect(collapseEl).not.toHaveClass('show')
@@ -470,9 +450,7 @@ describe('Collapse', () => {
         fixtureEl.innerHTML = '<div class="collapse show"></div>'
 
         const collapseEl = fixtureEl.querySelector('div')
-        const collapse = new Collapse(collapseEl, {
-          toggle: false
-        })
+        const collapse = new Collapse(collapseEl)
 
         const expectEnd = () => {
           setTimeout(() => {
@@ -500,9 +478,7 @@ describe('Collapse', () => {
       fixtureEl.innerHTML = '<div class="collapse show"></div>'
 
       const collapseEl = fixtureEl.querySelector('div')
-      const collapse = new Collapse(collapseEl, {
-        toggle: false
-      })
+      const collapse = new Collapse(collapseEl)
 
       expect(Collapse.getInstance(collapseEl)).toEqual(collapse)
 
@@ -1034,11 +1010,11 @@ describe('Collapse', () => {
 
       expect(Collapse.getInstance(div)).toBeNull()
       const collapse = Collapse.getOrCreateInstance(div, {
-        toggle: false
+        parent: fixtureEl
       })
       expect(collapse).toBeInstanceOf(Collapse)
 
-      expect(collapse._config.toggle).toBeFalse()
+      expect(collapse._config.parent).toEqual(fixtureEl)
     })
 
     it('should return the instance when exists without given configuration', () => {
@@ -1046,17 +1022,17 @@ describe('Collapse', () => {
 
       const div = fixtureEl.querySelector('div')
       const collapse = new Collapse(div, {
-        toggle: false
+        parent: fixtureEl
       })
       expect(Collapse.getInstance(div)).toEqual(collapse)
 
       const collapse2 = Collapse.getOrCreateInstance(div, {
-        toggle: true
+        parent: null
       })
       expect(collapse).toBeInstanceOf(Collapse)
       expect(collapse2).toEqual(collapse)
 
-      expect(collapse2._config.toggle).toBeFalse()
+      expect(collapse2._config.parent).toEqual(fixtureEl)
     })
   })
 })
