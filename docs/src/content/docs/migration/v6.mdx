@@ -504,6 +504,23 @@ adornment in the library — so the button needs no icon markup at all:
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`
   states on the inner `<input>` carry the semantics.
 
+#### Toast
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The fade moved to CSS.** Toast was the last component driving its animation
+  from JavaScript — it toggled `.fade`, forced a reflow, then juggled `.show`,
+  `.showing` and a deprecated `.hide` class to fake an exit. Menu and the picker
+  popup already express this with `@starting-style` and a discrete `display`
+  transition, and Toast now does the same. JavaScript only toggles `.show`.
+  - The `animation` option and `data-coreui-animation` are gone. Add
+    `.toast-instant` to skip the animation.
+  - `.showing` and the deprecated `.hide` class are gone, and toasts no longer
+    get the generic `.fade` class. Replace any CSS or tests that depend on them.
+  - The transition is tuned with `--cui-toast-transition-duration` and
+    `--cui-toast-transition-timing`.
+  - `isShown()` returns `false` as soon as `hide()` is called, rather than when
+    the fade-out ends.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component

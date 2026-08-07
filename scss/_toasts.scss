@@ -1,6 +1,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
+@use "mixins/transition" as *;
 @use "config" as *;
 
 // stylelint-disable custom-property-no-missing-var-function
@@ -17,6 +18,8 @@ $toast-border-color:                var(--#{$prefix}border-color-translucent) !d
 $toast-border-radius:               var(--#{$prefix}border-radius) !default;
 $toast-box-shadow:                  var(--#{$prefix}box-shadow) !default;
 $toast-spacing:                     $container-padding-x !default;
+$toast-transition-duration:         .15s !default;
+$toast-transition-timing:           linear !default;
 
 $toast-header-color:                var(--#{$prefix}secondary-color) !default;
 $toast-header-background-color:     color-mix(in srgb, var(--#{$prefix}body-bg) 85%, transparent) !default;
@@ -44,6 +47,8 @@ $toast-tokens: defaults(
     --#{$prefix}toast-header-bg: #{$toast-header-background-color},
     --#{$prefix}toast-header-border-color: #{$toast-header-border-color},
     --#{$prefix}toast-font-size: $toast-font-size,
+    --#{$prefix}toast-transition-duration: #{$toast-transition-duration},
+    --#{$prefix}toast-transition-timing: #{$toast-transition-timing},
   ),
   $toast-tokens
 );
@@ -52,6 +57,7 @@ $toast-tokens: defaults(
   .toast {
     @include tokens($toast-tokens);
 
+    display: none;
     width: var(--#{$prefix}toast-max-width);
     max-width: 100%;
     font-size: var(--#{$prefix}toast-font-size);
@@ -63,12 +69,28 @@ $toast-tokens: defaults(
     box-shadow: var(--#{$prefix}toast-box-shadow);
     @include border-radius(var(--#{$prefix}toast-border-radius));
 
-    &.showing {
+    // `display` is what makes a toast appear, and it cannot be interpolated, so
+    // `allow-discrete` keeps it laid out until the fade-out finishes. Add
+    // `.toast-instant` to skip the animation.
+    &:not(.toast-instant) {
       opacity: 0;
+      @include transition(
+        opacity var(--#{$prefix}toast-transition-duration) var(--#{$prefix}toast-transition-timing),
+        display var(--#{$prefix}toast-transition-duration) allow-discrete
+      );
     }
 
-    &:not(.show) {
-      display: none;
+    &.show {
+      display: block;
+      opacity: 1;
+    }
+  }
+
+  // The toast is not rendered before `.show` lands, so the fade-in needs an
+  // explicit state to animate FROM: the base rule cannot express it.
+  @starting-style {
+    .toast:not(.toast-instant).show {
+      opacity: 0;
     }
   }
 
