@@ -210,12 +210,12 @@ const tooltip = new coreui.Tooltip(element, {
 
 ### Methods
 
-<Callout color="danger">
-#### Asynchronous methods and transitions
+<Callout color="info">
+#### Promises and transitions
 
-All our API methods are **asynchronous** and initiate a **transition**. They return to the caller as soon as the transition begins but **before it concludes**. Furthermore, a method call on a **transitioning component will be ignored**.
+**Methods that show or hide a component return a promise.** The promise resolves when the transition ends, so `await` continues at the same moment a `shown.coreui.*` or `hidden.coreui.*` listener runs. The methods still return immediately and never block the caller. A call on a component that is already transitioning does nothing and resolves right away.
 
-[Refer to our JavaScript documentation for further details](/getting-started/javascript/#asynchronous-functions-and-transitions).
+[Refer to our JavaScript documentation for further details](/getting-started/javascript/#promises-and-transitions).
 </Callout>
 
 | Method | Description |

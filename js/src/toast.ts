@@ -85,7 +85,7 @@ class Toast extends BaseComponent {
   }
 
   // Public
-  show(): void {
+  async show(): Promise<void> {
     const showEvent = EventHandler.trigger(this._element, EVENT_SHOW)
 
     if (showEvent!.defaultPrevented) {
@@ -102,10 +102,10 @@ class Toast extends BaseComponent {
 
     this._element.classList.add(CLASS_NAME_SHOW)
 
-    this._queueCallback(complete, this._element, this._isAnimated())
+    await this._queueCallback(complete, this._element, this._isAnimated())
   }
 
-  hide(): void {
+  async hide(): Promise<void> {
     if (!this.isShown()) {
       return
     }
@@ -123,7 +123,7 @@ class Toast extends BaseComponent {
     // Removing .show starts the fade-out. The discrete `display` transition
     // keeps the toast laid out until the fade finishes.
     this._element.classList.remove(CLASS_NAME_SHOW)
-    this._queueCallback(complete, this._element, this._isAnimated())
+    await this._queueCallback(complete, this._element, this._isAnimated())
   }
 
   override dispose(): void {
