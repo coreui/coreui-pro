@@ -82,7 +82,8 @@ class Tab extends BaseComponent {
   }
 
   // Public
-  show(): void { // Shows this elem and deactivate the active sibling if exists
+  // Shows this elem and deactivate the active sibling if exists
+  async show(): Promise<void> {
     const innerElem = this._element
     if (this._elemIsActive(innerElem)) {
       return
@@ -102,11 +103,11 @@ class Tab extends BaseComponent {
     }
 
     this._deactivate(active, innerElem)
-    this._activate(innerElem, active)
+    await this._activate(innerElem, active)
   }
 
   // Private
-  _activate(element: HTMLElement | null, relatedElem?: HTMLElement | null): void {
+  async _activate(element: HTMLElement | null, relatedElem?: HTMLElement | null): Promise<void> {
     if (!element) {
       return
     }
@@ -129,10 +130,10 @@ class Tab extends BaseComponent {
       })
     }
 
-    this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
+    await this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
   }
 
-  _deactivate(element: HTMLElement | null, relatedElem?: HTMLElement | null): void {
+  async _deactivate(element: HTMLElement | null, relatedElem?: HTMLElement | null): Promise<void> {
     if (!element) {
       return
     }
@@ -154,7 +155,7 @@ class Tab extends BaseComponent {
       EventHandler.trigger(element, EVENT_HIDDEN, { relatedTarget: relatedElem })
     }
 
-    this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
+    await this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
   }
 
   _keydown(event: CoreUIEvent): void {

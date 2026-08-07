@@ -101,7 +101,7 @@ class Sidebar extends BaseComponent {
 
   // Public
 
-  show(): void {
+  async show(): Promise<void> {
     EventHandler.trigger(this._element, EVENT_SHOW)
 
     if (this._element.classList.contains(CLASS_NAME_HIDE)) {
@@ -129,10 +129,10 @@ class Sidebar extends BaseComponent {
       }
     }
 
-    this._queueCallback(complete, this._element, true)
+    await this._queueCallback(complete, this._element, true)
   }
 
-  hide(): void {
+  async hide(): Promise<void> {
     EventHandler.trigger(this._element, EVENT_HIDE)
 
     if (this._element.classList.contains(CLASS_NAME_SHOW)) {
@@ -159,16 +159,11 @@ class Sidebar extends BaseComponent {
       }
     }
 
-    this._queueCallback(complete, this._element, true)
+    await this._queueCallback(complete, this._element, true)
   }
 
-  toggle(): void {
-    if (this._isVisible()) {
-      this.hide()
-      return
-    }
-
-    this.show()
+  toggle(): Promise<void> {
+    return this._isVisible() ? this.hide() : this.show()
   }
 
   narrow(): void {

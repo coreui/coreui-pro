@@ -126,6 +126,32 @@ They are no longer part of the published package. Use the built bundle instead:
 or, if you are already resolving the package by name, `import { Tooltip } from
 '@coreui/coreui-pro'` — `module` points at the same ESM bundle.
 
+#### Lifecycle methods return a promise
+
+`show()`, `hide()`, `toggle()` and `close()` returned before the transition
+ended, so continuing after one meant listening for `shown.coreui.*` /
+`hidden.coreui.*`. They now return a promise that resolves at the same moment
+that event fires, so you can `await` the method instead:
+
+```diff
+- myCollapseEl.addEventListener('shown.coreui.collapse', () => {
+-   // the area is expanded
+- })
+- collapse.show()
++ await collapse.show()
++ // the area is expanded
+```
+
+Collapse, Menu, Modal, Offcanvas, Popover, Sidebar and Tooltip return one from
+`show`/`hide`/`toggle`, Toast from `show`/`hide`, Tab from `show`, and Alert
+from `close`. The event path is unchanged and still the right tool when you must
+react to changes your own code did not start.
+
+The promise always settles — a call that does nothing (already open, a prevented
+`show.coreui.*`, an instance disposed mid-transition) resolves right away rather
+than stranding the caller. It resolves with no value, so it tells you the call
+finished, not whether the state changed.
+
 ### Components
 
 #### Autocomplete and Multi Select share one options menu

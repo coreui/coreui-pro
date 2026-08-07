@@ -37,6 +37,19 @@ toast.dispose()
 tooltip.update()
 popover.setContent({ '.popover-body': 'Updated' })
 
+// Show, hide, toggle and close return a promise that settles once the component
+// finishes, so callers can await them instead of listening for `shown.coreui.*`.
+const closing: Promise<void> = alert.close()
+const modalShowing: Promise<void> = modal.show()
+const modalHiding: Promise<void> = modal.hide()
+const modalToggling: Promise<void> = modal.toggle()
+const toastShowing: Promise<void> = toast.show()
+const tooltipToggling: Promise<void> = tooltip.toggle()
+const popoverShowing: Promise<void> = popover.show()
+
+// @ts-expect-error — the promise resolves to void, not a component
+const wrongResolution: Promise<Modal> = modal.show()
+
 // PRO components.
 const calendar = new Calendar(element, { calendars: 2, locale: 'en-US' })
 calendar.update({ selectionType: 'week' })
@@ -52,5 +65,6 @@ const values: string[] = chipSet.getValues()
 const chip: Chip | null = Chip.getInstance(element)
 
 export {
-  alert, chip, chipSet, datePicker, instance, multiSelect, name, orCreated, selection, toast, values, version
+  alert, chip, chipSet, closing, datePicker, instance, modalHiding, modalShowing, modalToggling, multiSelect, name,
+  orCreated, popoverShowing, selection, toast, toastShowing, tooltipToggling, values, version, wrongResolution
 }
