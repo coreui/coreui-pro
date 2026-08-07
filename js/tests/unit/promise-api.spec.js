@@ -47,7 +47,7 @@ describe('Promise-returning API', () => {
       fixtureEl.innerHTML = '<div class="collapse"><div>content</div></div>'
 
       const collapseEl = fixtureEl.querySelector('.collapse')
-      const collapse = new Collapse(collapseEl, { toggle: false })
+      const collapse = new Collapse(collapseEl)
 
       expect(await orderOf(collapseEl, 'shown.coreui.collapse', () => collapse.show()))
         .toEqual(['shown.coreui.collapse', 'resolved'])
@@ -147,7 +147,7 @@ describe('Promise-returning API', () => {
       fixtureEl.innerHTML = '<div class="collapse"><div>content</div></div>'
 
       const collapseEl = fixtureEl.querySelector('.collapse')
-      const collapse = new Collapse(collapseEl, { toggle: false })
+      const collapse = new Collapse(collapseEl)
       const shownSpy = jasmine.createSpy('shown')
 
       collapseEl.addEventListener('show.coreui.collapse', event => {
@@ -165,7 +165,7 @@ describe('Promise-returning API', () => {
       fixtureEl.innerHTML = '<div class="collapse"><div>content</div></div>'
 
       const collapseEl = fixtureEl.querySelector('.collapse')
-      const collapse = new Collapse(collapseEl, { toggle: false })
+      const collapse = new Collapse(collapseEl)
 
       await collapse.show()
 
@@ -182,7 +182,7 @@ describe('Promise-returning API', () => {
       fixtureEl.innerHTML = '<div class="collapse"><div>content</div></div>'
 
       const collapseEl = fixtureEl.querySelector('.collapse')
-      const collapse = new Collapse(collapseEl, { toggle: false })
+      const collapse = new Collapse(collapseEl)
       const shownSpy = jasmine.createSpy('shown')
 
       collapseEl.addEventListener('shown.coreui.collapse', shownSpy)
@@ -218,7 +218,7 @@ describe('Promise-returning API', () => {
       fixtureEl.innerHTML = '<div class="collapse"><div>content</div></div>'
 
       const collapseEl = fixtureEl.querySelector('.collapse')
-      const collapse = new Collapse(collapseEl, { toggle: false })
+      const collapse = new Collapse(collapseEl)
 
       await collapse.show()
       expect(collapseEl).toHaveClass('show')
