@@ -374,6 +374,8 @@ You can also put the `<caption>` on the top of the table with `.caption-top`.
 
 Responsive tables allow tables to be scrolled horizontally with ease. Make any table responsive across all viewports by wrapping a `.table` with `.table-responsive`. Or, pick a maximum breakpoint with which to have a responsive table up to by using `.table-responsive{-sm|-md|-lg|-xl|-xxl}`.
 
+Every `.table-responsive*` is also a [query container](/utilities/container-queries/), which is what [stacked tables](#stacked-tables) below query to decide when to break rows into blocks.
+
 <Callout color="warning">
 ##### Vertical clipping/truncation
 
@@ -465,6 +467,39 @@ Use `.table-responsive{-sm|-md|-lg|-xl|-xxl}` as needed to create responsive tab
   </table>
 </div>
 ```
+
+## Stacked tables
+
+A table that scrolls sideways is still a table; on a narrow screen it is often easier to read one record at a time. Add `.table-stacked{-sm|-md|-lg|-xl|-xxl}` next to `.table` to turn each row into a block below that breakpoint — the header is hidden from sight (it stays in the accessibility tree) and every cell carries its own label.
+
+Two things are required: a `.table-responsive*` ancestor, because that is the query container the class measures, and a `data-cell` attribute on every `<td>` after the first, which supplies the label the hidden header would have given. The first cell is treated as the record's title and needs no label.
+
+<Example html={[`<div class="table-responsive">`, `    <table class="table table-stacked-md">`, `      <thead>`, `        <tr>`, `          <th scope="col">Name</th>`, `          <th scope="col">Role</th>`, `          <th scope="col">Email</th>`, `        </tr>`, `      </thead>`, `      <tbody>`, `        <tr>`, `          <td>Mark Otto</td>`, `          <td data-cell="Role">Maintainer</td>`, `          <td data-cell="Email">mark@example.com</td>`, `        </tr>`, `        <tr>`, `          <td>Jacob Thornton</td>`, `          <td data-cell="Role">Designer</td>`, `          <td data-cell="Email">jacob@example.com</td>`, `        </tr>`, `      </tbody>`, `    </table>`, `  </div>`]} />
+
+```html
+<div class="table-responsive">
+  <table class="table table-stacked-md">
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Role</th>
+        <th scope="col">Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mark Otto</td>
+        <td data-cell="Role">Maintainer</td>
+        <td data-cell="Email">mark@example.com</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+```
+
+<Callout color="info">
+Because the breakpoint is read from the `.table-responsive*` wrapper rather than the window, a stacked table inside a narrow column stacks there while the same markup in the main content area stays a table.
+</Callout>
 
 ## Customization
 
