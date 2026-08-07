@@ -1,17 +1,49 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:string";
+@use "../layout/breakpoints" as *;
+@use "../config" as *;
+
+// Every stack class, so the shared flex base is written once.
+// stylelint-disable-next-line scss/dollar-variable-default
+$stack-selectors: ();
+@each $breakpoint in map.keys($grid-breakpoints) {
+  $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+  $stack-selectors: list.append($stack-selectors, string.unquote(".hstack#{$infix}"), comma);
+  $stack-selectors: list.append($stack-selectors, string.unquote(".vstack#{$infix}"), comma);
+}
+
 @layer helpers {
   // scss-docs-start stacks
-  .hstack {
+  .stack-container {
+    @include set-container();
+  }
+
+  #{$stack-selectors} {
     display: flex;
-    flex-direction: row;
-    align-items: center;
     align-self: stretch;
   }
 
-  .vstack {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    align-self: stretch;
+  // The responsive variants read the width of the nearest query container — put
+  // `.stack-container` (or the `.contains-inline` utility) on an ancestor, or the
+  // query has nothing to measure and the direction never switches.
+  @each $breakpoint in map.keys($grid-breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    .hstack#{$infix} {
+      @include container-breakpoint-up($breakpoint) {
+        flex-direction: row;
+        align-items: center;
+      }
+    }
+
+    .vstack#{$infix} {
+      @include container-breakpoint-up($breakpoint) {
+        flex: 1 1 auto;
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
   }
   // scss-docs-end stacks
 }
