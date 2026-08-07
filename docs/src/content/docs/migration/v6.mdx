@@ -530,6 +530,23 @@ adornment in the library — so the button needs no icon markup at all:
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`
   states on the inner `<input>` carry the semantics.
 
+#### Collapse
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The `toggle` option is gone.** It made the constructor change the state the
+  markup declares, which surprised people — so nearly every caller passed
+  `toggle: false`. The constructor now always keeps the declared state; add
+  `.show` to start open, and call `show()`, `hide()` or `toggle()` to change it.
+
+  ```diff
+  - const collapse = new coreui.Collapse('#myCollapse', { toggle: false })
+  + const collapse = new coreui.Collapse('#myCollapse')
+  ```
+
+  Callers that relied on the constructor toggling need an explicit call:
+  `new coreui.Collapse(el).toggle()`. `data-coreui-toggle` on a *trigger* is
+  unrelated and unchanged.
+
 #### Toast
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
