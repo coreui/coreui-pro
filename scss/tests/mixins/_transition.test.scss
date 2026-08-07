@@ -1,0 +1,138 @@
+// stylelint-disable property-disallowed-list
+@use "../../config" as *;
+@use "../../mixins/transition" as *;
+
+// Store original values
+$original-enable-transitions: $enable-transitions;
+$original-enable-reduced-motion: $enable-reduced-motion;
+
+$enable-transitions: true !global;
+$enable-reduced-motion: true !global;
+
+@include describe("transition mixin") {
+  @include it("emits the transition behind a no-preference query") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition(color .15s ease-in-out);
+        }
+      }
+
+      @include expect() {
+        @media (prefers-reduced-motion: no-preference) {
+          .test {
+            transition: color .15s ease-in-out;
+          }
+        }
+      }
+    }
+  }
+
+  @include it("keeps a forced none outside the query") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition(none);
+        }
+      }
+
+      @include expect() {
+        .test {
+          transition: none;
+        }
+      }
+    }
+  }
+
+  @include it("keeps a forced none !important outside the query") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition(none !important);
+        }
+      }
+
+      @include expect() {
+        .test {
+          transition: none !important;
+        }
+      }
+    }
+  }
+
+  @include it("falls back to $transition-base without arguments") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition();
+        }
+      }
+
+      @include expect() {
+        @media (prefers-reduced-motion: no-preference) {
+          .test {
+            transition: all .2s ease-in-out;
+          }
+        }
+      }
+    }
+  }
+
+  @include it("handles null values by emitting nothing") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition(null);
+        }
+      }
+
+      @include expect() {
+        .test { // stylelint-disable-line block-no-empty
+        }
+      }
+    }
+  }
+
+  @include it("respects $enable-reduced-motion variable") {
+    $enable-reduced-motion: false !global;
+
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition(color .15s ease-in-out);
+        }
+      }
+
+      @include expect() {
+        .test {
+          transition: color .15s ease-in-out;
+        }
+      }
+    }
+
+    $enable-reduced-motion: true !global;
+  }
+
+  @include it("respects $enable-transitions variable") {
+    $enable-transitions: false !global;
+
+    @include assert() {
+      @include output() {
+        .test {
+          @include transition(color .15s ease-in-out);
+        }
+      }
+
+      @include expect() {
+        .test { // stylelint-disable-line block-no-empty
+        }
+      }
+    }
+
+    $enable-transitions: true !global;
+  }
+}
+
+// Restore original values
+$enable-transitions: $original-enable-transitions !global;
+$enable-reduced-motion: $original-enable-reduced-motion !global;
