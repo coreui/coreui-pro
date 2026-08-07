@@ -1,0 +1,77 @@
+@use "sass:map";
+@use "../functions/defaults" as *;
+@use "../functions/escape-svg" as *;
+@use "check" as *;
+@use "../mixins/tokens" as *;
+@use "../config" as *;
+
+// The switch's own theming surface — see the note in `_checkbox.scss`. The size
+// modifiers set tokens rather than declarations, so a size the map does not name
+// is two custom properties rather than a Sass recompile.
+
+// scss-docs-start switch-variables
+$switch-width:                $form-switch-width !default;
+$switch-height:               $form-check-input-width !default;
+$switch-border-radius:        $form-switch-border-radius !default;
+$switch-transition:           $form-switch-transition !default;
+$switch-knob:                 $form-switch-bg-image !default;
+$switch-knob-focus:           $form-switch-focus-bg-image !default;
+$switch-knob-checked:         $form-switch-checked-bg-image !default;
+$switch-knob-dark:            $form-switch-bg-image-dark !default;
+$switch-checked-knob-position: $form-switch-checked-bg-position !default;
+// scss-docs-end switch-variables
+
+$switch-tokens: () !default;
+
+// scss-docs-start switch-css-vars
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$switch-tokens: defaults(
+  (
+    --#{$prefix}switch-width: #{$switch-width},
+    --#{$prefix}switch-height: #{$switch-height},
+    --#{$prefix}switch-border-radius: #{$switch-border-radius},
+    --#{$prefix}switch-transition: #{$switch-transition},
+    --#{$prefix}switch-knob: #{escape-svg($switch-knob)},
+    --#{$prefix}switch-knob-focus: #{escape-svg($switch-knob-focus)},
+    --#{$prefix}switch-knob-checked: #{escape-svg($switch-knob-checked)},
+    --#{$prefix}switch-knob-dark: #{escape-svg($switch-knob-dark)},
+    --#{$prefix}switch-checked-knob-position: #{$switch-checked-knob-position},
+  ),
+  $switch-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end switch-css-vars
+
+@layer forms {
+  .form-switch {
+    @include tokens($switch-tokens);
+
+    // stylelint-disable-next-line function-disallowed-list
+    --#{$prefix}form-switch-padding-start: calc(var(--#{$prefix}switch-width) + .5em);
+    --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
+    --#{$prefix}form-switch-border-radius: var(--#{$prefix}switch-border-radius);
+    --#{$prefix}form-switch-transition: var(--#{$prefix}switch-transition);
+    --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob);
+    --#{$prefix}form-switch-checked-bg-position: var(--#{$prefix}switch-checked-knob-position);
+  }
+
+  // The named sizes are token overrides now: width and height, and the rest —
+  // padding, the label's optical centring — follows from them.
+  @each $size, $map in $form-switch-widths {
+    .form-switch-#{$size} {
+      --#{$prefix}switch-width: #{map.get($map, "width")};
+      --#{$prefix}switch-height: #{map.get($map, "height")};
+
+      // A sized switch is taller than the text line it sits on, so it sets the
+      // row height itself and re-centres the label; the default one keeps
+      // `.form-check`'s.
+      min-height: var(--#{$prefix}switch-height);
+
+      .form-check-label {
+        // stylelint-disable-next-line function-disallowed-list
+        padding-top: calc((var(--#{$prefix}switch-height) - #{$font-size-base}) * .5);
+      }
+    }
+  }
+}

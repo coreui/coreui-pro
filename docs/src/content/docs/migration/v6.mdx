@@ -616,6 +616,25 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### Checkbox, radio and switch: one page became four
 
+- **Each control now owns its custom properties.** `--#{$prefix}checkbox-*`,
+  `--#{$prefix}radio-*` and `--#{$prefix}switch-*` feed the shared implementation
+  at runtime, so restyling checkboxes no longer drags radios along and no longer
+  needs a Sass rebuild. Set them **on the control** — a token an element declares
+  for itself cannot be overridden from an ancestor. The old
+  `--#{$prefix}form-check-*` properties still exist and still work; they are the
+  shared layer underneath.
+- **The control stays on the text baseline when you resize it.** Its `margin-top`
+  used to be Sass arithmetic over `$form-check-input-width`, so changing the width
+  token at runtime moved the box off the line. It is a `calc()` over the size
+  token now.
+- **Sized switches are token overrides.** `.form-switch-lg` / `-xl` set
+  `--#{$prefix}switch-width` and `--#{$prefix}switch-height` instead of writing
+  their own geometry, so a size the map does not name is two custom properties
+  rather than a Sass recompile.
+- The Sass variables behind all of this moved into `scss/forms/_checkbox.scss`,
+  `_radio.scss` and `_switch.scss`. `$form-check-*` and `$form-switch-*` keep
+  working — the new per-control variables default to them.
+
 - **The docs split.** `/forms/checks-radios/` is now
   [Checkbox](/forms/checkbox/), [Radio](/forms/radio/) and
   [Switch](/forms/switch/) — one page per control, each self-contained down to its

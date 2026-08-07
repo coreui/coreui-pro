@@ -152,4 +152,16 @@ Create button-like radios by putting `.btn` styles on the `<label>` instead of `
 
 ### SASS variables
 
+<ScssDocs file="scss/forms/_radio.scss" capture="radio-variables" />
+
+### CSS variables
+
+Radios read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
+
+<ScssDocs file="scss/forms/_radio.scss" capture="radio-css-vars" />
+
+### Shared variables
+
+The wrapper and the shared control surface:
+
 <ScssDocs file="scss/forms/_check.scss" capture="form-check-variables" />
