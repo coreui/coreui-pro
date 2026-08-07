@@ -10,7 +10,8 @@
 
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
-import { defineJQueryPlugin } from './util/index.js'
+import SelectorEngine from './dom/selector-engine.js'
+import { defineJQueryPlugin, setAriaAttribute } from './util/index.js'
 
 /**
  * Constants
@@ -24,6 +25,7 @@ const DATA_API_KEY = '.data-api'
 const CLASS_NAME_ACTIVE = 'active'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="button"]'
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_DOM_CONTENT_LOADED = `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`
 
 /**
  * Class definition
@@ -38,7 +40,7 @@ class Button extends BaseComponent {
   // Public
   toggle(): void {
     // Toggle class and sync the `aria-pressed` attribute with the return value of the `.toggle()` method
-    this._element.setAttribute('aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE) as unknown as string)
+    setAriaAttribute(this._element, 'aria-pressed', this._element.classList.toggle(CLASS_NAME_ACTIVE))
   }
 
   // Static
@@ -56,6 +58,17 @@ class Button extends BaseComponent {
 /**
  * Data API implementation
  */
+
+// A toggle button must always expose `aria-pressed`. Without it, assistive technology
+// reads the control as a plain button and never announces the pressed state.
+// See https://www.w3.org/WAI/ARIA/apg/patterns/button/
+EventHandler.on(document, EVENT_DOM_CONTENT_LOADED, () => {
+  for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE)) {
+    if (!element.hasAttribute('aria-pressed')) {
+      setAriaAttribute(element, 'aria-pressed', element.classList.contains(CLASS_NAME_ACTIVE))
+    }
+  }
+})
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, event => {
   event.preventDefault()
