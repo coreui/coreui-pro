@@ -7,23 +7,16 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// scss-docs-start form-check-variables
+// The values each control's own variables default to. A consumer sets
+// `$checkbox-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
+// what those fall back to, and what still works for a v5-era override.
+// scss-docs-start form-check-defaults
 $form-check-input-width:                  1em !default;
-$form-check-min-height:                   $font-size-base * $line-height-base !default;
-$form-check-padding-start:                $form-check-input-width + .5em !default;
-$form-check-margin-bottom:                .125rem !default;
-$form-check-label-color:                  null !default;
-$form-check-label-cursor:                 null !default;
-$form-check-transition:                   null !default;
-
-$form-check-input-active-filter:          brightness(90%) !default;
 
 $form-check-input-bg:                     $input-bg !default;
 $form-check-input-border:                 var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
 $form-check-input-border-radius:          .25em !default;
 $form-check-radio-border-radius:          50% !default;
-$form-check-input-focus-border:           $input-focus-border-color !default;
-$form-check-input-focus-ring:       $focus-ring !default;
 
 $form-check-input-checked-color:          $component-active-color !default;
 $form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
@@ -31,12 +24,27 @@ $form-check-radio-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='ht
 
 $form-check-input-indeterminate-color:          $component-active-color !default;
 $form-check-input-indeterminate-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-indeterminate-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
+// scss-docs-end form-check-defaults
+
+// What the wrapper owns and what all three controls share: the row, the label,
+// and the focus / active / disabled states.
+// scss-docs-start form-check-variables
+$form-check-min-height:                   $font-size-base * $line-height-base !default;
+$form-check-padding-start:                $form-check-input-width + .5em !default;
+$form-check-margin-bottom:                .125rem !default;
+$form-check-inline-margin-end:            1rem !default;
+
+$form-check-label-color:                  null !default;
+$form-check-label-cursor:                 null !default;
+$form-check-transition:                   null !default;
+
+$form-check-input-active-filter:          brightness(90%) !default;
+$form-check-input-focus-border:           $input-focus-border-color !default;
+$form-check-input-focus-ring:             $focus-ring !default;
 
 $form-check-input-disabled-opacity:        .5 !default;
 $form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;
 $form-check-btn-check-disabled-opacity:    $input-btn-disabled-opacity !default;
-
-$form-check-inline-margin-end:    1rem !default;
 // scss-docs-end form-check-variables
 
 // scss-docs-start form-switch-variables
