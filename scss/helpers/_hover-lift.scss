@@ -1,0 +1,47 @@
+@use "../functions/defaults" as *;
+@use "../mixins/box-shadow" as *;
+@use "../mixins/tokens" as *;
+@use "../mixins/transition" as *;
+@use "../config" as *;
+
+// scss-docs-start hover-lift-variables
+$hover-lift-transition-duration: .2s !default;
+$hover-lift-transition-timing:   ease !default;
+$hover-lift-transform:           translateY(-.25rem) !default;
+$hover-lift-box-shadow:          var(--#{$prefix}box-shadow-lg) !default;
+// scss-docs-end hover-lift-variables
+
+$hover-lift-tokens: () !default;
+
+// scss-docs-start hover-lift-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$hover-lift-tokens: defaults(
+  (
+    --#{$prefix}hover-lift-transition-duration: #{$hover-lift-transition-duration},
+    --#{$prefix}hover-lift-transition-timing: #{$hover-lift-transition-timing},
+    --#{$prefix}hover-lift-transform: #{$hover-lift-transform},
+    --#{$prefix}hover-lift-box-shadow: #{$hover-lift-box-shadow},
+  ),
+  $hover-lift-tokens
+);
+// scss-docs-end hover-lift-css-vars
+
+@layer helpers {
+  //
+  // Hover lift
+  //
+
+  .hover-lift {
+    @include tokens($hover-lift-tokens);
+    @include transition(
+      transform var(--#{$prefix}hover-lift-transition-duration) var(--#{$prefix}hover-lift-transition-timing),
+      box-shadow var(--#{$prefix}hover-lift-transition-duration) var(--#{$prefix}hover-lift-transition-timing)
+    );
+
+    &:hover,
+    &:focus-visible {
+      transform: var(--#{$prefix}hover-lift-transform);
+      @include box-shadow(var(--#{$prefix}hover-lift-box-shadow));
+    }
+  }
+}

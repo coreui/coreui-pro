@@ -314,6 +314,8 @@
       to: /helpers/colored-links/
     - title: Focus ring
       to: /helpers/focus-ring/
+    - title: Hover lift
+      to: /helpers/hover-lift/
     - title: Icon link
       to: /helpers/icon-link/
     - title: Position
