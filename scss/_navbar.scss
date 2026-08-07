@@ -128,6 +128,23 @@ $navbar-dark-tokens: defaults(
   $navbar-dark-tokens
 );
 // scss-docs-end navbar-dark-css-vars
+// The expanded rules are read from inside the navbar's own query container, so
+// they can only style its descendants — an element is never its own container.
+// The two properties that used to sit on `.navbar-expand-*` itself move onto the
+// inner container, which is where they take effect anyway.
+@mixin navbar-expanded-container {
+  > .container,
+  > .container-fluid {
+    @content;
+  }
+
+  @each $breakpoint, $container-max-width in $container-max-widths {
+    > .container#{breakpoint-infix($breakpoint, $container-max-widths)} {
+      @content;
+    }
+  }
+}
+
 @layer components {
   // Navbar
   //
@@ -144,6 +161,9 @@ $navbar-dark-tokens: defaults(
     justify-content: space-between; // space out brand from logo
     padding: var(--#{$prefix}navbar-padding-y) var(--#{$prefix}navbar-padding-x);
     @include gradient-bg();
+    // The navbar answers to the width it is given, not to the window's: a navbar
+    // in a narrow column collapses there while a full-width one stays expanded.
+    @include set-container();
 
     // Because flex properties aren't inherited, we need to redeclare these first
     // few properties so that content nested within behave properly.
@@ -299,9 +319,11 @@ $navbar-dark-tokens: defaults(
 
       // stylelint-disable-next-line scss/selector-no-union-class-name
       &#{$infix} {
-        @include media-breakpoint-up($next) {
-          flex-wrap: nowrap;
-          justify-content: flex-start;
+        @include container-breakpoint-up($next) {
+          @include navbar-expanded-container() {
+            flex-wrap: nowrap;
+            justify-content: flex-start;
+          }
 
           .navbar-nav {
             flex-direction: row;

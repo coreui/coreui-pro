@@ -597,6 +597,34 @@ adornment in the library — so the button needs no icon markup at all:
   the value; an attribute you wrote yourself is left alone. Write it in your
   markup anyway, so the state is correct before our JavaScript runs.
 
+#### Navbar
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.navbar-expand-*` reads the navbar's own width, not the viewport's.** Every
+  `.navbar` is a [query container](/utilities/container-queries/) now, so a
+  navbar in a sidebar or a narrow dashboard column collapses there while a
+  full-width one on the same page stays expanded. For a navbar that spans the
+  page — which is most of them — nothing changes, because its width *is* the
+  viewport's.
+- **`flex-wrap: nowrap` and `justify-content: flex-start` moved from
+  `.navbar-expand-*` onto its inner `.container*`.** A container query styles
+  descendants of the container, never the container itself, and the inner
+  container is where those two properties took effect anyway (the navbar's
+  children inherit `flex-wrap`). A navbar written **without** an inner
+  `.container`, `.container-fluid` or `.container-{breakpoint}` no longer gets
+  them — wrap its content, the way every example in these docs does.
+
+#### Tables
+
+- **`.table-responsive*` is a query container.** It still scrolls horizontally
+  below its breakpoint; the addition is that things inside it can now respond to
+  its width.
+- **New: `.table-stacked{-sm|-md|-lg|-xl|-xxl}`** turns rows into stacked blocks
+  below the breakpoint, reading the width from the `.table-responsive*` wrapper.
+  Give every `<td>` past the first a `data-cell` attribute for its label; the
+  header is hidden visually and kept in the accessibility tree. See
+  [Stacked tables](/content/tables/#stacked-tables).
+
 #### Toast
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
