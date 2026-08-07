@@ -160,6 +160,13 @@ const isDisabled = (element: Element | null | undefined): boolean => {
   return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false'
 }
 
+// ARIA state attributes take the strings 'true' and 'false', but we track those
+// states as booleans. This keeps the conversion in one place, so callers do not
+// have to reach for a cast to satisfy `setAttribute`.
+const setAriaAttribute = (element: Element, name: string, value: boolean): void => {
+  element.setAttribute(name, String(value))
+}
+
 const findShadowRoot = (element: Node): ShadowRoot | null => {
   if (!document.documentElement.attachShadow) {
     return null
@@ -324,6 +331,7 @@ export {
   onDOMContentLoaded,
   parseSelector,
   reflow,
+  setAriaAttribute,
   triggerTransitionEnd,
   toType
 }
