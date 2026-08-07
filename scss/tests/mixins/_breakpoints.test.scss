@@ -1,0 +1,169 @@
+@use "../../config" as *;
+@use "../../layout/breakpoints" as *;
+
+$test-breakpoints: (xs: 0, sm: 576px, md: 768px, lg: 992px);
+
+@include describe("breakpoint functions") {
+  @include it("returns the raw value as the range upper bound") {
+    @include assert-equal(breakpoint-max(md, $test-breakpoints), 768px);
+  }
+
+  @include it("returns null for the smallest and for a missing breakpoint") {
+    @include assert-equal(breakpoint-min(xs, $test-breakpoints), null);
+    @include assert-equal(breakpoint-max(null, $test-breakpoints), null);
+  }
+}
+
+@include describe("media-breakpoint mixins") {
+  @include it("emits a range query going up") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include media-breakpoint-up(md, $test-breakpoints) {
+            color: #f00;
+          }
+        }
+      }
+
+      @include expect() {
+        @media (width >= 768px) {
+          .test {
+            color: #f00;
+          }
+        }
+      }
+    }
+  }
+
+  @include it("emits a range query going down, without the .02px workaround") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include media-breakpoint-down(md, $test-breakpoints) {
+            color: #f00;
+          }
+        }
+      }
+
+      @include expect() {
+        @media (width < 768px) {
+          .test {
+            color: #f00;
+          }
+        }
+      }
+    }
+  }
+
+  @include it("emits no query for the smallest breakpoint") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include media-breakpoint-up(xs, $test-breakpoints) {
+            color: #f00;
+          }
+        }
+      }
+
+      @include expect() {
+        .test {
+          color: #f00;
+        }
+      }
+    }
+  }
+}
+
+@include describe("container mixins") {
+  @include it("sets a container type") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include set-container();
+        }
+      }
+
+      @include expect() {
+        .test {
+          container-type: inline-size;
+        }
+      }
+    }
+  }
+
+  @include it("names the container when asked") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include set-container(inline-size, sidebar);
+        }
+      }
+
+      @include expect() {
+        .test {
+          container: sidebar / inline-size;
+        }
+      }
+    }
+  }
+
+  @include it("emits an unnamed container query") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include container-breakpoint-up(md, $breakpoints: $test-breakpoints) {
+            color: #f00;
+          }
+        }
+      }
+
+      @include expect() {
+        @container (width >= 768px) {
+          .test {
+            color: #f00;
+          }
+        }
+      }
+    }
+  }
+
+  @include it("targets a named container") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include container-breakpoint-down(md, sidebar, $test-breakpoints) {
+            color: #f00;
+          }
+        }
+      }
+
+      @include expect() {
+        @container sidebar (width < 768px) {
+          .test {
+            color: #f00;
+          }
+        }
+      }
+    }
+  }
+
+  @include it("spans two breakpoints") {
+    @include assert() {
+      @include output() {
+        .test {
+          @include container-breakpoint-between(sm, lg, $breakpoints: $test-breakpoints) {
+            color: #f00;
+          }
+        }
+      }
+
+      @include expect() {
+        @container (width >= 576px) and (width < 992px) {
+          .test {
+            color: #f00;
+          }
+        }
+      }
+    }
+  }
+}

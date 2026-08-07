@@ -71,8 +71,6 @@
       to: /layout/z-index/
     - title: CSS Grid
       to: /layout/css-grid/
-    - title: Container queries Grid
-      to: /layout/container-queries-grid/
 - title: Content
   icon: |-
     <path fill="var(--ci-primary-color, currentColor)" d="M136,24H16V144H136Zm-32,88H48V56h56Z" class="ci-primary"/>
@@ -346,6 +344,8 @@
       to: /utilities/borders/
     - title: Colors
       to: /utilities/colors/
+    - title: Container queries
+      to: /utilities/container-queries/
     - title: Display
       to: /utilities/display/
     - title: Flex

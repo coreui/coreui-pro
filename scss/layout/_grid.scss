@@ -1,7 +1,13 @@
+@use "../mixins/deprecate" as *;
 @use "../mixins/grid" as *;
+@use "breakpoints" as *;
 @use "../config" as *;
 
 $include-column-box-sizing: false !default;
+
+@if $enable-container-queries {
+  @include deprecate("$enable-container-queries", "v6.0.0", "v7.0.0");
+}
 
 @layer layout {
   // Row
@@ -28,6 +34,11 @@ $include-column-box-sizing: false !default;
 
   @if $enable-cssgrid {
     .grid {
+      // The grid is its own query container, so `.g-col-*` responds to the width of
+      // the grid rather than the viewport. `container-type` implies layout containment,
+      // which makes the grid the containing block of any positioned descendant.
+      @include set-container();
+
       display: grid;
       grid-template-rows: repeat(var(--#{$prefix}rows, 1), 1fr);
       grid-template-columns: repeat(var(--#{$prefix}columns, #{$grid-columns}), 1fr);
@@ -44,22 +55,5 @@ $include-column-box-sizing: false !default;
 
   @if $enable-grid-classes {
     @include make-grid-columns();
-  }
-
-  @if $enable-container-queries {
-    .cq-container {
-      container-type: inline-size;
-    }
-
-    .cq-row {
-      container-type: inline-size;
-      @include make-row();
-
-      > * {
-        @include make-col-ready($include-column-box-sizing);
-      }
-    }
-
-    @include make-c-grid-columns();
   }
 }

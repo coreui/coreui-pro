@@ -1110,6 +1110,72 @@ Five names are now registered with
 - Compiled output is otherwise byte-identical — the five `@property` blocks are
   the whole diff.
 
+#### The CSS Grid ships, and its responsive classes are container queries
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`$enable-cssgrid` is `true` by default, so `.grid` and the `.g-col-*` /
+`.g-start-*` classes are in the compiled CSS instead of waiting behind a Sass
+flag. Set it to `false` if you do not want them.
+
+Every `.grid` is now a **query container** (`container-type: inline-size`), so
+`.g-col-md-6` responds to the width of the grid rather than to the viewport — a
+grid inside a narrow column switches layout on that column's width. This is
+what upstream v6 does, and it is the point of having a second grid at all.
+
+`container-type` implies layout containment, so a `.grid` is the containing block
+for absolutely and fixed-positioned descendants: `position: fixed` inside a grid
+is positioned against the grid, not the viewport. Our own floating panels render
+through a portal and are unaffected; your own fixed markup has to live outside.
+
+#### The `cq-*` grid is gone
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+v5.3.0 shipped a second, experimental grid — `.cq-container`, `.cq-row`,
+`.cq-col-*`, `.cq-offset-*`, `.cq-g-*` — behind `$enable-container-queries`,
+with its own `$cq-grid-breakpoints` map that duplicated `$grid-breakpoints`
+value for value. It never shipped in the default build, and maintaining two
+grids to express one idea is what the CSS Grid above now does properly.
+
+The flag, the map, the classes and the `make-c-grid-columns()` mixin are all
+removed. If you had opted in: `.cq-row`/`.cq-col-*` map onto the CSS Grid
+(`.grid` + `.g-col-*`), which is container-based by default, or onto the flexbox
+grid (`.row`/`.col-*`) if you want viewport breakpoints. To keep the container
+behaviour on markup of your own, mark the element with
+[`.contains-inline`](/utilities/container-queries/) and write the query with the
+`container-breakpoint-*` mixins.
+
+#### Breakpoint mixins emit range queries
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`media-breakpoint-*` now emits `(width >= 768px)` / `(width < 768px)` instead of
+`(min-width: 768px)` / `(max-width: 767.98px)`. The `.02px` subtraction existed
+to work around `min-`/`max-` prefixes on fractional viewports; range syntax makes
+it unnecessary.
+
+**`breakpoint-max()` returns the raw breakpoint value now** (`768px`, not
+`767.98px`). If you call it yourself inside a `max-width:` query, subtract the
+`.02px` there or move that query to range syntax too — otherwise the two
+breakpoints overlap on exactly `768px`.
+
+The `container-breakpoint-*` mixins use the same syntax, take an optional
+container name as their second argument, and default to `$grid-breakpoints`:
+
+```scss
+@include container-breakpoint-up(md) { … }              // nearest container
+@include container-breakpoint-up(md, sidebar) { … }      // @container sidebar (width >= 768px)
+```
+
+`set-container($type, $name)` is new and marks an element as a query container.
+
+#### New: container-type utilities
+
+`.contains-inline` and `.contains-size` set `container-type`, so you can make any
+element a query container from markup. See
+[Container queries](/utilities/container-queries/).
+
 #### Sass file layout follows Bootstrap v6
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

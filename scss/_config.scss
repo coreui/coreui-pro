@@ -422,7 +422,7 @@ $enable-reduced-motion:       true !default;
 $enable-smooth-scroll:        true !default;
 $enable-grid-classes:         true !default;
 $enable-container-classes:    true !default;
-$enable-cssgrid:              false !default;
+$enable-cssgrid:              true !default;
 $enable-button-pointers:      true !default;
 $enable-validation-icons:     true !default;
 $enable-negative-margins:     false !default;
@@ -430,6 +430,9 @@ $enable-deprecation-messages: true !default;
 $enable-important-utilities:  true !default;
 $enable-ltr:                  true !default;
 $enable-rtl:                  true !default;
+// Deprecated in v6, removed in v7: the `cq-*` grid it gated is gone, and `.grid`
+// is a query container of its own. Kept so a build that still configures it —
+// the shared docs engine does — keeps compiling.
 $enable-container-queries:    false !default;
 
 $enable-dark-mode:            true !default;
@@ -525,20 +528,6 @@ $grid-breakpoints: (
 
 @include assert-ascending($grid-breakpoints, "$grid-breakpoints");
 @include assert-starts-at-zero($grid-breakpoints, "$grid-breakpoints");
-
-// scss-docs-start cq-grid-breakpoints
-$cq-grid-breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1200px,
-  xxl: 1400px
-) !default;
-
-@include assert-ascending($cq-grid-breakpoints, "$cq-grid-breakpoints");
-@include assert-starts-at-zero($cq-grid-breakpoints, "$cq-grid-breakpoints");
-// scss-docs-end cq-grid-breakpoints
 
 // Define the maximum width of `.container` for different screen sizes.
 

@@ -40,18 +40,17 @@
   @return if(sass($min != 0): $min; else: null);
 }
 
-// Maximum breakpoint width.
-// The maximum value is reduced by 0.02px to work around the limitations of
-// `min-` and `max-` prefixes and viewports with fractional widths.
-// See https://www.w3.org/TR/mediaqueries-4/#mq-min-max
-// Uses 0.02px rather than 0.01px to work around a current rounding bug in Safari.
-// See https://bugs.webkit.org/show_bug.cgi?id=178261
+// Maximum breakpoint width for range queries.
+// Returns the breakpoint value to use as an upper bound in `width < $max` queries.
 //
 //    >> breakpoint-max(md, (xs: 0, sm: 576px, md: 768px, lg: 992px, xl: 1200px, xxl: 1400px))
-//    767.98px
+//    768px
 @function breakpoint-max($name, $breakpoints: $grid-breakpoints) {
+  @if $name == null {
+    @return null;
+  }
   $max: map.get($breakpoints, $name);
-  @return if(sass($max and $max > 0): $max - .02; else: null);
+  @return if(sass($max and $max > 0): $max; else: null);
 }
 
 // Returns a blank string if smallest breakpoint, otherwise returns the name with a dash in front.
@@ -70,7 +69,7 @@
 @mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($name, $breakpoints);
   @if $min {
-    @media (min-width: $min) {
+    @media (width >= $min) {
       @content;
     }
   } @else {
@@ -83,7 +82,7 @@
 @mixin media-breakpoint-down($name, $breakpoints: $grid-breakpoints) {
   $max: breakpoint-max($name, $breakpoints);
   @if $max {
-    @media (max-width: $max) {
+    @media (width < $max) {
       @content;
     }
   } @else {
@@ -98,7 +97,7 @@
   $max: breakpoint-max($upper, $breakpoints);
 
   @if $min != null and $max != null {
-    @media (min-width: $min) and (max-width: $max) {
+    @media (width >= $min) and (width < $max) {
       @content;
     }
   } @else if $max == null {
@@ -121,7 +120,7 @@
   $max:  breakpoint-max($next, $breakpoints);
 
   @if $min != null and $max != null {
-    @media (min-width: $min) and (max-width: $max) {
+    @media (width >= $min) and (width < $max) {
       @content;
     }
   } @else if $max == null {
@@ -138,72 +137,114 @@
 //
 // Container query mixins
 //
+// Container queries let an element respond to the size of a containing element
+// rather than the viewport. These mixins mirror the media-breakpoint-* ones above,
+// and each takes an optional container name to target a specific container.
 
-// Container query for applying styles when the container’s inline size is at least the breakpoint’s minimum width.
-@mixin container-breakpoint-up($name, $breakpoints: $cq-grid-breakpoints) {
+// scss-docs-start container-query-mixins
+// Set an element as a query container.
+//
+//    @include set-container();                     // container-type: inline-size
+//    @include set-container(size);                 // container-type: size
+//    @include set-container(inline-size, sidebar); // container: sidebar / inline-size
+@mixin set-container($type: inline-size, $name: null) {
+  @if $name {
+    container: #{$name} / #{$type};
+  } @else {
+    container-type: #{$type};
+  }
+}
+
+// Container of at least the minimum breakpoint width. No query for the smallest breakpoint.
+// Makes the @content apply to the given breakpoint and wider.
+@mixin container-breakpoint-up($name, $container-name: null, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($name, $breakpoints);
   @if $min {
-    @container (min-width: #{$min}) {
-      @content;
+    @if $container-name {
+      @container #{$container-name} (width >= #{$min}) {
+        @content;
+      }
+    } @else {
+      @container (width >= #{$min}) {
+        @content;
+      }
     }
   } @else {
     @content;
   }
 }
 
-// Container query for applying styles when the container’s inline size is at most the breakpoint’s maximum width.
-@mixin container-breakpoint-down($name, $breakpoints: $cq-grid-breakpoints) {
+// Container of at most the maximum breakpoint width. No query for the largest breakpoint.
+// Makes the @content apply to the given breakpoint and narrower.
+@mixin container-breakpoint-down($name, $container-name: null, $breakpoints: $grid-breakpoints) {
   $max: breakpoint-max($name, $breakpoints);
   @if $max {
-    @container (max-width: #{$max}) {
-      @content;
+    @if $container-name {
+      @container #{$container-name} (width < #{$max}) {
+        @content;
+      }
+    } @else {
+      @container (width < #{$max}) {
+        @content;
+      }
     }
   } @else {
     @content;
   }
 }
 
-// Container query for applying styles between two breakpoints.
-@mixin container-breakpoint-between($lower, $upper, $breakpoints: $cq-grid-breakpoints) {
+// Container that spans multiple breakpoint widths.
+// Makes the @content apply between the min and max breakpoints.
+@mixin container-breakpoint-between($lower, $upper, $container-name: null, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($lower, $breakpoints);
   $max: breakpoint-max($upper, $breakpoints);
 
   @if $min != null and $max != null {
-    @container (min-width: #{$min}) and (max-width: #{$max}) {
-      @content;
+    @if $container-name {
+      @container #{$container-name} (width >= #{$min}) and (width < #{$max}) {
+        @content;
+      }
+    } @else {
+      @container (width >= #{$min}) and (width < #{$max}) {
+        @content;
+      }
     }
   } @else if $max == null {
-    // When the upper breakpoint is the last one.
-    @include container-breakpoint-up($lower, $breakpoints) {
+    @include container-breakpoint-up($lower, $container-name, $breakpoints) {
       @content;
     }
   } @else if $min == null {
-    // When the lower breakpoint is the smallest.
-    @include container-breakpoint-down($upper, $breakpoints) {
+    @include container-breakpoint-down($upper, $container-name, $breakpoints) {
       @content;
     }
   }
 }
 
-// Container query for applying styles only within a single breakpoint range.
-@mixin container-breakpoint-only($name, $breakpoints: $cq-grid-breakpoints) {
+// Container between the breakpoint's minimum and maximum widths.
+// No minimum for the smallest breakpoint, and no maximum for the largest one.
+@mixin container-breakpoint-only($name, $container-name: null, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($name, $breakpoints);
   $next: breakpoint-next($name, $breakpoints);
   $max: breakpoint-max($next, $breakpoints);
 
   @if $min != null and $max != null {
-    @container (min-width: #{$min}) and (max-width: #{$max}) {
-      @content;
+    @if $container-name {
+      @container #{$container-name} (width >= #{$min}) and (width < #{$max}) {
+        @content;
+      }
+    } @else {
+      @container (width >= #{$min}) and (width < #{$max}) {
+        @content;
+      }
     }
   } @else if $max == null {
-    // Last breakpoint – no maximum query.
-    @include container-breakpoint-up($name, $breakpoints) {
+    @include container-breakpoint-up($name, $container-name, $breakpoints) {
       @content;
     }
   } @else if $min == null {
-    // First breakpoint – no minimum query.
-    @include container-breakpoint-down($next, $breakpoints) {
+    @include container-breakpoint-down($next, $container-name, $breakpoints) {
       @content;
     }
   }
 }
+// scss-docs-end container-query-mixins
