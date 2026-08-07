@@ -38,6 +38,25 @@ description: "Track and review changes to the CoreUI for Bootstrap source files,
     Code that read the tip's coordinates synchronously right after `show()`
     should wait for the `shown` event.
 
+### Distributed files
+
+- **The `*.rtl.css` builds are gone.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  One stylesheet now serves both directions, so `dist/css` no longer carries
+  `coreui.rtl.css`, `coreui-grid.rtl.css`, `coreui-reboot.rtl.css`,
+  `coreui-utilities.rtl.css`, their minified twins, source maps or SRI hashes —
+  20 files in all. Everything positional was already written with logical
+  properties; the six places that genuinely differ (the off-canvas panel, the
+  range slider's label and tooltip, the select and validation arrows, the
+  carousel controls, the breadcrumb divider) now emit their mirrored
+  declaration from a `[dir="rtl"]` rule in the same file. That costs 396 bytes
+  gzip, where an RTL reader used to download a second 56&nbsp;kB stylesheet.
+
+  **What to change:** drop the `.rtl` from your stylesheet link and keep
+  `dir="rtl"` on `<html>`. `$enable-rtl: false` still produces an LTR-only
+  build and `$enable-ltr: false` an RTL-only one, so nothing that was possible
+  before stops being possible.
+
 ### Browser support
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -376,6 +395,28 @@ A chip input has no control to wrap — the element *is* the frame — so it add
 `.form-control-group` to itself rather than asking you to write both. Writing
 both still works; the component only removes on `dispose()` a class it added.
 
+#### Number Input (new)
+
+- **New component: [Number Input](/forms/number-input/)** (PRO) — a number field
+  with a stepper you can actually hit. The browser's own spinner is tiny, shows
+  only on hover in some engines and does not exist at all on iOS; the component
+  replaces it with two buttons sized like every other adornment, on the shared
+  [`.form-control-group`](/forms/form-control-group/) frame. Nothing to migrate —
+  it is listed here because the `number-input` name, its classes and its Sass
+  variables are new in v6.
+
+#### Multi Select
+
+- **The option checkboxes are the standard form-check surface.** The indicators
+  used to re-implement the form-check visuals as `::before` pseudo-elements with
+  their own variable set; they are decorative `.form-check-input` spans now
+  (`aria-hidden`, since `aria-selected` carries the semantics), so size, border,
+  radius, background and theming all come from the form-check surface and the
+  two stay in lockstep. The per-indicator look variables are gone with
+  them — only `$combobox-option-indicator-width` survives, and it defaults to
+  `var(--#{$prefix}form-check-input-width)`. Theme the option checkbox through
+  `$form-check-*` / `--#{$prefix}form-check-*` instead.
+
 #### Password Input and Number Input build their own frame
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -546,6 +587,15 @@ adornment in the library — so the button needs no icon markup at all:
   Callers that relied on the constructor toggling need an explicit call:
   `new coreui.Collapse(el).toggle()`. `data-coreui-toggle` on a *trigger* is
   unrelated and unchanged.
+
+#### Button
+
+- **A toggle button always exposes `aria-pressed` now.** The attribute has no
+  default value, so a `[data-coreui-toggle="button"]` that shipped without one
+  was announced as a plain button until the first click. JavaScript adds the
+  missing attribute on `DOMContentLoaded`, reading the `.active` class to pick
+  the value; an attribute you wrote yourself is left alone. Write it in your
+  markup anyway, so the state is correct before our JavaScript runs.
 
 #### Toast
 
@@ -1006,7 +1056,7 @@ Nothing existing changes; these are additions. See
   `$form-select-indicator-padding` and `$form-select-feedback-icon-padding-end`
   are now `calc()` expressions over `var(--cui-control-padding-x)` instead of
   Sass products, and `$form-select-bg-position` carries the `var()` inside it
-  (the RTL build still flips the `right`/`left` keyword at compile time).
+  (the mirrored keyword comes from the `[dir="rtl"]` rule in the same sheet).
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   Sass arithmetic on these variables in your own stylesheets no longer works —
   they are CSS calc strings now, not numbers. Override them with your own
@@ -1296,13 +1346,23 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `$combobox-popup-*` and the per-family `-zindex` variables are replaced by
   `$popup-zindex/-bg/-border-width/-border-color/-border-radius/-box-shadow`
   and the `--#{$prefix}popup-*` custom properties — theme the popup once and
-  every field component's panel follows. The anchored presentation is
-  unchanged; a fullscreen mode for mobile is designed at this primitive and
-  lands separately.
+  every field component's panel follows. **The panel fades in and out**, the way
+  Menu already animated: `@starting-style` supplies the state to animate from
+  and a discrete `display` transition keeps it laid out through the fade, tuned
+  with `--#{$prefix}popup-transition-duration` / `-timing`. Its anchored
+  placement is unchanged; a fullscreen mode for mobile is designed at this
+  primitive and lands separately.
 - **Validation and sizing ride the standard machinery.** `.is-invalid` /
   `.is-valid` on the group behave exactly as on a `.form-control`, and the
   state also propagates from the control inside it. The per-family
   `!important` overrides that forced the invalid border in v5 are gone.
+- **Markers are hidden with `list-style-type: ""`, not `list-style: none`.**
+  Safari drops the `list` role — and VoiceOver stops announcing the item count —
+  when a list is styled with `list-style: none`. The empty string hides the
+  markers with the same visual result while keeping the list exposed to
+  assistive technologies. Swept through nav, navbar, header, sidebar-nav,
+  dropdown, breadcrumb and the `list-unstyled` mixin; your own `list-style: none`
+  overrides still win, they just reintroduce the problem.
 - **Transitions are emitted inside `prefers-reduced-motion: no-preference`.**
   The `transition()` mixin used to emit a transition and then switch it off
   again under `prefers-reduced-motion: reduce`, so every animated rule shipped
