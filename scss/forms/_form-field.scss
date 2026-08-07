@@ -1,0 +1,63 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
+@use "../config" as *;
+
+// scss-docs-start form-field-variables
+$form-field-gap:            .5rem !default;
+$form-field-column-gap:     .5rem !default;
+// scss-docs-end form-field-variables
+
+$form-field-tokens: () !default;
+
+// scss-docs-start form-field-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-field-tokens: defaults(
+  (
+    --#{$prefix}form-field-gap: #{$form-field-gap},
+    --#{$prefix}form-field-column-gap: #{$form-field-column-gap},
+  ),
+  $form-field-tokens
+);
+// scss-docs-end form-field-css-vars
+
+@layer forms {
+  // The layout wrapper of a form control: label, control, description and
+  // validation feedback in one grid, so a form is spaced by the field rather than
+  // by margin utilities sprinkled over its parts.
+  .form-field {
+    @include tokens($form-field-tokens);
+
+    position: relative;
+    display: grid;
+    gap: var(--#{$prefix}form-field-gap);
+
+    > label,
+    > .form-label {
+      justify-self: start;
+      margin-bottom: 0;
+    }
+
+    // A check, radio or switch written without its `.form-check` wrapper pins to
+    // the first column and everything else stacks in the second — the layout the
+    // wrapper does for you when it is there.
+    &:has(> .form-check-input) {
+      grid-template-columns: auto 1fr;
+      column-gap: var(--#{$prefix}form-field-column-gap);
+      align-items: start;
+
+      > .form-check-input {
+        grid-column: 1;
+      }
+
+      > :not(.form-check-input) {
+        grid-column: 2;
+      }
+
+      // A label for the whole field, rather than for the control next to it,
+      // spans both columns and sits above the row.
+      > .form-label {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}

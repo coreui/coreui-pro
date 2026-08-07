@@ -103,8 +103,8 @@
       badge:
         color: danger
         text: PRO
-    - title: Checks & radios
-      to: /forms/checks-radios/
+    - title: Checkbox
+      to: /forms/checkbox/
     - title: Chip input
       to: /forms/chip-input/
       badge:
@@ -135,6 +135,8 @@
       badge:
         color: danger
         text: PRO
+    - title: Field
+      to: /forms/field/
     - title: Floating labels
       to: /forms/floating-labels/
     - title: Form control
@@ -166,6 +168,8 @@
       badge:
         color: danger
         text: PRO
+    - title: Radio
+      to: /forms/radio/
     - title: Range
       to: /forms/range/
     - title: Range Slider
@@ -180,6 +184,8 @@
         text: PRO
     - title: Select
       to: /forms/select/
+    - title: Switch
+      to: /forms/switch/
     - title: Stepper
       to: /forms/stepper/
       badge:
