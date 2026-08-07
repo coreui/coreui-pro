@@ -427,6 +427,10 @@ Navbars can use `.navbar-toggler`, `.navbar-collapse`, and `.navbar-expand{-sm|-
 
 For navbars that never collapse, add the `.navbar-expand` class on the navbar. For navbars that always collapse, don't add any `.navbar-expand` class.
 
+<Callout color="info">
+**The breakpoint is the navbar's own width, not the window's.** Every `.navbar` is a [query container](/utilities/container-queries/), so `.navbar-expand-lg` collapses when the navbar itself is narrower than `lg`. A navbar in a sidebar or a narrow dashboard column collapses there while a full-width one on the same page stays expanded — which is what you wanted from it in the first place. Nothing changes for a navbar that spans the page: its width *is* the viewport's.
+</Callout>
+
 ### Toggler
 
 Navbar togglers are left-aligned by default, but should they follow a sibling element like a `.navbar-brand`, they'll automatically be aligned to the far right. Reversing your markup will reverse the placement of the toggler. Below are examples of different toggle styles.

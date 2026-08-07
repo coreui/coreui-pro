@@ -2,6 +2,7 @@
 @use "sass:math";
 @use "../functions/color" as *;
 @use "../layout/breakpoints" as *;
+@use "../mixins/visually-hidden" as *;
 @use "../theme" as *;
 @use "../config" as *;
 
@@ -230,16 +231,66 @@ $table-variants: map.keys($theme-colors) !default;
 
   // Responsive tables
   //
-  // Generate series of `.table-responsive-*` classes for configuring the screen
-  // size of where your table will overflow.
+  // Generate series of `.table-responsive-*` classes that act as query containers
+  // and turn on horizontal scrolling below their breakpoint.
 
   @each $breakpoint in map.keys($grid-breakpoints) {
     $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
-    @include media-breakpoint-down($breakpoint) {
-      .table-responsive#{$infix} {
+    .table-responsive#{$infix} {
+      @include set-container();
+
+      @include media-breakpoint-down($breakpoint) {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+      }
+    }
+  }
+
+  // Stacked tables
+  //
+  // Generate `.table-stacked-*` classes that turn rows into stacked blocks when
+  // the table's container is narrower than the breakpoint. Needs a
+  // `.table-responsive*` ancestor to query, and `data-cell` on every `<td>` past
+  // the first to label the value the way the hidden header would.
+
+  @each $breakpoint in map.keys($grid-breakpoints) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    @include container-breakpoint-down($breakpoint) {
+      .table-stacked#{$infix} {
+        > thead {
+          @include visually-hidden();
+        }
+
+        > tbody > tr {
+          display: block;
+          padding-block: var(--#{$prefix}table-cell-padding-y);
+
+          + tr {
+            border-block-start: var(--#{$prefix}table-border-width) solid var(--#{$prefix}table-border-color);
+          }
+
+          > td {
+            display: block;
+            padding: calc(var(--#{$prefix}table-cell-padding-y) * .25) calc(var(--#{$prefix}table-cell-padding-x) * 2); // stylelint-disable-line function-disallowed-list
+            border: 0;
+
+            &:first-child {
+              font-weight: $font-weight-bold;
+            }
+
+            &[data-cell]:not(:first-child)::before {
+              display: block;
+              font-weight: $font-weight-semibold;
+              content: attr(data-cell);
+            }
+          }
+
+          > td:not(:first-child) + td::before {
+            margin-block-start: .25rem;
+          }
+        }
       }
     }
   }
