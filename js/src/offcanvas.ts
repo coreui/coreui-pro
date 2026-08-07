@@ -94,11 +94,11 @@ class Offcanvas extends BaseComponent {
   }
 
   // Public
-  toggle(relatedTarget?: HTMLElement | null): any {
+  toggle(relatedTarget?: HTMLElement | null): Promise<void> {
     return this._isShown ? this.hide() : this.show(relatedTarget)
   }
 
-  show(relatedTarget?: HTMLElement | null): void {
+  async show(relatedTarget?: HTMLElement | null): Promise<void> {
     if (this._isShown) {
       return
     }
@@ -130,10 +130,10 @@ class Offcanvas extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_SHOWN, { relatedTarget })
     }
 
-    this._queueCallback(completeCallBack, this._element, true)
+    await this._queueCallback(completeCallBack, this._element, true)
   }
 
-  hide(): void {
+  async hide(): Promise<void> {
     if (!this._isShown) {
       return
     }
@@ -162,7 +162,7 @@ class Offcanvas extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
-    this._queueCallback(completeCallback, this._element, true)
+    await this._queueCallback(completeCallback, this._element, true)
   }
 
   dispose(): any {

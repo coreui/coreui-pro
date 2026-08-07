@@ -102,11 +102,11 @@ class Modal extends BaseComponent {
   }
 
   // Public
-  toggle(relatedTarget?: HTMLElement | null): any {
+  toggle(relatedTarget?: HTMLElement | null): Promise<void> {
     return this._isShown ? this.hide() : this.show(relatedTarget)
   }
 
-  show(relatedTarget?: HTMLElement | null): void {
+  async show(relatedTarget?: HTMLElement | null): Promise<void> {
     if (this._isShown || this._isTransitioning) {
       return
     }
@@ -128,10 +128,15 @@ class Modal extends BaseComponent {
 
     this._adjustDialog()
 
-    this._backdrop.show(() => this._showElement(relatedTarget))
+    // The backdrop reports its own transition through a callback, so the element
+    // is only shown once it has settled — resolving with `_showElement` adopts
+    // the modal's own transition on top of it.
+    await new Promise<void>(resolve => {
+      this._backdrop.show(() => resolve(this._showElement(relatedTarget)))
+    })
   }
 
-  hide(): void {
+  async hide(): Promise<void> {
     if (!this._isShown || this._isTransitioning) {
       return
     }
@@ -148,7 +153,9 @@ class Modal extends BaseComponent {
 
     this._element.classList.remove(CLASS_NAME_SHOW)
 
-    this._queueCallback(() => this._hideModal(), this._element, this._isAnimated())
+    await new Promise<void>(resolve => {
+      this._queueCallback(() => resolve(this._hideModal()), this._element, this._isAnimated())
+    })
   }
 
   dispose(): any {
@@ -193,7 +200,7 @@ class Modal extends BaseComponent {
     })
   }
 
-  _showElement(relatedTarget?: HTMLElement | null): void {
+  async _showElement(relatedTarget?: HTMLElement | null): Promise<void> {
     // try to append dynamic modal
     if (!document.body.contains(this._element)) {
       document.body.append(this._element)
@@ -225,7 +232,7 @@ class Modal extends BaseComponent {
       })
     }
 
-    this._queueCallback(transitionComplete, this._dialog!, this._isAnimated())
+    await this._queueCallback(transitionComplete, this._dialog!, this._isAnimated())
   }
 
   _addEventListeners(): void {
@@ -267,18 +274,21 @@ class Modal extends BaseComponent {
     })
   }
 
-  _hideModal(): any {
+  async _hideModal(): Promise<void> {
     this._element.style.display = 'none'
     this._element.setAttribute('aria-hidden', true as unknown as string)
     this._element.removeAttribute('aria-modal')
     this._element.removeAttribute('role')
     this._isTransitioning = false
 
-    this._backdrop.hide(() => {
-      document.body.classList.remove(CLASS_NAME_OPEN)
-      this._resetAdjustments()
-      this._scrollBar.reset()
-      EventHandler.trigger(this._element, EVENT_HIDDEN)
+    await new Promise<void>(resolve => {
+      this._backdrop.hide(() => {
+        document.body.classList.remove(CLASS_NAME_OPEN)
+        this._resetAdjustments()
+        this._scrollBar.reset()
+        EventHandler.trigger(this._element, EVENT_HIDDEN)
+        resolve()
+      })
     })
   }
 
