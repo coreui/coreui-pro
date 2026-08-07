@@ -41,10 +41,6 @@ Bootstrap toasts are as flexible as you need and require very little markup. At 
     </div>
   </div>`} />
 
-<Callout color="warning">
-Previously, our scripts dynamically added the `.hide` class to fully hide a toast (using `display:none` instead of just `opacity:0`). This is no longer necessary. However, for backwards compatibility, our script will still toggle the class (even though there is no practical reason to do so) until the next major version.
-</Callout>
-
 ### Live example
 
 Click the button below to display a toast (positioned with our utilities in the lower right corner) that is hidden by default.
@@ -152,6 +148,22 @@ Building on the previous example, you can design various toast color schemes usi
         Hello, world! This is a toast message.
       </div>
       <button type="button" class="btn-close btn-close-white me-2 m-auto" data-coreui-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>`} />
+
+### Instant
+
+By default, toasts fade in and out. To disable the animation, add `.toast-instant` to the toast. The `show` and `hide` methods then finish immediately, so `shown.coreui.toast` and `hidden.coreui.toast` fire right away.
+
+<Example class=" bg-body-tertiary" code={`<div class="toast toast-instant" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
+      <strong class="me-auto">CoreUI for Bootstrap</strong>
+      <small>11 mins ago</small>
+      <button type="button" class="btn-close" data-coreui-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      This toast appears and disappears instantly.
     </div>
   </div>`} />
 
@@ -297,13 +309,12 @@ Dismissal can be achieved with the `data` attribute on a button **within the toa
 
 ### Options
 
-Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-animation="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
+Options can be passed using data attributes or JavaScript. To do this, append an option name to `data-coreui-`, such as `data-coreui-autohide="{value}"`. Remember to convert the case of the option name from "_camelCase_" to "_kebab-case_" when using data attributes. For instance, you should write `data-coreui-custom-class="beautifier"` rather than `data-coreui-customClass="beautifier"`.
 
 Starting with CoreUI 4.2.6, all components support an **experimental** reserved data attribute named `data-coreui-config`, which can contain simple component configurations as a JSON string. If an element has attributes `data-coreui-config='{"delay":50, "title":689}'` and `data-coreui-title="Custom Title"`, then the final value for `title` will be `Custom Title`, as the standard data attributes will take precedence over values specified in `data-coreui-config`. Moreover, existing data attributes can also hold JSON values like `data-coreui-delay='{"show":50, "hide":250}'`.
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `animation` | boolean | `true` | Adds a CSS fade transition to the toast |
 | `autohide` | boolean | `true` | Hides the Bootstrap toast automatically |
 | `delay` | number | `5000` | Sets delay before hiding the toast (ms) |
 
