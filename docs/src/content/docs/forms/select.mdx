@@ -8,9 +8,9 @@ otherFrameworks:
 
 ## Default
 
-Custom `<select>` menus need only a custom class, `.form-select` to trigger the custom styles. Custom styles are limited to the `<select>`'s initial appearance and cannot modify the `<option>`s due to browser limitations.
+A `<select>` takes `.form-control`, the same class as every other form control — it draws its own chevron because `appearance: none` takes the native one away. Custom styles are limited to the `<select>`'s initial appearance and cannot modify the `<option>`s due to browser limitations.
 
-<Example code={`<select class="form-select" aria-label="Default select example">
+<Example code={`<select class="form-control" aria-label="Default select example">
     <option selected>Open this select menu</option>
     <option value="1">One</option>
     <option value="2">Two</option>
@@ -19,16 +19,16 @@ Custom `<select>` menus need only a custom class, `.form-select` to trigger the 
 
 ## Sizing
 
-You may also choose from small and large custom selects to match our similarly sized text inputs.
+`.form-control-sm` and `.form-control-lg` size a select exactly as they size a text input.
 
-<Example code={`<select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+<Example code={`<select class="form-control form-control-lg mb-3" aria-label=".form-control-lg example">
     <option selected>Open this select menu</option>
     <option value="1">One</option>
     <option value="2">Two</option>
     <option value="3">Three</option>
   </select>
 
-  <select class="form-select form-select-sm" aria-label=".form-select-sm example">
+  <select class="form-control form-control-sm" aria-label=".form-control-sm example">
     <option selected>Open this select menu</option>
     <option value="1">One</option>
     <option value="2">Two</option>
@@ -37,7 +37,7 @@ You may also choose from small and large custom selects to match our similarly s
 
 The `multiple` attribute is also supported:
 
-<Example code={`<select class="form-select" multiple aria-label="multiple select example">
+<Example code={`<select class="form-control" multiple aria-label="multiple select example">
     <option selected>Open this select menu</option>
     <option value="1">One</option>
     <option value="2">Two</option>
@@ -46,7 +46,7 @@ The `multiple` attribute is also supported:
 
 As is the `size` attribute:
 
-<Example code={`<select class="form-select" size="3" aria-label="size 3 select example">
+<Example code={`<select class="form-control" size="3" aria-label="size 3 select example">
     <option selected>Open this select menu</option>
     <option value="1">One</option>
     <option value="2">Two</option>
@@ -57,15 +57,82 @@ As is the `size` attribute:
 
 Add the `disabled` boolean attribute on a select to give it a grayed out appearance and remove pointer events.
 
-<Example code={`<select class="form-select" aria-label="Disabled select example" disabled>
+<Example code={`<select class="form-control" aria-label="Disabled select example" disabled>
     <option selected>Open this select menu</option>
     <option value="1">One</option>
     <option value="2">Two</option>
     <option value="3">Three</option>
   </select>`} />
 
+## Styling the chevron
+
+Everything else about a select — padding, colors, border, focus ring, sizes — comes from [`.form-control`](/forms/form-control/) and is customized there. What belongs to the select alone is the chevron, and it answers to four custom properties you can set on the element itself:
+
+| Property | What it does |
+| --- | --- |
+| `--#{'{'}$prefix{'}'}control-select-bg-img` | the image. Any `url()` — an inline SVG, a data URI, or `none` to drop it |
+| `--#{'{'}$prefix{'}'}control-select-bg-position` | where it sits. Mirrored automatically in RTL |
+| `--#{'{'}$prefix{'}'}control-select-bg-size` | how big it is drawn |
+| `--#{'{'}$prefix{'}'}control-select-padding-end` | the room the text leaves for it |
+
+A different chevron is one declaration. The color lives inside the SVG, so recoloring means swapping the image:
+
+<Example code={`<select class="form-control" aria-label="Custom chevron"
+    style="--cui-control-select-bg-img: url(&quot;data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%235856d6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e&quot;)">
+    <option selected>Open this select menu</option>
+    <option value="1">One</option>
+    <option value="2">Two</option>
+  </select>`} />
+
+A wider gap, or none at all:
+
+<Example code={`<select class="form-control mb-3" aria-label="Roomier chevron"
+    style="--cui-control-select-bg-size: 20px 15px; --cui-control-select-padding-end: 3.5rem">
+    <option selected>Open this select menu</option>
+    <option value="1">One</option>
+  </select>
+
+  <select class="form-control" aria-label="No chevron"
+    style="--cui-control-select-bg-img: none; --cui-control-select-padding-end: .75rem">
+    <option selected>Open this select menu</option>
+    <option value="1">One</option>
+  </select>`} />
+
+<Callout color="info">
+The chevron is a background image, so its color is baked into the SVG and cannot follow a `currentColor` or a theme token. That is also why dark mode swaps the whole image rather than a color — see `$form-control-select-indicator-dark` below.
+</Callout>
+
+## The chevron on something that is not a select
+
+`.form-control-caret` draws the same chevron on an element that is not a `<select>` — a button opening a listbox, for instance.
+
+<Example code={`<button class="form-control form-control-caret text-start" type="button">Open this menu</button>`} />
+
+## Deprecated markup
+
+<DeprecatedIn version="6.0.0" />
+
+`.form-select`, `.form-select-sm` and `.form-select-lg` still work — they are aliases of the `.form-control` classes rather than a second implementation — and are removed in v7.
+
+```diff
+- <select class="form-select form-select-lg">
++ <select class="form-control form-control-lg">
+```
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
+
 ## Customizing
+
+### CSS variables
+
+Selects use local CSS variables on the control for real-time customization. Values are set via Sass, so Sass customization is still supported, too.
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-tokens" />
 
 ### SASS variables
 
-<ScssDocs file="scss/forms/_form-select.scss" capture="form-select-variables" />
+A select shares the `.form-control` surface; these are the ones only it uses — the chevron and the room made for it.
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-variables" />
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-dark-variables" />

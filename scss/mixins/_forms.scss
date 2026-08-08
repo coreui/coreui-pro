@@ -194,6 +194,9 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     }
   }
 
+  // stylelint-disable selector-no-qualifying-type
+  select.form-control,
+  .form-control-caret,
   .form-select {
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
@@ -203,15 +206,15 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
       @if $enable-validation-icons {
         &:not([multiple]):not([size]),
         &:not([multiple])[size="1"] {
-          --#{$prefix}form-select-bg-icon: #{escape-svg($icon)};
-          padding-inline-end: var(--#{$prefix}form-select-feedback-icon-padding-end);
-          background-position: var(--#{$prefix}form-select-validation-bg-position);
-          background-size: var(--#{$prefix}form-select-feedback-icon-size);
+          --#{$prefix}control-select-bg-icon: #{escape-svg($icon)};
+          padding-inline-end: var(--#{$prefix}control-select-feedback-icon-padding-end);
+          background-position: var(--#{$prefix}control-select-validation-bg-position);
+          background-size: var(--#{$prefix}control-select-feedback-icon-size);
         }
       }
-
     }
   }
+  // stylelint-enable selector-no-qualifying-type
 
   .form-control-color {
     @include form-validation-state-selector($state) {

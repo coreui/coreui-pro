@@ -86,8 +86,10 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
     }
 
     @include media-breakpoint-down($mobile-breakpoint) {
-      // Some of our components use this property to detect if the sidebar has mobile behavior.
-      --#{$prefix}is-mobile: true;
+      // Read by the plugin to detect the sidebar's mobile behavior, so the name
+      // cannot follow `$prefix` — the two sides would disagree in a build that
+      // changes it.
+      --cui-is-mobile: true;
 
       position: fixed;
       top: 0;
