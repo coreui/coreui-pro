@@ -218,7 +218,8 @@ $menu-tokens: defaults(
       color: var(--#{$prefix}menu-item-disabled-color);
       pointer-events: none;
       background-color: transparent;
-      background-image: if($enable-gradients, none, null);
+      // stylelint-disable-next-line scss/at-function-named-arguments
+      background-image: if(sass($enable-gradients): none);
     }
   }
 

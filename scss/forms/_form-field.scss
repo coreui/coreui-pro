@@ -23,9 +23,12 @@ $form-field-tokens: defaults(
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;
 // `$enable-deprecated-form-check: false` compiles it out.
-$form-field-selector: if($enable-deprecated-form-check, ".form-field, .form-check", ".form-field") !default;
-$form-field-controls: if($enable-deprecated-form-check, ".check, .radio, .switch, .form-check-input", ".check, .radio, .switch") !default;
-$form-field-control-children: if($enable-deprecated-form-check, "> .check, > .radio, > .switch, > .form-check-input", "> .check, > .radio, > .switch") !default;
+// stylelint-disable-next-line scss/at-function-named-arguments
+$form-field-selector: if(sass($enable-deprecated-form-check): ".form-field, .form-check"; else: ".form-field") !default;
+// stylelint-disable-next-line scss/at-function-named-arguments
+$form-field-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
+// stylelint-disable-next-line scss/at-function-named-arguments
+$form-field-control-children: if(sass($enable-deprecated-form-check): "> .check, > .radio, > .switch, > .form-check-input"; else: "> .check, > .radio, > .switch") !default;
 
 @layer forms {
   // The layout wrapper of a form control: label, control, description and

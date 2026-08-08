@@ -65,7 +65,8 @@ $check-tokens: defaults(
 // `$enable-deprecated-form-check: false` compiles it out.
 // A v5 switch input is a checkbox too, so it has to be kept out of this list:
 // it would collect the check mark on top of the switch thumb.
-$check-selector: if($enable-deprecated-form-check, ".check, .form-check-input[type=checkbox]:not(.form-switch *)", ".check") !default;
+// stylelint-disable-next-line scss/at-function-named-arguments
+$check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-input[type=checkbox]:not(.form-switch *)"; else: ".check") !default;
 
 @layer forms {
   // The class goes on the `<input>` itself. `appearance: none` lets the control

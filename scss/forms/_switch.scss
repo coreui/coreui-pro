@@ -84,7 +84,8 @@ $switch-tokens: defaults(
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;
 // `$enable-deprecated-form-check: false` compiles it out.
-$switch-selector: if($enable-deprecated-form-check, ".switch, .form-switch .form-check-input", ".switch") !default;
+// stylelint-disable-next-line scss/at-function-named-arguments
+$switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch .form-check-input"; else: ".switch") !default;
 
 @layer forms {
   // Like `.check` and `.radio`, the class goes on the `<input>`: the track is the

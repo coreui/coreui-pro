@@ -48,7 +48,8 @@ $radio-tokens: defaults(
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;
 // `$enable-deprecated-form-check: false` compiles it out.
-$radio-selector: if($enable-deprecated-form-check, ".radio, .form-check-input[type=radio]", ".radio") !default;
+// stylelint-disable-next-line scss/at-function-named-arguments
+$radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-input[type=radio]"; else: ".radio") !default;
 
 @layer forms {
   // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
