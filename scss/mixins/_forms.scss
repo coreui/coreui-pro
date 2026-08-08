@@ -68,6 +68,11 @@ $form-feedback-tokens: defaults(
   --#{$prefix}control-group-action-color: #{$color};
 }
 
+// The v5 spelling is an alias of the controls rather than a second
+// implementation; `$enable-deprecated-form-check: false` compiles it out.
+// stylelint-disable-next-line scss/at-function-named-arguments
+$validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
+
 @mixin form-validation-state(
   $state,
   $color,
@@ -216,7 +221,7 @@ $form-feedback-tokens: defaults(
     }
   }
 
-  .form-check-input {
+  #{$validated-controls} {
     @include form-validation-state-selector($state) {
       border-color: $border-color;
 
@@ -228,14 +233,17 @@ $form-feedback-tokens: defaults(
         outline: $focus-ring;
       }
 
-      ~ .form-check-label {
+      ~ label {
         color: $color;
       }
     }
   }
-  .form-check-inline .form-check-input {
-    ~ .#{$state}-feedback {
-      margin-inline-start: .5em;
+
+  @if $enable-deprecated-form-check {
+    .form-check-inline .form-check-input {
+      ~ .#{$state}-feedback {
+        margin-inline-start: .5em;
+      }
     }
   }
 

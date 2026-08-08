@@ -64,9 +64,9 @@ $utilities: (
 Output:
 
 ```css
-.text-decoration-none { text-decoration: none !important; }
-.text-decoration-underline { text-decoration: underline !important; }
-.text-decoration-line-through { text-decoration: line-through !important; }
+.text-decoration-none { text-decoration: none; }
+.text-decoration-underline { text-decoration: underline; }
+.text-decoration-line-through { text-decoration: line-through; }
 ```
 
 ### Values
@@ -120,11 +120,11 @@ $utilities: (
 Output:
 
 ```css
-.o-0 { opacity: 0 !important; }
-.o-25 { opacity: .25 !important; }
-.o-50 { opacity: .5 !important; }
-.o-75 { opacity: .75 !important; }
-.o-100 { opacity: 1 !important; }
+.o-0 { opacity: 0; }
+.o-25 { opacity: .25; }
+.o-50 { opacity: .5; }
+.o-75 { opacity: .75; }
+.o-100 { opacity: 1; }
 ```
 
 If `class: null`, generates classes for each of the `values` keys:
@@ -145,8 +145,8 @@ $utilities: (
 Output:
 
 ```css
-.visible { visibility: visible !important; }
-.invisible { visibility: hidden !important; }
+.visible { visibility: visible; }
+.invisible { visibility: hidden; }
 ```
 
 ### Child selector
@@ -170,7 +170,7 @@ $utilities: (
 Output:
 
 ```css
-:where(.space-x-3 > :not(:last-child)) { margin-inline-end: 1rem !important; }
+:where(.space-x-3 > :not(:last-child)) { margin-inline-end: 1rem; }
 ```
 
 The rule is wrapped in `:where()`, which contributes **no specificity**. That is
@@ -206,7 +206,7 @@ Output:
 ```css
 .ratio-1x1 { --cui-ratio: 1; }
 .ratio-16x9 { --cui-ratio: calc(16 / 9); }
-[class*="ratio-"] { aspect-ratio: var(--cui-ratio) !important; }
+[class*="ratio-"] { aspect-ratio: var(--cui-ratio); }
 ```
 
 `attr-starts` matches `[class^="…"]` (the class begins with the name),
@@ -241,7 +241,7 @@ Output:
 .bg-primary {
   --cui-bg: var(--cui-primary);
   --cui-bg-opacity: 1;
-  background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent) !important;
+  background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
 }
 ```
 
@@ -307,11 +307,11 @@ $utilities: (
 Output:
 
 ```css
-.opacity-0-hover:hover { opacity: 0 !important; }
-.opacity-25-hover:hover { opacity: .25 !important; }
-.opacity-50-hover:hover { opacity: .5 !important; }
-.opacity-75-hover:hover { opacity: .75 !important; }
-.opacity-100-hover:hover { opacity: 1 !important; }
+.opacity-0-hover:hover { opacity: 0; }
+.opacity-25-hover:hover { opacity: .25; }
+.opacity-50-hover:hover { opacity: .5; }
+.opacity-75-hover:hover { opacity: .75; }
+.opacity-100-hover:hover { opacity: 1; }
 ```
 
 ### Responsive
@@ -337,50 +337,50 @@ $utilities: (
 Output:
 
 ```css
-.opacity-0 { opacity: 0 !important; }
-.opacity-25 { opacity: .25 !important; }
-.opacity-50 { opacity: .5 !important; }
-.opacity-75 { opacity: .75 !important; }
-.opacity-100 { opacity: 1 !important; }
+.opacity-0 { opacity: 0; }
+.opacity-25 { opacity: .25; }
+.opacity-50 { opacity: .5; }
+.opacity-75 { opacity: .75; }
+.opacity-100 { opacity: 1; }
 
 @media (min-width: 576px) {
-  .opacity-sm-0 { opacity: 0 !important; }
-  .opacity-sm-25 { opacity: .25 !important; }
-  .opacity-sm-50 { opacity: .5 !important; }
-  .opacity-sm-75 { opacity: .75 !important; }
-  .opacity-sm-100 { opacity: 1 !important; }
+  .opacity-sm-0 { opacity: 0; }
+  .opacity-sm-25 { opacity: .25; }
+  .opacity-sm-50 { opacity: .5; }
+  .opacity-sm-75 { opacity: .75; }
+  .opacity-sm-100 { opacity: 1; }
 }
 
 @media (min-width: 768px) {
-  .opacity-md-0 { opacity: 0 !important; }
-  .opacity-md-25 { opacity: .25 !important; }
-  .opacity-md-50 { opacity: .5 !important; }
-  .opacity-md-75 { opacity: .75 !important; }
-  .opacity-md-100 { opacity: 1 !important; }
+  .opacity-md-0 { opacity: 0; }
+  .opacity-md-25 { opacity: .25; }
+  .opacity-md-50 { opacity: .5; }
+  .opacity-md-75 { opacity: .75; }
+  .opacity-md-100 { opacity: 1; }
 }
 
 @media (min-width: 992px) {
-  .opacity-lg-0 { opacity: 0 !important; }
-  .opacity-lg-25 { opacity: .25 !important; }
-  .opacity-lg-50 { opacity: .5 !important; }
-  .opacity-lg-75 { opacity: .75 !important; }
-  .opacity-lg-100 { opacity: 1 !important; }
+  .opacity-lg-0 { opacity: 0; }
+  .opacity-lg-25 { opacity: .25; }
+  .opacity-lg-50 { opacity: .5; }
+  .opacity-lg-75 { opacity: .75; }
+  .opacity-lg-100 { opacity: 1; }
 }
 
 @media (min-width: 1200px) {
-  .opacity-xl-0 { opacity: 0 !important; }
-  .opacity-xl-25 { opacity: .25 !important; }
-  .opacity-xl-50 { opacity: .5 !important; }
-  .opacity-xl-75 { opacity: .75 !important; }
-  .opacity-xl-100 { opacity: 1 !important; }
+  .opacity-xl-0 { opacity: 0; }
+  .opacity-xl-25 { opacity: .25; }
+  .opacity-xl-50 { opacity: .5; }
+  .opacity-xl-75 { opacity: .75; }
+  .opacity-xl-100 { opacity: 1; }
 }
 
 @media (min-width: 1400px) {
-  .opacity-xxl-0 { opacity: 0 !important; }
-  .opacity-xxl-25 { opacity: .25 !important; }
-  .opacity-xxl-50 { opacity: .5 !important; }
-  .opacity-xxl-75 { opacity: .75 !important; }
-  .opacity-xxl-100 { opacity: 1 !important; }
+  .opacity-xxl-0 { opacity: 0; }
+  .opacity-xxl-25 { opacity: .25; }
+  .opacity-xxl-50 { opacity: .5; }
+  .opacity-xxl-75 { opacity: .75; }
+  .opacity-xxl-100 { opacity: 1; }
 }
 ```
 
@@ -407,24 +407,40 @@ $utilities: (
 Output:
 
 ```css
-.opacity-0 { opacity: 0 !important; }
-.opacity-25 { opacity: .25 !important; }
-.opacity-50 { opacity: .5 !important; }
-.opacity-75 { opacity: .75 !important; }
-.opacity-100 { opacity: 1 !important; }
+.opacity-0 { opacity: 0; }
+.opacity-25 { opacity: .25; }
+.opacity-50 { opacity: .5; }
+.opacity-75 { opacity: .75; }
+.opacity-100 { opacity: 1; }
 
 @media print {
-  .opacity-print-0 { opacity: 0 !important; }
-  .opacity-print-25 { opacity: .25 !important; }
-  .opacity-print-50 { opacity: .5 !important; }
-  .opacity-print-75 { opacity: .75 !important; }
-  .opacity-print-100 { opacity: 1 !important; }
+  .opacity-print-0 { opacity: 0; }
+  .opacity-print-25 { opacity: .25; }
+  .opacity-print-50 { opacity: .5; }
+  .opacity-print-75 { opacity: .75; }
+  .opacity-print-100 { opacity: 1; }
 }
 ```
 
 ## Importance
 
-All utilities generated by the API include `!important` to ensure they override components and modifier classes as intended. You can toggle this setting globally with the `$enable-important-utilities` variable (defaults to `true`).
+Utilities carry no `!important`. They do not need it: the API emits them into the
+`utilities` cascade layer, which is declared last, so every utility already wins
+against every component and modifier class regardless of selector specificity.
+See [cascade layers](/migration/v6/#cascade-layers) for the full order.
+
+One case the suffix did cover is CSS of your own written **outside** any layer:
+unlayered styles beat every layer, so a plain `.card-title { text-align: left }`
+loaded after CoreUI wins over `.text-center`. Move that CSS into `@layer custom`
+— the slot reserved for it, between components and helpers — and utilities win
+again. If it is easier to flip one switch than to move a legacy stylesheet, set
+`$enable-important-utilities: true` to bring the suffix back everywhere.
+
+```scss
+@use "@coreui/coreui-pro/scss/coreui" with (
+  $enable-important-utilities: true
+);
+```
 
 ## Using the API
 

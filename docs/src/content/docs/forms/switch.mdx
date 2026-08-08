@@ -8,69 +8,93 @@ otherFrameworks:
 
 ## Approach
 
-A switch has the markup of a [checkbox](/forms/checkbox/) with `.form-switch` added to the wrapper — it is a checkbox, drawn as a track and a thumb.
+A switch is a [checkbox](/forms/checkbox/) drawn as a track and a thumb: put `.switch` on the `<input type="checkbox">` instead of `.check`. The thumb is the input's own `::before`, so its colour is a token rather than a fill inside an SVG — which is also what let the separate dark-mode artwork go.
 
 Add `role="switch"` to convey the nature of the control to assistive technologies that support the role. Older ones announce it as a plain checkbox, which is a fair fallback. Switches support `disabled` like any checkbox.
 
 ## Basic switch
 
-<Example code={`<div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-    <label class="form-check-label" for="flexSwitchCheckDefault">Default switch checkbox input</label>
+<Example code={`<div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+    <label for="flexSwitchCheckDefault">Default switch checkbox input</label>
   </div>
-  <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
-    <label class="form-check-label" for="flexSwitchCheckChecked">Checked switch checkbox input</label>
+  <div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckChecked" checked>
+    <label for="flexSwitchCheckChecked">Checked switch checkbox input</label>
   </div>`} />
 
 ## Disabled
 
-<Example code={`<div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDisabled" disabled>
-    <label class="form-check-label" for="flexSwitchCheckDisabled">Disabled switch checkbox input</label>
+<Example code={`<div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckDisabled" disabled>
+    <label for="flexSwitchCheckDisabled">Disabled switch checkbox input</label>
   </div>
-  <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
-    <label class="form-check-label" for="flexSwitchCheckCheckedDisabled">Disabled checked switch checkbox input</label>
+  <div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckCheckedDisabled" checked disabled>
+    <label for="flexSwitchCheckCheckedDisabled">Disabled checked switch checkbox input</label>
   </div>`} />
 
 ## Sizes
 
-Add `.form-switch-lg` or `.form-switch-xl` next to `.form-switch` for a larger control. The label scales with it.
+`.switch-sm`, `.switch-lg` and `.switch-xl` size the whole row — the track, its thumb, and the label beside it — the way [`.check-sm`](/forms/checkbox/#sizes) and [`.radio-lg`](/forms/radio/#sizes) do.
 
-<Example code={`<div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckSizeDefault">
-    <label class="form-check-label" for="flexSwitchCheckSizeDefault">Default switch checkbox input</label>
+Each sets **one** custom property. The track's width follows its height through the aspect ratio, the thumb follows the height minus the padding, and the alignment margin is computed from the line — so nothing needs re-tuning per size.
+
+<Example code={`<div class="form-field">
+    <input class="switch switch-sm" type="checkbox" role="switch" id="flexSwitchCheckSizeSm" checked>
+    <label for="flexSwitchCheckSizeSm">Small switch checkbox input</label>
   </div>
-  <div class="form-check form-switch form-switch-lg">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefaultLg">
-    <label class="form-check-label" for="flexSwitchCheckDefaultLg">Large switch checkbox input</label>
+  <div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckSizeDefault" checked>
+    <label for="flexSwitchCheckSizeDefault">Default switch checkbox input</label>
   </div>
-  <div class="form-check form-switch form-switch-xl">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefaultXl">
-    <label class="form-check-label" for="flexSwitchCheckDefaultXl">Extra large switch checkbox input</label>
+  <div class="form-field">
+    <input class="switch switch-lg" type="checkbox" role="switch" id="flexSwitchCheckDefaultLg" checked>
+    <label for="flexSwitchCheckDefaultLg">Large switch checkbox input</label>
+  </div>
+  <div class="form-field">
+    <input class="switch switch-xl" type="checkbox" role="switch" id="flexSwitchCheckDefaultXl" checked>
+    <label for="flexSwitchCheckDefaultXl">Extra large switch checkbox input</label>
   </div>`} />
 
-## Reverse
+Any other size is that one property:
 
-Put the switch on the opposite side with the `.form-check-reverse` modifier.
+```html
+<input class="switch" type="checkbox" role="switch" style="--cui-switch-height: 2rem">
+```
 
-<Example code={`<div class="form-check form-switch form-check-reverse">
-    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckReverse">
-    <label class="form-check-label" for="flexSwitchCheckReverse">Reverse switch checkbox input</label>
-  </div>`} />
+The proportion is a Sass variable, `$switch-aspect-ratio`, so a squarer or longer track is set once for every size.
 
-## With a form field
+## Description
 
 Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
 
 <Example code={`<div class="form-field">
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" id="fieldSwitch">
-      <label class="form-check-label" for="fieldSwitch">Email notifications</label>
-    </div>
+    <div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="fieldSwitch">
+    <label for="fieldSwitch">Email notifications</label>
+  </div>
     <div class="form-text">Turn this off and we will only contact you about your account.</div>
   </div>`} />
+
+## Deprecated markup
+
+<DeprecatedIn version="6.0.0" />
+
+The v5 spelling — `.form-check.form-switch` wrapping a `.form-check-input`, with `.form-switch-lg` / `-xl` for size — still works and renders exactly as it did. It is removed in v7, and `$enable-deprecated-form-check: false` leaves it out of your build today.
+
+```diff
+- <div class="form-check form-switch">
+-   <input class="form-check-input" type="checkbox" role="switch" id="s">
+-   <label class="form-check-label" for="s">Label</label>
+- </div>
++ <div class="form-field">
++   <input class="switch" type="checkbox" role="switch" id="s">
++   <label for="s">Label</label>
++ </div>
+```
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Customizing
 
@@ -86,6 +110,6 @@ Switchs read their own custom properties, so restyling one control does not touc
 
 ### Shared variables
 
-The wrapper and the shared control surface:
+`.form-check` lays out the row and all three controls share their focus, active and disabled states, so these are set once rather than per control:
 
-<ScssDocs file="scss/forms/_check.scss" capture="form-check-variables" />
+<ScssDocs file="scss/forms/_form-check.scss" capture="form-check-variables" />

@@ -878,12 +878,12 @@ class MultiSelect extends Combobox {
   }
 
   _createCheckboxIndicator(): HTMLElement {
-    // Decorative reuse of the form-check surface: a span (valid inside the
+    // Decorative reuse of the checkbox surface: a span (valid inside the
     // select-all <button>) styled as .form-check-input; the host's
     // selected/indeterminate classes drive its state, aria-selected carries
     // the semantics.
     const indicator = document.createElement('span')
-    indicator.classList.add('form-check-input', CLASS_NAME_OPTION_INDICATOR)
+    indicator.classList.add('check', CLASS_NAME_OPTION_INDICATOR)
     indicator.setAttribute('aria-hidden', 'true')
     return indicator
   }

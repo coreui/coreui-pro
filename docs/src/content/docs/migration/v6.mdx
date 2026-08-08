@@ -614,6 +614,95 @@ adornment in the library — so the button needs no icon markup at all:
   `.container`, `.container-fluid` or `.container-{breakpoint}` no longer gets
   them — wrap its content, the way every example in these docs does.
 
+#### Checkbox, radio and switch: the class moved onto the input
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`.check`, `.radio` and `.switch` go on the `<input>` itself. There is no wrapper
+and no second element: `appearance: none` lets the control render a
+pseudo-element, so the mark is drawn on the input, and its colour is a token
+(`--#{$prefix}check-mark-color`) rather than a value baked into an SVG. The
+separate dark-mode switch artwork is gone with it — a thumb painted from a token
+follows the colour scheme by itself.
+
+```diff
+- <div class="form-check">
+-   <input class="form-check-input" type="checkbox" id="c">
+-   <label class="form-check-label" for="c">Label</label>
+- </div>
++ <div class="form-field">
++   <input class="check" type="checkbox" id="c">
++   <label for="c">Label</label>
++ </div>
+```
+
+**The v5 spelling still works.** `.form-check`, `.form-check-input`,
+`.form-check-label`, `.form-switch` and `.form-check-inline` are kept as a
+compatibility layer — **aliases of the new controls**, not a second
+implementation, so there is one engine to maintain and the old markup lays out
+exactly as it did. Verified by measuring geometry across six markup variants and
+eight dimensions each: zero differences. It is deprecated in v6 and removed in
+v7. Set `$enable-deprecated-form-check: false` to leave it out of your build once
+your markup has moved; that takes **455 bytes gzip** off the stylesheet and
+leaves no `.form-check*` selector behind.
+
+`.btn-check` is **not** part of that layer — toggle buttons are a current
+feature, and they live with the buttons now rather than with the form check.
+
+**Five Sass variables shaped the old artwork and cannot be honoured any more**,
+because the compatibility layer draws through the new engine:
+`$form-check-input-checked-bg-image`, `$form-check-radio-checked-bg-image`,
+`$form-check-input-indeterminate-bg-image` and `$form-check-transition`. Their
+replacements are `--#{$prefix}check-mark-checked`,
+`--#{$prefix}radio-mark`, `--#{$prefix}check-mark-indeterminate` and the
+controls' own transition tokens. `$form-check-label-color` and
+`-cursor` keep working. `$form-check-btn-check-disabled-opacity` goes with the
+toggle button's move to the buttons — it duplicated `$btn-disabled-opacity`,
+which is now what the disabled toggle reads, through
+`--#{$prefix}btn-disabled-opacity`.
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Removed</span>
+**`.form-check-reverse` is gone.** It right-flushed the label and the control as
+a pair — which `order` utilities express directly — and it was never the settings
+row (label on the left, control on the right) that people actually reach for;
+that one is `justify-content: space-between`. The React and Vue `reverse` prop
+still emits the class and therefore stops having an effect; it is retired with
+those components in the framework editions.
+
+What replaces the wrapper's modifiers:
+
+| v5 | v6 |
+| --- | --- |
+| `.form-check` (layout) | [`.form-field`](/forms/field/), or nothing if you only need the control |
+| `.form-check-label` | a plain `<label>` |
+| `.form-check-inline` | a flex row: `.d-flex.gap-3` |
+| `.form-check-reverse` | `justify-content: space-between` on the field, or `order` utilities to swap the pair |
+| `.form-switch-lg` / `-xl` | `.switch-lg` / `.switch-xl` |
+
+**The switch is sized by one token, and gains `.switch-sm`.** `--#{$prefix}switch-width`
+is derived from `--#{$prefix}switch-height` through the new
+`$switch-aspect-ratio` (which `$form-switch-width` still sets, as the width the
+default height produces), so a size sets the height alone. The size classes now
+scale the label as well, matching `.check-sm` / `.radio-lg`; `$switch-sizes`
+replaces the width/height pairs for the new classes, while `$form-switch-widths`
+stays behind the deprecated `.form-switch-lg` / `-xl` in its original `em` scale.
+
+**Fixed: the switch animates again.** `--#{$prefix}switch-transition` carried a
+property name inside it (`background-position .15s ease-in-out`, inherited from
+v5's `$form-switch-transition`), so `transition: inset-inline-start var(…)`
+resolved to something invalid and every switch transition was dropped. It is two
+tokens now — `--#{$prefix}switch-transition-duration` and
+`-timing` — and the thumb slides rather than the background position.
+
+**New: checkbox and radio have sizes.** `.check-sm` / `.check-lg` and
+`.radio-sm` / `.radio-lg` — v5 had none, only the switch was sizeable. Each sets
+one custom property; the mark scales with the box and the alignment margin is
+computed from the same value, so any size you set yourself stays on the text's
+optical centre too.
+
+Multi Select's option indicators moved with it — they render as a decorative
+`.check` now, so a build with the compatibility layer off still draws them.
+
 #### Checkbox, radio and switch: one page became four
 
 - **Each control now owns its custom properties.** `--#{$prefix}checkbox-*`,
@@ -640,8 +729,8 @@ adornment in the library — so the button needs no icon markup at all:
   [Switch](/forms/switch/) — one page per control, each self-contained down to its
   own toggle-button and Sass sections. The old URL redirects to Checkbox.
   **No classes changed**: `.form-check`, `.form-check-input`, `.form-check-label`,
-  `.form-switch`, `.form-check-inline` and `.form-check-reverse` all work exactly
-  as before.
+  `.form-switch` and `.form-check-inline` all work exactly as before;
+  `.form-check-reverse` is removed.
 - **New: [`.form-field`](/forms/field/)**, a grid wrapper that lays a control out
   with its label, description and validation feedback on one consistent gap, so a
   form is spaced by the field instead of by margin utilities on its parts. A bare
@@ -776,6 +865,20 @@ assembles maps of CSS expressions and the browser resolves them.
   existing stylesheets now override the library more easily, not less. No
   action needed — selectors that worked before keep working, and low-specificity
   overrides that used to lose on specificity now win.
+- **Utilities no longer carry `!important`.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `$enable-important-utilities` now defaults to `false`, because the layer order
+  above already puts every utility past every component — the suffix was doing
+  nothing our own stylesheet needed. That takes 556 bytes gzip (19 kB
+  uncompressed) off the build.
+
+  The one case it did cover is your own **unlayered** CSS: since unlayered styles
+  beat every layer, a plain `.card-title { text-align: left }` in a stylesheet
+  loaded after ours now wins over `.text-center`. Two ways out, and the choice is
+  yours per rule rather than ours for all of them — move that CSS into
+  `@layer custom` so utilities win, or set
+  `$enable-important-utilities: true` to keep the v5 behavior everywhere.
+
 - If your build concatenates CoreUI with other CSS, make sure the layer
   declaration (emitted at the top of the bundle) is not stripped by a minifier
   that predates `@layer`.

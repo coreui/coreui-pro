@@ -17,7 +17,7 @@ description: "A layout wrapper for a form control, its label, description and va
 ## How it works
 
 - **Default layout** is a single-column grid: everything stacks vertically with one gap. Use it for text inputs, selects, textareas, ranges, input groups and any of the [PRO field components](/forms/form-control-group/).
-- **Two-column layout** switches on through `:has()` when a bare `.form-check-input` is a direct child — the control pins to the first column, the label and description stack in the second. A checkbox that keeps its `.form-check` wrapper does not need this: the wrapper already lays the control out next to its label.
+- **Two-column layout** switches on through `:has()` when a `.check`, `.radio` or `.switch` is a direct child — the control pins to the first column, the label and description stack in the second. The deprecated `.form-check-input` triggers it too, so markup that has not moved yet lays out the same way.
 - **A field label** (`.form-label`) spans both columns and sits above the control row.
 - **Grouped controls** — nest a `.form-field` per control inside an outer one to put several radios or checkboxes under a shared label with a shared description.
 
@@ -47,21 +47,9 @@ description: "A layout wrapper for a form control, its label, description and va
 
 ### Checkbox
 
-A checkbox in its `.form-check` wrapper stacks with its description:
-
 <Example code={`<div class="form-field">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" id="fieldCheck">
-      <label class="form-check-label" for="fieldCheck">Subscribe to the newsletter</label>
-    </div>
-    <div class="form-text">We send one email a month, and never share your address.</div>
-  </div>`} />
-
-Written without the wrapper, the field lays the control out itself — this is the two-column mode:
-
-<Example code={`<div class="form-field">
-    <input class="form-check-input" type="checkbox" id="fieldCheckBare">
-    <label for="fieldCheckBare">Subscribe to the newsletter</label>
+    <input class="check" type="checkbox" id="fieldCheck">
+    <label for="fieldCheck">Subscribe to the newsletter</label>
     <div class="form-text">We send one email a month, and never share your address.</div>
   </div>`} />
 
@@ -72,12 +60,12 @@ Nest one `.form-field` per control inside an outer one, and give the group its o
 <Example code={`<div class="form-field">
     <span class="form-label">Delivery</span>
     <div class="form-field">
-      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio1" checked>
+      <input class="radio" type="radio" name="fieldRadio" id="fieldRadio1" checked>
       <label for="fieldRadio1">Standard</label>
       <div class="form-text">Three to five working days.</div>
     </div>
     <div class="form-field">
-      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio2">
+      <input class="radio" type="radio" name="fieldRadio" id="fieldRadio2">
       <label for="fieldRadio2">Express</label>
       <div class="form-text">Next working day, where available.</div>
     </div>
@@ -86,10 +74,8 @@ Nest one `.form-field` per control inside an outer one, and give the group its o
 ### Switch
 
 <Example code={`<div class="form-field">
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" id="fieldSwitch">
-      <label class="form-check-label" for="fieldSwitch">Email notifications</label>
-    </div>
+    <input class="switch" type="checkbox" role="switch" id="fieldSwitch">
+    <label for="fieldSwitch">Email notifications</label>
     <div class="form-text">Turn this off and we will only contact you about your account.</div>
   </div>`} />
 

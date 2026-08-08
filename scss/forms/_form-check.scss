@@ -1,2 +1,147 @@
-// Renamed to _check.scss in v6, matching upstream. Kept so an existing `@use "forms/form-check"` resolves.
-@forward "check";
+@use "sass:map";
+@use "../functions/defaults" as *;
+@use "../functions/escape-svg" as *;
+@use "../mixins/border-radius" as *;
+@use "../mixins/color-mode" as *;
+@use "../mixins/tokens" as *;
+@use "../mixins/transition" as *;
+@use "../config" as *;
+
+// The values each control's own variables default to. A consumer sets
+// `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
+// what those fall back to, and what still works for a v5-era override.
+// scss-docs-start form-check-defaults
+$form-check-input-width:                  1em !default;
+
+$form-check-input-bg:                     $input-bg !default;
+$form-check-input-border:                 var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
+$form-check-input-border-radius:          .25em !default;
+$form-check-radio-border-radius:          50% !default;
+
+$form-check-input-checked-color:          $component-active-color !default;
+// scss-docs-end form-check-defaults
+
+// What the wrapper owns and what all three controls share: the row, the label,
+// and the focus / active / disabled states.
+// scss-docs-start form-check-variables
+$form-check-min-height:                   $font-size-base * $line-height-base !default;
+$form-check-padding-start:                $form-check-input-width + .5em !default;
+$form-check-margin-bottom:                .125rem !default;
+$form-check-inline-margin-end:            1rem !default;
+
+$form-check-label-color:                  null !default;
+$form-check-label-cursor:                 null !default;
+
+$form-check-input-active-filter:          brightness(90%) !default;
+$form-check-input-focus-border:           $input-focus-border-color !default;
+$form-check-input-focus-ring:             $focus-ring !default;
+
+$form-check-input-disabled-opacity:        .5 !default;
+$form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;
+// scss-docs-end form-check-variables
+
+// scss-docs-start form-switch-variables
+$form-switch-color:               rgba($black, .25) !default;
+$form-switch-width:               2em !default;
+$form-switch-padding-start:       $form-switch-width + .5em !default;
+$form-switch-bg-image:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color}'/></svg>") !default;
+$form-switch-border-radius:       $form-switch-width !default;
+$form-switch-transition:          background-position .15s ease-in-out !default;
+
+$form-switch-focus-color:         $input-focus-border-color !default;
+$form-switch-focus-bg-image:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-focus-color}'/></svg>") !default;
+
+$form-switch-checked-color:       $component-active-color !default;
+$form-switch-checked-bg-image:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-checked-color}'/></svg>") !default;
+$form-switch-checked-bg-position: right center !default;
+
+$form-switch-widths: (
+  lg: (
+    width: 2.5em,
+    height: 1.25em
+  ),
+  xl: (
+    width: 3em,
+    height: 1.5em
+  )
+) !default;
+// scss-docs-end form-switch-variables
+
+// The knob is an inline SVG, so its colour lives inside the image and cannot be
+// a light-dark() pair — the dark scheme gets its own rule below.
+// scss-docs-start form-switch-dark-variables
+$form-switch-color-dark:            rgba($white, .25) !default;
+$form-switch-bg-image-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color-dark}'/></svg>") !default;
+// scss-docs-end form-switch-dark-variables
+
+// scss-docs-start form-check-tokens
+// Tokens the wrapper owns; the input reads them by inheritance.
+$form-check-tokens: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-check-tokens: defaults(
+  (
+    --#{$prefix}form-check-min-height: #{$form-check-min-height},
+    --#{$prefix}form-check-padding-start: #{$form-check-padding-start},
+    --#{$prefix}form-check-margin-bottom: #{$form-check-margin-bottom},
+    --#{$prefix}form-check-inline-margin-end: #{$form-check-inline-margin-end},
+    --#{$prefix}form-check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}form-switch-padding-start: #{$form-switch-padding-start},
+  ),
+  $form-check-tokens
+);
+// scss-docs-end form-check-tokens
+
+// scss-docs-start form-check-input-tokens
+// Tokens the input owns, so it still styles itself when used outside .form-check
+// — an input group, for instance. Keeping them off the wrapper means a wrapper
+// or :root override is not shadowed by the input's own declaration.
+$form-check-input-tokens: () !default;
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-check-input-tokens: defaults(
+  (
+    --#{$prefix}form-check-input-width: #{$form-check-input-width},
+    --#{$prefix}form-check-bg: #{$form-check-input-bg},
+    --#{$prefix}form-check-input-border: #{$form-check-input-border},
+    --#{$prefix}form-check-input-border-radius: #{$form-check-input-border-radius},
+    --#{$prefix}form-check-radio-border-radius: #{$form-check-radio-border-radius},
+    --#{$prefix}form-check-input-active-filter: #{$form-check-input-active-filter},
+    --#{$prefix}form-check-input-focus-border: #{$form-check-input-focus-border},
+    --#{$prefix}form-check-input-focus-ring: #{$form-check-input-focus-ring},
+    --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}form-check-input-indeterminate-bg-color: var(--#{$prefix}control-indeterminate-bg),
+    --#{$prefix}form-check-input-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
+    --#{$prefix}form-check-input-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}form-switch-width: #{$form-switch-width},
+    --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image)},
+    --#{$prefix}form-switch-border-radius: #{$form-switch-border-radius},
+    --#{$prefix}form-switch-transition: #{$form-switch-transition},
+    --#{$prefix}form-switch-checked-bg-position: #{$form-switch-checked-bg-position},
+  ),
+  $form-check-input-tokens
+);
+// scss-docs-end form-check-input-tokens
+
+@layer forms {
+  @if $enable-deprecated-form-check {
+    // What the aliases cannot express: the stacked rhythm the wrapper added, the
+    // inline row, and the reversed order.
+    .form-check {
+      @include tokens($form-check-tokens);
+
+      min-height: var(--#{$prefix}form-check-min-height);
+      margin-bottom: var(--#{$prefix}form-check-margin-bottom);
+    }
+
+    .form-check-label {
+      color: var(--#{$prefix}form-check-label-color, #{$form-check-label-color});
+      cursor: $form-check-label-cursor;
+    }
+
+    .form-check-inline {
+      display: inline-grid;
+      margin-inline-end: var(--#{$prefix}form-check-inline-margin-end);
+      vertical-align: top;
+    }
+  }
+}

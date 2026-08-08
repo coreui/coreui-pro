@@ -269,6 +269,29 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
 
 
   //
+  // Toggle buttons (.btn-check)
+  //
+  // A checkbox or radio that looks like a button: the input carries
+  // `.btn-check` and is hidden, the `<label>` next to it carries `.btn`. The
+  // states are the `.btn-check:checked + .btn` rules in the base block above.
+
+  .btn-check {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+
+    &[disabled],
+    &:disabled {
+      + .btn {
+        pointer-events: none;
+        filter: none;
+        opacity: var(--#{$prefix}btn-disabled-opacity);
+      }
+    }
+  }
+
+
+  //
   // Alternate buttons
   //
 
