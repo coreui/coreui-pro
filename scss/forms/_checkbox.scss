@@ -18,12 +18,19 @@ $check-mark-color:           $form-check-input-checked-color !default;
 // carries the shape — `currentColor` in the path would be painted over anyway.
 $check-mark-checked:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
 $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
+
+// The size ladder shared by checkbox and radio. `lg` is the height of
+// `.switch-lg`, so a row mixing the three lines up.
+$check-sizes: (
+  sm: .875em,
+  lg: 1.25em
+) !default;
 // scss-docs-end check-variables
 
 $check-tokens: () !default;
 
 // scss-docs-start check-css-vars
-// stylelint-disable function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 // stylelint-disable-next-line scss/dollar-variable-default
 $check-tokens: defaults(
   (
@@ -47,7 +54,7 @@ $check-tokens: defaults(
   ),
   $check-tokens
 );
-// stylelint-enable function-disallowed-list
+// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end check-css-vars
 
 @layer forms {
@@ -118,6 +125,14 @@ $check-tokens: defaults(
         cursor: default;
         opacity: var(--#{$prefix}check-label-disabled-opacity);
       }
+    }
+  }
+
+  // A size is one token: the mark scales with the box, and the alignment margin
+  // is computed from the same value, so nothing has to be re-tuned by hand.
+  @each $size, $value in $check-sizes {
+    .check-#{$size} {
+      --#{$prefix}check-size: #{$value};
     }
   }
 }

@@ -88,6 +88,31 @@ Put the box after the label with the `order` utilities.
     <label class="order-1" for="reverseCheck1">Reverse checkbox</label>
   </div>`} />
 
+## Sizes
+
+`.check-sm` and `.check-lg` set `--#{'{'}$prefix{'}'}check-size` and nothing else — the mark scales with the box and the alignment margin is computed from the same value, so a checkbox stays on the text's optical centre at every size. `.check-lg` is the height of `.switch-lg`, so a row mixing the controls lines up.
+
+<Example code={`<div class="d-flex align-items-start gap-3">
+    <div class="form-field">
+      <input class="check check-sm" type="checkbox" id="checkSm" checked>
+      <label for="checkSm">Small</label>
+    </div>
+    <div class="form-field">
+      <input class="check" type="checkbox" id="checkMd" checked>
+      <label for="checkMd">Default</label>
+    </div>
+    <div class="form-field">
+      <input class="check check-lg" type="checkbox" id="checkLg" checked>
+      <label for="checkLg">Large</label>
+    </div>
+  </div>`} />
+
+Any other size is one custom property, and the alignment follows it:
+
+```html
+<input class="check" type="checkbox" style="--cui-check-size: 2em">
+```
+
 ## Without a label
 
 A checkbox with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.

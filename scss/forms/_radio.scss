@@ -1,6 +1,7 @@
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "check" as *;
+@use "checkbox" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
@@ -19,7 +20,7 @@ $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/
 $radio-tokens: () !default;
 
 // scss-docs-start radio-css-vars
-// stylelint-disable function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 // stylelint-disable-next-line scss/dollar-variable-default
 $radio-tokens: defaults(
   (
@@ -40,7 +41,7 @@ $radio-tokens: defaults(
   ),
   $radio-tokens
 );
-// stylelint-enable function-disallowed-list
+// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end radio-css-vars
 
 @layer forms {
@@ -100,6 +101,13 @@ $radio-tokens: defaults(
         cursor: default;
         opacity: var(--#{$prefix}radio-label-disabled-opacity);
       }
+    }
+  }
+
+  // Same ladder as the checkbox, so a row mixing the two lines up.
+  @each $size, $value in $check-sizes {
+    .radio-#{$size} {
+      --#{$prefix}radio-size: #{$value};
     }
   }
 }

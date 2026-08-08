@@ -654,6 +654,12 @@ What replaces the wrapper's modifiers:
 | `.form-check-reverse` | `order` utilities on the control and label |
 | `.form-switch-lg` / `-xl` | `.switch-lg` / `.switch-xl` |
 
+**New: checkbox and radio have sizes.** `.check-sm` / `.check-lg` and
+`.radio-sm` / `.radio-lg` — v5 had none, only the switch was sizeable. Each sets
+one custom property; the mark scales with the box and the alignment margin is
+computed from the same value, so any size you set yourself stays on the text's
+optical centre too.
+
 Multi Select's option indicators moved with it — they render as a decorative
 `.check` now, so a build with the compatibility layer off still draws them.
 

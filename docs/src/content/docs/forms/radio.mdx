@@ -85,6 +85,31 @@ Put the dot after the label with the `order` utilities (`.order-2` on the input,
     <label for="reverseRadio2">Disabled reverse radio</label>
   </div>`} />
 
+## Sizes
+
+`.radio-sm` and `.radio-lg` set `--#{'{'}$prefix{'}'}radio-size` and nothing else — the mark scales with the box and the alignment margin is computed from the same value, so a radio stays on the text's optical centre at every size. `.radio-lg` is the height of `.switch-lg`, so a row mixing the controls lines up.
+
+<Example code={`<div class="d-flex align-items-start gap-3">
+    <div class="form-field">
+      <input class="radio radio-sm" type="radio" name="sizeRadio" id="radioSm" checked>
+      <label for="radioSm">Small</label>
+    </div>
+    <div class="form-field">
+      <input class="radio" type="radio" name="sizeRadio" id="radioMd" checked>
+      <label for="radioMd">Default</label>
+    </div>
+    <div class="form-field">
+      <input class="radio radio-lg" type="radio" name="sizeRadio" id="radioLg" checked>
+      <label for="radioLg">Large</label>
+    </div>
+  </div>`} />
+
+Any other size is one custom property, and the alignment follows it:
+
+```html
+<input class="radio" type="radio" style="--cui-radio-size: 2em">
+```
+
 ## Without a label
 
 A radio with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
