@@ -183,7 +183,9 @@ $dropdown-dark-tokens: defaults(
       $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
       .dropdown-menu#{$infix}-start {
-        --#{$prefix}position: start;
+        // Read by the plugin, so the name cannot follow `$prefix` — the two
+        // sides would disagree in a build that changes it.
+        --cui-position: start;
 
         &[data#{$data-infix}popper] {
           inset-inline-start: 0;
@@ -192,7 +194,7 @@ $dropdown-dark-tokens: defaults(
       }
 
       .dropdown-menu#{$infix}-end {
-        --#{$prefix}position: end;
+        --cui-position: end;
 
         &[data#{$data-infix}popper] {
           inset-inline-start: auto;
