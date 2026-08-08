@@ -18,8 +18,10 @@
 
     // Bring the hover, focused, and "active" buttons to the front to overlay
     // the borders properly
-    > .btn-check:checked + .btn,
-    > .btn-check:focus + .btn,
+    > #{$btn-check-deprecated}:checked + .btn,
+    > #{$btn-check-deprecated}:focus + .btn,
+    > .btn-check:has(input:checked),
+    > .btn-check:has(input:focus),
     > .btn:hover,
     > .btn:focus,
     > .btn:active,
@@ -43,7 +45,7 @@
     @include border-radius($btn-border-radius);
 
     // Prevent double borders when buttons are next to each other
-    > :not(.btn-check:first-child) + .btn,
+    > :not(#{$btn-check-deprecated}:first-child) + .btn,
     > .btn-group:not(:first-child) {
       margin-inline-start: calc(-1 * #{$btn-border-width}); // stylelint-disable-line function-disallowed-list
     }
@@ -57,10 +59,11 @@
 
     // The left radius should be 0 if the button is:
     // - the "third or more" child
-    // - the second child and the previous element isn't `.btn-check` (making it the first child visually)
+    // - the second child and the previous element isn't a deprecated `.btn-check`
+    //   input (making it the first child visually)
     // - part of a btn-group which isn't the first child
     > .btn:nth-child(n + 3),
-    > :not(.btn-check) + .btn,
+    > :not(#{$btn-check-deprecated}) + .btn,
     > .btn-group:not(:first-child) > .btn {
       @include border-start-radius(0);
     }
@@ -143,10 +146,11 @@
 
     // The top radius should be 0 if the button is:
     // - the "third or more" child
-    // - the second child and the previous element isn't `.btn-check` (making it the first child visually)
+    // - the second child and the previous element isn't a deprecated `.btn-check`
+    //   input (making it the first child visually)
     // - part of a btn-group which isn't the first child
     > .btn:nth-child(n + 3),
-    > :not(.btn-check) + .btn,
+    > :not(#{$btn-check-deprecated}) + .btn,
     > .btn-group:not(:first-child) > .btn {
       @include border-top-radius(0);
     }
