@@ -36,20 +36,34 @@ Add `role="switch"` to convey the nature of the control to assistive technologie
 
 ## Sizes
 
-Add `.switch-lg` or `.switch-xl` for a larger control. Both only set `--#{'{'}$prefix{'}'}switch-width` and `-height`, so a size neither names is two custom properties rather than a Sass rebuild.
+`.switch-sm`, `.switch-lg` and `.switch-xl` size the whole row — the track, its thumb, and the label beside it — the way [`.check-sm`](/forms/checkbox/#sizes) and [`.radio-lg`](/forms/radio/#sizes) do.
+
+Each sets **one** custom property. The track's width follows its height through the aspect ratio, the thumb follows the height minus the padding, and the alignment margin is computed from the line — so nothing needs re-tuning per size.
 
 <Example code={`<div class="form-field">
-    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckSizeDefault">
+    <input class="switch switch-sm" type="checkbox" role="switch" id="flexSwitchCheckSizeSm" checked>
+    <label for="flexSwitchCheckSizeSm">Small switch checkbox input</label>
+  </div>
+  <div class="form-field">
+    <input class="switch" type="checkbox" role="switch" id="flexSwitchCheckSizeDefault" checked>
     <label for="flexSwitchCheckSizeDefault">Default switch checkbox input</label>
   </div>
   <div class="form-field">
-    <input class="switch switch-lg" type="checkbox" role="switch" id="flexSwitchCheckDefaultLg">
+    <input class="switch switch-lg" type="checkbox" role="switch" id="flexSwitchCheckDefaultLg" checked>
     <label for="flexSwitchCheckDefaultLg">Large switch checkbox input</label>
   </div>
   <div class="form-field">
-    <input class="switch switch-xl" type="checkbox" role="switch" id="flexSwitchCheckDefaultXl">
+    <input class="switch switch-xl" type="checkbox" role="switch" id="flexSwitchCheckDefaultXl" checked>
     <label for="flexSwitchCheckDefaultXl">Extra large switch checkbox input</label>
   </div>`} />
+
+Any other size is that one property:
+
+```html
+<input class="switch" type="checkbox" role="switch" style="--cui-switch-height: 2rem">
+```
+
+The proportion is a Sass variable, `$switch-aspect-ratio`, so a squarer or longer track is set once for every size.
 
 ## Description
 

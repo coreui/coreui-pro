@@ -679,6 +679,21 @@ What replaces the wrapper's modifiers:
 | `.form-check-reverse` | `justify-content: space-between` on the field, or `order` utilities to swap the pair |
 | `.form-switch-lg` / `-xl` | `.switch-lg` / `.switch-xl` |
 
+**The switch is sized by one token, and gains `.switch-sm`.** `--#{$prefix}switch-width`
+is derived from `--#{$prefix}switch-height` through the new
+`$switch-aspect-ratio` (which `$form-switch-width` still sets, as the width the
+default height produces), so a size sets the height alone. The size classes now
+scale the label as well, matching `.check-sm` / `.radio-lg`; `$switch-sizes`
+replaces the width/height pairs for the new classes, while `$form-switch-widths`
+stays behind the deprecated `.form-switch-lg` / `-xl` in its original `em` scale.
+
+**Fixed: the switch animates again.** `--#{$prefix}switch-transition` carried a
+property name inside it (`background-position .15s ease-in-out`, inherited from
+v5's `$form-switch-transition`), so `transition: inset-inline-start var(…)`
+resolved to something invalid and every switch transition was dropped. It is two
+tokens now — `--#{$prefix}switch-transition-duration` and
+`-timing` — and the thumb slides rather than the background position.
+
 **New: checkbox and radio have sizes.** `.check-sm` / `.check-lg` and
 `.radio-sm` / `.radio-lg` — v5 had none, only the switch was sizeable. Each sets
 one custom property; the mark scales with the box and the alignment margin is
