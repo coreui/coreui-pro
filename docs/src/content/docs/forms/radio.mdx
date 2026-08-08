@@ -87,7 +87,7 @@ Put the dot after the label with the `order` utilities (`.order-2` on the input,
 
 ## Sizes
 
-`.radio-sm` and `.radio-lg` set `--#{'{'}$prefix{'}'}radio-size` and nothing else — the mark scales with the box and the alignment margin is computed from the same value, so a radio stays on the text's optical centre at every size. `.radio-lg` is the height of `.switch-lg`, so a row mixing the controls lines up.
+`.radio-sm` and `.radio-lg` size the whole row — the box, its label, and the space they sit in. Each sets one font size: the box is `1em`, so it follows, and so does the alignment margin, which is computed from the line. Nothing needs re-tuning per size, and a size of your own is one custom property.
 
 <Example code={`<div class="d-flex align-items-start gap-3">
     <div class="form-field">

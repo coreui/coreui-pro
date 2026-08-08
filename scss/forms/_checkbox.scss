@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "check" as *;
@@ -22,8 +23,8 @@ $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 // The size ladder shared by checkbox and radio. `lg` is the height of
 // `.switch-lg`, so a row mixing the three lines up.
 $check-sizes: (
-  sm: .875em,
-  lg: 1.25em
+  sm: (size: 1em, font-size: $font-size-sm),
+  lg: (size: 1em, font-size: $font-size-lg)
 ) !default;
 // scss-docs-end check-variables
 
@@ -130,9 +131,17 @@ $check-tokens: defaults(
 
   // A size is one token: the mark scales with the box, and the alignment margin
   // is computed from the same value, so nothing has to be re-tuned by hand.
-  @each $size, $value in $check-sizes {
+  @each $size, $map in $check-sizes {
     .check-#{$size} {
-      --#{$prefix}check-size: #{$value};
+      --#{$prefix}check-size: #{map.get($map, "size")};
+
+      font-size: #{map.get($map, "font-size")};
+
+      // The label is a sibling, so it does not inherit the control's font size.
+      + label,
+      ~ .form-check-label {
+        font-size: #{map.get($map, "font-size")};
+      }
     }
   }
 }
