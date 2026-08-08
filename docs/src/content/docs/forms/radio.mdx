@@ -59,19 +59,20 @@ Any number of radios that are immediate siblings stack vertically and are spaced
 
 There is no inline modifier: the control is an inline element, so a row is a flex container with a gap. Wrap the group in `.d-flex.gap-3`.
 
-<Example code={`<div class="form-field">
-    <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-    <label for="inlineRadio1">1</label>
-  </div>
-  <div class="form-field">
-    <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-    <label for="inlineRadio2">2</label>
-  </div>
-  <div class="form-field">
-    <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled>
-    <label for="inlineRadio3">3 (disabled)</label>
+<Example code={`<div class="d-flex gap-3">
+    <div class="form-field">
+      <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+      <label for="inlineRadio1">1</label>
+    </div>
+    <div class="form-field">
+      <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+      <label for="inlineRadio2">2</label>
+    </div>
+    <div class="form-field">
+      <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled>
+      <label for="inlineRadio3">3 (disabled)</label>
+    </div>
   </div>`} />
-
 
 ## Sizes
 
