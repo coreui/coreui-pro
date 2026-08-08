@@ -8,108 +8,88 @@ otherFrameworks:
 
 ## Approach
 
-Browser default radios are replaced with `.form-check`, a wrapper that improves the layout and behavior of the native `<input type="radio">`. Radios are for selecting one option out of many; to select several, reach for a [checkbox](/forms/checkbox/).
+Put `.radio` on the `<input type="radio">`. That is the whole control — no wrapper, no extra element. Radios are for selecting one option out of many; to select several, reach for a [checkbox](/forms/checkbox/).
 
-Structurally, the `<input />` and its `<label>` are sibling elements rather than the input sitting inside the label. That is slightly more verbose — you have to relate them with `id` and `for` — but it lets us style the label from the input's state (`:checked`, `:disabled`) with the sibling selector.
+The input and its `<label>` stay siblings rather than the input sitting inside the label, so the label can be styled from the input's state. Relate them with `id` and `for`, and reach for [`.form-field`](/forms/field/) when you want the label, a description and validation feedback laid out for you. The dot is a CSS mask on the input's own `::before`, so its colour is a token.
 
 Radios in the same group share a `name` attribute; that is what makes them mutually exclusive.
 
 ## Basic radio
 
-<Example code={`<div class="form-check">
-    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
-    <label class="form-check-label" for="flexRadioDefault1">
-      Default radio
-    </label>
+<Example code={`<div class="form-field">
+    <input class="radio" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+    <label for="flexRadioDefault1">Default radio</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
-    <label class="form-check-label" for="flexRadioDefault2">
-      Default checked radio
-    </label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+    <label for="flexRadioDefault2">Default checked radio</label>
   </div>`} />
 
 ## Disabled
 
 Add the `disabled` attribute; the associated `<label>` is styled to match, in a lighter color, to indicate the state.
 
-<Example code={`<div class="form-check">
-    <input class="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioDisabled" disabled>
-    <label class="form-check-label" for="flexRadioDisabled">
-      Disabled radio
-    </label>
+<Example code={`<div class="form-field">
+    <input class="radio" type="radio" name="flexRadioDisabled" id="flexRadioDisabled" disabled>
+    <label for="flexRadioDisabled">Disabled radio</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked disabled>
-    <label class="form-check-label" for="flexRadioCheckedDisabled">
-      Disabled checked radio
-    </label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="flexRadioDisabled" id="flexRadioCheckedDisabled" checked disabled>
+    <label for="flexRadioCheckedDisabled">Disabled checked radio</label>
   </div>`} />
 
 ## Stacked
 
 Any number of radios that are immediate siblings stack vertically and are spaced by `.form-check`.
 
-<Example code={`<div class="form-check">
-    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-    <label class="form-check-label" for="exampleRadios1">
-      Default radio
-    </label>
+<Example code={`<div class="form-field">
+    <input class="radio" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+    <label for="exampleRadios1">Default radio</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-    <label class="form-check-label" for="exampleRadios2">
-      Second default radio
-    </label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+    <label for="exampleRadios2">Second default radio</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3" disabled>
-    <label class="form-check-label" for="exampleRadios3">
-      Disabled radio
-    </label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="exampleRadios" id="exampleRadios3" value="option3" disabled>
+    <label for="exampleRadios3">Disabled radio</label>
   </div>`} />
 
 ## Inline
 
-Put radios on the same horizontal row by adding `.form-check-inline` to any `.form-check`.
+There is no inline modifier: the control is an inline element, so a row is a flex container with a gap. Wrap the group in `.d-flex.gap-3`.
 
-<Example code={`<div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-    <label class="form-check-label" for="inlineRadio1">1</label>
+<Example code={`<div class="form-field">
+    <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+    <label for="inlineRadio1">1</label>
   </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-    <label class="form-check-label" for="inlineRadio2">2</label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+    <label for="inlineRadio2">2</label>
   </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled>
-    <label class="form-check-label" for="inlineRadio3">3 (disabled)</label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3" disabled>
+    <label for="inlineRadio3">3 (disabled)</label>
   </div>`} />
 
 ## Reverse
 
-Put the dot on the opposite side with the `.form-check-reverse` modifier.
+Put the dot after the label with the `order` utilities (`.order-2` on the input, `.order-1` on the label).
 
-<Example code={`<div class="form-check form-check-reverse">
-    <input class="form-check-input" type="radio" name="reverseRadio" id="reverseRadio1">
-    <label class="form-check-label" for="reverseRadio1">
-      Reverse radio
-    </label>
+<Example code={`<div class="form-field">
+    <input class="radio" type="radio" name="reverseRadio" id="reverseRadio1">
+    <label for="reverseRadio1">Reverse radio</label>
   </div>
-  <div class="form-check form-check-reverse">
-    <input class="form-check-input" type="radio" name="reverseRadio" id="reverseRadio2" disabled>
-    <label class="form-check-label" for="reverseRadio2">
-      Disabled reverse radio
-    </label>
+  <div class="form-field">
+    <input class="radio" type="radio" name="reverseRadio" id="reverseRadio2" disabled>
+    <label for="reverseRadio2">Disabled reverse radio</label>
   </div>`} />
 
 ## Without a label
 
-Drop the wrapping `.form-check` for a radio with no label text. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
+A radio with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
 
-<Example code={`<div>
-    <input class="form-check-input" type="radio" name="radioNoLabel" id="radioNoLabel1" value="" aria-label="...">
-  </div>`} />
+<Example code={`<input class="radio" type="radio" name="radioNoLabel" id="radioNoLabel1" value="" aria-label="...">`} />
 
 ## With a form field
 
@@ -118,12 +98,12 @@ Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label 
 <Example code={`<div class="form-field">
     <span class="form-label">Delivery</span>
     <div class="form-field">
-      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio1" checked>
+      <input class="radio" type="radio" name="fieldRadio" id="fieldRadio1" checked>
       <label for="fieldRadio1">Standard</label>
       <div class="form-text">Three to five working days.</div>
     </div>
     <div class="form-field">
-      <input class="form-check-input" type="radio" name="fieldRadio" id="fieldRadio2">
+      <input class="radio" type="radio" name="fieldRadio" id="fieldRadio2">
       <label for="fieldRadio2">Express</label>
       <div class="form-text">Next working day, where available.</div>
     </div>
@@ -147,6 +127,25 @@ Create button-like radios by putting `.btn` styles on the `<label>` instead of `
 
   <input type="radio" class="btn-check" name="options-outlined" id="danger-outlined" autocomplete="off">
   <label class="btn btn-outline-danger" for="danger-outlined">Danger radio</label>`} />
+
+## Deprecated markup
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Deprecated in v6</span>
+
+The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-check-label` — still works and renders exactly as it did. It is removed in v7, and `$enable-deprecated-form-check: false` leaves it out of your build today.
+
+```diff
+- <div class="form-check">
+-   <input class="form-check-input" type="radio" name="r" id="r1">
+-   <label class="form-check-label" for="r1">Label</label>
+- </div>
++ <div class="form-field">
++   <input class="radio" type="radio" name="r" id="r1">
++   <label for="r1">Label</label>
++ </div>
+```
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Customizing
 

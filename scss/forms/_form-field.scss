@@ -37,19 +37,22 @@ $form-field-tokens: defaults(
       margin-bottom: 0;
     }
 
-    // A check, radio or switch written without its `.form-check` wrapper pins to
-    // the first column and everything else stacks in the second — the layout the
-    // wrapper does for you when it is there.
-    &:has(> .form-check-input) {
+    // A check, radio or switch pins to the first column and everything else
+    // stacks in the second. `.form-check-input` is the deprecated spelling,
+    // matched here so markup that has not moved yet lays out the same way.
+    &:has(> .check, > .radio, > .switch, > .form-check-input) {
       grid-template-columns: auto 1fr;
       column-gap: var(--#{$prefix}form-field-column-gap);
       align-items: start;
 
+      > .check,
+      > .radio,
+      > .switch,
       > .form-check-input {
         grid-column: 1;
       }
 
-      > :not(.form-check-input) {
+      > :not(.check, .radio, .switch, .form-check-input) {
         grid-column: 2;
       }
 

@@ -8,123 +8,99 @@ otherFrameworks:
 
 ## Approach
 
-Browser default checkboxes are replaced with `.form-check`, a wrapper that improves the layout and behavior of the native `<input type="checkbox">`. Checkboxes are for selecting one or several options in a list; for one option out of many, reach for a [radio](/forms/radio/).
+Put `.check` on the `<input type="checkbox">`. That is the whole control — no wrapper, no extra element. Checkboxes are for selecting one or several options in a list; for one option out of many, reach for a [radio](/forms/radio/).
 
-Structurally, the `<input />` and its `<label>` are sibling elements rather than the input sitting inside the label. That is slightly more verbose — you have to relate them with `id` and `for` — but it lets us style the label from the input's state (`:checked`, `:disabled`) with the sibling selector.
+The input and its `<label>` stay siblings rather than the input sitting inside the label, so the label can be styled from the input's state (`:checked`, `:disabled`) with the sibling selector. Relate them with `id` and `for`, and reach for [`.form-field`](/forms/field/) when you want the label, a description and validation feedback laid out for you.
 
-The checked and indeterminate marks are drawn as background images on the input itself, so there is no extra element in your markup.
+The check and indeterminate marks are drawn with a CSS mask on the input's own `::before`, which is why their colour is a token (`--#{'{'}$prefix{'}'}check-mark-color`) rather than a value baked into an SVG.
 
 ## Basic checkbox
 
-<Example code={`<div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="checkDefault">
-    <label class="form-check-label" for="checkDefault">
-      Default checkbox
-    </label>
+<Example code={`<div class="form-field">
+    <input class="check" type="checkbox" value="" id="checkDefault">
+    <label for="checkDefault">Default checkbox</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="checkChecked" checked>
-    <label class="form-check-label" for="checkChecked">
-      Checked checkbox
-    </label>
+  <div class="form-field">
+    <input class="check" type="checkbox" value="" id="checkChecked" checked>
+    <label for="checkChecked">Checked checkbox</label>
   </div>`} />
 
 ## Indeterminate
 
 Checkboxes can use the `:indeterminate` pseudo-class when it is set from JavaScript — there is no HTML attribute for it.
 
-<Example class="docs-example-indeterminate" code={`<div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="checkIndeterminate">
-    <label class="form-check-label" for="checkIndeterminate">
-      Indeterminate checkbox
-    </label>
+<Example class="docs-example-indeterminate" code={`<div class="form-field">
+    <input class="check" type="checkbox" value="" id="checkIndeterminate">
+    <label for="checkIndeterminate">Indeterminate checkbox</label>
   </div>`} />
 
 ## Disabled
 
 Add the `disabled` attribute; the associated `<label>` is styled to match, in a lighter color, to indicate the state.
 
-<Example code={`<div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="checkDisabled" disabled>
-    <label class="form-check-label" for="checkDisabled">
-      Disabled checkbox
-    </label>
+<Example code={`<div class="form-field">
+    <input class="check" type="checkbox" value="" id="checkDisabled" disabled>
+    <label for="checkDisabled">Disabled checkbox</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="checkCheckedDisabled" checked disabled>
-    <label class="form-check-label" for="checkCheckedDisabled">
-      Disabled checked checkbox
-    </label>
+  <div class="form-field">
+    <input class="check" type="checkbox" value="" id="checkCheckedDisabled" checked disabled>
+    <label for="checkCheckedDisabled">Disabled checked checkbox</label>
   </div>`} />
 
 ## Stacked
 
 Any number of checkboxes that are immediate siblings stack vertically and are spaced by `.form-check`.
 
-<Example code={`<div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-    <label class="form-check-label" for="defaultCheck1">
-      Default checkbox
-    </label>
+<Example code={`<div class="form-field">
+    <input class="check" type="checkbox" value="" id="defaultCheck1">
+    <label for="defaultCheck1">Default checkbox</label>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" disabled>
-    <label class="form-check-label" for="defaultCheck2">
-      Disabled checkbox
-    </label>
+  <div class="form-field">
+    <input class="check" type="checkbox" value="" id="defaultCheck2" disabled>
+    <label for="defaultCheck2">Disabled checkbox</label>
   </div>`} />
 
 ## Inline
 
-Put checkboxes on the same horizontal row by adding `.form-check-inline` to any `.form-check`.
+There is no inline modifier: the control is an inline element, so a row is a flex container with a gap.
 
-<Example code={`<div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-    <label class="form-check-label" for="inlineCheckbox1">1</label>
-  </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-    <label class="form-check-label" for="inlineCheckbox2">2</label>
-  </div>
-  <div class="form-check form-check-inline">
-    <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="option3" disabled>
-    <label class="form-check-label" for="inlineCheckbox3">3 (disabled)</label>
+<Example code={`<div class="d-flex gap-3">
+    <div class="form-field">
+      <input class="check" type="checkbox" id="inlineCheckbox1" value="option1">
+      <label for="inlineCheckbox1">1</label>
+    </div>
+    <div class="form-field">
+      <input class="check" type="checkbox" id="inlineCheckbox2" value="option2">
+      <label for="inlineCheckbox2">2</label>
+    </div>
+    <div class="form-field">
+      <input class="check" type="checkbox" id="inlineCheckbox3" value="option3" disabled>
+      <label for="inlineCheckbox3">3 (disabled)</label>
+    </div>
   </div>`} />
 
 ## Reverse
 
-Put the box on the opposite side with the `.form-check-reverse` modifier.
+Put the box after the label with the `order` utilities.
 
-<Example code={`<div class="form-check form-check-reverse">
-    <input class="form-check-input" type="checkbox" value="" id="reverseCheck1">
-    <label class="form-check-label" for="reverseCheck1">
-      Reverse checkbox
-    </label>
-  </div>
-  <div class="form-check form-check-reverse">
-    <input class="form-check-input" type="checkbox" value="" id="reverseCheck2" disabled>
-    <label class="form-check-label" for="reverseCheck2">
-      Disabled reverse checkbox
-    </label>
+<Example code={`<div class="form-field">
+    <input class="check order-2" type="checkbox" value="" id="reverseCheck1">
+    <label class="order-1" for="reverseCheck1">Reverse checkbox</label>
   </div>`} />
 
 ## Without a label
 
-Drop the wrapping `.form-check` for a checkbox with no label text. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
+A checkbox with no label text is the input on its own. Give it an accessible name some other way — `aria-label`, for instance. See the [forms overview](/forms/overview/#accessibility) for details.
 
-<Example code={`<div>
-    <input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="...">
-  </div>`} />
+<Example code={`<input class="check" type="checkbox" id="checkboxNoLabel" value="" aria-label="...">`} />
 
-## With a form field
+## Description
 
-Wrap the control in [`.form-field`](/forms/field/) to lay it out with its label and description, and to get validation feedback in the right place.
+[`.form-field`](/forms/field/) puts a description under the label and keeps validation feedback in the right place.
 
 <Example code={`<div class="form-field">
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" value="" id="fieldCheck">
-      <label class="form-check-label" for="fieldCheck">Subscribe to the newsletter</label>
-    </div>
+    <input class="check" type="checkbox" value="" id="fieldCheck">
+    <label for="fieldCheck">Subscribe to the newsletter</label>
     <div class="form-text">We send one email a month, and never share your address.</div>
   </div>`} />
 
@@ -151,17 +127,43 @@ Create button-like checkboxes by putting `.btn` styles on the `<label>` instead 
 Visually, these checkbox toggle buttons are identical to the [button plugin toggle buttons](/components/buttons/#button-plugin). However, they are conveyed differently by assistive technologies: the checkbox toggles will be announced by screen readers as "checked"/"not checked" (since, despite their appearance, they are fundamentally still checkboxes), whereas the button plugin toggle buttons will be announced as "button"/"button pressed". The choice between these two approaches will depend on the type of toggle you are creating, and whether or not the toggle will make sense to users when announced as a checkbox or as an actual button.
 </Callout>
 
+## Deprecated markup
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Deprecated in v6</span>
+
+The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-check-label`, with `.form-check-inline` and `.form-check-reverse` as modifiers — still works and renders exactly as it did. It is removed in v7, and `$enable-deprecated-form-check: false` leaves it out of your build today.
+
+<Example code={`<div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="deprecatedCheck" checked>
+    <label class="form-check-label" for="deprecatedCheck">
+      Deprecated markup
+    </label>
+  </div>`} />
+
+```diff
+- <div class="form-check">
+-   <input class="form-check-input" type="checkbox" id="c">
+-   <label class="form-check-label" for="c">Label</label>
+- </div>
++ <div class="form-field">
++   <input class="check" type="checkbox" id="c">
++   <label for="c">Label</label>
++ </div>
+```
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
+
 ## Customizing
 
 ### SASS variables
 
-<ScssDocs file="scss/forms/_checkbox.scss" capture="checkbox-variables" />
+<ScssDocs file="scss/forms/_checkbox.scss" capture="check-variables" />
 
 ### CSS variables
 
 Checkboxs read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
 
-<ScssDocs file="scss/forms/_checkbox.scss" capture="checkbox-css-vars" />
+<ScssDocs file="scss/forms/_checkbox.scss" capture="check-css-vars" />
 
 ### Shared variables
 

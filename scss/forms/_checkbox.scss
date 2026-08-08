@@ -1,55 +1,116 @@
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "check" as *;
+@use "../mixins/border-radius" as *;
+@use "../mixins/focus-ring" as *;
+@use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
+@use "../mixins/transition" as *;
 @use "../config" as *;
 
-// The checkbox's own theming surface. `.form-check-input` carries one shared
-// implementation for all three controls; these tokens are what a consumer sets
-// to restyle checkboxes alone, and they feed that implementation at runtime —
-// no Sass, and radios and switches are left where they are.
+// scss-docs-start check-variables
+$check-size:                 $form-check-input-width !default;
+$check-bg:                   $form-check-input-bg !default;
+$check-border:               $form-check-input-border !default;
+$check-border-radius:        $form-check-input-border-radius !default;
+$check-mark-color:           $form-check-input-checked-color !default;
+// The marks are masks, so their colour comes from the element and the SVG only
+// carries the shape — `currentColor` in the path would be painted over anyway.
+$check-mark-checked:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
+$check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
+// scss-docs-end check-variables
 
-// scss-docs-start checkbox-variables
-$checkbox-size:                 $form-check-input-width !default;
-$checkbox-bg:                   $form-check-input-bg !default;
-$checkbox-border:               $form-check-input-border !default;
-$checkbox-border-radius:        $form-check-input-border-radius !default;
-$checkbox-checked-icon:         $form-check-input-checked-bg-image !default;
-$checkbox-indeterminate-icon:   $form-check-input-indeterminate-bg-image !default;
-// scss-docs-end checkbox-variables
+$check-tokens: () !default;
 
-$checkbox-tokens: () !default;
-
-// scss-docs-start checkbox-css-vars
+// scss-docs-start check-css-vars
 // stylelint-disable-next-line scss/dollar-variable-default
-$checkbox-tokens: defaults(
+$check-tokens: defaults(
   (
-    --#{$prefix}checkbox-size: #{$checkbox-size},
-    --#{$prefix}checkbox-bg: #{$checkbox-bg},
-    --#{$prefix}checkbox-border: #{$checkbox-border},
-    --#{$prefix}checkbox-border-radius: #{$checkbox-border-radius},
-    --#{$prefix}checkbox-checked-bg: var(--#{$prefix}control-checked-bg),
-    --#{$prefix}checkbox-checked-border-color: var(--#{$prefix}control-checked-border-color),
-    --#{$prefix}checkbox-checked-icon: #{escape-svg($checkbox-checked-icon)},
-    --#{$prefix}checkbox-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
-    --#{$prefix}checkbox-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
-    --#{$prefix}checkbox-indeterminate-icon: #{escape-svg($checkbox-indeterminate-icon)},
+    --#{$prefix}check-size: #{$check-size},
+    --#{$prefix}check-bg: #{$check-bg},
+    --#{$prefix}check-border: #{$check-border},
+    --#{$prefix}check-border-radius: #{$check-border-radius},
+    --#{$prefix}check-mark-color: #{$check-mark-color},
+    --#{$prefix}check-mark-checked: #{escape-svg($check-mark-checked)},
+    --#{$prefix}check-mark-indeterminate: #{escape-svg($check-mark-indeterminate)},
+    --#{$prefix}check-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}check-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}check-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
+    --#{$prefix}check-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
+    --#{$prefix}check-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}check-focus-border: #{$form-check-input-focus-border},
+    --#{$prefix}check-focus-ring: #{$form-check-input-focus-ring},
+    --#{$prefix}check-active-filter: #{$form-check-input-active-filter},
+    --#{$prefix}check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
   ),
-  $checkbox-tokens
+  $check-tokens
 );
-// scss-docs-end checkbox-css-vars
+// scss-docs-end check-css-vars
 
 @layer forms {
-  .form-check-input[type="checkbox"] {
-    @include tokens($checkbox-tokens);
+  // The class goes on the `<input>` itself. `appearance: none` lets the control
+  // render pseudo-elements, so the mark is drawn on the input — no wrapper, and
+  // the mark's colour is a token rather than a value baked into an SVG.
+  .check {
+    @include tokens($check-tokens);
 
-    --#{$prefix}form-check-input-width: var(--#{$prefix}checkbox-size);
-    --#{$prefix}form-check-bg: var(--#{$prefix}checkbox-bg);
-    --#{$prefix}form-check-input-border: var(--#{$prefix}checkbox-border);
-    --#{$prefix}form-check-input-border-radius: var(--#{$prefix}checkbox-border-radius);
-    --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}checkbox-checked-bg);
-    --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}checkbox-checked-border-color);
-    --#{$prefix}form-check-input-indeterminate-bg-color: var(--#{$prefix}checkbox-indeterminate-bg);
-    --#{$prefix}form-check-input-indeterminate-border-color: var(--#{$prefix}checkbox-indeterminate-border-color);
+    position: relative;
+    flex-shrink: 0;
+    width: var(--#{$prefix}check-size);
+    height: var(--#{$prefix}check-size);
+    appearance: none;
+    background-color: var(--#{$prefix}check-bg);
+    border: var(--#{$prefix}check-border);
+    print-color-adjust: exact;
+    @include border-radius(var(--#{$prefix}check-border-radius));
+
+    &::before {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      background-color: var(--#{$prefix}check-mark-color);
+      opacity: 0;
+      @include mask-icon(var(--#{$prefix}check-mark-checked));
+    }
+
+    &:checked {
+      background-color: var(--#{$prefix}check-checked-bg);
+      border-color: var(--#{$prefix}check-checked-border-color);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &:indeterminate {
+      background-color: var(--#{$prefix}check-indeterminate-bg);
+      border-color: var(--#{$prefix}check-indeterminate-border-color);
+
+      &::before {
+        opacity: 1;
+        mask-image: var(--#{$prefix}check-mark-indeterminate);
+      }
+    }
+
+    &:focus {
+      border-color: var(--#{$prefix}check-focus-border);
+      outline: var(--#{$prefix}check-focus-ring);
+    }
+
+    &:active {
+      filter: var(--#{$prefix}check-active-filter);
+    }
+
+    &:disabled {
+      pointer-events: none;
+      filter: none;
+      opacity: var(--#{$prefix}check-disabled-opacity);
+
+      ~ label {
+        cursor: default;
+        opacity: var(--#{$prefix}check-label-disabled-opacity);
+      }
+    }
   }
 }

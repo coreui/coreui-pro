@@ -8,7 +8,7 @@
 @use "../config" as *;
 
 // The values each control's own variables default to. A consumer sets
-// `$checkbox-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
+// `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
 // what those fall back to, and what still works for a v5-era override.
 // scss-docs-start form-check-defaults
 $form-check-input-width:                  1em !default;
@@ -132,202 +132,204 @@ $form-check-input-tokens: defaults(
 // scss-docs-end form-check-input-tokens
 
 @layer forms {
-  //
-  // Check/radio
-  //
+  @if $enable-deprecated-form-check {
+    //
+    // Check/radio
+    //
 
-  .form-check {
-    @include tokens($form-check-tokens);
+    .form-check {
+      @include tokens($form-check-tokens);
 
-    display: block;
-    min-height: var(--#{$prefix}form-check-min-height);
-    padding-inline-start: var(--#{$prefix}form-check-padding-start);
-    margin-bottom: var(--#{$prefix}form-check-margin-bottom);
+      display: block;
+      min-height: var(--#{$prefix}form-check-min-height);
+      padding-inline-start: var(--#{$prefix}form-check-padding-start);
+      margin-bottom: var(--#{$prefix}form-check-margin-bottom);
+
+      .form-check-input {
+        float: inline-start;
+        // stylelint-disable-next-line function-disallowed-list
+        margin-inline-start: calc(var(--#{$prefix}form-check-padding-start) * -1);
+      }
+    }
+
+    .form-check-reverse {
+      padding-inline: 0 var(--#{$prefix}form-check-padding-start);
+      text-align: end;
+
+      .form-check-input {
+        float: inline-end;
+        // stylelint-disable-next-line function-disallowed-list
+        margin-inline: 0 calc(var(--#{$prefix}form-check-padding-start) * -1);
+      }
+    }
 
     .form-check-input {
-      float: inline-start;
+      @include tokens($form-check-input-tokens);
+
+
+      flex-shrink: 0;
+      width: var(--#{$prefix}form-check-input-width);
+      height: var(--#{$prefix}form-check-input-width);
+      // Half the difference between the line box and the control, computed at
+      // runtime so the box stays on the text baseline when the size token changes.
       // stylelint-disable-next-line function-disallowed-list
-      margin-inline-start: calc(var(--#{$prefix}form-check-padding-start) * -1);
-    }
-  }
-
-  .form-check-reverse {
-    padding-inline: 0 var(--#{$prefix}form-check-padding-start);
-    text-align: end;
-
-    .form-check-input {
-      float: inline-end;
-      // stylelint-disable-next-line function-disallowed-list
-      margin-inline: 0 calc(var(--#{$prefix}form-check-padding-start) * -1);
-    }
-  }
-
-  .form-check-input {
-    @include tokens($form-check-input-tokens);
-
-
-    flex-shrink: 0;
-    width: var(--#{$prefix}form-check-input-width);
-    height: var(--#{$prefix}form-check-input-width);
-    // Half the difference between the line box and the control, computed at
-    // runtime so the box stays on the text baseline when the size token changes.
-    // stylelint-disable-next-line function-disallowed-list
-    margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}form-check-input-width)) * .5);
-    vertical-align: top;
-    appearance: none;
-    background-color: var(--#{$prefix}form-check-bg);
-    background-image: var(--#{$prefix}form-check-bg-image);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    border: var(--#{$prefix}form-check-input-border);
-    print-color-adjust: exact; // Keep themed appearance for print
-    @include transition($form-check-transition);
-
-    &[type="checkbox"] {
-      @include border-radius(var(--#{$prefix}form-check-input-border-radius));
-    }
-
-    &[type="radio"] {
-      // stylelint-disable-next-line property-disallowed-list
-      border-radius: var(--#{$prefix}form-check-radio-border-radius);
-    }
-
-    &:active {
-      filter: var(--#{$prefix}form-check-input-active-filter);
-    }
-
-    &:focus {
-      border-color: var(--#{$prefix}form-check-input-focus-border);
-      outline: var(--#{$prefix}form-check-input-focus-ring);
-    }
-
-    &:checked {
-      background-color: var(--#{$prefix}form-check-input-checked-bg-color);
-      border-color: var(--#{$prefix}form-check-input-checked-border-color);
+      margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}form-check-input-width)) * .5);
+      vertical-align: top;
+      appearance: none;
+      background-color: var(--#{$prefix}form-check-bg);
+      background-image: var(--#{$prefix}form-check-bg-image);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      border: var(--#{$prefix}form-check-input-border);
+      print-color-adjust: exact; // Keep themed appearance for print
+      @include transition($form-check-transition);
 
       &[type="checkbox"] {
-        @if $enable-gradients {
-          --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-checked-icon), var(--#{$prefix}gradient);
-        } @else {
-          --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-checked-icon);
-        }
+        @include border-radius(var(--#{$prefix}form-check-input-border-radius));
       }
 
       &[type="radio"] {
-        @if $enable-gradients {
-          --#{$prefix}form-check-bg-image: var(--#{$prefix}radio-checked-icon), var(--#{$prefix}gradient);
-        } @else {
-          --#{$prefix}form-check-bg-image: var(--#{$prefix}radio-checked-icon);
-        }
+        // stylelint-disable-next-line property-disallowed-list
+        border-radius: var(--#{$prefix}form-check-radio-border-radius);
       }
-    }
 
-    &[type="checkbox"]:indeterminate {
-      background-color: var(--#{$prefix}form-check-input-indeterminate-bg-color);
-      border-color: var(--#{$prefix}form-check-input-indeterminate-border-color);
-
-      @if $enable-gradients {
-        --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-indeterminate-icon), var(--#{$prefix}gradient);
-      } @else {
-        --#{$prefix}form-check-bg-image: var(--#{$prefix}checkbox-indeterminate-icon);
+      &:active {
+        filter: var(--#{$prefix}form-check-input-active-filter);
       }
-    }
-
-    &:disabled {
-      pointer-events: none;
-      filter: none;
-      opacity: var(--#{$prefix}form-check-input-disabled-opacity);
-    }
-
-    // Use disabled attribute in addition of :disabled pseudo-class
-    // See: https://github.com/twbs/bootstrap/issues/28247
-    &[disabled],
-    &:disabled {
-      ~ .form-check-label {
-        cursor: default;
-        opacity: var(--#{$prefix}form-check-label-disabled-opacity);
-      }
-    }
-  }
-
-  .form-check-label {
-    color: var(--#{$prefix}form-check-label-color, $form-check-label-color);
-    cursor: $form-check-label-cursor;
-  }
-
-  //
-  // Switch
-  //
-
-  .form-switch {
-    padding-inline-start: var(--#{$prefix}form-switch-padding-start);
-
-    .form-check-input {
-      // `.form-check-input` declares `--#{$prefix}form-switch-width` itself, so an
-      // inherited value from the wrapper would lose to it. Restate it here, where
-      // the selector is specific enough to win.
-      --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
-
-      width: var(--#{$prefix}form-switch-width);
-      height: var(--#{$prefix}switch-height);
-      // stylelint-disable-next-line function-disallowed-list
-      margin-inline-start: calc(var(--#{$prefix}form-switch-padding-start) * -1);
-      background-image: var(--#{$prefix}form-switch-bg);
-      background-position: left center;
-      @include border-radius(var(--#{$prefix}form-switch-border-radius), 0);
-      @include transition(var(--#{$prefix}form-switch-transition));
 
       &:focus {
-        --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-focus);
+        border-color: var(--#{$prefix}form-check-input-focus-border);
+        outline: var(--#{$prefix}form-check-input-focus-ring);
       }
 
       &:checked {
-        background-position: var(--#{$prefix}form-switch-checked-bg-position);
+        background-color: var(--#{$prefix}form-check-input-checked-bg-color);
+        border-color: var(--#{$prefix}form-check-input-checked-border-color);
+
+        &[type="checkbox"] {
+          @if $enable-gradients {
+            --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-checked-bg-image)}, var(--#{$prefix}gradient);
+          } @else {
+            --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-checked-bg-image)};
+          }
+        }
+
+        &[type="radio"] {
+          @if $enable-gradients {
+            --#{$prefix}form-check-bg-image: #{escape-svg($form-check-radio-checked-bg-image)}, var(--#{$prefix}gradient);
+          } @else {
+            --#{$prefix}form-check-bg-image: #{escape-svg($form-check-radio-checked-bg-image)};
+          }
+        }
+      }
+
+      &[type="checkbox"]:indeterminate {
+        background-color: var(--#{$prefix}form-check-input-indeterminate-bg-color);
+        border-color: var(--#{$prefix}form-check-input-indeterminate-border-color);
 
         @if $enable-gradients {
-          --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-checked), var(--#{$prefix}gradient);
+          --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)}, var(--#{$prefix}gradient);
         } @else {
-          --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-checked);
+          --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)};
+        }
+      }
+
+      &:disabled {
+        pointer-events: none;
+        filter: none;
+        opacity: var(--#{$prefix}form-check-input-disabled-opacity);
+      }
+
+      // Use disabled attribute in addition of :disabled pseudo-class
+      // See: https://github.com/twbs/bootstrap/issues/28247
+      &[disabled],
+      &:disabled {
+        ~ .form-check-label {
+          cursor: default;
+          opacity: var(--#{$prefix}form-check-label-disabled-opacity);
         }
       }
     }
 
-    &.form-check-reverse {
-      padding-inline: 0 var(--#{$prefix}form-switch-padding-start);
+    .form-check-label {
+      color: var(--#{$prefix}form-check-label-color, $form-check-label-color);
+      cursor: $form-check-label-cursor;
+    }
+
+    //
+    // Switch
+    //
+
+    .form-switch {
+      padding-inline-start: var(--#{$prefix}form-switch-padding-start);
 
       .form-check-input {
+        // `.form-check-input` declares `--#{$prefix}form-switch-width` itself, so an
+        // inherited value from the wrapper would lose to it. Restate it here, where
+        // the selector is specific enough to win.
+        --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
+
+        width: var(--#{$prefix}form-switch-width);
+        height: var(--#{$prefix}switch-height);
         // stylelint-disable-next-line function-disallowed-list
-        margin-inline: 0 calc(var(--#{$prefix}form-switch-padding-start) * -1);
+        margin-inline-start: calc(var(--#{$prefix}form-switch-padding-start) * -1);
+        background-image: var(--#{$prefix}form-switch-bg);
+        background-position: left center;
+        @include border-radius(var(--#{$prefix}form-switch-border-radius), 0);
+        @include transition(var(--#{$prefix}form-switch-transition));
+
+        &:focus {
+          --#{$prefix}form-switch-bg: #{escape-svg($form-switch-focus-bg-image)};
+        }
+
+        &:checked {
+          background-position: var(--#{$prefix}form-switch-checked-bg-position);
+
+          @if $enable-gradients {
+            --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)}, var(--#{$prefix}gradient);
+          } @else {
+            --#{$prefix}form-switch-bg: #{escape-svg($form-switch-checked-bg-image)};
+          }
+        }
+      }
+
+      &.form-check-reverse {
+        padding-inline: 0 var(--#{$prefix}form-switch-padding-start);
+
+        .form-check-input {
+          // stylelint-disable-next-line function-disallowed-list
+          margin-inline: 0 calc(var(--#{$prefix}form-switch-padding-start) * -1);
+        }
       }
     }
-  }
 
 
-  .form-check-inline {
-    display: inline-block;
-    margin-inline-end: var(--#{$prefix}form-check-inline-margin-end);
-  }
+    .form-check-inline {
+      display: inline-block;
+      margin-inline-end: var(--#{$prefix}form-check-inline-margin-end);
+    }
 
-  .btn-check {
-    position: absolute;
-    clip: rect(0, 0, 0, 0);
-    pointer-events: none;
+    .btn-check {
+      position: absolute;
+      clip: rect(0, 0, 0, 0);
+      pointer-events: none;
 
-    &[disabled],
-    &:disabled {
-      + .btn {
-        pointer-events: none;
-        filter: none;
-        opacity: $form-check-btn-check-disabled-opacity;
+      &[disabled],
+      &:disabled {
+        + .btn {
+          pointer-events: none;
+          filter: none;
+          opacity: $form-check-btn-check-disabled-opacity;
+        }
       }
     }
-  }
 
-  @if $enable-dark-mode {
-    @include color-mode(dark) {
-      .form-switch .form-check-input:not(:checked):not(:focus) {
-        --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob-dark);
+    @if $enable-dark-mode {
+      @include color-mode(dark) {
+        .form-switch .form-check-input:not(:checked):not(:focus) {
+          --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image-dark)};
+        }
       }
     }
   }

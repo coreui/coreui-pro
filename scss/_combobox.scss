@@ -56,7 +56,7 @@ $combobox-option-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
 $combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
 $combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
 
-$combobox-option-indicator-width:         var(--#{$prefix}form-check-input-width, 1em) !default;
+$combobox-option-indicator-width:         var(--#{$prefix}check-size, 1em) !default;
 
 // scss-docs-end combobox-variables
 
@@ -231,9 +231,9 @@ $combobox-tokens: defaults(
     padding-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) + var(--#{$prefix}combobox-option-indicator-width)); // stylelint-disable-line function-disallowed-list
   }
 
-  // The indicator is a decorative .form-check-input (span), so the checkbox
-  // visuals come from the form-check surface itself; only the placement and
-  // the class-driven states (a span never matches :checked) live here.
+  // The indicator is a decorative `.check` (a span, so it never matches
+  // `:checked`), which is why the states are driven by classes on the option and
+  // the mark's opacity is set here rather than by the control's own state rules.
   .combobox-option-indicator {
     position: absolute;
     inset-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
@@ -243,23 +243,25 @@ $combobox-tokens: defaults(
     margin: 0;
     pointer-events: none;
     transform: translateY(-50%);
-    // A span never matches the [type="checkbox"] radius selector of the
-    // form-check surface, so apply the same token here.
-    @include border-radius(var(--#{$prefix}form-check-input-border-radius));
   }
 
   .selected > .combobox-option-indicator {
-    --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-checked-bg-image)};
+    background-color: var(--#{$prefix}check-checked-bg);
+    border-color: var(--#{$prefix}check-checked-border-color);
 
-    background-color: var(--#{$prefix}form-check-input-checked-bg-color);
-    border-color: var(--#{$prefix}form-check-input-checked-border-color);
+    &::before {
+      opacity: 1;
+    }
   }
 
   .indeterminate > .combobox-option-indicator {
-    --#{$prefix}form-check-bg-image: #{escape-svg($form-check-input-indeterminate-bg-image)};
+    background-color: var(--#{$prefix}check-indeterminate-bg);
+    border-color: var(--#{$prefix}check-indeterminate-border-color);
 
-    background-color: var(--#{$prefix}form-check-input-indeterminate-bg-color);
-    border-color: var(--#{$prefix}form-check-input-indeterminate-border-color);
+    &::before {
+      opacity: 1;
+      mask-image: var(--#{$prefix}check-mark-indeterminate);
+    }
   }
 
   .combobox-options-empty {

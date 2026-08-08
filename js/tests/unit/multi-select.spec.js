@@ -4822,7 +4822,7 @@ describe('MultiSelect', () => {
   })
 
   describe('checkbox indicators reuse the form-check surface', () => {
-    it('should render a decorative form-check-input indicator in checkbox options', () => {
+    it('should render a decorative check indicator in checkbox options', () => {
       fixtureEl.innerHTML = '<select multiple></select>'
       const selectEl = fixtureEl.querySelector('select')
       const multiSelect = new MultiSelect(selectEl, {
@@ -4833,7 +4833,7 @@ describe('MultiSelect', () => {
 
       expect(indicator).not.toBeNull()
       expect(indicator.tagName).toBe('SPAN')
-      expect(indicator).toHaveClass('form-check-input')
+      expect(indicator).toHaveClass('check')
       expect(indicator.getAttribute('aria-hidden')).toBe('true')
     })
 

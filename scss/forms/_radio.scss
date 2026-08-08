@@ -1,6 +1,7 @@
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "check" as *;
+@use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
@@ -11,7 +12,8 @@ $radio-size:              $form-check-input-width !default;
 $radio-bg:                $form-check-input-bg !default;
 $radio-border:            $form-check-input-border !default;
 $radio-border-radius:     $form-check-radio-border-radius !default;
-$radio-checked-icon:      $form-check-radio-checked-bg-image !default;
+$radio-mark-color:        $form-check-input-checked-color !default;
+$radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='black'/></svg>") !default;
 // scss-docs-end radio-variables
 
 $radio-tokens: () !default;
@@ -26,21 +28,71 @@ $radio-tokens: defaults(
     --#{$prefix}radio-border-radius: #{$radio-border-radius},
     --#{$prefix}radio-checked-bg: var(--#{$prefix}control-checked-bg),
     --#{$prefix}radio-checked-border-color: var(--#{$prefix}control-checked-border-color),
-    --#{$prefix}radio-checked-icon: #{escape-svg($radio-checked-icon)},
+    --#{$prefix}radio-mark-color: #{$radio-mark-color},
+    --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
+    --#{$prefix}radio-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}radio-focus-border: #{$form-check-input-focus-border},
+    --#{$prefix}radio-focus-ring: #{$form-check-input-focus-ring},
+    --#{$prefix}radio-active-filter: #{$form-check-input-active-filter},
+    --#{$prefix}radio-label-disabled-opacity: #{$form-check-label-disabled-opacity},
   ),
   $radio-tokens
 );
 // scss-docs-end radio-css-vars
 
 @layer forms {
-  .form-check-input[type="radio"] {
+  // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
+  .radio {
     @include tokens($radio-tokens);
 
-    --#{$prefix}form-check-input-width: var(--#{$prefix}radio-size);
-    --#{$prefix}form-check-bg: var(--#{$prefix}radio-bg);
-    --#{$prefix}form-check-input-border: var(--#{$prefix}radio-border);
-    --#{$prefix}form-check-radio-border-radius: var(--#{$prefix}radio-border-radius);
-    --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}radio-checked-bg);
-    --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}radio-checked-border-color);
+    position: relative;
+    flex-shrink: 0;
+    width: var(--#{$prefix}radio-size);
+    height: var(--#{$prefix}radio-size);
+    appearance: none;
+    background-color: var(--#{$prefix}radio-bg);
+    border: var(--#{$prefix}radio-border);
+    print-color-adjust: exact;
+    // stylelint-disable-next-line property-disallowed-list
+    border-radius: var(--#{$prefix}radio-border-radius);
+
+    &::before {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      background-color: var(--#{$prefix}radio-mark-color);
+      opacity: 0;
+      @include mask-icon(var(--#{$prefix}radio-mark));
+    }
+
+    &:checked {
+      background-color: var(--#{$prefix}radio-checked-bg);
+      border-color: var(--#{$prefix}radio-checked-border-color);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &:focus {
+      border-color: var(--#{$prefix}radio-focus-border);
+      outline: var(--#{$prefix}radio-focus-ring);
+    }
+
+    &:active {
+      filter: var(--#{$prefix}radio-active-filter);
+    }
+
+    &:disabled {
+      pointer-events: none;
+      filter: none;
+      opacity: var(--#{$prefix}radio-disabled-opacity);
+
+      ~ label {
+        cursor: default;
+        opacity: var(--#{$prefix}radio-label-disabled-opacity);
+      }
+    }
   }
 }

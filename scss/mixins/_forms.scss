@@ -216,6 +216,9 @@ $form-feedback-tokens: defaults(
     }
   }
 
+  .check,
+  .radio,
+  .switch,
   .form-check-input {
     @include form-validation-state-selector($state) {
       border-color: $border-color;
@@ -228,6 +231,7 @@ $form-feedback-tokens: defaults(
         outline: $focus-ring;
       }
 
+      ~ label,
       ~ .form-check-label {
         color: $color;
       }
