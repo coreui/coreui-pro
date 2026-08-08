@@ -64,7 +64,9 @@ $check-tokens: defaults(
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;
 // `$enable-deprecated-form-check: false` compiles it out.
-$check-selector: if($enable-deprecated-form-check, ".check, .form-check-input[type=checkbox]", ".check") !default;
+// A v5 switch input is a checkbox too, so it has to be kept out of this list:
+// it would collect the check mark on top of the switch thumb.
+$check-selector: if($enable-deprecated-form-check, ".check, .form-check-input[type=checkbox]:not(.form-switch *)", ".check") !default;
 $check-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check-label", "+ label") !default;
 
 @layer forms {
