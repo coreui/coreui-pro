@@ -62,6 +62,36 @@ describe('RangeSlider', () => {
       expect(tooltip).not.toBeNull()
     })
 
+    it('should render the tooltip as a hidden <output> of phrasing content', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider"></div>'
+
+      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const rangeSlider = new RangeSlider(element)
+      const tooltip = element.querySelector('.range-slider-tooltip')
+
+      expect(tooltip.tagName).toBe('OUTPUT')
+      expect(tooltip.getAttribute('aria-hidden')).toBe('true')
+
+      expect([...tooltip.children].map(child => child.tagName)).toEqual(['SPAN', 'SPAN'])
+    })
+
+    it('should position the tooltip through a custom property, not inline offsets', () => {
+      fixtureEl.innerHTML = '<div data-coreui-toggle="range-slider" data-coreui-min="0" data-coreui-max="200" data-coreui-value="50"></div>'
+
+      const element = fixtureEl.querySelector('[data-coreui-toggle="range-slider"]')
+      const rangeSlider = new RangeSlider(element)
+      const tooltip = element.querySelector('.range-slider-tooltip')
+
+      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.25')
+      expect(tooltip.style.insetInlineStart).toBe('')
+      expect(tooltip.style.marginInlineStart).toBe('')
+
+      // `update()` rebuilds the subtree, so the tooltip has to be read again.
+      rangeSlider.update({ value: 150 })
+
+      expect(element.querySelector('.range-slider-tooltip').style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
+    })
+
     it('should initialize with custom configuration via data attributes', () => {
       fixtureEl.innerHTML = `
         <div
@@ -1476,21 +1506,7 @@ describe('RangeSlider', () => {
   })
 
   describe('_positionTooltip', () => {
-    it('should position tooltip for vertical mode', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-height: 16px;"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, {
-        value: [75],
-        vertical: true,
-        tooltips: true
-      })
-
-      const tooltip = element.querySelector('.range-slider-tooltip')
-      // In vertical mode, tooltip gets bottom style
-      expect(tooltip.style.bottom).not.toBe('')
-    })
-
-    it('should position tooltip for horizontal mode', () => {
+    it('should write the ratio for horizontal mode', () => {
       fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: 16px;"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
@@ -1500,38 +1516,60 @@ describe('RangeSlider', () => {
       })
 
       const tooltip = element.querySelector('.range-slider-tooltip')
-      // In horizontal mode, tooltip gets insetInlineStart style
-      expect(tooltip.style.insetInlineStart).not.toBe('')
+      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
     })
 
-    it('should compute negative margin when percent > 0.5', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: 20px;"></div>'
+    it('should write the same ratio for vertical mode', () => {
+      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-height: 16px;"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
-        value: [80], // 80% > 50%
-        vertical: false,
+        value: [75],
+        vertical: true,
         tooltips: true
       })
 
       const tooltip = element.querySelector('.range-slider-tooltip')
-      // margin should be negative (starts with -)
-      expect(tooltip.style.marginInlineStart).toContain('-')
+      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('0.75')
     })
 
-    it('should compute positive margin when percent < 0.5', () => {
-      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: 20px;"></div>'
+    it('should write a property name the stylesheet cannot rename', () => {
+      // The name is outside `$prefix` on both sides: a build with a different
+      // prefix must still read what the plugin writes.
+      fixtureEl.innerHTML = '<div id="slider"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, { value: [50], tooltips: true })
+      const tooltip = element.querySelector('.range-slider-tooltip')
+
+      expect([...tooltip.style].filter(property => property.startsWith('--')))
+        .toEqual(['--cui-range-slider-tooltip-position'])
+    })
+
+    it('should give every thumb its own ratio', () => {
+      fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, {
-        value: [20], // 20% < 50%
-        vertical: false,
+        value: [20, 80],
+        tooltips: true
+      })
+
+      const positions = [...element.querySelectorAll('.range-slider-tooltip')]
+        .map(tooltip => tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position'))
+
+      expect(positions).toEqual(['0.2', '0.8'])
+    })
+
+    it('should not fall back to a thumb size read from the stylesheet', () => {
+      // The old parser only matched a bare number and unit.
+      fixtureEl.innerHTML = '<div id="slider" style="--cui-range-slider-thumb-width: calc(1rem + 2px);"></div>'
+      const element = fixtureEl.querySelector('#slider')
+      const rangeSlider = new RangeSlider(element, {
+        value: [100],
         tooltips: true
       })
 
       const tooltip = element.querySelector('.range-slider-tooltip')
-      // margin should NOT start with - (positive or 0)
-      if (tooltip.style.marginInlineStart) {
-        expect(tooltip.style.marginInlineStart.startsWith('-')).toBeFalse()
-      }
+      expect(tooltip.style.getPropertyValue('--cui-range-slider-tooltip-position')).toBe('1')
+      expect(tooltip.style.marginInlineStart).toBe('')
     })
   })
 

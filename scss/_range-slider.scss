@@ -249,7 +249,12 @@ $range-slider-vertical-tokens: defaults(
   }
 
   .range-slider-tooltip {
+    // The thumb's centre: half a thumb in, then the track minus a thumb.
+    // Deliberately outside `$prefix`: the plugin writes this name, so a
+    // configurable one would let the two sides disagree.
     position: absolute;
+    // stylelint-disable-next-line function-disallowed-list
+    inset-inline-start: calc(var(--#{$prefix}range-slider-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-width)));
     z-index: var(--#{$prefix}range-slider-tooltip-zindex);
     display: flex;
     flex-direction: column;
@@ -331,7 +336,10 @@ $range-slider-vertical-tokens: defaults(
     }
 
     .range-slider-tooltip {
+      inset-inline-start: auto;
       inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width)); // stylelint-disable-line function-disallowed-list
+      // stylelint-disable-next-line function-disallowed-list
+      bottom: calc(var(--#{$prefix}range-slider-thumb-height) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-height)));
       flex-direction: row;
       transform: translateY(50%);
     }
