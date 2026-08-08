@@ -535,30 +535,11 @@ class RangeSlider extends BaseComponent {
     }
 
     const [min, max] = [Math.min(...this._currentValue), Math.max(...this._currentValue)]
-    const from = ((min - this._config.min) / (this._config.max - this._config.min)) * 100
-    const to = ((max - this._config.min) / (this._config.max - this._config.min)) * 100
-    const direction = this._config.vertical ? 'to top' : (isRTL() ? 'to left' : 'to right')
+    const span = this._config.max - this._config.min
+    const edge = (value: number): string => `${((value - this._config.min) / span) * 100}%`
 
-    if (this._currentValue.length === 1) {
-      this._sliderTrack.style.backgroundImage = `linear-gradient(
-        ${direction},
-        var(--cui-range-slider-track-in-range-bg) 0%,
-        var(--cui-range-slider-track-in-range-bg) ${to}%,
-        transparent ${to}%,
-        transparent 100%
-      )`
-      return
-    }
-
-    this._sliderTrack.style.backgroundImage = `linear-gradient(
-      ${direction},
-      transparent 0%,
-      transparent ${from}%,
-      var(--cui-range-slider-track-in-range-bg) ${from}%,
-      var(--cui-range-slider-track-in-range-bg) ${to}%,
-      transparent ${to}%,
-      transparent 100%
-    )`
+    this._sliderTrack.style.setProperty('--cui-range-slider-track-from', this._currentValue.length === 1 ? '0%' : edge(min))
+    this._sliderTrack.style.setProperty('--cui-range-slider-track-to', edge(max))
   }
 
   _updateNearestValue(value: number): void {

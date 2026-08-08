@@ -722,61 +722,53 @@ describe('RangeSlider', () => {
   })
 
   describe('Track / Gradient', () => {
-    it('should set background gradient when track is fill', () => {
+    const edges = track => [
+      track.style.getPropertyValue('--cui-range-slider-track-from'),
+      track.style.getPropertyValue('--cui-range-slider-track-to')
+    ]
+
+    it('should mark the filled band when track is fill', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: 50 })
 
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.backgroundImage).not.toBe('')
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
     })
 
-    it('should not set background gradient when track is false', () => {
+    it('should leave the band unset when track is false', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: false, value: 50 })
 
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.backgroundImage).toBe('')
+      // Unset rather than zero-width: the stylesheet has no fallback for these,
+      // so the whole `background-image` falls back to `none`.
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['', ''])
     })
 
-    it('should create a single-value gradient for one thumb', () => {
+    it('should start a single-thumb band at zero', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50] })
 
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.backgroundImage).toContain('linear-gradient')
-      expect(track.style.backgroundImage).toContain('50%')
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
     })
 
-    it('should create a multi-value gradient for multiple thumbs', () => {
+    it('should span a multi-thumb band between the outermost handles', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [25, 75] })
 
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.backgroundImage).toContain('linear-gradient')
-      expect(track.style.backgroundImage).toContain('25%')
-      expect(track.style.backgroundImage).toContain('75%')
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['25%', '75%'])
     })
 
-    it('should use "to top" direction for vertical', () => {
+    it('should write the same band whatever the orientation', () => {
       fixtureEl.innerHTML = '<div id="slider"></div>'
       const element = fixtureEl.querySelector('#slider')
       const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50], vertical: true })
 
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.backgroundImage).toContain('to top')
-    })
-
-    it('should use "to right" direction for horizontal LTR', () => {
-      fixtureEl.innerHTML = '<div id="slider"></div>'
-      const element = fixtureEl.querySelector('#slider')
-      const rangeSlider = new RangeSlider(element, { track: 'fill', value: [50], vertical: false })
-
-      const track = element.querySelector('.range-slider-track')
-      expect(track.style.backgroundImage).toContain('to right')
+      // Direction is the stylesheet's business now.
+      expect(edges(element.querySelector('.range-slider-track'))).toEqual(['0%', '50%'])
+      expect(element.querySelector('.range-slider-track').style.backgroundImage).toBe('')
     })
   })
 

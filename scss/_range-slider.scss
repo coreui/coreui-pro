@@ -148,6 +148,21 @@ $range-slider-vertical-tokens: defaults(
     height: var(--#{$prefix}range-slider-track-height);
     cursor: var(--#{$prefix}range-slider-track-cursor);
     background-color: var(--#{$prefix}range-slider-track-bg);
+    // The filled band, between the lowest and the highest handle. The edges are
+    // deliberately given no fallback: with `track: false` the plugin never
+    // writes them, the substitution fails and the whole declaration falls back
+    // to `none`, so nothing is painted. Their names sit outside `$prefix` for
+    // the same reason as the tooltip's position — the plugin writes them.
+    background-image:
+      linear-gradient(
+        var(--cui-range-slider-track-direction, to right),
+        transparent 0%,
+        transparent var(--cui-range-slider-track-from),
+        var(--#{$prefix}range-slider-track-in-range-bg) var(--cui-range-slider-track-from),
+        var(--#{$prefix}range-slider-track-in-range-bg) var(--cui-range-slider-track-to),
+        transparent var(--cui-range-slider-track-to),
+        transparent 100%
+      );
     border-color: transparent;
     @include border-radius(var(--#{$prefix}range-slider-track-border-radius));
     @include box-shadow(var(--#{$prefix}range-slider-track-box-shadow));
@@ -288,6 +303,13 @@ $range-slider-vertical-tokens: defaults(
   }
 
   .range-slider:not(.range-slider-vertical) {
+    // Gradients take no logical direction, so the horizontal one is mirrored
+    // here. Scoped away from the vertical slider so neither rule depends on
+    // source order.
+    @include rtl() {
+      --cui-range-slider-track-direction: to left;
+    }
+
 
     .range-slider-inputs-container {
       width: 100%;
@@ -314,6 +336,8 @@ $range-slider-vertical-tokens: defaults(
 
   .range-slider-vertical {
     @include tokens($range-slider-vertical-tokens);
+
+    --cui-range-slider-track-direction: to top;
 
     flex-direction: row;
     height: var(--#{$prefix}range-slider-vertical-track-height);
