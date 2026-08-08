@@ -643,16 +643,23 @@ implementation, so there is one engine to maintain and the old markup lays out
 exactly as it did. Verified by measuring geometry across six markup variants and
 eight dimensions each: zero differences. It is deprecated in v6 and removed in
 v7. Set `$enable-deprecated-form-check: false` to leave it out of your build once
-your markup has moved; that takes **151 bytes gzip** off the stylesheet.
+your markup has moved; that takes **455 bytes gzip** off the stylesheet and
+leaves no `.form-check*` selector behind.
 
-**Four Sass variables shaped the old artwork and cannot be honoured any more**,
+`.btn-check` is **not** part of that layer — toggle buttons are a current
+feature, and they live with the buttons now rather than with the form check.
+
+**Five Sass variables shaped the old artwork and cannot be honoured any more**,
 because the compatibility layer draws through the new engine:
 `$form-check-input-checked-bg-image`, `$form-check-radio-checked-bg-image`,
 `$form-check-input-indeterminate-bg-image` and `$form-check-transition`. Their
 replacements are `--#{$prefix}check-mark-checked`,
 `--#{$prefix}radio-mark`, `--#{$prefix}check-mark-indeterminate` and the
 controls' own transition tokens. `$form-check-label-color` and
-`-cursor` keep working.
+`-cursor` keep working. `$form-check-btn-check-disabled-opacity` goes with the
+toggle button's move to the buttons — it duplicated `$btn-disabled-opacity`,
+which is now what the disabled toggle reads, through
+`--#{$prefix}btn-disabled-opacity`.
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Removed</span>
 **`.form-check-reverse` is gone.** It right-flushed the label and the control as

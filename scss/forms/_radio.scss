@@ -45,10 +45,15 @@ $radio-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end radio-css-vars
 
+// The v5 spelling is an alias of this control rather than a second
+// implementation, so it is part of its selector list;
+// `$enable-deprecated-form-check: false` compiles it out.
+$radio-selector: if($enable-deprecated-form-check, ".radio, .form-check-input[type=radio]", ".radio") !default;
+$radio-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check-label", "+ label") !default;
+
 @layer forms {
   // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
-  .radio,
-  .form-check-input[type="radio"] {
+  #{$radio-selector} {
     @include tokens($radio-tokens);
 
     position: relative;
@@ -112,8 +117,7 @@ $radio-tokens: defaults(
       --#{$prefix}radio-size: #{map.get($map, "size")};
       --#{$prefix}radio-margin-top: #{map.get($map, "margin-top")};
 
-      + label,
-      ~ .form-check-label {
+      #{$radio-label-selector} {
         font-size: #{map.get($map, "font-size")};
       }
     }

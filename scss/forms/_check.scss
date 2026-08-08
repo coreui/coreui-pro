@@ -61,12 +61,17 @@ $check-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end check-css-vars
 
+// The v5 spelling is an alias of this control rather than a second
+// implementation, so it is part of its selector list;
+// `$enable-deprecated-form-check: false` compiles it out.
+$check-selector: if($enable-deprecated-form-check, ".check, .form-check-input[type=checkbox]", ".check") !default;
+$check-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check-label", "+ label") !default;
+
 @layer forms {
   // The class goes on the `<input>` itself. `appearance: none` lets the control
   // render pseudo-elements, so the mark is drawn on the input — no wrapper, and
   // the mark's colour is a token rather than a value baked into an SVG.
-  .check,
-  .form-check-input[type="checkbox"] {
+  #{$check-selector} {
     @include tokens($check-tokens);
 
     position: relative;
@@ -141,8 +146,7 @@ $check-tokens: defaults(
       --#{$prefix}check-margin-top: #{map.get($map, "margin-top")};
 
       // The label is a sibling, so it does not inherit anything from the control.
-      + label,
-      ~ .form-check-label {
+      #{$check-label-selector} {
         font-size: #{map.get($map, "font-size")};
       }
     }

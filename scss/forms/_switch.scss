@@ -64,13 +64,17 @@ $switch-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end switch-css-vars
 
+// The v5 spelling is an alias of this control rather than a second
+// implementation, so it is part of its selector list;
+// `$enable-deprecated-form-check: false` compiles it out.
+$switch-selector: if($enable-deprecated-form-check, ".switch, .form-switch .form-check-input", ".switch") !default;
+
 @layer forms {
   // Like `.check` and `.radio`, the class goes on the `<input>`: the track is the
   // input and the thumb is its `::before`, so the thumb's colour is a token
   // instead of a fill baked into an SVG — which is also what lets the separate
   // dark-mode knob go.
-  .switch,
-  .form-switch .form-check-input {
+  #{$switch-selector} {
     @include tokens($switch-tokens);
 
     position: relative;
@@ -130,16 +134,18 @@ $switch-tokens: defaults(
     }
   }
 
-  .form-switch {
-    @include tokens($switch-tokens);
+  @if $enable-deprecated-form-check {
+    .form-switch {
+      @include tokens($switch-tokens);
 
-    // stylelint-disable-next-line function-disallowed-list
-    --#{$prefix}form-switch-padding-start: calc(var(--#{$prefix}switch-width) + .5em);
-    --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
-    --#{$prefix}form-switch-border-radius: var(--#{$prefix}switch-border-radius);
-    --#{$prefix}form-switch-transition: var(--#{$prefix}switch-transition);
-    --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob);
-    --#{$prefix}form-switch-checked-bg-position: var(--#{$prefix}switch-checked-knob-position);
+      // stylelint-disable-next-line function-disallowed-list
+      --#{$prefix}form-switch-padding-start: calc(var(--#{$prefix}switch-width) + .5em);
+      --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
+      --#{$prefix}form-switch-border-radius: var(--#{$prefix}switch-border-radius);
+      --#{$prefix}form-switch-transition: var(--#{$prefix}switch-transition);
+      --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob);
+      --#{$prefix}form-switch-checked-bg-position: var(--#{$prefix}switch-checked-knob-position);
+    }
   }
 
   // The named sizes are token overrides now: width and height, and the rest —
@@ -152,21 +158,18 @@ $switch-tokens: defaults(
       --#{$prefix}switch-height: #{map.get($map, "height")};
     }
 
-    .form-switch-#{$size} .form-check-input {
-      --#{$prefix}switch-width: #{map.get($map, "width")};
-      --#{$prefix}switch-height: #{map.get($map, "height")};
-      // v5 gave every sized switch the same margin as the default one, which
-      // left it a little below the line's centre. The compatibility layer keeps
-      // that rather than quietly re-centring markup nobody has touched.
-      --#{$prefix}switch-margin-top: #{($line-height-base - $form-check-input-width) * .5};
-    }
-
-    .form-switch-#{$size} {
-      --#{$prefix}switch-height: #{map.get($map, "height")};
-    }
-
     @if $enable-deprecated-form-check {
+      .form-switch-#{$size} .form-check-input {
+        --#{$prefix}switch-width: #{map.get($map, "width")};
+        --#{$prefix}switch-height: #{map.get($map, "height")};
+        // v5 gave every sized switch the same margin as the default one, which
+        // left it a little below the line's centre. The compatibility layer keeps
+        // that rather than quietly re-centring markup nobody has touched.
+        --#{$prefix}switch-margin-top: #{($line-height-base - $form-check-input-width) * .5};
+      }
+
       .form-switch-#{$size} {
+        --#{$prefix}switch-height: #{map.get($map, "height")};
         // A sized switch is taller than the text line it sits on, so it sets the
         // row height itself and re-centres the label; the default one keeps
         // `.form-check`'s.

@@ -38,7 +38,6 @@ $form-check-input-focus-ring:             $focus-ring !default;
 
 $form-check-input-disabled-opacity:        .5 !default;
 $form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;
-$form-check-btn-check-disabled-opacity:    $input-btn-disabled-opacity !default;
 // scss-docs-end form-check-variables
 
 // scss-docs-start form-switch-variables
@@ -143,21 +142,6 @@ $form-check-input-tokens: defaults(
       display: inline-grid;
       margin-inline-end: var(--#{$prefix}form-check-inline-margin-end);
       vertical-align: top;
-    }
-
-    .btn-check {
-      position: absolute;
-      clip: rect(0, 0, 0, 0);
-      pointer-events: none;
-
-      &[disabled],
-      &:disabled {
-        + .btn {
-          pointer-events: none;
-          filter: none;
-          opacity: $form-check-btn-check-disabled-opacity;
-        }
-      }
     }
   }
 }
