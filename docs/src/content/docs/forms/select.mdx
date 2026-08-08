@@ -102,22 +102,6 @@ A wider gap, or none at all:
 The chevron is a background image, so its color is baked into the SVG and cannot follow a `currentColor` or a theme token. That is also why dark mode swaps the whole image rather than a color — see `$form-control-select-indicator-dark` below.
 </Callout>
 
-## Customizing
-
-### CSS variables
-
-Selects use local CSS variables on the control for real-time customization. Values are set via Sass, so Sass customization is still supported, too.
-
-<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-tokens" />
-
-### SASS variables
-
-A select shares the `.form-control` surface; these are the ones only it uses — the chevron and the room made for it.
-
-<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-variables" />
-
-<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-dark-variables" />
-
 ## The chevron on something that is not a select
 
 `.form-control-caret` draws the same chevron on an element that is not a `<select>` — a button opening a listbox, for instance.
@@ -136,3 +120,19 @@ A select shares the `.form-control` surface; these are the ones only it uses —
 ```
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
+
+## Customizing
+
+### CSS variables
+
+Selects use local CSS variables on the control for real-time customization. Values are set via Sass, so Sass customization is still supported, too.
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-tokens" />
+
+### SASS variables
+
+A select shares the `.form-control` surface; these are the ones only it uses — the chevron and the room made for it.
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-variables" />
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-dark-variables" />
