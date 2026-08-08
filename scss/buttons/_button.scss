@@ -53,6 +53,11 @@ $btn-transition:              $input-btn-transition !default;
 
 // scss-docs-end btn-variables
 
+// The two toggle-button spellings each select themselves: the v6 one puts
+// `.btn-check` on the `<label>` alongside the button classes, so the deprecated
+// one — the class on the input — is the `.btn-check` that is not a `.btn`.
+$btn-check-deprecated: ".btn-check:not(.btn)" !default;
+
 // scss-docs-start btn-outline-variables
 $btn-outline-color: var(--#{$prefix}secondary-color) !default;
 $btn-outline-border-color: var(--#{$prefix}border-color) !default;
@@ -208,7 +213,8 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
       border-color: var(--#{$prefix}btn-hover-border-color);
     }
 
-    .btn-check + &:hover {
+    #{$btn-check-deprecated} + &:hover,
+    &.btn-check:hover {
       // override for the checkbox/radio buttons
       color: var(--#{$prefix}btn-color);
       background-color: var(--#{$prefix}btn-bg);
@@ -223,14 +229,16 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
       outline: var(--#{$prefix}btn-focus-ring);
     }
 
-    .btn-check:focus-visible + & {
+    #{$btn-check-deprecated}:focus-visible + &,
+    &.btn-check:has(input:focus-visible) {
       border-color: var(--#{$prefix}btn-hover-border-color);
       // Avoid using mixin so we can pass custom focus shadow properly
       outline: var(--#{$prefix}btn-focus-ring);
     }
 
-    .btn-check:checked + &,
-    :not(.btn-check) + &:active,
+    #{$btn-check-deprecated}:checked + &,
+    &.btn-check:has(input:checked),
+    :not(#{$btn-check-deprecated}) + &:active,
     &:first-child:active,
     &.active,
     &.show {
@@ -248,7 +256,8 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
       }
     }
 
-    .btn-check:checked:focus-visible + & {
+    #{$btn-check-deprecated}:checked:focus-visible + &,
+    &.btn-check:has(input:checked:focus-visible) {
       // Avoid using mixin so we can pass custom focus shadow properly
       outline: var(--#{$prefix}btn-focus-ring);
     }
@@ -271,11 +280,31 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
   //
   // Toggle buttons (.btn-check)
   //
-  // A checkbox or radio that looks like a button: the input carries
-  // `.btn-check` and is hidden, the `<label>` next to it carries `.btn`. The
-  // states are the `.btn-check:checked + .btn` rules in the base block above.
+  // A checkbox or radio that looks like a button. The class goes on the
+  // `<label>` with the button classes, and the input nests inside it, so the
+  // button is one element and needs no `id`/`for` pair to hold it together:
+  //
+  //   <label class="btn btn-primary btn-check"><input type="checkbox">Toggle</label>
+  //
+  // Its states are the `&.btn-check:has(input:…)` rules in the base block above.
 
-  .btn-check {
+  .btn-check > input {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    pointer-events: none;
+  }
+
+  // Dimmed rather than repainted, so a disabled toggle that is checked still
+  // reads as checked — the behavior of the deprecated spelling, where the
+  // `:disabled` input never matched the label's own disabled rules.
+  .btn-check:has(input:disabled) {
+    pointer-events: none;
+    filter: none;
+    opacity: var(--#{$prefix}btn-disabled-opacity);
+  }
+
+  // Deprecated in v6: the class on the input, with a sibling `.btn` label.
+  #{$btn-check-deprecated} {
     position: absolute;
     clip: rect(0, 0, 0, 0);
     pointer-events: none;
