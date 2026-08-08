@@ -49,7 +49,6 @@ $radio-tokens: defaults(
 // implementation, so it is part of its selector list;
 // `$enable-deprecated-form-check: false` compiles it out.
 $radio-selector: if($enable-deprecated-form-check, ".radio, .form-check-input[type=radio]", ".radio") !default;
-$radio-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check-label", "+ label") !default;
 
 @layer forms {
   // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
@@ -117,7 +116,7 @@ $radio-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check
       --#{$prefix}radio-size: #{map.get($map, "size")};
       --#{$prefix}radio-margin-top: #{map.get($map, "margin-top")};
 
-      #{$radio-label-selector} {
+      + label {
         font-size: #{map.get($map, "font-size")};
       }
     }

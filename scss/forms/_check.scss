@@ -67,7 +67,6 @@ $check-tokens: defaults(
 // A v5 switch input is a checkbox too, so it has to be kept out of this list:
 // it would collect the check mark on top of the switch thumb.
 $check-selector: if($enable-deprecated-form-check, ".check, .form-check-input[type=checkbox]:not(.form-switch *)", ".check") !default;
-$check-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check-label", "+ label") !default;
 
 @layer forms {
   // The class goes on the `<input>` itself. `appearance: none` lets the control
@@ -148,7 +147,7 @@ $check-label-selector: if($enable-deprecated-form-check, "+ label, ~ .form-check
       --#{$prefix}check-margin-top: #{map.get($map, "margin-top")};
 
       // The label is a sibling, so it does not inherit anything from the control.
-      #{$check-label-selector} {
+      + label {
         font-size: #{map.get($map, "font-size")};
       }
     }

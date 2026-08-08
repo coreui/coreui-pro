@@ -71,7 +71,6 @@ $form-feedback-tokens: defaults(
 // The v5 spelling is an alias of the controls rather than a second
 // implementation; `$enable-deprecated-form-check: false` compiles it out.
 $validated-controls: if($enable-deprecated-form-check, ".check, .radio, .switch, .form-check-input", ".check, .radio, .switch") !default;
-$validated-control-labels: if($enable-deprecated-form-check, "~ label, ~ .form-check-label", "~ label") !default;
 
 @mixin form-validation-state(
   $state,
@@ -233,7 +232,7 @@ $validated-control-labels: if($enable-deprecated-form-check, "~ label, ~ .form-c
         outline: $focus-ring;
       }
 
-      #{$validated-control-labels} {
+      ~ label {
         color: $color;
       }
     }
