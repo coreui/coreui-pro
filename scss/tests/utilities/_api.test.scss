@@ -1,6 +1,9 @@
 @use "sass:map";
 
 @use "../../config" with (
+  // Stated rather than inherited: this spec is about breakpoints, so it should
+  // not change meaning when the importance default does.
+  $enable-important-utilities: false,
   $grid-breakpoints: (
     xs: 0,
     sm: 333px,
@@ -39,33 +42,33 @@ $utilities: (
         @layer utilities {
           // margin is not set to responsive
           .margin-auto {
-            margin: auto !important;
+            margin: auto;
           }
 
           // padding is, though
           .padding-1rem {
-            padding: 1rem !important;
+            padding: 1rem;
           }
 
           .font-size-large {
-            font-size: 1.25rem !important;
+            font-size: 1.25rem;
           }
 
           @media (width >= 333px) {
             .padding-sm-1rem {
-              padding: 1rem !important;
+              padding: 1rem;
             }
           }
 
           @media (width >= 666px) {
             .padding-md-1rem {
-              padding: 1rem !important;
+              padding: 1rem;
             }
           }
 
           @media print {
             .font-size-print-large {
-              font-size: 1.25rem !important;
+              font-size: 1.25rem;
             }
           }
         }

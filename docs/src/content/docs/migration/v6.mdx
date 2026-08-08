@@ -865,6 +865,20 @@ assembles maps of CSS expressions and the browser resolves them.
   existing stylesheets now override the library more easily, not less. No
   action needed — selectors that worked before keep working, and low-specificity
   overrides that used to lose on specificity now win.
+- **Utilities no longer carry `!important`.**
+  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  `$enable-important-utilities` now defaults to `false`, because the layer order
+  above already puts every utility past every component — the suffix was doing
+  nothing our own stylesheet needed. That takes 556 bytes gzip (19 kB
+  uncompressed) off the build.
+
+  The one case it did cover is your own **unlayered** CSS: since unlayered styles
+  beat every layer, a plain `.card-title { text-align: left }` in a stylesheet
+  loaded after ours now wins over `.text-center`. Two ways out, and the choice is
+  yours per rule rather than ours for all of them — move that CSS into
+  `@layer custom` so utilities win, or set
+  `$enable-important-utilities: true` to keep the v5 behavior everywhere.
+
 - If your build concatenates CoreUI with other CSS, make sure the layer
   declaration (emitted at the top of the bundle) is not stripped by a minifier
   that predates `@layer`.

@@ -427,7 +427,10 @@ $enable-button-pointers:      true !default;
 $enable-validation-icons:     true !default;
 $enable-negative-margins:     false !default;
 $enable-deprecation-messages: true !default;
-$enable-important-utilities:  true !default;
+// Utilities live in the last cascade layer, so they already win against every
+// component without it. Kept as a switch back to the v5 behavior for a codebase
+// whose own CSS sits outside a layer — unlayered styles beat every layer.
+$enable-important-utilities:  false !default;
 $enable-ltr:                  true !default;
 $enable-rtl:                  true !default;
 // The v5 spelling of the form controls — `.form-check`, `.form-check-input`,
