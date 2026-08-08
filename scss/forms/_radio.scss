@@ -19,6 +19,7 @@ $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/
 $radio-tokens: () !default;
 
 // scss-docs-start radio-css-vars
+// stylelint-disable function-disallowed-list
 // stylelint-disable-next-line scss/dollar-variable-default
 $radio-tokens: defaults(
   (
@@ -31,6 +32,7 @@ $radio-tokens: defaults(
     --#{$prefix}radio-mark-color: #{$radio-mark-color},
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
     --#{$prefix}radio-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}radio-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}radio-size)) * .5),
     --#{$prefix}radio-focus-border: #{$form-check-input-focus-border},
     --#{$prefix}radio-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}radio-active-filter: #{$form-check-input-active-filter},
@@ -38,6 +40,7 @@ $radio-tokens: defaults(
   ),
   $radio-tokens
 );
+// stylelint-enable function-disallowed-list
 // scss-docs-end radio-css-vars
 
 @layer forms {
@@ -49,6 +52,10 @@ $radio-tokens: defaults(
     flex-shrink: 0;
     width: var(--#{$prefix}radio-size);
     height: var(--#{$prefix}radio-size);
+    // Half the leading, so the control sits on the text's optical centre — the
+    // alignment the `.form-check` wrapper used to apply, now following the size.
+    margin-top: var(--#{$prefix}radio-margin-top);
+    vertical-align: top;
     appearance: none;
     background-color: var(--#{$prefix}radio-bg);
     border: var(--#{$prefix}radio-border);

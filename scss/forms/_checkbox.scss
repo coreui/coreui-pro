@@ -23,6 +23,7 @@ $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 $check-tokens: () !default;
 
 // scss-docs-start check-css-vars
+// stylelint-disable function-disallowed-list
 // stylelint-disable-next-line scss/dollar-variable-default
 $check-tokens: defaults(
   (
@@ -38,6 +39,7 @@ $check-tokens: defaults(
     --#{$prefix}check-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
     --#{$prefix}check-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
     --#{$prefix}check-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}check-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}check-size)) * .5),
     --#{$prefix}check-focus-border: #{$form-check-input-focus-border},
     --#{$prefix}check-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}check-active-filter: #{$form-check-input-active-filter},
@@ -45,6 +47,7 @@ $check-tokens: defaults(
   ),
   $check-tokens
 );
+// stylelint-enable function-disallowed-list
 // scss-docs-end check-css-vars
 
 @layer forms {
@@ -58,6 +61,10 @@ $check-tokens: defaults(
     flex-shrink: 0;
     width: var(--#{$prefix}check-size);
     height: var(--#{$prefix}check-size);
+    // Half the leading, so the control sits on the text's optical centre — the
+    // alignment the `.form-check` wrapper used to apply, now following the size.
+    margin-top: var(--#{$prefix}check-margin-top);
+    vertical-align: top;
     appearance: none;
     background-color: var(--#{$prefix}check-bg);
     border: var(--#{$prefix}check-border);

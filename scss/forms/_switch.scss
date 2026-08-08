@@ -48,6 +48,7 @@ $switch-tokens: defaults(
     --#{$prefix}switch-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
     --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}switch-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}switch-height)) * .5),
     --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
     --#{$prefix}switch-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
@@ -75,6 +76,10 @@ $switch-tokens: defaults(
     flex-shrink: 0;
     width: var(--#{$prefix}switch-width);
     height: var(--#{$prefix}switch-height);
+    // Half the leading, so the control sits on the text's optical centre — the
+    // alignment the `.form-check` wrapper used to apply, now following the size.
+    margin-top: var(--#{$prefix}switch-margin-top);
+    vertical-align: top;
     appearance: none;
     background-color: var(--#{$prefix}switch-bg);
     border: var(--#{$prefix}switch-border);
