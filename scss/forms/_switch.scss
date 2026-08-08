@@ -69,7 +69,8 @@ $switch-tokens: defaults(
   // input and the thumb is its `::before`, so the thumb's colour is a token
   // instead of a fill baked into an SVG — which is also what lets the separate
   // dark-mode knob go.
-  .switch {
+  .switch,
+  .form-switch .form-check-input {
     @include tokens($switch-tokens);
 
     position: relative;
@@ -144,9 +145,23 @@ $switch-tokens: defaults(
   // The named sizes are token overrides now: width and height, and the rest —
   // padding, the label's optical centring — follows from them.
   @each $size, $map in $form-switch-widths {
-    .switch-#{$size},
-    .form-switch-#{$size} {
+    // The control declares these tokens for itself, so a value inherited from a
+    // wrapper would lose to it — the deprecated spelling sets them on the input.
+    .switch-#{$size} {
       --#{$prefix}switch-width: #{map.get($map, "width")};
+      --#{$prefix}switch-height: #{map.get($map, "height")};
+    }
+
+    .form-switch-#{$size} .form-check-input {
+      --#{$prefix}switch-width: #{map.get($map, "width")};
+      --#{$prefix}switch-height: #{map.get($map, "height")};
+      // v5 gave every sized switch the same margin as the default one, which
+      // left it a little below the line's centre. The compatibility layer keeps
+      // that rather than quietly re-centring markup nobody has touched.
+      --#{$prefix}switch-margin-top: #{($line-height-base - $form-check-input-width) * .5};
+    }
+
+    .form-switch-#{$size} {
       --#{$prefix}switch-height: #{map.get($map, "height")};
     }
 

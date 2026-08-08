@@ -637,12 +637,30 @@ follows the colour scheme by itself.
 ```
 
 **The v5 spelling still works.** `.form-check`, `.form-check-input`,
-`.form-check-label`, `.form-switch`, `.form-check-inline` and
-`.form-check-reverse` are kept as a compatibility layer, unchanged, and render
-exactly as they did — verified by computing styles for eleven markup variants
-across light and dark. It is deprecated in v6 and removed in v7. Set
-`$enable-deprecated-form-check: false` to leave it out of your build once your
-markup has moved; that takes **698 bytes gzip** off the stylesheet.
+`.form-check-label`, `.form-switch` and `.form-check-inline` are kept as a
+compatibility layer — **aliases of the new controls**, not a second
+implementation, so there is one engine to maintain and the old markup lays out
+exactly as it did. Verified by measuring geometry across six markup variants and
+eight dimensions each: zero differences. It is deprecated in v6 and removed in
+v7. Set `$enable-deprecated-form-check: false` to leave it out of your build once
+your markup has moved; that takes **151 bytes gzip** off the stylesheet.
+
+**Four Sass variables shaped the old artwork and cannot be honoured any more**,
+because the compatibility layer draws through the new engine:
+`$form-check-input-checked-bg-image`, `$form-check-radio-checked-bg-image`,
+`$form-check-input-indeterminate-bg-image` and `$form-check-transition`. Their
+replacements are `--#{$prefix}check-mark-checked`,
+`--#{$prefix}radio-mark`, `--#{$prefix}check-mark-indeterminate` and the
+controls' own transition tokens. `$form-check-label-color` and
+`-cursor` keep working.
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Removed</span>
+**`.form-check-reverse` is gone.** It right-flushed the label and the control as
+a pair — which `order` utilities express directly — and it was never the settings
+row (label on the left, control on the right) that people actually reach for;
+that one is `justify-content: space-between`. The React and Vue `reverse` prop
+still emits the class and therefore stops having an effect; it is retired with
+those components in the framework editions.
 
 What replaces the wrapper's modifiers:
 
@@ -689,8 +707,8 @@ Multi Select's option indicators moved with it — they render as a decorative
   [Switch](/forms/switch/) — one page per control, each self-contained down to its
   own toggle-button and Sass sections. The old URL redirects to Checkbox.
   **No classes changed**: `.form-check`, `.form-check-input`, `.form-check-label`,
-  `.form-switch`, `.form-check-inline` and `.form-check-reverse` all work exactly
-  as before.
+  `.form-switch` and `.form-check-inline` all work exactly as before;
+  `.form-check-reverse` is removed.
 - **New: [`.form-field`](/forms/field/)**, a grid wrapper that lays a control out
   with its label, description and validation feedback on one consistent gap, so a
   form is spaced by the field instead of by margin utilities on its parts. A bare

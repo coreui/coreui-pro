@@ -65,7 +65,8 @@ $check-tokens: defaults(
   // The class goes on the `<input>` itself. `appearance: none` lets the control
   // render pseudo-elements, so the mark is drawn on the input — no wrapper, and
   // the mark's colour is a token rather than a value baked into an SVG.
-  .check {
+  .check,
+  .form-check-input[type="checkbox"] {
     @include tokens($check-tokens);
 
     position: relative;

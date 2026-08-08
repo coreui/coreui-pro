@@ -24,7 +24,8 @@ $form-field-tokens: defaults(
   // The layout wrapper of a form control: label, control, description and
   // validation feedback in one grid, so a form is spaced by the field rather than
   // by margin utilities sprinkled over its parts.
-  .form-field {
+  .form-field,
+  .form-check {
     @include tokens($form-field-tokens);
 
     position: relative;

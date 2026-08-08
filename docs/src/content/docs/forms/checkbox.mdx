@@ -156,7 +156,9 @@ Visually, these checkbox toggle buttons are identical to the [button plugin togg
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Deprecated in v6</span>
 
-The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-check-label`, with `.form-check-inline` and `.form-check-reverse` as modifiers — still works and renders exactly as it did. It is removed in v7, and `$enable-deprecated-form-check: false` leaves it out of your build today.
+The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-check-label`, with `.form-check-inline` — still works and lays out exactly as it did; it is an alias of the new controls now rather than a second implementation. It is removed in v7, and `$enable-deprecated-form-check: false` leaves it out of your build today.
+
+`.form-check-reverse` is **gone**. It right-flushed the label and control as a pair, which utilities express directly — and it was never the settings row (label left, control right) people reach for. Use `order` utilities, or `justify-content: space-between` for that row.
 
 <Example code={`<div class="form-check">
     <input class="form-check-input" type="checkbox" value="" id="deprecatedCheck" checked>

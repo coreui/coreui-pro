@@ -47,7 +47,8 @@ $radio-tokens: defaults(
 
 @layer forms {
   // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
-  .radio {
+  .radio,
+  .form-check-input[type="radio"] {
     @include tokens($radio-tokens);
 
     position: relative;
