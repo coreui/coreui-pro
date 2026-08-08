@@ -1,0 +1,24 @@
+---
+title: "Bootstrap 5 Hover Lift"
+name: "Hover lift"
+description: "Lift an element and add a shadow on hover or focus for a subtle sense of depth."
+---
+
+Add `.hover-lift` to any element to translate it upward and add a `box-shadow` on `:hover` and `:focus-visible`. Respects `prefers-reduced-motion`.
+
+<Example code={`<div class="card hover-lift" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">Card with hover lift</h5>
+      <p class="card-text">Hover or focus this card to see it lift with a shadow.</p>
+    </div>
+  </div>`} />
+
+## CSS variables
+
+CoreUI for Bootstrap's hover lift uses local CSS variables on `.hover-lift` for enhanced real-time customization.
+
+<ScssDocs file="scss/helpers/_hover-lift.scss" capture="hover-lift-css-vars" />
+
+## Sass variables
+
+<ScssDocs file="scss/helpers/_hover-lift.scss" capture="hover-lift-variables" />
