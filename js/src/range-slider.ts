@@ -122,7 +122,6 @@ class RangeSlider extends BaseComponent {
   protected declare _inputs: HTMLInputElement[]
   protected declare _isDragging: boolean
   protected declare _sliderTrack: any
-  protected declare _thumbSize: any
   protected declare _tooltips: HTMLElement[]
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -135,7 +134,6 @@ class RangeSlider extends BaseComponent {
     this._inputs = []
     this._isDragging = false
     this._sliderTrack = null
-    this._thumbSize = null
     this._tooltips = []
 
     this._initializeRangeSlider()
@@ -410,12 +408,13 @@ class RangeSlider extends BaseComponent {
     }
 
     const inputs = SelectorEngine.find(SELECTOR_RANGE_SLIDER_INPUT, this._element as ParentNode) as HTMLInputElement[]
-    this._thumbSize = this._getThumbSize()
 
     for (const input of inputs) {
-      const tooltipElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
-      const tooltipInnerElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP_INNER)
-      const tooltipArrowElement = this._createElement('div', CLASS_NAME_RANGE_SLIDER_TOOLTIP_ARROW)
+      // `<output>` is a live region; the input already announces the value.
+      const tooltipElement = this._createElement('output', CLASS_NAME_RANGE_SLIDER_TOOLTIP)
+      tooltipElement.setAttribute('aria-hidden', 'true')
+      const tooltipInnerElement = this._createElement('span', CLASS_NAME_RANGE_SLIDER_TOOLTIP_INNER)
+      const tooltipArrowElement = this._createElement('span', CLASS_NAME_RANGE_SLIDER_TOOLTIP_ARROW)
 
       tooltipInnerElement.innerHTML = this._config.tooltipsFormat ?
         (this._config.sanitize ? sanitizeHtml(this._config.tooltipsFormat(input.value), this._config.allowList, this._config.sanitizeFn) : this._config.tooltipsFormat(input.value)) :
@@ -428,43 +427,10 @@ class RangeSlider extends BaseComponent {
     }
   }
 
-  _getThumbSize(): any {
-    const value = window
-    .getComputedStyle(this._element, null)
-    .getPropertyValue(
-      this._config.vertical ? '--cui-range-slider-thumb-height' : '--cui-range-slider-thumb-width'
-    )
-
-    const regex = /^(\d+\.?\d*)([%a-z]*)$/i
-    const match = value.match(regex)
-
-    if (match) {
-      return {
-        value: Number.parseFloat(match[1]),
-        unit: match[2] || null
-      }
-    }
-
-    return '1rem'
-  }
-
   _positionTooltip(tooltip: HTMLElement, input: HTMLInputElement): void {
-    const thumbSize = this._thumbSize
-    const percent = ((input.value as any) - this._config.min) / (this._config.max - this._config.min)
-    const margin = percent > 0.5 ?
-      `-${(percent - 0.5) * thumbSize.value}${thumbSize.unit}` :
-      `${(0.5 - percent) * thumbSize.value}${thumbSize.unit}`
+    const percent = (Number(input.value) - this._config.min) / (this._config.max - this._config.min)
 
-    if (this._config.vertical) {
-      Object.assign(tooltip.style, {
-        bottom: `${percent * 100}%`,
-        marginBottom: margin
-      })
-
-      return
-    }
-
-    Object.assign(tooltip.style, { insetInlineStart: `${percent * 100}%`, marginInlineStart: margin })
+    tooltip.style.setProperty('--cui-range-slider-tooltip-position', `${percent}`)
   }
 
   _updateTooltip(index: number, value: number): void {
@@ -569,30 +535,11 @@ class RangeSlider extends BaseComponent {
     }
 
     const [min, max] = [Math.min(...this._currentValue), Math.max(...this._currentValue)]
-    const from = ((min - this._config.min) / (this._config.max - this._config.min)) * 100
-    const to = ((max - this._config.min) / (this._config.max - this._config.min)) * 100
-    const direction = this._config.vertical ? 'to top' : (isRTL() ? 'to left' : 'to right')
+    const span = this._config.max - this._config.min
+    const edge = (value: number): string => `${((value - this._config.min) / span) * 100}%`
 
-    if (this._currentValue.length === 1) {
-      this._sliderTrack.style.backgroundImage = `linear-gradient(
-        ${direction},
-        var(--cui-range-slider-track-in-range-bg) 0%,
-        var(--cui-range-slider-track-in-range-bg) ${to}%,
-        transparent ${to}%,
-        transparent 100%
-      )`
-      return
-    }
-
-    this._sliderTrack.style.backgroundImage = `linear-gradient(
-      ${direction},
-      transparent 0%,
-      transparent ${from}%,
-      var(--cui-range-slider-track-in-range-bg) ${from}%,
-      var(--cui-range-slider-track-in-range-bg) ${to}%,
-      transparent ${to}%,
-      transparent 100%
-    )`
+    this._sliderTrack.style.setProperty('--cui-range-slider-track-from', this._currentValue.length === 1 ? '0%' : edge(min))
+    this._sliderTrack.style.setProperty('--cui-range-slider-track-to', edge(max))
   }
 
   _updateNearestValue(value: number): void {

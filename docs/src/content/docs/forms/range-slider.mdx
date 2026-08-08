@@ -221,6 +221,8 @@ The Range Slider component is built with accessibility in mind. Each slider hand
 - `aria-valuenow`: Current value
 - `aria-orientation`: horizontal or vertical
 
+Tooltips are hidden from assistive technology (`aria-hidden="true"`): they repeat the value the handle already announces through `aria-valuenow`, so exposing them would have screen readers read every change twice.
+
 Additionally, ensure that labels and tooltips are clear and descriptive to provide the best experience for all users.
 
 ## Customizing
