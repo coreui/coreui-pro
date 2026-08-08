@@ -358,6 +358,46 @@ portal.
 shrinks to its content, and both pickers measure identically without the
 declaration.
 
+#### `.form-select` is absorbed by `.form-control`
+
+- **A `<select>` takes `.form-control` now**, like every other control. The two
+  were already the same thing everywhere but the chevron: measured across every
+  computed property, `.form-select` and `.form-control` on the same `<select>`
+  differed in exactly ten — the eight `background-*` that draw the chevron and
+  the padding that makes room for it. Everything else already came from the
+  shared `--#{$prefix}control-*` tokens.
+- **`<select class="form-control">` used to render without any arrow at all** —
+  `.form-control` sets `appearance: none`, which removes the native one, and
+  nothing put ours back. That is fixed by the same change.
+- **New: `.form-control-caret`** puts the chevron on an element that is not a
+  `<select>` — a button that opens a listbox, for instance.
+- **`.form-select`, `.form-select-sm` and `.form-select-lg` keep working** as
+  aliases of the `.form-control` classes, not as a second implementation.
+  Deprecated in v6, removed in v7.
+
+  ```diff
+  - <select class="form-select form-select-lg">
+  + <select class="form-control form-control-lg">
+  ```
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The `$form-select-*` Sass variables are gone**, along with
+  `scss/forms/_form-select.scss`. Most were pass-throughs to `$input-*` /
+  `--#{$prefix}btn-input-*` and their `.form-control` equivalents apply
+  unchanged; the chevron's own are renamed `$form-control-select-*`. The runtime
+  tokens move with them: `--#{$prefix}form-select-bg-img` →
+  `--#{$prefix}control-select-bg-img`, `-bg-position`, `-bg-size`,
+  `-indicator-padding` → `--#{$prefix}control-select-padding-end`, and the
+  `-feedback-icon-*` pair.
+- **Two differences a select inherits from `.form-control`,** neither of which
+  changed a rendered box in any case measured. It paints its background with
+  `background-clip: padding-box`, the value `.form-control` has always used to
+  avoid a rounded-corner artefact in Firefox — 0.12% of the control's pixels, the
+  antialiasing of the four corners. And `.form-select-sm` / `-lg` now carry the
+  `min-height` their `.form-control` counterparts always had, so a sized select
+  is finally the same height as a sized input; it only shows if you have cut the
+  padding below that floor.
+
 #### Input group: one frame class instead of five
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

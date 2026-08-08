@@ -1,8 +1,11 @@
 @use "sass:math";
 @use "../functions/defaults" as *;
+@use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
+@use "../mixins/color-mode" as *;
 @use "../mixins/gradients" as *;
+@use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -75,12 +78,50 @@ $form-control-tokens: defaults(
 }
 // scss-docs-end form-control-frame-mixin
 
+
+// The chevron a `<select>` draws in place of the native arrow, and the geometry
+// that makes room for it. Everything else a select needs is `.form-control`.
+// scss-docs-start form-control-select-variables
+$form-control-select-indicator-color:      $gray-800 !default;
+$form-control-select-indicator:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+$form-control-select-bg-position:          right var(--#{$prefix}control-padding-x) center !default;
+$form-control-select-bg-size:              16px 12px !default; // In pixels because image dimensions
+$form-control-select-padding-end:          calc(var(--#{$prefix}control-padding-x) * 3) !default; // stylelint-disable-line function-disallowed-list
+$form-control-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}control-select-padding-end)) !default; // stylelint-disable-line function-disallowed-list
+$form-control-select-feedback-icon-position: center right var(--#{$prefix}control-select-padding-end) !default;
+$form-control-select-feedback-icon-size:   $input-height-inner-half $input-height-inner-half !default;
+// scss-docs-end form-control-select-variables
+
+// The colour lives inside the inline SVG, so it cannot be a light-dark() pair.
+// scss-docs-start form-control-select-dark-variables
+$form-control-select-indicator-color-dark: rgba($white, .87) !default;
+$form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
+// scss-docs-end form-control-select-dark-variables
+
+$form-control-select-tokens: () !default;
+// scss-docs-start form-control-select-tokens
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-control-select-tokens: defaults(
+  (
+    --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator)},
+    --#{$prefix}control-select-bg-size: #{$form-control-select-bg-size},
+    --#{$prefix}control-select-padding-end: #{$form-control-select-padding-end},
+    --#{$prefix}control-select-feedback-icon-padding-end: #{$form-control-select-feedback-icon-padding-end},
+    --#{$prefix}control-select-feedback-icon-size: "#{$form-control-select-bg-size}, #{$form-control-select-feedback-icon-size}",
+  ),
+  $form-control-select-tokens
+);
+// stylelint-enable custom-property-no-missing-var-function
+// scss-docs-end form-control-select-tokens
+
 @layer forms {
   //
   // General form controls (plus a few specific high-level interventions)
   //
 
-  .form-control {
+  .form-control,
+  .form-select {
     @include tokens($form-control-tokens);
     @include form-control-frame();
 
@@ -213,7 +254,8 @@ $form-control-tokens: defaults(
   //
   // Repeated in `_input_group.scss` to avoid Sass extend issues.
 
-  .form-control-sm {
+  .form-control-sm,
+  .form-select-sm {
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
@@ -232,7 +274,8 @@ $form-control-tokens: defaults(
     }
   }
 
-  .form-control-lg {
+  .form-control-lg,
+  .form-select-lg {
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
@@ -250,6 +293,50 @@ $form-control-tokens: defaults(
       margin-inline-end: var(--#{$prefix}control-padding-x);
     }
   }
+
+  // A `<select>` draws its own chevron because `appearance: none` takes the
+  // native one away. `.form-control-caret` puts the same on an element that is
+  // not a select; `.form-select` is the deprecated spelling of both.
+  // stylelint-disable selector-no-qualifying-type
+  select.form-control,
+  .form-control-caret,
+  .form-select {
+    @include tokens($form-control-select-tokens);
+
+    padding-inline-end: var(--#{$prefix}control-select-padding-end);
+    background-image: var(--#{$prefix}control-select-bg-img), var(--#{$prefix}control-select-bg-icon, none);
+    background-repeat: no-repeat;
+    @include ltr-rtl-value-only("--#{$prefix}control-select-bg-position", $form-control-select-bg-position);
+    background-position: var(--#{$prefix}control-select-bg-position);
+    background-size: var(--#{$prefix}control-select-bg-size);
+
+    @if $enable-validation-icons {
+      @include ltr-rtl-value-only("--#{$prefix}control-select-validation-bg-position", #{$form-control-select-bg-position, $form-control-select-feedback-icon-position});
+    }
+
+    &[multiple],
+    &[size]:not([size="1"]) {
+      padding-inline-end: var(--#{$prefix}control-padding-x);
+      background-image: none;
+    }
+
+    // Remove the dotted focus outline Firefox draws inside a select
+    &:-moz-focusring {
+      color: transparent;
+      text-shadow: 0 0 0 var(--#{$prefix}control-color);
+    }
+  }
+
+  @if $enable-dark-mode {
+    @include color-mode(dark) {
+      select.form-control,
+      .form-control-caret,
+      .form-select {
+        --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator-dark)};
+      }
+    }
+  }
+  // stylelint-enable selector-no-qualifying-type
 
   // Make sure textareas don't shrink too much when resized
   // https://github.com/twbs/bootstrap/pull/29124
