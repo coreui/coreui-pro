@@ -122,22 +122,32 @@ A checkbox with no label text is the input on its own. Give it an accessible nam
 
 ## Toggle buttons
 
-Create button-like checkboxes by putting `.btn` styles on the `<label>` instead of `.form-check-label`, and `.btn-check` on the input. They can be grouped in a [button group](/components/button-group/).
+Create button-like checkboxes by putting `.btn-check` on a `<label>` with the button classes, and nesting the input inside it. The label is the button, so there is no `id`/`for` pair to keep in sync. They can be grouped in a [button group](/components/button-group/).
 
-<Example code={`<input type="checkbox" class="btn-check" id="btn-check" autocomplete="off">
-  <label class="btn btn-primary" for="btn-check">Single toggle</label>
+<Example code={`<label class="btn btn-primary btn-check">
+    <input type="checkbox" autocomplete="off">
+    Single toggle
+  </label>
 
-  <input type="checkbox" class="btn-check" id="btn-check-2" checked autocomplete="off">
-  <label class="btn btn-primary" for="btn-check-2">Checked</label>
+  <label class="btn btn-primary btn-check">
+    <input type="checkbox" checked autocomplete="off">
+    Checked
+  </label>
 
-  <input type="checkbox" class="btn-check" id="btn-check-3" autocomplete="off" disabled>
-  <label class="btn btn-primary" for="btn-check-3">Disabled</label>`} />
+  <label class="btn btn-primary btn-check">
+    <input type="checkbox" disabled autocomplete="off">
+    Disabled
+  </label>`} />
 
-<Example code={`<input type="checkbox" class="btn-check" id="btn-check-outlined" autocomplete="off">
-  <label class="btn btn-outline-primary" for="btn-check-outlined">Single toggle</label>
+<Example code={`<label class="btn btn-outline-primary btn-check">
+    <input type="checkbox" autocomplete="off">
+    Single toggle
+  </label>
 
-  <input type="checkbox" class="btn-check" id="btn-check-2-outlined" checked autocomplete="off">
-  <label class="btn btn-outline-secondary" for="btn-check-2-outlined">Checked</label>`} />
+  <label class="btn btn-outline-secondary btn-check">
+    <input type="checkbox" checked autocomplete="off">
+    Checked
+  </label>`} />
 
 <Callout color="info">
 Visually, these checkbox toggle buttons are identical to the [button plugin toggle buttons](/components/buttons/#button-plugin). However, they are conveyed differently by assistive technologies: the checkbox toggles will be announced by screen readers as "checked"/"not checked" (since, despite their appearance, they are fundamentally still checkboxes), whereas the button plugin toggle buttons will be announced as "button"/"button pressed". The choice between these two approaches will depend on the type of toggle you are creating, and whether or not the toggle will make sense to users when announced as a checkbox or as an actual button.
@@ -168,6 +178,8 @@ The v5 spelling — `.form-check` wrapping a `.form-check-input` and a `.form-ch
 +   <label for="c">Label</label>
 + </div>
 ```
+
+The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label tied to it by `id`/`for` — also still works and renders identically.
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 

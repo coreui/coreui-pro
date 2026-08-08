@@ -1085,6 +1085,26 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
 - `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
+- **Toggle buttons: `.btn-check` moves onto the `<label>`, with the input nested
+  inside.** A toggle button was two elements held together by an `id`/`for`
+  pair; it is one element now, so nothing can fall out of sync:
+
+  ```diff
+  - <input type="checkbox" class="btn-check" id="t" autocomplete="off">
+  - <label class="btn btn-primary" for="t">Toggle</label>
+  + <label class="btn btn-primary btn-check">
+  +   <input type="checkbox" autocomplete="off">
+  +   Toggle
+  + </label>
+  ```
+
+  The states read the nested input with `:has()` instead of sibling selectors,
+  and a `.btn-group` stops having to reason about a hidden child that is not a
+  button. **The old spelling keeps working** — the label carries `.btn` in the
+  new one, so the two select themselves apart — and renders identically; it is
+  deprecated in v6 and removed in v7. One behavior is deliberately carried over:
+  a disabled toggle is dimmed rather than repainted, so a disabled checked
+  toggle still reads as checked.
 
 #### Utilities API: one `property` map replaces `css-var`, `css-variable-name` and `local-vars`
 
