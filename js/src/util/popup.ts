@@ -40,6 +40,7 @@ type PopupConfig = {
   onShown: (() => void) | null
   placement: string
   returnFocus: boolean
+  topLayer: boolean
 }
 
 const Default: PopupConfig = {
@@ -55,7 +56,8 @@ const Default: PopupConfig = {
   onShow: null,
   onShown: null,
   placement: 'bottom-start',
-  returnFocus: true
+  returnFocus: true,
+  topLayer: true
 }
 
 const DefaultType = {
@@ -71,7 +73,8 @@ const DefaultType = {
   onShow: '(function|null)',
   onShown: '(function|null)',
   placement: 'string',
-  returnFocus: 'boolean'
+  returnFocus: 'boolean',
+  topLayer: 'boolean'
 }
 
 /**
@@ -151,6 +154,8 @@ class Popup extends Config {
       this._container.append(this._content!)
     }
 
+    this._showPopover()
+
     if (!this.isMobile) {
       this._startPositioning()
     }
@@ -172,6 +177,7 @@ class Popup extends Config {
     execute(this._config.onHide)
     this._isShown = false
     this._stopPositioning()
+    this._hidePopover()
     this._removeDismissListeners()
 
     if (this._focustrap) {
@@ -205,6 +211,42 @@ class Popup extends Config {
   }
 
   // Private
+
+  // Promote the surface to the top layer with the Popover API. `manual` (not
+  // `auto`) because the popup owns its own dismissal: light dismiss would race
+  // our click/keydown listeners and bypass `returnFocus`.
+  _showPopover(): void {
+    if (!this._config.topLayer || !this._supportsPopover()) {
+      return
+    }
+
+    this._content!.setAttribute('popover', 'manual')
+
+    if (!this._content!.matches(':popover-open')) {
+      this._content!.showPopover()
+    }
+  }
+
+  _hidePopover(): void {
+    if (!this._config.topLayer || !this._supportsPopover() || !this._content) {
+      return
+    }
+
+    if (this._content.matches(':popover-open')) {
+      this._content.hidePopover()
+    }
+
+    this._content.removeAttribute('popover')
+  }
+
+  _supportsPopover(): boolean {
+    return typeof this._content?.showPopover === 'function'
+  }
+
+  _isInTopLayer(): boolean {
+    return Boolean(this._content?.matches(':popover-open'))
+  }
+
   _startPositioning(): void {
     this._cleanupAutoUpdate = autoUpdate(this._anchor!, this._content, () => this._updatePosition())
   }
@@ -224,10 +266,15 @@ class Popup extends Config {
       shift()
     ]
 
+    // A top-layer element's containing block is the viewport, so it has no
+    // offsetParent to measure against — `absolute` would resolve the
+    // coordinates against the wrong origin.
+    const strategy = this._isInTopLayer() ? 'fixed' : 'absolute'
+
     computePosition(this._anchor!, this._content!, {
       middleware,
       placement: this._resolvePlacement() as any,
-      strategy: 'absolute'
+      strategy
     }).then(({ x, y }) => {
       // dispose() can null the content while computePosition is in flight
       if (!this._content || !this._content.isConnected) {
@@ -237,7 +284,7 @@ class Popup extends Config {
       Object.assign(this._content.style, {
         insetInlineStart: '0',
         left: `${x}px`,
-        position: 'absolute',
+        position: strategy,
         top: `${y}px`
       })
     })

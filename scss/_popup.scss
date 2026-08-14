@@ -73,6 +73,29 @@ $popup-tokens: defaults(
       display: block;
       opacity: 1;
     }
+
+    // The Popover API puts the surface in the top layer, which escapes every
+    // ancestor's overflow and stacking context. Its UA styles centre the
+    // element in the viewport (`inset: 0; margin: auto`) and give it a frame,
+    // all of which the anchored presentation has to undo — Floating UI writes
+    // the real coordinates into `left`/`top`.
+    &[popover] {
+      inset: auto;
+      width: fit-content;
+      height: fit-content;
+      padding: 0;
+      margin: 0;
+      overflow: visible;
+      color: inherit;
+      background-color: var(--#{$prefix}popup-bg);
+      border: var(--#{$prefix}popup-border-width) solid var(--#{$prefix}popup-border-color);
+
+      // A popover is hidden by the UA until it is open; `.show` must not
+      // override that, or a closed popup would paint in normal flow.
+      &:not(:popover-open) {
+        display: none;
+      }
+    }
   }
 
   @starting-style {
