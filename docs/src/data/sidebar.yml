@@ -247,6 +247,16 @@
       to: /components/close-button/
     - title: Collapse
       to: /components/collapse/
+    - title: Dialog
+      to: /components/dialog/
+      badge:
+        color: success
+        text: NEW
+    - title: Drawer
+      to: /components/drawer/
+      badge:
+        color: success
+        text: NEW
     - title: Dropdowns
       to: /components/dropdowns/
     - title: Footer
