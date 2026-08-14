@@ -85,7 +85,11 @@ $offcanvas-tokens: defaults(
         z-index: var(--#{$prefix}offcanvas-zindex);
         display: flex;
         flex-direction: column;
+        // The UA sizes a <dialog> to fit-content — reset to auto so the
+        // placement insets stretch the panel to the full viewport edge
+        width: auto;
         max-width: 100%;
+        height: auto;
         max-height: 100%;
         padding: 0;
         margin: 0;
