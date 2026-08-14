@@ -248,7 +248,17 @@ class Popup extends Config {
   }
 
   _startPositioning(): void {
-    this._cleanupAutoUpdate = autoUpdate(this._anchor!, this._content, () => this._updatePosition())
+    // A top-layer panel is `position: fixed`, so it no longer scrolls with the
+    // content the way an absolutely positioned one did — every frame has to be
+    // caught up in JS. Scroll events alone lag behind compositor-driven
+    // scrolling (the panel visibly drifts, then snaps back), so the top layer
+    // pays for a per-frame loop; the in-flow path keeps the cheap listeners.
+    this._cleanupAutoUpdate = autoUpdate(
+      this._anchor!,
+      this._content,
+      () => this._updatePosition(),
+      { animationFrame: this._isInTopLayer() }
+    )
   }
 
   _stopPositioning(): void {

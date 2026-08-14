@@ -238,6 +238,9 @@ describe('Popup — top layer experiment', () => {
       popup.dispose()
     })
 
+    // Correctness only. How *smooth* the tracking looks depends on
+    // compositor-driven scrolling, which a synthetic scrollTo cannot
+    // reproduce — that has to be judged in a real browser.
     it('should keep tracking the anchor after the page scrolls', async () => {
       document.body.style.height = '3000px'
       host.style.top = '400px'
@@ -264,6 +267,28 @@ describe('Popup — top layer experiment', () => {
       popup.dispose()
       window.scrollTo(0, 0)
       document.body.style.height = ''
+    })
+  })
+
+  describe('scroll tracking cost', () => {
+    it('should drive per-frame updates only while in the top layer', () => {
+      const inFlow = buildPopup([
+        '<button type="button" class="anchor">anchor</button>',
+        '<div class="popup show">panel</div>'
+      ].join(''), { topLayer: false })
+
+      inFlow.show()
+      expect(inFlow._isInTopLayer()).toBeFalse()
+      inFlow.dispose()
+
+      const promoted = buildPopup([
+        '<button type="button" class="anchor">anchor</button>',
+        '<div class="popup show">panel</div>'
+      ].join(''), { topLayer: true })
+
+      promoted.show()
+      expect(promoted._isInTopLayer()).toBeTrue()
+      promoted.dispose()
     })
   })
 
