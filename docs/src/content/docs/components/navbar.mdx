@@ -551,7 +551,7 @@ In the example below, to create an offcanvas navbar that is always collapsed acr
       <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <dialog class="offcanvas offcanvas-end" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
           <button type="button" class="btn-close text-reset" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
@@ -583,7 +583,7 @@ In the example below, to create an offcanvas navbar that is always collapsed acr
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
         </div>
-      </div>
+      </dialog>
     </div>
   </nav>`} />
 
@@ -595,9 +595,9 @@ To create an offcanvas navbar that expands into a normal navbar at a specific br
   <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#navbarOffcanvasLg" aria-controls="navbarOffcanvasLg">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="navbarOffcanvasLg" aria-labelledby="navbarOffcanvasLgLabel">
+  <dialog class="offcanvas offcanvas-end" id="navbarOffcanvasLg" aria-labelledby="navbarOffcanvasLgLabel">
     ...
-  </div>
+  </dialog>
 </nav>
 ```
 
@@ -609,7 +609,7 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
       <button class="navbar-toggler" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasDarkNavbar" aria-controls="offcanvasDarkNavbar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
+      <dialog class="offcanvas offcanvas-end text-bg-dark" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
           <button type="button" class="btn-close btn-close-white" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
@@ -641,7 +641,7 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
             <button class="btn btn-success" type="submit">Search</button>
           </form>
         </div>
-      </div>
+      </dialog>
     </div>
   </nav>`} />
 

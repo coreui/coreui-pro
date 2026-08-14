@@ -38,9 +38,7 @@
     <div class="container mt-3">
       <h1>Modal <small>Bootstrap Visual Test</small></h1>
 
-      <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
+      <dialog class="modal modal-scrollable" id="myModal" aria-labelledby="myModalLabel">
             <div class="modal-header">
               <h1 class="modal-title fs-4" id="myModalLabel">Modal title</h1>
               <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
@@ -119,13 +117,9 @@
               <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary">Save changes</button>
             </div>
-          </div>
-        </div>
-      </div>
+      </dialog>
 
-      <div class="modal fade" id="firefoxModal" tabindex="-1" aria-labelledby="firefoxModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
+      <dialog class="modal" id="firefoxModal" aria-labelledby="firefoxModalLabel">
             <div class="modal-header">
               <h1 class="modal-title fs-4" id="firefoxModalLabel">Firefox Bug Test</h1>
               <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
@@ -143,13 +137,9 @@
               <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary">Save changes</button>
             </div>
-          </div>
-        </div>
-      </div>
+      </dialog>
 
-      <div class="modal fade" id="slowModal" tabindex="-1" aria-labelledby="slowModalLabel" aria-hidden="true" style="transition-duration: 5s;">
-        <div class="modal-dialog" style="transition-duration: inherit;">
-          <div class="modal-content">
+      <dialog class="modal" id="slowModal" aria-labelledby="slowModalLabel" style="--cui-modal-transition-duration: 5s;">
             <div class="modal-header">
               <h1 class="modal-title fs-4" id="slowModalLabel">Lorem slowly</h1>
               <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
@@ -161,9 +151,7 @@
               <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Close</button>
               <button type="button" class="btn btn-primary">Save changes</button>
             </div>
-          </div>
-        </div>
-      </div>
+      </dialog>
 
       <button type="button" class="btn btn-primary btn-lg" data-coreui-toggle="modal" data-coreui-target="#myModal">
         Launch demo modal

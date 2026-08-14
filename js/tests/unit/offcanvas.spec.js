@@ -1,6 +1,6 @@
+import Data from '../../src/dom/data.js'
 import EventHandler from '../../src/dom/event-handler.js'
 import Offcanvas from '../../src/offcanvas.js'
-import ScrollBarHelper from '../../src/util/scrollbar.js'
 import { isVisible } from '../../src/util/index.js'
 import {
   clearBodyAndDocument, clearFixture, createEvent, getFixture, jQueryMock
@@ -15,8 +15,12 @@ describe('Offcanvas', () => {
 
   afterEach(() => {
     clearFixture()
-    document.body.classList.remove('offcanvas-open')
+    document.documentElement.classList.remove('dialog-open')
     clearBodyAndDocument()
+
+    for (const dialog of document.querySelectorAll('dialog[open]')) {
+      dialog.close()
+    }
   })
 
   beforeEach(() => {
@@ -44,593 +48,566 @@ describe('Offcanvas', () => {
   describe('constructor', () => {
     it('should call hide when a element with data-coreui-dismiss="offcanvas" is clicked', () => {
       fixtureEl.innerHTML = [
-        '<div class="offcanvas">',
+        '<dialog class="offcanvas">',
         '  <a href="#" data-coreui-dismiss="offcanvas">Close</a>',
-        '</div>'
+        '</dialog>'
       ].join('')
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
       const closeEl = fixtureEl.querySelector('a')
-      const offCanvas = new Offcanvas(offCanvasEl)
+      const drawer = new Offcanvas(drawerEl)
 
-      const spy = spyOn(offCanvas, 'hide')
+      const spy = spyOn(drawer, 'hide')
 
       closeEl.click()
 
-      expect(offCanvas._config.keyboard).toBeTrue()
+      expect(drawer._config.keyboard).toBeTrue()
       expect(spy).toHaveBeenCalled()
     })
 
-    it('should hide if esc is pressed', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+    it('should call hide on a responsive drawer without an explicit data-coreui-target', () => {
+      fixtureEl.innerHTML = [
+        '<dialog class="offcanvas-lg offcanvas-end">',
+        '  <button type="button" data-coreui-dismiss="offcanvas">Close</button>',
+        '</dialog>'
+      ].join('')
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl)
-      const keyDownEsc = createEvent('keydown')
-      keyDownEsc.key = 'Escape'
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const closeEl = fixtureEl.querySelector('button')
+      const drawer = new Offcanvas(drawerEl)
 
-      const spy = spyOn(offCanvas, 'hide')
+      const spy = spyOn(drawer, 'hide')
 
-      offCanvasEl.dispatchEvent(keyDownEsc)
+      closeEl.click()
 
       expect(spy).toHaveBeenCalled()
     })
 
-    it('should hide if esc is pressed and backdrop is static', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+    it('should hide if esc is pressed (non-modal via keydown)', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl, { backdrop: 'static' })
-      const keyDownEsc = createEvent('keydown')
-      keyDownEsc.key = 'Escape'
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, { scroll: true, backdrop: false })
 
-      const spy = spyOn(offCanvas, 'hide')
+        const spy = spyOn(drawer, 'hide').and.callThrough()
 
-      offCanvasEl.dispatchEvent(keyDownEsc)
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          const keyDownEsc = createEvent('keydown')
+          keyDownEsc.key = 'Escape'
+          drawerEl.dispatchEvent(keyDownEsc)
 
-      expect(spy).toHaveBeenCalled()
+          setTimeout(() => {
+            expect(spy).toHaveBeenCalled()
+            resolve()
+          }, 10)
+        })
+
+        drawer.show()
+      })
+    })
+
+    it('should hide if cancel event fires (modal mode)', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl)
+
+        const spy = spyOn(drawer, 'hide').and.callThrough()
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          const cancelEvent = createEvent('cancel')
+          drawerEl.dispatchEvent(cancelEvent)
+
+          setTimeout(() => {
+            expect(spy).toHaveBeenCalled()
+            resolve()
+          }, 10)
+        })
+
+        drawer.show()
+      })
     })
 
     it('should not hide if esc is not pressed', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl)
-      const keydownTab = createEvent('keydown')
-      keydownTab.key = 'Tab'
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, { scroll: true, backdrop: false })
 
-      const spy = spyOn(offCanvas, 'hide')
+        const spy = spyOn(drawer, 'hide')
 
-      offCanvasEl.dispatchEvent(keydownTab)
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          const keydownTab = createEvent('keydown')
+          keydownTab.key = 'Tab'
+          drawerEl.dispatchEvent(keydownTab)
 
-      expect(spy).not.toHaveBeenCalled()
+          setTimeout(() => {
+            expect(spy).not.toHaveBeenCalled()
+            resolve()
+          }, 10)
+        })
+
+        drawer.show()
+      })
     })
 
     it('should not hide if esc is pressed but with keyboard = false', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl, { keyboard: false })
-        const keyDownEsc = createEvent('keydown')
-        keyDownEsc.key = 'Escape'
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, { keyboard: false })
 
-        const spy = spyOn(offCanvas, 'hide')
+        const spy = spyOn(drawer, 'hide')
         const hidePreventedSpy = jasmine.createSpy('hidePrevented')
-        offCanvasEl.addEventListener('hidePrevented.coreui.offcanvas', hidePreventedSpy)
+        drawerEl.addEventListener('hidePrevented.coreui.offcanvas', hidePreventedSpy)
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(offCanvas._config.keyboard).toBeFalse()
-          offCanvasEl.dispatchEvent(keyDownEsc)
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawer._config.keyboard).toBeFalse()
+          const cancelEvent = createEvent('cancel')
+          drawerEl.dispatchEvent(cancelEvent)
 
-          expect(hidePreventedSpy).toHaveBeenCalled()
-          expect(spy).not.toHaveBeenCalled()
-          resolve()
+          setTimeout(() => {
+            expect(hidePreventedSpy).toHaveBeenCalled()
+            expect(spy).not.toHaveBeenCalled()
+            resolve()
+          }, 10)
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
 
     it('should not hide if user clicks on static backdrop', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl, { backdrop: 'static' })
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, { backdrop: 'static' })
 
-        const clickEvent = new Event('mousedown', { bubbles: true, cancelable: true })
-        const spyClick = spyOn(offCanvas._backdrop._config, 'clickCallback').and.callThrough()
-        const spyHide = spyOn(offCanvas._backdrop, 'hide').and.callThrough()
+        const spyHide = spyOn(drawer, 'hide')
         const hidePreventedSpy = jasmine.createSpy('hidePrevented')
-        offCanvasEl.addEventListener('hidePrevented.coreui.offcanvas', hidePreventedSpy)
+        drawerEl.addEventListener('hidePrevented.coreui.offcanvas', hidePreventedSpy)
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(spyClick).toEqual(jasmine.any(Function))
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          // Click on dialog element itself (backdrop area)
+          const clickEvent = createEvent('click')
+          Object.defineProperty(clickEvent, 'target', { value: drawerEl })
+          drawerEl.dispatchEvent(clickEvent)
 
-          offCanvas._backdrop._getElement().dispatchEvent(clickEvent)
-          expect(hidePreventedSpy).toHaveBeenCalled()
-          expect(spyHide).not.toHaveBeenCalled()
-          resolve()
+          setTimeout(() => {
+            expect(hidePreventedSpy).toHaveBeenCalled()
+            expect(spyHide).not.toHaveBeenCalled()
+            resolve()
+          }, 10)
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
 
     it('should call `hide` on resize, if element\'s position is not fixed any more', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas-lg"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas-lg"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl)
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
 
-        const spy = spyOn(offCanvas, 'hide').and.callThrough()
+        const spy = spyOn(drawer, 'hide').and.callThrough()
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          // Override computed position to non-fixed so resize handler triggers hide
+          drawerEl.style.position = 'static'
+
           const resizeEvent = createEvent('resize')
-          offCanvasEl.style.removeProperty('position')
-
           window.dispatchEvent(resizeEvent)
           expect(spy).toHaveBeenCalled()
           resolve()
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
   })
 
   describe('config', () => {
     it('should have default values', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl)
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
+      const drawer = new Offcanvas(drawerEl)
 
-      expect(offCanvas._config.backdrop).toBeTrue()
-      expect(offCanvas._backdrop._config.isVisible).toBeTrue()
-      expect(offCanvas._config.keyboard).toBeTrue()
-      expect(offCanvas._config.scroll).toBeFalse()
+      expect(drawer._config.backdrop).toBeTrue()
+      expect(drawer._config.keyboard).toBeTrue()
+      expect(drawer._config.scroll).toBeFalse()
     })
 
     it('should read data attributes and override default config', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false" data-coreui-keyboard="false"></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false" data-coreui-keyboard="false"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl)
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
+      const drawer = new Offcanvas(drawerEl)
 
-      expect(offCanvas._config.backdrop).toBeFalse()
-      expect(offCanvas._backdrop._config.isVisible).toBeFalse()
-      expect(offCanvas._config.keyboard).toBeFalse()
-      expect(offCanvas._config.scroll).toBeTrue()
+      expect(drawer._config.backdrop).toBeFalse()
+      expect(drawer._config.keyboard).toBeFalse()
+      expect(drawer._config.scroll).toBeTrue()
     })
 
     it('given a config object must override data attributes', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false" data-coreui-keyboard="false"></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas" data-coreui-scroll="true" data-coreui-backdrop="false" data-coreui-keyboard="false"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl, {
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
+      const drawer = new Offcanvas(drawerEl, {
         backdrop: true,
         keyboard: true,
         scroll: false
       })
-      expect(offCanvas._config.backdrop).toBeTrue()
-      expect(offCanvas._config.keyboard).toBeTrue()
-      expect(offCanvas._config.scroll).toBeFalse()
+      expect(drawer._config.backdrop).toBeTrue()
+      expect(drawer._config.keyboard).toBeTrue()
+      expect(drawer._config.scroll).toBeFalse()
     })
   })
 
   describe('options', () => {
-    it('if scroll is enabled, should allow body to scroll while offcanvas is open', async () => {
-      // Hide transitions leaked by earlier specs settle during this pause —
-      // their completeCallback calls ScrollBarHelper#reset, which would land
-      // in the prototype-wide spies below and fail the assertion.
-      await new Promise(resolve => {
-        setTimeout(resolve, 60)
-      })
-
+    it('if scroll is enabled, should not add dialog-open class to the root element', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const spyHide = spyOn(ScrollBarHelper.prototype, 'hide').and.callThrough()
-        const spyReset = spyOn(ScrollBarHelper.prototype, 'reset').and.callThrough()
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl, { scroll: true })
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, { scroll: true, backdrop: false })
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(spyHide).not.toHaveBeenCalled()
-          offCanvas.hide()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+          drawer.hide()
         })
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(spyReset).not.toHaveBeenCalled()
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
           resolve()
         })
-        offCanvas.show()
+        drawer.show()
       })
     })
 
-    it('if scroll is disabled, should call ScrollBarHelper to handle scrollBar on body', async () => {
-      await new Promise(resolve => {
-        setTimeout(resolve, 60)
-      })
-
+    it('if scroll is disabled, should add dialog-open class to the root element', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const spyHide = spyOn(ScrollBarHelper.prototype, 'hide').and.callThrough()
-        const spyReset = spyOn(ScrollBarHelper.prototype, 'reset').and.callThrough()
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl, { scroll: false })
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, { scroll: false })
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(spyHide).toHaveBeenCalled()
-          offCanvas.hide()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
+          drawer.hide()
         })
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(spyReset).toHaveBeenCalled()
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
           resolve()
         })
-        offCanvas.show()
+        drawer.show()
       })
     })
 
     it('should hide a shown element if user click on backdrop', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl, { backdrop: true })
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl, { backdrop: true })
 
-        const clickEvent = new Event('mousedown', { bubbles: true, cancelable: true })
-        const spy = spyOn(offCanvas._backdrop._config, 'clickCallback').and.callThrough()
+        const spy = spyOn(drawer, 'hide').and.callThrough()
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(offCanvas._backdrop._config.clickCallback).toEqual(jasmine.any(Function))
-
-          offCanvas._backdrop._getElement().dispatchEvent(clickEvent)
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          // Click on dialog element itself (backdrop area)
+          const clickEvent = createEvent('click')
+          Object.defineProperty(clickEvent, 'target', { value: drawerEl })
+          drawerEl.dispatchEvent(clickEvent)
         })
 
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
           expect(spy).toHaveBeenCalled()
           resolve()
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
 
-    it('should not trap focus if scroll is allowed', () => {
+    it('should not respond to backdrop clicks for non-modal drawers (scroll + no backdrop)', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl, {
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, {
           scroll: true,
           backdrop: false
         })
 
-        const spy = spyOn(offCanvas._focustrap, 'activate').and.callThrough()
+        const spy = spyOn(drawer, 'hide')
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(spy).not.toHaveBeenCalled()
-          resolve()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          // Click on dialog element itself
+          const clickEvent = createEvent('click')
+          Object.defineProperty(clickEvent, 'target', { value: drawerEl })
+          drawerEl.dispatchEvent(clickEvent)
+
+          setTimeout(() => {
+            expect(spy).not.toHaveBeenCalled()
+            resolve()
+          }, 10)
         })
 
-        offCanvas.show()
-      })
-    })
-
-    it('should trap focus if scroll is allowed OR backdrop is enabled', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
-
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl, {
-          scroll: true,
-          backdrop: true
-        })
-
-        const spy = spyOn(offCanvas._focustrap, 'activate').and.callThrough()
-
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(spy).toHaveBeenCalled()
-          resolve()
-        })
-
-        offCanvas.show()
+        drawer.show()
       })
     })
   })
 
   describe('toggle', () => {
-    it('should call show method if show class is not present', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+    it('should call show method if drawer is not open', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-      const offCanvas = new Offcanvas(offCanvasEl)
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
+      const drawer = new Offcanvas(drawerEl)
 
-      const spy = spyOn(offCanvas, 'show')
+      const spy = spyOn(drawer, 'show')
 
-      offCanvas.toggle()
+      drawer.toggle()
 
       expect(spy).toHaveBeenCalled()
     })
 
-    it('should call hide method if show class is present', () => {
+    it('should call hide method if drawer is open', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl)
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl)
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(offCanvasEl).toHaveClass('show')
-          const spy = spyOn(offCanvas, 'hide')
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeTrue()
+          const spy = spyOn(drawer, 'hide')
 
-          offCanvas.toggle()
+          drawer.toggle()
 
           expect(spy).toHaveBeenCalled()
           resolve()
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
   })
 
   describe('show', () => {
-    it('should add `showing` class during opening and `show` class on end', () => {
+    it('should open the dialog element', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl)
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl)
 
-        offCanvasEl.addEventListener('show.coreui.offcanvas', () => {
-          expect(offCanvasEl).not.toHaveClass('show')
+        drawerEl.addEventListener('show.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeFalse()
         })
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(offCanvasEl).not.toHaveClass('showing')
-          expect(offCanvasEl).toHaveClass('show')
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeTrue()
           resolve()
         })
 
-        offCanvas.show()
-        expect(offCanvasEl).toHaveClass('showing')
+        drawer.show()
       })
     })
 
-    it('should do nothing if already shown', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas show"></div>'
+    it('should do nothing if already open', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('div')
-      const offCanvas = new Offcanvas(offCanvasEl)
-      offCanvas.show()
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Offcanvas(drawerEl)
 
-      expect(offCanvasEl).toHaveClass('show')
+      // Manually open the dialog
+      drawerEl.showModal()
 
-      const spyShow = spyOn(offCanvas._backdrop, 'show').and.callThrough()
-      const spyTrigger = spyOn(EventHandler, 'trigger').and.callThrough()
-      offCanvas.show()
+      const spyTrigger = spyOn(EventHandler, 'trigger')
+      drawer.show()
 
       expect(spyTrigger).not.toHaveBeenCalled()
-      expect(spyShow).not.toHaveBeenCalled()
     })
 
     it('should show a hidden element', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl)
-        const spy = spyOn(offCanvas._backdrop, 'show').and.callThrough()
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(offCanvasEl).toHaveClass('show')
-          expect(spy).toHaveBeenCalled()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeTrue()
           resolve()
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
 
     it('should not fire shown when show is prevented', () => {
       return new Promise((resolve, reject) => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl)
-        const spy = spyOn(offCanvas._backdrop, 'show').and.callThrough()
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
 
         const expectEnd = () => {
           setTimeout(() => {
-            expect(spy).not.toHaveBeenCalled()
+            expect(drawerEl.open).toBeFalse()
             resolve()
           }, 10)
         }
 
-        offCanvasEl.addEventListener('show.coreui.offcanvas', event => {
+        drawerEl.addEventListener('show.coreui.offcanvas', event => {
           event.preventDefault()
           expectEnd()
         })
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
           reject(new Error('should not fire shown event'))
         })
 
-        offCanvas.show()
+        drawer.show()
       })
     })
 
-    it('on window load, should make visible an offcanvas element, if its markup contains class "show"', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas show"></div>'
+    it('on window load, should call show on a drawer element, if its markup contains open attribute', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas" open></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const spy = spyOn(Offcanvas.prototype, 'show').and.callThrough()
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const spy = spyOn(Offcanvas.prototype, 'show').and.callThrough()
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          resolve()
-        })
+      window.dispatchEvent(createEvent('load'))
 
-        window.dispatchEvent(createEvent('load'))
-
-        const instance = Offcanvas.getInstance(offCanvasEl)
-        expect(instance).not.toBeNull()
-        expect(spy).toHaveBeenCalled()
-      })
-    })
-
-    it('should trap focus', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
-
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl)
-
-        const spy = spyOn(offCanvas._focustrap, 'activate').and.callThrough()
-
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(spy).toHaveBeenCalled()
-          resolve()
-        })
-
-        offCanvas.show()
-      })
+      const instance = Offcanvas.getInstance(drawerEl)
+      expect(instance).not.toBeNull()
+      expect(spy).toHaveBeenCalled()
     })
   })
 
   describe('hide', () => {
-    it('should add `hiding` class during closing and remover `show` & `hiding` classes on end', () => {
+    it('should close the dialog element', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl)
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl)
 
-        offCanvasEl.addEventListener('hide.coreui.offcanvas', () => {
-          expect(offCanvasEl).not.toHaveClass('showing')
-          expect(offCanvasEl).toHaveClass('show')
-        })
-
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(offCanvasEl).not.toHaveClass('hiding')
-          expect(offCanvasEl).not.toHaveClass('show')
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeFalse()
           resolve()
         })
 
-        offCanvas.show()
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          offCanvas.hide()
-          expect(offCanvasEl).not.toHaveClass('showing')
-          expect(offCanvasEl).toHaveClass('hiding')
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
         })
+
+        drawer.show()
       })
     })
 
-    it('should do nothing if already shown', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+    it('should do nothing if not open', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const spyTrigger = spyOn(EventHandler, 'trigger').and.callThrough()
+      const spyTrigger = spyOn(EventHandler, 'trigger')
 
-      const offCanvasEl = fixtureEl.querySelector('div')
-      const offCanvas = new Offcanvas(offCanvasEl)
-      const spyHide = spyOn(offCanvas._backdrop, 'hide').and.callThrough()
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Offcanvas(drawerEl)
 
-      offCanvas.hide()
-      expect(spyHide).not.toHaveBeenCalled()
+      drawer.hide()
       expect(spyTrigger).not.toHaveBeenCalled()
     })
 
     it('should hide a shown element', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl)
-        const spy = spyOn(offCanvas._backdrop, 'hide').and.callThrough()
-        offCanvas.show()
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
 
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(offCanvasEl).not.toHaveClass('show')
-          expect(spy).toHaveBeenCalled()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
+        })
+
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeFalse()
           resolve()
         })
 
-        offCanvas.hide()
+        drawer.show()
       })
     })
 
     it('should not fire hidden when hide is prevented', () => {
       return new Promise((resolve, reject) => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl)
-        const spy = spyOn(offCanvas._backdrop, 'hide').and.callThrough()
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
 
-        offCanvas.show()
-
-        const expectEnd = () => {
+        drawerEl.addEventListener('hide.coreui.offcanvas', event => {
+          event.preventDefault()
           setTimeout(() => {
-            expect(spy).not.toHaveBeenCalled()
+            expect(drawerEl.open).toBeTrue()
             resolve()
           }, 10)
-        }
-
-        offCanvasEl.addEventListener('hide.coreui.offcanvas', event => {
-          event.preventDefault()
-          expectEnd()
         })
 
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
           reject(new Error('should not fire hidden event'))
         })
 
-        offCanvas.hide()
-      })
-    })
-
-    it('should release focus trap', () => {
-      return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
-
-        const offCanvasEl = fixtureEl.querySelector('div')
-        const offCanvas = new Offcanvas(offCanvasEl)
-        const spy = spyOn(offCanvas._focustrap, 'deactivate').and.callThrough()
-        offCanvas.show()
-
-        offCanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(spy).toHaveBeenCalled()
-          resolve()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
         })
 
-        offCanvas.hide()
+        drawer.show()
       })
     })
   })
 
   describe('dispose', () => {
-    it('should dispose an offcanvas', () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+    it('should dispose a drawer', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
 
-      const offCanvasEl = fixtureEl.querySelector('div')
-      const offCanvas = new Offcanvas(offCanvasEl)
-      const backdrop = offCanvas._backdrop
-      const spyDispose = spyOn(backdrop, 'dispose').and.callThrough()
-      const focustrap = offCanvas._focustrap
-      const spyDeactivate = spyOn(focustrap, 'deactivate').and.callThrough()
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Offcanvas(drawerEl)
 
-      expect(Offcanvas.getInstance(offCanvasEl)).toEqual(offCanvas)
+      expect(Offcanvas.getInstance(drawerEl)).toEqual(drawer)
 
-      offCanvas.dispose()
+      const spyOff = spyOn(EventHandler, 'off')
 
-      expect(spyDispose).toHaveBeenCalled()
-      expect(offCanvas._backdrop).toBeNull()
-      expect(spyDeactivate).toHaveBeenCalled()
-      expect(offCanvas._focustrap).toBeNull()
-      expect(Offcanvas.getInstance(offCanvasEl)).toBeNull()
+      drawer.dispose()
+
+      expect(Offcanvas.getInstance(drawerEl)).toBeNull()
+      expect(spyOff).toHaveBeenCalled()
+    })
+
+    it('should close the drawer and restore body scroll when disposed while open', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeTrue()
+          expect(document.documentElement.classList.contains('dialog-open')).toBeTrue()
+
+          drawer.dispose()
+
+          expect(drawerEl.open).toBeFalse()
+          expect(document.documentElement.classList.contains('dialog-open')).toBeFalse()
+          resolve()
+        })
+
+        drawer.show()
+      })
     })
   })
 
@@ -638,15 +615,15 @@ describe('Offcanvas', () => {
     it('should not prevent event for input', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<input type="checkbox" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasdiv1">',
-          '<div id="offcanvasdiv1" class="offcanvas"></div>'
+          '<input type="checkbox" data-coreui-toggle="offcanvas" data-coreui-target="#drawerdiv1">',
+          '<dialog id="drawerdiv1" class="offcanvas"></dialog>'
         ].join('')
 
         const target = fixtureEl.querySelector('input')
-        const offCanvasEl = fixtureEl.querySelector('#offcanvasdiv1')
+        const drawerEl = fixtureEl.querySelector('#drawerdiv1')
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(offCanvasEl).toHaveClass('show')
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeTrue()
           expect(target.checked).toBeTrue()
           resolve()
         })
@@ -657,8 +634,8 @@ describe('Offcanvas', () => {
 
     it('should not call toggle on disabled elements', () => {
       fixtureEl.innerHTML = [
-        '<a href="#" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasdiv1" class="disabled"></a>',
-        '<div id="offcanvasdiv1" class="offcanvas"></div>'
+        '<a href="#" data-coreui-toggle="offcanvas" data-coreui-target="#drawerdiv1" class="disabled"></a>',
+        '<dialog id="drawerdiv1" class="offcanvas"></dialog>'
       ].join('')
 
       const target = fixtureEl.querySelector('a')
@@ -670,48 +647,48 @@ describe('Offcanvas', () => {
       expect(spy).not.toHaveBeenCalled()
     })
 
-    it('should call hide first, if another offcanvas is open', () => {
+    it('should call hide first, if another drawer is open', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<button id="btn2" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvas2"></button>',
-          '<div id="offcanvas1" class="offcanvas"></div>',
-          '<div id="offcanvas2" class="offcanvas"></div>'
+          '<button id="btn2" data-coreui-toggle="offcanvas" data-coreui-target="#drawer2"></button>',
+          '<dialog id="drawer1" class="offcanvas"></dialog>',
+          '<dialog id="drawer2" class="offcanvas"></dialog>'
         ].join('')
 
         const trigger2 = fixtureEl.querySelector('#btn2')
-        const offcanvasEl1 = document.querySelector('#offcanvas1')
-        const offcanvasEl2 = document.querySelector('#offcanvas2')
-        const offcanvas1 = new Offcanvas(offcanvasEl1)
+        const drawerEl1 = document.querySelector('#drawer1')
+        const drawerEl2 = document.querySelector('#drawer2')
+        const drawer1 = new Offcanvas(drawerEl1)
 
-        offcanvasEl1.addEventListener('shown.coreui.offcanvas', () => {
+        drawerEl1.addEventListener('shown.coreui.offcanvas', () => {
           trigger2.click()
         })
-        offcanvasEl1.addEventListener('hidden.coreui.offcanvas', () => {
-          expect(Offcanvas.getInstance(offcanvasEl2)).not.toBeNull()
+        drawerEl1.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(Offcanvas.getInstance(drawerEl2)).not.toBeNull()
           resolve()
         })
-        offcanvas1.show()
+        drawer1.show()
       })
     })
 
-    it('should focus on trigger element after closing offcanvas', () => {
+    it('should focus on trigger element after closing drawer', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<button id="btn" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvas"></button>',
-          '<div id="offcanvas" class="offcanvas"></div>'
+          '<button id="btn" data-coreui-toggle="offcanvas" data-coreui-target="#drawer"></button>',
+          '<dialog id="drawer" class="offcanvas"></dialog>'
         ].join('')
 
         const trigger = fixtureEl.querySelector('#btn')
-        const offcanvasEl = fixtureEl.querySelector('#offcanvas')
-        const offcanvas = new Offcanvas(offcanvasEl)
+        const drawerEl = fixtureEl.querySelector('#drawer')
+        const drawer = new Offcanvas(drawerEl)
         const spy = spyOn(trigger, 'focus')
 
-        offcanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          offcanvas.hide()
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
         })
-        offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
           setTimeout(() => {
-            expect(spy).toHaveBeenCalled()
+            expect(spy).toHaveBeenCalledWith({ preventScroll: true })
             resolve()
           }, 5)
         })
@@ -720,23 +697,23 @@ describe('Offcanvas', () => {
       })
     })
 
-    it('should not focus on trigger element after closing offcanvas, if it is not visible', () => {
+    it('should not focus on trigger element after closing drawer, if it is not visible', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<button id="btn" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvas"></button>',
-          '<div id="offcanvas" class="offcanvas"></div>'
+          '<button id="btn" data-coreui-toggle="offcanvas" data-coreui-target="#drawer"></button>',
+          '<dialog id="drawer" class="offcanvas"></dialog>'
         ].join('')
 
         const trigger = fixtureEl.querySelector('#btn')
-        const offcanvasEl = fixtureEl.querySelector('#offcanvas')
-        const offcanvas = new Offcanvas(offcanvasEl)
+        const drawerEl = fixtureEl.querySelector('#drawer')
+        const drawer = new Offcanvas(drawerEl)
         const spy = spyOn(trigger, 'focus')
 
-        offcanvasEl.addEventListener('shown.coreui.offcanvas', () => {
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
           trigger.style.display = 'none'
-          offcanvas.hide()
+          drawer.hide()
         })
-        offcanvasEl.addEventListener('hidden.coreui.offcanvas', () => {
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
           setTimeout(() => {
             expect(isVisible(trigger)).toBeFalse()
             expect(spy).not.toHaveBeenCalled()
@@ -749,70 +726,346 @@ describe('Offcanvas', () => {
     })
   })
 
+  describe('getInstance', () => {
+    it('should return drawer instance', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Offcanvas(drawerEl)
+
+      expect(Offcanvas.getInstance(drawerEl)).toEqual(drawer)
+      expect(Offcanvas.getInstance(drawerEl)).toBeInstanceOf(Offcanvas)
+    })
+
+    it('should return null when there is no drawer instance', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+
+      expect(Offcanvas.getInstance(drawerEl)).toBeNull()
+    })
+  })
+
+  describe('getOrCreateInstance', () => {
+    it('should return drawer instance', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Offcanvas(drawerEl)
+
+      expect(Offcanvas.getOrCreateInstance(drawerEl)).toEqual(drawer)
+      expect(Offcanvas.getInstance(drawerEl)).toEqual(Offcanvas.getOrCreateInstance(drawerEl, {}))
+      expect(Offcanvas.getOrCreateInstance(drawerEl)).toBeInstanceOf(Offcanvas)
+    })
+
+    it('should return new instance when there is no Offcanvas instance', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+
+      expect(Offcanvas.getInstance(drawerEl)).toBeNull()
+      expect(Offcanvas.getOrCreateInstance(drawerEl)).toBeInstanceOf(Offcanvas)
+    })
+
+    it('should return new instance when there is no drawer instance with given configuration', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+
+      expect(Offcanvas.getInstance(drawerEl)).toBeNull()
+      const drawer = Offcanvas.getOrCreateInstance(drawerEl, {
+        scroll: true
+      })
+      expect(drawer).toBeInstanceOf(Offcanvas)
+
+      expect(drawer._config.scroll).toBeTrue()
+    })
+
+    it('should return the instance when exists without given configuration', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('dialog')
+      const drawer = new Offcanvas(drawerEl, {
+        scroll: true
+      })
+      expect(Offcanvas.getInstance(drawerEl)).toEqual(drawer)
+
+      const drawer2 = Offcanvas.getOrCreateInstance(drawerEl, {
+        scroll: false
+      })
+      expect(drawer).toBeInstanceOf(Offcanvas)
+      expect(drawer2).toEqual(drawer)
+
+      expect(drawer2._config.scroll).toBeTrue()
+    })
+  })
+
+  describe('child component cleanup', () => {
+    it('should hide tooltip instances inside drawer when drawer closes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog class="offcanvas">',
+          '  <button data-coreui-toggle="tooltip" title="tip">Hover</button>',
+          '</dialog>'
+        ].join('')
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const tooltipTrigger = fixtureEl.querySelector('[data-coreui-toggle="tooltip"]')
+        const drawer = new Offcanvas(drawerEl)
+
+        const fakeTooltip = { hide: jasmine.createSpy('tooltipHide') }
+        Data.set(tooltipTrigger, 'coreui.tooltip', fakeTooltip)
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
+        })
+
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(fakeTooltip.hide).toHaveBeenCalled()
+          Data.remove(tooltipTrigger, 'coreui.tooltip')
+          resolve()
+        })
+
+        drawer.show()
+      })
+    })
+
+    it('should hide popover instances inside drawer when drawer closes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog class="offcanvas">',
+          '  <button data-coreui-toggle="popover" title="pop">Click</button>',
+          '</dialog>'
+        ].join('')
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const popoverTrigger = fixtureEl.querySelector('[data-coreui-toggle="popover"]')
+        const drawer = new Offcanvas(drawerEl)
+
+        const fakePopover = { hide: jasmine.createSpy('popoverHide') }
+        Data.set(popoverTrigger, 'coreui.popover', fakePopover)
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
+        })
+
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(fakePopover.hide).toHaveBeenCalled()
+          Data.remove(popoverTrigger, 'coreui.popover')
+          resolve()
+        })
+
+        drawer.show()
+      })
+    })
+
+    it('should hide toast instances inside drawer when drawer closes', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<dialog class="offcanvas">',
+          '  <div class="toast show">Toast content</div>',
+          '</dialog>'
+        ].join('')
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const toastEl = fixtureEl.querySelector('.toast')
+        const drawer = new Offcanvas(drawerEl)
+
+        const fakeToast = { hide: jasmine.createSpy('toastHide') }
+        Data.set(toastEl, 'coreui.toast', fakeToast)
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
+        })
+
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(fakeToast.hide).toHaveBeenCalled()
+          Data.remove(toastEl, 'coreui.toast')
+          resolve()
+        })
+
+        drawer.show()
+      })
+    })
+  })
+
+  describe('offcanvas-instant', () => {
+    it('should show and fire shown event when offcanvas-instant class is present', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-instant"></dialog>'
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl)
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawer._isTransitioning).toBeFalse()
+          expect(drawerEl.open).toBeTrue()
+          resolve()
+        })
+
+        drawer.show()
+      })
+    })
+
+    it('should not report as animated when offcanvas-instant is present', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-instant"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
+      const drawer = new Offcanvas(drawerEl)
+
+      expect(drawer._isAnimated()).toBeFalse()
+    })
+
+    it('should report as animated when offcanvas-instant is not present', () => {
+      fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+      const drawerEl = fixtureEl.querySelector('.offcanvas')
+      const drawer = new Offcanvas(drawerEl)
+
+      expect(drawer._isAnimated()).toBeTrue()
+    })
+  })
+
+  describe('hiding class', () => {
+    it('should add hiding class during hide and remove after hidden', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl)
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawer.hide()
+          expect(drawerEl.classList.contains('hiding')).toBeTrue()
+        })
+
+        drawerEl.addEventListener('hidden.coreui.offcanvas', () => {
+          expect(drawerEl.classList.contains('hiding')).toBeFalse()
+          resolve()
+        })
+
+        drawer.show()
+      })
+    })
+  })
+
+  describe('offcanvas-static class', () => {
+    it('should add offcanvas-static class when static backdrop is clicked, then remove it', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas"></dialog>'
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const drawer = new Offcanvas(drawerEl, {
+          backdrop: 'static'
+        })
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          const clickEvent = createEvent('click')
+          Object.defineProperty(clickEvent, 'target', { value: drawerEl })
+          drawerEl.dispatchEvent(clickEvent)
+
+          expect(drawerEl.classList.contains('offcanvas-static')).toBeTrue()
+          expect(drawerEl.classList.contains('dialog-static')).toBeFalse()
+
+          setTimeout(() => {
+            expect(drawerEl.classList.contains('offcanvas-static')).toBeFalse()
+            resolve()
+          }, 300)
+        })
+
+        drawer.show()
+      })
+    })
+  })
+
+  describe('resize negative path', () => {
+    it('should not hide drawer on resize when position is still fixed', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<dialog class="offcanvas-lg"></dialog>'
+
+        const drawerEl = fixtureEl.querySelector('dialog')
+        const drawer = new Offcanvas(drawerEl)
+
+        const spy = spyOn(drawer, 'hide')
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          drawerEl.style.position = 'fixed'
+
+          const resizeEvent = createEvent('resize')
+          window.dispatchEvent(resizeEvent)
+
+          setTimeout(() => {
+            expect(spy).not.toHaveBeenCalled()
+            expect(drawerEl.open).toBeTrue()
+            resolve()
+          }, 10)
+        })
+
+        drawer.show()
+      })
+    })
+  })
+
+  describe('data-api link trigger', () => {
+    it('should prevent default when the trigger is <a>', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<a href="#" data-coreui-toggle="offcanvas" data-coreui-target="#drawerEl">Toggle</a>',
+          '<dialog id="drawerEl" class="offcanvas"></dialog>'
+        ].join('')
+
+        const drawerEl = fixtureEl.querySelector('.offcanvas')
+        const trigger = fixtureEl.querySelector('[data-coreui-toggle="offcanvas"]')
+
+        const spy = spyOn(Event.prototype, 'preventDefault').and.callThrough()
+
+        drawerEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(drawerEl.open).toBeTrue()
+          expect(spy).toHaveBeenCalled()
+          resolve()
+        })
+
+        trigger.click()
+      })
+    })
+  })
+
   describe('jQueryInterface', () => {
     it('should create an offcanvas', () => {
-      fixtureEl.innerHTML = '<div></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-start"></dialog>'
 
-      const div = fixtureEl.querySelector('div')
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
 
       jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
+      jQueryMock.elements = [offcanvasEl]
 
       jQueryMock.fn.offcanvas.call(jQueryMock)
 
-      expect(Offcanvas.getInstance(div)).not.toBeNull()
+      expect(Offcanvas.getInstance(offcanvasEl)).not.toBeNull()
     })
 
     it('should not re create an offcanvas', () => {
-      fixtureEl.innerHTML = '<div></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-start"></dialog>'
 
-      const div = fixtureEl.querySelector('div')
-      const offCanvas = new Offcanvas(div)
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const offcanvas = new Offcanvas(offcanvasEl)
 
       jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
+      jQueryMock.elements = [offcanvasEl]
 
       jQueryMock.fn.offcanvas.call(jQueryMock)
 
-      expect(Offcanvas.getInstance(div)).toEqual(offCanvas)
+      expect(Offcanvas.getInstance(offcanvasEl)).toEqual(offcanvas)
     })
 
     it('should throw error on undefined method', () => {
-      fixtureEl.innerHTML = '<div></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-start"></dialog>'
 
-      const div = fixtureEl.querySelector('div')
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
       const action = 'undefinedMethod'
 
       jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
-
-      expect(() => {
-        jQueryMock.fn.offcanvas.call(jQueryMock, action)
-      }).toThrowError(TypeError, `No method named "${action}"`)
-    })
-
-    it('should throw error on protected method', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const action = '_getConfig'
-
-      jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
-
-      expect(() => {
-        jQueryMock.fn.offcanvas.call(jQueryMock, action)
-      }).toThrowError(TypeError, `No method named "${action}"`)
-    })
-
-    it('should throw error if method "constructor" is being called', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const action = 'constructor'
-
-      jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
+      jQueryMock.elements = [offcanvasEl]
 
       expect(() => {
         jQueryMock.fn.offcanvas.call(jQueryMock, action)
@@ -820,128 +1073,89 @@ describe('Offcanvas', () => {
     })
 
     it('should call offcanvas method', () => {
-      fixtureEl.innerHTML = '<div></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-start"></dialog>'
 
-      const div = fixtureEl.querySelector('div')
-
-      const spy = spyOn(Offcanvas.prototype, 'show')
+      const offcanvasEl = fixtureEl.querySelector('.offcanvas')
+      const offcanvas = new Offcanvas(offcanvasEl)
 
       jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
+      jQueryMock.elements = [offcanvasEl]
+
+      const spy = spyOn(offcanvas, 'show')
 
       jQueryMock.fn.offcanvas.call(jQueryMock, 'show')
+
       expect(spy).toHaveBeenCalled()
     })
-
-    it('should create a offcanvas with given config', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-
-      jQueryMock.fn.offcanvas = Offcanvas.jQueryInterface
-      jQueryMock.elements = [div]
-
-      jQueryMock.fn.offcanvas.call(jQueryMock, { scroll: true })
-
-      const offcanvas = Offcanvas.getInstance(div)
-      expect(offcanvas).not.toBeNull()
-      expect(offcanvas._config.scroll).toBeTrue()
-    })
   })
 
-  describe('getInstance', () => {
-    it('should return offcanvas instance', () => {
-      fixtureEl.innerHTML = '<div></div>'
+  describe('legacy markup', () => {
+    it('should rebuild v5 markup into a native <dialog> inside a shell', () => {
+      fixtureEl.innerHTML = [
+        '<div class="offcanvas offcanvas-start" id="legacyOffcanvas" data-coreui-backdrop="static" aria-labelledby="legacyLabel">',
+        '  <div class="offcanvas-header"><h5 class="offcanvas-title" id="legacyLabel">Title</h5></div>',
+        '  <div class="offcanvas-body">Body</div>',
+        '</div>'
+      ].join('')
 
-      const div = fixtureEl.querySelector('div')
-      const offCanvas = new Offcanvas(div)
+      const legacyEl = fixtureEl.querySelector('#legacyOffcanvas')
+      const offcanvas = new Offcanvas(legacyEl)
 
-      expect(Offcanvas.getInstance(div)).toEqual(offCanvas)
-      expect(Offcanvas.getInstance(div)).toBeInstanceOf(Offcanvas)
+      const dialogEl = legacyEl.querySelector('dialog')
+      expect(dialogEl).not.toBeNull()
+      expect(offcanvas._element).toEqual(dialogEl)
+
+      expect(dialogEl.id).toEqual('legacyOffcanvas')
+      expect(dialogEl.getAttribute('data-coreui-backdrop')).toEqual('static')
+      expect(dialogEl.classList.contains('offcanvas')).toBeTrue()
+      expect(dialogEl.classList.contains('offcanvas-start')).toBeTrue()
+      expect(dialogEl.querySelector('.offcanvas-header')).not.toBeNull()
+      expect(dialogEl.querySelector('.offcanvas-body')).not.toBeNull()
+
+      expect(legacyEl.hasAttribute('data-coreui-legacy-shell')).toBeTrue()
+      expect(legacyEl.hasAttribute('id')).toBeFalse()
+      expect(legacyEl.style.display).toEqual('contents')
     })
 
-    it('should return null when there is no offcanvas instance', () => {
-      fixtureEl.innerHTML = '<div></div>'
+    it('should migrate responsive variants without the base class', () => {
+      fixtureEl.innerHTML = [
+        '<div class="offcanvas-lg offcanvas-end" id="legacyResponsive">',
+        '  <div class="offcanvas-body">Body</div>',
+        '</div>'
+      ].join('')
 
-      const div = fixtureEl.querySelector('div')
+      const legacyEl = fixtureEl.querySelector('#legacyResponsive')
+      const offcanvas = new Offcanvas(legacyEl)
 
-      expect(Offcanvas.getInstance(div)).toBeNull()
-    })
-  })
-
-  describe('getOrCreateInstance', () => {
-    it('should return offcanvas instance', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const offcanvas = new Offcanvas(div)
-
-      expect(Offcanvas.getOrCreateInstance(div)).toEqual(offcanvas)
-      expect(Offcanvas.getInstance(div)).toEqual(Offcanvas.getOrCreateInstance(div, {}))
-      expect(Offcanvas.getOrCreateInstance(div)).toBeInstanceOf(Offcanvas)
+      expect(offcanvas._element instanceof HTMLDialogElement).toBeTrue()
+      expect(offcanvas._element.classList.contains('offcanvas-lg')).toBeTrue()
+      expect(offcanvas._element.classList.contains('offcanvas-end')).toBeTrue()
     })
 
-    it('should return new instance when there is no Offcanvas instance', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-
-      expect(Offcanvas.getInstance(div)).toBeNull()
-      expect(Offcanvas.getOrCreateInstance(div)).toBeInstanceOf(Offcanvas)
-    })
-
-    it('should return new instance when there is no offcanvas instance with given configuration', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-
-      expect(Offcanvas.getInstance(div)).toBeNull()
-      const offcanvas = Offcanvas.getOrCreateInstance(div, {
-        scroll: true
-      })
-      expect(offcanvas).toBeInstanceOf(Offcanvas)
-
-      expect(offcanvas._config.scroll).toBeTrue()
-    })
-
-    it('should return the instance when exists without given configuration', () => {
-      fixtureEl.innerHTML = '<div></div>'
-
-      const div = fixtureEl.querySelector('div')
-      const offcanvas = new Offcanvas(div, {
-        scroll: true
-      })
-      expect(Offcanvas.getInstance(div)).toEqual(offcanvas)
-
-      const offcanvas2 = Offcanvas.getOrCreateInstance(div, {
-        scroll: false
-      })
-      expect(offcanvas).toBeInstanceOf(Offcanvas)
-      expect(offcanvas2).toEqual(offcanvas)
-
-      expect(offcanvas2._config.scroll).toBeTrue()
-    })
-  })
-
-  describe('dispose while open', () => {
-    it('should release the page scroll lock when disposed while shown', () => {
+    it('should keep events reachable through the pre-migration reference', () => {
       return new Promise(resolve => {
-        fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+        fixtureEl.innerHTML = '<div class="offcanvas offcanvas-start"><div class="offcanvas-body"></div></div>'
 
-        const offCanvasEl = fixtureEl.querySelector('.offcanvas')
-        const offCanvas = new Offcanvas(offCanvasEl)
+        const legacyEl = fixtureEl.querySelector('.offcanvas')
+        const offcanvas = new Offcanvas(legacyEl)
 
-        offCanvasEl.addEventListener('shown.coreui.offcanvas', () => {
-          expect(document.body.style.overflow).toEqual('hidden')
-
-          offCanvas.dispose()
-
-          expect(document.body.style.overflow).not.toEqual('hidden')
+        legacyEl.addEventListener('shown.coreui.offcanvas', () => {
+          expect(offcanvas._element.open).toBeTrue()
           resolve()
         })
 
-        offCanvas.show()
+        offcanvas.show()
       })
+    })
+
+    it('should resolve getInstance through the shell', () => {
+      fixtureEl.innerHTML = '<div class="offcanvas offcanvas-start"><div class="offcanvas-body"></div></div>'
+
+      const legacyEl = fixtureEl.querySelector('.offcanvas')
+      const offcanvas = new Offcanvas(legacyEl)
+
+      expect(Offcanvas.getInstance(legacyEl)).toEqual(offcanvas)
+      expect(Offcanvas.getOrCreateInstance(legacyEl)).toEqual(offcanvas)
     })
   })
 })

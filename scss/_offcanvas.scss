@@ -1,6 +1,5 @@
 @use "sass:map";
 @use "functions/defaults" as *;
-@use "mixins/backdrop" as *;
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/ltr-rtl" as *;
@@ -8,6 +7,10 @@
 @use "mixins/transition" as *;
 @use "modal" as *;
 @use "config" as *;
+
+// Native <dialog> component
+// Uses the browser's native dialog element with showModal()/show()/close()
+// APIs, the [open] attribute, and the ::backdrop pseudo-element.
 
 // stylelint-disable custom-property-no-missing-var-function
 // stylelint-disable function-disallowed-list
@@ -18,6 +21,7 @@ $offcanvas-padding-x:               $modal-inner-padding !default;
 $offcanvas-horizontal-width:        400px !default;
 $offcanvas-vertical-height:         30vh !default;
 $offcanvas-transition-duration:     .3s !default;
+$offcanvas-transition-timing:       ease-in-out !default;
 $offcanvas-border-color:            $modal-content-border-color !default;
 $offcanvas-border-width:            $modal-content-border-width !default;
 $offcanvas-title-line-height:       $modal-title-line-height !default;
@@ -44,7 +48,10 @@ $offcanvas-tokens: defaults(
     --#{$prefix}offcanvas-border-width: #{$offcanvas-border-width},
     --#{$prefix}offcanvas-border-color: #{$offcanvas-border-color},
     --#{$prefix}offcanvas-box-shadow: #{$offcanvas-box-shadow},
-    --#{$prefix}offcanvas-transition: #{transform $offcanvas-transition-duration ease-in-out},
+    --#{$prefix}offcanvas-transition-duration: #{$offcanvas-transition-duration},
+    --#{$prefix}offcanvas-transition-timing: #{$offcanvas-transition-timing},
+    --#{$prefix}offcanvas-backdrop-bg: #{$offcanvas-backdrop-bg},
+    --#{$prefix}offcanvas-backdrop-opacity: #{$offcanvas-backdrop-opacity},
     --#{$prefix}offcanvas-title-line-height: #{$offcanvas-title-line-height},
   ),
   $offcanvas-tokens
@@ -70,72 +77,153 @@ $offcanvas-tokens: defaults(
 
     .offcanvas#{$infix} {
       @include media-breakpoint-down($next) {
+        // Reset the native <dialog> UA defaults (fit-content sizing, inset,
+        // margins) and override display: none so visibility controls the
+        // hidden state, enabling exit animations after close().
         position: fixed;
-        bottom: 0;
+        inset: auto;
         z-index: var(--#{$prefix}offcanvas-zindex);
         display: flex;
         flex-direction: column;
         max-width: 100%;
+        max-height: 100%;
+        padding: 0;
+        margin: 0;
+        // Let popups (menus, tooltips) appended inside the dialog overflow its
+        // box; the body handles its own scrolling.
+        overflow: visible;
         color: var(--#{$prefix}offcanvas-color);
         visibility: hidden;
         background-color: var(--#{$prefix}offcanvas-bg);
         background-clip: padding-box;
+        border: 0;
         outline: 0;
         @include box-shadow(var(--#{$prefix}offcanvas-box-shadow));
-        @include transition(var(--#{$prefix}offcanvas-transition));
 
+        // Placement positioning and sizing — always applied regardless of
+        // animation mode
         &.offcanvas-start {
+          inset-block: 0;
           inset-inline-start: 0;
-          top: 0;
           width: var(--#{$prefix}offcanvas-width);
           border-inline-end: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
-          @include ltr-rtl-value-only("transform", translateX(-100%), translateX(100%));
         }
 
         &.offcanvas-end {
+          inset-block: 0;
           inset-inline-end: 0;
-          top: 0;
           width: var(--#{$prefix}offcanvas-width);
           border-inline-start: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
-          transform: translateX(100%);
         }
 
         &.offcanvas-top {
-          top: 0;
-          right: 0;
-          left: 0;
+          inset: 0 0 auto;
           height: var(--#{$prefix}offcanvas-height);
-          max-height: 100%;
           border-bottom: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
-          transform: translateY(-100%);
         }
 
         &.offcanvas-bottom {
-          right: 0;
-          left: 0;
+          inset: auto 0 0;
           height: var(--#{$prefix}offcanvas-height);
-          max-height: 100%;
           border-top: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
-          transform: translateY(100%);
         }
 
-        &.showing,
-        &.show:not(.hiding) {
-          transform: none !important; // stylelint-disable-line declaration-no-important
+        // Animated variant (default) — transitions + off-screen transforms.
+        // Adding .offcanvas-instant skips all animations. The base transform
+        // is the entry-from / exit-to position; the JS keeps the dialog in the
+        // top layer during the exit (.hiding) so the ::backdrop fade plays.
+        &:not(.offcanvas-instant) {
+          @include transition(
+            transform var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing),
+            visibility 0s var(--#{$prefix}offcanvas-transition-duration)
+          );
+
+          &.offcanvas-start {
+            @include ltr-rtl-value-only("transform", translateX(-100%), translateX(100%));
+          }
+
+          &.offcanvas-end {
+            @include ltr-rtl-value-only("transform", translateX(100%), translateX(-100%));
+          }
+
+          &.offcanvas-top {
+            transform: translateY(-100%);
+          }
+
+          &.offcanvas-bottom {
+            transform: translateY(100%);
+          }
+
+          // Open state: visibility flips immediately, the panel slides in
+          &[open]:not(.hiding) {
+            visibility: visible;
+            @include transition(
+              transform var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing),
+              visibility 0s
+            );
+            transform: none;
+          }
+
+          // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
+          // outrank the open-state transform reset.
+          &[open].offcanvas-static:not(.hiding) {
+            transform: $modal-scale-transform;
+          }
+
+          &::backdrop {
+            background-color: color-mix(in srgb, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
+            @include transition(background-color var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing));
+          }
+
+          // Exit: fade the native backdrop out alongside the panel — it is
+          // still rendered because close() is deferred until the transition
+          // ends.
+          &.hiding::backdrop {
+            background-color: transparent;
+          }
         }
 
-        &.showing,
-        &.hiding,
-        &.show {
+        &.offcanvas-instant::backdrop {
+          background-color: color-mix(in srgb, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
+        }
+
+        // Open state base (always applies, regardless of animation mode)
+        &[open]:not(.hiding) {
           visibility: visible;
+          transform: none;
+        }
+
+        // `backdrop: false` — modal behavior with a visually suppressed
+        // backdrop
+        &.offcanvas-no-backdrop::backdrop {
+          display: none;
         }
       }
 
+      // Above breakpoint — show content inline (for responsive offcanvas).
+      // The native <dialog> UA styles (display: none, fixed positioning) must
+      // be fully reset so the element behaves as an inline flex container.
       @if not ($infix == "") {
         @include media-breakpoint-up($next) {
+          // stylelint-disable declaration-no-important
           --#{$prefix}offcanvas-height: auto;
           --#{$prefix}offcanvas-border-width: 0;
-          background-color: transparent !important; // stylelint-disable-line declaration-no-important
+
+          position: static !important;
+          inset: auto;
+          z-index: auto;
+          display: flex !important;
+          max-width: none;
+          height: auto !important;
+          max-height: none;
+          padding: 0;
+          margin: 0;
+          visibility: visible !important;
+          background-color: transparent !important;
+          border: 0 !important;
+          transform: none !important;
+          @include transition(none !important);
+          // stylelint-enable declaration-no-important
 
           .offcanvas-header {
             display: none;
@@ -154,12 +242,22 @@ $offcanvas-tokens: defaults(
     }
   }
 
-  .offcanvas-backdrop {
-    @include overlay-backdrop($zindex-offcanvas-backdrop, var(--#{$prefix}offcanvas-backdrop-bg, $offcanvas-backdrop-bg), $offcanvas-backdrop-opacity);
+  // Entry animation for ::backdrop. It only exists while the dialog is in the
+  // top layer, so its starting state can't be expressed on the base selector.
+  @starting-style {
+    @each $breakpoint in map.keys($grid-breakpoints) {
+      $next: breakpoint-next($breakpoint, $grid-breakpoints);
+      $infix: breakpoint-infix($next, $grid-breakpoints);
+
+      .offcanvas#{$infix}:not(.offcanvas-instant)::backdrop {
+        background-color: transparent;
+      }
+    }
   }
 
   .offcanvas-header {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     padding: var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x);
 
