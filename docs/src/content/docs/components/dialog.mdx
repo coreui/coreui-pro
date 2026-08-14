@@ -1,0 +1,110 @@
+---
+title: "Bootstrap Dialog"
+name: "Dialog"
+description: "Bootstrap Dialog component built on the native <dialog> element — top layer rendering, native backdrop, focus trapping, and accessible semantics out of the box."
+otherFrameworks:
+  - modal
+---
+
+## Overview
+
+A **dialog** is a popup window rendered on the browser's native `<dialog>` element, with the top layer, `::backdrop`, focus trapping, background inertness, and dialog ARIA semantics provided by the browser itself.
+
+In CoreUI for Bootstrap this component ships as **[Modal](/components/modal/)** — the same native `<dialog>` architecture that Bootstrap 6 introduces under the *Dialog* name. If you arrive here from Bootstrap 6's vocabulary, everything on this page is the Modal component; only the class and event names differ. The full option, method, and event reference lives on the [Modal page](/components/modal/).
+
+## Example
+
+Toggle a working dialog by clicking the button below.
+
+<dialog class="modal" id="exampleDialogLive" aria-labelledby="exampleDialogLiveLabel">
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleDialogLiveLabel">Dialog title</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>This is a native dialog element. It uses the browser's built-in modal behavior for accessibility and focus management.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary">Save changes</button>
+  </div>
+</dialog>
+
+<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="modal" data-coreui-target="#exampleDialogLive">`, `    Open dialog`, `  </button>`]} />
+
+```html
+<button type="button" class="btn btn-primary" data-coreui-toggle="modal" data-coreui-target="#exampleDialog">
+  Open dialog
+</button>
+
+<dialog class="modal" id="exampleDialog" aria-labelledby="exampleDialogLabel">
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleDialogLabel">Dialog title</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>This is a native dialog element.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary">Save changes</button>
+  </div>
+</dialog>
+```
+
+Key features of the native dialog:
+
+- **Modal or non-modal** via `showModal()` / `show()` — the default modal mode promotes the dialog to the browser's top layer with a backdrop and focus trapping; the `modal: false` option renders it non-modally, leaving the rest of the page interactive.
+- **Built-in backdrop** using the `::backdrop` pseudo-element; set `backdrop: "static"` to lock clicks outside, or `backdrop: false` to visually suppress it.
+- **Escape key handling** closes the dialog by default; set `keyboard: false` to disable it.
+- **Accessibility** — focus is trapped inside modal dialogs and returned to the trigger on close, with native `<dialog>` ARIA semantics: no `role`, `aria-modal`, `aria-hidden`, or `tabindex` attributes in the markup.
+- **Animated open and close** — the exit transition (including the `::backdrop` fade) plays in every browser, because the plugin keeps the dialog in the top layer until the transition ends.
+
+## Non-modal dialog
+
+Set the `modal` option to `false` to open the dialog without the top layer — no backdrop, no focus trap, and the page stays interactive.
+
+<dialog class="modal" id="exampleDialogNonModal" data-coreui-modal="false" aria-labelledby="exampleDialogNonModalLabel">
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleDialogNonModalLabel">Non-modal dialog</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <p>The rest of the page stays interactive while this dialog is open.</p>
+  </div>
+</dialog>
+
+<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="modal" data-coreui-target="#exampleDialogNonModal">`, `    Open non-modal dialog`, `  </button>`]} />
+
+```html
+<dialog class="modal" id="myDialog" data-coreui-modal="false">
+  ...
+</dialog>
+```
+
+## Coming from Bootstrap 6
+
+Bootstrap 6 renames Modal to *Dialog*. CoreUI for Bootstrap keeps the established Modal vocabulary on the same native `<dialog>` architecture — migrating markup between the two is a rename:
+
+| Bootstrap 6 | CoreUI for Bootstrap |
+| --- | --- |
+| `<dialog class="dialog">` | `<dialog class="modal">` |
+| `.dialog-header` / `.dialog-title` / `.dialog-body` / `.dialog-footer` | `.modal-header` / `.modal-title` / `.modal-body` / `.modal-footer` |
+| `.dialog-sm` / `.dialog-lg` / `.dialog-xl` | `.modal-sm` / `.modal-lg` / `.modal-xl` |
+| `.dialog-fullscreen` | `.modal-fullscreen` |
+| `.dialog-scrollable` | `.modal-scrollable` |
+| `.dialog-instant` | `.modal-instant` |
+| `data-bs-toggle="dialog"` / `data-bs-dismiss="dialog"` | `data-coreui-toggle="modal"` / `data-coreui-dismiss="modal"` |
+| `show.bs.dialog`, `shown.bs.dialog`, … | `show.coreui.modal`, `shown.coreui.modal`, … |
+| `new bootstrap.Dialog(element)` | `new coreui.Modal(element)` |
+
+The option surface (`backdrop`, `keyboard`, `modal`), the promise-returning lifecycle methods, and the native behaviors are the same.
+
+## Options, methods and events
+
+The Dialog is the Modal component — the complete reference lives there:
+
+- [Options](/components/modal/#options)
+- [Methods](/components/modal/#methods)
+- [Events](/components/modal/#events)
+- [Customizing (CSS variables and Sass)](/components/modal/#customizing)

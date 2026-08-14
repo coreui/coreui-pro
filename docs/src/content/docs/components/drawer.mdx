@@ -1,0 +1,110 @@
+---
+title: "Bootstrap Drawer"
+name: "Drawer"
+description: "Bootstrap Drawer component built on the native <dialog> element — a sliding side panel with native backdrop, focus trapping, and responsive variants."
+otherFrameworks:
+  - offcanvas
+---
+
+## Overview
+
+A **drawer** is a panel that slides in from an edge of the viewport — for navigation, shopping carts, filters, and settings. It is rendered on the browser's native `<dialog>` element, so the top layer, `::backdrop`, focus trapping, and dialog semantics come from the browser.
+
+In CoreUI for Bootstrap this component ships as **[Offcanvas](/components/offcanvas/)** — the same native `<dialog>` architecture that Bootstrap 6 introduces under the *Drawer* name. If you arrive here from Bootstrap 6's vocabulary, everything on this page is the Offcanvas component; only the class and event names differ. The full option, method, and event reference lives on the [Offcanvas page](/components/offcanvas/).
+
+## Example
+
+Toggle a working drawer by clicking the button below.
+
+<dialog class="offcanvas offcanvas-start" id="exampleDrawerLive" aria-labelledby="exampleDrawerLiveLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="exampleDrawerLiveLabel">Drawer</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    The drawer content goes here. You can place nearly any Bootstrap component or custom element here.
+  </div>
+</dialog>
+
+<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="offcanvas" data-coreui-target="#exampleDrawerLive">`, `    Open drawer`, `  </button>`]} />
+
+```html
+<button type="button" class="btn btn-primary" data-coreui-toggle="offcanvas" data-coreui-target="#exampleDrawer">
+  Open drawer
+</button>
+
+<dialog class="offcanvas offcanvas-start" id="exampleDrawer" aria-labelledby="exampleDrawerLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="exampleDrawerLabel">Drawer</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    ...
+  </div>
+</dialog>
+```
+
+## Placement
+
+Drawers can slide in from any edge of the viewport — apply one of the placement classes:
+
+- `.offcanvas-start` — left side of the viewport
+- `.offcanvas-end` — right side of the viewport
+- `.offcanvas-top` — top of the viewport
+- `.offcanvas-bottom` — bottom of the viewport
+
+<dialog class="offcanvas offcanvas-end" id="exampleDrawerEnd" aria-labelledby="exampleDrawerEndLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="exampleDrawerEndLabel">Right drawer</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    ...
+  </div>
+</dialog>
+
+<dialog class="offcanvas offcanvas-bottom" id="exampleDrawerBottom" aria-labelledby="exampleDrawerBottomLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="exampleDrawerBottomLabel">Bottom drawer</h5>
+    <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    ...
+  </div>
+</dialog>
+
+<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="offcanvas" data-coreui-target="#exampleDrawerEnd">Right drawer</button>`, `  <button type="button" class="btn btn-primary" data-coreui-toggle="offcanvas" data-coreui-target="#exampleDrawerBottom">Bottom drawer</button>`]} />
+
+## Body scrolling and backdrop
+
+By default the drawer opens modally: the page scroll is blocked and the native `::backdrop` covers the content behind it. Set `scroll: true` to open it non-modally instead — the page stays interactive and scrollable. Set `backdrop: "static"` to keep the drawer open on outside clicks, or `backdrop: false` to visually suppress the backdrop. See the [Offcanvas examples](/components/offcanvas/#body-scrolling) for live demos.
+
+## Responsive
+
+Responsive variants (`.offcanvas-sm` … `.offcanvas-xxl`) act as a drawer below the given breakpoint and render their content inline above it — see [responsive offcanvas](/components/offcanvas/#responsive).
+
+## Coming from Bootstrap 6
+
+Bootstrap 6 renames Offcanvas to *Drawer*. CoreUI for Bootstrap keeps the established Offcanvas vocabulary on the same native `<dialog>` architecture — migrating markup between the two is a rename:
+
+| Bootstrap 6 | CoreUI for Bootstrap |
+| --- | --- |
+| `<dialog class="drawer">` | `<dialog class="offcanvas">` |
+| `.drawer-start` / `.drawer-end` / `.drawer-top` / `.drawer-bottom` | `.offcanvas-start` / `.offcanvas-end` / `.offcanvas-top` / `.offcanvas-bottom` |
+| `.drawer-header` / `.drawer-title` / `.drawer-body` | `.offcanvas-header` / `.offcanvas-title` / `.offcanvas-body` |
+| `.drawer-instant` | `.offcanvas-instant` |
+| `sm-down:drawer` … responsive variants | `.offcanvas-sm` … `.offcanvas-xxl` |
+| `data-bs-toggle="drawer"` / `data-bs-dismiss="drawer"` | `data-coreui-toggle="offcanvas"` / `data-coreui-dismiss="offcanvas"` |
+| `show.bs.drawer`, `shown.bs.drawer`, … | `show.coreui.offcanvas`, `shown.coreui.offcanvas`, … |
+| `new bootstrap.Drawer(element)` | `new coreui.Offcanvas(element)` |
+
+The option surface (`backdrop`, `keyboard`, `scroll`), the promise-returning lifecycle methods, and the native behaviors are the same.
+
+## Options, methods and events
+
+The Drawer is the Offcanvas component — the complete reference lives there:
+
+- [Options](/components/offcanvas/#options)
+- [Methods](/components/offcanvas/#methods)
+- [Events](/components/offcanvas/#events)
+- [Customization (CSS variables and Sass)](/components/offcanvas/#customization)
