@@ -222,18 +222,15 @@ describe('Popup', () => {
       expect(fixtureEl.querySelector('#content').style.position).toEqual('')
     })
 
-    // In the top layer the containing block is the viewport, so the strategy
-    // is `fixed`; `absolute` would resolve against an offsetParent the panel
-    // no longer has.
-    it('should position the content against the viewport after show', () => {
+    it('should absolutely position the content after show', () => {
       return new Promise((resolve, reject) => {
         const popup = buildPopup({ mobileBreakpoint: 0 })
         const content = fixtureEl.querySelector('#content')
         popup.show()
 
         const waitForPosition = deadline => {
-          if (content.style.position) {
-            expect(content.style.position).toEqual('fixed')
+          if (content.style.position === 'absolute') {
+            expect(content.style.position).toEqual('absolute')
             resolve()
             return
           }

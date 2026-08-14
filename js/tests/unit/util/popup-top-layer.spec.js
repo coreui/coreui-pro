@@ -270,25 +270,75 @@ describe('Popup — top layer experiment', () => {
     })
   })
 
-  describe('scroll tracking cost', () => {
-    it('should drive per-frame updates only while in the top layer', () => {
-      const inFlow = buildPopup([
+  // The top layer makes the panel viewport-fixed, so it stops scrolling with
+  // the content and the main thread has to chase compositor-driven scrolling —
+  // which it cannot win, and the panel visibly drifts. `auto` therefore pays
+  // that price only where staying in flow would clip or bury the panel.
+  describe('auto promotion', () => {
+    it('should stay in flow when nothing would clip the panel', () => {
+      const popup = buildPopup([
         '<button type="button" class="anchor">anchor</button>',
         '<div class="popup show">panel</div>'
+      ].join(''), { topLayer: 'auto' })
+
+      popup.show()
+
+      expect(popup._isInTopLayer()).toBeFalse()
+      expect(host.querySelector('.popup').hasAttribute('popover')).toBeFalse()
+
+      popup.dispose()
+    })
+
+    it('should promote when an ancestor clips overflow', () => {
+      const popup = buildPopup([
+        '<div style="overflow: hidden; height: 40px; position: relative;">',
+        '  <button type="button" class="anchor">anchor</button>',
+        '  <div class="popup show">panel</div>',
+        '</div>'
+      ].join(''), { topLayer: 'auto' })
+
+      popup.show()
+
+      expect(popup._isInTopLayer()).toBeTrue()
+
+      popup.dispose()
+    })
+
+    it('should promote when an ancestor creates a containing block', () => {
+      const popup = buildPopup([
+        '<div style="transform: translateZ(0);">',
+        '  <button type="button" class="anchor">anchor</button>',
+        '  <div class="popup show">panel</div>',
+        '</div>'
+      ].join(''), { topLayer: 'auto' })
+
+      popup.show()
+
+      expect(popup._isInTopLayer()).toBeTrue()
+
+      popup.dispose()
+    })
+
+    it('should honour an explicit override in both directions', () => {
+      const forcedOff = buildPopup([
+        '<div style="overflow: hidden; height: 40px; position: relative;">',
+        '  <button type="button" class="anchor">anchor</button>',
+        '  <div class="popup show">panel</div>',
+        '</div>'
       ].join(''), { topLayer: false })
 
-      inFlow.show()
-      expect(inFlow._isInTopLayer()).toBeFalse()
-      inFlow.dispose()
+      forcedOff.show()
+      expect(forcedOff._isInTopLayer()).toBeFalse()
+      forcedOff.dispose()
 
-      const promoted = buildPopup([
+      const forcedOn = buildPopup([
         '<button type="button" class="anchor">anchor</button>',
         '<div class="popup show">panel</div>'
       ].join(''), { topLayer: true })
 
-      promoted.show()
-      expect(promoted._isInTopLayer()).toBeTrue()
-      promoted.dispose()
+      forcedOn.show()
+      expect(forcedOn._isInTopLayer()).toBeTrue()
+      forcedOn.dispose()
     })
   })
 

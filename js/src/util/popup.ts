@@ -40,7 +40,7 @@ type PopupConfig = {
   onShown: (() => void) | null
   placement: string
   returnFocus: boolean
-  topLayer: boolean
+  topLayer: boolean | 'auto'
 }
 
 const Default: PopupConfig = {
@@ -57,7 +57,7 @@ const Default: PopupConfig = {
   onShown: null,
   placement: 'bottom-start',
   returnFocus: true,
-  topLayer: true
+  topLayer: 'auto'
 }
 
 const DefaultType = {
@@ -74,7 +74,7 @@ const DefaultType = {
   onShown: '(function|null)',
   placement: 'string',
   returnFocus: 'boolean',
-  topLayer: 'boolean'
+  topLayer: '(boolean|string)'
 }
 
 /**
@@ -216,7 +216,7 @@ class Popup extends Config {
   // `auto`) because the popup owns its own dismissal: light dismiss would race
   // our click/keydown listeners and bypass `returnFocus`.
   _showPopover(): void {
-    if (!this._config.topLayer || !this._supportsPopover()) {
+    if (!this._shouldPromote() || !this._supportsPopover()) {
       return
     }
 
@@ -228,7 +228,7 @@ class Popup extends Config {
   }
 
   _hidePopover(): void {
-    if (!this._config.topLayer || !this._supportsPopover() || !this._content) {
+    if (!this._supportsPopover() || !this._content) {
       return
     }
 
@@ -241,6 +241,42 @@ class Popup extends Config {
 
   _supportsPopover(): boolean {
     return typeof this._content?.showPopover === 'function'
+  }
+
+  // The top layer is a trade, not a free win: it escapes every clipping and
+  // stacking ancestor, but the panel becomes viewport-fixed, so it no longer
+  // scrolls with the content — the main thread has to chase compositor-driven
+  // scrolling and always loses, which reads as the panel drifting. So promote
+  // only when staying in flow would actually clip or bury the panel.
+  _shouldPromote(): boolean {
+    if (this._config.topLayer !== 'auto') {
+      return Boolean(this._config.topLayer)
+    }
+
+    return this._hasConstrainingAncestor()
+  }
+
+  _hasConstrainingAncestor(): boolean {
+    let node = (this._container ?? this._anchor)?.parentElement
+
+    while (node && node !== document.body && node !== document.documentElement) {
+      const styles = getComputedStyle(node)
+
+      if (
+        styles.overflow !== 'visible' ||
+        styles.transform !== 'none' ||
+        styles.filter !== 'none' ||
+        styles.perspective !== 'none' ||
+        styles.contain.includes('paint') ||
+        styles.willChange.includes('transform')
+      ) {
+        return true
+      }
+
+      node = node.parentElement
+    }
+
+    return false
   }
 
   _isInTopLayer(): boolean {
