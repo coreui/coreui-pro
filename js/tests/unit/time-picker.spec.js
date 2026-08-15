@@ -37,15 +37,15 @@ describe('TimePicker', () => {
 
     it('should not build the selection body until the popup opens', () => {
       const picker = buildPicker()
-      const el = fixtureEl.querySelector('#picker')
 
       expect(picker._selection).toBeNull()
-      expect(el.querySelector('.time-picker-roll-col')).toBeNull()
+      expect(fixtureEl.querySelector('.time-picker-popup')).toBeNull()
+      expect(fixtureEl.querySelector('.time-picker-roll-col')).toBeNull()
 
       picker.show()
 
       expect(picker._selection).not.toBeNull()
-      expect(el.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
+      expect(fixtureEl.querySelector('.time-picker-popup').querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
     })
 
     it('should initialize the field with the configured time', () => {
@@ -61,26 +61,27 @@ describe('TimePicker', () => {
       const picker = buildPicker()
       picker.show()
 
-      const el = fixtureEl.querySelector('#picker')
-      expect(el.querySelector('.time-picker-body').classList.contains('time-picker-roll')).toBeTrue()
-      expect(el.querySelector('select')).toBeNull()
+      const popup = fixtureEl.querySelector('.time-picker-popup')
+      expect(popup.querySelector('.time-picker-body').classList.contains('time-picker-roll')).toBeTrue()
+      expect(popup.querySelector('select')).toBeNull()
     })
 
     it('should render selects for the select variant', () => {
       const picker = buildPicker({ variant: 'select' })
       picker.show()
 
-      const el = fixtureEl.querySelector('#picker')
-      expect(el.querySelectorAll('select.time-picker-inline-select').length).toBeGreaterThan(0)
-      expect(el.querySelector('.time-picker-roll-col')).toBeNull()
+      const popup = fixtureEl.querySelector('.time-picker-popup')
+      expect(popup.querySelectorAll('select.time-picker-inline-select').length).toBeGreaterThan(0)
+      expect(popup.querySelector('.time-picker-roll-col')).toBeNull()
     })
 
     it('should drop the seconds column when seconds are disabled', () => {
       const picker = buildPicker({ seconds: false })
       picker.show()
 
-      const el = fixtureEl.querySelector('#picker')
-      expect(el.querySelector('[role="listbox"][aria-label="Select seconds"]')).toBeNull()
+      const popup = fixtureEl.querySelector('.time-picker-popup')
+      expect(popup.querySelector('[role="listbox"]')).not.toBeNull()
+      expect(popup.querySelector('[role="listbox"][aria-label="Select seconds"]')).toBeNull()
     })
   })
 
@@ -94,7 +95,7 @@ describe('TimePicker', () => {
       })
 
       picker.show()
-      const minutes = el.querySelectorAll('[data-coreui-minutes]')
+      const minutes = fixtureEl.querySelector('.time-picker-popup').querySelectorAll('[data-coreui-minutes]')
       minutes[15].click()
 
       expect(emitted).not.toBeNull()
@@ -142,7 +143,9 @@ describe('TimePicker', () => {
     it('should apply the size class', () => {
       buildPicker({ size: 'lg' })
 
-      expect(fixtureEl.querySelector('#picker .form-control-group').classList.contains('form-control-lg')).toBeTrue()
+      const el = fixtureEl.querySelector('#picker')
+      expect(el.classList.contains('form-control-group')).toBeTrue()
+      expect(el.classList.contains('form-control-lg')).toBeTrue()
     })
 
     it('should skip sanitizing when sanitize is false', () => {
@@ -236,7 +239,7 @@ describe('TimePicker', () => {
     })
 
     it('should disable a projected now action when the current time is not selectable', () => {
-      buildPicker({ maxDate: new Date(1969, 11, 31) }, [
+      const picker = buildPicker({ maxDate: new Date(1969, 11, 31) }, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="now">Now</button>',
@@ -244,11 +247,13 @@ describe('TimePicker', () => {
         '</div>'
       ].join(''))
 
-      expect(fixtureEl.querySelector('[data-coreui-picker-action="now"]').disabled).toBeTrue()
+      picker.show()
+
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-picker-action="now"]').disabled).toBeTrue()
     })
 
     it('should keep a projected now action enabled when the current time is selectable', () => {
-      buildPicker({}, [
+      const picker = buildPicker({}, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="now">Now</button>',
@@ -256,7 +261,9 @@ describe('TimePicker', () => {
         '</div>'
       ].join(''))
 
-      expect(fixtureEl.querySelector('[data-coreui-picker-action="now"]').disabled).toBeFalse()
+      picker.show()
+
+      expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-picker-action="now"]').disabled).toBeFalse()
     })
   })
 })

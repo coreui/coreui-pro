@@ -27,26 +27,29 @@ describe('DatePicker', () => {
 
   describe('constructor', () => {
     it('should compose an input group, an indicator, and an empty calendar container', () => {
-      buildPicker()
+      const picker = buildPicker()
 
       const el = fixtureEl.querySelector('#picker')
       expect(el.classList.contains('date-picker')).toBeTrue()
-      expect(el.querySelector('.form-control-group')).not.toBeNull()
+      expect(el.classList.contains('form-control-group')).toBeTrue()
       expect(el.querySelector('.form-control-action')).not.toBeNull()
-      expect(el.querySelector('.date-picker-popup .date-picker-calendar')).not.toBeNull()
+
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup .date-picker-calendar')).not.toBeNull()
     })
 
     it('should not build the calendar until the popup opens', () => {
       const picker = buildPicker()
-      const el = fixtureEl.querySelector('#picker')
 
       expect(picker._calendar).toBeNull()
-      expect(el.querySelector('.calendar')).toBeNull()
+      expect(fixtureEl.querySelector('.date-picker-popup')).toBeNull()
+      expect(fixtureEl.querySelector('.calendar')).toBeNull()
 
       picker.show()
 
       expect(picker._calendar).not.toBeNull()
-      expect(el.querySelector('.date-picker-popup .calendar')).not.toBeNull()
+      expect(fixtureEl.querySelector('.date-picker-popup .calendar')).not.toBeNull()
     })
 
     it('should seed the lazily built calendar with the current value', () => {
@@ -86,13 +89,16 @@ describe('DatePicker', () => {
     })
 
     it('should not render a footer without a template child', () => {
-      buildPicker()
+      const picker = buildPicker()
 
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup')).not.toBeNull()
       expect(fixtureEl.querySelector('.date-picker-footer')).toBeNull()
     })
 
     it('should clone a footer template into the dropdown', () => {
-      buildPicker({}, [
+      const picker = buildPicker({}, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="today">Today</button>',
@@ -101,7 +107,9 @@ describe('DatePicker', () => {
         '</div>'
       ].join(''))
 
-      const footer = fixtureEl.querySelector('.date-picker-footer')
+      picker.show()
+
+      const footer = fixtureEl.querySelector('.date-picker-popup .date-picker-footer')
       expect(footer).not.toBeNull()
       expect(footer.querySelectorAll('[data-coreui-picker-action]')).toHaveSize(2)
     })
@@ -152,7 +160,7 @@ describe('DatePicker', () => {
       })
 
       picker.show()
-      const dayCell = el.querySelector('.calendar-cell[tabindex="0"]')
+      const dayCell = fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]')
       dayCell.click()
 
       expect(emitted).not.toBeNull()
@@ -190,7 +198,7 @@ describe('DatePicker', () => {
       })
 
       picker.show()
-      el.querySelector('.calendar-row[tabindex="0"] .calendar-cell').click()
+      fixtureEl.querySelector('.date-picker-popup .calendar-row[tabindex="0"] .calendar-cell').click()
 
       expect(emitted).toMatch(/^\d{4}W\d{2}$/)
       expect(el.querySelector('input[type="hidden"]').value).toEqual(`Week ${emitted.slice(5)}, ${emitted.slice(0, 4)}`)
@@ -215,7 +223,7 @@ describe('DatePicker', () => {
       const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      el.querySelector('.calendar-cell[tabindex="0"]').click()
+      fixtureEl.querySelector('.date-picker-popup .calendar-cell[tabindex="0"]').click()
 
       expect(el.querySelector('input[type="hidden"]').value).toMatch(/^Q[1-4] \d{4}$/)
     })
@@ -287,7 +295,7 @@ describe('DatePicker', () => {
     it('should disable a projected today action when today is not selectable', () => {
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
-      buildPicker({ maxDate: yesterday }, [
+      const picker = buildPicker({ maxDate: yesterday }, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="today">Today</button>',
@@ -295,11 +303,13 @@ describe('DatePicker', () => {
         '</div>'
       ].join(''))
 
-      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
     it('should keep a projected today action enabled when today is selectable', () => {
-      buildPicker({}, [
+      const picker = buildPicker({}, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="today">Today</button>',
@@ -307,11 +317,13 @@ describe('DatePicker', () => {
         '</div>'
       ].join(''))
 
-      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeFalse()
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeFalse()
     })
 
     it('should not re-enable a today action disabled in the template', () => {
-      buildPicker({}, [
+      const picker = buildPicker({}, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="today" disabled>Today</button>',
@@ -319,7 +331,9 @@ describe('DatePicker', () => {
         '</div>'
       ].join(''))
 
-      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
     it('should emit and select a programmatic date within range', () => {
@@ -344,7 +358,7 @@ describe('DatePicker', () => {
       const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      el.querySelector('.btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
 
       expect(picker._popup.isShown).toBeTrue()
       expect(el.classList.contains('show')).toBeTrue()

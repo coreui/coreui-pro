@@ -123,6 +123,130 @@ describe('Popup', () => {
     })
   })
 
+  // The panel is in the DOM only while a choice is being made, and where it
+  // goes is decided on every open — these assert the contract that decision
+  // follows, because it is what keeps a picker usable inside a modal and
+  // unclipped inside a scroll container.
+  describe('mounting', () => {
+    const buildIn = (markup, config = {}) => {
+      fixtureEl.innerHTML = markup
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false,
+        ...config
+      })
+
+      popups.push(popup)
+      return popup
+    }
+
+    const PLAIN = [
+      '<div id="anchor"><button id="inside">toggle</button></div>',
+      '<div id="content">panel</div>'
+    ].join('')
+
+    it('should keep the panel out of the DOM until it is shown', () => {
+      const popup = buildIn(PLAIN)
+      const content = fixtureEl.querySelector('#content')
+      content.remove()
+
+      expect(content.isConnected).toBeFalse()
+
+      popup.show()
+
+      expect(content.isConnected).toBeTrue()
+    })
+
+    it('should mount next to the field, not inside it, when nothing clips', () => {
+      const popup = buildIn(PLAIN)
+      const anchor = fixtureEl.querySelector('#anchor')
+      const content = fixtureEl.querySelector('#content')
+
+      popup.show()
+
+      expect(anchor.contains(content)).toBeFalse()
+      expect(anchor.nextElementSibling).toEqual(content)
+    })
+
+    it('should escape to the body when an ancestor clips the panel', () => {
+      const popup = buildIn([
+        '<div style="overflow: hidden; position: relative;">',
+        '  <div id="anchor"><button id="inside">toggle</button></div>',
+        '</div>',
+        '<div id="content">panel</div>'
+      ].join(''))
+
+      popup.show()
+
+      expect(fixtureEl.querySelector('#content')).toBeNull()
+      expect(document.body.lastElementChild.id).toEqual('content')
+    })
+
+    it('should stay inside an open dialog rather than escape to the body', () => {
+      const popup = buildIn([
+        '<dialog id="host">',
+        '  <div style="overflow: hidden; position: relative;">',
+        '    <div id="anchor"><button id="inside">toggle</button></div>',
+        '  </div>',
+        '</dialog>',
+        '<div id="content">panel</div>'
+      ].join(''))
+
+      const dialog = fixtureEl.querySelector('#host')
+      dialog.show()
+
+      popup.show()
+
+      // Outside the dialog's subtree the panel would be painted but inert.
+      expect(dialog.contains(fixtureEl.querySelector('#content'))).toBeTrue()
+
+      dialog.close()
+    })
+
+    it('should honour an explicit container over the automatic choice', () => {
+      fixtureEl.innerHTML = [
+        '<div id="target"></div>',
+        '<div id="anchor"><button id="inside">toggle</button></div>',
+        '<div id="content">panel</div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        container: fixtureEl.querySelector('#target'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false
+      })
+
+      popups.push(popup)
+      popup.show()
+
+      expect(fixtureEl.querySelector('#target').firstElementChild.id).toEqual('content')
+    })
+
+    it('should return focus before it detaches the panel', () => {
+      const popup = buildIn(PLAIN, { returnFocus: true })
+      const trigger = fixtureEl.querySelector('#inside')
+
+      trigger.focus()
+      popup.show()
+
+      const content = fixtureEl.querySelector('#content')
+      content.tabIndex = -1
+      content.focus()
+
+      popup.hide()
+
+      // Detaching with the focus still inside would drop it on <body>.
+      expect(document.activeElement).toEqual(trigger)
+    })
+  })
+
   describe('dismissal', () => {
     it('should hide on outside click', () => {
       const popup = buildPopup()

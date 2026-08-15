@@ -152,6 +152,14 @@ class Combobox extends BaseComponent {
 
   _addTogglerKeydownListeners(): void {
     EventHandler.on(this._togglerElement, this.constructor.eventName('keydown'), (event: any) => {
+      // A nested control that owns its own keyboard handling marks the event
+      // handled — Multi Select's native <select> overlay lives inside the frame
+      // and hands the keystroke over itself, so the frame must not act on the
+      // same press a second time and jump into the menu.
+      if (event.defaultPrevented) {
+        return
+      }
+
       if (!this._isShown() && (event.key === ENTER_KEY || event.key === ARROW_DOWN_KEY)) {
         event.preventDefault()
         this.show()

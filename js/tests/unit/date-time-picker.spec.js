@@ -31,8 +31,6 @@ describe('DateTimePicker', () => {
       const el = fixtureEl.querySelector('#picker')
 
       expect(el.classList.contains('date-time-picker')).toBeTrue()
-      expect(el.querySelector('.date-picker-calendar')).not.toBeNull()
-      expect(el.querySelector('.date-picker-timepickers .time-picker-body')).not.toBeNull()
 
       // both bodies are built on first open
       expect(picker._calendar).toBeNull()
@@ -40,8 +38,11 @@ describe('DateTimePicker', () => {
 
       picker.show()
 
-      expect(el.querySelector('.calendar')).not.toBeNull()
-      expect(el.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      expect(popup.querySelector('.date-picker-calendar')).not.toBeNull()
+      expect(popup.querySelector('.date-picker-timepickers .time-picker-body')).not.toBeNull()
+      expect(popup.querySelector('.calendar')).not.toBeNull()
+      expect(popup.querySelectorAll('.time-picker-roll-col').length).toBeGreaterThan(0)
     })
 
     it('should initialize the field with the configured date and time', () => {
@@ -56,10 +57,9 @@ describe('DateTimePicker', () => {
   describe('composition of the two halves', () => {
     it('should keep the time when a calendar day is selected', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 14, 30, 0) })
-      const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      el.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
+      fixtureEl.querySelectorAll('.date-picker-popup .calendar-cell[tabindex="0"]')[0].click()
 
       const value = picker.getDate()
       expect(value.getHours()).toEqual(14)
@@ -68,10 +68,9 @@ describe('DateTimePicker', () => {
 
     it('should keep the date when a time cell is selected', () => {
       const picker = buildPicker({ date: new Date(2026, 5, 15, 10, 0, 0) })
-      const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      el.querySelectorAll('[data-coreui-minutes]')[45].click()
+      fixtureEl.querySelectorAll('.date-picker-popup [data-coreui-minutes]')[45].click()
 
       const value = picker.getDate()
       expect(value.getFullYear()).toEqual(2026)
@@ -87,8 +86,9 @@ describe('DateTimePicker', () => {
       el.addEventListener('dateChange.coreui.date-time-picker', event => emitted.push(event.date))
 
       picker.show()
-      el.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
-      el.querySelectorAll('[data-coreui-minutes]')[15].click()
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[0].click()
+      popup.querySelectorAll('[data-coreui-minutes]')[15].click()
 
       expect(emitted.length).toBeGreaterThanOrEqual(2)
     })
@@ -115,7 +115,9 @@ describe('DateTimePicker', () => {
     it('should apply the size class', () => {
       buildPicker({ size: 'sm' })
 
-      expect(fixtureEl.querySelector('#picker .form-control-group').classList.contains('form-control-sm')).toBeTrue()
+      const el = fixtureEl.querySelector('#picker')
+      expect(el.classList.contains('form-control-group')).toBeTrue()
+      expect(el.classList.contains('form-control-sm')).toBeTrue()
     })
 
     it('should toggle from the indicator button', () => {
@@ -166,7 +168,7 @@ describe('DateTimePicker', () => {
     it('should disable a projected today action when today is not selectable', () => {
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
-      buildPicker({ maxDate: yesterday }, [
+      const picker = buildPicker({ maxDate: yesterday }, [
         '<div id="picker">',
         '  <template data-coreui-template="footer">',
         '    <button type="button" data-coreui-picker-action="today">Today</button>',
@@ -174,7 +176,9 @@ describe('DateTimePicker', () => {
         '</div>'
       ].join(''))
 
-      expect(fixtureEl.querySelector('[data-coreui-picker-action="today"]').disabled).toBeTrue()
+      picker.show()
+
+      expect(fixtureEl.querySelector('.date-picker-popup [data-coreui-picker-action="today"]').disabled).toBeTrue()
     })
 
     it('should keep the value when the time half reports without a date set', () => {

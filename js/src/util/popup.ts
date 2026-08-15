@@ -11,7 +11,9 @@ import {
 import EventHandler from '../dom/event-handler.js'
 import Config from './config.js'
 import FocusTrap from './focustrap.js'
-import { execute, executeAfterTransition, getElement, isRTL } from './index.js'
+import {
+  execute, executeAfterTransition, getElement, isRTL
+} from './index.js'
 
 /**
  * Constants
