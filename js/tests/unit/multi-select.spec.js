@@ -695,6 +695,25 @@ describe('MultiSelect', () => {
       expect(document.querySelector('.combobox-popup')).toBeNull()
     })
 
+    it('should close on Escape pressed inside the menu and return focus home', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }], selectAll: true
+      })
+
+      multiSelect.show()
+      multiSelect._selectAllElement.focus()
+
+      // The menu mounts outside the frame, so this no longer bubbles through
+      // the wrapper's own Escape handler
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      multiSelect._selectAllElement.dispatchEvent(event)
+
+      expect(multiSelect._wrapperElement.classList.contains('show')).toBe(false)
+      expect(event.defaultPrevented).toBe(true)
+      expect(document.activeElement).toBe(multiSelect._togglerElement)
+    })
+
     it('should follow the frame width while open', async () => {
       fixtureEl.innerHTML = '<div style="width: 660px;"><select></select></div>'
       const wrap = fixtureEl.querySelector('div')

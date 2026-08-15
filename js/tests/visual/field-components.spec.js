@@ -12,6 +12,7 @@
  */
 
 import { page } from 'vitest/browser'
+import { userEvent } from '@vitest/browser/context'
 // The whole point of the suite is what the CSS does, so it loads the Sass
 // source rather than a built file: no dist step to remember, and a regression
 // in scss/ shows up on the next run.
@@ -288,6 +289,21 @@ describe('multi select', () => {
   it('invalid', async () => {
     const ms = new MultiSelect(mountSelect(), { cleaner: true, invalid: true })
     await shoot(frame(), 'multi-select-invalid')
+    ms.dispose()
+  })
+
+  // The panel mounts outside the frame while open, so the ring must come from
+  // the panel's own token — an inherited frame var resolves to nothing there
+  // and the outline silently disappears (how the select-all lost its ring).
+  it('open with the select-all ring', async () => {
+    const ms = new MultiSelect(mountSelect(), { selectAll: true })
+    ms.show()
+
+    // A real key press, so :focus-visible matches like it does for a user
+    ms._togglerElement.focus()
+    await userEvent.keyboard('{ArrowDown}')
+
+    await shoot(popup(), 'multi-select-select-all-focus', { tolerant: true })
     ms.dispose()
   })
 

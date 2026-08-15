@@ -2819,6 +2819,24 @@ describe('Autocomplete', () => {
   })
 
   describe('container mode', () => {
+    it('should close on Escape pressed inside the menu and return focus to the input', () => {
+      fixtureEl.innerHTML = '<div class="autocomplete"></div>'
+      const autocomplete = new Autocomplete(fixtureEl.querySelector('.autocomplete'), {
+        options: [{ label: 'Option 1', value: '1' }]
+      })
+
+      autocomplete.show()
+      const option = autocomplete._menu.querySelector('.combobox-option')
+      option.tabIndex = 0
+      option.focus()
+
+      const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+      option.dispatchEvent(event)
+
+      expect(autocomplete._element.classList.contains('show')).toBe(false)
+      expect(document.activeElement).toBe(autocomplete._inputElement)
+    })
+
     it('should append dropdown to container element', () => {
       fixtureEl.innerHTML = '<div class="autocomplete"></div><div id="my-container"></div>'
       const autocompleteEl = fixtureEl.querySelector('.autocomplete')

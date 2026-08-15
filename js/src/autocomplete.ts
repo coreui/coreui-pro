@@ -183,6 +183,10 @@ class Autocomplete extends Combobox {
     }
   }
 
+  override _escapeFocusTarget(): HTMLElement | null {
+    return this._inputElement
+  }
+
   override dispose(): void {
     this._disposeFloating()
     this._menu?.remove()
