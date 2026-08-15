@@ -130,6 +130,8 @@ class TimePicker extends BaseComponent {
   protected declare _selection: any
   protected declare _selectionElement: any
   protected declare _menu: any
+  protected declare _syncingFromPanel: boolean
+  protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -141,6 +143,7 @@ class TimePicker extends BaseComponent {
     this._cleanerElement = null
     this._input = null
     this._selection = null
+    this._syncingFromPanel = false
     this._selectionElement = null
     this._menu = null
     this._popup = null
@@ -186,7 +189,6 @@ class TimePicker extends BaseComponent {
 
   setTime(time: Date | null): void {
     this._input.update({ date: time })
-    this._selection?.update({ time })
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
   }
 
@@ -196,8 +198,6 @@ class TimePicker extends BaseComponent {
 
   clear(): void {
     this._input.clear()
-    this._selection?.update({ time: null })
-    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: null })
   }
 
   reset(): void {
@@ -218,6 +218,10 @@ class TimePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     this._popup.dispose()
     this._input.dispose()
     this._selection?.dispose()
@@ -246,7 +250,10 @@ class TimePicker extends BaseComponent {
   _createTimePicker(): void {
     this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER)
 
-    const inputGroup = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const inputGroup = this._element
+    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
@@ -270,14 +277,20 @@ class TimePicker extends BaseComponent {
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
-    this._element.append(inputGroup)
-
     this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
       date: this._config.time,
       disabled: this._config.disabled,
       locale: this._config.locale,
       name: this._config.name
     }, this._config.inputOptions))
+
+    // See DatePicker — the bridge from a typed value back to the panel
+    EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._selection?.update({ time: event.date })
+        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: event.date })
+      }
+    })
 
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
@@ -293,8 +306,6 @@ class TimePicker extends BaseComponent {
       this._disableUnselectableActions(footer)
       this._menu.append(footer)
     }
-
-    this._element.append(this._menu)
   }
 
   // See DatePicker._disableUnselectableActions — a button opting into the
@@ -321,7 +332,9 @@ class TimePicker extends BaseComponent {
     this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
       locale: this._config.locale,
       onChange: (time: Date | null) => {
+        this._syncingFromPanel = true
         this._input.update({ date: time })
+        this._syncingFromPanel = false
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
       },
       time: this.getTime(),

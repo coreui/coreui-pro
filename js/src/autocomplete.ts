@@ -185,6 +185,7 @@ class Autocomplete extends Combobox {
 
   override dispose(): void {
     this._disposeFloating()
+    this._menu?.remove()
 
     super.dispose()
   }
@@ -504,7 +505,9 @@ class Autocomplete extends Combobox {
   }
 
   _createInputGroup(): void {
-    const togglerEl = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const togglerEl = this._element
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
@@ -548,8 +551,6 @@ class Autocomplete extends Combobox {
 
     togglerEl.append(inputEl)
     this._inputElement = inputEl
-
-    this._element.append(togglerEl)
   }
 
   _createButtons(): void {
@@ -750,9 +751,9 @@ class Autocomplete extends Combobox {
 
       const composedPath = event.composedPath()
 
-      if (
-        composedPath.includes(context._element)
-      ) {
+      // The panel mounts outside the frame while open — a click on an option
+      // is very much inside
+      if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
         continue
       }
 

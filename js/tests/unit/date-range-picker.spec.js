@@ -33,12 +33,14 @@ describe('DateRangePicker', () => {
       expect(el.classList.contains('date-range-picker')).toBeTrue()
       expect(el.querySelectorAll('.form-date-time')).toHaveSize(2)
       expect(el.querySelector('.form-control-icon svg')).not.toBeNull()
-      expect(el.querySelectorAll('.date-picker-calendar')).toHaveSize(1)
 
       // the calendar itself is built on first open
       expect(picker._calendar).toBeNull()
       picker.show()
-      expect(el.querySelectorAll('.calendar-nav')).toHaveSize(2)
+
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      expect(popup.querySelectorAll('.date-picker-calendar')).toHaveSize(1)
+      expect(popup.querySelectorAll('.calendar-nav')).toHaveSize(2)
     })
 
     it('should seed the lazily built calendar with the current range and selection side', () => {
@@ -85,7 +87,7 @@ describe('DateRangePicker', () => {
     })
 
     it('should clone a ranges template into the dropdown body', () => {
-      buildPicker({}, [
+      const picker = buildPicker({}, [
         '<div id="picker">',
         '  <template data-coreui-template="ranges">',
         '    <button type="button" class="btn btn-sm" id="lastWeek">Last week</button>',
@@ -93,7 +95,9 @@ describe('DateRangePicker', () => {
         '</div>'
       ].join(''))
 
-      const ranges = fixtureEl.querySelector('.date-picker-ranges')
+      picker.show()
+
+      const ranges = fixtureEl.querySelector('.date-picker-popup .date-picker-ranges')
       expect(ranges).not.toBeNull()
       expect(ranges.querySelector('#lastWeek')).not.toBeNull()
     })
@@ -133,9 +137,10 @@ describe('DateRangePicker', () => {
       el.addEventListener('endDateChange.coreui.date-range-picker', event => events.push(['end', event.date]))
 
       picker.show()
-      const cells = el.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      const cells = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
       cells[0].click()
-      const remaining = el.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const remaining = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
       remaining[5].click()
 
       expect(picker.getStartDate()).not.toBeNull()
@@ -153,17 +158,17 @@ describe('DateRangePicker', () => {
         '  </template>',
         '</div>'
       ].join(''))
-      const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      const cells = el.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      const cells = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
       cells[0].click()
-      el.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
+      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
 
       expect(picker.getEndDate()).not.toBeNull()
       expect(picker._popup.isShown).toBeTrue()
 
-      el.querySelector('[data-coreui-picker-action="close"]').click()
+      popup.querySelector('[data-coreui-picker-action="close"]').click()
       expect(picker._popup.isShown).toBeFalse()
     })
 
@@ -176,11 +181,12 @@ describe('DateRangePicker', () => {
       el.querySelector('.form-date-time-section').dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
       picker.show()
 
-      expect(el.querySelectorAll('.calendar-nav')).toHaveSize(2)
+      const popup = fixtureEl.querySelector('.date-picker-popup')
+      expect(popup.querySelectorAll('.calendar-nav')).toHaveSize(2)
 
-      const cells = el.querySelectorAll('.calendar-cell[tabindex="0"]')
+      const cells = popup.querySelectorAll('.calendar-cell[tabindex="0"]')
       cells[0].click()
-      el.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
+      popup.querySelectorAll('.calendar-cell[tabindex="0"]')[5].click()
 
       expect(picker.getStartDate()).not.toBeNull()
       expect(picker.getEndDate()).not.toBeNull()
@@ -189,10 +195,9 @@ describe('DateRangePicker', () => {
 
     it('should keep the popup open when navigating months', () => {
       const picker = buildPicker()
-      const el = fixtureEl.querySelector('#picker')
 
       picker.show()
-      el.querySelector('.btn-next').click()
+      fixtureEl.querySelector('.date-picker-popup .btn-next').click()
 
       expect(picker._popup.isShown).toBeTrue()
       picker.hide()

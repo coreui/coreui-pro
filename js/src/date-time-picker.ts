@@ -148,6 +148,8 @@ class DateTimePicker extends BaseComponent {
   protected declare _selection: any
   protected declare _selectionElement: any
   protected declare _menu: any
+  protected declare _syncingFromPanel: boolean
+  protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -159,6 +161,7 @@ class DateTimePicker extends BaseComponent {
     this._cleanerElement = null
     this._input = null
     this._calendar = null
+    this._syncingFromPanel = false
     this._calendarElement = null
     this._selection = null
     this._selectionElement = null
@@ -208,10 +211,6 @@ class DateTimePicker extends BaseComponent {
   // follow the field's validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    const effectiveDate = this.getDate()
-    this._calendar?.update({ startDate: effectiveDate })
-    this._selection?.update({ time: effectiveDate })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   today(): void {
@@ -220,9 +219,6 @@ class DateTimePicker extends BaseComponent {
 
   clear(): void {
     this._input.clear()
-    this._calendar?.update({ startDate: null })
-    this._selection?.update({ time: null })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
   reset(): void {
@@ -243,6 +239,10 @@ class DateTimePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     this._popup.dispose()
     this._input.dispose()
     this._calendar?.dispose()
@@ -272,7 +272,10 @@ class DateTimePicker extends BaseComponent {
       CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
     )
 
-    const inputGroup = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const inputGroup = this._element
+    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
@@ -296,14 +299,21 @@ class DateTimePicker extends BaseComponent {
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
-    this._element.append(inputGroup)
-
     this._input = new DateTimeInput(inputEl, this._forwardConfig(DateTimeInput, {
       date: this._config.date,
       disabled: this._config.disabled,
       locale: this._config.locale,
       name: this._config.name
     }, this._config.inputOptions))
+
+    // See DatePicker — the bridge from a typed value back to both panel halves
+    EventHandler.on(inputEl, DateTimeInput.eventName(DateTimeInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._calendar?.update({ startDate: event.date })
+        this._selection?.update({ time: event.date })
+        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: event.date })
+      }
+    })
 
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
@@ -334,8 +344,6 @@ class DateTimePicker extends BaseComponent {
       this._disableUnselectableActions(footer)
       this._menu.append(footer)
     }
-
-    this._element.append(this._menu)
   }
 
   // See DatePicker._disableUnselectableActions — a button opting into the
@@ -390,7 +398,9 @@ class DateTimePicker extends BaseComponent {
       merged.setHours(current.getHours(), current.getMinutes(), current.getSeconds())
     }
 
+    this._syncingFromPanel = true
     this._input.update({ date: merged })
+    this._syncingFromPanel = false
     this._selection?.update({ time: merged })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }
@@ -404,7 +414,9 @@ class DateTimePicker extends BaseComponent {
     const merged = current ? new Date(current) : new Date()
     merged.setHours(time.getHours(), time.getMinutes(), time.getSeconds())
 
+    this._syncingFromPanel = true
     this._input.update({ date: merged })
+    this._syncingFromPanel = false
     this._calendar?.update({ startDate: merged })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: this.getDate() })
   }

@@ -2828,6 +2828,11 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
+      // the panel is in the DOM only while a choice is being made
+      expect(containerEl.querySelector('.combobox-popup')).toBeNull()
+
+      autocomplete.show()
+
       expect(containerEl.querySelector('.combobox-popup')).toBeTruthy()
       expect(autocomplete._inputElement.getAttribute('aria-owns')).toBeTruthy()
     })
@@ -2840,7 +2845,10 @@ describe('Autocomplete', () => {
         options: [{ label: 'Option 1', value: '1' }]
       })
 
+      autocomplete.show()
+
       expect(document.body.querySelector(`#${autocomplete._uniqueId}-listbox`)).toBeTruthy()
+      expect(autocomplete._menu.parentElement).toBe(document.body)
 
       // Cleanup
       const listbox = document.body.querySelector(`#${autocomplete._uniqueId}-listbox`)

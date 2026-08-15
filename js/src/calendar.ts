@@ -438,7 +438,15 @@ class Calendar extends BaseComponent {
   }
 
   _handleCalendarMouseEnter(event: any): void {
-    const target = event.target.closest(SELECTOR_CALENDAR_CELL)
+    // When weeks are the unit, the row is the focusable thing — a focus event
+    // then arrives with no cell above it, and the row stands in for one.
+    const target = event.target.closest(SELECTOR_CALENDAR_CELL) ??
+      event.target.closest(SELECTOR_CALENDAR_ROW)
+
+    if (!target) {
+      return
+    }
+
     const date = this._getDate(target)
 
     if (isDateDisabled(date, this._minDate, this._maxDate, this._config.disabledDates)) {

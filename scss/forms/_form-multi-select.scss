@@ -29,25 +29,21 @@ $form-multi-select-tokens: defaults(
 
     position: relative;
 
-    // The popup takes the focus away from the group, and a native focus on the
-    // overlaid select does the same, but the control is still active — so the
-    // frame keeps its focus treatment either way.
-    &.show,
+    // An open popup takes the focus away from the frame, but the control is
+    // still the one being operated — active treatment, no ring.
+    &.show {
+      @include form-control-group-active();
+    }
+
+    // A native focus on the overlaid select, on the other hand, really is here.
     &:has(> select:focus) {
-      .form-control-group {
-        @include form-control-group-focus();
-      }
+      @include form-control-group-focus();
     }
 
     // The chevron turns when the popup opens.
     &.show .form-control-action {
       transform: rotate(180deg);
     }
-  }
-
-  // Tags wrap onto their own rows inside the frame's padding, like chips do.
-  .form-multi-select .form-control-group {
-    flex-wrap: wrap;
   }
 
   // The native select stays in the DOM as an invisible overlay covering the control

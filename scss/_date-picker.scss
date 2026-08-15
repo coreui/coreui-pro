@@ -39,8 +39,8 @@ $date-picker-tokens: defaults(
 
     // The popup takes the focus away from the group, but the control is still
     // active — so the frame keeps its focus treatment while it is open.
-    &.show .form-control-group {
-      @include form-control-group-focus();
+    &.show {
+      @include form-control-group-active();
     }
   }
 

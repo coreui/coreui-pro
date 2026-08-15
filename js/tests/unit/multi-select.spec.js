@@ -84,7 +84,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
       expect(multiSelect._wrapperElement.classList.contains('form-multi-select')).toBe(true)
-      expect(multiSelect._wrapperElement.querySelector('.form-control-group')).toBeTruthy()
+      expect(multiSelect._wrapperElement.classList.contains('form-control-group')).toBe(true)
       expect(multiSelect._wrapperElement.querySelector('.form-multi-select-selection')).toBeTruthy()
     })
 
@@ -676,6 +676,74 @@ describe('MultiSelect', () => {
       expect(multiSelect._optionsElement.getAttribute('aria-multiselectable')).toBeNull()
     })
 
+    it('should mount next to the frame by default and leave no panel behind', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+
+      // next to the frame, not inside it — the frame is a flex control chrome
+      expect(multiSelect._menu.parentElement).not.toBe(multiSelect._wrapperElement)
+      expect(multiSelect._wrapperElement.nextElementSibling).toBe(multiSelect._menu)
+
+      multiSelect.hide()
+      multiSelect.dispose()
+
+      expect(document.querySelector('.combobox-popup')).toBeNull()
+    })
+
+    it('should follow the frame width while open', async () => {
+      fixtureEl.innerHTML = '<div style="width: 660px;"><select></select></div>'
+      const wrap = fixtureEl.querySelector('div')
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+
+      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.offsetWidth}px`)
+
+      // The frame resizes while the panel is open — an inline snapshot that
+      // does not follow it leaves the panel at the stale width.
+      wrap.style.width = '400px'
+      await new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      })
+
+      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.offsetWidth}px`)
+      expect(multiSelect._wrapperElement.offsetWidth).toBeLessThan(660)
+
+      multiSelect.hide()
+    })
+
+    it('should stay inside an open dialog rather than escape to the body', () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="host">',
+        '  <div style="overflow: hidden; position: relative;">',
+        '    <select></select>',
+        '  </div>',
+        '</dialog>'
+      ].join('')
+
+      const dialog = fixtureEl.querySelector('#host')
+      dialog.show()
+
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+
+      // outside the dialog's subtree the panel would be painted but inert
+      expect(dialog.contains(multiSelect._menu)).toBe(true)
+
+      multiSelect.hide()
+      dialog.close()
+    })
+
     it('should handle container option', () => {
       fixtureEl.innerHTML = '<select></select><div id="container"></div>'
       const selectEl = fixtureEl.querySelector('select')
@@ -684,6 +752,11 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }],
         container: containerEl
       })
+
+      // the panel is in the DOM only while a choice is being made
+      expect(containerEl.querySelector('.combobox-popup')).toBeNull()
+
+      multiSelect.show()
 
       expect(containerEl.querySelector('.combobox-popup')).not.toBeNull()
       expect(multiSelect._menu.parentElement).toBe(containerEl)
@@ -696,6 +769,8 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }],
         container: true
       })
+
+      multiSelect.show()
 
       expect(multiSelect._menu.parentElement).toBe(document.body)
       // Clean up
@@ -3016,7 +3091,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       option.focus()
-      expect(multiSelect._wrapperElement.contains(document.activeElement)).toBe(true)
+      expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
 
       multiSelect.hide()
 

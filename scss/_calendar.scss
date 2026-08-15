@@ -337,6 +337,9 @@ $calendar-tokens: defaults(
     }
 
     .calendars:not(.select-week) &:focus-visible {
+      // The ring is drawn on the inner box; without this the cell itself keeps
+      // the UA focus outline on top of it and the day shows two frames.
+      outline: 0;
 
       .calendar-cell-inner {
         outline: var(--#{$prefix}calendar-cell-focus-ring);

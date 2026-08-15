@@ -140,6 +140,8 @@ class DatePicker extends BaseComponent {
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _menu: any
+  protected declare _syncingFromPanel: boolean
+  protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -152,6 +154,7 @@ class DatePicker extends BaseComponent {
     this._cleanerElement = null
     this._input = null
     this._calendar = null
+    this._syncingFromPanel = false
     this._calendarElement = null
     this._menu = null
     this._popup = null
@@ -199,15 +202,10 @@ class DatePicker extends BaseComponent {
   // calendar selection follow the validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    const effectiveDate = this.getDate()
-    this._calendar?.update({ startDate: effectiveDate })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   clear(): void {
     this._input.clear()
-    this._calendar?.update({ startDate: null })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
   reset(): void {
@@ -232,6 +230,10 @@ class DatePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     this._popup.dispose()
     this._input.dispose()
     this._calendar?.dispose()
@@ -278,7 +280,10 @@ class DatePicker extends BaseComponent {
   _createDatePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_PICKER)
 
-    const inputGroup = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const inputGroup = this._element
+    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
@@ -302,8 +307,6 @@ class DatePicker extends BaseComponent {
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
-    this._element.append(inputGroup)
-
     this._input = new DateInput(inputEl, this._forwardConfig(DateInput, {
       date: this._config.date,
       disabled: this._config.disabled,
@@ -311,6 +314,17 @@ class DatePicker extends BaseComponent {
       name: this._config.name,
       ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
     }, this._config.inputOptions))
+
+    // Selection flows panel → field; this is the only bridge back, so a date
+    // typed into the field reaches the calendar too. The guard stops the echo
+    // of the panel's own updates — without it, picking a range start would
+    // re-render the calendar mid-interaction.
+    EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._calendar?.update({ startDate: event.date })
+        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: event.date })
+      }
+    })
 
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
@@ -326,7 +340,6 @@ class DatePicker extends BaseComponent {
     calendars.append(this._calendarElement)
     body.append(calendars)
     this._menu.append(body)
-    this._element.append(this._menu)
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')
@@ -369,7 +382,9 @@ class DatePicker extends BaseComponent {
       // `date` is formatted per selectionType ("2026-01", "2026Q1", …);
       // `dateObject` is the underlying Date the section field can hold
       const { date, dateObject } = event
+      this._syncingFromPanel = true
       this._input.update({ date: dateObject })
+      this._syncingFromPanel = false
       EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, dateObject })
       this.hide()
     })

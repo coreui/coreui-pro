@@ -741,7 +741,10 @@ class MultiSelect extends Combobox {
   }
 
   _createSelection(): void {
-    const togglerEl = document.createElement('div')
+    // The wrapper is the frame: it stands in for the native select, so it
+    // carries `.form-control-group` itself instead of nesting one. (`_element`
+    // is the native <select>, which stays as an invisible overlay.)
+    const togglerEl = this._wrapperElement
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     togglerEl.setAttribute('role', 'combobox')
     togglerEl.setAttribute('aria-expanded', 'false')
@@ -766,7 +769,6 @@ class MultiSelect extends Combobox {
     }
 
     togglerEl.append(selectionEl)
-    this._wrapperElement.append(togglerEl)
 
     this._updateSelection()
     this._selectionElement = selectionEl
@@ -1552,7 +1554,9 @@ class MultiSelect extends Combobox {
         continue
       }
 
-      if (context._wrapperElement.contains(event.target)) {
+      // The panel mounts outside the frame while open — a click on an option
+      // is very much inside
+      if (context._wrapperElement.contains(event.target) || context._menu.contains(event.target)) {
         continue
       }
 
