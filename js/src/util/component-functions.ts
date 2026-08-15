@@ -13,7 +13,7 @@ import SelectorEngine from '../dom/selector-engine.js'
 import type BaseComponent from '../base-component.js'
 import { isDisabled } from './index.js'
 
-const enableDismissTrigger = (component: typeof BaseComponent, method = 'hide'): void => {
+const enableDismissTrigger = (component: typeof BaseComponent, method = 'hide', closestSelector?: string): void => {
   const clickEvent = `click.dismiss${component.EVENT_KEY}`
   const name = component.NAME
 
@@ -26,7 +26,7 @@ const enableDismissTrigger = (component: typeof BaseComponent, method = 'hide'):
       return
     }
 
-    const target = SelectorEngine.getElementFromSelector(this) || this.closest(`.${name}`)
+    const target = SelectorEngine.getElementFromSelector(this) || this.closest(closestSelector ?? `.${name}`)
     const instance: any = component.getOrCreateInstance(target)
 
     // Method argument is left, for Alert and only, as it doesn't implement the 'hide' method

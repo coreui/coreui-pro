@@ -1,15 +1,14 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI offcanvas.ts
+ * CoreUI drawer.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
  * This component is a modified version of the Bootstrap's drawer.ts
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
 import DialogBase from './dialog-base.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
@@ -18,14 +17,13 @@ import {
   isDisabled,
   isVisible
 } from './util/index.js'
-import { resolveDialogElement } from './util/legacy-markup.js'
 
 /**
  * Constants
  */
 
-const NAME = 'offcanvas'
-const DATA_KEY = 'coreui.offcanvas'
+const NAME = 'drawer'
+const DATA_KEY = 'coreui.drawer'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 const EVENT_LOAD_DATA_API = `load${EVENT_KEY}${DATA_API_KEY}`
@@ -34,11 +32,11 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_RESIZE = `resize${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
-const OPEN_SELECTOR = 'dialog[open][class*="offcanvas"]'
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="offcanvas"]'
+const OPEN_SELECTOR = 'dialog[open][class*="drawer"]'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="drawer"]'
 // Responsive variants replace the base class, so the dismiss fallback must
 // match them too
-const SELECTOR_DISMISS_SCOPE = '.offcanvas, .offcanvas-sm, .offcanvas-md, .offcanvas-lg, .offcanvas-xl, .offcanvas-xxl'
+const SELECTOR_DISMISS_SCOPE = '.drawer, .drawer-sm, .drawer-md, .drawer-lg, .drawer-xl, .drawer-xxl'
 
 const Default = {
   backdrop: true,
@@ -56,11 +54,7 @@ const DefaultType = {
  * Class definition
  */
 
-class Offcanvas extends DialogBase {
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
-    super(resolveDialogElement(element, NAME), config)
-  }
-
+class Drawer extends DialogBase {
   // Getters
   static override get Default(): typeof Default {
     return Default
@@ -95,7 +89,7 @@ class Offcanvas extends DialogBase {
   // Static
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
-      const data: any = Offcanvas.getOrCreateInstance(this, config)
+      const data: any = Drawer.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
@@ -115,7 +109,7 @@ class Offcanvas extends DialogBase {
  */
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-  const target = resolveDialogElement(SelectorEngine.getElementFromSelector(this), NAME)
+  const target = SelectorEngine.getElementFromSelector(this)
 
   if (['A', 'AREA'].includes(this.tagName)) {
     event.preventDefault()
@@ -133,36 +127,36 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
     }
   })
 
-  // avoid conflict when clicking a toggler of an offcanvas, while another is open
+  // avoid conflict when clicking a toggler of a drawer, while another is open
   const alreadyOpen = SelectorEngine.findOne(OPEN_SELECTOR)
   if (alreadyOpen && alreadyOpen !== target) {
-    Offcanvas.getInstance(alreadyOpen)?.hide()
+    Drawer.getInstance(alreadyOpen)?.hide()
   }
 
-  const data: any = Offcanvas.getOrCreateInstance(target)
+  const data: any = Drawer.getOrCreateInstance(target)
   data.toggle(this)
 })
 
 EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
   for (const selector of SelectorEngine.find(OPEN_SELECTOR)) {
-    Offcanvas.getOrCreateInstance(selector).show()
+    Drawer.getOrCreateInstance(selector).show()
   }
 })
 
 EventHandler.on(window, EVENT_RESIZE, () => {
   for (const element of SelectorEngine.find(OPEN_SELECTOR)) {
     if (getComputedStyle(element).position !== 'fixed') {
-      Offcanvas.getOrCreateInstance(element).hide()
+      Drawer.getOrCreateInstance(element).hide()
     }
   }
 })
 
-enableDismissTrigger(Offcanvas, 'hide', SELECTOR_DISMISS_SCOPE)
+enableDismissTrigger(Drawer, 'hide', SELECTOR_DISMISS_SCOPE)
 
 /**
  * jQuery
  */
 
-defineJQueryPlugin(Offcanvas)
+defineJQueryPlugin(Drawer)
 
-export default Offcanvas
+export default Drawer
