@@ -62,6 +62,7 @@ class Combobox extends BaseComponent {
   protected declare _options: any
   protected declare _search: any
   protected declare _floatingCleanup: (() => void) | null
+  protected declare _widthObserver: ResizeObserver | null
   protected declare _anchoredPosition: ReturnType<typeof createAnchoredPosition> | null
 
   // Statics — the subclass seam
@@ -169,7 +170,18 @@ class Combobox extends BaseComponent {
       showTarget.after(this._menu)
     }
 
-    this._menu.style.minWidth = `${showTarget.offsetWidth}px`
+    // The frame used to size the panel through CSS (min-width: 100%), which
+    // tracked resizes for free; an inline snapshot must follow the frame
+    // itself for as long as the panel is open.
+    this._syncMenuWidth()
+    this._widthObserver = new ResizeObserver(() => this._syncMenuWidth())
+    this._widthObserver.observe(showTarget)
+  }
+
+  _syncMenuWidth(): void {
+    if (this._menu) {
+      this._menu.style.minWidth = `${this._getShowTarget().offsetWidth}px`
+    }
   }
 
   _getAriaExpandedTarget(): HTMLElement {
@@ -393,6 +405,11 @@ class Combobox extends BaseComponent {
   }
 
   _disposeFloating(): void {
+    // The width observer shares the floating lifecycle exactly: both live
+    // while the panel is interactive, and every hide/dispose path ends here.
+    this._widthObserver?.disconnect()
+    this._widthObserver = null
+
     if (this._floatingCleanup) {
       this._floatingCleanup()
       this._floatingCleanup = null

@@ -695,6 +695,30 @@ describe('MultiSelect', () => {
       expect(document.querySelector('.combobox-popup')).toBeNull()
     })
 
+    it('should follow the frame width while open', async () => {
+      fixtureEl.innerHTML = '<div style="width: 660px;"><select></select></div>'
+      const wrap = fixtureEl.querySelector('div')
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+
+      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.offsetWidth}px`)
+
+      // The frame resizes while the panel is open — an inline snapshot that
+      // does not follow it leaves the panel at the stale width.
+      wrap.style.width = '400px'
+      await new Promise(resolve => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      })
+
+      expect(multiSelect._menu.style.minWidth).toEqual(`${multiSelect._wrapperElement.offsetWidth}px`)
+      expect(multiSelect._wrapperElement.offsetWidth).toBeLessThan(660)
+
+      multiSelect.hide()
+    })
+
     it('should stay inside an open dialog rather than escape to the body', () => {
       fixtureEl.innerHTML = [
         '<dialog id="host">',
