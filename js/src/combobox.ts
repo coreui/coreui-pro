@@ -32,6 +32,7 @@ import {
 const ARROW_UP_KEY = 'ArrowUp'
 const ARROW_DOWN_KEY = 'ArrowDown'
 const END_KEY = 'End'
+const ESCAPE_KEY = 'Escape'
 const ENTER_KEY = 'Enter'
 const HOME_KEY = 'Home'
 
@@ -188,6 +189,10 @@ class Combobox extends BaseComponent {
     return this._togglerElement
   }
 
+  _escapeFocusTarget(): HTMLElement | null {
+    return this._togglerElement
+  }
+
   // Shared keyboard wiring
 
   _addTogglerKeydownListeners(): void {
@@ -254,6 +259,20 @@ class Combobox extends BaseComponent {
     }
 
     popupDiv.append(optionsDiv)
+
+    // The menu mounts outside the component while open, so its keystrokes no
+    // longer bubble through the frame — Escape is handled on the panel itself.
+    // Focus goes home before the panel unmounts, or a keyboard user is
+    // dropped on <body>; preventDefault keeps the same press from also
+    // closing an enclosing modal dialog.
+    EventHandler.on(popupDiv, this.constructor.eventName('keydown'), (event: any) => {
+      if (event.key === ESCAPE_KEY) {
+        event.preventDefault()
+        event.stopPropagation()
+        this._escapeFocusTarget()?.focus()
+        this.hide()
+      }
+    })
 
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv

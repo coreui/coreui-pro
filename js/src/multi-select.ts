@@ -256,6 +256,10 @@ class MultiSelect extends Combobox {
 
   // Public
 
+  override _escapeFocusTarget(): HTMLElement | null {
+    return this._config.search ? this._searchElement : this._togglerElement
+  }
+
   override _getShowTarget(): HTMLElement {
     return this._wrapperElement
   }
