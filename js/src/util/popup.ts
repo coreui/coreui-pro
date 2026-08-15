@@ -11,7 +11,7 @@ import {
 import EventHandler from '../dom/event-handler.js'
 import Config from './config.js'
 import FocusTrap from './focustrap.js'
-import { execute, getElement, isRTL } from './index.js'
+import { execute, executeAfterTransition, getElement, isRTL } from './index.js'
 
 /**
  * Constants
@@ -143,13 +143,17 @@ class Popup extends Config {
       return
     }
 
-    execute(this._config.onShow)
     this._isShown = true
     this._previouslyFocused = document.activeElement as HTMLElement | null
 
-    if (this._container) {
-      this._container.append(this._content!)
-    }
+    // Mount before the callback: consumers use it to scroll the selection into
+    // view, which needs the panel to have layout. Mounting it still hidden also
+    // keeps the entry animation exactly as it was when the panel lived in the
+    // DOM permanently — `.show` flips `display` afterwards, and
+    // `@starting-style` supplies the state to animate from.
+    this._mount()
+
+    execute(this._config.onShow)
 
     if (!this.isMobile) {
       this._startPositioning()
@@ -178,12 +182,17 @@ class Popup extends Config {
       this._focustrap.deactivate()
     }
 
+    // Focus goes home while the panel is still connected: unmounting with the
+    // focus inside drops it on <body> and a keyboard user loses their place.
     if (this._config.returnFocus && this._previouslyFocused) {
       this._previouslyFocused.focus()
       this._previouslyFocused = null
     }
 
     execute(this._config.onHidden)
+
+    // The exit transition needs the element to stay put while it plays.
+    executeAfterTransition(() => this._unmount(), this._content!)
   }
 
   toggle(): any {
@@ -198,6 +207,7 @@ class Popup extends Config {
 
   dispose(): void {
     this.hide()
+    this._unmount()
     this._focustrap = null
     this._anchor = null as HTMLElement | null
     this._content = null
@@ -205,6 +215,74 @@ class Popup extends Config {
   }
 
   // Private
+
+  // The panel is in the DOM only while a choice is being made. Where it goes is
+  // decided on every open, because the answer depends on where the anchor is
+  // *now*: inside a dialog, inside something that clips, or neither.
+  _mount(): void {
+    if (!this._content) {
+      return
+    }
+
+    const container = this._resolveContainer()
+
+    if (container) {
+      container.append(this._content)
+      return
+    }
+
+    // In place — next to the field, not inside it: the frame is a flex control
+    // chrome and the panel is not one of its items.
+    this._anchor?.after(this._content)
+  }
+
+  _unmount(): void {
+    if (!this._isShown) {
+      this._content?.remove()
+    }
+  }
+
+  _resolveContainer(): HTMLElement | null {
+    if (this._container) {
+      return this._container
+    }
+
+    // A panel outside an open modal dialog's subtree is painted but inert, so
+    // the dialog wins over every other escape route.
+    const dialog = this._anchor?.closest('dialog[open]') as HTMLElement | null
+
+    if (dialog) {
+      return this._hasConstrainingAncestor(dialog) ? dialog : null
+    }
+
+    return this._hasConstrainingAncestor() ? document.body : null
+  }
+
+  // Walk up from the anchor looking for anything that would clip the panel or
+  // trap it in a stacking context — exactly the cases the teleport exists for.
+  _hasConstrainingAncestor(boundary: HTMLElement = document.body): boolean {
+    let node = this._anchor?.parentElement
+
+    while (node && node !== boundary && node !== document.body && node !== document.documentElement) {
+      const styles = getComputedStyle(node)
+
+      if (
+        styles.overflow !== 'visible' ||
+        styles.transform !== 'none' ||
+        styles.filter !== 'none' ||
+        styles.perspective !== 'none' ||
+        styles.contain.includes('paint') ||
+        styles.willChange.includes('transform')
+      ) {
+        return true
+      }
+
+      node = node.parentElement
+    }
+
+    return false
+  }
+
   _startPositioning(): void {
     this._cleanupAutoUpdate = autoUpdate(this._anchor!, this._content, () => this._updatePosition())
   }

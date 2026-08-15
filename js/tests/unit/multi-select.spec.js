@@ -84,7 +84,7 @@ describe('MultiSelect', () => {
       const multiSelect = new MultiSelect(selectEl, { options: [] })
 
       expect(multiSelect._wrapperElement.classList.contains('form-multi-select')).toBe(true)
-      expect(multiSelect._wrapperElement.querySelector('.form-control-group')).toBeTruthy()
+      expect(multiSelect._wrapperElement.classList.contains('form-control-group')).toBe(true)
       expect(multiSelect._wrapperElement.querySelector('.form-multi-select-selection')).toBeTruthy()
     })
 

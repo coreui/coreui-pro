@@ -130,6 +130,7 @@ class TimePicker extends BaseComponent {
   protected declare _selection: any
   protected declare _selectionElement: any
   protected declare _menu: any
+  protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -218,6 +219,10 @@ class TimePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     this._popup.dispose()
     this._input.dispose()
     this._selection?.dispose()
@@ -246,7 +251,10 @@ class TimePicker extends BaseComponent {
   _createTimePicker(): void {
     this._element.classList.add(CLASS_NAME_TIME_PICKER, CLASS_NAME_PICKER)
 
-    const inputGroup = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const inputGroup = this._element
+    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
@@ -270,8 +278,6 @@ class TimePicker extends BaseComponent {
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
-    this._element.append(inputGroup)
-
     this._input = new TimeInput(inputEl, this._forwardConfig(TimeInput, {
       date: this._config.time,
       disabled: this._config.disabled,
@@ -293,8 +299,6 @@ class TimePicker extends BaseComponent {
       this._disableUnselectableActions(footer)
       this._menu.append(footer)
     }
-
-    this._element.append(this._menu)
   }
 
   // See DatePicker._disableUnselectableActions — a button opting into the

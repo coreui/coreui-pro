@@ -162,6 +162,7 @@ class DateRangePicker extends BaseComponent {
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _menu: any
+  protected declare _addedGroupClass: boolean
   protected declare _popup: any
   protected declare _selectEndDate: any
   protected declare _initialStartDate: any
@@ -262,6 +263,10 @@ class DateRangePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     this._popup.dispose()
     this._startInput.dispose()
     this._endInput.dispose()
@@ -338,7 +343,10 @@ class DateRangePicker extends BaseComponent {
   _createDateRangePicker(): void {
     this._element.classList.add(CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_RANGE_PICKER, CLASS_NAME_PICKER)
 
-    const inputGroup = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const inputGroup = this._element
+    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
@@ -375,8 +383,6 @@ class DateRangePicker extends BaseComponent {
     inputGroup.append(indicator)
     this._indicatorElement = indicator
 
-    this._element.append(inputGroup)
-
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
@@ -398,7 +404,6 @@ class DateRangePicker extends BaseComponent {
     calendars.append(this._calendarElement)
     body.append(calendars)
     this._menu.append(body)
-    this._element.append(this._menu)
 
     if (this._footerTemplate) {
       const footer = document.createElement('div')

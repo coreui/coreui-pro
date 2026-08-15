@@ -6,11 +6,9 @@
     position: relative;
 
     &.show {
-      // The popup takes the focus away from the group, but the control is
-      // still active, so the frame keeps its focus treatment while it is open.
-      .form-control-group {
-        @include form-control-group-focus();
-      }
+      // The popup takes the focus away from the frame, but the control is
+      // still the one being operated — active treatment, no ring.
+      @include form-control-group-active();
 
       // The chevron turns when the popup opens.
       .form-control-action {

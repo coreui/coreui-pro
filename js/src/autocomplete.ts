@@ -504,7 +504,9 @@ class Autocomplete extends Combobox {
   }
 
   _createInputGroup(): void {
-    const togglerEl = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const togglerEl = this._element
     togglerEl.classList.add(CLASS_NAME_INPUT_GROUP)
     this._togglerElement = togglerEl
 
@@ -548,8 +550,6 @@ class Autocomplete extends Combobox {
 
     togglerEl.append(inputEl)
     this._inputElement = inputEl
-
-    this._element.append(togglerEl)
   }
 
   _createButtons(): void {

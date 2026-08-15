@@ -44,14 +44,24 @@ $form-control-group-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-control-group-tokens
 
-// scss-docs-start form-control-group-focus-mixin
-// The focus treatment of the frame. A component whose focus leaves the group
-// while it is still active — a picker with an open popup, say — replays it on
-// its own open state.
-@mixin form-control-group-focus() {
+// scss-docs-start form-control-group-active-mixin
+// "This control is the one being operated" — colour, fill and border, with no
+// focus ring. A picker with an open popup is in this state: the panel has taken
+// the focus, but the field is still the subject of the interaction.
+@mixin form-control-group-active() {
   color: var(--#{$prefix}control-focus-color);
   background-color: var(--#{$prefix}control-focus-bg);
   border-color: var(--#{$prefix}control-focus-border-color);
+}
+// scss-docs-end form-control-group-active-mixin
+
+// scss-docs-start form-control-group-focus-mixin
+// The active treatment plus the ring. The ring says "focus is HERE", so it must
+// only ever be drawn where focus actually is — a field showing one while the
+// user is arrowing around a calendar gives a keyboard user two focus-looking
+// indicators and no way to tell which one answers the keys (WCAG 2.4.7).
+@mixin form-control-group-focus() {
+  @include form-control-group-active();
   outline: var(--#{$prefix}control-focus-ring);
 }
 // scss-docs-end form-control-group-focus-mixin

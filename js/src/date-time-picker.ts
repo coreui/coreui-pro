@@ -148,6 +148,7 @@ class DateTimePicker extends BaseComponent {
   protected declare _selection: any
   protected declare _selectionElement: any
   protected declare _menu: any
+  protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
   constructor(element?: string | Element | null, config?: ComponentConfig | null) {
@@ -243,6 +244,10 @@ class DateTimePicker extends BaseComponent {
   }
 
   override dispose(): void {
+    if (this._addedGroupClass) {
+      this._element.classList.remove(CLASS_NAME_INPUT_GROUP)
+    }
+
     this._popup.dispose()
     this._input.dispose()
     this._calendar?.dispose()
@@ -272,7 +277,10 @@ class DateTimePicker extends BaseComponent {
       CLASS_NAME_DATE_PICKER, CLASS_NAME_DATE_TIME_PICKER, CLASS_NAME_PICKER
     )
 
-    const inputGroup = document.createElement('div')
+    // The root is the frame: a field component has nothing to wrap, so it
+    // carries `.form-control-group` itself instead of nesting one.
+    const inputGroup = this._element
+    this._addedGroupClass = !inputGroup.classList.contains(CLASS_NAME_INPUT_GROUP)
     inputGroup.classList.add(CLASS_NAME_INPUT_GROUP)
 
     // Sizing rides the standard control classes on the frame itself
@@ -295,8 +303,6 @@ class DateTimePicker extends BaseComponent {
     const indicator = action(CLASS_NAME_INDICATOR, this._config.indicatorIcon, this._config.ariaToggleLabel)
     inputGroup.append(indicator)
     this._indicatorElement = indicator
-
-    this._element.append(inputGroup)
 
     this._input = new DateTimeInput(inputEl, this._forwardConfig(DateTimeInput, {
       date: this._config.date,
@@ -334,8 +340,6 @@ class DateTimePicker extends BaseComponent {
       this._disableUnselectableActions(footer)
       this._menu.append(footer)
     }
-
-    this._element.append(this._menu)
   }
 
   // See DatePicker._disableUnselectableActions — a button opting into the
