@@ -127,6 +127,78 @@ describe('Popup', () => {
   // goes is decided on every open — these assert the contract that decision
   // follows, because it is what keeps a picker usable inside a modal and
   // unclipped inside a scroll container.
+  // The native `<input type="date">` contract: the field's own arrows edit the
+  // value, so the panel answers the platform's dropdown keys instead, and
+  // opening moves focus into it — otherwise the calendar is unreachable
+  // without a mouse.
+  describe('opening from the field', () => {
+    const buildField = (config = {}) => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><button id="inside">field</button></div>',
+        '<div id="content"><button id="first">first</button><button id="entry" tabindex="0">entry</button></div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false,
+        ...config
+      })
+
+      popups.push(popup)
+      return popup
+    }
+
+    const press = (key, options = {}) => {
+      const event = new KeyboardEvent('keydown', {
+        bubbles: true, cancelable: true, key, ...options
+      })
+      fixtureEl.querySelector('#anchor').dispatchEvent(event)
+      return event
+    }
+
+    it('should open on Alt+ArrowDown and move focus into the panel', () => {
+      const popup = buildField()
+
+      const event = press('ArrowDown', { altKey: true })
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(popup.isShown).toBeTrue()
+      expect(document.activeElement.id).toEqual('entry')
+    })
+
+    it('should open on F4', () => {
+      const popup = buildField()
+
+      press('F4')
+
+      expect(popup.isShown).toBeTrue()
+    })
+
+    it('should leave a bare ArrowDown to the field, which spends it on the value', () => {
+      const popup = buildField()
+
+      const event = press('ArrowDown')
+
+      expect(event.defaultPrevented).toBeFalse()
+      expect(popup.isShown).toBeFalse()
+    })
+
+    it('should not reopen or steal focus while it is already open', () => {
+      const popup = buildField()
+
+      press('ArrowDown', { altKey: true })
+      fixtureEl.querySelector('#inside').focus()
+
+      press('ArrowDown', { altKey: true })
+
+      expect(popup.isShown).toBeTrue()
+      expect(document.activeElement.id).toEqual('inside')
+    })
+  })
+
   describe('mounting', () => {
     const buildIn = (markup, config = {}) => {
       fixtureEl.innerHTML = markup

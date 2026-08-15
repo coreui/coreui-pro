@@ -9,6 +9,7 @@ import {
   autoUpdate, computePosition, flip, offset, type Placement, shift
 } from '@floating-ui/dom'
 import EventHandler from '../dom/event-handler.js'
+import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
 import FocusTrap from './focustrap.js'
 import {
@@ -27,6 +28,7 @@ const EVENT_CLICK = `click${EVENT_KEY}`
 const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
 
 const ESCAPE_KEY = 'Escape'
+const ARROW_DOWN_KEY = 'ArrowDown'
 
 type PopupConfig = {
   anchor: HTMLElement | null
@@ -96,6 +98,7 @@ class Popup extends Config {
   protected declare _previouslyFocused: HTMLElement | null
   protected declare _clickListener: any
   protected declare _keydownListener: any
+  protected declare _anchorKeydownListener: any
   protected declare _focustrap: any
   protected declare _config: PopupConfig
 
@@ -110,12 +113,19 @@ class Popup extends Config {
     this._previouslyFocused = null
     this._clickListener = null
     this._keydownListener = null
+    this._anchorKeydownListener = null
+    // The panel now always lives outside the anchor, so the trap has to be told
+    // about it unconditionally — otherwise moving into it reads as escaping the
+    // trap and focus is yanked back to the field, which makes the calendar
+    // unreachable from the keyboard.
     this._focustrap = this._config.focusTrap ?
       new FocusTrap({
-        additionalElement: this._container ? this._content : null,
+        additionalElement: this._content,
         trapElement: this._anchor
       }) :
       null
+
+    this._addAnchorKeydownListener()
   }
 
   // Getters
@@ -210,6 +220,12 @@ class Popup extends Config {
   dispose(): void {
     this.hide()
     this._unmount()
+
+    if (this._anchorKeydownListener) {
+      EventHandler.off(this._anchor!, EVENT_KEYDOWN, this._anchorKeydownListener)
+      this._anchorKeydownListener = null
+    }
+
     this._focustrap = null
     this._anchor = null as HTMLElement | null
     this._content = null
@@ -334,6 +350,44 @@ class Popup extends Config {
       (placement.endsWith('-end') ? placement.replace('-end', '-start') : placement)
   }
 
+  // The native `<input type="date">` model: the field's own arrows belong to the
+  // value (our section input spends Up/Down changing the focused segment), so
+  // the panel opens on Alt+ArrowDown or F4 — the platform's dropdown keys —
+  // and focus moves straight into it. Escape closes and hands focus back,
+  // which the dismiss listener and `returnFocus` already do.
+  _addAnchorKeydownListener(): void {
+    if (!this._anchor) {
+      return
+    }
+
+    this._anchorKeydownListener = (event: KeyboardEvent) => {
+      const opensPanel = event.key === 'F4' || (event.altKey && event.key === ARROW_DOWN_KEY)
+
+      if (!opensPanel || this._isShown) {
+        return
+      }
+
+      event.preventDefault()
+      this.show()
+      this._focusPanel()
+    }
+
+    EventHandler.on(this._anchor, EVENT_KEYDOWN, this._anchorKeydownListener)
+  }
+
+  // Prefer whatever the panel nominates as its entry point — a roving-focus
+  // grid marks it with tabindex="0" — and fall back to the first focusable.
+  _focusPanel(): void {
+    if (!this._content) {
+      return
+    }
+
+    const preferred = this._content.querySelector('[tabindex="0"]') as HTMLElement | null
+    const target = preferred ?? SelectorEngine.focusableChildren(this._content)[0]
+
+    target?.focus()
+  }
+
   _addDismissListeners(): void {
     this._clickListener = (event: Event) => {
       // composedPath, not contains(): the click may re-render part of the
@@ -362,6 +416,7 @@ class Popup extends Config {
     EventHandler.off(document, EVENT_KEYDOWN, this._keydownListener)
     this._clickListener = null
     this._keydownListener = null
+    this._anchorKeydownListener = null
   }
 }
 
