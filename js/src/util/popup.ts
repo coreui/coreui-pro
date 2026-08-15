@@ -6,7 +6,7 @@
  */
 
 import {
-  autoUpdate, computePosition, flip, offset, type Placement, shift
+  autoUpdate, computePosition, flip, hide, offset, type Placement, shift
 } from '@floating-ui/dom'
 import EventHandler from '../dom/event-handler.js'
 import Config from './config.js'
@@ -284,17 +284,7 @@ class Popup extends Config {
   }
 
   _startPositioning(): void {
-    // A top-layer panel is `position: fixed`, so it no longer scrolls with the
-    // content the way an absolutely positioned one did — every frame has to be
-    // caught up in JS. Scroll events alone lag behind compositor-driven
-    // scrolling (the panel visibly drifts, then snaps back), so the top layer
-    // pays for a per-frame loop; the in-flow path keeps the cheap listeners.
-    this._cleanupAutoUpdate = autoUpdate(
-      this._anchor!,
-      this._content,
-      () => this._updatePosition(),
-      { animationFrame: this._isInTopLayer() }
-    )
+    this._cleanupAutoUpdate = autoUpdate(this._anchor!, this._content, () => this._updatePosition())
   }
 
   _stopPositioning(): void {
@@ -309,19 +299,21 @@ class Popup extends Config {
     const middleware = [
       offset({ crossAxis: skidding, mainAxis: distance }),
       flip(this._config.fallbackPlacements ? { fallbackPlacements: this._config.fallbackPlacements } : {}),
-      shift()
+      shift(),
+      hide()
     ]
 
-    // A top-layer element's containing block is the viewport, so it has no
-    // offsetParent to measure against — `absolute` would resolve the
-    // coordinates against the wrong origin.
-    const strategy = this._isInTopLayer() ? 'fixed' : 'absolute'
-
+    // `absolute` on both paths, and deliberately so in the top layer: a
+    // top-layer element has no offsetParent, so the coordinates resolve
+    // against the initial containing block, which scrolls with the document.
+    // The browser then carries the panel along natively — `fixed` would pin it
+    // to the viewport and leave the main thread chasing compositor-driven
+    // scrolling, which it cannot win (the panel visibly drifts).
     computePosition(this._anchor!, this._content!, {
       middleware,
       placement: this._resolvePlacement() as any,
-      strategy
-    }).then(({ x, y }) => {
+      strategy: 'absolute'
+    }).then(({ x, y, middlewareData }) => {
       // dispose() can null the content while computePosition is in flight
       if (!this._content || !this._content.isConnected) {
         return
@@ -330,10 +322,46 @@ class Popup extends Config {
       Object.assign(this._content.style, {
         insetInlineStart: '0',
         left: `${x}px`,
-        position: strategy,
-        top: `${y}px`
+        position: 'absolute',
+        top: `${y}px`,
+        // Once promoted, the panel outranks every sticky header and stays
+        // painted after its anchor has scrolled out of view. Follow the
+        // anchor's fate instead.
+        visibility: this._isAnchorObscured(middlewareData) ? 'hidden' : 'visible'
       })
     })
+  }
+
+  // A promoted panel outranks the whole page, so it keeps painting over a
+  // sticky header long after its anchor has slid underneath one. `hide()` only
+  // reports clipping by ancestors, not being covered, so ask the browser what
+  // is actually on top of the anchor.
+  _isAnchorObscured(middlewareData: any): boolean {
+    if (middlewareData.hide?.referenceHidden) {
+      return true
+    }
+
+    if (!this._isInTopLayer() || !this._anchor) {
+      return false
+    }
+
+    const { left, top, width, height } = this._anchor.getBoundingClientRect()
+    const x = left + (width / 2)
+    const y = top + (height / 2)
+
+    if (x < 0 || y < 0 || x > window.innerWidth || y > window.innerHeight) {
+      return false
+    }
+
+    const topmost = document.elementFromPoint(x, y)
+
+    if (!topmost) {
+      return false
+    }
+
+    // The panel covering its own anchor is not an obstruction — treating it as
+    // one would hide the panel, reveal the anchor, and oscillate.
+    return !this._anchor.contains(topmost) && !this._content?.contains(topmost)
   }
 
   _resolvePlacement(): any {

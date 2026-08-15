@@ -229,7 +229,7 @@ describe('Popup — top layer experiment', () => {
       const anchorRect = anchor.getBoundingClientRect()
       const contentRect = content.getBoundingClientRect()
 
-      expect(getComputedStyle(content).position).toEqual('fixed')
+      expect(getComputedStyle(content).position).toEqual('absolute')
       // bottom-start: left edges aligned, panel just below the anchor
       expect(Math.abs(contentRect.left - anchorRect.left)).toBeLessThan(2)
       expect(contentRect.top).toBeGreaterThanOrEqual(anchorRect.bottom)
@@ -238,12 +238,14 @@ describe('Popup — top layer experiment', () => {
       popup.dispose()
     })
 
-    // Correctness only. How *smooth* the tracking looks depends on
-    // compositor-driven scrolling, which a synthetic scrollTo cannot
-    // reproduce — that has to be judged in a real browser.
-    it('should keep tracking the anchor after the page scrolls', async () => {
+    // The decisive one for the drift: a top-layer element has no offsetParent,
+    // so absolute coordinates resolve against the initial containing block,
+    // which scrolls with the document. The browser then carries the panel
+    // natively — this asserts alignment survives a scroll with JS positioning
+    // switched off entirely, which is what `fixed` could never do.
+    it('should follow the page scroll natively, with JS positioning stopped', async () => {
       document.body.style.height = '3000px'
-      host.style.top = '400px'
+      host.style.top = '600px'
 
       const popup = buildPopup([
         '<button type="button" class="anchor" style="width: 100px; height: 24px;">anchor</button>',
@@ -253,20 +255,61 @@ describe('Popup — top layer experiment', () => {
       popup.show()
       await settled()
 
-      window.scrollTo(0, 200)
-      await settled()
-
       const anchor = host.querySelector('.anchor')
       const content = host.querySelector('.popup')
-      const anchorRect = anchor.getBoundingClientRect()
-      const contentRect = content.getBoundingClientRect()
+      const gapBefore = content.getBoundingClientRect().top - anchor.getBoundingClientRect().bottom
 
-      expect(Math.abs(contentRect.left - anchorRect.left)).toBeLessThan(2)
-      expect(contentRect.top - anchorRect.bottom).toBeLessThan(8)
+      // Kill every JS update, so anything that still holds is the browser's
+      // own doing.
+      popup._stopPositioning()
+
+      window.scrollTo(0, 300)
+      await settled()
+
+      const gapAfter = content.getBoundingClientRect().top - anchor.getBoundingClientRect().bottom
+      expect(Math.abs(gapAfter - gapBefore)).toBeLessThan(1)
 
       popup.dispose()
       window.scrollTo(0, 0)
       document.body.style.height = ''
+    })
+
+    it('should hide the panel once its anchor is clipped out of view', async () => {
+      host.innerHTML = [
+        '<div class="scroller" style="overflow: auto; height: 60px; width: 220px; position: relative;">',
+        '  <div style="height: 400px;">',
+        '    <button type="button" class="anchor" style="margin-top: 200px;">anchor</button>',
+        '  </div>',
+        '</div>',
+        '<div class="popup show" style="height: 50px; width: 120px;">panel</div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: host.querySelector('.anchor'),
+        content: host.querySelector('.popup'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false,
+        topLayer: true
+      })
+
+      const scroller = host.querySelector('.scroller')
+      scroller.scrollTop = 200
+
+      popup.show()
+      await settled()
+
+      const content = host.querySelector('.popup')
+      expect(getComputedStyle(content).visibility).toEqual('visible')
+
+      // Scroll the anchor out of its clipping ancestor
+      scroller.scrollTop = 0
+      await settled()
+      await settled()
+
+      expect(getComputedStyle(content).visibility).toEqual('hidden')
+
+      popup.dispose()
     })
   })
 
@@ -274,6 +317,59 @@ describe('Popup — top layer experiment', () => {
   // the content and the main thread has to chase compositor-driven scrolling —
   // which it cannot win, and the panel visibly drifts. `auto` therefore pays
   // that price only where staying in flow would clip or bury the panel.
+  describe('anchor covered by a sticky header', () => {
+    it('should hide the promoted panel once a sticky header covers the anchor', async () => {
+      const navbar = document.createElement('div')
+      navbar.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; height: 80px; background: #000; z-index: 1030;'
+      document.body.append(navbar)
+
+      host.style.top = '40px'
+      host.innerHTML = [
+        '<div style="overflow: hidden; position: relative; height: 30px; width: 220px;">',
+        '  <button type="button" class="anchor" style="width: 100px; height: 24px;">anchor</button>',
+        '</div>',
+        '<div class="popup show" style="height: 50px; width: 120px;">panel</div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: host.querySelector('.anchor'),
+        content: host.querySelector('.popup'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false,
+        topLayer: true
+      })
+
+      popup.show()
+      await settled()
+      await settled()
+
+      const content = host.querySelector('.popup')
+      expect(popup._isInTopLayer()).toBeTrue()
+      expect(getComputedStyle(content).visibility).toEqual('hidden')
+
+      popup.dispose()
+      navbar.remove()
+    })
+
+    it('should keep the panel visible when nothing covers the anchor', async () => {
+      const popup = buildPopup([
+        '<div style="overflow: hidden; position: relative; height: 30px; width: 220px;">',
+        '  <button type="button" class="anchor" style="width: 100px; height: 24px;">anchor</button>',
+        '</div>',
+        '<div class="popup show" style="height: 50px; width: 120px;">panel</div>'
+      ].join(''), { topLayer: true })
+
+      popup.show()
+      await settled()
+      await settled()
+
+      expect(getComputedStyle(host.querySelector('.popup')).visibility).toEqual('visible')
+
+      popup.dispose()
+    })
+  })
+
   describe('auto promotion', () => {
     it('should stay in flow when nothing would clip the panel', () => {
       const popup = buildPopup([
