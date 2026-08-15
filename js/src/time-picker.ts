@@ -130,6 +130,7 @@ class TimePicker extends BaseComponent {
   protected declare _selection: any
   protected declare _selectionElement: any
   protected declare _menu: any
+  protected declare _syncingFromPanel: boolean
   protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
@@ -142,6 +143,7 @@ class TimePicker extends BaseComponent {
     this._cleanerElement = null
     this._input = null
     this._selection = null
+    this._syncingFromPanel = false
     this._selectionElement = null
     this._menu = null
     this._popup = null
@@ -187,7 +189,6 @@ class TimePicker extends BaseComponent {
 
   setTime(time: Date | null): void {
     this._input.update({ date: time })
-    this._selection?.update({ time })
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
   }
 
@@ -197,7 +198,6 @@ class TimePicker extends BaseComponent {
 
   clear(): void {
     this._input.clear()
-    this._selection?.update({ time: null })
     EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: null })
   }
 
@@ -285,6 +285,13 @@ class TimePicker extends BaseComponent {
       name: this._config.name
     }, this._config.inputOptions))
 
+    // See DatePicker — the bridge from a typed value back to the panel
+    EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._selection?.update({ time: event.date })
+      }
+    })
+
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
@@ -325,7 +332,9 @@ class TimePicker extends BaseComponent {
     this._selection = new TimeSelection(this._selectionElement, this._forwardConfig(TimeSelection, {
       locale: this._config.locale,
       onChange: (time: Date | null) => {
+        this._syncingFromPanel = true
         this._input.update({ date: time })
+        this._syncingFromPanel = false
         EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time })
       },
       time: this.getTime(),

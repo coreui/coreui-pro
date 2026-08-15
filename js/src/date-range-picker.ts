@@ -160,6 +160,7 @@ class DateRangePicker extends BaseComponent {
   protected declare _startInput: any
   protected declare _endInput: any
   protected declare _calendar: any
+  protected declare _syncingFromPanel: boolean
   protected declare _calendarElement: any
   protected declare _menu: any
   protected declare _addedGroupClass: boolean
@@ -177,6 +178,7 @@ class DateRangePicker extends BaseComponent {
     this._startInput = null
     this._endInput = null
     this._calendar = null
+    this._syncingFromPanel = false
     this._calendarElement = null
     this._menu = null
     this._popup = null
@@ -231,8 +233,10 @@ class DateRangePicker extends BaseComponent {
   // See DatePicker.setDate — the emitted values and the calendar selection
   // follow the fields' validation outcome, not the arguments.
   setRange(startDate: Date | null, endDate: Date | null): void {
+    this._syncingFromPanel = true
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
+    this._syncingFromPanel = false
     const effectiveStartDate = this.getStartDate()
     const effectiveEndDate = this.getEndDate()
     this._selectEndDate = false
@@ -370,6 +374,19 @@ class DateRangePicker extends BaseComponent {
     this._endInputElement = end.inputEl
     inputGroup.append(end.inputEl)
 
+    // See DatePicker — the bridge from typed values back to the calendar
+    EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._calendar?.update({ startDate: event.date })
+      }
+    })
+
+    EventHandler.on(end.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._calendar?.update({ endDate: event.date })
+      }
+    })
+
     const action = (className: string, icon: string, label: string) => createControlGroupAction({
       className, disabled: this._config.disabled, icon, label, sanitizeIcon: (value: string) => this._sanitizeIcon(value)
     })
@@ -435,13 +452,17 @@ class DateRangePicker extends BaseComponent {
 
     EventHandler.on(this._calendar._element, 'startDateChange.coreui.calendar', event => {
       const { date, dateObject } = event
+      this._syncingFromPanel = true
       this._startInput.update({ date: dateObject })
+      this._syncingFromPanel = false
       EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date, dateObject })
     })
 
     EventHandler.on(this._calendar._element, 'endDateChange.coreui.calendar', event => {
       const { date, dateObject } = event
+      this._syncingFromPanel = true
       this._endInput.update({ date: dateObject })
+      this._syncingFromPanel = false
       EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date, dateObject })
 
       if (dateObject && this.getStartDate() && !this._footerTemplate) {

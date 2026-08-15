@@ -140,6 +140,7 @@ class DatePicker extends BaseComponent {
   protected declare _calendar: any
   protected declare _calendarElement: any
   protected declare _menu: any
+  protected declare _syncingFromPanel: boolean
   protected declare _addedGroupClass: boolean
   protected declare _popup: any
 
@@ -153,6 +154,7 @@ class DatePicker extends BaseComponent {
     this._cleanerElement = null
     this._input = null
     this._calendar = null
+    this._syncingFromPanel = false
     this._calendarElement = null
     this._menu = null
     this._popup = null
@@ -201,13 +203,11 @@ class DatePicker extends BaseComponent {
   setDate(date: Date | null): void {
     this._input.update({ date })
     const effectiveDate = this.getDate()
-    this._calendar?.update({ startDate: effectiveDate })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   clear(): void {
     this._input.clear()
-    this._calendar?.update({ startDate: null })
     EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
@@ -318,6 +318,16 @@ class DatePicker extends BaseComponent {
       ...(this._resolveFormat() ? { format: this._resolveFormat() } : {})
     }, this._config.inputOptions))
 
+    // Selection flows panel → field; this is the only bridge back, so a date
+    // typed into the field reaches the calendar too. The guard stops the echo
+    // of the panel's own updates — without it, picking a range start would
+    // re-render the calendar mid-interaction.
+    EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
+      if (!this._syncingFromPanel) {
+        this._calendar?.update({ startDate: event.date })
+      }
+    })
+
     this._menu = document.createElement('div')
     this._menu.classList.add(CLASS_NAME_POPUP, CLASS_NAME_DROPDOWN)
 
@@ -374,7 +384,9 @@ class DatePicker extends BaseComponent {
       // `date` is formatted per selectionType ("2026-01", "2026Q1", …);
       // `dateObject` is the underlying Date the section field can hold
       const { date, dateObject } = event
+      this._syncingFromPanel = true
       this._input.update({ date: dateObject })
+      this._syncingFromPanel = false
       EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date, dateObject })
       this.hide()
     })

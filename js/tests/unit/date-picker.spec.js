@@ -28,6 +28,22 @@ describe('DatePicker', () => {
   // The native <input type="date"> entry contract: opening puts focus on the
   // selected date; without one, on today; and when a max date has pushed both
   // out of reach, on the last date still selectable.
+  describe('field-to-calendar sync', () => {
+    it('should reflect a date entered in the field in the calendar', () => {
+      const picker = buildPicker({ date: '2026-08-10' })
+      picker.show()
+      picker.hide()
+
+      // the same path a typed value takes: the field validates and emits
+      picker._input.update({ date: '2026-08-20' })
+
+      picker.show()
+
+      const selected = fixtureEl.querySelector('.date-picker-popup [aria-selected="true"]')
+      expect(new Date(selected.dataset.coreuiDate).getDate()).toEqual(20)
+    })
+  })
+
   describe('focus entry', () => {
     it('should land on the selected date, not on the first day of the grid', () => {
       const picker = buildPicker({ date: '2026-08-10' })

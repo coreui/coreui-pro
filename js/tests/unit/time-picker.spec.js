@@ -56,6 +56,22 @@ describe('TimePicker', () => {
     })
   })
 
+  describe('field-to-panel sync', () => {
+    it('should reflect a time entered in the field in the selection body', () => {
+      const picker = buildPicker({ locale: 'en-GB', time: '10:15:00' })
+      picker.show()
+      picker.hide()
+
+      picker._input.update({ date: '14:30:00' })
+
+      picker.show()
+
+      const popup = fixtureEl.querySelector('.time-picker-popup')
+      const hour = popup.querySelector('[data-coreui-hours][aria-selected="true"]')
+      expect(hour.dataset.coreuiHours).toEqual('14')
+    })
+  })
+
   describe('variants', () => {
     it('should render roll columns by default', () => {
       const picker = buildPicker()
