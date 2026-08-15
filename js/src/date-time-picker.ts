@@ -211,8 +211,6 @@ class DateTimePicker extends BaseComponent {
   // follow the field's validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    const effectiveDate = this.getDate()
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   today(): void {
@@ -221,9 +219,6 @@ class DateTimePicker extends BaseComponent {
 
   clear(): void {
     this._input.clear()
-    this._calendar?.update({ startDate: null })
-    this._selection?.update({ time: null })
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
   reset(): void {
@@ -316,6 +311,7 @@ class DateTimePicker extends BaseComponent {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ startDate: event.date })
         this._selection?.update({ time: event.date })
+        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: event.date })
       }
     })
 

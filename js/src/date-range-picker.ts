@@ -233,16 +233,12 @@ class DateRangePicker extends BaseComponent {
   // See DatePicker.setDate — the emitted values and the calendar selection
   // follow the fields' validation outcome, not the arguments.
   setRange(startDate: Date | null, endDate: Date | null): void {
-    this._syncingFromPanel = true
+    // The field listeners carry each date into the calendar and emit the
+    // events; only the selection phase is this method's own business.
     this._startInput.update({ date: startDate })
     this._endInput.update({ date: endDate })
-    this._syncingFromPanel = false
-    const effectiveStartDate = this.getStartDate()
-    const effectiveEndDate = this.getEndDate()
     this._selectEndDate = false
-    this._calendar?.update({ endDate: effectiveEndDate, selectEndDate: false, startDate: effectiveStartDate })
-    EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: effectiveStartDate })
-    EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: effectiveEndDate })
+    this._calendar?.update({ selectEndDate: false })
   }
 
   clear(): void {
@@ -378,12 +374,14 @@ class DateRangePicker extends BaseComponent {
     EventHandler.on(start.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ startDate: event.date })
+        EventHandler.trigger(this._element, EVENT_START_DATE_CHANGE, { date: event.date })
       }
     })
 
     EventHandler.on(end.inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ endDate: event.date })
+        EventHandler.trigger(this._element, EVENT_END_DATE_CHANGE, { date: event.date })
       }
     })
 

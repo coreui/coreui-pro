@@ -198,7 +198,6 @@ class TimePicker extends BaseComponent {
 
   clear(): void {
     this._input.clear()
-    EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: null })
   }
 
   reset(): void {
@@ -289,6 +288,7 @@ class TimePicker extends BaseComponent {
     EventHandler.on(inputEl, TimeInput.eventName(TimeInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._selection?.update({ time: event.date })
+        EventHandler.trigger(this._element, EVENT_TIME_CHANGE, { time: event.date })
       }
     })
 

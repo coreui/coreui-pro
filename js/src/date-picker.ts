@@ -202,13 +202,10 @@ class DatePicker extends BaseComponent {
   // calendar selection follow the validation outcome, not the argument.
   setDate(date: Date | null): void {
     this._input.update({ date })
-    const effectiveDate = this.getDate()
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: effectiveDate })
   }
 
   clear(): void {
     this._input.clear()
-    EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: null })
   }
 
   reset(): void {
@@ -325,6 +322,7 @@ class DatePicker extends BaseComponent {
     EventHandler.on(inputEl, DateInput.eventName(DateInput.CHANGE_EVENT_NAME), (event: any) => {
       if (!this._syncingFromPanel) {
         this._calendar?.update({ startDate: event.date })
+        EventHandler.trigger(this._element, EVENT_DATE_CHANGE, { date: event.date })
       }
     })
 

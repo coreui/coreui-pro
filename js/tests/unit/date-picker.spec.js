@@ -324,7 +324,9 @@ describe('DatePicker', () => {
     it('should propagate field validation to a programmatic date beyond maxDate', () => {
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
-      const picker = buildPicker({ maxDate: yesterday })
+      const twoDaysAgo = new Date()
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
+      const picker = buildPicker({ date: twoDaysAgo, maxDate: yesterday })
       const el = fixtureEl.querySelector('#picker')
       let emitted = 'not-fired'
       el.addEventListener('dateChange.coreui.date-picker', event => {
@@ -333,9 +335,40 @@ describe('DatePicker', () => {
 
       picker.setDate(new Date())
 
+      // the emitted value follows the validation outcome, not the argument
       expect(picker.getDate()).toBeNull()
       expect(emitted).toBeNull()
       expect(el.querySelector('.form-date-time').classList.contains('is-invalid')).toBeTrue()
+    })
+
+    it('should not emit when the value does not actually change', () => {
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const picker = buildPicker({ maxDate: yesterday })
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = 'not-fired'
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      // empty picker, argument validates to null — null to null is no change
+      picker.setDate(new Date())
+
+      expect(picker.getDate()).toBeNull()
+      expect(emitted).toEqual('not-fired')
+    })
+
+    it('should emit dateChange for a value entered in the field, without the popup', () => {
+      const picker = buildPicker()
+      const el = fixtureEl.querySelector('#picker')
+      let emitted = 'not-fired'
+      el.addEventListener('dateChange.coreui.date-picker', event => {
+        emitted = event.date
+      })
+
+      picker._input.update({ date: '2026-08-20' })
+
+      expect(new Date(emitted).getDate()).toEqual(20)
     })
 
     it('should disable a projected today action when today is not selectable', () => {
