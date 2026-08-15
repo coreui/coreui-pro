@@ -23,10 +23,14 @@ describe('Promise-returning API', () => {
   afterEach(() => {
     clearFixture()
     clearBodyAndDocument()
-    document.body.classList.remove('modal-open')
+    document.documentElement.classList.remove('dialog-open')
 
-    for (const element of document.querySelectorAll('.modal-backdrop, .offcanvas-backdrop, .tooltip')) {
+    for (const element of document.querySelectorAll('.tooltip')) {
       element.remove()
+    }
+
+    for (const dialog of document.querySelectorAll('dialog[open]')) {
+      dialog.close()
     }
   })
 
@@ -70,7 +74,7 @@ describe('Promise-returning API', () => {
     })
 
     it('Modal show and hide', async () => {
-      fixtureEl.innerHTML = '<div class="modal"><div class="modal-dialog"></div></div>'
+      fixtureEl.innerHTML = '<dialog class="modal"></dialog>'
 
       const modalEl = fixtureEl.querySelector('.modal')
       const modal = new Modal(modalEl)
@@ -82,7 +86,7 @@ describe('Promise-returning API', () => {
     })
 
     it('Offcanvas show and hide', async () => {
-      fixtureEl.innerHTML = '<div class="offcanvas"></div>'
+      fixtureEl.innerHTML = '<dialog class="offcanvas offcanvas-start"></dialog>'
 
       const offcanvasEl = fixtureEl.querySelector('.offcanvas')
       const offcanvas = new Offcanvas(offcanvasEl)

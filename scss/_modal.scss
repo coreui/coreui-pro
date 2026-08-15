@@ -1,13 +1,16 @@
 @use "sass:map";
 @use "functions/defaults" as *;
 @use "functions/math" as *;
-@use "mixins/backdrop" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
+
+// Native <dialog> component
+// Uses the browser's native dialog element with showModal()/show()/close()
+// APIs, the [open] attribute, and the ::backdrop pseudo-element.
 
 // stylelint-disable custom-property-no-missing-var-function
 // stylelint-disable function-disallowed-list
@@ -50,9 +53,9 @@ $modal-lg:                          800px !default;
 $modal-xl:                          1140px !default;
 
 $modal-fade-transform:              translate(0, -50px) !default;
-$modal-show-transform:              none !default;
-$modal-transition:                  transform .3s ease-out !default;
 $modal-scale-transform:             scale(1.02) !default;
+$modal-transition-duration:         .3s !default;
+$modal-transition-timing:           ease-out !default;
 // scss-docs-end modal-variables
 
 $modal-tokens: () !default;
@@ -72,6 +75,10 @@ $modal-tokens: defaults(
     --#{$prefix}modal-border-radius: #{$modal-content-border-radius},
     --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-xs},
     --#{$prefix}modal-inner-border-radius: #{$modal-content-inner-border-radius},
+    --#{$prefix}modal-transition-duration: #{$modal-transition-duration},
+    --#{$prefix}modal-transition-timing: #{$modal-transition-timing},
+    --#{$prefix}modal-backdrop-bg: #{$modal-backdrop-bg},
+    --#{$prefix}modal-backdrop-opacity: #{$modal-backdrop-opacity},
     --#{$prefix}modal-header-padding-x: #{$modal-header-padding-x},
     --#{$prefix}modal-header-padding-y: #{$modal-header-padding-y},
     --#{$prefix}modal-header-padding: #{$modal-header-padding}, // Todo in v6: Split this padding into x and y
@@ -87,112 +94,133 @@ $modal-tokens: defaults(
 );
 // scss-docs-end modal-css-vars
 
-$modal-backdrop-tokens: () !default;
-
-// scss-docs-start modal-backdrop-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
-$modal-backdrop-tokens: defaults(
-  (
-    --#{$prefix}backdrop-zindex: #{$zindex-modal-backdrop},
-    --#{$prefix}backdrop-bg: #{$modal-backdrop-bg},
-    --#{$prefix}backdrop-opacity: #{$modal-backdrop-opacity},
-  ),
-  $modal-backdrop-tokens
-);
-// scss-docs-end modal-backdrop-css-vars
 @layer components {
-  // .modal-open      - body class for killing the scroll
-  // .modal           - container to scroll within
-  // .modal-dialog    - positioning shell for the actual modal
-  // .modal-content   - actual modal w/ bg and corners and stuff
+  // Scroll lock while any modal <dialog> (Modal or Offcanvas) is open. Both
+  // properties sit on the root element on purpose: `scrollbar-gutter` keeps
+  // the gutter reserved while `overflow: hidden` hides the scrollbar, so the
+  // page doesn't shift and the ::backdrop covers the gutter.
+  :root.dialog-open {
+    overflow: hidden;
+    scrollbar-gutter: stable;
+  }
 
-
-  // Container that the modal scrolls within
   .modal {
     @include tokens($modal-tokens);
 
-    position: fixed;
-    inset-inline-start: 0;
-    top: 0;
-    z-index: var(--#{$prefix}modal-zindex);
-    display: none;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    // Prevent Chrome on Windows from adding a focus outline. For details, see
-    // https://github.com/twbs/bootstrap/pull/10951.
+    // Override the UA display: none so visibility controls the hidden state,
+    // enabling reliable cross-browser exit animations after close().
+    display: flex;
+    flex-direction: column;
+    width: var(--#{$prefix}modal-width);
+    max-width: calc(100% - var(--#{$prefix}modal-margin) * 2);
+    max-height: calc(100% - var(--#{$prefix}modal-margin) * 2);
+    padding: 0;
+    margin: auto;
+    // Let popups (menus, tooltips) appended inside the dialog overflow its box
+    overflow: visible;
+    color: var(--#{$prefix}modal-color);
+    visibility: hidden;
+    background-color: var(--#{$prefix}modal-bg);
+    background-clip: padding-box;
+    border: var(--#{$prefix}modal-border-width) solid var(--#{$prefix}modal-border-color);
     outline: 0;
-    // We deliberately don't use `-webkit-overflow-scrolling: touch;` due to a
-    // gnarly iOS Safari bug: https://bugs.webkit.org/show_bug.cgi?id=158342
-    // See also https://github.com/twbs/bootstrap/issues/17695
-  }
+    @include border-radius(var(--#{$prefix}modal-border-radius));
+    @include box-shadow(var(--#{$prefix}modal-box-shadow));
 
-  // Shell div to position the modal with bottom padding
-  .modal-dialog {
-    position: relative;
-    width: auto;
-    margin: var(--#{$prefix}modal-margin);
-    // allow clicks to pass through for custom click handling to close modal
-    pointer-events: none;
-
-    // When fading in the modal, animate it to slide down
-    .modal.fade & {
+    // Animated variant (default) — fade plus the v5 slide-down entry.
+    // Adding .modal-instant skips all animations.
+    &:not(.modal-instant) {
+      // Exit state: faded out, shifted up. This is also the entry-from state —
+      // a base value (not @starting-style) so it applies on every open of a
+      // persistent element, and the exit transition can fall back to it while
+      // the JS keeps the dialog in the top layer (.hiding) so the ::backdrop
+      // and the browser's modal centering survive the exit animation.
+      opacity: 0;
       transform: $modal-fade-transform;
-      @include transition($modal-transition);
-    }
-    .modal.show & {
-      transform: $modal-show-transform;
+      @include transition(
+        opacity var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing),
+        transform var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing),
+        visibility 0s var(--#{$prefix}modal-transition-duration)
+      );
+
+      // Open state: visibility flips immediately, opacity and transform
+      // animate in.
+      &[open]:not(.hiding) {
+        visibility: visible;
+        opacity: 1;
+        @include transition(
+          opacity var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing),
+          transform var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing),
+          visibility 0s
+        );
+        transform: none;
+      }
+
+      // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
+      // outrank the open-state transform reset.
+      &[open].modal-static:not(.hiding) {
+        transform: $modal-scale-transform;
+      }
+
+      &::backdrop {
+        background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+        @include transition(background-color var(--#{$prefix}modal-transition-duration) var(--#{$prefix}modal-transition-timing));
+      }
+
+      // Exit: fade the native backdrop out alongside the dialog — it is still
+      // rendered because close() is deferred until the transition ends.
+      &.hiding::backdrop {
+        background-color: transparent;
+      }
     }
 
-    // When trying to close, animate focus to scale
-    .modal.modal-static & {
-      transform: $modal-scale-transform;
-    }
-  }
-
-  .modal-dialog-scrollable {
-    height: calc(100% - var(--#{$prefix}modal-margin) * 2);
-
-    .modal-content {
-      max-height: 100%;
-      overflow: hidden;
+    &.modal-instant::backdrop {
+      background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
     }
 
-    .modal-body {
+    // Open state base (always applies, regardless of animation mode)
+    &[open]:not(.hiding) {
+      visibility: visible;
+      opacity: 1;
+      transform: none;
+    }
+
+    // `backdrop: false` — modal behavior with a visually suppressed backdrop
+    &.modal-no-backdrop::backdrop {
+      display: none;
+    }
+
+    // Non-modal mode (`modal: false`) — show() skips the top layer, so
+    // explicit positioning and z-index are needed. Centering uses the
+    // `translate` property so the animated `transform` states don't fight it.
+    &.modal-nonmodal {
+      position: fixed;
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      z-index: var(--#{$prefix}modal-zindex);
+      margin: 0;
+      translate: -50% -50%;
+    }
+
+    // Scrollable modal body (header/footer stay fixed)
+    &.modal-scrollable .modal-body {
       overflow-y: auto;
     }
   }
 
-  .modal-dialog-centered {
-    display: flex;
-    align-items: center;
-    min-height: calc(100% - var(--#{$prefix}modal-margin) * 2);
-  }
+  // Entry animation for ::backdrop. It only exists while the dialog is in the
+  // top layer, so its starting state can't be expressed on the base selector.
+  @starting-style {
+    .modal:not(.modal-instant)::backdrop {
+      background-color: transparent;
+    }
 
-  // Actual modal
-  .modal-content {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%; // Ensure `.modal-content` extends the full width of the parent `.modal-dialog`
-    // counteract the pointer-events: none; in the .modal-dialog
-    color: var(--#{$prefix}modal-color);
-    pointer-events: auto;
-    background-color: var(--#{$prefix}modal-bg);
-    background-clip: padding-box;
-    border: var(--#{$prefix}modal-border-width) solid var(--#{$prefix}modal-border-color);
-    @include border-radius(var(--#{$prefix}modal-border-radius));
-    @include box-shadow(var(--#{$prefix}modal-box-shadow));
-    // Remove focus outline from opened modal
-    outline: 0;
-  }
-
-  // Modal background
-  .modal-backdrop {
-    @include tokens($modal-backdrop-tokens);
-
-    @include overlay-backdrop(var(--#{$prefix}backdrop-zindex), var(--#{$prefix}backdrop-bg), var(--#{$prefix}backdrop-opacity));
+    // Swap entry: the outgoing modal's ::backdrop is removed synchronously in
+    // the same tick, so this one starts already-opaque — the user sees one
+    // continuous backdrop instead of a dip or a double-darkened flash.
+    .modal.modal-swap-in:not(.modal-instant)::backdrop {
+      background-color: color-mix(in srgb, var(--#{$prefix}modal-backdrop-bg) calc(var(--#{$prefix}modal-backdrop-opacity) * 100%), transparent);
+    }
   }
 
   // Modal header
@@ -225,7 +253,7 @@ $modal-backdrop-tokens: defaults(
   .modal-body {
     position: relative;
     // Enable `flex-grow: 1` so that the body take up as much space as possible
-    // when there should be a fixed height on `.modal-dialog`.
+    // when there should be a fixed height on the modal.
     flex: 1 1 auto;
     padding: var(--#{$prefix}modal-padding);
   }
@@ -235,19 +263,13 @@ $modal-backdrop-tokens: defaults(
     display: flex;
     flex-shrink: 0;
     flex-wrap: wrap;
+    gap: var(--#{$prefix}modal-footer-gap);
     align-items: center; // vertically center
     justify-content: flex-end; // Right align buttons with flex property because text-align doesn't work on flex items
-    padding: calc(var(--#{$prefix}modal-padding) - var(--#{$prefix}modal-footer-gap) * .5);
+    padding: var(--#{$prefix}modal-padding);
     background-color: var(--#{$prefix}modal-footer-bg);
     border-top: var(--#{$prefix}modal-footer-border-width) solid var(--#{$prefix}modal-footer-border-color);
     @include border-bottom-radius(var(--#{$prefix}modal-inner-border-radius));
-
-    // Place margin between footer elements
-    // This solution is far from ideal because of the universal selector usage,
-    // but is needed to fix https://github.com/twbs/bootstrap/issues/24800
-    > * {
-      margin: calc(var(--#{$prefix}modal-footer-gap) * .5); // Todo in v6: replace with gap on parent class
-    }
   }
 
   // Scale up the modal
@@ -255,13 +277,6 @@ $modal-backdrop-tokens: defaults(
     .modal {
       --#{$prefix}modal-margin: #{$modal-dialog-margin-y-sm-up};
       --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-sm-up};
-    }
-
-    // Automatically set modal's width for larger viewports
-    .modal-dialog {
-      max-width: var(--#{$prefix}modal-width);
-      margin-right: auto;
-      margin-left: auto;
     }
 
     .modal-sm {
@@ -290,16 +305,15 @@ $modal-backdrop-tokens: defaults(
 
     @include media-breakpoint-down($breakpoint) {
       .modal-fullscreen#{$postfix} {
-        width: 100vw;
+        --#{$prefix}modal-width: 100vw;
+        --#{$prefix}modal-margin: 0;
+        --#{$prefix}modal-border-radius: 0;
+        --#{$prefix}modal-border-width: 0;
+
+        width: 100%;
         max-width: none;
         height: 100%;
-        margin: 0;
-
-        .modal-content {
-          height: 100%;
-          border: 0;
-          @include border-radius(0);
-        }
+        max-height: none;
 
         .modal-header,
         .modal-footer {

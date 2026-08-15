@@ -203,6 +203,71 @@ finished, not whether the state changed.
   notice: Dropdown may be removed in v7** — prefer Menu for new work.
 
 
+#### Modal and Offcanvas on the native `<dialog>`
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Both components render on the native `<dialog>` element now**, opened with
+  `showModal()`/`show()` and closed with `close()`. The browser provides the
+  top layer (no `z-index` management), the `::backdrop`, focus trapping,
+  background inertness and the dialog ARIA semantics — the markup drops
+  `role`, `aria-modal`, `aria-hidden` and `tabindex="-1"`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The modal wrapper layers are gone.** `.modal > .modal-dialog >
+  .modal-content` flattens to a single `<dialog class="modal">` holding
+  `.modal-header`/`.modal-body`/`.modal-footer` directly. Size
+  (`.modal-sm/-lg/-xl`) and fullscreen (`.modal-fullscreen*`) modifiers sit on
+  the dialog itself. `.modal-dialog-scrollable` is renamed to
+  `.modal-scrollable`; `.modal-dialog-centered` is gone — the browser centers
+  a modal dialog by default. Offcanvas markup only swaps the tag:
+  `<dialog class="offcanvas offcanvas-start">`.
+- **Legacy v5 markup keeps working — for now.** When a component is
+  instantiated on v5 markup (via data API or JavaScript), the plugin rebuilds
+  it into the `<dialog>` structure at runtime and logs a console warning. The
+  old element stays in the DOM as an inert `display: contents` shell around
+  the new dialog, so existing element references and event listeners keep
+  working (our events bubble through it). Selectors and custom CSS targeting
+  `.modal-dialog`/`.modal-content` are the one thing that cannot be preserved.
+  **This transitional layer will be removed in v7.**
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.modal-backdrop` and `.offcanvas-backdrop` are gone** — the backdrop is
+  the native `::backdrop` pseudo-element. Style it through the new
+  `--cui-modal-backdrop-bg`/`--cui-modal-backdrop-opacity` and
+  `--cui-offcanvas-backdrop-*` tokens. `$zindex-modal-backdrop` and
+  `$zindex-offcanvas-backdrop` are removed.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Animation opt-in is inverted.** Modals animate by default; `.fade` is gone
+  and `.modal-instant` / `.offcanvas-instant` disable animation instead. The
+  auto-upgrade maps a missing `.fade` to `.modal-instant`. The offcanvas
+  `.showing` state class is replaced by the native `[open]` attribute
+  (`.hiding` remains for the exit transition).
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The Modal `focus` option is removed** — the native dialog always traps
+  focus. `handleUpdate()` remains as a no-op for API compatibility; the
+  scrollbar-compensation logic it triggered no longer exists (scroll lock is
+  `overflow: hidden` + `scrollbar-gutter: stable` on the root element, with
+  the `dialog-open` class).
+- **New capabilities:** a `modal: false` option opens the dialog non-modally
+  (page stays interactive); a `cancel.coreui.modal` event fires when a modal
+  is dismissed with Escape; toggling from a trigger inside an open modal swaps
+  to the target modal with a seamless backdrop (no flash); modals can be
+  stacked — the top layer manages paint order.
+- **Sass:** `$modal-transition` and `$modal-show-transform` are replaced by
+  `$modal-transition-duration`/`$modal-transition-timing`; the offcanvas
+  transition token splits the same way
+  (`--cui-offcanvas-transition-duration`/`-timing`).
+
+#### Dialog (new) and Drawer (new)
+
+- **New components: Dialog and Drawer** — the native-`<dialog>` popup and
+  side panel with the Bootstrap 6 look and `dialog-*` / `drawer-*` classes:
+  Dialog is a centered floating panel over a blurred backdrop with optional
+  slide entry variants; Drawer is a floating, inset, rounded panel with
+  translucent/sheet/fullscreen/fit-content variants and responsive classes
+  (`.drawer-sm`…`.drawer-xxl`). Both share the DialogBase behavior with
+  Modal/Offcanvas (which keep the classic look and the v5 vocabulary) —
+  pick per surface, they are independent components. See the
+  [Dialog docs](/components/dialog/) and [Drawer docs](/components/drawer/).
+
 #### Calendar
 
 - **Behavior change:** `update()` now **merges** the given options over the

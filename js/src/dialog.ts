@@ -1,6 +1,6 @@
 /**
  * --------------------------------------------------------------------------
- * CoreUI modal.ts
+ * CoreUI dialog.ts
  * Licensed under MIT (https://github.com/coreui/coreui/blob/main/LICENSE)
  *
  * This component is a modified version of the Bootstrap's dialog.ts
@@ -9,19 +9,17 @@
  */
 
 import DialogBase from './dialog-base.js'
-import type { ComponentConfig } from './util/config.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { enableDismissTrigger } from './util/component-functions.js'
 import { defineJQueryPlugin, isVisible } from './util/index.js'
-import { resolveDialogElement } from './util/legacy-markup.js'
 
 /**
  * Constants
  */
 
-const NAME = 'modal'
-const DATA_KEY = 'coreui.modal'
+const NAME = 'dialog'
+const DATA_KEY = 'coreui.dialog'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
@@ -31,11 +29,11 @@ const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CANCEL = `cancel${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 
-const CLASS_NAME_NONMODAL = 'modal-nonmodal'
-const CLASS_NAME_INSTANT = 'modal-instant'
-const CLASS_NAME_SWAP_IN = 'modal-swap-in'
+const CLASS_NAME_NONMODAL = 'dialog-nonmodal'
+const CLASS_NAME_INSTANT = 'dialog-instant'
+const CLASS_NAME_SWAP_IN = 'dialog-swap-in'
 
-const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="modal"]'
+const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="dialog"]'
 
 const Default = {
   backdrop: true,
@@ -53,11 +51,7 @@ const DefaultType = {
  * Class definition
  */
 
-class Modal extends DialogBase {
-  constructor(element?: string | Element | null, config?: ComponentConfig | null) {
-    super(resolveDialogElement(element, NAME), config)
-  }
-
+class Dialog extends DialogBase {
   // Getters
   static override get Default(): typeof Default {
     return Default
@@ -73,8 +67,8 @@ class Modal extends DialogBase {
 
   // Public
   handleUpdate(): void {
-    // Provided for API consistency with the v5 Modal; the native <dialog>
-    // needs no manual adjustments.
+    // Provided for API consistency with Modal; the native <dialog> needs no
+    // manual adjustments.
   }
 
   // Protected — hook overrides
@@ -110,7 +104,7 @@ class Modal extends DialogBase {
   // Static
   static jQueryInterface(this: any, config?: any, relatedTarget?: HTMLElement | null): void {
     return this.each(function (this: HTMLElement) {
-      const data: any = Modal.getOrCreateInstance(this, config)
+      const data: any = Dialog.getOrCreateInstance(this, config)
 
       if (typeof config !== 'string') {
         return
@@ -130,7 +124,7 @@ class Modal extends DialogBase {
  */
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-  const target = resolveDialogElement(SelectorEngine.getElementFromSelector(this), NAME)
+  const target = SelectorEngine.getElementFromSelector(this)
 
   if (['A', 'AREA'].includes(this.tagName)) {
     event.preventDefault()
@@ -138,7 +132,7 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
 
   EventHandler.one(target, EVENT_SHOW, showEvent => {
     if (showEvent!.defaultPrevented) {
-      // only register focus restorer if modal will actually get shown
+      // only register focus restorer if dialog will actually get shown
       return
     }
 
@@ -150,27 +144,27 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
     })
   })
 
-  // A trigger inside an open modal swaps to the target one
+  // A trigger inside an open dialog swaps to the target one
   const currentDialog = this.closest('dialog[open]')
   const shouldSwap = currentDialog && currentDialog !== target
 
   if (shouldSwap && target) {
     // Swap strategy (seamless backdrop, no flash):
-    //   1. .modal-swap-in makes the incoming ::backdrop skip its
+    //   1. .dialog-swap-in makes the incoming ::backdrop skip its
     //      @starting-style fade-in and appear fully opaque on its first frame.
-    //   2. Open the incoming modal.
-    //   3. Close the outgoing one synchronously (.modal-instant forces the
+    //   2. Open the incoming dialog.
+    //   3. Close the outgoing one synchronously (.dialog-instant forces the
     //      non-deferred close path), so its ::backdrop is removed in the same
     //      frame the incoming one appears — the user sees one continuous
     //      backdrop instead of a double-darkened or half-faded flash.
-    const newModal = Modal.getOrCreateInstance(target)
+    const newDialog = Dialog.getOrCreateInstance(target)
     target.classList.add(CLASS_NAME_SWAP_IN)
-    newModal.show(this)
+    newDialog.show(this)
     EventHandler.one(target, EVENT_SHOWN, () => {
       target.classList.remove(CLASS_NAME_SWAP_IN)
     })
 
-    const currentInstance = Modal.getInstance(currentDialog)
+    const currentInstance = Dialog.getInstance(currentDialog)
     if (currentInstance) {
       currentDialog.classList.add(CLASS_NAME_INSTANT)
       EventHandler.one(currentDialog, EVENT_HIDDEN, () => {
@@ -182,17 +176,17 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (
     return
   }
 
-  const data: any = Modal.getOrCreateInstance(target)
+  const data: any = Dialog.getOrCreateInstance(target)
 
   data.toggle(this)
 })
 
-enableDismissTrigger(Modal)
+enableDismissTrigger(Dialog)
 
 /**
  * jQuery
  */
 
-defineJQueryPlugin(Modal)
+defineJQueryPlugin(Dialog)
 
-export default Modal
+export default Dialog
