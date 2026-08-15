@@ -25,6 +25,36 @@ describe('DatePicker', () => {
     return picker
   }
 
+  // The native <input type="date"> entry contract: opening puts focus on the
+  // selected date; without one, on today; and when a max date has pushed both
+  // out of reach, on the last date still selectable.
+  describe('focus entry', () => {
+    it('should land on the selected date, not on the first day of the grid', () => {
+      const picker = buildPicker({ date: '2026-08-10' })
+      picker.show()
+
+      const active = document.activeElement
+      expect(active.getAttribute('aria-selected')).toEqual('true')
+      expect(new Date(active.dataset.coreuiDate).getDate()).toEqual(10)
+    })
+
+    it('should land on today when nothing is selected', () => {
+      const picker = buildPicker()
+      picker.show()
+
+      expect(document.activeElement.getAttribute('aria-current')).toEqual('date')
+    })
+
+    it('should land on the last selectable date when today is out of range', () => {
+      // A fixed past view keeps this deterministic: today is never in it, so
+      // the only anchor left is the max date closing the range.
+      const picker = buildPicker({ calendarDate: '2020-05-20', maxDate: '2020-05-10' })
+      picker.show()
+
+      expect(new Date(document.activeElement.dataset.coreuiDate).getDate()).toEqual(10)
+    })
+  })
+
   describe('constructor', () => {
     it('should compose an input group, an indicator, and an empty calendar container', () => {
       const picker = buildPicker()

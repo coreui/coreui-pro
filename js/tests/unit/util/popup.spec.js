@@ -169,6 +169,68 @@ describe('Popup', () => {
       expect(document.activeElement.id).toEqual('entry')
     })
 
+    it('should start from the selected value, not from the first tab stop', () => {
+      // The calendar gives tabindex="0" to every selectable cell, so the entry
+      // has to be picked by the ARIA markers — first match would be the first
+      // day of the grid.
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><button id="inside">field</button></div>',
+        '<div id="content">',
+        '  <button id="d1" tabindex="0">1</button>',
+        '  <button id="d10" tabindex="0" aria-selected="true">10</button>',
+        '  <button id="d31" tabindex="0">31</button>',
+        '</div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false
+      })
+
+      popups.push(popup)
+      popup.show()
+
+      expect(document.activeElement.id).toEqual('d10')
+    })
+
+    it('should fall back to today, and then to the last available stop', () => {
+      fixtureEl.innerHTML = [
+        '<div id="anchor"><button id="inside">field</button></div>',
+        '<div id="content">',
+        '  <button id="d1" tabindex="0">1</button>',
+        '  <button id="today" tabindex="0" aria-current="date">15</button>',
+        '  <button id="d31" tabindex="0">31</button>',
+        '</div>'
+      ].join('')
+
+      const popup = new Popup({
+        anchor: fixtureEl.querySelector('#anchor'),
+        content: fixtureEl.querySelector('#content'),
+        focusTrap: false,
+        mobileBreakpoint: 0,
+        returnFocus: false
+      })
+
+      popups.push(popup)
+      popup.show()
+
+      expect(document.activeElement.id).toEqual('today')
+
+      popup.hide()
+
+      // Today gone from the stops — a max date pushed it out of reach — the
+      // native control lands on the last date still available.
+      fixtureEl.querySelector('#today').removeAttribute('aria-current')
+      fixtureEl.querySelector('#today').tabIndex = -1
+
+      popup.show()
+
+      expect(document.activeElement.id).toEqual('d31')
+    })
+
     it('should move focus into the panel however it was opened', () => {
       // Opening with the mouse — the indicator button — has to land in the
       // panel too, or the user arrives at its first navigation button instead
