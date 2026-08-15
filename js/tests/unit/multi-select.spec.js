@@ -676,6 +676,50 @@ describe('MultiSelect', () => {
       expect(multiSelect._optionsElement.getAttribute('aria-multiselectable')).toBeNull()
     })
 
+    it('should mount next to the frame by default and leave no panel behind', () => {
+      fixtureEl.innerHTML = '<select></select>'
+      const selectEl = fixtureEl.querySelector('select')
+      const multiSelect = new MultiSelect(selectEl, {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+
+      // next to the frame, not inside it — the frame is a flex control chrome
+      expect(multiSelect._menu.parentElement).not.toBe(multiSelect._wrapperElement)
+      expect(multiSelect._wrapperElement.nextElementSibling).toBe(multiSelect._menu)
+
+      multiSelect.hide()
+      multiSelect.dispose()
+
+      expect(document.querySelector('.combobox-popup')).toBeNull()
+    })
+
+    it('should stay inside an open dialog rather than escape to the body', () => {
+      fixtureEl.innerHTML = [
+        '<dialog id="host">',
+        '  <div style="overflow: hidden; position: relative;">',
+        '    <select></select>',
+        '  </div>',
+        '</dialog>'
+      ].join('')
+
+      const dialog = fixtureEl.querySelector('#host')
+      dialog.show()
+
+      const multiSelect = new MultiSelect(fixtureEl.querySelector('select'), {
+        options: [{ value: '1', text: 'Opt 1' }]
+      })
+
+      multiSelect.show()
+
+      // outside the dialog's subtree the panel would be painted but inert
+      expect(dialog.contains(multiSelect._menu)).toBe(true)
+
+      multiSelect.hide()
+      dialog.close()
+    })
+
     it('should handle container option', () => {
       fixtureEl.innerHTML = '<select></select><div id="container"></div>'
       const selectEl = fixtureEl.querySelector('select')
@@ -684,6 +728,11 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }],
         container: containerEl
       })
+
+      // the panel is in the DOM only while a choice is being made
+      expect(containerEl.querySelector('.combobox-popup')).toBeNull()
+
+      multiSelect.show()
 
       expect(containerEl.querySelector('.combobox-popup')).not.toBeNull()
       expect(multiSelect._menu.parentElement).toBe(containerEl)
@@ -696,6 +745,8 @@ describe('MultiSelect', () => {
         options: [{ value: '1', text: 'Opt 1' }],
         container: true
       })
+
+      multiSelect.show()
 
       expect(multiSelect._menu.parentElement).toBe(document.body)
       // Clean up
@@ -3016,7 +3067,7 @@ describe('MultiSelect', () => {
       multiSelect.show()
       const option = multiSelect._optionsElement.querySelector('[data-value="1"]')
       option.focus()
-      expect(multiSelect._wrapperElement.contains(document.activeElement)).toBe(true)
+      expect(multiSelect._menu.contains(document.activeElement)).toBe(true)
 
       multiSelect.hide()
 

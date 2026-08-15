@@ -78,6 +78,49 @@ const DefaultType = {
   returnFocus: 'boolean'
 }
 
+// Walk up from the anchor looking for anything that would clip the panel or
+// trap it in a stacking context — exactly the cases the teleport exists for.
+const hasConstrainingAncestor = (anchor: HTMLElement | null, boundary: HTMLElement = document.body): boolean => {
+  let node = anchor?.parentElement
+
+  while (node && node !== boundary && node !== document.body && node !== document.documentElement) {
+    const styles = getComputedStyle(node)
+
+    if (
+      styles.overflow !== 'visible' ||
+      styles.transform !== 'none' ||
+      styles.filter !== 'none' ||
+      styles.perspective !== 'none' ||
+      styles.contain.includes('paint') ||
+      styles.willChange.includes('transform')
+    ) {
+      return true
+    }
+
+    node = node.parentElement
+  }
+
+  return false
+}
+
+// Where an anchored surface should mount for the duration of an interaction:
+// null means in place next to the anchor. A panel outside an open modal
+// dialog's subtree is painted but inert, so the dialog wins over every other
+// escape route.
+const resolvePopupContainer = (anchor: HTMLElement | null, explicitContainer: HTMLElement | null = null): HTMLElement | null => {
+  if (explicitContainer) {
+    return explicitContainer
+  }
+
+  const dialog = anchor?.closest('dialog[open]') as HTMLElement | null
+
+  if (dialog) {
+    return hasConstrainingAncestor(anchor, dialog) ? dialog : null
+  }
+
+  return hasConstrainingAncestor(anchor) ? document.body : null
+}
+
 /**
  * Class definition
  *
@@ -266,44 +309,7 @@ class Popup extends Config {
   }
 
   _resolveContainer(): HTMLElement | null {
-    if (this._container) {
-      return this._container
-    }
-
-    // A panel outside an open modal dialog's subtree is painted but inert, so
-    // the dialog wins over every other escape route.
-    const dialog = this._anchor?.closest('dialog[open]') as HTMLElement | null
-
-    if (dialog) {
-      return this._hasConstrainingAncestor(dialog) ? dialog : null
-    }
-
-    return this._hasConstrainingAncestor() ? document.body : null
-  }
-
-  // Walk up from the anchor looking for anything that would clip the panel or
-  // trap it in a stacking context — exactly the cases the teleport exists for.
-  _hasConstrainingAncestor(boundary: HTMLElement = document.body): boolean {
-    let node = this._anchor?.parentElement
-
-    while (node && node !== boundary && node !== document.body && node !== document.documentElement) {
-      const styles = getComputedStyle(node)
-
-      if (
-        styles.overflow !== 'visible' ||
-        styles.transform !== 'none' ||
-        styles.filter !== 'none' ||
-        styles.perspective !== 'none' ||
-        styles.contain.includes('paint') ||
-        styles.willChange.includes('transform')
-      ) {
-        return true
-      }
-
-      node = node.parentElement
-    }
-
-    return false
+    return resolvePopupContainer(this._anchor, this._container)
   }
 
   _startPositioning(): void {
@@ -438,4 +444,5 @@ class Popup extends Config {
 }
 
 export default Popup
+export { resolvePopupContainer }
 export type { PopupConfig }

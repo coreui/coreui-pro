@@ -9,8 +9,11 @@ import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
 import { createAnchoredPosition } from './util/floating-ui.js'
+import { resolvePopupContainer } from './util/popup.js'
 import { sanitizeHtml } from './util/sanitizer.js'
-import { getElement, getNextActiveElement, isVisible } from './util/index.js'
+import {
+  executeAfterTransition, getElement, getNextActiveElement, isVisible
+} from './util/index.js'
 
 /**
  * Internal shared engine for the combobox-pattern components (Autocomplete,
@@ -89,6 +92,7 @@ class Combobox extends BaseComponent {
 
     EventHandler.trigger(this._element, this.constructor.eventName('show'))
     const showTarget = this._getShowTarget()
+    this._mountMenu()
     showTarget.classList.add(CLASS_NAME_SHOW)
     this._getAriaExpandedTarget().setAttribute('aria-expanded', 'true')
 
@@ -96,10 +100,6 @@ class Combobox extends BaseComponent {
     // both its display and its entry transition on it, so a panel shown only
     // through an ancestor's class would be laid out and never fade in.
     this._menu.classList.add(CLASS_NAME_SHOW)
-
-    if (this._config.container) {
-      this._menu.style.minWidth = `${showTarget.offsetWidth}px`
-    }
 
     EventHandler.trigger(this._element, this.constructor.eventName('shown'))
 
@@ -120,6 +120,15 @@ class Combobox extends BaseComponent {
 
     this._onHideEnd()
     EventHandler.trigger(this._element, this.constructor.eventName('hidden'))
+
+    // The panel lives in the DOM only while a choice is being made; let the
+    // exit transition play before it goes. dispose() can run before the
+    // transition ends — it nulls every field and removes the panel itself.
+    executeAfterTransition(() => {
+      if (this._menu && !this._isShown()) {
+        this._menu.remove()
+      }
+    }, this._menu)
   }
 
   _isShown(): boolean {
@@ -142,6 +151,25 @@ class Combobox extends BaseComponent {
 
   _getShowTarget(): HTMLElement {
     return this._element
+  }
+
+  // Mounted for the duration of the interaction, into a container decided
+  // fresh on each open (in place, the open dialog's subtree, or body when an
+  // ancestor would clip the panel). In place means next to the frame, not
+  // inside it — the frame is a flex control chrome. The frame cannot size the
+  // panel through CSS once the panel can leave it, so the width rides along
+  // inline.
+  _mountMenu(): void {
+    const showTarget = this._getShowTarget()
+    const container = resolvePopupContainer(showTarget, this._config.container ? getElement(this._config.container) : null)
+
+    if (container) {
+      container.append(this._menu)
+    } else {
+      showTarget.after(this._menu)
+    }
+
+    this._menu.style.minWidth = `${showTarget.offsetWidth}px`
   }
 
   _getAriaExpandedTarget(): HTMLElement {
@@ -214,13 +242,6 @@ class Combobox extends BaseComponent {
     }
 
     popupDiv.append(optionsDiv)
-
-    const { container } = this._config
-    if (container) {
-      container.append(popupDiv)
-    } else {
-      this._getShowTarget().append(popupDiv)
-    }
 
     this._createOptions(optionsDiv, this._options)
     this._optionsElement = optionsDiv
@@ -443,8 +464,10 @@ class Combobox extends BaseComponent {
   // Checks only `display` (unlike the imported `isVisible`) so it still works
   // while the menu is closed, e.g. when called from the constructor.
   _isOptionDisplayed(element: Element): boolean {
-    const style = window.getComputedStyle(element)
-    return (style.display !== 'none')
+    // The filter hides options with inline display only, so the inline style
+    // is the source of truth — computed style reads empty on a detached panel
+    // and would count every option as displayed
+    return (element as HTMLElement).style.display !== 'none'
   }
 
   // Listbox keyboard navigation

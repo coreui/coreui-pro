@@ -185,6 +185,7 @@ class Autocomplete extends Combobox {
 
   override dispose(): void {
     this._disposeFloating()
+    this._menu?.remove()
 
     super.dispose()
   }
@@ -750,9 +751,9 @@ class Autocomplete extends Combobox {
 
       const composedPath = event.composedPath()
 
-      if (
-        composedPath.includes(context._element)
-      ) {
+      // The panel mounts outside the frame while open — a click on an option
+      // is very much inside
+      if (composedPath.includes(context._element) || composedPath.includes(context._menu)) {
         continue
       }
 

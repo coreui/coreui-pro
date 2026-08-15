@@ -1554,7 +1554,9 @@ class MultiSelect extends Combobox {
         continue
       }
 
-      if (context._wrapperElement.contains(event.target)) {
+      // The panel mounts outside the frame while open — a click on an option
+      // is very much inside
+      if (context._wrapperElement.contains(event.target) || context._menu.contains(event.target)) {
         continue
       }
 
