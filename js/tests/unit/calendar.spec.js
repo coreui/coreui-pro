@@ -177,6 +177,21 @@ describe('Calendar', () => {
       expect(div.classList).toContain('select-week')
     })
 
+    it('should survive focusing a row when weeks are the unit', () => {
+      fixtureEl.innerHTML = '<div></div>'
+
+      const div = fixtureEl.querySelector('div')
+      new Calendar(div, { selectionType: 'week' }) // eslint-disable-line no-new
+
+      // The row is what takes focus in week selection, so the hover handler
+      // gets an event with no cell above it — it used to read `closest` off
+      // null and take the whole calendar down with it.
+      const row = div.querySelector('.calendar-row[tabindex]')
+      expect(row).not.toBeNull()
+
+      expect(() => row.focus()).not.toThrow()
+    })
+
     it('should add "select-day" class for day selectionType', () => {
       fixtureEl.innerHTML = '<div></div>'
 
