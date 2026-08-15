@@ -169,6 +169,17 @@ describe('Popup', () => {
       expect(document.activeElement.id).toEqual('entry')
     })
 
+    it('should move focus into the panel however it was opened', () => {
+      // Opening with the mouse — the indicator button — has to land in the
+      // panel too, or the user arrives at its first navigation button instead
+      // of at a date.
+      const popup = buildField()
+
+      popup.show()
+
+      expect(document.activeElement.id).toEqual('entry')
+    })
+
     it('should open on F4', () => {
       const popup = buildField()
 

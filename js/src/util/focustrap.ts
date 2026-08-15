@@ -146,25 +146,36 @@ class FocusTrap extends Config {
       return
     }
 
-    event.preventDefault()
+    // Only the four seams between the two groups are ours to redirect. Taking
+    // the event on every Tab would swallow the ones in the middle of a group —
+    // preventDefault with nothing to focus leaves Tab dead, which is what a
+    // calendar's navigation buttons used to run into.
+    const target = event.target as HTMLElement
+    const trapIndex = trapElements.indexOf(target)
+    const additionalIndex = additionalElements.indexOf(target)
 
-    if (trapElements.indexOf(event.target as HTMLElement) === trapElements.length - 1 && !event.shiftKey) {
-      additionalElements[0].focus()
+    const redirect = (element: HTMLElement) => {
+      event.preventDefault()
+      element.focus()
+    }
+
+    if (trapIndex === trapElements.length - 1 && !event.shiftKey) {
+      redirect(additionalElements[0])
       return
     }
 
-    if (trapElements.indexOf(event.target as HTMLElement) === 0 && event.shiftKey) {
-      additionalElements[additionalElements.length - 1].focus()
+    if (trapIndex === 0 && event.shiftKey) {
+      redirect(additionalElements[additionalElements.length - 1])
       return
     }
 
-    if (additionalElements.indexOf(event.target as HTMLElement) === additionalElements.length - 1 && !event.shiftKey) {
-      trapElements[0].focus()
+    if (additionalIndex === additionalElements.length - 1 && !event.shiftKey) {
+      redirect(trapElements[0])
       return
     }
 
-    if (additionalElements.indexOf(event.target as HTMLElement) === 0 && event.shiftKey) {
-      trapElements[trapElements.length - 1].focus()
+    if (additionalIndex === 0 && event.shiftKey) {
+      redirect(trapElements[trapElements.length - 1])
     }
   }
 }

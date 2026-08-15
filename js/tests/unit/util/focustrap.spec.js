@@ -215,4 +215,59 @@ describe('FocusTrap', () => {
       expect(spy).not.toHaveBeenCalled()
     })
   })
+
+  describe('tabbing between the trap and its additional element', () => {
+    it('should leave a Tab inside a group alone', () => {
+      fixtureEl.innerHTML = [
+        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
+        '<div id="extra"><button id="a1">a1</button><button id="a2">a2</button><button id="a3">a3</button></div>'
+      ].join('')
+
+      const focustrap = new FocusTrap({
+        additionalElement: fixtureEl.querySelector('#extra'),
+        trapElement: fixtureEl.querySelector('#trap')
+      })
+
+      focustrap.activate()
+
+      // a2 sits in the middle of the additional group, so Tab is the browser's
+      // to handle — taking it here would leave the key doing nothing at all.
+      const middle = fixtureEl.querySelector('#a2')
+      middle.focus()
+
+      const event = createEvent('keydown', { bubbles: true, cancelable: true })
+      event.key = 'Tab'
+      middle.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeFalse()
+
+      focustrap.deactivate()
+    })
+
+    it('should carry focus across the seam between the groups', () => {
+      fixtureEl.innerHTML = [
+        '<div id="trap"><button id="t1">t1</button><button id="t2">t2</button></div>',
+        '<div id="extra"><button id="a1">a1</button><button id="a2">a2</button></div>'
+      ].join('')
+
+      const focustrap = new FocusTrap({
+        additionalElement: fixtureEl.querySelector('#extra'),
+        trapElement: fixtureEl.querySelector('#trap')
+      })
+
+      focustrap.activate()
+
+      const last = fixtureEl.querySelector('#t2')
+      last.focus()
+
+      const event = createEvent('keydown', { bubbles: true, cancelable: true })
+      event.key = 'Tab'
+      last.dispatchEvent(event)
+
+      expect(event.defaultPrevented).toBeTrue()
+      expect(document.activeElement.id).toEqual('a1')
+
+      focustrap.deactivate()
+    })
+  })
 })

@@ -177,6 +177,11 @@ class Popup extends Config {
       this._focustrap.activate()
     }
 
+    // Opening a picker puts the user in the panel, the way the native date
+    // control does — the calendar nominates the entry point (the selected day,
+    // else today, else the nearest selectable one) by carrying tabindex="0".
+    this._focusPanel()
+
     execute(this._config.onShown)
   }
 
@@ -369,7 +374,6 @@ class Popup extends Config {
 
       event.preventDefault()
       this.show()
-      this._focusPanel()
     }
 
     EventHandler.on(this._anchor, EVENT_KEYDOWN, this._anchorKeydownListener)
