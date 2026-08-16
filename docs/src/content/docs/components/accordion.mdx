@@ -45,7 +45,7 @@ Click the accordions below to expand/collapse the accordion content.
     </details>
   </div>`} />
 
-### Variants
+## Variants
 
 Add a contextual `.theme-{color}` class to the `.accordion` to tint its **open** items. Closed items keep the neutral surface, so the theme marks what is currently expanded rather than recolouring the whole control.
 
@@ -64,7 +64,7 @@ Add a contextual `.theme-{color}` class to the `.accordion` to tint its **open**
     </details>
   </div>`} />
 
-### Nested
+## Nested
 
 Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each level its own `name`, so the outer and inner groups open and close independently — `name` groups the `<details>` elements across the whole document, not per container.
 
@@ -91,7 +91,7 @@ Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each leve
     </details>
   </div>`} />
 
-### Flush
+## Flush
 
 Add `.accordion-flush` to remove the default `background-color`, some borders, and some rounded corners to render accordions edge-to-edge with their parent container.
 
@@ -110,7 +110,7 @@ Add `.accordion-flush` to remove the default `background-color`, some borders, a
     </details>
   </div>`} />
 
-### Always open
+## Always open
 
 Omit the `name` attribute on each `.accordion-item` to make accordion items stay open when another item is opened.
 
@@ -135,7 +135,7 @@ Omit the `name` attribute on each `.accordion-item` to make accordion items stay
     </details>
   </div>`} />
 
-### Headings
+## Headings
 
 `<summary>` accepts heading content, so wrap the label in a heading to keep the sections reachable by heading navigation. The heading inherits the summary's typography, so it does not change how the accordion looks.
 
@@ -158,9 +158,13 @@ Because a bare `<summary>` is not a heading, wrap its label in an `<h2>`–`<h6>
 
 ## JavaScript behavior
 
-None is required. The `<details>` element opens and closes on its own, including on markup added to the page after load.
+None is required to open and close an accordion. The `<details>` element does that on its own, including on markup added to the page after load, and the styles do not depend on the component either.
 
-The optional `accordion.js` component only adds the open/close animation in browsers that cannot do it in CSS. Chromium animates `block-size: 0` to `auto` through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size); Firefox and Safari do not implement it yet, and there the panel snaps unless the component is loaded. It can be removed without a breaking change once they ship `calc-size()`.
+Loading `accordion.js` adds three things on top:
+
+- **The events below**, on every accordion in the document, in every browser. Nothing has to be instantiated for them.
+- **The methods below**, on an instance created for a `.accordion` element.
+- **The open/close animation where CSS cannot do it.** Chromium animates `block-size: 0` to `auto` through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size); Firefox and Safari do not implement it yet, so there the panel snaps unless the component is loaded. Only this part is conditional, and only this part goes away once they ship `calc-size()` — the events and methods stay.
 
 ### Expand & collapse all
 
