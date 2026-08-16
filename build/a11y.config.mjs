@@ -577,6 +577,68 @@ export const a11yComponents = [
     ]
   },
   {
+    component: 'components/accordion',
+    html: `<div class="accordion" id="a11yAccordion">
+    <details class="accordion-item" name="a11yAccordion" open>
+      <summary class="accordion-header"><h3>First</h3></summary>
+      <div class="accordion-body">First panel.</div>
+    </details>
+    <details class="accordion-item" name="a11yAccordion">
+      <summary class="accordion-header"><h3>Second</h3></summary>
+      <div class="accordion-body">Second panel.</div>
+    </details>
+  </div>`,
+    interactions: [
+      { focus: '#a11yAccordion > .accordion-item:last-of-type > .accordion-header' }
+    ],
+    assertions: [
+      {
+        criterion: '2.1.1',
+        label: 'Enter on a collapsed header opens its panel',
+        steps: [{ press: 'Enter' }, { wait: 100 }],
+        run: 'return document.querySelector(\'#a11yAccordion > .accordion-item:last-of-type\').open === true'
+      },
+      {
+        criterion: '2.1.1',
+        label: 'Enter on an expanded header closes it again',
+        steps: [{ press: 'Enter' }, { wait: 100 }],
+        run: 'return document.querySelector(\'#a11yAccordion > .accordion-item:last-of-type\').open === false'
+      },
+      {
+        criterion: '1.3.1',
+        label: 'A heading inside the summary stays exposed as a heading',
+        run: 'return document.querySelector(\'#a11yAccordion .accordion-header > h3\') !== null'
+      }
+    ],
+    criteria: [
+      {
+        criterion: '2.1.1',
+        status: 'built-in',
+        note: 'The header is a <summary>, so Enter/Space toggle its panel and Tab reaches every header without a roving tabindex. Verified here in both directions. APG also lists optional Arrow/Home/End navigation between headers, which we do not implement.'
+      },
+      {
+        criterion: '4.1.2',
+        status: 'partial',
+        note: 'The browser exposes the disclosure role and the expanded state from <details>/<summary>; nothing is bookkept in ARIA. Chromium reports role DisclosureTriangle (DisclosureTriangleGrouped when items share a name) with expanded=true|false. GAP vs the APG pattern: the header is not role=button, carries no aria-controls, and the panel is not role=region + aria-labelledby.'
+      },
+      {
+        criterion: '1.3.1',
+        status: 'partial',
+        note: 'A bare <summary> is not a heading. The docs show wrapping the label in <h2>-<h6> inside the summary, which keeps the sections reachable by heading navigation; APG instead wraps the button in the heading. Authors who skip the heading lose that navigation.'
+      },
+      {
+        criterion: '2.4.7',
+        status: 'built-in',
+        note: 'The header draws a focus ring on :focus-visible, so keyboard focus is visible while a mouse click leaves it alone.'
+      },
+      {
+        criterion: '1.4.3',
+        status: 'built-in',
+        note: 'Header text meets the contrast minimum in both the resting and the open state (audited on the examples above).'
+      }
+    ]
+  },
+  {
     component: 'components/alerts',
     criteria: [
       {
