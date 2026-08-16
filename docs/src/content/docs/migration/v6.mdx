@@ -173,6 +173,34 @@ finished, not whether the state changed.
 
 ### Components
 
+#### Accordion on the native `<details>`
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The accordion renders on the native `<details>`/`<summary>` elements now.**
+  `.accordion-item` goes on a `<details>` element and `.accordion-header` on its
+  `<summary>`; the browser opens and closes the panel, so the component needs no
+  initialization and works on markup added after load.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.accordion-button`, `.accordion-collapse` and `.collapsed` are gone.** The
+  trigger is the `<summary>` itself and the panel is the element's own content,
+  revealed through `::details-content`. Style the open state with
+  `.accordion-item[open] > .accordion-header` instead of `:not(.collapsed)`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Grouping moves from `data-coreui-parent` to the `name` attribute.** Give the
+  `<details>` elements of one accordion the same `name` to keep a single item
+  open at a time; omit it for an always-open accordion. The `id` plumbing
+  (`data-coreui-target`, `aria-controls`, `aria-expanded`) is no longer needed —
+  the browser exposes the disclosure state on its own.
+- **A `<summary>` is not a heading.** Where the accordion divides a page into
+  sections, wrap the label in an `<h2>`–`<h6>` inside the summary; the heading
+  inherits the summary's typography.
+- **The panel animation is CSS-driven** through `interpolate-size:
+  allow-keywords`, which only Chromium implements today. The optional
+  `accordion.js` component supplies the same animation in Firefox and Safari and
+  can be dropped, without a breaking change, once they ship `calc-size()`.
+  It emits `show`/`shown`/`hide`/`hidden.coreui.accordion`; for behaviour that
+  must work everywhere, listen for the native `toggle` event.
+
 #### Autocomplete and Multi Select share one options menu
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
