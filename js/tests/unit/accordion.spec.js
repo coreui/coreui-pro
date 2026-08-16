@@ -82,27 +82,14 @@ describe('Accordion', () => {
 
       const itemEl = fixtureEl.querySelector('.accordion-item')
       const accordion = new Accordion(itemEl)
-      const spy = jasmine.createSpy('show')
+      const spy = jasmine.createSpy('shown')
 
-      EventHandler.on(itemEl, 'show.coreui.accordion', spy)
+      EventHandler.on(itemEl, 'shown.coreui.accordion', spy)
 
       await accordion.show()
 
       expect(spy).not.toHaveBeenCalled()
       expect(itemEl.open).toBeTrue()
-    })
-
-    it('should not open when the show event is prevented', async () => {
-      fixtureEl.innerHTML = markup()
-
-      const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
-      const accordion = new Accordion(itemEl)
-
-      EventHandler.on(itemEl, 'show.coreui.accordion', event => event.preventDefault())
-
-      await accordion.show()
-
-      expect(itemEl.open).toBeFalse()
     })
 
     it('should close a sibling sharing the same name', async () => {
@@ -153,26 +140,13 @@ describe('Accordion', () => {
 
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
       const accordion = new Accordion(itemEl)
-      const spy = jasmine.createSpy('hide')
+      const spy = jasmine.createSpy('hidden')
 
-      EventHandler.on(itemEl, 'hide.coreui.accordion', spy)
+      EventHandler.on(itemEl, 'hidden.coreui.accordion', spy)
 
       await accordion.hide()
 
       expect(spy).not.toHaveBeenCalled()
-    })
-
-    it('should not close when the hide event is prevented', async () => {
-      fixtureEl.innerHTML = markup()
-
-      const itemEl = fixtureEl.querySelector('.accordion-item')
-      const accordion = new Accordion(itemEl)
-
-      EventHandler.on(itemEl, 'hide.coreui.accordion', event => event.preventDefault())
-
-      await accordion.hide()
-
-      expect(itemEl.open).toBeTrue()
     })
 
     it('should clear the animating attribute once finished', async () => {
@@ -216,8 +190,54 @@ describe('Accordion', () => {
     })
   })
 
+  describe('events', () => {
+    it('should mirror the native toggle where CSS animates the panel, without instantiating', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
+      const shown = new Promise(resolve => {
+        EventHandler.on(itemEl, 'shown.coreui.accordion', resolve)
+      })
+
+      itemEl.querySelector('.accordion-header').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      await shown
+
+      expect(itemEl.open).toBeTrue()
+      expect(Accordion.getInstance(itemEl)).toBeNull()
+    })
+
+    it('should be delegatable, unlike the native toggle', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
+      const delegated = new Promise(resolve => {
+        EventHandler.on(document, 'shown.coreui.accordion', resolve)
+      })
+
+      itemEl.querySelector('.accordion-header').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      await delegated
+
+      EventHandler.off(document, 'shown.coreui.accordion')
+      expect(itemEl.open).toBeTrue()
+    })
+
+    it('should fire hidden when the item closes', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const itemEl = fixtureEl.querySelector('.accordion-item')
+      const hidden = new Promise(resolve => {
+        EventHandler.on(itemEl, 'hidden.coreui.accordion', resolve)
+      })
+
+      itemEl.querySelector('.accordion-header').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      await hidden
+
+      expect(itemEl.open).toBeFalse()
+    })
+  })
+
   describe('data-api', () => {
-    it('should stand aside where CSS animates the panel', () => {
+    it('should leave the item to the browser where CSS animates the panel', () => {
       fixtureEl.innerHTML = markup()
 
       const summaryEl = fixtureEl.querySelectorAll('.accordion-header')[1]
@@ -242,6 +262,20 @@ describe('Accordion', () => {
       await shown
 
       expect(itemEl.open).toBeTrue()
+    })
+
+    it('should leave the item closed when the click is already prevented', () => {
+      withoutNativeAnimation()
+      fixtureEl.innerHTML = markup()
+
+      const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
+      const summaryEl = itemEl.querySelector('.accordion-header')
+
+      summaryEl.addEventListener('click', event => event.preventDefault())
+      summaryEl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+
+      expect(itemEl.open).toBeFalse()
+      expect(Accordion.getInstance(itemEl)).toBeNull()
     })
 
     it('should leave a control inside the summary to itself', () => {

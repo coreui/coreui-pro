@@ -101,7 +101,8 @@ const nativeEvents = new Set([
   'readystatechange',
   'error',
   'abort',
-  'scroll'
+  'scroll',
+  'toggle'
 ])
 
 /**

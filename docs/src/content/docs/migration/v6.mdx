@@ -198,8 +198,13 @@ finished, not whether the state changed.
   allow-keywords`, which only Chromium implements today. The optional
   `accordion.js` component supplies the same animation in Firefox and Safari and
   can be dropped, without a breaking change, once they ship `calc-size()`.
-  It emits `show`/`shown`/`hide`/`hidden.coreui.accordion`; for behaviour that
-  must work everywhere, listen for the native `toggle` event.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The accordion's events replace Collapse's.** `shown`/`hidden.coreui.accordion`
+  fire on the `.accordion-item` whenever its open state changes, mirroring the
+  native `toggle` event but bubbling, so they can be delegated. There is no
+  `show`/`hide` counterpart: `<details>` has no cancelable event before the
+  state change, so an item is kept shut by cancelling the click on its
+  `<summary>` instead of by preventing an event.
 
 #### Autocomplete and Multi Select share one options menu
 

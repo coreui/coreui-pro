@@ -116,14 +116,30 @@ The optional `accordion.js` component only adds the open/close animation in brow
 
 ### Events
 
-The component fires the following events on the `.accordion-item` element. They are only fired where the component is active — do not depend on them for core behavior; listen for the native `toggle` event instead.
+The accordion's own events mirror the native [`toggle`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/toggle_event) event, and are fired on the `.accordion-item` element whenever its open state changes — in every browser, whether the panel was animated by CSS or by the component, and whether it was opened by the user or by setting the `open` property.
 
 | Event | Description |
 | --- | --- |
-| `show.coreui.accordion` | Fires immediately when the `show` method is called. |
-| `shown.coreui.accordion` | Fired when an accordion item has been made visible. |
-| `hide.coreui.accordion` | Fires immediately when the `hide` method is called. |
-| `hidden.coreui.accordion` | Fired when an accordion item has been hidden. |
+| `shown.coreui.accordion` | Fired when an accordion item has been opened. |
+| `hidden.coreui.accordion` | Fired when an accordion item has been closed. |
+
+Both bubble, so they can be delegated. The native `toggle` event does not bubble, which is the one thing these add over listening for it directly:
+
+```js
+coreui.EventHandler.on(document, 'shown.coreui.accordion', event => {
+  console.log(event.target.querySelector('.accordion-header').textContent)
+})
+```
+
+There is no `show`/`hide` counterpart, because `<details>` has no cancelable event that precedes the state change. **To keep an item from opening, cancel the click on its `<summary>`** — the browser then leaves it closed, and the component honors that too:
+
+```js
+summary.addEventListener('click', event => {
+  if (!allowed) {
+    event.preventDefault()
+  }
+})
+```
 
 ## Customizing
 

@@ -19,11 +19,10 @@ const DATA_KEY = 'coreui.accordion'
 const EVENT_KEY = `.${DATA_KEY}`
 const DATA_API_KEY = '.data-api'
 
-const EVENT_SHOW = `show${EVENT_KEY}`
 const EVENT_SHOWN = `shown${EVENT_KEY}`
-const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_TOGGLE_DATA_API = `toggle${EVENT_KEY}${DATA_API_KEY}`
 
 const ATTRIBUTE_ANIMATING = 'data-coreui-accordion-animating'
 
@@ -94,11 +93,6 @@ class Accordion extends BaseComponent {
       return
     }
 
-    const startEvent = EventHandler.trigger(this._element, EVENT_SHOW)
-    if (startEvent!.defaultPrevented) {
-      return
-    }
-
     // Not awaited: the siblings collapse while this item expands, the way the
     // native exclusive accordion swaps them in the same frame.
     this._hideSiblings()
@@ -107,17 +101,10 @@ class Accordion extends BaseComponent {
     this._details.open = true
 
     await this._animate(from, this._element.getBoundingClientRect().height)
-
-    EventHandler.trigger(this._element, EVENT_SHOWN)
   }
 
   async hide(): Promise<void> {
     if (!this._isShown()) {
-      return
-    }
-
-    const startEvent = EventHandler.trigger(this._element, EVENT_HIDE)
-    if (startEvent!.defaultPrevented) {
       return
     }
 
@@ -126,8 +113,6 @@ class Accordion extends BaseComponent {
     await this._animate(from, this._collapsedSize(), () => {
       this._details.open = false
     })
-
-    EventHandler.trigger(this._element, EVENT_HIDDEN)
   }
 
   override dispose(): void {
@@ -234,21 +219,37 @@ class Accordion extends BaseComponent {
  * Data API implementation
  */
 
-EventHandler.on(document, EVENT_CLICK_DATA_API, `${SELECTOR_ITEM} > ${SELECTOR_HEADER}`, function (this: HTMLElement, event) {
+// The CoreUI events mirror the native `toggle`, which does not bubble and so
+// cannot be delegated. Registered for every item, whichever path opened it, so
+// the event surface does not depend on the browser.
+EventHandler.on(document, EVENT_TOGGLE_DATA_API, SELECTOR_ITEM, function (this: HTMLDetailsElement) {
+  EventHandler.trigger(this, this.open ? EVENT_SHOWN : EVENT_HIDDEN)
+})
+
+// Not delegated: EventHandler delegates in the capture phase, which runs before
+// a listener on the summary itself, so `defaultPrevented` would still be false
+// here and preventing the click would not hold the item shut the way it does
+// natively.
+EventHandler.on(document, EVENT_CLICK_DATA_API, (event: Event) => {
   // Where CSS can animate the panel, the element is left to toggle itself.
-  if (supportsNativeAnimation()) {
+  if (supportsNativeAnimation() || event.defaultPrevented) {
     return
   }
 
   const target = event.target as HTMLElement
+  const header = target.closest<HTMLElement>(`${SELECTOR_ITEM} > ${SELECTOR_HEADER}`)
+
+  if (!header) {
+    return
+  }
 
   // A control inside the summary keeps its own behaviour.
-  if (target !== this && target.closest(SELECTOR_INTERACTIVE)) {
+  if (target !== header && target.closest(SELECTOR_INTERACTIVE)) {
     return
   }
 
   event.preventDefault()
-  Accordion.getOrCreateInstance(this.parentElement).toggle()
+  Accordion.getOrCreateInstance(header.parentElement).toggle()
 })
 
 /**
