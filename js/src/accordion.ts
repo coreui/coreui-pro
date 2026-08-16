@@ -35,8 +35,6 @@ const SELECTOR_HEADER = '.accordion-header'
 const SELECTOR_INTERACTIVE = 'a, button, input, select, textarea'
 const SELECTOR_ITEM = 'details.accordion-item'
 
-const DEFAULT_DURATION = 350
-const DEFAULT_EASING = 'ease'
 const MILLISECONDS_MULTIPLIER = 1000
 
 // Chromium animates `block-size: 0 -> auto` on its own through `interpolate-size`,
@@ -54,7 +52,7 @@ const toMilliseconds = (value: string): number => {
   const number = Number.parseFloat(value)
 
   if (Number.isNaN(number)) {
-    return DEFAULT_DURATION
+    return 0
   }
 
   return value.trim().endsWith('ms') ? number : number * MILLISECONDS_MULTIPLIER
@@ -227,11 +225,20 @@ class Accordion extends BaseComponent {
     }
 
     const styles = window.getComputedStyle(details)
+    const duration = toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION))
+
+    // The duration is the stylesheet's to set. Without it there is no styled
+    // accordion to animate either, so there is nothing to fall back to.
+    if (!duration) {
+      onFinish?.()
+      return
+    }
+
     const animation = details.animate(
       { height: [`${from}px`, `${to}px`] },
       {
-        duration: toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION) || `${DEFAULT_DURATION}ms`),
-        easing: styles.getPropertyValue(PROPERTY_EASING).trim() || DEFAULT_EASING,
+        duration,
+        easing: styles.getPropertyValue(PROPERTY_EASING).trim() || 'linear',
         fill: 'both'
       }
     )
