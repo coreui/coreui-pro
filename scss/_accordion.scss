@@ -216,7 +216,6 @@ $accordion-tokens: defaults(
       position: relative;
       z-index: 3;
       outline: var(--#{$prefix}accordion-btn-focus-ring);
-      outline-offset: calc(-1 * var(--#{$prefix}accordion-border-width)); // stylelint-disable-line function-disallowed-list
     }
   }
 
