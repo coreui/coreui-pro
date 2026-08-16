@@ -45,6 +45,52 @@ Click the accordions below to expand/collapse the accordion content.
     </details>
   </div>`} />
 
+### Variants
+
+Add a contextual `.theme-{color}` class to the `.accordion` to tint its **open** items. Closed items keep the neutral surface, so the theme marks what is currently expanded rather than recolouring the whole control.
+
+<Example code={`<div class="accordion theme-success">
+    <details class="accordion-item" name="accordionTheme" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">The open item takes its text, background and border from the theme color.</div>
+    </details>
+    <details class="accordion-item" name="accordionTheme">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Closed items are untouched, so the tint reads as a state and not as decoration.</div>
+    </details>
+    <details class="accordion-item" name="accordionTheme">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Any of the theme colors works: <code>.theme-primary</code>, <code>.theme-danger</code>, and so on.</div>
+    </details>
+  </div>`} />
+
+### Nested
+
+Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each level its own `name`, so the outer and inner groups open and close independently — `name` groups the `<details>` elements across the whole document, not per container.
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionNestedOuter" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">
+        <strong>This item contains a nested accordion.</strong>
+        <div class="accordion mt-3">
+          <details class="accordion-item" name="accordionNestedInner" open>
+            <summary class="accordion-header">Nested Item #1</summary>
+            <div class="accordion-body">Body of the first nested item.</div>
+          </details>
+          <details class="accordion-item" name="accordionNestedInner">
+            <summary class="accordion-header">Nested Item #2</summary>
+            <div class="accordion-body">Body of the second nested item.</div>
+          </details>
+        </div>
+      </div>
+    </details>
+    <details class="accordion-item" name="accordionNestedOuter">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Opening this closes the item above, and the nested accordion goes with it.</div>
+    </details>
+  </div>`} />
+
 ### Flush
 
 Add `.accordion-flush` to remove the default `background-color`, some borders, and some rounded corners to render accordions edge-to-edge with their parent container.

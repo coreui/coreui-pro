@@ -29,6 +29,7 @@ $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default
 $accordion-transition:                    $btn-transition, border-radius .15s ease !default;
 $accordion-button-active-bg:              var(--#{$prefix}primary-bg-subtle) !default;
 $accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis) !default;
+$accordion-active-border-color:           $accordion-border-color !default;
 
 // fusv-disable
 // fusv-enable
@@ -68,14 +69,15 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
     --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width},
     --#{$prefix}accordion-btn-icon-color: #{$accordion-icon-color},
-    --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
+    --#{$prefix}accordion-btn-active-icon-color: var(--#{$prefix}theme-fg, #{$accordion-icon-active-color}),
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
     --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
     --#{$prefix}accordion-body-padding-x: #{$accordion-body-padding-x},
     --#{$prefix}accordion-body-padding-y: #{$accordion-body-padding-y},
-    --#{$prefix}accordion-active-color: #{$accordion-button-active-color},
-    --#{$prefix}accordion-active-bg: #{$accordion-button-active-bg},
+    --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg, #{$accordion-button-active-color}),
+    --#{$prefix}accordion-active-bg: var(--#{$prefix}theme-bg-subtle, #{$accordion-button-active-bg}),
+    --#{$prefix}accordion-active-border-color: var(--#{$prefix}theme-border, #{$accordion-active-border-color}),
     --#{$prefix}accordion-content-duration: #{$accordion-content-duration},
     --#{$prefix}accordion-content-easing: #{$accordion-content-easing},
   ),
@@ -147,6 +149,7 @@ $accordion-tokens: defaults(
 
     &[open] {
       z-index: 2;
+      border-color: var(--#{$prefix}accordion-active-border-color);
 
       &::details-content {
         block-size: auto;
@@ -155,7 +158,7 @@ $accordion-tokens: defaults(
       > .accordion-header {
         color: var(--#{$prefix}accordion-active-color);
         background-color: var(--#{$prefix}accordion-active-bg);
-        box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-border-color); // stylelint-disable-line function-disallowed-list
+        box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-active-border-color); // stylelint-disable-line function-disallowed-list
 
         &::after {
           background-color: var(--#{$prefix}accordion-btn-active-icon-color);
