@@ -129,6 +129,35 @@ describe('Accordion', () => {
       expect(firstEl.open).toBeFalse()
     })
 
+    it('should run the transition the stylesheet declares and clean up after it', async () => {
+      withoutNativeAnimation()
+      fixtureEl.innerHTML = [
+        '<style>',
+        '  .accordion-item[data-coreui-accordion-animating] { overflow: clip; transition: block-size 200ms linear }',
+        '  .accordion-body { block-size: 120px }',
+        '</style>',
+        markup()
+      ].join('')
+
+      const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
+      const collapsed = itemEl.getBoundingClientRect().height
+
+      const opening = accordion.show(itemEl)
+
+      // The only test that exercises a running transition: everywhere else the
+      // fixture carries no stylesheet, so the duration is 0 and the callback
+      // settles in the same tick.
+      expect(itemEl.getBoundingClientRect().height).toBeCloseTo(collapsed, 0)
+      expect(itemEl.hasAttribute('data-coreui-accordion-animating')).toBeTrue()
+
+      await opening
+
+      expect(itemEl.getBoundingClientRect().height).toBeGreaterThan(collapsed)
+      expect(itemEl.hasAttribute('data-coreui-accordion-animating')).toBeFalse()
+      expect(itemEl.style.blockSize).toEqual('')
+    })
+
     it('should leave a sibling without a shared name alone', async () => {
       fixtureEl.innerHTML = markup().replaceAll(' name="group"', '')
 
