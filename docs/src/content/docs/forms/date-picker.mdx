@@ -298,6 +298,21 @@ the first day of the month.
     </div>
   </div>`} sandboxJs={datePickerFormats} />
 
+## Accessibility
+
+The field is a [date input](/forms/date-input/#accessibility) — a group of spinbutton sections — so its own arrow keys belong to the value, and the popup opens on the native control's dropdown keys. Focus enters the calendar on the selected date, on today when nothing is selected, or on the last selectable date when today is out of range.
+
+### Keyboard support
+
+| Key | Action |
+| --- | --- |
+| <kbd>Alt</kbd> + <kbd>Arrow Down</kbd> / <kbd>F4</kbd> | Open the calendar popup and move focus into the grid |
+| <kbd>Escape</kbd> | Close the popup and return focus to the field |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> | Cycle between the field, its buttons, and the open popup |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date and close the popup |
+
+Inside the grid, navigation follows the [calendar keyboard model](/components/calendar/#keyboard-support): arrows move by day and week, <kbd>Home</kbd> / <kbd>End</kbd> jump within the week, and <kbd>Page Down</kbd> / <kbd>Page Up</kbd> (with <kbd>Shift</kbd> for years) move between months and years.
+
 ## Usage
 
 ### Via data attributes
