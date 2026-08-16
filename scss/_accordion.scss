@@ -99,19 +99,27 @@ $accordion-tokens: defaults(
     background-color: var(--#{$prefix}accordion-bg);
     border: var(--#{$prefix}accordion-border-width) solid var(--#{$prefix}accordion-border-color);
 
-    // `interpolate-size` is what makes the 0 -> auto transition below animate.
-    // Chromium-only today; elsewhere the panel snaps unless accordion.js runs.
-    @media (prefers-reduced-motion: no-preference) {
-      interpolate-size: allow-keywords;
-    }
-
     &::details-content {
       block-size: 0;
       overflow-y: clip;
-      @include transition(
-        block-size var(--#{$prefix}accordion-content-duration) var(--#{$prefix}accordion-content-easing),
-        content-visibility var(--#{$prefix}accordion-content-duration) allow-discrete
-      );
+    }
+
+    // Only where `auto` can be interpolated does the panel animate itself.
+    // Elsewhere accordion.js animates the item, and a transition left on the
+    // panel would still hold it short while the component measures how tall the
+    // item has to become — the open animation would then run to the wrong size
+    // and the panel would jump at the end.
+    @supports (interpolate-size: allow-keywords) {
+      @media (prefers-reduced-motion: no-preference) {
+        interpolate-size: allow-keywords;
+      }
+
+      &::details-content {
+        @include transition(
+          block-size var(--#{$prefix}accordion-content-duration) var(--#{$prefix}accordion-content-easing),
+          content-visibility var(--#{$prefix}accordion-content-duration) allow-discrete
+        );
+      }
     }
 
     // accordion.js animates the item's own block-size where the panel cannot be

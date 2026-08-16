@@ -196,10 +196,15 @@ class Accordion extends BaseComponent {
     }
 
     details.setAttribute(ATTRIBUTE_ANIMATING, '')
+
+    // The starting size has to land unanimated, or the transition the attribute
+    // just enabled would run towards it and the real move would cancel it.
+    details.style.transition = 'none'
     details.style.blockSize = `${from}px`
 
     reflow(details)
 
+    details.style.transition = ''
     details.style.blockSize = `${to}px`
 
     await this._queueCallback(() => {
