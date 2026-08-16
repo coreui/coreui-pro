@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, getElement } from './util/index.js'
+import { defineJQueryPlugin } from './util/index.js'
 
 /**
  * Constants
@@ -30,16 +30,14 @@ const ATTRIBUTE_NAME = 'data-coreui-accordion-name'
 const PROPERTY_DURATION = '--cui-accordion-content-duration'
 const PROPERTY_EASING = '--cui-accordion-content-easing'
 
+const SELECTOR_ACCORDION = '.accordion'
 const SELECTOR_HEADER = '.accordion-header'
 const SELECTOR_INTERACTIVE = 'a, button, input, select, textarea'
 const SELECTOR_ITEM = 'details.accordion-item'
 
 const DEFAULT_DURATION = 350
 const DEFAULT_EASING = 'ease'
-
-/**
- * Helpers
- */
+const MILLISECONDS_MULTIPLIER = 1000
 
 // Chromium animates `block-size: 0 -> auto` on its own through `interpolate-size`,
 // so this component only exists for the browsers that cannot. It is safe to drop
@@ -59,7 +57,7 @@ const toMilliseconds = (value: string): number => {
     return DEFAULT_DURATION
   }
 
-  return value.trim().endsWith('ms') ? number : number * 1000
+  return value.trim().endsWith('ms') ? number : number * MILLISECONDS_MULTIPLIER
 }
 
 /**
@@ -67,7 +65,7 @@ const toMilliseconds = (value: string): number => {
  */
 
 class Accordion extends BaseComponent {
-  protected declare _animation: Animation | null
+  protected declare _animations: WeakMap<HTMLDetailsElement, Animation>
 
   constructor(element?: string | Element | null, config?: any) {
     super(element, config)
@@ -76,7 +74,7 @@ class Accordion extends BaseComponent {
       return
     }
 
-    this._animation = null
+    this._animations = new WeakMap<HTMLDetailsElement, Animation>()
   }
 
   // Getters
@@ -85,128 +83,54 @@ class Accordion extends BaseComponent {
   }
 
   // Public
-  toggle(): Promise<void> {
-    return this._isShown() ? this.hide() : this.show()
+  toggle(item: Element | number): Promise<void> {
+    const details = this._resolve(item)
+
+    if (!details) {
+      return Promise.resolve()
+    }
+
+    return details.open ? this.hide(details) : this.show(details)
   }
 
-  async show(): Promise<void> {
-    if (this._isShown()) {
+  async show(item: Element | number): Promise<void> {
+    const details = this._resolve(item)
+
+    if (!details || details.open) {
       return
     }
 
     // Not awaited: the siblings collapse while this item expands, the way the
     // native exclusive accordion swaps them in the same frame.
-    this._hideSiblings()
+    this._hideSiblings(details)
 
-    const from = this._collapsedSize()
-    this._details.open = true
+    const from = this._collapsedSize(details)
+    details.open = true
 
-    await this._animate(from, this._element.getBoundingClientRect().height)
+    await this._animate(details, from, details.getBoundingClientRect().height)
   }
 
-  async hide(): Promise<void> {
-    if (!this._isShown()) {
+  async hide(item: Element | number): Promise<void> {
+    const details = this._resolve(item)
+
+    if (!details || !details.open) {
       return
     }
 
-    const from = this._element.getBoundingClientRect().height
+    const from = details.getBoundingClientRect().height
 
-    await this._animate(from, this._collapsedSize(), () => {
-      this._details.open = false
+    await this._animate(details, from, this._collapsedSize(details), () => {
+      details.open = false
     })
   }
 
-  override dispose(): void {
-    this._animation?.cancel()
-    this._element.removeAttribute(ATTRIBUTE_ANIMATING)
+  async showAll(): Promise<void> {
+    const items = this._items()
 
-    super.dispose()
-  }
-
-  // Private
-  get _details(): HTMLDetailsElement {
-    return this._element as HTMLDetailsElement
-  }
-
-  _isShown(): boolean {
-    return this._details.open
-  }
-
-  // The item's collapsed box is its summary plus whatever the item itself adds
-  // around it. Derived rather than measured, so nothing has to toggle `open`
-  // twice to find out.
-  _collapsedSize(): number {
-    const header = SelectorEngine.findOne(SELECTOR_HEADER, this._element)
-    const styles = window.getComputedStyle(this._element)
-    const around = [
-      styles.borderBlockStartWidth,
-      styles.borderBlockEndWidth,
-      styles.paddingBlockStart,
-      styles.paddingBlockEnd
-    ].reduce((total, value) => total + (Number.parseFloat(value) || 0), 0)
-
-    return (header ? header.getBoundingClientRect().height : 0) + around
-  }
-
-  _hideSiblings(): void {
-    const { name } = this._details
-
-    if (!name) {
-      return
-    }
-
-    const siblings = SelectorEngine.find<HTMLDetailsElement>(`details[name="${CSS.escape(name)}"][open]`)
-      .filter(element => element !== this._element)
-
-    for (const sibling of siblings) {
-      Accordion.getOrCreateInstance(sibling).hide()
-    }
-  }
-
-  async _animate(from: number, to: number, onFinish?: () => void): Promise<void> {
-    this._animation?.cancel()
-
-    // Where the panel is animated by CSS, running this one too would drive the
-    // same expansion from both ends.
-    if (supportsNativeAnimation() || prefersReducedMotion()) {
-      onFinish?.()
-      return
-    }
-
-    const styles = window.getComputedStyle(this._element)
-    const animation = this._element.animate(
-      { height: [`${from}px`, `${to}px`] },
-      {
-        duration: toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION) || `${DEFAULT_DURATION}ms`),
-        easing: styles.getPropertyValue(PROPERTY_EASING).trim() || DEFAULT_EASING,
-        fill: 'both'
-      }
-    )
-
-    this._animation = animation
-    this._element.setAttribute(ATTRIBUTE_ANIMATING, '')
-
-    try {
-      await animation.finished
-    } catch {
-      // Superseded by a newer animation, which now owns the cleanup below.
-      return
-    }
-
-    onFinish?.()
-
-    animation.cancel()
-    this._animation = null
-    this._element.removeAttribute(ATTRIBUTE_ANIMATING)
-  }
-
-  // Static
-  static async showAll(container: string | Element | null): Promise<void> {
-    const items = Accordion._items(container)
-
-    // `name` has to go before `open`, or the browser closes each item as the
-    // next one in the group opens. It is parked on the element so hideAll can
-    // put the grouping back without being told what it was.
+    // The name has to go before `open`: the HTML Standard forbids leaving more
+    // than one open item in a name group, and the browser enforces it by
+    // closing the others. Parked on the element so hideAll can put the grouping
+    // back without being told what it was.
     for (const item of items) {
       if (item.name) {
         item.setAttribute(ATTRIBUTE_NAME, item.name)
@@ -214,13 +138,13 @@ class Accordion extends BaseComponent {
       }
     }
 
-    await Promise.all(items.map(item => Accordion.getOrCreateInstance(item).show()))
+    await Promise.all(items.map(item => this.show(item)))
   }
 
-  static async hideAll(container: string | Element | null): Promise<void> {
-    const items = Accordion._items(container)
+  async hideAll(): Promise<void> {
+    const items = this._items()
 
-    await Promise.all(items.map(item => Accordion.getOrCreateInstance(item).hide()))
+    await Promise.all(items.map(item => this.hide(item)))
 
     // Restoring the group while more than one item is still open would leave
     // the browser to pick which one survives.
@@ -234,13 +158,103 @@ class Accordion extends BaseComponent {
     }
   }
 
-  static _items(container: string | Element | null): HTMLDetailsElement[] {
-    const element = getElement(container)
+  override dispose(): void {
+    for (const item of this._items()) {
+      this._animations.get(item)?.cancel()
+      item.removeAttribute(ATTRIBUTE_ANIMATING)
+    }
 
-    return element ? SelectorEngine.children<HTMLDetailsElement>(element, SELECTOR_ITEM) : []
+    super.dispose()
   }
 
-  static jQueryInterface(this: any, config: any): void {
+  // Private
+  _items(): HTMLDetailsElement[] {
+    return SelectorEngine.children<HTMLDetailsElement>(this._element, SELECTOR_ITEM)
+  }
+
+  _resolve(item: Element | number): HTMLDetailsElement | null {
+    if (typeof item === 'number') {
+      return this._items()[item] || null
+    }
+
+    return this._items().find(candidate => candidate === item) || null
+  }
+
+  // The item's collapsed box is its summary plus whatever the item itself adds
+  // around it. Derived rather than measured, so nothing has to toggle `open`
+  // twice to find out.
+  _collapsedSize(details: HTMLDetailsElement): number {
+    const header = SelectorEngine.findOne(SELECTOR_HEADER, details)
+    const styles = window.getComputedStyle(details)
+    const around = [
+      styles.borderBlockStartWidth,
+      styles.borderBlockEndWidth,
+      styles.paddingBlockStart,
+      styles.paddingBlockEnd
+    ].reduce((total, value) => total + (Number.parseFloat(value) || 0), 0)
+
+    return (header ? header.getBoundingClientRect().height : 0) + around
+  }
+
+  // Name groups are document-wide, so a sibling can sit in another accordion.
+  _hideSiblings(details: HTMLDetailsElement): void {
+    const { name } = details
+
+    if (!name) {
+      return
+    }
+
+    const siblings = SelectorEngine.find<HTMLDetailsElement>(`details[name="${CSS.escape(name)}"][open]`)
+      .filter(element => element !== details)
+
+    for (const sibling of siblings) {
+      const container = sibling.closest(SELECTOR_ACCORDION)
+
+      if (container) {
+        Accordion.getOrCreateInstance(container).hide(sibling)
+      }
+    }
+  }
+
+  async _animate(details: HTMLDetailsElement, from: number, to: number, onFinish?: () => void): Promise<void> {
+    this._animations.get(details)?.cancel()
+
+    // Where the panel is animated by CSS, running this one too would drive the
+    // same expansion from both ends.
+    if (supportsNativeAnimation() || prefersReducedMotion()) {
+      onFinish?.()
+      return
+    }
+
+    const styles = window.getComputedStyle(details)
+    const animation = details.animate(
+      { height: [`${from}px`, `${to}px`] },
+      {
+        duration: toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION) || `${DEFAULT_DURATION}ms`),
+        easing: styles.getPropertyValue(PROPERTY_EASING).trim() || DEFAULT_EASING,
+        fill: 'both'
+      }
+    )
+
+    this._animations.set(details, animation)
+    details.setAttribute(ATTRIBUTE_ANIMATING, '')
+
+    try {
+      await animation.finished
+    } catch {
+      // Superseded by a newer animation, which now owns the cleanup below.
+      return
+    }
+
+    onFinish?.()
+
+    animation.cancel()
+    this._animations.delete(details)
+    details.removeAttribute(ATTRIBUTE_ANIMATING)
+  }
+
+  // Static
+  static jQueryInterface(this: any, config: any, ...args: any[]): void {
     return this.each(function (this: HTMLElement) {
       const data: any = Accordion.getOrCreateInstance(this)
 
@@ -252,7 +266,7 @@ class Accordion extends BaseComponent {
         throw new TypeError(`No method named "${config}"`)
       }
 
-      data[config as string]()
+      data[config as string](...args)
     })
   }
 }
@@ -290,8 +304,17 @@ EventHandler.on(document, EVENT_CLICK_DATA_API, (event: Event) => {
     return
   }
 
+  const item = header.parentElement as HTMLDetailsElement
+  const container = item.closest(SELECTOR_ACCORDION)
+
+  // Outside an accordion there is nothing to hold the item's tokens either, so
+  // it is left to open the way the browser does it, without the animation.
+  if (!container) {
+    return
+  }
+
   event.preventDefault()
-  Accordion.getOrCreateInstance(header.parentElement).toggle()
+  Accordion.getOrCreateInstance(container).toggle(item)
 })
 
 /**

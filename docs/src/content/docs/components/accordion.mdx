@@ -118,7 +118,7 @@ The optional `accordion.js` component only adds the open/close animation in brow
 
 ### Expand & collapse all
 
-`Accordion.showAll()` and `Accordion.hideAll()` take the `.accordion` container and operate on its items. They work on an exclusive accordion too: opening every item of a group means dropping the shared `name` first, and the component parks it on each element and puts it back once the items are closed again, so nothing has to remember the group.
+`showAll()` and `hideAll()` open and close every item of the accordion they are called on. They work on an exclusive accordion too: the HTML Standard forbids leaving more than one open item in a `name` group, so opening them all means dropping the shared `name` first. The component parks it on each element and puts it back once the items are closed again, so nothing has to remember the group.
 
 Both return a promise that settles once the items have finished moving.
 
@@ -143,13 +143,24 @@ Both return a promise that settles once the items have finished moving.
 
 ### Methods
 
+The component is instantiated on the `.accordion` element, and its methods address the items inside it. An item is passed either as an element or as its index.
+
+```js
+const accordion = coreui.Accordion.getOrCreateInstance('#myAccordion')
+
+accordion.show(0)
+accordion.hide(document.querySelector('#myAccordion > .accordion-item'))
+```
+
 | Method | Description |
 | --- | --- |
-| `show()` | Opens an accordion item. Returns a promise that settles once it has finished expanding. |
-| `hide()` | Closes an accordion item. Returns a promise that settles once it has finished collapsing. |
-| `toggle()` | Opens or closes an accordion item, depending on its current state. |
-| `Accordion.showAll(container)` | Opens every item of the accordion, dropping the exclusive grouping for as long as they stay open. |
-| `Accordion.hideAll(container)` | Closes every item of the accordion and restores the grouping. |
+| `show(item)` | Opens an accordion item. Returns a promise that settles once it has finished expanding. |
+| `hide(item)` | Closes an accordion item. Returns a promise that settles once it has finished collapsing. |
+| `toggle(item)` | Opens or closes an accordion item, depending on its current state. |
+| `showAll()` | Opens every item of the accordion, dropping the exclusive grouping for as long as they stay open. |
+| `hideAll()` | Closes every item of the accordion and restores the grouping. |
+
+Items of a nested accordion belong to that accordion, not to the outer one, and an item that is not in this accordion is ignored.
 
 ### Events
 

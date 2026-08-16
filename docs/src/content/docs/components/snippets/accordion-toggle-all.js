@@ -2,11 +2,13 @@ const expandBtn = document.getElementById('accordionExpandAll')
 const collapseBtn = document.getElementById('accordionCollapseAll')
 
 if (expandBtn && collapseBtn) {
+  const accordion = coreui.Accordion.getOrCreateInstance('#accordionToggleAll')
+
   expandBtn.addEventListener('click', () => {
-    coreui.Accordion.showAll('#accordionToggleAll')
+    accordion.showAll()
   })
 
   collapseBtn.addEventListener('click', () => {
-    coreui.Accordion.hideAll('#accordionToggleAll')
+    accordion.hideAll()
   })
 }

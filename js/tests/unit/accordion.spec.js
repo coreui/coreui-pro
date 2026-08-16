@@ -52,12 +52,12 @@ describe('Accordion', () => {
     it('should take care of element either passed as a CSS selector or DOM element', () => {
       fixtureEl.innerHTML = markup()
 
-      const itemEl = fixtureEl.querySelector('.accordion-item')
-      const accordionBySelector = new Accordion('.accordion-item')
-      const accordionByElement = new Accordion(itemEl)
+      const accordionEl = fixtureEl.querySelector('.accordion')
+      const accordionBySelector = new Accordion('.accordion')
+      const accordionByElement = new Accordion(accordionEl)
 
-      expect(accordionBySelector._element).toEqual(itemEl)
-      expect(accordionByElement._element).toEqual(itemEl)
+      expect(accordionBySelector._element).toEqual(accordionEl)
+      expect(accordionByElement._element).toEqual(accordionEl)
     })
   })
 
@@ -66,13 +66,24 @@ describe('Accordion', () => {
       fixtureEl.innerHTML = markup()
 
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
-      const accordion = new Accordion(itemEl)
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
       const shown = new Promise(resolve => {
         EventHandler.on(itemEl, 'shown.coreui.accordion', resolve)
       })
 
-      await accordion.show()
+      await accordion.show(itemEl)
       await shown
+
+      expect(itemEl.open).toBeTrue()
+    })
+
+    it('should take an index', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
+
+      await accordion.show(1)
 
       expect(itemEl.open).toBeTrue()
     })
@@ -81,15 +92,26 @@ describe('Accordion', () => {
       fixtureEl.innerHTML = markup()
 
       const itemEl = fixtureEl.querySelector('.accordion-item')
-      const accordion = new Accordion(itemEl)
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
       const spy = jasmine.createSpy('shown')
 
       EventHandler.on(itemEl, 'shown.coreui.accordion', spy)
 
-      await accordion.show()
+      await accordion.show(itemEl)
 
       expect(spy).not.toHaveBeenCalled()
       expect(itemEl.open).toBeTrue()
+    })
+
+    it('should ignore an item that belongs to another accordion', async () => {
+      fixtureEl.innerHTML = markup() + markup('other')
+
+      const [firstEl, secondEl] = fixtureEl.querySelectorAll('.accordion')
+      const strangerEl = secondEl.querySelectorAll('.accordion-item')[1]
+
+      await new Accordion(firstEl).show(strangerEl)
+
+      expect(strangerEl.open).toBeFalse()
     })
 
     it('should close a sibling sharing the same name', async () => {
@@ -100,7 +122,7 @@ describe('Accordion', () => {
         EventHandler.on(firstEl, 'hidden.coreui.accordion', resolve)
       })
 
-      await new Accordion(secondEl).show()
+      await new Accordion(fixtureEl.querySelector('.accordion')).show(secondEl)
       await hidden
 
       expect(secondEl.open).toBeTrue()
@@ -112,7 +134,7 @@ describe('Accordion', () => {
 
       const [firstEl, secondEl] = fixtureEl.querySelectorAll('.accordion-item')
 
-      await new Accordion(secondEl).show()
+      await new Accordion(fixtureEl.querySelector('.accordion')).show(secondEl)
 
       expect(secondEl.open).toBeTrue()
       expect(firstEl.open).toBeTrue()
@@ -124,12 +146,12 @@ describe('Accordion', () => {
       fixtureEl.innerHTML = markup()
 
       const itemEl = fixtureEl.querySelector('.accordion-item')
-      const accordion = new Accordion(itemEl)
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
       const hidden = new Promise(resolve => {
         EventHandler.on(itemEl, 'hidden.coreui.accordion', resolve)
       })
 
-      await accordion.hide()
+      await accordion.hide(itemEl)
       await hidden
 
       expect(itemEl.open).toBeFalse()
@@ -139,12 +161,12 @@ describe('Accordion', () => {
       fixtureEl.innerHTML = markup()
 
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
-      const accordion = new Accordion(itemEl)
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
       const spy = jasmine.createSpy('hidden')
 
       EventHandler.on(itemEl, 'hidden.coreui.accordion', spy)
 
-      await accordion.hide()
+      await accordion.hide(itemEl)
 
       expect(spy).not.toHaveBeenCalled()
     })
@@ -154,7 +176,7 @@ describe('Accordion', () => {
 
       const itemEl = fixtureEl.querySelector('.accordion-item')
 
-      await new Accordion(itemEl).hide()
+      await new Accordion(fixtureEl.querySelector('.accordion')).hide(itemEl)
 
       expect(itemEl.hasAttribute('data-coreui-accordion-animating')).toBeFalse()
     })
@@ -165,28 +187,13 @@ describe('Accordion', () => {
       fixtureEl.innerHTML = markup()
 
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
-      const accordion = new Accordion(itemEl)
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
 
-      await accordion.toggle()
+      await accordion.toggle(itemEl)
       expect(itemEl.open).toBeTrue()
 
-      await accordion.toggle()
+      await accordion.toggle(itemEl)
       expect(itemEl.open).toBeFalse()
-    })
-  })
-
-  describe('dispose', () => {
-    it('should remove the animating attribute', () => {
-      fixtureEl.innerHTML = markup()
-
-      const itemEl = fixtureEl.querySelector('.accordion-item')
-      const accordion = new Accordion(itemEl)
-
-      itemEl.setAttribute('data-coreui-accordion-animating', '')
-      accordion.dispose()
-
-      expect(itemEl.hasAttribute('data-coreui-accordion-animating')).toBeFalse()
-      expect(Accordion.getInstance(itemEl)).toBeNull()
     })
   })
 
@@ -194,10 +201,9 @@ describe('Accordion', () => {
     it('should open every item of an exclusive accordion', async () => {
       fixtureEl.innerHTML = markup()
 
-      const accordionEl = fixtureEl.querySelector('.accordion')
       const items = [...fixtureEl.querySelectorAll('.accordion-item')]
 
-      await Accordion.showAll(accordionEl)
+      await new Accordion(fixtureEl.querySelector('.accordion')).showAll()
 
       expect(items.every(item => item.open)).toBeTrue()
       expect(items.every(item => !item.hasAttribute('name'))).toBeTrue()
@@ -206,35 +212,27 @@ describe('Accordion', () => {
     it('should close every item and put the grouping back', async () => {
       fixtureEl.innerHTML = markup()
 
-      const accordionEl = fixtureEl.querySelector('.accordion')
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
       const items = [...fixtureEl.querySelectorAll('.accordion-item')]
 
-      await Accordion.showAll(accordionEl)
-      await Accordion.hideAll(accordionEl)
+      await accordion.showAll()
+      await accordion.hideAll()
 
       expect(items.some(item => item.open)).toBeFalse()
       expect(items.every(item => item.getAttribute('name') === 'group')).toBeTrue()
       expect(items.every(item => !item.hasAttribute('data-coreui-accordion-name'))).toBeTrue()
     })
 
-    it('should take a CSS selector', async () => {
-      fixtureEl.innerHTML = markup().replace('class="accordion"', 'class="accordion" id="acc"')
-
-      await Accordion.showAll('#acc')
-
-      expect([...fixtureEl.querySelectorAll('.accordion-item')].every(item => item.open)).toBeTrue()
-    })
-
     it('should leave an accordion without a name alone', async () => {
       fixtureEl.innerHTML = markup().replaceAll(' name="group"', '')
 
-      const accordionEl = fixtureEl.querySelector('.accordion')
+      const accordion = new Accordion(fixtureEl.querySelector('.accordion'))
       const items = [...fixtureEl.querySelectorAll('.accordion-item')]
 
-      await Accordion.showAll(accordionEl)
+      await accordion.showAll()
       expect(items.every(item => item.open)).toBeTrue()
 
-      await Accordion.hideAll(accordionEl)
+      await accordion.hideAll()
       expect(items.some(item => item.open)).toBeFalse()
       expect(items.some(item => item.hasAttribute('name'))).toBeFalse()
     })
@@ -256,19 +254,27 @@ describe('Accordion', () => {
         '</div>'
       ].join('')
 
-      await Accordion.showAll('#outer')
+      await new Accordion('#outer').showAll()
 
       expect(fixtureEl.querySelector('#outer > .accordion-item').open).toBeTrue()
       expect(fixtureEl.querySelector('#inner > .accordion-item').open).toBeFalse()
       expect(fixtureEl.querySelector('#inner > .accordion-item').getAttribute('name')).toEqual('inner')
     })
+  })
 
-    it('should do nothing for a container that does not exist', async () => {
+  describe('dispose', () => {
+    it('should remove the animating attribute from its items', () => {
       fixtureEl.innerHTML = markup()
 
-      await Accordion.showAll('#missing')
+      const accordionEl = fixtureEl.querySelector('.accordion')
+      const itemEl = fixtureEl.querySelector('.accordion-item')
+      const accordion = new Accordion(accordionEl)
 
-      expect(fixtureEl.querySelectorAll('.accordion-item[open]').length).toEqual(1)
+      itemEl.setAttribute('data-coreui-accordion-animating', '')
+      accordion.dispose()
+
+      expect(itemEl.hasAttribute('data-coreui-accordion-animating')).toBeFalse()
+      expect(Accordion.getInstance(accordionEl)).toBeNull()
     })
   })
 
@@ -276,6 +282,7 @@ describe('Accordion', () => {
     it('should mirror the native toggle where CSS animates the panel, without instantiating', async () => {
       fixtureEl.innerHTML = markup()
 
+      const accordionEl = fixtureEl.querySelector('.accordion')
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
       const shown = new Promise(resolve => {
         EventHandler.on(itemEl, 'shown.coreui.accordion', resolve)
@@ -285,7 +292,7 @@ describe('Accordion', () => {
       await shown
 
       expect(itemEl.open).toBeTrue()
-      expect(Accordion.getInstance(itemEl)).toBeNull()
+      expect(Accordion.getInstance(accordionEl)).toBeNull()
     })
 
     it('should be delegatable, unlike the native toggle', async () => {
@@ -328,13 +335,14 @@ describe('Accordion', () => {
       summaryEl.dispatchEvent(event)
 
       expect(event.defaultPrevented).toBeFalse()
-      expect(Accordion.getInstance(summaryEl.parentElement)).toBeNull()
+      expect(Accordion.getInstance(fixtureEl.querySelector('.accordion'))).toBeNull()
     })
 
-    it('should toggle an item where CSS cannot', async () => {
+    it('should toggle an item where CSS cannot, instantiating on the container', async () => {
       withoutNativeAnimation()
       fixtureEl.innerHTML = markup()
 
+      const accordionEl = fixtureEl.querySelector('.accordion')
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
       const shown = new Promise(resolve => {
         EventHandler.on(itemEl, 'shown.coreui.accordion', resolve)
@@ -344,6 +352,7 @@ describe('Accordion', () => {
       await shown
 
       expect(itemEl.open).toBeTrue()
+      expect(Accordion.getInstance(accordionEl)).not.toBeNull()
     })
 
     it('should leave the item closed when the click is already prevented', () => {
@@ -357,7 +366,7 @@ describe('Accordion', () => {
       summaryEl.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
       expect(itemEl.open).toBeFalse()
-      expect(Accordion.getInstance(itemEl)).toBeNull()
+      expect(Accordion.getInstance(fixtureEl.querySelector('.accordion'))).toBeNull()
     })
 
     it('should leave a control inside the summary to itself', () => {
@@ -375,22 +384,41 @@ describe('Accordion', () => {
 
       itemEl.querySelector('a').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
-      expect(Accordion.getInstance(itemEl)).toBeNull()
+      expect(Accordion.getInstance(fixtureEl.querySelector('.accordion'))).toBeNull()
     })
   })
 
   describe('jQueryInterface', () => {
-    it('should toggle an item', async () => {
+    it('should open every item', async () => {
       fixtureEl.innerHTML = markup()
 
+      const accordionEl = fixtureEl.querySelector('.accordion')
+      const items = [...fixtureEl.querySelectorAll('.accordion-item')]
+      const shown = new Promise(resolve => {
+        EventHandler.on(items[1], 'shown.coreui.accordion', resolve)
+      })
+
+      jQueryMock.fn.accordion = Accordion.jQueryInterface
+      jQueryMock.elements = [accordionEl]
+      jQueryMock.fn.accordion.call(jQueryMock, 'showAll')
+
+      await shown
+
+      expect(items.every(item => item.open)).toBeTrue()
+    })
+
+    it('should forward arguments', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const accordionEl = fixtureEl.querySelector('.accordion')
       const itemEl = fixtureEl.querySelectorAll('.accordion-item')[1]
       const shown = new Promise(resolve => {
         EventHandler.on(itemEl, 'shown.coreui.accordion', resolve)
       })
 
       jQueryMock.fn.accordion = Accordion.jQueryInterface
-      jQueryMock.elements = [itemEl]
-      jQueryMock.fn.accordion.call(jQueryMock, 'show')
+      jQueryMock.elements = [accordionEl]
+      jQueryMock.fn.accordion.call(jQueryMock, 'show', 1)
 
       await shown
 
@@ -401,7 +429,7 @@ describe('Accordion', () => {
       fixtureEl.innerHTML = markup()
 
       jQueryMock.fn.accordion = Accordion.jQueryInterface
-      jQueryMock.elements = [fixtureEl.querySelector('.accordion-item')]
+      jQueryMock.elements = [fixtureEl.querySelector('.accordion')]
 
       expect(() => {
         jQueryMock.fn.accordion.call(jQueryMock, 'noMethod')
