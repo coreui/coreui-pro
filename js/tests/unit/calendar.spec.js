@@ -977,6 +977,190 @@ describe('Calendar', () => {
       })
     })
 
+    const findDayCell = (div, year, month, day) =>
+      [...div.querySelectorAll('.calendar-cell[tabindex="0"]')].find(cell => {
+        const date = new Date(cell.dataset.coreuiDate)
+        return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day
+      })
+
+    const pressKey = (cell, key, shiftKey = false) => {
+      const keydownEvent = createEvent('keydown')
+      keydownEvent.key = key
+      keydownEvent.shiftKey = shiftKey
+      cell.dispatchEvent(keydownEvent)
+    }
+
+    const activeDate = () => new Date(document.activeElement.dataset.coreuiDate)
+
+    it('should move focus to the first day of the week on Home', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'Home')
+
+          expect(activeDate().getDate()).toEqual(12)
+          resolve()
+        }, 10)
+      })
+    })
+
+    it('should move focus to the last day of the week on End', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'End')
+
+          expect(activeDate().getDate()).toEqual(18)
+          resolve()
+        }, 10)
+      })
+    })
+
+    it('should move focus to the same day of the previous month on PageUp', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'PageUp')
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2023, 4, 15))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
+    it('should move focus to the same day of the next month on PageDown', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'PageDown')
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2023, 6, 15))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
+    it('should move focus to the same day of the previous year on Shift+PageUp', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'PageUp', true)
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2022, 5, 15))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
+    it('should move focus to the same day of the next year on Shift+PageDown', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'PageDown', true)
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2024, 5, 15))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
+    it('should clamp the day to the target month length on PageDown', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        new Calendar(div, { calendarDate: new Date(2023, 0, 1), locale: 'en-US' }) // eslint-disable-line no-new
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 0, 31)
+          cell.focus()
+          pressKey(cell, 'PageDown')
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2023, 1, 28))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
+    it('should not move focus past maxDate on PageDown', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        // eslint-disable-next-line no-new
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US', maxDate: new Date(2023, 6, 5) })
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 15)
+          cell.focus()
+          pressKey(cell, 'PageDown')
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2023, 6, 5))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
+    it('should move focus to the same month of the next year on PageDown in months view', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div></div>'
+        const div = fixtureEl.querySelector('div')
+        // eslint-disable-next-line no-new
+        new Calendar(div, { calendarDate: new Date(2023, 5, 1), locale: 'en-US', selectionType: 'month' })
+
+        setTimeout(() => {
+          const cell = findDayCell(div, 2023, 5, 1)
+          cell.focus()
+          pressKey(cell, 'PageDown')
+
+          setTimeout(() => {
+            expect(activeDate()).toEqual(new Date(2024, 5, 1))
+            resolve()
+          }, 20)
+        }, 10)
+      })
+    })
+
     it('should not navigate past maxDate with ArrowRight', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = '<div></div>'

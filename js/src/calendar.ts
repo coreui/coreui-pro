@@ -57,6 +57,10 @@ const ARROW_DOWN_KEY = 'ArrowDown'
 const ARROW_LEFT_KEY = 'ArrowLeft'
 const ENTER_KEY = 'Enter'
 const SPACE_KEY = 'Space'
+const HOME_KEY = 'Home'
+const END_KEY = 'End'
+const PAGE_UP_KEY = 'PageUp'
+const PAGE_DOWN_KEY = 'PageDown'
 
 const EVENT_BLUR = `blur${EVENT_KEY}`
 const EVENT_CALENDAR_DATE_CHANGE = `calendarDateChange${EVENT_KEY}`
@@ -280,6 +284,29 @@ class Calendar extends BaseComponent {
     }
   }
 
+  // Closest by date, not exact match: the requested date may sit on a cell
+  // disabled by disabledDates or clamped away by min/max
+  _focusOnDate(date: Date): void {
+    const focusables = (SelectorEngine.find(
+      this._config.selectionType === 'week' ? SELECTOR_CALENDAR_ROW_CLICKABLE : SELECTOR_CALENDAR_CELL_CLICKABLE,
+      this._element as ParentNode
+    ) as HTMLElement[]).filter(element => !element.classList.contains('previous') && !element.classList.contains('next'))
+
+    let closest = null
+    let closestGap = Number.POSITIVE_INFINITY
+
+    for (const element of focusables) {
+      const gap = Math.abs(this._getDate(element).getTime() - date.getTime())
+
+      if (gap < closestGap) {
+        closest = element
+        closestGap = gap
+      }
+    }
+
+    closest?.focus()
+  }
+
   _getDate(target: HTMLElement): Date {
     if (this._config.selectionType === 'week') {
       const firstCell = SelectorEngine.findOne(SELECTOR_CALENDAR_CELL, target.closest(SELECTOR_CALENDAR_ROW) as ParentNode)
@@ -329,6 +356,55 @@ class Calendar extends BaseComponent {
     if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
       event.preventDefault()
       this._handleCalendarClick(event)
+    }
+
+    if (event.key === HOME_KEY || event.key === END_KEY) {
+      event.preventDefault()
+
+      const cells = SelectorEngine.find(SELECTOR_CALENDAR_CELL_CLICKABLE, event.target.closest('tr') as ParentNode)
+      const cell = event.key === HOME_KEY ? cells[0] : cells[cells.length - 1]
+      cell?.focus()
+      return
+    }
+
+    if (event.key === PAGE_UP_KEY || event.key === PAGE_DOWN_KEY) {
+      event.preventDefault()
+
+      const direction = event.key === PAGE_DOWN_KEY ? 1 : -1
+      const target = new Date(date)
+
+      if (this._view === 'days') {
+        // Land on day 1 before shifting so a 31st cannot overflow past the
+        // target month, then restore the day clamped to that month's length
+        const day = target.getDate()
+        target.setDate(1)
+
+        if (event.shiftKey) {
+          target.setFullYear(target.getFullYear() + direction)
+        } else {
+          target.setMonth(target.getMonth() + direction)
+        }
+
+        target.setDate(Math.min(day, new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()))
+      } else {
+        target.setFullYear(target.getFullYear() + ((this._view === 'years' ? 10 : 1) * direction))
+      }
+
+      if (this._maxDate && target > this._maxDate) {
+        target.setTime(this._maxDate.getTime())
+      }
+
+      if (this._minDate && target < this._minDate) {
+        target.setTime(this._minDate.getTime())
+      }
+
+      if (target.getTime() === date.getTime()) {
+        return
+      }
+
+      const monthsDelta = ((target.getFullYear() - date.getFullYear()) * 12) + (target.getMonth() - date.getMonth())
+      this._modifyCalendarDate(0, monthsDelta, () => this._focusOnDate(target))
+      return
     }
 
     if (
