@@ -114,10 +114,14 @@ $accordion-tokens: defaults(
       );
     }
 
-    // accordion.js animates the item's own block-size, so the box has to clip
-    // the still-expanded content while it does.
+    // accordion.js animates the item's own block-size where the panel cannot be
+    // animated by ::details-content. It sets the two sizes and leaves the timing
+    // here, so both paths are driven by the same tokens.
     &[data-coreui-accordion-animating] {
       overflow: clip;
+      @include transition(
+        block-size var(--#{$prefix}accordion-content-duration) var(--#{$prefix}accordion-content-easing)
+      );
     }
 
     &:first-of-type {

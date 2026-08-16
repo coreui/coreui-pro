@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, reflow } from './util/index.js'
 
 /**
  * Constants
@@ -27,17 +27,10 @@ const EVENT_TOGGLE_DATA_API = `toggle${EVENT_KEY}${DATA_API_KEY}`
 const ATTRIBUTE_ANIMATING = 'data-coreui-accordion-animating'
 const ATTRIBUTE_NAME = 'data-coreui-accordion-name'
 
-const PROPERTY_DURATION = '--cui-accordion-content-duration'
-const PROPERTY_EASING = '--cui-accordion-content-easing'
-const PSEUDO_CONTENT = '::details-content'
-const TRANSITIONED_PROPERTY = 'block-size'
-
 const SELECTOR_ACCORDION = '.accordion'
 const SELECTOR_HEADER = '.accordion-header'
 const SELECTOR_INTERACTIVE = 'a, button, input, select, textarea'
 const SELECTOR_ITEM = 'details.accordion-item'
-
-const MILLISECONDS_MULTIPLIER = 1000
 
 // Chromium animates `block-size: 0 -> auto` on its own through `interpolate-size`,
 // so this component only exists for the browsers that cannot. It is safe to drop
@@ -47,85 +40,11 @@ const supportsNativeAnimation = (): boolean =>
   typeof CSS.supports === 'function' &&
   CSS.supports('interpolate-size', 'allow-keywords')
 
-const prefersReducedMotion = (): boolean =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-const toMilliseconds = (value: string): number => {
-  const number = Number.parseFloat(value)
-
-  if (Number.isNaN(number)) {
-    return 0
-  }
-
-  return value.trim().endsWith('ms') ? number : number * MILLISECONDS_MULTIPLIER
-}
-
-// Splits a comma-separated CSS list without cutting inside cubic-bezier() & co.
-const splitList = (value: string): string[] => {
-  const parts: string[] = []
-  let depth = 0
-  let current = ''
-
-  for (const character of value) {
-    if (character === '(') {
-      depth++
-    } else if (character === ')') {
-      depth--
-    } else if (character === ',' && depth === 0) {
-      parts.push(current.trim())
-      current = ''
-      continue
-    }
-
-    current += character
-  }
-
-  parts.push(current.trim())
-
-  return parts
-}
-
-// The stylesheet owns the timing, including its reduced-motion and
-// $enable-transitions decisions. The transition resolved on ::details-content is
-// read first: it carries those decisions and needs no knowledge of the custom
-// property prefix. Browsers that do not know the pseudo-element report nothing
-// for it, and there the tokens are read instead.
-const contentTiming = (details: HTMLDetailsElement): { duration: number, easing: string } => {
-  const pseudo = window.getComputedStyle(details, PSEUDO_CONTENT)
-  const index = splitList(pseudo.transitionProperty).indexOf(TRANSITIONED_PROPERTY)
-
-  if (index !== -1) {
-    return {
-      duration: toMilliseconds(splitList(pseudo.transitionDuration)[index] || ''),
-      easing: splitList(pseudo.transitionTimingFunction)[index] || 'linear'
-    }
-  }
-
-  const styles = window.getComputedStyle(details)
-
-  return {
-    duration: toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION)),
-    easing: styles.getPropertyValue(PROPERTY_EASING).trim() || 'linear'
-  }
-}
-
 /**
  * Class definition
  */
 
 class Accordion extends BaseComponent {
-  protected declare _animations: WeakMap<HTMLDetailsElement, Animation>
-
-  constructor(element?: string | Element | null, config?: any) {
-    super(element, config)
-
-    if (!this._element) {
-      return
-    }
-
-    this._animations = new WeakMap<HTMLDetailsElement, Animation>()
-  }
-
   // Getters
   static override get NAME(): string {
     return NAME
@@ -145,7 +64,7 @@ class Accordion extends BaseComponent {
   async show(item: Element | number): Promise<void> {
     const details = this._resolve(item)
 
-    if (!details || details.open) {
+    if (!details || details.open || details.hasAttribute(ATTRIBUTE_ANIMATING)) {
       return
     }
 
@@ -162,7 +81,7 @@ class Accordion extends BaseComponent {
   async hide(item: Element | number): Promise<void> {
     const details = this._resolve(item)
 
-    if (!details || !details.open) {
+    if (!details || !details.open || details.hasAttribute(ATTRIBUTE_ANIMATING)) {
       return
     }
 
@@ -209,7 +128,7 @@ class Accordion extends BaseComponent {
 
   override dispose(): void {
     for (const item of this._items()) {
-      this._animations.get(item)?.cancel()
+      item.style.blockSize = ''
       item.removeAttribute(ATTRIBUTE_ANIMATING)
     }
 
@@ -265,45 +184,30 @@ class Accordion extends BaseComponent {
     }
   }
 
+  // Sets the two sizes and lets the stylesheet time the move between them, so
+  // the duration, the easing and the reduced-motion decision are read from one
+  // place by both paths and this file needs no token names.
   async _animate(details: HTMLDetailsElement, from: number, to: number, onFinish?: () => void): Promise<void> {
-    this._animations.get(details)?.cancel()
-
     // Where the panel is animated by CSS, running this one too would drive the
     // same expansion from both ends.
-    if (supportsNativeAnimation() || prefersReducedMotion()) {
+    if (supportsNativeAnimation()) {
       onFinish?.()
       return
     }
 
-    const { duration, easing } = contentTiming(details)
-
-    // Without a duration there is no styled accordion to animate either, so
-    // there is nothing to fall back to.
-    if (!duration) {
-      onFinish?.()
-      return
-    }
-
-    const animation = details.animate(
-      { height: [`${from}px`, `${to}px`] },
-      { duration, easing, fill: 'both' }
-    )
-
-    this._animations.set(details, animation)
     details.setAttribute(ATTRIBUTE_ANIMATING, '')
+    details.style.blockSize = `${from}px`
 
-    try {
-      await animation.finished
-    } catch {
-      // Superseded by a newer animation, which now owns the cleanup below.
-      return
-    }
+    reflow(details)
 
-    onFinish?.()
+    details.style.blockSize = `${to}px`
 
-    animation.cancel()
-    this._animations.delete(details)
-    details.removeAttribute(ATTRIBUTE_ANIMATING)
+    await this._queueCallback(() => {
+      onFinish?.()
+
+      details.style.blockSize = ''
+      details.removeAttribute(ATTRIBUTE_ANIMATING)
+    }, details, true)
   }
 
   // Static
