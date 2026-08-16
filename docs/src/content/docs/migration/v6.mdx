@@ -206,6 +206,27 @@ finished, not whether the state changed.
   `show`/`hide` counterpart: `<details>` has no cancelable event before the
   state change, so an item is kept shut by cancelling the click on its
   `<summary>` instead of by preventing an event.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The plugin replaces Collapse's, and it is instantiated on the `.accordion`
+  container, not on a panel.** Where v5 called
+  `Collapse.getOrCreateInstance(panel).show()`, v6 calls
+  `Accordion.getOrCreateInstance(accordion).show(item)`, with the item given as
+  an element or as its index. `hide()` and `toggle()` take the same argument,
+  and `showAll()` / `hideAll()` open and close the whole accordion — the latter
+  pair also handles the `name` juggling the HTML Standard requires, which is why
+  expanding an exclusive accordion is a plugin call rather than a loop over
+  `open`. None of it is needed to open and close items; the element does that
+  on its own.
+- **The header draws its focus ring on `:focus-visible`, not `:focus`.** A mouse
+  click no longer paints a ring, keyboard focus still does, matching `.btn`.
+- **New CSS variables:** `--cui-accordion-active-border-color` (the open item's
+  border and the header's inset shadow, previously stuck on the resting border
+  colour), plus `--cui-accordion-content-duration` and
+  `--cui-accordion-content-easing`, which drive the panel transition and are
+  read back by `accordion.js` so both paths animate for the same length of time.
+- **`.theme-{color}` tints the open items.** The active tokens resolve through
+  `--cui-theme-fg` / `-bg-subtle` / `-border` with the old primary values as the
+  fallback, so an untouched accordion renders exactly as before.
 
 #### Autocomplete and Multi Select share one options menu
 
@@ -1078,6 +1099,13 @@ assembles maps of CSS expressions and the browser resolves them.
   `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
   (alert, buttons) read them. Contextual classes like `.alert-success` are now
   implemented through these tokens — same rendering, new mechanics.
+- **`--cui-theme-focus-ring` joins the set.** It is mixed from the state colour
+  at `$focus-ring-opacity`, while the width still comes from
+  `--cui-focus-ring-width`, so only the hue is contextual. A component follows
+  the theme on focus by reading
+  `var(--cui-theme-focus-ring, var(--cui-focus-ring))`, which leaves the global
+  ring in place where no theme is set. Buttons still compute their own ring from
+  `--cui-btn-focus-shadow`; the two will be reconciled.
 - **`--cui-{color}-contrast` custom properties are new root tokens.** Previously
   only buttons computed their own contrast colour; the root tokens now carry it,
   written in `$theme-colors-contrast`. `.text-bg-*` reads the token instead of
