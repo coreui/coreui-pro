@@ -5,6 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
+export { default as Accordion } from './accordion.js'
 export { default as Alert } from './alert.js'
 export { default as Autocomplete } from './autocomplete.js'
 export { default as Button } from './button.js'

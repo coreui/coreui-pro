@@ -5,6 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
+import Accordion from './src/accordion.js'
 import Alert from './src/alert.js'
 import Autocomplete from './src/autocomplete.js'
 import Button from './src/button.js'
@@ -45,6 +46,7 @@ import Toast from './src/toast.js'
 import Tooltip from './src/tooltip.js'
 
 export default {
+  Accordion,
   Alert,
   Autocomplete,
   Button,

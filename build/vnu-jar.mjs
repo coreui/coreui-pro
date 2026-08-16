@@ -38,6 +38,9 @@ execFile('java', ['-version'], (error, stdout, stderr) => {
     'Trailing slash on void elements has no effect and interacts badly with unquoted attribute values.',
     // Allow `switch` attribute.
     'Attribute “switch” not allowed on element “input” at this point.',
+    // The exclusive accordion: `name` on <details> is in the HTML Standard, but
+    // postdates the pinned vnu-jar, which is held back by an open advisory.
+    'Attribute “name” not allowed on element “details” at this point.',
     // CoreUI custom controls (chip input, OTP) build their labelled <input> in JS on
     // init, so the static markup the validator sees has a `for` with no target yet.
     'The value of the “for” attribute of the “label” element must be the ID of a non-hidden form control.',

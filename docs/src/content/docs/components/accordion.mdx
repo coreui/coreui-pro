@@ -1,14 +1,22 @@
 ---
 title: "Bootstrap 5 Accordion"
 name: "Accordion"
-description: "Build vertically collapsing accordions in combination with our Collapse JavaScript plugin."
+description: "Build vertically collapsing accordions on top of the native HTML disclosure element."
 otherFrameworks:
   - accordion
 ---
 
+import accordionToggleAll from './snippets/accordion-toggle-all.js?raw'
+
 ## How it works
 
-The accordion uses [collapse](/components/collapse/) internally to make it collapsible.
+The accordion is built on the native `<details>` and `<summary>` elements, so it works without JavaScript. The browser handles opening, closing, keyboard interaction and the disclosure semantics announced by screen readers.
+
+- `.accordion-item` goes on a `<details>` element.
+- `.accordion-header` goes on its `<summary>` element.
+- `.accordion-body` holds the panel content.
+
+To render an item that's expanded by default, add the `open` attribute to its `<details>` element.
 
 <Callout color="info">
 This component's animation effect relies on the `prefers-reduced-motion` media query. For more information, refer to the [reduced motion section of our accessibility documentation](/getting-started/accessibility/#reduced-motion).
@@ -16,132 +24,222 @@ This component's animation effect relies on the `prefers-reduced-motion` media q
 
 Click the accordions below to expand/collapse the accordion content.
 
-To render an accordion that's expanded by default:
-- add the `.show` class on the `.accordion-collapse` element.
-- drop the `.collapsed` class from the `.accordion-button` element and set its `aria-expanded` attribute to `true`.
-
-<Example code={`<div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Accordion Item #1
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" data-coreui-parent="#accordionExample">
-        <div class="accordion-body">
-          <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionExample" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">
+        <strong>This is the first item's accordion body.</strong> It is shown by default, because its <code>&lt;details&gt;</code> element carries the <code>open</code> attribute. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>.
       </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          Accordion Item #2
-        </button>
-      </h2>
-      <div id="collapseTwo" class="accordion-collapse collapse" data-coreui-parent="#accordionExample">
-        <div class="accordion-body">
-          <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+    </details>
+    <details class="accordion-item" name="accordionExample">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">
+        <strong>This is the second item's accordion body.</strong> It is hidden by default. The shared <code>name</code> attribute is what makes the browser close the other items when this one opens.
       </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          Accordion Item #3
-        </button>
-      </h2>
-      <div id="collapseThree" class="accordion-collapse collapse" data-coreui-parent="#accordionExample">
-        <div class="accordion-body">
-          <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+    </details>
+    <details class="accordion-item" name="accordionExample">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">
+        <strong>This is the third item's accordion body.</strong> It is hidden by default. You can modify any of this with custom CSS or overriding our default variables.
       </div>
-    </div>
+    </details>
   </div>`} />
 
-### Flush
+## Variants
+
+Add a contextual `.theme-{color}` class to the `.accordion` to tint its **open** items. Closed items keep the neutral surface, so the theme marks what is currently expanded rather than recolouring the whole control.
+
+<Example code={`<div class="accordion theme-success">
+    <details class="accordion-item" name="accordionTheme" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">The open item takes its text, background and border from the theme color.</div>
+    </details>
+    <details class="accordion-item" name="accordionTheme">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Closed items are untouched, so the tint reads as a state and not as decoration.</div>
+    </details>
+    <details class="accordion-item" name="accordionTheme">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Any of the theme colors works: <code>.theme-primary</code>, <code>.theme-danger</code>, and so on.</div>
+    </details>
+  </div>`} />
+
+## Nested
+
+Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each level its own `name`, so the outer and inner groups open and close independently — `name` groups the `<details>` elements across the whole document, not per container.
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionNestedOuter" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">
+        <strong>This item contains a nested accordion.</strong>
+        <div class="accordion mt-3">
+          <details class="accordion-item" name="accordionNestedInner" open>
+            <summary class="accordion-header">Nested Item #1</summary>
+            <div class="accordion-body">Body of the first nested item.</div>
+          </details>
+          <details class="accordion-item" name="accordionNestedInner">
+            <summary class="accordion-header">Nested Item #2</summary>
+            <div class="accordion-body">Body of the second nested item.</div>
+          </details>
+        </div>
+      </div>
+    </details>
+    <details class="accordion-item" name="accordionNestedOuter">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Opening this closes the item above, and the nested accordion goes with it.</div>
+    </details>
+  </div>`} />
+
+## Flush
 
 Add `.accordion-flush` to remove the default `background-color`, some borders, and some rounded corners to render accordions edge-to-edge with their parent container.
 
-<Example class="bg-body-secondary" code={`<div class="accordion accordion-flush" id="accordionFlushExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-          Accordion Item #1
-        </button>
-      </h2>
-      <div id="flush-collapseOne" class="accordion-collapse collapse" data-coreui-parent="#accordionFlushExample">
-        <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-          Accordion Item #2
-        </button>
-      </h2>
-      <div id="flush-collapseTwo" class="accordion-collapse collapse" data-coreui-parent="#accordionFlushExample">
-        <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-          Accordion Item #3
-        </button>
-      </h2>
-      <div id="flush-collapseThree" class="accordion-collapse collapse" data-coreui-parent="#accordionFlushExample">
-        <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
-      </div>
-    </div>
+<Example class="bg-body-secondary" code={`<div class="accordion accordion-flush">
+    <details class="accordion-item" name="accordionFlushExample">
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
+    </details>
+    <details class="accordion-item" name="accordionFlushExample">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
+    </details>
+    <details class="accordion-item" name="accordionFlushExample">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body.</div>
+    </details>
   </div>`} />
 
-### Always open
+## Always open
 
-Omit the `data-coreui-parent` attribute on each `.accordion-collapse` to make accordion items stay open when another item is opened.
+Omit the `name` attribute on each `.accordion-item` to make accordion items stay open when another item is opened.
 
-<Example code={`<div class="accordion" id="accordionPanelsStayOpenExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" data-coreui-toggle="collapse" data-coreui-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-          Accordion Item #1
-        </button>
-      </h2>
-      <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
-        <div class="accordion-body">
-          <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+<Example code={`<div class="accordion">
+    <details class="accordion-item" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">
+        <strong>This is the first item's accordion body.</strong> Without a shared <code>name</code>, every item opens and closes on its own.
       </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-          Accordion Item #2
-        </button>
-      </h2>
-      <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+    </details>
+    <details class="accordion-item">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">
+        <strong>This is the second item's accordion body.</strong> Opening it leaves the other items untouched.
       </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
-          Accordion Item #3
-        </button>
-      </h2>
-      <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
-        <div class="accordion-body">
-          <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-        </div>
+    </details>
+    <details class="accordion-item">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">
+        <strong>This is the third item's accordion body.</strong> Opening it leaves the other items untouched.
       </div>
-    </div>
+    </details>
+  </div>`} />
+
+## Expand & collapse all
+
+This is the one feature of the accordion that needs `accordion.js`. The [`showAll()` and `hideAll()`](#methods) methods open and close every item of the accordion they are called on.
+
+They work on an exclusive accordion too: the HTML Standard forbids leaving more than one open item in a `name` group, so opening them all means dropping the shared `name` first. The component parks it on each element and puts it back once the items are closed again, so nothing has to remember the group.
+
+Both return a promise that settles once the items have finished moving.
+
+<Example code={`<button class="btn btn-primary mb-3" type="button" id="accordionExpandAll">Expand all</button>
+  <button class="btn btn-secondary mb-3" type="button" id="accordionCollapseAll">Collapse all</button>
+  <div class="accordion" id="accordionToggleAll">
+    <details class="accordion-item" name="accordionToggleAll" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">Use <strong>Expand all</strong> to open every item, even though they share a <code>name</code>.</div>
+    </details>
+    <details class="accordion-item" name="accordionToggleAll">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body"><strong>Collapse all</strong> closes every item and restores the exclusive grouping.</div>
+    </details>
+    <details class="accordion-item" name="accordionToggleAll">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Placeholder content for the third accordion item.</div>
+    </details>
+  </div>`} sandboxJs={accordionToggleAll} />
+
+<Code code={accordionToggleAll} lang="js" />
+
+## Headings
+
+`<summary>` accepts heading content, so wrap the label in a heading to keep the sections reachable by heading navigation. The heading inherits the summary's typography, so it does not change how the accordion looks.
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionHeadingExample" open>
+      <summary class="accordion-header"><h3>Accordion Item #1</h3></summary>
+      <div class="accordion-body">Placeholder content for the first accordion item.</div>
+    </details>
+    <details class="accordion-item" name="accordionHeadingExample">
+      <summary class="accordion-header"><h3>Accordion Item #2</h3></summary>
+      <div class="accordion-body">Placeholder content for the second accordion item.</div>
+    </details>
   </div>`} />
 
 ## Accessibility
 
-Please read the [collapse accessibility section](/components/collapse/#accessibility) for more information.
+`<summary>` is a native disclosure control. It is focusable, it is operated with <kbd>Enter</kbd> and <kbd>Space</kbd>, and its expanded state is exposed to assistive technology by the browser — no `aria-expanded` or `aria-controls` bookkeeping is required.
+
+Because a bare `<summary>` is not a heading, wrap its label in an `<h2>`–`<h6>` when the accordion divides a page into sections. See [Headings](#headings) above.
+
+## JavaScript behavior
+
+None is required to open and close an accordion. The `<details>` element does that on its own, including on markup added to the page after load, and the styles do not depend on the component either.
+
+Loading `accordion.js` adds three things on top:
+
+- **The events below**, on every accordion in the document, in every browser. Nothing has to be instantiated for them.
+- **The methods below**, on an instance created for a `.accordion` element.
+- **The open/close animation where CSS cannot do it.** Chromium animates `block-size: 0` to `auto` through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size); Firefox and Safari do not implement it yet, so there the panel snaps unless the component is loaded. Only this part is conditional, and only this part goes away once they ship `calc-size()` — the events and methods stay.
+
+### Methods
+
+The component is instantiated on the `.accordion` element, and its methods address the items inside it. An item is passed either as an element or as its index.
+
+```js
+const accordion = coreui.Accordion.getOrCreateInstance('#myAccordion')
+
+accordion.show(0)
+accordion.hide(document.querySelector('#myAccordion > .accordion-item'))
+```
+
+| Method | Description |
+| --- | --- |
+| `show(item)` | Opens an accordion item. Returns a promise that settles once it has finished expanding. |
+| `hide(item)` | Closes an accordion item. Returns a promise that settles once it has finished collapsing. |
+| `toggle(item)` | Opens or closes an accordion item, depending on its current state. |
+| `showAll()` | Opens every item of the accordion, dropping the exclusive grouping for as long as they stay open. |
+| `hideAll()` | Closes every item of the accordion and restores the grouping. |
+
+Items of a nested accordion belong to that accordion, not to the outer one, and an item that is not in this accordion is ignored.
+
+### Events
+
+The accordion's own events mirror the native [`toggle`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/toggle_event) event, and are fired on the `.accordion-item` element whenever its open state changes — in every browser, whether the panel was animated by CSS or by the component, and whether it was opened by the user or by setting the `open` property.
+
+| Event | Description |
+| --- | --- |
+| `shown.coreui.accordion` | Fired when an accordion item has been opened. |
+| `hidden.coreui.accordion` | Fired when an accordion item has been closed. |
+
+Both bubble, so they can be delegated. The native `toggle` event does not bubble, which is the one thing these add over listening for it directly:
+
+```js
+coreui.EventHandler.on(document, 'shown.coreui.accordion', event => {
+  console.log(event.target.querySelector('.accordion-header').textContent)
+})
+```
+
+There is no `show`/`hide` counterpart, because `<details>` has no cancelable event that precedes the state change. **To keep an item from opening, cancel the click on its `<summary>`** — the browser then leaves it closed, and the component honors that too:
+
+```js
+summary.addEventListener('click', event => {
+  if (!allowed) {
+    event.preventDefault()
+  }
+})
+```
 
 ## Customizing
 

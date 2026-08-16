@@ -4,7 +4,6 @@
 @use "functions/math" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/mask-icon" as *;
-@use "mixins/color-mode" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -30,10 +29,14 @@ $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default
 $accordion-transition:                    $btn-transition, border-radius .15s ease !default;
 $accordion-button-active-bg:              var(--#{$prefix}primary-bg-subtle) !default;
 $accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis) !default;
+$accordion-active-border-color:           $accordion-border-color !default;
 
 // fusv-disable
 // fusv-enable
-$accordion-button-focus-ring:       $btn-focus-ring !default;
+$accordion-button-focus-ring:       var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
+
+$accordion-content-duration:              .35s !default;
+$accordion-content-easing:                ease !default;
 
 $accordion-icon-width:                    1.25rem !default;
 $accordion-icon-color:                    var(--#{$prefix}body-color) !default;
@@ -66,14 +69,17 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
     --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width},
     --#{$prefix}accordion-btn-icon-color: #{$accordion-icon-color},
-    --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
+    --#{$prefix}accordion-btn-active-icon-color: var(--#{$prefix}theme-fg, #{$accordion-icon-active-color}),
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
     --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
     --#{$prefix}accordion-body-padding-x: #{$accordion-body-padding-x},
     --#{$prefix}accordion-body-padding-y: #{$accordion-body-padding-y},
-    --#{$prefix}accordion-active-color: #{$accordion-button-active-color},
-    --#{$prefix}accordion-active-bg: #{$accordion-button-active-bg},
+    --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg, #{$accordion-button-active-color}),
+    --#{$prefix}accordion-active-bg: var(--#{$prefix}theme-bg-subtle, #{$accordion-button-active-bg}),
+    --#{$prefix}accordion-active-border-color: var(--#{$prefix}theme-border, #{$accordion-active-border-color}),
+    --#{$prefix}accordion-content-duration: #{$accordion-content-duration},
+    --#{$prefix}accordion-content-easing: #{$accordion-content-easing},
   ),
   $accordion-tokens
 );
@@ -87,30 +93,112 @@ $accordion-tokens: defaults(
     @include tokens($accordion-tokens);
   }
 
-  .accordion-button {
+  .accordion-item {
     position: relative;
+    color: var(--#{$prefix}accordion-color);
+    background-color: var(--#{$prefix}accordion-bg);
+    border: var(--#{$prefix}accordion-border-width) solid var(--#{$prefix}accordion-border-color);
+
+    &::details-content {
+      block-size: 0;
+      overflow-y: clip;
+    }
+
+    // Only where `auto` can be interpolated does the panel animate itself.
+    // Elsewhere accordion.js animates the item, and a transition left on the
+    // panel would still hold it short while the component measures how tall the
+    // item has to become — the open animation would then run to the wrong size
+    // and the panel would jump at the end.
+    @supports (interpolate-size: allow-keywords) {
+      @media (prefers-reduced-motion: no-preference) {
+        interpolate-size: allow-keywords;
+      }
+
+      &::details-content {
+        @include transition(
+          block-size var(--#{$prefix}accordion-content-duration) var(--#{$prefix}accordion-content-easing),
+          content-visibility var(--#{$prefix}accordion-content-duration) allow-discrete
+        );
+      }
+    }
+
+    // accordion.js animates the item's own block-size where the panel cannot be
+    // animated by ::details-content. It sets the two sizes and leaves the timing
+    // here, so both paths are driven by the same tokens.
+    &[data-coreui-accordion-animating] {
+      overflow: clip;
+      @include transition(
+        block-size var(--#{$prefix}accordion-content-duration) var(--#{$prefix}accordion-content-easing)
+      );
+    }
+
+    &:first-of-type {
+      @include border-top-radius(var(--#{$prefix}accordion-border-radius));
+
+      > .accordion-header {
+        @include border-top-radius(var(--#{$prefix}accordion-inner-border-radius));
+      }
+    }
+
+    // Keep the border and pull the item up over it: an item without a
+    // block-start border has nothing to recolour when it opens.
+    &:not(:first-of-type) {
+      margin-block-start: calc(-1 * var(--#{$prefix}accordion-border-width)); // stylelint-disable-line function-disallowed-list
+    }
+
+    // Only set a border-radius on the last item if the accordion is collapsed
+    &:last-of-type {
+      @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
+
+      > .accordion-header {
+        @include border-bottom-radius(var(--#{$prefix}accordion-inner-border-radius));
+      }
+
+      > .accordion-body {
+        @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
+      }
+    }
+
+    &[open] {
+      z-index: 2;
+      border-color: var(--#{$prefix}accordion-active-border-color);
+
+      &::details-content {
+        block-size: auto;
+      }
+
+      > .accordion-header {
+        color: var(--#{$prefix}accordion-active-color);
+        background-color: var(--#{$prefix}accordion-active-bg);
+        box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-active-border-color); // stylelint-disable-line function-disallowed-list
+
+        &::after {
+          background-color: var(--#{$prefix}accordion-btn-active-icon-color);
+          transform: var(--#{$prefix}accordion-btn-icon-transform);
+        }
+      }
+
+      &:last-of-type > .accordion-header {
+        @include border-bottom-radius(0);
+      }
+    }
+  }
+
+  .accordion-header {
     display: flex;
     align-items: center;
     width: 100%;
     padding: var(--#{$prefix}accordion-btn-padding-y) var(--#{$prefix}accordion-btn-padding-x);
     font-size: $font-size-base;
     color: var(--#{$prefix}accordion-btn-color);
-    text-align: start; // Reset button style
+    text-align: start;
+    list-style: none;
+    cursor: pointer;
     background-color: var(--#{$prefix}accordion-btn-bg);
-    border: 0;
-    @include border-radius(0);
-    overflow-anchor: none;
     @include transition(var(--#{$prefix}accordion-transition));
 
-    &:not(.collapsed) {
-      color: var(--#{$prefix}accordion-active-color);
-      background-color: var(--#{$prefix}accordion-active-bg);
-      box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-border-color); // stylelint-disable-line function-disallowed-list
-
-      &::after {
-        background-color: var(--#{$prefix}accordion-btn-active-icon-color);
-        transform: var(--#{$prefix}accordion-btn-icon-transform);
-      }
+    &::-webkit-details-marker {
+      display: none;
     }
 
     // Accordion icon
@@ -125,50 +213,24 @@ $accordion-tokens: defaults(
       @include transition(var(--#{$prefix}accordion-btn-icon-transition));
     }
 
+    // A heading inside `<summary>` keeps the section reachable by heading
+    // navigation, which a bare `<summary>` does not offer.
+    > :is(h1, h2, h3, h4, h5, h6) {
+      margin-bottom: 0;
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
+      color: inherit;
+    }
+
     &:hover {
       z-index: 2;
     }
 
-    &:focus {
+    &:focus-visible {
+      position: relative;
       z-index: 3;
       outline: var(--#{$prefix}accordion-btn-focus-ring);
-    }
-  }
-
-  .accordion-header {
-    margin-bottom: 0;
-  }
-
-  .accordion-item {
-    color: var(--#{$prefix}accordion-color);
-    background-color: var(--#{$prefix}accordion-bg);
-    border: var(--#{$prefix}accordion-border-width) solid var(--#{$prefix}accordion-border-color);
-
-    &:first-of-type {
-      @include border-top-radius(var(--#{$prefix}accordion-border-radius));
-
-      > .accordion-header .accordion-button {
-        @include border-top-radius(var(--#{$prefix}accordion-inner-border-radius));
-      }
-    }
-
-    &:not(:first-of-type) {
-      border-top: 0;
-    }
-
-    // Only set a border-radius on the last item if the accordion is collapsed
-    &:last-of-type {
-      @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
-
-      > .accordion-header .accordion-button {
-        &.collapsed {
-          @include border-bottom-radius(var(--#{$prefix}accordion-inner-border-radius));
-        }
-      }
-
-      > .accordion-collapse {
-        @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
-      }
     }
   }
 
@@ -183,20 +245,16 @@ $accordion-tokens: defaults(
 
   .accordion-flush {
     > .accordion-item {
-      border-right: 0;
-      border-left: 0;
+      border-inline: 0;
       @include border-radius(0);
 
-      &:first-child { border-top: 0; }
-      &:last-child { border-bottom: 0; }
+      &:first-child { border-block-start: 0; }
+      &:last-child { border-block-end: 0; }
 
-      // stylelint-disable selector-max-class
-      > .accordion-collapse,
-      > .accordion-header .accordion-button,
-      > .accordion-header .accordion-button.collapsed {
+      > .accordion-header,
+      > .accordion-body {
         @include border-radius(0);
       }
-      // stylelint-enable selector-max-class
     }
   }
 

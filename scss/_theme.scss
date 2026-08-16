@@ -21,6 +21,11 @@ $theme-token-refs: (
   @each $token, $suffix in $theme-token-refs {
     --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
   }
+
+  // Mixed here rather than mapped, because the palette carries no per-color
+  // focus-ring value. Width still comes from the global token, so only the hue
+  // is contextual.
+  --#{$prefix}theme-focus-ring: var(--#{$prefix}focus-ring-width) solid color-mix(in srgb, var(--#{$prefix}#{$state}) #{$focus-ring-opacity * 100%}, transparent);
 }
 
 // scss-docs-start theme-classes
