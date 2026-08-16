@@ -269,6 +269,11 @@ $combobox-tokens: defaults(
     }
   }
 
+  .disabled > .combobox-option-indicator,
+  :disabled > .combobox-option-indicator {
+    opacity: var(--#{$prefix}check-disabled-opacity);
+  }
+
   .combobox-options-empty {
     padding: var(--#{$prefix}combobox-option-padding-y) var(--#{$prefix}combobox-option-padding-x);
   }

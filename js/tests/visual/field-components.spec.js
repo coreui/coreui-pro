@@ -307,6 +307,23 @@ describe('multi select', () => {
     ms.dispose()
   })
 
+  // The indicator is a span, so the native `.check:disabled` rule never fires —
+  // the faded state has to come from the option's `.disabled` class.
+  it('open with a disabled option', async () => {
+    container = document.createElement('div')
+    container.style.cssText = 'padding: 1rem; width: 480px;'
+    container.innerHTML = `<select id="host" multiple>
+        <option value="1" selected>Angular</option>
+        <option value="2" disabled>Bootstrap</option>
+        <option value="3">React</option>
+      </select>`
+    document.body.append(container)
+    const ms = new MultiSelect(container.querySelector('#host'))
+    ms.show()
+    await shoot(popup(), 'multi-select-disabled-option', { tolerant: true })
+    ms.dispose()
+  })
+
   it('chips selection in dark mode', async () => {
     document.documentElement.dataset.coreuiTheme = 'dark'
     const ms = new MultiSelect(mountSelect(), { cleaner: true })
