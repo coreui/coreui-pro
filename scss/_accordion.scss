@@ -33,7 +33,7 @@ $accordion-active-border-color:           $accordion-border-color !default;
 
 // fusv-disable
 // fusv-enable
-$accordion-button-focus-ring:       var(--#{$prefix}focus-ring) !default;
+$accordion-button-focus-ring:       var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;
