@@ -277,7 +277,7 @@ This example demonstrates advanced usage of custom cell rendering to display pri
 
 ## Accessibility
 
-Keyboard navigation in the grid follows the [date picker dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/). Selected cells carry `aria-selected`, today carries `aria-current="date"`, and every cell announces its full localized date.
+Keyboard navigation in the grid follows the [date picker dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/). Selected cells carry `aria-selected`, today carries `aria-current="date"`, and every cell announces its full localized date. The months, quarters, and years views answer to the same keys, with arrows moving by cell and row, and no jump ever lands outside `minDate` / `maxDate` — focus stops on the closest date still selectable.
 
 ### Keyboard support
 
@@ -286,11 +286,9 @@ Keyboard navigation in the grid follows the [date picker dialog pattern](https:/
 | <kbd>Arrow Right</kbd> / <kbd>Arrow Left</kbd> | Move focus to the next / previous day; crossing the edge of the grid moves to the adjacent month |
 | <kbd>Arrow Down</kbd> / <kbd>Arrow Up</kbd> | Move focus to the same day of the next / previous week |
 | <kbd>Home</kbd> / <kbd>End</kbd> | Move focus to the first / last selectable day of the current week |
-| <kbd>Page Down</kbd> / <kbd>Page Up</kbd> | Move focus to the same day of the next / previous month, keeping the day number when the target month is long enough |
+| <kbd>Page Down</kbd> / <kbd>Page Up</kbd> | Move focus to the same day of the next / previous month, keeping the day number when the target month is long enough; in the months and quarters views move by year, in the years view by decade |
 | <kbd>Shift</kbd> + <kbd>Page Down</kbd> / <kbd>Shift</kbd> + <kbd>Page Up</kbd> | Move focus to the same day of the next / previous year |
 | <kbd>Enter</kbd> / <kbd>Space</kbd> | Select the focused date |
-
-The months, quarters, and years views answer to the same keys, with arrows moving by cell and row, and <kbd>Page Down</kbd> / <kbd>Page Up</kbd> moving by year (by decade in the years view). A jump never lands outside `minDate` / `maxDate` — focus stops on the closest date still selectable.
 
 ## Usage
 
