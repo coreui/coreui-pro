@@ -6,6 +6,8 @@ otherFrameworks:
   - accordion
 ---
 
+import accordionToggleAll from './snippets/accordion-toggle-all.js?raw'
+
 ## How it works
 
 The accordion is built on the native `<details>` and `<summary>` elements, so it works without JavaScript. The browser handles opening, closing, keyboard interaction and the disclosure semantics announced by screen readers.
@@ -113,6 +115,41 @@ Because a bare `<summary>` is not a heading, wrap its label in an `<h2>`–`<h6>
 None is required. The `<details>` element opens and closes on its own, including on markup added to the page after load.
 
 The optional `accordion.js` component only adds the open/close animation in browsers that cannot do it in CSS. Chromium animates `block-size: 0` to `auto` through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size); Firefox and Safari do not implement it yet, and there the panel snaps unless the component is loaded. It can be removed without a breaking change once they ship `calc-size()`.
+
+### Expand & collapse all
+
+`Accordion.showAll()` and `Accordion.hideAll()` take the `.accordion` container and operate on its items. They work on an exclusive accordion too: opening every item of a group means dropping the shared `name` first, and the component parks it on each element and puts it back once the items are closed again, so nothing has to remember the group.
+
+Both return a promise that settles once the items have finished moving.
+
+<Example code={`<button class="btn btn-primary mb-3" type="button" id="accordionExpandAll">Expand all</button>
+  <button class="btn btn-secondary mb-3" type="button" id="accordionCollapseAll">Collapse all</button>
+  <div class="accordion" id="accordionToggleAll">
+    <details class="accordion-item" name="accordionToggleAll" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">Use <strong>Expand all</strong> to open every item, even though they share a <code>name</code>.</div>
+    </details>
+    <details class="accordion-item" name="accordionToggleAll">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body"><strong>Collapse all</strong> closes every item and restores the exclusive grouping.</div>
+    </details>
+    <details class="accordion-item" name="accordionToggleAll">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Placeholder content for the third accordion item.</div>
+    </details>
+  </div>`} sandboxJs={accordionToggleAll} />
+
+<Code code={accordionToggleAll} lang="js" />
+
+### Methods
+
+| Method | Description |
+| --- | --- |
+| `show()` | Opens an accordion item. Returns a promise that settles once it has finished expanding. |
+| `hide()` | Closes an accordion item. Returns a promise that settles once it has finished collapsing. |
+| `toggle()` | Opens or closes an accordion item, depending on its current state. |
+| `Accordion.showAll(container)` | Opens every item of the accordion, dropping the exclusive grouping for as long as they stay open. |
+| `Accordion.hideAll(container)` | Closes every item of the accordion and restores the grouping. |
 
 ### Events
 

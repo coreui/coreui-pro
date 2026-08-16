@@ -8,7 +8,7 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin } from './util/index.js'
+import { defineJQueryPlugin, getElement } from './util/index.js'
 
 /**
  * Constants
@@ -25,6 +25,7 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_TOGGLE_DATA_API = `toggle${EVENT_KEY}${DATA_API_KEY}`
 
 const ATTRIBUTE_ANIMATING = 'data-coreui-accordion-animating'
+const ATTRIBUTE_NAME = 'data-coreui-accordion-name'
 
 const PROPERTY_DURATION = '--cui-accordion-content-duration'
 const PROPERTY_EASING = '--cui-accordion-content-easing'
@@ -165,7 +166,9 @@ class Accordion extends BaseComponent {
   async _animate(from: number, to: number, onFinish?: () => void): Promise<void> {
     this._animation?.cancel()
 
-    if (prefersReducedMotion()) {
+    // Where the panel is animated by CSS, running this one too would drive the
+    // same expansion from both ends.
+    if (supportsNativeAnimation() || prefersReducedMotion()) {
       onFinish?.()
       return
     }
@@ -198,6 +201,45 @@ class Accordion extends BaseComponent {
   }
 
   // Static
+  static async showAll(container: string | Element | null): Promise<void> {
+    const items = Accordion._items(container)
+
+    // `name` has to go before `open`, or the browser closes each item as the
+    // next one in the group opens. It is parked on the element so hideAll can
+    // put the grouping back without being told what it was.
+    for (const item of items) {
+      if (item.name) {
+        item.setAttribute(ATTRIBUTE_NAME, item.name)
+        item.removeAttribute('name')
+      }
+    }
+
+    await Promise.all(items.map(item => Accordion.getOrCreateInstance(item).show()))
+  }
+
+  static async hideAll(container: string | Element | null): Promise<void> {
+    const items = Accordion._items(container)
+
+    await Promise.all(items.map(item => Accordion.getOrCreateInstance(item).hide()))
+
+    // Restoring the group while more than one item is still open would leave
+    // the browser to pick which one survives.
+    for (const item of items) {
+      const name = item.getAttribute(ATTRIBUTE_NAME)
+
+      if (name !== null) {
+        item.setAttribute('name', name)
+        item.removeAttribute(ATTRIBUTE_NAME)
+      }
+    }
+  }
+
+  static _items(container: string | Element | null): HTMLDetailsElement[] {
+    const element = getElement(container)
+
+    return element ? SelectorEngine.children<HTMLDetailsElement>(element, SELECTOR_ITEM) : []
+  }
+
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
       const data: any = Accordion.getOrCreateInstance(this)

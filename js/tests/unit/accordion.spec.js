@@ -190,6 +190,88 @@ describe('Accordion', () => {
     })
   })
 
+  describe('showAll / hideAll', () => {
+    it('should open every item of an exclusive accordion', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const accordionEl = fixtureEl.querySelector('.accordion')
+      const items = [...fixtureEl.querySelectorAll('.accordion-item')]
+
+      await Accordion.showAll(accordionEl)
+
+      expect(items.every(item => item.open)).toBeTrue()
+      expect(items.every(item => !item.hasAttribute('name'))).toBeTrue()
+    })
+
+    it('should close every item and put the grouping back', async () => {
+      fixtureEl.innerHTML = markup()
+
+      const accordionEl = fixtureEl.querySelector('.accordion')
+      const items = [...fixtureEl.querySelectorAll('.accordion-item')]
+
+      await Accordion.showAll(accordionEl)
+      await Accordion.hideAll(accordionEl)
+
+      expect(items.some(item => item.open)).toBeFalse()
+      expect(items.every(item => item.getAttribute('name') === 'group')).toBeTrue()
+      expect(items.every(item => !item.hasAttribute('data-coreui-accordion-name'))).toBeTrue()
+    })
+
+    it('should take a CSS selector', async () => {
+      fixtureEl.innerHTML = markup().replace('class="accordion"', 'class="accordion" id="acc"')
+
+      await Accordion.showAll('#acc')
+
+      expect([...fixtureEl.querySelectorAll('.accordion-item')].every(item => item.open)).toBeTrue()
+    })
+
+    it('should leave an accordion without a name alone', async () => {
+      fixtureEl.innerHTML = markup().replaceAll(' name="group"', '')
+
+      const accordionEl = fixtureEl.querySelector('.accordion')
+      const items = [...fixtureEl.querySelectorAll('.accordion-item')]
+
+      await Accordion.showAll(accordionEl)
+      expect(items.every(item => item.open)).toBeTrue()
+
+      await Accordion.hideAll(accordionEl)
+      expect(items.some(item => item.open)).toBeFalse()
+      expect(items.some(item => item.hasAttribute('name'))).toBeFalse()
+    })
+
+    it('should not reach into a nested accordion', async () => {
+      fixtureEl.innerHTML = [
+        '<div class="accordion" id="outer">',
+        '  <details class="accordion-item" name="outer">',
+        '    <summary class="accordion-header">Outer</summary>',
+        '    <div class="accordion-body">',
+        '      <div class="accordion" id="inner">',
+        '        <details class="accordion-item" name="inner">',
+        '          <summary class="accordion-header">Inner</summary>',
+        '          <div class="accordion-body">Inner body</div>',
+        '        </details>',
+        '      </div>',
+        '    </div>',
+        '  </details>',
+        '</div>'
+      ].join('')
+
+      await Accordion.showAll('#outer')
+
+      expect(fixtureEl.querySelector('#outer > .accordion-item').open).toBeTrue()
+      expect(fixtureEl.querySelector('#inner > .accordion-item').open).toBeFalse()
+      expect(fixtureEl.querySelector('#inner > .accordion-item').getAttribute('name')).toEqual('inner')
+    })
+
+    it('should do nothing for a container that does not exist', async () => {
+      fixtureEl.innerHTML = markup()
+
+      await Accordion.showAll('#missing')
+
+      expect(fixtureEl.querySelectorAll('.accordion-item[open]').length).toEqual(1)
+    })
+  })
+
   describe('events', () => {
     it('should mirror the native toggle where CSS animates the panel, without instantiating', async () => {
       fixtureEl.innerHTML = markup()
