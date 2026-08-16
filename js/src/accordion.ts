@@ -29,6 +29,8 @@ const ATTRIBUTE_NAME = 'data-coreui-accordion-name'
 
 const PROPERTY_DURATION = '--cui-accordion-content-duration'
 const PROPERTY_EASING = '--cui-accordion-content-easing'
+const PSEUDO_CONTENT = '::details-content'
+const TRANSITIONED_PROPERTY = 'block-size'
 
 const SELECTOR_ACCORDION = '.accordion'
 const SELECTOR_HEADER = '.accordion-header'
@@ -56,6 +58,55 @@ const toMilliseconds = (value: string): number => {
   }
 
   return value.trim().endsWith('ms') ? number : number * MILLISECONDS_MULTIPLIER
+}
+
+// Splits a comma-separated CSS list without cutting inside cubic-bezier() & co.
+const splitList = (value: string): string[] => {
+  const parts: string[] = []
+  let depth = 0
+  let current = ''
+
+  for (const character of value) {
+    if (character === '(') {
+      depth++
+    } else if (character === ')') {
+      depth--
+    } else if (character === ',' && depth === 0) {
+      parts.push(current.trim())
+      current = ''
+      continue
+    }
+
+    current += character
+  }
+
+  parts.push(current.trim())
+
+  return parts
+}
+
+// The stylesheet owns the timing, including its reduced-motion and
+// $enable-transitions decisions. The transition resolved on ::details-content is
+// read first: it carries those decisions and needs no knowledge of the custom
+// property prefix. Browsers that do not know the pseudo-element report nothing
+// for it, and there the tokens are read instead.
+const contentTiming = (details: HTMLDetailsElement): { duration: number, easing: string } => {
+  const pseudo = window.getComputedStyle(details, PSEUDO_CONTENT)
+  const index = splitList(pseudo.transitionProperty).indexOf(TRANSITIONED_PROPERTY)
+
+  if (index !== -1) {
+    return {
+      duration: toMilliseconds(splitList(pseudo.transitionDuration)[index] || ''),
+      easing: splitList(pseudo.transitionTimingFunction)[index] || 'linear'
+    }
+  }
+
+  const styles = window.getComputedStyle(details)
+
+  return {
+    duration: toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION)),
+    easing: styles.getPropertyValue(PROPERTY_EASING).trim() || 'linear'
+  }
 }
 
 /**
@@ -224,11 +275,10 @@ class Accordion extends BaseComponent {
       return
     }
 
-    const styles = window.getComputedStyle(details)
-    const duration = toMilliseconds(styles.getPropertyValue(PROPERTY_DURATION))
+    const { duration, easing } = contentTiming(details)
 
-    // The duration is the stylesheet's to set. Without it there is no styled
-    // accordion to animate either, so there is nothing to fall back to.
+    // Without a duration there is no styled accordion to animate either, so
+    // there is nothing to fall back to.
     if (!duration) {
       onFinish?.()
       return
@@ -236,11 +286,7 @@ class Accordion extends BaseComponent {
 
     const animation = details.animate(
       { height: [`${from}px`, `${to}px`] },
-      {
-        duration,
-        easing: styles.getPropertyValue(PROPERTY_EASING).trim() || 'linear',
-        fill: 'both'
-      }
+      { duration, easing, fill: 'both' }
     )
 
     this._animations.set(details, animation)
