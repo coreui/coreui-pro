@@ -135,6 +135,33 @@ Omit the `name` attribute on each `.accordion-item` to make accordion items stay
     </details>
   </div>`} />
 
+## Expand & collapse all
+
+This is the one feature of the accordion that needs `accordion.js`. The [`showAll()` and `hideAll()`](#methods) methods open and close every item of the accordion they are called on.
+
+They work on an exclusive accordion too: the HTML Standard forbids leaving more than one open item in a `name` group, so opening them all means dropping the shared `name` first. The component parks it on each element and puts it back once the items are closed again, so nothing has to remember the group.
+
+Both return a promise that settles once the items have finished moving.
+
+<Example code={`<button class="btn btn-primary mb-3" type="button" id="accordionExpandAll">Expand all</button>
+  <button class="btn btn-secondary mb-3" type="button" id="accordionCollapseAll">Collapse all</button>
+  <div class="accordion" id="accordionToggleAll">
+    <details class="accordion-item" name="accordionToggleAll" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">Use <strong>Expand all</strong> to open every item, even though they share a <code>name</code>.</div>
+    </details>
+    <details class="accordion-item" name="accordionToggleAll">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body"><strong>Collapse all</strong> closes every item and restores the exclusive grouping.</div>
+    </details>
+    <details class="accordion-item" name="accordionToggleAll">
+      <summary class="accordion-header">Accordion Item #3</summary>
+      <div class="accordion-body">Placeholder content for the third accordion item.</div>
+    </details>
+  </div>`} sandboxJs={accordionToggleAll} />
+
+<Code code={accordionToggleAll} lang="js" />
+
 ## Headings
 
 `<summary>` accepts heading content, so wrap the label in a heading to keep the sections reachable by heading navigation. The heading inherits the summary's typography, so it does not change how the accordion looks.
@@ -165,31 +192,6 @@ Loading `accordion.js` adds three things on top:
 - **The events below**, on every accordion in the document, in every browser. Nothing has to be instantiated for them.
 - **The methods below**, on an instance created for a `.accordion` element.
 - **The open/close animation where CSS cannot do it.** Chromium animates `block-size: 0` to `auto` through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size); Firefox and Safari do not implement it yet, so there the panel snaps unless the component is loaded. Only this part is conditional, and only this part goes away once they ship `calc-size()` — the events and methods stay.
-
-### Expand & collapse all
-
-`showAll()` and `hideAll()` open and close every item of the accordion they are called on. They work on an exclusive accordion too: the HTML Standard forbids leaving more than one open item in a `name` group, so opening them all means dropping the shared `name` first. The component parks it on each element and puts it back once the items are closed again, so nothing has to remember the group.
-
-Both return a promise that settles once the items have finished moving.
-
-<Example code={`<button class="btn btn-primary mb-3" type="button" id="accordionExpandAll">Expand all</button>
-  <button class="btn btn-secondary mb-3" type="button" id="accordionCollapseAll">Collapse all</button>
-  <div class="accordion" id="accordionToggleAll">
-    <details class="accordion-item" name="accordionToggleAll" open>
-      <summary class="accordion-header">Accordion Item #1</summary>
-      <div class="accordion-body">Use <strong>Expand all</strong> to open every item, even though they share a <code>name</code>.</div>
-    </details>
-    <details class="accordion-item" name="accordionToggleAll">
-      <summary class="accordion-header">Accordion Item #2</summary>
-      <div class="accordion-body"><strong>Collapse all</strong> closes every item and restores the exclusive grouping.</div>
-    </details>
-    <details class="accordion-item" name="accordionToggleAll">
-      <summary class="accordion-header">Accordion Item #3</summary>
-      <div class="accordion-body">Placeholder content for the third accordion item.</div>
-    </details>
-  </div>`} sandboxJs={accordionToggleAll} />
-
-<Code code={accordionToggleAll} lang="js" />
 
 ### Methods
 
