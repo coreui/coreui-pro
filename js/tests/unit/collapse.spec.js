@@ -474,6 +474,22 @@ describe('Collapse', () => {
   })
 
   describe('hiddenUntilFound', () => {
+    it('should apply the attribute from the data API, before any interaction', () => {
+      fixtureEl.innerHTML = [
+        '<a role="button" data-coreui-toggle="collapse" href="#panel"></a>',
+        '<div class="collapse" id="panel" data-coreui-hidden-until-found="true"><p>needle</p></div>'
+      ].join('')
+
+      const collapseEl = fixtureEl.querySelector('#panel')
+
+      expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+
+      Collapse._initializeDataApi()
+
+      expect(collapseEl.getAttribute('hidden')).toEqual('until-found')
+      expect(Collapse.getInstance(collapseEl)).not.toBeNull()
+    })
+
     it('should leave the content laid out so find-in-page can reach it', () => {
       fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
 

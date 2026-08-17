@@ -33,6 +33,7 @@ const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_LOAD_DATA_API = `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`
 const EVENT_BEFOREMATCH = `beforematch${EVENT_KEY}`
 
 const CLASS_NAME_SHOW = 'show'
@@ -49,6 +50,7 @@ const VALUE_UNTIL_FOUND = 'until-found'
 
 const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="collapse"]'
+const SELECTOR_HIDDEN_UNTIL_FOUND = '.collapse[data-coreui-hidden-until-found="true"]'
 
 const Default = {
   hiddenUntilFound: false,
@@ -306,6 +308,14 @@ class Collapse extends BaseComponent {
   }
 
   // Static
+  // The option has to take effect before anyone interacts with the area, and
+  // Collapse is otherwise only constructed on the first click of a trigger.
+  static _initializeDataApi(): void {
+    for (const element of SelectorEngine.find(SELECTOR_HIDDEN_UNTIL_FOUND)) {
+      Collapse.getOrCreateInstance(element)
+    }
+  }
+
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
       const data: any = Collapse.getOrCreateInstance(this)
@@ -324,6 +334,10 @@ class Collapse extends BaseComponent {
 /**
  * Data API implementation
  */
+
+EventHandler.on(document, EVENT_LOAD_DATA_API, () => {
+  Collapse._initializeDataApi()
+})
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
   // preventDefault only for <a> elements (which change the URL) not inside the collapsible element
