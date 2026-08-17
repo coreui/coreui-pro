@@ -59,6 +59,14 @@ $alert-tokens: defaults(
     margin-bottom: 0;
   }
 
+  // An alert inserted with `.show` already on it has no earlier state to
+  // transition from, so the fade-in needs one declared here.
+  @starting-style {
+    .alert.fade.show {
+      opacity: 0;
+    }
+  }
+
   .alert-heading {
     color: inherit;
   }
