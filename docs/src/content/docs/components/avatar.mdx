@@ -101,26 +101,26 @@ Add `.avatar-status` to show presence. The indicator takes its colour from a bac
 <Example code={`<div class="d-flex gap-3">
     <div class="avatar">
       <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
-      <span class="avatar-status bg-success"></span>
+      <span class="avatar-status bg-success" role="img" aria-label="Online"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status bg-warning"></span>
+      <span class="avatar-status bg-warning" role="img" aria-label="Away"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status bg-danger"></span>
+      <span class="avatar-status bg-danger" role="img" aria-label="Busy"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status bg-secondary"></span>
+      <span class="avatar-status bg-secondary" role="img" aria-label="Offline"></span>
     </div>
   </div>`} />
 
 The indicator carries no text, so it means nothing to a screen reader on its own. Where the state matters rather than decorates, put it in the markup as well:
 
 ```html
-<span class="avatar-status bg-danger"></span>
+<span class="avatar-status bg-danger" role="img" aria-label="Busy"></span>
 <span class="visually-hidden">Busy</span>
 ```
 
