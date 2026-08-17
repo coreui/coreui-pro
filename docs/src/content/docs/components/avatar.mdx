@@ -96,42 +96,36 @@ Display multiple avatars in a stack to represent a group of users or items, with
 
 ## Avatars with status
 
-Add `.avatar-status` to show presence, and one of the state classes to say which state it is. **Offline and busy are squared off**, so the state is still readable where the colour is not — for a viewer with a colour vision deficiency, or on a monochrome print.
+Add `.avatar-status` to show presence. The indicator takes its colour from a background utility and its shape from a radius utility, so a state needs no class of its own:
 
 <Example code={`<div class="d-flex gap-3">
     <div class="avatar">
       <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
-      <span class="avatar-status status-online"></span>
+      <span class="avatar-status bg-success"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status status-away"></span>
+      <span class="avatar-status bg-warning"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status status-busy"></span>
+      <span class="avatar-status bg-danger rounded-1"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status status-offline"></span>
-    </div>
-  </div>`} />
+      <span class="avatar-status bg-secondary rounded-1"></span>
+    </div>`} />
 
-| Class | Meaning |
-| --- | --- |
-| `.status-online` | Available |
-| `.status-away` | Idle |
-| `.status-busy` | Do not disturb — squared |
-| `.status-offline` | Not connected — squared |
+Squaring one state off, as the last two do, keeps it apart from the others where the colour is not available — for a viewer with a colour vision deficiency, or on a monochrome print.
 
-The indicator carries no text, so it means nothing to a screen reader on its own. Where the state matters, put it in the markup as well:
+The indicator carries no text, so it means nothing to a screen reader on its own. Where the state matters rather than decorates, put it in the markup as well:
 
 ```html
-<span class="avatar-status status-busy"></span>
+<span class="avatar-status bg-danger rounded-1"></span>
 <span class="visually-hidden">Busy</span>
 ```
 
-A background utility still works for a state of your own: `<span class="avatar-status bg-info"></span>`.
+The ring around the indicator follows the page background through `--cui-avatar-status-border-color`, so it stays correct in dark mode.
 
 ## Customizing
 

@@ -238,10 +238,6 @@ finished, not whether the state changed.
   **The status indicator's ring follows the theme.** It was `1px solid $white`,
   a hardcoded white that read as a mistake in dark mode. It now comes from
   `--cui-avatar-status-border-color`, defaulting to the body background.
-- **The status indicator has states.** `.status-online`, `.status-away`,
-  `.status-busy` and `.status-offline` set the colour, and the last two square
-  the indicator off so the state survives without colour. A background utility
-  still works for a state of your own.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **A stacked avatar lifts on hover instead of pushing its neighbours.** The
   hover changed `margin-inline-end`, which moved every avatar after it; it now
