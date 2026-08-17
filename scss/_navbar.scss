@@ -61,9 +61,10 @@ $navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
 
 $navbar-tokens: () !default;
 
-// scss-docs-start navbar-css-vars
 // stylelint-disable scss/at-function-named-arguments
-// stylelint-disable-next-line scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start navbar-css-vars
 $navbar-tokens: defaults(
   (
     --#{$prefix}navbar-padding-x: #{if(sass($navbar-padding-x == null): 0; else: $navbar-padding-x)},
@@ -89,13 +90,16 @@ $navbar-tokens: defaults(
   ),
   $navbar-tokens
 );
-// stylelint-enable scss/at-function-named-arguments
 // scss-docs-end navbar-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable scss/at-function-named-arguments
 
 $navbar-nav-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start navbar-nav-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $navbar-nav-tokens: defaults(
   (
     --#{$prefix}nav-link-padding-x: 0,
@@ -110,10 +114,13 @@ $navbar-nav-tokens: defaults(
 );
 // scss-docs-end navbar-nav-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $navbar-dark-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start navbar-dark-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $navbar-dark-tokens: defaults(
   (
     --#{$prefix}navbar-color: #{$navbar-dark-color},
@@ -128,6 +135,8 @@ $navbar-dark-tokens: defaults(
   $navbar-dark-tokens
 );
 // scss-docs-end navbar-dark-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 // The expanded rules are read from inside the navbar's own query container, so
 // they can only style its descendants — an element is never its own container.
 // The two properties that used to sit on `.navbar-expand-*` itself move onto the

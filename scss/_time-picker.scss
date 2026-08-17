@@ -7,8 +7,9 @@
 // Time Picker
 $time-picker-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start time-picker-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $time-picker-tokens: defaults(
   (
     --#{$prefix}time-picker-body-padding: #{$time-picker-body-padding},
@@ -34,6 +35,8 @@ $time-picker-tokens: defaults(
   $time-picker-tokens
 );
 // scss-docs-end time-picker-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .time-picker {
     position: relative;

@@ -47,8 +47,9 @@ $stepper-step-content-transition:               height .3s ease-in-out !default;
 
 $stepper-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start stepper-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $stepper-tokens: defaults(
   (
     --#{$prefix}stepper-steps-gap: #{$stepper-steps-gap},
@@ -88,6 +89,8 @@ $stepper-tokens: defaults(
   $stepper-tokens
 );
 // scss-docs-end stepper-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .stepper {
     @include tokens($stepper-tokens);

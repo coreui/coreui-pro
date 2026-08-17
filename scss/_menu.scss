@@ -49,9 +49,10 @@ $menu-transition-timing:        cubic-bezier(.22, 1, .36, 1) !default;
 
 $menu-tokens: () !default;
 
-// scss-docs-start menu-css-vars
 // stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start menu-css-vars
 $menu-tokens: defaults(
   (
     --#{$prefix}menu-zindex: #{$menu-zindex},
@@ -88,8 +89,10 @@ $menu-tokens: defaults(
   ),
   $menu-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end menu-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 @layer components {
   .menu {

@@ -59,8 +59,9 @@ $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !defau
 
 $nav-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start nav-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $nav-tokens: defaults(
   (
     --#{$prefix}nav-link-padding-x: #{$nav-link-padding-x},
@@ -75,10 +76,13 @@ $nav-tokens: defaults(
 );
 // scss-docs-end nav-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $nav-tabs-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start nav-tabs-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $nav-tabs-tokens: defaults(
   (
     --#{$prefix}nav-tabs-border-width: #{$nav-tabs-border-width},
@@ -93,10 +97,13 @@ $nav-tabs-tokens: defaults(
 );
 // scss-docs-end nav-tabs-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $nav-pills-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start nav-pills-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $nav-pills-tokens: defaults(
   (
     --#{$prefix}nav-pills-border-radius: #{$nav-pills-border-radius},
@@ -107,10 +114,13 @@ $nav-pills-tokens: defaults(
 );
 // scss-docs-end nav-pills-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $nav-underline-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start nav-underline-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $nav-underline-tokens: defaults(
   (
     --#{$prefix}nav-underline-gap: #{$nav-underline-gap},
@@ -121,10 +131,13 @@ $nav-underline-tokens: defaults(
 );
 // scss-docs-end nav-underline-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $nav-underline-border-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start nav-underline-border-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $nav-underline-border-tokens: defaults(
   (
     --#{$prefix}nav-underline-border-gap: #{$nav-underline-border-gap},
@@ -139,6 +152,8 @@ $nav-underline-border-tokens: defaults(
   $nav-underline-border-tokens
 );
 // scss-docs-end nav-underline-border-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   // Base class
   //

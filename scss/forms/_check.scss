@@ -32,9 +32,10 @@ $check-sizes: (
 
 $check-tokens: () !default;
 
-// scss-docs-start check-css-vars
 // stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
-// stylelint-disable-next-line scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start check-css-vars
 $check-tokens: defaults(
   (
     --#{$prefix}check-size: #{$check-size},
@@ -57,8 +58,10 @@ $check-tokens: defaults(
   ),
   $check-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end check-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;

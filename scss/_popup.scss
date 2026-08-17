@@ -16,9 +16,10 @@ $popup-transition-duration: .15s !default;
 $popup-transition-timing:   cubic-bezier(.22, 1, .36, 1) !default;
 // scss-docs-end popup-variables
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start popup-tokens
 $popup-tokens: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $popup-tokens: defaults(
   (
     --#{$prefix}popup-zindex: #{$popup-zindex},
@@ -33,6 +34,8 @@ $popup-tokens: defaults(
   $popup-tokens
 );
 // scss-docs-end popup-tokens
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   // The floating surface of the field components — one chrome for the pickers'

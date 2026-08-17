@@ -22,8 +22,9 @@ $tooltip-arrow-height:              .4rem !default;
 
 $tooltip-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start tooltip-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $tooltip-tokens: defaults(
   (
     --#{$prefix}tooltip-zindex: #{$zindex-tooltip},
@@ -42,6 +43,8 @@ $tooltip-tokens: defaults(
   $tooltip-tokens
 );
 // scss-docs-end tooltip-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   // Base class
   .tooltip {

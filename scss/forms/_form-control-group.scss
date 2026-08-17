@@ -20,12 +20,13 @@ $form-control-group-action-bg:        transparent !default;
 $form-control-group-action-hover-bg:  var(--#{$prefix}tertiary-bg) !default;
 // scss-docs-end form-control-group-variables
 
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-control-group-tokens
 // The frame itself runs on the shared --#{$prefix}control-* namespace, so only
 // the parts the group owns get their own properties.
 $form-control-group-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-control-group-tokens: defaults(
   (
     --#{$prefix}control-group-gap: #{$form-control-group-gap},
@@ -41,8 +42,10 @@ $form-control-group-tokens: defaults(
   ),
   $form-control-group-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-control-group-tokens
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 // scss-docs-start form-control-group-active-mixin
 // "This control is the one being operated" — colour, fill and border, with no

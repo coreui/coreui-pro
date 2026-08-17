@@ -21,9 +21,10 @@ $form-floating-label-disabled-color:    $gray-600 !default;
 $form-floating-transition:              opacity .1s ease-in-out, transform .1s ease-in-out !default;
 // scss-docs-end form-floating-variables
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-floating-tokens
 $form-floating-tokens: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-floating-tokens: defaults(
   (
     --#{$prefix}form-floating-height: #{$form-floating-height},
@@ -41,6 +42,8 @@ $form-floating-tokens: defaults(
   $form-floating-tokens
 );
 // scss-docs-end form-floating-tokens
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer forms {
   .form-floating {

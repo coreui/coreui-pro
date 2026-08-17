@@ -22,8 +22,9 @@ $breadcrumb-border-radius:          null !default;
 
 $breadcrumb-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start breadcrumb-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $breadcrumb-tokens: defaults(
   (
     --#{$prefix}breadcrumb-padding-x: #{$breadcrumb-padding-x},
@@ -39,6 +40,8 @@ $breadcrumb-tokens: defaults(
   $breadcrumb-tokens
 );
 // scss-docs-end breadcrumb-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .breadcrumb {
     @include tokens($breadcrumb-tokens);

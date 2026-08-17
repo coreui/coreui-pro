@@ -61,8 +61,9 @@ $range-slider-vertical-track-height:       10rem !default;
 
 $range-slider-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start range-slider-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $range-slider-tokens: defaults(
   (
     --#{$prefix}range-slider-track-width: #{$range-slider-track-width},
@@ -106,10 +107,13 @@ $range-slider-tokens: defaults(
 );
 // scss-docs-end range-slider-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $range-slider-vertical-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start range-slider-vertical-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $range-slider-vertical-tokens: defaults(
   (
     --#{$prefix}range-slider-vertical-track-width: #{$range-slider-vertical-track-width},
@@ -118,6 +122,8 @@ $range-slider-vertical-tokens: defaults(
   $range-slider-vertical-tokens
 );
 // scss-docs-end range-slider-vertical-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .range-slider {
     @include tokens($range-slider-tokens);

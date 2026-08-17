@@ -34,8 +34,9 @@ $offcanvas-backdrop-opacity:        $modal-backdrop-opacity !default;
 
 $offcanvas-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start offcanvas-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $offcanvas-tokens: defaults(
   (
     --#{$prefix}offcanvas-zindex: #{$zindex-offcanvas},
@@ -57,6 +58,8 @@ $offcanvas-tokens: defaults(
   $offcanvas-tokens
 );
 // scss-docs-end offcanvas-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   %offcanvas-css-vars {
     @include tokens($offcanvas-tokens);

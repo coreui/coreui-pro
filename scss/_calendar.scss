@@ -63,8 +63,9 @@ $calendar-cell-week-number-color:            var(--#{$prefix}secondary-color) !d
 
 $calendar-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start calendar-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $calendar-tokens: defaults(
   (
     --#{$prefix}calendar-table-margin: #{$calendar-table-margin},
@@ -108,6 +109,8 @@ $calendar-tokens: defaults(
   $calendar-tokens
 );
 // scss-docs-end calendar-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .calendar {
     @include tokens($calendar-tokens);

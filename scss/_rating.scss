@@ -21,8 +21,9 @@ $rating-item-icon:             url("data:image/svg+xml,%3Csvg xmlns='http://www.
 
 $rating-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start rating-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $rating-tokens: defaults(
   (
     --#{$prefix}rating-gap: #{$rating-gap},
@@ -36,6 +37,8 @@ $rating-tokens: defaults(
   $rating-tokens
 );
 // scss-docs-end rating-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .rating {
     @include tokens($rating-tokens);

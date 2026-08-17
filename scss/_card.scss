@@ -30,8 +30,9 @@ $card-group-margin:                 $grid-gutter-width * .5 !default;
 
 $card-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start card-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $card-tokens: defaults(
   (
     --#{$prefix}card-spacer-y: #{$card-spacer-y},
@@ -57,6 +58,8 @@ $card-tokens: defaults(
   $card-tokens
 );
 // scss-docs-end card-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   //
   // Base styles

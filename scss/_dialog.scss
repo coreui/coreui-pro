@@ -41,9 +41,10 @@ $dialog-footer-border-width:        var(--#{$prefix}border-width) !default;
 $dialog-footer-gap:                 .5rem !default;
 // scss-docs-end dialog-variables
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start dialog-sizes
 $dialog-sizes: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $dialog-sizes: defaults(
   (
     sm: 280px,
@@ -54,10 +55,13 @@ $dialog-sizes: defaults(
 );
 // scss-docs-end dialog-sizes
 
+// stylelint-enable scss/dollar-variable-default
+
 $dialog-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start dialog-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $dialog-tokens: defaults(
   (
     --#{$prefix}dialog-zindex: #{$zindex-modal},
@@ -86,6 +90,8 @@ $dialog-tokens: defaults(
   $dialog-tokens
 );
 // scss-docs-end dialog-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   .dialog {

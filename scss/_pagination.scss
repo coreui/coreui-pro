@@ -48,8 +48,9 @@ $pagination-border-radius-lg:       var(--#{$prefix}border-radius-lg) !default;
 
 $pagination-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start pagination-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $pagination-tokens: defaults(
   (
     --#{$prefix}pagination-padding-x: #{$pagination-padding-x},
@@ -76,6 +77,8 @@ $pagination-tokens: defaults(
   $pagination-tokens
 );
 // scss-docs-end pagination-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .pagination {
     @include tokens($pagination-tokens);

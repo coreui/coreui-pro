@@ -28,8 +28,9 @@ $callout-variants: (
 
 $callout-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start callout-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $callout-tokens: defaults(
   (
     --#{$prefix}callout-padding-x: #{$callout-padding-x},
@@ -44,6 +45,8 @@ $callout-tokens: defaults(
   $callout-tokens
 );
 // scss-docs-end callout-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .callout {
     @include tokens($callout-tokens);

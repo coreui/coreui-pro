@@ -40,8 +40,9 @@ $search-button-placeholder-margin-inline:  .55rem 2rem !default;
 
 $search-button-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start search-button-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $search-button-tokens: defaults(
   (
     --#{$prefix}search-button-height: #{$search-button-height},
@@ -74,6 +75,8 @@ $search-button-tokens: defaults(
   $search-button-tokens
 );
 // scss-docs-end search-button-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .search-button {
     @include tokens($search-button-tokens);
