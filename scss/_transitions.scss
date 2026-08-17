@@ -1,9 +1,37 @@
+@use "functions/defaults" as *;
+@use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
 
+$fade-tokens: () !default;
+$collapse-tokens: () !default;
+
+// scss-docs-start fade-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$fade-tokens: defaults(
+  (
+    --#{$prefix}transition-fade-duration: #{$transition-fade-duration},
+    --#{$prefix}transition-fade-timing: #{$transition-fade-timing},
+  ),
+  $fade-tokens
+);
+// scss-docs-end fade-css-vars
+
+// scss-docs-start collapse-css-vars
+// stylelint-disable-next-line scss/dollar-variable-default
+$collapse-tokens: defaults(
+  (
+    --#{$prefix}transition-collapse-duration: #{$transition-collapse-duration},
+    --#{$prefix}transition-collapse-timing: #{$transition-collapse-timing},
+  ),
+  $collapse-tokens
+);
+// scss-docs-end collapse-css-vars
+
 @layer components {
   .fade {
-    @include transition($transition-fade);
+    @include tokens($fade-tokens);
+    @include transition(opacity var(--#{$prefix}transition-fade-duration) var(--#{$prefix}transition-fade-timing));
 
     &:not(.show) {
       opacity: 0;
@@ -18,14 +46,16 @@
   }
 
   .collapsing {
+    @include tokens($collapse-tokens);
+
     height: 0;
     overflow: hidden;
-    @include transition($transition-collapse);
+    @include transition(height var(--#{$prefix}transition-collapse-duration) var(--#{$prefix}transition-collapse-timing));
 
     &.collapse-horizontal {
       width: 0;
       height: auto;
-      @include transition($transition-collapse-width);
+      @include transition(width var(--#{$prefix}transition-collapse-duration) var(--#{$prefix}transition-collapse-timing));
     }
   }
   // scss-docs-end collapse-classes

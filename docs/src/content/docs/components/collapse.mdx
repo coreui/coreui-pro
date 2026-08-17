@@ -176,6 +176,12 @@ myCollapsible.addEventListener('hidden.coreui.collapse', event => {
 
 ## Customization
 
+### CSS variables
+
+The transition is declared on `.collapsing`, so overriding these on an ancestor retimes every collapse below it.
+
+<ScssDocs file="scss/_transitions.scss" capture="collapse-css-vars" />
+
 ### SASS variables
 
 <ScssDocs file="scss/_config.scss" capture="collapse-transition" />
