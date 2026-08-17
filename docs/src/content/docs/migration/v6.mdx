@@ -247,6 +247,18 @@ finished, not whether the state changed.
 
 #### Avatar
 
+- **The avatar carries its own colours, and `.theme-{color}` tints it.**
+  `--cui-avatar-bg` and `--cui-avatar-color` are new: a bare avatar is a
+  neutral circle instead of a transparent one, and a `.theme-*` class puts the
+  theme colour behind the letters and the colour that reads on it in front of
+  them. The docs used to reach for `bg-{color}` plus a hand-picked `text-*`,
+  which fails WCAG AA on five of the six examples they shipped — measured 1.85
+  on `bg-warning text-white`, 2.94 on info, 3.50 on success, 3.69 on danger,
+  and 3.12 on `bg-secondary`, which carried no text colour at all. Every theme
+  colour now lands between 4.56 and 18.03. Background utilities keep working on
+  an avatar; they just no longer have to.
+- **New: `.avatar-subtle`**, a tinted avatar that keeps the theme colour in the
+  letters rather than behind them.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **One size token replaces the width/height pair.** `--cui-avatar-width` and
   `--cui-avatar-height` always carried the same value, in the base and in all
