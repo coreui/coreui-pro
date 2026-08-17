@@ -143,18 +143,12 @@ Different kinds of alert usually call for different icons. Put the matching SVG 
 
 ### Solid
 
-Add `.alert-solid` for a high-contrast alert. The background takes the theme color and the text takes the color that reads on it, so a yellow alert gets dark text and a dark one gets light text without you picking either. <AddedIn version="6.0.0" />
+<AddedIn version="6.0.0" />
+
+Add `.alert-solid` for a high-contrast alert. The background takes the theme color and the text takes the color that reads on it, so a yellow alert gets dark text and a dark one gets light text without you picking either.
 
 <Example code={getData('theme-colors').map((c) => `<div class="alert alert-solid alert-${c.name}" role="alert">
     Here's a straightforward example of solid ${c.name} alert—take a look!
-  </div>`)} />
-
-### Outline
-
-Add `.alert-outline` for an alert that carries a border and no fill. <AddedIn version="6.0.0" />
-
-<Example code={getData('theme-colors').map((c) => `<div class="alert alert-outline alert-${c.name}" role="alert">
-    Here's a straightforward example of outline ${c.name} alert—take a look!
   </div>`)} />
 
 ### Dismissing
@@ -162,10 +156,10 @@ Add `.alert-outline` for an alert that carries a border and no fill. <AddedIn ve
 Using the JavaScript plugin, you can remove any alert.
 
 - Ensure that you've loaded the Bootstrap alert plugin or the compiled CoreUI JavaScript.
-- Add a [close button](/components/close-button//) as a child of the alert. It is pushed to the end of the alert on its own — the `.alert-dismissible` class is no longer required. <AddedIn version="6.0.0" />
+- Add a [close button](/components/close-button//) as a child of the alert. It is pushed to the end of the alert on its own — the `.alert-dismissible` class is no longer required.
 - `.alert-dismissible` no longer carries any styling. Markup that still has it renders the same, so there is nothing to remove, but the close button has to be a direct child of the alert to be pushed to its end — a button nested in a wrapper is laid out by that wrapper.
 - On the close button, include the `data-coreui-dismiss="alert"` attribute, which triggers the JavaScript functionality. You must use the `<button>` element with it for proper behavior across all devices.
-- Add the `.fade` and `.show` classes to animate the alert. It fades out when dismissed, and an alert added to the page while carrying them fades in on its own. <AddedIn version="6.0.0" />
+- Add the `.fade` and `.show` classes to animate the alert. It fades out when dismissed, and an alert added to the page while carrying them fades in on its own.
 
 You can observe this in action with a live demonstration:
 
