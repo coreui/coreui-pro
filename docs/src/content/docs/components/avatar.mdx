@@ -117,12 +117,13 @@ Add `.avatar-status` to show presence. The indicator takes its colour from a bac
     </div>
   </div>`} />
 
-The indicator carries no text, so it means nothing to a screen reader on its own. Where the state matters rather than decorates, put it in the markup as well:
+The indicator is a few pixels of colour and nothing else, so colour is the only thing separating one state from another — not enough on its own, and at this size a different shape would not help either. Where the state means something rather than decorates, name it on the indicator:
 
 ```html
 <span class="avatar-status bg-danger" role="img" aria-label="Busy"></span>
-<span class="visually-hidden">Busy</span>
 ```
+
+`role="img"` is what makes the name stick: `aria-label` on a bare `<span>` has no role to attach to, and assistive technology is free to ignore it.
 
 The ring around the indicator follows the page background through `--cui-avatar-status-border-color`, so it stays correct in dark mode.
 
