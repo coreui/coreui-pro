@@ -228,6 +228,32 @@ finished, not whether the state changed.
   `--cui-theme-fg` / `-bg-subtle` / `-border` with the old primary values as the
   fallback, so an untouched accordion renders exactly as before.
 
+#### Avatar
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.avatar-img` fills the avatar and crops instead of stretching.** It was
+  `height: auto`, which deformed every image that was not square; it is now
+  `height: 100%` with `object-fit: cover`. Square images look the same.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The status indicator's ring follows the theme.** It was `1px solid $white`,
+  a hardcoded white that read as a mistake in dark mode. It now comes from
+  `--cui-avatar-status-border-color`, defaulting to the body background.
+- **The status indicator has states.** `.status-online`, `.status-away`,
+  `.status-busy` and `.status-offline` set the colour, and the last two square
+  the indicator off so the state survives without colour. A background utility
+  still works for a state of your own.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A stacked avatar lifts on hover instead of pushing its neighbours.** The
+  hover changed `margin-inline-end`, which moved every avatar after it; it now
+  uses `transform`, so nothing else shifts. `$avatar-transition` changes from
+  `margin .15s` to `transform .15s ease-in-out` accordingly.
+
+#### Alert
+
+- **An `<hr>` inside an alert takes the variant's border colour.** The alert
+  redeclares `--cui-hr-border-color`, so a separator in a `.alert-success` is
+  green rather than the page's neutral grey.
+
 #### Autocomplete and Multi Select share one options menu
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

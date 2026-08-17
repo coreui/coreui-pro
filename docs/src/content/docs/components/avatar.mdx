@@ -96,16 +96,42 @@ Display multiple avatars in a stack to represent a group of users or items, with
 
 ## Avatars with status
 
-Add a status indicator to avatars using the .avatar-status class to show online or offline status.
+Add `.avatar-status` to show presence, and one of the state classes to say which state it is. **Offline and busy are squared off**, so the state is still readable where the colour is not — for a viewer with a colour vision deficiency, or on a monochrome print.
 
-<Example code={`<div class="avatar">
-    <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
-    <span class="avatar-status bg-success"></span>
-  </div>
-  <div class="avatar bg-secondary">
-    CUI
-    <span class="avatar-status bg-danger"></span>
+<Example code={`<div class="d-flex gap-3">
+    <div class="avatar">
+      <img class="avatar-img" src="/assets/img/avatars/1.jpg" alt="user@email.com">
+      <span class="avatar-status status-online"></span>
+    </div>
+    <div class="avatar bg-secondary">
+      CUI
+      <span class="avatar-status status-away"></span>
+    </div>
+    <div class="avatar bg-secondary">
+      CUI
+      <span class="avatar-status status-busy"></span>
+    </div>
+    <div class="avatar bg-secondary">
+      CUI
+      <span class="avatar-status status-offline"></span>
+    </div>
   </div>`} />
+
+| Class | Meaning |
+| --- | --- |
+| `.status-online` | Available |
+| `.status-away` | Idle |
+| `.status-busy` | Do not disturb — squared |
+| `.status-offline` | Not connected — squared |
+
+The indicator carries no text, so it means nothing to a screen reader on its own. Where the state matters, put it in the markup as well:
+
+```html
+<span class="avatar-status status-busy"></span>
+<span class="visually-hidden">Busy</span>
+```
+
+A background utility still works for a state of your own: `<span class="avatar-status bg-info"></span>`.
 
 ## Customizing
 

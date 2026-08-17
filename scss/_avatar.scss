@@ -16,7 +16,18 @@ $avatar-border-radius:         50em !default;
 $avatar-status-width:          .5rem !default;
 $avatar-status-height:         .5rem !default;
 $avatar-status-border-radius:  50em !default;
-$avatar-transition:            margin .15s !default;
+$avatar-status-border-width:   1px !default;
+$avatar-status-border-color:   var(--#{$prefix}body-bg) !default;
+$avatar-status-bg:             var(--#{$prefix}secondary) !default;
+$avatar-status-online-bg:      var(--#{$prefix}success) !default;
+$avatar-status-busy-bg:        var(--#{$prefix}danger) !default;
+$avatar-status-away-bg:        var(--#{$prefix}warning) !default;
+$avatar-status-offline-bg:     var(--#{$prefix}secondary) !default;
+// Offline and busy are squared off, so the state is still readable where the
+// colour is not.
+$avatar-status-squared-border-radius: 20% !default;
+$avatar-stack-hover-transform: translateY(-2px) !default;
+$avatar-transition:            transform .15s ease-in-out !default;
 
 $avatar-sizes: (
   sm: (
@@ -73,6 +84,9 @@ $avatar-tokens: defaults(
     --#{$prefix}avatar-status-width: #{$avatar-status-width},
     --#{$prefix}avatar-status-height: #{$avatar-status-height},
     --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
+    --#{$prefix}avatar-status-border-width: #{$avatar-status-border-width},
+    --#{$prefix}avatar-status-border-color: #{$avatar-status-border-color},
+    --#{$prefix}avatar-status-bg: #{$avatar-status-bg},
   ),
   $avatar-tokens
 );
@@ -95,7 +109,8 @@ $avatar-tokens: defaults(
 
   .avatar-img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     @include border-radius(var(--#{$prefix}avatar-border-radius));
   }
 
@@ -106,8 +121,27 @@ $avatar-tokens: defaults(
     display: block;
     width: var(--#{$prefix}avatar-status-width);
     height: var(--#{$prefix}avatar-status-height);
-    border: 1px solid $white;
+    background-color: var(--#{$prefix}avatar-status-bg);
+    border: var(--#{$prefix}avatar-status-border-width) solid var(--#{$prefix}avatar-status-border-color);
     @include border-radius(var(--#{$prefix}avatar-status-border-radius));
+
+    &.status-online {
+      --#{$prefix}avatar-status-bg: #{$avatar-status-online-bg};
+    }
+
+    &.status-away {
+      --#{$prefix}avatar-status-bg: #{$avatar-status-away-bg};
+    }
+
+    &.status-busy {
+      --#{$prefix}avatar-status-bg: #{$avatar-status-busy-bg};
+      --#{$prefix}avatar-status-border-radius: #{$avatar-status-squared-border-radius};
+    }
+
+    &.status-offline {
+      --#{$prefix}avatar-status-bg: #{$avatar-status-offline-bg};
+      --#{$prefix}avatar-status-border-radius: #{$avatar-status-squared-border-radius};
+    }
   }
 
   @each $size, $map in $avatar-sizes {
@@ -126,8 +160,11 @@ $avatar-tokens: defaults(
     .avatar {
       margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-width)); // stylelint-disable-line function-disallowed-list
 
+      // Lifted rather than pulled apart: changing the margin here moves every
+      // avatar after this one.
       &:hover {
-        margin-inline-end: 0;
+        z-index: 1;
+        transform: #{$avatar-stack-hover-transform};
       }
     }
   }
