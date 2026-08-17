@@ -227,6 +227,15 @@ finished, not whether the state changed.
 - **`.theme-{color}` tints the open items.** The active tokens resolve through
   `--cui-theme-fg` / `-bg-subtle` / `-border` with the old primary values as the
   fallback, so an untouched accordion renders exactly as before.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-accordion-inner-border-radius` is gone; the header's corners follow
+  `--cui-accordion-border-radius`.** The token was computed from the global
+  `--cui-border-radius` when the stylesheet was built, so setting
+  `--cui-accordion-border-radius` rounded the item while the header inside kept
+  the page's default radius. The two corners are subtracted where they are
+  used — `calc(var(--cui-accordion-border-radius) - var(--cui-accordion-border-width))`
+  — so one token now shapes the whole item. Defaults render as before; drop any
+  override of the removed variable.
 
 #### Avatar
 
