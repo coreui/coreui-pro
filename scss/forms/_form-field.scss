@@ -9,8 +9,9 @@ $form-field-column-gap:     .5rem !default;
 
 $form-field-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-field-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-field-tokens: defaults(
   (
     --#{$prefix}form-field-gap: #{$form-field-gap},
@@ -19,6 +20,8 @@ $form-field-tokens: defaults(
   $form-field-tokens
 );
 // scss-docs-end form-field-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;

@@ -40,9 +40,10 @@ $form-otp-control-font-size-lg:        $input-font-size-lg !default;
 $form-otp-control-border-radius-lg:    $input-border-radius-lg !default;
 // scss-docs-end form-otp-variables
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-otp-tokens
 $form-otp-tokens: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-otp-tokens: defaults(
   (
     --#{$prefix}form-otp-gap: #{$form-otp-gap},
@@ -51,12 +52,15 @@ $form-otp-tokens: defaults(
 );
 // scss-docs-end form-otp-tokens
 
+// stylelint-enable scss/dollar-variable-default
+
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-otp-control-tokens
 // .form-otp-control is the input itself, so it carries the shared control
 // tokens rather than inheriting them from the .form-otp wrapper.
 $form-otp-control-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-otp-control-tokens: defaults(
   (
     --#{$prefix}control-padding-y: #{$form-otp-control-padding-y},
@@ -80,8 +84,10 @@ $form-otp-control-tokens: defaults(
   ),
   $form-otp-control-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-otp-control-tokens
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 @layer forms {
   .form-otp {

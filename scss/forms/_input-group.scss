@@ -14,13 +14,14 @@ $input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
 $input-group-addon-border-color:        $input-border-color !default;
 // scss-docs-end input-group-variables
 
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start input-group-tokens
 // The addon matches the text controls it sits next to, so its sizing lives in
 // the shared --#{$prefix}control-* namespace; only the addon-specific looks
 // keep the --#{$prefix}input-group-addon-* names.
 $input-group-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
 $input-group-tokens: defaults(
   (
     --#{$prefix}control-padding-y: #{$input-group-addon-padding-y},
@@ -36,8 +37,10 @@ $input-group-tokens: defaults(
   ),
   $input-group-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end input-group-tokens
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 @layer forms {
   //

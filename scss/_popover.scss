@@ -37,8 +37,9 @@ $popover-arrow-outer-color:         var(--#{$prefix}border-color-translucent) !d
 
 $popover-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start popover-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $popover-tokens: defaults(
   (
     --#{$prefix}popover-zindex: #{$zindex-popover},
@@ -65,6 +66,8 @@ $popover-tokens: defaults(
   $popover-tokens
 );
 // scss-docs-end popover-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .popover {
     @include tokens($popover-tokens);

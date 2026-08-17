@@ -31,8 +31,9 @@ $avatar-sizes: (
 
 $avatar-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start avatar-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $avatar-tokens: defaults(
   (
     --#{$prefix}avatar-size: #{$avatar-size},
@@ -45,6 +46,8 @@ $avatar-tokens: defaults(
   $avatar-tokens
 );
 // scss-docs-end avatar-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .avatar {
     @include tokens($avatar-tokens);

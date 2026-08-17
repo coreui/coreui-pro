@@ -20,9 +20,10 @@ $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/
 
 $radio-tokens: () !default;
 
-// scss-docs-start radio-css-vars
 // stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
-// stylelint-disable-next-line scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start radio-css-vars
 $radio-tokens: defaults(
   (
     --#{$prefix}radio-size: #{$radio-size},
@@ -42,8 +43,10 @@ $radio-tokens: defaults(
   ),
   $radio-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end radio-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;

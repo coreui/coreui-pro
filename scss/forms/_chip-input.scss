@@ -31,13 +31,14 @@ $chip-input-border-radius-lg:  var(--#{$prefix}border-radius-lg) !default;
 $chip-input-gap-lg:            .5rem !default;
 // scss-docs-end chip-input-variables
 
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start chip-input-css-vars
 // The frame — padding, typography, colors, border, transition — is the shared
 // text-control appearance, so it goes in the --#{$prefix}control-* namespace;
 // min-height and gap are the only chip-input-specific knobs.
 $chip-input-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
 $chip-input-tokens: defaults(
   (
     --#{$prefix}chip-input-min-height: #{$chip-input-min-height},
@@ -54,8 +55,10 @@ $chip-input-tokens: defaults(
   ),
   $chip-input-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end chip-input-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 @layer forms {
   // The frame, the focus and the disabled treatment come from

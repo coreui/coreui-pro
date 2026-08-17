@@ -39,8 +39,9 @@ $drawer-sheet-width:                760px !default;
 
 $drawer-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start drawer-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $drawer-tokens: defaults(
   (
     --#{$prefix}drawer-inset: #{$drawer-inset},
@@ -64,6 +65,8 @@ $drawer-tokens: defaults(
   $drawer-tokens
 );
 // scss-docs-end drawer-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   %drawer-css-vars {
     @include tokens($drawer-tokens);

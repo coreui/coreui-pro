@@ -8,8 +8,9 @@ $chip-set-gap: .25rem !default;
 
 $chip-set-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start chip-set-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $chip-set-tokens: defaults(
   (
     --#{$prefix}chip-set-gap: #{$chip-set-gap},
@@ -17,6 +18,8 @@ $chip-set-tokens: defaults(
   $chip-set-tokens
 );
 // scss-docs-end chip-set-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .chip-set {
     @include tokens($chip-set-tokens);

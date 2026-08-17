@@ -60,8 +60,9 @@ $modal-transition-timing:           ease-out !default;
 
 $modal-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start modal-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $modal-tokens: defaults(
   (
     --#{$prefix}modal-zindex: #{$zindex-modal},
@@ -93,6 +94,8 @@ $modal-tokens: defaults(
   $modal-tokens
 );
 // scss-docs-end modal-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   // Scroll lock while any modal <dialog> (Modal or Offcanvas) is open. Both

@@ -16,12 +16,13 @@ $form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default;
 $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 // scss-docs-end form-file-variables
 
+// stylelint-disable custom-property-no-missing-var-function
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-control-tokens
 // The --#{$prefix}control-* namespace is shared by every form control, so a
 // control never has to read another component's Sass variables to line up.
 $form-control-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-control-tokens: defaults(
   (
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
@@ -52,8 +53,10 @@ $form-control-tokens: defaults(
   ),
   $form-control-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-control-tokens
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 // scss-docs-start form-control-frame-mixin
 // The visual frame of a control, without the layout. `.form-control` is one
@@ -99,9 +102,10 @@ $form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='h
 // scss-docs-end form-control-select-dark-variables
 
 $form-control-select-tokens: () !default;
-// scss-docs-start form-control-select-tokens
 // stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable-next-line scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start form-control-select-tokens
 $form-control-select-tokens: defaults(
   (
     --#{$prefix}control-select-bg-img: #{escape-svg($form-control-select-indicator)},
@@ -112,8 +116,10 @@ $form-control-select-tokens: defaults(
   ),
   $form-control-select-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function
 // scss-docs-end form-control-select-tokens
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function
 
 @layer forms {
   //

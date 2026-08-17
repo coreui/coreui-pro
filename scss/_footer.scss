@@ -15,8 +15,9 @@ $footer-border-color:  var(--#{$prefix}border-color) !default;
 
 $footer-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start footer-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $footer-tokens: defaults(
   (
     --#{$prefix}footer-min-height: #{$footer-min-height},
@@ -30,6 +31,8 @@ $footer-tokens: defaults(
   $footer-tokens
 );
 // scss-docs-end footer-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .footer {
     @include tokens($footer-tokens);

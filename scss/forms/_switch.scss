@@ -46,9 +46,10 @@ $switch-sizes: (
 
 $switch-tokens: () !default;
 
-// scss-docs-start switch-css-vars
 // stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
-// stylelint-disable-next-line scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start switch-css-vars
 $switch-tokens: defaults(
   (
     --#{$prefix}switch-width: calc(var(--#{$prefix}switch-height) * #{$switch-aspect-ratio}),
@@ -78,8 +79,10 @@ $switch-tokens: defaults(
   ),
   $switch-tokens
 );
-// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 // scss-docs-end switch-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
 
 // The v5 spelling is an alias of this control rather than a second
 // implementation, so it is part of its selector list;

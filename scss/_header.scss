@@ -52,8 +52,9 @@ $header-divider-border-color:   var(--#{$prefix}border-color) !default;
 
 $header-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start header-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $header-tokens: defaults(
   (
     --#{$prefix}header-padding-x: #{$header-padding-x},
@@ -85,6 +86,8 @@ $header-tokens: defaults(
   $header-tokens
 );
 // scss-docs-end header-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .header {
     @include tokens($header-tokens);

@@ -6,8 +6,9 @@
 $fade-tokens: () !default;
 $collapse-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start fade-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $fade-tokens: defaults(
   (
     --#{$prefix}transition-fade-duration: #{$transition-fade-duration},
@@ -17,8 +18,11 @@ $fade-tokens: defaults(
 );
 // scss-docs-end fade-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start collapse-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $collapse-tokens: defaults(
   (
     --#{$prefix}transition-collapse-duration: #{$transition-collapse-duration},
@@ -27,6 +31,8 @@ $collapse-tokens: defaults(
   $collapse-tokens
 );
 // scss-docs-end collapse-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   .fade {

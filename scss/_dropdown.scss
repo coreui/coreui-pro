@@ -58,8 +58,9 @@ $dropdown-dark-header-color:        $gray-500 !default;
 
 $dropdown-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start dropdown-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $dropdown-tokens: defaults(
   (
     --#{$prefix}dropdown-zindex: #{$zindex-dropdown},
@@ -93,10 +94,13 @@ $dropdown-tokens: defaults(
 );
 // scss-docs-end dropdown-css-vars
 
+// stylelint-enable scss/dollar-variable-default
+
 $dropdown-dark-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start dropdown-dark-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $dropdown-dark-tokens: defaults(
   (
     --#{$prefix}dropdown-color: #{$dropdown-dark-color},
@@ -115,6 +119,8 @@ $dropdown-dark-tokens: defaults(
   $dropdown-dark-tokens
 );
 // scss-docs-end dropdown-dark-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   // The dropdown wrapper (`<div>`)
   .dropup,

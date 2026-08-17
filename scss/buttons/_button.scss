@@ -86,12 +86,13 @@ $btn-lightness-overrides: (
   "dark": ("hover": 1.48, "active": 1.62)
 ) !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start btn-variants
 // Each variant maps a button token to a --#{$prefix}theme-* token, so one set of
 // rules serves every theme color. Hover and active are derived in CSS from the
 // same token, which is what lets a custom theme color work without Sass.
 $button-variants: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $button-variants: defaults(
   (
     "solid": (
@@ -113,6 +114,8 @@ $button-variants: defaults(
   $button-variants
 );
 // scss-docs-end btn-variants
+
+// stylelint-enable scss/dollar-variable-default
 
 // scss-docs-start btn-variant-mixin
 @mixin button-variant($variant, $hover-lightness: $btn-hover-lightness, $active-lightness: $btn-active-lightness) {

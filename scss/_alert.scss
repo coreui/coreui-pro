@@ -21,8 +21,9 @@ $alert-dismissible-padding-r:   $alert-padding-x * 3 !default; // 3x covers widt
 
 $alert-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start alert-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $alert-tokens: defaults(
   (
     --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, transparent),
@@ -41,6 +42,8 @@ $alert-tokens: defaults(
   $alert-tokens
 );
 // scss-docs-end alert-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   .alert {

@@ -35,8 +35,9 @@ $list-group-action-active-bg:       var(--#{$prefix}secondary-bg) !default;
 
 $list-group-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start list-group-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $list-group-tokens: defaults(
   (
     --#{$prefix}list-group-color: #{$list-group-color},
@@ -60,6 +61,8 @@ $list-group-tokens: defaults(
   $list-group-tokens
 );
 // scss-docs-end list-group-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   // Base class
   //

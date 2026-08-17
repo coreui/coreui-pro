@@ -13,8 +13,9 @@ $hover-lift-box-shadow:          var(--#{$prefix}box-shadow-lg) !default;
 
 $hover-lift-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start hover-lift-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $hover-lift-tokens: defaults(
   (
     --#{$prefix}hover-lift-transition-duration: #{$hover-lift-transition-duration},
@@ -25,6 +26,8 @@ $hover-lift-tokens: defaults(
   $hover-lift-tokens
 );
 // scss-docs-end hover-lift-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer helpers {
   //

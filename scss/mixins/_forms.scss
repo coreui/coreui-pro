@@ -23,11 +23,12 @@ $form-feedback-tooltip-opacity:       .9 !default;
 $form-feedback-tooltip-border-radius: var(--#{$prefix}border-radius) !default;
 // scss-docs-end tooltip-feedback-variables
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-feedback-tokens
 // Geometry of the feedback and tooltip elements. They are siblings of the
 // control rather than descendants, so they carry their own tokens.
 $form-feedback-tokens: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-feedback-tokens: defaults(
   (
     --#{$prefix}form-feedback-margin-top: #{$form-feedback-margin-top},
@@ -42,6 +43,10 @@ $form-feedback-tokens: defaults(
   $form-feedback-tokens
 );
 // scss-docs-end form-feedback-tokens
+
+// stylelint-enable scss/dollar-variable-default
+
+// stylelint-disable scss/at-function-named-arguments
 
 // scss-docs-start form-validation-mixins
 @mixin form-validation-state-selector($state) {
@@ -70,7 +75,6 @@ $form-feedback-tokens: defaults(
 
 // The v5 spelling is an alias of the controls rather than a second
 // implementation; `$enable-deprecated-form-check: false` compiles it out.
-// stylelint-disable-next-line scss/at-function-named-arguments
 $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
 
 @mixin form-validation-state(
@@ -270,3 +274,5 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   }
 }
 // scss-docs-end form-validation-mixins
+
+// stylelint-enable scss/at-function-named-arguments

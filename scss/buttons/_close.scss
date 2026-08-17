@@ -24,8 +24,9 @@ $btn-close-filter-dark:      invert(1) grayscale(100%) brightness(200%) !default
 
 $close-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start close-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $close-tokens: defaults(
   (
     --#{$prefix}btn-close-color: #{$btn-close-color},
@@ -39,6 +40,8 @@ $close-tokens: defaults(
   $close-tokens
 );
 // scss-docs-end close-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   // Transparent background and border properties included for button version.
   // iOS requires the button element instead of an anchor tag.

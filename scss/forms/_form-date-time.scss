@@ -10,13 +10,14 @@ $form-date-time-section-border-radius:   .25rem !default;
 $form-date-time-section-focus-bg:        color-mix(in srgb, var(--#{$prefix}primary) 25%, transparent) !default;
 // scss-docs-end form-date-time-variables
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start form-date-time-tokens
 // Only the section-level knobs live here. The frame is `.form-control` on the
 // same element, so its --#{$prefix}control-* tokens are already in scope and
 // must not be redeclared — that would shadow `.form-control` and validation
 // state overrides.
 $form-date-time-tokens: () !default;
-// stylelint-disable-next-line scss/dollar-variable-default
 $form-date-time-tokens: defaults(
   (
     --#{$prefix}form-date-time-placeholder-color: #{$form-date-time-placeholder-color},
@@ -26,6 +27,8 @@ $form-date-time-tokens: defaults(
   $form-date-time-tokens
 );
 // scss-docs-end form-date-time-tokens
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer forms {
   // A cleaner next to a section field only means something once the field holds

@@ -28,8 +28,9 @@ $toast-header-border-color:         $toast-border-color !default;
 
 $toast-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start toast-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $toast-tokens: defaults(
   (
     --#{$prefix}toast-zindex: #{$zindex-toast},
@@ -53,6 +54,8 @@ $toast-tokens: defaults(
   $toast-tokens
 );
 // scss-docs-end toast-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   .toast {
     @include tokens($toast-tokens);
