@@ -77,8 +77,7 @@ $alert-tokens: defaults(
   }
 
 
-  .alert:has(> .btn-close) > .btn-close,
-  .alert-dismissible > .btn-close {
+  .alert > .btn-close {
     margin-inline-start: auto;
   }
 
