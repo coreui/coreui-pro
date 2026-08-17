@@ -392,7 +392,7 @@ CoreUI for Bootstrap does not officially support third-party JavaScript librarie
 
 ### jQuery events
 
-CoreUI for Bootstrap will detect jQuery if `jQuery` is present in the `window` object and there is no `data-coreui-no-jquery` attribute set on `<body>`. If jQuery is found, CoreUI for Bootstrap will emit events thanks to jQuery's event system. So if you want to listen to CoreUI for Bootstrap's events, you'll have to use the jQuery methods (`.on`, `.one`) instead of `addEventListener`.
+CoreUI for Bootstrap will detect jQuery if `jQuery` is present in the `window` object and there is no `data-coreui-no-jquery` attribute set on `<body>`. If jQuery is found, CoreUI for Bootstrap will emit events thanks to jQuery's event system. The events are dispatched natively as well, so `addEventListener` keeps working; jQuery's methods (`.on`, `.one`) are an additional way to reach them, not a replacement. A jQuery handler that calls `stopImmediatePropagation()` is the one case that stops the native listeners from running.
 
 ```js
 $('#myTab a').on('shown.coreui.tab', () => {
