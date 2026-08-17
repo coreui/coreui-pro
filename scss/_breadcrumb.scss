@@ -78,4 +78,20 @@ $breadcrumb-tokens: defaults(
       color: var(--#{$prefix}breadcrumb-item-active-color);
     }
   }
+
+  .breadcrumb-divider {
+    display: flex;
+    align-items: center;
+    padding-inline: var(--#{$prefix}breadcrumb-item-padding-x);
+    color: var(--#{$prefix}breadcrumb-divider-color);
+
+    &:empty::before {
+      @include ltr-rtl(
+        "content",
+        var(--#{$prefix}breadcrumb-divider, escape-svg($breadcrumb-divider)),
+        null,
+        var(--#{$prefix}breadcrumb-divider-flipped, escape-svg($breadcrumb-divider-flipped))
+      );
+    }
+  }
 }
