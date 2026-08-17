@@ -231,6 +231,23 @@ finished, not whether the state changed.
 #### Avatar
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **One size token replaces the width/height pair.** `--cui-avatar-width` and
+  `--cui-avatar-height` always carried the same value, in the base and in all
+  four size classes, so setting a size meant writing it twice. They become
+  `--cui-avatar-size`, and `--cui-avatar-status-width` / `-height` become
+  `--cui-avatar-status-size` the same way.
+
+  The label is derived from it — `calc(var(--cui-avatar-size) * .4)` — rather
+  than listed per size. That ratio is what every size already used, so nothing
+  renders differently; `--cui-avatar-font-size` still overrides it where a
+  size needs its own.
+
+  The Sass variables follow: `$avatar-width` / `$avatar-height` /
+  `$avatar-font-size` / `$avatar-status-width` / `$avatar-status-height` become
+  `$avatar-size` / `$avatar-status-size` plus `$avatar-font-size-ratio`, and
+  `$avatar-sizes` keys drop to `size` and an optional `status-size`. The
+  `$avatar-widths` map, deprecated since 5.1.0, is gone.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`.avatar-img` fills the avatar and crops instead of stretching.** It was
   `height: auto`, which deformed every image that was not square; it is now
   `height: 100%` with `object-fit: cover`. Square images look the same.

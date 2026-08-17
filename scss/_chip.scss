@@ -143,8 +143,7 @@ $chip-outline-tokens: defaults(
     }
 
     .avatar {
-      --#{$prefix}avatar-width: var(--#{$prefix}chip-img-size);
-      --#{$prefix}avatar-height: var(--#{$prefix}chip-img-size);
+      --#{$prefix}avatar-size: var(--#{$prefix}chip-img-size);
 
       font-size: inherit;
 
