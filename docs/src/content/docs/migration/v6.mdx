@@ -267,6 +267,38 @@ finished, not whether the state changed.
   redeclares `--cui-hr-border-color`, so a separator in a `.alert-success` is
   green rather than the page's neutral grey.
 
+#### Badge
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Colour comes from `.theme-*`, and `.badge-*` now names the variant.** A bare
+  `.badge` used to be white text with no background of its own, so it was
+  invisible until a `.text-bg-*` utility supplied both. It renders neutral on
+  its own now — `--cui-badge-color` is `inherit` and `--cui-badge-bg` is
+  `--cui-secondary-bg` — and a `.theme-*` class colours it:
+  `<span class="badge theme-danger">`. The `.badge-*` namespace carries the
+  three variants instead: solid (default), `.badge-subtle` and
+  `.badge-outline`, each mapping the same theme roles.
+
+  `.text-bg-*` still works and still sets both properties, so existing markup
+  keeps rendering. Markup that paired `.badge` with a background utility alone
+  (`<span class="badge bg-danger">`) now shows the inherited text colour on
+  that background instead of white — swap it for `.theme-danger` or add a text
+  colour utility.
+
+- **The badge lays itself out.** `display` is `inline-flex` with
+  `--cui-badge-gap` between children and `--cui-badge-min-height` as the floor,
+  so an icon next to a label needs no spacing utility and badges keep one
+  height across a table or a list.
+
+- **The font size has a legibility floor.** `--cui-badge-font-size` is
+  `clamp(12px, .75em, .75em)`, so a badge inside small text stops shrinking at
+  12px while still scaling up with a larger parent.
+
+- **New: `--cui-badge-border-width` / `--cui-badge-border-color` (transparent),
+  `.badge-lg`, and a link reset.** The border tokens are what `.badge-outline`
+  switches, `.badge-lg` joins `.badge-sm` on the size scale, and `a.badge` no
+  longer inherits the underline from the reboot.
+
 #### Autocomplete and Multi Select share one options menu
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
