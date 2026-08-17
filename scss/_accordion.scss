@@ -51,8 +51,9 @@ $accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w
 
 $accordion-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
 // scss-docs-start accordion-css-vars
-// stylelint-disable-next-line scss/dollar-variable-default
 $accordion-tokens: defaults(
   (
     --#{$prefix}accordion-color: #{$accordion-color},
@@ -84,6 +85,9 @@ $accordion-tokens: defaults(
   $accordion-tokens
 );
 // scss-docs-end accordion-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+
 @layer components {
   //
   // Base styles
