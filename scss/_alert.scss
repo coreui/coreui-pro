@@ -34,6 +34,9 @@ $alert-tokens: defaults(
     --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color),
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
     --#{$prefix}alert-link-color: var(--#{$prefix}theme-fg, inherit),
+    // Redeclared inside the alert so an <hr> in its body takes the variant's
+    // border instead of staying the page's neutral grey.
+    --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
   ),
   $alert-tokens
 );

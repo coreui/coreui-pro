@@ -16,7 +16,10 @@ $avatar-border-radius:         50em !default;
 $avatar-status-width:          .5rem !default;
 $avatar-status-height:         .5rem !default;
 $avatar-status-border-radius:  50em !default;
-$avatar-transition:            margin .15s !default;
+$avatar-status-border-width:   1px !default;
+$avatar-status-border-color:   var(--#{$prefix}body-bg) !default;
+$avatar-stack-hover-transform: translateY(-2px) !default;
+$avatar-transition:            transform .15s ease-in-out !default;
 
 $avatar-sizes: (
   sm: (
@@ -73,6 +76,8 @@ $avatar-tokens: defaults(
     --#{$prefix}avatar-status-width: #{$avatar-status-width},
     --#{$prefix}avatar-status-height: #{$avatar-status-height},
     --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
+    --#{$prefix}avatar-status-border-width: #{$avatar-status-border-width},
+    --#{$prefix}avatar-status-border-color: #{$avatar-status-border-color},
   ),
   $avatar-tokens
 );
@@ -95,7 +100,8 @@ $avatar-tokens: defaults(
 
   .avatar-img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     @include border-radius(var(--#{$prefix}avatar-border-radius));
   }
 
@@ -106,7 +112,7 @@ $avatar-tokens: defaults(
     display: block;
     width: var(--#{$prefix}avatar-status-width);
     height: var(--#{$prefix}avatar-status-height);
-    border: 1px solid $white;
+    border: var(--#{$prefix}avatar-status-border-width) solid var(--#{$prefix}avatar-status-border-color);
     @include border-radius(var(--#{$prefix}avatar-status-border-radius));
   }
 
@@ -126,8 +132,11 @@ $avatar-tokens: defaults(
     .avatar {
       margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-width)); // stylelint-disable-line function-disallowed-list
 
+      // Lifted rather than pulled apart: changing the margin here moves every
+      // avatar after this one.
       &:hover {
-        margin-inline-end: 0;
+        z-index: 1;
+        transform: #{$avatar-stack-hover-transform};
       }
     }
   }
