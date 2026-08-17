@@ -64,21 +64,6 @@ Add a contextual `.theme-{color}` class to the `.accordion` to tint its **open**
     </details>
   </div>`} />
 
-## Sizes
-
-Padding and font size are single tokens shared by the header and the body, so one declaration resizes the whole control:
-
-<Example code={`<div class="accordion" style="--cui-accordion-padding-x: 2rem; --cui-accordion-font-size: 1.125rem">
-    <details class="accordion-item" name="accordionTokens" open>
-      <summary class="accordion-header">Accordion Item #1</summary>
-      <div class="accordion-body">Set <code>--cui-accordion-padding-x</code> once and both the header and the body follow.</div>
-    </details>
-    <details class="accordion-item" name="accordionTokens">
-      <summary class="accordion-header">Accordion Item #2</summary>
-      <div class="accordion-body">Override <code>--cui-accordion-btn-padding-x</code> or <code>--cui-accordion-body-padding-x</code> to give one part its own value.</div>
-    </details>
-  </div>`} />
-
 ## Nested
 
 Put a whole `.accordion` inside an `.accordion-body` to nest one. Give each level its own `name`, so the outer and inner groups open and close independently — `name` groups the `<details>` elements across the whole document, not per container.
