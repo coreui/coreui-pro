@@ -283,6 +283,17 @@ finished, not whether the state changed.
 - **An `<hr>` inside an alert takes the variant's border colour.** The alert
   redeclares `--cui-hr-border-color`, so a separator in a `.alert-success` is
   green rather than the page's neutral grey.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$alert-dismissible-padding-r` is gone; the space for the close button
+  follows `--cui-alert-padding-x`.** The variable was multiplied out in Sass
+  when the stylesheet was built, so raising `--cui-alert-padding-x` widened
+  three sides of a dismissible alert and left the fourth on the default: at
+  `2rem` the alert had 32px of padding and 48px of room for the button, which
+  also kept its own 16px padding. Both are subtracted from the tokens now —
+  `calc(var(--cui-alert-padding-x) * 3)` and
+  `calc(var(--cui-alert-padding-y) * 1.25) var(--cui-alert-padding-x)` — so one
+  token resizes the whole alert. Defaults render as before; drop any override
+  of the removed variable.
 
 #### Badge
 

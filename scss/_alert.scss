@@ -12,12 +12,7 @@ $alert-margin-bottom:           1rem !default;
 $alert-border-radius:           var(--#{$prefix}border-radius) !default;
 $alert-link-font-weight:        $font-weight-bold !default;
 $alert-border-width:            var(--#{$prefix}border-width) !default;
-$alert-dismissible-padding-r:   $alert-padding-x * 3 !default; // 3x covers width of x plus default padding on either side
 // scss-docs-end alert-variables
-
-//
-// Base styles
-//
 
 $alert-tokens: () !default;
 
@@ -35,8 +30,6 @@ $alert-tokens: defaults(
     --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color),
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
     --#{$prefix}alert-link-color: var(--#{$prefix}theme-fg, inherit),
-    // Redeclared inside the alert so an <hr> in its body takes the variant's
-    // border instead of staying the page's neutral grey.
     --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
   ),
   $alert-tokens
@@ -58,44 +51,31 @@ $alert-tokens: defaults(
     @include border-radius(var(--#{$prefix}alert-border-radius));
   }
 
-  // Headings for larger alerts
   .alert-heading {
-    // Specified to prevent conflicts of changing $headings-color
     color: inherit;
   }
 
-  // Provide class for links that match alerts
   .alert-link {
     font-weight: $alert-link-font-weight;
     color: var(--#{$prefix}alert-link-color);
   }
 
 
-  // Dismissible alerts
-  //
-  // Expand the inline-end padding and account for the close button's
-  // positioning. An alert that contains a close button gets this on its own —
-  // `.alert-dismissible` stays supported for markup that already carries it,
-  // and for the case where the button is rendered later.
-
   .alert:has(> .btn-close),
   .alert-dismissible {
-    padding-inline-end: $alert-dismissible-padding-r;
+    padding-inline-end: calc(var(--#{$prefix}alert-padding-x) * 3); // stylelint-disable-line function-disallowed-list
 
-    // Adjust close link position (descendant, as before: the button may sit
-    // inside a wrapper in existing `.alert-dismissible` markup)
     .btn-close {
       position: absolute;
       inset-inline-end: 0;
       top: 0;
       z-index: $stretched-link-z-index + 1;
-      padding: $alert-padding-y * 1.25 $alert-padding-x;
+      padding: calc(var(--#{$prefix}alert-padding-y) * 1.25) var(--#{$prefix}alert-padding-x); // stylelint-disable-line function-disallowed-list
     }
   }
 
 
   // scss-docs-start alert-modifiers
-  // Generate contextual modifier classes for colorizing the alert.
   @each $state in map.keys($theme-colors) {
     .alert-#{$state} {
       @include theme-tokens($state);
