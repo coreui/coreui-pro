@@ -11,17 +11,13 @@
 // scss-docs-start accordion-variables
 $accordion-padding-y:                     1rem !default;
 $accordion-padding-x:                     1.25rem !default;
+$accordion-font-size:                     var(--#{$prefix}body-font-size) !default;
 $accordion-color:                         var(--#{$prefix}body-color) !default;
 $accordion-bg:                            var(--#{$prefix}body-bg) !default;
 $accordion-border-width:                  var(--#{$prefix}border-width) !default;
 $accordion-border-color:                  var(--#{$prefix}border-color) !default;
 $accordion-border-radius:                 var(--#{$prefix}border-radius) !default;
 
-$accordion-body-padding-y:                $accordion-padding-y !default;
-$accordion-body-padding-x:                $accordion-padding-x !default;
-
-$accordion-button-padding-y:              $accordion-padding-y !default;
-$accordion-button-padding-x:              $accordion-padding-x !default;
 $accordion-button-color:                  var(--#{$prefix}body-color) !default;
 $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default;
 $accordion-transition:                    $btn-transition, border-radius .15s ease !default;
@@ -30,6 +26,12 @@ $accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis)
 $accordion-active-border-color:           $accordion-border-color !default;
 
 $accordion-button-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
+
+$accordion-padding-y-sm:                  .625rem !default;
+$accordion-padding-x-sm:                  .875rem !default;
+$accordion-font-size-sm:                  $font-size-sm !default;
+$accordion-border-radius-sm:              var(--#{$prefix}border-radius-sm) !default;
+$accordion-icon-width-sm:                 1rem !default;
 
 $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;
@@ -41,25 +43,24 @@ $accordion-icon-transition:               transform .2s ease-in-out !default;
 $accordion-icon-transform:                rotate(-180deg) !default;
 
 $accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
-// Painted through the mask by --#{$prefix}accordion-btn-icon-color, so the
-// stroke colour above is irrelevant — only the shape's alpha is used.
 // scss-docs-end accordion-variables
 
 $accordion-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start accordion-css-vars
 $accordion-tokens: defaults(
   (
+    --#{$prefix}accordion-padding-x: #{$accordion-padding-x},
+    --#{$prefix}accordion-padding-y: #{$accordion-padding-y},
+    --#{$prefix}accordion-font-size: #{$accordion-font-size},
     --#{$prefix}accordion-color: #{$accordion-color},
     --#{$prefix}accordion-bg: #{$accordion-bg},
     --#{$prefix}accordion-transition: #{$accordion-transition},
     --#{$prefix}accordion-border-color: #{$accordion-border-color},
     --#{$prefix}accordion-border-width: #{$accordion-border-width},
     --#{$prefix}accordion-border-radius: #{$accordion-border-radius},
-    --#{$prefix}accordion-btn-padding-x: #{$accordion-button-padding-x},
-    --#{$prefix}accordion-btn-padding-y: #{$accordion-button-padding-y},
     --#{$prefix}accordion-btn-color: #{$accordion-button-color},
     --#{$prefix}accordion-btn-bg: #{$accordion-button-bg},
     --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
@@ -69,8 +70,6 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
     --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
-    --#{$prefix}accordion-body-padding-x: #{$accordion-body-padding-x},
-    --#{$prefix}accordion-body-padding-y: #{$accordion-body-padding-y},
     --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg, #{$accordion-button-active-color}),
     --#{$prefix}accordion-active-bg: var(--#{$prefix}theme-bg-subtle, #{$accordion-button-active-bg}),
     --#{$prefix}accordion-active-border-color: var(--#{$prefix}theme-border, #{$accordion-active-border-color}),
@@ -81,13 +80,9 @@ $accordion-tokens: defaults(
 );
 // scss-docs-end accordion-css-vars
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 @layer components {
-  //
-  // Base styles
-  //
-
   .accordion {
     @include tokens($accordion-tokens);
   }
@@ -103,11 +98,6 @@ $accordion-tokens: defaults(
       overflow-y: clip;
     }
 
-    // Only where `auto` can be interpolated does the panel animate itself.
-    // Elsewhere accordion.js animates the item, and a transition left on the
-    // panel would still hold it short while the component measures how tall the
-    // item has to become — the open animation would then run to the wrong size
-    // and the panel would jump at the end.
     @supports (interpolate-size: allow-keywords) {
       @media (prefers-reduced-motion: no-preference) {
         interpolate-size: allow-keywords;
@@ -121,9 +111,6 @@ $accordion-tokens: defaults(
       }
     }
 
-    // accordion.js animates the item's own block-size where the panel cannot be
-    // animated by ::details-content. It sets the two sizes and leaves the timing
-    // here, so both paths are driven by the same tokens.
     &[data-coreui-accordion-animating] {
       overflow: clip;
       @include transition(
@@ -139,13 +126,10 @@ $accordion-tokens: defaults(
       }
     }
 
-    // Keep the border and pull the item up over it: an item without a
-    // block-start border has nothing to recolour when it opens.
     &:not(:first-of-type) {
       margin-block-start: calc(-1 * var(--#{$prefix}accordion-border-width)); // stylelint-disable-line function-disallowed-list
     }
 
-    // Only set a border-radius on the last item if the accordion is collapsed
     &:last-of-type {
       @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
 
@@ -187,8 +171,8 @@ $accordion-tokens: defaults(
     display: flex;
     align-items: center;
     width: 100%;
-    padding: var(--#{$prefix}accordion-btn-padding-y) var(--#{$prefix}accordion-btn-padding-x);
-    font-size: $font-size-base;
+    padding: var(--#{$prefix}accordion-btn-padding-y, var(--#{$prefix}accordion-padding-y)) var(--#{$prefix}accordion-btn-padding-x, var(--#{$prefix}accordion-padding-x));
+    font-size: var(--#{$prefix}accordion-font-size);
     color: var(--#{$prefix}accordion-btn-color);
     text-align: start;
     list-style: none;
@@ -200,7 +184,6 @@ $accordion-tokens: defaults(
       display: none;
     }
 
-    // Accordion icon
     &::after {
       flex-shrink: 0;
       width: var(--#{$prefix}accordion-btn-icon-width);
@@ -212,8 +195,6 @@ $accordion-tokens: defaults(
       @include transition(var(--#{$prefix}accordion-btn-icon-transition));
     }
 
-    // A heading inside `<summary>` keeps the section reachable by heading
-    // navigation, which a bare `<summary>` does not offer.
     > :is(h1, h2, h3, h4, h5, h6) {
       margin-bottom: 0;
       font-size: inherit;
@@ -234,13 +215,21 @@ $accordion-tokens: defaults(
   }
 
   .accordion-body {
-    padding: var(--#{$prefix}accordion-body-padding-y) var(--#{$prefix}accordion-body-padding-x);
+    padding: var(--#{$prefix}accordion-body-padding-y, var(--#{$prefix}accordion-padding-y)) var(--#{$prefix}accordion-body-padding-x, var(--#{$prefix}accordion-padding-x));
+    font-size: var(--#{$prefix}accordion-font-size);
   }
 
 
-  // Flush accordion items
-  //
-  // Remove borders and border-radius to keep accordion items edge-to-edge.
+  .accordion-sm {
+    // scss-docs-start accordion-sm-css-vars
+    --#{$prefix}accordion-padding-x: #{$accordion-padding-x-sm};
+    --#{$prefix}accordion-padding-y: #{$accordion-padding-y-sm};
+    --#{$prefix}accordion-font-size: #{$accordion-font-size-sm};
+    --#{$prefix}accordion-border-radius: #{$accordion-border-radius-sm};
+    --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width-sm};
+    // scss-docs-end accordion-sm-css-vars
+  }
+
 
   .accordion-flush {
     > .accordion-item {
