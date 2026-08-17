@@ -40,6 +40,21 @@ $alert-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
+// scss-docs-start alert-variants
+$alert-variants: (
+  "solid": (
+    "color": "contrast",
+    "bg": "base",
+    "border-color": "base"
+  ),
+  "outline": (
+    "color": "fg",
+    "bg": "transparent",
+    "border-color": "border"
+  )
+) !default;
+// scss-docs-end alert-variants
+
 @layer components {
   .alert {
     @include tokens($alert-tokens);
@@ -83,6 +98,18 @@ $alert-tokens: defaults(
   @each $state in map.keys($theme-colors) {
     .alert-#{$state} {
       @include theme-tokens($state);
+    }
+  }
+
+  @each $variant, $properties in $alert-variants {
+    .alert-#{$variant} {
+      @each $property, $value in $properties {
+        @if $value == "transparent" {
+          --#{$prefix}alert-#{$property}: transparent;
+        } @else {
+          --#{$prefix}alert-#{$property}: var(--#{$prefix}theme-#{$value});
+        }
+      }
     }
   }
   // scss-docs-end alert-modifiers
