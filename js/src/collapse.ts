@@ -71,6 +71,13 @@ type CollapseConfig = {
   parent: string | Element | null
 }
 
+// Where `auto` can be interpolated, a `hidden="until-found"` area is animated by
+// the stylesheet: it stays in the layout, so its height needs no measuring.
+const usesInterpolatedHeight = (): boolean =>
+  typeof CSS !== 'undefined' &&
+  typeof CSS.supports === 'function' &&
+  CSS.supports('interpolate-size', 'allow-keywords')
+
 /**
  * Class definition
  */
@@ -159,13 +166,16 @@ class Collapse extends BaseComponent {
     }
 
     const dimension = this._getDimension()
+    const interpolated = this._usesInterpolatedHeight()
 
     this._setHiddenUntilFound(false)
 
     this._element.classList.remove(CLASS_NAME_COLLAPSE)
     this._element.classList.add(CLASS_NAME_COLLAPSING)
 
-    this._element.style[dimension] = '0'
+    if (!interpolated) {
+      this._element.style[dimension] = '0'
+    }
 
     this._setAriaExpanded(this._triggerArray, true)
     this._isTransitioning = true
@@ -179,6 +189,11 @@ class Collapse extends BaseComponent {
       this._element.style[dimension] = ''
 
       EventHandler.trigger(this._element, EVENT_SHOWN)
+    }
+
+    if (interpolated) {
+      await this._queueCallback(complete, this._element, true)
+      return
     }
 
     const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1)
@@ -203,10 +218,18 @@ class Collapse extends BaseComponent {
     }
 
     const dimension = this._getDimension()
+    const interpolated = this._usesInterpolatedHeight()
 
-    this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`
+    if (interpolated) {
+      // The attribute is what the stylesheet animates towards, so it goes on
+      // now rather than at the end; `content-visibility` is transitioned with
+      // `allow-discrete`, which keeps the content on screen until it finishes.
+      this._setHiddenUntilFound(true)
+    } else {
+      this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`
 
-    reflow(this._element)
+      reflow(this._element)
+    }
 
     this._element.classList.add(CLASS_NAME_COLLAPSING)
     this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW)
@@ -225,7 +248,11 @@ class Collapse extends BaseComponent {
       this._isTransitioning = false
       this._element.classList.remove(CLASS_NAME_COLLAPSING)
       this._element.classList.add(CLASS_NAME_COLLAPSE)
-      this._setHiddenUntilFound(true)
+
+      if (!interpolated) {
+        this._setHiddenUntilFound(true)
+      }
+
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
@@ -268,6 +295,10 @@ class Collapse extends BaseComponent {
     const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent as ParentNode)
     // remove children if greater depth
     return SelectorEngine.find(selector, this._config.parent as ParentNode).filter(element => !children.includes(element))
+  }
+
+  _usesInterpolatedHeight(): boolean {
+    return this._config.hiddenUntilFound && usesInterpolatedHeight()
   }
 
   _setHiddenUntilFound(hidden: boolean): void {

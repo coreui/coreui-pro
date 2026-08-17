@@ -62,4 +62,31 @@ $collapse-tokens: defaults(
     }
   }
   // scss-docs-end collapse-classes
+
+  // A `hidden="until-found"` area stays in the layout, which is what lets the
+  // height be interpolated to `auto` here instead of being measured in
+  // JavaScript. Scoped to the option rather than to `[hidden]`, because that
+  // attribute comes and goes while the opt-in does not.
+  @supports (interpolate-size: allow-keywords) {
+    // Not scoped to `.collapse`: during the transition the element carries
+    // `.collapsing` instead, and the declaration has to survive that swap.
+    [data-coreui-hidden-until-found="true"] {
+      interpolate-size: allow-keywords;
+      overflow: hidden;
+      @include transition(
+        height var(--#{$prefix}transition-collapse-duration) var(--#{$prefix}transition-collapse-timing),
+        content-visibility var(--#{$prefix}transition-collapse-duration) allow-discrete
+      );
+    }
+
+    // `.collapsing` still marks the transition for anyone styling it, but its
+    // own height would clamp the one being interpolated.
+    .collapsing[data-coreui-hidden-until-found="true"] {
+      height: auto;
+    }
+
+    [data-coreui-hidden-until-found="true"][hidden="until-found"] {
+      height: 0;
+    }
+  }
 }
