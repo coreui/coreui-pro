@@ -297,6 +297,18 @@ finished, not whether the state changed.
   </div>
   ```
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A solid alert is `.alert-solid`, not a pile of utilities.** The docs used to
+  say to drop the contextual class and reach for `bg-{color}` plus a `text-*`
+  class picked by hand — and the examples hard-coded `text-white`, which fails
+  WCAG AA on five of the eight theme colours: measured 3.50 on success, 3.69 on
+  danger, 2.94 on info, 1.85 on warning and 1.10 on light, where white text on a
+  near-white background is invisible. `.alert-solid` reads the theme's own
+  contrast token, so every colour lands between 4.56 and 18.03 — including a
+  theme colour you define yourself. `.alert-outline` joins it for an alert with
+  a border and no fill. Markup using the old recipe still renders; it is the
+  contrast that was never right.
+
 - **An alert marked `.fade show` fades in when it is added to the page.** The
   classes used to animate the alert in one direction only, because an element
   inserted with `.show` already on it has no earlier state to transition from;

@@ -143,12 +143,18 @@ Different kinds of alert usually call for different icons. Put the matching SVG 
 
 ### Solid
 
-Use solid alerts to create high-contrast notifications by applying background utility classes. This variant removes the default alert styling and relies on the utility classes for full-color backgrounds and text.
+Add `.alert-solid` for a high-contrast alert. The background takes the theme color and the text takes the color that reads on it, so a yellow alert gets dark text and a dark one gets light text without you picking either. <AddedIn version="6.0.0" />
 
-To create a solid alert, remove the `alert-*` contextual class (like alert-primary) and apply any of the `bg-*` utility classes (e.g. `bg-primary`, `bg-danger`, `bg-success`, etc.). Make sure to also add the appropriate `text-*` class to ensure good contrast and accessibility.
-
-<Example code={getData('theme-colors').map((c) => `<div class="alert bg-${c.name} text-white" role="alert">
+<Example code={getData('theme-colors').map((c) => `<div class="alert alert-solid alert-${c.name}" role="alert">
     Here's a straightforward example of solid ${c.name} alert—take a look!
+  </div>`)} />
+
+### Outline
+
+Add `.alert-outline` for an alert that carries a border and no fill. <AddedIn version="6.0.0" />
+
+<Example code={getData('theme-colors').map((c) => `<div class="alert alert-outline alert-${c.name}" role="alert">
+    Here's a straightforward example of outline ${c.name} alert—take a look!
   </div>`)} />
 
 ### Dismissing
@@ -253,8 +259,12 @@ Our Bootstrap alerts utilize local CSS variables on `.alert` for improved real-t
 
 <ScssDocs file="scss/_alert.scss" capture="alert-variables" />
 
+Each entry in the variants map names the theme role every token reads, so adding a variant takes a map entry rather than a new rule.
+
+<ScssDocs file="scss/_alert.scss" capture="alert-variants" />
+
 ### SASS loop
 
-Loop that creates the modifier classes, pointing each alert's tokens at the matching theme color.
+Loops that create the modifier classes: one points each alert's tokens at the matching theme color, the other at the roles a variant reads.
 
 <ScssDocs file="scss/_alert.scss" capture="alert-modifiers" />
