@@ -73,21 +73,23 @@ Utilize the `.alert-link` utility class to instantly create matching colored lin
 
 ### Additional content
 
-Bootstrap alerts can also include additional HTML elements such as headings, paragraphs, and dividers.
+Bootstrap alerts can also include additional HTML elements such as headings, paragraphs, and dividers. The alert lays its children out in a row, so wrap them in a [`.vstack`](/helpers/stacks/) to keep them stacked.
 
 <Example code={`<div class="alert alert-success" role="alert">
-    <h4 class="alert-heading">Great job! </h4>
-    <p>Awesome! You've successfully read this crucial alert message. This example text will be slightly longer to demonstrate how spacing in an alert interacts with this type of content.</p>
-    <hr>
-    <p class="mb-0">Whenever necessary, make sure to use margin utilities to keep everything organized and neat.</p>
+    <div class="vstack">
+      <h4 class="alert-heading">Great job! </h4>
+      <p>Awesome! You've successfully read this crucial alert message. This example text will be slightly longer to demonstrate how spacing in an alert interacts with this type of content.</p>
+      <hr>
+      <p class="mb-0">Whenever necessary, make sure to use margin utilities to keep everything organized and neat.</p>
+    </div>
   </div>`} />
 
 ### Icons
 
-In a similar vein, you can utilize [flexbox utilities](/utilities/flex/) and [CoreUI Icons](https://coreui.io/icons/) for crafting alerts that include icons. Based on your choice of icons and the content involved, you might consider incorporating additional utilities or custom styling.
+Put an icon straight into the alert — it lays its children out in a row and spaces them with `--cui-alert-gap`, so no flexbox utilities are needed. Use [CoreUI Icons](https://coreui.io/icons/) or any inline SVG.
 
-<Example code={`<div class="alert alert-primary d-flex align-items-center" role="alert">
-    <svg class="me-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512">
+<Example code={`<div class="alert alert-primary" role="alert">
+    <svg class="flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512">
       <rect width="32" height="176" x="240" y="176" fill="var(--ci-primary-color, currentColor)" class="ci-primary"/>
       <rect width="32" height="32" x="240" y="384" fill="var(--ci-primary-color, currentColor)" class="ci-primary"/>
       <path fill="var(--ci-primary-color, currentColor)" d="M274.014,16H237.986L16,445.174V496H496V445.174ZM464,464H48V452.959L256,50.826,464,452.959Z" class="ci-primary"/>
@@ -116,26 +118,26 @@ If you require multiple icons for your alerts, think about utilizing additional 
     </symbol>
   </svg>
 
-  <div class="alert alert-primary d-flex align-items-center" role="alert">
-    <svg class="flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#icon-info"/></svg>
+  <div class="alert alert-primary" role="alert">
+    <svg class="flex-shrink-0" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#icon-info"/></svg>
     <div>
       A straightforward alert with an icon
     </div>
   </div>
-  <div class="alert alert-success d-flex align-items-center" role="alert">
-    <svg class="flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#icon-check"/></svg>
+  <div class="alert alert-success" role="alert">
+    <svg class="flex-shrink-0" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#icon-check"/></svg>
     <div>
       A straightforward success alert with an icon
     </div>
   </div>
-  <div class="alert alert-warning d-flex align-items-center" role="alert">
-    <svg class="flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#icon-warning"/></svg>
+  <div class="alert alert-warning" role="alert">
+    <svg class="flex-shrink-0" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#icon-warning"/></svg>
     <div>
       A straightforward warning alert with an icon
     </div>
   </div>
-  <div class="alert alert-danger d-flex align-items-center" role="alert">
-    <svg class="flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#icon-warning"/></svg>
+  <div class="alert alert-danger" role="alert">
+    <svg class="flex-shrink-0" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#icon-warning"/></svg>
     <div>
       A straightforward danger alert with an icon
     </div>
@@ -156,7 +158,7 @@ To create a solid alert, remove the `alert-*` contextual class (like alert-prima
 Using the JavaScript plugin, you can remove any alert.
 
 - Ensure that you've loaded the Bootstrap alert plugin or the compiled CoreUI JavaScript.
-- Add a [close button](/components/close-button//) as a child of the alert. The alert makes room for it and positions it on its own — the `.alert-dismissible` class is no longer required. <AddedIn version="6.0.0" />
+- Add a [close button](/components/close-button//) as a child of the alert. It is pushed to the end of the alert on its own — the `.alert-dismissible` class is no longer required. <AddedIn version="6.0.0" />
 - Keep `.alert-dismissible` if the close button is added later by your own code, or if it sits inside a wrapper element rather than directly in the alert. The class keeps working and does exactly what it always did.
 - On the close button, include the `data-coreui-dismiss="alert"` attribute, which triggers the JavaScript functionality. You must use the `<button>` element with it for proper behavior across all devices.
 - To animate alerts during dismissal, you need to add the `.fade` and `.show` classes.
