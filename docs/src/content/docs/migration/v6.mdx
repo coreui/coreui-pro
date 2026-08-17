@@ -245,6 +245,19 @@ finished, not whether the state changed.
   still override their part where they are set, so existing overrides keep
   working.
 
+#### Breadcrumb
+
+- **New: `.breadcrumb-divider`, a separator you can put in the markup.** The
+  automatic `::before` divider stays exactly as it was and existing markup is
+  untouched, but a `<li class="breadcrumb-divider">` placed between two items
+  carries whatever you put in it — an inline SVG, an icon, a character — with
+  no URL escaping and no variable to set, and an empty one renders the default
+  divider. The automatic divider steps aside wherever an element is placed
+  (`.breadcrumb-item + .breadcrumb-item` stops matching), so the two never
+  double up, and the spacing is identical either way. Give the element
+  `aria-hidden="true"`, since a screen reader would otherwise count the
+  separators as steps in the trail.
+
 #### Avatar
 
 - **The avatar carries its own colours, and `.theme-{color}` tints it.**

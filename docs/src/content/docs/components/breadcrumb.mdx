@@ -48,6 +48,28 @@ When modifying via Sass, the [quote](https://sass-lang.com/documentation/modules
 $breadcrumb-divider: quote(">");
 ```
 
+### Divider element
+
+<AddedIn version="6.0.0" />
+
+Put a `.breadcrumb-divider` between two items to give that one divider its own content — an inline SVG, an icon, any character — without escaping anything or touching a variable. The automatic divider steps aside wherever you place one, so the two never double up, and an empty `.breadcrumb-divider` renders the default.
+
+Mark it `aria-hidden="true"`: it is a list item like any other, and without it a screen reader counts the separators as steps in the trail.
+
+<Example code={`<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="#">Home</a></li>
+      <li class="breadcrumb-divider" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="12" viewBox="0 0 8 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l4 6-4 6"/></svg>
+      </li>
+      <li class="breadcrumb-item"><a href="#">Library</a></li>
+      <li class="breadcrumb-divider" aria-hidden="true">→</li>
+      <li class="breadcrumb-item active" aria-current="page">Data</li>
+    </ol>
+  </nav>`} />
+
+### Embedded SVG
+
 It's also possible to use an **embedded SVG icon**. Apply it via our CSS custom property, or use the Sass variable.
 
 <Callout color="info">
