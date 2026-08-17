@@ -66,19 +66,6 @@ Add a contextual `.theme-{color}` class to the `.accordion` to tint its **open**
 
 ## Sizes
 
-Add `.accordion-sm` for a more compact accordion: tighter padding, a smaller font size, radius, and icon.
-
-<Example code={`<div class="accordion accordion-sm">
-    <details class="accordion-item" name="accordionSm" open>
-      <summary class="accordion-header">Accordion Item #1</summary>
-      <div class="accordion-body">Placeholder content for the first item of a small accordion.</div>
-    </details>
-    <details class="accordion-item" name="accordionSm">
-      <summary class="accordion-header">Accordion Item #2</summary>
-      <div class="accordion-body">Placeholder content for the second item of a small accordion.</div>
-    </details>
-  </div>`} />
-
 Padding and font size are single tokens shared by the header and the body, so one declaration resizes the whole control:
 
 <Example code={`<div class="accordion" style="--cui-accordion-padding-x: 2rem; --cui-accordion-font-size: 1.125rem">
@@ -276,10 +263,6 @@ summary.addEventListener('click', event => {
 Accordions use local CSS variables on .accordion for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 
 <ScssDocs file="scss/_accordion.scss" capture="accordion-css-vars" />
-
-`.accordion-sm` sets these:
-
-<ScssDocs file="scss/_accordion.scss" capture="accordion-sm-css-vars" />
 
 ### SASS variables
 

@@ -27,12 +27,6 @@ $accordion-active-border-color:           $accordion-border-color !default;
 
 $accordion-button-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
-$accordion-padding-y-sm:                  .625rem !default;
-$accordion-padding-x-sm:                  .875rem !default;
-$accordion-font-size-sm:                  $font-size-sm !default;
-$accordion-border-radius-sm:              var(--#{$prefix}border-radius-sm) !default;
-$accordion-icon-width-sm:                 1rem !default;
-
 $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;
 
@@ -47,7 +41,7 @@ $accordion-button-icon:                   url("data:image/svg+xml,<svg xmlns='ht
 
 $accordion-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start accordion-css-vars
 $accordion-tokens: defaults(
@@ -80,7 +74,7 @@ $accordion-tokens: defaults(
 );
 // scss-docs-end accordion-css-vars
 
-// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
+// stylelint-enable scss/dollar-variable-default
 
 @layer components {
   .accordion {
@@ -217,17 +211,6 @@ $accordion-tokens: defaults(
   .accordion-body {
     padding: var(--#{$prefix}accordion-body-padding-y, var(--#{$prefix}accordion-padding-y)) var(--#{$prefix}accordion-body-padding-x, var(--#{$prefix}accordion-padding-x));
     font-size: var(--#{$prefix}accordion-font-size);
-  }
-
-
-  .accordion-sm {
-    // scss-docs-start accordion-sm-css-vars
-    --#{$prefix}accordion-padding-x: #{$accordion-padding-x-sm};
-    --#{$prefix}accordion-padding-y: #{$accordion-padding-y-sm};
-    --#{$prefix}accordion-font-size: #{$accordion-font-size-sm};
-    --#{$prefix}accordion-border-radius: #{$accordion-border-radius-sm};
-    --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width-sm};
-    // scss-docs-end accordion-sm-css-vars
   }
 
 
