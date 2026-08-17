@@ -59,8 +59,6 @@ $alert-tokens: defaults(
     margin-bottom: 0;
   }
 
-  // An alert inserted with `.show` already on it has no earlier state to
-  // transition from, so the fade-in needs one declared here.
   @starting-style {
     .alert.fade.show {
       opacity: 0;
@@ -75,7 +73,6 @@ $alert-tokens: defaults(
     font-weight: $alert-link-font-weight;
     color: var(--#{$prefix}alert-link-color);
   }
-
 
   .alert > .btn-close {
     margin-inline-start: auto;
