@@ -9,59 +9,25 @@
 
 // Avatars
 // scss-docs-start avatar-variables
-$avatar-width:                 2rem !default;
-$avatar-height:                2rem !default;
-$avatar-font-size:             .8rem !default;
+$avatar-size:                  2rem !default;
+// The label scales with the frame, so a size only has to be given once.
+$avatar-font-size-ratio:       .4 !default;
 $avatar-border-radius:         50em !default;
-$avatar-status-width:          .5rem !default;
-$avatar-status-height:         .5rem !default;
+$avatar-status-size:           .5rem !default;
 $avatar-status-border-radius:  50em !default;
 $avatar-status-border-width:   1px !default;
 $avatar-status-border-color:   var(--#{$prefix}body-bg) !default;
 $avatar-stack-hover-transform: translateY(-2px) !default;
 $avatar-transition:            transform .15s ease-in-out !default;
 
+// `status-size` is optional: leave it out and the indicator keeps the base size.
 $avatar-sizes: (
-  sm: (
-    width: 1.5rem,
-    height: 1.5rem,
-    font-size: .6rem,
-    status-width: .4rem,
-    status-height: .4rem
-  ),
-  md: (
-    width: 2.5rem,
-    height: 2.5rem,
-    font-size: 1rem,
-    status-width: .7rem,
-    status-height: .7rem
-  ),
-  lg: (
-    width: 3rem,
-    height: 3rem,
-    font-size: 1.2rem,
-    status-width: .8rem,
-    status-height: .8rem
-  ),
-  xl: (
-    width: 4rem,
-    height: 4rem,
-    font-size: 1.6rem,
-    status-width: 1rem,
-    status-height: 1rem
-  ),
+  sm: (size: 1.5rem, status-size: .4rem),
+  md: (size: 2.5rem, status-size: .7rem),
+  lg: (size: 3rem,   status-size: .8rem),
+  xl: (size: 4rem,   status-size: 1rem),
 ) !default;
 // scss-docs-end avatar-variables
-
-// fusv-disable
-// Deprecated in 5.1.0 for CSS variables
-$avatar-widths: (
-  sm: 1.5rem,
-  md: 2.5rem,
-  lg: 3rem,
-  xl: 4rem
-) !default;
-// fusv-enable
 
 $avatar-tokens: () !default;
 
@@ -69,12 +35,9 @@ $avatar-tokens: () !default;
 // stylelint-disable-next-line scss/dollar-variable-default
 $avatar-tokens: defaults(
   (
-    --#{$prefix}avatar-width: #{$avatar-width},
-    --#{$prefix}avatar-height: #{$avatar-height},
-    --#{$prefix}avatar-font-size: #{$avatar-font-size},
+    --#{$prefix}avatar-size: #{$avatar-size},
     --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
-    --#{$prefix}avatar-status-width: #{$avatar-status-width},
-    --#{$prefix}avatar-status-height: #{$avatar-status-height},
+    --#{$prefix}avatar-status-size: #{$avatar-status-size},
     --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
     --#{$prefix}avatar-status-border-width: #{$avatar-status-border-width},
     --#{$prefix}avatar-status-border-color: #{$avatar-status-border-color},
@@ -90,9 +53,11 @@ $avatar-tokens: defaults(
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--#{$prefix}avatar-width);
-    height: var(--#{$prefix}avatar-height);
-    font-size: var(--#{$prefix}avatar-font-size);
+    width: var(--#{$prefix}avatar-size);
+    height: var(--#{$prefix}avatar-size);
+    // Declared as a fallback rather than a token, so the derived size is the
+    // default and an explicit one still wins.
+    font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio})); // stylelint-disable-line function-disallowed-list
     vertical-align: middle;
     @include border-radius(var(--#{$prefix}avatar-border-radius));
     @include transition($avatar-transition);
@@ -110,19 +75,19 @@ $avatar-tokens: defaults(
     inset-inline-end: 0;
     bottom: 0;
     display: block;
-    width: var(--#{$prefix}avatar-status-width);
-    height: var(--#{$prefix}avatar-status-height);
+    width: var(--#{$prefix}avatar-status-size);
+    height: var(--#{$prefix}avatar-status-size);
     border: var(--#{$prefix}avatar-status-border-width) solid var(--#{$prefix}avatar-status-border-color);
     @include border-radius(var(--#{$prefix}avatar-status-border-radius));
   }
 
   @each $size, $map in $avatar-sizes {
     .avatar-#{$size} {
-      --#{$prefix}avatar-width: #{map.get($map, "width")};
-      --#{$prefix}avatar-height: #{map.get($map, "height")};
-      --#{$prefix}avatar-font-size: #{map.get($map, "font-size")};
-      --#{$prefix}avatar-status-width: #{map.get($map, "status-width")};
-      --#{$prefix}avatar-status-height: #{map.get($map, "status-height")};
+      --#{$prefix}avatar-size: #{map.get($map, "size")};
+
+      @if map.has-key($map, "status-size") {
+        --#{$prefix}avatar-status-size: #{map.get($map, "status-size")};
+      }
     }
   }
 
@@ -130,7 +95,7 @@ $avatar-tokens: defaults(
     display: flex;
 
     .avatar {
-      margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-width)); // stylelint-disable-line function-disallowed-list
+      margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-size)); // stylelint-disable-line function-disallowed-list
 
       // Lifted rather than pulled apart: changing the margin here moves every
       // avatar after this one.
