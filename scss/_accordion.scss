@@ -1,7 +1,6 @@
 @use "buttons/button" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
-@use "functions/math" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
@@ -17,7 +16,6 @@ $accordion-bg:                            var(--#{$prefix}body-bg) !default;
 $accordion-border-width:                  var(--#{$prefix}border-width) !default;
 $accordion-border-color:                  var(--#{$prefix}border-color) !default;
 $accordion-border-radius:                 var(--#{$prefix}border-radius) !default;
-$accordion-inner-border-radius:           subtract($accordion-border-radius, $accordion-border-width) !default;
 
 $accordion-body-padding-y:                $accordion-padding-y !default;
 $accordion-body-padding-x:                $accordion-padding-x !default;
@@ -31,9 +29,7 @@ $accordion-button-active-bg:              var(--#{$prefix}primary-bg-subtle) !de
 $accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
 
-// fusv-disable
-// fusv-enable
-$accordion-button-focus-ring:       var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
+$accordion-button-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;
@@ -62,7 +58,6 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-border-color: #{$accordion-border-color},
     --#{$prefix}accordion-border-width: #{$accordion-border-width},
     --#{$prefix}accordion-border-radius: #{$accordion-border-radius},
-    --#{$prefix}accordion-inner-border-radius: #{$accordion-inner-border-radius},
     --#{$prefix}accordion-btn-padding-x: #{$accordion-button-padding-x},
     --#{$prefix}accordion-btn-padding-y: #{$accordion-button-padding-y},
     --#{$prefix}accordion-btn-color: #{$accordion-button-color},
@@ -140,7 +135,7 @@ $accordion-tokens: defaults(
       @include border-top-radius(var(--#{$prefix}accordion-border-radius));
 
       > .accordion-header {
-        @include border-top-radius(var(--#{$prefix}accordion-inner-border-radius));
+        @include border-top-radius(calc(var(--#{$prefix}accordion-border-radius) - var(--#{$prefix}accordion-border-width)));
       }
     }
 
@@ -155,7 +150,7 @@ $accordion-tokens: defaults(
       @include border-bottom-radius(var(--#{$prefix}accordion-border-radius));
 
       > .accordion-header {
-        @include border-bottom-radius(var(--#{$prefix}accordion-inner-border-radius));
+        @include border-bottom-radius(calc(var(--#{$prefix}accordion-border-radius) - var(--#{$prefix}accordion-border-width)));
       }
 
       > .accordion-body {
