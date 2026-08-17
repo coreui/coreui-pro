@@ -752,6 +752,28 @@ adornment in the library — so the button needs no icon markup at all:
   `new coreui.Collapse(el).toggle()`. `data-coreui-toggle` on a *trigger* is
   unrelated and unchanged.
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Triggers no longer get the `.collapsed` class.** Their state was written
+  twice, as the class and as `aria-expanded`, and only the second is required.
+  Nothing in the stylesheet had matched the class since the accordion stopped
+  using it, so it survived as a hook for custom CSS — style the attribute
+  instead, which is also what assistive technology reads:
+
+  ```diff
+  - .accordion-button.collapsed::after { transform: rotate(-90deg); }
+  + [data-coreui-toggle="collapse"][aria-expanded="false"]::after { transform: rotate(-90deg); }
+  ```
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The transition is set through CSS variables, and the Sass variables split
+  in two.** `$transition-collapse` and `$transition-collapse-width` were
+  shorthands carrying the property, the duration and the easing at once, which
+  meant retiming a collapse required restating the property. They are replaced
+  by `$transition-collapse-duration` and `$transition-collapse-timing`, emitted
+  as `--cui-transition-collapse-duration` / `-timing` on `.collapsing`, so the
+  timing can also be changed per instance at runtime. `$transition-fade` splits
+  the same way into `$transition-fade-duration` / `$transition-fade-timing`.
+
 #### Button
 
 - **A toggle button always exposes `aria-pressed` now.** The attribute has no

@@ -15,7 +15,8 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   defineJQueryPlugin,
   getElement,
-  reflow
+  reflow,
+  setAriaAttribute
 } from './util/index.js'
 
 /**
@@ -36,7 +37,6 @@ const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_COLLAPSE = 'collapse'
 const CLASS_NAME_COLLAPSING = 'collapsing'
-const CLASS_NAME_COLLAPSED = 'collapsed'
 const CLASS_NAME_DEEPER_CHILDREN = `:scope .${CLASS_NAME_COLLAPSE} .${CLASS_NAME_COLLAPSE}`
 const CLASS_NAME_HORIZONTAL = 'collapse-horizontal'
 
@@ -92,7 +92,7 @@ class Collapse extends BaseComponent {
     this._initializeChildren()
 
     if (!this._config.parent) {
-      this._addAriaAndCollapsedClass(this._triggerArray, this._isShown())
+      this._setAriaExpanded(this._triggerArray, this._isShown())
     }
   }
 
@@ -146,9 +146,9 @@ class Collapse extends BaseComponent {
     this._element.classList.remove(CLASS_NAME_COLLAPSE)
     this._element.classList.add(CLASS_NAME_COLLAPSING)
 
-    this._element.style[dimension as any] = 0 as unknown as string
+    this._element.style[dimension] = '0'
 
-    this._addAriaAndCollapsedClass(this._triggerArray, true)
+    this._setAriaExpanded(this._triggerArray, true)
     this._isTransitioning = true
 
     const complete = () => {
@@ -157,18 +157,18 @@ class Collapse extends BaseComponent {
       this._element.classList.remove(CLASS_NAME_COLLAPSING)
       this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW)
 
-      this._element.style[dimension as any] = ''
+      this._element.style[dimension] = ''
 
       EventHandler.trigger(this._element, EVENT_SHOWN)
     }
 
     const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1)
-    const scrollSize = `scroll${capitalizedDimension}`
+    const scrollSize = `scroll${capitalizedDimension}` as 'scrollWidth' | 'scrollHeight'
 
     // Register the completion callback first, then set the target size to start the
     // transition. Awaiting here instead would stop the size from ever being applied.
     const transition = this._queueCallback(complete, this._element, true)
-    this._element.style[dimension as any] = `${(this._element as any)[scrollSize]}px`
+    this._element.style[dimension] = `${this._element[scrollSize]}px`
 
     await transition
   }
@@ -185,7 +185,7 @@ class Collapse extends BaseComponent {
 
     const dimension = this._getDimension()
 
-    this._element.style[dimension as any] = `${(this._element.getBoundingClientRect() as any)[dimension]}px`
+    this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`
 
     reflow(this._element)
 
@@ -196,7 +196,7 @@ class Collapse extends BaseComponent {
       const element = SelectorEngine.getElementFromSelector(trigger)
 
       if (element && !this._isShown(element)) {
-        this._addAriaAndCollapsedClass([trigger], false)
+        this._setAriaExpanded([trigger], false)
       }
     }
 
@@ -209,7 +209,7 @@ class Collapse extends BaseComponent {
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
-    this._element.style[dimension as any] = ''
+    this._element.style[dimension] = ''
 
     await this._queueCallback(complete, this._element, true)
   }
@@ -224,7 +224,7 @@ class Collapse extends BaseComponent {
     return config
   }
 
-  _getDimension(): string {
+  _getDimension(): 'width' | 'height' {
     return this._element.classList.contains(CLASS_NAME_HORIZONTAL) ? WIDTH : HEIGHT
   }
 
@@ -239,7 +239,7 @@ class Collapse extends BaseComponent {
       const selected = SelectorEngine.getElementFromSelector(element)
 
       if (selected) {
-        this._addAriaAndCollapsedClass([element], this._isShown(selected))
+        this._setAriaExpanded([element], this._isShown(selected))
       }
     }
   }
@@ -250,14 +250,13 @@ class Collapse extends BaseComponent {
     return SelectorEngine.find(selector, this._config.parent as ParentNode).filter(element => !children.includes(element))
   }
 
-  _addAriaAndCollapsedClass(triggerArray: HTMLElement[], isOpen: boolean): void {
+  _setAriaExpanded(triggerArray: HTMLElement[], isOpen: boolean): void {
     if (!triggerArray.length) {
       return
     }
 
     for (const element of triggerArray) {
-      element.classList.toggle(CLASS_NAME_COLLAPSED, !isOpen)
-      element.setAttribute('aria-expanded', isOpen as unknown as string)
+      setAriaAttribute(element, 'aria-expanded', isOpen)
     }
   }
 

@@ -517,7 +517,7 @@ describe('Collapse', () => {
     it('should show multiple collapsed elements', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<a role="button" data-coreui-toggle="collapse" class="collapsed" href=".multi"></a>',
+          '<a role="button" data-coreui-toggle="collapse" href=".multi"></a>',
           '<div id="collapse1" class="collapse multi"></div>',
           '<div id="collapse2" class="collapse multi"></div>'
         ].join('')
@@ -528,7 +528,7 @@ describe('Collapse', () => {
 
         collapse2.addEventListener('shown.coreui.collapse', () => {
           expect(trigger.getAttribute('aria-expanded')).toEqual('true')
-          expect(trigger).not.toHaveClass('collapsed')
+          expect(trigger.getAttribute('aria-expanded')).toEqual('true')
           expect(collapse1).toHaveClass('show')
           expect(collapse1).toHaveClass('show')
           resolve()
@@ -552,7 +552,7 @@ describe('Collapse', () => {
 
         collapse2.addEventListener('hidden.coreui.collapse', () => {
           expect(trigger.getAttribute('aria-expanded')).toEqual('false')
-          expect(trigger).toHaveClass('collapsed')
+          expect(trigger.getAttribute('aria-expanded')).toEqual('false')
           expect(collapse1).not.toHaveClass('show')
           expect(collapse1).not.toHaveClass('show')
           resolve()
@@ -562,7 +562,7 @@ describe('Collapse', () => {
       })
     })
 
-    it('should remove "collapsed" class from target when collapse is shown', () => {
+    it('should set aria-expanded to true on triggers when collapse is shown', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<a id="link1" role="button" data-coreui-toggle="collapse" class="collapsed" href="#" data-coreui-target="#test1"></a>',
@@ -577,8 +577,8 @@ describe('Collapse', () => {
         collapseTest1.addEventListener('shown.coreui.collapse', () => {
           expect(link1.getAttribute('aria-expanded')).toEqual('true')
           expect(link2.getAttribute('aria-expanded')).toEqual('true')
-          expect(link1).not.toHaveClass('collapsed')
-          expect(link2).not.toHaveClass('collapsed')
+          expect(link1.getAttribute('aria-expanded')).toEqual('true')
+          expect(link2.getAttribute('aria-expanded')).toEqual('true')
           resolve()
         })
 
@@ -586,7 +586,7 @@ describe('Collapse', () => {
       })
     })
 
-    it('should add "collapsed" class to target when collapse is hidden', () => {
+    it('should set aria-expanded to false on triggers when collapse is hidden', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<a id="link1" role="button" data-coreui-toggle="collapse" href="#" data-coreui-target="#test1"></a>',
@@ -601,8 +601,8 @@ describe('Collapse', () => {
         collapseTest1.addEventListener('hidden.coreui.collapse', () => {
           expect(link1.getAttribute('aria-expanded')).toEqual('false')
           expect(link2.getAttribute('aria-expanded')).toEqual('false')
-          expect(link1).toHaveClass('collapsed')
-          expect(link2).toHaveClass('collapsed')
+          expect(link1.getAttribute('aria-expanded')).toEqual('false')
+          expect(link2.getAttribute('aria-expanded')).toEqual('false')
           resolve()
         })
 
@@ -695,20 +695,20 @@ describe('Collapse', () => {
 
         collapseOneEl.addEventListener('shown.coreui.collapse', () => {
           expect(collapseOneEl).toHaveClass('show')
-          expect(triggerEl).not.toHaveClass('collapsed')
+          expect(triggerEl.getAttribute('aria-expanded')).toEqual('true')
           expect(triggerEl.getAttribute('aria-expanded')).toEqual('true')
 
           expect(collapseTwoEl).not.toHaveClass('show')
-          expect(triggerTwoEl).toHaveClass('collapsed')
+          expect(triggerTwoEl.getAttribute('aria-expanded')).toEqual('false')
           expect(triggerTwoEl.getAttribute('aria-expanded')).toEqual('false')
 
           collapseTwoEl.addEventListener('shown.coreui.collapse', () => {
             expect(collapseOneEl).not.toHaveClass('show')
-            expect(triggerEl).toHaveClass('collapsed')
+            expect(triggerEl.getAttribute('aria-expanded')).toEqual('false')
             expect(triggerEl.getAttribute('aria-expanded')).toEqual('false')
 
             expect(collapseTwoEl).toHaveClass('show')
-            expect(triggerTwoEl).not.toHaveClass('collapsed')
+            expect(triggerTwoEl.getAttribute('aria-expanded')).toEqual('true')
             expect(triggerTwoEl.getAttribute('aria-expanded')).toEqual('true')
             resolve()
           })
@@ -859,7 +859,7 @@ describe('Collapse', () => {
       })
     })
 
-    it('should add "collapsed" class and set aria-expanded to triggers only when all the targeted collapse are hidden', () => {
+    it('should set aria-expanded on triggers only when all the targeted collapse are hidden', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
           '<a id="trigger1" role="button" data-coreui-toggle="collapse" href="#test1"></a>',
@@ -876,33 +876,33 @@ describe('Collapse', () => {
         const target2 = fixtureEl.querySelector(`#${CSS.escape('0/my/id')}`)
 
         const target2Shown = () => {
-          expect(trigger1).not.toHaveClass('collapsed')
+          expect(trigger1.getAttribute('aria-expanded')).toEqual('true')
           expect(trigger1.getAttribute('aria-expanded')).toEqual('true')
 
-          expect(trigger2).not.toHaveClass('collapsed')
+          expect(trigger2.getAttribute('aria-expanded')).toEqual('true')
           expect(trigger2.getAttribute('aria-expanded')).toEqual('true')
 
-          expect(trigger3).not.toHaveClass('collapsed')
+          expect(trigger3.getAttribute('aria-expanded')).toEqual('true')
           expect(trigger3.getAttribute('aria-expanded')).toEqual('true')
 
           target2.addEventListener('hidden.coreui.collapse', () => {
-            expect(trigger1).not.toHaveClass('collapsed')
+            expect(trigger1.getAttribute('aria-expanded')).toEqual('true')
             expect(trigger1.getAttribute('aria-expanded')).toEqual('true')
 
-            expect(trigger2).toHaveClass('collapsed')
+            expect(trigger2.getAttribute('aria-expanded')).toEqual('false')
             expect(trigger2.getAttribute('aria-expanded')).toEqual('false')
 
-            expect(trigger3).not.toHaveClass('collapsed')
+            expect(trigger3.getAttribute('aria-expanded')).toEqual('true')
             expect(trigger3.getAttribute('aria-expanded')).toEqual('true')
 
             target1.addEventListener('hidden.coreui.collapse', () => {
-              expect(trigger1).toHaveClass('collapsed')
+              expect(trigger1.getAttribute('aria-expanded')).toEqual('false')
               expect(trigger1.getAttribute('aria-expanded')).toEqual('false')
 
-              expect(trigger2).toHaveClass('collapsed')
+              expect(trigger2.getAttribute('aria-expanded')).toEqual('false')
               expect(trigger2.getAttribute('aria-expanded')).toEqual('false')
 
-              expect(trigger3).toHaveClass('collapsed')
+              expect(trigger3.getAttribute('aria-expanded')).toEqual('false')
               expect(trigger3.getAttribute('aria-expanded')).toEqual('false')
               resolve()
             })
