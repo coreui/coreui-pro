@@ -585,8 +585,6 @@ $border-radius-xl:            1rem !default;
 $border-radius-xxl:           2rem !default;
 $border-radius-pill:          50rem !default;
 // scss-docs-end border-radius-variables
-// fusv-disable
-// fusv-enable
 
 // scss-docs-start box-shadow-variables
 $box-shadow:                  0 .5rem 1rem rgba($black, .15) !default;
@@ -735,9 +733,6 @@ $small-font-size:               .875em !default;
 
 $sub-sup-font-size:             .75em !default;
 
-// fusv-disable
-// fusv-enable
-
 $initialism-font-size:        $small-font-size !default;
 
 $blockquote-margin-y:         $spacer !default;
@@ -747,9 +742,6 @@ $blockquote-footer-font-size: $small-font-size !default;
 
 $hr-margin-y:                 $spacer !default;
 $hr-color:                    inherit !default;
-
-// fusv-disable
-// fusv-enable
 
 $hr-border-color:             null !default; // Allows for inherited colors
 $hr-border-width:             var(--#{$prefix}border-width) !default;
@@ -973,9 +965,6 @@ $placeholder-opacity-min:           .2 !default;
 // Tooltips
 
 // Alerts
-
-// fusv-disable
-// fusv-enable
 
 // Image thumbnails
 
