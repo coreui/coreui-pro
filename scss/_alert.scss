@@ -8,6 +8,7 @@
 // scss-docs-start alert-variables
 $alert-padding-y:               $spacer !default;
 $alert-padding-x:               $spacer !default;
+$alert-gap:                     $spacer * .5 !default;
 $alert-margin-bottom:           1rem !default;
 $alert-border-radius:           var(--#{$prefix}border-radius) !default;
 $alert-link-font-weight:        $font-weight-bold !default;
@@ -24,12 +25,13 @@ $alert-tokens: defaults(
     --#{$prefix}alert-bg: var(--#{$prefix}theme-bg-subtle, transparent),
     --#{$prefix}alert-padding-x: #{$alert-padding-x},
     --#{$prefix}alert-padding-y: #{$alert-padding-y},
+    --#{$prefix}alert-gap: #{$alert-gap},
     --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom},
     --#{$prefix}alert-color: var(--#{$prefix}theme-fg, inherit),
     --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, transparent),
     --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color),
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
-    --#{$prefix}alert-link-color: var(--#{$prefix}theme-fg, inherit),
+    --#{$prefix}alert-link-color: inherit,
     --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
   ),
   $alert-tokens
@@ -42,13 +44,19 @@ $alert-tokens: defaults(
   .alert {
     @include tokens($alert-tokens);
 
-    position: relative;
+    display: flex;
+    gap: var(--#{$prefix}alert-gap);
+    align-items: start;
     padding: var(--#{$prefix}alert-padding-y) var(--#{$prefix}alert-padding-x);
     margin-bottom: var(--#{$prefix}alert-margin-bottom);
     color: var(--#{$prefix}alert-color);
     background-color: var(--#{$prefix}alert-bg);
     border: var(--#{$prefix}alert-border);
     @include border-radius(var(--#{$prefix}alert-border-radius));
+  }
+
+  .alert > p {
+    margin-bottom: 0;
   }
 
   .alert-heading {
@@ -61,17 +69,9 @@ $alert-tokens: defaults(
   }
 
 
-  .alert:has(> .btn-close),
-  .alert-dismissible {
-    padding-inline-end: calc(var(--#{$prefix}alert-padding-x) * 3); // stylelint-disable-line function-disallowed-list
-
-    .btn-close {
-      position: absolute;
-      inset-inline-end: 0;
-      top: 0;
-      z-index: $stretched-link-z-index + 1;
-      padding: calc(var(--#{$prefix}alert-padding-y) * 1.25) var(--#{$prefix}alert-padding-x); // stylelint-disable-line function-disallowed-list
-    }
+  .alert:has(> .btn-close) > .btn-close,
+  .alert-dismissible > .btn-close {
+    margin-inline-start: auto;
   }
 
 

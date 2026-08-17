@@ -280,6 +280,30 @@ finished, not whether the state changed.
 
 #### Alert
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The alert lays its children out in a row.** It is `display: flex` with
+  `align-items: start` and `--cui-alert-gap` between children, so an icon next
+  to a label needs no `d-flex` and no spacing utility. Text mixed with inline
+  elements is a single anonymous item and is unaffected, but an alert built
+  from **several block elements** — a heading, paragraphs, an `<hr>` — now sits
+  side by side. Wrap that content in a `.vstack`:
+
+  ```html
+  <div class="alert alert-success" role="alert">
+    <div class="vstack">
+      <h4 class="alert-heading">Great job!</h4>
+      <p>…</p>
+    </div>
+  </div>
+  ```
+
+- **The close button is a flex item, not an absolutely positioned one.** It is
+  pushed to the end with `margin-inline-start: auto`, so it no longer overlaps
+  the text and the alert no longer reserves three paddings of room for it.
+  Markup does not change: a `.btn-close` inside the alert still lands where it
+  did, with or without `.alert-dismissible`. `--cui-alert-close-*` and the
+  `$alert-dismissible-padding-r` machinery are gone with the positioning.
+
 - **An `<hr>` inside an alert takes the variant's border colour.** The alert
   redeclares `--cui-hr-border-color`, so a separator in a `.alert-success` is
   green rather than the page's neutral grey.
