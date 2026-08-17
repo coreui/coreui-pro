@@ -12,6 +12,8 @@
 $avatar-size:                  2rem !default;
 // The label scales with the frame, so a size only has to be given once.
 $avatar-font-size-ratio:       .4 !default;
+$avatar-color:                 inherit !default;
+$avatar-bg:                    var(--#{$prefix}secondary-bg) !default;
 $avatar-border-radius:         50em !default;
 $avatar-status-size:           .5rem !default;
 $avatar-status-border-radius:  50em !default;
@@ -37,6 +39,8 @@ $avatar-tokens: () !default;
 $avatar-tokens: defaults(
   (
     --#{$prefix}avatar-size: #{$avatar-size},
+    --#{$prefix}avatar-color: var(--#{$prefix}theme-contrast, #{$avatar-color}),
+    --#{$prefix}avatar-bg: var(--#{$prefix}theme-base, #{$avatar-bg}),
     --#{$prefix}avatar-border-radius: #{$avatar-border-radius},
     --#{$prefix}avatar-status-size: #{$avatar-status-size},
     --#{$prefix}avatar-status-border-radius: #{$avatar-status-border-radius},
@@ -48,6 +52,15 @@ $avatar-tokens: defaults(
 // scss-docs-end avatar-css-vars
 
 // stylelint-enable scss/dollar-variable-default
+
+// scss-docs-start avatar-variants
+$avatar-variants: (
+  "subtle": (
+    "color": "fg",
+    "bg": "bg-subtle"
+  )
+) !default;
+// scss-docs-end avatar-variants
 @layer components {
   .avatar {
     @include tokens($avatar-tokens);
@@ -61,10 +74,22 @@ $avatar-tokens: defaults(
     // Declared as a fallback rather than a token, so the derived size is the
     // default and an explicit one still wins.
     font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio})); // stylelint-disable-line function-disallowed-list
+    color: var(--#{$prefix}avatar-color);
     vertical-align: middle;
+    background-color: var(--#{$prefix}avatar-bg);
     @include border-radius(var(--#{$prefix}avatar-border-radius));
     @include transition($avatar-transition);
   }
+
+  // scss-docs-start avatar-modifiers
+  @each $variant, $properties in $avatar-variants {
+    .avatar-#{$variant} {
+      @each $property, $value in $properties {
+        --#{$prefix}avatar-#{$property}: var(--#{$prefix}theme-#{$value});
+      }
+    }
+  }
+  // scss-docs-end avatar-modifiers
 
   .avatar-img {
     width: 100%;
