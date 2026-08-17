@@ -307,9 +307,12 @@ finished, not whether the state changed.
 - **The close button is a flex item, not an absolutely positioned one.** It is
   pushed to the end with `margin-inline-start: auto`, so it no longer overlaps
   the text and the alert no longer reserves three paddings of room for it.
-  Markup does not change: a `.btn-close` inside the alert still lands where it
-  did, with or without `.alert-dismissible`. `--cui-alert-close-*` and the
-  `$alert-dismissible-padding-r` machinery are gone with the positioning.
+  A `.btn-close` that is a **direct child** of the alert still lands where it
+  did, with or without `.alert-dismissible`, and `.alert-dismissible` itself is
+  now an empty class kept for existing markup. One case does change: a close
+  button nested inside a wrapper used to be positioned by the alert, and is now
+  laid out by that wrapper like any other content. Move it up to be a direct
+  child of the alert to keep it at the trailing edge.
 
 - **An `<hr>` inside an alert takes the variant's border colour.** The alert
   redeclares `--cui-hr-border-color`, so a separator in a `.alert-success` is
