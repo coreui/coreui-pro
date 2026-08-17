@@ -33,6 +33,8 @@ const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_LOAD_DATA_API = `DOMContentLoaded${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_BEFOREMATCH = `beforematch${EVENT_KEY}`
 
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_COLLAPSE = 'collapse'
@@ -43,14 +45,20 @@ const CLASS_NAME_HORIZONTAL = 'collapse-horizontal'
 const WIDTH = 'width'
 const HEIGHT = 'height'
 
+const ATTRIBUTE_HIDDEN = 'hidden'
+const VALUE_UNTIL_FOUND = 'until-found'
+
 const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="collapse"]'
+const SELECTOR_HIDDEN_UNTIL_FOUND = '.collapse[data-coreui-hidden-until-found="true"]'
 
 const Default = {
+  hiddenUntilFound: false,
   parent: null
 }
 
 const DefaultType = {
+  hiddenUntilFound: 'boolean',
   parent: '(null|element)'
 }
 
@@ -59,8 +67,22 @@ const DefaultType = {
  */
 
 type CollapseConfig = {
+  hiddenUntilFound: boolean
   parent: string | Element | null
 }
+
+// Without support the attribute is left off entirely. A browser that does not
+// know it falls back to plain `hidden`, which the stylesheet no longer backs
+// with `!important` — so an area carrying a display utility would show.
+const supportsUntilFound = (): boolean =>
+  typeof document !== 'undefined' && 'onbeforematch' in document.documentElement
+
+// Where `auto` can be interpolated, a `hidden="until-found"` area is animated by
+// the stylesheet: it stays in the layout, so its height needs no measuring.
+const usesInterpolatedHeight = (): boolean =>
+  typeof CSS !== 'undefined' &&
+  typeof CSS.supports === 'function' &&
+  CSS.supports('interpolate-size', 'allow-keywords')
 
 /**
  * Class definition
@@ -93,6 +115,14 @@ class Collapse extends BaseComponent {
 
     if (!this._config.parent) {
       this._setAriaExpanded(this._triggerArray, this._isShown())
+    }
+
+    if (this._config.hiddenUntilFound && supportsUntilFound()) {
+      // The browser strips the attribute as it reveals the content, so the
+      // classes have to catch up before it does — otherwise the stylesheet
+      // hides what the reader was just sent to.
+      EventHandler.on(this._element, EVENT_BEFOREMATCH, () => this._onBeforeMatch())
+      this._setHiddenUntilFound(!this._isShown())
     }
   }
 
@@ -142,11 +172,16 @@ class Collapse extends BaseComponent {
     }
 
     const dimension = this._getDimension()
+    const interpolated = this._usesInterpolatedHeight()
+
+    this._setHiddenUntilFound(false)
 
     this._element.classList.remove(CLASS_NAME_COLLAPSE)
     this._element.classList.add(CLASS_NAME_COLLAPSING)
 
-    this._element.style[dimension] = '0'
+    if (!interpolated) {
+      this._element.style[dimension] = '0'
+    }
 
     this._setAriaExpanded(this._triggerArray, true)
     this._isTransitioning = true
@@ -160,6 +195,11 @@ class Collapse extends BaseComponent {
       this._element.style[dimension] = ''
 
       EventHandler.trigger(this._element, EVENT_SHOWN)
+    }
+
+    if (interpolated) {
+      await this._queueCallback(complete, this._element, true)
+      return
     }
 
     const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1)
@@ -184,10 +224,18 @@ class Collapse extends BaseComponent {
     }
 
     const dimension = this._getDimension()
+    const interpolated = this._usesInterpolatedHeight()
 
-    this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`
+    if (interpolated) {
+      // The attribute is what the stylesheet animates towards, so it goes on
+      // now rather than at the end; `content-visibility` is transitioned with
+      // `allow-discrete`, which keeps the content on screen until it finishes.
+      this._setHiddenUntilFound(true)
+    } else {
+      this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`
 
-    reflow(this._element)
+      reflow(this._element)
+    }
 
     this._element.classList.add(CLASS_NAME_COLLAPSING)
     this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW)
@@ -206,6 +254,11 @@ class Collapse extends BaseComponent {
       this._isTransitioning = false
       this._element.classList.remove(CLASS_NAME_COLLAPSING)
       this._element.classList.add(CLASS_NAME_COLLAPSE)
+
+      if (!interpolated) {
+        this._setHiddenUntilFound(true)
+      }
+
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
@@ -250,6 +303,37 @@ class Collapse extends BaseComponent {
     return SelectorEngine.find(selector, this._config.parent as ParentNode).filter(element => !children.includes(element))
   }
 
+  _usesInterpolatedHeight(): boolean {
+    return this._config.hiddenUntilFound && supportsUntilFound() && usesInterpolatedHeight()
+  }
+
+  _setHiddenUntilFound(hidden: boolean): void {
+    if (!this._config.hiddenUntilFound || !supportsUntilFound()) {
+      return
+    }
+
+    if (hidden) {
+      this._element.setAttribute(ATTRIBUTE_HIDDEN, VALUE_UNTIL_FOUND)
+      return
+    }
+
+    this._element.removeAttribute(ATTRIBUTE_HIDDEN)
+  }
+
+  // Find-in-page reveals the content itself; this only brings the component's
+  // state in line with what the reader can already see. `beforematch` is not
+  // cancelable, so there is no `show` event to prevent here.
+  _onBeforeMatch(): void {
+    if (this._isShown()) {
+      return
+    }
+
+    this._element.classList.add(CLASS_NAME_SHOW)
+    this._setAriaExpanded(this._triggerArray, true)
+
+    EventHandler.trigger(this._element, EVENT_SHOWN)
+  }
+
   _setAriaExpanded(triggerArray: HTMLElement[], isOpen: boolean): void {
     if (!triggerArray.length) {
       return
@@ -261,6 +345,18 @@ class Collapse extends BaseComponent {
   }
 
   // Static
+  // The option has to take effect before anyone interacts with the area, and
+  // Collapse is otherwise only constructed on the first click of a trigger.
+  static _initializeDataApi(): void {
+    if (!supportsUntilFound()) {
+      return
+    }
+
+    for (const element of SelectorEngine.find(SELECTOR_HIDDEN_UNTIL_FOUND)) {
+      Collapse.getOrCreateInstance(element)
+    }
+  }
+
   static jQueryInterface(this: any, config: any): void {
     return this.each(function (this: HTMLElement) {
       const data: any = Collapse.getOrCreateInstance(this)
@@ -279,6 +375,10 @@ class Collapse extends BaseComponent {
 /**
  * Data API implementation
  */
+
+EventHandler.on(document, EVENT_LOAD_DATA_API, () => {
+  Collapse._initializeDataApi()
+})
 
 EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
   // preventDefault only for <a> elements (which change the URL) not inside the collapsible element

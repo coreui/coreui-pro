@@ -473,6 +473,127 @@ describe('Collapse', () => {
     })
   })
 
+  describe('hiddenUntilFound', () => {
+    it('should apply the attribute from the data API, before any interaction', () => {
+      fixtureEl.innerHTML = [
+        '<a role="button" data-coreui-toggle="collapse" href="#panel"></a>',
+        '<div class="collapse" id="panel" data-coreui-hidden-until-found="true"><p>needle</p></div>'
+      ].join('')
+
+      const collapseEl = fixtureEl.querySelector('#panel')
+
+      expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+
+      Collapse._initializeDataApi()
+
+      expect(collapseEl.getAttribute('hidden')).toEqual('until-found')
+      expect(Collapse.getInstance(collapseEl)).not.toBeNull()
+    })
+
+    it('should stay out of the way where the browser has no support', () => {
+      // The property sits somewhere up the prototype chain; find its owner.
+      let owner = Object.getPrototypeOf(document.documentElement)
+      while (owner && !Object.getOwnPropertyDescriptor(owner, 'onbeforematch')) {
+        owner = Object.getPrototypeOf(owner)
+      }
+
+      const support = owner && Object.getOwnPropertyDescriptor(owner, 'onbeforematch')
+
+      if (support) {
+        delete owner.onbeforematch
+      }
+
+      try {
+        fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
+
+        const collapseEl = fixtureEl.querySelector('#panel')
+        // eslint-disable-next-line no-new
+        new Collapse(collapseEl, { hiddenUntilFound: true })
+
+        expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+      } finally {
+        if (support) {
+          Object.defineProperty(owner, 'onbeforematch', support)
+        }
+      }
+    })
+
+    it('should leave the content laid out so find-in-page can reach it', () => {
+      fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
+
+      const collapseEl = fixtureEl.querySelector('#panel')
+      // eslint-disable-next-line no-new
+      new Collapse(collapseEl, { hiddenUntilFound: true })
+
+      expect(collapseEl.getAttribute('hidden')).toEqual('until-found')
+    })
+
+    it('should not touch the attribute when the option is off', () => {
+      fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
+
+      const collapseEl = fixtureEl.querySelector('#panel')
+      // eslint-disable-next-line no-new
+      new Collapse(collapseEl)
+
+      expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should leave an already shown collapse alone', () => {
+      fixtureEl.innerHTML = '<div class="collapse show" id="panel"><p>needle</p></div>'
+
+      const collapseEl = fixtureEl.querySelector('#panel')
+      // eslint-disable-next-line no-new
+      new Collapse(collapseEl, { hiddenUntilFound: true })
+
+      expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+    })
+
+    it('should drop the attribute while shown and restore it once hidden', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
+
+        const collapseEl = fixtureEl.querySelector('#panel')
+        const collapse = new Collapse(collapseEl, { hiddenUntilFound: true })
+
+        collapseEl.addEventListener('shown.coreui.collapse', () => {
+          expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+          collapse.hide()
+        })
+
+        collapseEl.addEventListener('hidden.coreui.collapse', () => {
+          expect(collapseEl.getAttribute('hidden')).toEqual('until-found')
+          resolve()
+        })
+
+        collapse.show()
+      })
+    })
+
+    it('should catch up with the browser when find-in-page reveals the content', () => {
+      return new Promise(resolve => {
+        fixtureEl.innerHTML = [
+          '<a role="button" data-coreui-toggle="collapse" href="#panel" aria-expanded="false"></a>',
+          '<div class="collapse" id="panel"><p>needle</p></div>'
+        ].join('')
+
+        const collapseEl = fixtureEl.querySelector('#panel')
+        const trigger = fixtureEl.querySelector('a')
+        // eslint-disable-next-line no-new
+        new Collapse(collapseEl, { hiddenUntilFound: true })
+
+        collapseEl.addEventListener('shown.coreui.collapse', () => {
+          expect(collapseEl).toHaveClass('show')
+          expect(trigger.getAttribute('aria-expanded')).toEqual('true')
+          resolve()
+        })
+
+        // What the browser does on a match: announce it, then strip the attribute.
+        collapseEl.dispatchEvent(new Event('beforematch', { bubbles: true }))
+        collapseEl.removeAttribute('hidden')
+      })
+    })
+  })
+
   describe('dispose', () => {
     it('should destroy a collapse', () => {
       fixtureEl.innerHTML = '<div class="collapse show"></div>'

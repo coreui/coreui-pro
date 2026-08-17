@@ -764,6 +764,13 @@ adornment in the library — so the button needs no icon markup at all:
   + [data-coreui-toggle="collapse"][aria-expanded="false"]::after { transform: rotate(-90deg); }
   ```
 
+- **New `hiddenUntilFound` option.** With `data-coreui-hidden-until-found="true"`
+  a collapsed area is hidden with `hidden="until-found"` rather than taken out
+  of the layout, so the browser's find-in-page searches it and expands it on a
+  match; the component then syncs `.show` and `aria-expanded` so the declared
+  state follows what the reader sees. Off by default, and below Chrome 102 /
+  Firefox 148 / Safari 26.2 it hides the content the way `hidden` always did.
+
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The transition is set through CSS variables, and the Sass variables split
   in two.** `$transition-collapse` and `$transition-collapse-width` were

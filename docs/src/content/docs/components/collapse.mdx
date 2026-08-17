@@ -86,6 +86,25 @@ Multiple `<button>` or `<a>` can show and hide an element if they each reference
     </div>
   </div>`} />
 
+## Findable when collapsed
+
+By default a collapsed area is removed from the layout, which also removes it from what the browser's find-in-page can search. Set `data-coreui-hidden-until-found="true"` on the collapsible element to hide it with [`hidden="until-found"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden) instead: the content stays laid out but invisible, so searching the page finds it, and the browser expands the area to show the match.
+
+<Example code={`<p>
+    <button class="btn btn-primary" type="button" data-coreui-toggle="collapse" data-coreui-target="#collapseFindable" aria-expanded="false" aria-controls="collapseFindable">
+      Toggle findable content
+    </button>
+  </p>
+  <div class="collapse" id="collapseFindable" data-coreui-hidden-until-found="true">
+    <div class="card card-body">
+      Search this page for <strong>capybara</strong> with your browser's find-in-page and this panel opens on its own.
+    </div>
+  </div>`} />
+
+The component keeps up with the browser: when a match reveals the content, it adds `.show` and sets `aria-expanded` on the triggers, so the state the reader sees and the state the markup declares do not drift apart. The attribute goes back on once the area is collapsed again.
+
+Requires Chrome 102, Firefox 148 or Safari 26.2. Below those the attribute hides the content the way `hidden` always did, which is what a collapsed area does anyway — the content is simply not findable, exactly as without the option.
+
 ## Accessibility
 
 Be sure to add `aria-expanded` to the control component. This attribute explicitly sends the current state of the collapsible element connected to the control to screen readers and related assistive technologies. If the collapsible part is closed by default, the attribute on the control element should have a value of `aria-expanded="false"`. If you have set the collapsible element to be open by default using the `show` class, set `aria-expanded="true"` on the control alternatively. The plugin will automatically toggle this attribute on the control based on whether or not the collapsible element has been opened or closed (via JavaScript, or because the user triggered another control element also tied to the same collapsible element). If the control element's HTML element is not a button (e.g., an `<a>` or `<div>`), the attribute `role="button"` should be added to the element.
@@ -126,6 +145,7 @@ Starting with CoreUI 4.2.6, all components support an **experimental** reserved 
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
+`hiddenUntilFound` | boolean | `false` | Hides the collapsed content with [`hidden="until-found"`](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/hidden) instead of taking it out of the layout, so find-in-page can search it and reveal it. |
 `parent` | selector, jQuery object, DOM element | `null` | If parent is provided, then all collapsible elements under the specified parent will be closed when this collapsible item is shown. (similar to traditional accordion behavior - this is dependent on the `card` class). The attribute has to be set on the target collapsible area. |
 
 ### Methods
