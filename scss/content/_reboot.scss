@@ -626,9 +626,13 @@ $th-font-weight:       null !default;
 
   // Hidden attribute
   //
-  // Always hide an element with the `hidden` HTML attribute.
+  // Always hide an element with the `hidden` HTML attribute. The user agent
+  // already does, but from its own origin, which any author rule setting
+  // `display` outruns — a `hidden` element carrying `.d-flex` would show.
+  // `until-found` is excluded the way the user agent stylesheet excludes it:
+  // that content stays laid out so find-in-page can reach and reveal it.
 
-  [hidden] {
+  [hidden]:not([hidden="until-found"]) {
     display: none !important;
   }
 }
