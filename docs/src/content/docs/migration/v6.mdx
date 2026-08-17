@@ -297,6 +297,13 @@ finished, not whether the state changed.
   </div>
   ```
 
+- **An alert marked `.fade show` fades in when it is added to the page.** The
+  classes used to animate the alert in one direction only, because an element
+  inserted with `.show` already on it has no earlier state to transition from;
+  `@starting-style` supplies one. Nothing to change in your code — an alert you
+  append at runtime animates without the class juggling that used to be needed,
+  and an alert already in the markup is unaffected.
+
 - **The close button is a flex item, not an absolutely positioned one.** It is
   pushed to the end with `margin-inline-start: auto`, so it no longer overlaps
   the text and the alert no longer reserves three paddings of room for it.
