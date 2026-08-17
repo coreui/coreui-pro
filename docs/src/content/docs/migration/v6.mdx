@@ -237,14 +237,13 @@ finished, not whether the state changed.
   — so one token now shapes the whole item. Defaults render as before; drop any
   override of the removed variable.
 
-- **One padding token and one font size for the whole control, plus
-  `.accordion-sm`.** `--cui-accordion-padding-x` / `-y` and
-  `--cui-accordion-font-size` are read by the header and the body alike, so
-  resizing an accordion is one declaration instead of four.
-  `--cui-accordion-btn-padding-*` and `--cui-accordion-body-padding-*` are no
-  longer declared by default, but they still override their part where they are
-  set, so existing overrides keep working. `.accordion-sm` builds on the same
-  tokens for a compact accordion.
+- **One padding token and one font size for the whole control.**
+  `--cui-accordion-padding-x` / `-y` and `--cui-accordion-font-size` are read by
+  the header and the body alike, so resizing an accordion is one declaration
+  instead of four. `--cui-accordion-btn-padding-*` and
+  `--cui-accordion-body-padding-*` are no longer declared by default, but they
+  still override their part where they are set, so existing overrides keep
+  working.
 
 #### Avatar
 
