@@ -490,6 +490,34 @@ describe('Collapse', () => {
       expect(Collapse.getInstance(collapseEl)).not.toBeNull()
     })
 
+    it('should stay out of the way where the browser has no support', () => {
+      // The property sits somewhere up the prototype chain; find its owner.
+      let owner = Object.getPrototypeOf(document.documentElement)
+      while (owner && !Object.getOwnPropertyDescriptor(owner, 'onbeforematch')) {
+        owner = Object.getPrototypeOf(owner)
+      }
+
+      const support = owner && Object.getOwnPropertyDescriptor(owner, 'onbeforematch')
+
+      if (support) {
+        delete owner.onbeforematch
+      }
+
+      try {
+        fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
+
+        const collapseEl = fixtureEl.querySelector('#panel')
+        // eslint-disable-next-line no-new
+        new Collapse(collapseEl, { hiddenUntilFound: true })
+
+        expect(collapseEl.hasAttribute('hidden')).toBeFalse()
+      } finally {
+        if (support) {
+          Object.defineProperty(owner, 'onbeforematch', support)
+        }
+      }
+    })
+
     it('should leave the content laid out so find-in-page can reach it', () => {
       fixtureEl.innerHTML = '<div class="collapse" id="panel"><p>needle</p></div>'
 

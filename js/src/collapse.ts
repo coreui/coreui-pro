@@ -71,6 +71,12 @@ type CollapseConfig = {
   parent: string | Element | null
 }
 
+// Without support the attribute is left off entirely. A browser that does not
+// know it falls back to plain `hidden`, which the stylesheet no longer backs
+// with `!important` — so an area carrying a display utility would show.
+const supportsUntilFound = (): boolean =>
+  typeof document !== 'undefined' && 'onbeforematch' in document.documentElement
+
 // Where `auto` can be interpolated, a `hidden="until-found"` area is animated by
 // the stylesheet: it stays in the layout, so its height needs no measuring.
 const usesInterpolatedHeight = (): boolean =>
@@ -111,7 +117,7 @@ class Collapse extends BaseComponent {
       this._setAriaExpanded(this._triggerArray, this._isShown())
     }
 
-    if (this._config.hiddenUntilFound) {
+    if (this._config.hiddenUntilFound && supportsUntilFound()) {
       // The browser strips the attribute as it reveals the content, so the
       // classes have to catch up before it does — otherwise the stylesheet
       // hides what the reader was just sent to.
@@ -298,11 +304,11 @@ class Collapse extends BaseComponent {
   }
 
   _usesInterpolatedHeight(): boolean {
-    return this._config.hiddenUntilFound && usesInterpolatedHeight()
+    return this._config.hiddenUntilFound && supportsUntilFound() && usesInterpolatedHeight()
   }
 
   _setHiddenUntilFound(hidden: boolean): void {
-    if (!this._config.hiddenUntilFound) {
+    if (!this._config.hiddenUntilFound || !supportsUntilFound()) {
       return
     }
 
@@ -342,6 +348,10 @@ class Collapse extends BaseComponent {
   // The option has to take effect before anyone interacts with the area, and
   // Collapse is otherwise only constructed on the first click of a trigger.
   static _initializeDataApi(): void {
+    if (!supportsUntilFound()) {
+      return
+    }
+
     for (const element of SelectorEngine.find(SELECTOR_HIDDEN_UNTIL_FOUND)) {
       Collapse.getOrCreateInstance(element)
     }
