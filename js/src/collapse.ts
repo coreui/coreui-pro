@@ -33,6 +33,7 @@ const EVENT_SHOWN = `shown${EVENT_KEY}`
 const EVENT_HIDE = `hide${EVENT_KEY}`
 const EVENT_HIDDEN = `hidden${EVENT_KEY}`
 const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`
+const EVENT_BEFOREMATCH = `beforematch${EVENT_KEY}`
 
 const CLASS_NAME_SHOW = 'show'
 const CLASS_NAME_COLLAPSE = 'collapse'
@@ -43,14 +44,19 @@ const CLASS_NAME_HORIZONTAL = 'collapse-horizontal'
 const WIDTH = 'width'
 const HEIGHT = 'height'
 
+const ATTRIBUTE_HIDDEN = 'hidden'
+const VALUE_UNTIL_FOUND = 'until-found'
+
 const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="collapse"]'
 
 const Default = {
+  hiddenUntilFound: false,
   parent: null
 }
 
 const DefaultType = {
+  hiddenUntilFound: 'boolean',
   parent: '(null|element)'
 }
 
@@ -59,6 +65,7 @@ const DefaultType = {
  */
 
 type CollapseConfig = {
+  hiddenUntilFound: boolean
   parent: string | Element | null
 }
 
@@ -93,6 +100,14 @@ class Collapse extends BaseComponent {
 
     if (!this._config.parent) {
       this._setAriaExpanded(this._triggerArray, this._isShown())
+    }
+
+    if (this._config.hiddenUntilFound) {
+      // The browser strips the attribute as it reveals the content, so the
+      // classes have to catch up before it does — otherwise the stylesheet
+      // hides what the reader was just sent to.
+      EventHandler.on(this._element, EVENT_BEFOREMATCH, () => this._onBeforeMatch())
+      this._setHiddenUntilFound(!this._isShown())
     }
   }
 
@@ -142,6 +157,8 @@ class Collapse extends BaseComponent {
     }
 
     const dimension = this._getDimension()
+
+    this._setHiddenUntilFound(false)
 
     this._element.classList.remove(CLASS_NAME_COLLAPSE)
     this._element.classList.add(CLASS_NAME_COLLAPSING)
@@ -206,6 +223,7 @@ class Collapse extends BaseComponent {
       this._isTransitioning = false
       this._element.classList.remove(CLASS_NAME_COLLAPSING)
       this._element.classList.add(CLASS_NAME_COLLAPSE)
+      this._setHiddenUntilFound(true)
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
@@ -248,6 +266,33 @@ class Collapse extends BaseComponent {
     const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent as ParentNode)
     // remove children if greater depth
     return SelectorEngine.find(selector, this._config.parent as ParentNode).filter(element => !children.includes(element))
+  }
+
+  _setHiddenUntilFound(hidden: boolean): void {
+    if (!this._config.hiddenUntilFound) {
+      return
+    }
+
+    if (hidden) {
+      this._element.setAttribute(ATTRIBUTE_HIDDEN, VALUE_UNTIL_FOUND)
+      return
+    }
+
+    this._element.removeAttribute(ATTRIBUTE_HIDDEN)
+  }
+
+  // Find-in-page reveals the content itself; this only brings the component's
+  // state in line with what the reader can already see. `beforematch` is not
+  // cancelable, so there is no `show` event to prevent here.
+  _onBeforeMatch(): void {
+    if (this._isShown()) {
+      return
+    }
+
+    this._element.classList.add(CLASS_NAME_SHOW)
+    this._setAriaExpanded(this._triggerArray, true)
+
+    EventHandler.trigger(this._element, EVENT_SHOWN)
   }
 
   _setAriaExpanded(triggerArray: HTMLElement[], isOpen: boolean): void {

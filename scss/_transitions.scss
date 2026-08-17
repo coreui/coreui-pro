@@ -40,7 +40,10 @@ $collapse-tokens: defaults(
 
   // scss-docs-start collapse-classes
   .collapse {
-    &:not(.show) {
+    // `until-found` content is hidden by the browser instead, which keeps it
+    // laid out so find-in-page can reach it. `display: none` would take it back
+    // out of the layout and undo that.
+    &:not(.show):not([hidden="until-found"]) {
       display: none;
     }
   }

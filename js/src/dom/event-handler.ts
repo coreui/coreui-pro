@@ -102,7 +102,8 @@ const nativeEvents = new Set([
   'error',
   'abort',
   'scroll',
-  'toggle'
+  'toggle',
+  'beforematch'
 ])
 
 /**
