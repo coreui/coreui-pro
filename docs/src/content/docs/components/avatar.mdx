@@ -96,7 +96,7 @@ Display multiple avatars in a stack to represent a group of users or items, with
 
 ## Avatars with status
 
-Add `.avatar-status` to show presence. The indicator takes its colour from a background utility and its shape from a radius utility, so a state needs no class of its own:
+Add `.avatar-status` to show presence. The indicator takes its colour from a background utility, so a state needs no class of its own:
 
 <Example code={`<div class="d-flex gap-3">
     <div class="avatar">
@@ -109,20 +109,18 @@ Add `.avatar-status` to show presence. The indicator takes its colour from a bac
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status bg-danger rounded-1"></span>
+      <span class="avatar-status bg-danger"></span>
     </div>
     <div class="avatar bg-secondary">
       CUI
-      <span class="avatar-status bg-secondary rounded-1"></span>
+      <span class="avatar-status bg-secondary"></span>
     </div>
   </div>`} />
-
-Squaring one state off, as the last two do, keeps it apart from the others where the colour is not available — for a viewer with a colour vision deficiency, or on a monochrome print.
 
 The indicator carries no text, so it means nothing to a screen reader on its own. Where the state matters rather than decorates, put it in the markup as well:
 
 ```html
-<span class="avatar-status bg-danger rounded-1"></span>
+<span class="avatar-status bg-danger"></span>
 <span class="visually-hidden">Busy</span>
 ```
 
