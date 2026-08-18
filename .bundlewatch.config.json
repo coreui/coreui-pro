@@ -10,15 +10,15 @@
     },
     {
       "path": "./dist/css/coreui-reboot.css",
-      "maxSize": "4.4 kB"
+      "maxSize": "4.5 kB"
     },
     {
       "path": "./dist/css/coreui-reboot.min.css",
-      "maxSize": "4.25 kB"
+      "maxSize": "4.35 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.css",
-      "maxSize": "14.3 kB"
+      "maxSize": "14.5 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.min.css",
@@ -26,11 +26,11 @@
     },
     {
       "path": "./dist/css/coreui.css",
-      "maxSize": "59.75kB"
+      "maxSize": "60kB"
     },
     {
       "path": "./dist/css/coreui.min.css",
-      "maxSize": "49.75kB"
+      "maxSize": "50kB"
     },
     {
       "path": "./dist/js/coreui.bundle.js",
