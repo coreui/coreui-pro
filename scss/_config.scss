@@ -322,18 +322,94 @@ $light:         $gray-100 !default;
 $dark:          $gray-900 !default;
 // scss-docs-end theme-color-variables
 
+// stylelint-disable function-disallowed-list
+
 // scss-docs-start theme-colors-map
 $theme-colors: (
-  "primary":    $primary,
-  "secondary":  $secondary,
-  "success":    $success,
-  "info":       $info,
-  "warning":    $warning,
-  "danger":     $danger,
-  "light":      $light,
-  "dark":       $dark
+  "primary": (
+    "base":          $primary,
+    "contrast":      $white,
+    "fg":            light-dark(var(--#{$prefix}primary-700), var(--#{$prefix}primary-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
+    "border-subtle": light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "secondary": (
+    "base":          $secondary,
+    "contrast":      $white,
+    "fg":            light-dark(var(--#{$prefix}secondary-700), var(--#{$prefix}secondary-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}secondary-200), var(--#{$prefix}secondary-800)),
+    "border-subtle": light-dark(var(--#{$prefix}secondary-300), var(--#{$prefix}secondary-600)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}secondary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "success": (
+    "base":          $success,
+    "contrast":      $black,
+    "fg":            light-dark(var(--#{$prefix}success-700), var(--#{$prefix}success-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
+    "border-subtle": light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "info": (
+    "base":          $info,
+    "contrast":      $black,
+    "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
+    "border-subtle": light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "warning": (
+    "base":          $warning,
+    "contrast":      $black,
+    "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
+    "border-subtle": light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "danger": (
+    "base":          $danger,
+    "contrast":      $black,
+    "fg":            light-dark(var(--#{$prefix}danger-700), var(--#{$prefix}danger-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
+    "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
+    "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
+    "border-subtle": light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "light": (
+    "base":          $light,
+    "contrast":      $black,
+    "fg":            light-dark(var(--#{$prefix}light-700), var(--#{$prefix}light-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)),
+    "bg-subtle":     light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)),
+    "bg-muted":      light-dark(var(--#{$prefix}light-200), var(--#{$prefix}light-800)),
+    "border-subtle": light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}light) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
+  "dark": (
+    "base":          $dark,
+    "contrast":      $white,
+    "fg":            light-dark(var(--#{$prefix}dark-700), var(--#{$prefix}dark-300)),
+    "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)),
+    "bg-subtle":     light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)),
+    "bg-muted":      light-dark(var(--#{$prefix}dark-200), var(--#{$prefix}dark-800)),
+    "border-subtle": light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-800)),
+    "focus-ring":    color-mix(in srgb, var(--#{$prefix}dark) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
+  ),
 ) !default;
 // scss-docs-end theme-colors-map
+
+// stylelint-enable function-disallowed-list
 
 // Color scales
 //
@@ -366,39 +442,6 @@ $color-shades: (
 // color reads correctly in both schemes without a second set of variables.
 // `light` and `dark` point at the gray scale instead: their own scales would
 // be a scale of a gray, which is what `$grays` already is.
-
-// scss-docs-start theme-text-variables
-$primary-text-emphasis:    light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)) !default;
-$secondary-text-emphasis:  light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)) !default;
-$success-text-emphasis:    light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)) !default;
-$info-text-emphasis:       light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)) !default;
-$warning-text-emphasis:    light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)) !default;
-$danger-text-emphasis:     light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)) !default;
-$light-text-emphasis:      light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)) !default;
-$dark-text-emphasis:       light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)) !default;
-// scss-docs-end theme-text-variables
-
-// scss-docs-start theme-bg-subtle-variables
-$primary-bg-subtle:    light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)) !default;
-$secondary-bg-subtle:  light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)) !default;
-$success-bg-subtle:    light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)) !default;
-$info-bg-subtle:       light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)) !default;
-$warning-bg-subtle:    light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)) !default;
-$danger-bg-subtle:     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)) !default;
-$light-bg-subtle:      light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)) !default;
-$dark-bg-subtle:       light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)) !default;
-// scss-docs-end theme-bg-subtle-variables
-
-// scss-docs-start theme-border-subtle-variables
-$primary-border-subtle:    light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)) !default;
-$secondary-border-subtle:  light-dark(var(--#{$prefix}secondary-300), var(--#{$prefix}secondary-600)) !default;
-$success-border-subtle:    light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)) !default;
-$info-border-subtle:       light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)) !default;
-$warning-border-subtle:    light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)) !default;
-$danger-border-subtle:     light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)) !default;
-$light-border-subtle:      light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)) !default;
-$dark-border-subtle:       light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-800)) !default;
-// scss-docs-end theme-border-subtle-variables
 
 // Gradients
 

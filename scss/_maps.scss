@@ -7,60 +7,32 @@
 // Placed here so that others can override the default Sass maps and see automatic updates to utilities and more.
 
 // scss-docs-start theme-text-map
-$theme-colors-text: (
-  "primary": $primary-text-emphasis,
-  "secondary": $secondary-text-emphasis,
-  "success": $success-text-emphasis,
-  "info": $info-text-emphasis,
-  "warning": $warning-text-emphasis,
-  "danger": $danger-text-emphasis,
-  "light": $light-text-emphasis,
-  "dark": $dark-text-emphasis,
-) !default;
+$theme-colors-text: map-slot($theme-colors, "text-emphasis") !default;
 // scss-docs-end theme-text-map
 
 // scss-docs-start theme-bg-subtle-map
-$theme-colors-bg-subtle: (
-  "primary": $primary-bg-subtle,
-  "secondary": $secondary-bg-subtle,
-  "success": $success-bg-subtle,
-  "info": $info-bg-subtle,
-  "warning": $warning-bg-subtle,
-  "danger": $danger-bg-subtle,
-  "light": $light-bg-subtle,
-  "dark": $dark-bg-subtle,
-) !default;
+$theme-colors-bg-subtle: map-slot($theme-colors, "bg-subtle") !default;
 // scss-docs-end theme-bg-subtle-map
 
 // scss-docs-start theme-border-subtle-map
-$theme-colors-border-subtle: (
-  "primary": $primary-border-subtle,
-  "secondary": $secondary-border-subtle,
-  "success": $success-border-subtle,
-  "info": $info-border-subtle,
-  "warning": $warning-border-subtle,
-  "danger": $danger-border-subtle,
-  "light": $light-border-subtle,
-  "dark": $dark-border-subtle,
-) !default;
+$theme-colors-border-subtle: map-slot($theme-colors, "border-subtle") !default;
 // scss-docs-end theme-border-subtle-map
 
 // scss-docs-start theme-contrast-map
-// The colour that reads on top of each theme colour. Written rather than
-// computed: color-contrast() picked these by ratio, which made every theme
-// colour a Sass colour the compiler had to evaluate. Upstream v6 writes them
-// too — it keeps a "contrast" key per colour and never calls the function.
-$theme-colors-contrast: (
-  "primary": $white,
-  "secondary": $white,
-  "success": $black,
-  "info": $black,
-  "warning": $black,
-  "danger": $black,
-  "light": $black,
-  "dark": $white,
-) !default;
+$theme-colors-contrast: map-slot($theme-colors, "contrast") !default;
 // scss-docs-end theme-contrast-map
+
+// scss-docs-start theme-fg-map
+$theme-colors-fg: map-slot($theme-colors, "fg") !default;
+// scss-docs-end theme-fg-map
+
+// scss-docs-start theme-bg-muted-map
+$theme-colors-bg-muted: map-slot($theme-colors, "bg-muted") !default;
+// scss-docs-end theme-bg-muted-map
+
+// scss-docs-start theme-focus-ring-map
+$theme-colors-focus-ring: map-slot($theme-colors, "focus-ring") !default;
+// scss-docs-end theme-focus-ring-map
 
 // Utilities maps
 //
@@ -68,7 +40,7 @@ $theme-colors-contrast: (
 
 // Come v6, we'll de-dupe these variables. Until then, for backward compatibility, we keep them to reassign.
 // scss-docs-start utilities-colors
-$utilities-colors: $theme-colors !default;
+$utilities-colors: map-slot($theme-colors, "base") !default;
 // scss-docs-end utilities-colors
 
 // scss-docs-start utilities-text-colors

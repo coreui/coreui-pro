@@ -1,3 +1,4 @@
+@use "../functions/maps" as *;
 @use "../functions/color" as *;
 @use "../functions/color-contrast" as *;
 @use "../functions/to-rgb" as *;
@@ -7,7 +8,7 @@
 // The opacity utilities scale a runtime var, so calc() is unavoidable here.
 
 @layer helpers {
-  @each $color, $value in $theme-colors {
+  @each $color, $value in map-slot($theme-colors, "base") {
     .link-#{$color} {
       // stylelint-disable-next-line scss/at-function-named-arguments
       color: color-mix(in srgb, var(--#{$prefix}#{$color}) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent) if(sass($enable-important-utilities): !important);
