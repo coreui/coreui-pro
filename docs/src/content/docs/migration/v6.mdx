@@ -1228,6 +1228,38 @@ assembles maps of CSS expressions and the browser resolves them.
   `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
   the ghost and link variants.
 
+#### A theme colour is one nested map entry
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`$theme-colors` carried one value per colour and three further families carried
+the rest, so a theme colour was defined in four places and adding one meant
+editing four blocks. It is a map of maps now — one name, eight slots.
+
+- **Twenty-four Sass variables are removed**: `$primary-text-emphasis` and its
+  seven siblings, `$primary-bg-subtle` and its seven, `$primary-border-subtle`
+  and its seven. Override a slot through the map instead:
+
+  ```diff
+  - $success-bg-subtle: #e8f5ec;
+  + $theme-colors: map.merge($theme-colors, (
+  +   "success": map.merge(map.get($theme-colors, "success"), ("bg-subtle": #e8f5ec))
+  + ));
+  ```
+
+  Every `--#{$prefix}{color}-*` custom property keeps its name and its value, so
+  a runtime override is unaffected.
+- **`$theme-colors` is a map of maps**, so `@each $name, $value in $theme-colors`
+  now yields a map. Use `map-slot($theme-colors, "base")` where a flat
+  `name → colour` map is what you want; the four `$theme-colors-*` families in
+  `scss/_maps.scss` are built that way.
+- **New slots:** `fg` (the state colour readable as text, one step lighter than
+  `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid colour) and
+  `focus-ring` (the hue the `.theme-*` ring mixes from). They emit
+  `--#{$prefix}{color}-fg`, `-bg-muted` and `-focus-ring`, and reach components
+  as `--#{$prefix}theme-fg-base`, `--#{$prefix}theme-bg-muted` and
+  `--#{$prefix}theme-focus-ring`.
+
 #### The control variables moved out of the shared config
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
