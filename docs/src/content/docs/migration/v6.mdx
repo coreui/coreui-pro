@@ -1254,11 +1254,12 @@ them. A state names a theme colour now, and every value is a slot of it.
   them (`$form-valid-*`, `$form-invalid-*`, `$form-feedback-valid-color`,
   `$form-feedback-invalid-color`). Retint a state by retinting its theme colour,
   or override the slot on the map.
-- **Feedback text and the invalid border are a step darker**, because they read
-  the `fg` slot instead of the raw brand colour. That is a fix, not a
-  preference: measured against the body background, the old colours scored
-  **3.50** (valid) and **3.69** (invalid), both under WCAG AA; the new ones
-  score **7.69** and **7.93**.
+- **Feedback text and the invalid border are one step darker**, because both
+  read the state colour's `fg` slot instead of the raw brand colour. That is a
+  fix, not a preference: measured against the body background, the old pair
+  scored **3.50** (valid) and **3.69** (invalid), both under WCAG AA; the new
+  pair scores **5.13** and **5.39**. Text and border stay the same colour, as
+  they were before.
 - **`$input-btn-focus-color-opacity` is removed.** The validation ring comes
   from the colour's `focus-ring` slot, which reads
   `--#{$prefix}focus-ring-opacity`; set that instead.

@@ -329,7 +329,7 @@ $theme-colors: (
   "primary": (
     "base":          $primary,
     "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}primary-700), var(--#{$prefix}primary-300)),
+    "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
     "text-emphasis": light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
@@ -339,7 +339,7 @@ $theme-colors: (
   "secondary": (
     "base":          $secondary,
     "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}secondary-700), var(--#{$prefix}secondary-300)),
+    "fg":            light-dark(var(--#{$prefix}secondary-600), var(--#{$prefix}secondary-400)),
     "text-emphasis": light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}secondary-200), var(--#{$prefix}secondary-800)),
@@ -349,7 +349,7 @@ $theme-colors: (
   "success": (
     "base":          $success,
     "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}success-700), var(--#{$prefix}success-300)),
+    "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
     "text-emphasis": light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
     "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
@@ -379,7 +379,7 @@ $theme-colors: (
   "danger": (
     "base":          $danger,
     "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}danger-700), var(--#{$prefix}danger-300)),
+    "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
     "text-emphasis": light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
     "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
@@ -389,7 +389,7 @@ $theme-colors: (
   "light": (
     "base":          $light,
     "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}light-700), var(--#{$prefix}light-300)),
+    "fg":            light-dark(var(--#{$prefix}light-800), var(--#{$prefix}light-300)),
     "text-emphasis": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)),
     "bg-subtle":     light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)),
     "bg-muted":      light-dark(var(--#{$prefix}light-200), var(--#{$prefix}light-800)),
@@ -399,7 +399,7 @@ $theme-colors: (
   "dark": (
     "base":          $dark,
     "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}dark-700), var(--#{$prefix}dark-300)),
+    "fg":            light-dark(var(--#{$prefix}dark-600), var(--#{$prefix}dark-300)),
     "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)),
     "bg-subtle":     light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)),
     "bg-muted":      light-dark(var(--#{$prefix}dark-200), var(--#{$prefix}dark-800)),
