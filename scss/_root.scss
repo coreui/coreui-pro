@@ -99,10 +99,18 @@
     --#{$prefix}border-radius-pill: #{$border-radius-pill};
     // scss-docs-end root-border-var
 
-    --#{$prefix}box-shadow: #{$box-shadow};
-    --#{$prefix}box-shadow-sm: #{$box-shadow-sm};
-    --#{$prefix}box-shadow-lg: #{$box-shadow-lg};
-    --#{$prefix}box-shadow-inset: #{$box-shadow-inset};
+    // scss-docs-start root-box-shadow-variables
+    --#{$prefix}shadow-color: #{$shadow-color};
+    --#{$prefix}shadow-strength: #{$shadow-strength};
+
+    @each $key, $value in $shadows {
+      @if $key == null {
+        --#{$prefix}box-shadow: #{$value};
+      } @else {
+        --#{$prefix}box-shadow-#{$key}: #{$value};
+      }
+    }
+    // scss-docs-end root-box-shadow-variables
 
     // Focus styles
     // scss-docs-start root-focus-variables
@@ -162,6 +170,10 @@
       color-scheme: dark;
 
       // scss-docs-start root-dark-mode-vars
+      // A shadow reads as depth against the surface behind it, and a dark
+      // surface swallows the same alpha, so the strength rises instead of the
+      // colour changing.
+      --#{$prefix}shadow-strength: #{$shadow-strength-dark};
       // scss-docs-end root-dark-mode-vars
     }
   }
