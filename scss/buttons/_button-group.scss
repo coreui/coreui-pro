@@ -82,8 +82,8 @@
   //
 
   .dropdown-toggle-split {
-    padding-right: $btn-padding-x * .75;
-    padding-left: $btn-padding-x * .75;
+    padding-right: calc(#{$btn-padding-x} * .75); // stylelint-disable-line function-disallowed-list
+    padding-left: calc(#{$btn-padding-x} * .75); // stylelint-disable-line function-disallowed-list
 
     &::after,
     .dropup &::after,
@@ -97,13 +97,13 @@
   }
 
   .btn-sm + .dropdown-toggle-split {
-    padding-right: $btn-padding-x-sm * .75;
-    padding-left: $btn-padding-x-sm * .75;
+    padding-right: calc(#{$btn-padding-x-sm} * .75); // stylelint-disable-line function-disallowed-list
+    padding-left: calc(#{$btn-padding-x-sm} * .75); // stylelint-disable-line function-disallowed-list
   }
 
   .btn-lg + .dropdown-toggle-split {
-    padding-right: $btn-padding-x-lg * .75;
-    padding-left: $btn-padding-x-lg * .75;
+    padding-right: calc(#{$btn-padding-x-lg} * .75); // stylelint-disable-line function-disallowed-list
+    padding-left: calc(#{$btn-padding-x-lg} * .75); // stylelint-disable-line function-disallowed-list
   }
 
 
