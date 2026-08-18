@@ -329,7 +329,7 @@ $theme-colors: (
   "primary": (
     "base":          $primary,
     "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}primary-700), var(--#{$prefix}primary-300)),
+    "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
     "text-emphasis": light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
@@ -339,7 +339,7 @@ $theme-colors: (
   "secondary": (
     "base":          $secondary,
     "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}secondary-700), var(--#{$prefix}secondary-300)),
+    "fg":            light-dark(var(--#{$prefix}secondary-600), var(--#{$prefix}secondary-400)),
     "text-emphasis": light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)),
     "bg-muted":      light-dark(var(--#{$prefix}secondary-200), var(--#{$prefix}secondary-800)),
@@ -349,7 +349,7 @@ $theme-colors: (
   "success": (
     "base":          $success,
     "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}success-700), var(--#{$prefix}success-300)),
+    "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
     "text-emphasis": light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
     "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
@@ -379,7 +379,7 @@ $theme-colors: (
   "danger": (
     "base":          $danger,
     "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}danger-700), var(--#{$prefix}danger-300)),
+    "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
     "text-emphasis": light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
     "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
     "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
@@ -389,7 +389,7 @@ $theme-colors: (
   "light": (
     "base":          $light,
     "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}light-700), var(--#{$prefix}light-300)),
+    "fg":            light-dark(var(--#{$prefix}light-800), var(--#{$prefix}light-300)),
     "text-emphasis": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)),
     "bg-subtle":     light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)),
     "bg-muted":      light-dark(var(--#{$prefix}light-200), var(--#{$prefix}light-800)),
@@ -399,7 +399,7 @@ $theme-colors: (
   "dark": (
     "base":          $dark,
     "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}dark-700), var(--#{$prefix}dark-300)),
+    "fg":            light-dark(var(--#{$prefix}dark-600), var(--#{$prefix}dark-300)),
     "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)),
     "bg-subtle":     light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)),
     "bg-muted":      light-dark(var(--#{$prefix}dark-200), var(--#{$prefix}dark-800)),
@@ -857,7 +857,6 @@ $input-btn-font-size:         $font-size-base !default;
 $input-btn-line-height:       $line-height-base !default;
 
 $input-btn-focus-width:         $focus-ring-width !default;
-$input-btn-focus-color-opacity: $focus-ring-opacity !default;
 $input-btn-focus-color:         $focus-ring-color !default;
 // Composed from the two knobs above rather than taken whole from
 // `$focus-ring`, so setting either one reaches every control. Same value by
@@ -891,58 +890,9 @@ $form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-
 
 // Forms
 
-// scss-docs-start form-text-variables
-$form-text-margin-top:                  .25rem !default;
-$form-text-font-size:                   $small-font-size !default;
-$form-text-font-style:                  null !default;
-$form-text-font-weight:                 null !default;
-$form-text-color:                       var(--#{$prefix}secondary-color) !default;
-// scss-docs-end form-text-variables
-
 $form-check-inline-margin-end:    1rem !default;
 
 // Form validation
-
-// scss-docs-start form-feedback-variables
-$form-feedback-margin-top:          $form-text-margin-top !default;
-$form-feedback-font-size:           $form-text-font-size !default;
-$form-feedback-font-style:          $form-text-font-style !default;
-$form-feedback-valid-color:         $success !default;
-$form-feedback-invalid-color:       $danger !default;
-
-$form-feedback-icon-valid-color:    $form-feedback-valid-color !default;
-$form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1'/></svg>") !default;
-$form-feedback-icon-invalid-color:  $form-feedback-invalid-color !default;
-$form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/></svg>") !default;
-// scss-docs-end form-feedback-variables
-
-// scss-docs-start form-validation-colors
-$form-valid-color:                  light-dark($form-feedback-valid-color, $green-300) !default;
-$form-valid-border-color:           light-dark($form-feedback-valid-color, $green-300) !default;
-$form-invalid-color:                light-dark($form-feedback-invalid-color, $red-300) !default;
-$form-invalid-border-color:         light-dark($form-feedback-invalid-color, $red-300) !default;
-// scss-docs-end form-validation-colors
-
-// scss-docs-start form-validation-states
-$form-validation-states: (
-  "valid": (
-    "color": var(--#{$prefix}form-valid-color),
-    "icon": $form-feedback-icon-valid,
-    "tooltip-color": #fff,
-    "tooltip-bg-color": var(--#{$prefix}success),
-    "focus-ring": $input-btn-focus-width solid color-mix(in srgb, var(--#{$prefix}success) math.percentage($input-btn-focus-color-opacity), transparent),
-    "border-color": var(--#{$prefix}form-valid-border-color),
-  ),
-  "invalid": (
-    "color": var(--#{$prefix}form-invalid-color),
-    "icon": $form-feedback-icon-invalid,
-    "tooltip-color": #fff,
-    "tooltip-bg-color": var(--#{$prefix}danger),
-    "focus-ring": $input-btn-focus-width solid color-mix(in srgb, var(--#{$prefix}danger) math.percentage($input-btn-focus-color-opacity), transparent),
-    "border-color": var(--#{$prefix}form-invalid-border-color),
-  )
-) !default;
-// scss-docs-end form-validation-states
 
 // Warning: Avoid customizing these values. They're used for a bird's eye view
 // of components dependent on the z-axis and are designed to all work together.

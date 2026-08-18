@@ -1228,6 +1228,45 @@ assembles maps of CSS expressions and the browser resolves them.
   `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
   the ghost and link variants.
 
+#### A validation state is a theme colour, not a palette of its own
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`$form-validation-states` carried a colour, a border colour, a focus ring and a
+pair of tooltip colours per state, and `_root.scss` emitted four tokens to feed
+them. A state names a theme colour now, and every value is a slot of it.
+
+```diff
+  $form-validation-states: (
+    "valid": (
+-     "color": var(--cui-form-valid-color),
+-     "border-color": var(--cui-form-valid-border-color),
+-     "tooltip-bg-color": var(--cui-success),
+-     …
++     "theme": "success",
+      "icon": …,
+    ),
+  )
+```
+
+- **`--#{$prefix}form-valid-color`, `-valid-border-color`, `-invalid-color` and
+  `-invalid-border-color` are removed**, together with the Sass variables behind
+  them (`$form-valid-*`, `$form-invalid-*`, `$form-feedback-valid-color`,
+  `$form-feedback-invalid-color`). Retint a state by retinting its theme colour,
+  or override the slot on the map.
+- **Feedback text and the invalid border are one step darker**, because both
+  read the state colour's `fg` slot instead of the raw brand colour. That is a
+  fix, not a preference: measured against the body background, the old pair
+  scored **3.50** (valid) and **3.69** (invalid), both under WCAG AA; the new
+  pair scores **5.13** and **5.39**. Text and border stay the same colour, as
+  they were before.
+- **`$input-btn-focus-color-opacity` is removed.** The validation ring comes
+  from the colour's `focus-ring` slot, which reads
+  `--#{$prefix}focus-ring-opacity`; set that instead.
+- **`form-validation-state()` takes `$theme` where it took `$color`**, and the
+  variables moved from `scss/_config.scss` to `scss/forms/_variables.scss`
+  alongside `$form-text-*` and `$form-feedback-*`.
+
 #### A theme colour is one nested map entry
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
