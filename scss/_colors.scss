@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "config" as *;
 @use "maps" as *;
 
@@ -24,15 +25,15 @@
     --#{$prefix}gray-#{$color}: #{$value};
   }
 
-  @each $color, $value in $theme-colors {
-    --#{$prefix}#{$color}: #{$value};
+  @each $color, $slots in $theme-colors {
+    --#{$prefix}#{$color}: #{map.get($slots, "base")};
   }
 
   // A 100-900 scale per theme color, mixed at runtime from the color's own
   // token so overriding the token retints the whole family. The subtle
   // backgrounds, borders and emphasis text below are `light-dark()` pairs of
   // these stops (see $color-tints / $color-shades).
-  @each $color, $value in $theme-colors {
+  @each $color, $slots in $theme-colors {
     @each $stop, $weight in $color-tints {
       --#{$prefix}#{$color}-#{$stop}: #{color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color}))};
     }
@@ -56,5 +57,17 @@
 
   @each $color, $value in $theme-colors-contrast {
     --#{$prefix}#{$color}-contrast: #{$value};
+  }
+
+  @each $color, $value in $theme-colors-fg {
+    --#{$prefix}#{$color}-fg: #{$value};
+  }
+
+  @each $color, $value in $theme-colors-bg-muted {
+    --#{$prefix}#{$color}-bg-muted: #{$value};
+  }
+
+  @each $color, $value in $theme-colors-focus-ring {
+    --#{$prefix}#{$color}-focus-ring: #{$value};
   }
 }

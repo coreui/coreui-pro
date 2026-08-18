@@ -12,7 +12,9 @@ $theme-token-refs: (
   "base": "",
   "contrast": "-contrast",
   "fg": "-text-emphasis",
+  "fg-base": "-fg",
   "bg-subtle": "-bg-subtle",
+  "bg-muted": "-bg-muted",
   "border": "-border-subtle"
 ) !default;
 // scss-docs-end theme-token-refs
@@ -22,10 +24,9 @@ $theme-token-refs: (
     --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
   }
 
-  // Mixed here rather than mapped, because the palette carries no per-color
-  // focus-ring value. Width still comes from the global token, so only the hue
-  // is contextual.
-  --#{$prefix}theme-focus-ring: var(--#{$prefix}focus-ring-width) solid color-mix(in srgb, var(--#{$prefix}#{$state}) #{$focus-ring-opacity * 100%}, transparent);
+  // The map carries the hue; the width stays global, so only the colour is
+  // contextual.
+  --#{$prefix}theme-focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}#{$state}-focus-ring);
 }
 
 // scss-docs-start theme-classes
