@@ -17,11 +17,11 @@
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start drawer-variables
-$drawer-inset:                      $spacer !default;
+$drawer-inset:                      var(--#{$prefix}spacer-3) !default;
 $drawer-width:                      400px !default;
 $drawer-height:                     30vh !default;
-$drawer-padding-y:                  $spacer !default;
-$drawer-padding-x:                  $spacer !default;
+$drawer-padding-y:                  var(--#{$prefix}spacer-3) !default;
+$drawer-padding-x:                  var(--#{$prefix}spacer-3) !default;
 $drawer-color:                      var(--#{$prefix}body-color) !default;
 $drawer-bg:                         var(--#{$prefix}body-bg) !default;
 $drawer-border-color:               var(--#{$prefix}border-color-translucent) !default;
@@ -45,7 +45,7 @@ $drawer-tokens: () !default;
 $drawer-tokens: defaults(
   (
     --#{$prefix}drawer-inset: #{$drawer-inset},
-    --#{$prefix}drawer-zindex: #{$zindex-offcanvas},
+    --#{$prefix}drawer-zindex: var(--#{$prefix}z-offcanvas),
     --#{$prefix}drawer-width: #{$drawer-width},
     --#{$prefix}drawer-height: #{$drawer-height},
     --#{$prefix}drawer-padding-x: #{$drawer-padding-x},

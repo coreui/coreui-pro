@@ -10,6 +10,7 @@
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
+@use "variables" as *;
 
 // scss-docs-start form-file-variables
 $form-file-button-color:          $input-color !default;

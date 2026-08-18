@@ -9,7 +9,7 @@
     vertical-align: -.125rem; // Fix the position of icon
     fill: currentcolor;
     &:not(.icon-c-s):not(.icon-custom-size) {
-      @include icon-size($icon-size-base);
+      @include icon-size(var(--#{$prefix}icon-size-base));
 
       &.icon-xxl {
         @include icon-size($icon-size-xxl);
@@ -29,7 +29,7 @@
 
       @for $i from 3 through 9 {
         &.icon-#{$i}xl {
-          @include icon-size($i * $icon-size-base);
+          @include icon-size(calc(#{$i} * var(--#{$prefix}icon-size-base)));
         }
       }
     }

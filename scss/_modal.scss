@@ -16,7 +16,7 @@
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start modal-variables
-$modal-inner-padding:               $spacer !default;
+$modal-inner-padding:               var(--#{$prefix}spacer-3) !default;
 
 $modal-footer-margin-between:       .5rem !default;
 
@@ -65,7 +65,7 @@ $modal-tokens: () !default;
 // scss-docs-start modal-css-vars
 $modal-tokens: defaults(
   (
-    --#{$prefix}modal-zindex: #{$zindex-modal},
+    --#{$prefix}modal-zindex: var(--#{$prefix}z-modal),
     --#{$prefix}modal-width: #{$modal-md},
     --#{$prefix}modal-padding: #{$modal-inner-padding},
     --#{$prefix}modal-margin: #{$modal-dialog-margin},

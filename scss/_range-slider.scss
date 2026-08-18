@@ -1,4 +1,5 @@
 @use "sass:string";
+@use "forms/variables" as *;
 @use "forms/form-range" as *;
 @use "functions/color" as *;
 @use "functions/defaults" as *;
@@ -42,8 +43,8 @@ $range-slider-thumb-disabled-bg:           color-mix(in srgb, var(--#{$prefix}se
 $range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 
 $range-slider-tooltip-max-width:           200px !default;
-$range-slider-tooltip-padding-y:           $spacer * .25 !default;
-$range-slider-tooltip-padding-x:           $spacer * .5 !default;
+$range-slider-tooltip-padding-y:           var(--#{$prefix}spacer-1) !default;
+$range-slider-tooltip-padding-x:           var(--#{$prefix}spacer-2) !default;
 $range-slider-tooltip-margin-end:          .25rem !default;
 $range-slider-tooltip-margin-bottom:       .25rem !default;
 $range-slider-tooltip-font-size:           $font-size-sm !default;
@@ -89,7 +90,7 @@ $range-slider-tokens: defaults(
     --#{$prefix}range-slider-thumb-active-bg: #{$range-slider-thumb-active-bg},
     --#{$prefix}range-slider-thumb-disabled-bg: #{$range-slider-thumb-disabled-bg},
     --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition},
-    --#{$prefix}range-slider-tooltip-zindex: #{$zindex-tooltip},
+    --#{$prefix}range-slider-tooltip-zindex: var(--#{$prefix}z-tooltip),
     --#{$prefix}range-slider-tooltip-max-width: #{$range-slider-tooltip-max-width},
     --#{$prefix}range-slider-tooltip-padding-y: #{$range-slider-tooltip-padding-y},
     --#{$prefix}range-slider-tooltip-padding-x: #{$range-slider-tooltip-padding-x},

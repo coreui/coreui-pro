@@ -33,7 +33,7 @@ $toast-tokens: () !default;
 // scss-docs-start toast-css-vars
 $toast-tokens: defaults(
   (
-    --#{$prefix}toast-zindex: #{$zindex-toast},
+    --#{$prefix}toast-zindex: var(--#{$prefix}z-toast),
     --#{$prefix}toast-padding-x: #{$toast-padding-x},
     --#{$prefix}toast-padding-y: #{$toast-padding-y},
     --#{$prefix}toast-spacing: #{$toast-spacing},
@@ -98,7 +98,7 @@ $toast-tokens: defaults(
   }
 
   .toast-container {
-    --#{$prefix}toast-zindex: #{$zindex-toast};
+    --#{$prefix}toast-zindex: var(--#{$prefix}z-toast);
 
     position: absolute;
     z-index: var(--#{$prefix}toast-zindex);

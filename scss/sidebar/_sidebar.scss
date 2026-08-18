@@ -28,8 +28,8 @@ $sidebar-widths: (
   lg: 20rem,
   xl: 24rem
 ) !default;
-$sidebar-padding-y:                        $spacer !default;
-$sidebar-padding-x:                        $spacer !default;
+$sidebar-padding-y:                        var(--#{$prefix}spacer-3) !default;
+$sidebar-padding-x:                        var(--#{$prefix}spacer-3) !default;
 $sidebar-color:                            var(--#{$prefix}body-color) !default;
 $sidebar-bg:                               var(--#{$prefix}body-bg) !default;
 $sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;
@@ -47,7 +47,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 @layer components {
   .sidebar {
     // scss-docs-start sidebar-css-vars
-    --#{$prefix}sidebar-zindex: #{$zindex-sidebar};
+    --#{$prefix}sidebar-zindex: var(--#{$prefix}z-sidebar);
     --#{$prefix}sidebar-width: #{$sidebar-width};
     --#{$prefix}sidebar-bg: #{$sidebar-bg};
     --#{$prefix}sidebar-padding-x: #{$sidebar-padding-x};
@@ -282,7 +282,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 
   .sidebar-backdrop {
     // scss-docs-start sidebar-backdrop-css-vars
-    --#{$prefix}backdrop-zindex: #{$zindex-sidebar-backdrop};
+    --#{$prefix}backdrop-zindex: var(--#{$prefix}z-sidebar-backdrop);
     --#{$prefix}backdrop-bg: #{$sidebar-backdrop-bg};
     --#{$prefix}backdrop-opacity: #{$sidebar-backdrop-opacity};
     // scss-docs-end sidebar-backdrop-css-vars

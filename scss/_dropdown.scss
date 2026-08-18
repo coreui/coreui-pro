@@ -21,7 +21,7 @@ $dropdown-border-radius:            var(--#{$prefix}border-radius) !default;
 $dropdown-border-width:             var(--#{$prefix}border-width) !default;
 $dropdown-inner-border-radius:      calc(#{$dropdown-border-radius} - #{$dropdown-border-width}) !default; // stylelint-disable-line function-disallowed-list
 $dropdown-divider-bg:               $dropdown-border-color !default;
-$dropdown-divider-margin-y:         $spacer * .5 !default;
+$dropdown-divider-margin-y:         var(--#{$prefix}spacer-2) !default;
 $dropdown-box-shadow:               var(--#{$prefix}box-shadow) !default;
 
 $dropdown-link-color:               var(--#{$prefix}body-color) !default;
@@ -33,8 +33,8 @@ $dropdown-link-active-bg:           $component-active-bg !default;
 
 $dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
 
-$dropdown-item-padding-y:           $spacer * .25 !default;
-$dropdown-item-padding-x:           $spacer !default;
+$dropdown-item-padding-y:           var(--#{$prefix}spacer-1) !default;
+$dropdown-item-padding-x:           var(--#{$prefix}spacer-3) !default;
 
 $dropdown-header-color:             $gray-600 !default;
 $dropdown-header-padding-x:         $dropdown-item-padding-x !default;
@@ -63,7 +63,7 @@ $dropdown-tokens: () !default;
 // scss-docs-start dropdown-css-vars
 $dropdown-tokens: defaults(
   (
-    --#{$prefix}dropdown-zindex: #{$zindex-dropdown},
+    --#{$prefix}dropdown-zindex: var(--#{$prefix}z-dropdown),
     --#{$prefix}dropdown-min-width: #{$dropdown-min-width},
     --#{$prefix}dropdown-padding-x: #{$dropdown-padding-x},
     --#{$prefix}dropdown-padding-y: #{$dropdown-padding-y},

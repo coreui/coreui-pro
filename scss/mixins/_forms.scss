@@ -1,3 +1,4 @@
+@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../functions/math" as *;
@@ -16,8 +17,8 @@
 // tooltip's default formulas. The Sass-level derivation from $tooltip-* is
 // gone — the runtime link through var(--#{$prefix}tooltip-*) replaces it.
 // scss-docs-start tooltip-feedback-variables
-$form-feedback-tooltip-padding-y:     $spacer * .25 !default;
-$form-feedback-tooltip-padding-x:     $spacer * .5 !default;
+$form-feedback-tooltip-padding-y:     var(--#{$prefix}spacer-1) !default;
+$form-feedback-tooltip-padding-x:     var(--#{$prefix}spacer-2) !default;
 $form-feedback-tooltip-font-size:     $font-size-sm !default;
 $form-feedback-tooltip-line-height:   null !default;
 $form-feedback-tooltip-opacity:       .9 !default;
