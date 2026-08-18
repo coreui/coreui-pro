@@ -1,6 +1,16 @@
 @use "../mixins/border-radius" as *;
 @use "../config" as *;
 
+// scss-docs-start kbd-variables
+$kbd-padding-y:                     .1875rem !default;
+$kbd-padding-x:                     .375rem !default;
+$kbd-font-size:                     $code-font-size !default;
+$kbd-color:                         var(--#{$prefix}body-bg) !default;
+$kbd-bg:                            var(--#{$prefix}body-color) !default;
+
+$pre-color:                         null !default;
+// scss-docs-end kbd-variables
+
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start reboot-table-variables
