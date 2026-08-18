@@ -50,6 +50,15 @@
     }
     --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
     --#{$prefix}body-font-size: #{$font-size-base};
+    // scss-docs-start root-zindex-loop
+    // One token per stop of the z-axis, so a page can relayer the library
+    // without recompiling — a third-party overlay that must sit above the
+    // modal sets --#{$prefix}z-modal instead of guessing its number.
+    @each $name, $value in $zindex-levels {
+      --#{$prefix}z-#{$name}: #{$value};
+    }
+    // scss-docs-end root-zindex-loop
+
     // scss-docs-start root-font-weight-loop
     @each $name, $value in $font-weights {
       --#{$prefix}font-weight-#{$name}: #{$value};

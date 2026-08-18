@@ -63,7 +63,7 @@ $dropdown-tokens: () !default;
 // scss-docs-start dropdown-css-vars
 $dropdown-tokens: defaults(
   (
-    --#{$prefix}dropdown-zindex: #{$zindex-dropdown},
+    --#{$prefix}dropdown-zindex: var(--#{$prefix}z-dropdown),
     --#{$prefix}dropdown-min-width: #{$dropdown-min-width},
     --#{$prefix}dropdown-padding-x: #{$dropdown-padding-x},
     --#{$prefix}dropdown-padding-y: #{$dropdown-padding-y},

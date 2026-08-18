@@ -51,6 +51,6 @@ $footer-tokens: defaults(
   .footer-sticky {
     position: sticky;
     bottom: 0;
-    z-index: $zindex-fixed;
+    z-index: var(--#{$prefix}z-fixed);
   }
 }

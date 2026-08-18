@@ -126,7 +126,7 @@ $header-tokens: defaults(
     &.header-sticky {
       position: sticky;
       top: 0;
-      z-index: $zindex-sticky;
+      z-index: var(--#{$prefix}z-sticky);
     }
   }
 

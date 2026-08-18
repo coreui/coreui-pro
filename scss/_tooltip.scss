@@ -27,7 +27,7 @@ $tooltip-tokens: () !default;
 // scss-docs-start tooltip-css-vars
 $tooltip-tokens: defaults(
   (
-    --#{$prefix}tooltip-zindex: #{$zindex-tooltip},
+    --#{$prefix}tooltip-zindex: var(--#{$prefix}z-tooltip),
     --#{$prefix}tooltip-max-width: #{$tooltip-max-width},
     --#{$prefix}tooltip-padding-x: #{$tooltip-padding-x},
     --#{$prefix}tooltip-padding-y: #{$tooltip-padding-y},

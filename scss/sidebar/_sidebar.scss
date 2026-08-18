@@ -47,7 +47,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 @layer components {
   .sidebar {
     // scss-docs-start sidebar-css-vars
-    --#{$prefix}sidebar-zindex: #{$zindex-sidebar};
+    --#{$prefix}sidebar-zindex: var(--#{$prefix}z-sidebar);
     --#{$prefix}sidebar-width: #{$sidebar-width};
     --#{$prefix}sidebar-bg: #{$sidebar-bg};
     --#{$prefix}sidebar-padding-x: #{$sidebar-padding-x};
@@ -282,7 +282,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 
   .sidebar-backdrop {
     // scss-docs-start sidebar-backdrop-css-vars
-    --#{$prefix}backdrop-zindex: #{$zindex-sidebar-backdrop};
+    --#{$prefix}backdrop-zindex: var(--#{$prefix}z-sidebar-backdrop);
     --#{$prefix}backdrop-bg: #{$sidebar-backdrop-bg};
     --#{$prefix}backdrop-opacity: #{$sidebar-backdrop-opacity};
     // scss-docs-end sidebar-backdrop-css-vars

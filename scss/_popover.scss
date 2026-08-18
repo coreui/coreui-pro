@@ -42,7 +42,7 @@ $popover-tokens: () !default;
 // scss-docs-start popover-css-vars
 $popover-tokens: defaults(
   (
-    --#{$prefix}popover-zindex: #{$zindex-popover},
+    --#{$prefix}popover-zindex: var(--#{$prefix}z-popover),
     --#{$prefix}popover-max-width: #{$popover-max-width},
     --#{$prefix}popover-bg: #{$popover-bg},
     --#{$prefix}popover-border-width: #{$popover-border-width},

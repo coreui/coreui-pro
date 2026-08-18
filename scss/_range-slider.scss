@@ -89,7 +89,7 @@ $range-slider-tokens: defaults(
     --#{$prefix}range-slider-thumb-active-bg: #{$range-slider-thumb-active-bg},
     --#{$prefix}range-slider-thumb-disabled-bg: #{$range-slider-thumb-disabled-bg},
     --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition},
-    --#{$prefix}range-slider-tooltip-zindex: #{$zindex-tooltip},
+    --#{$prefix}range-slider-tooltip-zindex: var(--#{$prefix}z-tooltip),
     --#{$prefix}range-slider-tooltip-max-width: #{$range-slider-tooltip-max-width},
     --#{$prefix}range-slider-tooltip-padding-y: #{$range-slider-tooltip-padding-y},
     --#{$prefix}range-slider-tooltip-padding-x: #{$range-slider-tooltip-padding-x},
