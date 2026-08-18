@@ -247,6 +247,15 @@ finished, not whether the state changed.
 
 #### Breadcrumb
 
+- **Three breadcrumb tokens have real defaults.** `--cui-breadcrumb-bg`,
+  `--cui-breadcrumb-border-radius` and `--cui-breadcrumb-font-size` were `null`
+  in Sass, so the first two were emitted empty (`--cui-breadcrumb-bg: ;`) and
+  the third was not emitted at all. They are `transparent`,
+  `var(--cui-border-radius)` and `inherit` now. Nothing renders differently on
+  a default breadcrumb, and a font size set on an ancestor still reaches it —
+  the one visible change is that a breadcrumb **given a background** now has
+  rounded corners like every other surface. Set
+  `--cui-breadcrumb-border-radius: 0` to square it off.
 - **New: `.breadcrumb-link`, an opt-in class that gives a step a padded,
   hoverable target.** Bare links keep rendering as they always did. On a
   `<button>` it looks identical to a link, which is what lets one step toggle a

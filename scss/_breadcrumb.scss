@@ -7,12 +7,12 @@
 @use "config" as *;
 
 // scss-docs-start breadcrumb-variables
-$breadcrumb-font-size:              null !default;
+$breadcrumb-font-size:              inherit !default;
 $breadcrumb-padding-y:              0 !default;
 $breadcrumb-padding-x:              0 !default;
 $breadcrumb-item-padding-x:         .5rem !default;
 $breadcrumb-margin-bottom:          1rem !default;
-$breadcrumb-bg:                     null !default;
+$breadcrumb-bg:                     transparent !default;
 $breadcrumb-divider-color:          var(--#{$prefix}secondary-color) !default;
 $breadcrumb-active-color:           var(--#{$prefix}secondary-color) !default;
 $breadcrumb-link-padding-y:         .25rem !default;
@@ -23,7 +23,7 @@ $breadcrumb-link-hover-bg:          var(--#{$prefix}tertiary-bg) !default;
 $breadcrumb-link-border-radius:     var(--#{$prefix}border-radius) !default;
 $breadcrumb-divider:                string.quote("/") !default;
 $breadcrumb-divider-flipped:        $breadcrumb-divider !default;
-$breadcrumb-border-radius:          null !default;
+$breadcrumb-border-radius:          var(--#{$prefix}border-radius) !default;
 // scss-docs-end breadcrumb-variables
 
 $breadcrumb-tokens: () !default;
@@ -47,7 +47,7 @@ $breadcrumb-tokens: defaults(
     --#{$prefix}breadcrumb-link-hover-color: #{$breadcrumb-link-hover-color},
     --#{$prefix}breadcrumb-link-hover-bg: #{$breadcrumb-link-hover-bg},
     --#{$prefix}breadcrumb-link-border-radius: #{$breadcrumb-link-border-radius},
-    --#{$prefix}breadcrumb-font-size: $breadcrumb-font-size,
+    --#{$prefix}breadcrumb-font-size: #{$breadcrumb-font-size},
   ),
   $breadcrumb-tokens
 );
