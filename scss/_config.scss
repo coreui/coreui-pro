@@ -858,7 +858,7 @@ $input-focus-bg:                        $input-bg !default;
 $input-focus-border-color:              tint-color($primary, 50%) !default;
 $input-focus-color:                     $input-color !default;
 $input-focus-width:                     $input-btn-focus-width !default;
-$input-focus-ring:                var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
+$input-focus-ring:                      var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $input-placeholder-color:               var(--#{$prefix}secondary-color) !default;
 $input-plaintext-color:                 var(--#{$prefix}body-color) !default;
