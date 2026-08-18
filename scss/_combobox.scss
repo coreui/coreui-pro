@@ -16,7 +16,7 @@ $combobox-popup-min-width:         100% !default;
 // The panel's own ring token: the panel mounts outside the frame while open,
 // so it cannot inherit --#{$prefix}control-focus-ring from it — an inherited
 // var would resolve to nothing there and invalidate the outline.
-$combobox-focus-ring:              $focus-ring !default;
+$combobox-focus-ring:              var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $combobox-header-padding-y:    .375rem !default;
 $combobox-header-padding-x:    .375rem !default;

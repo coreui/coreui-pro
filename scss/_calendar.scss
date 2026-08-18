@@ -28,7 +28,7 @@ $calendar-nav-btn-hover-bg:                  transparent !default;
 $calendar-nav-btn-hover-border-color:        transparent !default;
 
 $calendar-nav-btn-focus-border-color:        transparent !default;
-$calendar-nav-btn-focus-ring:          $focus-ring !default;
+$calendar-nav-btn-focus-ring:          var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $calendar-nav-date-font-weight:              600 !default;
 $calendar-nav-date-color:                    var(--#{$prefix}body-color) !default;
@@ -46,7 +46,7 @@ $calendar-cell-hover-color:                  var(--#{$prefix}body-color) !defaul
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
 
-$calendar-cell-focus-ring:             $focus-ring !default;
+$calendar-cell-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $calendar-cell-selected-color:               $white !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;

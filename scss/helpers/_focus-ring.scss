@@ -2,7 +2,7 @@
 
 @layer helpers {
   .focus-ring:focus {
-    outline: var(--#{$prefix}focus-ring);
+    outline: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring));
     outline-offset: var(--#{$prefix}focus-ring-offset);
   }
 }
