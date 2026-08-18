@@ -212,10 +212,15 @@ $accordion-tokens: defaults(
     }
 
     .accordion-icon {
+      display: flex;
       flex-shrink: 0;
+      align-items: center;
+      justify-content: center;
       width: var(--#{$prefix}accordion-btn-icon-width);
       height: var(--#{$prefix}accordion-btn-icon-width);
       margin-inline-start: auto;
+      font-size: var(--#{$prefix}accordion-btn-icon-width);
+      line-height: 1;
       color: var(--#{$prefix}accordion-btn-icon-color);
       @include transition(var(--#{$prefix}accordion-btn-icon-transition));
     }

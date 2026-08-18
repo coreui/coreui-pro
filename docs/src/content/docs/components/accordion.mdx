@@ -4,6 +4,8 @@ name: "Accordion"
 description: "Build vertically collapsing accordions on top of the native HTML disclosure element."
 otherFrameworks:
   - accordion
+css:
+  - "https://cdn.jsdelivr.net/npm/@coreui/icons@3.1.0/css/free.min.css"
 ---
 
 import accordionToggleAll from './snippets/accordion-toggle-all.js?raw'
@@ -181,9 +183,9 @@ Both return a promise that settles once the items have finished moving.
 
 <AddedIn version="6.0.0" />
 
-The chevron is drawn by the header itself, from the `--cui-accordion-btn-icon` custom property, and rotated by `--cui-accordion-btn-icon-transform` while the item is open. Point the property at your own URL-escaped SVG to change it everywhere.
+The chevron is drawn by the header itself, from the `--cui-accordion-btn-icon` custom property, and rotated by `--cui-accordion-btn-icon-transform` while the item is open. Point the property at your own URL-escaped SVG to change it everywhere. The example takes `cil-chevron-right` from [CoreUI Icons](https://coreui.io/icons/) and turns it a quarter clockwise when the item opens.
 
-<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 3 5 5-5 5'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: rotate(90deg);">
+<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='m183.505 496-97.268-97.27 143.175-143.174L86.237 112.38l97.268-97.27 143.227 143.228 11.316 11.209 85.9 85.9.051.05-11.311 11.419-85.9 85.9-.055-.054Zm-52.013-97.27 52.013 52.014L326.629 307.62l.055.054 52.116-52.118-52.127-52.128-11.308-11.2-131.86-131.862-52.013 52.014 143.175 143.176Z'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: rotate(90deg);">
     <details class="accordion-item" name="accordionIconToken" open>
       <summary class="accordion-header">Accordion Item #1</summary>
       <div class="accordion-body">The icon comes from the custom property, so no item carries markup for it.</div>
@@ -196,18 +198,37 @@ The chevron is drawn by the header itself, from the `--cui-accordion-btn-icon` c
 
 ### Icon as an element
 
-Put an `<svg class="accordion-icon">` inside the `<summary>` to hand the header a real element instead. Nothing has to be URL escaped, an icon font or an `<img>` works the same way, and the header stops drawing its own icon as soon as it finds one — so the two never double up. Sizing, placement and the open-state rotation stay with the class; `currentColor` keeps the shape on the header's text color, theme tint included.
+Put an element carrying `.accordion-icon` inside the `<summary>` to hand the header a real icon instead. The header stops drawing its own as soon as it finds one, so the two never double up. Sizing, placement and the open-state rotation stay with the class, and it fits both kinds of icon: an `<svg>` on `currentColor`, or a glyph from an icon font, which the class scales to the same box.
+
+The example uses [CoreUI Icons](https://coreui.io/icons/), so a step is one class:
 
 <Example code={`<div class="accordion">
     <details class="accordion-item" name="accordionIconElement" open>
       <summary class="accordion-header">Accordion Item #1
-        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 5 5 5-5"/></svg>
+        <span class="accordion-icon cil-chevron-bottom" aria-hidden="true"></span>
       </summary>
       <div class="accordion-body">Placeholder content for the first accordion item.</div>
     </details>
     <details class="accordion-item" name="accordionIconElement">
       <summary class="accordion-header">Accordion Item #2
-        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 5 5 5-5"/></svg>
+        <span class="accordion-icon cil-chevron-bottom" aria-hidden="true"></span>
+      </summary>
+      <div class="accordion-body">Placeholder content for the second accordion item.</div>
+    </details>
+  </div>`} />
+
+An inline `<svg>` goes in the same slot, and nothing about it has to be URL escaped:
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionIconSvg" open>
+      <summary class="accordion-header">Accordion Item #1
+        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="m256.072 424-11.421-11.313-85.808-85.809.053-.054L16 183.928l97.122-97.122 142.9 142.9 142.9-142.9 97.122 97.122-142.801 142.794-11.361 11.469Zm-.107-45.254.054.053 51.835-51.835 11.346-11.453 131.583-131.583-51.868-51.868-142.9 142.9-142.9-142.9-51.861 51.868 142.9 142.9-.053.054Z"/></svg>
+      </summary>
+      <div class="accordion-body">Placeholder content for the first accordion item.</div>
+    </details>
+    <details class="accordion-item" name="accordionIconSvg">
+      <summary class="accordion-header">Accordion Item #2
+        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor"><path d="m256.072 424-11.421-11.313-85.808-85.809.053-.054L16 183.928l97.122-97.122 142.9 142.9 142.9-142.9 97.122 97.122-142.801 142.794-11.361 11.469Zm-.107-45.254.054.053 51.835-51.835 11.346-11.453 131.583-131.583-51.868-51.868-142.9 142.9-142.9-142.9-51.861 51.868 142.9 142.9-.053.054Z"/></svg>
       </summary>
       <div class="accordion-body">Placeholder content for the second accordion item.</div>
     </details>
@@ -217,7 +238,7 @@ Put an `<svg class="accordion-icon">` inside the `<summary>` to hand the header 
 
 A plus that becomes a minus is a swap, not a rotation. Set `--cui-accordion-btn-active-icon` to the open-state shape and turn the rotation off:
 
-<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M8 3v10M3 8h10'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-active-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 8h10'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: none;">
+<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M440 240H272V72h-32v168H72v32h168v168h32V272h168z'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-active-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%23000' d='M72 240h368v32H72z'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: none;">
     <details class="accordion-item" name="accordionIconPair" open>
       <summary class="accordion-header">Accordion Item #1</summary>
       <div class="accordion-body">Placeholder content for the first accordion item.</div>
@@ -233,22 +254,22 @@ The element form takes a pair too: add a second icon marked `.accordion-icon-act
 <Example code={`<div class="accordion">
     <details class="accordion-item" name="accordionIconElementPair" open>
       <summary class="accordion-header">Accordion Item #1
-        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
-        <svg class="accordion-icon accordion-icon-active" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10"/></svg>
+        <span class="accordion-icon cil-plus" aria-hidden="true"></span>
+        <span class="accordion-icon accordion-icon-active cil-minus" aria-hidden="true"></span>
       </summary>
       <div class="accordion-body">Placeholder content for the first accordion item.</div>
     </details>
     <details class="accordion-item" name="accordionIconElementPair">
       <summary class="accordion-header">Accordion Item #2
-        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
-        <svg class="accordion-icon accordion-icon-active" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10"/></svg>
+        <span class="accordion-icon cil-plus" aria-hidden="true"></span>
+        <span class="accordion-icon accordion-icon-active cil-minus" aria-hidden="true"></span>
       </summary>
       <div class="accordion-body">Placeholder content for the second accordion item.</div>
     </details>
   </div>`} />
 
 <Callout color="info">
-The icon carries no accessible name in either form. `<summary>` already announces its expanded state, so keep the SVG out of the accessibility tree with `aria-hidden="true"` if your icon set does not do that for you.
+The icon carries no accessible name in either form. `<summary>` already announces its expanded state, so keep the icon out of the accessibility tree with `aria-hidden="true"` — a bare inline `<svg>` reaches it as an unnamed image otherwise.
 </Callout>
 
 ## Accessibility
