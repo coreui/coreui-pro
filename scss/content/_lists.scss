@@ -1,6 +1,10 @@
 @use "../mixins/lists" as *;
 @use "../config" as *;
 
+// scss-docs-start list-variables
+$list-inline-padding:         .5rem !default;
+// scss-docs-end list-variables
+
 @layer content {
   .list-unstyled {
     @include list-unstyled();

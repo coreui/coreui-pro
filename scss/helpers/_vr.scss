@@ -1,5 +1,9 @@
 @use "../config" as *;
 
+// scss-docs-start vr-variables
+$vr-border-width:             var(--#{$prefix}border-width) !default;
+// scss-docs-end vr-variables
+
 @layer helpers {
   .vr {
     display: inline-block;
