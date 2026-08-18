@@ -657,17 +657,6 @@ $focus-ring: $focus-ring-width solid $focus-ring-color !default;
 
 $transition-base:             all .2s ease-in-out !default;
 
-// stylelint-disable function-disallowed-list
-// scss-docs-start aspect-ratios
-$aspect-ratios: (
-  "1x1": 100%,
-  "4x3": calc(3 / 4 * 100%),
-  "16x9": calc(9 / 16 * 100%),
-  "21x9": calc(9 / 21 * 100%)
-) !default;
-// scss-docs-end aspect-ratios
-// stylelint-enable function-disallowed-list
-
 // Font, line-height, and color for body text, headings, and more.
 
 // scss-docs-start font-variables
@@ -765,8 +754,6 @@ $font-sizes-legacy: (
 // scss-docs-start type-variables
 
 $small-font-size:               .875em !default;
-
-$hr-opacity:                  .25 !default;
 
 $mark-color:                  $body-color !default;
 $mark-bg:                     light-dark($yellow-100, $yellow-800) !default;

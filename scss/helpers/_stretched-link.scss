@@ -1,5 +1,26 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
+@use "../config" as *;
+
+// scss-docs-start stretched-link-variables
 $stretched-link-pseudo-element: after !default;
 $stretched-link-z-index:        1 !default;
+// scss-docs-end stretched-link-variables
+
+$stretched-link-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start stretched-link-css-vars
+$stretched-link-tokens: defaults(
+  (
+    --#{$prefix}stretched-link-z-index: #{$stretched-link-z-index},
+  ),
+  $stretched-link-tokens
+);
+// scss-docs-end stretched-link-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer helpers {
   //
@@ -7,13 +28,12 @@ $stretched-link-z-index:        1 !default;
   //
 
   .stretched-link {
+    @include tokens($stretched-link-tokens);
+
     &::#{$stretched-link-pseudo-element} {
       position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: $stretched-link-z-index;
+      inset: 0;
+      z-index: var(--#{$prefix}stretched-link-z-index);
       content: "";
     }
   }

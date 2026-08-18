@@ -1,3 +1,5 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
@@ -12,21 +14,42 @@ $icon-link-icon-transition:   .2s ease-in-out transform !default;
 $icon-link-icon-transform:    translate3d(.25em, 0, 0) !default;
 // scss-docs-end icon-link-variables
 
+$icon-link-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start icon-link-css-vars
+$icon-link-tokens: defaults(
+  (
+    --#{$prefix}icon-link-gap: #{$icon-link-gap},
+    --#{$prefix}icon-link-underline-offset: #{$icon-link-underline-offset},
+    --#{$prefix}icon-link-icon-size: #{$icon-link-icon-size},
+    --#{$prefix}icon-link-icon-transition: #{$icon-link-icon-transition},
+    --#{$prefix}icon-link-icon-transform: #{$icon-link-icon-transform},
+  ),
+  $icon-link-tokens
+);
+// scss-docs-end icon-link-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+
 @layer helpers {
   .icon-link {
+    @include tokens($icon-link-tokens);
+
     display: inline-flex;
-    gap: $icon-link-gap;
+    gap: var(--#{$prefix}icon-link-gap);
     align-items: center;
     text-decoration-color: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-opacity, .5) * 100%), transparent);
-    text-underline-offset: $icon-link-underline-offset;
+    text-underline-offset: var(--#{$prefix}icon-link-underline-offset);
     backface-visibility: hidden;
 
     > .bi {
       flex-shrink: 0;
-      width: $icon-link-icon-size;
-      height: $icon-link-icon-size;
+      width: var(--#{$prefix}icon-link-icon-size);
+      height: var(--#{$prefix}icon-link-icon-size);
       fill: currentcolor;
-      @include transition($icon-link-icon-transition);
+      @include transition(var(--#{$prefix}icon-link-icon-transition));
     }
   }
 
@@ -34,7 +57,7 @@ $icon-link-icon-transform:    translate3d(.25em, 0, 0) !default;
     &:hover,
     &:focus-visible {
       > .bi {
-        transform: var(--#{$prefix}icon-link-transform, $icon-link-icon-transform);
+        transform: var(--#{$prefix}icon-link-transform, var(--#{$prefix}icon-link-icon-transform));
       }
     }
   }

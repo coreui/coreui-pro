@@ -2,7 +2,7 @@
 @use "../config" as *;
 
 @layer helpers {
-  .focus-ring:focus {
+  .focus-ring:focus-visible {
     @include focus-ring(true);
   }
 }
