@@ -232,9 +232,15 @@ finished, not whether the state changed.
   `.accordion-icon-active` does the same in markup — that is what a plus/minus
   accordion needs, where the icon is swapped rather than rotated. The default
   chevron and its rotation are unchanged when neither is used.
-- **`.theme-{color}` tints the open items.** The active tokens resolve through
-  `--cui-theme-fg` / `-bg-subtle` / `-border` with the old primary values as the
-  fallback, so an untouched accordion renders exactly as before.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The open item is neutral, and `.theme-{color}` is what tints it.**
+  `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
+  `--cui-primary-bg-subtle` / `--cui-primary-text-emphasis`, so every accordion
+  turned the brand colour on open whether or not that suited the page. They are
+  `--cui-secondary-bg` and `--cui-body-color` now, and the active tokens resolve
+  through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
+  decision you make per accordion instead of one baked into the component. To
+  keep the old look, put `.theme-primary` on the `.accordion`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`--cui-accordion-inner-border-radius` is gone; the header's corners follow
   `--cui-accordion-border-radius`.** The token was computed from the global

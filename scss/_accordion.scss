@@ -21,8 +21,8 @@ $accordion-border-radius:                 var(--#{$prefix}border-radius) !defaul
 $accordion-button-color:                  var(--#{$prefix}body-color) !default;
 $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default;
 $accordion-transition:                    $btn-transition, border-radius .15s ease !default;
-$accordion-button-active-bg:              var(--#{$prefix}primary-bg-subtle) !default;
-$accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis) !default;
+$accordion-button-active-bg:              var(--#{$prefix}secondary-bg) !default;
+$accordion-button-active-color:           var(--#{$prefix}body-color) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
 
 $accordion-button-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
