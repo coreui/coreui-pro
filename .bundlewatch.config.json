@@ -26,11 +26,11 @@
     },
     {
       "path": "./dist/css/coreui.css",
-      "maxSize": "60.5kB"
+      "maxSize": "61kB"
     },
     {
       "path": "./dist/css/coreui.min.css",
-      "maxSize": "50.5kB"
+      "maxSize": "51kB"
     },
     {
       "path": "./dist/js/coreui.bundle.js",

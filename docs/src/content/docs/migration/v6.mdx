@@ -1228,6 +1228,27 @@ assembles maps of CSS expressions and the browser resolves them.
   `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
   the ghost and link variants.
 
+#### The control variables moved out of the shared config
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`$input-*` described one thing — the frame every field component draws — but sat
+in `_config.scss` next to the breakpoints and the spacing scale. It lives in
+`scss/forms/_form-control.scss` now, with `.form-control` itself.
+
+- **Nothing changes for CSS.** The compiled stylesheet is identical; the
+  `--#{$prefix}control-*` and `--#{$prefix}btn-input-*` tokens are untouched, so
+  runtime customisation is unaffected.
+- **A Sass override needs the new path** when you `@use` the partial directly.
+  Overriding through `@use "@coreui/coreui-pro" with (...)` is unchanged.
+- **`$input-btn-*` stays in the config**: those are the values the button and
+  the field agree on, and `buttons/_button.scss` reads them.
+- **`$input-height`, `$input-height-sm` and `$input-height-lg` are removed.**
+  They existed to be baked into `--#{$prefix}btn-input-min-height`, which now
+  computes from `--#{$prefix}btn-input-line-height`, `-padding-y` and
+  `-border-width` in the browser. Set those tokens, or
+  `--#{$prefix}btn-input-min-height` itself, instead of recompiling.
+
 #### Shadows are computed at runtime
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

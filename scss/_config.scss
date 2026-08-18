@@ -856,59 +856,6 @@ $form-text-font-weight:                 null !default;
 $form-text-color:                       var(--#{$prefix}secondary-color) !default;
 // scss-docs-end form-text-variables
 
-// scss-docs-start form-input-variables
-$input-padding-y:                       $input-btn-padding-y !default;
-$input-padding-x:                       $input-btn-padding-x !default;
-$input-font-family:                     $input-btn-font-family !default;
-$input-font-size:                       $input-btn-font-size !default;
-$input-font-weight:                     $font-weight-base !default;
-$input-line-height:                     $input-btn-line-height !default;
-
-$input-padding-y-sm:                    $input-btn-padding-y-sm !default;
-$input-padding-x-sm:                    $input-btn-padding-x-sm !default;
-$input-font-size-sm:                    $input-btn-font-size-sm !default;
-
-$input-padding-y-lg:                    $input-btn-padding-y-lg !default;
-$input-font-size-lg:                    $input-btn-font-size-lg !default;
-
-$input-bg:                              var(--#{$prefix}body-bg) !default;
-$input-disabled-color:                  var(--#{$prefix}body-color) !default;
-$input-disabled-bg:                     var(--#{$prefix}secondary-bg) !default;
-$input-disabled-border-color:           var(--#{$prefix}border-color) !default;
-
-$input-color:                           var(--#{$prefix}body-color) !default;
-$input-border-color:                    var(--#{$prefix}border-color) !default;
-$input-border-width:                    $input-btn-border-width !default;
-$input-box-shadow:                      var(--#{$prefix}box-shadow-inset) !default;
-
-$input-border-radius:                   var(--#{$prefix}border-radius) !default;
-$input-border-radius-sm:                var(--#{$prefix}border-radius-sm) !default;
-$input-border-radius-lg:                var(--#{$prefix}border-radius-lg) !default;
-
-$input-focus-bg:                        $input-bg !default;
-$input-focus-border-color:              tint-color($primary, 50%) !default;
-$input-focus-color:                     $input-color !default;
-$input-focus-width:                     $input-btn-focus-width !default;
-$input-focus-ring:                      var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
-
-$input-placeholder-color:               var(--#{$prefix}secondary-color) !default;
-$input-plaintext-color:                 var(--#{$prefix}body-color) !default;
-
-$input-height-border:                   calc(#{$input-border-width} * 2) !default; // stylelint-disable-line function-disallowed-list
-
-$input-height-inner:                    calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2) !default; // stylelint-disable-line function-disallowed-list
-$input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-height) * .5em + var(--#{$prefix}btn-input-padding-y)) !default; // stylelint-disable-line function-disallowed-list
-$input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default; // stylelint-disable-line function-disallowed-list
-
-$input-height:                          calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
-$input-height-sm:                       calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-sm-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
-$input-height-lg:                       calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-lg-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
-
-$input-transition:                      border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-
-$form-color-width:                      3rem !default;
-// scss-docs-end form-input-variables
-
 $form-check-inline-margin-end:    1rem !default;
 
 // Form validation
@@ -940,7 +887,7 @@ $form-validation-states: (
     "icon": $form-feedback-icon-valid,
     "tooltip-color": #fff,
     "tooltip-bg-color": var(--#{$prefix}success),
-    "focus-ring": $input-focus-width solid color-mix(in srgb, var(--#{$prefix}success) math.percentage($input-btn-focus-color-opacity), transparent),
+    "focus-ring": $input-btn-focus-width solid color-mix(in srgb, var(--#{$prefix}success) math.percentage($input-btn-focus-color-opacity), transparent),
     "border-color": var(--#{$prefix}form-valid-border-color),
   ),
   "invalid": (
@@ -948,7 +895,7 @@ $form-validation-states: (
     "icon": $form-feedback-icon-invalid,
     "tooltip-color": #fff,
     "tooltip-bg-color": var(--#{$prefix}danger),
-    "focus-ring": $input-focus-width solid color-mix(in srgb, var(--#{$prefix}danger) math.percentage($input-btn-focus-color-opacity), transparent),
+    "focus-ring": $input-btn-focus-width solid color-mix(in srgb, var(--#{$prefix}danger) math.percentage($input-btn-focus-color-opacity), transparent),
     "border-color": var(--#{$prefix}form-invalid-border-color),
   )
 ) !default;
@@ -998,4 +945,3 @@ $zindex-levels: (
 
 $code-font-size:                    $small-font-size !default;
 $code-color:                        light-dark($pink, tint-color($pink, 40%)) !default;
-

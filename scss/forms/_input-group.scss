@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "sass:string";
+@use "../forms/form-control" as *;
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/tokens" as *;
