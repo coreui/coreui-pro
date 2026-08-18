@@ -3,6 +3,7 @@
 @use "../functions/escape-svg" as *;
 @use "form-check" as *;
 @use "check" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
@@ -95,7 +96,7 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
 
     &:focus {
       border-color: var(--#{$prefix}radio-focus-border);
-      outline: var(--#{$prefix}radio-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}radio-focus-ring));
     }
 
     &:active {

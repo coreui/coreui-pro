@@ -1,5 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/gradients" as *;
 @use "mixins/lists" as *;
 @use "mixins/pagination" as *;
@@ -26,7 +27,7 @@ $pagination-border-color:           var(--#{$prefix}border-color) !default;
 
 $pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-focus-bg:               var(--#{$prefix}secondary-bg) !default;
-$pagination-focus-ring:       $focus-ring !default;
+$pagination-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
@@ -111,7 +112,7 @@ $pagination-tokens: defaults(
       z-index: 3;
       color: var(--#{$prefix}pagination-focus-color);
       background-color: var(--#{$prefix}pagination-focus-bg);
-      outline: var(--#{$prefix}pagination-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}pagination-focus-ring));
     }
 
     &.active,

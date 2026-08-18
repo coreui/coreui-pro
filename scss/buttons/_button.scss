@@ -7,6 +7,7 @@
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/color-mode" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/gradients" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
@@ -231,14 +232,14 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
       @include gradient-bg(var(--#{$prefix}btn-hover-bg));
       border-color: var(--#{$prefix}btn-hover-border-color);
       // Avoid using mixin so we can pass custom focus shadow properly
-      outline: var(--#{$prefix}btn-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}btn-focus-ring));
     }
 
     #{$btn-check-deprecated}:focus-visible + &,
     &.btn-check:has(input:focus-visible) {
       border-color: var(--#{$prefix}btn-hover-border-color);
       // Avoid using mixin so we can pass custom focus shadow properly
-      outline: var(--#{$prefix}btn-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}btn-focus-ring));
     }
 
     #{$btn-check-deprecated}:checked + &,
@@ -257,14 +258,14 @@ $btn-ghost-focus-shadow: var(--#{$prefix}tertiary-bg) !default;
 
       &:focus-visible {
         // Avoid using mixin so we can pass custom focus shadow properly
-        outline: var(--#{$prefix}btn-focus-ring);
+        @include focus-ring(true, $ring: var(--#{$prefix}btn-focus-ring));
       }
     }
 
     #{$btn-check-deprecated}:checked:focus-visible + &,
     &.btn-check:has(input:checked:focus-visible) {
       // Avoid using mixin so we can pass custom focus shadow properly
-      outline: var(--#{$prefix}btn-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}btn-focus-ring));
     }
 
     &:disabled,

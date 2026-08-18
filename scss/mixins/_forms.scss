@@ -3,6 +3,7 @@
 @use "../functions/math" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
@@ -148,7 +149,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
 
       &:focus {
         border-color: $border-color;
-        outline: $focus-ring;
+        @include focus-ring(true, $ring: $focus-ring);
       }
     }
   }
@@ -237,7 +238,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
       }
 
       &:focus {
-        outline: $focus-ring;
+        @include focus-ring(true, $ring: $focus-ring);
       }
 
       ~ label {

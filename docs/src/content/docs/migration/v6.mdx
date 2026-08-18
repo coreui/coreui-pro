@@ -1874,9 +1874,33 @@ box-shadow ring was cut off.
   `$focus-ring-offset` / `--#{$prefix}focus-ring-offset` (defaults to `0`), which
   pushes the ring away from the element, and `--#{$prefix}focus-ring`, the
   composite shorthand the mixin reads.
-- **`focus-ring()` changed signature** to upstream's:
-  `focus-ring($offset: false, $color: null)`. It no longer emits `outline: 0`.
+- **`focus-ring()` changed signature** to
+  `focus-ring($offset: false, $color: null, $ring: null)`. It no longer emits
+  `outline: 0`. Every ring in the library is drawn through it now, passing the
+  component's own token as `$ring`; with no arguments it draws the global ring.
+- **`--#{$prefix}focus-ring-offset` actually applies.** The mixin emits
+  `outline-offset` wherever a ring is drawn, so one declaration moves every ring
+  in or out. It was previously read by the `.focus-ring` helper alone, which
+  made the token look supported while doing nothing on any component.
 - `$pagination-focus-outline` is gone — the outline is now the ring itself.
+- **A component ring is a reference to the global one, not a copy of it.** Every
+  `--#{$prefix}*-focus-ring` defaults to
+  `var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring))`, so setting
+  `--#{$prefix}focus-ring-color` or `--#{$prefix}focus-ring-width` at the root
+  reaches every control, and a `.theme-{color}` region tints the rings inside
+  it. Previously each component baked the resolved value in at build time, which
+  is why a runtime change to the global ring left the components behind. The
+  per-component tokens and their Sass variables are unchanged as override
+  points; only their default moved.
+
+  ```diff
+  - --cui-pagination-focus-ring: .25rem solid rgba(88, 86, 214, .25);
+  + --cui-pagination-focus-ring: var(--cui-theme-focus-ring, var(--cui-focus-ring));
+  ```
+- **`$input-btn-focus-color` no longer reaches the input and control rings.**
+  They read the global ring now; set `$focus-ring-color` (or
+  `--#{$prefix}focus-ring-color`) instead. `$input-btn-focus-width` is
+  unaffected — it still sizes the validation rings and the button.
 
 **Sizes and colours are unchanged**, so the ring keeps its width
 (`$focus-ring-width`, `.25rem`) and its translucent theme colour. What changes is

@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "layout/breakpoints" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
@@ -28,7 +29,7 @@ $calendar-nav-btn-hover-bg:                  transparent !default;
 $calendar-nav-btn-hover-border-color:        transparent !default;
 
 $calendar-nav-btn-focus-border-color:        transparent !default;
-$calendar-nav-btn-focus-ring:          $focus-ring !default;
+$calendar-nav-btn-focus-ring:                var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $calendar-nav-date-font-weight:              600 !default;
 $calendar-nav-date-color:                    var(--#{$prefix}body-color) !default;
@@ -46,7 +47,7 @@ $calendar-cell-hover-color:                  var(--#{$prefix}body-color) !defaul
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
 
-$calendar-cell-focus-ring:             $focus-ring !default;
+$calendar-cell-focus-ring:                   var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $calendar-cell-selected-color:               $white !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
@@ -178,7 +179,7 @@ $calendar-tokens: defaults(
 
     &:focus-visible {
       border-color: var(--#{$prefix}calendar-nav-btn-focus-border-color);
-      outline: var(--#{$prefix}calendar-nav-btn-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}calendar-nav-btn-focus-ring));
     }
   }
 
@@ -345,7 +346,7 @@ $calendar-tokens: defaults(
       outline: 0;
 
       .calendar-cell-inner {
-        outline: var(--#{$prefix}calendar-cell-focus-ring);
+        @include focus-ring(true, $ring: var(--#{$prefix}calendar-cell-focus-ring));
         @include border-radius($border-radius);
       }
     }
@@ -390,7 +391,7 @@ $calendar-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: var(--#{$prefix}calendar-cell-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}calendar-cell-focus-ring));
       @include border-radius($border-radius);
     }
   }

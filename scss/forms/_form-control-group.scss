@@ -1,5 +1,6 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -65,7 +66,7 @@ $form-control-group-tokens: defaults(
 // indicators and no way to tell which one answers the keys (WCAG 2.4.7).
 @mixin form-control-group-focus() {
   @include form-control-group-active();
-  outline: var(--#{$prefix}control-focus-ring);
+  @include focus-ring(true, $ring: var(--#{$prefix}control-focus-ring));
 }
 // scss-docs-end form-control-group-focus-mixin
 
@@ -222,7 +223,7 @@ $form-control-group-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      outline: var(--#{$prefix}focus-ring);
+      @include focus-ring(true);
     }
 
     &:disabled {
