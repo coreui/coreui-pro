@@ -1,4 +1,5 @@
-@use "../config" as *;
+$stretched-link-pseudo-element: after !default;
+$stretched-link-z-index:        1 !default;
 
 @layer helpers {
   //

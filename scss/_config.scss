@@ -462,7 +462,6 @@ $enable-shadows:              false !default;
 $enable-gradients:            false !default;
 $enable-transitions:          true !default;
 $enable-reduced-motion:       true !default;
-$enable-smooth-scroll:        true !default;
 $enable-grid-classes:         true !default;
 $enable-container-classes:    true !default;
 $enable-cssgrid:              true !default;
@@ -554,13 +553,6 @@ $link-decoration:                         underline !default;
 $link-shade-percentage:                   20% !default;
 $link-hover-color:                        light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)) !default;
 $link-hover-decoration:                   null !default;
-
-$stretched-link-pseudo-element:           after !default;
-$stretched-link-z-index:                  1 !default;
-
-// Style p element.
-
-$paragraph-margin-bottom:   1rem !default;
 
 // Define the minimum dimensions at which your layout will change,
 // adapting to different screen sizes, for use in media queries.
@@ -664,14 +656,6 @@ $focus-ring: $focus-ring-width solid $focus-ring-color !default;
 // scss-docs-end focus-ring-variables
 
 $transition-base:             all .2s ease-in-out !default;
-// scss-docs-start fade-transition
-$transition-fade-duration:    .15s !default;
-$transition-fade-timing:      linear !default;
-// scss-docs-end fade-transition
-// scss-docs-start collapse-transition
-$transition-collapse-duration: .35s !default;
-$transition-collapse-timing:   ease !default;
-// scss-docs-end collapse-transition
 
 // stylelint-disable function-disallowed-list
 // scss-docs-start aspect-ratios
@@ -692,7 +676,6 @@ $font-family-sans-serif:      system-ui, -apple-system, "Segoe UI", Roboto, "Hel
 $font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
 // stylelint-enable value-keyword-case
 $font-family-base:            var(--#{$prefix}font-sans-serif) !default;
-$font-family-code:            var(--#{$prefix}font-monospace) !default;
 
 // $font-size-root affects the value of `rem`, which is used for as well font sizes, paddings, and margins
 // $font-size-base affects the font size of the body text
@@ -739,10 +722,6 @@ $h6-font-size:                var(--#{$prefix}body-font-size) !default;
 // scss-docs-end font-variables
 
 // scss-docs-start headings-variables
-$headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
-$headings-font-family:        null !default;
-$headings-font-style:         null !default;
-$headings-font-weight:        500 !default;
 $headings-line-height:        1.2 !default;
 $headings-color:              inherit !default;
 // scss-docs-end headings-variables
@@ -783,57 +762,12 @@ $font-sizes-legacy: (
 ) !default;
 // scss-docs-end font-sizes-legacy
 
-// scss-docs-start display-headings
-$display-font-sizes: (
-  1: clamp(1.625rem, 1.625rem + 4.5vw, 5rem),
-  2: clamp(1.575rem, 1.575rem + 3.9vw, 4.5rem),
-  3: clamp(1.525rem, 1.525rem + 3.3vw, 4rem),
-  4: clamp(1.475rem, 1.475rem + 2.7vw, 3.5rem),
-  5: clamp(1.425rem, 1.425rem + 2.1vw, 3rem),
-  6: clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem)
-) !default;
-
-$display-font-family: null !default;
-$display-font-style:  null !default;
-$display-font-weight: 300 !default;
-$display-line-height: $headings-line-height !default;
-// scss-docs-end display-headings
-
 // scss-docs-start type-variables
-$lead-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
-$lead-font-weight:              300 !default;
 
 $small-font-size:               .875em !default;
 
-$sub-sup-font-size:             .75em !default;
-
-$initialism-font-size:        $small-font-size !default;
-
-$blockquote-margin-y:         $spacer !default;
-$blockquote-font-size:        calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
-$blockquote-footer-color:     $gray-600 !default;
-$blockquote-footer-font-size: $small-font-size !default;
-
-$hr-margin-y:                 $spacer !default;
-$hr-color:                    inherit !default;
-
-$hr-border-color:             null !default; // Allows for inherited colors
-$hr-border-width:             var(--#{$prefix}border-width) !default;
 $hr-opacity:                  .25 !default;
 
-// scss-docs-start vr-variables
-$vr-border-width:             var(--#{$prefix}border-width) !default;
-// scss-docs-end vr-variables
-
-$legend-margin-bottom:        .5rem !default;
-$legend-font-size:            clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$legend-font-weight:          null !default;
-
-$dt-font-weight:              $font-weight-bold !default;
-
-$list-inline-padding:         .5rem !default;
-
-$mark-padding:                .1875em !default;
 $mark-color:                  $body-color !default;
 $mark-bg:                     light-dark($yellow-100, $yellow-800) !default;
 // scss-docs-end type-variables
@@ -936,5 +870,4 @@ $zindex-levels: (
 
 // Code
 
-$code-font-size:                    $small-font-size !default;
 $code-color:                        light-dark($pink, tint-color($pink, 40%)) !default;

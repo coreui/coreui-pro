@@ -1,5 +1,12 @@
 @use "../config" as *;
 
+// scss-docs-start blockquote-variables
+$blockquote-margin-y:         $spacer !default;
+$blockquote-font-size:        calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$blockquote-footer-color:     $gray-600 !default;
+$blockquote-footer-font-size: $small-font-size !default;
+// scss-docs-end blockquote-variables
+
 @layer content {
   .blockquote {
     margin-bottom: $blockquote-margin-y;
