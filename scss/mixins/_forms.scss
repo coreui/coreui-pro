@@ -79,14 +79,17 @@ $form-feedback-tokens: defaults(
 // implementation; `$enable-deprecated-form-check: false` compiles it out.
 $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
 
+// Every colour comes from a slot of the state's theme colour, so a validation
+// state carries a name rather than a palette of its own.
 @mixin form-validation-state(
   $state,
-  $color,
+  $theme,
   $icon,
-  $tooltip-color: color-contrast($color, $color-contrast-dark, $color-contrast-light, $white, $black, $min-contrast-ratio),
-  $tooltip-bg-color: rgba($color, $form-feedback-tooltip-opacity),
-  $focus-ring: $input-focus-width solid rgba($color, $input-btn-focus-color-opacity),
-  $border-color: $color
+  $color: var(--#{$prefix}#{$theme}-fg),
+  $tooltip-color: var(--#{$prefix}#{$theme}-contrast),
+  $tooltip-bg-color: color-mix(in srgb, var(--#{$prefix}#{$theme}) #{$form-feedback-tooltip-opacity * 100%}, transparent),
+  $focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}#{$theme}-focus-ring),
+  $border-color: var(--#{$prefix}#{$theme}-fg)
 ) {
   .#{$state}-feedback {
     @include tokens($form-feedback-tokens);
