@@ -11,7 +11,7 @@ $alert-padding-x:               $spacer !default;
 $alert-gap:                     $spacer * .5 !default;
 $alert-margin-bottom:           1rem !default;
 $alert-border-radius:           var(--#{$prefix}border-radius) !default;
-$alert-link-font-weight:        $font-weight-bold !default;
+$alert-link-font-weight:        var(--#{$prefix}font-weight-bold) !default;
 $alert-border-width:            var(--#{$prefix}border-width) !default;
 // scss-docs-end alert-variables
 

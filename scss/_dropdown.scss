@@ -276,7 +276,7 @@ $dropdown-dark-tokens: defaults(
     width: 100%; // For `<button>`s
     padding: var(--#{$prefix}dropdown-item-padding-y) var(--#{$prefix}dropdown-item-padding-x);
     clear: both;
-    font-weight: $font-weight-normal;
+    font-weight: var(--#{$prefix}font-weight-normal);
     color: var(--#{$prefix}dropdown-link-color);
     text-align: inherit; // For `<button>`s
     text-decoration: if(not sass($link-decoration == none): none);

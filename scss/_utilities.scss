@@ -667,15 +667,7 @@ $utilities: map.merge(
     "font-weight": (
       property: font-weight,
       class: fw,
-      values: (
-        lighter: $font-weight-lighter,
-        light: $font-weight-light,
-        normal: $font-weight-normal,
-        medium: $font-weight-medium,
-        semibold: $font-weight-semibold,
-        bold: $font-weight-bold,
-        bolder: $font-weight-bolder
-      )
+      values: $font-weights
     ),
     "line-height": (
       property: line-height,

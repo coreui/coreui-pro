@@ -225,7 +225,7 @@ $th-font-weight:       null !default;
 
   b,
   strong {
-    font-weight: $font-weight-bolder;
+    font-weight: var(--#{$prefix}font-weight-bolder);
   }
 
 

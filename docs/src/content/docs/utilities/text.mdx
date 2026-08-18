@@ -107,6 +107,26 @@ Quickly change the `font-weight` or `font-style` of text with these utilities. `
   <p class="fst-italic">Italic text.</p>
   <p class="fst-normal">Text with normal font style</p>`} />
 
+<AddedIn version="6.0.0" />
+
+The weights come from one `$font-weights` map, which generates the `.fw-*` classes and a `--#{$prefix}font-weight-{name}` custom property each. Adding a step therefore adds its utility:
+
+```scss
+@use "@coreui/coreui-pro" with (
+  $font-weights: map.merge($font-weights, ("black": 900))
+);
+```
+
+`map.merge` matters here — assigning the map plainly replaces it, and the other six weights go with it.
+
+Components read the tokens rather than a build-time copy, so raising a weight at runtime reaches them:
+
+```css
+:root {
+  --cui-font-weight-semibold: 650;
+}
+```
+
 ## Line height
 
 Change the line height with `.lh-*` utilities.

@@ -668,6 +668,21 @@ $font-weight-bolder:          bolder !default;
 
 $font-weight-base:            $font-weight-normal !default;
 
+// Composed from the variables above rather than replacing them, so a Sass
+// override of one step still reaches the token, the utility and every
+// component that reads it.
+// scss-docs-start font-weights
+$font-weights: (
+  lighter: $font-weight-lighter,
+  light: $font-weight-light,
+  normal: $font-weight-normal,
+  medium: $font-weight-medium,
+  semibold: $font-weight-semibold,
+  bold: $font-weight-bold,
+  bolder: $font-weight-bolder
+) !default;
+// scss-docs-end font-weights
+
 $line-height-base:            1.5 !default;
 $line-height-sm:              1.25 !default;
 $line-height-lg:              2 !default;
