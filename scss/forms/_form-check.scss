@@ -1,5 +1,5 @@
 @use "sass:map";
-@use "../forms/form-control" as *;
+@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
