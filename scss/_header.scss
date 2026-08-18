@@ -25,8 +25,8 @@ $header-disabled-color:         color-mix(in srgb, var(--#{$prefix}emphasis-colo
 $header-transition:             box-shadow .15s ease-in-out !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
-$header-brand-height:           $header-brand-font-size * $line-height-base !default;
-$header-brand-padding-y:        ($nav-link-height - $header-brand-height) * .5 !default;
+$header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
+$header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default; // stylelint-disable-line function-disallowed-list
 $header-brand-margin-end:       1rem !default;
 $header-brand-font-size:        $font-size-lg !default;
 $header-brand-color:            $gray-900 !default;
@@ -242,7 +242,7 @@ $header-tokens: defaults(
 
   .header-toggler-icon {
     display: block;
-    height: $header-toggler-font-size * 1.25;
+    height: calc(#{$header-toggler-font-size} * 1.25); // stylelint-disable-line function-disallowed-list
     background-image: var(--#{$prefix}header-toggler-icon-bg);
     background-repeat: no-repeat;
     background-position: center center;

@@ -38,7 +38,7 @@ $menu-item-padding-x:           .75rem !default;
 $menu-item-padding-y:           .25rem !default;
 $menu-item-border-radius:       $border-radius-sm !default;
 $menu-icon-size:                1rem !default;
-$menu-description-font-size:    $font-size-base * .75 !default;
+$menu-description-font-size:    calc(var(--#{$prefix}body-font-size) * .75) !default; // stylelint-disable-line function-disallowed-list
 $menu-check-color:              currentcolor !default;
 $menu-header-color:             var(--#{$prefix}tertiary-color) !default;
 $menu-header-padding-x:         .75rem !default;

@@ -655,8 +655,8 @@ $font-family-code:            var(--#{$prefix}font-monospace) !default;
 // $font-size-base affects the font size of the body text
 $font-size-root:              null !default;
 $font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
-$font-size-sm:                $font-size-base * .875 !default;
-$font-size-lg:                $font-size-base * 1.25 !default;
+$font-size-sm:                calc(var(--#{$prefix}body-font-size) * .875) !default; // stylelint-disable-line function-disallowed-list
+$font-size-lg:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
 
 $font-weight-lighter:         lighter !default;
 $font-weight-light:           300 !default;
@@ -691,12 +691,12 @@ $h1-font-size:                clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem) !default
 $h2-font-size:                clamp(1.325rem, 1.325rem + .9vw, 2rem) !default;
 $h3-font-size:                clamp(1.3rem, 1.3rem + .6vw, 1.75rem) !default;
 $h4-font-size:                clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$h5-font-size:                $font-size-base * 1.25 !default;
-$h6-font-size:                $font-size-base !default;
+$h5-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$h6-font-size:                var(--#{$prefix}body-font-size) !default;
 // scss-docs-end font-variables
 
 // scss-docs-start headings-variables
-$headings-margin-bottom:      $spacer * .5 !default;
+$headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
 $headings-font-family:        null !default;
 $headings-font-style:         null !default;
 $headings-font-weight:        500 !default;
@@ -757,7 +757,7 @@ $display-line-height: $headings-line-height !default;
 // scss-docs-end display-headings
 
 // scss-docs-start type-variables
-$lead-font-size:                $font-size-base * 1.25 !default;
+$lead-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
 $lead-font-weight:              300 !default;
 
 $small-font-size:               .875em !default;
@@ -767,7 +767,7 @@ $sub-sup-font-size:             .75em !default;
 $initialism-font-size:        $small-font-size !default;
 
 $blockquote-margin-y:         $spacer !default;
-$blockquote-font-size:        $font-size-base * 1.25 !default;
+$blockquote-font-size:        calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
 $blockquote-footer-color:     $gray-600 !default;
 $blockquote-footer-font-size: $small-font-size !default;
 
