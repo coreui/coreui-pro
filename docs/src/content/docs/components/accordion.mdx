@@ -177,6 +177,80 @@ Both return a promise that settles once the items have finished moving.
     </details>
   </div>`} />
 
+## Custom icon
+
+<AddedIn version="6.0.0" />
+
+The chevron is drawn by the header itself, from the `--cui-accordion-btn-icon` custom property, and rotated by `--cui-accordion-btn-icon-transform` while the item is open. Point the property at your own URL-escaped SVG to change it everywhere.
+
+<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 3 5 5-5 5'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: rotate(90deg);">
+    <details class="accordion-item" name="accordionIconToken" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">The icon comes from the custom property, so no item carries markup for it.</div>
+    </details>
+    <details class="accordion-item" name="accordionIconToken">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Placeholder content for the second accordion item.</div>
+    </details>
+  </div>`} />
+
+### Icon as an element
+
+Put an `<svg class="accordion-icon">` inside the `<summary>` to hand the header a real element instead. Nothing has to be URL escaped, an icon font or an `<img>` works the same way, and the header stops drawing its own icon as soon as it finds one — so the two never double up. Sizing, placement and the open-state rotation stay with the class; `currentColor` keeps the shape on the header's text color, theme tint included.
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionIconElement" open>
+      <summary class="accordion-header">Accordion Item #1
+        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 5 5 5-5"/></svg>
+      </summary>
+      <div class="accordion-body">Placeholder content for the first accordion item.</div>
+    </details>
+    <details class="accordion-item" name="accordionIconElement">
+      <summary class="accordion-header">Accordion Item #2
+        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 5 5 5-5"/></svg>
+      </summary>
+      <div class="accordion-body">Placeholder content for the second accordion item.</div>
+    </details>
+  </div>`} />
+
+### A different icon when open
+
+A plus that becomes a minus is a swap, not a rotation. Set `--cui-accordion-btn-active-icon` to the open-state shape and turn the rotation off:
+
+<Example code={`<div class="accordion" style="--cui-accordion-btn-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M8 3v10M3 8h10'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-active-icon: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 8h10'/%3E%3C/svg%3E&quot;); --cui-accordion-btn-icon-transform: none;">
+    <details class="accordion-item" name="accordionIconPair" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">Placeholder content for the first accordion item.</div>
+    </details>
+    <details class="accordion-item" name="accordionIconPair">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Placeholder content for the second accordion item.</div>
+    </details>
+  </div>`} />
+
+The element form takes a pair too: add a second icon marked `.accordion-icon-active` and the header shows it in place of the first while the item is open. Rotation is dropped on its own here, because supplying a second shape already says the icon is not meant to turn.
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionIconElementPair" open>
+      <summary class="accordion-header">Accordion Item #1
+        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
+        <svg class="accordion-icon accordion-icon-active" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10"/></svg>
+      </summary>
+      <div class="accordion-body">Placeholder content for the first accordion item.</div>
+    </details>
+    <details class="accordion-item" name="accordionIconElementPair">
+      <summary class="accordion-header">Accordion Item #2
+        <svg class="accordion-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg>
+        <svg class="accordion-icon accordion-icon-active" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10"/></svg>
+      </summary>
+      <div class="accordion-body">Placeholder content for the second accordion item.</div>
+    </details>
+  </div>`} />
+
+<Callout color="info">
+The icon carries no accessible name in either form. `<summary>` already announces its expanded state, so keep the SVG out of the accessibility tree with `aria-hidden="true"` if your icon set does not do that for you.
+</Callout>
+
 ## Accessibility
 
 `<summary>` is a native disclosure control. It is focusable, it is operated with <kbd>Enter</kbd> and <kbd>Space</kbd>, and its expanded state is exposed to assistive technology by the browser — no `aria-expanded` or `aria-controls` bookkeeping is required.

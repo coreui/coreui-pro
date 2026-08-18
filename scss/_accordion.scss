@@ -37,6 +37,7 @@ $accordion-icon-transition:               transform .2s ease-in-out !default;
 $accordion-icon-transform:                rotate(-180deg) !default;
 
 $accordion-button-icon:                   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round'><path d='m2 5 6 6 6-6'/></svg>") !default;
+$accordion-button-active-icon:            var(--#{$prefix}accordion-btn-icon) !default;
 // scss-docs-end accordion-variables
 
 $accordion-tokens: () !default;
@@ -58,6 +59,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-color: #{$accordion-button-color},
     --#{$prefix}accordion-btn-bg: #{$accordion-button-bg},
     --#{$prefix}accordion-btn-icon: #{escape-svg($accordion-button-icon)},
+    --#{$prefix}accordion-btn-active-icon: #{escape-svg($accordion-button-active-icon)},
     --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width},
     --#{$prefix}accordion-btn-icon-color: #{$accordion-icon-color},
     --#{$prefix}accordion-btn-active-icon-color: var(--#{$prefix}theme-fg, #{$accordion-icon-active-color}),
@@ -150,8 +152,27 @@ $accordion-tokens: defaults(
         box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-active-border-color); // stylelint-disable-line function-disallowed-list
 
         &::after {
-          background-color: var(--#{$prefix}accordion-btn-active-icon-color);
+          mask-image: var(--#{$prefix}accordion-btn-active-icon);
+        }
+
+        &::after,
+        .accordion-icon {
+          color: var(--#{$prefix}accordion-btn-active-icon-color);
+        }
+
+        &:not(:has(.accordion-icon-active))::after,
+        &:not(:has(.accordion-icon-active)) .accordion-icon {
           transform: var(--#{$prefix}accordion-btn-icon-transform);
+        }
+
+        &:has(.accordion-icon-active) {
+          .accordion-icon:not(.accordion-icon-active) {
+            display: none;
+          }
+
+          .accordion-icon-active {
+            display: block;
+          }
         }
       }
 
@@ -178,15 +199,29 @@ $accordion-tokens: defaults(
       display: none;
     }
 
-    &::after {
+    &:not(:has(.accordion-icon))::after {
       flex-shrink: 0;
       width: var(--#{$prefix}accordion-btn-icon-width);
       height: var(--#{$prefix}accordion-btn-icon-width);
       margin-inline-start: auto;
+      color: var(--#{$prefix}accordion-btn-icon-color);
       content: "";
-      background-color: var(--#{$prefix}accordion-btn-icon-color);
+      background-color: currentcolor;
       @include mask-icon(var(--#{$prefix}accordion-btn-icon), var(--#{$prefix}accordion-btn-icon-width), null);
       @include transition(var(--#{$prefix}accordion-btn-icon-transition));
+    }
+
+    .accordion-icon {
+      flex-shrink: 0;
+      width: var(--#{$prefix}accordion-btn-icon-width);
+      height: var(--#{$prefix}accordion-btn-icon-width);
+      margin-inline-start: auto;
+      color: var(--#{$prefix}accordion-btn-icon-color);
+      @include transition(var(--#{$prefix}accordion-btn-icon-transition));
+    }
+
+    .accordion-icon-active {
+      display: none;
     }
 
     > :is(h1, h2, h3, h4, h5, h6) {

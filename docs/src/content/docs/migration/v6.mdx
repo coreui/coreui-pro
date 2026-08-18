@@ -224,6 +224,14 @@ finished, not whether the state changed.
   colour), plus `--cui-accordion-content-duration` and
   `--cui-accordion-content-easing`, which drive the panel transition and are
   read back by `accordion.js` so both paths animate for the same length of time.
+- **The indicator can be an element instead of a background image.** Put an
+  `<svg class="accordion-icon">` in the `<summary>` and the header stops drawing
+  its own icon, so any icon set or `<img>` can be used without URL escaping an
+  SVG into a custom property. `--cui-accordion-btn-active-icon` selects the
+  shape shown while the item is open, and a second element marked
+  `.accordion-icon-active` does the same in markup — that is what a plus/minus
+  accordion needs, where the icon is swapped rather than rotated. The default
+  chevron and its rotation are unchanged when neither is used.
 - **`.theme-{color}` tints the open items.** The active tokens resolve through
   `--cui-theme-fg` / `-bg-subtle` / `-border` with the old primary values as the
   fallback, so an untouched accordion renders exactly as before.
