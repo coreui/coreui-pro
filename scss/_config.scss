@@ -565,6 +565,7 @@ $container-padding-x: $grid-gutter-width !default;
 // scss-docs-start border-variables
 $border-width:                1px !default;
 $border-widths: (
+  keyline: .5px,
   1: 1px,
   2: 2px,
   3: 3px,
@@ -666,6 +667,21 @@ $font-weight-bold:            700 !default;
 $font-weight-bolder:          bolder !default;
 
 $font-weight-base:            $font-weight-normal !default;
+
+// Composed from the variables above rather than replacing them, so a Sass
+// override of one step still reaches the token, the utility and every
+// component that reads it.
+// scss-docs-start font-weights
+$font-weights: (
+  lighter: $font-weight-lighter,
+  light: $font-weight-light,
+  normal: $font-weight-normal,
+  medium: $font-weight-medium,
+  semibold: $font-weight-semibold,
+  bold: $font-weight-bold,
+  bolder: $font-weight-bolder
+) !default;
+// scss-docs-end font-weights
 
 $line-height-base:            1.5 !default;
 $line-height-sm:              1.25 !default;
@@ -954,13 +970,27 @@ $zindex-tooltip:                    1080 !default;
 $zindex-toast:                      1090 !default;
 // scss-docs-end zindex-stack
 
+// The whole z-axis in one place: the small steps for stacking inside a
+// component, then the library's overlay layers. Composed from the variables
+// above rather than replacing them, so overriding `$zindex-modal` still reaches
+// the 15 files that read it, and the map follows.
 // scss-docs-start zindex-levels-map
 $zindex-levels: (
   n1: -1,
   0: 0,
   1: 1,
   2: 2,
-  3: 3
+  3: 3,
+  dropdown: $zindex-dropdown,
+  sticky: $zindex-sticky,
+  fixed: $zindex-fixed,
+  sidebar-backdrop: $zindex-sidebar-backdrop,
+  sidebar: $zindex-sidebar,
+  offcanvas: $zindex-offcanvas,
+  modal: $zindex-modal,
+  popover: $zindex-popover,
+  tooltip: $zindex-tooltip,
+  toast: $zindex-toast
 ) !default;
 // scss-docs-end zindex-levels-map
 

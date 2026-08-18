@@ -50,6 +50,11 @@
     }
     --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
     --#{$prefix}body-font-size: #{$font-size-base};
+    // scss-docs-start root-font-weight-loop
+    @each $name, $value in $font-weights {
+      --#{$prefix}font-weight-#{$name}: #{$value};
+    }
+    // scss-docs-end root-font-weight-loop
     --#{$prefix}body-font-weight: #{$font-weight-base};
     --#{$prefix}body-line-height: #{$line-height-base};
     @if $body-text-align != null {

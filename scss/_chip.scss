@@ -11,7 +11,7 @@
 
 // scss-docs-start chip-variables
 $chip-font-size:             .875rem !default;
-$chip-font-weight:           $font-weight-normal !default;
+$chip-font-weight:           var(--#{$prefix}font-weight-normal) !default;
 $chip-height:                1.75rem !default;
 $chip-padding-x:             .625rem !default;
 $chip-gap:                   .3125rem !default;

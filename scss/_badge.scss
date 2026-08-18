@@ -10,7 +10,7 @@ $badge-padding-y:                   .25em !default;
 $badge-padding-x:                   .625em !default;
 $badge-font-size:                   .75em !default;
 $badge-font-size-floor:             12px !default;
-$badge-font-weight:                 $font-weight-semibold !default;
+$badge-font-weight:                 var(--#{$prefix}font-weight-semibold) !default;
 $badge-color:                       inherit !default;
 $badge-bg:                          var(--#{$prefix}secondary-bg) !default;
 $badge-border-width:                var(--#{$prefix}border-width) !default;

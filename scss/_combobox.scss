@@ -38,14 +38,14 @@ $combobox-options-gap:                .125rem !default;
 $combobox-options-padding-y:          .375rem !default;
 $combobox-options-padding-x:          .375rem !default;
 $combobox-options-font-size:          $font-size-base !default;
-$combobox-options-font-weight:        $font-weight-normal !default;
+$combobox-options-font-weight:        var(--#{$prefix}font-weight-normal) !default;
 $combobox-options-color:              var(--#{$prefix}body-color) !default;
 
 $combobox-optgroup-label-padding-y:      .5rem !default;
 $combobox-optgroup-label-padding-x:      .625rem !default;
 $combobox-optgroup-label-border-radius:  var(--#{$prefix}border-radius) !default;
 $combobox-optgroup-label-font-size:      80% !default;
-$combobox-optgroup-label-font-weight:    $font-weight-bold !default;
+$combobox-optgroup-label-font-weight:    var(--#{$prefix}font-weight-bold) !default;
 $combobox-optgroup-label-color:          var(--#{$prefix}tertiary-color) !default;
 $combobox-optgroup-label-text-transform: uppercase !default;
 

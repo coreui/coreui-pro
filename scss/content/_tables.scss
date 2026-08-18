@@ -277,12 +277,12 @@ $table-variants: map.keys($theme-colors) !default;
             border: 0;
 
             &:first-child {
-              font-weight: $font-weight-bold;
+              font-weight: var(--#{$prefix}font-weight-bold);
             }
 
             &[data-cell]:not(:first-child)::before {
               display: block;
-              font-weight: $font-weight-semibold;
+              font-weight: var(--#{$prefix}font-weight-semibold);
               content: attr(data-cell);
             }
           }
