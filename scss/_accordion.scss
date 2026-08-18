@@ -31,8 +31,8 @@ $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;
 
 $accordion-icon-width:                    1.25rem !default;
-$accordion-icon-color:                    var(--#{$prefix}body-color) !default;
-$accordion-icon-active-color:             var(--#{$prefix}primary-text-emphasis) !default;
+$accordion-icon-color:                    currentcolor !default;
+$accordion-icon-active-color:             currentcolor !default;
 $accordion-icon-transition:               transform .2s ease-in-out !default;
 $accordion-icon-transform:                rotate(-180deg) !default;
 
@@ -62,7 +62,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-active-icon: #{escape-svg($accordion-button-active-icon)},
     --#{$prefix}accordion-btn-icon-width: #{$accordion-icon-width},
     --#{$prefix}accordion-btn-icon-color: #{$accordion-icon-color},
-    --#{$prefix}accordion-btn-active-icon-color: var(--#{$prefix}theme-fg, #{$accordion-icon-active-color}),
+    --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
     --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
