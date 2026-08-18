@@ -586,12 +586,27 @@ $border-radius-xxl:           2rem !default;
 $border-radius-pill:          50rem !default;
 // scss-docs-end border-radius-variables
 
+// Every layer's alpha is base * strength * opacity, so the tint, the depth and
+// the per-element dimming are three separate knobs at runtime.
+// `--#{$prefix}shadow-tint` and `--#{$prefix}shadow-opacity` are written by the
+// `.shadow-{color}` and `.shadow-opacity-*` utilities and registered as
+// non-inheriting, so neither leaks into a nested `.shadow-*`.
+// stylelint-disable function-disallowed-list
+
 // scss-docs-start box-shadow-variables
-$box-shadow:                  0 .5rem 1rem rgba($black, .15) !default;
-$box-shadow-sm:               0 .125rem .25rem rgba($black, .075) !default;
-$box-shadow-lg:               0 1rem 3rem rgba($black, .175) !default;
-$box-shadow-inset:            inset 0 1px 2px rgba($black, .075) !default;
+$shadow-color:                #000 !default;
+$shadow-strength:             1 !default;
+$shadow-strength-dark:        2.5 !default;
+
+$shadows: (
+  null:  0 .5rem 1rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(15% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+  sm:    0 .125rem .25rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+  lg:    0 1rem 3rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(17.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+  inset: inset 0 1px 2px color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(7.5% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
+) !default;
 // scss-docs-end box-shadow-variables
+
+// stylelint-enable function-disallowed-list
 
 $component-active-color:      rgba($white, .87) !default;
 $component-active-bg:         var(--#{$prefix}primary) !default;

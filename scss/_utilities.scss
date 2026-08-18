@@ -94,14 +94,35 @@ $utilities: map.merge(
     "shadow": (
       property: box-shadow,
       class: shadow,
-      values: (
-        null: var(--#{$prefix}box-shadow),
-        sm: var(--#{$prefix}box-shadow-sm),
-        lg: var(--#{$prefix}box-shadow-lg),
-        none: none,
-      )
+      // The literal expressions from $shadows, not var(--#{$prefix}box-shadow*).
+      // A token resolves where it is declared — on :root — so going through one
+      // would freeze the tint and the opacity there and leave .shadow-primary
+      // and .shadow-opacity-* with nothing to change.
+      // `inset` stays out: it is a component's inner shadow, not a utility.
+      values: map.merge(map.remove($shadows, inset), (none: none))
     ),
     // scss-docs-end utils-shadow
+    // scss-docs-start utils-shadow-color
+    "shadow-color": (
+      property: (--#{$prefix}shadow-tint: null),
+      class: shadow,
+      values: map.merge(
+        $theme-colors,
+        (
+          "current": currentcolor,
+          "black": $black,
+          "white": $white,
+        )
+      )
+    ),
+    // scss-docs-end utils-shadow-color
+    // scss-docs-start utils-shadow-opacity
+    "shadow-opacity": (
+      property: (--#{$prefix}shadow-opacity: null),
+      class: shadow-opacity,
+      values: (25: .25, 50: .5, 75: .75, 100: 1)
+    ),
+    // scss-docs-end utils-shadow-opacity
     // scss-docs-start utils-focus-ring
     "focus-ring": (
       property: (--#{$prefix}focus-ring-color: null),

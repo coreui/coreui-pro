@@ -1228,6 +1228,40 @@ assembles maps of CSS expressions and the browser resolves them.
   `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
   the ghost and link variants.
 
+#### Shadows are computed at runtime
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+A shadow's alpha is now `base * strength * opacity`, computed on the element
+rather than resolved when the stylesheet is built. That is what makes a shadow
+tintable and lets dark mode deepen every shadow at once.
+
+- **`$box-shadow`, `$box-shadow-sm`, `$box-shadow-lg` and `$box-shadow-inset`
+  are replaced by the `$shadows` map.** The `--#{$prefix}box-shadow*` custom
+  properties are unchanged in name and in rendered value — they are generated
+  from the map — so runtime overrides keep working. Only the Sass override point
+  moved:
+
+  ```diff
+  - $box-shadow-sm: 0 .125rem .25rem rgba($black, .1);
+  + $shadows: map.merge($shadows, (sm: 0 .125rem .25rem rgba($black, .1)));
+  ```
+
+  A literal value like that opts the entry out of the runtime knobs, which is
+  the point of overriding it.
+- **New: `$shadow-color`, `$shadow-strength`, `$shadow-strength-dark`** and the
+  `--#{$prefix}shadow-color` / `--#{$prefix}shadow-strength` tokens they emit.
+  Setting the colour once at the root recolours every shadow in the page,
+  components included.
+- **New utilities:** `.shadow-{color}` for the theme colours plus
+  `current`/`black`/`white`, and `.shadow-opacity-{25|50|75|100}`. They write
+  `--#{$prefix}shadow-tint` and `--#{$prefix}shadow-opacity`, both registered
+  `inherits: false`, so a tinted element does not recolour the shadows nested
+  inside it.
+- **Dark mode raises `--#{$prefix}shadow-strength` to 2.5** instead of carrying
+  a second set of shadow values. The same alpha reads as weaker against a dark
+  surface, which is why the light-mode values looked almost absent there.
+
 #### Theme gradients removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
