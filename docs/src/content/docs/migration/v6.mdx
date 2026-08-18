@@ -247,6 +247,11 @@ finished, not whether the state changed.
 
 #### Breadcrumb
 
+- **New: `.breadcrumb-link`, an opt-in class that gives a step a padded,
+  hoverable target.** Bare links keep rendering as they always did. On a
+  `<button>` it looks identical to a link, which is what lets one step toggle a
+  menu of collapsed items — the composition is documented under Collapsed
+  items, together with the reason not to reach for `role="menu"` there.
 - **New: `.breadcrumb-divider`, a separator you can put in the markup.** The
   automatic `::before` divider stays exactly as it was and existing markup is
   untouched, but a `<li class="breadcrumb-divider">` placed between two items

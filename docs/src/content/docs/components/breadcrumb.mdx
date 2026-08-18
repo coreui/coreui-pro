@@ -102,6 +102,49 @@ You can also remove the divider setting `--cui-breadcrumb-divider: '';` (empty s
 $breadcrumb-divider: none;
 ```
 
+## Interactive links
+
+<AddedIn version="6.0.0" />
+
+Add `.breadcrumb-link` to give each step a padded, hoverable target instead of a bare text link. It works on an `<a>`, and on a `<button>` it looks exactly the same — which is what lets a step open a menu.
+
+<Example code={`<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a class="breadcrumb-link" href="#">Home</a></li>
+      <li class="breadcrumb-item"><a class="breadcrumb-link" href="#">Library</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="breadcrumb-link">Data</span></li>
+    </ol>
+  </nav>`} />
+
+## Collapsed items
+
+<AddedIn version="6.0.0" />
+
+A long trail can keep its middle steps behind one item. Make that item a `.breadcrumb-link` button that toggles a [menu](/components/menu/) of the hidden steps — no new component, the two compose as they are.
+
+Give the button an accessible name: `…` on its own tells a screen reader nothing.
+
+<Example code={`<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a class="breadcrumb-link" href="#">Home</a></li>
+      <li class="breadcrumb-item">
+        <button class="breadcrumb-link" type="button" data-coreui-toggle="menu" aria-expanded="false" aria-label="Show 3 hidden breadcrumb items">…</button>
+        <ul class="menu">
+          <li><a class="menu-item" href="#">Library</a></li>
+          <li><a class="menu-item" href="#">Reports</a></li>
+          <li><a class="menu-item" href="#">2026</a></li>
+        </ul>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page"><span class="breadcrumb-link">Data</span></li>
+    </ol>
+  </nav>`} />
+
+<Callout color="info">
+##### Keep it a disclosure, not a menu
+
+The hidden steps are navigation links, so leave them as links inside a plain list. Do not add `role="menu"` and `role="menuitem"`: those describe an application menu of commands, and applying them makes a screen reader announce a menu, expect arrow-key navigation, and stop presenting the steps as links. Our menu deliberately adds no `role` of its own, so the markup above is already a disclosure — the button carries `aria-expanded`, and that is what a user needs to hear.
+</Callout>
+
 ## Accessibility
 
 Since breadcrumbs provide navigation, it's useful to add a significant label such as `aria-label="breadcrumb"` to explain the type of navigation implemented in the `<nav>` element. You should also add an `aria-current="page"` to the last item of the set to show that it represents the current page.

@@ -15,6 +15,12 @@ $breadcrumb-margin-bottom:          1rem !default;
 $breadcrumb-bg:                     null !default;
 $breadcrumb-divider-color:          var(--#{$prefix}secondary-color) !default;
 $breadcrumb-active-color:           var(--#{$prefix}secondary-color) !default;
+$breadcrumb-link-padding-y:         .25rem !default;
+$breadcrumb-link-padding-x:         .5rem !default;
+$breadcrumb-link-color:             var(--#{$prefix}secondary-color) !default;
+$breadcrumb-link-hover-color:       var(--#{$prefix}body-color) !default;
+$breadcrumb-link-hover-bg:          var(--#{$prefix}tertiary-bg) !default;
+$breadcrumb-link-border-radius:     var(--#{$prefix}border-radius) !default;
 $breadcrumb-divider:                string.quote("/") !default;
 $breadcrumb-divider-flipped:        $breadcrumb-divider !default;
 $breadcrumb-border-radius:          null !default;
@@ -35,6 +41,12 @@ $breadcrumb-tokens: defaults(
     --#{$prefix}breadcrumb-divider-color: #{$breadcrumb-divider-color},
     --#{$prefix}breadcrumb-item-padding-x: #{$breadcrumb-item-padding-x},
     --#{$prefix}breadcrumb-item-active-color: #{$breadcrumb-active-color},
+    --#{$prefix}breadcrumb-link-padding-x: #{$breadcrumb-link-padding-x},
+    --#{$prefix}breadcrumb-link-padding-y: #{$breadcrumb-link-padding-y},
+    --#{$prefix}breadcrumb-link-color: #{$breadcrumb-link-color},
+    --#{$prefix}breadcrumb-link-hover-color: #{$breadcrumb-link-hover-color},
+    --#{$prefix}breadcrumb-link-hover-bg: #{$breadcrumb-link-hover-bg},
+    --#{$prefix}breadcrumb-link-border-radius: #{$breadcrumb-link-border-radius},
     --#{$prefix}breadcrumb-font-size: $breadcrumb-font-size,
   ),
   $breadcrumb-tokens
@@ -76,6 +88,23 @@ $breadcrumb-tokens: defaults(
 
     &.active {
       color: var(--#{$prefix}breadcrumb-item-active-color);
+    }
+  }
+
+  .breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--#{$prefix}breadcrumb-link-padding-y) var(--#{$prefix}breadcrumb-link-padding-x);
+    color: var(--#{$prefix}breadcrumb-link-color);
+    text-decoration: none;
+    background-color: transparent;
+    border: 0;
+    @include border-radius(var(--#{$prefix}breadcrumb-link-border-radius));
+
+    &:hover,
+    &:focus-visible {
+      color: var(--#{$prefix}breadcrumb-link-hover-color);
+      background-color: var(--#{$prefix}breadcrumb-link-hover-bg);
     }
   }
 
