@@ -50,6 +50,8 @@
     }
     --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
     --#{$prefix}body-font-size: #{$font-size-base};
+    --#{$prefix}icon-size-base: #{$icon-size-base};
+
     // scss-docs-start root-spacer-loop
     // One token per stop of the spacing scale, so rescaling the system is a
     // runtime change rather than a recompile. Components read these instead of
