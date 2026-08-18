@@ -949,78 +949,8 @@ $zindex-levels: (
 ) !default;
 // scss-docs-end zindex-levels-map
 
-// Navs
-
-// Navbar
-
-// Dropdown menu container and contents.
-
-// Placeholders
-
-// scss-docs-start placeholders
-$placeholder-opacity-max:           .5 !default;
-$placeholder-opacity-min:           .2 !default;
-// scss-docs-end placeholders
-
-// Tooltips
-
-// Alerts
-
-// Image thumbnails
-
-// Figures
-
-// Carousel
-
-// scss-docs-start sidebar-toggler
-$sidebar-toggler-width:             .5rem !default;
-$sidebar-toggler-height:            .5rem !default;
-$sidebar-toggler-padding-x:         .25rem !default;
-$sidebar-toggler-padding-y:         .25rem !default;
-$sidebar-toggler-bg:                transparent !default;
-$sidebar-toggler-color:             var(--#{$prefix}tertiary-color) !default;
-$sidebar-toggler-icon:              url("data:image/svg+xml,%0A%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cg xmlns='http://www.w3.org/2000/svg' transform='matrix(-1 0 0 -1 512 512)'%3E%3Cpath fill='%23000' d='M472,16H40A24.028,24.028,0,0,0,16,40V200H48V48H464V464H48V304H16V472a24.028,24.028,0,0,0,24,24H472a24.028,24.028,0,0,0,24-24V40A24.028,24.028,0,0,0,472,16Z'/%3E%3Cpolygon fill='%23000' points='209.377 363.306 232.004 385.933 366.627 251.31 232.004 116.687 209.377 139.313 305.374 235.311 16 235.311 16 267.311 305.372 267.311 209.377 363.306'/%3E%3C/g%3E%3C/svg%3E") !default;
-$sidebar-toggler-focus-shadow:      $focus-ring !default;
-$sidebar-toggler-hover-color:       var(--#{$prefix}secondary-color) !default;
-$sidebar-toggler-focus-color:       var(--#{$prefix}secondary-color) !default;
-$sidebar-toggler-transition:        transform .15s !default;
-// scss-docs-end sidebar-toggler
-
 // Code
 
 $code-font-size:                    $small-font-size !default;
 $code-color:                        light-dark($pink, tint-color($pink, 40%)) !default;
 
-$kbd-padding-y:                     .1875rem !default;
-$kbd-padding-x:                     .375rem !default;
-$kbd-font-size:                     $code-font-size !default;
-$kbd-color:                         var(--#{$prefix}body-bg) !default;
-$kbd-bg:                            var(--#{$prefix}body-color) !default;
-
-$pre-color:                         null !default;
-
-// Time Picker
-// scss-docs-start time-picker-variables
-$time-picker-body-padding:                  $spacer * .5 !default;
-
-$time-picker-footer-padding:                .5rem !default;
-$time-picker-footer-border-width:           1px !default;
-$time-picker-footer-border-color:           var(--#{$prefix}border-color) !default;
-
-$time-picker-roll-col-border-width:           var(--#{$prefix}border-width) !default;
-$time-picker-roll-col-border-color:           var(--#{$prefix}border-color) !default;
-$time-picker-roll-cell-width:                 3rem !default;
-$time-picker-roll-cell-height:                2rem !default;
-$time-picker-roll-cell-hover-color:           var(--#{$prefix}body-color) !default;
-$time-picker-roll-cell-hover-bg:              var(--#{$prefix}tertiary-bg) !default;
-$time-picker-roll-cell-selected-color:        var(--#{$prefix}white) !default;
-$time-picker-roll-cell-selected-bg:           var(--#{$prefix}primary) !default;
-$time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}white) !default;
-$time-picker-roll-cell-selected-hover-bg:     light-dark(color.scale($primary, $lightness: -20%), color.scale($primary, $saturation: -10%, $lightness: -10%)) !default; // stylelint-disable-line scss/at-function-named-arguments
-
-$time-picker-inline-select-font-size:       var(--#{$prefix}btn-input-sm-font-size) !default;
-$time-picker-inline-select-color:           $input-color !default;
-$time-picker-inline-select-padding-y:       $input-padding-y-sm !default;
-$time-picker-inline-select-padding-x:       $input-padding-x-sm !default;
-$time-picker-inline-select-disabled-color:  $input-disabled-color !default;
-// scss-docs-end time-picker-variables
