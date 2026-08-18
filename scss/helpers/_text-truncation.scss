@@ -1,10 +1,6 @@
 @use "../mixins/text-truncate" as *;
 
 @layer helpers {
-  //
-  // Text truncation
-  //
-
   .text-truncate {
     @include text-truncate();
   }

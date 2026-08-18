@@ -1,17 +1,36 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start vr-variables
 $vr-border-width:             var(--#{$prefix}border-width) !default;
+$vr-color:                    var(--#{$prefix}border-color) !default;
 // scss-docs-end vr-variables
+
+$vr-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start vr-css-vars
+$vr-tokens: defaults(
+  (
+    --#{$prefix}vr-border-width: #{$vr-border-width},
+    --#{$prefix}vr-color: #{$vr-color},
+  ),
+  $vr-tokens
+);
+// scss-docs-end vr-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer helpers {
   .vr {
+    @include tokens($vr-tokens);
+
     display: inline-block;
     align-self: stretch;
-    width: $vr-border-width;
+    width: var(--#{$prefix}vr-border-width);
     min-height: 1em;
-    padding: 0;
-    background-color: currentcolor;
-    opacity: $hr-opacity;
+    background-color: var(--#{$prefix}vr-color);
   }
 }
