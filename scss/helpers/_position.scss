@@ -3,8 +3,6 @@
 @use "../config" as *;
 
 @layer helpers {
-  // Shorthand
-
   .fixed-top {
     position: fixed;
     inset: 0 0 auto;

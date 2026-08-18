@@ -23,10 +23,6 @@ $stretched-link-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer helpers {
-  //
-  // Stretched link
-  //
-
   .stretched-link {
     @include tokens($stretched-link-tokens);
 

@@ -30,10 +30,6 @@ $hover-lift-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer helpers {
-  //
-  // Hover lift
-  //
-
   .hover-lift {
     @include tokens($hover-lift-tokens);
     @include transition(

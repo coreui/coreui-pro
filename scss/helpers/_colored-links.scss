@@ -29,7 +29,6 @@
     }
   }
 
-  // One-off special link helper as a bridge until v6
   .link-body-emphasis {
     // stylelint-disable-next-line scss/at-function-named-arguments
     color: color-mix(in srgb, var(--#{$prefix}emphasis-color) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent) if(sass($enable-important-utilities): !important);
