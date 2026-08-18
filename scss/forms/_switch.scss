@@ -4,6 +4,7 @@
 @use "../functions/escape-svg" as *;
 @use "form-check" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -140,7 +141,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
 
     &:focus {
       border-color: var(--#{$prefix}switch-focus-border);
-      outline: var(--#{$prefix}switch-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}switch-focus-ring));
     }
 
     &:disabled {

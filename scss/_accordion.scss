@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/mask-icon" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -204,7 +205,7 @@ $accordion-tokens: defaults(
     &:focus-visible {
       position: relative;
       z-index: 3;
-      outline: var(--#{$prefix}accordion-btn-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}accordion-btn-focus-ring));
     }
   }
 

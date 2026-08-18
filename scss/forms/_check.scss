@@ -123,7 +123,7 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
 
     &:focus {
       border-color: var(--#{$prefix}check-focus-border);
-      outline: var(--#{$prefix}check-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}check-focus-ring));
     }
 
     &:active {

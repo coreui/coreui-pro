@@ -4,6 +4,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/gradients" as *;
 @use "mixins/ltr-rtl" as *;
 @use "mixins/tokens" as *;
@@ -193,8 +194,8 @@ $range-slider-vertical-tokens: defaults(
 
       // Pseudo-elements must be split across multiple rulesets to have an effect.
       // No box-shadow() mixin for focus accessibility.
-      &::-webkit-slider-thumb { outline: var(--#{$prefix}range-slider-thumb-focus-ring); }
-      &::-moz-range-thumb     { outline: var(--#{$prefix}range-slider-thumb-focus-ring); }
+      &::-webkit-slider-thumb { @include focus-ring(true, $ring: var(--#{$prefix}range-slider-thumb-focus-ring)); }
+      &::-moz-range-thumb     { @include focus-ring(true, $ring: var(--#{$prefix}range-slider-thumb-focus-ring)); }
     }
 
     &::-moz-focus-outer {

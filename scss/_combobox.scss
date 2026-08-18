@@ -1,6 +1,7 @@
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
 @use "forms/form-check" as *;
@@ -152,7 +153,7 @@ $combobox-tokens: defaults(
     &:focus-visible {
       z-index: 5;
       border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
-      outline: var(--#{$prefix}combobox-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}combobox-focus-ring));
     }
   }
 
@@ -185,7 +186,7 @@ $combobox-tokens: defaults(
     &:focus-visible {
       z-index: 5;
       border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
-      outline: var(--#{$prefix}combobox-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}combobox-focus-ring));
     }
 
     &.disabled {
@@ -227,7 +228,7 @@ $combobox-tokens: defaults(
       &:focus-visible {
         z-index: 5;
         border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
-        outline: var(--#{$prefix}combobox-focus-ring);
+        @include focus-ring(true, $ring: var(--#{$prefix}combobox-focus-ring));
       }
     }
   }

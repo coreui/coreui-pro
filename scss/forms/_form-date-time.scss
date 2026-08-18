@@ -1,5 +1,6 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 @use "floating-labels" as *;
@@ -66,7 +67,7 @@ $form-date-time-tokens: defaults(
       color: var(--#{$prefix}control-focus-color);
       background-color: var(--#{$prefix}control-focus-bg);
       border-color: var(--#{$prefix}control-focus-border-color);
-      outline: var(--#{$prefix}control-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}control-focus-ring));
     }
 
     &.disabled {

@@ -1,5 +1,6 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
@@ -189,7 +190,7 @@ $nav-underline-border-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: $nav-link-focus-ring;
+      @include focus-ring(true, $ring: $nav-link-focus-ring);
     }
 
     // Disabled state lightens text

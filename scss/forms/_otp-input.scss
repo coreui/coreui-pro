@@ -2,6 +2,7 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -124,7 +125,7 @@ $form-otp-control-tokens: defaults(
       color: var(--#{$prefix}control-focus-color);
       background-color: var(--#{$prefix}control-focus-bg);
       border-color: var(--#{$prefix}control-focus-border-color);
-      outline: var(--#{$prefix}control-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}control-focus-ring));
     }
   }
 

@@ -1,6 +1,7 @@
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
+@use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
@@ -100,7 +101,7 @@ $search-button-tokens: defaults(
       color: var(--#{$prefix}search-button-focus-color);
       background-color: var(--#{$prefix}search-button-focus-bg);
       border-color: var(--#{$prefix}search-button-focus-border-color);
-      outline: var(--#{$prefix}search-button-focus-ring);
+      @include focus-ring(true, $ring: var(--#{$prefix}search-button-focus-ring));
     }
   }
 
