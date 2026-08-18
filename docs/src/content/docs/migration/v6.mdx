@@ -224,9 +224,23 @@ finished, not whether the state changed.
   colour), plus `--cui-accordion-content-duration` and
   `--cui-accordion-content-easing`, which drive the panel transition and are
   read back by `accordion.js` so both paths animate for the same length of time.
-- **`.theme-{color}` tints the open items.** The active tokens resolve through
-  `--cui-theme-fg` / `-bg-subtle` / `-border` with the old primary values as the
-  fallback, so an untouched accordion renders exactly as before.
+- **The indicator can be an element instead of a background image.** Put an
+  `<svg class="accordion-icon">` in the `<summary>` and the header stops drawing
+  its own icon, so any icon set or `<img>` can be used without URL escaping an
+  SVG into a custom property. `--cui-accordion-btn-active-icon` selects the
+  shape shown while the item is open, and a second element marked
+  `.accordion-icon-active` does the same in markup — that is what a plus/minus
+  accordion needs, where the icon is swapped rather than rotated. The default
+  chevron and its rotation are unchanged when neither is used.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The open item is neutral, and `.theme-{color}` is what tints it.**
+  `--cui-accordion-active-bg` and `--cui-accordion-active-color` were fixed to
+  `--cui-primary-bg-subtle` / `--cui-primary-text-emphasis`, so every accordion
+  turned the brand colour on open whether or not that suited the page. They are
+  `--cui-secondary-bg` and `--cui-body-color` now, and the active tokens resolve
+  through `--cui-theme-fg` / `-bg-subtle` / `-border` first — so the colour is a
+  decision you make per accordion instead of one baked into the component. To
+  keep the old look, put `.theme-primary` on the `.accordion`.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **`--cui-accordion-inner-border-radius` is gone; the header's corners follow
   `--cui-accordion-border-radius`.** The token was computed from the global
@@ -1410,21 +1424,24 @@ the accordion swapped in a second SVG, the carousel inverted the first with a
 `background-color` as an ordinary token and follows the root colours by itself.
 Upstream v6 does the same, with a `mask-icon()` mixin.
 
-- **The accordion's two icons collapse into one.**
-  `$accordion-button-active-icon` and the `--#{$prefix}accordion-btn-active-icon`
-  custom property are **removed**; the active state changes
-  `--#{$prefix}accordion-btn-active-icon-color` instead of the whole image. New
-  tokens: `--#{$prefix}accordion-btn-icon-color` and
+- **The accordion's icon is one shape recoloured per state, not two images.**
+  `--#{$prefix}accordion-btn-active-icon` no longer has to carry a second copy
+  of the artwork: it defaults to `--#{$prefix}accordion-btn-icon`, and the open
+  state changes `--#{$prefix}accordion-btn-active-icon-color` instead. Set it
+  only when the open state is a genuinely different shape — a minus against a
+  plus. New tokens: `--#{$prefix}accordion-btn-icon-color` and
   `--#{$prefix}accordion-btn-active-icon-color`.
 - **A custom icon is now a shape, not a coloured image.** Whatever colour you put
   inside `$accordion-button-icon` or `$carousel-control-prev-icon-bg` /
   `$carousel-control-next-icon-bg` is ignored — only the alpha of the SVG is used.
   Set the colour through the token (`--#{$prefix}accordion-btn-icon-color`,
   `--#{$prefix}carousel-control-color`).
-- **`$accordion-icon-color` and `$accordion-icon-active-color` are `var()`
-  references now** (`var(--#{$prefix}body-color)`,
-  `var(--#{$prefix}primary-text-emphasis)`), not Sass colours — Sass colour
-  functions on them no longer work.
+- **`$accordion-icon-color` and `$accordion-icon-active-color` are
+  `currentcolor` now**, not Sass colours — Sass colour functions on them no
+  longer work. The icon therefore takes the header's colour in every state, so
+  anything that recolours an open header (`--#{$prefix}accordion-active-color`,
+  a `.theme-{color}` class) carries the icon with it. Both tokens stay, for the
+  case where the icon is meant to differ from the text.
 - **`$carousel-control-icon-filter` is removed**, with its
   `--#{$prefix}carousel-control-icon-filter` custom property and its two dark
   companions (`$carousel-control-icon-filter-dark`,
