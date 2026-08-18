@@ -28,8 +28,8 @@ $sidebar-widths: (
   lg: 20rem,
   xl: 24rem
 ) !default;
-$sidebar-padding-y:                        $spacer !default;
-$sidebar-padding-x:                        $spacer !default;
+$sidebar-padding-y:                        var(--#{$prefix}spacer-3) !default;
+$sidebar-padding-x:                        var(--#{$prefix}spacer-3) !default;
 $sidebar-color:                            var(--#{$prefix}body-color) !default;
 $sidebar-bg:                               var(--#{$prefix}body-bg) !default;
 $sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;

@@ -6,7 +6,7 @@
 @use "forms/form-control-group" as *;
 
 // scss-docs-start time-picker-variables
-$time-picker-body-padding:                  $spacer * .5 !default;
+$time-picker-body-padding:                  var(--#{$prefix}spacer-2) !default;
 
 $time-picker-footer-padding:                .5rem !default;
 $time-picker-footer-border-width:           1px !default;

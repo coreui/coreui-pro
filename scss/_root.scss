@@ -50,6 +50,15 @@
     }
     --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
     --#{$prefix}body-font-size: #{$font-size-base};
+    // scss-docs-start root-spacer-loop
+    // One token per stop of the spacing scale, so rescaling the system is a
+    // runtime change rather than a recompile. Components read these instead of
+    // multiplying `$spacer` when the stylesheet is built.
+    @each $key, $value in $spacers {
+      --#{$prefix}spacer-#{$key}: #{$value};
+    }
+    // scss-docs-end root-spacer-loop
+
     // scss-docs-start root-zindex-loop
     // One token per stop of the z-axis, so a page can relayer the library
     // without recompiling — a third-party overlay that must sit above the

@@ -5,8 +5,8 @@
 // Footer
 // scss-docs-start footer-variables
 $footer-min-height:    3rem !default;
-$footer-padding-y:     $spacer * .5 !default;
-$footer-padding-x:     $spacer !default;
+$footer-padding-y:     var(--#{$prefix}spacer-2) !default;
+$footer-padding-x:     var(--#{$prefix}spacer-3) !default;
 $footer-bg:            var(--#{$prefix}tertiary-bg) !default;
 $footer-color:         var(--#{$prefix}body-color) !default;
 $footer-border-width:  var(--#{$prefix}border-width) !default;

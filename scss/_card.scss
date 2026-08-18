@@ -7,9 +7,9 @@
 @use "config" as *;
 
 // scss-docs-start card-variables
-$card-spacer-y:                     $spacer !default;
-$card-spacer-x:                     $spacer !default;
-$card-title-spacer-y:               $spacer * .5 !default;
+$card-spacer-y:                     var(--#{$prefix}spacer-3) !default;
+$card-spacer-x:                     var(--#{$prefix}spacer-3) !default;
+$card-title-spacer-y:               var(--#{$prefix}spacer-2) !default;
 $card-title-color:                  null !default;
 $card-subtitle-color:               null !default;
 $card-border-width:                 var(--#{$prefix}border-width) !default;
@@ -17,14 +17,14 @@ $card-border-color:                 var(--#{$prefix}border-color-translucent) !d
 $card-border-radius:                var(--#{$prefix}border-radius) !default;
 $card-box-shadow:                   null !default;
 $card-inner-border-radius:          subtract($card-border-radius, $card-border-width) !default;
-$card-cap-padding-y:                $card-spacer-y * .5 !default;
+$card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-x:                $card-spacer-x !default;
 $card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}body-color) 3%, transparent) !default;
 $card-cap-color:                    null !default;
 $card-height:                       null !default;
 $card-color:                        null !default;
 $card-bg:                           var(--#{$prefix}body-bg) !default;
-$card-img-overlay-padding:          $spacer !default;
+$card-img-overlay-padding:          var(--#{$prefix}spacer-3) !default;
 $card-group-margin:                 $grid-gutter-width * .5 !default;
 // scss-docs-end card-variables
 

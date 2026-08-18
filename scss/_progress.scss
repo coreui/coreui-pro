@@ -18,8 +18,8 @@ $progress-bar-animation-timing:     1s linear infinite !default;
 $progress-bar-transition:           width .6s ease !default;
 
 // TODO: clean-up ???
-$progress-group-margin-bottom:         $spacer !default;
-$progress-group-header-margin-bottom:  $spacer * .25 !default;
+$progress-group-margin-bottom:         var(--#{$prefix}spacer-3) !default;
+$progress-group-header-margin-bottom:  var(--#{$prefix}spacer-1) !default;
 // scss-docs-end progress-variables
 
 $progress-tokens: () !default;

@@ -52,7 +52,7 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
   }
 
   .figure-img {
-    margin-bottom: $spacer * .5;
+    margin-bottom: var(--#{$prefix}spacer-2);
     line-height: 1;
   }
 

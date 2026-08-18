@@ -12,8 +12,8 @@
 
 // Header
 // scss-docs-start header-variables
-$header-padding-y:              $spacer * .5 !default;
-$header-padding-x:              $spacer * .5 !default;
+$header-padding-y:              var(--#{$prefix}spacer-2) !default;
+$header-padding-x:              var(--#{$prefix}spacer-2) !default;
 $header-brand-font-size:        $font-size-lg !default;
 $header-color:                  color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-bg:                     var(--#{$prefix}body-bg) !default;

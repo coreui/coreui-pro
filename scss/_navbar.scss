@@ -17,7 +17,7 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start navbar-variables
-$navbar-padding-y:                  $spacer * .5 !default;
+$navbar-padding-y:                  var(--#{$prefix}spacer-2) !default;
 $navbar-padding-x:                  null !default;
 
 $navbar-nav-link-padding-x:         .5rem !default;
