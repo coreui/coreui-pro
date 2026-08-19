@@ -77,6 +77,12 @@ Use background utility classes to change the appearance of individual progress b
     <div class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
+Or use a [theme class](/customize/components/#theme-variants) — the bar reads the theme's colors, including the label's contrast color:
+
+<Example code={`<div class="progress theme-success">
+    <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+  </div>`} />
+
 ## Multiple bars
 
 Include multiple progress bars in a progress component if you need.
