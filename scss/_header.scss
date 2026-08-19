@@ -1,3 +1,4 @@
+@use "mixins/mask-icon" as *;
 @use "buttons/button" as *;
 @use "functions/color" as *;
 @use "functions/defaults" as *;
@@ -29,7 +30,7 @@ $header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefi
 $header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default; // stylelint-disable-line function-disallowed-list
 $header-brand-margin-end:       1rem !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
-$header-brand-color:            $gray-900 !default;
+$header-brand-color:            var(--#{$prefix}gray-900) !default;
 $header-brand-hover-color:      shade-color($gray-900, 10%) !default;
 
 $header-toggler-padding-y:      .25rem !default;
@@ -40,8 +41,7 @@ $header-toggler-bg:             transparent !default;
 $header-toggler-border-radius:  $btn-border-radius !default;
 $header-toggler-hover-color:    color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 
-$header-toggler-icon-bg:        url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !default;
-$header-toggler-hover-icon-bg:  url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$header-hover-color}' stroke-width='2.25' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !default;
+$header-toggler-icon-bg:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 
 $header-nav-link-padding-x:     .5rem !default;
 $header-nav-link-padding-y:     .5rem !default;
@@ -77,7 +77,6 @@ $header-tokens: defaults(
     --#{$prefix}header-toggler-border-radius: #{$header-toggler-border-radius},
     --#{$prefix}header-toggler-hover-color: #{$header-toggler-hover-color},
     --#{$prefix}header-toggler-icon-bg: #{escape-svg($header-toggler-icon-bg)},
-    --#{$prefix}header-toggler-hover-icon-bg: #{escape-svg($header-toggler-hover-icon-bg)},
     --#{$prefix}header-nav-link-padding-x: #{$header-nav-link-padding-x},
     --#{$prefix}header-nav-link-padding-y: #{$header-nav-link-padding-y},
     --#{$prefix}header-divider-border-color: #{$header-divider-border-color},
@@ -243,13 +242,7 @@ $header-tokens: defaults(
   .header-toggler-icon {
     display: block;
     height: calc(#{$header-toggler-font-size} * 1.25); // stylelint-disable-line function-disallowed-list
-    background-image: var(--#{$prefix}header-toggler-icon-bg);
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 100% 100%;
-
-    &:hover {
-      background-image: var(--#{$prefix}header-toggler-hover-icon-bg);
-    }
+    background-color: currentcolor;
+    @include mask-icon(var(--#{$prefix}header-toggler-icon-bg), 100% 100%);
   }
 }

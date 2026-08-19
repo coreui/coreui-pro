@@ -1,3 +1,4 @@
+@use "../mixins/mask-icon" as *;
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
@@ -10,21 +11,18 @@ $btn-close-width:            1em !default;
 $btn-close-height:           $btn-close-width !default;
 $btn-close-padding-x:        .25em !default;
 $btn-close-padding-y:        $btn-close-padding-x !default;
-$btn-close-color:            $black !default;
-$btn-close-bg:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$btn-close-color}'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>") !default;
+$btn-close-color:            inherit !default;
+$btn-close-bg:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>") !default;
 $btn-close-focus-shadow:     var(--#{$prefix}focus-ring) !default;
 $btn-close-opacity:          .5 !default;
 $btn-close-hover-opacity:    .75 !default;
 $btn-close-focus-opacity:    1 !default;
 $btn-close-disabled-opacity: .25 !default;
-$btn-close-filter:           null !default;
 // scss-docs-end close-variables
-
-$btn-close-filter-dark:      invert(1) grayscale(100%) brightness(200%) !default;
 
 $close-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // scss-docs-start close-css-vars
 $close-tokens: defaults(
@@ -41,7 +39,7 @@ $close-tokens: defaults(
 );
 // scss-docs-end close-css-vars
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 @layer components {
   // Transparent background and border properties included for button version.
   // iOS requires the button element instead of an anchor tag.
@@ -60,8 +58,8 @@ $close-tokens: defaults(
     min-height: $btn-close-height;
     padding: $btn-close-padding-y $btn-close-padding-x;
     color: var(--#{$prefix}btn-close-color);
-    background: transparent var(--#{$prefix}btn-close-bg) center / $btn-close-width auto no-repeat; // include transparent for button elements
-    filter: var(--#{$prefix}btn-close-filter);
+    background-color: currentcolor;
+    @include mask-icon(var(--#{$prefix}btn-close-bg), $btn-close-width auto);
     border: 0; // for button elements
     @include border-radius();
     opacity: var(--#{$prefix}btn-close-opacity);
@@ -89,7 +87,7 @@ $close-tokens: defaults(
 }
 
 @mixin btn-close-white() {
-  --#{$prefix}btn-close-filter: #{$btn-close-filter-dark};
+  --#{$prefix}btn-close-color: var(--#{$prefix}white);
 }
 
 @layer components {
@@ -97,10 +95,6 @@ $close-tokens: defaults(
     @include btn-close-white();
   }
 
-  :root,
-  [data#{$data-infix}theme="light"] {
-    --#{$prefix}btn-close-filter: #{$btn-close-filter};
-  }
 
   @if $enable-dark-mode {
     @include color-mode(dark, true) {

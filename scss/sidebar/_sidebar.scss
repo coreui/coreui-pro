@@ -34,8 +34,8 @@ $sidebar-color:                            var(--#{$prefix}body-color) !default;
 $sidebar-bg:                               var(--#{$prefix}body-bg) !default;
 $sidebar-transition:                       margin-left .15s, margin-right .15s, box-shadow .075s, transform .15s, width .15s, z-index 0s ease .15s !default;
 $sidebar-brand-color:                      var(--#{$prefix}body-color) !default;
-$sidebar-brand-bg:                         rgba($black, .2) !default;
-$sidebar-backdrop-bg:                      $black !default;
+$sidebar-brand-bg:                         color-mix(in srgb, var(--#{$prefix}black) 20%, transparent) !default;
+$sidebar-backdrop-bg:                      var(--#{$prefix}black) !default;
 $sidebar-backdrop-opacity:                 .5 !default;
 $sidebar-overlaid-box-shadow:              var(--#{$prefix}box-shadow) !default;
 

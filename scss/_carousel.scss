@@ -7,7 +7,7 @@
 @use "config" as *;
 
 // scss-docs-start carousel-variables
-$carousel-control-color:             light-dark($white, $black) !default;
+$carousel-control-color:             light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
 $carousel-control-width:             15% !default;
 $carousel-control-opacity:           .5 !default;
 $carousel-control-hover-opacity:     .9 !default;
@@ -18,12 +18,12 @@ $carousel-indicator-height:          3px !default;
 $carousel-indicator-hit-area-height: 10px !default;
 $carousel-indicator-spacer:          3px !default;
 $carousel-indicator-opacity:         .5 !default;
-$carousel-indicator-active-bg:       light-dark($white, $black) !default;
+$carousel-indicator-active-bg:       light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
 $carousel-indicator-active-opacity:  1 !default;
 $carousel-indicator-transition:      opacity .6s ease !default;
 
 $carousel-caption-width:             70% !default;
-$carousel-caption-color:             light-dark($white, $black) !default;
+$carousel-caption-color:             light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
 $carousel-caption-padding-y:         1.25rem !default;
 $carousel-caption-spacer:            1.25rem !default;
 
@@ -152,12 +152,12 @@ $carousel-transition:                transform $carousel-transition-duration eas
   .carousel-control-prev {
     left: 0;
     // stylelint-disable-next-line scss/at-function-named-arguments
-    background-image: if(sass($enable-gradients): linear-gradient(90deg, rgba($black, .25), rgba($black, .001)));
+    background-image: if(sass($enable-gradients): linear-gradient(90deg, color-mix(in srgb, var(--#{$prefix}black) 25%, transparent), color-mix(in srgb, var(--#{$prefix}black) .1%, transparent)));
   }
   .carousel-control-next {
     right: 0;
     // stylelint-disable-next-line scss/at-function-named-arguments
-    background-image: if(sass($enable-gradients): linear-gradient(270deg, rgba($black, .25), rgba($black, .001)));
+    background-image: if(sass($enable-gradients): linear-gradient(270deg, color-mix(in srgb, var(--#{$prefix}black) 25%, transparent), color-mix(in srgb, var(--#{$prefix}black) .1%, transparent)));
   }
 
   // Icons for within
@@ -244,9 +244,9 @@ $carousel-transition:                transform $carousel-transition-duration eas
 // The .carousel-dark opt-in is deliberately independent of the colour scheme,
 // so it pins the dark side of each pair rather than reading the token.
 // scss-docs-start carousel-dark-variables
-$carousel-dark-indicator-active-bg: $black !default;
-$carousel-dark-caption-color:       $black !default;
-$carousel-dark-control-color:       $black !default;
+$carousel-dark-indicator-active-bg: var(--#{$prefix}black) !default;
+$carousel-dark-caption-color:       var(--#{$prefix}black) !default;
+$carousel-dark-control-color:       var(--#{$prefix}black) !default;
 // scss-docs-end carousel-dark-variables
 
 @mixin carousel-dark() {

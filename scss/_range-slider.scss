@@ -36,7 +36,7 @@ $range-slider-thumb-height:                $range-slider-thumb-width !default;
 $range-slider-thumb-bg:                    var(--#{$prefix}primary) !default;
 $range-slider-thumb-border:                0 !default;
 $range-slider-thumb-border-radius:         1rem !default;
-$range-slider-thumb-box-shadow:            0 .1rem .25rem rgba($black, .1) !default;
+$range-slider-thumb-box-shadow:            0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
 $range-slider-thumb-focus-ring:      $input-focus-ring !default;
 $range-slider-thumb-active-bg:             tint-color($primary, 70%) !default;
 $range-slider-thumb-disabled-bg:           color-mix(in srgb, var(--#{$prefix}secondary) 100%, transparent) !default;

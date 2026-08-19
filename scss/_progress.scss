@@ -12,7 +12,7 @@ $progress-font-size:                calc(var(--#{$prefix}body-font-size) * .75) 
 $progress-bg:                       var(--#{$prefix}secondary-bg) !default;
 $progress-border-radius:            var(--#{$prefix}border-radius) !default;
 $progress-box-shadow:               var(--#{$prefix}box-shadow-inset) !default;
-$progress-bar-color:                $white !default;
+$progress-bar-color:                var(--#{$prefix}white) !default;
 $progress-bar-bg:                   var(--#{$prefix}primary) !default;
 $progress-bar-animation-timing:     1s linear infinite !default;
 $progress-bar-transition:           width .6s ease !default;
@@ -112,7 +112,7 @@ $progress-tokens: defaults(
   .progress.progress-white {
     background-color: rgba(255, 255, 255, .2);
     .progress-bar {
-      background-color: $white;
+      background-color: var(--#{$prefix}white);
     }
   }
 
