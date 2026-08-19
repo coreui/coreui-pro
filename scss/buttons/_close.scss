@@ -71,7 +71,7 @@ $close-tokens: defaults(
       opacity: var(--#{$prefix}btn-close-hover-opacity);
     }
 
-    &:focus {
+    &:focus-visible {
       outline: 0;
       box-shadow: var(--#{$prefix}btn-close-focus-shadow);
       opacity: var(--#{$prefix}btn-close-focus-opacity);

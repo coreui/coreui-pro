@@ -182,7 +182,7 @@ $stepper-tokens: defaults(
       display: none;
     }
 
-    &:focus {
+    &:focus-visible {
 
       .stepper-step-indicator {
         @include focus-ring(true, $ring: var(--#{$prefix}stepper-step-indicator-focus-ring));

@@ -94,7 +94,7 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
       }
     }
 
-    &:focus {
+    &:focus-visible {
       border-color: var(--#{$prefix}radio-focus-border);
       @include focus-ring(true, $ring: var(--#{$prefix}radio-focus-ring));
     }

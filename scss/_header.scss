@@ -226,10 +226,6 @@ $header-tokens: defaults(
       text-decoration: none;
     }
 
-    &:focus {
-      outline: 0;
-    }
-
     // Opinionated: add "hand" cursor to non-disabled .navbar-toggler elements
     &:not(:disabled) {
       cursor: pointer;

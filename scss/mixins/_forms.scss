@@ -241,7 +241,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
         background-color: $color;
       }
 
-      &:focus {
+      &:focus-visible {
         @include focus-ring(true, $ring: $focus-ring);
       }
 

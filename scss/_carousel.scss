@@ -145,7 +145,6 @@ $carousel-transition:                transform $carousel-transition-duration eas
     &:focus {
       color: var(--#{$prefix}carousel-control-color);
       text-decoration: none;
-      outline: 0;
       opacity: $carousel-control-hover-opacity;
     }
   }

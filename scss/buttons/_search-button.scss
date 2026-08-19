@@ -98,7 +98,7 @@ $search-button-tokens: defaults(
     @include box-shadow(var(--#{$prefix}search-button-box-shadow));
     @include transition(var(--#{$prefix}search-button-transition));
 
-    &:focus {
+    &:focus-visible {
       color: var(--#{$prefix}search-button-focus-color);
       background-color: var(--#{$prefix}search-button-focus-bg);
       border-color: var(--#{$prefix}search-button-focus-border-color);
