@@ -16,7 +16,7 @@ $pagination-padding-x-sm:           .5rem !default;
 $pagination-padding-y-lg:           .75rem !default;
 $pagination-padding-x-lg:           1.5rem !default;
 
-$pagination-font-size:              $font-size-base !default;
+$pagination-font-size:              var(--#{$prefix}body-font-size) !default;
 
 $pagination-color:                  var(--#{$prefix}link-color) !default;
 $pagination-bg:                     var(--#{$prefix}body-bg) !default;
@@ -163,10 +163,10 @@ $pagination-tokens: defaults(
   //
 
   .pagination-lg {
-    @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $pagination-border-radius-lg);
+    @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, var(--#{$prefix}font-size-lg), $pagination-border-radius-lg);
   }
 
   .pagination-sm {
-    @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $pagination-border-radius-sm);
+    @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, var(--#{$prefix}font-size-sm), $pagination-border-radius-sm);
   }
 }

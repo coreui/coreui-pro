@@ -25,8 +25,8 @@ $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 // values recomputed for our scale: the box matches the label's font size, and the
 // margin is half that step's leading, so the control sits on the text's centre.
 $check-sizes: (
-  sm: (size: .875rem, margin-top: .21875rem, font-size: $font-size-sm),
-  lg: (size: 1.25rem, margin-top: .3125rem, font-size: $font-size-lg)
+  sm: (size: .875rem, margin-top: .21875rem, font-size: var(--#{$prefix}font-size-sm)),
+  lg: (size: 1.25rem, margin-top: .3125rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
 // scss-docs-end check-variables
 

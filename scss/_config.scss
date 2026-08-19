@@ -655,7 +655,7 @@ $h1-font-size:                clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem) !default
 $h2-font-size:                clamp(1.325rem, 1.325rem + .9vw, 2rem) !default;
 $h3-font-size:                clamp(1.3rem, 1.3rem + .6vw, 1.75rem) !default;
 $h4-font-size:                clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$h5-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$h5-font-size:                $font-size-lg !default;
 $h6-font-size:                var(--#{$prefix}body-font-size) !default;
 // scss-docs-end font-variables
 

@@ -65,7 +65,7 @@ $font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
 $input-btn-padding-y:         .375rem !default;
 $input-btn-padding-x:         .75rem !default;
 $input-btn-font-family:       null !default;
-$input-btn-font-size:         $font-size-base !default;
+$input-btn-font-size:         var(--#{$prefix}body-font-size) !default;
 $input-btn-line-height:       $line-height-base !default;
 $input-btn-border-width:      var(--#{$prefix}border-width) !default;
 $input-btn-transition:        color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;

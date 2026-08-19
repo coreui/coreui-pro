@@ -6,7 +6,7 @@
 @use "config" as *;
 
 // scss-docs-start tooltip-variables
-$tooltip-font-size:                 $font-size-sm !default;
+$tooltip-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $tooltip-max-width:                 200px !default;
 $tooltip-color:                     var(--#{$prefix}body-bg) !default;
 $tooltip-bg:                        var(--#{$prefix}emphasis-color) !default;

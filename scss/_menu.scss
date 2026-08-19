@@ -17,7 +17,7 @@ $menu-min-width:                10rem !default;
 $menu-padding-x:                .25rem !default;
 $menu-padding-y:                .25rem !default;
 $menu-spacer:                   .125rem !default;
-$menu-font-size:                $font-size-sm !default;
+$menu-font-size:                var(--#{$prefix}font-size-sm) !default;
 $menu-color:                    var(--#{$prefix}body-color) !default;
 $menu-bg:                       var(--#{$prefix}body-bg) !default;
 $menu-border-color:             var(--#{$prefix}border-color-translucent) !default;
@@ -264,7 +264,7 @@ $menu-tokens: defaults(
     display: block;
     padding: var(--#{$prefix}menu-header-padding-y) var(--#{$prefix}menu-header-padding-x);
     margin-bottom: 0;
-    font-size: $font-size-sm;
+    font-size: var(--#{$prefix}font-size-sm);
     color: var(--#{$prefix}menu-header-color);
     white-space: nowrap;
   }

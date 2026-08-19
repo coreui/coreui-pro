@@ -39,9 +39,9 @@ $switch-checked-knob-position: $form-switch-checked-bg-position !default;
 // Sized like `.check` and `.radio`: one height, and the label follows so the
 // whole row scales. `xl` has no checkbox counterpart — it is ours.
 $switch-sizes: (
-  sm: (height: .875rem, font-size: $font-size-sm),
-  lg: (height: 1.25rem, font-size: $font-size-lg),
-  xl: (height: 1.5rem, font-size: $font-size-lg)
+  sm: (height: .875rem, font-size: var(--#{$prefix}font-size-sm)),
+  lg: (height: 1.25rem, font-size: var(--#{$prefix}font-size-lg)),
+  xl: (height: 1.5rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
 // scss-docs-end switch-variables
 
@@ -208,7 +208,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
 
         .form-check-label {
           // stylelint-disable-next-line function-disallowed-list
-          padding-top: calc((var(--#{$prefix}switch-height) - #{$font-size-base}) * .5);
+          padding-top: calc((var(--#{$prefix}switch-height) - #{var(--#{$prefix}body-font-size)}) * .5);
         }
       }
     }
