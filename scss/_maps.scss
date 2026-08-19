@@ -47,8 +47,8 @@ $utilities-colors: map-slot($theme-colors, "base") !default;
 $utilities-text: map.merge(
   $utilities-colors,
   (
-    "black": $black,
-    "white": $white,
+    "black": var(--#{$prefix}black),
+    "white": var(--#{$prefix}white),
     "body": $body-color
   )
 ) !default;
@@ -70,8 +70,8 @@ $utilities-text-emphasis-colors: (
 $utilities-bg: map.merge(
   $utilities-colors,
   (
-    "black": $black,
-    "white": $white,
+    "black": var(--#{$prefix}black),
+    "white": var(--#{$prefix}white),
     "body": $body-bg
   )
 ) !default;
@@ -93,8 +93,8 @@ $utilities-bg-subtle: (
 $utilities-border: map.merge(
   $utilities-colors,
   (
-    "black": $black,
-    "white": $white
+    "black": var(--#{$prefix}black),
+    "white": var(--#{$prefix}white)
   )
 ) !default;
 $utilities-border-colors: map-loop($utilities-border, color-var-ref, "$prefix", "$key", "border") !default;

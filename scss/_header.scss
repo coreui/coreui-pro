@@ -29,7 +29,7 @@ $header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefi
 $header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default; // stylelint-disable-line function-disallowed-list
 $header-brand-margin-end:       1rem !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
-$header-brand-color:            $gray-900 !default;
+$header-brand-color:            var(--#{$prefix}gray-900) !default;
 $header-brand-hover-color:      shade-color($gray-900, 10%) !default;
 
 $header-toggler-padding-y:      .25rem !default;

@@ -15,14 +15,14 @@ $callout-border-color:              var(--#{$prefix}border-color) !default;
 $callout-border-left-width:         calc(#{$callout-border-width} * 4) !default; // stylelint-disable-line function-disallowed-list
 
 $callout-variants: (
-  "primary":    $primary,
-  "secondary":  $secondary,
-  "success":    $success,
-  "danger":     $danger,
-  "warning":    $warning,
-  "info":       $info,
-  "light":      $light,
-  "dark":       $dark
+  "primary":    var(--#{$prefix}primary),
+  "secondary":  var(--#{$prefix}secondary),
+  "success":    var(--#{$prefix}success),
+  "danger":     var(--#{$prefix}danger),
+  "warning":    var(--#{$prefix}warning),
+  "info":       var(--#{$prefix}info),
+  "light":      var(--#{$prefix}light),
+  "dark":       var(--#{$prefix}dark)
 ) !default;
 // scss-docs-end callout-variables
 

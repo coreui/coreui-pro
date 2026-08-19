@@ -146,8 +146,8 @@ $utilities: map.merge(
         map-slot($theme-colors, "base"),
         (
           "current": currentcolor,
-          "black": $black,
-          "white": $white,
+          "black": var(--#{$prefix}black),
+          "white": var(--#{$prefix}white),
         )
       )
     ),
@@ -252,25 +252,25 @@ $utilities: map.merge(
     "border-top-color": (
       property: border-top-color,
       class: border-top,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true
     ),
     "border-end-color": (
       property: border-inline-end-color,
       class: border-end,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true,
     ),
     "border-bottom-color": (
       property: border-bottom-color,
       class: border-bottom,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true
     ),
     "border-start-color": (
       property: border-inline-start-color,
       class: border-start,
-      values: map.merge(map-slot($theme-colors, "base"), ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true,
     ),
     "border-width": (
@@ -760,8 +760,8 @@ $utilities: map.merge(
         $utilities-text-colors,
         (
           "muted": var(--#{$prefix}secondary-color), // deprecated
-          "black-50": rgba($black, .5), // deprecated
-          "white-50": rgba($white, .5), // deprecated
+          "black-50": color-mix(in srgb, var(--#{$prefix}black) 50%, transparent), // deprecated
+          "white-50": color-mix(in srgb, var(--#{$prefix}white) 50%, transparent), // deprecated
           "body-secondary": var(--#{$prefix}secondary-color),
           "body-tertiary": var(--#{$prefix}tertiary-color),
           "body-emphasis": var(--#{$prefix}emphasis-color),

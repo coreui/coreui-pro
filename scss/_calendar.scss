@@ -49,7 +49,7 @@ $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !de
 
 $calendar-cell-focus-ring:                   var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
-$calendar-cell-selected-color:               $white !default;
+$calendar-cell-selected-color:               var(--#{$prefix}white) !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
 
 $calendar-cell-range-bg:                     color-mix(in srgb, var(--#{$prefix}primary) 12.5%, transparent) !default;
