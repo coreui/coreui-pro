@@ -644,9 +644,6 @@ $shadows: (
 
 // stylelint-enable function-disallowed-list
 
-$component-active-color:      rgba($white, .87) !default;
-$component-active-bg:         var(--#{$prefix}primary) !default;
-
 // scss-docs-start focus-ring-variables
 $focus-ring-width:      .25rem !default;
 $focus-ring-opacity:    .25 !default;
@@ -800,9 +797,9 @@ $input-btn-disabled-opacity:  .65 !default;
 // Sources of the :root --#{$prefix}control-checked-*/-indeterminate-* knobs,
 // shared by every checkable control. They stay here because _root.scss reads
 // them and loads before any component.
-$form-check-input-checked-bg-color:       $component-active-bg !default;
-$form-check-input-checked-border-color:   $form-check-input-checked-bg-color !default;
-$form-check-input-indeterminate-bg-color:       $component-active-bg !default;
+$form-check-input-checked-bg-color:             var(--#{$prefix}primary) !default;
+$form-check-input-checked-border-color:         $form-check-input-checked-bg-color !default;
+$form-check-input-indeterminate-bg-color:       var(--#{$prefix}primary) !default;
 $form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
 // scss-docs-end control-state-variables
 // scss-docs-end input-btn-variables

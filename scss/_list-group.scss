@@ -19,8 +19,8 @@ $list-group-item-padding-y:         var(--#{$prefix}spacer-2) !default;
 $list-group-item-padding-x:         var(--#{$prefix}spacer-3) !default;
 
 $list-group-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
-$list-group-active-color:           $component-active-color !default;
-$list-group-active-bg:              $component-active-bg !default;
+$list-group-active-color:           var(--#{$prefix}primary-contrast) !default;
+$list-group-active-bg:              var(--#{$prefix}primary) !default;
 $list-group-active-border-color:    $list-group-active-bg !default;
 
 $list-group-disabled-color:         var(--#{$prefix}secondary-color) !default;

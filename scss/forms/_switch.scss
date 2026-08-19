@@ -29,7 +29,7 @@ $switch-bg:                   $form-check-input-bg !default;
 $switch-border:               $form-check-input-border !default;
 $switch-padding:              .125em !default;
 $switch-thumb-bg:             $form-switch-color !default;
-$switch-checked-thumb-bg:     $form-switch-checked-color !default;
+$switch-checked-thumb-bg:     var(--#{$prefix}primary-contrast) !default;
 $switch-knob:                 $form-switch-bg-image !default;
 $switch-knob-focus:           $form-switch-focus-bg-image !default;
 $switch-knob-checked:         $form-switch-checked-bg-image !default;

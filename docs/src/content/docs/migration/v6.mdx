@@ -1267,6 +1267,40 @@ them. A state names a theme colour now, and every value is a slot of it.
   variables moved from `scss/_config.scss` to `scss/forms/_variables.scss`
   alongside `$form-text-*` and `$form-feedback-*`.
 
+#### `$component-active-color` and `$component-active-bg` are removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+One shared pair in `_config.scss` fed every active state in the library — the
+list group, pagination, the menu, nav pills, the dropdown, both range sliders
+and the checkable controls. Each component names its own default now and points
+it at the colour's slots, so nothing is defined in a file that never renders it.
+
+```diff
+- $list-group-active-color:  $component-active-color;
+- $list-group-active-bg:     $component-active-bg;
++ $list-group-active-color:  var(--cui-primary-contrast);
++ $list-group-active-bg:     var(--cui-primary);
+```
+
+- **Active text is fully opaque.** `$component-active-color` was
+  `rgba($white, .87)`, a colour frozen at build time, so an active state
+  recoloured to a light background kept near-white text. It reads the
+  `contrast` slot now. Against the default primary that lifts the ratio from
+  **4.71** to **5.65**, and it matches `.text-bg-primary`, which already used
+  the slot — the two whites in the library are one white again. Our own
+  Bootstrap theme was already overriding the pair to pure white, so it renders
+  as before.
+- **Override the colour, not the pair.** Set `$primary` (or
+  `--#{$prefix}primary` at runtime) to move every active state at once, or the
+  component's own knob to move one. Per instance, `.theme-*` still wins where a
+  component reads `--#{$prefix}theme-*`.
+- **The switch keeps a literal colour on the deprecated path only.**
+  `$form-switch-checked-color` is interpolated into an SVG data URI, where a
+  custom property cannot reach, so it stays `$white`. The current `.switch`
+  paints its thumb with `background-color`, so `$switch-checked-thumb-bg` takes
+  the slot and no longer inherits from the deprecated variable.
+
 #### A theme colour is one nested map entry
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

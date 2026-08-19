@@ -33,7 +33,7 @@ $range-slider-label-color:                 var(--#{$prefix}body-color) !default;
 
 $range-slider-thumb-width:                 1rem !default;
 $range-slider-thumb-height:                $range-slider-thumb-width !default;
-$range-slider-thumb-bg:                    $component-active-bg !default;
+$range-slider-thumb-bg:                    var(--#{$prefix}primary) !default;
 $range-slider-thumb-border:                0 !default;
 $range-slider-thumb-border-radius:         1rem !default;
 $range-slider-thumb-box-shadow:            0 .1rem .25rem rgba($black, .1) !default;
