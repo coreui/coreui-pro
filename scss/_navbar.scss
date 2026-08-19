@@ -1,3 +1,4 @@
+@use "mixins/mask-icon" as *;
 @use "sass:map";
 @use "buttons/button" as *;
 @use "functions/color" as *;
@@ -13,8 +14,6 @@
 @use "mixins/transition" as *;
 @use "nav" as *;
 @use "config" as *;
-
-// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start navbar-variables
 $navbar-padding-y:                  var(--#{$prefix}spacer-2) !default;
@@ -40,8 +39,7 @@ $navbar-light-color:                color-mix(in srgb, var(--#{$prefix}emphasis-
 $navbar-light-hover-color:          color-mix(in srgb, var(--#{$prefix}emphasis-color) 80%, transparent) !default;
 $navbar-light-active-color:         color-mix(in srgb, var(--#{$prefix}emphasis-color) 100%, transparent) !default;
 $navbar-light-disabled-color:       color-mix(in srgb, var(--#{$prefix}emphasis-color) 30%, transparent) !default;
-$navbar-light-icon-color:           rgba(shift-color($gray-base, +26%), .75) !default;
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
+$navbar-toggler-icon:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 $navbar-light-toggler-border-color: color-mix(in srgb, var(--#{$prefix}emphasis-color) 15%, transparent) !default;
 $navbar-light-brand-color:          $navbar-light-active-color !default;
 $navbar-light-brand-hover-color:    $navbar-light-active-color !default;
@@ -52,8 +50,6 @@ $navbar-dark-color:                 rgba($white, .55) !default;
 $navbar-dark-hover-color:           color-mix(in srgb, var(--#{$prefix}white) 75%, transparent) !default;
 $navbar-dark-active-color:          var(--#{$prefix}white) !default;
 $navbar-dark-disabled-color:        color-mix(in srgb, var(--#{$prefix}white) 25%, transparent) !default;
-$navbar-dark-icon-color:            $navbar-dark-color !default;
-$navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>") !default;
 $navbar-dark-toggler-border-color:  color-mix(in srgb, var(--#{$prefix}white) 10%, transparent) !default;$navbar-dark-toggler-border-color:  color-mix(in srgb, var(--#{$prefix}white) 10%, transparent) !default;
 $navbar-dark-brand-color:           $navbar-dark-active-color !default;
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
@@ -82,7 +78,7 @@ $navbar-tokens: defaults(
     --#{$prefix}navbar-toggler-padding-y: #{$navbar-toggler-padding-y},
     --#{$prefix}navbar-toggler-padding-x: #{$navbar-toggler-padding-x},
     --#{$prefix}navbar-toggler-font-size: #{$navbar-toggler-font-size},
-    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-light-toggler-icon-bg)},
+    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-toggler-icon)},
     --#{$prefix}navbar-toggler-border-color: #{$navbar-light-toggler-border-color},
     --#{$prefix}navbar-toggler-border-radius: #{$navbar-toggler-border-radius},
     --#{$prefix}navbar-toggler-focus-width: #{$navbar-toggler-focus-width},
@@ -130,7 +126,6 @@ $navbar-dark-tokens: defaults(
     --#{$prefix}navbar-brand-color: #{$navbar-dark-brand-color},
     --#{$prefix}navbar-brand-hover-color: #{$navbar-dark-brand-hover-color},
     --#{$prefix}navbar-toggler-border-color: #{$navbar-dark-toggler-border-color},
-    --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-dark-toggler-icon-bg)},
   ),
   $navbar-dark-tokens
 );
@@ -307,10 +302,8 @@ $navbar-dark-tokens: defaults(
     width: 1.5em;
     height: 1.5em;
     vertical-align: middle;
-    background-image: var(--#{$prefix}navbar-toggler-icon-bg);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100%;
+    background-color: currentcolor;
+    @include mask-icon(var(--#{$prefix}navbar-toggler-icon-bg), 100%);
   }
 
   .navbar-nav-scroll {
@@ -405,11 +398,4 @@ $navbar-dark-tokens: defaults(
     @include tokens($navbar-dark-tokens);
   }
 
-  @if $enable-dark-mode {
-    @include color-mode(dark) {
-      .navbar-toggler-icon {
-        --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-dark-toggler-icon-bg)};
-      }
-    }
-  }
 }
