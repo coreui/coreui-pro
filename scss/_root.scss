@@ -256,16 +256,25 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
     --#{$prefix}btn-input-disabled-opacity: #{$input-btn-disabled-opacity};
     --#{$prefix}btn-input-color: var(--#{$prefix}body-color);
     --#{$prefix}btn-input-bg: var(--#{$prefix}body-bg);
+    --#{$prefix}btn-input-font-weight: var(--#{$prefix}body-font-weight);
+    --#{$prefix}btn-input-border-color: var(--#{$prefix}border-color);
+    --#{$prefix}btn-input-border-radius: var(--#{$prefix}border-radius);
+    --#{$prefix}btn-input-box-shadow: var(--#{$prefix}box-shadow-inset);
+    --#{$prefix}btn-input-focus-color: var(--#{$prefix}btn-input-color);
+    --#{$prefix}btn-input-focus-bg: var(--#{$prefix}btn-input-bg);
+    --#{$prefix}btn-input-focus-border-color: color-mix(in srgb, var(--#{$prefix}primary) 50%, var(--#{$prefix}white));
     --#{$prefix}btn-input-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2); // stylelint-disable-line function-disallowed-list
 
     --#{$prefix}btn-input-sm-padding-y: #{$input-btn-padding-y-sm};
     --#{$prefix}btn-input-sm-padding-x: #{$input-btn-padding-x-sm};
     --#{$prefix}btn-input-sm-font-size: #{$input-btn-font-size-sm};
+    --#{$prefix}btn-input-sm-border-radius: var(--#{$prefix}border-radius-sm);
     --#{$prefix}btn-input-sm-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-sm-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2); // stylelint-disable-line function-disallowed-list
 
     --#{$prefix}btn-input-lg-padding-y: #{$input-btn-padding-y-lg};
     --#{$prefix}btn-input-lg-padding-x: #{$input-btn-padding-x-lg};
     --#{$prefix}btn-input-lg-font-size: #{$input-btn-font-size-lg};
+    --#{$prefix}btn-input-lg-border-radius: var(--#{$prefix}border-radius-lg);
     --#{$prefix}btn-input-lg-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-lg-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2); // stylelint-disable-line function-disallowed-list
     // scss-docs-end root-btn-input-variables
 

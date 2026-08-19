@@ -11,7 +11,7 @@ $input-padding-y:                       var(--#{$prefix}btn-input-padding-y) !de
 $input-padding-x:                       var(--#{$prefix}btn-input-padding-x) !default;
 $input-font-family:                     var(--#{$prefix}btn-input-font-family) !default;
 $input-font-size:                       var(--#{$prefix}btn-input-font-size) !default;
-$input-font-weight:                     var(--#{$prefix}body-font-weight) !default;
+$input-font-weight:                     var(--#{$prefix}btn-input-font-weight) !default;
 $input-line-height:                     var(--#{$prefix}btn-input-line-height) !default;
 
 $input-padding-y-sm:                    var(--#{$prefix}btn-input-sm-padding-y) !default;
@@ -21,23 +21,23 @@ $input-font-size-sm:                    var(--#{$prefix}btn-input-sm-font-size) 
 $input-padding-y-lg:                    var(--#{$prefix}btn-input-lg-padding-y) !default;
 $input-font-size-lg:                    var(--#{$prefix}btn-input-lg-font-size) !default;
 
-$input-bg:                              var(--#{$prefix}body-bg) !default;
+$input-bg:                              var(--#{$prefix}btn-input-bg) !default;
 $input-disabled-color:                  var(--#{$prefix}body-color) !default;
 $input-disabled-bg:                     var(--#{$prefix}secondary-bg) !default;
 $input-disabled-border-color:           var(--#{$prefix}border-color) !default;
 
-$input-color:                           var(--#{$prefix}body-color) !default;
-$input-border-color:                    var(--#{$prefix}border-color) !default;
+$input-color:                           var(--#{$prefix}btn-input-color) !default;
+$input-border-color:                    var(--#{$prefix}btn-input-border-color) !default;
 $input-border-width:                    var(--#{$prefix}btn-input-border-width) !default;
-$input-box-shadow:                      var(--#{$prefix}box-shadow-inset) !default;
+$input-box-shadow:                      var(--#{$prefix}btn-input-box-shadow) !default;
 
-$input-border-radius:                   var(--#{$prefix}border-radius) !default;
-$input-border-radius-sm:                var(--#{$prefix}border-radius-sm) !default;
-$input-border-radius-lg:                var(--#{$prefix}border-radius-lg) !default;
+$input-border-radius:                   var(--#{$prefix}btn-input-border-radius) !default;
+$input-border-radius-sm:                var(--#{$prefix}btn-input-sm-border-radius) !default;
+$input-border-radius-lg:                var(--#{$prefix}btn-input-lg-border-radius) !default;
 
-$input-focus-bg:                        $input-bg !default;
-$input-focus-border-color:              tint-color($primary, 50%) !default;
-$input-focus-color:                     $input-color !default;
+$input-focus-bg:                        var(--#{$prefix}btn-input-focus-bg) !default;
+$input-focus-border-color:              var(--#{$prefix}btn-input-focus-border-color) !default;
+$input-focus-color:                     var(--#{$prefix}btn-input-focus-color) !default;
 $input-focus-width:                     var(--#{$prefix}focus-ring-width) !default;
 $input-focus-ring:                      var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
