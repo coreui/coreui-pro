@@ -633,7 +633,6 @@ $font-weight-semibold:        600 !default;
 $font-weight-bold:            700 !default;
 $font-weight-bolder:          bolder !default;
 
-$font-weight-base:            $font-weight-normal !default;
 
 // Composed from the variables above rather than replacing them, so a Sass
 // override of one step still reaches the token, the utility and every

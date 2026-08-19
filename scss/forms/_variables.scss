@@ -10,7 +10,7 @@ $input-padding-y:                       var(--#{$prefix}btn-input-padding-y) !de
 $input-padding-x:                       var(--#{$prefix}btn-input-padding-x) !default;
 $input-font-family:                     var(--#{$prefix}btn-input-font-family) !default;
 $input-font-size:                       var(--#{$prefix}btn-input-font-size) !default;
-$input-font-weight:                     $font-weight-base !default;
+$input-font-weight:                     var(--#{$prefix}body-font-weight) !default;
 $input-line-height:                     var(--#{$prefix}btn-input-line-height) !default;
 
 $input-padding-y-sm:                    var(--#{$prefix}btn-input-sm-padding-y) !default;

@@ -59,6 +59,8 @@ $mark-bg:    light-dark($yellow-100, $yellow-800) !default;
 
 $icon-size-base: 1rem !default;
 
+$font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
+
 // scss-docs-start input-btn-variables
 $input-btn-padding-y:         .375rem !default;
 $input-btn-padding-x:         .75rem !default;
