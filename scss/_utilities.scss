@@ -954,6 +954,39 @@ $utilities: map.merge(
       values: $utilities-bg-subtle
     ),
     // scss-docs-end utils-bg-color
+    // scss-docs-start utils-theme
+    // Theme style utilities — pair with .theme-{color} to apply coordinated
+    // background and text colors
+    "theme-contrast": (
+      property: (
+        "background-color": var(--#{$prefix}theme-base),
+        "color": var(--#{$prefix}theme-contrast)
+      ),
+      class: theme-contrast,
+      values: (null: null)
+    ),
+    "theme-subtle": (
+      property: (
+        "background-color": var(--#{$prefix}theme-bg-subtle),
+        "color": var(--#{$prefix}theme-fg)
+      ),
+      class: theme-subtle,
+      values: (null: null)
+    ),
+    "theme-muted": (
+      property: (
+        "background-color": var(--#{$prefix}theme-bg-muted),
+        "color": var(--#{$prefix}theme-fg-emphasis)
+      ),
+      class: theme-muted,
+      values: (null: null)
+    ),
+    "theme-border": (
+      property: border,
+      class: theme-border,
+      values: (null: var(--#{$prefix}border-width) solid var(--#{$prefix}theme-border))
+    ),
+    // scss-docs-end utils-theme
     "gradient": (
       property: background-image,
       class: bg,
