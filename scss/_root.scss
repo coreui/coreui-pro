@@ -42,7 +42,10 @@ $shadow-strength-dark: 2.5 !default;
 // scss-docs-end box-shadow-variables
 
 // scss-docs-start focus-ring-variables
-$focus-ring-offset: 0 !default;
+$focus-ring-width:            .25rem !default;
+$focus-ring-opacity:          .25 !default;
+$focus-ring-color:            var(--#{$prefix}primary-focus-ring) !default;
+$focus-ring-offset:           0 !default;
 // scss-docs-end focus-ring-variables
 
 // scss-docs-start font-variables
