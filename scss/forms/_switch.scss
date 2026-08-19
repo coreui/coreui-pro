@@ -1,5 +1,4 @@
 @use "sass:map";
-@use "sass:math";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "form-check" as *;
@@ -14,10 +13,9 @@
 // is one custom property rather than a Sass recompile.
 
 // scss-docs-start switch-variables
-// The track's proportion, not its width: the width follows the height, so a
-// size is one token. `$form-switch-width` still sets it, as the width the
-// default height produces.
-$switch-aspect-ratio:         math.div($form-switch-width, $form-check-input-width) !default;
+// The track's proportion, not its width: the width follows the height in the
+// browser, so a size is one token and the ratio is a plain number.
+$switch-aspect-ratio:         2 !default;
 $switch-height:               $form-check-input-width !default;
 $switch-border-radius:        $form-switch-border-radius !default;
 // Duration and timing only — the property is named at the point of use. The v5
