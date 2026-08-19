@@ -7,7 +7,7 @@
 @use "config" as *;
 
 // scss-docs-start carousel-variables
-$carousel-control-color:             light-dark($white, $black) !default;
+$carousel-control-color:             light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
 $carousel-control-width:             15% !default;
 $carousel-control-opacity:           .5 !default;
 $carousel-control-hover-opacity:     .9 !default;
@@ -18,12 +18,12 @@ $carousel-indicator-height:          3px !default;
 $carousel-indicator-hit-area-height: 10px !default;
 $carousel-indicator-spacer:          3px !default;
 $carousel-indicator-opacity:         .5 !default;
-$carousel-indicator-active-bg:       light-dark($white, $black) !default;
+$carousel-indicator-active-bg:       light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
 $carousel-indicator-active-opacity:  1 !default;
 $carousel-indicator-transition:      opacity .6s ease !default;
 
 $carousel-caption-width:             70% !default;
-$carousel-caption-color:             light-dark($white, $black) !default;
+$carousel-caption-color:             light-dark(var(--#{$prefix}white), var(--#{$prefix}black)) !default;
 $carousel-caption-padding-y:         1.25rem !default;
 $carousel-caption-spacer:            1.25rem !default;
 
