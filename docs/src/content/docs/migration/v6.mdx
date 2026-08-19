@@ -896,6 +896,17 @@ adornment in the library — so the button needs no icon markup at all:
   back to the nearest `[dir]` ancestor, but placement first is the reliable
   path).
 
+#### Range / Range Slider
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The pressed thumb adapts to the color mode.** Its color was 70% white
+  mixed into the theme color at build time, so in dark mode the pressed
+  thumb flashed a near-white pastel. It now mixes toward `--cui-body-bg` at
+  runtime — identical in light mode, dark and correct in dark mode.
+- **Both sliders are themeable**: the filled track and the thumbs read the
+  theme slots, so a `.theme-*` class recolors them; without one they stay
+  on primary as before.
+
 #### ScrollSpy
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
