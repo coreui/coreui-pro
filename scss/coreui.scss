@@ -3,10 +3,10 @@
 // scss-docs-start import-stack
 // Configuration
 @forward "config";
+@forward "theme";
 @forward "utilities";
 @forward "functions";
 @forward "mixins";
-@forward "theme";
 
 // Layout & components
 @forward "root";

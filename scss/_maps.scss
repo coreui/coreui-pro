@@ -1,38 +1,11 @@
 @use "sass:map";
 @use "functions/maps" as *;
 @use "config" as *;
+@use "theme" as *;
 
 // Re-assigned maps
 //
 // Placed here so that others can override the default Sass maps and see automatic updates to utilities and more.
-
-// scss-docs-start theme-text-map
-$theme-colors-text: map-slot($theme-colors, "text-emphasis") !default;
-// scss-docs-end theme-text-map
-
-// scss-docs-start theme-bg-subtle-map
-$theme-colors-bg-subtle: map-slot($theme-colors, "bg-subtle") !default;
-// scss-docs-end theme-bg-subtle-map
-
-// scss-docs-start theme-border-subtle-map
-$theme-colors-border-subtle: map-slot($theme-colors, "border-subtle") !default;
-// scss-docs-end theme-border-subtle-map
-
-// scss-docs-start theme-contrast-map
-$theme-colors-contrast: map-slot($theme-colors, "contrast") !default;
-// scss-docs-end theme-contrast-map
-
-// scss-docs-start theme-fg-map
-$theme-colors-fg: map-slot($theme-colors, "fg") !default;
-// scss-docs-end theme-fg-map
-
-// scss-docs-start theme-bg-muted-map
-$theme-colors-bg-muted: map-slot($theme-colors, "bg-muted") !default;
-// scss-docs-end theme-bg-muted-map
-
-// scss-docs-start theme-focus-ring-map
-$theme-colors-focus-ring: map-slot($theme-colors, "focus-ring") !default;
-// scss-docs-end theme-focus-ring-map
 
 // Utilities maps
 //

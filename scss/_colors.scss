@@ -1,6 +1,6 @@
 @use "sass:map";
 @use "config" as *;
-@use "maps" as *;
+@use "theme" as *;
 
 // The colour tokens: the full palette, the greys, the theme colours, the 100-900
 // scale generated from each of them, and the subtle/emphasis/contrast families
