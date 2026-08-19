@@ -1267,11 +1267,32 @@ assembles maps of CSS expressions and the browser resolves them.
   utilities. It was disabled by default (`$enable-elevations: false`), so the
   utilities were the only reachable part. Use the shadow utilities
   (`.shadow`, `.shadow-sm`, `.shadow-lg`) or set `box-shadow` directly.
-- **Button focus rings take a colour, not channels.**
-  `--#{$prefix}btn-focus-shadow-rgb` becomes
-  `--#{$prefix}btn-focus-shadow`, and the Sass variables follow:
-  `$btn-outline-focus-shadow-rgb` → `$btn-outline-focus-shadow`, likewise for
-  the ghost and link variants.
+- **The button focus ring is the theme ring.** `--#{$prefix}btn-focus-shadow-rgb`
+  and the per-variant `$btn-*-focus-shadow-rgb` Sass variables are gone without
+  a renamed successor: the button reads
+  `var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring))`, so a colour
+  button rings in its colour through the theme slot and a neutral one gets the
+  global ring. To restyle it, set `--#{$prefix}btn-focus-ring` (any outline
+  shorthand) or the global focus-ring tokens. Two visible consequences: a
+  colour button's ring uses the focus-ring opacity (fainter than the old 50%
+  mix), and the neutral outline/ghost buttons ring in the global colour
+  instead of a grey.
+
+#### Focus rings are keyboard-only on activation controls
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+Controls you click to act — checkboxes, radios, switches, both range sliders,
+pagination links, stepper buttons, the search, close, sidebar and navbar
+togglers — draw their focus ring on `:focus-visible`, so clicking no longer
+flashes it and keyboard focus still shows it, joining the buttons which
+already worked this way. Fields you type into — text inputs, the OTP cells,
+the date-time sections — keep `:focus`: a field shows its ring on mouse focus
+by design.
+
+Two suppressed rings are restored: the header toggler and the carousel
+controls declared `outline: 0` with no replacement, so keyboard focus was
+invisible on both.
 
 #### A validation state is a theme colour, not a palette of its own
 
