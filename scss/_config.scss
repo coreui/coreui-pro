@@ -702,27 +702,11 @@ $small-font-size:               .875em !default;
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
 // scss-docs-start input-btn-variables
-$input-btn-padding-y:         .375rem !default;
-$input-btn-padding-x:         .75rem !default;
-$input-btn-font-family:       null !default;
-$input-btn-font-size:         $font-size-base !default;
-$input-btn-line-height:       $line-height-base !default;
-
-$input-btn-focus-width:         $focus-ring-width !default;
-$input-btn-focus-color:         $focus-ring-color !default;
-// Composed from the two knobs above rather than taken whole from
+// Composed from the two knobs below rather than taken whole from
 // `$focus-ring`, so setting either one reaches every control. Same value by
 // default.
-
-$input-btn-padding-y-sm:      .25rem !default;
-$input-btn-padding-x-sm:      .5rem !default;
-$input-btn-font-size-sm:      $font-size-sm !default;
-
-$input-btn-padding-y-lg:      .5rem !default;
-$input-btn-font-size-lg:      $font-size-lg !default;
-
-$input-btn-border-width:      var(--#{$prefix}border-width) !default;
-
+$input-btn-focus-width:       $focus-ring-width !default;
+$input-btn-focus-color:       $focus-ring-color !default;
 // scss-docs-end input-btn-variables
 
 // For each of Bootstrap's buttons, define text, background, and border color.
