@@ -272,11 +272,9 @@ Each theme color gets a 100–900 scale of `color-mix()` tokens in `:root`, mixe
 
 <ScssDocs file="scss/_theme.scss" capture="color-scale-variables" />
 
-The two values that cannot be a `light-dark()` pair — the colors baked into the select chevron and the switch knob SVGs — keep a dark counterpart next to the component they belong to:
+The one value that cannot be a `light-dark()` pair — the color baked into the select chevron SVG — keeps a dark counterpart next to the component it belongs to (the switch thumb, once the other case, is a plain color token now):
 
 <ScssDocs file="scss/forms/_form-control.scss" capture="form-control-select-dark-variables" />
-
-<ScssDocs file="scss/forms/_form-check.scss" capture="form-switch-dark-variables" />
 
 ### Sass mixins
 
