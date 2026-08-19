@@ -1373,8 +1373,9 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid colour) and
   `focus-ring` (the hue the `.theme-*` ring mixes from). They emit
   `--#{$prefix}{color}-fg`, `-bg-muted` and `-focus-ring`, and reach components
-  as `--#{$prefix}theme-fg-base`, `--#{$prefix}theme-bg-muted` and
-  `--#{$prefix}theme-focus-ring`.
+  as `--#{$prefix}theme-fg`, `--#{$prefix}theme-bg-muted` and
+  `--#{$prefix}theme-focus-ring`; the emphasis text reaches them as
+  `--#{$prefix}theme-fg-emphasis`.
 
 #### The control variables moved out of the shared config
 

@@ -41,7 +41,7 @@ $list-group-tokens: () !default;
 // scss-docs-start list-group-css-vars
 $list-group-tokens: defaults(
   (
-    --#{$prefix}list-group-color: var(--#{$prefix}theme-fg, #{$list-group-color}),
+    --#{$prefix}list-group-color: var(--#{$prefix}theme-fg-emphasis, #{$list-group-color}),
     --#{$prefix}list-group-bg: var(--#{$prefix}theme-bg-subtle, #{$list-group-bg}),
     --#{$prefix}list-group-border-color: var(--#{$prefix}theme-border, #{$list-group-border-color}),
     --#{$prefix}list-group-border-width: #{$list-group-border-width},
@@ -56,8 +56,8 @@ $list-group-tokens: defaults(
     --#{$prefix}list-group-disabled-color: #{$list-group-disabled-color},
     --#{$prefix}list-group-disabled-bg: #{$list-group-disabled-bg},
     --#{$prefix}list-group-active-color: var(--#{$prefix}theme-bg-subtle, #{$list-group-active-color}),
-    --#{$prefix}list-group-active-bg: var(--#{$prefix}theme-fg, #{$list-group-active-bg}),
-    --#{$prefix}list-group-active-border-color: var(--#{$prefix}theme-fg, #{$list-group-active-border-color}),
+    --#{$prefix}list-group-active-bg: var(--#{$prefix}theme-fg-emphasis, #{$list-group-active-bg}),
+    --#{$prefix}list-group-active-border-color: var(--#{$prefix}theme-fg-emphasis, #{$list-group-active-border-color}),
   ),
   $list-group-tokens
 );
@@ -238,7 +238,7 @@ $list-group-tokens: defaults(
     .list-group-item-#{$state} {
       @include theme-tokens($state);
 
-      --#{$prefix}list-group-color: var(--#{$prefix}theme-fg);
+      --#{$prefix}list-group-color: var(--#{$prefix}theme-fg-emphasis);
       --#{$prefix}list-group-bg: var(--#{$prefix}theme-bg-subtle);
       --#{$prefix}list-group-border-color: var(--#{$prefix}theme-border);
       --#{$prefix}list-group-action-hover-color: var(--#{$prefix}emphasis-color);
@@ -246,8 +246,8 @@ $list-group-tokens: defaults(
       --#{$prefix}list-group-action-active-color: var(--#{$prefix}emphasis-color);
       --#{$prefix}list-group-action-active-bg: var(--#{$prefix}theme-border);
       --#{$prefix}list-group-active-color: var(--#{$prefix}theme-bg-subtle);
-      --#{$prefix}list-group-active-bg: var(--#{$prefix}theme-fg);
-      --#{$prefix}list-group-active-border-color: var(--#{$prefix}theme-fg);
+      --#{$prefix}list-group-active-bg: var(--#{$prefix}theme-fg-emphasis);
+      --#{$prefix}list-group-active-border-color: var(--#{$prefix}theme-fg-emphasis);
     }
   }
   // scss-docs-end list-group-modifiers

@@ -27,7 +27,7 @@ $alert-tokens: defaults(
     --#{$prefix}alert-padding-y: #{$alert-padding-y},
     --#{$prefix}alert-gap: #{$alert-gap},
     --#{$prefix}alert-margin-bottom: #{$alert-margin-bottom},
-    --#{$prefix}alert-color: var(--#{$prefix}theme-fg, inherit),
+    --#{$prefix}alert-color: var(--#{$prefix}theme-fg-emphasis, inherit),
     --#{$prefix}alert-border-color: var(--#{$prefix}theme-border, transparent),
     --#{$prefix}alert-border: #{$alert-border-width} solid var(--#{$prefix}alert-border-color),
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
