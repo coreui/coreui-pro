@@ -1,61 +1,7 @@
-@use "sass:map";
 @use "../forms/variables" as *;
 @use "../functions/defaults" as *;
-@use "../functions/escape-svg" as *;
-@use "../mixins/border-radius" as *;
-@use "../mixins/color-mode" as *;
 @use "../mixins/tokens" as *;
-@use "../mixins/transition" as *;
-@use "../colors" as *;
 @use "../config" as *;
-
-$form-check-inline-margin-end:    1rem !default;
-
-// The values each control's own variables default to. A consumer sets
-// `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
-// what those fall back to, and what still works for a v5-era override.
-// scss-docs-start form-check-defaults
-$form-check-input-width:                  1em !default;
-
-$form-check-input-bg:                     $input-bg !default;
-$form-check-input-border:                 var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
-$form-check-input-border-radius:          .25em !default;
-$form-check-radio-border-radius:          50% !default;
-
-$form-check-input-checked-color:          var(--#{$prefix}primary-contrast) !default;
-// scss-docs-end form-check-defaults
-
-// What the wrapper owns and what all three controls share: the row, the label,
-// and the focus / active / disabled states.
-// scss-docs-start form-check-variables
-$form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
-$form-check-margin-bottom:                .125rem !default;
-$form-check-inline-margin-end:            1rem !default;
-
-$form-check-label-color:                  null !default;
-$form-check-label-cursor:                 null !default;
-
-$form-check-input-active-filter:          brightness(90%) !default;
-$form-check-input-focus-border:           $input-focus-border-color !default;
-$form-check-input-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
-
-$form-check-input-disabled-opacity:        .5 !default;
-$form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;
-// scss-docs-end form-check-variables
-
-// scss-docs-start form-switch-variables
-
-$form-switch-widths: (
-  lg: (
-    width: 2.5em,
-    height: 1.25em
-  ),
-  xl: (
-    width: 3em,
-    height: 1.5em
-  )
-) !default;
-// scss-docs-end form-switch-variables
 
 // stylelint-disable scss/dollar-variable-default
 
@@ -71,22 +17,6 @@ $form-check-tokens: defaults(
   $form-check-tokens
 );
 // scss-docs-end form-check-tokens
-
-// stylelint-enable scss/dollar-variable-default
-
-// stylelint-disable scss/dollar-variable-default
-
-// scss-docs-start form-check-input-tokens
-// Tokens the input owns, so it still styles itself when used outside .form-check
-// — an input group, for instance. Keeping them off the wrapper means a wrapper
-// or :root override is not shadowed by the input's own declaration.
-$form-check-input-tokens: () !default;
-$form-check-input-tokens: defaults(
-  (
-  ),
-  $form-check-input-tokens
-);
-// scss-docs-end form-check-input-tokens
 
 // stylelint-enable scss/dollar-variable-default
 
