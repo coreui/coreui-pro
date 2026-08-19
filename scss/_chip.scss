@@ -29,7 +29,7 @@ $chip-bg:                    var(--#{$prefix}secondary-bg) !default;
 $chip-border-width:          var(--#{$prefix}border-width) !default;
 $chip-border-color:          transparent !default;
 
-$chip-active-color:          color-mix(in srgb, var(--#{$prefix}white) 87%, transparent) !default;
+$chip-active-color:          var(--#{$prefix}primary-contrast) !default;
 $chip-active-bg:             var(--#{$prefix}primary) !default;
 $chip-active-border-color:   transparent !default;
 
