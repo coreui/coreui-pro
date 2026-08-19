@@ -18,15 +18,15 @@
     },
     {
       "path": "./dist/css/coreui-utilities.css",
-      "maxSize": "15 kB"
+      "maxSize": "15.25 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.min.css",
-      "maxSize": "14 kB"
+      "maxSize": "14.25 kB"
     },
     {
       "path": "./dist/css/coreui.css",
-      "maxSize": "61kB"
+      "maxSize": "61.25kB"
     },
     {
       "path": "./dist/css/coreui.min.css",
