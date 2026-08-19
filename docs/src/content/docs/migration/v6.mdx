@@ -1425,6 +1425,23 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   `--#{$prefix}theme-focus-ring`; the emphasis text reaches them as
   `--#{$prefix}theme-fg-emphasis`.
 
+#### The input frame is complete on `:root`
+
+The shared `--#{$prefix}btn-input-*` frame gains the slots every field was
+still deriving at Sass level: `border-color`, `border-radius` (with `-sm`/`-lg`),
+`box-shadow`, `font-weight` and the `focus-color`/`-bg`/`-border-color` trio.
+The `$input-*` knobs keep working — they read the tokens now — so a `with()`
+override reaches the whole family as before, and a runtime override of one
+root token restyles every text control at once.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$input-focus-border-color` is a `var()` reference, not a Sass colour.**
+  It was `tint-color($primary, 50%)`, frozen at build time — retint the
+  palette and the focus border stayed on the old primary. It reads
+  `--#{$prefix}btn-input-focus-border-color` now (the same 50% mix, computed
+  in the browser). Sass colour functions on it no longer compile; override
+  the token or the variable with a colour of your own instead.
+
 #### The control variables moved out of the shared config
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
