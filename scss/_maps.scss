@@ -49,7 +49,7 @@ $utilities-text: map.merge(
   (
     "black": var(--#{$prefix}black),
     "white": var(--#{$prefix}white),
-    "body": $body-color
+    "body": var(--#{$prefix}body-color)
   )
 ) !default;
 $utilities-text-colors: map-loop($utilities-text, color-var-ref, "$prefix", "$key", "text") !default;
@@ -72,7 +72,7 @@ $utilities-bg: map.merge(
   (
     "black": var(--#{$prefix}black),
     "white": var(--#{$prefix}white),
-    "body": $body-bg
+    "body": var(--#{$prefix}body-bg)
   )
 ) !default;
 $utilities-bg-colors: map-loop($utilities-bg, color-var-ref, "$prefix", "$key", "bg") !default;

@@ -1,5 +1,3 @@
-@use "sass:color";
-@use "sass:string";
 @use "functions/assert-ascending" as *;
 @use "functions/assert-starts-at-zero" as *;
 @use "functions/color" as *;
@@ -292,23 +290,6 @@ $spacers: (
 // Define the edge positioning anchors of the position utilities.
 
 // Define common box shadows
-
-// Settings for the `<body>` element.
-
-$body-color:                light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
-$body-bg:                   $white !default;
-
-$body-secondary-color:      light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default;
-$body-secondary-bg:         light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
-
-$body-tertiary-color:       light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
-$body-tertiary-bg:          $gray-100 !default;
-
-// `color-translucent()` un-blends a color against a background, so both sides
-// have to stay Sass colors — `light-dark()` would hand it a string. These two
-// are the only dark counterparts left; everything else pairs inline above.
-$body-bg-dark:              $gray-900 !default;
-$body-tertiary-bg-dark:     color.mix($gray-800, $gray-900) !default;
 
 // Style anchor elements.
 
