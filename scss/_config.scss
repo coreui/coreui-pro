@@ -676,9 +676,9 @@ $headings-color:              inherit !default;
 
 // scss-docs-start font-sizes
 $font-sizes: (
-  "xs":  ("font-size": $font-size-base * .75, "line-height": $line-height-base),
-  "sm":  ("font-size": $font-size-sm,         "line-height": $line-height-base),
-  "md":  ("font-size": $h6-font-size,         "line-height": $line-height-base),
+  "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75), "line-height": var(--#{$prefix}body-line-height)), // stylelint-disable-line function-disallowed-list
+  "sm":  ("font-size": $font-size-sm,         "line-height": var(--#{$prefix}body-line-height)),
+  "md":  ("font-size": $h6-font-size,         "line-height": var(--#{$prefix}body-line-height)),
   "lg":  ("font-size": $h5-font-size,         "line-height": $headings-line-height),
   "xl":  ("font-size": $h4-font-size,         "line-height": $headings-line-height),
   "2xl": ("font-size": $h3-font-size,         "line-height": $headings-line-height),

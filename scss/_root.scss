@@ -22,7 +22,7 @@ $gradient: linear-gradient(180deg, rgba($white, .15), rgba($white, 0)) !default;
 
 $body-text-align:     null !default;
 $body-emphasis-color: light-dark($black, $white) !default;
-$link-hover-color:    light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)) !default;
+$link-hover-color:    var(--#{$prefix}primary-fg) !default;
 
 // scss-docs-start border-variables
 $border-width:             1px !default;
@@ -53,7 +53,7 @@ $font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mo
 // scss-docs-end font-variables
 
 // scss-docs-start type-variables
-$mark-color: $body-color !default;
+$mark-color: var(--#{$prefix}body-color) !default;
 $mark-bg:    light-dark($yellow-100, $yellow-800) !default;
 // scss-docs-end type-variables
 
@@ -73,11 +73,11 @@ $input-btn-disabled-opacity:  .65 !default;
 
 $input-btn-padding-y-sm:      .25rem !default;
 $input-btn-padding-x-sm:      .5rem !default;
-$input-btn-font-size-sm:      $font-size-sm !default;
+$input-btn-font-size-sm:      var(--#{$prefix}font-size-sm) !default;
 
 $input-btn-padding-y-lg:      .5rem !default;
 $input-btn-padding-x-lg:      1rem !default;
-$input-btn-font-size-lg:      $font-size-lg !default;
+$input-btn-font-size-lg:      var(--#{$prefix}font-size-lg) !default;
 // scss-docs-end input-btn-variables
 
 $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
