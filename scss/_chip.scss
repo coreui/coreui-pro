@@ -29,7 +29,7 @@ $chip-bg:                    var(--#{$prefix}secondary-bg) !default;
 $chip-border-width:          var(--#{$prefix}border-width) !default;
 $chip-border-color:          transparent !default;
 
-$chip-active-color:          color-mix(in srgb, var(--#{$prefix}white) 87%, transparent) !default;
+$chip-active-color:          var(--#{$prefix}primary-contrast) !default;
 $chip-active-bg:             var(--#{$prefix}primary) !default;
 $chip-active-border-color:   transparent !default;
 
@@ -81,8 +81,8 @@ $chip-tokens: defaults(
     --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
     --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
     --#{$prefix}chip-active-border-color: #{$chip-active-border-color},
-    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-contrast, #{$chip-hover-color}),
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-base, #{$chip-hover-bg}),
+    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg, #{$chip-hover-color}),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
     --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
     --#{$prefix}chip-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)),
   ),
