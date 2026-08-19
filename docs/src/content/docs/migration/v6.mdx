@@ -1263,6 +1263,15 @@ them. A state names a theme colour now, and every value is a slot of it.
 - **`$input-btn-focus-color-opacity` is removed.** The validation ring comes
   from the colour's `focus-ring` slot, which reads
   `--#{$prefix}focus-ring-opacity`; set that instead.
+- **`$focus-ring` is removed and `$focus-ring-color` reads the slot.** The
+  colour was `rgba($primary, $focus-ring-opacity)`, resolved at build time, so
+  neither retinting `--#{$prefix}primary` nor changing
+  `--#{$prefix}focus-ring-opacity` at runtime moved the default ring. It is
+  `var(--#{$prefix}primary-focus-ring)` now — the slot every `.theme-*` ring
+  already mixed from. `$focus-ring` itself only restated
+  `--#{$prefix}focus-ring`, which `_root.scss` composes, so the two variables
+  that read it (`$btn-close-focus-shadow`, `$sidebar-toggler-focus-shadow`)
+  take the token instead.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
   variables moved from `scss/_config.scss` to `scss/forms/_variables.scss`
   alongside `$form-text-*` and `$form-feedback-*`.

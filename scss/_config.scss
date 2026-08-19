@@ -609,8 +609,7 @@ $shadows: (
 // scss-docs-start focus-ring-variables
 $focus-ring-width:      .25rem !default;
 $focus-ring-opacity:    .25 !default;
-$focus-ring-color:      rgba($primary, $focus-ring-opacity) !default;
-$focus-ring: $focus-ring-width solid $focus-ring-color !default;
+$focus-ring-color:      var(--#{$prefix}primary-focus-ring) !default;
 // scss-docs-end focus-ring-variables
 
 // Font, line-height, and color for body text, headings, and more.
