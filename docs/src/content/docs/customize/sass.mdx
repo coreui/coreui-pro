@@ -93,7 +93,6 @@ In your `custom.scss`, you'll import CoreUI's source Sass files. You have two op
 // 4. Include any default map overrides here
 
 // 5. Include remainder of required parts
-@import "../node_modules/@coreui/coreui/scss/maps";
 @import "../node_modules/@coreui/coreui/scss/mixins";
 @import "../node_modules/@coreui/coreui/scss/root";
 
@@ -113,6 +112,13 @@ In your `custom.scss`, you'll import CoreUI's source Sass files. You have two op
 ```
 
 With that setup in place, you can begin to modify any of the Sass variables and maps in your `custom.scss`. You can also start to add parts of CoreUI for Bootstrap under the `// Optional` section as needed. We suggest using the full import stack from our `coreui.scss` file as your starting point.
+
+The library's configuration is split across four modules, each importable on its
+own: `scss/config` holds the global settings — options, spacing, breakpoints,
+borders, shadows, typography, z-index; `scss/colors` the palette and the grays;
+`scss/theme` the theme colours, the `$theme-colors` map and the runtime colour
+scale; and `scss/root` emits every token on `:root`. The pre-v6 `scss/variables`
+and `scss/maps` paths still resolve to the same modules.
 
 ## Compiling
 
@@ -151,7 +157,7 @@ Once your CSS is compiled, you can include it in your HTML files. Inside your `i
 
 Every Sass variable in CoreUI for Bootstrap includes the `!default` flag allowing you to override the variable's default value in your own Sass without modifying CoreUI for Bootstrap's source code. Copy and paste variables as needed, modify their values, and remove the `!default` flag. If a variable has already been assigned, then it won't be re-assigned by the default values in Bootstrap.
 
-You will find the complete list of CoreUI for Bootstrap's variables in `scss/_config.scss`. Some variables are set to `null`, these variables don't output the property unless they are overridden in your configuration.
+The global settings live in `scss/_config.scss`, the palette in `scss/_colors.scss`, the theme colours in `scss/_theme.scss`, and each component's variables at the top of its own partial. Some variables are set to `null`, these variables don't output the property unless they are overridden in your configuration.
 
 Variable overrides must come after our functions are imported, but before the rest of the imports.
 
@@ -178,7 +184,6 @@ $body-color: #111;
 
 // Required
 @import "../node_modules/@coreui/coreui/scss/variables";
-@import "../node_modules/@coreui/coreui/scss/maps";
 @import "../node_modules/@coreui/coreui/scss/mixins";
 @import "../node_modules/@coreui/coreui/scss/root";
 
@@ -198,34 +203,49 @@ Some of our Sass maps are merged into empty ones by default. This is done to all
 
 ### Modify map
 
-All variables in the `$theme-colors` map are defined as standalone variables. To modify an existing color in our `$theme-colors` map, add the following to your custom Sass file:
+Each theme color's base value is a standalone variable. To modify an existing color in our `$theme-colors` map, add the following to your custom Sass file:
 
 ```scss
 $primary: #0074d9;
 $danger: #ff4136;
 ```
 
-Later on, these variables are set in CoreUI for Bootstrap's `$theme-colors` map:
+Later on, these variables feed the `base` slot of the entry in CoreUI for Bootstrap's `$theme-colors` map, and the rest of the entry — the subtle backgrounds, borders and emphasis text — is mixed from that base at runtime, so overriding the one variable retints the whole family:
 
 ```scss
 $theme-colors: (
-  "primary": $primary,
-  "danger": $danger
+  "primary": (
+    "base": $primary,
+    // …the remaining slots read the runtime scale mixed from the base
+  ),
+  "danger": (
+    "base": $danger,
+    // …
+  ),
 );
 ```
 
 ### Add to map
 
-Add new colors to `$theme-colors`, or any other map, by creating a new Sass map with your custom values and merging it with the original map. In this case, we'll create a new `$custom-colors` map and merge it with `$theme-colors`.
+Add new colors to `$theme-colors`, or any other map, by creating a new Sass map with your custom values and merging it with the original map. In this case, we'll create a new `$custom-colors` map and merge it with `$theme-colors`. A theme colour entry is a map of slots: give the new colour a `base` and a `contrast`, and point the remaining slots at the 100–900 scale the library mixes from the base at runtime, the same way the built-in colours do.
 
 <Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
 
 ```scss
 @use "sass:map";
-@use "@coreui/coreui/scss/variables" as *;
+@use "@coreui/coreui/scss/theme" as *;
 
 $custom-colors: (
-  "custom-color": #900
+  "custom-color": (
+    "base":          #900,
+    "contrast":      #fff,
+    "fg":            light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
+    "text-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+    "bg-subtle":     light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
+    "bg-muted":      light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
+    "border-subtle": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
+    "focus-ring":    color-mix(in srgb, var(--cui-custom-color) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+  ),
 );
 
 $theme-colors: map.merge($theme-colors, $custom-colors);
@@ -238,7 +258,11 @@ $theme-colors: map.merge($theme-colors, $custom-colors);
 ```scss
 // Create your own map
 $custom-colors: (
-  "custom-color": #900
+  "custom-color": (
+    "base":     #900,
+    "contrast": #fff,
+    // …the remaining slots, as above
+  ),
 );
 
 // Merge the maps
@@ -253,8 +277,7 @@ To remove colors from `$theme-colors`, or any other map, use `map-remove`. Be aw
 
 ```scss
 @use "sass:map";
-@use "@coreui/coreui/scss/variables" as *;
-@use "@coreui/coreui/scss/maps" as *;
+@use "@coreui/coreui/scss/theme" as *;
 
 $theme-colors: map-remove($theme-colors, "info", "light", "dark");
 $theme-colors-border-subtle: map.remove($theme-colors-border-subtle, "info", "light", "dark");
@@ -262,13 +285,14 @@ $theme-colors-border-subtle: map.remove($theme-colors-border-subtle, "info", "li
 @use "@coreui/coreui/scss/coreui";
 ```
 
+The `$theme-colors-*` families are derived from `$theme-colors` when the theme module first loads, so a later reassignment of the main map doesn't reach them — remove the keys from each derived map you use, as above.
+
 <Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
 
 ```scss
 // Required
 @import "../node_modules/@coreui/coreui/scss/functions";
 @import "../node_modules/@coreui/coreui/scss/variables";
-@import "../node_modules/@coreui/coreui/scss/maps";
 @import "../node_modules/@coreui/coreui/scss/mixins";
 @import "../node_modules/@coreui/coreui/scss/root";
 

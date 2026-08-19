@@ -21,6 +21,45 @@ Here are two examples of how we loop over the `$theme-colors` map to generate mo
 
 <ScssDocs file="scss/_list-group.scss" capture="list-group-modifiers" />
 
+## Theme variants
+
+Themeable components also support a single family of composable `.theme-*` classes that recolor a component without a per-component color class. A themeable component reads a shared set of generic `--cui-theme-*` tokens for its background, foreground, border, and focus styles — each with a fallback to the component's own default token. When no theme class is present, the fallback applies. Add a `.theme-*` class to the component (or to an ancestor) and it picks up that theme's colors instead.
+
+| Token | Description |
+| --- | --- |
+| `--cui-theme-base` | The theme color itself, e.g. a solid badge or button background |
+| `--cui-theme-contrast` | Contrasting color for text and icons sitting on the solid base |
+| `--cui-theme-fg` | Emphasis foreground — the theme's readable text color |
+| `--cui-theme-fg-base` | Foreground one step lighter than the emphasis text |
+| `--cui-theme-bg-subtle` | Subtle background tint for low-emphasis surfaces |
+| `--cui-theme-bg-muted` | Muted background, between subtle and solid |
+| `--cui-theme-border` | Border color |
+| `--cui-theme-focus-ring` | The focus ring, in the theme's hue |
+
+The `.theme-{name}` classes mirror the keys of the `$theme-colors` map in `scss/_theme.scss` — `.theme-primary`, `.theme-success`, `.theme-danger`, and so on — so adding or renaming a theme color automatically produces a matching class. Each entry defines the tokens for both light and dark mode via `light-dark()`.
+
+To see how a component consumes these tokens, here's the badge in `scss/_badge.scss`. Its color and background each read a theme token first, falling back to the badge's own default:
+
+```scss
+--cui-badge-color: var(--cui-theme-contrast, #{$badge-color}),
+--cui-badge-bg: var(--cui-theme-base, #{$badge-bg}),
+```
+
+With no theme class the badge stays neutral; add `.theme-success` and the very same element resolves the success tokens — no `.badge-success` selector required. Structural variants compose with any theme:
+
+<Example html={[`<span class="badge">Default</span>`, `  <span class="badge theme-success">Success</span>`, `  <span class="badge badge-subtle theme-success">Success</span>`, `  <span class="badge badge-outline theme-success">Success</span>`]} />
+
+Because the theme tokens are plain CSS variables, you can also scope a theme to a container and let everything inside inherit it, or define a brand of your own without recompiling:
+
+```css
+.my-brand {
+  --cui-theme-base: #6f42c1;
+  --cui-theme-contrast: #fff;
+}
+```
+
+The classic color classes — `.btn-primary`, `.alert-success`, `.badge` color spellings from v5 — keep working: they are generated from the same theme tokens, so both APIs stay pixel-identical.
+
 ## Responsive
 
 These Sass loops aren't limited to color maps, either. You can also generate responsive variations of your components. Take for example our responsive alignment of the dropdowns where we mix an `@each` loop for the `$grid-breakpoints` Sass map with a media query include.
