@@ -3,6 +3,7 @@
 @use "mixins/border-radius" as *;
 @use "layout/breakpoints" as *;
 @use "mixins/tokens" as *;
+@use "theme" as *;
 @use "config" as *;
 
 // stylelint-disable custom-property-no-missing-var-function

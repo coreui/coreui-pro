@@ -1,9 +1,9 @@
+@use "sass:color";
 @use "sass:map";
 @use "sass:meta";
 @use "functions/color" as *;
 @use "functions/color-scheme" as *;
 @use "functions/color-translucent" as *;
-@use "maps" as *;
 @use "mixins/color-mode" as *;
 @use "theme" as *;
 @use "colors" as *;
@@ -23,6 +23,21 @@ $gradient: linear-gradient(180deg, rgba($white, .15), rgba($white, 0)) !default;
 $body-text-align:     null !default;
 $body-emphasis-color: light-dark($black, $white) !default;
 $link-hover-color:    var(--#{$prefix}primary-fg) !default;
+
+$body-color:                light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
+$body-bg:                   $white !default;
+
+$body-secondary-color:      light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default;
+$body-secondary-bg:         light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
+
+$body-tertiary-color:       light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
+$body-tertiary-bg:          $gray-100 !default;
+
+// `color-translucent()` un-blends a color against a background, so both sides
+// have to stay Sass colors — `light-dark()` would hand it a string. These two
+// are the only dark counterparts left; everything else pairs inline above.
+$body-bg-dark:              $gray-900 !default;
+$body-tertiary-bg-dark:     color.mix($gray-800, $gray-900) !default;
 
 // scss-docs-start border-variables
 $border-width:             1px !default;
@@ -104,6 +119,7 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
     color-scheme: light;
 
     @include color-tokens();
+    @include theme-color-tokens();
 
     // Fonts
 

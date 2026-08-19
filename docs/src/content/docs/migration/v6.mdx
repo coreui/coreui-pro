@@ -1357,8 +1357,8 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   a runtime override is unaffected.
 - **`$theme-colors` is a map of maps**, so `@each $name, $value in $theme-colors`
   now yields a map. Use `map-slot($theme-colors, "base")` where a flat
-  `name → colour` map is what you want; the four `$theme-colors-*` families in
-  `scss/_maps.scss` are built that way.
+  `name → colour` map is what you want; the `$theme-colors-*` families in
+  `scss/_theme.scss` are built that way.
 - **New slots:** `fg` (the state colour readable as text, one step lighter than
   `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid colour) and
   `focus-ring` (the hue the `.theme-*` ring mixes from). They emit
@@ -1998,6 +1998,28 @@ classes* — `.modal`, `.offcanvas`, `.dropdown`, `.dropdown-menu` and
 `.menu` and `.menu-item`. Those are three of the most-used components in any
 Bootstrap app, so `_modal.scss`, `_offcanvas.scss` and `_dropdown.scss` keep their
 names and their classes here.
+
+#### The colour system has its own modules
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`_config.scss` no longer defines a single colour. The palette — the base
+colours, the grays and their maps — lives in `scss/_colors.scss`; the theme
+colour system — `$primary`…`$dark`, the `$theme-colors` map, the runtime
+colour-scale knobs and the `$theme-colors-*` slot maps — lives in
+`scss/_theme.scss`. `scss/_maps.scss` is dissolved: the `$utilities-*` maps and
+`$negative-spacers` sit in `scss/_utilities.scss` next to the `$utilities`
+definitions they feed, and `$gutters` in `scss/_config.scss` with the rest of
+the grid settings.
+
+- **Nothing changes for CSS** — the compiled stylesheet is byte-identical, and
+  every custom property keeps its name.
+- **Overriding through `@use "@coreui/coreui-pro/scss/coreui" with (...)` is
+  unchanged** — the entry point forwards all of these modules.
+- **Old module paths keep resolving**: `scss/variables` and `scss/maps` are thin
+  `@forward` shims over the new modules, so an existing `@use` or `@import`
+  compiles as before. New code should import `.../scss/colors`,
+  `.../scss/theme` or `.../scss/utilities` directly.
 
 #### The type scale is one named map
 

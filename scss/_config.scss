@@ -1,232 +1,9 @@
-@use "sass:color";
-@use "sass:string";
 @use "functions/assert-ascending" as *;
 @use "functions/assert-starts-at-zero" as *;
-@use "functions/color" as *;
-@use "functions/color-contrast-variables" as *;
-@use "functions/color-translucent" as *;
-@use "functions/math" as *;
-@use "functions/to-rgb" as *;
-@use "sass:map";
-@use "sass:math";
 
 // Prefix for :root CSS variables
-//
-// Declared before the color system because the theme color variables below
-// reference the tokens generated from it.
 
 $prefix:                      cui- !default;
-
-// Color system
-
-// scss-docs-start gray-color-variables
-$white:     #fff !default;
-$gray-base: #323a49 !default;
-$gray-100:  #f3f4f7 !default;
-$gray-200:  #e7eaee !default;
-$gray-300:  #dbdfe6 !default;
-$gray-400:  #cfd4de !default;
-$gray-500:  #aab3c5 !default;
-$gray-600:  #6d7d9c !default;
-$gray-700:  #4a566d !default;
-$gray-800:  #323a49 !default;
-$gray-900:  #212631 !default;
-$black:     #080a0c !default;
-// scss-docs-end gray-color-variables
-
-// fusv-disable
-// scss-docs-start gray-colors-map
-$grays: (
-  "100": $gray-100,
-  "200": $gray-200,
-  "300": $gray-300,
-  "400": $gray-400,
-  "500": $gray-500,
-  "600": $gray-600,
-  "700": $gray-700,
-  "800": $gray-800,
-  "900": $gray-900
-) !default;
-// scss-docs-end gray-colors-map
-// fusv-enable
-
-// scss-docs-start color-variables
-$blue:    #0d6efd !default;
-$indigo:  #6610f2 !default;
-$purple:  #6f42c1 !default;
-$pink:    #d63384 !default;
-$red:     #dc3545 !default;
-$orange:  #fd7e14 !default;
-$yellow:  #ffc107 !default;
-$green:   #198754 !default;
-$teal:    #20c997 !default;
-$cyan:    #0dcaf0 !default;
-// scss-docs-end color-variables
-
-// scss-docs-start colors-map
-$colors: (
-  "blue":       $blue,
-  "indigo":     $indigo,
-  "purple":     $purple,
-  "pink":       $pink,
-  "red":        $red,
-  "orange":     $orange,
-  "yellow":     $yellow,
-  "green":      $green,
-  "teal":       $teal,
-  "cyan":       $cyan,
-  "black":      $black,
-  "white":      $white,
-  "gray":       $gray-600,
-  "gray-dark":  $gray-800
-) !default;
-// scss-docs-end colors-map
-
-// See https://www.w3.org/TR/WCAG/#contrast-minimum
-$min-contrast-ratio:   4.5 !default;
-
-// Customize the light and dark text colors for use in our color contrast function.
-$color-contrast-dark:      $black !default;
-$color-contrast-light:     $white !default;
-
-// fusv-disable
-
-$yellow-100: tint-color($yellow, 80%) !default;
-$yellow-800: shade-color($yellow, 60%) !default;
-
-// fusv-enable
-
-// scss-docs-start theme-color-variables
-$primary:       #5856d6 !default;
-$secondary:     #6b7785 !default;
-$success:       #1b9e3e !default;
-$info:          #39f !default;
-$warning:       #f9b115 !default;
-$danger:        #e55353 !default;
-$light:         $gray-100 !default;
-$dark:          $gray-900 !default;
-// scss-docs-end theme-color-variables
-
-// stylelint-disable function-disallowed-list
-
-// scss-docs-start theme-colors-map
-$theme-colors: (
-  "primary": (
-    "base":          $primary,
-    "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}primary-800), var(--#{$prefix}primary-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}primary-100), var(--#{$prefix}primary-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}primary-200), var(--#{$prefix}primary-800)),
-    "border-subtle": light-dark(var(--#{$prefix}primary-300), var(--#{$prefix}primary-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}primary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "secondary": (
-    "base":          $secondary,
-    "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}secondary-600), var(--#{$prefix}secondary-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}secondary-800), var(--#{$prefix}secondary-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}secondary-100), var(--#{$prefix}secondary-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}secondary-200), var(--#{$prefix}secondary-800)),
-    "border-subtle": light-dark(var(--#{$prefix}secondary-300), var(--#{$prefix}secondary-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}secondary) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "success": (
-    "base":          $success,
-    "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}success-600), var(--#{$prefix}success-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}success-800), var(--#{$prefix}success-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}success-100), var(--#{$prefix}success-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}success-200), var(--#{$prefix}success-800)),
-    "border-subtle": light-dark(var(--#{$prefix}success-300), var(--#{$prefix}success-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}success) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "info": (
-    "base":          $info,
-    "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}info-700), var(--#{$prefix}info-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}info-800), var(--#{$prefix}info-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}info-100), var(--#{$prefix}info-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}info-200), var(--#{$prefix}info-800)),
-    "border-subtle": light-dark(var(--#{$prefix}info-300), var(--#{$prefix}info-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}info) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "warning": (
-    "base":          $warning,
-    "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}warning-700), var(--#{$prefix}warning-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}warning-800), var(--#{$prefix}warning-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}warning-100), var(--#{$prefix}warning-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}warning-200), var(--#{$prefix}warning-800)),
-    "border-subtle": light-dark(var(--#{$prefix}warning-300), var(--#{$prefix}warning-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}warning) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "danger": (
-    "base":          $danger,
-    "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}danger-600), var(--#{$prefix}danger-400)),
-    "text-emphasis": light-dark(var(--#{$prefix}danger-800), var(--#{$prefix}danger-200)),
-    "bg-subtle":     light-dark(var(--#{$prefix}danger-100), var(--#{$prefix}danger-900)),
-    "bg-muted":      light-dark(var(--#{$prefix}danger-200), var(--#{$prefix}danger-800)),
-    "border-subtle": light-dark(var(--#{$prefix}danger-300), var(--#{$prefix}danger-600)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}danger) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "light": (
-    "base":          $light,
-    "contrast":      $black,
-    "fg":            light-dark(var(--#{$prefix}light-800), var(--#{$prefix}light-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-100)),
-    "bg-subtle":     light-dark(var(--#{$prefix}light-100), var(--#{$prefix}gray-800)),
-    "bg-muted":      light-dark(var(--#{$prefix}light-200), var(--#{$prefix}light-800)),
-    "border-subtle": light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}light) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-  "dark": (
-    "base":          $dark,
-    "contrast":      $white,
-    "fg":            light-dark(var(--#{$prefix}dark-600), var(--#{$prefix}dark-300)),
-    "text-emphasis": light-dark(var(--#{$prefix}gray-800), var(--#{$prefix}gray-300)),
-    "bg-subtle":     light-dark(var(--#{$prefix}gray-400), var(--#{$prefix}dark-600)),
-    "bg-muted":      light-dark(var(--#{$prefix}dark-200), var(--#{$prefix}dark-800)),
-    "border-subtle": light-dark(var(--#{$prefix}gray-500), var(--#{$prefix}gray-800)),
-    "focus-ring":    color-mix(in srgb, var(--#{$prefix}dark) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent),
-  ),
-) !default;
-// scss-docs-end theme-colors-map
-
-// stylelint-enable function-disallowed-list
-
-// Color scales
-//
-// Every theme color gets a 100–900 scale of `color-mix()` tokens in `:root`,
-// mixed at runtime from the color's own token. Override `--#{$prefix}primary`
-// (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis
-// text — follows, in both color schemes.
-
-// scss-docs-start color-scale-variables
-$color-mix-space: lab !default;
-$tint-color:      var(--#{$prefix}white) !default;
-$shade-color:     var(--#{$prefix}black) !default;
-
-$color-tints: (
-  "100": 80%,
-  "200": 60%,
-  "300": 40%,
-  "400": 20%
-) !default;
-
-$color-shades: (
-  "600": 20%,
-  "700": 40%,
-  "800": 60%,
-  "900": 80%
-) !default;
-// scss-docs-end color-scale-variables
-
-// The three families below read the scales through `light-dark()`, so a theme
-// color reads correctly in both schemes without a second set of variables.
-// `light` and `dark` point at the gray scale instead: their own scales would
-// be a scale of a gray, which is what `$grays` already is.
 
 // Gradients
 
@@ -293,26 +70,8 @@ $spacers: (
 
 // Define common box shadows
 
-// Settings for the `<body>` element.
-
-$body-color:                light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
-$body-bg:                   $white !default;
-
-$body-secondary-color:      light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default;
-$body-secondary-bg:         light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
-
-$body-tertiary-color:       light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
-$body-tertiary-bg:          $gray-100 !default;
-
-// `color-translucent()` un-blends a color against a background, so both sides
-// have to stay Sass colors — `light-dark()` would hand it a string. These two
-// are the only dark counterparts left; everything else pairs inline above.
-$body-bg-dark:              $gray-900 !default;
-$body-tertiary-bg-dark:     color.mix($gray-800, $gray-900) !default;
-
 // Style anchor elements.
 
-$link-color:                              $primary !default;
 $link-decoration:                         underline !default;
 $link-hover-decoration:                   null !default;
 
@@ -351,6 +110,7 @@ $container-max-widths: (
 
 $grid-columns:                12 !default;
 $grid-gutter-width:           1.5rem !default;
+$gutters:                     $spacers !default;
 
 // Container padding
 

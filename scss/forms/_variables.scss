@@ -1,4 +1,5 @@
 @use "../functions/color" as *;
+@use "../theme" as *;
 @use "../config" as *;
 
 // The control contract: every field component draws its frame with these.

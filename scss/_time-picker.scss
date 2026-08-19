@@ -3,6 +3,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
+@use "theme" as *;
 @use "config" as *;
 @use "forms/form-control-group" as *;
 

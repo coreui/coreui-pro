@@ -1,3 +1,6 @@
-// Renamed to _config.scss in v6, matching upstream. Kept so an existing
+// Renamed to _config.scss in v6, matching upstream; the palette and the theme
+// colour system live in _colors.scss and _theme.scss. Kept so an existing
 // `@use "variables"` — with or without a `with()` configuration — resolves.
 @forward "config";
+@forward "colors";
+@forward "theme";

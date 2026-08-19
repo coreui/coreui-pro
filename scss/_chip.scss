@@ -5,6 +5,7 @@
 @use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "theme" as *;
 @use "config" as *;
 
 // stylelint-disable function-disallowed-list

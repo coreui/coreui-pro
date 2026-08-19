@@ -1,7 +1,6 @@
 @use "../../functions/color-contrast" as *;
 @use "../../functions/contrast-ratio" as *;
-@use "../../config" as *;
-@use "../../maps" as *;
+@use "../../colors" as *;
 @use "../../mixins" as *;
 
 $black: #000;
