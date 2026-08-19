@@ -6,6 +6,8 @@ otherFrameworks:
   - switch
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 ## Approach
 
 A switch is a [checkbox](/forms/checkbox/) drawn as a track and a thumb: put `.switch` on the `<input type="checkbox">` instead of `.check`. The thumb is the input's own `::before`, so its colour is a token rather than a fill inside an SVG — which is also what let the separate dark-mode artwork go.
@@ -96,14 +98,14 @@ The v5 spelling — `.form-check.form-switch` wrapping a `.form-check-input`, wi
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
-## Theming
+## Theme colors
 
-A [theme class](/customize/components/#theme-variants) colors the checked state:
+Modify the appearance of checked switches by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
 
-<Example code={`<div class="form-check form-switch theme-success">
-    <input class="form-check-input" type="checkbox" role="switch" id="themedSwitch" checked>
-    <label class="form-check-label" for="themedSwitch">Themed switch</label>
-  </div>`} />
+<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-check form-switch theme-${c.name}">
+    <input class="form-check-input" type="checkbox" role="switch" id="switch-${c.name}" checked>
+    <label class="form-check-label" for="switch-${c.name}">${c.title} switch</label>
+  </div>`)} />
 
 ## Customizing
 

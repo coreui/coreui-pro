@@ -6,6 +6,8 @@ otherFrameworks:
   - radio
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 ## Approach
 
 Put `.radio` on the `<input type="radio">`. That is the whole control — no wrapper, no extra element. Radios are for selecting one option out of many; to select several, reach for a [checkbox](/forms/checkbox/).
@@ -173,14 +175,14 @@ The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label 
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
-## Theming
+## Theme colors
 
-A [theme class](/customize/components/#theme-variants) colors the checked state:
+Modify the appearance of checked radios by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
 
-<Example code={`<div class="form-check theme-success">
-    <input class="form-check-input" type="radio" name="themedRadio" id="themedRadio" checked>
-    <label class="form-check-label" for="themedRadio">Themed radio</label>
-  </div>`} />
+<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-check theme-${c.name}">
+    <input class="form-check-input" type="radio" name="radio-theme-${c.name}" id="radio-${c.name}" checked>
+    <label class="form-check-label" for="radio-${c.name}">${c.title} radio</label>
+  </div>`)} />
 
 ## Customizing
 
