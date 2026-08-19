@@ -38,7 +38,7 @@ $form-range-thumb-transition:              background-color .15s ease-in-out, bo
 
   .form-range {
     width: 100%;
-    height: add($form-range-thumb-height, $form-range-thumb-focus-ring-width * 2);
+    height: calc(#{$form-range-thumb-height} + #{$form-range-thumb-focus-ring-width} * 2); // stylelint-disable-line function-disallowed-list
     padding: 0; // Need to reset padding
     appearance: none;
     background-color: transparent;

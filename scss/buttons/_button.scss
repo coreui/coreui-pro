@@ -14,10 +14,6 @@
 @use "../theme" as *;
 @use "../config" as *;
 
-// scss-docs-start input-btn-variables
-$input-btn-focus-ring:    $input-btn-focus-width solid $input-btn-focus-color !default;
-// scss-docs-end input-btn-variables
-
 
 // scss-docs-start btn-variables
 $btn-color:                   var(--#{$prefix}body-color) !default;
@@ -40,9 +36,9 @@ $btn-border-width:            var(--#{$prefix}btn-input-border-width) !default;
 
 $btn-font-weight:             var(--#{$prefix}font-weight-normal) !default;
 $btn-box-shadow:              inset 0 1px 0 rgba($white, .15), 0 1px 1px rgba($black, .075) !default;
-$btn-focus-width:             $input-btn-focus-width !default;
+$btn-focus-width:             var(--#{$prefix}focus-ring-width) !default;
 // fusv-disable
-$btn-focus-ring:              $input-btn-focus-ring !default;
+$btn-focus-ring:              var(--#{$prefix}focus-ring) !default;
 // fusv-enable
 $btn-disabled-opacity:        var(--#{$prefix}btn-input-disabled-opacity) !default;
 $btn-active-box-shadow:       inset 0 3px 5px rgba($black, .125) !default;
