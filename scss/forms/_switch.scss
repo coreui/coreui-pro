@@ -1,6 +1,6 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
-@use "form-check" as *;
+@use "variables" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
@@ -8,21 +8,26 @@
 @use "../config" as *;
 
 // scss-docs-start switch-variables
-$switch-aspect-ratio:         2 !default;
-$switch-height:               $form-check-input-width !default;
-$switch-border-radius:        $form-switch-border-radius !default;
-$switch-transition-duration:  .15s !default;
-$switch-transition-timing:    ease-in-out !default;
-$switch-bg:                   $form-check-input-bg !default;
-$switch-border:               $form-check-input-border !default;
-$switch-padding:              .125em !default;
-$switch-thumb-bg:             $form-switch-color !default;
+$switch-aspect-ratio:         1.75 !default;
+$switch-height:               1.25rem !default;
+$switch-border-radius:        var(--#{$prefix}border-radius-pill) !default;
+$switch-transition-duration:  var(--#{$prefix}control-transition-duration) !default;
+$switch-transition-timing:    var(--#{$prefix}control-transition-timing) !default;
+$switch-bg:                   var(--#{$prefix}tertiary-bg) !default;
+$switch-box-shadow:           inset 0 1px 2px color-mix(in srgb, var(--#{$prefix}black) 5%, transparent) !default;
+$switch-border-width:         var(--#{$prefix}border-width) !default;
+$switch-border-color:         var(--#{$prefix}border-color) !default;
+$switch-padding:              .0625rem !default;
+$switch-thumb-bg:             var(--#{$prefix}white) !default;
+$switch-thumb-shadow:         0 1px 2px color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
 $switch-checked-thumb-bg:     var(--#{$prefix}primary-contrast) !default;
+$switch-disabled-bg:          var(--#{$prefix}control-disabled-bg) !default;
+$switch-disabled-thumb-bg:    var(--#{$prefix}tertiary-color) !default;
 
 $switch-sizes: (
-  sm: (height: .875rem, font-size: var(--#{$prefix}font-size-sm)),
-  lg: (height: 1.25rem, font-size: var(--#{$prefix}font-size-lg)),
-  xl: (height: 1.5rem, font-size: var(--#{$prefix}font-size-lg))
+  sm: (height: 1rem,    font-size: var(--#{$prefix}font-size-sm)),
+  lg: (height: 1.5rem,  font-size: var(--#{$prefix}font-size-lg)),
+  xl: (height: 1.75rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
 // scss-docs-end switch-variables
 
@@ -39,13 +44,18 @@ $switch-tokens: defaults(
     --#{$prefix}switch-transition-duration: #{$switch-transition-duration},
     --#{$prefix}switch-transition-timing: #{$switch-transition-timing},
     --#{$prefix}switch-bg: #{$switch-bg},
-    --#{$prefix}switch-border: #{$switch-border},
+    --#{$prefix}switch-box-shadow: #{$switch-box-shadow},
+    --#{$prefix}switch-border-width: #{$switch-border-width},
+    --#{$prefix}switch-border-color: #{$switch-border-color},
     --#{$prefix}switch-padding: #{$switch-padding},
     --#{$prefix}switch-thumb-bg: #{$switch-thumb-bg},
-    --#{$prefix}switch-thumb-size: calc(var(--#{$prefix}switch-height) - var(--#{$prefix}switch-padding) * 2),
+    --#{$prefix}switch-thumb-size: calc(var(--#{$prefix}switch-height) - var(--#{$prefix}switch-padding) * 2 - var(--#{$prefix}switch-border-width) * 2),
+    --#{$prefix}switch-thumb-shadow: #{$switch-thumb-shadow},
     --#{$prefix}switch-checked-bg: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-bg)),
     --#{$prefix}switch-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
+    --#{$prefix}switch-disabled-bg: #{$switch-disabled-bg},
+    --#{$prefix}switch-disabled-thumb-bg: #{$switch-disabled-thumb-bg},
     --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
     --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
     --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
@@ -74,7 +84,8 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
     vertical-align: top;
     appearance: none;
     background-color: var(--#{$prefix}switch-bg);
-    border: var(--#{$prefix}switch-border);
+    border: var(--#{$prefix}switch-border-width) solid var(--#{$prefix}switch-border-color);
+    box-shadow: var(--#{$prefix}switch-box-shadow);
     print-color-adjust: exact;
     @include border-radius(var(--#{$prefix}switch-border-radius), 0);
     @include transition(background-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing), border-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing));
@@ -89,6 +100,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       background-color: var(--#{$prefix}switch-thumb-bg);
       // stylelint-disable-next-line property-disallowed-list
       border-radius: 50%;
+      box-shadow: var(--#{$prefix}switch-thumb-shadow);
       transform: translateY(-50%);
       @include transition(inset-inline-start var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing), background-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing));
     }
@@ -112,7 +124,19 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
     &:disabled {
       pointer-events: none;
       filter: none;
-      opacity: var(--#{$prefix}switch-disabled-opacity);
+
+      &:not(:checked) {
+        background-color: var(--#{$prefix}switch-disabled-bg);
+
+        &::before {
+          background-color: var(--#{$prefix}switch-disabled-thumb-bg);
+          opacity: .4;
+        }
+      }
+
+      &:checked {
+        opacity: var(--#{$prefix}switch-disabled-opacity);
+      }
 
       ~ label {
         cursor: default;

@@ -277,6 +277,11 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
     --#{$prefix}control-checked-border-color: #{$form-check-input-checked-border-color};
     --#{$prefix}control-indeterminate-bg: #{$form-check-input-indeterminate-bg-color};
     --#{$prefix}control-indeterminate-border-color: #{$form-check-input-indeterminate-border-color};
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}tertiary-bg);
+    // Shared motion for the checkbox, radio and switch; the overshoot easing
+    // makes the mark pop as it settles.
+    --#{$prefix}control-transition-duration: .15s;
+    --#{$prefix}control-transition-timing: cubic-bezier(.34, 1.56, .64, 1);
     // scss-docs-end root-control-variables
 
   }

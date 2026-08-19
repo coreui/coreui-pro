@@ -1116,8 +1116,8 @@ What replaces the wrapper's modifiers:
 
 **The switch is sized by one token, and gains `.switch-sm`.** `--#{$prefix}switch-width`
 is derived from `--#{$prefix}switch-height` through the new
-`$switch-aspect-ratio` (which `$form-switch-width` still sets, as the width the
-default height produces), so a size sets the height alone. The size classes now
+`$switch-aspect-ratio` — a plain number, multiplied in the browser — so a size
+sets the height alone. The size classes now
 scale the label as well, matching `.check-sm` / `.radio-lg`; `$switch-sizes`
 replaces the width/height pairs for the new classes, while `$form-switch-widths`
 stays behind the deprecated `.form-switch-lg` / `-xl` in its original `em` scale.
@@ -1128,6 +1128,23 @@ v5's `$form-switch-transition`), so `transition: inset-inline-start var(…)`
 resolved to something invalid and every switch transition was dropped. It is two
 tokens now — `--#{$prefix}switch-transition-duration` and
 `-timing` — and the thumb slides rather than the background position.
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+**The switch is redrawn.** The track is 1.25rem tall with a 1.75 aspect ratio
+(was a 2:1, font-relative `em` track), pill-radiused, on the tertiary surface
+with an inset shadow; the thumb is white with a drop shadow and turns
+contrast-coloured when checked. A disabled unchecked switch swaps to the
+disabled surface with a faded thumb instead of dimming wholesale; a checked one
+dims. `--#{$prefix}switch-border` splits into `-border-width` and
+`-border-color`, and `$form-switch-color`, `$form-switch-width` and
+`$form-switch-border-radius` fed only the old look and are removed. The
+deprecated `.form-switch-lg` / `-xl` sizing keeps its original `em` scale.
+
+**The controls animate on shared knobs.** `:root` carries
+`--#{$prefix}control-transition-duration` and `-timing` (an overshoot easing);
+the checkbox tick and the radio dot pop in on them, the boxes' colours animate,
+and the switch thumb slides on the same pair — the three controls move in sync
+and restyle from one place. Reduced motion disables all of it as usual.
 
 **New: checkbox and radio have sizes.** `.check-sm` / `.check-lg` and
 `.radio-sm` / `.radio-lg` — v5 had none, only the switch was sizeable. Each sets
@@ -1370,11 +1387,10 @@ it at the colour's slots, so nothing is defined in a file that never renders it.
   `--#{$prefix}primary` at runtime) to move every active state at once, or the
   component's own knob to move one. Per instance, `.theme-*` still wins where a
   component reads `--#{$prefix}theme-*`.
-- **The switch keeps a literal colour on the deprecated path only.**
-  `$form-switch-checked-color` is interpolated into an SVG data URI, where a
-  custom property cannot reach, so it stays `$white`. The current `.switch`
-  paints its thumb with `background-color`, so `$switch-checked-thumb-bg` takes
-  the slot and no longer inherits from the deprecated variable.
+- **The switch has no SVG knob at all any more.** The thumb is painted with
+  `background-color` in every state, so `$switch-thumb-bg` and
+  `$switch-checked-thumb-bg` are ordinary colour knobs; the v5 knob images and
+  the variables that fed them (`$form-switch-bg-image` and friends) are gone.
 
 #### A theme colour is one nested map entry
 
