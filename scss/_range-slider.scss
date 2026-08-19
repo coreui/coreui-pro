@@ -189,7 +189,7 @@ $range-slider-vertical-tokens: defaults(
       opacity: 1;
     }
 
-    &:focus {
+    &:focus-visible {
       outline: 0;
 
       // Pseudo-elements must be split across multiple rulesets to have an effect.

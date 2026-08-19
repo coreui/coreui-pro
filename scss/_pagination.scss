@@ -108,7 +108,7 @@ $pagination-tokens: defaults(
       border-color: var(--#{$prefix}pagination-hover-border-color);
     }
 
-    &:focus {
+    &:focus-visible {
       z-index: 3;
       color: var(--#{$prefix}pagination-focus-color);
       background-color: var(--#{$prefix}pagination-focus-bg);

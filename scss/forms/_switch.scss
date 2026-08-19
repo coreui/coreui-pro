@@ -139,7 +139,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       }
     }
 
-    &:focus {
+    &:focus-visible {
       border-color: var(--#{$prefix}switch-focus-border);
       @include focus-ring(true, $ring: var(--#{$prefix}switch-focus-ring));
     }

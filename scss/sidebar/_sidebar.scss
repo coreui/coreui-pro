@@ -263,7 +263,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
       }
     }
 
-    &:focus {
+    &:focus-visible {
       outline: 0;
       box-shadow: var(--#{$prefix}sidebar-toggler-focus-shadow);
 

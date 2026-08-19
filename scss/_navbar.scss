@@ -289,7 +289,7 @@ $navbar-dark-tokens: defaults(
       text-decoration: none;
     }
 
-    &:focus {
+    &:focus-visible {
       text-decoration: none;
       outline: 0;
       box-shadow: 0 0 0 var(--#{$prefix}navbar-toggler-focus-width);
