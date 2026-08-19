@@ -6,19 +6,19 @@
 // early must not drag a `@layer` block above the `@layer` order declaration.
 
 // scss-docs-start form-input-variables
-$input-padding-y:                       $input-btn-padding-y !default;
-$input-padding-x:                       $input-btn-padding-x !default;
-$input-font-family:                     $input-btn-font-family !default;
-$input-font-size:                       $input-btn-font-size !default;
-$input-font-weight:                     $font-weight-base !default;
-$input-line-height:                     $input-btn-line-height !default;
+$input-padding-y:                       var(--#{$prefix}btn-input-padding-y) !default;
+$input-padding-x:                       var(--#{$prefix}btn-input-padding-x) !default;
+$input-font-family:                     var(--#{$prefix}btn-input-font-family) !default;
+$input-font-size:                       var(--#{$prefix}btn-input-font-size) !default;
+$input-font-weight:                     var(--#{$prefix}body-font-weight) !default;
+$input-line-height:                     var(--#{$prefix}btn-input-line-height) !default;
 
-$input-padding-y-sm:                    $input-btn-padding-y-sm !default;
-$input-padding-x-sm:                    $input-btn-padding-x-sm !default;
-$input-font-size-sm:                    $input-btn-font-size-sm !default;
+$input-padding-y-sm:                    var(--#{$prefix}btn-input-sm-padding-y) !default;
+$input-padding-x-sm:                    var(--#{$prefix}btn-input-sm-padding-x) !default;
+$input-font-size-sm:                    var(--#{$prefix}btn-input-sm-font-size) !default;
 
-$input-padding-y-lg:                    $input-btn-padding-y-lg !default;
-$input-font-size-lg:                    $input-btn-font-size-lg !default;
+$input-padding-y-lg:                    var(--#{$prefix}btn-input-lg-padding-y) !default;
+$input-font-size-lg:                    var(--#{$prefix}btn-input-lg-font-size) !default;
 
 $input-bg:                              var(--#{$prefix}body-bg) !default;
 $input-disabled-color:                  var(--#{$prefix}body-color) !default;
@@ -27,7 +27,7 @@ $input-disabled-border-color:           var(--#{$prefix}border-color) !default;
 
 $input-color:                           var(--#{$prefix}body-color) !default;
 $input-border-color:                    var(--#{$prefix}border-color) !default;
-$input-border-width:                    $input-btn-border-width !default;
+$input-border-width:                    var(--#{$prefix}btn-input-border-width) !default;
 $input-box-shadow:                      var(--#{$prefix}box-shadow-inset) !default;
 
 $input-border-radius:                   var(--#{$prefix}border-radius) !default;
@@ -37,7 +37,7 @@ $input-border-radius-lg:                var(--#{$prefix}border-radius-lg) !defau
 $input-focus-bg:                        $input-bg !default;
 $input-focus-border-color:              tint-color($primary, 50%) !default;
 $input-focus-color:                     $input-color !default;
-$input-focus-width:                     $input-btn-focus-width !default;
+$input-focus-width:                     var(--#{$prefix}focus-ring-width) !default;
 $input-focus-ring:                      var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $input-placeholder-color:               var(--#{$prefix}secondary-color) !default;
@@ -57,7 +57,7 @@ $form-color-width:                      3rem !default;
 
 // scss-docs-start form-text-variables
 $form-text-margin-top:                  .25rem !default;
-$form-text-font-size:                   $small-font-size !default;
+$form-text-font-size:                   var(--#{$prefix}small-font-size) !default;
 $form-text-font-style:                  null !default;
 $form-text-font-weight:                 null !default;
 $form-text-color:                       var(--#{$prefix}secondary-color) !default;

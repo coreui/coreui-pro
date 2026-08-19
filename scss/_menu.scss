@@ -17,7 +17,7 @@ $menu-min-width:                10rem !default;
 $menu-padding-x:                .25rem !default;
 $menu-padding-y:                .25rem !default;
 $menu-spacer:                   .125rem !default;
-$menu-font-size:                $font-size-sm !default;
+$menu-font-size:                var(--#{$prefix}font-size-sm) !default;
 $menu-color:                    var(--#{$prefix}body-color) !default;
 $menu-bg:                       var(--#{$prefix}body-bg) !default;
 $menu-border-color:             var(--#{$prefix}border-color-translucent) !default;
@@ -30,8 +30,8 @@ $menu-divider-margin-x:         .25rem !default;
 $menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}body-color)) !default;
 $menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}body-color)) !default;
 $menu-item-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-$menu-item-active-color:        $component-active-color !default;
-$menu-item-active-bg:           $component-active-bg !default;
+$menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
+$menu-item-active-bg:           var(--#{$prefix}primary) !default;
 $menu-item-disabled-color:      var(--#{$prefix}tertiary-color) !default;
 $menu-item-gap:                 .5rem !default;
 $menu-item-padding-x:           .75rem !default;
@@ -165,7 +165,7 @@ $menu-tokens: defaults(
 
   .menu-translucent {
     --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}tertiary-bg) 85%, transparent);
-    --#{$prefix}menu-item-active-bg: color-mix(in oklch, #{$component-active-bg} 75%, transparent);
+    --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary) 75%, transparent);
 
     background-color: color-mix(in oklch, var(--#{$prefix}menu-bg) 80%, transparent);
     backdrop-filter: blur(5px) saturate(180%);
@@ -264,7 +264,7 @@ $menu-tokens: defaults(
     display: block;
     padding: var(--#{$prefix}menu-header-padding-y) var(--#{$prefix}menu-header-padding-x);
     margin-bottom: 0;
-    font-size: $font-size-sm;
+    font-size: var(--#{$prefix}font-size-sm);
     color: var(--#{$prefix}menu-header-color);
     white-space: nowrap;
   }

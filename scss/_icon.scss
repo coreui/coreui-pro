@@ -1,6 +1,12 @@
 @use "mixins/icon" as *;
 @use "config" as *;
 
+$icon-size-sm:    calc(var(--#{$prefix}icon-size-base) * .875) !default; // stylelint-disable-line function-disallowed-list
+$icon-size-lg:    calc(var(--#{$prefix}icon-size-base) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$icon-size-xl:    calc(var(--#{$prefix}icon-size-base) * 1.5) !default; // stylelint-disable-line function-disallowed-list
+$icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default; // stylelint-disable-line function-disallowed-list
+
+
 @layer components {
   .icon {
     display: inline-block;

@@ -36,7 +36,7 @@ $radio-tokens: defaults(
     --#{$prefix}radio-mark-color: #{$radio-mark-color},
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
     --#{$prefix}radio-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}radio-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}radio-size)) * .5),
+    --#{$prefix}radio-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}radio-size)) * .5),
     --#{$prefix}radio-focus-border: #{$form-check-input-focus-border},
     --#{$prefix}radio-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}radio-active-filter: #{$form-check-input-active-filter},

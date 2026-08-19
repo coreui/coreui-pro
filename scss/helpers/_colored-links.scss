@@ -4,6 +4,9 @@
 @use "../functions/to-rgb" as *;
 @use "../config" as *;
 
+$link-shade-percentage:                   20% !default;
+
+
 // stylelint-disable function-disallowed-list
 // The opacity utilities scale a runtime var, so calc() is unavoidable here.
 

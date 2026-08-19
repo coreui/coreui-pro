@@ -190,125 +190,6 @@ $cyan-700: shade-color($cyan, 40%) !default;
 $cyan-800: shade-color($cyan, 60%) !default;
 $cyan-900: shade-color($cyan, 80%) !default;
 
-$blues: (
-  "blue-100": $blue-100,
-  "blue-200": $blue-200,
-  "blue-300": $blue-300,
-  "blue-400": $blue-400,
-  "blue-500": $blue-500,
-  "blue-600": $blue-600,
-  "blue-700": $blue-700,
-  "blue-800": $blue-800,
-  "blue-900": $blue-900
-) !default;
-
-$indigos: (
-  "indigo-100": $indigo-100,
-  "indigo-200": $indigo-200,
-  "indigo-300": $indigo-300,
-  "indigo-400": $indigo-400,
-  "indigo-500": $indigo-500,
-  "indigo-600": $indigo-600,
-  "indigo-700": $indigo-700,
-  "indigo-800": $indigo-800,
-  "indigo-900": $indigo-900
-) !default;
-
-$purples: (
-  "purple-100": $purple-100,
-  "purple-200": $purple-200,
-  "purple-300": $purple-300,
-  "purple-400": $purple-400,
-  "purple-500": $purple-500,
-  "purple-600": $purple-600,
-  "purple-700": $purple-700,
-  "purple-800": $purple-800,
-  "purple-900": $purple-900
-) !default;
-
-$pinks: (
-  "pink-100": $pink-100,
-  "pink-200": $pink-200,
-  "pink-300": $pink-300,
-  "pink-400": $pink-400,
-  "pink-500": $pink-500,
-  "pink-600": $pink-600,
-  "pink-700": $pink-700,
-  "pink-800": $pink-800,
-  "pink-900": $pink-900
-) !default;
-
-$reds: (
-  "red-100": $red-100,
-  "red-200": $red-200,
-  "red-300": $red-300,
-  "red-400": $red-400,
-  "red-500": $red-500,
-  "red-600": $red-600,
-  "red-700": $red-700,
-  "red-800": $red-800,
-  "red-900": $red-900
-) !default;
-
-$oranges: (
-  "orange-100": $orange-100,
-  "orange-200": $orange-200,
-  "orange-300": $orange-300,
-  "orange-400": $orange-400,
-  "orange-500": $orange-500,
-  "orange-600": $orange-600,
-  "orange-700": $orange-700,
-  "orange-800": $orange-800,
-  "orange-900": $orange-900
-) !default;
-
-$yellows: (
-  "yellow-100": $yellow-100,
-  "yellow-200": $yellow-200,
-  "yellow-300": $yellow-300,
-  "yellow-400": $yellow-400,
-  "yellow-500": $yellow-500,
-  "yellow-600": $yellow-600,
-  "yellow-700": $yellow-700,
-  "yellow-800": $yellow-800,
-  "yellow-900": $yellow-900
-) !default;
-
-$greens: (
-  "green-100": $green-100,
-  "green-200": $green-200,
-  "green-300": $green-300,
-  "green-400": $green-400,
-  "green-500": $green-500,
-  "green-600": $green-600,
-  "green-700": $green-700,
-  "green-800": $green-800,
-  "green-900": $green-900
-) !default;
-
-$teals: (
-  "teal-100": $teal-100,
-  "teal-200": $teal-200,
-  "teal-300": $teal-300,
-  "teal-400": $teal-400,
-  "teal-500": $teal-500,
-  "teal-600": $teal-600,
-  "teal-700": $teal-700,
-  "teal-800": $teal-800,
-  "teal-900": $teal-900
-) !default;
-
-$cyans: (
-  "cyan-100": $cyan-100,
-  "cyan-200": $cyan-200,
-  "cyan-300": $cyan-300,
-  "cyan-400": $cyan-400,
-  "cyan-500": $cyan-500,
-  "cyan-600": $cyan-600,
-  "cyan-700": $cyan-700,
-  "cyan-800": $cyan-800,
-  "cyan-900": $cyan-900
-) !default;
 // fusv-enable
 
 // scss-docs-start theme-color-variables
@@ -446,13 +327,6 @@ $color-shades: (
 // Gradients
 
 // Characters which are escaped by the escape-svg function
-$escaped-characters: (
-  ("<", "%3c"),
-  (">", "%3e"),
-  ("#", "%23"),
-  ("(", "%28"),
-  (")", "%29"),
-) !default;
 
 // Quickly modify global styling by enabling or disabling optional features.
 
@@ -496,9 +370,6 @@ $data-infix:                  -coreui- !default;
 $mobile-breakpoint:           lg !default;
 
 // This gradient is also added to elements with `.bg-gradient`
-// scss-docs-start variable-gradient
-$gradient: linear-gradient(180deg, rgba($white, .15), rgba($white, 0)) !default;
-// scss-docs-end variable-gradient
 
 // You can add more entries to the $spacers map, should you need more variation.
 
@@ -516,19 +387,11 @@ $spacers: (
 
 // Define the edge positioning anchors of the position utilities.
 
-// scss-docs-start position-map
-$position-values: (
-  0: 0,
-  50: 50%,
-  100: 100%
-) !default;
-// scss-docs-end position-map
 
 // Define common box shadows
 
 // Settings for the `<body>` element.
 
-$body-text-align:           null !default;
 $body-color:                light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
 $body-bg:                   $white !default;
 
@@ -538,7 +401,6 @@ $body-secondary-bg:         light-dark(var(--#{$prefix}gray-200), var(--#{$prefi
 $body-tertiary-color:       light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
 $body-tertiary-bg:          $gray-100 !default;
 
-$body-emphasis-color:       light-dark($black, $white) !default;
 
 // `color-translucent()` un-blends a color against a background, so both sides
 // have to stay Sass colors — `light-dark()` would hand it a string. These two
@@ -550,8 +412,6 @@ $body-tertiary-bg-dark:     color.mix($gray-800, $gray-900) !default;
 
 $link-color:                              $primary !default;
 $link-decoration:                         underline !default;
-$link-shade-percentage:                   20% !default;
-$link-hover-color:                        light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400)) !default;
 $link-hover-decoration:                   null !default;
 
 // Define the minimum dimensions at which your layout will change,
@@ -589,7 +449,6 @@ $container-max-widths: (
 
 $grid-columns:                12 !default;
 $grid-gutter-width:           1.5rem !default;
-$grid-row-columns:            6 !default;
 
 // Container padding
 
@@ -598,27 +457,14 @@ $container-padding-x: $grid-gutter-width !default;
 // Define common padding and border radius sizes and more.
 
 // scss-docs-start border-variables
-$border-width:                1px !default;
-$border-widths: (
-  keyline: .5px,
-  1: 1px,
-  2: 2px,
-  3: 3px,
-  4: 4px,
-  5: 5px
-) !default;
 
-$border-style:                solid !default;
 $border-color:                light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-800)) !default;
-$border-color-translucent:    light-dark(color-translucent($gray-300, .175), color-translucent($gray-800, .175, $body-bg-dark)) !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
 $border-radius:               .375rem !default;
 $border-radius-sm:            .25rem !default;
 $border-radius-lg:            .5rem !default;
-$border-radius-xl:            1rem !default;
-$border-radius-xxl:           2rem !default;
 $border-radius-pill:          50rem !default;
 // scss-docs-end border-radius-variables
 
@@ -630,9 +476,6 @@ $border-radius-pill:          50rem !default;
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start box-shadow-variables
-$shadow-color:                #000 !default;
-$shadow-strength:             1 !default;
-$shadow-strength-dark:        2.5 !default;
 
 $shadows: (
   null:  0 .5rem 1rem color-mix(in oklch, var(--#{$prefix}shadow-tint, var(--#{$prefix}shadow-color)) calc(15% * var(--#{$prefix}shadow-strength) * var(--#{$prefix}shadow-opacity, 1)), transparent),
@@ -644,26 +487,9 @@ $shadows: (
 
 // stylelint-enable function-disallowed-list
 
-$component-active-color:      rgba($white, .87) !default;
-$component-active-bg:         var(--#{$prefix}primary) !default;
-
-// scss-docs-start focus-ring-variables
-$focus-ring-width:      .25rem !default;
-$focus-ring-opacity:    .25 !default;
-$focus-ring-color:      rgba($primary, $focus-ring-opacity) !default;
-$focus-ring-offset:     0 !default;
-$focus-ring: $focus-ring-width solid $focus-ring-color !default;
-// scss-docs-end focus-ring-variables
-
-$transition-base:             all .2s ease-in-out !default;
-
 // Font, line-height, and color for body text, headings, and more.
 
 // scss-docs-start font-variables
-// stylelint-disable value-keyword-case
-$font-family-sans-serif:      system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
-$font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !default;
-// stylelint-enable value-keyword-case
 $font-family-base:            var(--#{$prefix}font-sans-serif) !default;
 
 // $font-size-root affects the value of `rem`, which is used for as well font sizes, paddings, and margins
@@ -681,7 +507,6 @@ $font-weight-semibold:        600 !default;
 $font-weight-bold:            700 !default;
 $font-weight-bolder:          bolder !default;
 
-$font-weight-base:            $font-weight-normal !default;
 
 // Composed from the variables above rather than replacing them, so a Sass
 // override of one step still reaches the token, the utility and every
@@ -698,15 +523,12 @@ $font-weights: (
 ) !default;
 // scss-docs-end font-weights
 
-$line-height-base:            1.5 !default;
-$line-height-sm:              1.25 !default;
-$line-height-lg:              2 !default;
 
 $h1-font-size:                clamp(1.375rem, 1.375rem + 1.5vw, 2.5rem) !default;
 $h2-font-size:                clamp(1.325rem, 1.325rem + .9vw, 2rem) !default;
 $h3-font-size:                clamp(1.3rem, 1.3rem + .6vw, 1.75rem) !default;
 $h4-font-size:                clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$h5-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$h5-font-size:                $font-size-lg !default;
 $h6-font-size:                var(--#{$prefix}body-font-size) !default;
 // scss-docs-end font-variables
 
@@ -727,9 +549,9 @@ $headings-color:              inherit !default;
 
 // scss-docs-start font-sizes
 $font-sizes: (
-  "xs":  ("font-size": $font-size-base * .75, "line-height": $line-height-base),
-  "sm":  ("font-size": $font-size-sm,         "line-height": $line-height-base),
-  "md":  ("font-size": $h6-font-size,         "line-height": $line-height-base),
+  "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75), "line-height": var(--#{$prefix}body-line-height)), // stylelint-disable-line function-disallowed-list
+  "sm":  ("font-size": $font-size-sm,         "line-height": var(--#{$prefix}body-line-height)),
+  "md":  ("font-size": $h6-font-size,         "line-height": var(--#{$prefix}body-line-height)),
   "lg":  ("font-size": $h5-font-size,         "line-height": $headings-line-height),
   "xl":  ("font-size": $h4-font-size,         "line-height": $headings-line-height),
   "2xl": ("font-size": $h3-font-size,         "line-height": $headings-line-height),
@@ -738,80 +560,22 @@ $font-sizes: (
 ) !default;
 // scss-docs-end font-sizes
 
-// scss-docs-start font-sizes-legacy
-// The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They
-// read the named scale, so overriding a stop moves both.
-$font-sizes-legacy: (
-  1: map.get($font-sizes, "4xl", "font-size"),
-  2: map.get($font-sizes, "3xl", "font-size"),
-  3: map.get($font-sizes, "2xl", "font-size"),
-  4: map.get($font-sizes, "xl", "font-size"),
-  5: map.get($font-sizes, "lg", "font-size"),
-  6: map.get($font-sizes, "md", "font-size")
-) !default;
-// scss-docs-end font-sizes-legacy
 
 // scss-docs-start type-variables
 
-$small-font-size:               .875em !default;
-
-$mark-color:                  $body-color !default;
-$mark-bg:                     light-dark($yellow-100, $yellow-800) !default;
 // scss-docs-end type-variables
 
 // Icons
-$icon-size-base:  1rem !default;
-$icon-size-sm:    calc(var(--#{$prefix}icon-size-base) * .875) !default; // stylelint-disable-line function-disallowed-list
-$icon-size-lg:    calc(var(--#{$prefix}icon-size-base) * 1.25) !default; // stylelint-disable-line function-disallowed-list
-$icon-size-xl:    calc(var(--#{$prefix}icon-size-base) * 1.5) !default; // stylelint-disable-line function-disallowed-list
-$icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default; // stylelint-disable-line function-disallowed-list
 
 // Customizes the `.table` component with basic values, each used across all table variations.
 
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 
-// scss-docs-start input-btn-variables
-$input-btn-padding-y:         .375rem !default;
-$input-btn-padding-x:         .75rem !default;
-$input-btn-font-family:       null !default;
-$input-btn-font-size:         $font-size-base !default;
-$input-btn-line-height:       $line-height-base !default;
-
-$input-btn-focus-width:         $focus-ring-width !default;
-$input-btn-focus-color:         $focus-ring-color !default;
-// Composed from the two knobs above rather than taken whole from
-// `$focus-ring`, so setting either one reaches every control. Same value by
-// default.
-$input-btn-focus-ring:    $input-btn-focus-width solid $input-btn-focus-color !default;
-
-$input-btn-padding-y-sm:      .25rem !default;
-$input-btn-padding-x-sm:      .5rem !default;
-$input-btn-font-size-sm:      $font-size-sm !default;
-
-$input-btn-padding-y-lg:      .5rem !default;
-$input-btn-padding-x-lg:      1rem !default;
-$input-btn-font-size-lg:      $font-size-lg !default;
-
-$input-btn-border-width:      var(--#{$prefix}border-width) !default;
-$input-btn-transition:        color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-$input-btn-disabled-opacity:  .65 !default;
-
-// scss-docs-start control-state-variables
-// Sources of the :root --#{$prefix}control-checked-*/-indeterminate-* knobs,
-// shared by every checkable control. They stay here because _root.scss reads
-// them and loads before any component.
-$form-check-input-checked-bg-color:       $component-active-bg !default;
-$form-check-input-checked-border-color:   $form-check-input-checked-bg-color !default;
-$form-check-input-indeterminate-bg-color:       $component-active-bg !default;
-$form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
-// scss-docs-end control-state-variables
-// scss-docs-end input-btn-variables
 
 // For each of Bootstrap's buttons, define text, background, and border color.
 
 // Forms
 
-$form-check-inline-margin-end:    1rem !default;
 
 // Form validation
 
@@ -857,4 +621,3 @@ $zindex-levels: (
 
 // Code
 
-$code-color:                        light-dark($pink, tint-color($pink, 40%)) !default;

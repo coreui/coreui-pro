@@ -19,7 +19,7 @@ $calendar-nav-border-color:                  var(--#{$prefix}border-color) !defa
 
 $calendar-nav-btn-padding-y:                 .25rem !default;
 $calendar-nav-btn-padding-x:                 .5rem !default;
-$calendar-nav-btn-font-size:                 $font-size-sm !default;
+$calendar-nav-btn-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $calendar-nav-btn-bg:                        transparent !default;
 $calendar-nav-btn-border-width:              1px !default;
 $calendar-nav-btn-border-color:              transparent !default;

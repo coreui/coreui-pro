@@ -29,7 +29,7 @@ $switch-bg:                   $form-check-input-bg !default;
 $switch-border:               $form-check-input-border !default;
 $switch-padding:              .125em !default;
 $switch-thumb-bg:             $form-switch-color !default;
-$switch-checked-thumb-bg:     $form-switch-checked-color !default;
+$switch-checked-thumb-bg:     var(--#{$prefix}primary-contrast) !default;
 $switch-knob:                 $form-switch-bg-image !default;
 $switch-knob-focus:           $form-switch-focus-bg-image !default;
 $switch-knob-checked:         $form-switch-checked-bg-image !default;
@@ -39,9 +39,9 @@ $switch-checked-knob-position: $form-switch-checked-bg-position !default;
 // Sized like `.check` and `.radio`: one height, and the label follows so the
 // whole row scales. `xl` has no checkbox counterpart — it is ours.
 $switch-sizes: (
-  sm: (height: .875rem, font-size: $font-size-sm),
-  lg: (height: 1.25rem, font-size: $font-size-lg),
-  xl: (height: 1.5rem, font-size: $font-size-lg)
+  sm: (height: .875rem, font-size: var(--#{$prefix}font-size-sm)),
+  lg: (height: 1.25rem, font-size: var(--#{$prefix}font-size-lg)),
+  xl: (height: 1.5rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
 // scss-docs-end switch-variables
 
@@ -67,7 +67,7 @@ $switch-tokens: defaults(
     --#{$prefix}switch-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
     --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}switch-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}switch-height)) * .5),
+    --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
     --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
     --#{$prefix}switch-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
@@ -196,7 +196,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
         // v5 gave every sized switch the same margin as the default one, which
         // left it a little below the line's centre. The compatibility layer keeps
         // that rather than quietly re-centring markup nobody has touched.
-        --#{$prefix}switch-margin-top: #{($line-height-base - $form-check-input-width) * .5};
+        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - #{$form-check-input-width}) * .5); // stylelint-disable-line function-disallowed-list
       }
 
       .form-switch-#{$size} {
@@ -208,7 +208,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
 
         .form-check-label {
           // stylelint-disable-next-line function-disallowed-list
-          padding-top: calc((var(--#{$prefix}switch-height) - #{$font-size-base}) * .5);
+          padding-top: calc((var(--#{$prefix}switch-height) - #{var(--#{$prefix}body-font-size)}) * .5);
         }
       }
     }

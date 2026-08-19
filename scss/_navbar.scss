@@ -22,7 +22,7 @@ $navbar-padding-x:                  null !default;
 
 $navbar-nav-link-padding-x:         .5rem !default;
 
-$navbar-brand-font-size:            $font-size-lg !default;
+$navbar-brand-font-size:            var(--#{$prefix}font-size-lg) !default;
 // Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
 $nav-link-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height) + #{$nav-link-padding-y} * 2) !default; // stylelint-disable-line function-disallowed-list
 $navbar-brand-height:               calc(#{$navbar-brand-font-size} * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
@@ -31,7 +31,7 @@ $navbar-brand-margin-end:           1rem !default;
 
 $navbar-toggler-padding-y:          .25rem !default;
 $navbar-toggler-padding-x:          .75rem !default;
-$navbar-toggler-font-size:          $font-size-lg !default;
+$navbar-toggler-font-size:          var(--#{$prefix}font-size-lg) !default;
 $navbar-toggler-border-radius:      $btn-border-radius !default;
 $navbar-toggler-focus-width:        $btn-focus-width !default;
 $navbar-toggler-transition:         box-shadow .15s ease-in-out !default;

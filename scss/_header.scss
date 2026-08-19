@@ -14,7 +14,7 @@
 // scss-docs-start header-variables
 $header-padding-y:              var(--#{$prefix}spacer-2) !default;
 $header-padding-x:              var(--#{$prefix}spacer-2) !default;
-$header-brand-font-size:        $font-size-lg !default;
+$header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 $header-color:                  color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-bg:                     var(--#{$prefix}body-bg) !default;
 $header-border-color:           var(--#{$prefix}border-color) !default;
@@ -28,13 +28,13 @@ $header-transition:             box-shadow .15s ease-in-out !default;
 $header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
 $header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default; // stylelint-disable-line function-disallowed-list
 $header-brand-margin-end:       1rem !default;
-$header-brand-font-size:        $font-size-lg !default;
+$header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 $header-brand-color:            $gray-900 !default;
 $header-brand-hover-color:      shade-color($gray-900, 10%) !default;
 
 $header-toggler-padding-y:      .25rem !default;
 $header-toggler-padding-x:      .75rem !default;
-$header-toggler-font-size:      $font-size-lg !default;
+$header-toggler-font-size:      var(--#{$prefix}font-size-lg) !default;
 $header-toggler-color:          color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
 $header-toggler-bg:             transparent !default;
 $header-toggler-border-radius:  $btn-border-radius !default;

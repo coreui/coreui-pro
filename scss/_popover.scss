@@ -6,7 +6,7 @@
 @use "config" as *;
 
 // scss-docs-start popover-variables
-$popover-font-size:                 $font-size-sm !default;
+$popover-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $popover-bg:                        var(--#{$prefix}body-bg) !default;
 $popover-max-width:                 276px !default;
 $popover-border-width:              var(--#{$prefix}border-width) !default;
@@ -15,7 +15,7 @@ $popover-border-radius:             var(--#{$prefix}border-radius-lg) !default;
 $popover-inner-border-radius:       calc(#{$popover-border-radius} - #{$popover-border-width}) !default; // stylelint-disable-line function-disallowed-list
 $popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
 
-$popover-header-font-size:          $font-size-base !default;
+$popover-header-font-size:          var(--#{$prefix}body-font-size) !default;
 $popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
 $popover-header-color:              $headings-color !default;
 $popover-header-padding-y:          .5rem !default;

@@ -38,7 +38,7 @@ $combobox-select-all-border-radius:   var(--#{$prefix}border-radius) !default;
 $combobox-options-gap:                .125rem !default;
 $combobox-options-padding-y:          .375rem !default;
 $combobox-options-padding-x:          .375rem !default;
-$combobox-options-font-size:          $font-size-base !default;
+$combobox-options-font-size:          var(--#{$prefix}body-font-size) !default;
 $combobox-options-font-weight:        var(--#{$prefix}font-weight-normal) !default;
 $combobox-options-color:              var(--#{$prefix}body-color) !default;
 

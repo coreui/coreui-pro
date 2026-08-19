@@ -5,7 +5,7 @@
 // scss-docs-start type-variables
 $lead-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
 $lead-font-weight:              300 !default;
-$initialism-font-size:        $small-font-size !default;
+$initialism-font-size:        var(--#{$prefix}small-font-size) !default;
 // scss-docs-end type-variables
 
 // scss-docs-start display-headings

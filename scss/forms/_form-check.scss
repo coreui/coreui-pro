@@ -8,6 +8,9 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
+$form-check-inline-margin-end:    1rem !default;
+
+
 // The values each control's own variables default to. A consumer sets
 // `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
 // what those fall back to, and what still works for a v5-era override.
@@ -19,7 +22,7 @@ $form-check-input-border:                 var(--#{$prefix}border-width) solid va
 $form-check-input-border-radius:          .25em !default;
 $form-check-radio-border-radius:          50% !default;
 
-$form-check-input-checked-color:          $component-active-color !default;
+$form-check-input-checked-color:          var(--#{$prefix}primary-contrast) !default;
 // scss-docs-end form-check-defaults
 
 // What the wrapper owns and what all three controls share: the row, the label,
@@ -52,7 +55,7 @@ $form-switch-transition:          background-position .15s ease-in-out !default;
 $form-switch-focus-color:         $input-focus-border-color !default;
 $form-switch-focus-bg-image:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-focus-color}'/></svg>") !default;
 
-$form-switch-checked-color:       $component-active-color !default;
+$form-switch-checked-color:       $white !default;
 $form-switch-checked-bg-image:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-checked-color}'/></svg>") !default;
 $form-switch-checked-bg-position: right center !default;
 

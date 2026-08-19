@@ -3,6 +3,42 @@
 @use "maps" as *;
 @use "config" as *;
 
+// scss-docs-start border-variables
+$border-widths: (
+  keyline: .5px,
+  1: 1px,
+  2: 2px,
+  3: 3px,
+  4: 4px,
+  5: 5px
+) !default;
+// scss-docs-end border-variables
+
+// scss-docs-start font-sizes-legacy
+// The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They
+// read the named scale, so overriding a stop moves both.
+$font-sizes-legacy: (
+  1: map.get($font-sizes, "4xl", "font-size"),
+  2: map.get($font-sizes, "3xl", "font-size"),
+  3: map.get($font-sizes, "2xl", "font-size"),
+  4: map.get($font-sizes, "xl", "font-size"),
+  5: map.get($font-sizes, "lg", "font-size"),
+  6: map.get($font-sizes, "md", "font-size")
+) !default;
+// scss-docs-end font-sizes-legacy
+
+$line-height-lg:              2 !default;
+$line-height-sm:              1.25 !default;
+
+// scss-docs-start position-map
+$position-values: (
+  0: 0,
+  50: 50%,
+  100: 100%
+) !default;
+// scss-docs-end position-map
+
+
 // stylelint-disable function-disallowed-list
 // The opacity utilities scale a runtime var, so calc() is unavoidable here.
 
@@ -675,7 +711,7 @@ $utilities: map.merge(
       values: (
         1: 1,
         sm: $line-height-sm,
-        base: $line-height-base,
+        base: var(--#{$prefix}body-line-height),
         lg: $line-height-lg,
       )
     ),
