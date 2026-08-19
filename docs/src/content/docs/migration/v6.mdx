@@ -955,6 +955,16 @@ adornment in the library — so the button needs no icon markup at all:
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`
   states on the inner `<input>` carry the semantics.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The selected chip's text follows the palette.** `$chip-active-color` was
+  white at 87% opacity, computed at build time — repaint the selected
+  background and the text stayed near-white. It defaults to
+  `var(--cui-primary-contrast)` now (solid, slightly brighter than before),
+  and a `.theme-*` class supplies its own contrast colour through the slot.
+- **Hovering a themed, unselected chip no longer previews the selected
+  look.** The background steps from `bg-subtle` to `bg-muted` and the text
+  colour stays put; only selection paints the solid theme colour. A chip
+  without a theme class hovers exactly as before.
 
 #### Collapse
 
