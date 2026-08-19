@@ -1,0 +1,6 @@
+// Dissolved in v6: the theme slot maps live in _theme.scss, the $utilities-*
+// maps in _utilities.scss, $gutters in _config.scss. Kept so an existing
+// `@use "maps"` resolves.
+@forward "config";
+@forward "theme";
+@forward "utilities";

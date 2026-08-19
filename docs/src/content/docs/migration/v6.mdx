@@ -2007,7 +2007,7 @@ names and their classes here.
 colours, the grays and their maps — lives in `scss/_colors.scss`; the theme
 colour system — `$primary`…`$dark`, the `$theme-colors` map, the runtime
 colour-scale knobs and the `$theme-colors-*` slot maps — lives in
-`scss/_theme.scss`. `scss/_maps.scss` is removed: the `$utilities-*` maps and
+`scss/_theme.scss`. `scss/_maps.scss` is dissolved: the `$utilities-*` maps and
 `$negative-spacers` sit in `scss/_utilities.scss` next to the `$utilities`
 definitions they feed, and `$gutters` in `scss/_config.scss` with the rest of
 the grid settings.
@@ -2016,10 +2016,10 @@ the grid settings.
   every custom property keeps its name.
 - **Overriding through `@use "@coreui/coreui-pro/scss/coreui" with (...)` is
   unchanged** — the entry point forwards all of these modules.
-- **Only a direct module import needs the new path**: replace
-  `@use ".../scss/config"` with `.../scss/colors` or `.../scss/theme` for the
-  variables that moved, and `@use ".../scss/maps"` with `.../scss/theme` (the
-  `$theme-colors-*` families) or `.../scss/utilities` (the `$utilities-*` maps).
+- **Old module paths keep resolving**: `scss/variables` and `scss/maps` are thin
+  `@forward` shims over the new modules, so an existing `@use` or `@import`
+  compiles as before. New code should import `.../scss/colors`,
+  `.../scss/theme` or `.../scss/utilities` directly.
 
 #### The type scale is one named map
 
