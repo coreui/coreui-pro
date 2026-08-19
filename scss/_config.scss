@@ -793,15 +793,6 @@ $input-btn-border-width:      var(--#{$prefix}border-width) !default;
 $input-btn-transition:        color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 $input-btn-disabled-opacity:  .65 !default;
 
-// scss-docs-start control-state-variables
-// Sources of the :root --#{$prefix}control-checked-*/-indeterminate-* knobs,
-// shared by every checkable control. They stay here because _root.scss reads
-// them and loads before any component.
-$form-check-input-checked-bg-color:             var(--#{$prefix}primary) !default;
-$form-check-input-checked-border-color:         $form-check-input-checked-bg-color !default;
-$form-check-input-indeterminate-bg-color:       var(--#{$prefix}primary) !default;
-$form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
-// scss-docs-end control-state-variables
 // scss-docs-end input-btn-variables
 
 // For each of Bootstrap's buttons, define text, background, and border color.

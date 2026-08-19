@@ -9,6 +9,13 @@
 @use "colors" as *;
 @use "config" as *;
 
+// scss-docs-start control-state-variables
+$form-check-input-checked-bg-color:             var(--#{$prefix}primary) !default;
+$form-check-input-checked-border-color:         $form-check-input-checked-bg-color !default;
+$form-check-input-indeterminate-bg-color:       var(--#{$prefix}primary) !default;
+$form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
+// scss-docs-end control-state-variables
+
 // `colors` and `config` are reserved and empty, matching upstream's declaration:
 // two slots below `root` for a palette or a configuration sheet of your own, so
 // yours loses to nothing but still beats the library. `custom` is the same idea
