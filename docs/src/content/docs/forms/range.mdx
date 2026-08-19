@@ -6,6 +6,8 @@ otherFrameworks:
   - range
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 ## Overview
 
 Create custom `<input type="range" />` controls with `.form-range`. The track (the background) and thumb (the value) are both styled to appear the same across browsers. As only Firefox supports "filling" their track from the left or right of the thumb as a means to visually indicate progress, we do not currently support it.
@@ -51,6 +53,13 @@ The value of the range input can be shown using the `output` element and a bit o
       rangeOutput.textContent = this.value;
     });
   </script>`} />
+
+## Theme colors
+
+Color the thumb by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the input or a wrapper.
+
+<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<label for="range-${c.name}" class="form-label">${c.title} range</label>
+  <input type="range" class="form-range theme-${c.name}" id="range-${c.name}">`)} />
 
 ## Customizing
 
