@@ -14,6 +14,11 @@
 @use "../theme" as *;
 @use "../config" as *;
 
+// scss-docs-start input-btn-variables
+$input-btn-focus-ring:    $input-btn-focus-width solid $input-btn-focus-color !default;
+// scss-docs-end input-btn-variables
+
+
 // scss-docs-start btn-variables
 $btn-color:                   var(--#{$prefix}body-color) !default;
 $btn-padding-y:               var(--#{$prefix}btn-input-padding-y) !default;

@@ -6,6 +6,9 @@
 @use "../config" as *;
 @use "breakpoints" as *;
 
+$grid-row-columns:            6 !default;
+
+
 // Grid system
 //
 // Generate semantic grid columns with these mixins.

@@ -8,6 +8,9 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
+$form-check-inline-margin-end:    1rem !default;
+
+
 // The values each control's own variables default to. A consumer sets
 // `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
 // what those fall back to, and what still works for a v5-era override.
