@@ -12,7 +12,7 @@ $progress-font-size:                calc(var(--#{$prefix}body-font-size) * .75) 
 $progress-bg:                       var(--#{$prefix}secondary-bg) !default;
 $progress-border-radius:            var(--#{$prefix}border-radius) !default;
 $progress-box-shadow:               var(--#{$prefix}box-shadow-inset) !default;
-$progress-bar-color:                var(--#{$prefix}white) !default;
+$progress-bar-color:                var(--#{$prefix}primary-contrast) !default;
 $progress-bar-bg:                   var(--#{$prefix}primary) !default;
 $progress-bar-animation-timing:     1s linear infinite !default;
 $progress-bar-transition:           width .6s ease !default;
@@ -33,8 +33,8 @@ $progress-tokens: defaults(
     --#{$prefix}progress-bg: #{$progress-bg},
     --#{$prefix}progress-border-radius: #{$progress-border-radius},
     --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
-    --#{$prefix}progress-bar-color: #{$progress-bar-color},
-    --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
+    --#{$prefix}progress-bar-color: var(--#{$prefix}theme-contrast, #{$progress-bar-color}),
+    --#{$prefix}progress-bar-bg: var(--#{$prefix}theme-base, #{$progress-bar-bg}),
     --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
     --#{$prefix}progress-font-size: $progress-font-size,
   ),

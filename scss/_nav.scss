@@ -69,8 +69,8 @@ $nav-tokens: defaults(
     --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
     --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
     --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight},
-    --#{$prefix}nav-link-color: #{$nav-link-color},
-    --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color},
+    --#{$prefix}nav-link-color: var(--#{$prefix}theme-fg, #{$nav-link-color}),
+    --#{$prefix}nav-link-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$nav-link-hover-color}),
     --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color},
   ),
   $nav-tokens
@@ -108,8 +108,8 @@ $nav-pills-tokens: () !default;
 $nav-pills-tokens: defaults(
   (
     --#{$prefix}nav-pills-border-radius: #{$nav-pills-border-radius},
-    --#{$prefix}nav-pills-link-active-color: #{$nav-pills-link-active-color},
-    --#{$prefix}nav-pills-link-active-bg: #{$nav-pills-link-active-bg},
+    --#{$prefix}nav-pills-link-active-color: var(--#{$prefix}theme-contrast, #{$nav-pills-link-active-color}),
+    --#{$prefix}nav-pills-link-active-bg: var(--#{$prefix}theme-base, #{$nav-pills-link-active-bg}),
   ),
   $nav-pills-tokens
 );
@@ -126,7 +126,7 @@ $nav-underline-tokens: defaults(
   (
     --#{$prefix}nav-underline-gap: #{$nav-underline-gap},
     --#{$prefix}nav-underline-border-width: #{$nav-underline-border-width},
-    --#{$prefix}nav-underline-link-active-color: #{$nav-underline-link-active-color},
+    --#{$prefix}nav-underline-link-active-color: var(--#{$prefix}theme-fg, #{$nav-underline-link-active-color}),
   ),
   $nav-underline-tokens
 );
@@ -147,7 +147,7 @@ $nav-underline-border-tokens: defaults(
     --#{$prefix}nav-underline-border-link-padding-x: #{$nav-underline-border-link-padding-x},
     --#{$prefix}nav-underline-border-link-padding-y: #{$nav-underline-border-link-padding-y},
     --#{$prefix}nav-underline-border-link-color: #{$nav-underline-border-link-color},
-    --#{$prefix}nav-underline-border-link-active-color: #{$nav-underline-border-link-active-color},
+    --#{$prefix}nav-underline-border-link-active-color: var(--#{$prefix}theme-base, #{$nav-underline-border-link-active-color}),
     --#{$prefix}nav-underline-border-link-disabled-color: #{$nav-underline-border-link-disabled-color},
   ),
   $nav-underline-border-tokens
