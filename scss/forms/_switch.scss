@@ -67,7 +67,7 @@ $switch-tokens: defaults(
     --#{$prefix}switch-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
     --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}switch-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}switch-height)) * .5),
+    --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
     --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
     --#{$prefix}switch-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
@@ -196,7 +196,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
         // v5 gave every sized switch the same margin as the default one, which
         // left it a little below the line's centre. The compatibility layer keeps
         // that rather than quietly re-centring markup nobody has touched.
-        --#{$prefix}switch-margin-top: #{($line-height-base - $form-check-input-width) * .5};
+        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - #{$form-check-input-width}) * .5); // stylelint-disable-line function-disallowed-list
       }
 
       .form-switch-#{$size} {

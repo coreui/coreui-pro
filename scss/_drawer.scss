@@ -31,7 +31,7 @@ $drawer-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
 $drawer-transition-duration:        .3s !default;
 $drawer-transition-timing:          cubic-bezier(.22, 1, .36, 1) !default;
 $drawer-scale-transform:            scale(1.02) !default;
-$drawer-title-line-height:          $line-height-base !default;
+$drawer-title-line-height:          var(--#{$prefix}body-line-height) !default;
 $drawer-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}body-bg) 25%, transparent) !default;
 $drawer-backdrop-blur:              8px !default;
 $drawer-sheet-width:                760px !default;

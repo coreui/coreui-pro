@@ -20,7 +20,7 @@ $legend-font-size:            clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
 $legend-font-weight:          null !default;
 $dt-font-weight:              $font-weight-bold !default;
 $mark-padding:                .1875em !default;
-$code-font-size:              $small-font-size !default;
+$code-font-size:              var(--#{$prefix}small-font-size) !default;
 // scss-docs-end reboot-type-variables
 
 // scss-docs-start kbd-variables
@@ -256,7 +256,7 @@ $th-font-weight:       null !default;
   // Add the correct font size in all browsers
 
   small {
-    font-size: $small-font-size;
+    font-size: var(--#{$prefix}small-font-size);
   }
 
 

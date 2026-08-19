@@ -34,7 +34,7 @@ $dialog-backdrop-blur:              8px !default;
 $dialog-header-padding:             var(--#{$prefix}spacer-3) !default;
 $dialog-header-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $dialog-header-border-width:        var(--#{$prefix}border-width) !default;
-$dialog-title-line-height:          $line-height-base !default;
+$dialog-title-line-height:          var(--#{$prefix}body-line-height) !default;
 $dialog-footer-padding:             var(--#{$prefix}spacer-3) !default;
 $dialog-footer-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $dialog-footer-border-width:        var(--#{$prefix}border-width) !default;
