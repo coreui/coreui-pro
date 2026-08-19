@@ -96,6 +96,14 @@ $theme-colors: map.merge($theme-colors, (
 
 For a runtime-only brand — no Sass compilation — set the generic tokens on a container instead, as shown in [the theme variants section](/customize/components/#theme-variants).
 
+## Theme utilities
+
+Four style utilities pair a themed surface with its matching text color — compose them with any `.theme-{color}` class to color arbitrary markup the same way the components do:
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-theme" />
+
+<Example html={[`<div class="theme-success d-flex flex-column gap-2">`, `    <div class="theme-contrast p-2 rounded">Solid surface with contrast text</div>`, `    <div class="theme-subtle p-2 rounded">Subtle surface with readable text</div>`, `    <div class="theme-muted p-2 rounded">Muted surface with emphasis text</div>`, `    <div class="theme-border p-2 rounded">Themed border</div>`, `  </div>`]} />
+
 ## Customizing
 
 ### SASS variables

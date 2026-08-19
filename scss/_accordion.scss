@@ -67,7 +67,7 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
     --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
-    --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg, #{$accordion-button-active-color}),
+    --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg-emphasis, #{$accordion-button-active-color}),
     --#{$prefix}accordion-active-bg: var(--#{$prefix}theme-bg-subtle, #{$accordion-button-active-bg}),
     --#{$prefix}accordion-active-border-color: var(--#{$prefix}theme-border, #{$accordion-active-border-color}),
     --#{$prefix}accordion-content-duration: #{$accordion-content-duration},

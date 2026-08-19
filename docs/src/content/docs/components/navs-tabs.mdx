@@ -586,6 +586,22 @@ tabEl.addEventListener('shown.coreui.tab', event => {
 })
 ```
 
+## Theming
+
+A [theme class](/customize/components/#theme-variants) recolors a nav: links read the theme's foreground and the active pill or underline its solid color.
+
+<Example code={`<ul class="nav nav-pills theme-success">
+    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Active</a></li>
+    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+  </ul>`} />
+
+<Example code={`<ul class="nav nav-underline theme-success">
+    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Active</a></li>
+    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
+  </ul>`} />
+
 ## Customizing
 
 ### CSS variables

@@ -41,13 +41,13 @@ $card-tokens: defaults(
     --#{$prefix}card-title-color: #{$card-title-color},
     --#{$prefix}card-subtitle-color: #{$card-subtitle-color},
     --#{$prefix}card-border-width: #{$card-border-width},
-    --#{$prefix}card-border-color: #{$card-border-color},
+    --#{$prefix}card-border-color: var(--#{$prefix}theme-base, #{$card-border-color}),
     --#{$prefix}card-border-radius: #{$card-border-radius},
     --#{$prefix}card-box-shadow: #{$card-box-shadow},
     --#{$prefix}card-inner-border-radius: #{$card-inner-border-radius},
     --#{$prefix}card-cap-padding-y: #{$card-cap-padding-y},
     --#{$prefix}card-cap-padding-x: #{$card-cap-padding-x},
-    --#{$prefix}card-cap-bg: #{$card-cap-bg},
+    --#{$prefix}card-cap-bg: var(--#{$prefix}theme-base, #{$card-cap-bg}),
     --#{$prefix}card-cap-color: #{$card-cap-color},
     --#{$prefix}card-height: #{$card-height},
     --#{$prefix}card-color: #{$card-color},
@@ -150,7 +150,7 @@ $card-tokens: defaults(
   .card-header {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
     margin-bottom: 0; // Removes the default margin-bottom of <hN>
-    color: var(--#{$prefix}card-cap-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
     background-color: var(--#{$prefix}card-cap-bg);
     border-bottom: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
 

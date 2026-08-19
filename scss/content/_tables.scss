@@ -56,15 +56,15 @@ $table-variants: map.keys($theme-colors) !default;
   .table-#{$state} {
     @include theme-tokens($state);
 
-    --#{$prefix}table-color: var(--#{$prefix}theme-fg);
+    --#{$prefix}table-color: var(--#{$prefix}theme-fg-emphasis);
     --#{$prefix}table-bg: var(--#{$prefix}theme-bg-subtle);
     --#{$prefix}table-border-color: var(--#{$prefix}theme-border);
-    --#{$prefix}table-striped-color: var(--#{$prefix}theme-fg);
-    --#{$prefix}table-striped-bg: color-mix(in srgb, var(--#{$prefix}theme-fg) #{math.percentage($table-striped-bg-factor)}, transparent);
-    --#{$prefix}table-active-color: var(--#{$prefix}theme-fg);
-    --#{$prefix}table-active-bg: color-mix(in srgb, var(--#{$prefix}theme-fg) #{math.percentage($table-active-bg-factor)}, transparent);
-    --#{$prefix}table-hover-color: var(--#{$prefix}theme-fg);
-    --#{$prefix}table-hover-bg: color-mix(in srgb, var(--#{$prefix}theme-fg) #{math.percentage($table-hover-bg-factor)}, transparent);
+    --#{$prefix}table-striped-color: var(--#{$prefix}theme-fg-emphasis);
+    --#{$prefix}table-striped-bg: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis) #{math.percentage($table-striped-bg-factor)}, transparent);
+    --#{$prefix}table-active-color: var(--#{$prefix}theme-fg-emphasis);
+    --#{$prefix}table-active-bg: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis) #{math.percentage($table-active-bg-factor)}, transparent);
+    --#{$prefix}table-hover-color: var(--#{$prefix}theme-fg-emphasis);
+    --#{$prefix}table-hover-bg: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis) #{math.percentage($table-hover-bg-factor)}, transparent);
 
     color: var(--#{$prefix}table-color);
     border-color: var(--#{$prefix}table-border-color);

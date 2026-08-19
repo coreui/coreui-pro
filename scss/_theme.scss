@@ -175,8 +175,8 @@ $theme-colors-focus-ring: map-slot($theme-colors, "focus-ring") !default;
 $theme-token-refs: (
   "base": "",
   "contrast": "-contrast",
-  "fg": "-text-emphasis",
-  "fg-base": "-fg",
+  "fg": "-fg",
+  "fg-emphasis": "-text-emphasis",
   "bg-subtle": "-bg-subtle",
   "bg-muted": "-bg-muted",
   "border": "-border-subtle"

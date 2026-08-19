@@ -320,6 +320,10 @@ Navbar themes are easier than ever thanks to CoreUI for Bootstrap's combination 
 </nav>
 ```
 
+A [theme class](/customize/components/#theme-variants) accents the brand and the active link with the theme's foreground colors, on top of either scheme:
+
+<Example html={[`<nav class="navbar navbar-expand-lg theme-primary bg-body-tertiary">`, `    <div class="container-fluid">`, `      <a class="navbar-brand" href="#">Navbar</a>`, `      <ul class="navbar-nav me-auto mb-2 mb-lg-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `      </ul>`, `    </div>`, `  </nav>`]} />
+
 ## Containers
 
 Although it's not required, you can wrap a navbar in a `.container` to center it on a page–though note that an inner container is still required. Or you can add a container inside the `.navbar` to only center the contents of a [fixed or static top navbar](#placement).

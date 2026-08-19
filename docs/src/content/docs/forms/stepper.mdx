@@ -614,6 +614,35 @@ myStepper.addEventListener('stepChange.coreui.stepper', event => {
 })
 ```
 
+## Theming
+
+A [theme class](/customize/components/#theme-variants) colors the active and completed step indicators and the connectors:
+
+<Example code={`<div class="stepper theme-success" data-coreui-toggle="stepper">
+    <ol class="stepper-steps">
+      <li class="stepper-step complete">
+        <button type="button" class="stepper-step-button" data-coreui-step="1">
+          <span class="stepper-step-indicator">1</span>
+          Account
+        </button>
+        <span class="stepper-step-connector"><span></span></span>
+      </li>
+      <li class="stepper-step active">
+        <button type="button" class="stepper-step-button" data-coreui-step="2">
+          <span class="stepper-step-indicator">2</span>
+          Profile
+        </button>
+        <span class="stepper-step-connector"><span></span></span>
+      </li>
+      <li class="stepper-step">
+        <button type="button" class="stepper-step-button" data-coreui-step="3">
+          <span class="stepper-step-indicator">3</span>
+          Review
+        </button>
+      </li>
+    </ol>
+  </div>`} />
+
 ## Customization
 
 ### CSS Variables

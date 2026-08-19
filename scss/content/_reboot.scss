@@ -288,7 +288,7 @@ $th-font-weight:       null !default;
   // Links
 
   a {
-    color: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
+    color: color-mix(in srgb, var(--#{$prefix}theme-fg, var(--#{$prefix}link-color)) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
     text-decoration: $link-decoration;
 
     &:hover {
