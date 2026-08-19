@@ -12,7 +12,6 @@ $headings-font-weight:        500 !default;
 $sub-sup-font-size:           .75em !default;
 $hr-margin-y:                 $spacer !default;
 $hr-color:                    inherit !default;
-$hr-border-color:             null !default; // Allows for inherited colors
 $hr-border-width:             var(--#{$prefix}border-width) !default;
 $hr-opacity:                  .25 !default;
 $legend-margin-bottom:        .5rem !default;
@@ -116,7 +115,7 @@ $th-font-weight:       null !default;
     margin: $hr-margin-y 0;
     color: $hr-color; // 1
     border: 0;
-    border-top: $hr-border-width solid $hr-border-color;
+    border-top: $hr-border-width solid var(--#{$prefix}hr-border-color);
     opacity: $hr-opacity;
   }
 

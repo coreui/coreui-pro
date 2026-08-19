@@ -59,6 +59,7 @@ $mark-bg:    light-dark($yellow-100, $yellow-800) !default;
 
 $icon-size-base: 1rem !default;
 
+$hr-border-color:             currentcolor !default;
 $line-height-base:            1.5 !default;
 $small-font-size:             .875em !default;
 $font-weight-base:            var(--#{$prefix}font-weight-normal) !default;
@@ -126,6 +127,7 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
     --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
     --#{$prefix}body-font-size: #{$font-size-base};
     --#{$prefix}small-font-size: #{$small-font-size};
+    --#{$prefix}hr-border-color: #{$hr-border-color};
     --#{$prefix}icon-size-base: #{$icon-size-base};
 
     // scss-docs-start root-spacer-loop
