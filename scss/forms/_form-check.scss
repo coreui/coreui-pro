@@ -11,7 +11,6 @@
 
 $form-check-inline-margin-end:    1rem !default;
 
-
 // The values each control's own variables default to. A consumer sets
 // `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
 // what those fall back to, and what still works for a v5-era override.
@@ -30,7 +29,6 @@ $form-check-input-checked-color:          var(--#{$prefix}primary-contrast) !def
 // and the focus / active / disabled states.
 // scss-docs-start form-check-variables
 $form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
-$form-check-padding-start:                $form-check-input-width + .5em !default;
 $form-check-margin-bottom:                .125rem !default;
 $form-check-inline-margin-end:            1rem !default;
 
@@ -48,17 +46,7 @@ $form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !d
 // scss-docs-start form-switch-variables
 $form-switch-color:               rgba($black, .25) !default;
 $form-switch-width:               2em !default;
-$form-switch-padding-start:       $form-switch-width + .5em !default;
-$form-switch-bg-image:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color}'/></svg>") !default;
 $form-switch-border-radius:       $form-switch-width !default;
-$form-switch-transition:          background-position .15s ease-in-out !default;
-
-$form-switch-focus-color:         $input-focus-border-color !default;
-$form-switch-focus-bg-image:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-focus-color}'/></svg>") !default;
-
-$form-switch-checked-color:       $white !default;
-$form-switch-checked-bg-image:    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-checked-color}'/></svg>") !default;
-$form-switch-checked-bg-position: right center !default;
 
 $form-switch-widths: (
   lg: (
@@ -72,13 +60,6 @@ $form-switch-widths: (
 ) !default;
 // scss-docs-end form-switch-variables
 
-// The knob is an inline SVG, so its colour lives inside the image and cannot be
-// a light-dark() pair — the dark scheme gets its own rule below.
-// scss-docs-start form-switch-dark-variables
-$form-switch-color-dark:            rgba($white, .25) !default;
-$form-switch-bg-image-dark:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color-dark}'/></svg>") !default;
-// scss-docs-end form-switch-dark-variables
-
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-check-tokens
@@ -87,11 +68,8 @@ $form-check-tokens: () !default;
 $form-check-tokens: defaults(
   (
     --#{$prefix}form-check-min-height: #{$form-check-min-height},
-    --#{$prefix}form-check-padding-start: #{$form-check-padding-start},
     --#{$prefix}form-check-margin-bottom: #{$form-check-margin-bottom},
     --#{$prefix}form-check-inline-margin-end: #{$form-check-inline-margin-end},
-    --#{$prefix}form-check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
-    --#{$prefix}form-switch-padding-start: #{$form-switch-padding-start},
   ),
   $form-check-tokens
 );
@@ -108,24 +86,6 @@ $form-check-tokens: defaults(
 $form-check-input-tokens: () !default;
 $form-check-input-tokens: defaults(
   (
-    --#{$prefix}form-check-input-width: #{$form-check-input-width},
-    --#{$prefix}form-check-bg: #{$form-check-input-bg},
-    --#{$prefix}form-check-input-border: #{$form-check-input-border},
-    --#{$prefix}form-check-input-border-radius: #{$form-check-input-border-radius},
-    --#{$prefix}form-check-radio-border-radius: #{$form-check-radio-border-radius},
-    --#{$prefix}form-check-input-active-filter: #{$form-check-input-active-filter},
-    --#{$prefix}form-check-input-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}form-check-input-focus-ring: #{$form-check-input-focus-ring},
-    --#{$prefix}form-check-input-checked-bg-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-bg)),
-    --#{$prefix}form-check-input-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
-    --#{$prefix}form-check-input-indeterminate-bg-color: var(--#{$prefix}control-indeterminate-bg),
-    --#{$prefix}form-check-input-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
-    --#{$prefix}form-check-input-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}form-switch-width: #{$form-switch-width},
-    --#{$prefix}form-switch-bg: #{escape-svg($form-switch-bg-image)},
-    --#{$prefix}form-switch-border-radius: #{$form-switch-border-radius},
-    --#{$prefix}form-switch-transition: #{$form-switch-transition},
-    --#{$prefix}form-switch-checked-bg-position: #{$form-switch-checked-bg-position},
   ),
   $form-check-input-tokens
 );
