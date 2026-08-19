@@ -230,83 +230,31 @@ Here's a look at the JavaScript that powers it. Feel free to inspect our own doc
 
 ## Adding theme colors
 
-Adding a new color in `$theme-colors` is not enough for some of our components like [alerts](/components/alerts/) and [list groups](/components/list-group/). New colors must also be defined in `$theme-colors-text`, `$theme-colors-bg-subtle`, and `$theme-colors-border-subtle` for light theme; but also in `$theme-colors-text-dark`, `$theme-colors-bg-subtle-dark`, and `$theme-colors-border-subtle-dark` for dark theme.
-
-This is a manual process because Sass cannot generate its own Sass variables from an existing variable or map. In future versions of Bootstrap, we'll revisit this setup to reduce the duplication.
+A theme color is one entry in the `$theme-colors` map — a map of slots covering both color modes, described on [the Theme page](/customize/theme/). Merge your entry and the library generates everything else: the `--cui-custom-color-*` tokens, the 100–900 runtime scale the slots read, and the `.theme-custom-color` class.
 
 <Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
 
 ```scss
-// Required
 @use "sass:map";
-@use "variables" as *;
-@use "maps" as *;
+@use "@coreui/coreui/scss/theme" as *;
 
-// Add a custom color to $theme-colors
-$custom-colors: (
-  "custom-color": #712cf9
-);
-$theme-colors: map.merge($theme-colors, $custom-colors);
-// Add a custom color to new theme maps
+$theme-colors: map.merge($theme-colors, (
+  "custom-color": (
+    "base":          #712cf9,
+    "contrast":      #fff,
+    "fg":            light-dark(var(--cui-custom-color-600), var(--cui-custom-color-400)),
+    "text-emphasis": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)),
+    "bg-subtle":     light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)),
+    "bg-muted":      light-dark(var(--cui-custom-color-200), var(--cui-custom-color-800)),
+    "border-subtle": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)),
+    "focus-ring":    color-mix(in srgb, var(--cui-custom-color) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+  ),
+));
 
-// Light mode
-$custom-colors-text: ("custom-color": #712cf9);
-$custom-colors-bg-subtle: ("custom-color": #e1d2fe);
-$custom-colors-border-subtle: ("custom-color": #bfa1fc);
-
-$theme-colors-text: map.merge($theme-colors-text, $custom-colors-text);
-$theme-colors-bg-subtle: map.merge($theme-colors-bg-subtle, $custom-colors-bg-subtle);
-$theme-colors-border-subtle: map.merge($theme-colors-border-subtle, $custom-colors-border-subtle);
-
-// Dark mode
-$custom-colors-text-dark: ("custom-color": #e1d2f2);
-$custom-colors-bg-subtle-dark: ("custom-color": #8951fa);
-$custom-colors-border-subtle-dark: ("custom-color": #e1d2f2);
-
-$theme-colors-text-dark: map.merge($theme-colors-text-dark, $custom-colors-text-dark);
-$theme-colors-bg-subtle-dark: map.merge($theme-colors-bg-subtle-dark, $custom-colors-bg-subtle-dark);
-$theme-colors-border-subtle-dark: map.merge($theme-colors-border-subtle-dark, $custom-colors-border-subtle-dark);
-
-// Import CoreUI
-@use "coreui";
-
+@use "@coreui/coreui/scss/coreui";
 ```
 
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
-
-```scss
-// Required
-@import "functions";
-@import "variables";
-
-// Add a custom color to $theme-colors
-$custom-colors: (
-  "custom-color": #712cf9
-);
-$theme-colors: map-merge($theme-colors, $custom-colors);
-
-@import "maps";
-@import "mixins";
-@import "utilities";
-
-// Add a custom color to new theme maps
-
-// The new color gets a --cui-custom-color-100...900 scale in :root, so its
-// emphasis text, subtle background and border can be light-dark() pairs of
-// those stops — one declaration each, covering both color modes.
-$custom-colors-text: ("custom-color": light-dark(var(--cui-custom-color-800), var(--cui-custom-color-200)));
-$custom-colors-bg-subtle: ("custom-color": light-dark(var(--cui-custom-color-100), var(--cui-custom-color-900)));
-$custom-colors-border-subtle: ("custom-color": light-dark(var(--cui-custom-color-300), var(--cui-custom-color-600)));
-
-$theme-colors-text: map-merge($theme-colors-text, $custom-colors-text);
-$theme-colors-bg-subtle: map-merge($theme-colors-bg-subtle, $custom-colors-bg-subtle);
-$theme-colors-border-subtle: map-merge($theme-colors-border-subtle, $custom-colors-border-subtle);
-
-// Remainder of CoreUI for Bootstrap imports
-@import "root";
-@import "reboot";
-// etc
-```
+The slots are `light-dark()` pairs of the runtime scale, so both color modes are covered by the one entry — there is no second, dark set of maps to fill in.
 
 ## Customizing
 

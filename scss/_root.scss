@@ -293,6 +293,4 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
       // scss-docs-end root-dark-mode-vars
     }
   }
-
-  @include generate-theme-classes();
 }
