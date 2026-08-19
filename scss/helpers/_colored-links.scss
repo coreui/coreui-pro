@@ -3,6 +3,7 @@
 @use "../functions/color-contrast" as *;
 @use "../functions/to-rgb" as *;
 @use "../theme" as *;
+@use "../colors" as *;
 @use "../config" as *;
 
 $link-shade-percentage:                   20% !default;

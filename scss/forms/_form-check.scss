@@ -6,6 +6,7 @@
 @use "../mixins/color-mode" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
+@use "../colors" as *;
 @use "../config" as *;
 
 $form-check-inline-margin-end:    1rem !default;
