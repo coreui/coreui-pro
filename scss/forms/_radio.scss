@@ -9,7 +9,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// The radio's own theming surface — see the note in `_checkbox.scss`.
 
 // scss-docs-start radio-variables
 $radio-size:              $form-check-input-width !default;
@@ -47,14 +46,10 @@ $radio-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function, function-disallowed-list
 
-// The v5 spelling is an alias of this control rather than a second
-// implementation, so it is part of its selector list;
-// `$enable-deprecated-form-check: false` compiles it out.
 // stylelint-disable-next-line scss/at-function-named-arguments
 $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-input[type=radio]"; else: ".radio") !default;
 
 @layer forms {
-  // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
   #{$radio-selector} {
     @include tokens($radio-tokens);
 
@@ -62,8 +57,6 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     flex-shrink: 0;
     width: var(--#{$prefix}radio-size);
     height: var(--#{$prefix}radio-size);
-    // Half the leading, so the control sits on the text's optical centre — the
-    // alignment the `.form-check` wrapper used to apply, now following the size.
     margin-top: var(--#{$prefix}radio-margin-top);
     vertical-align: top;
     appearance: none;
@@ -117,7 +110,6 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     }
   }
 
-  // Same ladder as the checkbox, so a row mixing the two lines up.
   @each $size, $map in $check-sizes {
     .radio-#{$size} {
       --#{$prefix}radio-size: #{map.get($map, "size")};

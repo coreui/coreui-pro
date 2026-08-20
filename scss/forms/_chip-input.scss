@@ -37,9 +37,6 @@ $chip-input-gap-lg:            .5rem !default;
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start chip-input-css-vars
-// The frame — padding, typography, colors, border, transition — is the shared
-// text-control appearance, so it goes in the --#{$prefix}control-* namespace;
-// min-height and gap are the only chip-input-specific knobs.
 $chip-input-tokens: () !default;
 $chip-input-tokens: defaults(
   (
@@ -64,8 +61,6 @@ $chip-input-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
-  // The frame, the focus and the disabled treatment come from
-  // `.form-control-group`; chips need the row to wrap and their own spacing.
   .chip-input {
     @include tokens($chip-input-tokens);
 
@@ -89,7 +84,6 @@ $chip-input-tokens: defaults(
     outline: 0;
   }
 
-  // Sizing variants
   .chip-input-lg {
     --#{$prefix}chip-input-min-height: #{$chip-input-min-height-lg};
     --#{$prefix}control-padding-y: #{$chip-input-padding-y-lg};

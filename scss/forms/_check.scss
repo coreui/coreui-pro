@@ -15,16 +15,9 @@ $check-bg:                   $form-check-input-bg !default;
 $check-border:               $form-check-input-border !default;
 $check-border-radius:        $form-check-input-border-radius !default;
 $check-mark-color:           $form-check-input-checked-color !default;
-// The marks are masks, so their colour comes from the element and the SVG only
-// carries the shape — `currentColor` in the path would be painted over anyway.
 $check-mark-checked:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
 $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
 
-// The size ladder shared by checkbox and radio. `lg` is the height of
-// `.switch-lg`, so a row mixing the three lines up.
-// Upstream's shape — an explicit size, margin and label font per step — with the
-// values recomputed for our scale: the box matches the label's font size, and the
-// margin is half that step's leading, so the control sits on the text's centre.
 $check-sizes: (
   sm: (size: .875rem, margin-top: .21875rem, font-size: var(--#{$prefix}font-size-sm)),
   lg: (size: 1.25rem, margin-top: .3125rem, font-size: var(--#{$prefix}font-size-lg))
@@ -61,18 +54,12 @@ $check-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function, function-disallowed-list
 
-// The v5 spelling is an alias of this control rather than a second
-// implementation, so it is part of its selector list;
-// `$enable-deprecated-form-check: false` compiles it out.
-// A v5 switch input is a checkbox too, so it has to be kept out of this list:
-// it would collect the check mark on top of the switch thumb.
+// A v5 switch input is a checkbox too: without the `:not()` it would collect
+// the check mark on top of the switch thumb.
 // stylelint-disable-next-line scss/at-function-named-arguments
 $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-input[type=checkbox]:not(.form-switch *)"; else: ".check") !default;
 
 @layer forms {
-  // The class goes on the `<input>` itself. `appearance: none` lets the control
-  // render pseudo-elements, so the mark is drawn on the input — no wrapper, and
-  // the mark's colour is a token rather than a value baked into an SVG.
   #{$check-selector} {
     @include tokens($check-tokens);
 
@@ -80,8 +67,6 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
     flex-shrink: 0;
     width: var(--#{$prefix}check-size);
     height: var(--#{$prefix}check-size);
-    // Half the leading, so the control sits on the text's optical centre — the
-    // alignment the `.form-check` wrapper used to apply, now following the size.
     margin-top: var(--#{$prefix}check-margin-top);
     vertical-align: top;
     appearance: none;
@@ -145,14 +130,11 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
     }
   }
 
-  // A size is one token: the mark scales with the box, and the alignment margin
-  // is computed from the same value, so nothing has to be re-tuned by hand.
   @each $size, $map in $check-sizes {
     .check-#{$size} {
       --#{$prefix}check-size: #{map.get($map, "size")};
       --#{$prefix}check-margin-top: #{map.get($map, "margin-top")};
 
-      // The label is a sibling, so it does not inherit anything from the control.
       + label {
         font-size: #{map.get($map, "font-size")};
       }

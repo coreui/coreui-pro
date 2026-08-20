@@ -3,7 +3,6 @@
 @use "../config" as *;
 @use "form-control-group" as *;
 
-// Multi Select
 // scss-docs-start form-multi-select-variables
 
 $form-multi-select-selection-tags-gap:        .25rem !default;
@@ -32,25 +31,21 @@ $form-multi-select-tokens: defaults(
 
     position: relative;
 
-    // An open popup takes the focus away from the frame, but the control is
-    // still the one being operated — active treatment, no ring.
     &.show {
       @include form-control-group-active();
     }
 
-    // A native focus on the overlaid select, on the other hand, really is here.
     &:has(> select:focus) {
       @include form-control-group-focus();
     }
 
-    // The chevron turns when the popup opens.
     &.show .form-control-action {
       transform: rotate(180deg);
     }
   }
 
-  // The native select stays in the DOM as an invisible overlay covering the control
-  // so native `required` constraint validation focuses and anchors over the field.
+  // An invisible overlay so native `required` validation focuses and anchors
+  // over the field.
   // stylelint-disable-next-line selector-no-qualifying-type
   select.form-multi-select,
   [data-coreui-multi-select] {
@@ -73,8 +68,6 @@ $form-multi-select-tokens: defaults(
     min-width: 0;
   }
 
-  // The frame carries the padding; tags only need their own spacing. They also
-  // sit a touch tighter than the text, hence the negative inline margin.
   .form-multi-select-selection-tags {
     gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
     align-content: center;

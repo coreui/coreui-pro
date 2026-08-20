@@ -61,8 +61,6 @@ $form-otp-tokens: defaults(
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-otp-control-tokens
-// .form-otp-control is the input itself, so it carries the shared control
-// tokens rather than inheriting them from the .form-otp wrapper.
 $form-otp-control-tokens: () !default;
 $form-otp-control-tokens: defaults(
   (

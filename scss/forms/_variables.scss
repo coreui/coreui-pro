@@ -3,9 +3,8 @@
 @use "../theme" as *;
 @use "../config" as *;
 
-// The control contract: every field component draws its frame with these.
-// A variables-only partial on purpose — pulling it into a module that loads
-// early must not drag a `@layer` block above the `@layer` order declaration.
+// Variables only, no rules: importing this from a module that loads early must
+// not drag a `@layer` block above the `@layer` order declaration.
 
 // scss-docs-start form-input-variables
 $input-padding-y:                       var(--#{$prefix}btn-input-padding-y) !default;
@@ -79,9 +78,7 @@ $form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://w
 // scss-docs-end form-feedback-variables
 
 // scss-docs-start form-validation-states
-// A validation state is a name pointing at a theme colour; every value the
-// mixin needs is a slot of that colour, so the states carry no colours of their
-// own. `icon` stays here because the SVG bakes its fill in at build time.
+// `icon` stays a Sass value because the SVG bakes its fill in at build time.
 $form-validation-states: (
   "valid": (
     "theme": "success",
@@ -94,9 +91,6 @@ $form-validation-states: (
 ) !default;
 // scss-docs-end form-validation-states
 
-// The values each control's own variables default to. A consumer sets
-// `$check-*` / `$radio-*` / `$switch-*` (documented on their pages); these are
-// what those fall back to, and what still works for a v5-era override.
 // scss-docs-start form-check-defaults
 $form-check-input-width:                  1em !default;
 
@@ -108,8 +102,6 @@ $form-check-radio-border-radius:          50% !default;
 $form-check-input-checked-color:          var(--#{$prefix}primary-contrast) !default;
 // scss-docs-end form-check-defaults
 
-// What the wrapper owns and what all three controls share: the row, the label,
-// and the focus / active / disabled states.
 // scss-docs-start form-check-variables
 $form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
 $form-check-margin-bottom:                .125rem !default;

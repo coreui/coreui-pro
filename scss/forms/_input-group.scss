@@ -18,9 +18,6 @@ $input-group-addon-border-color:        $input-border-color !default;
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start input-group-tokens
-// The addon matches the text controls it sits next to, so its sizing lives in
-// the shared --#{$prefix}control-* namespace; only the addon-specific looks
-// keep the --#{$prefix}input-group-addon-* names.
 $input-group-tokens: () !default;
 $input-group-tokens: defaults(
   (
