@@ -12,8 +12,7 @@
 // the DialogBase behavior (and the `:root.dialog-open` scroll lock defined in
 // _modal.scss) with Modal.
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 
 // scss-docs-start dialog-variables
 $dialog-padding:                    var(--#{$prefix}spacer-3) !default;

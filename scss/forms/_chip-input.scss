@@ -34,8 +34,7 @@ $chip-input-border-radius-lg:  var(--#{$prefix}border-radius-lg) !default;
 $chip-input-gap-lg:            .5rem !default;
 // scss-docs-end chip-input-variables
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start chip-input-css-vars
 // The frame — padding, typography, colors, border, transition — is the shared
@@ -62,8 +61,7 @@ $chip-input-tokens: defaults(
 );
 // scss-docs-end chip-input-css-vars
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
   // The frame, the focus and the disabled treatment come from

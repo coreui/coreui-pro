@@ -67,8 +67,7 @@ $combobox-option-indicator-width:         var(--#{$prefix}check-size, 1em) !defa
 
 $combobox-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start combobox-css-vars
 $combobox-tokens: defaults(
@@ -117,8 +116,7 @@ $combobox-tokens: defaults(
 );
 // scss-docs-end combobox-css-vars
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer components {
   // The chrome comes from the `.popup` primitive the panel carries; the

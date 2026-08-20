@@ -19,8 +19,7 @@ $form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default;
 $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 // scss-docs-end form-file-variables
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-control-tokens
 $form-control-tokens: () !default;
@@ -61,8 +60,7 @@ $form-control-tokens: defaults(
 );
 // scss-docs-end form-control-tokens
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // scss-docs-start form-control-frame-mixin
 @mixin form-control-frame() {
@@ -105,8 +103,7 @@ $form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='h
 // scss-docs-end form-control-select-dark-variables
 
 $form-control-select-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-control-select-tokens
 $form-control-select-tokens: defaults(
@@ -121,8 +118,7 @@ $form-control-select-tokens: defaults(
 );
 // scss-docs-end form-control-select-tokens
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
   .form-control,

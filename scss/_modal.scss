@@ -12,8 +12,7 @@
 // Uses the browser's native dialog element with showModal()/show()/close()
 // APIs, the [open] attribute, and the ::backdrop pseudo-element.
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 
 // scss-docs-start modal-variables
 $modal-inner-padding:               var(--#{$prefix}spacer-3) !default;

@@ -22,8 +22,7 @@ $form-control-group-action-bg:        transparent !default;
 $form-control-group-action-hover-bg:  var(--#{$prefix}tertiary-bg) !default;
 // scss-docs-end form-control-group-variables
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-control-group-tokens
 $form-control-group-tokens: () !default;
@@ -47,8 +46,7 @@ $form-control-group-tokens: defaults(
 );
 // scss-docs-end form-control-group-tokens
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // scss-docs-start form-control-group-active-mixin
 @mixin form-control-group-active() {
