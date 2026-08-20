@@ -10,17 +10,3 @@ $form-text-font-style:                  null !default;
 $form-text-font-weight:                 null !default;
 $form-text-color:                       var(--#{$prefix}secondary-color) !default;
 // scss-docs-end form-text-variables
-
-// scss-docs-start form-switch-variables
-
-$form-switch-widths: (
-  lg: (
-    width: 2.5em,
-    height: 1.25em
-  ),
-  xl: (
-    width: 3em,
-    height: 1.5em
-  )
-) !default;
-// scss-docs-end form-switch-variables

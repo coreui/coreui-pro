@@ -1,3 +1,4 @@
+@use "sass:list";
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "variables" as *;
@@ -29,6 +30,9 @@ $switch-sizes: (
   lg: (height: 1.5rem,  font-size: var(--#{$prefix}font-size-lg)),
   xl: (height: 1.75rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
+
+// The v5 spelling shipped two sizes; both take their height from the map above.
+$form-switch-sizes: ("lg", "xl") !default;
 // scss-docs-end switch-variables
 
 $switch-tokens: () !default;
@@ -152,16 +156,12 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
         font-size: #{map.get($map, "font-size")};
       }
     }
-  }
 
-  @each $size, $map in $form-switch-widths {
-    @if $enable-deprecated-form-check {
+    @if $enable-deprecated-form-check and list.index($form-switch-sizes, $size) {
       // Set on the input — the control declares these tokens itself, so an
       // inherited value would lose to its own declaration.
       .form-switch-#{$size} .form-check-input {
-        --#{$prefix}switch-width: #{map.get($map, "width")};
         --#{$prefix}switch-height: #{map.get($map, "height")};
-        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}control-size)) * .5); // stylelint-disable-line function-disallowed-list
       }
 
       .form-switch-#{$size} {
@@ -170,7 +170,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
 
         .form-check-label {
           // stylelint-disable-next-line function-disallowed-list
-          padding-top: calc((var(--#{$prefix}switch-height) - #{var(--#{$prefix}body-font-size)}) * .5);
+          padding-top: calc((var(--#{$prefix}switch-height) - var(--#{$prefix}body-font-size)) * .5);
         }
       }
     }
