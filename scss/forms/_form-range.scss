@@ -61,9 +61,6 @@ $form-range-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
-// Vendor-prefixed pseudo-elements cannot share a ruleset — one unknown selector
-// drops the whole rule — so the thumb and the track are written once here and
-// included per engine.
 // scss-docs-start form-range-mixins
 @mixin form-range-thumb() {
   width: var(--#{$prefix}range-thumb-width);
@@ -87,7 +84,7 @@ $form-range-tokens: defaults(
 @mixin form-range-track() {
   width: var(--#{$prefix}range-track-width);
   height: var(--#{$prefix}range-track-height);
-  color: transparent; // Why?
+  color: transparent;
   cursor: var(--#{$prefix}range-track-cursor);
   background-color: var(--#{$prefix}range-track-bg);
   border-color: transparent;
@@ -97,12 +94,6 @@ $form-range-tokens: defaults(
 // scss-docs-end form-range-mixins
 
 @layer forms {
-  // Range
-  //
-  // Style range inputs the same across browsers. Vendor-specific rules for pseudo
-  // elements cannot be mixed. As such, there are no shared styles for focus or
-  // active states on prefixed selectors.
-
   .form-range {
     @include tokens($form-range-tokens);
 
@@ -115,8 +106,6 @@ $form-range-tokens: defaults(
     &:focus-visible {
       outline: 0;
 
-      // Pseudo-elements must be split across multiple rulesets to have an effect.
-      // No box-shadow() mixin for focus accessibility.
       &::-webkit-slider-thumb { @include focus-ring(true); }
       &::-moz-range-thumb     { @include focus-ring(true); }
     }
@@ -126,7 +115,6 @@ $form-range-tokens: defaults(
     }
 
     &::-webkit-slider-thumb {
-      // Webkit specific: the thumb is laid out against the track's box.
       margin-top: calc((var(--#{$prefix}range-track-height) - var(--#{$prefix}range-thumb-height)) * .5); // stylelint-disable-line function-disallowed-list
       @include form-range-thumb();
     }

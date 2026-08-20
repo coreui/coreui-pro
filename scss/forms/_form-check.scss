@@ -6,15 +6,12 @@
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-check-tokens
-// Tokens the wrapper owns; the input reads them by inheritance.
 $form-check-tokens: () !default;
 $form-check-tokens: defaults(
   (
     --#{$prefix}form-check-min-height: #{$form-check-min-height},
     --#{$prefix}form-check-margin-bottom: #{$form-check-margin-bottom},
     --#{$prefix}form-check-inline-margin-end: #{$form-check-inline-margin-end},
-    // Null knobs reach `defaults()` unquoted so the key is dropped rather than
-    // emitted empty; the declarations fall back to `inherit`.
     --#{$prefix}form-check-label-color: $form-check-label-color,
     --#{$prefix}form-check-label-cursor: $form-check-label-cursor,
   ),
@@ -26,8 +23,6 @@ $form-check-tokens: defaults(
 
 @layer forms {
   @if $enable-deprecated-form-check {
-    // What the aliases cannot express: the stacked rhythm the wrapper added, the
-    // inline row, and the reversed order.
     .form-check {
       @include tokens($form-check-tokens);
 

@@ -13,8 +13,6 @@ $form-label-color:                      null !default;
 
 $form-label-tokens: () !default;
 
-// A null knob has to reach `defaults()` unquoted — interpolating it here would
-// emit an empty token and shadow the `var()` fallback in the declaration.
 // stylelint-disable custom-property-no-missing-var-function
 // stylelint-disable scss/dollar-variable-default
 
@@ -35,10 +33,6 @@ $form-label-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function
 
 @layer forms {
-  //
-  // Labels
-  //
-
   .form-label,
   .col-form-label {
     @include tokens($form-label-tokens);

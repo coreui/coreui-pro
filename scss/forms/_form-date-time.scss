@@ -14,10 +14,8 @@ $form-date-time-section-focus-bg:        color-mix(in srgb, var(--#{$prefix}them
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-date-time-tokens
-// Only the section-level knobs live here. The frame is `.form-control` on the
-// same element, so its --#{$prefix}control-* tokens are already in scope and
-// must not be redeclared — that would shadow `.form-control` and validation
-// state overrides.
+// Redeclaring a --#{$prefix}control-* token here would shadow `.form-control`
+// on the same element, and with it the validation states.
 $form-date-time-tokens: () !default;
 $form-date-time-tokens: defaults(
   (
@@ -32,26 +30,17 @@ $form-date-time-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer forms {
-  // A cleaner next to a section field only means something once the field holds
-  // a value — the field itself reports that with `.form-date-time-filled`. The
-  // first half of the selector keeps this to groups built around such a field:
-  // other components decide their cleaner's visibility themselves.
   .form-control-group:has(> .form-date-time):not(:has(> .form-date-time-filled)) > .form-control-cleaner {
     display: none;
   }
 
-  // The component element carries `.form-control` for the base look, sizing
-  // (`.form-control-sm`/`-lg`), validation states, and input group support.
-  // This layer only covers what a div of contenteditable sections needs on top
-  // of it: `:focus`/`:disabled` don't apply to the wrapper, so their styles are
-  // re-bound to `:focus-within` and the `.disabled` class.
   .form-date-time {
     @include tokens($form-date-time-tokens);
 
     display: flex;
     align-items: center;
-    // Hold the final height before initialization — the sections are injected
-    // by JS, so an empty container would collapse and flash on load.
+    // The sections are injected by JS; without this the empty container
+    // collapses and flashes on load.
     min-height: var(--#{$prefix}btn-input-min-height);
     cursor: text;
 
@@ -108,16 +97,12 @@ $form-date-time-tokens: defaults(
     white-space: pre;
   }
 
-  // While the whole field is empty the separators are part of the mask
-  // placeholder, so they take the placeholder color too.
   .form-date-time:not(.form-date-time-filled) .form-date-time-separator {
     color: var(--#{$prefix}form-date-time-placeholder-color);
   }
 
-  // `.form-floating` drives its label with `:placeholder-shown`, which never
-  // matches a div, so the field would render as permanently "filled". Re-bind
-  // the float to `:focus-within` and the JS-managed `.form-date-time-filled`
-  // class, and hide the mask placeholders while the label rests in the field.
+  // `:placeholder-shown` never matches a div, so the float is re-bound to
+  // `:focus-within` and the JS-managed `.form-date-time-filled`.
   .form-floating > .form-date-time {
     height: var(--#{$prefix}form-floating-height);
     min-height: var(--#{$prefix}form-floating-height);

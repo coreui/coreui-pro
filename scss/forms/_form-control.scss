@@ -23,8 +23,6 @@ $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-control-tokens
-// The --#{$prefix}control-* namespace is shared by every form control, so a
-// control never has to read another component's Sass variables to line up.
 $form-control-tokens: () !default;
 $form-control-tokens: defaults(
   (
@@ -67,9 +65,6 @@ $form-control-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function
 
 // scss-docs-start form-control-frame-mixin
-// The visual frame of a control, without the layout. `.form-control` is one
-// consumer; `.form-control-group` — a group of parts that has to read as a
-// single control — is the other, so the frame is described once.
 @mixin form-control-frame() {
   padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
   font-family: var(--#{$prefix}control-font-family);
@@ -93,9 +88,6 @@ $form-control-tokens: defaults(
 }
 // scss-docs-end form-control-frame-mixin
 
-
-// The chevron a `<select>` draws in place of the native arrow, and the geometry
-// that makes room for it. Everything else a select needs is `.form-control`.
 // scss-docs-start form-control-select-variables
 $form-control-select-indicator-color:      $gray-800 !default;
 $form-control-select-indicator:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
@@ -107,7 +99,6 @@ $form-control-select-feedback-icon-position: center right var(--#{$prefix}contro
 $form-control-select-feedback-icon-size:   $input-height-inner-half $input-height-inner-half !default;
 // scss-docs-end form-control-select-variables
 
-// The colour lives inside the inline SVG, so it cannot be a light-dark() pair.
 // scss-docs-start form-control-select-dark-variables
 $form-control-select-indicator-color-dark: rgba($white, .87) !default;
 $form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
@@ -134,10 +125,6 @@ $form-control-select-tokens: defaults(
 // stylelint-enable custom-property-no-missing-var-function
 
 @layer forms {
-  //
-  // General form controls (plus a few specific high-level interventions)
-  //
-
   .form-control,
   .form-select {
     @include tokens($form-control-tokens);
@@ -318,9 +305,6 @@ $form-control-select-tokens: defaults(
     }
   }
 
-  // A `<select>` draws its own chevron because `appearance: none` takes the
-  // native one away. `.form-control-caret` puts the same on an element that is
-  // not a select; `.form-select` is the deprecated spelling of both.
   // stylelint-disable selector-no-qualifying-type
   select.form-control,
   .form-control-caret,

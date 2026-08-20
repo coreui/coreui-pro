@@ -5,8 +5,6 @@
 
 $form-text-tokens: () !default;
 
-// A null knob has to reach `defaults()` unquoted — interpolating it here would
-// emit an empty token and shadow the `var()` fallback in the declaration.
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-text-css-vars
@@ -25,10 +23,6 @@ $form-text-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer forms {
-  //
-  // Form text
-  //
-
   .form-text {
     @include tokens($form-text-tokens);
 
