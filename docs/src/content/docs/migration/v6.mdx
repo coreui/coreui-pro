@@ -1332,6 +1332,22 @@ Multi Select's option indicators moved with it — they render as a decorative
   and thins out the caps to match. Tuned at build time through
   `$card-translucent-bg-opacity`, `$card-translucent-cap-bg-opacity` and
   `$card-translucent-backdrop-filter`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.card-group` attaches its cards from a container query, not a media
+  query.** The `sm` breakpoint is now the width of the nearest query container,
+  which is what a group inside a column actually has to fit — the viewport
+  being wide never meant the group was. Mark an ancestor with
+  [`.contains-inline`](/utilities/container-queries/); without a container the
+  query has nothing to read and the cards stay stacked at every width.
+
+#### List group
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.list-group-horizontal-{sm|md|lg|xl|xxl}` turns horizontal from a
+  container query.** Same change and same fix as `.card-group`: put
+  [`.contains-inline`](/utilities/container-queries/) on an ancestor, or the
+  list stays vertical. Plain `.list-group-horizontal` is unconditional and
+  needs no container.
 
 ### Sass architecture & design tokens
 

@@ -165,12 +165,15 @@ $list-group-tokens: defaults(
   // Horizontal
   //
   // Change the layout of list group items from vertical (default) to horizontal.
+  // The responsive variants read the width of the nearest query container — put
+  // `.contains-inline` on an ancestor, or the query has nothing to measure and
+  // the direction never switches.
 
   @each $breakpoint in map.keys($grid-breakpoints) {
-    @include media-breakpoint-up($breakpoint) {
-      $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
-      .list-group-horizontal#{$infix} {
+    .list-group-horizontal#{$infix} {
+      @include container-breakpoint-up($breakpoint) {
         flex-direction: row;
 
         > .list-group-item {
