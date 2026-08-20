@@ -268,7 +268,7 @@ CoreUI's button component is built with a base-modifier class approach. This mea
 
 There are two mixins for buttons: a variant mixin and a size mixin. Both live in `scss/_buttons.scss`.
 
-`button-variant()` takes a variant name rather than colors. It reads that variant's entry from `$button-variants`, which maps each button token to a `--#{$prefix}theme-*` token, and derives the hover and active states from the same token in CSS. That is what lets a theme color you add yourself get correct states without compiling Sass.
+`button-variant()` takes a variant name rather than colors. It reads that variant's entry from `$button-variants`, which maps each button token to a `--cui-theme-*` token, and derives the hover and active states from the same token in CSS. That is what lets a theme color you add yourself get correct states without compiling Sass.
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-variants" />
 

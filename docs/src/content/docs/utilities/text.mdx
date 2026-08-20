@@ -88,8 +88,8 @@ heading-sized stop comes with heading leading rather than body leading:
   <p class="text-sm">.text-sm text</p>`} />
 
 Customize the scale by modifying the `$font-sizes` Sass map. Each stop carries
-both values, and `:root` gets a `--#{$prefix}font-size-*` and
-`--#{$prefix}line-height-*` token per stop, so a stop can also be restyled at
+both values, and `:root` gets a `--cui-font-size-*` and
+`--cui-line-height-*` token per stop, so a stop can also be restyled at
 runtime:
 
 <ScssDocs file="scss/_root.scss" capture="root-font-size-loop" />
@@ -109,7 +109,7 @@ Quickly change the `font-weight` or `font-style` of text with these utilities. `
 
 <AddedIn version="6.0.0" />
 
-The weights come from one `$font-weights` map, which generates the `.fw-*` classes and a `--#{$prefix}font-weight-{name}` custom property each. Adding a step therefore adds its utility:
+The weights come from one `$font-weights` map, which generates the `.fw-*` classes and a `--cui-font-weight-{name}` custom property each. Adding a step therefore adds its utility:
 
 ```scss
 @use "@coreui/coreui-pro" with (
