@@ -46,12 +46,8 @@ $input-group-tokens: defaults(
     align-items: stretch;
     width: 100%;
 
-    > .autocomplete,
-    > .date-picker,
-    > .time-picker,
     > .form-control,
     > .form-control-group,
-    > .form-multi-select,
     > .form-select,
     > .form-floating {
       position: relative; // For focus state's z-index
@@ -61,11 +57,7 @@ $input-group-tokens: defaults(
     }
 
     // Bring the "active" form control to the top of surrounding elements
-    > .autocomplete:focus-within,
-    > .date-picker:focus-within,
-    > .time-picker:focus-within,
     > .form-control-group:focus-within,
-    > .form-multi-select:focus-within,
     > .form-control:focus,
     > .form-select:focus,
     > .form-floating:focus-within {
