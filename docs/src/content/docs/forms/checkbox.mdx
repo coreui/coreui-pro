@@ -14,7 +14,7 @@ Put `.check` on the `<input type="checkbox">`. That is the whole control — no 
 
 The input and its `<label>` stay siblings rather than the input sitting inside the label, so the label can be styled from the input's state (`:checked`, `:disabled`) with the sibling selector. Relate them with `id` and `for`, and reach for [`.form-field`](/forms/field/) when you want the label, a description and validation feedback laid out for you.
 
-The check and indeterminate marks are drawn with a CSS mask on the input's own `::before`, which is why their colour is a token (`--#{'{'}$prefix{'}'}check-mark-color`) rather than a value baked into an SVG.
+The check and indeterminate marks are drawn with a CSS mask on the input's own `::before`, which is why their colour is a token (`--cui-check-mark-color`) rather than a value baked into an SVG.
 
 ## Basic checkbox
 

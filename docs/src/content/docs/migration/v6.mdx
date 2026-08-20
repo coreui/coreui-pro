@@ -706,7 +706,7 @@ declaration.
   computed property, `.form-select` and `.form-control` on the same `<select>`
   differed in exactly ten — the eight `background-*` that draw the chevron and
   the padding that makes room for it. Everything else already came from the
-  shared `--#{$prefix}control-*` tokens.
+  shared `--cui-control-*` tokens.
 - **`<select class="form-control">` used to render without any arrow at all** —
   `.form-control` sets `appearance: none`, which removes the native one, and
   nothing put ours back. That is fixed by the same change.
@@ -724,11 +724,11 @@ declaration.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The `$form-select-*` Sass variables are gone**, along with
   `scss/forms/_form-select.scss`. Most were pass-throughs to `$input-*` /
-  `--#{$prefix}btn-input-*` and their `.form-control` equivalents apply
+  `--cui-btn-input-*` and their `.form-control` equivalents apply
   unchanged; the chevron's own are renamed `$form-control-select-*`. The runtime
-  tokens move with them: `--#{$prefix}form-select-bg-img` →
-  `--#{$prefix}control-select-bg-img`, `-bg-position`, `-bg-size`,
-  `-indicator-padding` → `--#{$prefix}control-select-padding-end`, and the
+  tokens move with them: `--cui-form-select-bg-img` →
+  `--cui-control-select-bg-img`, `-bg-position`, `-bg-size`,
+  `-indicator-padding` → `--cui-control-select-padding-end`, and the
   `-feedback-icon-*` pair.
 - **Two differences a select inherits from `.form-control`,** neither of which
   changed a rendered box in any case measured. It paints its background with
@@ -799,8 +799,8 @@ both still works; the component only removes on `dispose()` a class it added.
   radius, background and theming all come from the form-check surface and the
   two stay in lockstep. The per-indicator look variables are gone with
   them — only `$combobox-option-indicator-width` survives, and it defaults to
-  `var(--#{$prefix}form-check-input-width)`. Theme the option checkbox through
-  `$form-check-*` / `--#{$prefix}form-check-*` instead.
+  `var(--cui-form-check-input-width)`. Theme the option checkbox through
+  `$form-check-*` / `--cui-form-check-*` instead.
 
 #### Password Input and Number Input build their own frame
 
@@ -1056,7 +1056,7 @@ adornment in the library — so the button needs no icon markup at all:
 `.check`, `.radio` and `.switch` go on the `<input>` itself. There is no wrapper
 and no second element: `appearance: none` lets the control render a
 pseudo-element, so the mark is drawn on the input, and its colour is a token
-(`--#{$prefix}check-mark-color`) rather than a value baked into an SVG. The
+(`--cui-check-mark-color`) rather than a value baked into an SVG. The
 separate dark-mode switch artwork is gone with it — a thumb painted from a token
 follows the colour scheme by itself.
 
@@ -1088,13 +1088,13 @@ feature, and they live with the buttons now rather than with the form check.
 because the compatibility layer draws through the new engine:
 `$form-check-input-checked-bg-image`, `$form-check-radio-checked-bg-image`,
 `$form-check-input-indeterminate-bg-image` and `$form-check-transition`. Their
-replacements are `--#{$prefix}check-mark-checked`,
-`--#{$prefix}radio-mark`, `--#{$prefix}check-mark-indeterminate` and the
+replacements are `--cui-check-mark-checked`,
+`--cui-radio-mark`, `--cui-check-mark-indeterminate` and the
 controls' own transition tokens. `$form-check-label-color` and
 `-cursor` keep working. `$form-check-btn-check-disabled-opacity` goes with the
 toggle button's move to the buttons — it duplicated `$btn-disabled-opacity`,
 which is now what the disabled toggle reads, through
-`--#{$prefix}btn-disabled-opacity`.
+`--cui-btn-disabled-opacity`.
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Removed</span>
 **`.form-check-reverse` is gone.** It right-flushed the label and the control as
@@ -1114,19 +1114,19 @@ What replaces the wrapper's modifiers:
 | `.form-check-reverse` | `justify-content: space-between` on the field, or `order` utilities to swap the pair |
 | `.form-switch-lg` / `-xl` | `.switch-lg` / `.switch-xl` |
 
-**The switch is sized by one token, and gains `.switch-sm`.** `--#{$prefix}switch-width`
-is derived from `--#{$prefix}switch-height` through the new
+**The switch is sized by one token, and gains `.switch-sm`.** `--cui-switch-width`
+is derived from `--cui-switch-height` through the new
 `$switch-aspect-ratio` — a plain number, multiplied in the browser — so a size
 sets the height alone. The size classes now
 scale the label as well, matching `.check-sm` / `.radio-lg`; `$switch-sizes`
 replaces the width/height pairs for the new classes, while `$form-switch-widths`
 stays behind the deprecated `.form-switch-lg` / `-xl` in its original `em` scale.
 
-**Fixed: the switch animates again.** `--#{$prefix}switch-transition` carried a
+**Fixed: the switch animates again.** `--cui-switch-transition` carried a
 property name inside it (`background-position .15s ease-in-out`, inherited from
 v5's `$form-switch-transition`), so `transition: inset-inline-start var(…)`
 resolved to something invalid and every switch transition was dropped. It is two
-tokens now — `--#{$prefix}switch-transition-duration` and
+tokens now — `--cui-switch-transition-duration` and
 `-timing` — and the thumb slides rather than the background position.
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -1135,13 +1135,13 @@ tokens now — `--#{$prefix}switch-transition-duration` and
 with an inset shadow; the thumb is white with a drop shadow and turns
 contrast-coloured when checked. A disabled unchecked switch swaps to the
 disabled surface with a faded thumb instead of dimming wholesale; a checked one
-dims. `--#{$prefix}switch-border` splits into `-border-width` and
+dims. `--cui-switch-border` splits into `-border-width` and
 `-border-color`, and `$form-switch-color`, `$form-switch-width` and
 `$form-switch-border-radius` fed only the old look and are removed. The
 deprecated `.form-switch-lg` / `-xl` sizing keeps its original `em` scale.
 
 **The controls animate on shared knobs.** `:root` carries
-`--#{$prefix}control-transition-duration` and `-timing` (an overshoot easing);
+`--cui-control-transition-duration` and `-timing` (an overshoot easing);
 the checkbox tick and the radio dot pop in on them, the boxes' colours animate,
 and the switch thumb slides on the same pair — the three controls move in sync
 and restyle from one place. Reduced motion disables all of it as usual.
@@ -1157,19 +1157,19 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 #### Checkbox, radio and switch: one page became four
 
-- **Each control now owns its custom properties.** `--#{$prefix}checkbox-*`,
-  `--#{$prefix}radio-*` and `--#{$prefix}switch-*` feed the shared implementation
+- **Each control now owns its custom properties.** `--cui-checkbox-*`,
+  `--cui-radio-*` and `--cui-switch-*` feed the shared implementation
   at runtime, so restyling checkboxes no longer drags radios along and no longer
   needs a Sass rebuild. Set them **on the control** — a token an element declares
   for itself cannot be overridden from an ancestor. The old
-  `--#{$prefix}form-check-*` properties still exist and still work; they are the
+  `--cui-form-check-*` properties still exist and still work; they are the
   shared layer underneath.
 - **The control stays on the text baseline when you resize it.** Its `margin-top`
   used to be Sass arithmetic over `$form-check-input-width`, so changing the width
   token at runtime moved the box off the line. It is a `calc()` over the size
   token now.
 - **Sized switches are token overrides.** `.form-switch-lg` / `-xl` set
-  `--#{$prefix}switch-width` and `--#{$prefix}switch-height` instead of writing
+  `--cui-switch-width` and `--cui-switch-height` instead of writing
   their own geometry, so a size the map does not name is two custom properties
   rather than a Sass recompile.
 - The Sass variables behind all of this moved into `scss/forms/_checkbox.scss`,
@@ -1248,7 +1248,7 @@ assembles maps of CSS expressions and the browser resolves them.
 - **Table variants read the theme tokens.**
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   `.table-primary` and friends still exist, but they are generated the way
-  `.btn-primary` is: the class sets `--#{$prefix}theme-*` and the base `.table`
+  `.btn-primary` is: the class sets `--cui-theme-*` and the base `.table`
   rules read it. `$table-variants` is now a **list of colour names**, not a map
   of pre-shifted colours, and `$table-bg-scale` / `$table-border-factor` are
   gone. A theme colour you add yourself now gets a table variant without
@@ -1264,7 +1264,7 @@ assembles maps of CSS expressions and the browser resolves them.
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
-- **Every `--#{$prefix}{name}-rgb` custom property is gone**, along with the
+- **Every `--cui-{name}-rgb` custom property is gone**, along with the
   `$theme-colors-rgb` and `$theme-colors-rgb-dark` maps, the `to-rgb()`
   function's role in `:root`, and the `rgba-css-var()` helper (now
   `translucent-css-var()`). They existed only so
@@ -1331,7 +1331,7 @@ them. A state names a theme colour now, and every value is a slot of it.
   )
 ```
 
-- **`--#{$prefix}form-valid-color`, `-valid-border-color`, `-invalid-color` and
+- **`--cui-form-valid-color`, `-valid-border-color`, `-invalid-color` and
   `-invalid-border-color` are removed**, together with the Sass variables behind
   them (`$form-valid-*`, `$form-invalid-*`, `$form-feedback-valid-color`,
   `$form-feedback-invalid-color`). Retint a state by retinting its theme colour,
@@ -1344,14 +1344,14 @@ them. A state names a theme colour now, and every value is a slot of it.
   they were before.
 - **`$input-btn-focus-color-opacity` is removed.** The validation ring comes
   from the colour's `focus-ring` slot, which reads
-  `--#{$prefix}focus-ring-opacity`; set that instead.
+  `--cui-focus-ring-opacity`; set that instead.
 - **`$focus-ring` is removed and `$focus-ring-color` reads the slot.** The
   colour was `rgba($primary, $focus-ring-opacity)`, resolved at build time, so
-  neither retinting `--#{$prefix}primary` nor changing
-  `--#{$prefix}focus-ring-opacity` at runtime moved the default ring. It is
-  `var(--#{$prefix}primary-focus-ring)` now — the slot every `.theme-*` ring
+  neither retinting `--cui-primary` nor changing
+  `--cui-focus-ring-opacity` at runtime moved the default ring. It is
+  `var(--cui-primary-focus-ring)` now — the slot every `.theme-*` ring
   already mixed from. `$focus-ring` itself only restated
-  `--#{$prefix}focus-ring`, which `_root.scss` composes, so the two variables
+  `--cui-focus-ring`, which `_root.scss` composes, so the two variables
   that read it (`$btn-close-focus-shadow`, `$sidebar-toggler-focus-shadow`)
   take the token instead.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
@@ -1383,9 +1383,9 @@ it at the colour's slots, so nothing is defined in a file that never renders it.
   Bootstrap theme was already overriding the pair to pure white, so it renders
   as before.
 - **Override the colour, not the pair.** Set `$primary` (or
-  `--#{$prefix}primary` at runtime) to move every active state at once, or the
+  `--cui-primary` at runtime) to move every active state at once, or the
   component's own knob to move one. Per instance, `.theme-*` still wins where a
-  component reads `--#{$prefix}theme-*`.
+  component reads `--cui-theme-*`.
 - **The switch has no SVG knob at all any more.** The thumb is painted with
   `background-color` in every state, so `$switch-thumb-bg` and
   `$switch-checked-thumb-bg` are ordinary colour knobs; the v5 knob images and
@@ -1410,7 +1410,7 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   + ));
   ```
 
-  Every `--#{$prefix}{color}-*` custom property keeps its name and its value, so
+  Every `--cui-{color}-*` custom property keeps its name and its value, so
   a runtime override is unaffected.
 - **`$theme-colors` is a map of maps**, so `@each $name, $value in $theme-colors`
   now yields a map. Use `map-slot($theme-colors, "base")` where a flat
@@ -1419,10 +1419,10 @@ editing four blocks. It is a map of maps now — one name, eight slots.
 - **New slots:** `fg` (the state colour readable as text, one step lighter than
   `text-emphasis`), `bg-muted` (between `bg-subtle` and the solid colour) and
   `focus-ring` (the hue the `.theme-*` ring mixes from). They emit
-  `--#{$prefix}{color}-fg`, `-bg-muted` and `-focus-ring`, and reach components
-  as `--#{$prefix}theme-fg`, `--#{$prefix}theme-bg-muted` and
-  `--#{$prefix}theme-focus-ring`; the emphasis text reaches them as
-  `--#{$prefix}theme-fg-emphasis`.
+  `--cui-{color}-fg`, `-bg-muted` and `-focus-ring`, and reach components
+  as `--cui-theme-fg`, `--cui-theme-bg-muted` and
+  `--cui-theme-focus-ring`; the emphasis text reaches them as
+  `--cui-theme-fg-emphasis`.
 
 #### The OTP input defaults to the shared frame
 
@@ -1441,7 +1441,7 @@ alongside it.
 
 #### The input frame is complete on `:root`
 
-The shared `--#{$prefix}btn-input-*` frame gains the slots every field was
+The shared `--cui-btn-input-*` frame gains the slots every field was
 still deriving at Sass level: `border-color`, `border-radius` (with `-sm`/`-lg`),
 `box-shadow`, `font-weight` and the `focus-color`/`-bg`/`-border-color` trio.
 The `$input-*` knobs keep working — they read the tokens now — so a `with()`
@@ -1452,7 +1452,7 @@ root token restyles every text control at once.
   **`$input-focus-border-color` is a `var()` reference, not a Sass colour.**
   It was `tint-color($primary, 50%)`, frozen at build time — retint the
   palette and the focus border stayed on the old primary. It reads
-  `--#{$prefix}btn-input-focus-border-color` now (the same 50% mix, computed
+  `--cui-btn-input-focus-border-color` now (the same 50% mix, computed
   in the browser). Sass colour functions on it no longer compile; override
   the token or the variable with a colour of your own instead.
 
@@ -1503,17 +1503,17 @@ in `_config.scss` next to the breakpoints and the spacing scale. It lives in
 `scss/forms/_form-control.scss` now, with `.form-control` itself.
 
 - **Nothing changes for CSS.** The compiled stylesheet is identical; the
-  `--#{$prefix}control-*` and `--#{$prefix}btn-input-*` tokens are untouched, so
+  `--cui-control-*` and `--cui-btn-input-*` tokens are untouched, so
   runtime customisation is unaffected.
 - **A Sass override needs the new path** when you `@use` the partial directly.
   Overriding through `@use "@coreui/coreui-pro" with (...)` is unchanged.
 - **`$input-btn-*` stays in the config**: those are the values the button and
   the field agree on, and `buttons/_button.scss` reads them.
 - **`$input-height`, `$input-height-sm` and `$input-height-lg` are removed.**
-  They existed to be baked into `--#{$prefix}btn-input-min-height`, which now
-  computes from `--#{$prefix}btn-input-line-height`, `-padding-y` and
+  They existed to be baked into `--cui-btn-input-min-height`, which now
+  computes from `--cui-btn-input-line-height`, `-padding-y` and
   `-border-width` in the browser. Set those tokens, or
-  `--#{$prefix}btn-input-min-height` itself, instead of recompiling.
+  `--cui-btn-input-min-height` itself, instead of recompiling.
 
 #### Shadows are computed at runtime
 
@@ -1524,7 +1524,7 @@ rather than resolved when the stylesheet is built. That is what makes a shadow
 tintable and lets dark mode deepen every shadow at once.
 
 - **`$box-shadow`, `$box-shadow-sm`, `$box-shadow-lg` and `$box-shadow-inset`
-  are replaced by the `$shadows` map.** The `--#{$prefix}box-shadow*` custom
+  are replaced by the `$shadows` map.** The `--cui-box-shadow*` custom
   properties are unchanged in name and in rendered value — they are generated
   from the map — so runtime overrides keep working. Only the Sass override point
   moved:
@@ -1537,15 +1537,15 @@ tintable and lets dark mode deepen every shadow at once.
   A literal value like that opts the entry out of the runtime knobs, which is
   the point of overriding it.
 - **New: `$shadow-color`, `$shadow-strength`, `$shadow-strength-dark`** and the
-  `--#{$prefix}shadow-color` / `--#{$prefix}shadow-strength` tokens they emit.
+  `--cui-shadow-color` / `--cui-shadow-strength` tokens they emit.
   Setting the colour once at the root recolours every shadow in the page,
   components included.
 - **New utilities:** `.shadow-{color}` for the theme colours plus
   `current`/`black`/`white`, and `.shadow-opacity-{25|50|75|100}`. They write
-  `--#{$prefix}shadow-tint` and `--#{$prefix}shadow-opacity`, both registered
+  `--cui-shadow-tint` and `--cui-shadow-opacity`, both registered
   `inherits: false`, so a tinted element does not recolour the shadows nested
   inside it.
-- **Dark mode raises `--#{$prefix}shadow-strength` to 2.5** instead of carrying
+- **Dark mode raises `--cui-shadow-strength` to 2.5** instead of carrying
   a second set of shadow values. The same alpha reads as weaker against a dark
   surface, which is why the light-mode values looked almost absent there.
 
@@ -1682,10 +1682,10 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   select chevron and switch knob SVGs keep a dark counterpart next to their
   component (`$form-select-indicator-dark`, `$form-switch-bg-image-dark`).
 - **Every theme colour gets a 100–900 scale of tokens in `:root`**, mixed at
-  runtime from the colour's own token: `--#{$prefix}primary-100` …
-  `--#{$prefix}primary-900`, for each key of `$theme-colors`. Knobs:
+  runtime from the colour's own token: `--cui-primary-100` …
+  `--cui-primary-900`, for each key of `$theme-colors`. Knobs:
   `$color-tints`, `$color-shades`, `$color-mix-space` (`lab`), `$tint-color`,
-  `$shade-color`. Override `$primary` — or the `--#{$prefix}primary` token at
+  `$shade-color`. Override `$primary` — or the `--cui-primary` token at
   runtime — and the whole family retints.
 - **`-bg-subtle`, `-border-subtle` and `-text-emphasis` are pairs of those
   stops** rather than hand-picked hexes:
@@ -1715,16 +1715,16 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   between colour modes — the old dark variants were a 10% desaturation, which
   upstream does not do either. Consequence: the eight
   `[data#{$data-infix}theme="dark"] .text-bg-*` overrides are gone.
-- **The `--#{$prefix}{name}-dark` root tokens are gone**
-  (`--#{$prefix}body-color-dark`, `--#{$prefix}body-bg-dark`,
-  `--#{$prefix}emphasis-color-dark`, `--#{$prefix}secondary-color-dark`,
-  `--#{$prefix}secondary-bg-dark`, `--#{$prefix}tertiary-color-dark`,
-  `--#{$prefix}tertiary-bg-dark`). They existed so a component could pin the dark
+- **The `--cui-{name}-dark` root tokens are gone**
+  (`--cui-body-color-dark`, `--cui-body-bg-dark`,
+  `--cui-emphasis-color-dark`, `--cui-secondary-color-dark`,
+  `--cui-secondary-bg-dark`, `--cui-tertiary-color-dark`,
+  `--cui-tertiary-bg-dark`). They existed so a component could pin the dark
   palette while the page stayed light; declare `color-scheme: dark` instead and
   the `light-dark()` pairs follow — which is exactly what `.sidebar-dark` now
   does, having dropped its eight token overrides.
 - **`$link-shade-percentage` no longer drives `$link-hover-color`**, which is now
-  `light-dark(var(--#{$prefix}primary-600), var(--#{$prefix}primary-400))`. The
+  `light-dark(var(--cui-primary-600), var(--cui-primary-400))`. The
   variable still exists and still drives the `.link-*-*` hover helpers.
 - **Two dead table knobs were removed**: `$table-th-font-weight` and
   `$table-caption-color`. Reboot owns those declarations, so use `$th-font-weight`
@@ -1745,32 +1745,32 @@ the accordion swapped in a second SVG, the carousel inverted the first with a
 Upstream v6 does the same, with a `mask-icon()` mixin.
 
 - **The accordion's icon is one shape recoloured per state, not two images.**
-  `--#{$prefix}accordion-btn-active-icon` no longer has to carry a second copy
-  of the artwork: it defaults to `--#{$prefix}accordion-btn-icon`, and the open
-  state changes `--#{$prefix}accordion-btn-active-icon-color` instead. Set it
+  `--cui-accordion-btn-active-icon` no longer has to carry a second copy
+  of the artwork: it defaults to `--cui-accordion-btn-icon`, and the open
+  state changes `--cui-accordion-btn-active-icon-color` instead. Set it
   only when the open state is a genuinely different shape — a minus against a
-  plus. New tokens: `--#{$prefix}accordion-btn-icon-color` and
-  `--#{$prefix}accordion-btn-active-icon-color`.
+  plus. New tokens: `--cui-accordion-btn-icon-color` and
+  `--cui-accordion-btn-active-icon-color`.
 - **A custom icon is now a shape, not a coloured image.** Whatever colour you put
   inside `$accordion-button-icon` or `$carousel-control-prev-icon-bg` /
   `$carousel-control-next-icon-bg` is ignored — only the alpha of the SVG is used.
-  Set the colour through the token (`--#{$prefix}accordion-btn-icon-color`,
-  `--#{$prefix}carousel-control-color`).
+  Set the colour through the token (`--cui-accordion-btn-icon-color`,
+  `--cui-carousel-control-color`).
 - **`$accordion-icon-color` and `$accordion-icon-active-color` are
   `currentcolor` now**, not Sass colours — Sass colour functions on them no
   longer work. The icon therefore takes the header's colour in every state, so
-  anything that recolours an open header (`--#{$prefix}accordion-active-color`,
+  anything that recolours an open header (`--cui-accordion-active-color`,
   a `.theme-{color}` class) carries the icon with it. Both tokens stay, for the
   case where the icon is meant to differ from the text.
 - **`$carousel-control-icon-filter` is removed**, with its
-  `--#{$prefix}carousel-control-icon-filter` custom property and its two dark
+  `--cui-carousel-control-icon-filter` custom property and its two dark
   companions (`$carousel-control-icon-filter-dark`,
   `$carousel-dark-control-icon-filter`), along with the four accordion
   dark variables (`$accordion-icon-color-dark`,
   `$accordion-icon-active-color-dark`, `$accordion-button-icon-dark`,
   `$accordion-button-active-icon-dark`). The accordion's dark-mode block is gone
   entirely.
-- **The carousel's colours are tokens.** `--#{$prefix}carousel-control-color` is
+- **The carousel's colours are tokens.** `--cui-carousel-control-color` is
   new; `.carousel-dark` pins the dark side of each pair through
   `$carousel-dark-control-color`, `$carousel-dark-indicator-active-bg` and
   `$carousel-dark-caption-color` (previously `$carousel-*-dark` in
@@ -1996,29 +1996,29 @@ Nothing existing changes; these are additions. See
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
 The opacity utilities compose through custom properties — `.text-opacity-50` sets
-`--#{$prefix}text-opacity` and the colour utilities read it. Custom properties
+`--cui-text-opacity` and the colour utilities read it. Custom properties
 inherit, so the value leaked into every descendant. The colour utilities that
 restate their own opacity (`.text-primary` declares
-`--#{$prefix}text-opacity: 1`) were immune; the ones reading it through a
+`--cui-text-opacity: 1`) were immune; the ones reading it through a
 `var(…, 1)` fallback were not.
 
 Reachable consequences in v5: `.bg-opacity-25` on a container faded every nested
 `.text-bg-*`, and `.link-opacity-50` faded every nested link — including bare
-`<a>` elements, which read `--#{$prefix}link-opacity` too.
+`<a>` elements, which read `--cui-link-opacity` too.
 
 Five names are now registered with
 [`@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/@property) as
 `inherits: false`, so each utility is scoped to the element it is applied to:
-`--#{$prefix}text-opacity`, `--#{$prefix}bg-opacity`,
-`--#{$prefix}border-opacity`, `--#{$prefix}link-opacity`,
-`--#{$prefix}link-underline-opacity`. Upstream v6 does the same.
+`--cui-text-opacity`, `--cui-bg-opacity`,
+`--cui-border-opacity`, `--cui-link-opacity`,
+`--cui-link-underline-opacity`. Upstream v6 does the same.
 
 - **If you relied on the leak** — one `.link-opacity-*` on a wrapper fading a
   whole block of links — put the utility on each element, or set the custom
   property yourself in your own CSS (a hand-written declaration still inherits;
   only the registration changes how *utilities* behave).
 - `.focus-ring-*` is deliberately **not** registered: it writes
-  `--#{$prefix}focus-ring-color`, which is a global `:root` token, and components
+  `--cui-focus-ring-color`, which is a global `:root` token, and components
   read it without a fallback. A custom utility that writes a `:root` token name
   must opt out the same way, with `at-property: false` in its `$utilities` entry.
 - Compiled output is otherwise byte-identical — the five `@property` blocks are
@@ -2168,7 +2168,7 @@ $font-sizes: (
   <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   If you overrode `$font-sizes`, move your values into the new shape. The numeric
   keys live on in `$font-sizes-legacy`, which is derived from the named scale.
-- **`:root` gets `--#{$prefix}font-size-*` and `--#{$prefix}line-height-*` per
+- **`:root` gets `--cui-font-size-*` and `--cui-line-height-*` per
   stop**, and `h1`–`h6` read the tokens instead of the Sass variables. Restyling a
   stop at runtime now moves every heading and utility that uses it.
   `$h1-font-size` … `$h6-font-size` are unchanged and still feed the scale.
@@ -2213,17 +2213,17 @@ box-shadow ring was cut off.
 - **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`, and
   the per-component ones (`$btn-focus-box-shadow`, `$pagination-focus-ring`,
   `$combobox-focus-ring`, `$form-check-input-focus-ring`, …) are removed.
-- **`$focus-ring-blur` is gone**, along with `--#{$prefix}focus-ring-x`,
+- **`$focus-ring-blur` is gone**, along with `--cui-focus-ring-x`,
   `-y` and `-blur`. An outline has no blur or offset vector. **New:**
-  `$focus-ring-offset` / `--#{$prefix}focus-ring-offset` (defaults to `0`), which
-  pushes the ring away from the element, and `--#{$prefix}focus-ring`, the
+  `$focus-ring-offset` / `--cui-focus-ring-offset` (defaults to `0`), which
+  pushes the ring away from the element, and `--cui-focus-ring`, the
   composite shorthand the mixin reads.
 - **`focus-ring()` changed signature** to
   `focus-ring($offset: false, $color: null)`. It no longer emits `outline: 0`.
   Every ring in the library is drawn through it; with no arguments it draws the
   themed ring, and `$color` swaps the hue for one rule — which is how the
   validation states ring in red and green.
-- **`--#{$prefix}focus-ring-offset` actually applies.** The mixin emits
+- **`--cui-focus-ring-offset` actually applies.** The mixin emits
   `outline-offset` wherever a ring is drawn, so one declaration moves every ring
   in or out. It was previously read by the `.focus-ring` helper alone, which
   made the token look supported while doing nothing on any component.
@@ -2242,7 +2242,7 @@ box-shadow ring was cut off.
   ```
 - **`$input-btn-focus-color` no longer reaches the input and control rings.**
   They read the global ring now; set `$focus-ring-color` (or
-  `--#{$prefix}focus-ring-color`) instead. `$input-btn-focus-width` is
+  `--cui-focus-ring-color`) instead. `$input-btn-focus-width` is
   unaffected — it still sizes the validation rings and the button.
 
 **Sizes and colours are unchanged**, so the ring keeps its width
@@ -2273,10 +2273,10 @@ they used to build are generated by a Sass loop over the theme tokens instead.
 Eleven of those were already dead — nothing read them, so removing them changed
 no output at all.
 
-**CSS custom properties** — `--#{$prefix}high-emphasis`,
-`--#{$prefix}medium-emphasis`, `--#{$prefix}disabled`, and the three
-`-inverse` counterparts, plus `--#{$prefix}border-radius-2xl` (use
-`--#{$prefix}border-radius-xxl`).
+**CSS custom properties** — `--cui-high-emphasis`,
+`--cui-medium-emphasis`, `--cui-disabled`, and the three
+`-inverse` counterparts, plus `--cui-border-radius-2xl` (use
+`--cui-border-radius-xxl`).
 
 **Classes** — ten, every one a CoreUI-only addition:
 
@@ -2335,16 +2335,16 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   and `'chips'` used to be the same idea built twice, the default `'tags'`
   being a private copy of the chip without the roles chips carry. Both values
   are still accepted and now produce the same markup, so a selection is a chip
-  everywhere in the library — style it through the `--#{$prefix}chip-*`
+  everywhere in the library — style it through the `--cui-chip-*`
   properties. The `$form-multi-select-tag-*` variables are gone with it.
 
 - **The per-family frame variables are gone.** `$autocomplete-font-size`,
   `$date-picker-border-color`, `$time-picker-focus-bg`,
   `$form-multi-select-padding-y` and the rest of each family's copy of the
   input look mirrored the shared frame value for value — and since the frame
-  declares the `--#{$prefix}control-*` properties on itself, an override
+  declares the `--cui-control-*` properties on itself, an override
   through them never reached it. Theme the frame once through the `$input-*`
-  variables, or per instance through `--#{$prefix}control-*` on
+  variables, or per instance through `--cui-control-*` on
   `.form-control-group`. Each family keeps only the variables for what is
   genuinely its own (placeholder colours, the pickers' footers, the tag row).
 
@@ -2360,7 +2360,7 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   library is the same mark at the same size.
 
   Sass overrides move with the classes. Because the group *is* the control
-  frame, theming `.form-control` — or the `--#{$prefix}control-*` custom
+  frame, theming `.form-control` — or the `--cui-control-*` custom
   properties — now reaches all of these components at once, which is what the
   per-family variables were emulating. The families keep the variables for what
   they actually own (calendars, the time roll, listboxes, chips), and the ones
@@ -2372,11 +2372,11 @@ Prefer the `.d-sidebar-narrow*` names in new markup.
   `$date-picker-dropdown-*`, `$time-picker-dropdown-*`, the chrome half of
   `$combobox-popup-*` and the per-family `-zindex` variables are replaced by
   `$popup-zindex/-bg/-border-width/-border-color/-border-radius/-box-shadow`
-  and the `--#{$prefix}popup-*` custom properties — theme the popup once and
+  and the `--cui-popup-*` custom properties — theme the popup once and
   every field component's panel follows. **The panel fades in and out**, the way
   Menu already animated: `@starting-style` supplies the state to animate from
   and a discrete `display` transition keeps it laid out through the fade, tuned
-  with `--#{$prefix}popup-transition-duration` / `-timing`. Its anchored
+  with `--cui-popup-transition-duration` / `-timing`. Its anchored
   placement is unchanged; a fullscreen mode for mobile is designed at this
   primitive and lands separately.
 - **Validation and sizing ride the standard machinery.** `.is-invalid` /
