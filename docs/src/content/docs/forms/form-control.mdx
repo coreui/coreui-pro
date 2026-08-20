@@ -150,6 +150,12 @@ Learn more about [support for datalist elements](https://caniuse.com/datalist).
 
 ## Customizing
 
+### CSS variables
+
+`.form-label` and `.col-form-label` carry the `--cui-label-*` tokens. Set them on a single label to restyle just that one, or on an ancestor to cover a whole form. The size classes are themselves token overrides: `.col-form-label-lg` sets `--cui-label-padding-y` and `--cui-label-font-size`.
+
+<ScssDocs file="scss/forms/_labels.scss" capture="form-label-css-vars" />
+
 ### SASS variables
 
 `$input-*` are shared across most of our form controls (and not buttons).
