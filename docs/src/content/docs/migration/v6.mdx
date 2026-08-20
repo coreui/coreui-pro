@@ -1906,13 +1906,13 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 #### Buttons
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  **`button-variant()`, `button-outline-variant()` and `button-ghost-variant()`
-  are removed**, and so is `scss/mixins/_buttons.scss`. A variant is a token map
-  now — `$button-solid-tokens`, `$button-outline-tokens`,
-  `$button-subtle-tokens`, `$button-ghost-tokens` — where each button variable
-  names the theme token it reads and the neutral value it falls back to. Adding
-  a variant is a map plus one rule; `$button-variants` collects them and
-  generates both spellings of each class.
+  **`button-variant()` takes a variant name, not a colour pair**, and reads it
+  from `$button-variants`. Each entry of that map names, per state, the theme
+  token a button variable reads and the neutral value behind it; `disabled`
+  repeats `base`. `button-outline-variant()` and `button-ghost-variant()` are
+  **removed** (they are entries in the map now), and `scss/mixins/_buttons.scss`
+  no longer exists — the mixin lives next to the map in
+  `scss/buttons/_button.scss`.
 - **Hover and active shades are computed in CSS** with
   `oklch(from var(--cui-primary) calc(l * …) c h)` instead of precompiled
   `shade-color()`/`tint-color()`. Shades shift slightly (measured 8–23 per RGB

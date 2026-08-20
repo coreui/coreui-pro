@@ -282,9 +282,7 @@ Buttons use local CSS variables on `.btn` for enhanced real-time customization. 
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-tokens" />
 
-Each variant class rewrites those variables from the theme tokens, falling back to a neutral value, which is why one set of rules serves every colour — including a theme colour you add yourself, with no Sass to compile:
-
-<ScssDocs file="scss/buttons/_button.scss" capture="btn-solid-tokens" />
+Each variant class rewrites those variables from the theme tokens, falling back to a neutral value, which is why one set of rules serves every colour — including a theme colour you add yourself, with no Sass to compile.
 
 A brand colour of your own is a theme, not a button: set the theme tokens on a class and every variant follows, in plain CSS.
 
@@ -300,17 +298,17 @@ The variables below are the neutral fallbacks — what a variant renders as when
 
 ### SASS maps
 
-One map per variant decides which theme token each button variable reads, so adding a variant is a map plus a rule, not a new mixin.
-
-<ScssDocs file="scss/buttons/_button.scss" capture="btn-outline-tokens" />
-
-<ScssDocs file="scss/buttons/_button.scss" capture="btn-subtle-tokens" />
-
-<ScssDocs file="scss/buttons/_button.scss" capture="btn-ghost-tokens" />
-
-Both spellings of every variant come out of `$button-variants` — the variant class and the `.btn-{variant}-{color}` class — while `$button-sizes` points each size at the shared `--cui-btn-input-{size}-*` tokens.
+`$button-variants` holds every variant. Each entry names, per state, the theme token a button variable reads and the neutral value behind it; `disabled` repeats `base`. Add an entry and both spellings of the new variant are generated — the variant class and the `.btn-{variant}-{color}` class.
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-variants" />
+
+### SASS mixins
+
+`button-variant()` turns one entry of that map into the button's variables.
+
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-variant-mixin" />
+
+### SASS loops
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-variant-loops" />
 
