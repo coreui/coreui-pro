@@ -1043,6 +1043,29 @@ adornment in the library — so the button needs no icon markup at all:
   from the gap instead of its own margin.
 - **`.btn-icon` (new).** A button that holds nothing but an icon: no padding,
   and its width follows its height, so it stays square at every size.
+- **A variant is a shape, the colour is a theme.** `.btn-solid`, `.btn-outline`,
+  `.btn-subtle` (new) and `.btn-ghost` take their colour from a `.theme-*` class
+  on the button or on any element above it, and each carries the base button
+  styles on its own — `.btn` is no longer required next to them:
+
+  ```diff
+  - <button class="btn btn-primary">Save</button>
+  + <button class="btn-solid theme-primary">Save</button>
+  ```
+
+  **The colour classes keep working** and stay the spelling the docs use:
+  `.btn-primary` is `.btn-solid.theme-primary`, `.btn-outline-primary` is
+  `.btn-outline.theme-primary`, and `.btn-subtle-*` completes the set. What
+  changes is that one rule per variant now serves every colour, so a theme
+  colour of your own gets the whole set for free.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A bare `.btn` is a neutral button, not an invisible one.** It renders in the
+  surface colours (`--cui-secondary-bg`, one step darker on hover) instead of
+  being transparent and unstyled. Buttons that carry a variant or a colour class
+  are unaffected. For the old behaviour use `.btn-ghost`, which is transparent
+  by design.
+- **`.btn-xs` (new).** A fourth size below `.btn-sm`, reading the shared
+  `--cui-btn-input-xs-*` tokens.
 
 #### Navbar
 
@@ -1882,25 +1905,33 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
 
 #### Buttons
 
-- **`button-variant()` changed signature** — it takes a variant name from the
-  new `$button-variants` map (`"solid"`, `"outline"`, `"ghost"`) instead of a
-  color pair, and reads the theme tokens.
-  <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
-  `button-outline-variant()` and `button-ghost-variant()` mixins are **removed**
-  (replaced by map entries), and `scss/mixins/_buttons.scss` no longer exists —
-  the variant and size mixins live in `scss/_buttons.scss`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`button-variant()`, `button-outline-variant()` and `button-ghost-variant()`
+  are removed**, and so is `scss/mixins/_buttons.scss`. A variant is a token map
+  now — `$button-solid-tokens`, `$button-outline-tokens`,
+  `$button-subtle-tokens`, `$button-ghost-tokens` — where each button variable
+  names the theme token it reads and the neutral value it falls back to. Adding
+  a variant is a map plus one rule; `$button-variants` collects them and
+  generates both spellings of each class.
 - **Hover and active shades are computed in CSS** with
-  `oklch(from var(--cui-theme-base) calc(l * …) c h)` instead of precompiled
+  `oklch(from var(--cui-primary) calc(l * …) c h)` instead of precompiled
   `shade-color()`/`tint-color()`. Shades shift slightly (measured 8–23 per RGB
-  channel); `.btn-dark` keeps brightening on hover via the
-  `$btn-lightness-overrides` map. The win: a theme color you add yourself gets
-  correct hover/active states without compiling Sass.
+  channel). The win: a theme color you add yourself gets correct hover/active
+  states without compiling Sass.
 - **The eight shade/tint amount knobs are removed**:
   `$btn-hover-bg-shade-amount`, `$btn-hover-bg-tint-amount`,
   `$btn-hover-border-shade-amount`, `$btn-hover-border-tint-amount` and the four
   `$btn-active-*` counterparts. They fed the Sass mixes that no longer happen.
-  The runtime equivalents are `$btn-hover-lightness`, `$btn-active-lightness` and
-  the per-colour `$btn-lightness-overrides` map.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The interaction shade belongs to the theme, not to the button.** Every
+  `.theme-*` class emits `--cui-theme-hover` and `--cui-theme-active` — its own
+  colour, shifted in lightness — and the button variants read them, so a
+  component that wants "this theme colour, one step darker" no longer has to
+  recompute it. The knobs moved with them: `$btn-hover-lightness`,
+  `$btn-active-lightness` and `$btn-lightness-overrides` are now
+  `$theme-hover-lightness`, `$theme-active-lightness` and
+  `$theme-lightness-overrides` in `scss/_theme.scss` (dark still brightens
+  instead of darkening).
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

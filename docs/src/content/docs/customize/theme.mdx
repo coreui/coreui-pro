@@ -111,3 +111,7 @@ Four style utilities pair a themed surface with its matching text color — comp
 <ScssDocs file="scss/_theme.scss" capture="theme-color-variables" />
 
 <ScssDocs file="scss/_theme.scss" capture="theme-token-refs" />
+
+Each theme class also carries its own interaction shades, computed from the color in the browser, so a component asking for "this color, one step darker" reads a token instead of recomputing it. A color that is already dark brightens instead — that is what the overrides map is for.
+
+<ScssDocs file="scss/_theme.scss" capture="theme-interaction-variables" />
