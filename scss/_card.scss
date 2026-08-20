@@ -8,14 +8,13 @@
 // scss-docs-start card-variables
 $card-spacer-y:                     var(--#{$prefix}spacer-3) !default;
 $card-spacer-x:                     var(--#{$prefix}spacer-3) !default;
-$card-title-spacer-y:               var(--#{$prefix}spacer-2) !default;
+$card-body-gap:                     calc(#{$card-spacer-y} * .5) !default; // stylelint-disable-line function-disallowed-list
 $card-title-color:                  inherit !default;
 $card-subtitle-color:               inherit !default;
 $card-border-width:                 var(--#{$prefix}border-width) !default;
 $card-border-color:                 var(--#{$prefix}border-color-translucent) !default;
 $card-border-radius:                var(--#{$prefix}border-radius) !default;
 $card-box-shadow:                   none !default;
-$card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-x:                $card-spacer-x !default;
 $card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}body-color) 3%, transparent) !default;
@@ -27,6 +26,12 @@ $card-img-overlay-padding:          var(--#{$prefix}spacer-3) !default;
 $card-group-margin:                 $grid-gutter-width * .5 !default;
 // scss-docs-end card-variables
 
+// scss-docs-start card-translucent-variables
+$card-translucent-bg-opacity:       80% !default;
+$card-translucent-cap-bg-opacity:   60% !default;
+$card-translucent-backdrop-filter:  blur(5px) saturate(180%) !default;
+// scss-docs-end card-translucent-variables
+
 $card-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -36,17 +41,16 @@ $card-tokens: defaults(
   (
     --#{$prefix}card-spacer-y: #{$card-spacer-y},
     --#{$prefix}card-spacer-x: #{$card-spacer-x},
-    --#{$prefix}card-title-spacer-y: #{$card-title-spacer-y},
+    --#{$prefix}card-body-gap: #{$card-body-gap},
     --#{$prefix}card-title-color: #{$card-title-color},
     --#{$prefix}card-subtitle-color: #{$card-subtitle-color},
     --#{$prefix}card-border-width: #{$card-border-width},
-    --#{$prefix}card-border-color: var(--#{$prefix}theme-base, #{$card-border-color}),
+    --#{$prefix}card-border-color: #{$card-border-color},
     --#{$prefix}card-border-radius: #{$card-border-radius},
     --#{$prefix}card-box-shadow: #{$card-box-shadow},
-    --#{$prefix}card-inner-border-radius: #{$card-inner-border-radius},
     --#{$prefix}card-cap-padding-y: #{$card-cap-padding-y},
     --#{$prefix}card-cap-padding-x: #{$card-cap-padding-x},
-    --#{$prefix}card-cap-bg: var(--#{$prefix}theme-base, #{$card-cap-bg}),
+    --#{$prefix}card-cap-bg: #{$card-cap-bg},
     --#{$prefix}card-cap-color: #{$card-cap-color},
     --#{$prefix}card-height: #{$card-height},
     --#{$prefix}card-color: #{$card-color},
@@ -71,93 +75,126 @@ $card-tokens: defaults(
     color: var(--#{$prefix}body-color);
     word-wrap: break-word;
     background-color: var(--#{$prefix}card-bg);
-    background-clip: border-box;
-    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    // The card frames nothing itself, but it keeps a zero-width border so a
+    // border utility (an accent bar, say) still has a style to widen.
+    border: 0 solid var(--#{$prefix}card-border-color);
     @include border-radius(var(--#{$prefix}card-border-radius));
     @include box-shadow(var(--#{$prefix}card-box-shadow));
 
     > hr {
-      margin-right: 0;
-      margin-left: 0;
-    }
-
-    > .list-group {
-      border-top: inherit;
-      border-bottom: inherit;
-
-      &:first-child {
-        border-top-width: 0;
-        @include border-top-radius(var(--#{$prefix}card-inner-border-radius));
-      }
-
-      &:last-child  {
-        border-bottom-width: 0;
-        @include border-bottom-radius(var(--#{$prefix}card-inner-border-radius));
-      }
-    }
-
-    // Due to specificity of the above selector (`.card > .list-group`), we must
-    // use a child selector here to prevent double borders.
-    > .card-header + .list-group,
-    > .list-group + .card-footer {
-      border-top: 0;
+      margin-inline: 0;
     }
   }
 
   .card-body {
+    display: flex;
     // Enable `flex-grow: 1` for decks and groups so that card blocks take up
     // as much space as possible, ensuring footers are aligned to the bottom.
     flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--#{$prefix}card-body-gap);
+    align-items: flex-start;
     padding: var(--#{$prefix}card-spacer-y) var(--#{$prefix}card-spacer-x);
     color: var(--#{$prefix}card-color);
+
+    > * {
+      margin-block: 0;
+    }
+  }
+
+
+  // Segment borders
+  //
+  // The card draws no border of its own. Every segment frames itself instead,
+  // so a themed or subtle segment can carry its own border color and a card can
+  // be laid out in either direction from the same rules.
+
+  .card-body,
+  .card-list {
+    border: solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
+    border-width: 0 var(--#{$prefix}card-border-width);
+
+    &:first-child {
+      border-block-start-width: var(--#{$prefix}card-border-width);
+      @include border-top-radius(var(--#{$prefix}card-border-radius));
+    }
+
+    &:last-child {
+      border-block-end-width: var(--#{$prefix}card-border-width);
+      @include border-bottom-radius(var(--#{$prefix}card-border-radius));
+    }
+
+    // A header or footer draws all four of its own edges, so a segment next to
+    // one must not add a second line at the seam.
+    &:not(:last-child, :has(+ .card-footer)) {
+      border-block-end-width: var(--#{$prefix}card-border-width);
+    }
+  }
+
+  .card-title,
+  .card-subtitle,
+  .card-text {
+    align-self: stretch;
   }
 
   .card-title {
-    margin-bottom: var(--#{$prefix}card-title-spacer-y);
     color: var(--#{$prefix}card-title-color);
   }
 
   .card-subtitle {
-    margin-top: calc(-.5 * var(--#{$prefix}card-title-spacer-y)); // stylelint-disable-line function-disallowed-list
-    margin-bottom: 0;
+    margin-block-start: calc(-.5 * var(--#{$prefix}card-body-gap)); // stylelint-disable-line function-disallowed-list
     color: var(--#{$prefix}card-subtitle-color);
-  }
-
-  .card-text:last-child {
-    margin-bottom: 0;
-  }
-
-  .card-link {
-    &:hover {
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      text-decoration: if(sass($link-hover-decoration == underline): none);
-    }
-
-    + .card-link {
-      margin-inline-start: var(--#{$prefix}card-spacer-x);
-    }
   }
 
   .card-header {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
     margin-bottom: 0; // Removes the default margin-bottom of <hN>
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
-    background-color: var(--#{$prefix}card-cap-bg);
-    border-bottom: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}card-cap-bg));
+    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
 
     &:first-child {
-      @include border-radius(var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius) 0 0);
+      @include border-top-radius(var(--#{$prefix}card-border-radius));
     }
   }
 
   .card-footer {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
-    background-color: var(--#{$prefix}card-cap-bg);
-    border-top: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}card-cap-bg));
+    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
 
     &:last-child {
-      @include border-radius(0 0 var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius));
+      @include border-bottom-radius(var(--#{$prefix}card-border-radius));
+    }
+  }
+
+
+  //
+  // Variants
+  //
+
+  .card-subtle {
+    .card-header,
+    .card-footer {
+      color: var(--#{$prefix}theme-fg-emphasis, currentcolor);
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}card-cap-bg));
+      border-color: var(--#{$prefix}theme-border, var(--#{$prefix}card-border-color));
+    }
+
+    .card-body,
+    .card-list {
+      border-color: var(--#{$prefix}theme-border, var(--#{$prefix}card-border-color));
+    }
+  }
+
+  .card-translucent {
+    background-color: color-mix(in oklch, var(--#{$prefix}card-bg) #{$card-translucent-bg-opacity}, transparent);
+    backdrop-filter: $card-translucent-backdrop-filter;
+
+    .card-header,
+    .card-footer {
+      background-color: color-mix(in oklch, var(--#{$prefix}card-cap-bg) #{$card-translucent-cap-bg-opacity}, transparent);
     }
   }
 
@@ -177,15 +214,27 @@ $card-tokens: defaults(
     }
   }
 
-  // Card image
+
+  //
+  // Card images
+  //
+
   .card-img-overlay {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    inset: 0;
     padding: var(--#{$prefix}card-img-overlay-padding);
-    @include border-radius(var(--#{$prefix}card-inner-border-radius));
+    @include border-radius(var(--#{$prefix}card-border-radius));
+  }
+
+  .card-img,
+  .card-img-top,
+  .card-img-bottom,
+  .card-img-start,
+  .card-img-end {
+    // An image cannot draw a border without changing its own box, so it frames
+    // itself with an inset outline that lines up with the segments around it.
+    outline: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    outline-offset: calc(-1 * var(--#{$prefix}card-border-width)); // stylelint-disable-line function-disallowed-list
   }
 
   .card-img,
@@ -196,12 +245,45 @@ $card-tokens: defaults(
 
   .card-img,
   .card-img-top {
-    @include border-top-radius(var(--#{$prefix}card-inner-border-radius));
+    @include border-top-radius(var(--#{$prefix}card-border-radius));
   }
 
   .card-img,
   .card-img-bottom {
-    @include border-bottom-radius(var(--#{$prefix}card-inner-border-radius));
+    @include border-bottom-radius(var(--#{$prefix}card-border-radius));
+  }
+
+  .card-img-start {
+    @include border-start-radius(var(--#{$prefix}card-border-radius));
+  }
+
+  .card-img-end {
+    @include border-end-radius(var(--#{$prefix}card-border-radius));
+  }
+
+
+  //
+  // Horizontal cards
+  //
+
+  .card-row {
+    flex-direction: row;
+
+    .card-body,
+    .card-list {
+      border-width: var(--#{$prefix}card-border-width);
+      border-inline-start-width: 0;
+      @include border-radius(0);
+
+      &:first-child {
+        border-inline-start-width: var(--#{$prefix}card-border-width);
+        @include border-start-radius(var(--#{$prefix}card-border-radius));
+      }
+
+      &:last-child {
+        @include border-end-radius(var(--#{$prefix}card-border-radius));
+      }
+    }
   }
 
 
@@ -225,9 +307,12 @@ $card-tokens: defaults(
         flex: 1 0 0;
         margin-bottom: 0;
 
+        // Each segment frames itself, so at a seam the two neighbouring cards
+        // would draw a line each. Pull every card after the first back over its
+        // predecessor's trailing edge to collapse the pair into one line; a gap
+        // cannot be negative, so this has to be a margin.
         + .card {
-          margin-inline-start: 0;
-          border-inline-start: 0;
+          margin-inline-start: calc(-1 * var(--#{$prefix}card-border-width)); // stylelint-disable-line function-disallowed-list
         }
 
         // Handle rounded corners
@@ -235,30 +320,34 @@ $card-tokens: defaults(
           &:not(:last-child) {
             @include border-end-radius(0);
 
+            > .card-body,
+            > .card-list {
+              @include border-end-radius(0);
+            }
             > .card-img-top,
             > .card-header {
-              // stylelint-disable-next-line property-disallowed-list
-              border-top-right-radius: 0;
+              border-start-end-radius: 0;
             }
             > .card-img-bottom,
             > .card-footer {
-              // stylelint-disable-next-line property-disallowed-list
-              border-bottom-right-radius: 0;
+              border-end-end-radius: 0;
             }
           }
 
           &:not(:first-child) {
             @include border-start-radius(0);
 
+            > .card-body,
+            > .card-list {
+              @include border-start-radius(0);
+            }
             > .card-img-top,
             > .card-header {
-              // stylelint-disable-next-line property-disallowed-list
-              border-top-left-radius: 0;
+              border-start-start-radius: 0;
             }
             > .card-img-bottom,
             > .card-footer {
-              // stylelint-disable-next-line property-disallowed-list
-              border-bottom-left-radius: 0;
+              border-end-start-radius: 0;
             }
           }
         }

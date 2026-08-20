@@ -1303,6 +1303,60 @@ Multi Select's option indicators moved with it — they render as a decorative
   rule targeting it was written `> card-footer`, without the leading dot, so it
   matched an element type that does not exist and never applied.
 
+#### Card: every section frames itself
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The border moved off `.card` and onto its sections.** The header, footer,
+  body and list group each draw their own edges and round the corners they sit
+  in; `.card` keeps only its radius and background. That is what lets one
+  section carry a colour the rest of the card does not — `.card-subtle`, a
+  themed header over a plain body — and what makes a horizontal card the same
+  set of rules turned sideways. Card images carry an inset `outline` instead of
+  a border, so they frame themselves without changing their own box.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A list group inside a card needs `.card-list`.** `.card > .list-group` no
+  longer gets special treatment, because a list can now sit anywhere among the
+  sections rather than only first or last. Add `.card-list` next to
+  `.list-group-flush` and the list frames itself like any other section.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A `.border-{color}` utility on `.card` has nothing to paint.** The card has
+  no edge of its own any more. Colour the frame with a theme class, and use
+  `.card-subtle` where the solid fill is too strong. The card does keep a
+  zero-width border, so the accent-bar recipe still works:
+  `.card.border-top-3.border-top-primary` draws exactly as before.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.card-body` is a flex column.** It spaces its children with
+  `--cui-card-body-gap` and zeroes their block margins, so nothing in a card
+  needs `.mb-*` to sit correctly any more. Two consequences for existing markup:
+  a direct child takes its natural width rather than filling the card (add
+  `.w-100` where a block child has to stretch), and `text-align` no longer
+  moves a button or a link, because they are flex items — use `.mx-auto` or
+  `.ms-auto` instead.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.card-link` is gone**, along with `--cui-card-title-spacer-y`. Both existed
+  to space children the gap now handles; the class's inline margin only ever
+  worked because the links were inline. Wrap them yourself:
+  `<div class="hstack gap-3">…</div>`.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-card-inner-border-radius` is gone.** It described a corner nested
+  inside the card's own border, and there is no such border to nest inside.
+  Every section that sits at the card's edge rounds to
+  `--cui-card-border-radius`, which also removes the one-pixel mismatch between
+  a card that opened with a header and one that opened with a body.
+- **New: `.card-row`** lays a card out along the inline axis, with
+  `.card-img-start` and `.card-img-end` for an image cap on either side. It
+  replaces the `.row.g-0` + `.col-md-*` recipe, which needed a wrapper per
+  section and produced no border between them.
+- **New: `.card-subtle`** swaps the theme's solid fill for its subtle
+  background, border and emphasis text.
+- **New: `.card-translucent`** blurs and saturates whatever is behind the card
+  and thins out the caps to match. Tuned at build time through
+  `$card-translucent-bg-opacity`, `$card-translucent-cap-bg-opacity` and
+  `$card-translucent-backdrop-filter`.
+- **Two adjacent `.card-body` blocks now have a rule between them.** Every
+  section draws a bottom edge unless it is last or a footer follows, so a card
+  split into two bodies reads as two sections rather than one run of padding.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
