@@ -13,6 +13,10 @@ $form-check-tokens: defaults(
     --#{$prefix}form-check-min-height: #{$form-check-min-height},
     --#{$prefix}form-check-margin-bottom: #{$form-check-margin-bottom},
     --#{$prefix}form-check-inline-margin-end: #{$form-check-inline-margin-end},
+    // Null knobs reach `defaults()` unquoted so the key is dropped rather than
+    // emitted empty; the declarations fall back to `inherit`.
+    --#{$prefix}form-check-label-color: $form-check-label-color,
+    --#{$prefix}form-check-label-cursor: $form-check-label-cursor,
   ),
   $form-check-tokens
 );
@@ -32,8 +36,8 @@ $form-check-tokens: defaults(
     }
 
     .form-check-label {
-      color: var(--#{$prefix}form-check-label-color, #{$form-check-label-color});
-      cursor: $form-check-label-cursor;
+      color: var(--#{$prefix}form-check-label-color, inherit);
+      cursor: var(--#{$prefix}form-check-label-cursor, inherit);
     }
 
     .form-check-inline {
