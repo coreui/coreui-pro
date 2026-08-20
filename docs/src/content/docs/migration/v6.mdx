@@ -1032,6 +1032,17 @@ adornment in the library — so the button needs no icon markup at all:
   missing attribute on `DOMContentLoaded`, reading the `.active` class to pick
   the value; an attribute you wrote yourself is left alone. Write it in your
   markup anyway, so the state is correct before our JavaScript runs.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.btn` is a flex container.** It lays its content out in a row, centres it
+  on both axes and separates the parts with `--cui-btn-gap`, so an icon next to
+  a label no longer depends on a whitespace text node in your markup — and no
+  longer gets a second space where you did leave one. `--cui-btn-min-height`
+  keeps a button that holds only an icon as tall as one that holds text. Custom
+  CSS that positioned button content with `display`, `line-height` or margins
+  needs a second look; the caret of a `.dropdown-toggle` now takes its distance
+  from the gap instead of its own margin.
+- **`.btn-icon` (new).** A button that holds nothing but an icon: no padding,
+  and its width follows its height, so it stays square at every size.
 
 #### Navbar
 
@@ -1892,6 +1903,28 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   the per-colour `$btn-lightness-overrides` map.
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The `$btn-*` variables that only forwarded a shared value are removed**:
+  `$btn-color`, `$btn-padding-y`, `$btn-padding-x`, `$btn-font-family`,
+  `$btn-font-size`, `$btn-line-height`, `$btn-border-width`,
+  `$btn-border-radius`, `$btn-disabled-opacity`, `$btn-transition-*` and the
+  `-sm`/`-lg` pairs. They pointed at `--cui-btn-input-*`, so a value assigned to
+  them was overwritten by the token anyway. Configure the frame once on `:root`
+  with the `$input-btn-*` variables, or set `--cui-btn-*` on the button.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`button-size()` is removed.** Sizes are a loop over `$button-sizes`, which
+  points the button's tokens at the matching `--cui-btn-input-{size}-*` set. Add
+  a size by adding its tokens on `:root` and its name to the map.
+- **New tokens on `.btn`:** `--cui-btn-gap`, `--cui-btn-min-height`,
+  `--cui-btn-white-space` and `--cui-btn-transition-property` /
+  `-duration` / `-timing`. The transition was read straight from the shared
+  `--cui-btn-input-*` tokens before, so it could not be retuned per button.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.btn-close` draws its focus ring as an `outline`,** like every other
+  control; `$btn-close-focus-shadow` and `--cui-btn-close-focus-shadow` are
+  removed. A box-shadow ring was clipped by the `overflow: hidden` of the modal,
+  toast or drawer the close button usually sits in. Its geometry is tokens now
+  too: `--cui-btn-close-width`, `-height`, `-padding-x`, `-padding-y`.
 - `.btn-primary`, `.btn-outline-*`, `.btn-ghost-*` class APIs are unchanged.
 - **Toggle buttons: `.btn-check` moves onto the `<label>`, with the input nested
   inside.** A toggle button was two elements held together by an `id`/`for`
