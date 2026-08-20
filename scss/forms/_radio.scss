@@ -11,11 +11,11 @@
 
 
 // scss-docs-start radio-variables
-$radio-size:              $form-check-input-width !default;
-$radio-bg:                $form-check-input-bg !default;
-$radio-border:            $form-check-input-border !default;
-$radio-border-radius:     $form-check-radio-border-radius !default;
-$radio-mark-color:        $form-check-input-checked-color !default;
+$radio-size:              var(--#{$prefix}control-size) !default;
+$radio-bg:                var(--#{$prefix}btn-input-bg) !default;
+$radio-border:            var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
+$radio-border-radius:     50% !default;
+$radio-mark-color:        var(--#{$prefix}primary-contrast) !default;
 $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='black'/></svg>") !default;
 // scss-docs-end radio-variables
 
@@ -34,11 +34,11 @@ $radio-tokens: defaults(
     --#{$prefix}radio-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}radio-mark-color: #{$radio-mark-color},
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
-    --#{$prefix}radio-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}radio-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}radio-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}radio-size)) * .5),
-    --#{$prefix}radio-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}radio-active-filter: #{$form-check-input-active-filter},
-    --#{$prefix}radio-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}radio-focus-border: var(--#{$prefix}control-focus-border-color),
+    --#{$prefix}radio-active-filter: var(--#{$prefix}control-active-filter),
+    --#{$prefix}radio-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
   $radio-tokens
 );

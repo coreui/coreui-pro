@@ -1499,6 +1499,44 @@ The split also removes a trap the shorthand carries: a trailing duration binds
 to the last property only, so adding `color` to the front of the old list would
 have left it at `0s`. The rendered animation is unchanged.
 
+#### `$form-check-*` is now named for what it configures
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The checkbox, the radio and the switch shared their defaults through variables
+named after `.form-check` — the v5 wrapper they no longer use. The names said
+"deprecated wrapper" while the role was "the three current controls":
+
+| v5 | v6 |
+| --- | --- |
+| `$form-check-input-width` | `$control-size` |
+| `$form-check-input-focus-border` | `$control-focus-border` |
+| `$form-check-input-active-filter` | `$control-active-filter` |
+| `$form-check-input-disabled-opacity` | `$control-disabled-opacity` |
+| `$form-check-label-disabled-opacity` | `$control-label-disabled-opacity` |
+| `$form-check-input-checked-bg-color` | `$control-checked-bg` |
+| `$form-check-input-checked-border-color` | `$control-checked-border-color` |
+| `$form-check-input-indeterminate-bg-color` | `$control-indeterminate-bg` |
+| `$form-check-input-indeterminate-border-color` | `$control-indeterminate-border-color` |
+
+All nine sit in `_root.scss` and are emitted as `--cui-control-*` on `:root`,
+so the three controls can also be retuned together without recompiling:
+
+```css
+:root { --cui-control-disabled-opacity: .3; }
+```
+
+`$form-check-input-bg`, `-border`, `-border-radius`, `-checked-color` and
+`$form-check-radio-border-radius` are gone without a replacement: they were one
+control's value reached through another control's name. Set `$check-*`,
+`$radio-*` or `$switch-*` — the variables of the control you mean.
+
+The five that shape the deprecated `.form-check` wrapper keep their names and
+move into `forms/_form-check.scss`, so they leave the build with it.
+
+The class names are unchanged. `.form-check`, `.form-check-input` and
+`.form-check-label` still work exactly as before.
+
 #### The `$input-*` variables are gone; configure the frame once
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

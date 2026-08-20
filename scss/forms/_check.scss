@@ -10,11 +10,11 @@
 @use "../config" as *;
 
 // scss-docs-start check-variables
-$check-size:                 $form-check-input-width !default;
-$check-bg:                   $form-check-input-bg !default;
-$check-border:               $form-check-input-border !default;
-$check-border-radius:        $form-check-input-border-radius !default;
-$check-mark-color:           $form-check-input-checked-color !default;
+$check-size:                 var(--#{$prefix}control-size) !default;
+$check-bg:                   var(--#{$prefix}btn-input-bg) !default;
+$check-border:               var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
+$check-border-radius:        .25em !default;
+$check-mark-color:           var(--#{$prefix}primary-contrast) !default;
 $check-mark-checked:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>") !default;
 $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>") !default;
 
@@ -42,11 +42,11 @@ $check-tokens: defaults(
     --#{$prefix}check-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}check-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
     --#{$prefix}check-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
-    --#{$prefix}check-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}check-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}check-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}check-size)) * .5),
-    --#{$prefix}check-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}check-active-filter: #{$form-check-input-active-filter},
-    --#{$prefix}check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}check-focus-border: var(--#{$prefix}control-focus-border-color),
+    --#{$prefix}check-active-filter: var(--#{$prefix}control-active-filter),
+    --#{$prefix}check-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
   $check-tokens
 );

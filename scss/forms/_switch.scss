@@ -56,11 +56,11 @@ $switch-tokens: defaults(
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
     --#{$prefix}switch-disabled-bg: #{$switch-disabled-bg},
     --#{$prefix}switch-disabled-thumb-bg: #{$switch-disabled-thumb-bg},
-    --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}switch-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
-    --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
-    --#{$prefix}switch-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}switch-focus-border: var(--#{$prefix}control-focus-border-color),
+    --#{$prefix}switch-active-filter: var(--#{$prefix}control-active-filter),
+    --#{$prefix}switch-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
   $switch-tokens
 );
@@ -161,7 +161,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       .form-switch-#{$size} .form-check-input {
         --#{$prefix}switch-width: #{map.get($map, "width")};
         --#{$prefix}switch-height: #{map.get($map, "height")};
-        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - #{$form-check-input-width}) * .5); // stylelint-disable-line function-disallowed-list
+        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}control-size)) * .5); // stylelint-disable-line function-disallowed-list
       }
 
       .form-switch-#{$size} {

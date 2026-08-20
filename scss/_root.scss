@@ -10,10 +10,15 @@
 @use "config" as *;
 
 // scss-docs-start control-state-variables
-$form-check-input-checked-bg-color:             var(--#{$prefix}primary) !default;
-$form-check-input-checked-border-color:         $form-check-input-checked-bg-color !default;
-$form-check-input-indeterminate-bg-color:       var(--#{$prefix}primary) !default;
-$form-check-input-indeterminate-border-color:   $form-check-input-indeterminate-bg-color !default;
+$control-size:                                  1em !default;
+$control-checked-bg:                            var(--#{$prefix}primary) !default;
+$control-checked-border-color:                  $control-checked-bg !default;
+$control-indeterminate-bg:                      var(--#{$prefix}primary) !default;
+$control-indeterminate-border-color:            $control-indeterminate-bg !default;
+$control-focus-border:                          var(--#{$prefix}btn-input-focus-border-color) !default;
+$control-active-filter:                         brightness(90%) !default;
+$control-disabled-opacity:                      .5 !default;
+$control-label-disabled-opacity:                $control-disabled-opacity !default;
 // scss-docs-end control-state-variables
 
 // scss-docs-start variable-gradient
@@ -288,11 +293,16 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
     // State colors shared by every control that can be checked or selected —
     // checkboxes, radios, switches, and the option indicators the autocomplete
     // and multi select draw. Restyle them here once.
-    --#{$prefix}control-checked-bg: #{$form-check-input-checked-bg-color};
-    --#{$prefix}control-checked-border-color: #{$form-check-input-checked-border-color};
-    --#{$prefix}control-indeterminate-bg: #{$form-check-input-indeterminate-bg-color};
-    --#{$prefix}control-indeterminate-border-color: #{$form-check-input-indeterminate-border-color};
+    --#{$prefix}control-checked-bg: #{$control-checked-bg};
+    --#{$prefix}control-checked-border-color: #{$control-checked-border-color};
+    --#{$prefix}control-indeterminate-bg: #{$control-indeterminate-bg};
+    --#{$prefix}control-indeterminate-border-color: #{$control-indeterminate-border-color};
     --#{$prefix}control-disabled-bg: var(--#{$prefix}tertiary-bg);
+    --#{$prefix}control-disabled-opacity: #{$control-disabled-opacity};
+    --#{$prefix}control-label-disabled-opacity: #{$control-label-disabled-opacity};
+    --#{$prefix}control-focus-border-color: #{$control-focus-border};
+    --#{$prefix}control-active-filter: #{$control-active-filter};
+    --#{$prefix}control-size: #{$control-size};
     // Shared motion for the checkbox, radio and switch; the overshoot easing
     // makes the mark pop as it settles.
     --#{$prefix}control-transition-duration: .15s;

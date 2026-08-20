@@ -121,6 +121,6 @@ Switchs read their own custom properties, so restyling one control does not touc
 
 ### Shared variables
 
-The checkbox, the radio and the switch share their focus, active and disabled states, so these are set once rather than per control:
+The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime; the Sass variables behind them set the defaults:
 
-<ScssDocs file="scss/forms/_variables.scss" capture="form-check-variables" />
+<ScssDocs file="scss/_root.scss" capture="control-state-variables" />
