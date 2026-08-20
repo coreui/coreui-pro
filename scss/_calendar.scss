@@ -166,7 +166,11 @@ $calendar-tokens: defaults(
     background-color: var(--#{$prefix}calendar-nav-btn-bg);
     border: var(--#{$prefix}calendar-nav-btn-border-width) solid var(--#{$prefix}calendar-nav-btn-border-color);
     @include border-radius(var(--#{$prefix}calendar-nav-btn-border-radius));
-    @include transition($btn-transition);
+    @include transition-props(
+      var(--#{$prefix}btn-input-action-transition-property),
+      var(--#{$prefix}btn-input-transition-duration),
+      var(--#{$prefix}btn-input-transition-timing)
+    );
 
     &:hover {
       background-color: var(--#{$prefix}calendar-nav-btn-hover-bg);
