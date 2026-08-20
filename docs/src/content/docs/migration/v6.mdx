@@ -1494,6 +1494,39 @@ The split also removes a trap the shorthand carries: a trailing duration binds
 to the last property only, so adding `color` to the front of the old list would
 have left it at `0s`. The rendered animation is unchanged.
 
+#### The `$input-*` variables are gone; configure the frame once
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`$input-padding-y`, `$input-color`, `$input-bg`, `$input-border-radius` and the
+30 others were aliases: each one held nothing but `var(--cui-btn-input-…)`, the
+token the frame already declares on `:root`. Components read them in some places
+and wrote the token out in others, so a Sass override reached part of the
+library and not the rest — `$input-color: lime` recoloured the file-input button
+and the input group addon but not the input's own text.
+
+There is one place to configure the frame now. `$input-btn-*` in `_root.scss`
+holds the values, and every component reads the `--cui-btn-input-*` token it is
+emitted as:
+
+```scss
+// before
+@use "@coreui/coreui-pro" with ($input-padding-y: 1rem);
+
+// after — Sass
+@use "@coreui/coreui-pro" with ($input-btn-padding-y: 1rem);
+```
+
+```css
+/* after — runtime, no recompile */
+:root { --cui-btn-input-padding-y: 1rem; }
+```
+
+Four names stay in `forms/_variables.scss`, because they are geometry derived
+from that frame rather than aliases of it: `$input-height-border`,
+`$input-height-inner`, `$input-height-inner-half` and
+`$input-height-inner-quarter`.
+
 #### The control variables moved out of the shared config
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

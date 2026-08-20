@@ -10,7 +10,7 @@
 // scss-docs-start form-floating-variables
 $form-floating-height:                  calc(3.5rem + #{$input-height-border}) !default;
 $form-floating-line-height:             1.25 !default;
-$form-floating-padding-x:               $input-padding-x !default;
+$form-floating-padding-x:               var(--#{$prefix}btn-input-padding-x) !default;
 $form-floating-padding-y:               1rem !default;
 $form-floating-input-padding-t:         1.625rem !default;
 $form-floating-input-padding-b:         .625rem !default;
@@ -20,9 +20,9 @@ $form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX
 $form-floating-label-disabled-color:    var(--#{$prefix}gray-600) !default;
 // The label is a sibling of the control, so it cannot inherit the control's own
 // background — the textarea mask has to be told the same colour a second time.
-$form-floating-label-bg:                $input-bg !default;
-$form-floating-label-disabled-bg:       $input-disabled-bg !default;
-$form-floating-label-border-radius:     $input-border-radius !default;
+$form-floating-label-bg:                var(--#{$prefix}btn-input-bg) !default;
+$form-floating-label-disabled-bg:       var(--#{$prefix}secondary-bg) !default;
+$form-floating-label-border-radius:     var(--#{$prefix}btn-input-border-radius) !default;
 $form-floating-transition-property:     "opacity, transform" !default;
 $form-floating-transition-duration:     .1s !default;
 $form-floating-transition-timing:       ease-in-out !default;
@@ -85,7 +85,7 @@ $form-floating-tokens: defaults(
       text-overflow: ellipsis;
       white-space: nowrap;
       pointer-events: none;
-      border: $input-border-width solid transparent; // Required for aligning label's text with the input as it affects inner box model
+      border: var(--#{$prefix}btn-input-border-width) solid transparent; // Required for aligning label's text with the input as it affects inner box model
       transform-origin: 0 0;
       @include transition-props(
         var(--#{$prefix}form-floating-transition-property),
@@ -152,7 +152,7 @@ $form-floating-tokens: defaults(
 
     > .form-control-plaintext {
       ~ label {
-        border-width: $input-border-width 0; // Required to properly position label text - as explained above
+        border-width: var(--#{$prefix}btn-input-border-width) 0; // Required to properly position label text - as explained above
       }
     }
 

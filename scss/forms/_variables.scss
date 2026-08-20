@@ -1,5 +1,3 @@
-@use "../functions/color" as *;
-@use "../mixins/focus-ring" as *;
 @use "../theme" as *;
 @use "../config" as *;
 
@@ -7,53 +5,11 @@
 // not drag a `@layer` block above the `@layer` order declaration.
 
 // scss-docs-start form-input-variables
-$input-padding-y:                       var(--#{$prefix}btn-input-padding-y) !default;
-$input-padding-x:                       var(--#{$prefix}btn-input-padding-x) !default;
-$input-font-family:                     var(--#{$prefix}btn-input-font-family) !default;
-$input-font-size:                       var(--#{$prefix}btn-input-font-size) !default;
-$input-font-weight:                     var(--#{$prefix}btn-input-font-weight) !default;
-$input-line-height:                     var(--#{$prefix}btn-input-line-height) !default;
+$input-height-border:                   calc(var(--#{$prefix}btn-input-border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
 
-$input-padding-y-sm:                    var(--#{$prefix}btn-input-sm-padding-y) !default;
-$input-padding-x-sm:                    var(--#{$prefix}btn-input-sm-padding-x) !default;
-$input-font-size-sm:                    var(--#{$prefix}btn-input-sm-font-size) !default;
-
-$input-padding-y-lg:                    var(--#{$prefix}btn-input-lg-padding-y) !default;
-$input-font-size-lg:                    var(--#{$prefix}btn-input-lg-font-size) !default;
-
-$input-bg:                              var(--#{$prefix}btn-input-bg) !default;
-$input-disabled-color:                  var(--#{$prefix}body-color) !default;
-$input-disabled-bg:                     var(--#{$prefix}secondary-bg) !default;
-$input-disabled-border-color:           var(--#{$prefix}border-color) !default;
-
-$input-color:                           var(--#{$prefix}btn-input-color) !default;
-$input-border-color:                    var(--#{$prefix}btn-input-border-color) !default;
-$input-border-width:                    var(--#{$prefix}btn-input-border-width) !default;
-$input-box-shadow:                      var(--#{$prefix}btn-input-box-shadow) !default;
-
-$input-border-radius:                   var(--#{$prefix}btn-input-border-radius) !default;
-$input-border-radius-sm:                var(--#{$prefix}btn-input-sm-border-radius) !default;
-$input-border-radius-lg:                var(--#{$prefix}btn-input-lg-border-radius) !default;
-
-$input-focus-bg:                        var(--#{$prefix}btn-input-focus-bg) !default;
-$input-focus-border-color:              var(--#{$prefix}btn-input-focus-border-color) !default;
-$input-focus-color:                     var(--#{$prefix}btn-input-focus-color) !default;
-$input-focus-width:                     var(--#{$prefix}focus-ring-width) !default;
-$input-focus-ring:                      var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)) !default;
-
-$input-placeholder-color:               var(--#{$prefix}secondary-color) !default;
-$input-plaintext-color:                 var(--#{$prefix}body-color) !default;
-
-$input-height-border:                   calc(#{$input-border-width} * 2) !default; // stylelint-disable-line function-disallowed-list
-
-$input-height-inner:                    calc(#{$input-line-height} * 1em + #{$input-padding-y} * 2) !default; // stylelint-disable-line function-disallowed-list
-$input-height-inner-half:               calc(#{$input-line-height} * .5em + #{$input-padding-y}) !default; // stylelint-disable-line function-disallowed-list
-$input-height-inner-quarter:            calc(#{$input-line-height} * .25em + #{$input-padding-y} * .5) !default; // stylelint-disable-line function-disallowed-list
-
-
-$input-transition-property:             var(--#{$prefix}btn-input-transition-property) !default;
-$input-transition-duration:             var(--#{$prefix}btn-input-transition-duration) !default;
-$input-transition-timing:               var(--#{$prefix}btn-input-transition-timing) !default;
+$input-height-inner:                    calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2) !default; // stylelint-disable-line function-disallowed-list
+$input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-height) * .5em + var(--#{$prefix}btn-input-padding-y)) !default; // stylelint-disable-line function-disallowed-list
+$input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default; // stylelint-disable-line function-disallowed-list
 
 $form-color-width:                      3rem !default;
 // scss-docs-end form-input-variables
@@ -94,7 +50,7 @@ $form-validation-states: (
 // scss-docs-start form-check-defaults
 $form-check-input-width:                  1em !default;
 
-$form-check-input-bg:                     $input-bg !default;
+$form-check-input-bg:                     var(--#{$prefix}btn-input-bg) !default;
 $form-check-input-border:                 var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
 $form-check-input-border-radius:          .25em !default;
 $form-check-radio-border-radius:          50% !default;
@@ -111,7 +67,7 @@ $form-check-label-color:                  null !default;
 $form-check-label-cursor:                 null !default;
 
 $form-check-input-active-filter:          brightness(90%) !default;
-$form-check-input-focus-border:           $input-focus-border-color !default;
+$form-check-input-focus-border:           var(--#{$prefix}btn-input-focus-border-color) !default;
 
 $form-check-input-disabled-opacity:        .5 !default;
 $form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;

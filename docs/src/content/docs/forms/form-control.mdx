@@ -168,7 +168,11 @@ Two tokens are declared by the class that uses them rather than on every control
 
 ### SASS variables
 
-`$input-*` are shared across most of our form controls (and not buttons).
+The frame every field draws is configured once, in `_root.scss`. `$input-btn-*` sets it for buttons and controls together, and each value is emitted as a `--cui-btn-input-*` token that the components read:
+
+<ScssDocs file="scss/_root.scss" capture="input-btn-variables" />
+
+What is left in the forms partial is the geometry derived from that frame, plus the colour picker's width:
 
 <ScssDocs file="scss/forms/_variables.scss" capture="form-input-variables" />
 

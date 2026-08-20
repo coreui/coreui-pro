@@ -36,10 +36,10 @@ $form-control-group-tokens: defaults(
     --#{$prefix}control-group-action-hover-color: #{$form-control-group-action-hover-color},
     --#{$prefix}control-group-action-bg: #{$form-control-group-action-bg},
     --#{$prefix}control-group-action-hover-bg: #{$form-control-group-action-hover-bg},
-    --#{$prefix}control-group-action-border-radius: #{$input-border-radius-sm},
+    --#{$prefix}control-group-action-border-radius: var(--#{$prefix}btn-input-sm-border-radius),
     --#{$prefix}control-group-action-transition-property: #{var(--#{$prefix}btn-input-action-transition-property), transform},
-    --#{$prefix}control-group-action-transition-duration: #{$input-transition-duration},
-    --#{$prefix}control-group-action-transition-timing: #{$input-transition-timing},
+    --#{$prefix}control-group-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-group-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
     --#{$prefix}control-group-disabled-opacity: var(--#{$prefix}btn-input-disabled-opacity),
   ),
   $form-control-group-tokens
@@ -82,20 +82,20 @@ $form-control-group-tokens: defaults(
     // classes' declarations, which sit earlier in the cascade.
     &.form-control-sm {
       --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
-      --#{$prefix}control-padding-y: #{$input-padding-y-sm};
-      --#{$prefix}control-padding-x: #{$input-padding-x-sm};
-      --#{$prefix}control-font-size: #{$input-font-size-sm};
-      --#{$prefix}control-border-radius: #{$input-border-radius-sm};
+      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
+      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
+      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
+      --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-sm-border-radius);
       --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-sm};
       --#{$prefix}control-group-action-size: #{$form-control-group-action-size-sm};
     }
 
     &.form-control-lg {
       --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
-      --#{$prefix}control-padding-y: #{$input-padding-y-lg};
+      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
       --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
-      --#{$prefix}control-font-size: #{$input-font-size-lg};
-      --#{$prefix}control-border-radius: #{$input-border-radius-lg};
+      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
+      --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-lg-border-radius);
       --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-lg};
       --#{$prefix}control-group-action-size: #{$form-control-group-action-size-lg};
     }

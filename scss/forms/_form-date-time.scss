@@ -6,7 +6,7 @@
 @use "../config" as *;
 
 // scss-docs-start form-date-time-variables
-$form-date-time-placeholder-color:       $input-placeholder-color !default;
+$form-date-time-placeholder-color:       var(--#{$prefix}secondary-color) !default;
 $form-date-time-section-border-radius:   .25rem !default;
 $form-date-time-section-focus-bg:        color-mix(in srgb, var(--#{$prefix}theme-base, var(--#{$prefix}primary)) 25%, transparent) !default;
 // scss-docs-end form-date-time-variables

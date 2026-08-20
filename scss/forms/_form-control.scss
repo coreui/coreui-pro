@@ -14,7 +14,7 @@
 @use "variables" as *;
 
 // scss-docs-start form-file-variables
-$form-file-button-color:          $input-color !default;
+$form-file-button-color:          var(--#{$prefix}btn-input-color) !default;
 $form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default;
 $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 // scss-docs-end form-file-variables
@@ -26,35 +26,35 @@ $form-control-tokens: () !default;
 $form-control-tokens: defaults(
   (
     --#{$prefix}control-min-height: var(--#{$prefix}btn-input-min-height),
-    --#{$prefix}control-padding-y: #{$input-padding-y},
-    --#{$prefix}control-padding-x: #{$input-padding-x},
-    --#{$prefix}control-font-family: #{$input-font-family},
-    --#{$prefix}control-font-size: #{$input-font-size},
-    --#{$prefix}control-font-weight: #{$input-font-weight},
-    --#{$prefix}control-line-height: #{$input-line-height},
-    --#{$prefix}control-color: #{$input-color},
-    --#{$prefix}control-bg: #{$input-bg},
-    --#{$prefix}control-border-width: #{$input-border-width},
-    --#{$prefix}control-border-color: #{$input-border-color},
-    --#{$prefix}control-border-radius: #{$input-border-radius},
-    --#{$prefix}control-box-shadow: #{$input-box-shadow},
-    --#{$prefix}control-transition-property: #{$input-transition-property},
-    --#{$prefix}control-transition-duration: #{$input-transition-duration},
-    --#{$prefix}control-transition-timing: #{$input-transition-timing},
-    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, #{$input-placeholder-color}),
-    --#{$prefix}control-focus-color: #{$input-focus-color},
-    --#{$prefix}control-focus-bg: #{$input-focus-bg},
-    --#{$prefix}control-focus-border-color: #{$input-focus-border-color},
-    --#{$prefix}control-focus-ring: #{$input-focus-ring},
-    --#{$prefix}control-disabled-color: #{$input-disabled-color},
-    --#{$prefix}control-disabled-bg: #{$input-disabled-bg},
-    --#{$prefix}control-disabled-border-color: #{$input-disabled-border-color},
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-padding-x),
+    --#{$prefix}control-font-family: var(--#{$prefix}btn-input-font-family),
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}control-font-weight: var(--#{$prefix}btn-input-font-weight),
+    --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
+    --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
+    --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}control-border-color: var(--#{$prefix}btn-input-border-color),
+    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-border-radius),
+    --#{$prefix}control-box-shadow: var(--#{$prefix}btn-input-box-shadow),
+    --#{$prefix}control-transition-property: var(--#{$prefix}btn-input-transition-property),
+    --#{$prefix}control-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-transition-timing: var(--#{$prefix}btn-input-transition-timing),
+    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, var(--#{$prefix}secondary-color)),
+    --#{$prefix}control-focus-color: var(--#{$prefix}btn-input-focus-color),
+    --#{$prefix}control-focus-bg: var(--#{$prefix}btn-input-focus-bg),
+    --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
+    --#{$prefix}control-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)),
+    --#{$prefix}control-disabled-color: var(--#{$prefix}body-color),
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}secondary-bg),
+    --#{$prefix}control-disabled-border-color: var(--#{$prefix}border-color),
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},
     --#{$prefix}control-action-hover-bg: #{$form-file-button-hover-bg},
     --#{$prefix}control-action-transition-property: var(--#{$prefix}btn-input-action-transition-property),
-    --#{$prefix}control-action-transition-duration: #{$input-transition-duration},
-    --#{$prefix}control-action-transition-timing: #{$input-transition-timing},
+    --#{$prefix}control-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
   ),
   $form-control-tokens
 );
@@ -157,7 +157,7 @@ $form-control-select-tokens: defaults(
       // Add some height to date inputs on iOS
       // https://github.com/twbs/bootstrap/issues/23307
       // TODO: we can remove this workaround once https://bugs.webkit.org/show_bug.cgi?id=198959 is resolved
-      height: calc(#{$input-line-height} * 1em); // stylelint-disable-line function-disallowed-list
+      height: calc(var(--#{$prefix}btn-input-line-height) * 1em); // stylelint-disable-line function-disallowed-list
 
       // Android Chrome type="date" is taller than the other inputs
       // because of "margin: 1px 24px 1px 4px" inside the shadow DOM
@@ -229,7 +229,7 @@ $form-control-select-tokens: defaults(
     // invalid and fall back to their initial values.
     @include tokens($form-control-tokens);
 
-    --#{$prefix}control-plaintext-color: #{$input-plaintext-color};
+    --#{$prefix}control-plaintext-color: var(--#{$prefix}body-color);
 
     display: block;
     width: 100%;
@@ -262,10 +262,10 @@ $form-control-select-tokens: defaults(
   .form-control-sm,
   .form-select-sm {
     --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
-    --#{$prefix}control-padding-y: #{$input-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$input-padding-x-sm};
-    --#{$prefix}control-font-size: #{$input-font-size-sm};
-    --#{$prefix}control-border-radius: #{$input-border-radius-sm};
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
+    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
+    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-sm-border-radius);
 
     min-height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
@@ -283,10 +283,10 @@ $form-control-select-tokens: defaults(
   .form-control-lg,
   .form-select-lg {
     --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
-    --#{$prefix}control-padding-y: #{$input-padding-y-lg};
+    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
-    --#{$prefix}control-font-size: #{$input-font-size-lg};
-    --#{$prefix}control-border-radius: #{$input-border-radius-lg};
+    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
+    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-lg-border-radius);
 
     min-height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
