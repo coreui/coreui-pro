@@ -2,9 +2,9 @@ name: Visual
 
 on:
   push:
-    branches: [main, v6-dev]
+    branches: [main, v6-dev, feat/v6-config]
   pull_request:
-    branches: [main, v6-dev]
+    branches: [main, v6-dev, feat/v6-config]
   workflow_dispatch:
 
 env:

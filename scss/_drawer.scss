@@ -17,11 +17,11 @@
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start drawer-variables
-$drawer-inset:                      $spacer !default;
+$drawer-inset:                      var(--#{$prefix}spacer-3) !default;
 $drawer-width:                      400px !default;
 $drawer-height:                     30vh !default;
-$drawer-padding-y:                  $spacer !default;
-$drawer-padding-x:                  $spacer !default;
+$drawer-padding-y:                  var(--#{$prefix}spacer-3) !default;
+$drawer-padding-x:                  var(--#{$prefix}spacer-3) !default;
 $drawer-color:                      var(--#{$prefix}body-color) !default;
 $drawer-bg:                         var(--#{$prefix}body-bg) !default;
 $drawer-border-color:               var(--#{$prefix}border-color-translucent) !default;
@@ -31,7 +31,7 @@ $drawer-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
 $drawer-transition-duration:        .3s !default;
 $drawer-transition-timing:          cubic-bezier(.22, 1, .36, 1) !default;
 $drawer-scale-transform:            scale(1.02) !default;
-$drawer-title-line-height:          $line-height-base !default;
+$drawer-title-line-height:          var(--#{$prefix}body-line-height) !default;
 $drawer-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}body-bg) 25%, transparent) !default;
 $drawer-backdrop-blur:              8px !default;
 $drawer-sheet-width:                760px !default;
@@ -45,7 +45,7 @@ $drawer-tokens: () !default;
 $drawer-tokens: defaults(
   (
     --#{$prefix}drawer-inset: #{$drawer-inset},
-    --#{$prefix}drawer-zindex: #{$zindex-offcanvas},
+    --#{$prefix}drawer-zindex: var(--#{$prefix}z-offcanvas),
     --#{$prefix}drawer-width: #{$drawer-width},
     --#{$prefix}drawer-height: #{$drawer-height},
     --#{$prefix}drawer-padding-x: #{$drawer-padding-x},

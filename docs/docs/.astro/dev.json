@@ -1,0 +1,13 @@
+{
+	"pid": 15938,
+	"port": 9001,
+	"url": "http://localhost:9001",
+	"urls": {
+		"local": [
+			"http://localhost:9001/"
+		],
+		"network": []
+	},
+	"background": true,
+	"startedAt": "2026-08-08T20:08:50.187Z"
+}

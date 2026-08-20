@@ -76,3 +76,14 @@
   }
   @return $merged-maps;
 }
+
+// Pull one slot out of a map of maps: map-slot($theme-colors, "bg-subtle")
+// returns ("primary": …, "secondary": …, …). Lets the nested definition stay
+// the single source while consumers that want one flat family keep working.
+@function map-slot($map, $slot) {
+  $result: ();
+  @each $key, $slots in $map {
+    $result: map.set($result, $key, map.get($slots, $slot));
+  }
+  @return $result;
+}

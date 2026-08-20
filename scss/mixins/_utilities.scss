@@ -168,7 +168,8 @@
       $selector: ":where(#{$selector} #{$child-selector})";
     }
 
-    @if $value != null {
+    // A property map can be all literals — the rule then needs no value at all.
+    @if $value != null or $property-map {
       #{$selector} {
         @include declarations($property-map, $properties, $value);
       }

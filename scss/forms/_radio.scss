@@ -1,11 +1,12 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
-@use "form-check" as *;
+@use "variables" as *;
 @use "check" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
+@use "../mixins/transition" as *;
 @use "../config" as *;
 
 // The radio's own theming surface — see the note in `_checkbox.scss`.
@@ -31,14 +32,13 @@ $radio-tokens: defaults(
     --#{$prefix}radio-bg: #{$radio-bg},
     --#{$prefix}radio-border: #{$radio-border},
     --#{$prefix}radio-border-radius: #{$radio-border-radius},
-    --#{$prefix}radio-checked-bg: var(--#{$prefix}control-checked-bg),
-    --#{$prefix}radio-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}radio-checked-bg: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-bg)),
+    --#{$prefix}radio-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}radio-mark-color: #{$radio-mark-color},
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
     --#{$prefix}radio-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}radio-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}radio-size)) * .5),
+    --#{$prefix}radio-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}radio-size)) * .5),
     --#{$prefix}radio-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}radio-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}radio-active-filter: #{$form-check-input-active-filter},
     --#{$prefix}radio-label-disabled-opacity: #{$form-check-label-disabled-opacity},
   ),
@@ -71,6 +71,7 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     appearance: none;
     background-color: var(--#{$prefix}radio-bg);
     border: var(--#{$prefix}radio-border);
+    @include transition(background-color var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing), border-color var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing));
     print-color-adjust: exact;
     // stylelint-disable-next-line property-disallowed-list
     border-radius: var(--#{$prefix}radio-border-radius);
@@ -82,7 +83,9 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
       content: "";
       background-color: var(--#{$prefix}radio-mark-color);
       opacity: 0;
+      transform: scale(0);
       @include mask-icon(var(--#{$prefix}radio-mark));
+      @include transition(opacity var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing), transform var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing));
     }
 
     &:checked {
@@ -91,12 +94,13 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
 
       &::before {
         opacity: 1;
+        transform: scale(1);
       }
     }
 
-    &:focus {
+    &:focus-visible {
       border-color: var(--#{$prefix}radio-focus-border);
-      @include focus-ring(true, $ring: var(--#{$prefix}radio-focus-ring));
+      @include focus-ring(true);
     }
 
     &:active {

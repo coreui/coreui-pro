@@ -24,15 +24,14 @@ $stepper-step-indicator-border-width:           var(--#{$prefix}border-width) !d
 $stepper-step-indicator-border-color:           var(--#{$prefix}border-color) !default;
 $stepper-step-indicator-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 $stepper-step-indicator-active-color:           var(--#{$prefix}primary) !default;
-$stepper-step-indicator-active-bg:              color-mix(in srgb, var(--#{$prefix}primary) 5%, transparent) !default;
+$stepper-step-indicator-active-bg:              color-mix(in srgb, var(--#{$prefix}theme-base, var(--#{$prefix}primary)) 5%, transparent) !default;
 $stepper-step-indicator-active-border-color:    var(--#{$prefix}primary) !default;
-$stepper-step-indicator-complete-color:         var(--#{$prefix}white) !default;
+$stepper-step-indicator-complete-color:         var(--#{$prefix}primary-contrast) !default;
 $stepper-step-indicator-complete-bg:            var(--#{$prefix}primary) !default;
 $stepper-step-indicator-complete-border-color:  var(--#{$prefix}primary) !default;
 $stepper-step-indicator-disabled-color:         var(--#{$prefix}secondary) !default;
 $stepper-step-indicator-disabled-bg:            transparent !default;
 $stepper-step-indicator-disabled-border-color:  var(--#{$prefix}border-color) !default;
-$stepper-step-indicator-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 $stepper-step-indicator-icon:                   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpolygon fill='var(--ci-primary-color, currentColor)' points='200.359 382.269 61.057 251.673 82.943 228.327 199.641 337.731 428.686 108.687 451.314 131.313 200.359 382.269' class='ci-primary'/%3E%3C/svg%3E") !default;
 $stepper-step-indicator-icon-color:             var(--#{$prefix}white) !default;
 $stepper-step-indicator-icon-size:              1rem !default;
@@ -67,23 +66,22 @@ $stepper-tokens: defaults(
     --#{$prefix}stepper-step-indicator-border-width: #{$stepper-step-indicator-border-width},
     --#{$prefix}stepper-step-indicator-border-color: #{$stepper-step-indicator-border-color},
     --#{$prefix}stepper-step-indicator-transition: #{$stepper-step-indicator-transition},
-    --#{$prefix}stepper-step-indicator-active-color: #{$stepper-step-indicator-active-color},
+    --#{$prefix}stepper-step-indicator-active-color: var(--#{$prefix}theme-base, #{$stepper-step-indicator-active-color}),
     --#{$prefix}stepper-step-indicator-active-bg: #{$stepper-step-indicator-active-bg},
-    --#{$prefix}stepper-step-indicator-active-border-color: #{$stepper-step-indicator-active-border-color},
-    --#{$prefix}stepper-step-indicator-complete-color: #{$stepper-step-indicator-complete-color},
-    --#{$prefix}stepper-step-indicator-complete-bg: #{$stepper-step-indicator-complete-bg},
-    --#{$prefix}stepper-step-indicator-complete-border-color: #{$stepper-step-indicator-complete-border-color},
+    --#{$prefix}stepper-step-indicator-active-border-color: var(--#{$prefix}theme-base, #{$stepper-step-indicator-active-border-color}),
+    --#{$prefix}stepper-step-indicator-complete-color: var(--#{$prefix}theme-contrast, #{$stepper-step-indicator-complete-color}),
+    --#{$prefix}stepper-step-indicator-complete-bg: var(--#{$prefix}theme-base, #{$stepper-step-indicator-complete-bg}),
+    --#{$prefix}stepper-step-indicator-complete-border-color: var(--#{$prefix}theme-base, #{$stepper-step-indicator-complete-border-color}),
     --#{$prefix}stepper-step-indicator-disabled-color: #{$stepper-step-indicator-disabled-color},
     --#{$prefix}stepper-step-indicator-disabled-bg: #{$stepper-step-indicator-disabled-bg},
     --#{$prefix}stepper-step-indicator-disabled-border-color: #{$stepper-step-indicator-disabled-border-color},
-    --#{$prefix}stepper-step-indicator-focus-ring: #{$stepper-step-indicator-focus-ring},
     --#{$prefix}stepper-step-indicator-icon: #{$stepper-step-indicator-icon},
     --#{$prefix}stepper-step-indicator-icon-color: #{$stepper-step-indicator-icon-color},
     --#{$prefix}stepper-step-indicator-icon-size: #{$stepper-step-indicator-icon-size},
     --#{$prefix}stepper-step-connector-height: #{$stepper-step-connector-height},
     --#{$prefix}stepper-step-connector-gap: #{$stepper-step-connector-gap},
     --#{$prefix}stepper-step-connector-bg: #{$stepper-step-connector-bg},
-    --#{$prefix}stepper-step-connector-complete-bg: #{$stepper-step-connector-complete-bg},
+    --#{$prefix}stepper-step-connector-complete-bg: var(--#{$prefix}theme-base, #{$stepper-step-connector-complete-bg}),
     --#{$prefix}stepper-step-connector-transition: #{$stepper-step-connector-transition},
     --#{$prefix}stepper-step-content-transition: #{$stepper-step-content-transition},
   ),
@@ -182,10 +180,10 @@ $stepper-tokens: defaults(
       display: none;
     }
 
-    &:focus {
+    &:focus-visible {
 
       .stepper-step-indicator {
-        @include focus-ring(true, $ring: var(--#{$prefix}stepper-step-indicator-focus-ring));
+        @include focus-ring(true);
       }
     }
   }

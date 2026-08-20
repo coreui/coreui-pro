@@ -4,13 +4,11 @@
 // upstream v6. An outline is not clipped by an ancestor's `overflow`, so the
 // ring stays visible inside scroll containers, where a box-shadow was cut off.
 
-@mixin focus-ring($offset: false, $color: null, $ring: null) {
-  @if $ring != null {
-    outline: $ring;
-  } @else if $color != null {
+@mixin focus-ring($offset: false, $color: null) {
+  @if $color != null {
     outline: var(--#{$prefix}focus-ring-width) solid #{$color};
   } @else {
-    outline: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring));
+    outline: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color));
   }
   @if $offset {
     outline-offset: var(--#{$prefix}focus-ring-offset);

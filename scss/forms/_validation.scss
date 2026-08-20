@@ -1,5 +1,6 @@
 @use "../mixins/forms" as *;
 @use "../config" as *;
+@use "variables" as *;
 
 @layer forms {
   // Form validation

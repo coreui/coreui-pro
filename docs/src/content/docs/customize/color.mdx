@@ -373,7 +373,7 @@ We use a subset of all colors to create a smaller color palette for generating c
 
 All these colors are available as a Sass map, `$theme-colors`.
 
-<ScssDocs file="scss/_config.scss" capture="theme-colors-map" />
+<ScssDocs file="scss/_theme.scss" capture="theme-colors-map" />
 
 Check out [our Sass maps and loops docs](/customize/sass/#maps-and-loops) for how to modify these colors.
 
@@ -440,7 +440,7 @@ CoreUI for Bootstrap's source Sass files include three maps to help you quickly 
 
 Within `scss/_config.scss`, you'll find CoreUI for Bootstrap's color variables and Sass map. Here's an example of the `$colors` Sass map:
 
-<ScssDocs file="scss/_config.scss" capture="colors-map" />
+<ScssDocs file="scss/_colors.scss" capture="colors-map" />
 
 Add, remove, or modify values within the map to update how they're used in many other components. Unfortunately at this time, not _every_ component utilizes this Sass map. Future updates will strive to improve upon this. Until then, plan on making use of the `${color}` variables and this Sass map.
 
@@ -505,7 +505,6 @@ $utilities: map-merge(
 ```scss
 @import "@coreui/coreui/scss/functions";
 @import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/maps";
 @import "@coreui/coreui/scss/mixins";
 @import "@coreui/coreui/scss/utilities";
 

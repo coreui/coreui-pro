@@ -9,7 +9,9 @@
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
+@use "../colors" as *;
 @use "../config" as *;
+@use "variables" as *;
 
 // scss-docs-start form-file-variables
 $form-file-button-color:          $input-color !default;
@@ -38,7 +40,9 @@ $form-control-tokens: defaults(
     --#{$prefix}control-border-color: #{$input-border-color},
     --#{$prefix}control-border-radius: #{$input-border-radius},
     --#{$prefix}control-box-shadow: #{$input-box-shadow},
-    --#{$prefix}control-transition: #{$input-transition},
+    --#{$prefix}control-transition-property: #{$input-transition-property},
+    --#{$prefix}control-transition-duration: #{$input-transition-duration},
+    --#{$prefix}control-transition-timing: #{$input-transition-timing},
     --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, #{$input-placeholder-color}),
     --#{$prefix}control-focus-color: #{$input-focus-color},
     --#{$prefix}control-focus-bg: #{$input-focus-bg},
@@ -50,7 +54,9 @@ $form-control-tokens: defaults(
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},
     --#{$prefix}control-action-hover-bg: #{$form-file-button-hover-bg},
-    --#{$prefix}control-action-transition: var(--#{$prefix}btn-input-transition),
+    --#{$prefix}control-action-transition-property: var(--#{$prefix}btn-input-action-transition-property),
+    --#{$prefix}control-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
   ),
   $form-control-tokens
 );
@@ -78,7 +84,11 @@ $form-control-tokens: defaults(
   @include border-radius(var(--#{$prefix}control-border-radius), 0);
 
   @include box-shadow(var(--#{$prefix}control-box-shadow));
-  @include transition(var(--#{$prefix}control-transition));
+  @include transition-props(
+    var(--#{$prefix}control-transition-property),
+    var(--#{$prefix}control-transition-duration),
+    var(--#{$prefix}control-transition-timing)
+  );
 }
 // scss-docs-end form-control-frame-mixin
 
@@ -149,7 +159,7 @@ $form-control-select-tokens: defaults(
       color: var(--#{$prefix}control-focus-color);
       background-color: var(--#{$prefix}control-focus-bg);
       border-color: var(--#{$prefix}control-focus-border-color);
-      @include focus-ring(true, $ring: var(--#{$prefix}control-focus-ring));
+      @include focus-ring(true, $color: var(--#{$prefix}control-focus-ring));
     }
 
     &::-webkit-date-and-time-value {
@@ -163,9 +173,7 @@ $form-control-select-tokens: defaults(
       // Add some height to date inputs on iOS
       // https://github.com/twbs/bootstrap/issues/23307
       // TODO: we can remove this workaround once https://bugs.webkit.org/show_bug.cgi?id=198959 is resolved
-      // Multiply line-height by 1em if it has no unit
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      height: if(sass(math.unit($input-line-height) == ""): $input-line-height * 1em; else: $input-line-height);
+      height: calc(var(--#{$prefix}btn-input-line-height) * 1em); // stylelint-disable-line function-disallowed-list
 
       // Android Chrome type="date" is taller than the other inputs
       // because of "margin: 1px 24px 1px 4px" inside the shadow DOM
@@ -214,7 +222,11 @@ $form-control-select-tokens: defaults(
       border-width: 0;
       border-inline-end-width: var(--#{$prefix}control-border-width);
       border-radius: 0; // stylelint-disable-line property-disallowed-list
-      @include transition(var(--#{$prefix}control-action-transition));
+      @include transition-props(
+        var(--#{$prefix}control-action-transition-property),
+        var(--#{$prefix}control-action-transition-duration),
+        var(--#{$prefix}control-action-transition-timing)
+      );
     }
 
     &:hover:not(:disabled):not([readonly])::file-selector-button {

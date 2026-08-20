@@ -11,13 +11,13 @@
 // built around (see js/src/menu.ts).
 
 // scss-docs-start menu-variables
-$menu-zindex:                   $zindex-dropdown !default;
+$menu-zindex:                   var(--#{$prefix}z-dropdown) !default;
 $menu-gap:                      .125rem !default;
 $menu-min-width:                10rem !default;
 $menu-padding-x:                .25rem !default;
 $menu-padding-y:                .25rem !default;
 $menu-spacer:                   .125rem !default;
-$menu-font-size:                $font-size-sm !default;
+$menu-font-size:                var(--#{$prefix}font-size-sm) !default;
 $menu-color:                    var(--#{$prefix}body-color) !default;
 $menu-bg:                       var(--#{$prefix}body-bg) !default;
 $menu-border-color:             var(--#{$prefix}border-color-translucent) !default;
@@ -30,15 +30,15 @@ $menu-divider-margin-x:         .25rem !default;
 $menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}body-color)) !default;
 $menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}body-color)) !default;
 $menu-item-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-$menu-item-active-color:        $component-active-color !default;
-$menu-item-active-bg:           $component-active-bg !default;
+$menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
+$menu-item-active-bg:           var(--#{$prefix}primary) !default;
 $menu-item-disabled-color:      var(--#{$prefix}tertiary-color) !default;
 $menu-item-gap:                 .5rem !default;
 $menu-item-padding-x:           .75rem !default;
 $menu-item-padding-y:           .25rem !default;
 $menu-item-border-radius:       $border-radius-sm !default;
 $menu-icon-size:                1rem !default;
-$menu-description-font-size:    $font-size-base * .75 !default;
+$menu-description-font-size:    calc(var(--#{$prefix}body-font-size) * .75) !default; // stylelint-disable-line function-disallowed-list
 $menu-check-color:              currentcolor !default;
 $menu-header-color:             var(--#{$prefix}tertiary-color) !default;
 $menu-header-padding-x:         .75rem !default;
@@ -165,7 +165,7 @@ $menu-tokens: defaults(
 
   .menu-translucent {
     --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}tertiary-bg) 85%, transparent);
-    --#{$prefix}menu-item-active-bg: color-mix(in oklch, #{$component-active-bg} 75%, transparent);
+    --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary) 75%, transparent);
 
     background-color: color-mix(in oklch, var(--#{$prefix}menu-bg) 80%, transparent);
     backdrop-filter: blur(5px) saturate(180%);
@@ -185,8 +185,8 @@ $menu-tokens: defaults(
     align-items: center;
     width: 100%;
     padding: var(--#{$prefix}menu-item-padding-y) var(--#{$prefix}menu-item-padding-x);
-    font-weight: var(--#{$prefix}menu-item-font-weight, #{$font-weight-normal});
-    color: var(--#{$prefix}theme-fg, var(--#{$prefix}menu-item-color));
+    font-weight: var(--#{$prefix}menu-item-font-weight, var(--#{$prefix}font-weight-normal));
+    color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}menu-item-color));
     text-align: inherit;
     text-decoration: none;
     white-space: nowrap;
@@ -198,7 +198,7 @@ $menu-tokens: defaults(
 
     &:hover,
     &:focus {
-      color: var(--#{$prefix}theme-fg, var(--#{$prefix}menu-item-hover-color));
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}menu-item-hover-color));
       background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}menu-item-hover-bg));
     }
 
@@ -213,7 +213,7 @@ $menu-tokens: defaults(
     }
 
     &.selected {
-      font-weight: $font-weight-semibold;
+      font-weight: var(--#{$prefix}font-weight-semibold);
     }
 
     &.disabled,
@@ -243,7 +243,7 @@ $menu-tokens: defaults(
 
   .menu-item-description {
     font-size: var(--#{$prefix}menu-description-font-size);
-    font-weight: $font-weight-normal;
+    font-weight: var(--#{$prefix}font-weight-normal);
     color: color-mix(in oklch, currentcolor 65%, transparent);
   }
 
@@ -264,7 +264,7 @@ $menu-tokens: defaults(
     display: block;
     padding: var(--#{$prefix}menu-header-padding-y) var(--#{$prefix}menu-header-padding-x);
     margin-bottom: 0;
-    font-size: $font-size-sm;
+    font-size: var(--#{$prefix}font-size-sm);
     color: var(--#{$prefix}menu-header-color);
     white-space: nowrap;
   }

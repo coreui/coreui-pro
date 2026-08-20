@@ -39,7 +39,7 @@ $offcanvas-tokens: () !default;
 // scss-docs-start offcanvas-css-vars
 $offcanvas-tokens: defaults(
   (
-    --#{$prefix}offcanvas-zindex: #{$zindex-offcanvas},
+    --#{$prefix}offcanvas-zindex: var(--#{$prefix}z-offcanvas),
     --#{$prefix}offcanvas-width: #{$offcanvas-horizontal-width},
     --#{$prefix}offcanvas-height: #{$offcanvas-vertical-height},
     --#{$prefix}offcanvas-padding-x: #{$offcanvas-padding-x},

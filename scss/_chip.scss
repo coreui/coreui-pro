@@ -5,13 +5,14 @@
 @use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
+@use "theme" as *;
 @use "config" as *;
 
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start chip-variables
 $chip-font-size:             .875rem !default;
-$chip-font-weight:           $font-weight-normal !default;
+$chip-font-weight:           var(--#{$prefix}font-weight-normal) !default;
 $chip-height:                1.75rem !default;
 $chip-padding-x:             .625rem !default;
 $chip-gap:                   .3125rem !default;
@@ -29,7 +30,7 @@ $chip-bg:                    var(--#{$prefix}secondary-bg) !default;
 $chip-border-width:          var(--#{$prefix}border-width) !default;
 $chip-border-color:          transparent !default;
 
-$chip-active-color:          rgba($white, .87) !default;
+$chip-active-color:          var(--#{$prefix}primary-contrast) !default;
 $chip-active-bg:             var(--#{$prefix}primary) !default;
 $chip-active-border-color:   transparent !default;
 
@@ -74,15 +75,15 @@ $chip-tokens: defaults(
     --#{$prefix}chip-remove-opacity: #{$chip-remove-opacity},
     --#{$prefix}chip-remove-hover-opacity: #{$chip-remove-hover-opacity},
     --#{$prefix}chip-transition: #{$chip-transition},
-    --#{$prefix}chip-color: var(--#{$prefix}text-emphasis, #{$chip-color}),
-    --#{$prefix}chip-bg: var(--#{$prefix}bg-subtle, #{$chip-bg}),
+    --#{$prefix}chip-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-bg}),
     --#{$prefix}chip-border-width: #{$chip-border-width},
     --#{$prefix}chip-border-color: #{$chip-border-color},
-    --#{$prefix}chip-active-color: var(--#{$prefix}contrast, #{$chip-active-color}),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}color, #{$chip-active-bg}),
+    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
     --#{$prefix}chip-active-border-color: #{$chip-active-border-color},
-    --#{$prefix}chip-hover-color: var(--#{$prefix}contrast, #{$chip-hover-color}),
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}color, #{$chip-hover-bg}),
+    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-hover-color}),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
     --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
   ),
   $chip-tokens
@@ -98,14 +99,14 @@ $chip-outline-tokens: () !default;
 // scss-docs-start chip-outline-css-vars
 $chip-outline-tokens: defaults(
   (
-    --#{$prefix}chip-color: var(--#{$prefix}color, var(--#{$prefix}body-color)),
+    --#{$prefix}chip-color: var(--#{$prefix}theme-base, var(--#{$prefix}body-color)),
     --#{$prefix}chip-bg: transparent,
-    --#{$prefix}chip-border-color: var(--#{$prefix}color, var(--#{$prefix}border-color)),
-    --#{$prefix}chip-hover-bg: var(--#{$prefix}bg-subtle, #{$chip-hover-bg}),
-    --#{$prefix}chip-hover-color: var(--#{$prefix}text-emphasis, #{$chip-color}),
-    --#{$prefix}chip-hover-border-color: var(--#{$prefix}color, var(--#{$prefix}border-color)),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}color, #{$chip-active-bg}),
-    --#{$prefix}chip-active-color: var(--#{$prefix}contrast, #{$chip-active-color}),
+    --#{$prefix}chip-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}border-color)),
+    --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-hover-bg}),
+    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-hover-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}border-color)),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
+    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
   ),
   $chip-outline-tokens
 );
@@ -245,8 +246,8 @@ $chip-outline-tokens: defaults(
     }
 
     &:focus-visible {
-      opacity: 1;
       @include focus-ring();
+      opacity: 1;
     }
 
     > svg {
@@ -287,13 +288,11 @@ $chip-outline-tokens: defaults(
   }
 
   // scss-docs-start chip-modifiers
+  // The variant sets the theme tokens and lets the base .chip tokens read
+  // them, the way the alert and table variants do.
   @each $state in map.keys($theme-colors) {
     .chip-#{$state} {
-      --#{$prefix}bg-subtle: var(--#{$prefix}#{$state}-bg-subtle);
-      --#{$prefix}color: var(--#{$prefix}#{$state});
-      --#{$prefix}contrast: var(--#{$prefix}#{$state}-contrast);
-      --#{$prefix}text-emphasis: var(--#{$prefix}#{$state}-text-emphasis);
-      --#{$prefix}focus-ring-color: color-mix(in srgb, var(--#{$prefix}#{$state}) calc(var(--#{$prefix}focus-ring-opacity) * 100%), transparent);
+      @include theme-tokens($state);
     }
   }
   // scss-docs-end chip-modifiers

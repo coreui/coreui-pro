@@ -1,3 +1,4 @@
+@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
@@ -18,12 +19,13 @@ $search-button-border-width:        $input-border-width !default;
 $search-button-border-color:        $input-border-color !default;
 $search-button-border-radius:       $input-border-radius !default;
 $search-button-box-shadow:          $input-box-shadow !default;
-$search-button-transition:          $input-transition !default;
+$search-button-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
+$search-button-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
+$search-button-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
 
 $search-button-focus-color:         $input-focus-color !default;
 $search-button-focus-bg:            $input-focus-bg !default;
 $search-button-focus-border-color:  $input-focus-border-color !default;
-$search-button-focus-ring:    $input-focus-ring !default;
 
 $search-button-icon-size:           1.125rem !default;
 
@@ -57,11 +59,12 @@ $search-button-tokens: defaults(
     --#{$prefix}search-button-border-color: #{$search-button-border-color},
     --#{$prefix}search-button-border-radius: #{$search-button-border-radius},
     --#{$prefix}search-button-box-shadow: #{$search-button-box-shadow},
-    --#{$prefix}search-button-transition: #{$search-button-transition},
+    --#{$prefix}search-button-transition-property: #{$search-button-transition-property},
+    --#{$prefix}search-button-transition-duration: #{$search-button-transition-duration},
+    --#{$prefix}search-button-transition-timing: #{$search-button-transition-timing},
     --#{$prefix}search-button-focus-color: #{$search-button-focus-color},
     --#{$prefix}search-button-focus-bg: #{$search-button-focus-bg},
     --#{$prefix}search-button-focus-border-color: #{$search-button-focus-border-color},
-    --#{$prefix}search-button-focus-ring: #{$search-button-focus-ring},
     --#{$prefix}search-button-icon-size: #{$search-button-icon-size},
     --#{$prefix}search-button-keys-gap: #{$search-button-keys-gap},
     --#{$prefix}search-button-key-width: #{$search-button-key-width},
@@ -95,13 +98,17 @@ $search-button-tokens: defaults(
 
     @include border-radius(var(--#{$prefix}search-button-border-radius), 0);
     @include box-shadow(var(--#{$prefix}search-button-box-shadow));
-    @include transition(var(--#{$prefix}search-button-transition));
+    @include transition-props(
+      var(--#{$prefix}search-button-transition-property),
+      var(--#{$prefix}search-button-transition-duration),
+      var(--#{$prefix}search-button-transition-timing)
+    );
 
-    &:focus {
+    &:focus-visible {
       color: var(--#{$prefix}search-button-focus-color);
       background-color: var(--#{$prefix}search-button-focus-bg);
       border-color: var(--#{$prefix}search-button-focus-border-color);
-      @include focus-ring(true, $ring: var(--#{$prefix}search-button-focus-ring));
+      @include focus-ring(true);
     }
   }
 

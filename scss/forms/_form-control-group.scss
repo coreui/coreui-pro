@@ -5,6 +5,7 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 @use "form-control" as *;
+@use "variables" as *;
 
 // scss-docs-start form-control-group-variables
 $form-control-group-gap:              .5rem !default;
@@ -39,7 +40,9 @@ $form-control-group-tokens: defaults(
     --#{$prefix}control-group-action-bg: #{$form-control-group-action-bg},
     --#{$prefix}control-group-action-hover-bg: #{$form-control-group-action-hover-bg},
     --#{$prefix}control-group-action-border-radius: #{$input-border-radius-sm},
-    --#{$prefix}control-group-action-transition: #{var(--#{$prefix}btn-input-transition), transform .15s ease-in-out},
+    --#{$prefix}control-group-action-transition-property: #{var(--#{$prefix}btn-input-action-transition-property), transform},
+    --#{$prefix}control-group-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-group-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
   ),
   $form-control-group-tokens
 );
@@ -66,7 +69,7 @@ $form-control-group-tokens: defaults(
 // indicators and no way to tell which one answers the keys (WCAG 2.4.7).
 @mixin form-control-group-focus() {
   @include form-control-group-active();
-  @include focus-ring(true, $ring: var(--#{$prefix}control-focus-ring));
+  @include focus-ring(true, $color: var(--#{$prefix}control-focus-ring));
 }
 // scss-docs-end form-control-group-focus-mixin
 
@@ -204,7 +207,11 @@ $form-control-group-tokens: defaults(
     background-color: var(--#{$prefix}control-group-action-bg);
     border: 0;
     @include border-radius(var(--#{$prefix}control-group-action-border-radius));
-    @include transition(var(--#{$prefix}control-group-action-transition));
+    @include transition-props(
+      var(--#{$prefix}control-group-action-transition-property),
+      var(--#{$prefix}control-group-action-transition-duration),
+      var(--#{$prefix}control-group-action-transition-timing)
+    );
 
     > svg {
       width: var(--#{$prefix}control-group-icon-size);

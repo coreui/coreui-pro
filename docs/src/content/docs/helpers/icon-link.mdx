@@ -46,6 +46,8 @@ Modify the styling of an icon link with our link CSS variables, Sass variables, 
 
 Modify the `--cui-link-*` and `--cui-icon-link-*` CSS variables as needed to change the default appearance.
 
+<ScssDocs file="scss/helpers/_icon-link.scss" capture="icon-link-css-vars" />
+
 Customize the hover `transform` by overriding the `--cui-icon-link-transform` CSS variable:
 
 <Example code={`<a class="icon-link icon-link-hover" style="--cui-icon-link-transform: translate3d(0, -.125rem, 0);" href="#">
@@ -58,7 +60,7 @@ Customize the hover `transform` by overriding the `--cui-icon-link-transform` CS
 
 Customize the color by overriding the `--cui-link-*` CSS variable:
 
-<Example code={`<a class="icon-link icon-link-hover" style="--cui-link-hover-color-rgb: 25, 135, 84;" href="#">
+<Example code={`<a class="icon-link icon-link-hover" style="--cui-link-color: var(--cui-success);" href="#">
     Icon link
     <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 16 16" aria-hidden="true">
       <path d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>

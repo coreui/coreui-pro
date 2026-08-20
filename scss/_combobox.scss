@@ -1,3 +1,4 @@
+@use "forms/variables" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
@@ -17,7 +18,6 @@ $combobox-popup-min-width:         100% !default;
 // The panel's own ring token: the panel mounts outside the frame while open,
 // so it cannot inherit --#{$prefix}control-focus-ring from it — an inherited
 // var would resolve to nothing there and invalidate the outline.
-$combobox-focus-ring:              var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $combobox-header-padding-y:    .375rem !default;
 $combobox-header-padding-x:    .375rem !default;
@@ -37,15 +37,15 @@ $combobox-select-all-border-radius:   var(--#{$prefix}border-radius) !default;
 $combobox-options-gap:                .125rem !default;
 $combobox-options-padding-y:          .375rem !default;
 $combobox-options-padding-x:          .375rem !default;
-$combobox-options-font-size:          $font-size-base !default;
-$combobox-options-font-weight:        $font-weight-normal !default;
+$combobox-options-font-size:          var(--#{$prefix}body-font-size) !default;
+$combobox-options-font-weight:        var(--#{$prefix}font-weight-normal) !default;
 $combobox-options-color:              var(--#{$prefix}body-color) !default;
 
 $combobox-optgroup-label-padding-y:      .5rem !default;
 $combobox-optgroup-label-padding-x:      .625rem !default;
 $combobox-optgroup-label-border-radius:  var(--#{$prefix}border-radius) !default;
 $combobox-optgroup-label-font-size:      80% !default;
-$combobox-optgroup-label-font-weight:    $font-weight-bold !default;
+$combobox-optgroup-label-font-weight:    var(--#{$prefix}font-weight-bold) !default;
 $combobox-optgroup-label-color:          var(--#{$prefix}tertiary-color) !default;
 $combobox-optgroup-label-text-transform: uppercase !default;
 
@@ -74,7 +74,6 @@ $combobox-tokens: () !default;
 $combobox-tokens: defaults(
   (
     --#{$prefix}combobox-popup-min-width: #{$combobox-popup-min-width},
-    --#{$prefix}combobox-focus-ring: #{$combobox-focus-ring},
     --#{$prefix}combobox-header-padding-y: #{$combobox-header-padding-y},
     --#{$prefix}combobox-header-padding-x: #{$combobox-header-padding-x},
     --#{$prefix}combobox-header-border-width: #{$combobox-header-border-width},
@@ -153,7 +152,7 @@ $combobox-tokens: defaults(
     &:focus-visible {
       z-index: 5;
       border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
-      @include focus-ring(true, $ring: var(--#{$prefix}combobox-focus-ring));
+      @include focus-ring(true);
     }
   }
 
@@ -186,7 +185,7 @@ $combobox-tokens: defaults(
     &:focus-visible {
       z-index: 5;
       border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
-      @include focus-ring(true, $ring: var(--#{$prefix}combobox-focus-ring));
+      @include focus-ring(true);
     }
 
     &.disabled {
@@ -228,7 +227,7 @@ $combobox-tokens: defaults(
       &:focus-visible {
         z-index: 5;
         border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
-        @include focus-ring(true, $ring: var(--#{$prefix}combobox-focus-ring));
+        @include focus-ring(true);
       }
     }
   }

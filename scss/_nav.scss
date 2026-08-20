@@ -17,7 +17,6 @@ $nav-link-color:                    var(--#{$prefix}link-color) !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
 $nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out !default;
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
-$nav-link-focus-ring:               var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
 $nav-tabs-border-width:             var(--#{$prefix}border-width) !default;
@@ -28,8 +27,8 @@ $nav-tabs-link-active-bg:           var(--#{$prefix}body-bg) !default;
 $nav-tabs-link-active-border-color: var(--#{$prefix}border-color) var(--#{$prefix}border-color) $nav-tabs-link-active-bg !default;
 
 $nav-pills-border-radius:           var(--#{$prefix}border-radius) !default;
-$nav-pills-link-active-color:       $component-active-color !default;
-$nav-pills-link-active-bg:          $component-active-bg !default;
+$nav-pills-link-active-color:       var(--#{$prefix}primary-contrast) !default;
+$nav-pills-link-active-bg:          var(--#{$prefix}primary) !default;
 
 $nav-underline-gap:                 1rem !default;
 $nav-underline-border-width:        .125rem !default;
@@ -69,8 +68,8 @@ $nav-tokens: defaults(
     --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
     --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
     --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight},
-    --#{$prefix}nav-link-color: #{$nav-link-color},
-    --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color},
+    --#{$prefix}nav-link-color: var(--#{$prefix}theme-fg, #{$nav-link-color}),
+    --#{$prefix}nav-link-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$nav-link-hover-color}),
     --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color},
   ),
   $nav-tokens
@@ -108,8 +107,8 @@ $nav-pills-tokens: () !default;
 $nav-pills-tokens: defaults(
   (
     --#{$prefix}nav-pills-border-radius: #{$nav-pills-border-radius},
-    --#{$prefix}nav-pills-link-active-color: #{$nav-pills-link-active-color},
-    --#{$prefix}nav-pills-link-active-bg: #{$nav-pills-link-active-bg},
+    --#{$prefix}nav-pills-link-active-color: var(--#{$prefix}theme-contrast, #{$nav-pills-link-active-color}),
+    --#{$prefix}nav-pills-link-active-bg: var(--#{$prefix}theme-base, #{$nav-pills-link-active-bg}),
   ),
   $nav-pills-tokens
 );
@@ -126,7 +125,7 @@ $nav-underline-tokens: defaults(
   (
     --#{$prefix}nav-underline-gap: #{$nav-underline-gap},
     --#{$prefix}nav-underline-border-width: #{$nav-underline-border-width},
-    --#{$prefix}nav-underline-link-active-color: #{$nav-underline-link-active-color},
+    --#{$prefix}nav-underline-link-active-color: var(--#{$prefix}theme-fg, #{$nav-underline-link-active-color}),
   ),
   $nav-underline-tokens
 );
@@ -147,7 +146,7 @@ $nav-underline-border-tokens: defaults(
     --#{$prefix}nav-underline-border-link-padding-x: #{$nav-underline-border-link-padding-x},
     --#{$prefix}nav-underline-border-link-padding-y: #{$nav-underline-border-link-padding-y},
     --#{$prefix}nav-underline-border-link-color: #{$nav-underline-border-link-color},
-    --#{$prefix}nav-underline-border-link-active-color: #{$nav-underline-border-link-active-color},
+    --#{$prefix}nav-underline-border-link-active-color: var(--#{$prefix}theme-base, #{$nav-underline-border-link-active-color}),
     --#{$prefix}nav-underline-border-link-disabled-color: #{$nav-underline-border-link-disabled-color},
   ),
   $nav-underline-border-tokens
@@ -190,7 +189,7 @@ $nav-underline-border-tokens: defaults(
     }
 
     &:focus-visible {
-      @include focus-ring(true, $ring: $nav-link-focus-ring);
+      @include focus-ring(true);
     }
 
     // Disabled state lightens text
@@ -281,7 +280,7 @@ $nav-underline-border-tokens: defaults(
 
     .nav-link.active,
     .show > .nav-link {
-      font-weight: $font-weight-bold;
+      font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}nav-underline-link-active-color);
       border-bottom-color: currentcolor;
     }
@@ -314,7 +313,7 @@ $nav-underline-border-tokens: defaults(
 
     .nav-link.active,
     .show > .nav-link {
-      font-weight: $font-weight-bold;
+      font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}nav-underline-border-link-active-color);
       border-bottom-color: currentcolor;
     }

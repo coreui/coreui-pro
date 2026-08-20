@@ -13,7 +13,7 @@ $thumbnail-box-shadow:              var(--#{$prefix}box-shadow-sm) !default;
 // scss-docs-end thumbnail-variables
 
 // scss-docs-start figure-variables
-$figure-caption-font-size:          $small-font-size !default;
+$figure-caption-font-size:          var(--#{$prefix}small-font-size) !default;
 $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
 // scss-docs-end figure-variables
 
@@ -52,7 +52,7 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
   }
 
   .figure-img {
-    margin-bottom: $spacer * .5;
+    margin-bottom: var(--#{$prefix}spacer-2);
     line-height: 1;
   }
 

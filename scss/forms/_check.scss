@@ -1,11 +1,12 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
-@use "form-check" as *;
+@use "variables" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
+@use "../mixins/transition" as *;
 @use "../config" as *;
 
 // scss-docs-start check-variables
@@ -25,8 +26,8 @@ $check-mark-indeterminate:   url("data:image/svg+xml,<svg xmlns='http://www.w3.o
 // values recomputed for our scale: the box matches the label's font size, and the
 // margin is half that step's leading, so the control sits on the text's centre.
 $check-sizes: (
-  sm: (size: .875rem, margin-top: .21875rem, font-size: $font-size-sm),
-  lg: (size: 1.25rem, margin-top: .3125rem, font-size: $font-size-lg)
+  sm: (size: .875rem, margin-top: .21875rem, font-size: var(--#{$prefix}font-size-sm)),
+  lg: (size: 1.25rem, margin-top: .3125rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
 // scss-docs-end check-variables
 
@@ -45,14 +46,13 @@ $check-tokens: defaults(
     --#{$prefix}check-mark-color: #{$check-mark-color},
     --#{$prefix}check-mark-checked: #{escape-svg($check-mark-checked)},
     --#{$prefix}check-mark-indeterminate: #{escape-svg($check-mark-indeterminate)},
-    --#{$prefix}check-checked-bg: var(--#{$prefix}control-checked-bg),
-    --#{$prefix}check-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}check-checked-bg: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-bg)),
+    --#{$prefix}check-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}check-indeterminate-bg: var(--#{$prefix}control-indeterminate-bg),
     --#{$prefix}check-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
     --#{$prefix}check-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}check-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}check-size)) * .5),
+    --#{$prefix}check-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}check-size)) * .5),
     --#{$prefix}check-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}check-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}check-active-filter: #{$form-check-input-active-filter},
     --#{$prefix}check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
   ),
@@ -89,6 +89,7 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
     appearance: none;
     background-color: var(--#{$prefix}check-bg);
     border: var(--#{$prefix}check-border);
+    @include transition(background-color var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing), border-color var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing));
     print-color-adjust: exact;
     @include border-radius(var(--#{$prefix}check-border-radius));
 
@@ -99,7 +100,9 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
       content: "";
       background-color: var(--#{$prefix}check-mark-color);
       opacity: 0;
+      transform: scale(0);
       @include mask-icon(var(--#{$prefix}check-mark-checked));
+      @include transition(opacity var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing), transform var(--#{$prefix}control-transition-duration) var(--#{$prefix}control-transition-timing));
     }
 
     &:checked {
@@ -108,6 +111,7 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
 
       &::before {
         opacity: 1;
+        transform: scale(1);
       }
     }
 
@@ -118,12 +122,13 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
       &::before {
         opacity: 1;
         mask-image: var(--#{$prefix}check-mark-indeterminate);
+        transform: scale(1);
       }
     }
 
-    &:focus {
+    &:focus-visible {
       border-color: var(--#{$prefix}check-focus-border);
-      @include focus-ring(true, $ring: var(--#{$prefix}check-focus-ring));
+      @include focus-ring(true);
     }
 
     &:active {

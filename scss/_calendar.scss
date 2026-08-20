@@ -19,7 +19,7 @@ $calendar-nav-border-color:                  var(--#{$prefix}border-color) !defa
 
 $calendar-nav-btn-padding-y:                 .25rem !default;
 $calendar-nav-btn-padding-x:                 .5rem !default;
-$calendar-nav-btn-font-size:                 $font-size-sm !default;
+$calendar-nav-btn-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $calendar-nav-btn-bg:                        transparent !default;
 $calendar-nav-btn-border-width:              1px !default;
 $calendar-nav-btn-border-color:              transparent !default;
@@ -29,7 +29,6 @@ $calendar-nav-btn-hover-bg:                  transparent !default;
 $calendar-nav-btn-hover-border-color:        transparent !default;
 
 $calendar-nav-btn-focus-border-color:        transparent !default;
-$calendar-nav-btn-focus-ring:                var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $calendar-nav-date-font-weight:              600 !default;
 $calendar-nav-date-color:                    var(--#{$prefix}body-color) !default;
@@ -47,9 +46,8 @@ $calendar-cell-hover-color:                  var(--#{$prefix}body-color) !defaul
 $calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
 $calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
 
-$calendar-cell-focus-ring:                   var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
-$calendar-cell-selected-color:               $white !default;
+$calendar-cell-selected-color:               var(--#{$prefix}white) !default;
 $calendar-cell-selected-bg:                  var(--#{$prefix}primary) !default;
 
 $calendar-cell-range-bg:                     color-mix(in srgb, var(--#{$prefix}primary) 12.5%, transparent) !default;
@@ -84,7 +82,6 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-nav-btn-hover-bg: #{$calendar-nav-btn-hover-bg},
     --#{$prefix}calendar-nav-btn-hover-border-color: #{$calendar-nav-btn-hover-border-color},
     --#{$prefix}calendar-nav-btn-focus-border-color: #{$calendar-nav-btn-focus-border-color},
-    --#{$prefix}calendar-nav-btn-focus-ring: #{$calendar-nav-btn-focus-ring},
     --#{$prefix}calendar-nav-date-font-weight: #{$calendar-nav-date-font-weight},
     --#{$prefix}calendar-nav-date-color: #{$calendar-nav-date-color},
     --#{$prefix}calendar-nav-date-hover-color: #{$calendar-nav-date-hover-color},
@@ -98,7 +95,6 @@ $calendar-tokens: defaults(
     --#{$prefix}calendar-cell-week-number-color: #{$calendar-cell-week-number-color},
     --#{$prefix}calendar-cell-hover-color: #{$calendar-cell-hover-color},
     --#{$prefix}calendar-cell-hover-bg: #{$calendar-cell-hover-bg},
-    --#{$prefix}calendar-cell-focus-ring: #{$calendar-cell-focus-ring},
     --#{$prefix}calendar-cell-disabled-color: #{$calendar-cell-disabled-color},
     --#{$prefix}calendar-cell-selected-color: #{$calendar-cell-selected-color},
     --#{$prefix}calendar-cell-selected-bg: #{$calendar-cell-selected-bg},
@@ -170,7 +166,11 @@ $calendar-tokens: defaults(
     background-color: var(--#{$prefix}calendar-nav-btn-bg);
     border: var(--#{$prefix}calendar-nav-btn-border-width) solid var(--#{$prefix}calendar-nav-btn-border-color);
     @include border-radius(var(--#{$prefix}calendar-nav-btn-border-radius));
-    @include transition($btn-transition);
+    @include transition-props(
+      var(--#{$prefix}btn-input-action-transition-property),
+      var(--#{$prefix}btn-input-transition-duration),
+      var(--#{$prefix}btn-input-transition-timing)
+    );
 
     &:hover {
       background-color: var(--#{$prefix}calendar-nav-btn-hover-bg);
@@ -179,7 +179,7 @@ $calendar-tokens: defaults(
 
     &:focus-visible {
       border-color: var(--#{$prefix}calendar-nav-btn-focus-border-color);
-      @include focus-ring(true, $ring: var(--#{$prefix}calendar-nav-btn-focus-ring));
+      @include focus-ring(true);
     }
   }
 
@@ -346,7 +346,7 @@ $calendar-tokens: defaults(
       outline: 0;
 
       .calendar-cell-inner {
-        @include focus-ring(true, $ring: var(--#{$prefix}calendar-cell-focus-ring));
+        @include focus-ring(true);
         @include border-radius($border-radius);
       }
     }
@@ -391,7 +391,7 @@ $calendar-tokens: defaults(
     }
 
     &:focus-visible {
-      @include focus-ring(true, $ring: var(--#{$prefix}calendar-cell-focus-ring));
+      @include focus-ring(true);
       @include border-radius($border-radius);
     }
   }

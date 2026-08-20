@@ -6,7 +6,7 @@
 @use "config" as *;
 
 // scss-docs-start popover-variables
-$popover-font-size:                 $font-size-sm !default;
+$popover-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $popover-bg:                        var(--#{$prefix}body-bg) !default;
 $popover-max-width:                 276px !default;
 $popover-border-width:              var(--#{$prefix}border-width) !default;
@@ -15,15 +15,15 @@ $popover-border-radius:             var(--#{$prefix}border-radius-lg) !default;
 $popover-inner-border-radius:       calc(#{$popover-border-radius} - #{$popover-border-width}) !default; // stylelint-disable-line function-disallowed-list
 $popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
 
-$popover-header-font-size:          $font-size-base !default;
+$popover-header-font-size:          var(--#{$prefix}body-font-size) !default;
 $popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
 $popover-header-color:              $headings-color !default;
 $popover-header-padding-y:          .5rem !default;
-$popover-header-padding-x:          $spacer !default;
+$popover-header-padding-x:          var(--#{$prefix}spacer-3) !default;
 
 $popover-body-color:                var(--#{$prefix}body-color) !default;
-$popover-body-padding-y:            $spacer !default;
-$popover-body-padding-x:            $spacer !default;
+$popover-body-padding-y:            var(--#{$prefix}spacer-3) !default;
+$popover-body-padding-x:            var(--#{$prefix}spacer-3) !default;
 
 $popover-arrow-width:               1rem !default;
 $popover-arrow-height:              .5rem !default;
@@ -42,7 +42,7 @@ $popover-tokens: () !default;
 // scss-docs-start popover-css-vars
 $popover-tokens: defaults(
   (
-    --#{$prefix}popover-zindex: #{$zindex-popover},
+    --#{$prefix}popover-zindex: var(--#{$prefix}z-popover),
     --#{$prefix}popover-max-width: #{$popover-max-width},
     --#{$prefix}popover-bg: #{$popover-bg},
     --#{$prefix}popover-border-width: #{$popover-border-width},

@@ -8,7 +8,7 @@ description: "Use our low-level `z-index` utilities to quickly change the stack 
 
 Use `z-index` utilities to stack elements on top of one another. Requires a `position` value other than `static`, which can be set with custom styles or using our [position utilities](/utilities/position/).
 
-We call these "low-level" `z-index` utilities because of their default values of `-1` through `3`, which we use for the layout of overlapping components. High-level `z-index` values are used for overlay components like modals and tooltips.
+We call these "low-level" `z-index` utilities because of their default values of `-1` through `3`, which we use for the layout of overlapping components. The library's overlay layers are available as utilities too — see [Overlays](#overlays) below.
 
 <Example class="docs-example-zindex-levels position-relative" code={`<div class="z-3 position-absolute p-5 rounded-3"><span>z-3</span></div>
   <div class="z-2 position-absolute p-5 rounded-3"><span>z-2</span></div>
@@ -20,7 +20,15 @@ We call these "low-level" `z-index` utilities because of their default values of
 
 Bootstrap overlay components—dropdown, modal, offcanvas, popover, toast, and tooltip—all have their own `z-index` values to ensure a usable experience with competing "layers" of an interface.
 
-Read about them in the [`z-index` layout page](/layout/z-index/).
+<AddedIn version="6.0.0" />
+
+Each of those layers has a matching utility, so your own element can join a layer by name instead of repeating the number it happens to have: `.z-dropdown`, `.z-sticky`, `.z-fixed`, `.z-sidebar-backdrop`, `.z-sidebar`, `.z-offcanvas`, `.z-modal`, `.z-popover`, `.z-tooltip` and `.z-toast`.
+
+<Example code={`<div class="position-relative" style="height: 6rem;">
+    <div class="z-modal position-absolute top-0 start-0 p-3 bg-primary-subtle border rounded">Sits at the modal layer</div>
+  </div>`} />
+
+Read about the values themselves in the [`z-index` layout page](/layout/z-index/).
 
 ## CSS
 

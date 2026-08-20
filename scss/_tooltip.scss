@@ -6,14 +6,14 @@
 @use "config" as *;
 
 // scss-docs-start tooltip-variables
-$tooltip-font-size:                 $font-size-sm !default;
+$tooltip-font-size:                 var(--#{$prefix}font-size-sm) !default;
 $tooltip-max-width:                 200px !default;
 $tooltip-color:                     var(--#{$prefix}body-bg) !default;
 $tooltip-bg:                        var(--#{$prefix}emphasis-color) !default;
 $tooltip-border-radius:             var(--#{$prefix}border-radius) !default;
 $tooltip-opacity:                   .9 !default;
-$tooltip-padding-y:                 $spacer * .25 !default;
-$tooltip-padding-x:                 $spacer * .5 !default;
+$tooltip-padding-y:                 var(--#{$prefix}spacer-1) !default;
+$tooltip-padding-x:                 var(--#{$prefix}spacer-2) !default;
 $tooltip-margin:                    null !default; // TODO: remove this in v6
 
 $tooltip-arrow-width:               .8rem !default;
@@ -27,7 +27,7 @@ $tooltip-tokens: () !default;
 // scss-docs-start tooltip-css-vars
 $tooltip-tokens: defaults(
   (
-    --#{$prefix}tooltip-zindex: #{$zindex-tooltip},
+    --#{$prefix}tooltip-zindex: var(--#{$prefix}z-tooltip),
     --#{$prefix}tooltip-max-width: #{$tooltip-max-width},
     --#{$prefix}tooltip-padding-x: #{$tooltip-padding-x},
     --#{$prefix}tooltip-padding-y: #{$tooltip-padding-y},

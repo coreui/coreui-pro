@@ -1,54 +1,39 @@
 @use "sass:map";
-@use "sass:math";
 @use "../functions/defaults" as *;
-@use "../functions/escape-svg" as *;
-@use "form-check" as *;
+@use "variables" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// The switch's own theming surface — see the note in `_check.scss`. The size
-// modifiers set tokens rather than declarations, so a size the map does not name
-// is one custom property rather than a Sass recompile.
-
 // scss-docs-start switch-variables
-// The track's proportion, not its width: the width follows the height, so a
-// size is one token. `$form-switch-width` still sets it, as the width the
-// default height produces.
-$switch-aspect-ratio:         math.div($form-switch-width, $form-check-input-width) !default;
-$switch-height:               $form-check-input-width !default;
-$switch-border-radius:        $form-switch-border-radius !default;
-// Duration and timing only — the property is named at the point of use. The v5
-// `$form-switch-transition` cannot serve here: it carries `background-position`
-// inside it, which made the whole `transition` declaration invalid.
-$switch-transition-duration:  .15s !default;
-$switch-transition-timing:    ease-in-out !default;
-$switch-bg:                   $form-check-input-bg !default;
-$switch-border:               $form-check-input-border !default;
-$switch-padding:              .125em !default;
-$switch-thumb-bg:             $form-switch-color !default;
-$switch-checked-thumb-bg:     $form-switch-checked-color !default;
-$switch-knob:                 $form-switch-bg-image !default;
-$switch-knob-focus:           $form-switch-focus-bg-image !default;
-$switch-knob-checked:         $form-switch-checked-bg-image !default;
-$switch-knob-dark:            $form-switch-bg-image-dark !default;
-$switch-checked-knob-position: $form-switch-checked-bg-position !default;
+$switch-aspect-ratio:         1.75 !default;
+$switch-height:               1.25rem !default;
+$switch-border-radius:        var(--#{$prefix}border-radius-pill) !default;
+$switch-transition-duration:  var(--#{$prefix}control-transition-duration) !default;
+$switch-transition-timing:    var(--#{$prefix}control-transition-timing) !default;
+$switch-bg:                   var(--#{$prefix}tertiary-bg) !default;
+$switch-box-shadow:           inset 0 1px 2px color-mix(in srgb, var(--#{$prefix}black) 5%, transparent) !default;
+$switch-border-width:         var(--#{$prefix}border-width) !default;
+$switch-border-color:         var(--#{$prefix}border-color) !default;
+$switch-padding:              .0625rem !default;
+$switch-thumb-bg:             var(--#{$prefix}white) !default;
+$switch-thumb-shadow:         0 1px 2px color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
+$switch-checked-thumb-bg:     var(--#{$prefix}primary-contrast) !default;
+$switch-disabled-bg:          var(--#{$prefix}control-disabled-bg) !default;
+$switch-disabled-thumb-bg:    var(--#{$prefix}tertiary-color) !default;
 
-// Sized like `.check` and `.radio`: one height, and the label follows so the
-// whole row scales. `xl` has no checkbox counterpart — it is ours.
 $switch-sizes: (
-  sm: (height: .875rem, font-size: $font-size-sm),
-  lg: (height: 1.25rem, font-size: $font-size-lg),
-  xl: (height: 1.5rem, font-size: $font-size-lg)
+  sm: (height: 1rem,    font-size: var(--#{$prefix}font-size-sm)),
+  lg: (height: 1.5rem,  font-size: var(--#{$prefix}font-size-lg)),
+  xl: (height: 1.75rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
 // scss-docs-end switch-variables
 
 $switch-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
 
 // scss-docs-start switch-css-vars
 $switch-tokens: defaults(
@@ -59,43 +44,34 @@ $switch-tokens: defaults(
     --#{$prefix}switch-transition-duration: #{$switch-transition-duration},
     --#{$prefix}switch-transition-timing: #{$switch-transition-timing},
     --#{$prefix}switch-bg: #{$switch-bg},
-    --#{$prefix}switch-border: #{$switch-border},
+    --#{$prefix}switch-box-shadow: #{$switch-box-shadow},
+    --#{$prefix}switch-border-width: #{$switch-border-width},
+    --#{$prefix}switch-border-color: #{$switch-border-color},
     --#{$prefix}switch-padding: #{$switch-padding},
     --#{$prefix}switch-thumb-bg: #{$switch-thumb-bg},
-    --#{$prefix}switch-thumb-size: calc(var(--#{$prefix}switch-height) - var(--#{$prefix}switch-padding) * 2),
-    --#{$prefix}switch-checked-bg: var(--#{$prefix}control-checked-bg),
-    --#{$prefix}switch-checked-border-color: var(--#{$prefix}control-checked-border-color),
+    --#{$prefix}switch-thumb-size: calc(var(--#{$prefix}switch-height) - var(--#{$prefix}switch-padding) * 2 - var(--#{$prefix}switch-border-width) * 2),
+    --#{$prefix}switch-thumb-shadow: #{$switch-thumb-shadow},
+    --#{$prefix}switch-checked-bg: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-bg)),
+    --#{$prefix}switch-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
+    --#{$prefix}switch-disabled-bg: #{$switch-disabled-bg},
+    --#{$prefix}switch-disabled-thumb-bg: #{$switch-disabled-thumb-bg},
     --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
-    --#{$prefix}switch-margin-top: calc((#{$line-height-base * 1em} - var(--#{$prefix}switch-height)) * .5),
+    --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
     --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}switch-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
     --#{$prefix}switch-label-disabled-opacity: #{$form-check-label-disabled-opacity},
-    --#{$prefix}switch-knob: #{escape-svg($switch-knob)},
-    --#{$prefix}switch-knob-focus: #{escape-svg($switch-knob-focus)},
-    --#{$prefix}switch-knob-checked: #{escape-svg($switch-knob-checked)},
-    --#{$prefix}switch-knob-dark: #{escape-svg($switch-knob-dark)},
-    --#{$prefix}switch-checked-knob-position: #{$switch-checked-knob-position},
   ),
   $switch-tokens
 );
 // scss-docs-end switch-css-vars
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
+// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
 
-// The v5 spelling is an alias of this control rather than a second
-// implementation, so it is part of its selector list;
-// `$enable-deprecated-form-check: false` compiles it out.
 // stylelint-disable-next-line scss/at-function-named-arguments
 $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch .form-check-input"; else: ".switch") !default;
 
 @layer forms {
-  // Like `.check` and `.radio`, the class goes on the `<input>`: the track is the
-  // input and the thumb is its `::before`, so the thumb's colour is a token
-  // instead of a fill baked into an SVG — which is also what lets the separate
-  // dark-mode knob go.
   #{$switch-selector} {
     @include tokens($switch-tokens);
 
@@ -103,13 +79,12 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
     flex-shrink: 0;
     width: var(--#{$prefix}switch-width);
     height: var(--#{$prefix}switch-height);
-    // Half the leading, so the control sits on the text's optical centre — the
-    // alignment the `.form-check` wrapper used to apply, now following the size.
     margin-top: var(--#{$prefix}switch-margin-top);
     vertical-align: top;
     appearance: none;
     background-color: var(--#{$prefix}switch-bg);
-    border: var(--#{$prefix}switch-border);
+    border: var(--#{$prefix}switch-border-width) solid var(--#{$prefix}switch-border-color);
+    box-shadow: var(--#{$prefix}switch-box-shadow);
     print-color-adjust: exact;
     @include border-radius(var(--#{$prefix}switch-border-radius), 0);
     @include transition(background-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing), border-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing));
@@ -124,6 +99,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       background-color: var(--#{$prefix}switch-thumb-bg);
       // stylelint-disable-next-line property-disallowed-list
       border-radius: 50%;
+      box-shadow: var(--#{$prefix}switch-thumb-shadow);
       transform: translateY(-50%);
       @include transition(inset-inline-start var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing), background-color var(--#{$prefix}switch-transition-duration) var(--#{$prefix}switch-transition-timing));
     }
@@ -139,15 +115,27 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       }
     }
 
-    &:focus {
+    &:focus-visible {
       border-color: var(--#{$prefix}switch-focus-border);
-      @include focus-ring(true, $ring: var(--#{$prefix}switch-focus-ring));
+      @include focus-ring(true);
     }
 
     &:disabled {
       pointer-events: none;
       filter: none;
-      opacity: var(--#{$prefix}switch-disabled-opacity);
+
+      &:not(:checked) {
+        background-color: var(--#{$prefix}switch-disabled-bg);
+
+        &::before {
+          background-color: var(--#{$prefix}switch-disabled-thumb-bg);
+          opacity: .4;
+        }
+      }
+
+      &:checked {
+        opacity: var(--#{$prefix}switch-disabled-opacity);
+      }
 
       ~ label {
         cursor: default;
@@ -156,23 +144,6 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
     }
   }
 
-  @if $enable-deprecated-form-check {
-    .form-switch {
-      @include tokens($switch-tokens);
-
-      // stylelint-disable-next-line function-disallowed-list
-      --#{$prefix}form-switch-padding-start: calc(var(--#{$prefix}switch-width) + .5em);
-      --#{$prefix}form-switch-width: var(--#{$prefix}switch-width);
-      --#{$prefix}form-switch-border-radius: var(--#{$prefix}switch-border-radius);
-      --#{$prefix}form-switch-transition: #{$form-switch-transition};
-      --#{$prefix}form-switch-bg: var(--#{$prefix}switch-knob);
-      --#{$prefix}form-switch-checked-bg-position: var(--#{$prefix}switch-checked-knob-position);
-    }
-  }
-
-  // A size is one token: the width follows the height through the aspect ratio,
-  // and so do the thumb and the optical centring. The label follows too, so the
-  // whole row scales — the way `.check-sm` and `.radio-lg` do.
   @each $size, $map in $switch-sizes {
     .switch-#{$size} {
       --#{$prefix}switch-height: #{map.get($map, "height")};
@@ -183,32 +154,23 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
     }
   }
 
-  // v5 sized the wrapper, and only `lg` and `xl` existed. Its own map keeps
-  // driving them, in `em` as it always was, so markup that has not moved is
-  // unaffected by the new `rem` scale above.
   @each $size, $map in $form-switch-widths {
     @if $enable-deprecated-form-check {
-      // The control declares these tokens for itself, so a value inherited from
-      // the wrapper would lose to it — they are set on the input.
+      // Set on the input — the control declares these tokens itself, so an
+      // inherited value would lose to its own declaration.
       .form-switch-#{$size} .form-check-input {
         --#{$prefix}switch-width: #{map.get($map, "width")};
         --#{$prefix}switch-height: #{map.get($map, "height")};
-        // v5 gave every sized switch the same margin as the default one, which
-        // left it a little below the line's centre. The compatibility layer keeps
-        // that rather than quietly re-centring markup nobody has touched.
-        --#{$prefix}switch-margin-top: #{($line-height-base - $form-check-input-width) * .5};
+        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - #{$form-check-input-width}) * .5); // stylelint-disable-line function-disallowed-list
       }
 
       .form-switch-#{$size} {
         --#{$prefix}switch-height: #{map.get($map, "height")};
-        // A sized switch is taller than the text line it sits on, so it sets the
-        // row height itself and re-centres the label; the default one keeps
-        // `.form-check`'s.
         min-height: var(--#{$prefix}switch-height);
 
         .form-check-label {
           // stylelint-disable-next-line function-disallowed-list
-          padding-top: calc((var(--#{$prefix}switch-height) - #{$font-size-base}) * .5);
+          padding-top: calc((var(--#{$prefix}switch-height) - #{var(--#{$prefix}body-font-size)}) * .5);
         }
       }
     }

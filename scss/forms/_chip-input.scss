@@ -1,3 +1,4 @@
+@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
@@ -14,7 +15,9 @@ $chip-input-border-width:      var(--#{$prefix}btn-input-border-width) !default;
 $chip-input-border-color:      var(--#{$prefix}border-color) !default;
 $chip-input-border-radius:     var(--#{$prefix}border-radius) !default;
 $chip-input-gap:               .375rem !default;
-$chip-input-transition:        $input-transition !default;
+$chip-input-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
+$chip-input-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
+$chip-input-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
 
 $chip-input-min-height-sm:     var(--#{$prefix}btn-input-sm-min-height) !default;
 $chip-input-padding-y-sm:      .125rem !default;
@@ -51,7 +54,9 @@ $chip-input-tokens: defaults(
     --#{$prefix}control-border-color: #{$chip-input-border-color},
     --#{$prefix}control-border-radius: #{$chip-input-border-radius},
     --#{$prefix}chip-input-gap: #{$chip-input-gap},
-    --#{$prefix}control-transition: #{$chip-input-transition},
+    --#{$prefix}control-transition-property: #{$chip-input-transition-property},
+    --#{$prefix}control-transition-duration: #{$chip-input-transition-duration},
+    --#{$prefix}control-transition-timing: #{$chip-input-transition-timing},
   ),
   $chip-input-tokens
 );

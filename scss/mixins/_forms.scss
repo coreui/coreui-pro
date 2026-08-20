@@ -1,3 +1,4 @@
+@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../functions/math" as *;
@@ -16,9 +17,9 @@
 // tooltip's default formulas. The Sass-level derivation from $tooltip-* is
 // gone — the runtime link through var(--#{$prefix}tooltip-*) replaces it.
 // scss-docs-start tooltip-feedback-variables
-$form-feedback-tooltip-padding-y:     $spacer * .25 !default;
-$form-feedback-tooltip-padding-x:     $spacer * .5 !default;
-$form-feedback-tooltip-font-size:     $font-size-sm !default;
+$form-feedback-tooltip-padding-y:     var(--#{$prefix}spacer-1) !default;
+$form-feedback-tooltip-padding-x:     var(--#{$prefix}spacer-2) !default;
+$form-feedback-tooltip-font-size:     var(--#{$prefix}font-size-sm) !default;
 $form-feedback-tooltip-line-height:   null !default;
 $form-feedback-tooltip-opacity:       .9 !default;
 $form-feedback-tooltip-border-radius: var(--#{$prefix}border-radius) !default;
@@ -66,10 +67,10 @@ $form-feedback-tokens: defaults(
 // The frame's share of a validation state. Every field component draws its
 // frame with `.form-control-group`, so the treatment is one and the same —
 // only the selector that spots the state differs from family to family.
-@mixin form-control-group-validation-state($color, $border-color, $focus-ring) {
+@mixin form-control-group-validation-state($color, $border-color, $focus-ring-color) {
   --#{$prefix}control-border-color: #{$border-color};
   --#{$prefix}control-focus-border-color: #{$border-color};
-  --#{$prefix}control-focus-ring: #{$focus-ring};
+  --#{$prefix}control-focus-ring: #{$focus-ring-color};
   --#{$prefix}control-group-icon-color: #{$color};
   --#{$prefix}control-group-action-color: #{$color};
 }
@@ -78,14 +79,17 @@ $form-feedback-tokens: defaults(
 // implementation; `$enable-deprecated-form-check: false` compiles it out.
 $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
 
+// Every colour comes from a slot of the state's theme colour, so a validation
+// state carries a name rather than a palette of its own.
 @mixin form-validation-state(
   $state,
-  $color,
+  $theme,
   $icon,
-  $tooltip-color: color-contrast($color, $color-contrast-dark, $color-contrast-light, $white, $black, $min-contrast-ratio),
-  $tooltip-bg-color: rgba($color, $form-feedback-tooltip-opacity),
-  $focus-ring: $input-focus-width solid rgba($color, $input-btn-focus-color-opacity),
-  $border-color: $color
+  $color: var(--#{$prefix}#{$theme}-fg),
+  $tooltip-color: var(--#{$prefix}#{$theme}-contrast),
+  $tooltip-bg-color: color-mix(in srgb, var(--#{$prefix}#{$theme}) #{$form-feedback-tooltip-opacity * 100%}, transparent),
+  $focus-ring-color: var(--#{$prefix}#{$theme}-focus-ring),
+  $border-color: var(--#{$prefix}#{$theme}-fg)
 ) {
   .#{$state}-feedback {
     @include tokens($form-feedback-tokens);
@@ -130,7 +134,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring};
+      --#{$prefix}control-focus-ring: #{$focus-ring-color};
 
       @if $enable-validation-icons {
         padding-inline-end: $input-height-inner;
@@ -149,7 +153,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
 
       &:focus {
         border-color: $border-color;
-        @include focus-ring(true, $ring: $focus-ring);
+        @include focus-ring(true, $color: $focus-ring-color);
       }
     }
   }
@@ -168,7 +172,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   .form-control-group:has(> .form-control.is-#{$state}),
   .autocomplete.is-#{$state} .form-control-group,
   .form-multi-select.is-#{$state} .form-control-group {
-    @include form-control-group-validation-state($color, $border-color, $focus-ring);
+    @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
   }
 
   @if $state == "valid" or $state == "invalid" {
@@ -177,7 +181,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     // native select, which sits next to the group rather than inside it.
     .was-validated .form-control-group:has(> .form-control:#{$state}),
     .was-validated .form-multi-select:has(> select:#{$state}) .form-control-group {
-      @include form-control-group-validation-state($color, $border-color, $focus-ring);
+      @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
     }
   }
 
@@ -206,7 +210,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     @include form-validation-state-selector($state) {
       --#{$prefix}control-border-color: #{$border-color};
       --#{$prefix}control-focus-border-color: #{$border-color};
-      --#{$prefix}control-focus-ring: #{$focus-ring};
+      --#{$prefix}control-focus-ring: #{$focus-ring-color};
 
       @if $enable-validation-icons {
         &:not([multiple]):not([size]),
@@ -237,8 +241,8 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
         background-color: $color;
       }
 
-      &:focus {
-        @include focus-ring(true, $ring: $focus-ring);
+      &:focus-visible {
+        @include focus-ring(true, $color: $focus-ring-color);
       }
 
       ~ label {

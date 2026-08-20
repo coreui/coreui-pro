@@ -16,7 +16,7 @@ $pagination-padding-x-sm:           .5rem !default;
 $pagination-padding-y-lg:           .75rem !default;
 $pagination-padding-x-lg:           1.5rem !default;
 
-$pagination-font-size:              $font-size-base !default;
+$pagination-font-size:              var(--#{$prefix}body-font-size) !default;
 
 $pagination-color:                  var(--#{$prefix}link-color) !default;
 $pagination-bg:                     var(--#{$prefix}body-bg) !default;
@@ -27,15 +27,14 @@ $pagination-border-color:           var(--#{$prefix}border-color) !default;
 
 $pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-focus-bg:               var(--#{$prefix}secondary-bg) !default;
-$pagination-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
 $pagination-hover-border-color:     var(--#{$prefix}border-color) !default; // Todo in v6: remove this?
 
-$pagination-active-color:           $component-active-color !default;
-$pagination-active-bg:              $component-active-bg !default;
-$pagination-active-border-color:    $component-active-bg !default;
+$pagination-active-color:           var(--#{$prefix}primary-contrast) !default;
+$pagination-active-bg:              var(--#{$prefix}primary) !default;
+$pagination-active-border-color:    $pagination-active-bg !default;
 
 $pagination-disabled-color:         var(--#{$prefix}secondary-color) !default;
 $pagination-disabled-bg:            var(--#{$prefix}secondary-bg) !default;
@@ -56,20 +55,19 @@ $pagination-tokens: defaults(
   (
     --#{$prefix}pagination-padding-x: #{$pagination-padding-x},
     --#{$prefix}pagination-padding-y: #{$pagination-padding-y},
-    --#{$prefix}pagination-color: #{$pagination-color},
+    --#{$prefix}pagination-color: var(--#{$prefix}theme-fg, #{$pagination-color}),
     --#{$prefix}pagination-bg: #{$pagination-bg},
     --#{$prefix}pagination-border-width: #{$pagination-border-width},
     --#{$prefix}pagination-border-color: #{$pagination-border-color},
     --#{$prefix}pagination-border-radius: #{$pagination-border-radius},
-    --#{$prefix}pagination-hover-color: #{$pagination-hover-color},
-    --#{$prefix}pagination-hover-bg: #{$pagination-hover-bg},
-    --#{$prefix}pagination-hover-border-color: #{$pagination-hover-border-color},
+    --#{$prefix}pagination-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$pagination-hover-color}),
+    --#{$prefix}pagination-hover-bg: var(--#{$prefix}theme-bg-subtle, #{$pagination-hover-bg}),
+    --#{$prefix}pagination-hover-border-color: var(--#{$prefix}theme-border, #{$pagination-hover-border-color}),
     --#{$prefix}pagination-focus-color: #{$pagination-focus-color},
     --#{$prefix}pagination-focus-bg: #{$pagination-focus-bg},
-    --#{$prefix}pagination-focus-ring: #{$pagination-focus-ring},
-    --#{$prefix}pagination-active-color: #{$pagination-active-color},
-    --#{$prefix}pagination-active-bg: #{$pagination-active-bg},
-    --#{$prefix}pagination-active-border-color: #{$pagination-active-border-color},
+    --#{$prefix}pagination-active-color: var(--#{$prefix}theme-contrast, #{$pagination-active-color}),
+    --#{$prefix}pagination-active-bg: var(--#{$prefix}theme-base, #{$pagination-active-bg}),
+    --#{$prefix}pagination-active-border-color: var(--#{$prefix}theme-base, #{$pagination-active-border-color}),
     --#{$prefix}pagination-disabled-color: #{$pagination-disabled-color},
     --#{$prefix}pagination-disabled-bg: #{$pagination-disabled-bg},
     --#{$prefix}pagination-disabled-border-color: #{$pagination-disabled-border-color},
@@ -108,11 +106,11 @@ $pagination-tokens: defaults(
       border-color: var(--#{$prefix}pagination-hover-border-color);
     }
 
-    &:focus {
+    &:focus-visible {
       z-index: 3;
       color: var(--#{$prefix}pagination-focus-color);
       background-color: var(--#{$prefix}pagination-focus-bg);
-      @include focus-ring(true, $ring: var(--#{$prefix}pagination-focus-ring));
+      @include focus-ring(true);
     }
 
     &.active,
@@ -163,10 +161,10 @@ $pagination-tokens: defaults(
   //
 
   .pagination-lg {
-    @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $pagination-border-radius-lg);
+    @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, var(--#{$prefix}font-size-lg), $pagination-border-radius-lg);
   }
 
   .pagination-sm {
-    @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $pagination-border-radius-sm);
+    @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, var(--#{$prefix}font-size-sm), $pagination-border-radius-sm);
   }
 }

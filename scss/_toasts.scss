@@ -33,7 +33,7 @@ $toast-tokens: () !default;
 // scss-docs-start toast-css-vars
 $toast-tokens: defaults(
   (
-    --#{$prefix}toast-zindex: #{$zindex-toast},
+    --#{$prefix}toast-zindex: var(--#{$prefix}z-toast),
     --#{$prefix}toast-padding-x: #{$toast-padding-x},
     --#{$prefix}toast-padding-y: #{$toast-padding-y},
     --#{$prefix}toast-spacing: #{$toast-spacing},
@@ -41,12 +41,12 @@ $toast-tokens: defaults(
     --#{$prefix}toast-color: #{$toast-color},
     --#{$prefix}toast-bg: #{$toast-background-color},
     --#{$prefix}toast-border-width: #{$toast-border-width},
-    --#{$prefix}toast-border-color: #{$toast-border-color},
+    --#{$prefix}toast-border-color: var(--#{$prefix}theme-border, #{$toast-border-color}),
     --#{$prefix}toast-border-radius: #{$toast-border-radius},
     --#{$prefix}toast-box-shadow: #{$toast-box-shadow},
-    --#{$prefix}toast-header-color: #{$toast-header-color},
-    --#{$prefix}toast-header-bg: #{$toast-header-background-color},
-    --#{$prefix}toast-header-border-color: #{$toast-header-border-color},
+    --#{$prefix}toast-header-color: var(--#{$prefix}theme-fg-emphasis, #{$toast-header-color}),
+    --#{$prefix}toast-header-bg: var(--#{$prefix}theme-bg-subtle, #{$toast-header-background-color}),
+    --#{$prefix}toast-header-border-color: var(--#{$prefix}theme-border, #{$toast-header-border-color}),
     --#{$prefix}toast-font-size: $toast-font-size,
     --#{$prefix}toast-transition-duration: #{$toast-transition-duration},
     --#{$prefix}toast-transition-timing: #{$toast-transition-timing},
@@ -98,7 +98,7 @@ $toast-tokens: defaults(
   }
 
   .toast-container {
-    --#{$prefix}toast-zindex: #{$zindex-toast};
+    --#{$prefix}toast-zindex: var(--#{$prefix}z-toast);
 
     position: absolute;
     z-index: var(--#{$prefix}toast-zindex);

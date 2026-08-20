@@ -1,7 +1,125 @@
 @use "sass:map";
 @use "functions/maps" as *;
-@use "maps" as *;
+@use "theme" as *;
 @use "config" as *;
+
+// Utilities maps
+//
+// Extends the default `$theme-colors` maps to help create our utilities.
+
+// Come v6, we'll de-dupe these variables. Until then, for backward compatibility, we keep them to reassign.
+// scss-docs-start utilities-colors
+$utilities-colors: map-slot($theme-colors, "base") !default;
+// scss-docs-end utilities-colors
+
+// scss-docs-start utilities-text-colors
+$utilities-text: map.merge(
+  $utilities-colors,
+  (
+    "black": var(--#{$prefix}black),
+    "white": var(--#{$prefix}white),
+    "body": var(--#{$prefix}body-color)
+  )
+) !default;
+$utilities-text-colors: map-loop($utilities-text, color-var-ref, "$prefix", "$key", "text") !default;
+
+$utilities-text-emphasis-colors: (
+  "primary-emphasis": var(--#{$prefix}primary-text-emphasis),
+  "secondary-emphasis": var(--#{$prefix}secondary-text-emphasis),
+  "success-emphasis": var(--#{$prefix}success-text-emphasis),
+  "info-emphasis": var(--#{$prefix}info-text-emphasis),
+  "warning-emphasis": var(--#{$prefix}warning-text-emphasis),
+  "danger-emphasis": var(--#{$prefix}danger-text-emphasis),
+  "light-emphasis": var(--#{$prefix}light-text-emphasis),
+  "dark-emphasis": var(--#{$prefix}dark-text-emphasis)
+) !default;
+// scss-docs-end utilities-text-colors
+
+// scss-docs-start utilities-bg-colors
+$utilities-bg: map.merge(
+  $utilities-colors,
+  (
+    "black": var(--#{$prefix}black),
+    "white": var(--#{$prefix}white),
+    "body": var(--#{$prefix}body-bg)
+  )
+) !default;
+$utilities-bg-colors: map-loop($utilities-bg, color-var-ref, "$prefix", "$key", "bg") !default;
+
+$utilities-bg-subtle: (
+  "primary-subtle": var(--#{$prefix}primary-bg-subtle),
+  "secondary-subtle": var(--#{$prefix}secondary-bg-subtle),
+  "success-subtle": var(--#{$prefix}success-bg-subtle),
+  "info-subtle": var(--#{$prefix}info-bg-subtle),
+  "warning-subtle": var(--#{$prefix}warning-bg-subtle),
+  "danger-subtle": var(--#{$prefix}danger-bg-subtle),
+  "light-subtle": var(--#{$prefix}light-bg-subtle),
+  "dark-subtle": var(--#{$prefix}dark-bg-subtle)
+) !default;
+// scss-docs-end utilities-bg-colors
+
+// scss-docs-start utilities-border-colors
+$utilities-border: map.merge(
+  $utilities-colors,
+  (
+    "black": var(--#{$prefix}black),
+    "white": var(--#{$prefix}white)
+  )
+) !default;
+$utilities-border-colors: map-loop($utilities-border, color-var-ref, "$prefix", "$key", "border") !default;
+
+$utilities-border-subtle: (
+  "primary-subtle": var(--#{$prefix}primary-border-subtle),
+  "secondary-subtle": var(--#{$prefix}secondary-border-subtle),
+  "success-subtle": var(--#{$prefix}success-border-subtle),
+  "info-subtle": var(--#{$prefix}info-border-subtle),
+  "warning-subtle": var(--#{$prefix}warning-border-subtle),
+  "danger-subtle": var(--#{$prefix}danger-border-subtle),
+  "light-subtle": var(--#{$prefix}light-border-subtle),
+  "dark-subtle": var(--#{$prefix}dark-border-subtle)
+) !default;
+// scss-docs-end utilities-border-colors
+
+$utilities-links-underline: map-loop($utilities-colors, color-var-ref, "$prefix", "$key", "link-underline") !default;
+
+// stylelint-disable-next-line scss/at-function-named-arguments
+$negative-spacers: if(sass($enable-negative-margins): negativify-map($spacers)) !default;
+
+// scss-docs-start border-variables
+$border-widths: (
+  keyline: .5px,
+  1: 1px,
+  2: 2px,
+  3: 3px,
+  4: 4px,
+  5: 5px
+) !default;
+// scss-docs-end border-variables
+
+// scss-docs-start font-sizes-legacy
+// The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They
+// read the named scale, so overriding a stop moves both.
+$font-sizes-legacy: (
+  1: map.get($font-sizes, "4xl", "font-size"),
+  2: map.get($font-sizes, "3xl", "font-size"),
+  3: map.get($font-sizes, "2xl", "font-size"),
+  4: map.get($font-sizes, "xl", "font-size"),
+  5: map.get($font-sizes, "lg", "font-size"),
+  6: map.get($font-sizes, "md", "font-size")
+) !default;
+// scss-docs-end font-sizes-legacy
+
+$line-height-lg:              2 !default;
+$line-height-sm:              1.25 !default;
+
+// scss-docs-start position-map
+$position-values: (
+  0: 0,
+  50: 50%,
+  100: 100%
+) !default;
+// scss-docs-end position-map
+
 
 // stylelint-disable function-disallowed-list
 // The opacity utilities scale a runtime var, so calc() is unavoidable here.
@@ -94,14 +212,35 @@ $utilities: map.merge(
     "shadow": (
       property: box-shadow,
       class: shadow,
-      values: (
-        null: var(--#{$prefix}box-shadow),
-        sm: var(--#{$prefix}box-shadow-sm),
-        lg: var(--#{$prefix}box-shadow-lg),
-        none: none,
-      )
+      // The literal expressions from $shadows, not var(--#{$prefix}box-shadow*).
+      // A token resolves where it is declared — on :root — so going through one
+      // would freeze the tint and the opacity there and leave .shadow-primary
+      // and .shadow-opacity-* with nothing to change.
+      // `inset` stays out: it is a component's inner shadow, not a utility.
+      values: map.merge(map.remove($shadows, inset), (none: none))
     ),
     // scss-docs-end utils-shadow
+    // scss-docs-start utils-shadow-color
+    "shadow-color": (
+      property: (--#{$prefix}shadow-tint: null),
+      class: shadow,
+      values: map.merge(
+        map-slot($theme-colors, "base"),
+        (
+          "current": currentcolor,
+          "black": var(--#{$prefix}black),
+          "white": var(--#{$prefix}white),
+        )
+      )
+    ),
+    // scss-docs-end utils-shadow-color
+    // scss-docs-start utils-shadow-opacity
+    "shadow-opacity": (
+      property: (--#{$prefix}shadow-opacity: null),
+      class: shadow-opacity,
+      values: (25: .25, 50: .5, 75: .75, 100: 1)
+    ),
+    // scss-docs-end utils-shadow-opacity
     // scss-docs-start utils-focus-ring
     "focus-ring": (
       property: (--#{$prefix}focus-ring-color: null),
@@ -109,7 +248,7 @@ $utilities: map.merge(
       // generate-utility-at-properties().
       at-property: false,
       class: focus-ring,
-      values: map-loop($theme-colors, translucent-css-var, "$prefix", "$key", "focus-ring")
+      values: map-loop(map-slot($theme-colors, "base"), translucent-css-var, "$prefix", "$key", "focus-ring")
     ),
     // scss-docs-end utils-focus-ring
     // scss-docs-start utils-position
@@ -195,25 +334,25 @@ $utilities: map.merge(
     "border-top-color": (
       property: border-top-color,
       class: border-top,
-      values: map.merge($theme-colors, ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true
     ),
     "border-end-color": (
       property: border-inline-end-color,
       class: border-end,
-      values: map.merge($theme-colors, ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true,
     ),
     "border-bottom-color": (
       property: border-bottom-color,
       class: border-bottom,
-      values: map.merge($theme-colors, ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true
     ),
     "border-start-color": (
       property: border-inline-start-color,
       class: border-start,
-      values: map.merge($theme-colors, ("white": $white)),
+      values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white))),
       vars: true,
     ),
     "border-width": (
@@ -646,15 +785,7 @@ $utilities: map.merge(
     "font-weight": (
       property: font-weight,
       class: fw,
-      values: (
-        lighter: $font-weight-lighter,
-        light: $font-weight-light,
-        normal: $font-weight-normal,
-        medium: $font-weight-medium,
-        semibold: $font-weight-semibold,
-        bold: $font-weight-bold,
-        bolder: $font-weight-bolder
-      )
+      values: $font-weights
     ),
     "line-height": (
       property: line-height,
@@ -662,7 +793,7 @@ $utilities: map.merge(
       values: (
         1: 1,
         sm: $line-height-sm,
-        base: $line-height-base,
+        base: var(--#{$prefix}body-line-height),
         lg: $line-height-lg,
       )
     ),
@@ -711,8 +842,8 @@ $utilities: map.merge(
         $utilities-text-colors,
         (
           "muted": var(--#{$prefix}secondary-color), // deprecated
-          "black-50": rgba($black, .5), // deprecated
-          "white-50": rgba($white, .5), // deprecated
+          "black-50": color-mix(in srgb, var(--#{$prefix}black) 50%, transparent), // deprecated
+          "white-50": color-mix(in srgb, var(--#{$prefix}white) 50%, transparent), // deprecated
           "body-secondary": var(--#{$prefix}secondary-color),
           "body-tertiary": var(--#{$prefix}tertiary-color),
           "body-emphasis": var(--#{$prefix}emphasis-color),
@@ -823,6 +954,39 @@ $utilities: map.merge(
       values: $utilities-bg-subtle
     ),
     // scss-docs-end utils-bg-color
+    // scss-docs-start utils-theme
+    // Theme style utilities — pair with .theme-{color} to apply coordinated
+    // background and text colors
+    "theme-contrast": (
+      property: (
+        "background-color": var(--#{$prefix}theme-base),
+        "color": var(--#{$prefix}theme-contrast)
+      ),
+      class: theme-contrast,
+      values: (null: null)
+    ),
+    "theme-subtle": (
+      property: (
+        "background-color": var(--#{$prefix}theme-bg-subtle),
+        "color": var(--#{$prefix}theme-fg)
+      ),
+      class: theme-subtle,
+      values: (null: null)
+    ),
+    "theme-muted": (
+      property: (
+        "background-color": var(--#{$prefix}theme-bg-muted),
+        "color": var(--#{$prefix}theme-fg-emphasis)
+      ),
+      class: theme-muted,
+      values: (null: null)
+    ),
+    "theme-border": (
+      property: border,
+      class: theme-border,
+      values: (null: var(--#{$prefix}border-width) solid var(--#{$prefix}theme-border))
+    ),
+    // scss-docs-end utils-theme
     "gradient": (
       property: background-image,
       class: bg,

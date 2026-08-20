@@ -6,6 +6,8 @@ otherFrameworks:
   - switch
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 ## Approach
 
 A switch is a [checkbox](/forms/checkbox/) drawn as a track and a thumb: put `.switch` on the `<input type="checkbox">` instead of `.check`. The thumb is the input's own `::before`, so its colour is a token rather than a fill inside an SVG — which is also what let the separate dark-mode artwork go.
@@ -96,6 +98,15 @@ The v5 spelling — `.form-check.form-switch` wrapping a `.form-check-input`, wi
 
 See the [v6 migration guide](/migration/v6/) for the full picture.
 
+## Theme colors
+
+Modify the appearance of checked switches by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the `.form-check` element. This sets the checked background and border color to the theme color.
+
+<Example class="d-flex flex-column gap-2" code={getData('theme-colors').map((c) => `<div class="form-check form-switch theme-${c.name}">
+    <input class="form-check-input" type="checkbox" role="switch" id="switch-${c.name}" checked>
+    <label class="form-check-label" for="switch-${c.name}">${c.title} switch</label>
+  </div>`)} />
+
 ## Customizing
 
 ### SASS variables
@@ -112,4 +123,4 @@ Switchs read their own custom properties, so restyling one control does not touc
 
 `.form-check` lays out the row and all three controls share their focus, active and disabled states, so these are set once rather than per control:
 
-<ScssDocs file="scss/forms/_form-check.scss" capture="form-check-variables" />
+<ScssDocs file="scss/forms/_variables.scss" capture="form-check-variables" />

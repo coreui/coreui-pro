@@ -1,6 +1,12 @@
 @use "mixins/icon" as *;
 @use "config" as *;
 
+$icon-size-sm:    calc(var(--#{$prefix}icon-size-base) * .875) !default; // stylelint-disable-line function-disallowed-list
+$icon-size-lg:    calc(var(--#{$prefix}icon-size-base) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$icon-size-xl:    calc(var(--#{$prefix}icon-size-base) * 1.5) !default; // stylelint-disable-line function-disallowed-list
+$icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default; // stylelint-disable-line function-disallowed-list
+
+
 @layer components {
   .icon {
     display: inline-block;
@@ -9,7 +15,7 @@
     vertical-align: -.125rem; // Fix the position of icon
     fill: currentcolor;
     &:not(.icon-c-s):not(.icon-custom-size) {
-      @include icon-size($icon-size-base);
+      @include icon-size(var(--#{$prefix}icon-size-base));
 
       &.icon-xxl {
         @include icon-size($icon-size-xxl);
@@ -29,7 +35,7 @@
 
       @for $i from 3 through 9 {
         &.icon-#{$i}xl {
-          @include icon-size($i * $icon-size-base);
+          @include icon-size(calc(#{$i} * var(--#{$prefix}icon-size-base)));
         }
       }
     }

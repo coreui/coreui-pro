@@ -8,18 +8,18 @@
 
 // scss-docs-start progress-variables
 $progress-height:                   1rem !default;
-$progress-font-size:                $font-size-base * .75 !default;
+$progress-font-size:                calc(var(--#{$prefix}body-font-size) * .75) !default; // stylelint-disable-line function-disallowed-list
 $progress-bg:                       var(--#{$prefix}secondary-bg) !default;
 $progress-border-radius:            var(--#{$prefix}border-radius) !default;
 $progress-box-shadow:               var(--#{$prefix}box-shadow-inset) !default;
-$progress-bar-color:                $white !default;
+$progress-bar-color:                var(--#{$prefix}primary-contrast) !default;
 $progress-bar-bg:                   var(--#{$prefix}primary) !default;
 $progress-bar-animation-timing:     1s linear infinite !default;
 $progress-bar-transition:           width .6s ease !default;
 
 // TODO: clean-up ???
-$progress-group-margin-bottom:         $spacer !default;
-$progress-group-header-margin-bottom:  $spacer * .25 !default;
+$progress-group-margin-bottom:         var(--#{$prefix}spacer-3) !default;
+$progress-group-header-margin-bottom:  var(--#{$prefix}spacer-1) !default;
 // scss-docs-end progress-variables
 
 $progress-tokens: () !default;
@@ -33,8 +33,8 @@ $progress-tokens: defaults(
     --#{$prefix}progress-bg: #{$progress-bg},
     --#{$prefix}progress-border-radius: #{$progress-border-radius},
     --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
-    --#{$prefix}progress-bar-color: #{$progress-bar-color},
-    --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
+    --#{$prefix}progress-bar-color: var(--#{$prefix}theme-contrast, #{$progress-bar-color}),
+    --#{$prefix}progress-bar-bg: var(--#{$prefix}theme-base, #{$progress-bar-bg}),
     --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
     --#{$prefix}progress-font-size: $progress-font-size,
   ),
@@ -112,7 +112,7 @@ $progress-tokens: defaults(
   .progress.progress-white {
     background-color: rgba(255, 255, 255, .2);
     .progress-bar {
-      background-color: $white;
+      background-color: var(--#{$prefix}white);
     }
   }
 

@@ -7,6 +7,8 @@ otherFrameworks:
   - range-slider
 ---
 
+import { getData } from '@coreui/astro-docs/data'
+
 import rangeSliderCustomLabels from './snippets/range-slider-custom-labels.js?raw'
 import rangeSliderCustomTooltips from './snippets/range-slider-custom-tooltips.js?raw'
 
@@ -124,6 +126,12 @@ If you set `data-coreui-track` to `false`, the slider's track will not display a
 <Example pro code={`<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50" ></div>
   <div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="50, 75"></div>
   <div data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-value="25, 50, 75"></div>`} />
+
+## Theme colors
+
+Color the filled track and the handles by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the slider element.
+
+<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-toggle="range-slider" data-coreui-value="25, 75" aria-label="${c.title} range slider"></div>`)} />
 
 ## Usage
 

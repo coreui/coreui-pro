@@ -1,0 +1,113 @@
+---
+title: "Theme"
+description: "The theme is a set of semantically named colors, each carrying a full family of slots, used to style components, utilities, and more. It is configurable via Sass or CSS and responds to color modes."
+---
+
+## How it works
+
+Theme colors are defined in the `$theme-colors` map in `scss/_theme.scss`. Each entry is a **map of slots** — one semantic name carries the solid color, its contrast color, the readable foregrounds, the subtle and muted backgrounds, the border, and the focus ring, for both light and dark mode via `light-dark()`.
+
+From this one map the library generates:
+
+- a `--cui-{color}-{slot}` custom property per slot on `:root`,
+- a 100–900 runtime scale per color (`--cui-primary-100` … `--cui-primary-900`), mixed in the browser from the color's own token,
+- a [`.theme-{color}` class](#theme-classes) per entry,
+- the color variants of themeable components and the `.text-*`, `.bg-*`, and `.border-*` utilities.
+
+## Theme colors
+
+| Theme color | Default value | Description |
+| --- | --- | --- |
+| `primary` | `#5856d6` | Main brand color for primary actions |
+| `secondary` | `#6b7785` | Less prominent actions and states |
+| `success` | `#1b9e3e` | Positive actions and successful states |
+| `info` | `#39f` | Informational messages and neutral states |
+| `warning` | `#f9b115` | Cautionary messages and states |
+| `danger` | `#e55353` | Destructive actions and error states |
+| `light` | `$gray-100` | Light surfaces and low-emphasis elements |
+| `dark` | `$gray-900` | Dark surfaces and high-contrast elements |
+
+Each base value is a standalone Sass variable (`$primary`, `$danger`, …) feeding the `base` slot of its entry, so overriding the one variable retints the whole family.
+
+## Color slots
+
+Every entry defines the same slots, emitted as `--cui-{color}-{slot}` on `:root`:
+
+| Slot | Emitted token | Description |
+| --- | --- | --- |
+| `base` | `--cui-primary` | The color itself, e.g. a solid button background |
+| `contrast` | `--cui-primary-contrast` | Text and icons sitting on the solid base |
+| `fg` | `--cui-primary-fg` | The color readable as text, one step lighter than the emphasis |
+| `text-emphasis` | `--cui-primary-text-emphasis` | High-contrast foreground text |
+| `bg-subtle` | `--cui-primary-bg-subtle` | Subtle background tint for low-emphasis surfaces |
+| `bg-muted` | `--cui-primary-bg-muted` | Muted background, between subtle and solid |
+| `border-subtle` | `--cui-primary-border-subtle` | Border color |
+| `focus-ring` | `--cui-primary-focus-ring` | The hue the color's focus ring mixes from |
+
+The slot values are `light-dark()` pairs of stops from the runtime scale, so a theme color reads correctly in both color modes without a second set of definitions:
+
+<ScssDocs file="scss/_theme.scss" capture="theme-colors-map" />
+
+## The runtime scale
+
+Every theme color gets a 100–900 scale of `color-mix()` tokens, mixed at runtime from the color's own token. Override `--cui-primary` (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis text — follows, in both color schemes:
+
+<ScssDocs file="scss/_theme.scss" capture="color-scale-variables" />
+
+```css
+:root {
+  --cui-primary: #6f42c1; /* the scale, the slots and every component follow */
+}
+```
+
+## Theme classes
+
+A `.theme-{color}` class is generated for every key of `$theme-colors`. It sets the generic `--cui-theme-*` tokens that themeable components read — see [the theme variants section](/customize/components/#theme-variants) for the token table and how components consume them.
+
+<ScssDocs file="scss/_theme.scss" capture="theme-classes" />
+
+Because the tokens are ordinary custom properties, they inherit: put a `.theme-*` class on a container and every themeable component inside follows it. Components read the slots only as defaults of their own tokens, so an explicit component token override still wins over the region's theme.
+
+<Example html={[`<div class="theme-primary d-flex gap-2 align-items-center">`, `    <span class="badge">Regional</span>`, `    <span class="badge theme-danger">Local override</span>`, `  </div>`]} />
+
+## Adding a theme color
+
+A new theme color is one entry in the map. Point the slots at the runtime scale and the library generates the tokens, the scale, and the `.theme-*` class for it:
+
+```scss
+@use "sass:map";
+@use "@coreui/coreui/scss/theme" as *;
+
+$theme-colors: map.merge($theme-colors, (
+  "brand": (
+    "base":          #6f42c1,
+    "contrast":      #fff,
+    "fg":            light-dark(var(--cui-brand-600), var(--cui-brand-400)),
+    "text-emphasis": light-dark(var(--cui-brand-800), var(--cui-brand-200)),
+    "bg-subtle":     light-dark(var(--cui-brand-100), var(--cui-brand-900)),
+    "bg-muted":      light-dark(var(--cui-brand-200), var(--cui-brand-800)),
+    "border-subtle": light-dark(var(--cui-brand-300), var(--cui-brand-600)),
+    "focus-ring":    color-mix(in srgb, var(--cui-brand) calc(var(--cui-focus-ring-opacity) * 100%), transparent),
+  ),
+));
+
+@use "@coreui/coreui/scss/coreui";
+```
+
+For a runtime-only brand — no Sass compilation — set the generic tokens on a container instead, as shown in [the theme variants section](/customize/components/#theme-variants).
+
+## Theme utilities
+
+Four style utilities pair a themed surface with its matching text color — compose them with any `.theme-{color}` class to color arbitrary markup the same way the components do:
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-theme" />
+
+<Example html={[`<div class="theme-success d-flex flex-column gap-2">`, `    <div class="theme-contrast p-2 rounded">Solid surface with contrast text</div>`, `    <div class="theme-subtle p-2 rounded">Subtle surface with readable text</div>`, `    <div class="theme-muted p-2 rounded">Muted surface with emphasis text</div>`, `    <div class="theme-border p-2 rounded">Themed border</div>`, `  </div>`]} />
+
+## Customizing
+
+### SASS variables
+
+<ScssDocs file="scss/_theme.scss" capture="theme-color-variables" />
+
+<ScssDocs file="scss/_theme.scss" capture="theme-token-refs" />

@@ -1,5 +1,10 @@
 @use "config" as *;
 
+// scss-docs-start placeholders
+$placeholder-opacity-max:           .5 !default;
+$placeholder-opacity-min:           .2 !default;
+// scss-docs-end placeholders
+
 @layer components {
   .placeholder {
     display: inline-block;
@@ -48,7 +53,7 @@
   }
 
   .placeholder-wave {
-    mask-image: linear-gradient(130deg, $black 55%, rgba(0, 0, 0, (1 - $placeholder-opacity-min)) 75%, $black 95%);
+    mask-image: linear-gradient(130deg, var(--#{$prefix}black) 55%, rgba(0, 0, 0, (1 - $placeholder-opacity-min)) 75%, var(--#{$prefix}black) 95%);
     mask-size: 200% 100%;
     animation: placeholder-wave 2s linear infinite;
 

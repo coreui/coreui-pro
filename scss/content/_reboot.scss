@@ -1,6 +1,37 @@
 @use "../mixins/border-radius" as *;
 @use "../config" as *;
 
+// scss-docs-start reboot-type-variables
+$enable-smooth-scroll:        true !default;
+$paragraph-margin-bottom:     1rem !default;
+$font-family-code:            var(--#{$prefix}font-monospace) !default;
+$headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
+$headings-font-family:        null !default;
+$headings-font-style:         null !default;
+$headings-font-weight:        500 !default;
+$sub-sup-font-size:           .75em !default;
+$hr-margin-y:                 $spacer !default;
+$hr-color:                    inherit !default;
+$hr-border-width:             var(--#{$prefix}border-width) !default;
+$hr-opacity:                  .25 !default;
+$legend-margin-bottom:        .5rem !default;
+$legend-font-size:            clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
+$legend-font-weight:          null !default;
+$dt-font-weight:              $font-weight-bold !default;
+$mark-padding:                .1875em !default;
+$code-font-size:              var(--#{$prefix}small-font-size) !default;
+// scss-docs-end reboot-type-variables
+
+// scss-docs-start kbd-variables
+$kbd-padding-y:                     .1875rem !default;
+$kbd-padding-x:                     .375rem !default;
+$kbd-font-size:                     $code-font-size !default;
+$kbd-color:                         var(--#{$prefix}body-bg) !default;
+$kbd-bg:                            var(--#{$prefix}body-color) !default;
+
+$pre-color:                         null !default;
+// scss-docs-end kbd-variables
+
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start reboot-table-variables
@@ -71,7 +102,7 @@ $th-font-weight:       null !default;
     text-align: var(--#{$prefix}body-text-align);
     background-color: var(--#{$prefix}body-bg); // 2
     -webkit-text-size-adjust: 100%; // 3
-    -webkit-tap-highlight-color: rgba($black, 0); // 4
+    -webkit-tap-highlight-color: transparent; // 4
   }
   // scss-docs-end reboot-body-rules
 
@@ -84,7 +115,7 @@ $th-font-weight:       null !default;
     margin: $hr-margin-y 0;
     color: $hr-color; // 1
     border: 0;
-    border-top: $hr-border-width solid $hr-border-color;
+    border-top: $hr-border-width solid var(--#{$prefix}hr-border-color);
     opacity: $hr-opacity;
   }
 
@@ -215,7 +246,7 @@ $th-font-weight:       null !default;
 
   b,
   strong {
-    font-weight: $font-weight-bolder;
+    font-weight: var(--#{$prefix}font-weight-bolder);
   }
 
 
@@ -224,7 +255,7 @@ $th-font-weight:       null !default;
   // Add the correct font size in all browsers
 
   small {
-    font-size: $small-font-size;
+    font-size: var(--#{$prefix}small-font-size);
   }
 
 
@@ -257,7 +288,7 @@ $th-font-weight:       null !default;
   // Links
 
   a {
-    color: color-mix(in srgb, var(--#{$prefix}link-color) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
+    color: color-mix(in srgb, var(--#{$prefix}theme-fg, var(--#{$prefix}link-color)) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
     text-decoration: $link-decoration;
 
     &:hover {
