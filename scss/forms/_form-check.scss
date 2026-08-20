@@ -3,6 +3,15 @@
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
+// scss-docs-start form-check-wrapper-variables
+$form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
+$form-check-margin-bottom:                .125rem !default;
+$form-check-inline-margin-end:            1rem !default;
+
+$form-check-label-color:                  null !default;
+$form-check-label-cursor:                 null !default;
+// scss-docs-end form-check-wrapper-variables
+
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-check-tokens

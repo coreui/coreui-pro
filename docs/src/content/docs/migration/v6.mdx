@@ -1084,6 +1084,11 @@ leaves no `.form-check*` selector behind.
 `.btn-check` is **not** part of that layer — toggle buttons are a current
 feature, and they live with the buttons now rather than with the form check.
 
+The variables that shape the wrapper moved with it, into `forms/_form-check.scss`,
+and go when it does:
+
+<ScssDocs file="scss/forms/_form-check.scss" capture="form-check-wrapper-variables" />
+
 **Five Sass variables shaped the old artwork and cannot be honoured any more**,
 because the compatibility layer draws through the new engine:
 `$form-check-input-checked-bg-image`, `$form-check-radio-checked-bg-image`,
