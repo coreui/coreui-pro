@@ -1363,7 +1363,7 @@ them. A state names a theme colour now, and every value is a slot of it.
   that read it (`$btn-close-focus-shadow`, `$sidebar-toggler-focus-shadow`)
   take the token instead.
 - **`form-validation-state()` takes `$theme` where it took `$color`**, and the
-  variables moved from `scss/_config.scss` to `scss/forms/_variables.scss`
+  variables moved from `scss/_config.scss` into the partials that use them
   alongside `$form-text-*` and `$form-feedback-*`.
 
 #### `$component-active-color` and `$component-active-bg` are removed
@@ -1568,10 +1568,9 @@ emitted as:
 :root { --cui-btn-input-padding-y: 1rem; }
 ```
 
-Four names stay in `forms/_variables.scss`, because they are geometry derived
-from that frame rather than aliases of it: `$input-height-border`,
-`$input-height-inner`, `$input-height-inner-half` and
-`$input-height-inner-quarter`.
+`$input-height-inner`, `-half` and `-quarter` are geometry rather than aliases,
+so they follow the validation mixin they serve into `scss/mixins/_forms.scss`;
+`$input-height-border` had one reader and is written where it is used.
 
 #### The control variables moved out of the shared config
 

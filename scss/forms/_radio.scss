@@ -1,7 +1,6 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
-@use "variables" as *;
 @use "check" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;

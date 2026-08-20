@@ -5,7 +5,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 @use "form-control" as *;
-@use "variables" as *;
 
 // scss-docs-start form-control-group-variables
 $form-control-group-gap:              .5rem !default;

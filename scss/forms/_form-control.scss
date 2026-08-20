@@ -12,7 +12,6 @@
 @use "../mixins/transition" as *;
 @use "../colors" as *;
 @use "../config" as *;
-@use "variables" as *;
 
 // scss-docs-start form-color-variables
 $form-color-width:                3rem !default;
