@@ -26,7 +26,7 @@ $accordion-button-active-bg:              var(--#{$prefix}secondary-bg) !default
 $accordion-button-active-color:           var(--#{$prefix}body-color) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
 
-$accordion-button-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
+$accordion-button-focus-ring:             $themed-focus-ring !default;
 
 $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;

@@ -27,7 +27,7 @@ $pagination-border-color:           var(--#{$prefix}border-color) !default;
 
 $pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-focus-bg:               var(--#{$prefix}secondary-bg) !default;
-$pagination-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
+$pagination-focus-ring:             $themed-focus-ring !default;
 
 $pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
