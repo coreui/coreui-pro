@@ -382,8 +382,16 @@ document.addEventListener('complete.coreui.otp-input', event => {
 
 ## Customizing
 
+### CSS variables
+
+Each cell is an input, so it carries the shared `--cui-control-*` tokens on `.form-otp-control` itself. Override them on a single OTP input to restyle just that one; to restyle every text control at once, set the `--cui-btn-input-*` frame on `:root` instead.
+
+<ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-control-tokens" />
+
+<ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-tokens" />
+
 ### SASS variables
 
-Customize the appearance of the one-time password input using the following SASS variables:
+Everything except the cell width and the gap defaults to the shared `--cui-btn-input-*` frame, so restyling the text controls reaches the OTP input without touching these. Override one when the cell should differ from the rest of the family:
 
 <ScssDocs file="scss/forms/_otp-input.scss" capture="form-otp-variables" />
