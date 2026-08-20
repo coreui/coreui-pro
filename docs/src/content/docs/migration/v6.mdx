@@ -1456,6 +1456,29 @@ root token restyles every text control at once.
   in the browser). Sass colour functions on it no longer compile; override
   the token or the variable with a colour of your own instead.
 
+#### The field transition is three tokens, not one shorthand
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`--cui-control-transition` held a whole shorthand
+(`border-color .15s ease-in-out, box-shadow .15s ease-in-out`), so retiming a
+field meant restating the property list. It splits into
+`--cui-control-transition-property`, `-duration` and `-timing`, and the rules
+set the three `transition-*` longhands. `$input-transition` splits the same way
+into `$input-transition-property` / `-duration` / `-timing`, and so do the
+components that derived from it — `$chip-input-transition`,
+`$search-button-transition`, `$form-otp-control-transition`.
+
+Retiming every text control is one declaration now:
+
+```css
+.form-control { --cui-control-transition-duration: .3s; }
+```
+
+The split also removes a trap the shorthand carries: a trailing duration binds
+to the last property only, so adding `color` to the front of the old list would
+have left it at `0s`. The rendered animation is unchanged.
+
 #### The control variables moved out of the shared config
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

@@ -40,7 +40,9 @@ $form-control-tokens: defaults(
     --#{$prefix}control-border-color: #{$input-border-color},
     --#{$prefix}control-border-radius: #{$input-border-radius},
     --#{$prefix}control-box-shadow: #{$input-box-shadow},
-    --#{$prefix}control-transition: #{$input-transition},
+    --#{$prefix}control-transition-property: #{$input-transition-property},
+    --#{$prefix}control-transition-duration: #{$input-transition-duration},
+    --#{$prefix}control-transition-timing: #{$input-transition-timing},
     --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, #{$input-placeholder-color}),
     --#{$prefix}control-focus-color: #{$input-focus-color},
     --#{$prefix}control-focus-bg: #{$input-focus-bg},
@@ -80,7 +82,11 @@ $form-control-tokens: defaults(
   @include border-radius(var(--#{$prefix}control-border-radius), 0);
 
   @include box-shadow(var(--#{$prefix}control-box-shadow));
-  @include transition(var(--#{$prefix}control-transition));
+  @include transition-props(
+    var(--#{$prefix}control-transition-property),
+    var(--#{$prefix}control-transition-duration),
+    var(--#{$prefix}control-transition-timing)
+  );
 }
 // scss-docs-end form-control-frame-mixin
 
