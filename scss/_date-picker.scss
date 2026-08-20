@@ -6,7 +6,6 @@
 @use "config" as *;
 @use "forms/form-control-group" as *;
 
-// Date Picker
 // scss-docs-start date-picker-variables
 $date-picker-footer-padding:           .5rem !default;
 $date-picker-footer-border-width:      1px !default;
@@ -30,35 +29,23 @@ $date-picker-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
-  // The shell styles only what it owns: the field comes from
-  // forms/_form-date-time.scss, the popup content from _calendar.scss.
 
   .date-picker {
     position: relative;
 
-    // The popup takes the focus away from the group, but the control is still
-    // active — so the frame keeps its focus treatment while it is open.
     &.show {
       @include form-control-group-active();
     }
   }
 
-  // The panel declares its own tokens rather than inheriting them from the
-  // field's root: a panel can be teleported by the `container` option, and a
-  // framework port may render it through a portal, so nothing inside it may
-  // depend on having a particular ancestor. Chrome comes from `.popup`; its
-  // width needs no declaration, an absolutely positioned box already shrinks
-  // to its content.
+  // The panel declares its own tokens: `container` can teleport it and a
+  // framework port may portal it, so nothing inside may depend on an ancestor.
   .date-picker-popup {
     @include tokens($date-picker-tokens);
 
-    // The date-time picker puts the calendar and the time body side by side. The
-    // time body's layout rules are global but read --#{$prefix}time-picker-* custom
-    // properties that _time-picker.scss only defines on `.time-picker`, and this
-    // shell's root is a date picker — so the ones the body needs are declared here.
-    // They belong on the panel rather than on the field's root for the same reason
-    // the tokens above do; only the date-time picker's panel holds these elements,
-    // so the scope stays exact.
+    // The time body's rules read --#{$prefix}time-picker-* properties that
+    // `_time-picker.scss` declares on `.time-picker` alone, and this root is a
+    // date picker — so the ones the body needs are declared here.
 
     .date-picker-timepickers {
       display: flex;

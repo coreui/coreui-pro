@@ -8,10 +8,6 @@
 @use "modal" as *;
 @use "config" as *;
 
-// Native <dialog> component
-// Uses the browser's native dialog element with showModal()/show()/close()
-// APIs, the [open] attribute, and the ::backdrop pseudo-element.
-
 // stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 
 // scss-docs-start offcanvas-variables
@@ -79,9 +75,9 @@ $offcanvas-tokens: defaults(
 
     .offcanvas#{$infix} {
       @include media-breakpoint-down($next) {
-        // Reset the native <dialog> UA defaults (fit-content sizing, inset,
-        // margins) and override display: none so visibility controls the
-        // hidden state, enabling exit animations after close().
+        // Resets the UA's fit-content sizing, inset and margins, and its
+        // display: none, so visibility controls the hidden state and the exit
+        // can animate after close().
         position: fixed;
         inset: auto;
         z-index: var(--#{$prefix}offcanvas-zindex);
@@ -134,10 +130,9 @@ $offcanvas-tokens: defaults(
           border-top: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
         }
 
-        // Animated variant (default) — transitions + off-screen transforms.
-        // Adding .offcanvas-instant skips all animations. The base transform
-        // is the entry-from / exit-to position; the JS keeps the dialog in the
-        // top layer during the exit (.hiding) so the ::backdrop fade plays.
+        // The base transform is the entry-from and exit-to position; the JS
+        // holds the dialog in the top layer during the exit so the ::backdrop
+        // fade plays.
         &:not(.offcanvas-instant) {
           @include transition(
             transform var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing),
@@ -160,7 +155,6 @@ $offcanvas-tokens: defaults(
             transform: translateY(100%);
           }
 
-          // Open state: visibility flips immediately, the panel slides in
           &[open]:not(.hiding) {
             visibility: visible;
             @include transition(
@@ -199,16 +193,13 @@ $offcanvas-tokens: defaults(
           transform: none;
         }
 
-        // `backdrop: false` — modal behavior with a visually suppressed
-        // backdrop
         &.offcanvas-no-backdrop::backdrop {
           display: none;
         }
       }
 
-      // Above breakpoint — show content inline (for responsive offcanvas).
-      // The native <dialog> UA styles (display: none, fixed positioning) must
-      // be fully reset so the element behaves as an inline flex container.
+      // The UA's display: none and fixed positioning have to be reset in full
+      // for the element to behave as an inline flex container.
       @if not ($infix == "") {
         @include media-breakpoint-up($next) {
           // stylelint-disable declaration-no-important
