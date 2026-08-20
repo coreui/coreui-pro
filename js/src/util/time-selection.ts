@@ -5,6 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
+import EventHandler from '../dom/event-handler.js'
 import Manipulator from '../dom/manipulator.js'
 import SelectorEngine from '../dom/selector-engine.js'
 import Config from './config.js'
@@ -16,7 +17,7 @@ import {
   getSelectedSeconds,
   isAmPm
 } from './time.js'
-import { execute } from './index.js'
+import { execute, getNextActiveElement, isRTL } from './index.js'
 
 /**
  * Constants
@@ -30,8 +31,21 @@ const CLASS_NAME_ROLL_CELL = 'time-picker-roll-cell'
 const CLASS_NAME_ROLL_COL = 'time-picker-roll-col'
 const CLASS_NAME_SELECTED = 'selected'
 
+const ARROW_DOWN_KEY = 'ArrowDown'
+const ARROW_LEFT_KEY = 'ArrowLeft'
+const ARROW_RIGHT_KEY = 'ArrowRight'
+const ARROW_UP_KEY = 'ArrowUp'
+const END_KEY = 'End'
 const ENTER_KEY = 'Enter'
+const HOME_KEY = 'Home'
 const SPACE_KEY = 'Space'
+
+const EVENT_KEY = '.coreui.time-selection'
+const EVENT_KEYDOWN = `keydown${EVENT_KEY}`
+
+const SELECTOR_ROLL_CELL = `.${CLASS_NAME_ROLL_CELL}`
+const SELECTOR_ROLL_CELL_FOCUSABLE = `.${CLASS_NAME_ROLL_CELL}[tabindex="0"]`
+const SELECTOR_ROLL_COL = `.${CLASS_NAME_ROLL_COL}`
 
 const Default = {
   ariaSelectHoursLabel: 'Select hours',
@@ -113,6 +127,7 @@ class TimeSelection extends Config {
   }
 
   dispose(): void {
+    EventHandler.off(this._element, EVENT_KEYDOWN)
     this._element!.innerHTML = ''
     this._element = null
   }
@@ -131,9 +146,11 @@ class TimeSelection extends Config {
     this._element!.classList.toggle(CLASS_NAME_ROLL, this._config.variant === 'roll')
 
     if (this._config.variant === 'select') {
+      EventHandler.off(this._element, EVENT_KEYDOWN)
       this._renderSelects()
     } else {
       this._renderRoll()
+      this._addRollKeyboardNavigation()
     }
 
     this._markSelected(true)
@@ -185,6 +202,7 @@ class TimeSelection extends Config {
           if (event.code === SPACE_KEY || event.key === ENTER_KEY) {
             event.preventDefault()
             this._change(part.name, (option as HTMLSelectElement).value)
+            this._moveFocusToColumn(cell, 1)
           }
         })
 
@@ -193,6 +211,59 @@ class TimeSelection extends Config {
 
       this._element!.append(column)
     }
+  }
+
+  // A roving tabindex reaches one cell per column with Tab; the rest of the
+  // options are only reachable with the arrows.
+  _addRollKeyboardNavigation(): void {
+    EventHandler.off(this._element, EVENT_KEYDOWN)
+    EventHandler.on(this._element, EVENT_KEYDOWN, SELECTOR_ROLL_CELL, (event: any) => {
+      const target = event.target as HTMLElement
+
+      if (event.key === ARROW_DOWN_KEY || event.key === ARROW_UP_KEY) {
+        event.preventDefault()
+        const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement as HTMLElement)
+
+        if (items.length === 0) {
+          return
+        }
+
+        const nextElement = getNextActiveElement(
+          items, target, event.key === ARROW_DOWN_KEY, !items.includes(target)
+        )
+        nextElement?.focus()
+        return
+      }
+
+      if (event.key === HOME_KEY || event.key === END_KEY) {
+        event.preventDefault()
+        const items = SelectorEngine.find(SELECTOR_ROLL_CELL, target.parentElement as HTMLElement)
+
+        if (items.length === 0) {
+          return
+        }
+
+        items[event.key === HOME_KEY ? 0 : items.length - 1].focus()
+        return
+      }
+
+      if (event.key === ARROW_LEFT_KEY || event.key === ARROW_RIGHT_KEY) {
+        event.preventDefault()
+        const goLeft = (event.key === ARROW_LEFT_KEY && !isRTL()) || (event.key === ARROW_RIGHT_KEY && isRTL())
+        this._moveFocusToColumn(target, goLeft ? -1 : 1)
+      }
+    })
+  }
+
+  _moveFocusToColumn(cell: HTMLElement, offset: number): void {
+    const columns = SelectorEngine.find(SELECTOR_ROLL_COL, this._element as HTMLElement)
+    const index = columns.indexOf(cell.parentElement as HTMLElement) + offset
+
+    if (index < 0 || index > columns.length - 1) {
+      return
+    }
+
+    SelectorEngine.findOne(SELECTOR_ROLL_CELL_FOCUSABLE, columns[index])?.focus()
   }
 
   _renderSelects(): void {
