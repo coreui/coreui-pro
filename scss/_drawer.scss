@@ -8,11 +8,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// Native <dialog> component with the Bootstrap 6 Drawer look — a floating,
-// inset, rounded panel sliding in from any viewport edge, with a blurred
-// translucent ::backdrop. Shares the DialogBase behavior (and the
-// `:root.dialog-open` scroll lock defined in _modal.scss) with Modal.
-
 // stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 
 // scss-docs-start drawer-variables
@@ -86,9 +81,6 @@ $drawer-tokens: defaults(
 
     .drawer#{$infix} {
       @include media-breakpoint-down($next) {
-        // Reset the native <dialog> UA defaults (fit-content sizing, inset,
-        // margins) and override display: none so visibility controls the
-        // hidden state, enabling exit animations after close().
         position: fixed;
         inset: auto;
         z-index: var(--#{$prefix}drawer-zindex);
@@ -110,9 +102,6 @@ $drawer-tokens: defaults(
         @include border-radius(var(--#{$prefix}drawer-border-radius));
         @include box-shadow(var(--#{$prefix}drawer-box-shadow));
 
-        // Placement positioning and sizing — always applied regardless of
-        // animation mode. :where() keeps specificity flat so modifiers like
-        // .drawer-sheet can override without escalation.
         &:where(.drawer-start) {
           inset-block: var(--#{$prefix}drawer-inset);
           inset-inline-start: var(--#{$prefix}drawer-inset);
@@ -143,10 +132,6 @@ $drawer-tokens: defaults(
           max-height: none;
         }
 
-        // Animated variant (default) — transitions + off-screen transforms.
-        // Adding .drawer-instant skips all animations. The base transform is
-        // the entry-from / exit-to position; the JS keeps the dialog in the
-        // top layer during the exit (.hiding) so the ::backdrop fade plays.
         &:not(.drawer-instant) {
           @include transition(
             transform var(--#{$prefix}drawer-transition-duration) var(--#{$prefix}drawer-transition-timing),
@@ -181,7 +166,6 @@ $drawer-tokens: defaults(
             transform: translateY(calc(100% + var(--#{$prefix}drawer-inset)));
           }
 
-          // Open state: visibility flips immediately, the panel slides in
           &[open]:not(.hiding) {
             visibility: visible;
             @include transition(
@@ -191,8 +175,6 @@ $drawer-tokens: defaults(
             transform: none;
           }
 
-          // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
-          // outrank the open-state transform reset.
           &[open].drawer-static:not(.hiding) {
             transform: $drawer-scale-transform;
           }
@@ -206,9 +188,6 @@ $drawer-tokens: defaults(
             );
           }
 
-          // Exit: fade the native backdrop out alongside the panel — it is
-          // still rendered because close() is deferred until the transition
-          // ends
           &.hiding::backdrop {
             background-color: transparent;
             backdrop-filter: blur(0);
@@ -226,16 +205,11 @@ $drawer-tokens: defaults(
           transform: none;
         }
 
-        // `backdrop: false` — modal behavior with a visually suppressed
-        // backdrop
         &.drawer-no-backdrop::backdrop {
           display: none;
         }
       }
 
-      // Above breakpoint — show content inline (for responsive drawer). The
-      // native <dialog> UA styles (display: none, fixed positioning) must be
-      // fully reset so the element behaves as an inline flex container.
       @if not ($infix == "") {
         @include media-breakpoint-up($next) {
           // stylelint-disable declaration-no-important
@@ -272,7 +246,6 @@ $drawer-tokens: defaults(
             width: 100%;
             padding: 0;
             overflow-y: visible;
-            // Reset `background-color` in case `.bg-*` classes are used in drawer
             background-color: transparent !important; // stylelint-disable-line declaration-no-important
           }
         }
@@ -280,8 +253,6 @@ $drawer-tokens: defaults(
     }
   }
 
-  // Entry animation for ::backdrop. It only exists while the dialog is in the
-  // top layer, so its starting state can't be expressed on the base selector.
   @starting-style {
     @each $breakpoint in map.keys($grid-breakpoints) {
       $next: breakpoint-next($breakpoint, $grid-breakpoints);
@@ -294,15 +265,11 @@ $drawer-tokens: defaults(
     }
   }
 
-  // Frosted-glass panel variant
   .drawer-translucent {
     background-color: color-mix(in oklch, var(--#{$prefix}drawer-bg) 80%, transparent);
     backdrop-filter: blur(5px) saturate(180%);
   }
 
-  // Sheet variant: flush-to-edge bottom panel with no inset or bottom radius.
-  // Overrides the placement insets so the calc() off-screen transforms
-  // automatically position the drawer at the viewport edge.
   .drawer-sheet {
     right: 0;
     bottom: 0;
@@ -318,12 +285,10 @@ $drawer-tokens: defaults(
     }
   }
 
-  // Keep the panel only as tall as its content
   .drawer-fit-content {
     inset-block-end: auto;
   }
 
-  // Drawer header
   .drawer-header {
     display: flex;
     flex-shrink: 0;
@@ -336,13 +301,11 @@ $drawer-tokens: defaults(
     }
   }
 
-  // Drawer title
   .drawer-title {
     margin-bottom: 0;
     line-height: var(--#{$prefix}drawer-title-line-height);
   }
 
-  // Drawer body
   .drawer-body {
     // Contain absolutely positioned children (e.g. menus) so they scroll with
     // the body instead of being clipped by the drawer's overflow.
@@ -356,7 +319,6 @@ $drawer-tokens: defaults(
     overflow-y: auto;
   }
 
-  // Drawer footer
   .drawer-footer {
     display: flex;
     flex-shrink: 0;

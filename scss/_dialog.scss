@@ -7,11 +7,6 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// Native <dialog> component with the Bootstrap 6 Dialog look — centered
-// floating panel, blurred ::backdrop, optional slide entry variants. Shares
-// the DialogBase behavior (and the `:root.dialog-open` scroll lock defined in
-// _modal.scss) with Modal.
-
 // stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 
 // scss-docs-start dialog-variables
@@ -105,7 +100,6 @@ $dialog-tokens: defaults(
     max-height: calc(100% - var(--#{$prefix}dialog-margin) * 2);
     padding: 0;
     margin: auto;
-    // Let popups (menus, tooltips) appended inside the dialog overflow its box
     overflow: visible;
     color: var(--#{$prefix}dialog-color);
     visibility: hidden;
@@ -116,14 +110,7 @@ $dialog-tokens: defaults(
     @include border-radius(var(--#{$prefix}dialog-border-radius));
     @include box-shadow(var(--#{$prefix}dialog-box-shadow));
 
-    // Animated variant (default) — fade, with optional slide entry variants.
-    // Adding .dialog-instant skips all animations.
     &:not(.dialog-instant) {
-      // Exit state: faded out. This is also the entry-from state — a base
-      // value (not @starting-style) so it applies on every open of a
-      // persistent element, and the exit transition can fall back to it while
-      // the JS keeps the dialog in the top layer (.hiding) so the ::backdrop
-      // and the browser's modal centering survive the exit animation.
       opacity: 0;
       @include transition(
         opacity var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
@@ -131,7 +118,6 @@ $dialog-tokens: defaults(
         visibility 0s var(--#{$prefix}dialog-transition-duration)
       );
 
-      // Slide variants: enter from above/below, exit by reversing
       &.dialog-slide-down {
         transform: translateY(-$dialog-slide-distance);
       }
@@ -140,8 +126,6 @@ $dialog-tokens: defaults(
         transform: translateY($dialog-slide-distance);
       }
 
-      // Open state: visibility flips immediately, opacity and transform
-      // animate in
       &[open]:not(.hiding) {
         visibility: visible;
         opacity: 1;
@@ -153,8 +137,6 @@ $dialog-tokens: defaults(
         transform: none;
       }
 
-      // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
-      // outrank the open-state transform reset.
       &[open].dialog-static:not(.hiding) {
         transform: $dialog-scale-transform;
       }
@@ -188,14 +170,10 @@ $dialog-tokens: defaults(
       transform: none;
     }
 
-    // `backdrop: false` — modal behavior with a visually suppressed backdrop
     &.dialog-no-backdrop::backdrop {
       display: none;
     }
 
-    // Non-modal mode (`modal: false`) — show() skips the top layer, so
-    // explicit positioning and z-index are needed. Centering uses the
-    // `translate` property so the animated `transform` states don't fight it.
     &.dialog-nonmodal {
       position: fixed;
       inset-block-start: 50%;
@@ -211,17 +189,12 @@ $dialog-tokens: defaults(
     }
   }
 
-  // Entry animation for ::backdrop. It only exists while the dialog is in the
-  // top layer, so its starting state can't be expressed on the base selector.
   @starting-style {
     .dialog:not(.dialog-instant)::backdrop {
       background-color: transparent;
       backdrop-filter: blur(0);
     }
 
-    // Swap entry: the outgoing dialog's ::backdrop is removed synchronously in
-    // the same tick, so this one starts already-opaque — the user sees one
-    // continuous backdrop instead of a dip or a double-darkened flash.
     .dialog.dialog-swap-in:not(.dialog-instant)::backdrop {
       background-color: var(--#{$prefix}dialog-backdrop-bg);
       backdrop-filter: blur(var(--#{$prefix}dialog-backdrop-blur));
