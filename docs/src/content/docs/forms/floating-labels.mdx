@@ -128,6 +128,12 @@ When working with the CoreUI for Bootstrap grid system, be sure to place form el
 
 ## Customizing
 
+### CSS variables
+
+`.form-floating` carries the tokens, so a single field can be retuned without recompiling. Anything nested inside it follows them, including the date and time inputs, which drive their own float on `:focus-within` instead of `:placeholder-shown`.
+
+<ScssDocs file="scss/forms/_floating-labels.scss" capture="form-floating-tokens" />
+
 ### SASS variables
 
 <ScssDocs file="scss/forms/_floating-labels.scss" capture="form-floating-variables" />

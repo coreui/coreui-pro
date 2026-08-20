@@ -4,7 +4,6 @@
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
-@use "floating-labels" as *;
 
 // scss-docs-start form-date-time-variables
 $form-date-time-placeholder-color:       $input-placeholder-color !default;
@@ -120,19 +119,19 @@ $form-date-time-tokens: defaults(
   // the float to `:focus-within` and the JS-managed `.form-date-time-filled`
   // class, and hide the mask placeholders while the label rests in the field.
   .form-floating > .form-date-time {
-    height: $form-floating-height;
-    min-height: $form-floating-height;
-    line-height: $form-floating-line-height;
+    height: var(--#{$prefix}form-floating-height);
+    min-height: var(--#{$prefix}form-floating-height);
+    line-height: var(--#{$prefix}form-floating-line-height);
 
     &:focus-within,
     &.form-date-time-filled {
-      padding-top: $form-floating-input-padding-t;
-      padding-bottom: $form-floating-input-padding-b;
+      padding-top: var(--#{$prefix}form-floating-input-padding-t);
+      padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
 
     &:not(:focus-within):not(.form-date-time-filled) {
-      padding-top: $form-floating-padding-y;
-      padding-bottom: $form-floating-padding-y;
+      padding-top: var(--#{$prefix}form-floating-padding-y);
+      padding-bottom: var(--#{$prefix}form-floating-padding-y);
 
       .form-date-time-section,
       .form-date-time-separator {
@@ -146,7 +145,7 @@ $form-date-time-tokens: defaults(
 
     &:focus-within ~ label,
     &.form-date-time-filled ~ label {
-      transform: $form-floating-label-transform;
+      transform: var(--#{$prefix}form-floating-label-transform);
     }
   }
 }
