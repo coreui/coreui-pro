@@ -1284,16 +1284,15 @@ assembles maps of CSS expressions and the browser resolves them.
   utilities. It was disabled by default (`$enable-elevations: false`), so the
   utilities were the only reachable part. Use the shadow utilities
   (`.shadow`, `.shadow-sm`, `.shadow-lg`) or set `box-shadow` directly.
-- **The button focus ring is the theme ring.** `--#{$prefix}btn-focus-shadow-rgb`
-  and the per-variant `$btn-*-focus-shadow-rgb` Sass variables are gone without
-  a renamed successor: the button reads
-  `var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring))`, so a colour
-  button rings in its colour through the theme slot and a neutral one gets the
-  global ring. To restyle it, set `--#{$prefix}btn-focus-ring` (any outline
-  shorthand) or the global focus-ring tokens. Two visible consequences: a
-  colour button's ring uses the focus-ring opacity (fainter than the old 50%
-  mix), and the neutral outline/ghost buttons ring in the global colour
-  instead of a grey.
+- **The button focus ring is the theme ring.** `--cui-btn-focus-shadow-rgb` and
+  the per-variant `$btn-*-focus-shadow-rgb` Sass variables are gone without a
+  renamed successor, and so is `--cui-btn-focus-ring`: the button draws the ring
+  from the global width and the theme's colour, so a colour button rings in its
+  colour and a neutral one gets the global ring. To restyle it, set
+  `--cui-focus-ring-color` (or `--cui-theme-focus-ring`) on the button. Two
+  visible consequences: a colour button's ring uses the focus-ring opacity
+  (fainter than the old 50% mix), and the neutral outline/ghost buttons ring in
+  the global colour instead of a grey.
 
 #### Focus rings are keyboard-only on activation controls
 
@@ -1609,13 +1608,12 @@ tintable and lets dark mode deepen every shadow at once.
   `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
   (alert, buttons) read them. Contextual classes like `.alert-success` are now
   implemented through these tokens — same rendering, new mechanics.
-- **`--cui-theme-focus-ring` joins the set.** It is mixed from the state colour
-  at `$focus-ring-opacity`, while the width still comes from
-  `--cui-focus-ring-width`, so only the hue is contextual. A component follows
-  the theme on focus by reading
-  `var(--cui-theme-focus-ring, var(--cui-focus-ring))`, which leaves the global
-  ring in place where no theme is set. Buttons still compute their own ring from
-  `--cui-btn-focus-shadow`; the two will be reconciled.
+- **`--cui-theme-focus-ring` joins the set.** It carries the state colour mixed
+  at `$focus-ring-opacity` — a colour, like every other slot; the width stays
+  global. Every component draws its ring as
+  `var(--cui-focus-ring-width) solid var(--cui-theme-focus-ring, var(--cui-focus-ring-color))`,
+  so a themed ancestor recolours the ring and the global colour applies
+  everywhere else.
 - **`--cui-{color}-contrast` custom properties are new root tokens.** Previously
   only buttons computed their own contrast colour; the root tokens now carry it,
   written in `$theme-colors-contrast`. `.text-bg-*` reads the token instead of
@@ -2154,54 +2152,55 @@ following upstream v6. The practical win is that an outline is **not clipped by 
 ancestor's `overflow`** — the ring stays visible inside scroll containers, where a
 box-shadow ring was cut off.
 
-- **Twelve `--#{$prefix}*-focus-box-shadow` custom properties are renamed to
-  `-focus-ring`**, and their values are an `outline` shorthand rather than a
-  box-shadow one: `--#{$prefix}btn-focus-ring`,
-  `--#{$prefix}control-focus-ring`, `--#{$prefix}pagination-focus-ring`,
-  `--#{$prefix}accordion-btn-focus-ring`, `--#{$prefix}form-check-input-focus-ring`,
-  `--#{$prefix}calendar-cell-focus-ring`, `--#{$prefix}calendar-nav-btn-focus-ring`,
-  `--#{$prefix}stepper-step-indicator-focus-ring`,
-  `--#{$prefix}range-slider-thumb-focus-ring`,
-  `--#{$prefix}search-button-focus-ring`,
-  `--#{$prefix}autocomplete-option-focus-ring`,
-  `--#{$prefix}form-multi-select-option-focus-ring`.
+- **The per-component ring custom properties are gone**, not renamed. Every
+  `--cui-*-focus-box-shadow` — button, pagination, accordion button, check,
+  radio, switch, calendar cell and nav button, stepper indicator, range-slider
+  thumb, search button, combobox, chip — had exactly one value, and the ring is
+  now drawn from the global width and the theme's colour wherever it appears.
+  Restyle it with `--cui-focus-ring-color` / `--cui-focus-ring-width` for the
+  whole page, or set either on the component itself for one instance.
 
   ```diff
   - --cui-btn-focus-box-shadow: 0 0 0 .25rem rgba(88, 86, 214, .5);
-  + --cui-btn-focus-ring: .25rem solid rgba(88, 86, 214, .5);
+  + --cui-focus-ring-color: rgba(88, 86, 214, .5);
   ```
 
   A runtime override written against an old name is now inert — there is no
   fallback path, because the value goes to a different property.
-- **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`,
-  `$btn-focus-box-shadow` → `$btn-focus-ring`, and so on for every component.
+
+  `--cui-control-focus-ring` is the exception that stays: the field frame keeps
+  it because a validation state writes it once and the whole family — text
+  input, select, control group, date-time, OTP cell — reads it. Its value is now
+  a **colour**, not an outline shorthand.
+- **The Sass variables follow**: `$focus-ring-box-shadow` → `$focus-ring`, and
+  the per-component ones (`$btn-focus-box-shadow`, `$pagination-focus-ring`,
+  `$combobox-focus-ring`, `$form-check-input-focus-ring`, …) are removed.
 - **`$focus-ring-blur` is gone**, along with `--#{$prefix}focus-ring-x`,
   `-y` and `-blur`. An outline has no blur or offset vector. **New:**
   `$focus-ring-offset` / `--#{$prefix}focus-ring-offset` (defaults to `0`), which
   pushes the ring away from the element, and `--#{$prefix}focus-ring`, the
   composite shorthand the mixin reads.
 - **`focus-ring()` changed signature** to
-  `focus-ring($offset: false, $color: null, $ring: null)`. It no longer emits
-  `outline: 0`. Every ring in the library is drawn through it now, passing the
-  component's own token as `$ring`; with no arguments it draws the global ring.
+  `focus-ring($offset: false, $color: null)`. It no longer emits `outline: 0`.
+  Every ring in the library is drawn through it; with no arguments it draws the
+  themed ring, and `$color` swaps the hue for one rule — which is how the
+  validation states ring in red and green.
 - **`--#{$prefix}focus-ring-offset` actually applies.** The mixin emits
   `outline-offset` wherever a ring is drawn, so one declaration moves every ring
   in or out. It was previously read by the `.focus-ring` helper alone, which
   made the token look supported while doing nothing on any component.
 - `$pagination-focus-outline` is gone — the outline is now the ring itself.
 - **A component ring is a reference to the global one, not a copy of it.** Every
-  `--#{$prefix}*-focus-ring` defaults to
-  `var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring))`, so setting
-  `--#{$prefix}focus-ring-color` or `--#{$prefix}focus-ring-width` at the root
-  reaches every control, and a `.theme-{color}` region tints the rings inside
-  it. Previously each component baked the resolved value in at build time, which
-  is why a runtime change to the global ring left the components behind. The
-  per-component tokens and their Sass variables are unchanged as override
-  points; only their default moved.
+  ring resolves as
+  `var(--cui-focus-ring-width) solid var(--cui-theme-focus-ring, var(--cui-focus-ring-color))`,
+  so setting `--cui-focus-ring-color` or `--cui-focus-ring-width` at the root
+  reaches every control, and a `.theme-{color}` region tints the rings inside it.
+  Previously each component baked the resolved value in at build time, which is
+  why a runtime change to the global ring left the components behind.
 
   ```diff
   - --cui-pagination-focus-ring: .25rem solid rgba(88, 86, 214, .25);
-  + --cui-pagination-focus-ring: var(--cui-theme-focus-ring, var(--cui-focus-ring));
+  + /* nothing to declare — the pagination link rings from the global tokens */
   ```
 - **`$input-btn-focus-color` no longer reaches the input and control rings.**
   They read the global ring now; set `$focus-ring-color` (or

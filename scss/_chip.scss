@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/chip" as *;
+@use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "theme" as *;
@@ -84,7 +85,6 @@ $chip-tokens: defaults(
     --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-hover-color}),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
     --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
-    --#{$prefix}chip-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)),
   ),
   $chip-tokens
 );
@@ -146,7 +146,7 @@ $chip-outline-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: var(--#{$prefix}chip-focus-ring);
+      @include focus-ring();
     }
 
     .avatar {
@@ -246,7 +246,7 @@ $chip-outline-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: var(--#{$prefix}chip-focus-ring);
+      @include focus-ring();
       opacity: 1;
     }
 

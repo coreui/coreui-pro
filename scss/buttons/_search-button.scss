@@ -24,7 +24,6 @@ $search-button-transition:          $input-transition !default;
 $search-button-focus-color:         $input-focus-color !default;
 $search-button-focus-bg:            $input-focus-bg !default;
 $search-button-focus-border-color:  $input-focus-border-color !default;
-$search-button-focus-ring:    $input-focus-ring !default;
 
 $search-button-icon-size:           1.125rem !default;
 
@@ -62,7 +61,6 @@ $search-button-tokens: defaults(
     --#{$prefix}search-button-focus-color: #{$search-button-focus-color},
     --#{$prefix}search-button-focus-bg: #{$search-button-focus-bg},
     --#{$prefix}search-button-focus-border-color: #{$search-button-focus-border-color},
-    --#{$prefix}search-button-focus-ring: #{$search-button-focus-ring},
     --#{$prefix}search-button-icon-size: #{$search-button-icon-size},
     --#{$prefix}search-button-keys-gap: #{$search-button-keys-gap},
     --#{$prefix}search-button-key-width: #{$search-button-key-width},
@@ -102,7 +100,7 @@ $search-button-tokens: defaults(
       color: var(--#{$prefix}search-button-focus-color);
       background-color: var(--#{$prefix}search-button-focus-bg);
       border-color: var(--#{$prefix}search-button-focus-border-color);
-      @include focus-ring(true, $ring: var(--#{$prefix}search-button-focus-ring));
+      @include focus-ring(true);
     }
   }
 

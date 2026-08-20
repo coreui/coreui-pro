@@ -17,7 +17,6 @@ $nav-link-color:                    var(--#{$prefix}link-color) !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
 $nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out !default;
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
-$nav-link-focus-ring:               var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
 $nav-tabs-border-width:             var(--#{$prefix}border-width) !default;
@@ -190,7 +189,7 @@ $nav-underline-border-tokens: defaults(
     }
 
     &:focus-visible {
-      @include focus-ring(true, $ring: $nav-link-focus-ring);
+      @include focus-ring(true);
     }
 
     // Disabled state lightens text

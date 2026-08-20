@@ -21,7 +21,6 @@ $form-range-thumb-bg:                      var(--#{$prefix}theme-base, var(--#{$
 $form-range-thumb-border:                  0 !default;
 $form-range-thumb-border-radius:           1rem !default;
 $form-range-thumb-box-shadow:              0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
-$form-range-thumb-focus-ring:        $input-focus-ring !default;
 $form-range-thumb-focus-ring-width:  $input-focus-width !default; // For focus box shadow issue in Edge
 $form-range-thumb-active-bg:               color-mix(in srgb, var(--#{$prefix}theme-base, var(--#{$prefix}primary)) 30%, var(--#{$prefix}body-bg)) !default;
 $form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color) !default;
@@ -47,8 +46,8 @@ $form-range-thumb-transition:              background-color .15s ease-in-out, bo
 
       // Pseudo-elements must be split across multiple rulesets to have an effect.
       // No box-shadow() mixin for focus accessibility.
-      &::-webkit-slider-thumb { @include focus-ring(true, $ring: $form-range-thumb-focus-ring); }
-      &::-moz-range-thumb     { @include focus-ring(true, $ring: $form-range-thumb-focus-ring); }
+      &::-webkit-slider-thumb { @include focus-ring(true); }
+      &::-moz-range-thumb     { @include focus-ring(true); }
     }
 
     &::-moz-focus-outer {

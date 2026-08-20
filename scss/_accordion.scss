@@ -26,7 +26,6 @@ $accordion-button-active-bg:              var(--#{$prefix}secondary-bg) !default
 $accordion-button-active-color:           var(--#{$prefix}body-color) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
 
-$accordion-button-focus-ring:             var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring)) !default;
 
 $accordion-content-duration:              .35s !default;
 $accordion-content-easing:                ease !default;
@@ -66,7 +65,6 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
-    --#{$prefix}accordion-btn-focus-ring: #{$accordion-button-focus-ring},
     --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg-emphasis, #{$accordion-button-active-color}),
     --#{$prefix}accordion-active-bg: var(--#{$prefix}theme-bg-subtle, #{$accordion-button-active-bg}),
     --#{$prefix}accordion-active-border-color: var(--#{$prefix}theme-border, #{$accordion-active-border-color}),
@@ -245,7 +243,7 @@ $accordion-tokens: defaults(
     &:focus-visible {
       position: relative;
       z-index: 3;
-      @include focus-ring(true, $ring: var(--#{$prefix}accordion-btn-focus-ring));
+      @include focus-ring(true);
     }
   }
 
