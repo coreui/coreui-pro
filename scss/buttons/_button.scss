@@ -1,94 +1,153 @@
 @use "sass:map";
-@use "../functions/color" as *;
 @use "../functions/defaults" as *;
-@use "../functions/to-rgb" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
-@use "../mixins/color-mode" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/gradients" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../theme" as *;
-@use "../colors" as *;
 @use "../config" as *;
 
-
 // scss-docs-start btn-variables
-$btn-color:                   var(--#{$prefix}body-color) !default;
-$btn-padding-y:               var(--#{$prefix}btn-input-padding-y) !default;
-$btn-padding-x:               var(--#{$prefix}btn-input-padding-x) !default;
-$btn-font-family:             var(--#{$prefix}btn-input-font-family) !default;
-$btn-font-size:               var(--#{$prefix}btn-input-font-size) !default;
-$btn-line-height:             var(--#{$prefix}btn-input-line-height) !default;
 $btn-white-space:             null !default; // Set to `nowrap` to prevent text wrapping
 
-$btn-padding-y-sm:            var(--#{$prefix}btn-input-sm-padding-y) !default;
-$btn-padding-x-sm:            var(--#{$prefix}btn-input-sm-padding-x) !default;
-$btn-font-size-sm:            var(--#{$prefix}btn-input-sm-font-size) !default;
-
-$btn-padding-y-lg:            var(--#{$prefix}btn-input-lg-padding-y) !default;
-$btn-padding-x-lg:            var(--#{$prefix}btn-input-lg-padding-x) !default;
-$btn-font-size-lg:            var(--#{$prefix}btn-input-lg-font-size) !default;
-
-$btn-border-width:            var(--#{$prefix}btn-input-border-width) !default;
-
-$btn-font-weight:             var(--#{$prefix}font-weight-normal) !default;
 $btn-box-shadow:              inset 0 1px 0 color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), 0 1px 1px color-mix(in srgb, var(--#{$prefix}black) 7.5%, transparent) !default;
-$btn-disabled-opacity:        var(--#{$prefix}btn-input-disabled-opacity) !default;
 $btn-active-box-shadow:       inset 0 3px 5px color-mix(in srgb, var(--#{$prefix}black) 12.5%, transparent) !default;
 
 $btn-link-color:              var(--#{$prefix}link-color) !default;
 $btn-link-hover-color:        var(--#{$prefix}link-hover-color) !default;
 $btn-link-disabled-color:     var(--#{$prefix}gray-600) !default;
 
-// Allows for customizing button radius independently from global border radius
-$btn-border-radius:           var(--#{$prefix}border-radius) !default;
-$btn-border-radius-sm:        var(--#{$prefix}border-radius-sm) !default;
-$btn-border-radius-lg:        var(--#{$prefix}border-radius-lg) !default;
-
-$btn-transition-property:     var(--#{$prefix}btn-input-action-transition-property) !default;
-$btn-transition-duration:     var(--#{$prefix}btn-input-transition-duration) !default;
-$btn-transition-timing:       var(--#{$prefix}btn-input-transition-timing) !default;
-
-// scss-docs-end btn-variables
-
-// The two toggle-button spellings each select themselves: the v6 one puts
-// `.btn-check` on the `<label>` alongside the button classes, so the deprecated
-// one — the class on the input — is the `.btn-check` that is not a `.btn`.
-$btn-check-deprecated: ".btn-check:not(.btn)" !default;
-
-// scss-docs-start btn-outline-variables
-$btn-outline-color: var(--#{$prefix}secondary-color) !default;
-$btn-outline-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-active-color: var(--#{$prefix}body-color) !default;
-$btn-outline-active-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-outline-active-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-disabled-color: var(--#{$prefix}secondary-color) !default;
+$btn-outline-color:                 var(--#{$prefix}secondary-color) !default;
+$btn-outline-border-color:          var(--#{$prefix}border-color) !default;
+$btn-outline-hover-color:           var(--#{$prefix}body-color) !default;
+$btn-outline-hover-bg:              var(--#{$prefix}tertiary-bg) !default;
+$btn-outline-hover-border-color:    var(--#{$prefix}border-color) !default;
+$btn-outline-active-color:          var(--#{$prefix}body-color) !default;
+$btn-outline-active-bg:             var(--#{$prefix}tertiary-bg) !default;
+$btn-outline-active-border-color:   var(--#{$prefix}border-color) !default;
+$btn-outline-disabled-color:        var(--#{$prefix}secondary-color) !default;
 $btn-outline-disabled-border-color: var(--#{$prefix}border-color) !default;
-$btn-outline-hover-color: var(--#{$prefix}body-color) !default;
-$btn-outline-hover-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-outline-hover-border-color: var(--#{$prefix}border-color) !default;
-// scss-docs-end btn-outline-variables
-// Lightness applied to a theme color for the hover and active states. Upstream
-// uses .95/.9; these are tuned to land near the shade-color() amounts CoreUI
-// compiled before the states moved into CSS.
-$btn-hover-lightness: .85 !default;
-$btn-active-lightness: .8 !default;
 
-// Dark theme colors are already near the bottom of the lightness range, so
-// darkening them further reads as no hover at all. They brighten instead, the
-// direction tint-color() used to take them.
+$btn-ghost-color:             var(--#{$prefix}secondary-color) !default;
+$btn-ghost-hover-color:       var(--#{$prefix}body-color) !default;
+$btn-ghost-hover-bg:          var(--#{$prefix}tertiary-bg) !default;
+$btn-ghost-active-color:      var(--#{$prefix}body-color) !default;
+$btn-ghost-active-bg:         var(--#{$prefix}tertiary-bg) !default;
+$btn-ghost-disabled-color:    var(--#{$prefix}secondary-color) !default;
+
+// Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
+$btn-hover-lightness:         .85 !default;
+$btn-active-lightness:        .8 !default;
+
+// Dark theme colors sit too low to darken any further, so they brighten instead.
 $btn-lightness-overrides: (
   "dark": ("hover": 1.48, "active": 1.62)
 ) !default;
+// scss-docs-end btn-variables
 
-// stylelint-disable scss/dollar-variable-default
+// The v6 spelling puts `.btn-check` on the `<label>` next to `.btn`, so the
+// deprecated one — the class on the input — is the `.btn-check` that is not a `.btn`.
+$btn-check-deprecated: ".btn-check:not(.btn)" !default;
+
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+$button-tokens: () !default;
+
+// scss-docs-start btn-tokens
+$button-tokens: defaults(
+  (
+    --#{$prefix}btn-gap: var(--#{$prefix}btn-input-gap),
+    --#{$prefix}btn-min-height: var(--#{$prefix}btn-input-min-height),
+    --#{$prefix}btn-padding-y: var(--#{$prefix}btn-input-padding-y),
+    --#{$prefix}btn-padding-x: var(--#{$prefix}btn-input-padding-x),
+    --#{$prefix}btn-font-family: var(--#{$prefix}btn-input-font-family),
+    --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-font-size),
+    --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
+    --#{$prefix}btn-line-height: var(--#{$prefix}btn-input-line-height),
+    --#{$prefix}btn-color: var(--#{$prefix}body-color),
+    --#{$prefix}btn-bg: transparent,
+    --#{$prefix}btn-white-space: $btn-white-space,
+    --#{$prefix}btn-border-width: var(--#{$prefix}btn-input-border-width),
+    --#{$prefix}btn-border-color: transparent,
+    --#{$prefix}btn-border-radius: var(--#{$prefix}border-radius),
+    --#{$prefix}btn-hover-border-color: transparent,
+    --#{$prefix}btn-box-shadow: #{$btn-box-shadow},
+    --#{$prefix}btn-disabled-opacity: var(--#{$prefix}btn-input-disabled-opacity),
+    --#{$prefix}btn-transition-property: var(--#{$prefix}btn-input-action-transition-property),
+    --#{$prefix}btn-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}btn-transition-timing: var(--#{$prefix}btn-input-transition-timing)
+  ),
+  $button-tokens
+);
+// scss-docs-end btn-tokens
+
+$button-outline-tokens: () !default;
+
+// scss-docs-start btn-outline-tokens
+$button-outline-tokens: defaults(
+  (
+    --#{$prefix}btn-color: #{$btn-outline-color},
+    --#{$prefix}btn-border-color: #{$btn-outline-border-color},
+    --#{$prefix}btn-hover-color: #{$btn-outline-hover-color},
+    --#{$prefix}btn-hover-bg: #{$btn-outline-hover-bg},
+    --#{$prefix}btn-hover-border-color: #{$btn-outline-hover-border-color},
+    --#{$prefix}btn-active-color: #{$btn-outline-active-color},
+    --#{$prefix}btn-active-bg: #{$btn-outline-active-bg},
+    --#{$prefix}btn-active-border-color: #{$btn-outline-active-border-color},
+    --#{$prefix}btn-disabled-color: #{$btn-outline-disabled-color},
+    --#{$prefix}btn-disabled-border-color: #{$btn-outline-disabled-border-color}
+  ),
+  $button-outline-tokens
+);
+// scss-docs-end btn-outline-tokens
+
+$button-ghost-tokens: () !default;
+
+// scss-docs-start btn-ghost-tokens
+$button-ghost-tokens: defaults(
+  (
+    --#{$prefix}btn-color: #{$btn-ghost-color},
+    --#{$prefix}btn-border-color: transparent,
+    --#{$prefix}btn-hover-color: #{$btn-ghost-hover-color},
+    --#{$prefix}btn-hover-bg: #{$btn-ghost-hover-bg},
+    --#{$prefix}btn-hover-border-color: #{$btn-ghost-hover-bg},
+    --#{$prefix}btn-active-color: #{$btn-ghost-active-color},
+    --#{$prefix}btn-active-bg: #{$btn-ghost-active-bg},
+    --#{$prefix}btn-active-border-color: #{$btn-ghost-active-bg},
+    --#{$prefix}btn-disabled-color: #{$btn-ghost-disabled-color},
+    --#{$prefix}btn-disabled-border-color: transparent
+  ),
+  $button-ghost-tokens
+);
+// scss-docs-end btn-ghost-tokens
+
+$button-link-tokens: () !default;
+
+// scss-docs-start btn-link-tokens
+$button-link-tokens: defaults(
+  (
+    --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal),
+    --#{$prefix}btn-color: #{$btn-link-color},
+    --#{$prefix}btn-bg: transparent,
+    --#{$prefix}btn-border-color: transparent,
+    --#{$prefix}btn-hover-color: #{$btn-link-hover-color},
+    --#{$prefix}btn-hover-border-color: transparent,
+    --#{$prefix}btn-active-border-color: transparent,
+    --#{$prefix}btn-disabled-color: #{$btn-link-disabled-color},
+    --#{$prefix}btn-disabled-border-color: transparent,
+    --#{$prefix}btn-box-shadow: none
+  ),
+  $button-link-tokens
+);
+// scss-docs-end btn-link-tokens
+
+// scss-docs-start btn-sizes
+$button-sizes: ("sm", "lg") !default;
+// scss-docs-end btn-sizes
 
 // scss-docs-start btn-variants
-// Each variant maps a button token to a --#{$prefix}theme-* token, so one set of
-// rules serves every theme color. Hover and active are derived in CSS from the
-// same token, which is what lets a custom theme color work without Sass.
 $button-variants: () !default;
 $button-variants: defaults(
   (
@@ -112,7 +171,7 @@ $button-variants: defaults(
 );
 // scss-docs-end btn-variants
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start btn-variant-mixin
 @mixin button-variant($variant, $hover-lightness: $btn-hover-lightness, $active-lightness: $btn-active-lightness) {
@@ -143,48 +202,19 @@ $button-variants: defaults(
 }
 // scss-docs-end btn-variant-mixin
 
-// scss-docs-start btn-size-mixin
-@mixin button-size($padding-y, $padding-x, $font-size, $border-radius) {
-  --#{$prefix}btn-padding-y: #{$padding-y};
-  --#{$prefix}btn-padding-x: #{$padding-x};
-  --#{$prefix}btn-font-size: #{$font-size};
-  --#{$prefix}btn-border-radius: #{$border-radius};
-}
-// scss-docs-end btn-size-mixin
-
-// scss-docs-start btn-ghost-variables
-$btn-ghost-color: var(--#{$prefix}secondary-color) !default;
-$btn-ghost-active-color: var(--#{$prefix}body-color) !default;
-$btn-ghost-active-bg: var(--#{$prefix}tertiary-bg) !default;
-$btn-ghost-disabled-color: var(--#{$prefix}secondary-color) !default;
-$btn-ghost-hover-color: var(--#{$prefix}body-color) !default;
-$btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
-// scss-docs-end btn-ghost-variables
-
 @layer components {
   //
   // Base styles
   //
 
   .btn {
-    // scss-docs-start btn-css-vars
-    --#{$prefix}btn-padding-x: #{$btn-padding-x};
-    --#{$prefix}btn-padding-y: #{$btn-padding-y};
-    --#{$prefix}btn-font-family: #{$btn-font-family};
-    --#{$prefix}btn-font-size: #{$btn-font-size};
-    --#{$prefix}btn-font-weight: #{$btn-font-weight};
-    --#{$prefix}btn-line-height: #{$btn-line-height};
-    --#{$prefix}btn-color: #{$btn-color};
-    --#{$prefix}btn-bg: transparent;
-    --#{$prefix}btn-border-width: #{$btn-border-width};
-    --#{$prefix}btn-border-color: transparent;
-    --#{$prefix}btn-border-radius: #{$btn-border-radius};
-    --#{$prefix}btn-hover-border-color: transparent;
-    --#{$prefix}btn-box-shadow: #{$btn-box-shadow};
-    --#{$prefix}btn-disabled-opacity: #{$btn-disabled-opacity};
-    // scss-docs-end btn-css-vars
+    @include tokens($button-tokens);
 
-    display: inline-block;
+    display: inline-flex;
+    gap: var(--#{$prefix}btn-gap);
+    align-items: center;
+    justify-content: center;
+    min-height: var(--#{$prefix}btn-min-height);
     padding: var(--#{$prefix}btn-padding-y) var(--#{$prefix}btn-padding-x);
     font-family: var(--#{$prefix}btn-font-family);
     font-size: var(--#{$prefix}btn-font-size);
@@ -193,7 +223,7 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
     color: var(--#{$prefix}btn-color);
     text-align: center;
     text-decoration: if(not sass($link-decoration == none): none);
-    white-space: $btn-white-space;
+    white-space: var(--#{$prefix}btn-white-space);
     vertical-align: middle;
     // stylelint-disable-next-line scss/at-function-named-arguments
     cursor: if(sass($enable-button-pointers): pointer);
@@ -202,7 +232,11 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
     @include border-radius(var(--#{$prefix}btn-border-radius));
     @include gradient-bg(var(--#{$prefix}btn-bg));
     @include box-shadow(var(--#{$prefix}btn-box-shadow));
-    @include transition-props($btn-transition-property, $btn-transition-duration, $btn-transition-timing);
+    @include transition-props(
+      var(--#{$prefix}btn-transition-property),
+      var(--#{$prefix}btn-transition-duration),
+      var(--#{$prefix}btn-transition-timing)
+    );
 
     &:hover {
       color: var(--#{$prefix}btn-hover-color);
@@ -214,7 +248,6 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
 
     #{$btn-check-deprecated} + &:hover,
     &.btn-check:hover {
-      // override for the checkbox/radio buttons
       color: var(--#{$prefix}btn-color);
       background-color: var(--#{$prefix}btn-bg);
       border-color: var(--#{$prefix}btn-border-color);
@@ -224,14 +257,12 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
       color: var(--#{$prefix}btn-hover-color);
       @include gradient-bg(var(--#{$prefix}btn-hover-bg));
       border-color: var(--#{$prefix}btn-hover-border-color);
-      // Avoid using mixin so we can pass custom focus shadow properly
       @include focus-ring(true);
     }
 
     #{$btn-check-deprecated}:focus-visible + &,
     &.btn-check:has(input:focus-visible) {
       border-color: var(--#{$prefix}btn-hover-border-color);
-      // Avoid using mixin so we can pass custom focus shadow properly
       @include focus-ring(true);
     }
 
@@ -243,21 +274,18 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
     &.show {
       color: var(--#{$prefix}btn-active-color);
       background-color: var(--#{$prefix}btn-active-bg);
-      // Remove CSS gradients if they're enabled
       // stylelint-disable-next-line scss/at-function-named-arguments
       background-image: if(sass($enable-gradients): none);
       border-color: var(--#{$prefix}btn-active-border-color);
       @include box-shadow(var(--#{$prefix}btn-active-shadow));
 
       &:focus-visible {
-        // Avoid using mixin so we can pass custom focus shadow properly
         @include focus-ring(true);
       }
     }
 
     #{$btn-check-deprecated}:checked:focus-visible + &,
     &.btn-check:has(input:checked:focus-visible) {
-      // Avoid using mixin so we can pass custom focus shadow properly
       @include focus-ring(true);
     }
 
@@ -275,17 +303,15 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
     }
   }
 
+  .btn-icon {
+    aspect-ratio: 1;
+    padding: 0;
+  }
+
 
   //
   // Toggle buttons (.btn-check)
   //
-  // A checkbox or radio that looks like a button. The class goes on the
-  // `<label>` with the button classes, and the input nests inside it, so the
-  // button is one element and needs no `id`/`for` pair to hold it together:
-  //
-  //   <label class="btn btn-primary btn-check"><input type="checkbox">Toggle</label>
-  //
-  // Its states are the `&.btn-check:has(input:…)` rules in the base block above.
 
   .btn-check > input {
     position: absolute;
@@ -293,9 +319,7 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
     pointer-events: none;
   }
 
-  // Dimmed rather than repainted, so a disabled toggle that is checked still
-  // reads as checked — the behavior of the deprecated spelling, where the
-  // `:disabled` input never matched the label's own disabled rules.
+  // Dimmed rather than repainted, so a disabled toggle still reads as checked.
   .btn-check:has(input:disabled) {
     pointer-events: none;
     filter: none;
@@ -320,33 +344,11 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
 
 
   .btn-ghost {
-    // scss-docs-start btn-ghost-css-vars
-    --#{$prefix}btn-color: #{$btn-ghost-color};
-    --#{$prefix}btn-border-color: #{transparent};
-    --#{$prefix}btn-active-color: #{$btn-ghost-active-color};
-    --#{$prefix}btn-active-bg: #{$btn-ghost-active-bg};
-    --#{$prefix}btn-active-border-color: #{$btn-ghost-active-bg};
-    --#{$prefix}btn-disabled-color: #{$btn-ghost-disabled-color};
-    --#{$prefix}btn-disabled-border-color: #{transparent};
-    --#{$prefix}btn-hover-color: #{$btn-ghost-hover-color};
-    --#{$prefix}btn-hover-bg: #{$btn-ghost-hover-bg};
-    --#{$prefix}btn-hover-border-color: #{$btn-ghost-hover-bg};
-    // scss-docs-end btn-ghost-css-vars
+    @include tokens($button-ghost-tokens);
   }
 
   .btn-outline {
-    // scss-docs-start btn-outline-css-vars
-    --#{$prefix}btn-color: #{$btn-outline-color};
-    --#{$prefix}btn-border-color: #{$btn-outline-border-color};
-    --#{$prefix}btn-active-color: #{$btn-outline-active-color};
-    --#{$prefix}btn-active-bg: #{$btn-outline-active-bg};
-    --#{$prefix}btn-active-border-color: #{$btn-outline-active-border-color};
-    --#{$prefix}btn-disabled-color: #{$btn-outline-disabled-color};
-    --#{$prefix}btn-disabled-border-color: #{$btn-outline-disabled-border-color};
-    --#{$prefix}btn-hover-color: #{$btn-outline-hover-color};
-    --#{$prefix}btn-hover-bg: #{$btn-outline-hover-bg};
-    --#{$prefix}btn-hover-border-color: #{$btn-outline-hover-border-color};
-    // scss-docs-end btn-outline-css-vars
+    @include tokens($button-outline-tokens);
   }
 
   .btn-transparent {
@@ -356,9 +358,6 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
   }
 
   // scss-docs-start btn-variant-loops
-  // .btn-outline and .btn-ghost keep their standalone neutral meaning, so the
-  // colour-bearing spellings below are the composable form: the variant's token
-  // mapping plus the matching theme tokens.
   @each $color in map.keys($theme-colors) {
     $overrides: map.get($btn-lightness-overrides, $color) or ();
     $hover-l: map.get($overrides, "hover") or $btn-hover-lightness;
@@ -388,16 +387,7 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
 
   // Make a button look and behave like a link
   .btn-link {
-    --#{$prefix}btn-font-weight: var(--#{$prefix}font-weight-normal);
-    --#{$prefix}btn-color: #{$btn-link-color};
-    --#{$prefix}btn-bg: transparent;
-    --#{$prefix}btn-border-color: transparent;
-    --#{$prefix}btn-hover-color: #{$btn-link-hover-color};
-    --#{$prefix}btn-hover-border-color: transparent;
-    --#{$prefix}btn-active-border-color: transparent;
-    --#{$prefix}btn-disabled-color: #{$btn-link-disabled-color};
-    --#{$prefix}btn-disabled-border-color: transparent;
-    --#{$prefix}btn-box-shadow: none;
+    @include tokens($button-link-tokens);
 
     text-decoration: $link-decoration;
     @if $enable-gradients {
@@ -421,12 +411,18 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
   // Button Sizes
   //
 
-  .btn-lg {
-    @include button-size($btn-padding-y-lg, $btn-padding-x-lg, $btn-font-size-lg, $btn-border-radius-lg);
+  // scss-docs-start btn-sizes-loop
+  @each $size in $button-sizes {
+    .btn-#{$size},
+    .btn-group-#{$size} > .btn,
+    .input-group-#{$size} > .btn {
+      --#{$prefix}btn-gap: var(--#{$prefix}btn-input-#{$size}-gap);
+      --#{$prefix}btn-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
+      --#{$prefix}btn-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
+      --#{$prefix}btn-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
+      --#{$prefix}btn-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}btn-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
+    }
   }
-
-  .btn-sm {
-    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-border-radius-sm);
-  }
-
+  // scss-docs-end btn-sizes-loop
 }

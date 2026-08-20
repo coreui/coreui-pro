@@ -38,13 +38,21 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 ### With icons
 
-You can combine button with our [CoreUI Icons](https://coreui.io/icons/).
+You can combine button with our [CoreUI Icons](https://coreui.io/icons/). The button lays its content out in a row and separates the parts with `--cui-btn-gap`, so the icon keeps its distance from the label whether or not there is whitespace between them in your markup.
 
 <Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name}"><span class="cil-contrast"></span> ${c.title}</button>`), ``, `<button type="button" class="btn btn-link">Link</button>`]} />
 
+### Icon only
+
+<AddedIn version="6.0.0" />
+
+Add `.btn-icon` for a button that holds nothing but an icon. It drops the padding and takes its width from its height, so the result is square at every size.
+
+<Example code={[`<button type="button" class="btn btn-primary btn-icon btn-sm"><span class="cil-contrast"></span></button>`, `<button type="button" class="btn btn-primary btn-icon"><span class="cil-contrast"></span></button>`, `<button type="button" class="btn btn-primary btn-icon btn-lg"><span class="cil-contrast"></span></button>`]} />
+
 ## Disable text wrapping
 
-If you don't want the button text to wrap, you can add the `.text-nowrap` class to the button. In Sass, you can set `$btn-white-space: nowrap` to disable text wrapping for each button.
+If you don't want the button text to wrap, you can add the `.text-nowrap` class to the button, or set `--cui-btn-white-space: nowrap` on it. In Sass, `$btn-white-space: nowrap` disables text wrapping for every button.
 
 ## Button tags
 
@@ -248,9 +256,9 @@ document.querySelectorAll('.btn').forEach(buttonElement => {
 
 Buttons use local CSS variables on `.btn` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
 
-<ScssDocs file="scss/buttons/_button.scss" capture="btn-css-vars" />
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-tokens" />
 
-Each `.btn-*` modifier class updates the appropriate CSS variables to minimize additional CSS rules with our `button-variant()` and `button-size()` mixins.
+Each `.btn-*` modifier class updates the appropriate CSS variables to minimize additional CSS rules with our `button-variant()` mixin.
 
 Here's an example of building a custom `.btn-*` modifier class like we do for the buttons unique to our docs by reassigning Bootstrap's CSS variables with a mixture of our own CSS and Sass variables.
 
@@ -266,15 +274,15 @@ Here's an example of building a custom `.btn-*` modifier class like we do for th
 
 CoreUI's button component is built with a base-modifier class approach. This means the bulk of the styling is contained to a base class `.btn` while style variations are confined to modifier classes (e.g., `.btn-danger`). These modifier classes are built from the `$button-variants` map to make customizing the number and name of our modifier classes.
 
-There are two mixins for buttons: a variant mixin and a size mixin. Both live in `scss/_buttons.scss`.
-
 `button-variant()` takes a variant name rather than colors. It reads that variant's entry from `$button-variants`, which maps each button token to a `--cui-theme-*` token, and derives the hover and active states from the same token in CSS. That is what lets a theme color you add yourself get correct states without compiling Sass.
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-variants" />
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-variant-mixin" />
 
-<ScssDocs file="scss/buttons/_button.scss" capture="btn-size-mixin" />
+Sizes need no mixin: each entry in `$button-sizes` points the button's tokens at the matching `--cui-btn-input-*` set, so `.btn-sm` and `.btn-lg` line up with form controls of the same size.
+
+<ScssDocs file="scss/buttons/_button.scss" capture="btn-sizes-loop" />
 
 ### SASS loops
 

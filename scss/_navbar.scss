@@ -32,7 +32,7 @@ $navbar-brand-margin-end:           1rem !default;
 $navbar-toggler-padding-y:          .25rem !default;
 $navbar-toggler-padding-x:          .75rem !default;
 $navbar-toggler-font-size:          var(--#{$prefix}font-size-lg) !default;
-$navbar-toggler-border-radius:      $btn-border-radius !default;
+$navbar-toggler-border-radius:      var(--#{$prefix}border-radius) !default;
 $navbar-toggler-focus-width:        var(--#{$prefix}focus-ring-width) !default;
 $navbar-toggler-transition:         box-shadow .15s ease-in-out !default;
 

@@ -110,6 +110,7 @@ $input-group-tokens: defaults(
   .input-group-lg > .form-select,
   .input-group-lg > .input-group-text,
   .input-group-lg > .btn {
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
@@ -124,6 +125,7 @@ $input-group-tokens: defaults(
   .input-group-sm > .form-select,
   .input-group-sm > .input-group-text,
   .input-group-sm > .btn {
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
