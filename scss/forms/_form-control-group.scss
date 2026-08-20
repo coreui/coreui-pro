@@ -43,6 +43,7 @@ $form-control-group-tokens: defaults(
     --#{$prefix}control-group-action-transition-property: #{var(--#{$prefix}btn-input-action-transition-property), transform},
     --#{$prefix}control-group-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
     --#{$prefix}control-group-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
+    --#{$prefix}control-group-disabled-opacity: var(--#{$prefix}btn-input-disabled-opacity),
   ),
   $form-control-group-tokens
 );
@@ -86,32 +87,30 @@ $form-control-group-tokens: defaults(
     gap: var(--#{$prefix}control-group-gap);
     align-items: center;
     width: 100%;
-    min-height: var(--#{$prefix}btn-input-min-height);
+    min-height: var(--#{$prefix}control-min-height);
     cursor: text;
 
     // The group declares the control tokens itself, so the sizing classes have
     // to be answered here — their own declarations sit earlier in the cascade
     // and would lose to the block above.
     &.form-control-sm {
+      --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
       --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
       --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
       --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
       --#{$prefix}control-border-radius: #{$input-border-radius-sm};
       --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-sm};
       --#{$prefix}control-group-action-size: #{$form-control-group-action-size-sm};
-
-      min-height: var(--#{$prefix}btn-input-sm-min-height);
     }
 
     &.form-control-lg {
+      --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
       --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
       --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
       --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
       --#{$prefix}control-border-radius: #{$input-border-radius-lg};
       --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-lg};
       --#{$prefix}control-group-action-size: #{$form-control-group-action-size-lg};
-
-      min-height: var(--#{$prefix}btn-input-lg-min-height);
     }
 
     // A div never fires :focus, so the frame takes the focus treatment from
@@ -139,7 +138,7 @@ $form-control-group-tokens: defaults(
       > .form-control-cleaner,
       > .form-control-icon {
         pointer-events: none;
-        opacity: .65;
+        opacity: var(--#{$prefix}control-group-disabled-opacity);
       }
     }
 
@@ -235,7 +234,7 @@ $form-control-group-tokens: defaults(
 
     &:disabled {
       pointer-events: none;
-      opacity: .65;
+      opacity: var(--#{$prefix}control-group-disabled-opacity);
     }
   }
 }
