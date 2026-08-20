@@ -286,11 +286,11 @@ Each variant class rewrites those variables from the theme tokens, falling back 
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-solid-tokens" />
 
-Here's an example of building a custom `.btn-*` modifier class like we do for the buttons unique to our docs by reassigning Bootstrap's CSS variables with a mixture of our own CSS and Sass variables.
+A brand colour of your own is a theme, not a button: set the theme tokens on a class and every variant follows, in plain CSS.
 
-<Example html={[`<button type="button" class="btn btn-cd-primary">Custom button</button>`]} />
+<Example html={[`<style>`, `    .theme-brand {`, `      --cui-theme-base: #6f42c1;`, `      --cui-theme-contrast: #fff;`, `      --cui-theme-hover: #6134ae;`, `      --cui-theme-active: #56309b;`, `      --cui-theme-bg-subtle: #e9e0f7;`, `      --cui-theme-fg: #59359a;`, `      --cui-theme-fg-emphasis: #432a72;`, `    }`, `  </style>`, `  <button type="button" class="btn-solid theme-brand">Solid</button>`, `  <button type="button" class="btn-outline theme-brand">Outline</button>`, `  <button type="button" class="btn-subtle theme-brand">Subtle</button>`, `  <button type="button" class="btn-ghost theme-brand">Ghost</button>`]} />
 
-<ScssDocs file="@docs/_buttons.scss" capture="btn-css-vars-example" />
+To restyle a single button instead, set the `--cui-btn-*` variables on it directly.
 
 ### SASS variables
 

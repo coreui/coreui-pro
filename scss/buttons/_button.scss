@@ -94,16 +94,16 @@ $button-solid-tokens: defaults(
   (
     --#{$prefix}btn-color: var(--#{$prefix}theme-contrast, #{$btn-color}),
     --#{$prefix}btn-bg: var(--#{$prefix}theme-base, #{$btn-bg}),
-    --#{$prefix}btn-border-color: var(--#{$prefix}theme-base, #{$btn-bg}),
-    --#{$prefix}btn-hover-color: var(--#{$prefix}theme-contrast, #{$btn-color}),
+    --#{$prefix}btn-border-color: var(--#{$prefix}btn-bg),
+    --#{$prefix}btn-hover-color: var(--#{$prefix}btn-color),
     --#{$prefix}btn-hover-bg: var(--#{$prefix}theme-hover, #{$btn-hover-bg}),
-    --#{$prefix}btn-hover-border-color: var(--#{$prefix}theme-hover, #{$btn-hover-bg}),
-    --#{$prefix}btn-active-color: var(--#{$prefix}theme-contrast, #{$btn-color}),
+    --#{$prefix}btn-hover-border-color: var(--#{$prefix}btn-hover-bg),
+    --#{$prefix}btn-active-color: var(--#{$prefix}btn-color),
     --#{$prefix}btn-active-bg: var(--#{$prefix}theme-active, #{$btn-hover-bg}),
-    --#{$prefix}btn-active-border-color: var(--#{$prefix}theme-active, #{$btn-hover-bg}),
-    --#{$prefix}btn-disabled-color: var(--#{$prefix}theme-contrast, #{$btn-color}),
-    --#{$prefix}btn-disabled-bg: var(--#{$prefix}theme-base, #{$btn-bg}),
-    --#{$prefix}btn-disabled-border-color: var(--#{$prefix}theme-base, #{$btn-bg})
+    --#{$prefix}btn-active-border-color: var(--#{$prefix}btn-active-bg),
+    --#{$prefix}btn-disabled-color: var(--#{$prefix}btn-color),
+    --#{$prefix}btn-disabled-bg: var(--#{$prefix}btn-bg),
+    --#{$prefix}btn-disabled-border-color: var(--#{$prefix}btn-bg)
   ),
   $button-solid-tokens
 );
@@ -120,12 +120,12 @@ $button-outline-tokens: defaults(
     --#{$prefix}btn-hover-color: var(--#{$prefix}theme-contrast, #{$btn-outline-hover-color}),
     --#{$prefix}btn-hover-bg: var(--#{$prefix}theme-hover, #{$btn-outline-hover-bg}),
     --#{$prefix}btn-hover-border-color: var(--#{$prefix}theme-hover, #{$btn-outline-border-color}),
-    --#{$prefix}btn-active-color: var(--#{$prefix}theme-contrast, #{$btn-outline-hover-color}),
+    --#{$prefix}btn-active-color: var(--#{$prefix}btn-hover-color),
     --#{$prefix}btn-active-bg: var(--#{$prefix}theme-active, #{$btn-outline-hover-bg}),
     --#{$prefix}btn-active-border-color: var(--#{$prefix}theme-active, #{$btn-outline-border-color}),
-    --#{$prefix}btn-disabled-color: var(--#{$prefix}theme-base, #{$btn-outline-color}),
+    --#{$prefix}btn-disabled-color: var(--#{$prefix}btn-color),
     --#{$prefix}btn-disabled-bg: transparent,
-    --#{$prefix}btn-disabled-border-color: var(--#{$prefix}theme-base, #{$btn-outline-border-color})
+    --#{$prefix}btn-disabled-border-color: var(--#{$prefix}btn-border-color)
   ),
   $button-outline-tokens
 );
@@ -142,11 +142,11 @@ $button-subtle-tokens: defaults(
     --#{$prefix}btn-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$btn-subtle-color}),
     --#{$prefix}btn-hover-bg: var(--#{$prefix}theme-bg-muted, #{$btn-subtle-hover-bg}),
     --#{$prefix}btn-hover-border-color: transparent,
-    --#{$prefix}btn-active-color: var(--#{$prefix}theme-fg-emphasis, #{$btn-subtle-color}),
-    --#{$prefix}btn-active-bg: var(--#{$prefix}theme-bg-muted, #{$btn-subtle-hover-bg}),
+    --#{$prefix}btn-active-color: var(--#{$prefix}btn-hover-color),
+    --#{$prefix}btn-active-bg: var(--#{$prefix}btn-hover-bg),
     --#{$prefix}btn-active-border-color: transparent,
-    --#{$prefix}btn-disabled-color: var(--#{$prefix}theme-fg, #{$btn-subtle-color}),
-    --#{$prefix}btn-disabled-bg: var(--#{$prefix}theme-bg-subtle, #{$btn-subtle-bg}),
+    --#{$prefix}btn-disabled-color: var(--#{$prefix}btn-color),
+    --#{$prefix}btn-disabled-bg: var(--#{$prefix}btn-bg),
     --#{$prefix}btn-disabled-border-color: transparent
   ),
   $button-subtle-tokens
@@ -163,11 +163,11 @@ $button-ghost-tokens: defaults(
     --#{$prefix}btn-border-color: transparent,
     --#{$prefix}btn-hover-color: var(--#{$prefix}theme-contrast, #{$btn-ghost-hover-color}),
     --#{$prefix}btn-hover-bg: var(--#{$prefix}theme-hover, #{$btn-ghost-hover-bg}),
-    --#{$prefix}btn-hover-border-color: var(--#{$prefix}theme-hover, #{$btn-ghost-hover-bg}),
-    --#{$prefix}btn-active-color: var(--#{$prefix}theme-contrast, #{$btn-ghost-hover-color}),
+    --#{$prefix}btn-hover-border-color: var(--#{$prefix}btn-hover-bg),
+    --#{$prefix}btn-active-color: var(--#{$prefix}btn-hover-color),
     --#{$prefix}btn-active-bg: var(--#{$prefix}theme-active, #{$btn-ghost-hover-bg}),
-    --#{$prefix}btn-active-border-color: var(--#{$prefix}theme-active, #{$btn-ghost-hover-bg}),
-    --#{$prefix}btn-disabled-color: var(--#{$prefix}theme-base, #{$btn-ghost-color}),
+    --#{$prefix}btn-active-border-color: var(--#{$prefix}btn-active-bg),
+    --#{$prefix}btn-disabled-color: var(--#{$prefix}btn-color),
     --#{$prefix}btn-disabled-bg: transparent,
     --#{$prefix}btn-disabled-border-color: transparent
   ),
