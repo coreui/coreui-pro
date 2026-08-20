@@ -4,7 +4,6 @@
 @use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
-@use "forms/form-check" as *;
 
 // The shared options menu rendered by the internal combobox engine
 // (js/src/combobox.ts) for Autocomplete and Multi Select. The components keep
@@ -60,7 +59,7 @@ $combobox-option-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
 $combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
 $combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
 
-$combobox-option-indicator-width:         var(--#{$prefix}check-size, 1em) !default;
+$combobox-option-indicator-width:         var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
 
 // scss-docs-end combobox-variables
 

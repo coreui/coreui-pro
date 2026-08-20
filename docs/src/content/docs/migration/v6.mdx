@@ -798,9 +798,10 @@ both still works; the component only removes on `dispose()` a class it added.
   (`aria-hidden`, since `aria-selected` carries the semantics), so size, border,
   radius, background and theming all come from the form-check surface and the
   two stay in lockstep. The per-indicator look variables are gone with
-  them — only `$combobox-option-indicator-width` survives, and it defaults to
-  `var(--cui-form-check-input-width)`. Theme the option checkbox through
-  `$form-check-*` / `--cui-form-check-*` instead.
+  them — only `$combobox-option-indicator-width` survives, and it follows the
+  checkbox: `--cui-check-size` where the indicator can see it, and the shared
+  `--cui-control-size` otherwise. Theme the option checkbox through `$check-*` /
+  `--cui-check-*` instead.
 
 #### Password Input and Number Input build their own frame
 
