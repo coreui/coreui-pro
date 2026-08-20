@@ -20,6 +20,7 @@
 .cache
 .claude
 .DS_Store
+.gstack
 .idea
 .project
 .settings
@@ -38,6 +39,7 @@ Thumbs.db
 *.komodoproject
 
 # Folders to ignore
+/.vitest-attachments/
 /dist-sass/
 /js/coverage/
 node_modules/
