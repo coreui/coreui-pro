@@ -149,11 +149,6 @@ $navbar-dark-tokens: defaults(
 }
 
 @layer components {
-  // Navbar
-  //
-  // Provide a static navbar from which we expand to create full-width, fixed, and
-  // other navbar variations.
-
   .navbar {
     @include tokens($navbar-tokens);
 

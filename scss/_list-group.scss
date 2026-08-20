@@ -65,10 +65,6 @@ $list-group-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
-  // Base class
-  //
-  // Easily usable on <ul>, <ol>, or <div>.
-
   .list-group {
     @include tokens($list-group-tokens);
 

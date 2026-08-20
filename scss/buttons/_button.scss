@@ -237,10 +237,6 @@ $btn-variant-selectors: (string.unquote(".btn"), string.unquote(".btn-link"), st
 }
 
 @layer components {
-  //
-  // Base styles
-  //
-
   #{$btn-variant-selectors} {
     @include tokens($button-tokens);
 

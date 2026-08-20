@@ -767,6 +767,14 @@ input group, target `.form-control-group` instead. A hand-authored group — a
 password field, a chip input — is now a first-class child of `.input-group`
 and needs no wrapper of its own.
 
+**The input group styles ship in the `components` layer**, not `forms`. It
+assembles controls rather than being one, and the layer it sat in lost to
+`components` whatever the selector said — so a `.btn` inside a group kept the
+radius it sets for itself and showed rounded corners against the field. If your
+own stylesheet re-squared those corners as a workaround, the override is no
+longer needed. A rule of yours that relied on the group losing to a component
+now loses to the group instead; give it a layer of its own if you need it back.
+
 #### Chip Input takes the frame class itself
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

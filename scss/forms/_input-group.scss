@@ -13,6 +13,9 @@ $input-group-addon-font-weight:         var(--#{$prefix}btn-input-font-weight) !
 $input-group-addon-color:               var(--#{$prefix}btn-input-color) !default;
 $input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
 $input-group-addon-border-color:        var(--#{$prefix}btn-input-border-color) !default;
+
+// A button in the group sizes itself from `$button-sizes`, so it is not listed here.
+$input-group-sizes:                     ("sm", "lg") !default;
 // scss-docs-end input-group-variables
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -38,7 +41,7 @@ $input-group-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
-@layer forms {
+@layer components {
   .input-group {
     position: relative;
     display: flex;
@@ -106,34 +109,20 @@ $input-group-tokens: defaults(
   // Remix the default form control sizing classes into new ones for easier
   // manipulation.
 
-  .input-group-lg > .form-control,
-  .input-group-lg > .form-select,
-  .input-group-lg > .input-group-text,
-  .input-group-lg > .btn {
-    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
-    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-lg-border-radius);
+  @each $size in $input-group-sizes {
+    .input-group-#{$size} > .form-control,
+    .input-group-#{$size} > .form-select,
+    .input-group-#{$size} > .input-group-text {
+      --#{$prefix}control-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
+      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
+      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
+      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
 
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    @include border-radius(var(--#{$prefix}control-border-radius));
-  }
-
-  .input-group-sm > .form-control,
-  .input-group-sm > .form-select,
-  .input-group-sm > .input-group-text,
-  .input-group-sm > .btn {
-    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
-    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-sm-border-radius);
-
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    @include border-radius(var(--#{$prefix}control-border-radius));
+      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+      font-size: var(--#{$prefix}control-font-size);
+      @include border-radius(var(--#{$prefix}control-border-radius));
+    }
   }
 
   .input-group-lg > .form-select,
@@ -141,7 +130,6 @@ $input-group-tokens: defaults(
     // stylelint-disable-next-line function-disallowed-list
     padding-inline-end: calc(var(--#{$prefix}control-padding-x) + var(--#{$prefix}control-select-padding-end));
   }
-
 
   // Rounded corners
   //
