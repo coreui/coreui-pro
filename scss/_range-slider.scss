@@ -36,7 +36,6 @@ $range-slider-thumb-bg:                    var(--#{$prefix}theme-base, var(--#{$
 $range-slider-thumb-border:                0 !default;
 $range-slider-thumb-border-radius:         1rem !default;
 $range-slider-thumb-box-shadow:            0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
-$range-slider-thumb-focus-ring:      $input-focus-ring !default;
 $range-slider-thumb-active-bg:             color-mix(in srgb, var(--#{$prefix}theme-base, var(--#{$prefix}primary)) 30%, var(--#{$prefix}body-bg)) !default;
 $range-slider-thumb-disabled-bg:           color-mix(in srgb, var(--#{$prefix}secondary) 100%, transparent) !default;
 $range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
@@ -85,7 +84,6 @@ $range-slider-tokens: defaults(
     --#{$prefix}range-slider-thumb-border: #{$range-slider-thumb-border},
     --#{$prefix}range-slider-thumb-border-radius: #{$range-slider-thumb-border-radius},
     --#{$prefix}range-slider-thumb-box-shadow: #{$range-slider-thumb-box-shadow},
-    --#{$prefix}range-slider-thumb-focus-ring: #{$range-slider-thumb-focus-ring},
     --#{$prefix}range-slider-thumb-active-bg: #{$range-slider-thumb-active-bg},
     --#{$prefix}range-slider-thumb-disabled-bg: #{$range-slider-thumb-disabled-bg},
     --#{$prefix}range-slider-thumb-transition: #{$range-slider-thumb-transition},
@@ -194,8 +192,8 @@ $range-slider-vertical-tokens: defaults(
 
       // Pseudo-elements must be split across multiple rulesets to have an effect.
       // No box-shadow() mixin for focus accessibility.
-      &::-webkit-slider-thumb { @include focus-ring(true, $ring: var(--#{$prefix}range-slider-thumb-focus-ring)); }
-      &::-moz-range-thumb     { @include focus-ring(true, $ring: var(--#{$prefix}range-slider-thumb-focus-ring)); }
+      &::-webkit-slider-thumb { @include focus-ring(true); }
+      &::-moz-range-thumb     { @include focus-ring(true); }
     }
 
     &::-moz-focus-outer {

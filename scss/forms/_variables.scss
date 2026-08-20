@@ -40,7 +40,7 @@ $input-focus-bg:                        var(--#{$prefix}btn-input-focus-bg) !def
 $input-focus-border-color:              var(--#{$prefix}btn-input-focus-border-color) !default;
 $input-focus-color:                     var(--#{$prefix}btn-input-focus-color) !default;
 $input-focus-width:                     var(--#{$prefix}focus-ring-width) !default;
-$input-focus-ring:                      $themed-focus-ring !default;
+$input-focus-ring:                      var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)) !default;
 
 $input-placeholder-color:               var(--#{$prefix}secondary-color) !default;
 $input-plaintext-color:                 var(--#{$prefix}body-color) !default;
@@ -118,7 +118,6 @@ $form-check-label-cursor:                 null !default;
 
 $form-check-input-active-filter:          brightness(90%) !default;
 $form-check-input-focus-border:           $input-focus-border-color !default;
-$form-check-input-focus-ring:             $themed-focus-ring !default;
 
 $form-check-input-disabled-opacity:        .5 !default;
 $form-check-label-disabled-opacity:        $form-check-input-disabled-opacity !default;

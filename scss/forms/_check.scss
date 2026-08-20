@@ -53,7 +53,6 @@ $check-tokens: defaults(
     --#{$prefix}check-disabled-opacity: #{$form-check-input-disabled-opacity},
     --#{$prefix}check-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}check-size)) * .5),
     --#{$prefix}check-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}check-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}check-active-filter: #{$form-check-input-active-filter},
     --#{$prefix}check-label-disabled-opacity: #{$form-check-label-disabled-opacity},
   ),
@@ -129,7 +128,7 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
 
     &:focus-visible {
       border-color: var(--#{$prefix}check-focus-border);
-      @include focus-ring(true, $ring: var(--#{$prefix}check-focus-ring));
+      @include focus-ring(true);
     }
 
     &:active {

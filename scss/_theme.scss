@@ -179,7 +179,8 @@ $theme-token-refs: (
   "fg-emphasis": "-text-emphasis",
   "bg-subtle": "-bg-subtle",
   "bg-muted": "-bg-muted",
-  "border": "-border-subtle"
+  "border": "-border-subtle",
+  "focus-ring": "-focus-ring"
 ) !default;
 // scss-docs-end theme-token-refs
 
@@ -187,10 +188,6 @@ $theme-token-refs: (
   @each $token, $suffix in $theme-token-refs {
     --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
   }
-
-  // The map carries the hue; the width stays global, so only the colour is
-  // contextual.
-  --#{$prefix}theme-focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}#{$state}-focus-ring);
 }
 
 // scss-docs-start theme-classes

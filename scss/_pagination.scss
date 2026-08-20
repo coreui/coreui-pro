@@ -27,7 +27,6 @@ $pagination-border-color:           var(--#{$prefix}border-color) !default;
 
 $pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-focus-bg:               var(--#{$prefix}secondary-bg) !default;
-$pagination-focus-ring:             $themed-focus-ring !default;
 
 $pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
@@ -66,7 +65,6 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-hover-border-color: var(--#{$prefix}theme-border, #{$pagination-hover-border-color}),
     --#{$prefix}pagination-focus-color: #{$pagination-focus-color},
     --#{$prefix}pagination-focus-bg: #{$pagination-focus-bg},
-    --#{$prefix}pagination-focus-ring: #{$pagination-focus-ring},
     --#{$prefix}pagination-active-color: var(--#{$prefix}theme-contrast, #{$pagination-active-color}),
     --#{$prefix}pagination-active-bg: var(--#{$prefix}theme-base, #{$pagination-active-bg}),
     --#{$prefix}pagination-active-border-color: var(--#{$prefix}theme-base, #{$pagination-active-border-color}),
@@ -112,7 +110,7 @@ $pagination-tokens: defaults(
       z-index: 3;
       color: var(--#{$prefix}pagination-focus-color);
       background-color: var(--#{$prefix}pagination-focus-bg);
-      @include focus-ring(true, $ring: var(--#{$prefix}pagination-focus-ring));
+      @include focus-ring(true);
     }
 
     &.active,

@@ -59,7 +59,6 @@ $switch-tokens: defaults(
     --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
     --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
     --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}switch-focus-ring: #{$form-check-input-focus-ring},
     --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
     --#{$prefix}switch-label-disabled-opacity: #{$form-check-label-disabled-opacity},
   ),
@@ -118,7 +117,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
 
     &:focus-visible {
       border-color: var(--#{$prefix}switch-focus-border);
-      @include focus-ring(true, $ring: var(--#{$prefix}switch-focus-ring));
+      @include focus-ring(true);
     }
 
     &:disabled {

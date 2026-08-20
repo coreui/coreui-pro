@@ -85,7 +85,6 @@ $chip-tokens: defaults(
     --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-hover-color}),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
     --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
-    --#{$prefix}chip-focus-ring: #{$themed-focus-ring},
   ),
   $chip-tokens
 );
@@ -147,7 +146,7 @@ $chip-outline-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: var(--#{$prefix}chip-focus-ring);
+      @include focus-ring();
     }
 
     .avatar {
@@ -247,7 +246,7 @@ $chip-outline-tokens: defaults(
     }
 
     &:focus-visible {
-      outline: var(--#{$prefix}chip-focus-ring);
+      @include focus-ring();
       opacity: 1;
     }
 
