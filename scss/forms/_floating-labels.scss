@@ -8,7 +8,7 @@
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start form-floating-variables
-$form-floating-height:                  calc(3.5rem + #{$input-height-border}) !default;
+$form-floating-height:                  calc(3.5rem + var(--#{$prefix}btn-input-border-width) * 2) !default;
 $form-floating-line-height:             1.25 !default;
 $form-floating-padding-x:               var(--#{$prefix}btn-input-padding-x) !default;
 $form-floating-padding-y:               1rem !default;

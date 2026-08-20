@@ -1,18 +1,7 @@
-@use "../theme" as *;
 @use "../config" as *;
 
 // Variables only, no rules: importing this from a module that loads early must
 // not drag a `@layer` block above the `@layer` order declaration.
-
-// scss-docs-start form-input-variables
-$input-height-border:                   calc(var(--#{$prefix}btn-input-border-width) * 2) !default; // stylelint-disable-line function-disallowed-list
-
-$input-height-inner:                    calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2) !default; // stylelint-disable-line function-disallowed-list
-$input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-height) * .5em + var(--#{$prefix}btn-input-padding-y)) !default; // stylelint-disable-line function-disallowed-list
-$input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default; // stylelint-disable-line function-disallowed-list
-
-$form-color-width:                      3rem !default;
-// scss-docs-end form-input-variables
 
 // scss-docs-start form-text-variables
 $form-text-margin-top:                  .25rem !default;
@@ -21,31 +10,6 @@ $form-text-font-style:                  null !default;
 $form-text-font-weight:                 null !default;
 $form-text-color:                       var(--#{$prefix}secondary-color) !default;
 // scss-docs-end form-text-variables
-
-// scss-docs-start form-feedback-variables
-$form-feedback-margin-top:          $form-text-margin-top !default;
-$form-feedback-font-size:           $form-text-font-size !default;
-$form-feedback-font-style:          $form-text-font-style !default;
-
-$form-feedback-icon-valid-color:    $success !default;
-$form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1'/></svg>") !default;
-$form-feedback-icon-invalid-color:  $danger !default;
-$form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/></svg>") !default;
-// scss-docs-end form-feedback-variables
-
-// scss-docs-start form-validation-states
-// `icon` stays a Sass value because the SVG bakes its fill in at build time.
-$form-validation-states: (
-  "valid": (
-    "theme": "success",
-    "icon": $form-feedback-icon-valid,
-  ),
-  "invalid": (
-    "theme": "danger",
-    "icon": $form-feedback-icon-invalid,
-  )
-) !default;
-// scss-docs-end form-validation-states
 
 // scss-docs-start form-check-defaults
 $form-check-input-width:                  1em !default;

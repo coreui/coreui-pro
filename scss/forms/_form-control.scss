@@ -8,10 +8,15 @@
 @use "../mixins/gradients" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
+@use "../mixins/forms" as *;
 @use "../mixins/transition" as *;
 @use "../colors" as *;
 @use "../config" as *;
 @use "variables" as *;
+
+// scss-docs-start form-color-variables
+$form-color-width:                3rem !default;
+// scss-docs-end form-color-variables
 
 // scss-docs-start form-file-variables
 $form-file-button-color:          var(--#{$prefix}btn-input-color) !default;
