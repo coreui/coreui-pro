@@ -1,7 +1,6 @@
-@use "../forms/variables" as *;
+@use "../theme" as *;
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
-@use "../functions/math" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/focus-ring" as *;
@@ -12,10 +11,40 @@
 // This mixin uses an `if()` technique to be compatible with Dart Sass
 // See https://github.com/sass/sass/issues/1873#issuecomment-152293725 for more details
 
-// Form tooltips reuse the tooltip's runtime tokens when the element also
-// carries the .tooltip class; these are the standalone fallbacks, matching the
-// tooltip's default formulas. The Sass-level derivation from $tooltip-* is
-// gone — the runtime link through var(--#{$prefix}tooltip-*) replaces it.
+// scss-docs-start form-feedback-variables
+$form-feedback-margin-top:          .25rem !default;
+$form-feedback-font-size:           var(--#{$prefix}small-font-size) !default;
+$form-feedback-font-style:          null !default;
+
+$form-feedback-icon-valid-color:    $success !default;
+$form-feedback-icon-valid:          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='#{$form-feedback-icon-valid-color}' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1'/></svg>") !default;
+$form-feedback-icon-invalid-color:  $danger !default;
+$form-feedback-icon-invalid:        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='#{$form-feedback-icon-invalid-color}'><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#{$form-feedback-icon-invalid-color}' stroke='none'/></svg>") !default;
+// scss-docs-end form-feedback-variables
+
+// `icon` stays a Sass value because the SVG bakes its fill in at build time.
+// scss-docs-start form-validation-states
+// `icon` stays a Sass value because the SVG bakes its fill in at build time.
+$form-validation-states: (
+  "valid": (
+    "theme": "success",
+    "icon": $form-feedback-icon-valid,
+  ),
+  "invalid": (
+    "theme": "danger",
+    "icon": $form-feedback-icon-invalid,
+  )
+) !default;
+// scss-docs-end form-validation-states
+
+// Geometry of the validation icon painted into the field: the room it needs and
+// where it sits. Derived from the frame, so it follows a retuned control.
+// stylelint-disable function-disallowed-list
+$input-height-inner:                    calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2) !default;
+$input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-height) * .5em + var(--#{$prefix}btn-input-padding-y)) !default;
+$input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default;
+// stylelint-enable function-disallowed-list
+
 // scss-docs-start tooltip-feedback-variables
 $form-feedback-tooltip-padding-y:     var(--#{$prefix}spacer-1) !default;
 $form-feedback-tooltip-padding-x:     var(--#{$prefix}spacer-2) !default;
@@ -28,8 +57,6 @@ $form-feedback-tooltip-border-radius: var(--#{$prefix}border-radius) !default;
 // stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start form-feedback-tokens
-// Geometry of the feedback and tooltip elements. They are siblings of the
-// control rather than descendants, so they carry their own tokens.
 $form-feedback-tokens: () !default;
 $form-feedback-tokens: defaults(
   (
@@ -64,9 +91,6 @@ $form-feedback-tokens: defaults(
   }
 }
 
-// The frame's share of a validation state. Every field component draws its
-// frame with `.form-control-group`, so the treatment is one and the same —
-// only the selector that spots the state differs from family to family.
 @mixin form-control-group-validation-state($color, $border-color, $focus-ring-color) {
   --#{$prefix}control-border-color: #{$border-color};
   --#{$prefix}control-focus-border-color: #{$border-color};
@@ -75,12 +99,8 @@ $form-feedback-tokens: defaults(
   --#{$prefix}control-group-action-color: #{$color};
 }
 
-// The v5 spelling is an alias of the controls rather than a second
-// implementation; `$enable-deprecated-form-check: false` compiles it out.
 $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .switch, .form-check-input"; else: ".check, .radio, .switch") !default;
 
-// Every colour comes from a slot of the state's theme colour, so a validation
-// state carries a name rather than a palette of its own.
 @mixin form-validation-state(
   $state,
   $theme,
@@ -102,8 +122,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     color: $color;
   }
 
-  // The compound variant outweighs .tooltip's own opacity: 0 (0,2,0 vs 0,1,0);
-  // the bare class keeps the standalone fallbacks working.
+  // The compound variant outweighs .tooltip's own opacity: 0 (0,2,0 vs 0,1,0).
   .tooltip.#{$state}-tooltip,
   .#{$state}-tooltip {
     @include tokens($form-feedback-tokens);
@@ -158,16 +177,8 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
     }
   }
 
-  // The group is the frame and the control inside it draws no border of its
-  // own, so the state has to reach the group — custom properties set on the
-  // control would only inherit downwards. Actions sit where the validation
-  // icon would go, so the icon is suppressed and the actions carry the color
-  // instead (see the password input example).
-  //
-  // Which element carries the state differs from family to family: the group
-  // itself, the control inside it (the pickers' section field), or the
-  // component root — autocomplete and multi select keep it there. They all
-  // colour the same frame, so they share one rule.
+  // The state has to reach the group: a custom property set on the control
+  // inside it only inherits downwards, never back up to the frame.
   .form-control-group.is-#{$state},
   .form-control-group:has(> .form-control.is-#{$state}),
   .autocomplete.is-#{$state} .form-control-group,
@@ -176,9 +187,6 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   }
 
   @if $state == "valid" or $state == "invalid" {
-    // Native constraint validation reports through a real form control: the
-    // one inside the group (autocomplete's required input), or multi select's
-    // native select, which sits next to the group rather than inside it.
     .was-validated .form-control-group:has(> .form-control:#{$state}),
     .was-validated .form-multi-select:has(> select:#{$state}) .form-control-group {
       @include form-control-group-validation-state($color, $border-color, $focus-ring-color);
@@ -228,7 +236,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   .form-control-color {
     @include form-validation-state-selector($state) {
       @if $enable-validation-icons {
-        width: add($form-color-width, $input-height-inner);
+        width: calc(var(--#{$prefix}control-color-width) + #{$input-height-inner}); // stylelint-disable-line function-disallowed-list
       }
     }
   }

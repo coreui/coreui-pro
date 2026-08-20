@@ -257,10 +257,6 @@ $chip-outline-tokens: defaults(
     }
   }
 
-  //
-  // Chip sizes
-  //
-
   .chip-lg,
   .chip-input-lg .chip {
     @include chip-size(

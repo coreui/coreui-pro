@@ -1,16 +1,42 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
-@use "variables" as *;
+
+// scss-docs-start form-text-variables
+$form-text-margin-top:                  .25rem !default;
+$form-text-font-size:                   var(--#{$prefix}small-font-size) !default;
+$form-text-font-style:                  null !default;
+$form-text-font-weight:                 null !default;
+$form-text-color:                       var(--#{$prefix}secondary-color) !default;
+// scss-docs-end form-text-variables
+
+$form-text-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start form-text-css-vars
+$form-text-tokens: defaults(
+  (
+    --#{$prefix}form-text-margin-top: $form-text-margin-top,
+    --#{$prefix}form-text-font-size: $form-text-font-size,
+    --#{$prefix}form-text-font-style: $form-text-font-style,
+    --#{$prefix}form-text-font-weight: $form-text-font-weight,
+    --#{$prefix}form-text-color: $form-text-color,
+  ),
+  $form-text-tokens
+);
+// scss-docs-end form-text-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer forms {
-  //
-  // Form text
-  //
-
   .form-text {
-    margin-top: $form-text-margin-top;
-    font-size: $form-text-font-size;
-    font-style: $form-text-font-style;
-    font-weight: $form-text-font-weight;
-    color: $form-text-color;
+    @include tokens($form-text-tokens);
+
+    margin-top: var(--#{$prefix}form-text-margin-top);
+    font-size: var(--#{$prefix}form-text-font-size);
+    font-style: var(--#{$prefix}form-text-font-style, inherit);
+    font-weight: var(--#{$prefix}form-text-font-weight, inherit);
+    color: var(--#{$prefix}form-text-color);
   }
 }

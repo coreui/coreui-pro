@@ -8,49 +8,51 @@
 @use "../mixins/gradients" as *;
 @use "../mixins/ltr-rtl" as *;
 @use "../mixins/tokens" as *;
+@use "../mixins/forms" as *;
 @use "../mixins/transition" as *;
 @use "../colors" as *;
 @use "../config" as *;
-@use "variables" as *;
+
+// scss-docs-start form-color-variables
+$form-color-width:                3rem !default;
+// scss-docs-end form-color-variables
 
 // scss-docs-start form-file-variables
-$form-file-button-color:          $input-color !default;
+$form-file-button-color:          var(--#{$prefix}btn-input-color) !default;
 $form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default;
 $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 // scss-docs-end form-file-variables
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-control-tokens
-// The --#{$prefix}control-* namespace is shared by every form control, so a
-// control never has to read another component's Sass variables to line up.
 $form-control-tokens: () !default;
 $form-control-tokens: defaults(
   (
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-min-height),
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-padding-x),
     --#{$prefix}control-font-family: var(--#{$prefix}btn-input-font-family),
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-font-size),
-    --#{$prefix}control-font-weight: #{$input-font-weight},
+    --#{$prefix}control-font-weight: var(--#{$prefix}btn-input-font-weight),
     --#{$prefix}control-line-height: var(--#{$prefix}btn-input-line-height),
     --#{$prefix}control-color: var(--#{$prefix}btn-input-color),
     --#{$prefix}control-bg: var(--#{$prefix}btn-input-bg),
     --#{$prefix}control-border-width: var(--#{$prefix}btn-input-border-width),
-    --#{$prefix}control-border-color: #{$input-border-color},
-    --#{$prefix}control-border-radius: #{$input-border-radius},
-    --#{$prefix}control-box-shadow: #{$input-box-shadow},
-    --#{$prefix}control-transition-property: #{$input-transition-property},
-    --#{$prefix}control-transition-duration: #{$input-transition-duration},
-    --#{$prefix}control-transition-timing: #{$input-transition-timing},
-    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, #{$input-placeholder-color}),
-    --#{$prefix}control-focus-color: #{$input-focus-color},
-    --#{$prefix}control-focus-bg: #{$input-focus-bg},
-    --#{$prefix}control-focus-border-color: #{$input-focus-border-color},
-    --#{$prefix}control-focus-ring: #{$input-focus-ring},
-    --#{$prefix}control-disabled-color: #{$input-disabled-color},
-    --#{$prefix}control-disabled-bg: #{$input-disabled-bg},
-    --#{$prefix}control-disabled-border-color: #{$input-disabled-border-color},
+    --#{$prefix}control-border-color: var(--#{$prefix}btn-input-border-color),
+    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-border-radius),
+    --#{$prefix}control-box-shadow: var(--#{$prefix}btn-input-box-shadow),
+    --#{$prefix}control-transition-property: var(--#{$prefix}btn-input-transition-property),
+    --#{$prefix}control-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-transition-timing: var(--#{$prefix}btn-input-transition-timing),
+    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, var(--#{$prefix}secondary-color)),
+    --#{$prefix}control-focus-color: var(--#{$prefix}btn-input-focus-color),
+    --#{$prefix}control-focus-bg: var(--#{$prefix}btn-input-focus-bg),
+    --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
+    --#{$prefix}control-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)),
+    --#{$prefix}control-disabled-color: var(--#{$prefix}body-color),
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}secondary-bg),
+    --#{$prefix}control-disabled-border-color: var(--#{$prefix}border-color),
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},
     --#{$prefix}control-action-hover-bg: #{$form-file-button-hover-bg},
@@ -62,13 +64,9 @@ $form-control-tokens: defaults(
 );
 // scss-docs-end form-control-tokens
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // scss-docs-start form-control-frame-mixin
-// The visual frame of a control, without the layout. `.form-control` is one
-// consumer; `.form-control-group` — a group of parts that has to read as a
-// single control — is the other, so the frame is described once.
 @mixin form-control-frame() {
   padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
   font-family: var(--#{$prefix}control-font-family);
@@ -92,9 +90,6 @@ $form-control-tokens: defaults(
 }
 // scss-docs-end form-control-frame-mixin
 
-
-// The chevron a `<select>` draws in place of the native arrow, and the geometry
-// that makes room for it. Everything else a select needs is `.form-control`.
 // scss-docs-start form-control-select-variables
 $form-control-select-indicator-color:      $gray-800 !default;
 $form-control-select-indicator:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
@@ -106,15 +101,13 @@ $form-control-select-feedback-icon-position: center right var(--#{$prefix}contro
 $form-control-select-feedback-icon-size:   $input-height-inner-half $input-height-inner-half !default;
 // scss-docs-end form-control-select-variables
 
-// The colour lives inside the inline SVG, so it cannot be a light-dark() pair.
 // scss-docs-start form-control-select-dark-variables
 $form-control-select-indicator-color-dark: rgba($white, .87) !default;
 $form-control-select-indicator-dark:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color-dark}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
 // scss-docs-end form-control-select-dark-variables
 
 $form-control-select-tokens: () !default;
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-control-select-tokens
 $form-control-select-tokens: defaults(
@@ -129,14 +122,9 @@ $form-control-select-tokens: defaults(
 );
 // scss-docs-end form-control-select-tokens
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
-  //
-  // General form controls (plus a few specific high-level interventions)
-  //
-
   .form-control,
   .form-select {
     @include tokens($form-control-tokens);
@@ -245,12 +233,14 @@ $form-control-select-tokens: defaults(
     // invalid and fall back to their initial values.
     @include tokens($form-control-tokens);
 
+    --#{$prefix}control-plaintext-color: var(--#{$prefix}body-color);
+
     display: block;
     width: 100%;
     padding: var(--#{$prefix}control-padding-y) 0;
     margin-bottom: 0; // match inputs if this class comes on inputs with default margins
     line-height: var(--#{$prefix}control-line-height);
-    color: $input-plaintext-color;
+    color: var(--#{$prefix}control-plaintext-color);
     background-color: transparent;
     border: solid transparent;
     border-width: var(--#{$prefix}control-border-width) 0;
@@ -275,12 +265,13 @@ $form-control-select-tokens: defaults(
 
   .form-control-sm,
   .form-select-sm {
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
-    --#{$prefix}control-border-radius: #{$input-border-radius-sm};
+    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-sm-border-radius);
 
-    min-height: var(--#{$prefix}btn-input-sm-min-height);
+    min-height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     font-size: var(--#{$prefix}control-font-size);
     @include border-radius(var(--#{$prefix}control-border-radius));
@@ -295,12 +286,13 @@ $form-control-select-tokens: defaults(
 
   .form-control-lg,
   .form-select-lg {
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
-    --#{$prefix}control-border-radius: #{$input-border-radius-lg};
+    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-lg-border-radius);
 
-    min-height: var(--#{$prefix}btn-input-lg-min-height);
+    min-height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     font-size: var(--#{$prefix}control-font-size);
     @include border-radius(var(--#{$prefix}control-border-radius));
@@ -313,9 +305,6 @@ $form-control-select-tokens: defaults(
     }
   }
 
-  // A `<select>` draws its own chevron because `appearance: none` takes the
-  // native one away. `.form-control-caret` puts the same on an element that is
-  // not a select; `.form-select` is the deprecated spelling of both.
   // stylelint-disable selector-no-qualifying-type
   select.form-control,
   .form-control-caret,
@@ -362,22 +351,16 @@ $form-control-select-tokens: defaults(
   // stylelint-disable selector-no-qualifying-type
   textarea {
     &.form-control {
-      min-height: var(--#{$prefix}btn-input-min-height);
-    }
-
-    &.form-control-sm {
-      min-height: var(--#{$prefix}btn-input-sm-min-height);
-    }
-
-    &.form-control-lg {
-      min-height: var(--#{$prefix}btn-input-lg-min-height);
+      min-height: var(--#{$prefix}control-min-height);
     }
   }
   // stylelint-enable selector-no-qualifying-type
 
   .form-control-color {
-    width: $form-color-width;
-    height: var(--#{$prefix}btn-input-min-height);
+    --#{$prefix}control-color-width: #{$form-color-width};
+
+    width: var(--#{$prefix}control-color-width);
+    height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y);
 
     &:not(:disabled):not([readonly]) {
@@ -393,8 +376,5 @@ $form-control-select-tokens: defaults(
       border: 0 !important; // stylelint-disable-line declaration-no-important
       @include border-radius(var(--#{$prefix}control-border-radius));
     }
-
-    &.form-control-sm { height: var(--#{$prefix}btn-input-sm-min-height); }
-    &.form-control-lg { height: var(--#{$prefix}btn-input-lg-min-height); }
   }
 }

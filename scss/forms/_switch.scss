@@ -1,6 +1,6 @@
+@use "sass:list";
 @use "sass:map";
 @use "../functions/defaults" as *;
-@use "variables" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
@@ -29,6 +29,9 @@ $switch-sizes: (
   lg: (height: 1.5rem,  font-size: var(--#{$prefix}font-size-lg)),
   xl: (height: 1.75rem, font-size: var(--#{$prefix}font-size-lg))
 ) !default;
+
+// The v5 spelling shipped two sizes; both take their height from the map above.
+$form-switch-sizes: ("lg", "xl") !default;
 // scss-docs-end switch-variables
 
 $switch-tokens: () !default;
@@ -56,11 +59,11 @@ $switch-tokens: defaults(
     --#{$prefix}switch-checked-thumb-bg: #{$switch-checked-thumb-bg},
     --#{$prefix}switch-disabled-bg: #{$switch-disabled-bg},
     --#{$prefix}switch-disabled-thumb-bg: #{$switch-disabled-thumb-bg},
-    --#{$prefix}switch-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}switch-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
-    --#{$prefix}switch-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}switch-active-filter: #{$form-check-input-active-filter},
-    --#{$prefix}switch-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}switch-focus-border: var(--#{$prefix}control-focus-border-color),
+    --#{$prefix}switch-active-filter: var(--#{$prefix}control-active-filter),
+    --#{$prefix}switch-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
   $switch-tokens
 );
@@ -152,16 +155,12 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
         font-size: #{map.get($map, "font-size")};
       }
     }
-  }
 
-  @each $size, $map in $form-switch-widths {
-    @if $enable-deprecated-form-check {
+    @if $enable-deprecated-form-check and list.index($form-switch-sizes, $size) {
       // Set on the input — the control declares these tokens itself, so an
       // inherited value would lose to its own declaration.
       .form-switch-#{$size} .form-check-input {
-        --#{$prefix}switch-width: #{map.get($map, "width")};
         --#{$prefix}switch-height: #{map.get($map, "height")};
-        --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - #{$form-check-input-width}) * .5); // stylelint-disable-line function-disallowed-list
       }
 
       .form-switch-#{$size} {
@@ -170,7 +169,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
 
         .form-check-label {
           // stylelint-disable-next-line function-disallowed-list
-          padding-top: calc((var(--#{$prefix}switch-height) - #{var(--#{$prefix}body-font-size)}) * .5);
+          padding-top: calc((var(--#{$prefix}switch-height) - var(--#{$prefix}body-font-size)) * .5);
         }
       }
     }

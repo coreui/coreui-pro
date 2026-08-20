@@ -1,5 +1,4 @@
 @use "functions/defaults" as *;
-@use "functions/math" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
@@ -16,7 +15,7 @@ $card-border-width:                 var(--#{$prefix}border-width) !default;
 $card-border-color:                 var(--#{$prefix}border-color-translucent) !default;
 $card-border-radius:                var(--#{$prefix}border-radius) !default;
 $card-box-shadow:                   null !default;
-$card-inner-border-radius:          subtract($card-border-radius, $card-border-width) !default;
+$card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-x:                $card-spacer-x !default;
 $card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}body-color) 3%, transparent) !default;
@@ -61,10 +60,6 @@ $card-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
-  //
-  // Base styles
-  //
-
   .card {
     @include tokens($card-tokens);
 
@@ -142,10 +137,6 @@ $card-tokens: defaults(
       margin-inline-start: var(--#{$prefix}card-spacer-x);
     }
   }
-
-  //
-  // Optional textual caps
-  //
 
   .card-header {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);

@@ -23,9 +23,6 @@ $form-field-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
-// The v5 spelling is an alias of this control rather than a second
-// implementation, so it is part of its selector list;
-// `$enable-deprecated-form-check: false` compiles it out.
 // stylelint-disable-next-line scss/at-function-named-arguments
 $form-field-selector: if(sass($enable-deprecated-form-check): ".form-field, .form-check"; else: ".form-field") !default;
 // stylelint-disable-next-line scss/at-function-named-arguments
@@ -34,9 +31,6 @@ $form-field-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .
 $form-field-control-children: if(sass($enable-deprecated-form-check): "> .check, > .radio, > .switch, > .form-check-input"; else: "> .check, > .radio, > .switch") !default;
 
 @layer forms {
-  // The layout wrapper of a form control: label, control, description and
-  // validation feedback in one grid, so a form is spaced by the field rather than
-  // by margin utilities sprinkled over its parts.
   #{$form-field-selector} {
     @include tokens($form-field-tokens);
 
@@ -50,9 +44,6 @@ $form-field-control-children: if(sass($enable-deprecated-form-check): "> .check,
       margin-bottom: 0;
     }
 
-    // A check, radio or switch pins to the first column and everything else
-    // stacks in the second. `.form-check-input` is the deprecated spelling,
-    // matched here so markup that has not moved yet lays out the same way.
     &:has(#{$form-field-control-children}) {
       grid-template-columns: auto 1fr;
       column-gap: var(--#{$prefix}form-field-column-gap);
@@ -66,8 +57,6 @@ $form-field-control-children: if(sass($enable-deprecated-form-check): "> .check,
         grid-column: 2;
       }
 
-      // A label for the whole field, rather than for the control next to it,
-      // spans both columns and sits above the row.
       > .form-label {
         grid-column: 1 / -1;
       }

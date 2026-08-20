@@ -1,11 +1,9 @@
-@use "forms/variables" as *;
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/focus-ring" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
-@use "forms/form-check" as *;
 
 // The shared options menu rendered by the internal combobox engine
 // (js/src/combobox.ts) for Autocomplete and Multi Select. The components keep
@@ -53,7 +51,7 @@ $combobox-option-padding-y:           .5rem !default;
 $combobox-option-padding-x:           1.25rem !default;
 $combobox-option-margin-y:            0 !default;
 $combobox-option-margin-x:            0 !default;
-$combobox-option-border-width:        $input-border-width !default;
+$combobox-option-border-width:        var(--#{$prefix}btn-input-border-width) !default;
 $combobox-option-border-color:        transparent !default;
 $combobox-option-border-radius:       var(--#{$prefix}border-radius) !default;
 $combobox-option-hover-color:         var(--#{$prefix}body-color) !default;
@@ -61,14 +59,13 @@ $combobox-option-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
 $combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
 $combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
 
-$combobox-option-indicator-width:         var(--#{$prefix}check-size, 1em) !default;
+$combobox-option-indicator-width:         var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
 
 // scss-docs-end combobox-variables
 
 $combobox-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start combobox-css-vars
 $combobox-tokens: defaults(
@@ -117,8 +114,7 @@ $combobox-tokens: defaults(
 );
 // scss-docs-end combobox-css-vars
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer components {
   // The chrome comes from the `.popup` primitive the panel carries; the
@@ -151,7 +147,7 @@ $combobox-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+      border-color: var(--#{$prefix}input-focus-border-color, var(--#{$prefix}btn-input-focus-border-color));
       @include focus-ring(true);
     }
   }
@@ -184,7 +180,7 @@ $combobox-tokens: defaults(
 
     &:focus-visible {
       z-index: 5;
-      border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+      border-color: var(--#{$prefix}input-focus-border-color, var(--#{$prefix}btn-input-focus-border-color));
       @include focus-ring(true);
     }
 
@@ -226,7 +222,7 @@ $combobox-tokens: defaults(
 
       &:focus-visible {
         z-index: 5;
-        border-color: var(--#{$prefix}input-focus-border-color, $input-focus-border-color);
+        border-color: var(--#{$prefix}input-focus-border-color, var(--#{$prefix}btn-input-focus-border-color));
         @include focus-ring(true);
       }
     }
@@ -259,6 +255,7 @@ $combobox-tokens: defaults(
 
     &::before {
       opacity: 1;
+      transform: scale(1);
     }
   }
 
@@ -269,6 +266,7 @@ $combobox-tokens: defaults(
     &::before {
       opacity: 1;
       mask-image: var(--#{$prefix}check-mark-indeterminate);
+      transform: scale(1);
     }
   }
 

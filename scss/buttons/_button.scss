@@ -319,10 +319,6 @@ $btn-ghost-hover-bg: var(--#{$prefix}tertiary-bg) !default;
   }
 
 
-  //
-  // Alternate buttons
-  //
-
   .btn-ghost {
     // scss-docs-start btn-ghost-css-vars
     --#{$prefix}btn-color: #{$btn-ghost-color};

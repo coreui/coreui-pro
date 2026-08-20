@@ -1,6 +1,4 @@
-@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
-@use "../functions/math" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
@@ -9,9 +7,9 @@
 // stylelint-disable function-disallowed-list
 
 // scss-docs-start form-floating-variables
-$form-floating-height:                  add(3.5rem, $input-height-border) !default;
+$form-floating-height:                  calc(3.5rem + var(--#{$prefix}btn-input-border-width) * 2) !default;
 $form-floating-line-height:             1.25 !default;
-$form-floating-padding-x:               $input-padding-x !default;
+$form-floating-padding-x:               var(--#{$prefix}btn-input-padding-x) !default;
 $form-floating-padding-y:               1rem !default;
 $form-floating-input-padding-t:         1.625rem !default;
 $form-floating-input-padding-b:         .625rem !default;
@@ -19,7 +17,14 @@ $form-floating-label-height:            1.5em !default;
 $form-floating-label-opacity:           .65 !default;
 $form-floating-label-transform:         scale(.85) translateY(-.5rem) translateX(.15rem) !default;
 $form-floating-label-disabled-color:    var(--#{$prefix}gray-600) !default;
-$form-floating-transition:              opacity .1s ease-in-out, transform .1s ease-in-out !default;
+// The label is a sibling of the control, so it cannot inherit the control's own
+// background — the textarea mask has to be told the same colour a second time.
+$form-floating-label-bg:                var(--#{$prefix}btn-input-bg) !default;
+$form-floating-label-disabled-bg:       var(--#{$prefix}secondary-bg) !default;
+$form-floating-label-border-radius:     var(--#{$prefix}btn-input-border-radius) !default;
+$form-floating-transition-property:     "opacity, transform" !default;
+$form-floating-transition-duration:     .1s !default;
+$form-floating-transition-timing:       ease-in-out !default;
 // scss-docs-end form-floating-variables
 
 // stylelint-disable scss/dollar-variable-default
@@ -38,7 +43,12 @@ $form-floating-tokens: defaults(
     --#{$prefix}form-floating-label-opacity: #{$form-floating-label-opacity},
     --#{$prefix}form-floating-label-transform: #{$form-floating-label-transform},
     --#{$prefix}form-floating-label-disabled-color: #{$form-floating-label-disabled-color},
-    --#{$prefix}form-floating-transition: "#{$form-floating-transition}",
+    --#{$prefix}form-floating-label-bg: #{$form-floating-label-bg},
+    --#{$prefix}form-floating-label-disabled-bg: #{$form-floating-label-disabled-bg},
+    --#{$prefix}form-floating-label-border-radius: #{$form-floating-label-border-radius},
+    --#{$prefix}form-floating-transition-property: #{$form-floating-transition-property},
+    --#{$prefix}form-floating-transition-duration: #{$form-floating-transition-duration},
+    --#{$prefix}form-floating-transition-timing: #{$form-floating-transition-timing},
   ),
   $form-floating-tokens
 );
@@ -74,9 +84,13 @@ $form-floating-tokens: defaults(
       text-overflow: ellipsis;
       white-space: nowrap;
       pointer-events: none;
-      border: $input-border-width solid transparent; // Required for aligning label's text with the input as it affects inner box model
+      border: var(--#{$prefix}btn-input-border-width) solid transparent; // Required for aligning label's text with the input as it affects inner box model
       transform-origin: 0 0;
-      @include transition(var(--#{$prefix}form-floating-transition));
+      @include transition-props(
+        var(--#{$prefix}form-floating-transition-property),
+        var(--#{$prefix}form-floating-transition-duration),
+        var(--#{$prefix}form-floating-transition-timing)
+      );
     }
 
     > .form-control,
@@ -127,17 +141,17 @@ $form-floating-tokens: defaults(
         z-index: -1;
         height: var(--#{$prefix}form-floating-label-height);
         content: "";
-        background-color: $input-bg;
-        @include border-radius($input-border-radius);
+        background-color: var(--#{$prefix}form-floating-label-bg);
+        @include border-radius(var(--#{$prefix}form-floating-label-border-radius));
       }
     }
     > textarea:disabled ~ label::after {
-      background-color: $input-disabled-bg;
+      background-color: var(--#{$prefix}form-floating-label-disabled-bg);
     }
 
     > .form-control-plaintext {
       ~ label {
-        border-width: $input-border-width 0; // Required to properly position label text - as explained above
+        border-width: var(--#{$prefix}btn-input-border-width) 0; // Required to properly position label text - as explained above
       }
     }
 

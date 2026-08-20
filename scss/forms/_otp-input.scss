@@ -1,5 +1,4 @@
 @use "sass:math";
-@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
@@ -29,7 +28,7 @@ $form-otp-control-transition-timing:   var(--#{$prefix}btn-input-transition-timi
 $form-otp-control-focus-color:         var(--#{$prefix}btn-input-focus-color) !default;
 $form-otp-control-focus-bg:            var(--#{$prefix}btn-input-focus-bg) !default;
 $form-otp-control-focus-border-color:  var(--#{$prefix}btn-input-focus-border-color) !default;
-$form-otp-control-focus-ring:          $input-focus-ring !default;
+$form-otp-control-focus-ring:          var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)) !default;
 
 $form-otp-control-width-sm:            1.5rem !default;
 $form-otp-control-padding-y-sm:        var(--#{$prefix}btn-input-sm-padding-y) !default;
@@ -58,12 +57,9 @@ $form-otp-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start form-otp-control-tokens
-// .form-otp-control is the input itself, so it carries the shared control
-// tokens rather than inheriting them from the .form-otp wrapper.
 $form-otp-control-tokens: () !default;
 $form-otp-control-tokens: defaults(
   (
@@ -92,8 +88,7 @@ $form-otp-control-tokens: defaults(
 );
 // scss-docs-end form-otp-control-tokens
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
   .form-otp {

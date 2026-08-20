@@ -58,8 +58,7 @@ $navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
 
 $navbar-tokens: () !default;
 
-// stylelint-disable scss/at-function-named-arguments
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable scss/at-function-named-arguments, scss/dollar-variable-default
 
 // scss-docs-start navbar-css-vars
 $navbar-tokens: defaults(
@@ -89,8 +88,7 @@ $navbar-tokens: defaults(
 );
 // scss-docs-end navbar-css-vars
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable scss/at-function-named-arguments
+// stylelint-enable scss/dollar-variable-default, scss/at-function-named-arguments
 
 $navbar-nav-tokens: () !default;
 

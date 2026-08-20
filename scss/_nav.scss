@@ -287,10 +287,6 @@ $nav-underline-border-tokens: defaults(
   }
 
 
-  //
-  // Underline border
-  //
-
   .nav-underline-border {
     @include tokens($nav-underline-border-tokens);
 
@@ -319,10 +315,6 @@ $nav-underline-border-tokens: defaults(
     }
   }
 
-
-  //
-  // Enclosed
-  //
 
   .nav-enclosed {
     --#{$prefix}nav-enclosed-padding: #{$nav-enclosed-padding};

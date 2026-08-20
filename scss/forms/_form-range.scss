@@ -1,42 +1,103 @@
-@use "../forms/variables" as *;
-@use "../functions/math" as *;
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/gradients" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
 // scss-docs-start form-range-variables
-$form-range-track-width:          100% !default;
-$form-range-track-height:         .5rem !default;
-$form-range-track-cursor:         pointer !default;
-$form-range-track-bg:             var(--#{$prefix}secondary-bg) !default;
-$form-range-track-border-radius:  1rem !default;
-$form-range-track-box-shadow:     var(--#{$prefix}box-shadow-inset) !default;
+$form-range-track-width:                   100% !default;
+$form-range-track-height:                  .5rem !default;
+$form-range-track-cursor:                  pointer !default;
+$form-range-track-bg:                      var(--#{$prefix}secondary-bg) !default;
+$form-range-track-border-radius:           1rem !default;
+$form-range-track-box-shadow:              var(--#{$prefix}box-shadow-inset) !default;
 
 $form-range-thumb-width:                   1rem !default;
-$form-range-thumb-height:                  $form-range-thumb-width !default;
+$form-range-thumb-height:                  var(--#{$prefix}range-thumb-width) !default;
 $form-range-thumb-bg:                      var(--#{$prefix}theme-base, var(--#{$prefix}primary)) !default;
 $form-range-thumb-border:                  0 !default;
 $form-range-thumb-border-radius:           1rem !default;
 $form-range-thumb-box-shadow:              0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
-$form-range-thumb-focus-ring-width:  $input-focus-width !default; // For focus box shadow issue in Edge
+$form-range-thumb-focus-ring-width:        var(--#{$prefix}focus-ring-width) !default; // For focus box shadow issue in Edge
 $form-range-thumb-active-bg:               color-mix(in srgb, var(--#{$prefix}theme-base, var(--#{$prefix}primary)) 30%, var(--#{$prefix}body-bg)) !default;
 $form-range-thumb-disabled-bg:             var(--#{$prefix}secondary-color) !default;
-$form-range-thumb-transition:              background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
+$form-range-thumb-transition-property:     "background-color, border-color, box-shadow" !default;
+$form-range-thumb-transition-duration:     .15s !default;
+$form-range-thumb-transition-timing:       ease-in-out !default;
 // scss-docs-end form-range-variables
 
-@layer forms {
-  // Range
-  //
-  // Style range inputs the same across browsers. Vendor-specific rules for pseudo
-  // elements cannot be mixed. As such, there are no shared styles for focus or
-  // active states on prefixed selectors.
+$form-range-tokens: () !default;
 
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start form-range-tokens
+$form-range-tokens: defaults(
+  (
+    --#{$prefix}range-track-width: #{$form-range-track-width},
+    --#{$prefix}range-track-height: #{$form-range-track-height},
+    --#{$prefix}range-track-cursor: #{$form-range-track-cursor},
+    --#{$prefix}range-track-bg: #{$form-range-track-bg},
+    --#{$prefix}range-track-border-radius: #{$form-range-track-border-radius},
+    --#{$prefix}range-track-box-shadow: #{$form-range-track-box-shadow},
+    --#{$prefix}range-thumb-width: #{$form-range-thumb-width},
+    --#{$prefix}range-thumb-height: #{$form-range-thumb-height},
+    --#{$prefix}range-thumb-bg: #{$form-range-thumb-bg},
+    --#{$prefix}range-thumb-border: #{$form-range-thumb-border},
+    --#{$prefix}range-thumb-border-radius: #{$form-range-thumb-border-radius},
+    --#{$prefix}range-thumb-box-shadow: #{$form-range-thumb-box-shadow},
+    --#{$prefix}range-thumb-active-bg: #{$form-range-thumb-active-bg},
+    --#{$prefix}range-thumb-disabled-bg: #{$form-range-thumb-disabled-bg},
+    --#{$prefix}range-thumb-transition-property: #{$form-range-thumb-transition-property},
+    --#{$prefix}range-thumb-transition-duration: #{$form-range-thumb-transition-duration},
+    --#{$prefix}range-thumb-transition-timing: #{$form-range-thumb-transition-timing},
+  ),
+  $form-range-tokens
+);
+// scss-docs-end form-range-tokens
+
+// stylelint-enable scss/dollar-variable-default
+
+// scss-docs-start form-range-mixins
+@mixin form-range-thumb() {
+  width: var(--#{$prefix}range-thumb-width);
+  height: var(--#{$prefix}range-thumb-height);
+  appearance: none;
+  @include gradient-bg(var(--#{$prefix}range-thumb-bg));
+  border: var(--#{$prefix}range-thumb-border);
+  @include border-radius(var(--#{$prefix}range-thumb-border-radius));
+  @include box-shadow(var(--#{$prefix}range-thumb-box-shadow));
+  @include transition-props(
+    var(--#{$prefix}range-thumb-transition-property),
+    var(--#{$prefix}range-thumb-transition-duration),
+    var(--#{$prefix}range-thumb-transition-timing)
+  );
+
+  &:active {
+    @include gradient-bg(var(--#{$prefix}range-thumb-active-bg));
+  }
+}
+
+@mixin form-range-track() {
+  width: var(--#{$prefix}range-track-width);
+  height: var(--#{$prefix}range-track-height);
+  color: transparent;
+  cursor: var(--#{$prefix}range-track-cursor);
+  background-color: var(--#{$prefix}range-track-bg);
+  border-color: transparent;
+  @include border-radius(var(--#{$prefix}range-track-border-radius));
+  @include box-shadow(var(--#{$prefix}range-track-box-shadow));
+}
+// scss-docs-end form-range-mixins
+
+@layer forms {
   .form-range {
+    @include tokens($form-range-tokens);
+
     width: 100%;
-    height: calc(#{$form-range-thumb-height} + #{$form-range-thumb-focus-ring-width} * 2); // stylelint-disable-line function-disallowed-list
+    height: calc(var(--#{$prefix}range-thumb-height) + #{$form-range-thumb-focus-ring-width} * 2); // stylelint-disable-line function-disallowed-list
     padding: 0; // Need to reset padding
     appearance: none;
     background-color: transparent;
@@ -44,8 +105,6 @@ $form-range-thumb-transition:              background-color .15s ease-in-out, bo
     &:focus-visible {
       outline: 0;
 
-      // Pseudo-elements must be split across multiple rulesets to have an effect.
-      // No box-shadow() mixin for focus accessibility.
       &::-webkit-slider-thumb { @include focus-ring(true); }
       &::-moz-range-thumb     { @include focus-ring(true); }
     }
@@ -55,67 +114,31 @@ $form-range-thumb-transition:              background-color .15s ease-in-out, bo
     }
 
     &::-webkit-slider-thumb {
-      width: $form-range-thumb-width;
-      height: $form-range-thumb-height;
-      margin-top: ($form-range-track-height - $form-range-thumb-height) * .5; // Webkit specific
-      appearance: none;
-      @include gradient-bg($form-range-thumb-bg);
-      border: $form-range-thumb-border;
-      @include border-radius($form-range-thumb-border-radius);
-      @include box-shadow($form-range-thumb-box-shadow);
-      @include transition($form-range-thumb-transition);
-
-      &:active {
-        @include gradient-bg($form-range-thumb-active-bg);
-      }
+      margin-top: calc((var(--#{$prefix}range-track-height) - var(--#{$prefix}range-thumb-height)) * .5); // stylelint-disable-line function-disallowed-list
+      @include form-range-thumb();
     }
 
     &::-webkit-slider-runnable-track {
-      width: $form-range-track-width;
-      height: $form-range-track-height;
-      color: transparent; // Why?
-      cursor: $form-range-track-cursor;
-      background-color: $form-range-track-bg;
-      border-color: transparent;
-      @include border-radius($form-range-track-border-radius);
-      @include box-shadow($form-range-track-box-shadow);
+      @include form-range-track();
     }
 
     &::-moz-range-thumb {
-      width: $form-range-thumb-width;
-      height: $form-range-thumb-height;
-      appearance: none;
-      @include gradient-bg($form-range-thumb-bg);
-      border: $form-range-thumb-border;
-      @include border-radius($form-range-thumb-border-radius);
-      @include box-shadow($form-range-thumb-box-shadow);
-      @include transition($form-range-thumb-transition);
-
-      &:active {
-        @include gradient-bg($form-range-thumb-active-bg);
-      }
+      @include form-range-thumb();
     }
 
     &::-moz-range-track {
-      width: $form-range-track-width;
-      height: $form-range-track-height;
-      color: transparent;
-      cursor: $form-range-track-cursor;
-      background-color: $form-range-track-bg;
-      border-color: transparent; // Firefox specific?
-      @include border-radius($form-range-track-border-radius);
-      @include box-shadow($form-range-track-box-shadow);
+      @include form-range-track();
     }
 
     &:disabled {
       pointer-events: none;
 
       &::-webkit-slider-thumb {
-        background-color: $form-range-thumb-disabled-bg;
+        background-color: var(--#{$prefix}range-thumb-disabled-bg);
       }
 
       &::-moz-range-thumb {
-        background-color: $form-range-thumb-disabled-bg;
+        background-color: var(--#{$prefix}range-thumb-disabled-bg);
       }
     }
   }

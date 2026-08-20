@@ -1,5 +1,4 @@
 @use "sass:color";
-@use "forms/variables" as *;
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
@@ -26,10 +25,10 @@ $time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}white) !default;
 $time-picker-roll-cell-selected-hover-bg:     light-dark(color.scale($primary, $lightness: -20%), color.scale($primary, $saturation: -10%, $lightness: -10%)) !default; // stylelint-disable-line scss/at-function-named-arguments
 
 $time-picker-inline-select-font-size:       var(--#{$prefix}btn-input-sm-font-size) !default;
-$time-picker-inline-select-color:           $input-color !default;
-$time-picker-inline-select-padding-y:       $input-padding-y-sm !default;
-$time-picker-inline-select-padding-x:       $input-padding-x-sm !default;
-$time-picker-inline-select-disabled-color:  $input-disabled-color !default;
+$time-picker-inline-select-color:           var(--#{$prefix}btn-input-color) !default;
+$time-picker-inline-select-padding-y:       var(--#{$prefix}btn-input-sm-padding-y) !default;
+$time-picker-inline-select-padding-x:       var(--#{$prefix}btn-input-sm-padding-x) !default;
+$time-picker-inline-select-disabled-color:  var(--#{$prefix}body-color) !default;
 // scss-docs-end time-picker-variables
 
 // Time Picker

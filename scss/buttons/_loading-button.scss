@@ -2,10 +2,6 @@
 @use "../config" as *;
 
 @layer components {
-  //
-  // Loading button
-  //
-
   .btn-loading {
     position: relative;
     overflow: hidden;

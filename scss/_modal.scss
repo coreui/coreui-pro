@@ -1,6 +1,5 @@
 @use "sass:map";
 @use "functions/defaults" as *;
-@use "functions/math" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/box-shadow" as *;
 @use "layout/breakpoints" as *;
@@ -12,8 +11,7 @@
 // Uses the browser's native dialog element with showModal()/show()/close()
 // APIs, the [open] attribute, and the ::backdrop pseudo-element.
 
-// stylelint-disable custom-property-no-missing-var-function
-// stylelint-disable function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
 
 // scss-docs-start modal-variables
 $modal-inner-padding:               var(--#{$prefix}spacer-3) !default;
@@ -30,7 +28,7 @@ $modal-content-bg:                  var(--#{$prefix}body-bg) !default;
 $modal-content-border-color:        var(--#{$prefix}border-color-translucent) !default;
 $modal-content-border-width:        var(--#{$prefix}border-width) !default;
 $modal-content-border-radius:       var(--#{$prefix}border-radius-lg) !default;
-$modal-content-inner-border-radius: subtract($modal-content-border-radius, $modal-content-border-width) !default;
+$modal-content-inner-border-radius: calc(#{$modal-content-border-radius} - #{$modal-content-border-width}) !default;
 $modal-content-box-shadow-xs:       var(--#{$prefix}box-shadow-sm) !default;
 $modal-content-box-shadow-sm-up:    var(--#{$prefix}box-shadow) !default;
 

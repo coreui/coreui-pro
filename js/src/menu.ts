@@ -8,7 +8,7 @@
  *
  * Deviation from upstream: the selectors and class hooks live in static
  * getters, not module constants, so Dropdown can subclass Menu and keep the
- * v5 markup working. See workspace/plans/menu-and-dropdown-compat.md.
+ * v5 markup working.
  * --------------------------------------------------------------------------
  */
 

@@ -1,5 +1,5 @@
-@use "../forms/variables" as *;
-@use "../functions/math" as *;
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start form-label-variables
@@ -10,41 +10,59 @@ $form-label-font-weight:                null !default;
 $form-label-color:                      null !default;
 // scss-docs-end form-label-variables
 
+$form-label-tokens: () !default;
+
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+// scss-docs-start form-label-css-vars
+$form-label-tokens: defaults(
+  (
+    --#{$prefix}label-margin-bottom: $form-label-margin-bottom,
+    --#{$prefix}label-font-size: $form-label-font-size,
+    --#{$prefix}label-font-style: $form-label-font-style,
+    --#{$prefix}label-font-weight: $form-label-font-weight,
+    --#{$prefix}label-color: $form-label-color,
+  ),
+  $form-label-tokens
+);
+// scss-docs-end form-label-css-vars
+
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
+
 @layer forms {
-  //
-  // Labels
-  //
+  .form-label,
+  .col-form-label {
+    @include tokens($form-label-tokens);
+
+    font-size: var(--#{$prefix}label-font-size, inherit);
+    font-style: var(--#{$prefix}label-font-style, inherit);
+    font-weight: var(--#{$prefix}label-font-weight, inherit);
+    color: var(--#{$prefix}label-color, inherit);
+  }
 
   .form-label {
-    margin-bottom: $form-label-margin-bottom;
-    font-size: $form-label-font-size;
-    font-style: $form-label-font-style;
-    font-weight: $form-label-font-weight;
-    color: $form-label-color;
+    margin-bottom: var(--#{$prefix}label-margin-bottom);
   }
 
   // For use with horizontal and inline forms, when you need the label (or legend)
   // text to align with the form controls.
   .col-form-label {
-    padding-top: add($input-padding-y, $input-border-width);
-    padding-bottom: add($input-padding-y, $input-border-width);
+    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-padding-y) + var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+    --#{$prefix}label-line-height: var(--#{$prefix}btn-input-line-height);
+
+    padding-top: var(--#{$prefix}label-padding-y);
+    padding-bottom: var(--#{$prefix}label-padding-y);
     margin-bottom: 0; // Override the `<legend>` default
-    font-size: inherit; // Override the `<legend>` default
-    font-style: $form-label-font-style;
-    font-weight: $form-label-font-weight;
-    line-height: $input-line-height;
-    color: $form-label-color;
+    line-height: var(--#{$prefix}label-line-height);
   }
 
   .col-form-label-lg {
-    padding-top: add($input-padding-y-lg, $input-border-width);
-    padding-bottom: add($input-padding-y-lg, $input-border-width);
-    font-size: $input-font-size-lg;
+    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-lg-padding-y) + var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+    --#{$prefix}label-font-size: var(--#{$prefix}btn-input-lg-font-size);
   }
 
   .col-form-label-sm {
-    padding-top: add($input-padding-y-sm, $input-border-width);
-    padding-bottom: add($input-padding-y-sm, $input-border-width);
-    font-size: $input-font-size-sm;
+    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-sm-padding-y) + var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+    --#{$prefix}label-font-size: var(--#{$prefix}btn-input-sm-font-size);
   }
 }

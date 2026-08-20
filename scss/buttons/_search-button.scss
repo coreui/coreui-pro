@@ -1,4 +1,3 @@
-@use "../forms/variables" as *;
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
@@ -9,23 +8,23 @@
 
 // scss-docs-start search-button-variables
 $search-button-height:              var(--#{$prefix}btn-input-min-height) !default;
-$search-button-padding-x:           $input-padding-x !default;
-$search-button-font-family:         $input-font-family !default;
-$search-button-font-size:           $input-font-size !default;
-$search-button-font-weight:         $input-font-weight !default;
-$search-button-color:               $input-placeholder-color !default;
-$search-button-bg:                  $input-bg !default;
-$search-button-border-width:        $input-border-width !default;
-$search-button-border-color:        $input-border-color !default;
-$search-button-border-radius:       $input-border-radius !default;
-$search-button-box-shadow:          $input-box-shadow !default;
+$search-button-padding-x:           var(--#{$prefix}btn-input-padding-x) !default;
+$search-button-font-family:         var(--#{$prefix}btn-input-font-family) !default;
+$search-button-font-size:           var(--#{$prefix}btn-input-font-size) !default;
+$search-button-font-weight:         var(--#{$prefix}btn-input-font-weight) !default;
+$search-button-color:               var(--#{$prefix}secondary-color) !default;
+$search-button-bg:                  var(--#{$prefix}btn-input-bg) !default;
+$search-button-border-width:        var(--#{$prefix}btn-input-border-width) !default;
+$search-button-border-color:        var(--#{$prefix}btn-input-border-color) !default;
+$search-button-border-radius:       var(--#{$prefix}btn-input-border-radius) !default;
+$search-button-box-shadow:          var(--#{$prefix}btn-input-box-shadow) !default;
 $search-button-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
 $search-button-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
 $search-button-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
 
-$search-button-focus-color:         $input-focus-color !default;
-$search-button-focus-bg:            $input-focus-bg !default;
-$search-button-focus-border-color:  $input-focus-border-color !default;
+$search-button-focus-color:         var(--#{$prefix}btn-input-focus-color) !default;
+$search-button-focus-bg:            var(--#{$prefix}btn-input-focus-bg) !default;
+$search-button-focus-border-color:  var(--#{$prefix}btn-input-focus-border-color) !default;
 
 $search-button-icon-size:           1.125rem !default;
 

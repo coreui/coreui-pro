@@ -1,7 +1,6 @@
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
-@use "variables" as *;
 @use "check" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;
@@ -9,21 +8,19 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// The radio's own theming surface — see the note in `_checkbox.scss`.
 
 // scss-docs-start radio-variables
-$radio-size:              $form-check-input-width !default;
-$radio-bg:                $form-check-input-bg !default;
-$radio-border:            $form-check-input-border !default;
-$radio-border-radius:     $form-check-radio-border-radius !default;
-$radio-mark-color:        $form-check-input-checked-color !default;
+$radio-size:              var(--#{$prefix}control-size) !default;
+$radio-bg:                var(--#{$prefix}btn-input-bg) !default;
+$radio-border:            var(--#{$prefix}border-width) solid var(--#{$prefix}border-color) !default;
+$radio-border-radius:     50% !default;
+$radio-mark-color:        var(--#{$prefix}primary-contrast) !default;
 $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='black'/></svg>") !default;
 // scss-docs-end radio-variables
 
 $radio-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
 
 // scss-docs-start radio-css-vars
 $radio-tokens: defaults(
@@ -36,27 +33,22 @@ $radio-tokens: defaults(
     --#{$prefix}radio-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
     --#{$prefix}radio-mark-color: #{$radio-mark-color},
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
-    --#{$prefix}radio-disabled-opacity: #{$form-check-input-disabled-opacity},
+    --#{$prefix}radio-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}radio-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}radio-size)) * .5),
-    --#{$prefix}radio-focus-border: #{$form-check-input-focus-border},
-    --#{$prefix}radio-active-filter: #{$form-check-input-active-filter},
-    --#{$prefix}radio-label-disabled-opacity: #{$form-check-label-disabled-opacity},
+    --#{$prefix}radio-focus-border: var(--#{$prefix}control-focus-border-color),
+    --#{$prefix}radio-active-filter: var(--#{$prefix}control-active-filter),
+    --#{$prefix}radio-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
   $radio-tokens
 );
 // scss-docs-end radio-css-vars
 
-// stylelint-enable scss/dollar-variable-default
-// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function, function-disallowed-list
 
-// The v5 spelling is an alias of this control rather than a second
-// implementation, so it is part of its selector list;
-// `$enable-deprecated-form-check: false` compiles it out.
 // stylelint-disable-next-line scss/at-function-named-arguments
 $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-input[type=radio]"; else: ".radio") !default;
 
 @layer forms {
-  // The class goes on the `<input>` itself — see the note in `_checkbox.scss`.
   #{$radio-selector} {
     @include tokens($radio-tokens);
 
@@ -64,8 +56,6 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     flex-shrink: 0;
     width: var(--#{$prefix}radio-size);
     height: var(--#{$prefix}radio-size);
-    // Half the leading, so the control sits on the text's optical centre — the
-    // alignment the `.form-check` wrapper used to apply, now following the size.
     margin-top: var(--#{$prefix}radio-margin-top);
     vertical-align: top;
     appearance: none;
@@ -119,7 +109,6 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     }
   }
 
-  // Same ladder as the checkbox, so a row mixing the two lines up.
   @each $size, $map in $check-sizes {
     .radio-#{$size} {
       --#{$prefix}radio-size: #{map.get($map, "size")};
