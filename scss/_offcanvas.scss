@@ -75,24 +75,17 @@ $offcanvas-tokens: defaults(
 
     .offcanvas#{$infix} {
       @include media-breakpoint-down($next) {
-        // Resets the UA's fit-content sizing, inset and margins, and its
-        // display: none, so visibility controls the hidden state and the exit
-        // can animate after close().
         position: fixed;
         inset: auto;
         z-index: var(--#{$prefix}offcanvas-zindex);
         display: flex;
         flex-direction: column;
-        // The UA sizes a <dialog> to fit-content — reset to auto so the
-        // placement insets stretch the panel to the full viewport edge
         width: auto;
         max-width: 100%;
         height: auto;
         max-height: 100%;
         padding: 0;
         margin: 0;
-        // Let popups (menus, tooltips) appended inside the dialog overflow its
-        // box; the body handles its own scrolling.
         overflow: visible;
         color: var(--#{$prefix}offcanvas-color);
         visibility: hidden;
@@ -102,8 +95,6 @@ $offcanvas-tokens: defaults(
         outline: 0;
         @include box-shadow(var(--#{$prefix}offcanvas-box-shadow));
 
-        // Placement positioning and sizing — always applied regardless of
-        // animation mode
         &.offcanvas-start {
           inset-block: 0;
           inset-inline-start: 0;
@@ -130,9 +121,6 @@ $offcanvas-tokens: defaults(
           border-top: var(--#{$prefix}offcanvas-border-width) solid var(--#{$prefix}offcanvas-border-color);
         }
 
-        // The base transform is the entry-from and exit-to position; the JS
-        // holds the dialog in the top layer during the exit so the ::backdrop
-        // fade plays.
         &:not(.offcanvas-instant) {
           @include transition(
             transform var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing),
@@ -164,8 +152,6 @@ $offcanvas-tokens: defaults(
             transform: none;
           }
 
-          // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
-          // outrank the open-state transform reset.
           &[open].offcanvas-static:not(.hiding) {
             transform: $modal-scale-transform;
           }
@@ -175,9 +161,6 @@ $offcanvas-tokens: defaults(
             @include transition(background-color var(--#{$prefix}offcanvas-transition-duration) var(--#{$prefix}offcanvas-transition-timing));
           }
 
-          // Exit: fade the native backdrop out alongside the panel — it is
-          // still rendered because close() is deferred until the transition
-          // ends.
           &.hiding::backdrop {
             background-color: transparent;
           }
@@ -187,7 +170,6 @@ $offcanvas-tokens: defaults(
           background-color: color-mix(in srgb, var(--#{$prefix}offcanvas-backdrop-bg) calc(var(--#{$prefix}offcanvas-backdrop-opacity) * 100%), transparent);
         }
 
-        // Open state base (always applies, regardless of animation mode)
         &[open]:not(.hiding) {
           visibility: visible;
           transform: none;
@@ -198,8 +180,6 @@ $offcanvas-tokens: defaults(
         }
       }
 
-      // The UA's display: none and fixed positioning have to be reset in full
-      // for the element to behave as an inline flex container.
       @if not ($infix == "") {
         @include media-breakpoint-up($next) {
           // stylelint-disable declaration-no-important
@@ -231,7 +211,6 @@ $offcanvas-tokens: defaults(
             flex-grow: 0;
             padding: 0;
             overflow-y: visible;
-            // Reset `background-color` in case `.bg-*` classes are used in offcanvas
             background-color: transparent !important; // stylelint-disable-line declaration-no-important
           }
         }
@@ -239,8 +218,6 @@ $offcanvas-tokens: defaults(
     }
   }
 
-  // Entry animation for ::backdrop. It only exists while the dialog is in the
-  // top layer, so its starting state can't be expressed on the base selector.
   @starting-style {
     @each $breakpoint in map.keys($grid-breakpoints) {
       $next: breakpoint-next($breakpoint, $grid-breakpoints);
@@ -273,8 +250,6 @@ $offcanvas-tokens: defaults(
   }
 
   .offcanvas-body {
-    // Contain absolutely positioned children (e.g. menus) so they scroll with
-    // the body instead of being clipped by the offcanvas' overflow.
     position: relative;
     flex-grow: 1;
     padding: var(--#{$prefix}offcanvas-padding-y) var(--#{$prefix}offcanvas-padding-x);

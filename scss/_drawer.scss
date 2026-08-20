@@ -81,9 +81,6 @@ $drawer-tokens: defaults(
 
     .drawer#{$infix} {
       @include media-breakpoint-down($next) {
-        // Resets the UA's fit-content sizing, inset and margins, and its
-        // display: none, so visibility controls the hidden state and the exit
-        // can animate after close().
         position: fixed;
         inset: auto;
         z-index: var(--#{$prefix}drawer-zindex);
@@ -105,8 +102,6 @@ $drawer-tokens: defaults(
         @include border-radius(var(--#{$prefix}drawer-border-radius));
         @include box-shadow(var(--#{$prefix}drawer-box-shadow));
 
-        // `:where()` keeps specificity flat so a modifier like `.drawer-sheet`
-        // overrides without escalation.
         &:where(.drawer-start) {
           inset-block: var(--#{$prefix}drawer-inset);
           inset-inline-start: var(--#{$prefix}drawer-inset);
@@ -137,9 +132,6 @@ $drawer-tokens: defaults(
           max-height: none;
         }
 
-        // The base transform is the entry-from and exit-to position; the JS
-        // holds the dialog in the top layer during the exit so the ::backdrop
-        // fade plays.
         &:not(.drawer-instant) {
           @include transition(
             transform var(--#{$prefix}drawer-transition-duration) var(--#{$prefix}drawer-transition-timing),
@@ -183,8 +175,6 @@ $drawer-tokens: defaults(
             transform: none;
           }
 
-          // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
-          // outrank the open-state transform reset.
           &[open].drawer-static:not(.hiding) {
             transform: $drawer-scale-transform;
           }
@@ -198,7 +188,6 @@ $drawer-tokens: defaults(
             );
           }
 
-          // Still rendered because close() is deferred until the transition ends.
           &.hiding::backdrop {
             background-color: transparent;
             backdrop-filter: blur(0);
@@ -221,8 +210,6 @@ $drawer-tokens: defaults(
         }
       }
 
-      // The UA's display: none and fixed positioning have to be reset in full
-      // for the element to behave as an inline flex container.
       @if not ($infix == "") {
         @include media-breakpoint-up($next) {
           // stylelint-disable declaration-no-important
@@ -259,7 +246,6 @@ $drawer-tokens: defaults(
             width: 100%;
             padding: 0;
             overflow-y: visible;
-            // Reset `background-color` in case `.bg-*` classes are used in drawer
             background-color: transparent !important; // stylelint-disable-line declaration-no-important
           }
         }
@@ -267,8 +253,6 @@ $drawer-tokens: defaults(
     }
   }
 
-  // Entry animation for ::backdrop. It only exists while the dialog is in the
-  // top layer, so its starting state can't be expressed on the base selector.
   @starting-style {
     @each $breakpoint in map.keys($grid-breakpoints) {
       $next: breakpoint-next($breakpoint, $grid-breakpoints);
@@ -286,8 +270,6 @@ $drawer-tokens: defaults(
     backdrop-filter: blur(5px) saturate(180%);
   }
 
-  // Overrides the placement insets so the off-screen transforms land the panel
-  // on the viewport edge.
   .drawer-sheet {
     right: 0;
     bottom: 0;

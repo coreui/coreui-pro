@@ -38,14 +38,8 @@ $date-picker-tokens: defaults(
     }
   }
 
-  // The panel declares its own tokens: `container` can teleport it and a
-  // framework port may portal it, so nothing inside may depend on an ancestor.
   .date-picker-popup {
     @include tokens($date-picker-tokens);
-
-    // The time body's rules read --#{$prefix}time-picker-* properties that
-    // `_time-picker.scss` declares on `.time-picker` alone, and this root is a
-    // date picker — so the ones the body needs are declared here.
 
     .date-picker-timepickers {
       display: flex;

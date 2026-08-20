@@ -100,7 +100,6 @@ $dialog-tokens: defaults(
     max-height: calc(100% - var(--#{$prefix}dialog-margin) * 2);
     padding: 0;
     margin: auto;
-    // Let popups (menus, tooltips) appended inside the dialog overflow its box
     overflow: visible;
     color: var(--#{$prefix}dialog-color);
     visibility: hidden;
@@ -112,9 +111,6 @@ $dialog-tokens: defaults(
     @include box-shadow(var(--#{$prefix}dialog-box-shadow));
 
     &:not(.dialog-instant) {
-      // A base value, not @starting-style, so it applies on every open of a
-      // persistent element and the exit can fall back to it while the JS holds
-      // the dialog in the top layer.
       opacity: 0;
       @include transition(
         opacity var(--#{$prefix}dialog-transition-duration) var(--#{$prefix}dialog-transition-timing),
@@ -141,8 +137,6 @@ $dialog-tokens: defaults(
         transform: none;
       }
 
-      // Static backdrop "bounce". Qualified with [open]:not(.hiding) to
-      // outrank the open-state transform reset.
       &[open].dialog-static:not(.hiding) {
         transform: $dialog-scale-transform;
       }
@@ -180,8 +174,6 @@ $dialog-tokens: defaults(
       display: none;
     }
 
-    // show() skips the top layer here, so positioning and z-index are ours.
-    // Centring uses `translate` so the animated `transform` states don't fight it.
     &.dialog-nonmodal {
       position: fixed;
       inset-block-start: 50%;
@@ -197,16 +189,12 @@ $dialog-tokens: defaults(
     }
   }
 
-  // Entry animation for ::backdrop. It only exists while the dialog is in the
-  // top layer, so its starting state can't be expressed on the base selector.
   @starting-style {
     .dialog:not(.dialog-instant)::backdrop {
       background-color: transparent;
       backdrop-filter: blur(0);
     }
 
-    // The outgoing dialog's ::backdrop is removed in the same tick, so this one
-    // starts opaque — otherwise the user sees a dip or a double-darkened flash.
     .dialog.dialog-swap-in:not(.dialog-instant)::backdrop {
       background-color: var(--#{$prefix}dialog-backdrop-bg);
       backdrop-filter: blur(var(--#{$prefix}dialog-backdrop-blur));
