@@ -228,7 +228,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
   .form-control-color {
     @include form-validation-state-selector($state) {
       @if $enable-validation-icons {
-        width: add($form-color-width, $input-height-inner);
+        width: calc(var(--#{$prefix}control-color-width) + #{$input-height-inner}); // stylelint-disable-line function-disallowed-list
       }
     }
   }
