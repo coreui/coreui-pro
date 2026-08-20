@@ -63,6 +63,19 @@ Color the thumb by adding a [`.theme-{color}` class](/customize/components/#them
 
 ## Customizing
 
+### CSS variables
+
+`.form-range` carries the tokens. The pseudo-elements that draw the thumb and the track cannot be reached from a stylesheet of your own in every engine, so a token on the input is the way to restyle them:
+
+```css
+.form-range.brand {
+  --cui-range-thumb-width: 1.5rem;
+  --cui-range-track-height: .25rem;
+}
+```
+
+<ScssDocs file="scss/forms/_form-range.scss" capture="form-range-tokens" />
+
 ### SASS variables
 
 <ScssDocs file="scss/forms/_form-range.scss" capture="form-range-variables" />
