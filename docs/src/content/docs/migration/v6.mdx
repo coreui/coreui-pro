@@ -1425,6 +1425,21 @@ editing four blocks. It is a map of maps now — one name, eight slots.
   `--#{$prefix}theme-focus-ring`; the emphasis text reaches them as
   `--#{$prefix}theme-fg-emphasis`.
 
+#### The OTP input defaults to the shared frame
+
+Twenty-five `$form-otp-control-*` variables were one-to-one aliases of the
+`$input-*` family — `$form-otp-control-bg: $input-bg` and so on down to the
+focus ring. They now default to the `--cui-btn-input-*` tokens on `:root`
+instead, so the cell picks up a runtime restyle of the text controls without
+going through a second Sass tier. The variables themselves stay, and so does
+every rendered value.
+
+One consequence for Sass customization: setting `$input-bg` (or another
+`$input-*` knob) no longer reaches the OTP cell, because the cell now reads the
+root token rather than that variable. Restyle the whole family through the
+`--cui-btn-input-*` tokens, or set the matching `$form-otp-control-*` variable
+alongside it.
+
 #### The input frame is complete on `:root`
 
 The shared `--#{$prefix}btn-input-*` frame gains the slots every field was
