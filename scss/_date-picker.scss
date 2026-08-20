@@ -30,13 +30,8 @@ $date-picker-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
-  // Lean pickers-v2 shell styling (workspace: architecture/pickers-v2.md, "Styling
-  // budget"). Compiled AFTER _date-picker.scss and replaces it once the v1 shell
-  // retires. The shell styles only what it owns: the field is styled by
-  // forms/_form-date-time.scss, the popup content by _calendar.scss, icons are
-  // inline SVG rendered by the component (the chips pattern), projected footer
-  // content is userland. Sass knobs reuse the existing $date-picker-* shell-layer
-  // variables — no new configuration surface.
+  // The shell styles only what it owns: the field comes from
+  // forms/_form-date-time.scss, the popup content from _calendar.scss.
 
   .date-picker {
     position: relative;

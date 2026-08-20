@@ -6,8 +6,7 @@
  * Dropdown is the v5 compatibility surface built on the Menu implementation:
  * the same engine, keyboard handling and dismissal, with the v5 class names,
  * events (`*.coreui.dropdown`), class-driven placement and the navbar/static
- * CSS hook preserved. The acceptance contract is the untouched v5 spec suite —
- * see workspace/plans/menu-and-dropdown-compat.md.
+ * CSS hook preserved. The acceptance contract is the untouched v5 spec suite.
  * --------------------------------------------------------------------------
  */
 

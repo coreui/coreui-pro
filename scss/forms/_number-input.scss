@@ -1,14 +1,8 @@
 @use "../config" as *;
 
 @layer forms {
-  // The component supplies its own stepper buttons, so the native one has to
-  // go — and each engine hides it its own way. Chromium and WebKit paint it as
-  // a pseudo-element; Firefox has no such pseudo-element and answers only to
-  // `appearance`. Neither rule covers the other engine, so both are here:
-  // measured in Chromium and Firefox, where `appearance: textfield` alone
-  // leaves Chromium's spinner painted on hover and the pseudo-element rule
-  // alone leaves Firefox's painted at rest. Safari checked by hand — the
-  // automated probe cannot reach it, see the note in the workspace.
+  // Both rules are needed: `appearance` alone leaves Chromium's spinner
+  // painted on hover, the pseudo-element alone leaves Firefox's at rest.
   .number-input .form-control {
     appearance: textfield;
 
