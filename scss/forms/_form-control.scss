@@ -28,6 +28,7 @@ $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 $form-control-tokens: () !default;
 $form-control-tokens: defaults(
   (
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-min-height),
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-padding-y),
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-padding-x),
     --#{$prefix}control-font-family: var(--#{$prefix}btn-input-font-family),
@@ -245,12 +246,14 @@ $form-control-select-tokens: defaults(
     // invalid and fall back to their initial values.
     @include tokens($form-control-tokens);
 
+    --#{$prefix}control-plaintext-color: #{$input-plaintext-color};
+
     display: block;
     width: 100%;
     padding: var(--#{$prefix}control-padding-y) 0;
     margin-bottom: 0; // match inputs if this class comes on inputs with default margins
     line-height: var(--#{$prefix}control-line-height);
-    color: $input-plaintext-color;
+    color: var(--#{$prefix}control-plaintext-color);
     background-color: transparent;
     border: solid transparent;
     border-width: var(--#{$prefix}control-border-width) 0;
@@ -275,12 +278,13 @@ $form-control-select-tokens: defaults(
 
   .form-control-sm,
   .form-select-sm {
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
     --#{$prefix}control-border-radius: #{$input-border-radius-sm};
 
-    min-height: var(--#{$prefix}btn-input-sm-min-height);
+    min-height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     font-size: var(--#{$prefix}control-font-size);
     @include border-radius(var(--#{$prefix}control-border-radius));
@@ -295,12 +299,13 @@ $form-control-select-tokens: defaults(
 
   .form-control-lg,
   .form-select-lg {
+    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
     --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
     --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
     --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
     --#{$prefix}control-border-radius: #{$input-border-radius-lg};
 
-    min-height: var(--#{$prefix}btn-input-lg-min-height);
+    min-height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
     font-size: var(--#{$prefix}control-font-size);
     @include border-radius(var(--#{$prefix}control-border-radius));
@@ -362,22 +367,16 @@ $form-control-select-tokens: defaults(
   // stylelint-disable selector-no-qualifying-type
   textarea {
     &.form-control {
-      min-height: var(--#{$prefix}btn-input-min-height);
-    }
-
-    &.form-control-sm {
-      min-height: var(--#{$prefix}btn-input-sm-min-height);
-    }
-
-    &.form-control-lg {
-      min-height: var(--#{$prefix}btn-input-lg-min-height);
+      min-height: var(--#{$prefix}control-min-height);
     }
   }
   // stylelint-enable selector-no-qualifying-type
 
   .form-control-color {
-    width: $form-color-width;
-    height: var(--#{$prefix}btn-input-min-height);
+    --#{$prefix}control-color-width: #{$form-color-width};
+
+    width: var(--#{$prefix}control-color-width);
+    height: var(--#{$prefix}control-min-height);
     padding: var(--#{$prefix}control-padding-y);
 
     &:not(:disabled):not([readonly]) {
@@ -393,8 +392,5 @@ $form-control-select-tokens: defaults(
       border: 0 !important; // stylelint-disable-line declaration-no-important
       @include border-radius(var(--#{$prefix}control-border-radius));
     }
-
-    &.form-control-sm { height: var(--#{$prefix}btn-input-sm-min-height); }
-    &.form-control-lg { height: var(--#{$prefix}btn-input-lg-min-height); }
   }
 }

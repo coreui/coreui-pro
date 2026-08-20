@@ -152,6 +152,12 @@ Learn more about [support for datalist elements](https://caniuse.com/datalist).
 
 ### CSS variables
 
+`.form-control` and `.form-select` carry the `--cui-control-*` tokens. The namespace is shared by every field component — the OTP input, the chip input, the pickers — so setting one of these on an ancestor restyles all of them at once. `.form-control-sm` and `.form-control-lg` are themselves token overrides.
+
+<ScssDocs file="scss/forms/_form-control.scss" capture="form-control-tokens" />
+
+Two tokens are declared by the class that uses them rather than on every control: `--cui-control-plaintext-color` on `.form-control-plaintext`, and `--cui-control-color-width` on `.form-control-color`.
+
 `.form-label` and `.col-form-label` carry the `--cui-label-*` tokens. Set them on a single label to restyle just that one, or on an ancestor to cover a whole form. The size classes are themselves token overrides: `.col-form-label-lg` sets `--cui-label-padding-y` and `--cui-label-font-size`.
 
 <ScssDocs file="scss/forms/_labels.scss" capture="form-label-css-vars" />
