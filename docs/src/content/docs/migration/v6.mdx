@@ -1302,6 +1302,36 @@ Multi Select's option indicators moved with it — they render as a decorative
 - **The last card in a `.card-group` gets its bottom-left corner squared.** The
   rule targeting it was written `> card-footer`, without the leading dot, so it
   matched an element type that does not exist and never applied.
+- **A theme class works on a single section, not just the whole card.**
+  `<div class="card-header theme-primary">` used to paint white text on a
+  neutral header, because the background came from `--cui-card-cap-bg`, a token
+  declared on `.card` — a custom property resolves where it is declared, and
+  `--cui-theme-base` was set one level below it, on the header. The theme
+  indirection moved to the point of use, so each section reads the theme in its
+  own scope. A theme class on the `.card` itself behaves exactly as before.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.card-body` is a flex column.** It spaces its children with
+  `--cui-card-body-gap` and zeroes their block margins, so nothing in a card
+  needs `.mb-*` to sit correctly any more. Two consequences for existing markup:
+  a direct child takes its natural width rather than filling the card (add
+  `.w-100` where a block child has to stretch), and `text-align` no longer moves
+  a button or a link, because they are flex items — use `.mx-auto` or `.ms-auto`
+  instead.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.card-link` is gone**, along with `--cui-card-title-spacer-y`. Both existed
+  to space children the gap now handles; the class's inline margin only ever
+  worked because the links were inline. Wrap them yourself:
+  `<div class="hstack gap-3">…</div>`.
+- **New: `.card-row`** lays a card out along the inline axis, with
+  `.card-img-start` and `.card-img-end` for an image cap on either side. It
+  replaces the `.row.g-0` + `.col-md-*` recipe, which needed a wrapper per
+  section and drew no divider between them.
+- **New: `.card-subtle`** swaps the theme's solid fill for its subtle
+  background, border and emphasis text.
+- **New: `.card-translucent`** blurs and saturates whatever is behind the card
+  and thins out the caps to match. Tuned at build time through
+  `$card-translucent-bg-opacity`, `$card-translucent-cap-bg-opacity` and
+  `$card-translucent-backdrop-filter`.
 
 ### Sass architecture & design tokens
 
