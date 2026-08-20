@@ -291,6 +291,9 @@ $card-tokens: defaults(
   // Card groups
   //
 
+  // A group lays its cards out in a row from a container query, so the width it
+  // reads is the nearest query container's — put `.contains-inline` on an
+  // ancestor, or the query has nothing to measure and the cards stay stacked.
   .card-group {
     // The child selector allows nested `.card` within `.card-group`
     // to display properly.
@@ -298,7 +301,7 @@ $card-tokens: defaults(
       margin-bottom: var(--#{$prefix}card-group-margin);
     }
 
-    @include media-breakpoint-up(sm) {
+    @include container-breakpoint-up(sm) {
       display: flex;
       flex-flow: row wrap;
       // The child selector allows nested `.card` within `.card-group`

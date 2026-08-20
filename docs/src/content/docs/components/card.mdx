@@ -432,9 +432,11 @@ In addition to styling the content within cards, Bootstrap includes a few option
 
 ### Card groups
 
-Use card groups to render cards as a single, attached element with equal width and height columns. Card groups start off stacked and use `display: flex;` to become attached with uniform dimensions starting at the `sm` breakpoint.
+Use card groups to render cards as a single, attached element with equal width and height columns. Card groups start off stacked and become attached with uniform dimensions from the `sm` breakpoint up.
 
-<Example code={`<div class="card-group">
+That breakpoint is measured on the nearest [query container](/utilities/container-queries/), not the viewport, so a group in a narrow column stays stacked while the same markup in a wide one attaches. Mark an ancestor with `.contains-inline` — without one the query has nothing to read and the cards never attach.
+
+<Example class="contains-inline" code={`<div class="card-group">
     <div class="card">
       <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
       <div class="card-body">
@@ -463,7 +465,7 @@ Use card groups to render cards as a single, attached element with equal width a
 
 When using card groups with footers, their content will automatically line up.
 
-<Example code={`<div class="card-group">
+<Example class="contains-inline" code={`<div class="card-group">
     <div class="card">
       <svg class="docs-placeholder-img card-img-top" width="100%" height="180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image cap" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image cap</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text></svg>
       <div class="card-body">
