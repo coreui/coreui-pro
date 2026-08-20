@@ -60,10 +60,6 @@ $card-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
-  //
-  // Base styles
-  //
-
   .card {
     @include tokens($card-tokens);
 
@@ -141,10 +137,6 @@ $card-tokens: defaults(
       margin-inline-start: var(--#{$prefix}card-spacer-x);
     }
   }
-
-  //
-  // Optional textual caps
-  //
 
   .card-header {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);

@@ -77,10 +77,6 @@
   .btn-group-lg > .btn { @extend .btn-lg; }
 
 
-  //
-  // Split button dropdowns
-  //
-
   .dropdown-toggle-split {
     padding-right: calc(#{$btn-padding-x} * .75); // stylelint-disable-line function-disallowed-list
     padding-left: calc(#{$btn-padding-x} * .75); // stylelint-disable-line function-disallowed-list

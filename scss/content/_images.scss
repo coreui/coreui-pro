@@ -42,10 +42,6 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
     @include img-fluid();
   }
 
-  //
-  // Figures
-  //
-
   .figure {
     // Ensures the caption's text aligns with the image.
     display: inline-block;

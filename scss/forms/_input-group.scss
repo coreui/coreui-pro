@@ -39,10 +39,6 @@ $input-group-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 @layer forms {
-  //
-  // Base styles
-  //
-
   .input-group {
     position: relative;
     display: flex;

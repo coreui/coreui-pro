@@ -116,10 +116,6 @@ $badge-variants: (
   }
   // scss-docs-end badge-modifiers
 
-  //
-  // Badge Sizes
-  //
-
   .badge-sm {
     --#{$prefix}badge-min-height: #{$badge-min-height-sm};
     --#{$prefix}badge-padding-x: #{$badge-padding-x-sm};
