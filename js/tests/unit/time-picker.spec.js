@@ -282,4 +282,62 @@ describe('TimePicker', () => {
       expect(fixtureEl.querySelector('.time-picker-popup [data-coreui-picker-action="now"]').disabled).toBeFalse()
     })
   })
+
+  describe('roll keyboard navigation', () => {
+    const openRoll = () => {
+      const picker = buildPicker({ seconds: false })
+      picker.show()
+      return fixtureEl.querySelector('.time-picker-roll')
+    }
+
+    const cellsOf = column => Array.from(column.querySelectorAll('.time-picker-roll-cell'))
+
+    it('should move down and up within a column', () => {
+      const roll = openRoll()
+      const [hours] = roll.querySelectorAll('.time-picker-roll-col')
+      const cells = cellsOf(hours)
+
+      cells[0].focus()
+      cells[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }))
+      expect(document.activeElement).toEqual(cells[1])
+
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }))
+      expect(document.activeElement).toEqual(cells[0])
+    })
+
+    it('should jump to the first and the last option', () => {
+      const roll = openRoll()
+      const [hours] = roll.querySelectorAll('.time-picker-roll-col')
+      const cells = cellsOf(hours)
+
+      cells[0].focus()
+      cells[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }))
+      expect(document.activeElement).toEqual(cells[cells.length - 1])
+
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }))
+      expect(document.activeElement).toEqual(cells[0])
+    })
+
+    it('should move between columns', () => {
+      const roll = openRoll()
+      const [hours, minutes] = roll.querySelectorAll('.time-picker-roll-col')
+
+      cellsOf(hours)[0].focus()
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+      expect(minutes.contains(document.activeElement)).toBeTrue()
+
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+      expect(hours.contains(document.activeElement)).toBeTrue()
+    })
+
+    it('should stay in the first column on ArrowLeft', () => {
+      const roll = openRoll()
+      const [hours] = roll.querySelectorAll('.time-picker-roll-col')
+      const first = cellsOf(hours)[0]
+
+      first.focus()
+      first.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+      expect(document.activeElement).toEqual(first)
+    })
+  })
 })
