@@ -34,6 +34,8 @@ Themeable components also support a single family of composable `.theme-*` class
 | `--cui-theme-bg-subtle` | Subtle background tint for low-emphasis surfaces |
 | `--cui-theme-bg-muted` | Muted background, between subtle and solid |
 | `--cui-theme-border` | Border color |
+| `--cui-theme-hover` | The theme color shifted in lightness for a hover state |
+| `--cui-theme-active` | The same, one step further, for a pressed state |
 | `--cui-theme-focus-ring` | Focus ring color, translucent at `$focus-ring-opacity` |
 
 The `.theme-{name}` classes mirror the keys of the `$theme-colors` map in `scss/_theme.scss` — `.theme-primary`, `.theme-success`, `.theme-danger`, and so on — so adding or renaming a theme color automatically produces a matching class. Each entry defines the tokens for both light and dark mode via `light-dark()`.

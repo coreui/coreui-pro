@@ -258,6 +258,14 @@ $dropdown-dark-tokens: defaults(
     }
   }
 
+  // In a button the caret is a flex item, so the gap already sets it apart.
+  .btn.dropdown-toggle {
+    &::after,
+    &::before {
+      margin-inline: 0;
+    }
+  }
+
 
   // Dividers (basically an `<hr>`) within the dropdown
   .dropdown-divider {

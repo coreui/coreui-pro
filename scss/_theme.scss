@@ -184,9 +184,28 @@ $theme-token-refs: (
 ) !default;
 // scss-docs-end theme-token-refs
 
+// scss-docs-start theme-interaction-variables
+// Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
+$theme-hover-lightness:   .85 !default;
+$theme-active-lightness:  .8 !default;
+
+// Dark theme colors sit too low to darken any further, so they brighten instead.
+$theme-lightness-overrides: (
+  "dark": ("hover": 1.48, "active": 1.62)
+) !default;
+// scss-docs-end theme-interaction-variables
+
 @mixin theme-tokens($state) {
   @each $token, $suffix in $theme-token-refs {
     --#{$prefix}theme-#{$token}: var(--#{$prefix}#{$state}#{$suffix});
+  }
+
+  $overrides: map.get($theme-lightness-overrides, $state) or ();
+
+  @each $token, $lightness in ("hover": $theme-hover-lightness, "active": $theme-active-lightness) {
+    $shift: map.get($overrides, $token) or $lightness;
+    // stylelint-disable-next-line function-disallowed-list
+    --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}) calc(l * #{$shift}) c h);
   }
 }
 
