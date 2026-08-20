@@ -255,6 +255,7 @@ $combobox-tokens: defaults(
 
     &::before {
       opacity: 1;
+      transform: scale(1);
     }
   }
 
@@ -265,6 +266,7 @@ $combobox-tokens: defaults(
     &::before {
       opacity: 1;
       mask-image: var(--#{$prefix}check-mark-indeterminate);
+      transform: scale(1);
     }
   }
 
