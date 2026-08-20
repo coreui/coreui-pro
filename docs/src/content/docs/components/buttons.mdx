@@ -33,9 +33,11 @@ The colour is a [`.theme-*` class](/customize/components/#theme-variants), which
 
 <Example class="d-flex flex-wrap gap-2" code={[`<button type="button" class="btn-solid">Solid</button>`, `<button type="button" class="btn-outline">Outline</button>`, `<button type="button" class="btn-subtle">Subtle</button>`, `<button type="button" class="btn-ghost">Ghost</button>`]} />
 
-Every theme colour also has a class of its own, which is the spelling most of these docs use: `.btn-{color}` for solid, `.btn-{variant}-{color}` for the rest. It carries the theme and the variant together, so `.btn-primary` is `.btn-solid.theme-primary`.
+Pair the variant with any theme colour. `.btn-link` is the exception — it is a link that behaves like a button, so it takes its colour from the link colour rather than from a theme.
 
-<Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name}">${c.title}</button>`), ``, `<button type="button" class="btn btn-link">Link</button>`]} />
+<Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn-solid theme-${c.name}">${c.title}</button>`), ``, `<button type="button" class="btn-link">Link</button>`]} />
+
+The v5 spelling — `.btn` with a `.btn-{color}` modifier — still works and renders identically; see [Deprecated markup](#deprecated-markup).
 
 <Callout color="info">
 ##### Conveying meaning to assistive technologies
@@ -47,7 +49,7 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 You can combine button with our [CoreUI Icons](https://coreui.io/icons/). The button lays its content out in a row and separates the parts with `--cui-btn-gap`, so the icon keeps its distance from the label whether or not there is whitespace between them in your markup.
 
-<Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name}"><span class="cil-contrast"></span> ${c.title}</button>`), ``, `<button type="button" class="btn btn-link">Link</button>`]} />
+<Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn-solid theme-${c.name}"><span class="cil-contrast"></span> ${c.title}</button>`), ``, `<button type="button" class="btn-link">Link</button>`]} />
 
 ### Icon only
 
@@ -55,7 +57,7 @@ You can combine button with our [CoreUI Icons](https://coreui.io/icons/). The bu
 
 Add `.btn-icon` for a button that holds nothing but an icon. It drops the padding and takes its width from its height, so the result is square at every size.
 
-<Example code={[`<button type="button" class="btn btn-primary btn-icon btn-sm"><span class="cil-contrast"></span></button>`, `<button type="button" class="btn btn-primary btn-icon"><span class="cil-contrast"></span></button>`, `<button type="button" class="btn btn-primary btn-icon btn-lg"><span class="cil-contrast"></span></button>`]} />
+<Example code={[`<button type="button" class="btn-solid theme-primary btn-icon btn-sm"><span class="cil-contrast"></span></button>`, `<button type="button" class="btn-solid theme-primary btn-icon"><span class="cil-contrast"></span></button>`, `<button type="button" class="btn-solid theme-primary btn-icon btn-lg"><span class="cil-contrast"></span></button>`]} />
 
 ## Disable text wrapping
 
@@ -67,11 +69,11 @@ The `.btn` classes are designed for `<button>` ,  `<a>`  or  `<input />` element
 
 If you're using `.btn` classes on `<a>` elements that are used to trigger functionality ex. collapsing content,  these links should be given a `role="button"` to adequately communicate their meaning to assistive technologies such as screen readers.
 
-<Example code={`<a class="btn btn-primary" href="#" role="button">Link</a>
-  <button class="btn btn-primary" type="submit">Button</button>
-  <input class="btn btn-primary" type="button" value="Input">
-  <input class="btn btn-primary" type="submit" value="Submit">
-  <input class="btn btn-primary" type="reset" value="Reset">`} />
+<Example code={`<a class="btn-solid theme-primary" href="#" role="button">Link</a>
+  <button class="btn-solid theme-primary" type="submit">Button</button>
+  <input class="btn-solid theme-primary" type="button" value="Input">
+  <input class="btn-solid theme-primary" type="submit" value="Submit">
+  <input class="btn-solid theme-primary" type="reset" value="Reset">`} />
 
 ## Outline buttons
 
@@ -79,19 +81,19 @@ If you're using `.btn` classes on `<a>` elements that are used to trigger functi
 
 The `.btn-outline` class provides a neutral outline button style without any color modifiers. It’s useful as a foundation for minimal buttons without background color or strong visual emphasis.
 
-<Example code={`<button type="button" class="btn btn-outline">Base outline button</button>
-  <button type="button" class="btn btn-outline active">Active state</button>
-  <button type="button" class="btn btn-outline" disabled>Disabled state</button>`} />
+<Example code={`<button type="button" class="btn-outline">Base outline button</button>
+  <button type="button" class="btn-outline active">Active state</button>
+  <button type="button" class="btn-outline" disabled>Disabled state</button>`} />
 
 These buttons use a transparent background, subtle border, and inherit text color from the parent context. They’re best suited for minimalist UI elements like modals, toolbars, or secondary actions.
 
-### Themed outline variants: `.btn-outline-*`
+### Themed outline buttons
 
-If you need a button, but without the strong background colors. Replace the default modifier classes with the `.btn-outline-*` ones to remove all background colors on any element with `.btn` class.
+Add a theme colour and the border, the text and the hover fill all follow it.
 
-<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-outline-${c.name}">${c.title}</button>`)} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-outline theme-${c.name}">${c.title}</button>`)} />
 
-These outline variant buttons retain transparent backgrounds by default, but display a subtle background tint on hover or focus to indicate interactivity. They're ideal for secondary actions when you want to visually differentiate from solid `.btn-*` buttons.
+These buttons keep a transparent background until they are hovered or focused, which makes them the natural pairing for a secondary action next to a solid one.
 
 <Callout color="info">
 Some of the button styles use a relatively light foreground color, and should only be used on a dark background in order to have sufficient contrast.
@@ -105,15 +107,15 @@ Use the `.btn-ghost` class to create ultra-minimalist buttons with no borders an
 
 They’re perfect for interfaces where you want buttons to be present but visually unobtrusive—such as action buttons in modals, cards, or toolbars.
 
-<Example code={`<button type="button" class="btn btn-ghost">Base ghost button</button>
-  <button type="button" class="btn btn-ghost active">Active state</button>
-  <button type="button" class="btn btn-ghost" disabled>Disabled state</button>`} />
+<Example code={`<button type="button" class="btn-ghost">Base ghost button</button>
+  <button type="button" class="btn-ghost active">Active state</button>
+  <button type="button" class="btn-ghost" disabled>Disabled state</button>`} />
 
-### Themed ghost variants: `.btn-ghost-*`
+### Themed ghost buttons
 
-To apply theme colors to ghost buttons, use `.btn-ghost-*` classes. These variants color only the text by default. On hover or focus, they add a faint background tint corresponding to the theme color.
+With a theme colour the text takes it, and the fill that appears on hover takes it too.
 
-<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-ghost-${c.name}">${c.title}</button>`)} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-ghost theme-${c.name}">${c.title}</button>`)} />
 
 ## Subtle buttons
 
@@ -121,30 +123,30 @@ To apply theme colors to ghost buttons, use `.btn-ghost-*` classes. These varian
 
 `.btn-subtle` fills the button with the theme's tinted background instead of the colour itself, so it carries the meaning of the colour without the weight of a solid button. Use it where a solid button would shout: a secondary action next to a primary one, or a row of actions that all matter equally.
 
-<Example code={`<button type="button" class="btn btn-subtle">Base subtle button</button>
-  <button type="button" class="btn btn-subtle active">Active state</button>
-  <button type="button" class="btn btn-subtle" disabled>Disabled state</button>`} />
+<Example code={`<button type="button" class="btn-subtle">Base subtle button</button>
+  <button type="button" class="btn-subtle active">Active state</button>
+  <button type="button" class="btn-subtle" disabled>Disabled state</button>`} />
 
-<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-subtle-${c.name}">${c.title}</button>`)} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-subtle theme-${c.name}">${c.title}</button>`)} />
 
 ## Sizes
 
 Larger or smaller buttons? Add `.btn-xs`, `.btn-sm` or `.btn-lg` for additional sizes.
 
-<Example code={`<button type="button" class="btn btn-primary btn-lg">Large button</button>
-  <button type="button" class="btn btn-secondary btn-lg">Large button</button>`} />
+<Example code={`<button type="button" class="btn-solid theme-primary btn-lg">Large button</button>
+  <button type="button" class="btn-solid theme-secondary btn-lg">Large button</button>`} />
 
-<Example code={`<button type="button" class="btn btn-primary btn-sm">Small button</button>
-  <button type="button" class="btn btn-secondary btn-sm">Small button</button>`} />
+<Example code={`<button type="button" class="btn-solid theme-primary btn-sm">Small button</button>
+  <button type="button" class="btn-solid theme-secondary btn-sm">Small button</button>`} />
 
-<Example code={`<button type="button" class="btn btn-primary btn-xs">Extra small button</button>
-  <button type="button" class="btn btn-secondary btn-xs">Extra small button</button>`} />
+<Example code={`<button type="button" class="btn-solid theme-primary btn-xs">Extra small button</button>
+  <button type="button" class="btn-solid theme-secondary btn-xs">Extra small button</button>`} />
 
 Each size points the button's tokens at the matching `--cui-btn-input-{size}-*` set, the same one the form controls read, so a button and a field of the same size line up.
 
 You can even roll your own custom sizing with CSS variables:
 
-<Example code={`<button type="button" class="btn btn-primary"
+<Example code={`<button type="button" class="btn-solid theme-primary"
           style="--cui-btn-padding-y: .25rem; --cui-btn-padding-x: .5rem; --cui-btn-font-size: .75rem;">
     Custom button
   </button>`} />
@@ -153,63 +155,63 @@ You can even roll your own custom sizing with CSS variables:
 
 ### Pill buttons
 
-<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name} rounded-pill">${c.title}</button>`)} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-solid theme-${c.name} rounded-pill">${c.title}</button>`)} />
 
 <div class="pro-component"></div>
 
 ### Square buttons
 
-<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name} rounded-0">${c.title}</button>`)} />
+<Example code={getData('theme-colors').map((c) => `<button type="button" class="btn-solid theme-${c.name} rounded-0">${c.title}</button>`)} />
 
 ## Disabled state
 
 Add the `disabled` boolean attribute to any `<button>` element to make buttons look inactive. Disabled button has `pointer-events: none` applied to, disabling hover and active states from triggering.
 
-<Example code={`<button type="button" class="btn btn-lg btn-primary" disabled>Primary button</button>
-  <button type="button" class="btn btn-secondary btn-lg" disabled>Button</button>`} />
+<Example code={`<button type="button" class="btn-solid theme-primary btn-lg" disabled>Primary button</button>
+  <button type="button" class="btn-solid theme-secondary btn-lg" disabled>Button</button>`} />
 
 Disabled buttons using the `<a>` element act a little different:
 
 `<a>`s don't support the `disabled` attribute, so you have to add `.disabled` class to make buttons look inactive. The disabled bootstrap button must have the `aria-disabled="true"` attribute to show the state of the element to assistive technologies.
 
-<Example code={`<a href="#" class="btn btn-primary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Primary link</a>
-  <a href="#" class="btn btn-secondary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Link</a>`} />
+<Example code={`<a href="#" class="btn-solid theme-primary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Primary link</a>
+  <a href="#" class="btn-solid theme-secondary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Link</a>`} />
 
 ### Link functionality caveat
 
 To cover cases where you have to keep the `href` attribute on a disabled link, the `.disabled` class uses `pointer-events: none` to try to disable the link functionality of `<a>`s. Note that this CSS property is not yet standardized for HTML, but all modern browsers support it. In addition, even in browsers that do support `pointer-events: none`, keyboard navigation remains unaffected, meaning that sighted keyboard users and users of assistive technologies will still be able to activate these links. So to be safe, in addition to `aria-disabled="true"`, also include a `tabindex="-1"` attribute on these links to prevent them from receiving keyboard focus, and use custom JavaScript to disable their functionality altogether.
 
-<Example code={`<a href="#" class="btn btn-primary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Primary link</a>
-  <a href="#" class="btn btn-secondary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Link</a>`} />
+<Example code={`<a href="#" class="btn-solid theme-primary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Primary link</a>
+  <a href="#" class="btn-solid theme-secondary btn-lg disabled" tabindex="-1" role="button" aria-disabled="true">Link</a>`} />
 
 ## Block buttons
 
 Create buttons that span the full width of a parent—by using utilities.
 
 <Example code={`<div class="d-grid gap-2">
-    <button class="btn btn-primary" type="button">Button</button>
-    <button class="btn btn-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
 Here we create a responsive variation, starting with vertically stacked buttons until the `md` breakpoint, where `.d-md-block` replaces the `.d-grid` class, thus nullifying the `gap-2` utility. Resize your browser to see them change.
 
 <Example code={`<div class="d-grid gap-2 d-md-block">
-    <button class="btn btn-primary" type="button">Button</button>
-    <button class="btn btn-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
 You can adjust the width of your block buttons with grid column width classes. For example, for a half-width "block button", use `.col-6`. Center it horizontally with `.mx-auto`, too.
 
 <Example code={`<div class="d-grid gap-2 col-6 mx-auto">
-    <button class="btn btn-primary" type="button">Button</button>
-    <button class="btn btn-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
 Additional utilities can be used to adjust the alignment of buttons when horizontal. Here we've taken our previous responsive example and added some flex utilities and a margin utility on the button to right align the buttons when they're no longer stacked.
 
 <Example code={`<div class="d-grid gap-2 d-md-flex justify-content-md-end">
-    <button class="btn btn-primary me-md-2" type="button">Button</button>
-    <button class="btn btn-primary" type="button">Button</button>
+    <button class="btn-solid theme-primary me-md-2" type="button">Button</button>
+    <button class="btn-solid theme-primary" type="button">Button</button>
   </div>`} />
 
 ## Button plugin
@@ -230,9 +232,9 @@ Add `data-coreui-toggle="button"` to toggle a button's `active` state. Also add 
     <button type="button" class="btn" disabled data-coreui-toggle="button" aria-pressed="false">Disabled toggle button</button>
   </div>
   <div class="d-flex gap-1">
-    <button type="button" class="btn btn-primary" data-coreui-toggle="button" aria-pressed="false">Toggle button</button>
-    <button type="button" class="btn btn-primary active" data-coreui-toggle="button" aria-pressed="true">Active toggle button</button>
-    <button type="button" class="btn btn-primary" disabled data-coreui-toggle="button" aria-pressed="false">Disabled toggle button</button>
+    <button type="button" class="btn-solid theme-primary" data-coreui-toggle="button" aria-pressed="false">Toggle button</button>
+    <button type="button" class="btn-solid theme-primary active" data-coreui-toggle="button" aria-pressed="true">Active toggle button</button>
+    <button type="button" class="btn-solid theme-primary" disabled data-coreui-toggle="button" aria-pressed="false">Disabled toggle button</button>
   </div>`} />
 
 <Example code={`<div class="d-flex gap-1 mb-3">
@@ -241,9 +243,9 @@ Add `data-coreui-toggle="button"` to toggle a button's `active` state. Also add 
     <a class="btn disabled" aria-disabled="true" role="button" data-coreui-toggle="button" aria-pressed="false">Disabled toggle link</a>
   </div>
   <div class="d-flex gap-1">
-    <a href="#" class="btn btn-primary" role="button" data-coreui-toggle="button" aria-pressed="false">Toggle link</a>
-    <a href="#" class="btn btn-primary active" role="button" data-coreui-toggle="button" aria-pressed="true">Active toggle link</a>
-    <a class="btn btn-primary disabled" aria-disabled="true" role="button" data-coreui-toggle="button" aria-pressed="false">Disabled toggle link</a>
+    <a href="#" class="btn-solid theme-primary" role="button" data-coreui-toggle="button" aria-pressed="false">Toggle link</a>
+    <a href="#" class="btn-solid theme-primary active" role="button" data-coreui-toggle="button" aria-pressed="true">Active toggle link</a>
+    <a class="btn-solid theme-primary disabled" aria-disabled="true" role="button" data-coreui-toggle="button" aria-pressed="false">Disabled toggle link</a>
   </div>`} />
 
 <Callout color="info">
@@ -273,6 +275,37 @@ document.querySelectorAll('.btn').forEach(buttonElement => {
   button.toggle()
 })
 ```
+
+## Deprecated markup
+
+<DeprecatedIn version="6.0.0" />
+
+The v5 spelling — `.btn` with a colour modifier — still works and renders identically. Each colour class is generated from the same variants map as the class it replaces, so `.btn-primary` *is* `.btn-solid.theme-primary`, `.btn-outline-primary` is `.btn-outline.theme-primary`, and `.btn-ghost-primary` is `.btn-ghost.theme-primary`. They are removed in v7.
+
+<Example code={[...getData('theme-colors').map((c) => `<button type="button" class="btn btn-${c.name}">${c.title}</button>`)]} />
+
+```diff
+- <button class="btn btn-primary">Save</button>
++ <button class="btn-solid theme-primary">Save</button>
+
+- <button class="btn btn-outline-danger">Delete</button>
++ <button class="btn-outline theme-danger">Delete</button>
+```
+
+Two things are worth the rewrite rather than the alias. A theme colour reaches a whole toolbar from one class on the wrapper, which no `.btn-{color}` can do; and a colour of your own works with every variant the moment you define its theme tokens, with no Sass to compile.
+
+The v5 toggle button — `.btn-check` on the input, with a sibling `.btn` label tied to it by `id`/`for` — is deprecated the same way and renders identically. The current spelling puts `.btn-check` on the `<label>` with the input nested inside it, so the pair cannot fall out of sync.
+
+```diff
+- <input type="checkbox" class="btn-check" id="t" autocomplete="off">
+- <label class="btn btn-primary" for="t">Toggle</label>
++ <label class="btn-solid theme-primary btn-check">
++   <input type="checkbox" autocomplete="off">
++   Toggle
++ </label>
+```
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Customizing
 
