@@ -1465,6 +1465,15 @@ root token restyles every text control at once.
   in the browser). Sass colour functions on it no longer compile; override
   the token or the variable with a colour of your own instead.
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$time-picker-roll-cell-selected-hover-bg` is computed in the browser.**
+  It was a `light-dark()` pair of `color.scale($primary, …)`, frozen at build
+  time, so a retinted palette moved the selected cell but left its hover state
+  on the old indigo. It darkens the primary the way the solid button darkens
+  its own background — `oklch(from var(--cui-primary) calc(l * .85) c h)` —
+  which also drops the separate dark-mode variant, since the formula works in
+  both. Sass colour functions on it no longer compile.
+
 #### The field transition is three tokens, not one shorthand
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
