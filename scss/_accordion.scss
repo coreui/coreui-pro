@@ -21,7 +21,9 @@ $accordion-border-radius:                 var(--#{$prefix}border-radius) !defaul
 
 $accordion-button-color:                  var(--#{$prefix}body-color) !default;
 $accordion-button-bg:                     var(--#{$prefix}accordion-bg) !default;
-$accordion-transition:                    $btn-transition, border-radius .15s ease !default;
+$accordion-transition-property:           #{var(--#{$prefix}btn-input-action-transition-property), border-radius} !default;
+$accordion-transition-duration:           var(--#{$prefix}btn-input-transition-duration) !default;
+$accordion-transition-timing:             var(--#{$prefix}btn-input-transition-timing) !default;
 $accordion-button-active-bg:              var(--#{$prefix}secondary-bg) !default;
 $accordion-button-active-color:           var(--#{$prefix}body-color) !default;
 $accordion-active-border-color:           $accordion-border-color !default;
@@ -52,7 +54,9 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-font-size: #{$accordion-font-size},
     --#{$prefix}accordion-color: #{$accordion-color},
     --#{$prefix}accordion-bg: #{$accordion-bg},
-    --#{$prefix}accordion-transition: #{$accordion-transition},
+    --#{$prefix}accordion-transition-property: #{$accordion-transition-property},
+    --#{$prefix}accordion-transition-duration: #{$accordion-transition-duration},
+    --#{$prefix}accordion-transition-timing: #{$accordion-transition-timing},
     --#{$prefix}accordion-border-color: #{$accordion-border-color},
     --#{$prefix}accordion-border-width: #{$accordion-border-width},
     --#{$prefix}accordion-border-radius: #{$accordion-border-radius},
@@ -192,7 +196,11 @@ $accordion-tokens: defaults(
     list-style: none;
     cursor: pointer;
     background-color: var(--#{$prefix}accordion-btn-bg);
-    @include transition(var(--#{$prefix}accordion-transition));
+    @include transition-props(
+      var(--#{$prefix}accordion-transition-property),
+      var(--#{$prefix}accordion-transition-duration),
+      var(--#{$prefix}accordion-transition-timing)
+    );
 
     &::-webkit-details-marker {
       display: none;

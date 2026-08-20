@@ -1464,16 +1464,25 @@ root token restyles every text control at once.
 (`border-color .15s ease-in-out, box-shadow .15s ease-in-out`), so retiming a
 field meant restating the property list. It splits into
 `--cui-control-transition-property`, `-duration` and `-timing`, and the rules
-set the three `transition-*` longhands. `$input-transition` splits the same way
-into `$input-transition-property` / `-duration` / `-timing`, and so do the
-components that derived from it — `$chip-input-transition`,
-`$search-button-transition`, `$form-otp-control-transition`.
+set the three `transition-*` longhands. `$input-transition` splits the same way,
+and so do the components that derived from it — `$chip-input-transition`,
+`$search-button-transition`, `$form-otp-control-transition`,
+`$accordion-transition`, `$btn-transition`.
 
-Retiming every text control is one declaration now:
+`--cui-btn-input-transition` is gone with them. The frame carries the parts
+instead — `--cui-btn-input-transition-duration`, `-timing`, `-property` (what a
+plain field animates: `border-color, box-shadow`) and
+`--cui-btn-input-action-transition-property` (what a button or an action part
+animates: the same plus `color` and `background-color`). One declaration retimes
+every control on the page:
 
 ```css
-.form-control { --cui-control-transition-duration: .3s; }
+:root { --cui-btn-input-transition-duration: .3s; }
 ```
+
+One easing changes with the split: the accordion animated `border-radius` on
+`ease` while everything else used `ease-in-out`; the longhands take a single
+easing, so it is `ease-in-out` throughout.
 
 The split also removes a trap the shorthand carries: a trailing duration binds
 to the last property only, so adding `color` to the front of the old list would

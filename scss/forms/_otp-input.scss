@@ -23,9 +23,9 @@ $form-otp-control-border-width:        var(--#{$prefix}btn-input-border-width) !
 $form-otp-control-border-color:        var(--#{$prefix}btn-input-border-color) !default;
 $form-otp-control-border-radius:       var(--#{$prefix}btn-input-border-radius) !default;
 $form-otp-control-box-shadow:          var(--#{$prefix}btn-input-box-shadow) !default;
-$form-otp-control-transition-property: $input-transition-property !default;
-$form-otp-control-transition-duration: $input-transition-duration !default;
-$form-otp-control-transition-timing:   $input-transition-timing !default;
+$form-otp-control-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
+$form-otp-control-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
+$form-otp-control-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
 $form-otp-control-focus-color:         var(--#{$prefix}btn-input-focus-color) !default;
 $form-otp-control-focus-bg:            var(--#{$prefix}btn-input-focus-bg) !default;
 $form-otp-control-focus-border-color:  var(--#{$prefix}btn-input-focus-border-color) !default;

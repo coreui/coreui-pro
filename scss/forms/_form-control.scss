@@ -54,7 +54,9 @@ $form-control-tokens: defaults(
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},
     --#{$prefix}control-action-hover-bg: #{$form-file-button-hover-bg},
-    --#{$prefix}control-action-transition: var(--#{$prefix}btn-input-transition),
+    --#{$prefix}control-action-transition-property: var(--#{$prefix}btn-input-action-transition-property),
+    --#{$prefix}control-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
   ),
   $form-control-tokens
 );
@@ -220,7 +222,11 @@ $form-control-select-tokens: defaults(
       border-width: 0;
       border-inline-end-width: var(--#{$prefix}control-border-width);
       border-radius: 0; // stylelint-disable-line property-disallowed-list
-      @include transition(var(--#{$prefix}control-action-transition));
+      @include transition-props(
+        var(--#{$prefix}control-action-transition-property),
+        var(--#{$prefix}control-action-transition-duration),
+        var(--#{$prefix}control-action-transition-timing)
+      );
     }
 
     &:hover:not(:disabled):not([readonly])::file-selector-button {

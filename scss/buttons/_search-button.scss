@@ -19,9 +19,9 @@ $search-button-border-width:        $input-border-width !default;
 $search-button-border-color:        $input-border-color !default;
 $search-button-border-radius:       $input-border-radius !default;
 $search-button-box-shadow:          $input-box-shadow !default;
-$search-button-transition-property: $input-transition-property !default;
-$search-button-transition-duration: $input-transition-duration !default;
-$search-button-transition-timing:   $input-transition-timing !default;
+$search-button-transition-property: var(--#{$prefix}btn-input-transition-property) !default;
+$search-button-transition-duration: var(--#{$prefix}btn-input-transition-duration) !default;
+$search-button-transition-timing:   var(--#{$prefix}btn-input-transition-timing) !default;
 
 $search-button-focus-color:         $input-focus-color !default;
 $search-button-focus-bg:            $input-focus-bg !default;

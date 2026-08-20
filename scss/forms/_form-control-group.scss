@@ -40,7 +40,9 @@ $form-control-group-tokens: defaults(
     --#{$prefix}control-group-action-bg: #{$form-control-group-action-bg},
     --#{$prefix}control-group-action-hover-bg: #{$form-control-group-action-hover-bg},
     --#{$prefix}control-group-action-border-radius: #{$input-border-radius-sm},
-    --#{$prefix}control-group-action-transition: #{var(--#{$prefix}btn-input-transition), transform .15s ease-in-out},
+    --#{$prefix}control-group-action-transition-property: #{var(--#{$prefix}btn-input-action-transition-property), transform},
+    --#{$prefix}control-group-action-transition-duration: var(--#{$prefix}btn-input-transition-duration),
+    --#{$prefix}control-group-action-transition-timing: var(--#{$prefix}btn-input-transition-timing),
   ),
   $form-control-group-tokens
 );
@@ -205,7 +207,11 @@ $form-control-group-tokens: defaults(
     background-color: var(--#{$prefix}control-group-action-bg);
     border: 0;
     @include border-radius(var(--#{$prefix}control-group-action-border-radius));
-    @include transition(var(--#{$prefix}control-group-action-transition));
+    @include transition-props(
+      var(--#{$prefix}control-group-action-transition-property),
+      var(--#{$prefix}control-group-action-transition-duration),
+      var(--#{$prefix}control-group-action-transition-timing)
+    );
 
     > svg {
       width: var(--#{$prefix}control-group-icon-size);

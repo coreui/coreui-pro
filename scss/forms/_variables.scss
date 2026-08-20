@@ -52,9 +52,9 @@ $input-height-inner-half:               calc(var(--#{$prefix}btn-input-line-heig
 $input-height-inner-quarter:            calc(var(--#{$prefix}btn-input-line-height) * .25em + var(--#{$prefix}btn-input-padding-y) * .5) !default; // stylelint-disable-line function-disallowed-list
 
 
-$input-transition-property:             "border-color, box-shadow" !default;
-$input-transition-duration:             .15s !default;
-$input-transition-timing:               ease-in-out !default;
+$input-transition-property:             var(--#{$prefix}btn-input-transition-property) !default;
+$input-transition-duration:             var(--#{$prefix}btn-input-transition-duration) !default;
+$input-transition-timing:               var(--#{$prefix}btn-input-transition-timing) !default;
 
 $form-color-width:                      3rem !default;
 // scss-docs-end form-input-variables
