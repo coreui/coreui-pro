@@ -1,5 +1,28 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 @use "variables" as *;
+
+$form-text-tokens: () !default;
+
+// A null knob has to reach `defaults()` unquoted — interpolating it here would
+// emit an empty token and shadow the `var()` fallback in the declaration.
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start form-text-css-vars
+$form-text-tokens: defaults(
+  (
+    --#{$prefix}form-text-margin-top: $form-text-margin-top,
+    --#{$prefix}form-text-font-size: $form-text-font-size,
+    --#{$prefix}form-text-font-style: $form-text-font-style,
+    --#{$prefix}form-text-font-weight: $form-text-font-weight,
+    --#{$prefix}form-text-color: $form-text-color,
+  ),
+  $form-text-tokens
+);
+// scss-docs-end form-text-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer forms {
   //
@@ -7,10 +30,12 @@
   //
 
   .form-text {
-    margin-top: $form-text-margin-top;
-    font-size: $form-text-font-size;
-    font-style: $form-text-font-style;
-    font-weight: $form-text-font-weight;
-    color: $form-text-color;
+    @include tokens($form-text-tokens);
+
+    margin-top: var(--#{$prefix}form-text-margin-top);
+    font-size: var(--#{$prefix}form-text-font-size);
+    font-style: var(--#{$prefix}form-text-font-style, inherit);
+    font-weight: var(--#{$prefix}form-text-font-weight, inherit);
+    color: var(--#{$prefix}form-text-color);
   }
 }
