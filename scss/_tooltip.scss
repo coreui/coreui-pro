@@ -46,7 +46,6 @@ $tooltip-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
-  // Base class
   .tooltip {
     @include tokens($tooltip-tokens);
 

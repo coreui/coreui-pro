@@ -10,10 +10,6 @@ $include-column-box-sizing: false !default;
 }
 
 @layer layout {
-  // Row
-  //
-  // Rows contain your columns.
-
   :root {
     @each $name, $value in $grid-breakpoints {
       --#{$prefix}breakpoint-#{$name}: #{$value};

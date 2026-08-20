@@ -73,10 +73,6 @@ $table-variants: map.keys($theme-colors) !default;
 // scss-docs-end table-variant
 
 @layer content {
-  //
-  // Basic Bootstrap table
-  //
-
   .table {
     // Reset needed for nesting tables
     --#{$prefix}table-color-type: initial;
