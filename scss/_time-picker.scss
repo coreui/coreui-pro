@@ -1,4 +1,3 @@
-@use "sass:color";
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
@@ -22,7 +21,7 @@ $time-picker-roll-cell-hover-bg:              var(--#{$prefix}tertiary-bg) !defa
 $time-picker-roll-cell-selected-color:        var(--#{$prefix}white) !default;
 $time-picker-roll-cell-selected-bg:           var(--#{$prefix}primary) !default;
 $time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}white) !default;
-$time-picker-roll-cell-selected-hover-bg:     light-dark(color.scale($primary, $lightness: -20%), color.scale($primary, $saturation: -10%, $lightness: -10%)) !default; // stylelint-disable-line scss/at-function-named-arguments
+$time-picker-roll-cell-selected-hover-bg:     oklch(from var(--#{$prefix}primary) calc(l * .85) c h) !default; // stylelint-disable-line function-disallowed-list
 
 $time-picker-inline-select-font-size:       var(--#{$prefix}btn-input-sm-font-size) !default;
 $time-picker-inline-select-color:           var(--#{$prefix}btn-input-color) !default;
