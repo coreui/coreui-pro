@@ -30,9 +30,9 @@ $include-column-box-sizing: false !default;
       grid-template-rows: repeat(var(--#{$prefix}rows), 1fr);
       grid-template-columns: repeat(var(--#{$prefix}columns), 1fr);
       gap: var(--#{$prefix}gap);
-
-      @include make-cssgrid();
     }
+
+    @include make-cssgrid();
   }
 
 
