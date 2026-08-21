@@ -12,7 +12,7 @@ const base = new URL(
 ).pathname.replace(/\/$/, '')
 
 export default defineConfig({
-  // Publish URL (site + base) is config-driven: coreuiDocs() reads `seo.url` from
+  // Publish URL (site + base) is config-driven: coreuiDocs({ libraryConfig: 'src/styles/_library-config.scss' }) reads `seo.url` from
   // src/data/config.yml and sets Astro's `site` + `base` from it.
   // Vanilla JS docs render the examples as static HTML (no framework island), so there's
   // no React/Vue integration — just the engine + MDX.
@@ -39,5 +39,5 @@ export default defineConfig({
     // gets served raw and `import { compressToBase64 }` fails in dev. Force pre-bundling.
     optimizeDeps: { include: ['lz-string'] }
   },
-  integrations: [...coreuiDocs(), mdx()],
+  integrations: [...coreuiDocs({ libraryConfig: 'src/styles/_library-config.scss' }), mdx()],
 })

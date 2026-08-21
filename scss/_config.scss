@@ -34,11 +34,6 @@ $enable-rtl:                  true !default;
 // `.form-switch` and friends. Deprecated in v6, removed in v7; set to `false` to
 // leave it out of the build once your markup uses `.check` / `.radio` / `.switch`.
 $enable-deprecated-form-check: true !default;
-// Deprecated in v6, removed in v7: the `cq-*` grid it gated is gone, and `.grid`
-// is a query container of its own. Kept so a build that still configures it —
-// the shared docs engine does — keeps compiling.
-$enable-container-queries:    false !default;
-
 $enable-dark-mode:            true !default;
 $color-mode-type:             data !default; // `data` or `media-query`
 
