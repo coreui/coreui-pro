@@ -50,7 +50,7 @@ $rating-tokens: defaults(
       opacity: 50%;
     }
 
-    &:not(.disabled):not(.readonly) {
+    &:not(.disabled, .readonly) {
       .rating-item:hover {
         transform: var(--#{$prefix}rating-item-scale-transform);
       }

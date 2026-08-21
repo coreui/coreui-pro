@@ -14,7 +14,7 @@ $icon-size-xxl:   calc(var(--#{$prefix}icon-size-base) * 2) !default; // styleli
     text-align: center;
     vertical-align: -.125rem; // Fix the position of icon
     fill: currentcolor;
-    &:not(.icon-c-s):not(.icon-custom-size) {
+    &:not(.icon-c-s, .icon-custom-size) {
       @include icon-size(var(--#{$prefix}icon-size-base));
 
       &.icon-xxl {

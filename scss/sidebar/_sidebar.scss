@@ -79,7 +79,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
     }
 
     @include media-breakpoint-up($mobile-breakpoint) {
-      &:not(.hide):not(.sidebar-narrow):not(.sidebar-narrow-unfoldable):not(.sidebar-overlaid) {
+      &:not(.hide, .sidebar-narrow, .sidebar-narrow-unfoldable, .sidebar-overlaid) {
         &:not(.sidebar-end) ~ * {
           --#{$prefix}sidebar-occupy-start: #{$sidebar-width};
         }
@@ -176,7 +176,7 @@ $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
       --#{$prefix}sidebar-width: #{$value};
 
       @include media-breakpoint-up($mobile-breakpoint) {
-        &:not(.hide):not(.sidebar-narrow):not(.sidebar-narrow-unfoldable):not(.sidebar-overlaid) {
+        &:not(.hide, .sidebar-narrow, .sidebar-narrow-unfoldable, .sidebar-overlaid) {
           &:not(.sidebar-end) ~ * {
             --#{$prefix}sidebar-occupy-start: #{$value};
           }

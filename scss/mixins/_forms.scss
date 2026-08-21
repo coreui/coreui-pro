@@ -221,7 +221,7 @@ $validated-controls: if(sass($enable-deprecated-form-check): ".check, .radio, .s
       --#{$prefix}control-focus-ring: #{$focus-ring-color};
 
       @if $enable-validation-icons {
-        &:not([multiple]):not([size]),
+        &:not([multiple], [size]),
         &:not([multiple])[size="1"] {
           --#{$prefix}control-select-bg-icon: #{escape-svg($icon)};
           padding-inline-end: var(--#{$prefix}control-select-feedback-icon-padding-end);

@@ -113,7 +113,7 @@ $form-date-time-tokens: defaults(
       padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
 
-    &:not(:focus-within):not(.form-date-time-filled) {
+    &:not(:focus-within, .form-date-time-filled) {
       padding-top: var(--#{$prefix}form-floating-padding-y);
       padding-bottom: var(--#{$prefix}form-floating-padding-y);
 
