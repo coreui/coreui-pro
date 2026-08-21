@@ -34,6 +34,13 @@ Apply `.contains-inline` to query on inline size (width in horizontal writing mo
 
 Our [CSS Grid](/layout/css-grid/) uses this: every `.grid` is a query container, which is what makes `.g-col-md-*` respond to the width of the grid instead of the browser window.
 
+Several components read a query container rather than the viewport, and need one on an ancestor to switch at all:
+
+- [`.card-group`](/components/card/#card-groups) attaches its cards from `sm` up
+- [`.list-group-horizontal-*`](/components/list-group/#horizontal) turns horizontal from its breakpoint up
+- [`.hstack-*` and `.vstack-*`](/helpers/stacks/) switch direction at their breakpoint
+- [`.table-responsive*`](/content/tables/#responsive-tables) is itself a query container, so content inside it can respond to its width
+
 ## Sass
 
 ### Mixins
