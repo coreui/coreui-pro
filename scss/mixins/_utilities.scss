@@ -36,7 +36,7 @@
   $names: ();
 
   @each $key, $utility in $utilities {
-    @if meta.type-of($utility) == "map" and map.get($utility, at-property) != false {
+    @if meta.type-of($utility) == "map" and map.get($utility, enabled) != false and map.get($utility, at-property) != false {
       $properties: map.get($utility, property);
 
       @if meta.type-of($properties) == "map" {
@@ -93,6 +93,33 @@
 // Utility generator
 // Used to generate utilities & print utilities
 @mixin generate-utility($utility, $infix: "") {
+  // Every key `$utilities` understands. A key outside this list is read by
+  // nothing, so it fails silently — which is how `vars: true` sat on four
+  // border utilities across two majors doing nothing at all.
+  $utility-keys: at-property, child-selector, class, enabled, print, property, responsive, selector, state, values;
+
+  // Named by its `class` where it has one — a map interpolates as "isn't a
+  // valid CSS value", which says nothing about which utility is at fault.
+  @if not map.has-key($utility, property) {
+    @error "Utility `#{map.get($utility, class)}` is missing the required `property` key; keys present: #{map.keys($utility)}.";
+  }
+
+  @if not map.has-key($utility, values) {
+    @error "Utility `#{map.get($utility, class)}` is missing the required `values` key; keys present: #{map.keys($utility)}.";
+  }
+
+  @each $key in map.keys($utility) {
+    @if not list.index($utility-keys, $key) {
+      @warn "Unknown utility key `#{$key}`. Valid keys are: #{$utility-keys}.";
+    }
+  }
+
+  @each $flag in (at-property, enabled, print, responsive) {
+    @if map.has-key($utility, $flag) and meta.type-of(map.get($utility, $flag)) != "bool" {
+      @error "Utility key `#{$flag}` takes a boolean, got `#{map.get($utility, $flag)}`.";
+    }
+  }
+
   $values: map.get($utility, values);
 
   // If the values are a list or string, convert it into a map
