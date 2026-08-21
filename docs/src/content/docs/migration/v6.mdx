@@ -1288,6 +1288,21 @@ Multi Select's option indicators moved with it — they render as a decorative
   `<html>` through the language rather than the attribute.
 - `pre` reserves scrollbar space (`scrollbar-gutter: stable`), so a horizontal
   scrollbar no longer covers the last line of a code block.
+- **Reboot's type and spacing are CSS variables on `:root`.** Heading margin,
+  family, style, weight and line height, paragraph margin, `hr`, `legend`, `dt`,
+  `sub`/`sup`, `mark` padding, the code font size and `--cui-list-padding-x` are
+  declared rather than compiled in, so a subtree can be retyped without a class.
+  `<kbd>` carries its own set on the element, `--cui-kbd-border-radius`
+  included.
+- **`.h1`–`.h6`, `.small`, `.mark` and `.initialism` are defined in Reboot**,
+  next to the elements they mirror, instead of `@extend`-ing them from
+  `_type.scss`. Only `.initialism` changes cascade layer (`content` → `reboot`);
+  the others were already emitted there, because `@extend` hoists a class to
+  wherever the extended selector is defined. `_type.scss` keeps `.lead` and
+  `.display-*` and no longer depends on the Reboot module.
+- **Hardcoded spacing in Reboot now reads the `--cui-spacer-*` scale**
+  (`address`, `ol`/`ul`/`dl`, `dd`, `blockquote`, `pre`, `figure`). Values are
+  unchanged.
 
 #### Tables
 

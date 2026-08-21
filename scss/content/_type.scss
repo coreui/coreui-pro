@@ -1,11 +1,8 @@
-@use "../mixins/lists" as *;
-@use "reboot" as *;
 @use "../config" as *;
 
 // scss-docs-start type-variables
-$lead-font-size:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
-$lead-font-weight:              300 !default;
-$initialism-font-size:        var(--#{$prefix}small-font-size) !default;
+$lead-font-size:              calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$lead-font-weight:            300 !default;
 // scss-docs-end type-variables
 
 // scss-docs-start display-headings
@@ -25,30 +22,6 @@ $display-line-height: $headings-line-height !default;
 // scss-docs-end display-headings
 
 @layer content {
-  .h1 {
-    @extend h1;
-  }
-
-  .h2 {
-    @extend h2;
-  }
-
-  .h3 {
-    @extend h3;
-  }
-
-  .h4 {
-    @extend h4;
-  }
-
-  .h5 {
-    @extend h5;
-  }
-
-  .h6 {
-    @extend h6;
-  }
-
   .lead {
     font-size: $lead-font-size;
     font-weight: $lead-font-weight;
@@ -63,19 +36,5 @@ $display-line-height: $headings-line-height !default;
       font-weight: $display-font-weight;
       line-height: $display-line-height;
     }
-  }
-
-  .small {
-    @extend small;
-  }
-
-  .mark {
-    @extend mark;
-  }
-
-  // Builds on `abbr`
-  .initialism {
-    font-size: $initialism-font-size;
-    text-transform: uppercase;
   }
 }
