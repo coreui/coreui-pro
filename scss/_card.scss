@@ -9,19 +9,19 @@
 $card-spacer-y:                     var(--#{$prefix}spacer-3) !default;
 $card-spacer-x:                     var(--#{$prefix}spacer-3) !default;
 $card-title-spacer-y:               var(--#{$prefix}spacer-2) !default;
-$card-title-color:                  null !default;
-$card-subtitle-color:               null !default;
+$card-title-color:                  inherit !default;
+$card-subtitle-color:               inherit !default;
 $card-border-width:                 var(--#{$prefix}border-width) !default;
 $card-border-color:                 var(--#{$prefix}border-color-translucent) !default;
 $card-border-radius:                var(--#{$prefix}border-radius) !default;
-$card-box-shadow:                   null !default;
+$card-box-shadow:                   none !default;
 $card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default; // stylelint-disable-line function-disallowed-list
 $card-cap-padding-x:                $card-spacer-x !default;
 $card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}body-color) 3%, transparent) !default;
-$card-cap-color:                    null !default;
-$card-height:                       null !default;
-$card-color:                        null !default;
+$card-cap-color:                    inherit !default;
+$card-height:                       auto !default;
+$card-color:                        inherit !default;
 $card-bg:                           var(--#{$prefix}body-bg) !default;
 $card-img-overlay-padding:          var(--#{$prefix}spacer-3) !default;
 $card-group-margin:                 $grid-gutter-width * .5 !default;
@@ -152,7 +152,7 @@ $card-tokens: defaults(
 
   .card-footer {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
-    color: var(--#{$prefix}card-cap-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
     background-color: var(--#{$prefix}card-cap-bg);
     border-top: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
 
@@ -167,20 +167,14 @@ $card-tokens: defaults(
   //
 
   .card-header-tabs {
-    margin-right: calc(-.5 * var(--#{$prefix}card-cap-padding-x)); // stylelint-disable-line function-disallowed-list
+    margin-inline: calc(-.5 * var(--#{$prefix}card-cap-padding-x)); // stylelint-disable-line function-disallowed-list
     margin-bottom: calc(-1 * var(--#{$prefix}card-cap-padding-y)); // stylelint-disable-line function-disallowed-list
-    margin-left: calc(-.5 * var(--#{$prefix}card-cap-padding-x)); // stylelint-disable-line function-disallowed-list
     border-bottom: 0;
 
     .nav-link.active {
       background-color: var(--#{$prefix}card-bg);
       border-bottom-color: var(--#{$prefix}card-bg);
     }
-  }
-
-  .card-header-pills {
-    margin-right: calc(-.5 * var(--#{$prefix}card-cap-padding-x)); // stylelint-disable-line function-disallowed-list
-    margin-left: calc(-.5 * var(--#{$prefix}card-cap-padding-x)); // stylelint-disable-line function-disallowed-list
   }
 
   // Card image
@@ -262,7 +256,7 @@ $card-tokens: defaults(
               border-top-left-radius: 0;
             }
             > .card-img-bottom,
-            > card-footer {
+            > .card-footer {
               // stylelint-disable-next-line property-disallowed-list
               border-bottom-left-radius: 0;
             }

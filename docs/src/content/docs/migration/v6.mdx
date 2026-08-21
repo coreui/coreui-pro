@@ -1277,6 +1277,32 @@ Multi Select's option indicators moved with it — they render as a decorative
   - `isShown()` returns `false` as soon as `hide()` is called, rather than when
     the fade-out ends.
 
+#### Card
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.card-header-pills` is gone.** It only pulled the pill row out to the
+  header's padding edge, which is wrong for pills — they carry their own
+  background, so flush against the header's inner edge they touch the border.
+  Drop the class and keep `.nav.nav-pills`.
+- **The footer follows the theme colour like the header does.** A themed card
+  (`.card.theme-dark`, say) used to paint the footer's background from the theme
+  while leaving its text at the body colour, so the label sank into the fill.
+  The footer now reads `--cui-theme-contrast` with `--cui-card-cap-color` as the
+  fallback, the same expression the header already used.
+- **Every card token now carries a real value.** `--cui-card-title-color`,
+  `--cui-card-subtitle-color`, `--cui-card-cap-color`, `--cui-card-color`,
+  `--cui-card-height` and `--cui-card-box-shadow` shipped as empty declarations
+  (`--cui-card-title-color: ;`), because their Sass variables were `null` and
+  interpolating `null` yields an empty string rather than dropping the entry.
+  An empty custom property makes every `var()` that reads it invalid at
+  computed-value time, so the rendered result happened to be right, but the
+  token read as blank in devtools and could not be told apart from one you had
+  cleared yourself. They now ship `inherit`, `auto` and `none`, which compute to
+  the same thing and make the customization surface inspectable.
+- **The last card in a `.card-group` gets its bottom-left corner squared.** The
+  rule targeting it was written `> card-footer`, without the leading dot, so it
+  matched an element type that does not exist and never applied.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
