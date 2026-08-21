@@ -42,7 +42,17 @@ If you are using the `<picture>` element to specify multiple `<source />` elemen
 </picture>
 ```
 
-## Customization
+## Customizing
+
+### CSS variables
+
+`.img-thumbnail` declares its frame on the element, so a single thumbnail can be reframed without a modifier class:
+
+<ScssDocs file="scss/content/_images.scss" capture="thumbnail-css-vars" />
+
+```html
+<img src="..." class="img-thumbnail" style="--cui-thumbnail-padding: .5rem; --cui-thumbnail-border-color: var(--cui-primary);" alt="...">
+```
 
 ### SASS variables
 

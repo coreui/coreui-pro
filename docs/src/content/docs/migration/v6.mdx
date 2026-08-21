@@ -1269,6 +1269,14 @@ Multi Select's option indicators moved with it — they render as a decorative
   direction never switches. Plain `.hstack` and `.vstack` are unchanged, including
   `.hstack`'s vertical centring and its shrink-to-content width.
 
+#### Images and figures
+
+- **`--cui-thumbnail-*` and `--cui-figure-caption-*` are declared, not just
+  read.** They existed only as the fallback arm of a `var()` call, so nothing
+  reported them and an override had to guess the name. `.img-thumbnail` and
+  `.figure-caption` declare their full set on the element, padding, border width
+  and caption font size included.
+
 #### Reboot
 
 - **Links change color on hover.** `--cui-link-hover-color` was declared and

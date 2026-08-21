@@ -1,6 +1,8 @@
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/box-shadow" as *;
 @use "../mixins/image" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start thumbnail-variables
@@ -13,9 +15,41 @@ $thumbnail-box-shadow:              var(--#{$prefix}box-shadow-sm) !default;
 // scss-docs-end thumbnail-variables
 
 // scss-docs-start figure-variables
+$figure-img-margin-bottom:          var(--#{$prefix}spacer-2) !default;
 $figure-caption-font-size:          var(--#{$prefix}small-font-size) !default;
 $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
 // scss-docs-end figure-variables
+
+$thumbnail-tokens: () !default;
+$figure-caption-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start thumbnail-css-vars
+$thumbnail-tokens: defaults(
+  (
+    --#{$prefix}thumbnail-padding: #{$thumbnail-padding},
+    --#{$prefix}thumbnail-bg: #{$thumbnail-bg},
+    --#{$prefix}thumbnail-border-width: #{$thumbnail-border-width},
+    --#{$prefix}thumbnail-border-color: #{$thumbnail-border-color},
+    --#{$prefix}thumbnail-border-radius: #{$thumbnail-border-radius},
+    --#{$prefix}thumbnail-box-shadow: #{$thumbnail-box-shadow},
+  ),
+  $thumbnail-tokens
+);
+// scss-docs-end thumbnail-css-vars
+
+// scss-docs-start figure-css-vars
+$figure-caption-tokens: defaults(
+  (
+    --#{$prefix}figure-caption-font-size: #{$figure-caption-font-size},
+    --#{$prefix}figure-caption-color: #{$figure-caption-color},
+  ),
+  $figure-caption-tokens
+);
+// scss-docs-end figure-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer content {
   // Responsive images (ensure images don't scale beyond their parents)
@@ -32,11 +66,13 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
 
   // Image thumbnails
   .img-thumbnail {
-    padding: $thumbnail-padding;
-    background-color: var(--#{$prefix}thumbnail-bg, $thumbnail-bg);
-    border: $thumbnail-border-width solid var(--#{$prefix}thumbnail-border-color, $thumbnail-border-color);
-    @include border-radius($thumbnail-border-radius);
-    @include box-shadow($thumbnail-box-shadow);
+    @include tokens($thumbnail-tokens);
+
+    padding: var(--#{$prefix}thumbnail-padding);
+    background-color: var(--#{$prefix}thumbnail-bg);
+    border: var(--#{$prefix}thumbnail-border-width) solid var(--#{$prefix}thumbnail-border-color);
+    @include border-radius(var(--#{$prefix}thumbnail-border-radius));
+    @include box-shadow(var(--#{$prefix}thumbnail-box-shadow));
 
     // Keep them at most 100% wide
     @include img-fluid();
@@ -48,12 +84,14 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
   }
 
   .figure-img {
-    margin-bottom: var(--#{$prefix}spacer-2);
+    margin-bottom: $figure-img-margin-bottom;
     line-height: 1;
   }
 
   .figure-caption {
-    font-size: $figure-caption-font-size;
-    color: var(--#{$prefix}figure-caption-color, $figure-caption-color);
+    @include tokens($figure-caption-tokens);
+
+    font-size: var(--#{$prefix}figure-caption-font-size);
+    color: var(--#{$prefix}figure-caption-color);
   }
 }
