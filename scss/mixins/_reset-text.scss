@@ -1,10 +1,10 @@
 @use "../config" as *;
 
 @mixin reset-text {
-  font-family: $font-family-base;
+  font-family: var(--#{$prefix}body-font-family);
   // We deliberately do NOT reset font-size or overflow-wrap / word-wrap.
   font-style: normal;
-  font-weight: $font-weight-normal;
+  font-weight: var(--#{$prefix}body-font-weight);
   line-height: var(--#{$prefix}body-line-height);
   text-align: start;
   text-decoration: none;
