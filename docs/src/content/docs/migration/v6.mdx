@@ -1961,6 +1961,25 @@ tintable and lets dark mode deepen every shadow at once.
   written in `$theme-colors-contrast`. `.text-bg-*` reads the token instead of
   calling `color-contrast()`.
 
+#### `--cui-mobile-breakpoint` removed
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The token carried the **name** of the sidebar's breakpoint (`lg`), not a length,
+so it could not be used in a media query or in `calc()`, and nothing in the
+library read it. Read `--cui-breakpoint-lg` for the value.
+
+It also sat one letter away from a mechanism that does work and looks similar.
+The sidebar tells its plugin about the mobile layout with `--cui-is-mobile`,
+which is declared **inside** the media query, so it is `"true"` below the
+breakpoint and empty above — the plugin only tests whether it is set. The
+removed token was declared on `:root` unconditionally, so the same
+`Boolean(getPropertyValue(…))` test against it answered "mobile" at every
+width.
+
+The Sass variable `$mobile-breakpoint` is unchanged; the sidebar's own media
+queries are built on it.
+
 #### Colour scales, and `_variables-dark.scss` removed
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
