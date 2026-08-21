@@ -8,7 +8,7 @@
 // scss-docs-start card-variables
 $card-spacer-y:                     var(--#{$prefix}spacer-3) !default;
 $card-spacer-x:                     var(--#{$prefix}spacer-3) !default;
-$card-title-spacer-y:               var(--#{$prefix}spacer-2) !default;
+$card-body-gap:                     calc(#{$card-spacer-y} * .5) !default; // stylelint-disable-line function-disallowed-list
 $card-title-color:                  inherit !default;
 $card-subtitle-color:               inherit !default;
 $card-border-width:                 var(--#{$prefix}border-width) !default;
@@ -27,6 +27,12 @@ $card-img-overlay-padding:          var(--#{$prefix}spacer-3) !default;
 $card-group-margin:                 $grid-gutter-width * .5 !default;
 // scss-docs-end card-variables
 
+// scss-docs-start card-translucent-variables
+$card-translucent-bg-opacity:       80% !default;
+$card-translucent-cap-bg-opacity:   60% !default;
+$card-translucent-backdrop-filter:  blur(5px) saturate(180%) !default;
+// scss-docs-end card-translucent-variables
+
 $card-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -36,17 +42,17 @@ $card-tokens: defaults(
   (
     --#{$prefix}card-spacer-y: #{$card-spacer-y},
     --#{$prefix}card-spacer-x: #{$card-spacer-x},
-    --#{$prefix}card-title-spacer-y: #{$card-title-spacer-y},
+    --#{$prefix}card-body-gap: #{$card-body-gap},
     --#{$prefix}card-title-color: #{$card-title-color},
     --#{$prefix}card-subtitle-color: #{$card-subtitle-color},
     --#{$prefix}card-border-width: #{$card-border-width},
-    --#{$prefix}card-border-color: var(--#{$prefix}theme-base, #{$card-border-color}),
+    --#{$prefix}card-border-color: #{$card-border-color},
     --#{$prefix}card-border-radius: #{$card-border-radius},
     --#{$prefix}card-box-shadow: #{$card-box-shadow},
     --#{$prefix}card-inner-border-radius: #{$card-inner-border-radius},
     --#{$prefix}card-cap-padding-y: #{$card-cap-padding-y},
     --#{$prefix}card-cap-padding-x: #{$card-cap-padding-x},
-    --#{$prefix}card-cap-bg: var(--#{$prefix}theme-base, #{$card-cap-bg}),
+    --#{$prefix}card-cap-bg: #{$card-cap-bg},
     --#{$prefix}card-cap-color: #{$card-cap-color},
     --#{$prefix}card-height: #{$card-height},
     --#{$prefix}card-color: #{$card-color},
@@ -72,13 +78,12 @@ $card-tokens: defaults(
     word-wrap: break-word;
     background-color: var(--#{$prefix}card-bg);
     background-clip: border-box;
-    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    border: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
     @include border-radius(var(--#{$prefix}card-border-radius));
     @include box-shadow(var(--#{$prefix}card-box-shadow));
 
     > hr {
-      margin-right: 0;
-      margin-left: 0;
+      margin-inline: 0;
     }
 
     > .list-group {
@@ -105,45 +110,44 @@ $card-tokens: defaults(
   }
 
   .card-body {
+    display: flex;
     // Enable `flex-grow: 1` for decks and groups so that card blocks take up
     // as much space as possible, ensuring footers are aligned to the bottom.
     flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--#{$prefix}card-body-gap);
+    align-items: flex-start;
     padding: var(--#{$prefix}card-spacer-y) var(--#{$prefix}card-spacer-x);
     color: var(--#{$prefix}card-color);
+
+    > * {
+      margin-block: 0;
+    }
+  }
+
+  // The body aligns its children to the start so a button keeps its own width;
+  // text has to opt back into the full column.
+  .card-title,
+  .card-subtitle,
+  .card-text {
+    align-self: stretch;
   }
 
   .card-title {
-    margin-bottom: var(--#{$prefix}card-title-spacer-y);
     color: var(--#{$prefix}card-title-color);
   }
 
   .card-subtitle {
-    margin-top: calc(-.5 * var(--#{$prefix}card-title-spacer-y)); // stylelint-disable-line function-disallowed-list
-    margin-bottom: 0;
+    margin-block-start: calc(-.5 * var(--#{$prefix}card-body-gap)); // stylelint-disable-line function-disallowed-list
     color: var(--#{$prefix}card-subtitle-color);
-  }
-
-  .card-text:last-child {
-    margin-bottom: 0;
-  }
-
-  .card-link {
-    &:hover {
-      // stylelint-disable-next-line scss/at-function-named-arguments
-      text-decoration: if(sass($link-hover-decoration == underline): none);
-    }
-
-    + .card-link {
-      margin-inline-start: var(--#{$prefix}card-spacer-x);
-    }
   }
 
   .card-header {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
     margin-bottom: 0; // Removes the default margin-bottom of <hN>
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
-    background-color: var(--#{$prefix}card-cap-bg);
-    border-bottom: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}card-cap-bg));
+    border-bottom: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
 
     &:first-child {
       @include border-radius(var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius) 0 0);
@@ -153,11 +157,37 @@ $card-tokens: defaults(
   .card-footer {
     padding: var(--#{$prefix}card-cap-padding-y) var(--#{$prefix}card-cap-padding-x);
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}card-cap-color));
-    background-color: var(--#{$prefix}card-cap-bg);
-    border-top: var(--#{$prefix}card-border-width) solid var(--#{$prefix}card-border-color);
+    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}card-cap-bg));
+    border-top: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
 
     &:last-child {
       @include border-radius(0 0 var(--#{$prefix}card-inner-border-radius) var(--#{$prefix}card-inner-border-radius));
+    }
+  }
+
+
+  //
+  // Variants
+  //
+
+  .card-subtle {
+    border-color: var(--#{$prefix}theme-border, var(--#{$prefix}card-border-color));
+
+    .card-header,
+    .card-footer {
+      color: var(--#{$prefix}theme-fg-emphasis, currentcolor);
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}card-cap-bg));
+      border-color: var(--#{$prefix}theme-border, var(--#{$prefix}card-border-color));
+    }
+  }
+
+  .card-translucent {
+    background-color: color-mix(in oklch, var(--#{$prefix}card-bg) #{$card-translucent-bg-opacity}, transparent);
+    backdrop-filter: $card-translucent-backdrop-filter;
+
+    .card-header,
+    .card-footer {
+      background-color: color-mix(in oklch, var(--#{$prefix}card-cap-bg) #{$card-translucent-cap-bg-opacity}, transparent);
     }
   }
 
@@ -202,6 +232,45 @@ $card-tokens: defaults(
   .card-img,
   .card-img-bottom {
     @include border-bottom-radius(var(--#{$prefix}card-inner-border-radius));
+  }
+
+  .card-img-start {
+    @include border-start-radius(var(--#{$prefix}card-inner-border-radius));
+  }
+
+  .card-img-end {
+    @include border-end-radius(var(--#{$prefix}card-inner-border-radius));
+  }
+
+
+  //
+  // Horizontal cards
+  //
+
+  .card-row {
+    flex-direction: row;
+
+    // The header and footer divide the card along the block axis; along the
+    // inline one every section is divided by the same single rule.
+    > :not(:first-child) {
+      border-inline-start: var(--#{$prefix}card-border-width) solid var(--#{$prefix}theme-base, var(--#{$prefix}card-border-color));
+    }
+
+    // A cap divides the card along the block axis, which is the wrong axis here,
+    // so it hands the job over to the rule above and rounds its inline corners.
+    > .card-header,
+    > .card-footer {
+      border-block: 0;
+      @include border-radius(0);
+
+      &:first-child {
+        @include border-start-radius(var(--#{$prefix}card-inner-border-radius));
+      }
+
+      &:last-child {
+        @include border-end-radius(var(--#{$prefix}card-inner-border-radius));
+      }
+    }
   }
 
 

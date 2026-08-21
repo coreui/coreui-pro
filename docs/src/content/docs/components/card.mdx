@@ -43,17 +43,23 @@ The main block of a card is the `.card-body`. Use it whenever you need a padded 
 
 ### Titles, text, and links
 
-Card titles are managed by adding `.card-title` to a `<h*>` tag. Identically, links are attached and collected next to each other by adding `.card-link` to an `<a>` tag.
+The card body is a flex column and spaces its children with `--cui-card-body-gap`, so titles, text and links need no margins of their own.
 
-Subtitles are managed by adding a `.card-subtitle` to a `<h*>` tag. If the `.card-title` also, the `.card-subtitle` items are stored in a `.card-body` item, the card title, and subtitle are arranged rightly.
+- For a title, use `.card-title` on a `<h*>` tag.
+- For a subtitle, use `.card-subtitle`. It pulls itself up by half the body gap to sit closer to the title.
+- For text, use `.card-text`. It clears the element's block margins.
+
+Anything else in the body is a flex item too, so a link or a button takes its natural width instead of filling the card. Put several links in a flex wrapper to keep them on one line.
 
 <Example code={`<div class="card" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">Card title</h5>
-      <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+      <h6 class="card-subtitle text-body-secondary">Card subtitle</h6>
       <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="card-link">Card link</a>
-      <a href="#" class="card-link">Another link</a>
+      <div class="hstack gap-3">
+        <a href="#">Card link</a>
+        <a href="#">Another link</a>
+      </div>
     </div>
   </div>`} />
 
@@ -118,8 +124,10 @@ Combine and match many content types to build the card you need, or throw everyt
       <li class="list-group-item">A third item</li>
     </ul>
     <div class="card-body">
-      <a href="#" class="card-link">Card link</a>
-      <a href="#" class="card-link">Another link</a>
+      <div class="hstack gap-3">
+        <a href="#">Card link</a>
+        <a href="#">Another link</a>
+      </div>
     </div>
   </div>`} />
 
@@ -240,6 +248,8 @@ Use custom CSS in your stylesheets or as inline styles to set a width.
 
 You can instantly change the text arrangement of any card—in its whole or specific parts—with [text align classes](/utilities/text/#text-alignment).
 
+`text-align` reaches the text but not the body's own flex items, so a button or a link stays at the start of the card. Move it with a [margin utility](/utilities/spacing/): `.mx-auto` to centre it, `.ms-auto` to push it to the end.
+
 <Example code={`<div class="card mb-3" style="width: 18rem;">
     <div class="card-body">
       <h5 class="card-title">Special title treatment</h5>
@@ -252,7 +262,7 @@ You can instantly change the text arrangement of any card—in its whole or spec
     <div class="card-body">
       <h5 class="card-title">Special title treatment</h5>
       <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      <a href="#" class="btn btn-primary mx-auto">Go somewhere</a>
     </div>
   </div>
 
@@ -260,7 +270,7 @@ You can instantly change the text arrangement of any card—in its whole or spec
     <div class="card-body">
       <h5 class="card-title">Special title treatment</h5>
       <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
+      <a href="#" class="btn btn-primary ms-auto">Go somewhere</a>
     </div>
   </div>`} />
 
@@ -356,22 +366,27 @@ Note that content should not be larger than the height of the image. If content 
 
 ## Horizontal
 
-Using a combination of grid and utility classes, cards can be made horizontal in a mobile-friendly and responsive way. In the example below, we remove the grid gutters with `.g-0` and use `.col-md-*` classes to make the card horizontal at the `md` breakpoint. Further adjustments may be needed depending on your card content.
+Add `.card-row` to lay a card out along the inline axis. The sections sit side by side with a single divider between each pair, so no wrapper markup is needed. For an image cap, use `.card-img-start` or `.card-img-end` to round the leading or trailing edge.
 
-<Example code={`<div class="card mb-3" style="max-width: 540px;">
-    <div class="row g-0">
-      <div class="col-md-4">
-        <svg class="docs-placeholder-img img-fluid rounded-start" width="100%" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image</text></svg>
-      </div>
-      <div class="col-md-8">
-        <div class="card-body">
-          <h5 class="card-title">Card title</h5>
-          <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-        </div>
-      </div>
+<Example code={`<div class="card card-row mb-3" style="max-width: 540px;">
+    <svg class="docs-placeholder-img card-img-start" width="40%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image</text></svg>
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
     </div>
+  </div>
+
+  <div class="card card-row" style="max-width: 540px;">
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+    </div>
+    <svg class="docs-placeholder-img card-img-end" width="40%" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Image" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Image</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image</text></svg>
   </div>`} />
+
+`.card-row` also moves the divider a header or footer draws onto the inline axis, so those work in a row too. It applies at every width; toggle the class yourself if the layout has to change at a breakpoint.
 
 ## Card styles
 
@@ -672,13 +687,47 @@ Just like with card groups, card footers will automatically line up.
 
 ## Theming
 
-A [theme class](/customize/components/#theme-variants) paints the card's frame and caps with the theme color, with contrast text in the header:
+A [theme class](/customize/components/#theme-variants) paints the card's frame and caps with the theme color, with contrast text in the header and footer:
 
-<Example code={`<div class="card theme-primary" style="max-width: 18rem;">
+<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card theme-${c.name}" style="width: 15rem;">
     <div class="card-header">Header</div>
     <div class="card-body">
       <p class="card-text">Some quick example text to build on the card title.</p>
     </div>
+    <div class="card-footer">Footer</div>
+  </div>`)} />
+
+Put the theme class on a single section instead and only that section follows it:
+
+<Example code={`<div class="card" style="max-width: 18rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer theme-danger">Something went wrong</div>
+  </div>`} />
+
+Add `.card-subtle` to swap the solid fill for the theme's subtle background and border, with emphasis text in the caps.
+
+<Example class="d-flex flex-wrap gap-3" code={getData('theme-colors').map((c) => `<div class="card card-subtle theme-${c.name}" style="width: 15rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer">Footer</div>
+  </div>`)} />
+
+## Translucent
+
+Add `.card-translucent` to let the background through the card and blur it. The caps thin out with it, so the whole card reads as one surface.
+
+<Example class="bg-dark p-4" code={`<div class="card card-translucent" style="width: 18rem;">
+    <div class="card-header">Header</div>
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">Some quick example text to build on the card title.</p>
+    </div>
+    <div class="card-footer">Footer</div>
   </div>`} />
 
 ## Customizing
@@ -692,3 +741,7 @@ Cards use local CSS variables on `.card` for enhanced real-time customization. V
 ### SASS variables
 
 <ScssDocs file="scss/_card.scss" capture="card-variables" />
+
+The `.card-translucent` mix amounts and backdrop filter are build-time only — they are not tokens, so a card does not carry three custom properties it will never read.
+
+<ScssDocs file="scss/_card.scss" capture="card-translucent-variables" />
