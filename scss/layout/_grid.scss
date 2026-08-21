@@ -1,13 +1,8 @@
-@use "../mixins/deprecate" as *;
 @use "../mixins/grid" as *;
 @use "breakpoints" as *;
 @use "../config" as *;
 
 $include-column-box-sizing: false !default;
-
-@if $enable-container-queries {
-  @include deprecate("$enable-container-queries", "v6.0.0", "v7.0.0");
-}
 
 @layer layout {
   :root {

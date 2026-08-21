@@ -2410,11 +2410,9 @@ with its own `$cq-grid-breakpoints` map that duplicated `$grid-breakpoints`
 value for value. It never shipped in the default build, and maintaining two
 grids to express one idea is what the CSS Grid above now does properly.
 
-The map, the classes and the `make-c-grid-columns()` mixin are removed.
-`$enable-container-queries` itself is still accepted and now does nothing —
-it stays until v7 because the shared docs engine passes it in its `with()`
-block for every edition, and an unknown variable there is a hard Sass error.
-If you had opted in: `.cq-row`/`.cq-col-*` map onto the CSS Grid
+The flag, the map, the classes and the `make-c-grid-columns()` mixin are all
+removed. If you configured `$enable-container-queries`, drop it: `@use ... with
+()` errors on a variable the module no longer declares. If you had opted in: `.cq-row`/`.cq-col-*` map onto the CSS Grid
 (`.grid` + `.g-col-*`), which is container-based by default, or onto the flexbox
 grid (`.row`/`.col-*`) if you want viewport breakpoints. To keep the container
 behaviour on markup of your own, mark the element with

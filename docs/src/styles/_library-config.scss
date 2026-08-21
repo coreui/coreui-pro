@@ -1,0 +1,8 @@
+// Sass configuration for the library the docs compile, passed to the engine as
+// `libraryConfig`. The engine's default also sets `$enable-container-queries`,
+// which v6 no longer declares, and `$enable-cssgrid`, which v6 already defaults
+// to `true`.
+
+@forward "@coreui-docs-source/scss/variables" with (
+  $enable-deprecation-messages: false
+);
