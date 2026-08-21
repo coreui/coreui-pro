@@ -2376,6 +2376,30 @@ for absolutely and fixed-positioned descendants: `position: fixed` inside a grid
 is positioned against the grid, not the viewport. Our own floating panels render
 through a portal and are unaffected; your own fixed markup has to live outside.
 
+#### The CSS Grid declares its variables, and nested grids no longer inherit
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`.grid` read `--cui-rows`, `--cui-columns` and `--cui-gap` through a `var()`
+fallback and declared none of them. Two consequences: the variables did not
+appear in dev tools, and — because a custom property that is never declared
+simply inherits — a nested `.grid` picked up the column count of the grid
+around it.
+
+All three are declared on `.grid` now, so every grid starts from twelve
+columns, one row and the standard gap regardless of its surroundings. A
+component built on `.grid` keeps its own layout wherever it is dropped.
+
+If you relied on a nested grid inheriting, set the variable on that grid too:
+
+```html
+<div class="grid" style="--cui-columns: 3;">
+  <div>
+    <div class="grid" style="--cui-columns: 3;">...</div>
+  </div>
+</div>
+```
+
 #### The `cq-*` grid is gone
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2386,8 +2410,11 @@ with its own `$cq-grid-breakpoints` map that duplicated `$grid-breakpoints`
 value for value. It never shipped in the default build, and maintaining two
 grids to express one idea is what the CSS Grid above now does properly.
 
-The flag, the map, the classes and the `make-c-grid-columns()` mixin are all
-removed. If you had opted in: `.cq-row`/`.cq-col-*` map onto the CSS Grid
+The map, the classes and the `make-c-grid-columns()` mixin are removed.
+`$enable-container-queries` itself is still accepted and now does nothing —
+it stays until v7 because the shared docs engine passes it in its `with()`
+block for every edition, and an unknown variable there is a hard Sass error.
+If you had opted in: `.cq-row`/`.cq-col-*` map onto the CSS Grid
 (`.grid` + `.g-col-*`), which is container-based by default, or onto the flexbox
 grid (`.row`/`.col-*`) if you want viewport breakpoints. To keep the container
 behaviour on markup of your own, mark the element with

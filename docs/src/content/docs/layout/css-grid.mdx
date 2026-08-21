@@ -41,7 +41,7 @@ Compared to the default grid system:
 
 - Inline and custom styles should be viewed as replacements for modifier classes (e.g., `style="--cui-columns: 3;"` vs `class="row-cols-3"`).
 
-- Nesting works similarly, but may require you to reset your column counts on each instance of a nested `.grid`. See the [nesting section](#nesting) for details.
+- Nesting works similarly, except every `.grid` starts from the defaults rather than picking up the grid around it. See the [nesting section](#nesting) for details.
 
 ## Examples
 
@@ -132,29 +132,29 @@ This behavior can be mixed with grid column classes.
 
 ## Nesting
 
-Similar to our default grid system, our CSS Grid allows for easy nesting of `.grid`s. However, unlike the default, this grid inherits changes in the rows, columns, and gaps. Consider the example below:
+Similar to our default grid system, our CSS Grid allows for easy nesting of `.grid`s. Every `.grid` declares its own rows, columns and gap, so a nested one starts from the defaults no matter what the grid around it is set to. Consider the example below:
 
-- We override the default number of columns with a local CSS variable: `--cui-columns: 3`.
-- In the first auto-column, the column count is inherited and each column is one-third of the available width.
-- In the second auto-column, we've reset the column count on the nested `.grid` to 12 (our default).
+- We set three columns on the outer grid with `--cui-columns: 3`.
+- The nested grid in the first auto-column takes the default twelve columns — the outer value does not reach it.
+- The nested grid in the second auto-column is set to three columns of its own, matching its parent.
 - The third auto-column has no nested content.
 
-In practice this allows for more complex and custom layouts when compared to our default grid system.
+That independence is the point: a component built on `.grid` keeps its own layout wherever you drop it, instead of silently taking the column count of whatever contains it.
 
 <Example class="docs-example-cssgrid" code={`<div class="grid text-center overflow-x-auto" style="--cui-columns: 3;">
     <div>
       First auto-column
       <div class="grid">
-        <div>Auto-column</div>
-        <div>Auto-column</div>
+        <div class="g-col-6">6 of 12</div>
+        <div class="g-col-4">4 of 12</div>
+        <div class="g-col-2">2 of 12</div>
       </div>
     </div>
     <div>
       Second auto-column
-      <div class="grid" style="--cui-columns: 12;">
-        <div class="g-col-6">6 of 12</div>
-        <div class="g-col-4">4 of 12</div>
-        <div class="g-col-2">2 of 12</div>
+      <div class="grid" style="--cui-columns: 3;">
+        <div>Auto-column</div>
+        <div>Auto-column</div>
       </div>
     </div>
     <div>Third auto-column</div>
@@ -164,13 +164,13 @@ In practice this allows for more complex and custom layouts when compared to our
 
 Customize the number of columns, the number of rows, and the width of the gaps with local CSS variables.
 
-| Variable | Fallback value | Description |
+| Variable | Default | Description |
 | --- | --- | --- |
 | `--cui-rows` | `1` | The number of rows in your grid template |
 | `--cui-columns` | `12` | The number of columns in your grid template |
 | `--cui-gap` | `1.5rem` | The size of the gap between columns (vertical and horizontal) |
 
-These CSS variables have no default value; instead, they apply fallback values that are used _until_ a local instance is provided. For example, we use `var(--cui-rows, 1)` for our CSS Grid rows, which ignores `--cui-rows` because that hasn't been set anywhere yet. Once it is, the `.grid` instance will use that value instead of the fallback value of `1`.
+Every `.grid` declares all three, so they show up in your browser's dev tools and each grid is self-contained. Set them on the `.grid` you want to change — inline, or in a stylesheet — and only that grid changes.
 
 ### No grid classes
 

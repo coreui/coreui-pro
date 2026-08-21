@@ -30,15 +30,19 @@ $include-column-box-sizing: false !default;
 
   @if $enable-cssgrid {
     .grid {
+      --#{$prefix}rows: 1;
+      --#{$prefix}columns: #{$grid-columns};
+      --#{$prefix}gap: #{$grid-gutter-width};
+
       // The grid is its own query container, so `.g-col-*` responds to the width of
       // the grid rather than the viewport. `container-type` implies layout containment,
       // which makes the grid the containing block of any positioned descendant.
       @include set-container();
 
       display: grid;
-      grid-template-rows: repeat(var(--#{$prefix}rows, 1), 1fr);
-      grid-template-columns: repeat(var(--#{$prefix}columns, #{$grid-columns}), 1fr);
-      gap: var(--#{$prefix}gap, #{$grid-gutter-width});
+      grid-template-rows: repeat(var(--#{$prefix}rows), 1fr);
+      grid-template-columns: repeat(var(--#{$prefix}columns), 1fr);
+      gap: var(--#{$prefix}gap);
 
       @include make-cssgrid();
     }
