@@ -29,6 +29,16 @@ The `<html>` and `<body>` elements are updated to provide better page-wide defau
   - No base `font-size` is declared on the `<html>`, but `16px` is assumed (the browser default). `font-size: 1rem` is applied on the `<body>` for easy responsive type-scaling via media queries while respecting user preferences and ensuring a more accessible approach. This browser default can be overridden by modifying the `$font-size-root` variable.
 - The `<body>` also sets a global `font-family`, `font-weight`, `line-height`, and `color`. This is inherited later by some form elements to prevent font inconsistencies.
 - For safety, the `<body>` has a declared `background-color`, defaulting to `#fff`.
+- `accent-color` is set to `--cui-primary` on the root, so native controls that we do not restyle — a bare checkbox, radio, range or `<progress>` — are drawn in your brand color instead of the browser's blue.
+
+## Links
+
+Links take `--cui-link-color` and switch to `--cui-link-hover-color` on hover. Inside anything that sets a theme, both follow it: the link reads `--cui-theme-fg` and hovers to `--cui-theme-fg-emphasis`, so a link on a colored surface stays part of that surface.
+
+Placeholder links — an `<a>` with neither `href` nor a class — keep the surrounding text color and get no underline, so an anchor waiting for its URL doesn't read as a working link.
+
+<Example code={`<p><a href="#">This is a link</a></p>
+  <p><a>This is a placeholder link</a></p>`} />
 
 ## Native font stack
 
@@ -308,6 +318,11 @@ These changes, and more, are demonstrated below.
 
 Keep in mind date inputs are [not fully supported](https://caniuse.com/input-datetime) by all browsers, namely Safari.
 </Callout>
+
+Two more form resets worth knowing about:
+
+- Every segment of a date or time input — including seconds, milliseconds, the week number and the AM/PM field — has its browser padding removed, so a `<input type="time" step="1">` is the same height as a text input.
+- `tel`, `url`, `email` and `number` inputs stay left-to-right whatever the document direction is, because their content is not language text.
 
 ### Pointers on buttons
 
