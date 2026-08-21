@@ -501,7 +501,27 @@ Two things are required: a `.table-responsive*` ancestor, because that is the qu
 Because the breakpoint is read from the `.table-responsive*` wrapper rather than the window, a stacked table inside a narrow column stacks there while the same markup in the main content area stays a table.
 </Callout>
 
-## Customization
+## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/content/_tables.scss" capture="table-css-vars" />
+
+Every value the table draws with is on the table element, so a one-off table is a style attribute away:
+
+```html
+<table class="table" style="--cui-table-cell-padding-y: 1rem; --cui-table-border-color: var(--cui-primary);">
+  ...
+</table>
+```
+
+The striped, active and hover backgrounds are mixed from `--cui-table-color`, so a variant that changes the text color carries them along. To make the zebra stripes stronger or fainter without touching the color, change the factor:
+
+```html
+<table class="table table-striped" style="--cui-table-striped-bg-factor: 12%;">
+  ...
+</table>
+```
 
 ### SASS variables
 
@@ -510,8 +530,3 @@ Because the breakpoint is read from the `.table-responsive*` wrapper rather than
 ### SASS loop
 
 <ScssDocs file="scss/content/_tables.scss" capture="table-loop" />
-
-### Customizing
-
-- The factor variables (`$table-striped-bg-factor`, `$table-active-bg-factor` & `$table-hover-bg-factor`) are used to determine the contrast in table variants.
-- Apart from the light & dark table variants, theme colors are lightened by the `$table-bg-scale` variable.

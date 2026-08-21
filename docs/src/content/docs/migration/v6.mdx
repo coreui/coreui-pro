@@ -1279,6 +1279,28 @@ Multi Select's option indicators moved with it — they render as a decorative
   Give every `<td>` past the first a `data-cell` attribute for its label; the
   header is hidden visually and kept in the accessibility tree. See
   [Stacked tables](/content/tables/#stacked-tables).
+- **Cell padding, vertical alignment and the border width are CSS variables
+  now.** `--cui-table-cell-padding-y`, `--cui-table-cell-padding-x`,
+  `--cui-table-cell-vertical-align`, `--cui-table-border-width` and
+  `--cui-table-group-separator-color` are declared on `.table` instead of being
+  compiled into the cell rule. This also fixes stacked tables, which read
+  `--cui-table-cell-padding-*` and `--cui-table-border-width` while nothing
+  declared them, so their rows collapsed to zero padding and lost the separating
+  line.
+- **`.table-sm` sets the padding variables** on the table instead of overriding
+  the padding on every cell. Anything that raised specificity to beat
+  `.table-sm > :not(caption) > * > *` can set `--cui-table-cell-padding-y`/`-x`
+  instead.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The contrast factors are percentages.** `$table-striped-bg-factor`,
+  `$table-active-bg-factor` and `$table-hover-bg-factor` changed from unit-less
+  fractions (`.05`) to percentages (`5%`), because they now ship as the
+  `--cui-table-*-bg-factor` variables that `color-mix()` reads at runtime.
+- **The state colours follow `--cui-table-color`.** `--cui-table-striped-color`,
+  `--cui-table-active-color` and `--cui-table-hover-color` default to
+  `var(--cui-table-color)`, and the matching backgrounds are mixed from it, so a
+  variant only has to set `--cui-table-color`, `--cui-table-bg` and
+  `--cui-table-border-color`.
 
 #### Toast
 
