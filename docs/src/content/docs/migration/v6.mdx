@@ -405,16 +405,36 @@ check, radio, carousel and toggler icons already work:
 - background: transparent var(--cui-btn-close-bg) center / 1em auto no-repeat;
 - filter: var(--cui-btn-close-filter);
 + background-color: currentcolor;
-+ mask-image: var(--cui-btn-close-bg);
++ mask-image: var(--cui-btn-close-icon);
 ```
 
 - **`--cui-btn-close-filter` is removed**, together with `$btn-close-filter` and
   `$btn-close-filter-dark`. Recolour the button with `--cui-btn-close-color`
-  instead of inverting the image; `.btn-close-white` does exactly that now.
+  instead of inverting the image.
 - **`$btn-close-color` defaults to `inherit`**, so the glyph follows the surface
   it sits on. A close button inside a themed alert or a dark toast no longer
   needs a rule of its own to stay legible.
-- The SVG in `--cui-btn-close-bg` carries the shape only. A custom image works
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.btn-close-white` is gone**, deprecated since v5.0.0, and so is the
+  dark-mode rule that forced the glyph white. Both restated what the inherited
+  colour already produces on a surface that paints its own text — a
+  `.text-bg-dark` toast, a dark navbar's offcanvas, a `.bg-body.text-body`
+  section under `data-coreui-theme="dark"`. Delete the class; the button
+  renders identically without it. The rule additionally got the mirror case
+  wrong: a `data-coreui-theme="light"` section inside a dark page inherited the
+  forced white and drew a white icon on white.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The size surface is two variables instead of five.**
+  `--cui-btn-close-width`, `-height`, `-padding-x` and `-padding-y` collapse
+  into `--cui-btn-close-icon-size` and `--cui-btn-close-padding`, matching the
+  Sass variables of the same names. Nothing changes on screen: the glyph is
+  still `1em` inside `.25em` of padding, so the pointer target stays 24px at
+  the default font size — the WCAG 2.2 minimum.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-btn-close-bg` is `--cui-btn-close-icon`** (`$btn-close-bg` →
+  `$btn-close-icon`). It stopped being a background when the glyph moved to a
+  mask; the name had been describing the old implementation.
+- The SVG in `--cui-btn-close-icon` carries the shape only. A custom image works
   the same way — give it any colour, the mask ignores it.
 
 #### Badge

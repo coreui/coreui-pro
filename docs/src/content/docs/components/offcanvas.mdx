@@ -134,7 +134,7 @@ When the backdrop is set to static, the Bootstrap offcanvas will remain open whe
 
 <AddedIn version="4.2.6" />
 
-Change the appearance of offcanvas elements using utilities to better match various contexts, such as dark navbars. Here, we add `.text-bg-dark` to the `.offcanvas` and `.btn-close-white` to `.btn-close` for proper styling with a dark offcanvas. If there are dropdowns inside, consider also adding `.dropdown-menu-dark` to `.dropdown-menu`.
+Change the appearance of offcanvas elements using utilities to better match various contexts, such as dark navbars. Here, we add `.text-bg-dark` to the `.offcanvas`; the close button takes the colour it inherits, so it needs nothing. If there are dropdowns inside, consider also adding `.dropdown-menu-dark` to `.dropdown-menu`.
 
 <Callout color="warning">
 Attention! Dark variants for components are no longer supported as of v5.3.0 due to the introduction of color modes. Instead of manually adding the classes mentioned earlier, simply set `data-coreui-theme="dark"` on the root element, a parent wrapper, or the component itself.
@@ -143,7 +143,7 @@ Attention! Dark variants for components are no longer supported as of v5.3.0 due
 <Example class="docs-example-offcanvas p-0 bg-body-secondary overflow-hidden" code={`<dialog class="offcanvas offcanvas-start text-bg-dark" id="offcanvasDark" aria-labelledby="offcanvasDarkLabel" open>
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasDarkLabel">Offcanvas</h5>
-      <button type="button" class="btn-close btn-close-white" data-coreui-dismiss="offcanvasDark" aria-label="Close"></button>
+      <button type="button" class="btn-close" data-coreui-dismiss="offcanvasDark" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
       <p>Place offcanvas content here.</p>

@@ -138,16 +138,16 @@ Alternatively, you can also add additional controls and components to toasts.
 
 ### Color schemes
 
-Building on the previous example, you can design various toast color schemes using our color and background utilities. In this case, we've added .text-bg-primary to the .toast and included .btn-close-white for the close button. To achieve a clean edge, we remove the default border with .border-0.
+Building on the previous example, you can design various toast color schemes using our color and background utilities. In this case, we've added .text-bg-primary to the .toast. To achieve a clean edge, we remove the default border with .border-0.
 
-Building on the previous example, you can design various toast color schemes using our [color](/utilities/colors/) and [background](/utilities/background/) utilities. We added `.text-bg-primary` to the `.toast`, and applied `.btn-close-white` to the close button. To achieve a clean edge, we remove the default border with `.border-0`.
+Building on the previous example, you can design various toast color schemes using our [color](/utilities/colors/) and [background](/utilities/background/) utilities. We added `.text-bg-primary` to the `.toast`; the close button takes the colour it inherits, so it stays legible on its own. To achieve a clean edge, we remove the default border with `.border-0`.
 
 <Example class=" bg-body-tertiary" code={`<div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">
         Hello, world! This is a toast message.
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-coreui-dismiss="toast" aria-label="Close"></button>
+      <button type="button" class="btn-close me-2 m-auto" data-coreui-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>`} />
 

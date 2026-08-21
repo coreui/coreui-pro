@@ -1,19 +1,18 @@
 @use "../functions/defaults" as *;
 @use "../functions/escape-svg" as *;
 @use "../mixins/border-radius" as *;
-@use "../mixins/color-mode" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/mask-icon" as *;
 @use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start close-variables
-$btn-close-width:            1em !default;
-$btn-close-height:           $btn-close-width !default;
-$btn-close-padding-x:        .25em !default;
-$btn-close-padding-y:        $btn-close-padding-x !default;
+$btn-close-icon-size:        1em !default;
+// The icon plus this padding on both sides is the pointer target. At the
+// default font size that is 24px, the WCAG 2.2 minimum.
+$btn-close-padding:          .25em !default;
 $btn-close-color:            inherit !default;
-$btn-close-bg:               url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>") !default;
+$btn-close-icon:             url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='black'><path d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/></svg>") !default;
 $btn-close-opacity:          .5 !default;
 $btn-close-hover-opacity:    .75 !default;
 $btn-close-focus-opacity:    1 !default;
@@ -22,17 +21,15 @@ $btn-close-disabled-opacity: .25 !default;
 
 $close-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default, custom-property-no-missing-var-function
+// stylelint-disable scss/dollar-variable-default
 
 // scss-docs-start close-css-vars
 $close-tokens: defaults(
   (
-    --#{$prefix}btn-close-width: #{$btn-close-width},
-    --#{$prefix}btn-close-height: #{$btn-close-height},
-    --#{$prefix}btn-close-padding-y: #{$btn-close-padding-y},
-    --#{$prefix}btn-close-padding-x: #{$btn-close-padding-x},
+    --#{$prefix}btn-close-icon-size: #{$btn-close-icon-size},
+    --#{$prefix}btn-close-padding: #{$btn-close-padding},
     --#{$prefix}btn-close-color: #{$btn-close-color},
-    --#{$prefix}btn-close-bg: #{ escape-svg($btn-close-bg) },
+    --#{$prefix}btn-close-icon: #{ escape-svg($btn-close-icon) },
     --#{$prefix}btn-close-opacity: #{$btn-close-opacity},
     --#{$prefix}btn-close-hover-opacity: #{$btn-close-hover-opacity},
     --#{$prefix}btn-close-focus-opacity: #{$btn-close-focus-opacity},
@@ -42,7 +39,7 @@ $close-tokens: defaults(
 );
 // scss-docs-end close-css-vars
 
-// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
+// stylelint-enable scss/dollar-variable-default
 @layer components {
   // Transparent background and border properties included for button version.
   // iOS requires the button element instead of an anchor tag.
@@ -53,16 +50,14 @@ $close-tokens: defaults(
     @include tokens($close-tokens);
 
     box-sizing: content-box;
-    // Flex containers may shrink the button below its icon; a minimum keeps it
-    // square and clickable.
-    width: var(--#{$prefix}btn-close-width);
-    min-width: var(--#{$prefix}btn-close-width);
-    height: var(--#{$prefix}btn-close-height);
-    min-height: var(--#{$prefix}btn-close-height);
-    padding: var(--#{$prefix}btn-close-padding-y) var(--#{$prefix}btn-close-padding-x);
+    // A minimum rather than a size: the button carries no content of its own,
+    // and a flex container would otherwise shrink it below its icon.
+    min-width: var(--#{$prefix}btn-close-icon-size);
+    min-height: var(--#{$prefix}btn-close-icon-size);
+    padding: var(--#{$prefix}btn-close-padding);
     color: var(--#{$prefix}btn-close-color);
     background-color: currentcolor;
-    @include mask-icon(var(--#{$prefix}btn-close-bg), var(--#{$prefix}btn-close-width) auto);
+    @include mask-icon(var(--#{$prefix}btn-close-icon), var(--#{$prefix}btn-close-icon-size));
     border: 0; // for button elements
     @include border-radius();
     opacity: var(--#{$prefix}btn-close-opacity);
@@ -84,23 +79,6 @@ $close-tokens: defaults(
       pointer-events: none;
       user-select: none;
       opacity: var(--#{$prefix}btn-close-disabled-opacity);
-    }
-  }
-}
-
-@mixin btn-close-white() {
-  --#{$prefix}btn-close-color: var(--#{$prefix}white);
-}
-
-@layer components {
-  .btn-close-white {
-    @include btn-close-white();
-  }
-
-
-  @if $enable-dark-mode {
-    @include color-mode(dark, true) {
-      @include btn-close-white();
     }
   }
 }
