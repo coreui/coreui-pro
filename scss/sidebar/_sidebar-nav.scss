@@ -7,8 +7,8 @@
 // Sidebar navigation
 
 // scss-docs-start sidebar-nav-variables
-$sidebar-nav-padding-y:                       calc(#{$sidebar-padding-y} * .5) !default; // stylelint-disable-line function-disallowed-list
-$sidebar-nav-padding-x:                       calc(#{$sidebar-padding-x} * .5) !default; // stylelint-disable-line function-disallowed-list
+$sidebar-nav-padding-y:                       calc(#{$sidebar-padding-y} * .5) !default;
+$sidebar-nav-padding-x:                       calc(#{$sidebar-padding-x} * .5) !default;
 $sidebar-nav-gap:                             1px !default;
 
 $sidebar-nav-title-padding-y:                 .75rem !default;
@@ -325,11 +325,11 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
       @include transition($sidebar-nav-group-items-transition);
 
       .nav-link {
-        padding-inline-start: calc(var(--#{$prefix}sidebar-nav-link-padding-x) + var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin)); // stylelint-disable-line function-disallowed-list
+        padding-inline-start: calc(var(--#{$prefix}sidebar-nav-link-padding-x) + var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin));
       }
 
       .nav-icon {
-        margin-inline-start: calc(-1 * (var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin))); // stylelint-disable-line function-disallowed-list
+        margin-inline-start: calc(-1 * (var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin)));
       }
     }
 
@@ -349,7 +349,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
       // scss-docs-end sidebar-nav-tree-css-vars
 
       .nav-group .nav-group-items {
-        $indent: calc((var(--#{$prefix}sidebar-nav-link-padding-x) + var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin)) / 2); // stylelint-disable-line function-disallowed-list
+        $indent: calc((var(--#{$prefix}sidebar-nav-link-padding-x) + var(--#{$prefix}sidebar-nav-link-icon-width) + var(--#{$prefix}sidebar-nav-link-icon-margin)) / 2);
 
         position: relative;
         z-index: 0;
@@ -357,7 +357,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
 
         &::before {
           position: absolute;
-          inset-inline-start: calc($indent + 1.5px); // stylelint-disable-line function-disallowed-list
+          inset-inline-start: calc($indent + 1.5px);
           top: 0;
           z-index: -1;
           height: 100%;
@@ -367,7 +367,7 @@ $sidebar-nav-tree-link-active-icon-bullet-bg:  var(--#{$prefix}border-color) !de
 
         // stylelint-disable-next-line selector-max-class
         .nav-link {
-          margin-inline-start: calc(-1 * $indent); // stylelint-disable-line function-disallowed-list
+          margin-inline-start: calc(-1 * $indent);
         }
       }
     }

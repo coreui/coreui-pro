@@ -36,7 +36,7 @@ $form-switch-sizes: ("lg", "xl") !default;
 
 $switch-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start switch-css-vars
 $switch-tokens: defaults(
@@ -69,7 +69,7 @@ $switch-tokens: defaults(
 );
 // scss-docs-end switch-css-vars
 
-// stylelint-enable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // stylelint-disable-next-line scss/at-function-named-arguments
 $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch .form-check-input"; else: ".switch") !default;
@@ -112,7 +112,6 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       border-color: var(--#{$prefix}switch-checked-border-color);
 
       &::before {
-        // stylelint-disable-next-line function-disallowed-list
         inset-inline-start: calc(100% - var(--#{$prefix}switch-thumb-size) - var(--#{$prefix}switch-padding));
         background-color: var(--#{$prefix}switch-checked-thumb-bg);
       }
@@ -168,7 +167,6 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
         min-height: var(--#{$prefix}switch-height);
 
         .form-check-label {
-          // stylelint-disable-next-line function-disallowed-list
           padding-top: calc((var(--#{$prefix}switch-height) - var(--#{$prefix}body-font-size)) * .5);
         }
       }

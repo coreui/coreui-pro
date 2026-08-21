@@ -272,7 +272,6 @@ $range-slider-vertical-tokens: defaults(
     // Deliberately outside `$prefix`: the plugin writes this name, so a
     // configurable one would let the two sides disagree.
     position: absolute;
-    // stylelint-disable-next-line function-disallowed-list
     inset-inline-start: calc(var(--#{$prefix}range-slider-thumb-width) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-width)));
     z-index: var(--#{$prefix}range-slider-tooltip-zindex);
     display: flex;
@@ -320,11 +319,11 @@ $range-slider-vertical-tokens: defaults(
     }
 
     .range-slider-labels-container {
-      width: calc(var(--#{$prefix}range-slider-track-width) - var(--#{$prefix}range-slider-thumb-width)); // stylelint-disable-line function-disallowed-list
+      width: calc(var(--#{$prefix}range-slider-track-width) - var(--#{$prefix}range-slider-thumb-width));
     }
 
     .range-slider-tooltip {
-      bottom: calc(var(--#{$prefix}range-slider-tooltip-margin-bottom) + var(--#{$prefix}range-slider-thumb-height)); // stylelint-disable-line function-disallowed-list
+      bottom: calc(var(--#{$prefix}range-slider-tooltip-margin-bottom) + var(--#{$prefix}range-slider-thumb-height));
     }
 
     .range-slider-tooltip-arrow {
@@ -332,7 +331,7 @@ $range-slider-vertical-tokens: defaults(
       height: var(--#{$prefix}range-slider-tooltip-arrow-height);
 
       &::before {
-        border-width: var(--#{$prefix}range-slider-tooltip-arrow-height) calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
+        border-width: var(--#{$prefix}range-slider-tooltip-arrow-height) calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0;
         border-top-color: var(--#{$prefix}range-slider-tooltip-bg);
       }
     }
@@ -365,8 +364,7 @@ $range-slider-vertical-tokens: defaults(
 
     .range-slider-tooltip {
       inset-inline-start: auto;
-      inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width)); // stylelint-disable-line function-disallowed-list
-      // stylelint-disable-next-line function-disallowed-list
+      inset-inline-end: calc(var(--#{$prefix}range-slider-tooltip-margin-end) + var(--#{$prefix}range-slider-thumb-width));
       bottom: calc(var(--#{$prefix}range-slider-thumb-height) * .5 + var(--cui-range-slider-tooltip-position, 0) * (100% - var(--#{$prefix}range-slider-thumb-height)));
       flex-direction: row;
       transform: translateY(50%);
@@ -378,15 +376,15 @@ $range-slider-vertical-tokens: defaults(
 
       &::before {
         border-inline-start-color: var(--#{$prefix}range-slider-tooltip-bg);
-        border-inline-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0; // stylelint-disable-line function-disallowed-list
-        border-top-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5); // stylelint-disable-line function-disallowed-list
-        border-bottom-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5); // stylelint-disable-line function-disallowed-list
+        border-inline-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5) 0;
+        border-top-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5);
+        border-bottom-width: calc(var(--#{$prefix}range-slider-tooltip-arrow-width) * .5);
       }
     }
 
     .range-slider-labels-container {
       flex-shrink: 0;
-      height: calc(var(--#{$prefix}range-slider-vertical-track-height) - var(--#{$prefix}range-slider-thumb-height)); // stylelint-disable-line function-disallowed-list
+      height: calc(var(--#{$prefix}range-slider-vertical-track-height) - var(--#{$prefix}range-slider-thumb-height));
     }
 
     .range-slider-label {

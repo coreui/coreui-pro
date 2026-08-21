@@ -27,8 +27,8 @@ $header-disabled-color:         color-mix(in srgb, var(--#{$prefix}emphasis-colo
 $header-transition:             box-shadow .15s ease-in-out !default;
 
 // Compute the header-brand padding-y so the header-brand will have the same height as header-text and nav-link
-$header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
-$header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default; // stylelint-disable-line function-disallowed-list
+$header-brand-height:           calc(#{$header-brand-font-size} * var(--#{$prefix}body-line-height)) !default;
+$header-brand-padding-y:        calc((#{$nav-link-height} - #{$header-brand-height}) * .5) !default;
 $header-brand-margin-end:       1rem !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 $header-brand-color:            var(--#{$prefix}gray-900) !default;
@@ -131,9 +131,9 @@ $header-tokens: defaults(
   }
 
   .header-divider {
-    flex-basis: calc(100% + (2 * var(--#{$prefix}header-padding-x))); // stylelint-disable-line function-disallowed-list
+    flex-basis: calc(100% + (2 * var(--#{$prefix}header-padding-x)));
     height: 0;
-    margin: var(--#{$prefix}header-padding-y) calc(-1 * var(--#{$prefix}header-padding-x)); // stylelint-disable-line function-disallowed-list
+    margin: var(--#{$prefix}header-padding-y) calc(-1 * var(--#{$prefix}header-padding-x));
     border-top: var(--#{$prefix}header-divider-border);
   }
 
@@ -238,7 +238,7 @@ $header-tokens: defaults(
 
   .header-toggler-icon {
     display: block;
-    height: calc(#{$header-toggler-font-size} * 1.25); // stylelint-disable-line function-disallowed-list
+    height: calc(#{$header-toggler-font-size} * 1.25);
     background-color: currentcolor;
     @include mask-icon(var(--#{$prefix}header-toggler-icon-bg), 100% 100%);
   }

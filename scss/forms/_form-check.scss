@@ -3,7 +3,7 @@
 @use "../config" as *;
 
 // scss-docs-start form-check-wrapper-variables
-$form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default; // stylelint-disable-line function-disallowed-list
+$form-check-min-height:                   calc(var(--#{$prefix}body-font-size) * var(--#{$prefix}body-line-height)) !default;
 $form-check-margin-bottom:                .125rem !default;
 $form-check-inline-margin-end:            1rem !default;
 

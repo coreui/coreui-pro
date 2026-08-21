@@ -25,7 +25,7 @@ $check-sizes: (
 
 $check-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start check-css-vars
 $check-tokens: defaults(
@@ -51,7 +51,7 @@ $check-tokens: defaults(
 );
 // scss-docs-end check-css-vars
 
-// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function, function-disallowed-list
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // A v5 switch input is a checkbox too: without the `:not()` it would collect
 // the check mark on top of the switch thumb.

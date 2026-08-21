@@ -16,7 +16,6 @@ $dark:          $gray-900 !default;
 
 $link-color:    $primary !default;
 
-// stylelint-disable function-disallowed-list
 
 // scss-docs-start theme-colors-map
 $theme-colors: (
@@ -103,7 +102,6 @@ $theme-colors: (
 ) !default;
 // scss-docs-end theme-colors-map
 
-// stylelint-enable function-disallowed-list
 
 // Color scales
 //
@@ -204,7 +202,6 @@ $theme-lightness-overrides: (
 
   @each $token, $lightness in ("hover": $theme-hover-lightness, "active": $theme-active-lightness) {
     $shift: map.get($overrides, $token) or $lightness;
-    // stylelint-disable-next-line function-disallowed-list
     --#{$prefix}theme-#{$token}: oklch(from var(--#{$prefix}#{$state}) calc(l * #{$shift}) c h);
   }
 }

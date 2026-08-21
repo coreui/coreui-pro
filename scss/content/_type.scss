@@ -1,7 +1,7 @@
 @use "../config" as *;
 
 // scss-docs-start type-variables
-$lead-font-size:              calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$lead-font-size:              calc(var(--#{$prefix}body-font-size) * 1.25) !default;
 $lead-font-weight:            300 !default;
 // scss-docs-end type-variables
 

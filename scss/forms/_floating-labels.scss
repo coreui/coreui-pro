@@ -4,7 +4,6 @@
 @use "../mixins/transition" as *;
 @use "../config" as *;
 
-// stylelint-disable function-disallowed-list
 
 // scss-docs-start form-floating-variables
 $form-floating-height:                  calc(3.5rem + var(--#{$prefix}btn-input-border-width) * 2) !default;

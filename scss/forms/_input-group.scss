@@ -127,7 +127,6 @@ $input-group-tokens: defaults(
 
   .input-group-lg > .form-select,
   .input-group-sm > .form-select {
-    // stylelint-disable-next-line function-disallowed-list
     padding-inline-end: calc(var(--#{$prefix}control-padding-x) + var(--#{$prefix}control-select-padding-end));
   }
 
@@ -163,7 +162,7 @@ $input-group-tokens: defaults(
     }
 
     > :not(:first-child):not(.dropdown-menu)#{$validation-messages} {
-      margin-inline-start: calc(-1 * var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+      margin-inline-start: calc(-1 * var(--#{$prefix}btn-input-border-width));
       @include border-start-radius(0);
     }
 

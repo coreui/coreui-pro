@@ -24,7 +24,6 @@ export default {
           outline: 'none'
         },
         'function-disallowed-list': [
-          'calc',
           'lighten',
           'darken'
         ],

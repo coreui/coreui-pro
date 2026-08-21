@@ -71,7 +71,6 @@ $form-multi-select-tokens: defaults(
   .form-multi-select-selection-tags {
     gap: var(--#{$prefix}form-multi-select-selection-tags-gap);
     align-content: center;
-    // stylelint-disable-next-line function-disallowed-list
     margin: calc(var(--#{$prefix}form-multi-select-selection-tags-padding-y) * -1) 0;
   }
 
@@ -98,7 +97,7 @@ $form-multi-select-tokens: defaults(
     }
 
     .form-multi-select-selection-tags & {
-      padding-inline-start: calc(var(--#{$prefix}control-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
+      padding-inline-start: calc(var(--#{$prefix}control-padding-x) - .25rem);
     }
   }
 
@@ -106,7 +105,7 @@ $form-multi-select-tokens: defaults(
     color: var(--#{$prefix}control-placeholder-color);
 
     .form-multi-select-selection-tags & {
-      padding: calc(var(--#{$prefix}control-padding-y) - .25rem) calc(var(--#{$prefix}control-padding-x) - .25rem); // stylelint-disable-line function-disallowed-list
+      padding: calc(var(--#{$prefix}control-padding-y) - .25rem) calc(var(--#{$prefix}control-padding-x) - .25rem);
     }
   }
 

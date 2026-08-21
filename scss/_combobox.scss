@@ -232,7 +232,7 @@ $combobox-tokens: defaults(
   .combobox-option-with-checkbox,
   .combobox-optgroup-label-with-checkbox {
     position: relative;
-    padding-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) + var(--#{$prefix}combobox-option-indicator-width)); // stylelint-disable-line function-disallowed-list
+    padding-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) + var(--#{$prefix}combobox-option-indicator-width));
   }
 
   // The indicator is a decorative `.check` (a span, so it never matches
@@ -240,7 +240,7 @@ $combobox-tokens: defaults(
   // the mark's opacity is set here rather than by the control's own state rules.
   .combobox-option-indicator {
     position: absolute;
-    inset-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) * .5); // stylelint-disable-line function-disallowed-list
+    inset-inline-start: calc(var(--#{$prefix}combobox-option-padding-x) * .5);
     top: 50%;
     width: var(--#{$prefix}combobox-option-indicator-width);
     height: var(--#{$prefix}combobox-option-indicator-width);

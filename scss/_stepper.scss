@@ -130,9 +130,9 @@ $stepper-tokens: defaults(
 
       .stepper-step-connector {
         position: absolute;
-        inset-inline-start: calc((var(--#{$prefix}stepper-step-button-width) / 2) + (var(--#{$prefix}stepper-step-indicator-width) / 2) + var(--#{$prefix}stepper-steps-gap)); // stylelint-disable-line function-disallowed-list
-        top: calc(var(--#{$prefix}stepper-step-indicator-height) / 2); // stylelint-disable-line function-disallowed-list
-        width: calc(100% - var(--#{$prefix}stepper-step-indicator-width) + var(--#{$prefix}stepper-steps-gap) - (var(--#{$prefix}stepper-steps-gap) * 2)); // stylelint-disable-line function-disallowed-list
+        inset-inline-start: calc((var(--#{$prefix}stepper-step-button-width) / 2) + (var(--#{$prefix}stepper-step-indicator-width) / 2) + var(--#{$prefix}stepper-steps-gap));
+        top: calc(var(--#{$prefix}stepper-step-indicator-height) / 2);
+        width: calc(100% - var(--#{$prefix}stepper-step-indicator-width) + var(--#{$prefix}stepper-steps-gap) - (var(--#{$prefix}stepper-steps-gap) * 2));
         transform: translateY(-50%);
       }
     }
@@ -234,21 +234,21 @@ $stepper-tokens: defaults(
       position: relative;
       display: block;
       &:not(:last-child) {
-        min-height: calc(var(--#{$prefix}stepper-step-indicator-height) * 2); // stylelint-disable-line function-disallowed-list
+        min-height: calc(var(--#{$prefix}stepper-step-indicator-height) * 2);
       }
     }
 
     .stepper-step-connector {
       position: absolute;
-      inset-inline-start: calc(var(--#{$prefix}stepper-step-indicator-width) / 2); // stylelint-disable-line function-disallowed-list
-      top: calc(var(--#{$prefix}stepper-step-indicator-height) + var(--#{$prefix}stepper-steps-gap)); // stylelint-disable-line function-disallowed-list
+      inset-inline-start: calc(var(--#{$prefix}stepper-step-indicator-width) / 2);
+      top: calc(var(--#{$prefix}stepper-step-indicator-height) + var(--#{$prefix}stepper-steps-gap));
       width: var(--#{$prefix}stepper-step-connector-height);
-      height: calc(100% - var(--#{$prefix}stepper-step-indicator-height) - var(--#{$prefix}stepper-step-connector-gap)); // stylelint-disable-line function-disallowed-list
+      height: calc(100% - var(--#{$prefix}stepper-step-indicator-height) - var(--#{$prefix}stepper-step-connector-gap));
       transform: translateX(-50%);
     }
 
     .stepper-step-content {
-      padding-inline-start: calc(var(--#{$prefix}stepper-step-indicator-width) + var(--#{$prefix}stepper-step-connector-gap) / 2); // stylelint-disable-line function-disallowed-list
+      padding-inline-start: calc(var(--#{$prefix}stepper-step-indicator-width) + var(--#{$prefix}stepper-step-connector-gap) / 2);
       @include transition(var(--#{$prefix}stepper-step-content-transition));
     }
 

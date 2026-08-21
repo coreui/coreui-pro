@@ -129,7 +129,7 @@ $list-group-tokens: defaults(
       border-top-width: 0;
 
       &.active {
-        margin-top: calc(-1 * var(--#{$prefix}list-group-border-width)); // stylelint-disable-line function-disallowed-list
+        margin-top: calc(-1 * var(--#{$prefix}list-group-border-width));
         border-top-width: var(--#{$prefix}list-group-border-width);
       }
     }
@@ -196,7 +196,7 @@ $list-group-tokens: defaults(
             border-top-width: var(--#{$prefix}list-group-border-width);
 
             &.active {
-              margin-inline-start: calc(-1 * var(--#{$prefix}list-group-border-width)); // stylelint-disable-line function-disallowed-list
+              margin-inline-start: calc(-1 * var(--#{$prefix}list-group-border-width));
               border-inline-start-width: var(--#{$prefix}list-group-border-width);
             }
           }

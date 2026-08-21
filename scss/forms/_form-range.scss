@@ -97,7 +97,7 @@ $form-range-tokens: defaults(
     @include tokens($form-range-tokens);
 
     width: 100%;
-    height: calc(var(--#{$prefix}range-thumb-height) + #{$form-range-thumb-focus-ring-width} * 2); // stylelint-disable-line function-disallowed-list
+    height: calc(var(--#{$prefix}range-thumb-height) + #{$form-range-thumb-focus-ring-width} * 2);
     padding: 0; // Need to reset padding
     appearance: none;
     background-color: transparent;
@@ -114,7 +114,7 @@ $form-range-tokens: defaults(
     }
 
     &::-webkit-slider-thumb {
-      margin-top: calc((var(--#{$prefix}range-track-height) - var(--#{$prefix}range-thumb-height)) * .5); // stylelint-disable-line function-disallowed-list
+      margin-top: calc((var(--#{$prefix}range-track-height) - var(--#{$prefix}range-thumb-height)) * .5);
       @include form-range-thumb();
     }
 

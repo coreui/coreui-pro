@@ -32,7 +32,7 @@
       }
 
       .nav-icon {
-        flex: 0 0 calc(var(--#{$prefix}sidebar-narrow-width) - (var(--#{$prefix}sidebar-nav-padding-x) * 2) - (var(--#{$prefix}sidebar-nav-link-padding-x) * 2)); // stylelint-disable-line function-disallowed-list
+        flex: 0 0 calc(var(--#{$prefix}sidebar-narrow-width) - (var(--#{$prefix}sidebar-nav-padding-x) * 2) - (var(--#{$prefix}sidebar-nav-link-padding-x) * 2));
       }
 
       .nav-label,

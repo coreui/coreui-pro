@@ -206,7 +206,7 @@ $nav-underline-border-tokens: defaults(
     border-bottom: var(--#{$prefix}nav-tabs-border-width) solid var(--#{$prefix}nav-tabs-border-color);
 
     .nav-link {
-      margin-bottom: calc(-1 * var(--#{$prefix}nav-tabs-border-width)); // stylelint-disable-line function-disallowed-list
+      margin-bottom: calc(-1 * var(--#{$prefix}nav-tabs-border-width));
       border: var(--#{$prefix}nav-tabs-border-width) solid transparent;
       @include border-top-radius(var(--#{$prefix}nav-tabs-border-radius));
 
@@ -227,7 +227,7 @@ $nav-underline-border-tokens: defaults(
 
     .dropdown-menu {
       // Make dropdown border overlap tab border
-      margin-top: calc(-1 * var(--#{$prefix}nav-tabs-border-width)); // stylelint-disable-line function-disallowed-list
+      margin-top: calc(-1 * var(--#{$prefix}nav-tabs-border-width));
       // Remove the top rounded corners here since there is a hard edge above the menu
       @include border-top-radius(0);
     }
@@ -293,7 +293,7 @@ $nav-underline-border-tokens: defaults(
 
     .nav-link {
       padding: var(--#{$prefix}nav-underline-border-link-padding-y) var(--#{$prefix}nav-underline-border-link-padding-x);
-      margin-bottom: calc(-1 * var(--#{$prefix}nav-underline-border-border-width)); // stylelint-disable-line function-disallowed-list
+      margin-bottom: calc(-1 * var(--#{$prefix}nav-underline-border-border-width));
       border-bottom: var(--#{$prefix}nav-underline-border-border-width) solid transparent;
 
       &:hover,
@@ -331,7 +331,7 @@ $nav-underline-border-tokens: defaults(
     @include border-radius(var(--#{$prefix}nav-enclosed-border-radius));
 
     .nav-link {
-      padding: calc(var(--#{$prefix}nav-enclosed-link-padding-y) - var(--#{$prefix}nav-enclosed-link-border-width)) calc(var(--#{$prefix}nav-enclosed-link-padding-x) - var(--#{$prefix}nav-enclosed-link-border-width)); // stylelint-disable-line function-disallowed-list
+      padding: calc(var(--#{$prefix}nav-enclosed-link-padding-y) - var(--#{$prefix}nav-enclosed-link-border-width)) calc(var(--#{$prefix}nav-enclosed-link-padding-x) - var(--#{$prefix}nav-enclosed-link-border-width));
       color: var(--#{$prefix}nav-enclosed-link-color);
       border: var(--#{$prefix}nav-enclosed-link-border-width) solid transparent;
       @include border-radius(calc(var(--#{$prefix}nav-enclosed-border-radius) - var(--#{$prefix}nav-enclosed-padding)));

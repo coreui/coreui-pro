@@ -20,7 +20,7 @@ $radio-mark:              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/
 
 $radio-tokens: () !default;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list, scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start radio-css-vars
 $radio-tokens: defaults(
@@ -43,7 +43,7 @@ $radio-tokens: defaults(
 );
 // scss-docs-end radio-css-vars
 
-// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function, function-disallowed-list
+// stylelint-enable scss/dollar-variable-default, custom-property-no-missing-var-function
 
 // stylelint-disable-next-line scss/at-function-named-arguments
 $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-input[type=radio]"; else: ".radio") !default;

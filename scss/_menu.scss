@@ -38,7 +38,7 @@ $menu-item-padding-x:           .75rem !default;
 $menu-item-padding-y:           .25rem !default;
 $menu-item-border-radius:       $border-radius-sm !default;
 $menu-icon-size:                1rem !default;
-$menu-description-font-size:    calc(var(--#{$prefix}body-font-size) * .75) !default; // stylelint-disable-line function-disallowed-list
+$menu-description-font-size:    calc(var(--#{$prefix}body-font-size) * .75) !default;
 $menu-check-color:              currentcolor !default;
 $menu-header-color:             var(--#{$prefix}tertiary-color) !default;
 $menu-header-padding-x:         .75rem !default;
@@ -298,7 +298,7 @@ $menu-tokens: defaults(
 
     > .menu {
       top: 0;
-      margin-top: calc(-1 * var(--#{$prefix}menu-padding-y)); // stylelint-disable-line function-disallowed-list
+      margin-top: calc(-1 * var(--#{$prefix}menu-padding-y));
     }
 
     &:hover > .menu-item,

@@ -73,7 +73,7 @@ $avatar-variants: (
     height: var(--#{$prefix}avatar-size);
     // Declared as a fallback rather than a token, so the derived size is the
     // default and an explicit one still wins.
-    font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio})); // stylelint-disable-line function-disallowed-list
+    font-size: var(--#{$prefix}avatar-font-size, calc(var(--#{$prefix}avatar-size) * #{$avatar-font-size-ratio}));
     color: var(--#{$prefix}avatar-color);
     vertical-align: middle;
     background-color: var(--#{$prefix}avatar-bg);
@@ -123,7 +123,7 @@ $avatar-variants: (
     display: flex;
 
     .avatar {
-      margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-size)); // stylelint-disable-line function-disallowed-list
+      margin-inline-end: calc(-.4 * var(--#{$prefix}avatar-size));
 
       // Lifted rather than pulled apart: changing the margin here moves every
       // avatar after this one.
