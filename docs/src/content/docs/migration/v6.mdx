@@ -1269,6 +1269,26 @@ Multi Select's option indicators moved with it — they render as a decorative
   direction never switches. Plain `.hstack` and `.vstack` are unchanged, including
   `.hstack`'s vertical centring and its shrink-to-content width.
 
+#### Reboot
+
+- **Links change color on hover.** `--cui-link-hover-color` was declared and
+  read by navs and pagination, but a plain `<a>` only ever changed its underline.
+  It now switches color as well, and inside a themed surface it hovers to
+  `--cui-theme-fg-emphasis`.
+- **`accent-color: var(--cui-primary)` on `:root`.** Native controls we don't
+  restyle — a bare checkbox, radio, range or `<progress>` — follow the brand
+  color instead of the browser's blue.
+- **Every segment of a date or time input gets its padding removed.** The list
+  covered five pseudo-elements and one of them (`::-webkit-datetime-edit-minute`)
+  had been renamed by browsers years ago; seconds, milliseconds, the week number
+  and the AM/PM field were never in it. `<input type="time" step="1">` no longer
+  renders taller than a text input.
+- **`tel`, `url`, `email` and `number` inputs stay LTR everywhere.** The rule was
+  scoped to `[dir="rtl"]` elements, so it missed pages that set the direction on
+  `<html>` through the language rather than the attribute.
+- `pre` reserves scrollbar space (`scrollbar-gutter: stable`), so a horizontal
+  scrollbar no longer covers the last line of a code block.
+
 #### Tables
 
 - **`.table-responsive*` is a query container.** It still scrolls horizontally

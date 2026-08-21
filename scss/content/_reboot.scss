@@ -72,6 +72,8 @@ $th-font-weight:       null !default;
   // null by default, thus nothing is generated.
 
   :root {
+    accent-color: var(--#{$prefix}primary);
+
     @if $font-size-root != null {
       font-size: var(--#{$prefix}root-font-size);
     }
@@ -292,15 +294,17 @@ $th-font-weight:       null !default;
     text-decoration: $link-decoration;
 
     &:hover {
+      color: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}link-hover-color)) calc(var(--#{$prefix}link-opacity, 1) * 100%), transparent);
       text-decoration: $link-hover-decoration;
     }
   }
+
   // And undo these styles for placeholder links/named anchors (without href).
   // It would be more straightforward to just use a[href] in previous block, but that
   // causes specificity issues in many other styles that are too complex to fix.
   // See https://github.com/twbs/bootstrap/issues/19402
 
-  a:not([href]):not([class]) {
+  a:not([href], [class]) {
     &,
     &:hover {
       color: inherit;
@@ -322,6 +326,7 @@ $th-font-weight:       null !default;
   // 1. Remove browser default top margin
   // 2. Reset browser default of `1em` to use `rem`s
   // 3. Don't allow content to break outside
+  // 4. Reserve room for the scrollbar so it cannot sit on top of the last line
 
   pre {
     display: block;
@@ -330,6 +335,7 @@ $th-font-weight:       null !default;
     overflow: auto; // 3
     font-size: $code-font-size;
     color: var(--#{$prefix}pre-color, $pre-color);
+    scrollbar-gutter: stable; // 4
 
     // Account for some code outputs that place code tags in pre tags
     code {
@@ -483,7 +489,7 @@ $th-font-weight:       null !default;
   // Remove the dropdown arrow only from text type inputs built with datalists in Chrome.
   // See https://stackoverflow.com/a/54997118
 
-  [list]:not([type="date"]):not([type="datetime-local"]):not([type="month"]):not([type="week"]):not([type="time"])::-webkit-calendar-picker-indicator {
+  [list]:not([type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"])::-webkit-calendar-picker-indicator {
     display: none !important;
   }
 
@@ -532,7 +538,7 @@ $th-font-weight:       null !default;
     border: 0; // 2
   }
 
-  // 1. By using `float: left`, the legend will behave like a block element.
+  // 1. By using `float: inline-start`, the legend will behave like a block element.
   //    This way the border of a fieldset wraps around the legend if present.
   // 2. Fix wrapping bug.
   //    See https://github.com/twbs/bootstrap/issues/29712
@@ -547,7 +553,7 @@ $th-font-weight:       null !default;
     line-height: inherit;
 
     + * {
-      clear: left; // 2
+      clear: inline-start; // 2
     }
   }
 
@@ -556,15 +562,21 @@ $th-font-weight:       null !default;
 
   ::-webkit-datetime-edit-fields-wrapper,
   ::-webkit-datetime-edit-text,
-  ::-webkit-datetime-edit-minute,
+  ::-webkit-datetime-edit-millisecond-field,
+  ::-webkit-datetime-edit-second-field,
+  ::-webkit-datetime-edit-minute-field,
   ::-webkit-datetime-edit-hour-field,
+  ::-webkit-datetime-edit-meridiem-field, // WebKit
+  ::-webkit-datetime-edit-ampm-field, // Chromium
   ::-webkit-datetime-edit-day-field,
+  ::-webkit-datetime-edit-week-field,
   ::-webkit-datetime-edit-month-field,
   ::-webkit-datetime-edit-year-field {
     padding: 0;
   }
 
-  ::-webkit-inner-spin-button {
+  ::-webkit-inner-spin-button,
+  ::-webkit-outer-spin-button {
     height: auto;
   }
 
@@ -585,16 +597,14 @@ $th-font-weight:       null !default;
     }
   }
 
-  // 1. A few input types should stay LTR
+  // A few input types should stay LTR regardless of document direction
   // See https://rtlstyling.com/posts/rtl-styling#form-inputs
 
-  *[dir="rtl"] {
-    [type="tel"],
-    [type="url"],
-    [type="email"],
-    [type="number"] {
-      direction: ltr;
-    }
+  [type="tel"],
+  [type="url"],
+  [type="email"],
+  [type="number"] {
+    direction: ltr;
   }
 
 
