@@ -1,14 +1,16 @@
 @use "../config" as *;
 
-// Shared between modals and offcanvases
-@mixin overlay-backdrop($zindex, $backdrop-bg, $backdrop-opacity) {
+// The full-viewport scrim behind an overlay. Used by the sidebar; exported for
+// anything else that needs the same surface.
+@mixin overlay-backdrop($zindex, $backdrop-bg, $backdrop-opacity, $backdrop-blur: null) {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   z-index: $zindex;
-  width: 100vw;
-  height: 100vh;
   background-color: $backdrop-bg;
+
+  @if $backdrop-blur {
+    backdrop-filter: blur($backdrop-blur);
+  }
 
   // Fade for backdrop
   &.fade { opacity: 0; }
