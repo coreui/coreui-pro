@@ -96,7 +96,7 @@
   .sidebar-narrow,
   .sidebar-narrow-unfoldable {
     @include media-breakpoint-up($mobile-breakpoint) {
-      &:not(.sidebar-end):not(.hide) ~ * {
+      &:not(.sidebar-end, .hide) ~ * {
         --#{$prefix}sidebar-occupy-start: #{$sidebar-narrow-width};
       }
       &.sidebar-end:not(.hide) ~ * {

@@ -252,7 +252,7 @@ $stepper-tokens: defaults(
       @include transition(var(--#{$prefix}stepper-step-content-transition));
     }
 
-    .stepper-step .stepper-step-button:not(.active) ~ .stepper-step-content:not(.collapsing):not(.collapse) {
+    .stepper-step .stepper-step-button:not(.active) ~ .stepper-step-content:not(.collapsing, .collapse) {
       display: none;
     }
   }

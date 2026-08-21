@@ -140,7 +140,7 @@ $input-group-tokens: defaults(
   // stylelint-disable-next-line no-duplicate-selectors
   .input-group {
     &:not(.has-validation) {
-      > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
+      > :not(:last-child, .dropdown-toggle, .dropdown-menu, .form-floating),
       > .dropdown-toggle:nth-last-child(n + 3),
       > .form-floating:not(:last-child) > .form-control,
       > .form-floating:not(:last-child) > .form-select {
@@ -149,7 +149,7 @@ $input-group-tokens: defaults(
     }
 
     &.has-validation {
-      > :nth-last-child(n + 3):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating),
+      > :nth-last-child(n + 3):not(.dropdown-toggle, .dropdown-menu, .form-floating),
       > .dropdown-toggle:nth-last-child(n + 4),
       > .form-floating:nth-last-child(n + 3) > .form-control,
       > .form-floating:nth-last-child(n + 3) > .form-select {

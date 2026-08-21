@@ -1,0 +1,71 @@
+/** @type {import('stylelint').Config} */
+export default {
+  extends: [
+    'stylelint-config-twbs-bootstrap'
+  ],
+  reportInvalidScopeDisables: true,
+  reportNeedlessDisables: true,
+  rules: {
+    // The shared config leaves this off with a "TODO enable this later".
+    'selector-not-notation': 'complex',
+    // The optional prefix group is what lets `.dark\\:bg-*` through — the one
+    // colon-prefixed name we keep. Responsive variants stay infixed.
+    'selector-class-pattern': [
+      '^([a-z][a-z0-9]*(-[a-z0-9]+)*:)?([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
+      { message: 'Expected class selector "%s" to be kebab-case (with optional prefix)' }
+    ]
+  },
+  overrides: [
+    {
+      files: '**/*.scss',
+      rules: {
+        'declaration-property-value-disallowed-list': {
+          border: 'none',
+          outline: 'none'
+        },
+        'function-disallowed-list': [
+          'calc',
+          'lighten',
+          'darken'
+        ],
+        'property-disallowed-list': [
+          'border-radius',
+          'border-top-left-radius',
+          'border-top-right-radius',
+          'border-bottom-right-radius',
+          'border-bottom-left-radius',
+          'transition'
+        ],
+        'scss/dollar-variable-default': [
+          true,
+          {
+            ignore: 'local'
+          }
+        ],
+        'scss/selector-no-union-class-name': true
+      }
+    },
+    {
+      files: 'scss/**/*.{test,spec}.scss',
+      rules: {
+        'scss/dollar-variable-default': null,
+        'declaration-no-important': null
+      }
+    },
+    {
+      files: 'docs/**/*.scss',
+      rules: {
+        'scss/dollar-variable-default': null
+      }
+    },
+    {
+      files: 'docs/**/examples/**/*.css',
+      rules: {
+        'comment-empty-line-before': null,
+        'property-no-vendor-prefix': null,
+        'selector-no-qualifying-type': null,
+        'value-no-vendor-prefix': null
+      }
+    }
+  ]
+}
