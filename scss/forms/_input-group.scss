@@ -138,6 +138,11 @@ $input-group-tokens: defaults(
 
   // stylelint-disable-next-line no-duplicate-selectors
   .input-group {
+    $validation-messages: "";
+    @each $state in map.keys($form-validation-states) {
+      $validation-messages: $validation-messages + ":not(." + string.unquote($state) + "-tooltip)" + ":not(." + string.unquote($state) + "-feedback)";
+    }
+
     &:not(.has-validation) {
       > :not(:last-child, .dropdown-toggle, .dropdown-menu, .form-floating),
       > .dropdown-toggle:nth-last-child(n + 3),
@@ -154,11 +159,6 @@ $input-group-tokens: defaults(
       > .form-floating:nth-last-child(n + 3) > .form-select {
         @include border-end-radius(0);
       }
-    }
-
-    $validation-messages: "";
-    @each $state in map.keys($form-validation-states) {
-      $validation-messages: $validation-messages + ":not(." + string.unquote($state) + "-tooltip)" + ":not(." + string.unquote($state) + "-feedback)";
     }
 
     > :not(:first-child):not(.dropdown-menu)#{$validation-messages} {
