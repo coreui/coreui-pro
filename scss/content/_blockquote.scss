@@ -1,27 +1,70 @@
+@use "../functions/defaults" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start blockquote-variables
-$blockquote-margin-y:         $spacer !default;
-$blockquote-font-size:        calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
-$blockquote-footer-color:     var(--#{$prefix}gray-600) !default;
-$blockquote-footer-font-size: var(--#{$prefix}small-font-size) !default;
+$blockquote-margin-y:            var(--#{$prefix}spacer-3) !default;
+$blockquote-gap:                 var(--#{$prefix}spacer-3) !default;
+$blockquote-font-size:           calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$blockquote-footer-margin-y:     var(--#{$prefix}spacer-3) !default;
+$blockquote-footer-color:        var(--#{$prefix}secondary-color) !default;
+$blockquote-footer-font-size:    var(--#{$prefix}small-font-size) !default;
 // scss-docs-end blockquote-variables
+
+$blockquote-tokens: () !default;
+$blockquote-footer-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start blockquote-css-vars
+$blockquote-tokens: defaults(
+  (
+    --#{$prefix}blockquote-margin-y: #{$blockquote-margin-y},
+    --#{$prefix}blockquote-gap: #{$blockquote-gap},
+    --#{$prefix}blockquote-font-size: #{$blockquote-font-size},
+  ),
+  $blockquote-tokens
+);
+// scss-docs-end blockquote-css-vars
+
+// scss-docs-start blockquote-footer-css-vars
+$blockquote-footer-tokens: defaults(
+  (
+    --#{$prefix}blockquote-footer-margin-y: #{$blockquote-footer-margin-y},
+    --#{$prefix}blockquote-footer-color: #{$blockquote-footer-color},
+    --#{$prefix}blockquote-footer-font-size: #{$blockquote-footer-font-size},
+  ),
+  $blockquote-footer-tokens
+);
+// scss-docs-end blockquote-footer-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer content {
   .blockquote {
-    margin-bottom: $blockquote-margin-y;
-    font-size: $blockquote-font-size;
+    @include tokens($blockquote-tokens);
 
-    > :last-child {
+    display: flex;
+    flex-direction: column;
+    gap: var(--#{$prefix}blockquote-gap);
+    margin-bottom: var(--#{$prefix}blockquote-margin-y);
+    font-size: var(--#{$prefix}blockquote-font-size);
+
+    > * {
+      margin-block: 0;
+    }
+
+    &:has(+ .blockquote-footer) {
       margin-bottom: 0;
     }
   }
 
   .blockquote-footer {
-    margin-top: -$blockquote-margin-y;
-    margin-bottom: $blockquote-margin-y;
-    font-size: $blockquote-footer-font-size;
-    color: $blockquote-footer-color;
+    @include tokens($blockquote-footer-tokens);
+
+    margin-bottom: var(--#{$prefix}blockquote-footer-margin-y);
+    font-size: var(--#{$prefix}blockquote-footer-font-size);
+    color: var(--#{$prefix}blockquote-footer-color);
 
     &::before {
       content: "\2014\00A0"; // em dash, nbsp
