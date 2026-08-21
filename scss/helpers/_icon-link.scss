@@ -42,6 +42,9 @@ $icon-link-tokens: defaults(
     text-underline-offset: var(--#{$prefix}icon-link-underline-offset);
     backface-visibility: hidden;
 
+    // `.icon` is our own icon set; `.bi` is Bootstrap Icons, kept so markup
+    // written against upstream keeps working.
+    > .icon,
     > .bi {
       flex-shrink: 0;
       width: var(--#{$prefix}icon-link-icon-size);
@@ -54,6 +57,7 @@ $icon-link-tokens: defaults(
   .icon-link-hover {
     &:hover,
     &:focus-visible {
+      > .icon,
       > .bi {
         transform: var(--#{$prefix}icon-link-transform, var(--#{$prefix}icon-link-icon-transform));
       }
