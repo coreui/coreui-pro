@@ -1,7 +1,7 @@
 @use "sass:map";
-@use "sass:math";
-@use "../functions/color" as *;
+@use "../functions/defaults" as *;
 @use "../layout/breakpoints" as *;
+@use "../mixins/tokens" as *;
 @use "../mixins/visually-hidden" as *;
 @use "../theme" as *;
 @use "../config" as *;
@@ -18,18 +18,17 @@ $table-color:                 var(--#{$prefix}emphasis-color) !default;
 $table-bg:                    var(--#{$prefix}body-bg) !default;
 $table-accent-bg:             transparent !default;
 
+$table-striped-color:         var(--#{$prefix}table-color) !default;
+$table-striped-bg-factor:     5% !default;
+$table-striped-bg:            color-mix(in srgb, var(--#{$prefix}table-color) var(--#{$prefix}table-striped-bg-factor), transparent) !default;
 
-$table-striped-color:         $table-color !default;
-$table-striped-bg-factor:     .05 !default;
-$table-striped-bg:            color-mix(in srgb, var(--#{$prefix}emphasis-color) math.percentage($table-striped-bg-factor), transparent) !default;
+$table-active-color:          var(--#{$prefix}table-color) !default;
+$table-active-bg-factor:      10% !default;
+$table-active-bg:             color-mix(in srgb, var(--#{$prefix}table-color) var(--#{$prefix}table-active-bg-factor), transparent) !default;
 
-$table-active-color:          $table-color !default;
-$table-active-bg-factor:      .1 !default;
-$table-active-bg:             color-mix(in srgb, var(--#{$prefix}emphasis-color) math.percentage($table-active-bg-factor), transparent) !default;
-
-$table-hover-color:           $table-color !default;
-$table-hover-bg-factor:       .075 !default;
-$table-hover-bg:              color-mix(in srgb, var(--#{$prefix}emphasis-color) math.percentage($table-hover-bg-factor), transparent) !default;
+$table-hover-color:           var(--#{$prefix}table-color) !default;
+$table-hover-bg-factor:       7.5% !default;
+$table-hover-bg:              color-mix(in srgb, var(--#{$prefix}table-color) var(--#{$prefix}table-hover-bg-factor), transparent) !default;
 
 $table-border-width:          var(--#{$prefix}border-width) !default;
 $table-border-color:          var(--#{$prefix}border-color) !default;
@@ -38,9 +37,39 @@ $table-striped-order:         odd !default;
 $table-striped-columns-order: even !default;
 
 $table-group-separator-color: currentcolor !default;
-
-
 // scss-docs-end table-variables
+
+$table-tokens: () !default;
+
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+// scss-docs-start table-css-vars
+$table-tokens: defaults(
+  (
+    --#{$prefix}table-cell-padding-y: #{$table-cell-padding-y},
+    --#{$prefix}table-cell-padding-x: #{$table-cell-padding-x},
+    --#{$prefix}table-cell-vertical-align: #{$table-cell-vertical-align},
+    --#{$prefix}table-color: #{$table-color},
+    --#{$prefix}table-bg: #{$table-bg},
+    --#{$prefix}table-accent-bg: #{$table-accent-bg},
+    --#{$prefix}table-border-width: #{$table-border-width},
+    --#{$prefix}table-border-color: #{$table-border-color},
+    --#{$prefix}table-group-separator-color: #{$table-group-separator-color},
+    --#{$prefix}table-striped-color: #{$table-striped-color},
+    --#{$prefix}table-striped-bg-factor: #{$table-striped-bg-factor},
+    --#{$prefix}table-striped-bg: #{$table-striped-bg},
+    --#{$prefix}table-active-color: #{$table-active-color},
+    --#{$prefix}table-active-bg-factor: #{$table-active-bg-factor},
+    --#{$prefix}table-active-bg: #{$table-active-bg},
+    --#{$prefix}table-hover-color: #{$table-hover-color},
+    --#{$prefix}table-hover-bg-factor: #{$table-hover-bg-factor},
+    --#{$prefix}table-hover-bg: #{$table-hover-bg},
+  ),
+  $table-tokens
+);
+// scss-docs-end table-css-vars
+
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start table-loop
 // Which theme colours get a .table-* variant. The values come from the theme
@@ -59,12 +88,6 @@ $table-variants: map.keys($theme-colors) !default;
     --#{$prefix}table-color: var(--#{$prefix}theme-fg-emphasis);
     --#{$prefix}table-bg: var(--#{$prefix}theme-bg-subtle);
     --#{$prefix}table-border-color: var(--#{$prefix}theme-border);
-    --#{$prefix}table-striped-color: var(--#{$prefix}theme-fg-emphasis);
-    --#{$prefix}table-striped-bg: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis) #{math.percentage($table-striped-bg-factor)}, transparent);
-    --#{$prefix}table-active-color: var(--#{$prefix}theme-fg-emphasis);
-    --#{$prefix}table-active-bg: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis) #{math.percentage($table-active-bg-factor)}, transparent);
-    --#{$prefix}table-hover-color: var(--#{$prefix}theme-fg-emphasis);
-    --#{$prefix}table-hover-bg: color-mix(in srgb, var(--#{$prefix}theme-fg-emphasis) #{math.percentage($table-hover-bg-factor)}, transparent);
 
     color: var(--#{$prefix}table-color);
     border-color: var(--#{$prefix}table-border-color);
@@ -74,26 +97,18 @@ $table-variants: map.keys($theme-colors) !default;
 
 @layer content {
   .table {
+    @include tokens($table-tokens);
+
     // Reset needed for nesting tables
     --#{$prefix}table-color-type: initial;
     --#{$prefix}table-bg-type: initial;
     --#{$prefix}table-color-state: initial;
     --#{$prefix}table-bg-state: initial;
     // End of reset
-    --#{$prefix}table-color: #{$table-color};
-    --#{$prefix}table-bg: #{$table-bg};
-    --#{$prefix}table-border-color: #{$table-border-color};
-    --#{$prefix}table-accent-bg: #{$table-accent-bg};
-    --#{$prefix}table-striped-color: #{$table-striped-color};
-    --#{$prefix}table-striped-bg: #{$table-striped-bg};
-    --#{$prefix}table-active-color: #{$table-active-color};
-    --#{$prefix}table-active-bg: #{$table-active-bg};
-    --#{$prefix}table-hover-color: #{$table-hover-color};
-    --#{$prefix}table-hover-bg: #{$table-hover-bg};
 
     width: 100%;
     margin-bottom: var(--#{$prefix}spacer-3);
-    vertical-align: $table-cell-vertical-align;
+    vertical-align: var(--#{$prefix}table-cell-vertical-align);
     border-color: var(--#{$prefix}table-border-color);
 
     // Target th & td
@@ -102,11 +117,11 @@ $table-variants: map.keys($theme-colors) !default;
     // Another advantage is that this generates less code and makes the selector less specific making it easier to override.
     // stylelint-disable-next-line selector-max-universal
     > :not(caption) > * > * {
-      padding: $table-cell-padding-y $table-cell-padding-x;
+      padding: var(--#{$prefix}table-cell-padding-y) var(--#{$prefix}table-cell-padding-x);
       // Following the precept of cascades: https://codepen.io/miriamsuzanne/full/vYNgodb
       color: var(--#{$prefix}table-color-state, var(--#{$prefix}table-color-type, var(--#{$prefix}table-color)));
       background-color: var(--#{$prefix}table-bg);
-      border-bottom-width: $table-border-width;
+      border-block-end-width: var(--#{$prefix}table-border-width);
       box-shadow: inset 0 0 0 9999px var(--#{$prefix}table-bg-state, var(--#{$prefix}table-bg-type, var(--#{$prefix}table-accent-bg)));
     }
 
@@ -120,7 +135,7 @@ $table-variants: map.keys($theme-colors) !default;
   }
 
   .table-group-divider {
-    border-top: calc(#{$table-border-width} * 2) solid $table-group-separator-color; // stylelint-disable-line function-disallowed-list
+    border-block-start: calc(var(--#{$prefix}table-border-width) * 2) solid var(--#{$prefix}table-group-separator-color); // stylelint-disable-line function-disallowed-list
   }
 
   //
@@ -137,10 +152,8 @@ $table-variants: map.keys($theme-colors) !default;
   //
 
   .table-sm {
-    // stylelint-disable-next-line selector-max-universal
-    > :not(caption) > * > * {
-      padding: $table-cell-padding-y-sm $table-cell-padding-x-sm;
-    }
+    --#{$prefix}table-cell-padding-y: #{$table-cell-padding-y-sm};
+    --#{$prefix}table-cell-padding-x: #{$table-cell-padding-x-sm};
   }
 
 
@@ -155,11 +168,13 @@ $table-variants: map.keys($theme-colors) !default;
 
   .table-bordered {
     > :not(caption) > * {
-      border-width: $table-border-width 0;
+      border-block-width: var(--#{$prefix}table-border-width);
+      border-inline-width: 0;
 
       // stylelint-disable-next-line selector-max-universal
       > * {
-        border-width: 0 $table-border-width;
+        border-block-width: 0;
+        border-inline-width: var(--#{$prefix}table-border-width);
       }
     }
   }
@@ -167,11 +182,11 @@ $table-variants: map.keys($theme-colors) !default;
   .table-borderless {
     // stylelint-disable-next-line selector-max-universal
     > :not(caption) > * > * {
-      border-bottom-width: 0;
+      border-block-end-width: 0;
     }
 
     > :not(:first-child) {
-      border-top-width: 0;
+      border-block-start-width: 0;
     }
   }
 
