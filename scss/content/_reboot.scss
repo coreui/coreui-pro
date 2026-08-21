@@ -1,36 +1,89 @@
+@use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start reboot-type-variables
 $enable-smooth-scroll:        true !default;
-$paragraph-margin-bottom:     1rem !default;
+$paragraph-margin-bottom:     var(--#{$prefix}spacer-3) !default;
 $font-family-code:            var(--#{$prefix}font-monospace) !default;
 $headings-margin-bottom:      var(--#{$prefix}spacer-2) !default;
-$headings-font-family:        null !default;
-$headings-font-style:         null !default;
+$headings-font-family:        inherit !default;
+$headings-font-style:         inherit !default;
 $headings-font-weight:        500 !default;
 $sub-sup-font-size:           .75em !default;
-$hr-margin-y:                 $spacer !default;
+$hr-margin-y:                 var(--#{$prefix}spacer-3) !default;
 $hr-color:                    inherit !default;
 $hr-border-width:             var(--#{$prefix}border-width) !default;
 $hr-opacity:                  .25 !default;
-$legend-margin-bottom:        .5rem !default;
+$legend-margin-bottom:        var(--#{$prefix}spacer-2) !default;
 $legend-font-size:            clamp(1.275rem, 1.275rem + .3vw, 1.5rem) !default;
-$legend-font-weight:          null !default;
+$legend-font-weight:          inherit !default;
+$list-padding-x:              2rem !default;
 $dt-font-weight:              $font-weight-bold !default;
 $mark-padding:                .1875em !default;
+$initialism-font-size:        var(--#{$prefix}small-font-size) !default;
 $code-font-size:              var(--#{$prefix}small-font-size) !default;
+$pre-color:                   inherit !default;
 // scss-docs-end reboot-type-variables
 
 // scss-docs-start kbd-variables
-$kbd-padding-y:                     .1875rem !default;
-$kbd-padding-x:                     .375rem !default;
-$kbd-font-size:                     $code-font-size !default;
-$kbd-color:                         var(--#{$prefix}body-bg) !default;
-$kbd-bg:                            var(--#{$prefix}body-color) !default;
-
-$pre-color:                         null !default;
+$kbd-padding-y:               .1875rem !default;
+$kbd-padding-x:               .375rem !default;
+$kbd-font-size:               $code-font-size !default;
+$kbd-color:                   var(--#{$prefix}body-bg) !default;
+$kbd-bg:                      var(--#{$prefix}body-color) !default;
+$kbd-border-radius:           $border-radius-sm !default;
 // scss-docs-end kbd-variables
+
+$reboot-tokens: () !default;
+$reboot-kbd-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start reboot-css-vars
+$reboot-tokens: defaults(
+  (
+    --#{$prefix}paragraph-margin-bottom: #{$paragraph-margin-bottom},
+    --#{$prefix}heading-margin-bottom: #{$headings-margin-bottom},
+    --#{$prefix}heading-font-family: #{$headings-font-family},
+    --#{$prefix}heading-font-style: #{$headings-font-style},
+    --#{$prefix}heading-font-weight: #{$headings-font-weight},
+    --#{$prefix}heading-line-height: #{$headings-line-height},
+    --#{$prefix}sub-sup-font-size: #{$sub-sup-font-size},
+    --#{$prefix}hr-margin-y: #{$hr-margin-y},
+    --#{$prefix}hr-color: #{$hr-color},
+    --#{$prefix}hr-border-width: #{$hr-border-width},
+    --#{$prefix}hr-opacity: #{$hr-opacity},
+    --#{$prefix}legend-margin-bottom: #{$legend-margin-bottom},
+    --#{$prefix}legend-font-size: #{$legend-font-size},
+    --#{$prefix}legend-font-weight: #{$legend-font-weight},
+    --#{$prefix}list-padding-x: #{$list-padding-x},
+    --#{$prefix}dt-font-weight: #{$dt-font-weight},
+    --#{$prefix}mark-padding: #{$mark-padding},
+    --#{$prefix}initialism-font-size: #{$initialism-font-size},
+    --#{$prefix}code-font-size: #{$code-font-size},
+    --#{$prefix}pre-color: #{$pre-color},
+  ),
+  $reboot-tokens
+);
+// scss-docs-end reboot-css-vars
+
+// scss-docs-start kbd-css-vars
+$reboot-kbd-tokens: defaults(
+  (
+    --#{$prefix}kbd-padding-y: #{$kbd-padding-y},
+    --#{$prefix}kbd-padding-x: #{$kbd-padding-x},
+    --#{$prefix}kbd-font-size: #{$kbd-font-size},
+    --#{$prefix}kbd-color: #{$kbd-color},
+    --#{$prefix}kbd-bg: #{$kbd-bg},
+    --#{$prefix}kbd-border-radius: #{$kbd-border-radius},
+  ),
+  $reboot-kbd-tokens
+);
+// scss-docs-end kbd-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 // stylelint-disable function-disallowed-list
 
@@ -72,6 +125,8 @@ $th-font-weight:       null !default;
   // null by default, thus nothing is generated.
 
   :root {
+    @include tokens($reboot-tokens);
+
     accent-color: var(--#{$prefix}primary);
 
     @if $font-size-root != null {
@@ -114,11 +169,11 @@ $th-font-weight:       null !default;
   // 1. Reset Firefox's gray color
 
   hr {
-    margin: $hr-margin-y 0;
-    color: $hr-color; // 1
+    margin: var(--#{$prefix}hr-margin-y) 0;
+    color: var(--#{$prefix}hr-color); // 1
     border: 0;
-    border-top: $hr-border-width solid var(--#{$prefix}hr-border-color);
-    opacity: $hr-opacity;
+    border-block-start: var(--#{$prefix}hr-border-width) solid var(--#{$prefix}hr-border-color);
+    opacity: var(--#{$prefix}hr-opacity);
   }
 
 
@@ -130,40 +185,46 @@ $th-font-weight:       null !default;
 
   %heading {
     margin-top: 0; // 1
-    margin-bottom: $headings-margin-bottom;
-    font-family: $headings-font-family;
-    font-style: $headings-font-style;
-    font-weight: $headings-font-weight;
-    line-height: $headings-line-height;
+    margin-bottom: var(--#{$prefix}heading-margin-bottom);
+    font-family: var(--#{$prefix}heading-font-family);
+    font-style: var(--#{$prefix}heading-font-style);
+    font-weight: var(--#{$prefix}heading-font-weight);
+    line-height: var(--#{$prefix}heading-line-height);
     color: var(--#{$prefix}heading-color);
   }
 
-  h1 {
+  h1,
+  .h1 {
     @extend %heading;
     font-size: var(--#{$prefix}font-size-4xl);
   }
 
-  h2 {
+  h2,
+  .h2 {
     @extend %heading;
     font-size: var(--#{$prefix}font-size-3xl);
   }
 
-  h3 {
+  h3,
+  .h3 {
     @extend %heading;
     font-size: var(--#{$prefix}font-size-2xl);
   }
 
-  h4 {
+  h4,
+  .h4 {
     @extend %heading;
     font-size: var(--#{$prefix}font-size-xl);
   }
 
-  h5 {
+  h5,
+  .h5 {
     @extend %heading;
     font-size: var(--#{$prefix}font-size-lg);
   }
 
-  h6 {
+  h6,
+  .h6 {
     @extend %heading;
     font-size: var(--#{$prefix}font-size-md);
   }
@@ -176,7 +237,7 @@ $th-font-weight:       null !default;
 
   p {
     margin-top: 0;
-    margin-bottom: $paragraph-margin-bottom;
+    margin-bottom: var(--#{$prefix}paragraph-margin-bottom);
   }
 
 
@@ -192,11 +253,17 @@ $th-font-weight:       null !default;
     text-decoration-skip-ink: none; // 3
   }
 
+  // Builds on `abbr`
+  .initialism {
+    font-size: var(--#{$prefix}initialism-font-size);
+    text-transform: uppercase;
+  }
+
 
   // Address
 
   address {
-    margin-bottom: 1rem;
+    margin-bottom: var(--#{$prefix}spacer-3);
     font-style: normal;
     line-height: inherit;
   }
@@ -206,14 +273,14 @@ $th-font-weight:       null !default;
 
   ol,
   ul {
-    padding-inline-start: 2rem;
+    padding-inline-start: var(--#{$prefix}list-padding-x);
   }
 
   ol,
   ul,
   dl {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: var(--#{$prefix}spacer-3);
   }
 
   ol ol,
@@ -224,21 +291,21 @@ $th-font-weight:       null !default;
   }
 
   dt {
-    font-weight: $dt-font-weight;
+    font-weight: var(--#{$prefix}dt-font-weight);
   }
 
   // 1. Undo browser default
 
   dd {
     margin-inline-start: 0; // 1
-    margin-bottom: .5rem;
+    margin-bottom: var(--#{$prefix}spacer-2);
   }
 
 
   // Blockquote
 
   blockquote {
-    margin: 0 0 1rem;
+    margin: 0 0 var(--#{$prefix}spacer-3);
   }
 
 
@@ -256,15 +323,17 @@ $th-font-weight:       null !default;
   //
   // Add the correct font size in all browsers
 
-  small {
+  small,
+  .small {
     font-size: var(--#{$prefix}small-font-size);
   }
 
 
   // Mark
 
-  mark {
-    padding: $mark-padding;
+  mark,
+  .mark {
+    padding: var(--#{$prefix}mark-padding);
     color: var(--#{$prefix}highlight-color);
     background-color: var(--#{$prefix}highlight-bg);
   }
@@ -278,7 +347,7 @@ $th-font-weight:       null !default;
   sub,
   sup {
     position: relative;
-    font-size: $sub-sup-font-size;
+    font-size: var(--#{$prefix}sub-sup-font-size);
     line-height: 0;
     vertical-align: baseline;
   }
@@ -331,10 +400,10 @@ $th-font-weight:       null !default;
   pre {
     display: block;
     margin-top: 0; // 1
-    margin-bottom: 1rem; // 2
+    margin-bottom: var(--#{$prefix}spacer-3); // 2
     overflow: auto; // 3
-    font-size: $code-font-size;
-    color: var(--#{$prefix}pre-color, $pre-color);
+    font-size: var(--#{$prefix}code-font-size);
+    color: var(--#{$prefix}pre-color);
     scrollbar-gutter: stable; // 4
 
     // Account for some code outputs that place code tags in pre tags
@@ -346,7 +415,7 @@ $th-font-weight:       null !default;
   }
 
   code {
-    font-size: $code-font-size;
+    font-size: var(--#{$prefix}code-font-size);
     color: var(--#{$prefix}code-color);
     word-wrap: break-word;
 
@@ -357,11 +426,13 @@ $th-font-weight:       null !default;
   }
 
   kbd {
-    padding: $kbd-padding-y $kbd-padding-x;
-    font-size: $kbd-font-size;
-    color: var(--#{$prefix}kbd-color, $kbd-color);
-    background-color: var(--#{$prefix}kbd-bg, $kbd-bg);
-    @include border-radius($border-radius-sm);
+    @include tokens($reboot-kbd-tokens);
+
+    padding: var(--#{$prefix}kbd-padding-y) var(--#{$prefix}kbd-padding-x);
+    font-size: var(--#{$prefix}kbd-font-size);
+    color: var(--#{$prefix}kbd-color);
+    background-color: var(--#{$prefix}kbd-bg);
+    @include border-radius(var(--#{$prefix}kbd-border-radius));
 
     kbd {
       padding: 0;
@@ -375,7 +446,7 @@ $th-font-weight:       null !default;
   // Apply a consistent margin strategy (matches our type styles).
 
   figure {
-    margin: 0 0 1rem;
+    margin: 0 0 var(--#{$prefix}spacer-3);
   }
 
 
@@ -547,9 +618,9 @@ $th-font-weight:       null !default;
     float: inline-start; // 1
     width: 100%;
     padding: 0;
-    margin-bottom: $legend-margin-bottom;
-    font-size: $legend-font-size;
-    font-weight: $legend-font-weight;
+    margin-bottom: var(--#{$prefix}legend-margin-bottom);
+    font-size: var(--#{$prefix}legend-font-size);
+    font-weight: var(--#{$prefix}legend-font-weight);
     line-height: inherit;
 
     + * {
