@@ -1,0 +1,16 @@
+@use "../config" as *;
+
+// The breakpoint scale as custom properties, for consumers reading it at runtime.
+// It lives with layout rather than in _root.scss because coreui-grid.scss ships
+// layout without root, and it is forwarded ahead of the layout partials so the
+// root layer registers before the layout one in that bundle too.
+
+@layer root {
+  :root {
+    @each $name, $value in $grid-breakpoints {
+      --#{$prefix}breakpoint-#{$name}: #{$value};
+    }
+
+    --#{$prefix}mobile-breakpoint: #{$mobile-breakpoint};
+  }
+}
