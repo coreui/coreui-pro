@@ -1,6 +1,8 @@
 @use "sass:color";
 @use "sass:map";
 @use "sass:meta";
+@use "functions/defaults" as *;
+@use "mixins/tokens" as *;
 @use "functions/color" as *;
 @use "functions/color-scheme" as *;
 @use "functions/color-translucent" as *;
@@ -123,222 +125,212 @@ $code-color: light-dark($pink, tint-color($pink, 40%)) !default;
 // two slots below `root` for a palette or a configuration sheet of your own, so
 // yours loses to nothing but still beats the library. `custom` is the same idea
 // between components and helpers.
+$root-tokens: () !default;
+
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
+
+// Everything the library declares on the root, assembled as one map and emitted
+// with a single `tokens()` call. Building it here rather than writing the
+// declarations inside `:root` keeps the rule a list of values instead of a mix
+// of declarations and loops, and gives the whole set one override point.
+$root-token-defaults: map.merge(color-tokens(), theme-color-tokens());
+
+// Fonts
+//
+// Note: Use `meta.inspect` for lists so that quoted items keep the quotes.
+// See https://github.com/sass/sass/issues/2383#issuecomment-336349172
+// scss-docs-start root-font-size-loop
+// One token pair per stop of the type scale, so a stop can be restyled at
+// runtime and every heading and .text-* utility follows.
+@each $name, $props in $font-sizes {
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}font-size-#{$name}, map.get($props, "font-size"));
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}line-height-#{$name}, map.get($props, "line-height"));
+}
+// scss-docs-end root-font-size-loop
+
+// scss-docs-start root-spacer-loop
+// One token per stop of the spacing scale, so rescaling the system is a
+// runtime change rather than a recompile. Components read these instead of
+// multiplying `$spacer` when the stylesheet is built.
+@each $key, $value in $spacers {
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}spacer-#{$key}, $value);
+}
+// scss-docs-end root-spacer-loop
+
+// scss-docs-start root-zindex-loop
+// One token per stop of the z-axis, so a page can relayer the library without
+// recompiling — a third-party overlay that must sit above the modal sets
+// --#{$prefix}z-modal instead of guessing its number.
+@each $name, $value in $zindex-levels {
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}z-#{$name}, $value);
+}
+// scss-docs-end root-zindex-loop
+
+// scss-docs-start root-font-weight-loop
+@each $name, $value in $font-weights {
+  $root-token-defaults: map.set($root-token-defaults, --#{$prefix}font-weight-#{$name}, $value);
+}
+// scss-docs-end root-font-weight-loop
+
+// scss-docs-start root-box-shadow-variables
+@each $key, $value in $shadows {
+  // stylelint-disable-next-line scss/at-function-named-arguments
+  $name: if(sass($key == null): --#{$prefix}box-shadow; else: --#{$prefix}box-shadow-#{$key});
+  $root-token-defaults: map.set($root-token-defaults, $name, $value);
+}
+// scss-docs-end root-box-shadow-variables
+
+// A null entry is dropped by `defaults()`, which is how the optional tokens
+// below stay optional.
+$root-token-defaults: map.merge(
+  $root-token-defaults,
+  (
+    --#{$prefix}font-sans-serif: meta.inspect($font-family-sans-serif),
+    --#{$prefix}font-monospace: meta.inspect($font-family-monospace),
+    --#{$prefix}gradient: $gradient,
+    // scss-docs-start root-body-variables
+    --#{$prefix}root-font-size: $font-size-root,
+    --#{$prefix}body-font-family: meta.inspect($font-family-base),
+    --#{$prefix}body-font-size: $font-size-base,
+    --#{$prefix}small-font-size: $small-font-size,
+    --#{$prefix}hr-border-color: $hr-border-color,
+    --#{$prefix}icon-size-base: $icon-size-base,
+    --#{$prefix}body-font-weight: $font-weight-base,
+    --#{$prefix}body-line-height: $line-height-base,
+    --#{$prefix}body-text-align: $body-text-align,
+    --#{$prefix}body-color: $body-color,
+    --#{$prefix}body-bg: color-scheme($body-bg, $body-bg-dark),
+    --#{$prefix}emphasis-color: $body-emphasis-color,
+    --#{$prefix}secondary-color: $body-secondary-color,
+    --#{$prefix}secondary-bg: $body-secondary-bg,
+    --#{$prefix}tertiary-color: $body-tertiary-color,
+    --#{$prefix}tertiary-bg: color-scheme($body-tertiary-bg, $body-tertiary-bg-dark),
+    --#{$prefix}tertiary-bg-translucent: color-scheme(color-translucent($body-tertiary-bg), color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark)),
+    // scss-docs-end root-body-variables
+    --#{$prefix}heading-color: $headings-color,
+    --#{$prefix}link-color: $link-color,
+    --#{$prefix}link-decoration: $link-decoration,
+    --#{$prefix}link-hover-color: $link-hover-color,
+    --#{$prefix}link-hover-decoration: $link-hover-decoration,
+    --#{$prefix}code-color: $code-color,
+    --#{$prefix}highlight-color: $mark-color,
+    --#{$prefix}highlight-bg: $mark-bg,
+    // scss-docs-start root-border-var
+    --#{$prefix}border-width: $border-width,
+    --#{$prefix}border-style: $border-style,
+    --#{$prefix}border-color: $border-color,
+    --#{$prefix}border-color-translucent: $border-color-translucent,
+    --#{$prefix}border-radius: $border-radius,
+    --#{$prefix}border-radius-sm: $border-radius-sm,
+    --#{$prefix}border-radius-lg: $border-radius-lg,
+    --#{$prefix}border-radius-xl: $border-radius-xl,
+    --#{$prefix}border-radius-xxl: $border-radius-xxl,
+    --#{$prefix}border-radius-2xl: var(--#{$prefix}border-radius-xxl), // Deprecated in v5.0.0 for consistency
+    --#{$prefix}border-radius-pill: $border-radius-pill,
+    // scss-docs-end root-border-var
+    --#{$prefix}shadow-color: $shadow-color,
+    --#{$prefix}shadow-strength: $shadow-strength,
+    // Focus styles
+    // scss-docs-start root-focus-variables
+    --#{$prefix}focus-ring-width: $focus-ring-width,
+    --#{$prefix}focus-ring-opacity: $focus-ring-opacity,
+    --#{$prefix}focus-ring-color: $focus-ring-color,
+    --#{$prefix}focus-ring-offset: $focus-ring-offset,
+    --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color),
+    // scss-docs-end root-focus-variables
+    // scss-docs-start root-btn-input-variables
+    // Sizing shared by buttons and form controls, so neither has to reach for
+    // the other's Sass variables to line up.
+    --#{$prefix}btn-input-gap: $input-btn-gap,
+    --#{$prefix}btn-input-padding-y: $input-btn-padding-y,
+    --#{$prefix}btn-input-padding-x: $input-btn-padding-x,
+    --#{$prefix}btn-input-font-family: $input-btn-font-family,
+    --#{$prefix}btn-input-font-size: $input-btn-font-size,
+    --#{$prefix}btn-input-line-height: $input-btn-line-height,
+    --#{$prefix}btn-input-border-width: $input-btn-border-width,
+    --#{$prefix}btn-input-transition-duration: $input-btn-transition-duration,
+    --#{$prefix}btn-input-transition-timing: $input-btn-transition-timing,
+    --#{$prefix}btn-input-transition-property: $input-btn-transition-property,
+    --#{$prefix}btn-input-action-transition-property: $input-btn-action-transition-property,
+    --#{$prefix}btn-input-disabled-opacity: $input-btn-disabled-opacity,
+    --#{$prefix}btn-input-color: var(--#{$prefix}body-color),
+    --#{$prefix}btn-input-bg: var(--#{$prefix}body-bg),
+    --#{$prefix}btn-input-font-weight: var(--#{$prefix}body-font-weight),
+    --#{$prefix}btn-input-border-color: var(--#{$prefix}border-color),
+    --#{$prefix}btn-input-border-radius: var(--#{$prefix}border-radius),
+    --#{$prefix}btn-input-box-shadow: var(--#{$prefix}box-shadow-inset),
+    --#{$prefix}btn-input-focus-color: var(--#{$prefix}btn-input-color),
+    --#{$prefix}btn-input-focus-bg: var(--#{$prefix}btn-input-bg),
+    --#{$prefix}btn-input-focus-border-color: color-mix(in srgb, var(--#{$prefix}primary) 50%, var(--#{$prefix}white)),
+    --#{$prefix}btn-input-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
+    --#{$prefix}btn-input-xs-gap: $input-btn-gap-xs,
+    --#{$prefix}btn-input-xs-padding-y: $input-btn-padding-y-xs,
+    --#{$prefix}btn-input-xs-padding-x: $input-btn-padding-x-xs,
+    --#{$prefix}btn-input-xs-font-size: $input-btn-font-size-xs,
+    --#{$prefix}btn-input-xs-border-radius: var(--#{$prefix}border-radius-sm),
+    --#{$prefix}btn-input-xs-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-xs-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
+    --#{$prefix}btn-input-sm-gap: $input-btn-gap-sm,
+    --#{$prefix}btn-input-sm-padding-y: $input-btn-padding-y-sm,
+    --#{$prefix}btn-input-sm-padding-x: $input-btn-padding-x-sm,
+    --#{$prefix}btn-input-sm-font-size: $input-btn-font-size-sm,
+    --#{$prefix}btn-input-sm-border-radius: var(--#{$prefix}border-radius-sm),
+    --#{$prefix}btn-input-sm-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-sm-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
+    --#{$prefix}btn-input-lg-gap: $input-btn-gap-lg,
+    --#{$prefix}btn-input-lg-padding-y: $input-btn-padding-y-lg,
+    --#{$prefix}btn-input-lg-padding-x: $input-btn-padding-x-lg,
+    --#{$prefix}btn-input-lg-font-size: $input-btn-font-size-lg,
+    --#{$prefix}btn-input-lg-border-radius: var(--#{$prefix}border-radius-lg),
+    --#{$prefix}btn-input-lg-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-lg-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2),
+    // scss-docs-end root-btn-input-variables
+    // scss-docs-start root-control-variables
+    // State colors shared by every control that can be checked or selected —
+    // checkboxes, radios, switches, and the option indicators the autocomplete
+    // and multi select draw. Restyle them here once.
+    --#{$prefix}control-checked-bg: $control-checked-bg,
+    --#{$prefix}control-checked-border-color: $control-checked-border-color,
+    --#{$prefix}control-indeterminate-bg: $control-indeterminate-bg,
+    --#{$prefix}control-indeterminate-border-color: $control-indeterminate-border-color,
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}tertiary-bg),
+    --#{$prefix}control-disabled-opacity: $control-disabled-opacity,
+    --#{$prefix}control-label-disabled-opacity: $control-label-disabled-opacity,
+    --#{$prefix}control-focus-border-color: $control-focus-border,
+    --#{$prefix}control-active-filter: $control-active-filter,
+    --#{$prefix}control-size: $control-size,
+    // Shared motion for the checkbox, radio and switch; the overshoot easing
+    // makes the mark pop as it settles.
+    --#{$prefix}control-transition-duration: .15s,
+    --#{$prefix}control-transition-timing: cubic-bezier(.34, 1.56, .64, 1),
+    // scss-docs-end root-control-variables
+  )
+);
+// scss-docs-start root-tokens
+$root-tokens: defaults($root-token-defaults, $root-tokens);
+// scss-docs-end root-tokens
+
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
+
 @layer colors, config, root, reboot, layout, content, forms, components, custom, helpers, utilities;
 
 @layer root {
   :root,
   [data#{$data-infix}theme="light"] {
-    // Note: Custom variable values only support SassScript inside `#{}`.
+    @include tokens($root-tokens);
 
     // Declared explicitly so light-dark() resolves deterministically rather
     // than inheriting the initial `normal`, and so native widgets match.
     color-scheme: light;
-
-    @include color-tokens();
-    @include theme-color-tokens();
-
-    // Fonts
-
-    // Note: Use `meta.inspect` for lists so that quoted items keep the quotes.
-    // See https://github.com/sass/sass/issues/2383#issuecomment-336349172
-    // scss-docs-start root-font-size-loop
-    // One token pair per stop of the type scale, so a stop can be restyled at
-    // runtime and every heading and .text-* utility follows.
-    @each $name, $props in $font-sizes {
-      --#{$prefix}font-size-#{$name}: #{map.get($props, "font-size")};
-      --#{$prefix}line-height-#{$name}: #{map.get($props, "line-height")};
-    }
-    // scss-docs-end root-font-size-loop
-
-    --#{$prefix}font-sans-serif: #{meta.inspect($font-family-sans-serif)};
-    --#{$prefix}font-monospace: #{meta.inspect($font-family-monospace)};
-    --#{$prefix}gradient: #{$gradient};
-
-    // Root and body
-    // scss-docs-start root-body-variables
-    @if $font-size-root != null {
-      --#{$prefix}root-font-size: #{$font-size-root};
-    }
-    --#{$prefix}body-font-family: #{meta.inspect($font-family-base)};
-    --#{$prefix}body-font-size: #{$font-size-base};
-    --#{$prefix}small-font-size: #{$small-font-size};
-    --#{$prefix}hr-border-color: #{$hr-border-color};
-    --#{$prefix}icon-size-base: #{$icon-size-base};
-
-    // scss-docs-start root-spacer-loop
-    // One token per stop of the spacing scale, so rescaling the system is a
-    // runtime change rather than a recompile. Components read these instead of
-    // multiplying `$spacer` when the stylesheet is built.
-    @each $key, $value in $spacers {
-      --#{$prefix}spacer-#{$key}: #{$value};
-    }
-    // scss-docs-end root-spacer-loop
-
-    // scss-docs-start root-zindex-loop
-    // One token per stop of the z-axis, so a page can relayer the library
-    // without recompiling — a third-party overlay that must sit above the
-    // modal sets --#{$prefix}z-modal instead of guessing its number.
-    @each $name, $value in $zindex-levels {
-      --#{$prefix}z-#{$name}: #{$value};
-    }
-    // scss-docs-end root-zindex-loop
-
-    // scss-docs-start root-font-weight-loop
-    @each $name, $value in $font-weights {
-      --#{$prefix}font-weight-#{$name}: #{$value};
-    }
-    // scss-docs-end root-font-weight-loop
-    --#{$prefix}body-font-weight: #{$font-weight-base};
-    --#{$prefix}body-line-height: #{$line-height-base};
-    @if $body-text-align != null {
-      --#{$prefix}body-text-align: #{$body-text-align};
-    }
-
-    --#{$prefix}body-color: #{$body-color};
-    --#{$prefix}body-bg: #{color-scheme($body-bg, $body-bg-dark)};
-
-    --#{$prefix}emphasis-color: #{$body-emphasis-color};
-
-    --#{$prefix}secondary-color: #{$body-secondary-color};
-    --#{$prefix}secondary-bg: #{$body-secondary-bg};
-
-    --#{$prefix}tertiary-color: #{$body-tertiary-color};
-    --#{$prefix}tertiary-bg: #{color-scheme($body-tertiary-bg, $body-tertiary-bg-dark)};
-    --#{$prefix}tertiary-bg-translucent: #{color-scheme(color-translucent($body-tertiary-bg), color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark))};
-    // scss-docs-end root-body-variables
-
-    --#{$prefix}heading-color: #{$headings-color};
-
-    --#{$prefix}link-color: #{$link-color};
-    --#{$prefix}link-decoration: #{$link-decoration};
-
-    --#{$prefix}link-hover-color: #{$link-hover-color};
-
-    @if $link-hover-decoration != null {
-      --#{$prefix}link-hover-decoration: #{$link-hover-decoration};
-    }
-
-    --#{$prefix}code-color: #{$code-color};
-    --#{$prefix}highlight-color: #{$mark-color};
-    --#{$prefix}highlight-bg: #{$mark-bg};
-
-    // scss-docs-start root-border-var
-    --#{$prefix}border-width: #{$border-width};
-    --#{$prefix}border-style: #{$border-style};
-    --#{$prefix}border-color: #{$border-color};
-    --#{$prefix}border-color-translucent: #{$border-color-translucent};
-
-    --#{$prefix}border-radius: #{$border-radius};
-    --#{$prefix}border-radius-sm: #{$border-radius-sm};
-    --#{$prefix}border-radius-lg: #{$border-radius-lg};
-    --#{$prefix}border-radius-xl: #{$border-radius-xl};
-    --#{$prefix}border-radius-xxl: #{$border-radius-xxl};
-    --#{$prefix}border-radius-2xl: var(--#{$prefix}border-radius-xxl); // Deprecated in v5.0.0 for consistency
-    --#{$prefix}border-radius-pill: #{$border-radius-pill};
-    // scss-docs-end root-border-var
-
-    // scss-docs-start root-box-shadow-variables
-    --#{$prefix}shadow-color: #{$shadow-color};
-    --#{$prefix}shadow-strength: #{$shadow-strength};
-
-    @each $key, $value in $shadows {
-      @if $key == null {
-        --#{$prefix}box-shadow: #{$value};
-      } @else {
-        --#{$prefix}box-shadow-#{$key}: #{$value};
-      }
-    }
-    // scss-docs-end root-box-shadow-variables
-
-    // Focus styles
-    // scss-docs-start root-focus-variables
-    --#{$prefix}focus-ring-width: #{$focus-ring-width};
-    --#{$prefix}focus-ring-opacity: #{$focus-ring-opacity};
-    --#{$prefix}focus-ring-color: #{$focus-ring-color};
-    --#{$prefix}focus-ring-offset: #{$focus-ring-offset};
-    --#{$prefix}focus-ring: var(--#{$prefix}focus-ring-width) solid var(--#{$prefix}focus-ring-color);
-    // scss-docs-end root-focus-variables
-
-    // scss-docs-start root-btn-input-variables
-    // Sizing shared by buttons and form controls, so neither has to reach for
-    // the other's Sass variables to line up.
-    --#{$prefix}btn-input-gap: #{$input-btn-gap};
-    --#{$prefix}btn-input-padding-y: #{$input-btn-padding-y};
-    --#{$prefix}btn-input-padding-x: #{$input-btn-padding-x};
-    --#{$prefix}btn-input-font-family: #{$input-btn-font-family};
-    --#{$prefix}btn-input-font-size: #{$input-btn-font-size};
-    --#{$prefix}btn-input-line-height: #{$input-btn-line-height};
-    --#{$prefix}btn-input-border-width: #{$input-btn-border-width};
-    --#{$prefix}btn-input-transition-duration: #{$input-btn-transition-duration};
-    --#{$prefix}btn-input-transition-timing: #{$input-btn-transition-timing};
-    --#{$prefix}btn-input-transition-property: #{$input-btn-transition-property};
-    --#{$prefix}btn-input-action-transition-property: #{$input-btn-action-transition-property};
-    --#{$prefix}btn-input-disabled-opacity: #{$input-btn-disabled-opacity};
-    --#{$prefix}btn-input-color: var(--#{$prefix}body-color);
-    --#{$prefix}btn-input-bg: var(--#{$prefix}body-bg);
-    --#{$prefix}btn-input-font-weight: var(--#{$prefix}body-font-weight);
-    --#{$prefix}btn-input-border-color: var(--#{$prefix}border-color);
-    --#{$prefix}btn-input-border-radius: var(--#{$prefix}border-radius);
-    --#{$prefix}btn-input-box-shadow: var(--#{$prefix}box-shadow-inset);
-    --#{$prefix}btn-input-focus-color: var(--#{$prefix}btn-input-color);
-    --#{$prefix}btn-input-focus-bg: var(--#{$prefix}btn-input-bg);
-    --#{$prefix}btn-input-focus-border-color: color-mix(in srgb, var(--#{$prefix}primary) 50%, var(--#{$prefix}white));
-    --#{$prefix}btn-input-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2);
-
-    --#{$prefix}btn-input-xs-gap: #{$input-btn-gap-xs};
-    --#{$prefix}btn-input-xs-padding-y: #{$input-btn-padding-y-xs};
-    --#{$prefix}btn-input-xs-padding-x: #{$input-btn-padding-x-xs};
-    --#{$prefix}btn-input-xs-font-size: #{$input-btn-font-size-xs};
-    --#{$prefix}btn-input-xs-border-radius: var(--#{$prefix}border-radius-sm);
-    --#{$prefix}btn-input-xs-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-xs-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2);
-
-    --#{$prefix}btn-input-sm-gap: #{$input-btn-gap-sm};
-    --#{$prefix}btn-input-sm-padding-y: #{$input-btn-padding-y-sm};
-    --#{$prefix}btn-input-sm-padding-x: #{$input-btn-padding-x-sm};
-    --#{$prefix}btn-input-sm-font-size: #{$input-btn-font-size-sm};
-    --#{$prefix}btn-input-sm-border-radius: var(--#{$prefix}border-radius-sm);
-    --#{$prefix}btn-input-sm-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-sm-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2);
-
-    --#{$prefix}btn-input-lg-gap: #{$input-btn-gap-lg};
-    --#{$prefix}btn-input-lg-padding-y: #{$input-btn-padding-y-lg};
-    --#{$prefix}btn-input-lg-padding-x: #{$input-btn-padding-x-lg};
-    --#{$prefix}btn-input-lg-font-size: #{$input-btn-font-size-lg};
-    --#{$prefix}btn-input-lg-border-radius: var(--#{$prefix}border-radius-lg);
-    --#{$prefix}btn-input-lg-min-height: calc(var(--#{$prefix}btn-input-line-height) * 1em + var(--#{$prefix}btn-input-lg-padding-y) * 2 + var(--#{$prefix}btn-input-border-width) * 2);
-    // scss-docs-end root-btn-input-variables
-
-    // scss-docs-start root-control-variables
-    // State colors shared by every control that can be checked or selected —
-    // checkboxes, radios, switches, and the option indicators the autocomplete
-    // and multi select draw. Restyle them here once.
-    --#{$prefix}control-checked-bg: #{$control-checked-bg};
-    --#{$prefix}control-checked-border-color: #{$control-checked-border-color};
-    --#{$prefix}control-indeterminate-bg: #{$control-indeterminate-bg};
-    --#{$prefix}control-indeterminate-border-color: #{$control-indeterminate-border-color};
-    --#{$prefix}control-disabled-bg: var(--#{$prefix}tertiary-bg);
-    --#{$prefix}control-disabled-opacity: #{$control-disabled-opacity};
-    --#{$prefix}control-label-disabled-opacity: #{$control-label-disabled-opacity};
-    --#{$prefix}control-focus-border-color: #{$control-focus-border};
-    --#{$prefix}control-active-filter: #{$control-active-filter};
-    --#{$prefix}control-size: #{$control-size};
-    // Shared motion for the checkbox, radio and switch; the overshoot easing
-    // makes the mark pop as it settles.
-    --#{$prefix}control-transition-duration: .15s;
-    --#{$prefix}control-transition-timing: cubic-bezier(.34, 1.56, .64, 1);
-    // scss-docs-end root-control-variables
-
   }
 
   @if $enable-dark-mode {
     @include color-mode(dark, true) {
-      color-scheme: dark;
-
       // scss-docs-start root-dark-mode-vars
       // A shadow reads as depth against the surface behind it, and a dark
       // surface swallows the same alpha, so the strength rises instead of the
       // colour changing.
       --#{$prefix}shadow-strength: #{$shadow-strength-dark};
       // scss-docs-end root-dark-mode-vars
+
+      color-scheme: dark;
     }
   }
 }

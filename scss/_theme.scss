@@ -1,5 +1,6 @@
 @use "sass:map";
 @use "functions/maps" as *;
+@use "mixins/tokens" as *;
 @use "colors" as *;
 @use "config" as *;
 
@@ -216,9 +217,11 @@ $theme-lightness-overrides: (
 }
 // scss-docs-end theme-classes
 
-@mixin theme-color-tokens() {
+@function theme-color-tokens() {
+  $tokens: ();
+
   @each $color, $slots in $theme-colors {
-    --#{$prefix}#{$color}: #{map.get($slots, "base")};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
   }
 
   // A 100-900 scale per theme color, mixed at runtime from the color's own
@@ -227,39 +230,45 @@ $theme-lightness-overrides: (
   // these stops (see $color-tints / $color-shades).
   @each $color, $slots in $theme-colors {
     @each $stop, $weight in $color-tints {
-      --#{$prefix}#{$color}-#{$stop}: #{color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color}))};
+      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
     }
-    --#{$prefix}#{$color}-500: var(--#{$prefix}#{$color});
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
     @each $stop, $weight in $color-shades {
-      --#{$prefix}#{$color}-#{$stop}: #{color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color}))};
+      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
     }
   }
 
   @each $color, $value in $theme-colors-text {
-    --#{$prefix}#{$color}-text-emphasis: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-text-emphasis, $value);
   }
 
   @each $color, $value in $theme-colors-bg-subtle {
-    --#{$prefix}#{$color}-bg-subtle: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg-subtle, $value);
   }
 
   @each $color, $value in $theme-colors-border-subtle {
-    --#{$prefix}#{$color}-border-subtle: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-border-subtle, $value);
   }
 
   @each $color, $value in $theme-colors-contrast {
-    --#{$prefix}#{$color}-contrast: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-contrast, $value);
   }
 
   @each $color, $value in $theme-colors-fg {
-    --#{$prefix}#{$color}-fg: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-fg, $value);
   }
 
   @each $color, $value in $theme-colors-bg-muted {
-    --#{$prefix}#{$color}-bg-muted: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-bg-muted, $value);
   }
 
   @each $color, $value in $theme-colors-focus-ring {
-    --#{$prefix}#{$color}-focus-ring: #{$value};
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-focus-ring, $value);
   }
+
+  @return $tokens;
+}
+
+@mixin theme-color-tokens() {
+  @include tokens(theme-color-tokens());
 }
