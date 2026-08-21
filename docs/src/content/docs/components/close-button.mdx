@@ -8,7 +8,7 @@ otherFrameworks:
 
 ## Example
 
-Provide an option to dismiss or close a component with `.btn-close`. Default styling is limited, but highly customizable. Modify the Sass variables to replace the default `background-image`. **Be sure to include text for screen readers**, as we've done with `aria-label`.
+Provide an option to dismiss or close a component with `.btn-close`. The icon is drawn with a CSS mask, so it takes the element's own `color` — put the button on any surface and it stays legible without a variant class. **Be sure to include text for screen readers**, as we've done with `aria-label`.
 
 <Example code={`<button type="button" class="btn-close" aria-label="Close"></button>`} />
 
@@ -18,20 +18,27 @@ Disabled close buttons change their `opacity`. We've also applied `pointer-event
 
 <Example code={`<button type="button" class="btn-close" disabled aria-label="Close"></button>`} />
 
-## Dark variant
+## On a dark surface
 
-<Callout color="warning">
-**Heads up!** As of v5.0.0, the `.btn-close-white` class is deprecated. Instead, use `data-coreui-theme="dark"` to change the color mode of the close button.
-</Callout>
+A close button takes the color it inherits, so a colored surface needs nothing extra — the same `.btn-close` works on a dark toast, a dark offcanvas or an alert.
 
-Add `data-coreui-theme="dark"` to the `.btn-close`, or to its parent element, to invert the close button. This uses the `filter` property to invert the `background-image` without overriding its value.
+<Example class="text-bg-dark p-3" code={`<button type="button" class="btn-close" aria-label="Close"></button>
+  <button type="button" class="btn-close" disabled aria-label="Close"></button>`} />
 
-<Example class="bg-dark" code={`<div data-coreui-theme="dark">
+`data-coreui-theme` on a section flips the tokens but paints nothing by itself, so give that section a surface — `.bg-body` and `.text-body` read the flipped tokens — and the close button follows the text like everything else in it.
+
+<Example code={`<div data-coreui-theme="dark" class="bg-body text-body p-3">
     <button type="button" class="btn-close" aria-label="Close"></button>
     <button type="button" class="btn-close" disabled aria-label="Close"></button>
   </div>`} />
 
 ## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/buttons/_close.scss" capture="close-css-vars" />
+
+Point `--cui-btn-close-icon` at any SVG to replace the glyph. The mask uses its shape only, so whatever color the file carries is ignored.
 
 ### SASS variables
 

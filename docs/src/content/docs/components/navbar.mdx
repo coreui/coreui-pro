@@ -605,7 +605,7 @@ To create an offcanvas navbar that expands into a normal navbar at a specific br
 </nav>
 ```
 
-When using offcanvas in a dark navbar, be aware that you may need to have a dark background on the offcanvas content to avoid the text becoming illegible. In the example below, we add `.navbar-dark` and `.bg-dark` to the `.navbar`, `.text-bg-dark` to the `.offcanvas`, `.dropdown-menu-dark` to `.dropdown-menu`, and `.btn-close-white` to `.btn-close` for proper styling with a dark offcanvas.
+When using offcanvas in a dark navbar, be aware that you may need to have a dark background on the offcanvas content to avoid the text becoming illegible. In the example below, we add `.navbar-dark` and `.bg-dark` to the `.navbar`, `.text-bg-dark` to the `.offcanvas`, `.dropdown-menu-dark` to `.dropdown-menu` for proper styling with a dark offcanvas. The close button takes the colour it inherits, so it needs nothing.
 
 <Example code={`<nav class="navbar navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
@@ -616,7 +616,7 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
       <dialog class="offcanvas offcanvas-end text-bg-dark" id="offcanvasDarkNavbar" aria-labelledby="offcanvasDarkNavbarLabel">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasDarkNavbarLabel">Dark offcanvas</h5>
-          <button type="button" class="btn-close btn-close-white" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
           <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
