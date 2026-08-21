@@ -1,6 +1,5 @@
 @use "../config" as *;
 
-// stylelint-disable function-disallowed-list
 // scss-docs-start aspect-ratios
 $aspect-ratios: (
   "1x1": 100%,
@@ -9,7 +8,6 @@ $aspect-ratios: (
   "21x9": calc(9 / 21 * 100%)
 ) !default;
 // scss-docs-end aspect-ratios
-// stylelint-enable function-disallowed-list
 
 @layer helpers {
   // Credit: Nicolas Gallagher and SUIT CSS.

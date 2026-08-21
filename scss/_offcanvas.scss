@@ -8,7 +8,7 @@
 @use "modal" as *;
 @use "config" as *;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start offcanvas-variables
 $offcanvas-padding-y:               $modal-inner-padding !default;

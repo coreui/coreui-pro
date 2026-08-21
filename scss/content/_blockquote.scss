@@ -5,7 +5,7 @@
 // scss-docs-start blockquote-variables
 $blockquote-margin-y:            var(--#{$prefix}spacer-3) !default;
 $blockquote-gap:                 var(--#{$prefix}spacer-3) !default;
-$blockquote-font-size:           calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$blockquote-font-size:           calc(var(--#{$prefix}body-font-size) * 1.25) !default;
 $blockquote-footer-margin-y:     var(--#{$prefix}spacer-3) !default;
 $blockquote-footer-color:        var(--#{$prefix}secondary-color) !default;
 $blockquote-footer-font-size:    var(--#{$prefix}small-font-size) !default;

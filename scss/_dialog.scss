@@ -7,7 +7,7 @@
 @use "mixins/transition" as *;
 @use "config" as *;
 
-// stylelint-disable custom-property-no-missing-var-function, function-disallowed-list
+// stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start dialog-variables
 $dialog-padding:                    var(--#{$prefix}spacer-3) !default;

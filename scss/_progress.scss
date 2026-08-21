@@ -8,7 +8,7 @@
 
 // scss-docs-start progress-variables
 $progress-height:                   1rem !default;
-$progress-font-size:                calc(var(--#{$prefix}body-font-size) * .75) !default; // stylelint-disable-line function-disallowed-list
+$progress-font-size:                calc(var(--#{$prefix}body-font-size) * .75) !default;
 $progress-bg:                       var(--#{$prefix}secondary-bg) !default;
 $progress-border-radius:            var(--#{$prefix}border-radius) !default;
 $progress-box-shadow:               var(--#{$prefix}box-shadow-inset) !default;

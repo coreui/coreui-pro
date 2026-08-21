@@ -47,7 +47,7 @@ $form-label-tokens: defaults(
   // For use with horizontal and inline forms, when you need the label (or legend)
   // text to align with the form controls.
   .col-form-label {
-    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-padding-y) + var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-padding-y) + var(--#{$prefix}btn-input-border-width));
     --#{$prefix}label-line-height: var(--#{$prefix}btn-input-line-height);
 
     padding-top: var(--#{$prefix}label-padding-y);
@@ -57,12 +57,12 @@ $form-label-tokens: defaults(
   }
 
   .col-form-label-lg {
-    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-lg-padding-y) + var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-lg-padding-y) + var(--#{$prefix}btn-input-border-width));
     --#{$prefix}label-font-size: var(--#{$prefix}btn-input-lg-font-size);
   }
 
   .col-form-label-sm {
-    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-sm-padding-y) + var(--#{$prefix}btn-input-border-width)); // stylelint-disable-line function-disallowed-list
+    --#{$prefix}label-padding-y: calc(var(--#{$prefix}btn-input-sm-padding-y) + var(--#{$prefix}btn-input-border-width));
     --#{$prefix}label-font-size: var(--#{$prefix}btn-input-sm-font-size);
   }
 }

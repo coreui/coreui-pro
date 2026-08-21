@@ -130,7 +130,6 @@ $border-radius-pill:          50rem !default;
 // `--#{$prefix}shadow-tint` and `--#{$prefix}shadow-opacity` are written by the
 // `.shadow-{color}` and `.shadow-opacity-*` utilities and registered as
 // non-inheriting, so neither leaks into a nested `.shadow-*`.
-// stylelint-disable function-disallowed-list
 
 // scss-docs-start box-shadow-variables
 
@@ -142,7 +141,6 @@ $shadows: (
 ) !default;
 // scss-docs-end box-shadow-variables
 
-// stylelint-enable function-disallowed-list
 
 // Font, line-height, and color for body text, headings, and more.
 
@@ -153,8 +151,8 @@ $font-family-base:            var(--#{$prefix}font-sans-serif) !default;
 // $font-size-base affects the font size of the body text
 $font-size-root:              null !default;
 $font-size-base:              1rem !default; // Assumes the browser default, typically `16px`
-$font-size-sm:                calc(var(--#{$prefix}body-font-size) * .875) !default; // stylelint-disable-line function-disallowed-list
-$font-size-lg:                calc(var(--#{$prefix}body-font-size) * 1.25) !default; // stylelint-disable-line function-disallowed-list
+$font-size-sm:                calc(var(--#{$prefix}body-font-size) * .875) !default;
+$font-size-lg:                calc(var(--#{$prefix}body-font-size) * 1.25) !default;
 
 $font-weight-lighter:         lighter !default;
 $font-weight-light:           300 !default;
@@ -204,7 +202,7 @@ $headings-color:              inherit !default;
 
 // scss-docs-start font-sizes
 $font-sizes: (
-  "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75), "line-height": var(--#{$prefix}body-line-height)), // stylelint-disable-line function-disallowed-list
+  "xs":  ("font-size": calc(var(--#{$prefix}body-font-size) * .75), "line-height": var(--#{$prefix}body-line-height)),
   "sm":  ("font-size": $font-size-sm,         "line-height": var(--#{$prefix}body-line-height)),
   "md":  ("font-size": $h6-font-size,         "line-height": var(--#{$prefix}body-line-height)),
   "lg":  ("font-size": $h5-font-size,         "line-height": $headings-line-height),

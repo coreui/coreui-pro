@@ -6,6 +6,6 @@
   --#{$prefix}gutter-x: #{$gutter};
   --#{$prefix}gutter-y: 0;
   width: 100%;
-  padding-inline: calc(var(--#{$prefix}gutter-x) * .5); // stylelint-disable-line function-disallowed-list
+  padding-inline: calc(var(--#{$prefix}gutter-x) * .5);
   margin-inline: auto;
 }

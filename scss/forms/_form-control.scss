@@ -95,8 +95,8 @@ $form-control-select-indicator-color:      $gray-800 !default;
 $form-control-select-indicator:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='#{$form-control-select-indicator-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/></svg>") !default;
 $form-control-select-bg-position:          right var(--#{$prefix}control-padding-x) center !default;
 $form-control-select-bg-size:              16px 12px !default; // In pixels because image dimensions
-$form-control-select-padding-end:          calc(var(--#{$prefix}control-padding-x) * 3) !default; // stylelint-disable-line function-disallowed-list
-$form-control-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}control-select-padding-end)) !default; // stylelint-disable-line function-disallowed-list
+$form-control-select-padding-end:          calc(var(--#{$prefix}control-padding-x) * 3) !default;
+$form-control-select-feedback-icon-padding-end: calc(var(--#{$prefix}control-padding-x) * 2.5 + var(--#{$prefix}control-select-padding-end)) !default;
 $form-control-select-feedback-icon-position: center right var(--#{$prefix}control-select-padding-end) !default;
 $form-control-select-feedback-icon-size:   $input-height-inner-half $input-height-inner-half !default;
 // scss-docs-end form-control-select-variables
@@ -161,7 +161,7 @@ $form-control-select-tokens: defaults(
       // Add some height to date inputs on iOS
       // https://github.com/twbs/bootstrap/issues/23307
       // TODO: we can remove this workaround once https://bugs.webkit.org/show_bug.cgi?id=198959 is resolved
-      height: calc(var(--#{$prefix}btn-input-line-height) * 1em); // stylelint-disable-line function-disallowed-list
+      height: calc(var(--#{$prefix}btn-input-line-height) * 1em);
 
       // Android Chrome type="date" is taller than the other inputs
       // because of "margin: 1px 24px 1px 4px" inside the shadow DOM
@@ -199,7 +199,6 @@ $form-control-select-tokens: defaults(
     // File input buttons theming
     &::file-selector-button {
       padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      // stylelint-disable-next-line function-disallowed-list
       margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
       margin-inline-end: var(--#{$prefix}control-padding-x);
       color: var(--#{$prefix}control-action-color);
@@ -278,7 +277,6 @@ $form-control-select-tokens: defaults(
 
     &::file-selector-button {
       padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      // stylelint-disable-next-line function-disallowed-list
       margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
       margin-inline-end: var(--#{$prefix}control-padding-x);
     }
@@ -299,7 +297,6 @@ $form-control-select-tokens: defaults(
 
     &::file-selector-button {
       padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      // stylelint-disable-next-line function-disallowed-list
       margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
       margin-inline-end: var(--#{$prefix}control-padding-x);
     }

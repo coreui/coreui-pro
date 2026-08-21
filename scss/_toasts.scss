@@ -122,7 +122,7 @@ $toast-tokens: defaults(
     @include border-top-radius(calc(var(--#{$prefix}toast-border-radius) - var(--#{$prefix}toast-border-width)));
 
     .btn-close {
-      margin-inline: var(--#{$prefix}toast-padding-x) calc(-.5 * var(--#{$prefix}toast-padding-x)); // stylelint-disable-line function-disallowed-list
+      margin-inline: var(--#{$prefix}toast-padding-x) calc(-.5 * var(--#{$prefix}toast-padding-x));
     }
   }
 

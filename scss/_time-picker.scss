@@ -21,7 +21,7 @@ $time-picker-roll-cell-hover-bg:              var(--#{$prefix}tertiary-bg) !defa
 $time-picker-roll-cell-selected-color:        var(--#{$prefix}white) !default;
 $time-picker-roll-cell-selected-bg:           var(--#{$prefix}primary) !default;
 $time-picker-roll-cell-selected-hover-color:  var(--#{$prefix}white) !default;
-$time-picker-roll-cell-selected-hover-bg:     oklch(from var(--#{$prefix}primary) calc(l * .85) c h) !default; // stylelint-disable-line function-disallowed-list
+$time-picker-roll-cell-selected-hover-bg:     oklch(from var(--#{$prefix}primary) calc(l * .85) c h) !default;
 
 $time-picker-inline-select-font-size:       var(--#{$prefix}btn-input-sm-font-size) !default;
 $time-picker-inline-select-color:           var(--#{$prefix}btn-input-color) !default;
@@ -131,7 +131,7 @@ $time-picker-tokens: defaults(
   }
 
   .time-picker-roll-col {
-    height: calc(8 * var(--#{$prefix}time-picker-roll-cell-height)); // stylelint-disable-line
+    height: calc(8 * var(--#{$prefix}time-picker-roll-cell-height));
     overflow: scroll;
 
     -ms-overflow-style: none;  /* Internet Explorer 10+ */
@@ -177,7 +177,7 @@ $time-picker-tokens: defaults(
     }
 
     &:last-child {
-      margin-bottom: calc(7 * var(--#{$prefix}time-picker-roll-cell-height)); // stylelint-disable-line
+      margin-bottom: calc(7 * var(--#{$prefix}time-picker-roll-cell-height));
     }
   }
 

@@ -115,7 +115,7 @@ $calendar-tokens: defaults(
     font-weight: initial;
 
     table {
-      width: calc(var(--#{$prefix}calendar-table-cell-size) * 7); // stylelint-disable-line function-disallowed-list
+      width: calc(var(--#{$prefix}calendar-table-cell-size) * 7);
       margin: var(--#{$prefix}calendar-table-margin);
 
       th,
@@ -137,7 +137,7 @@ $calendar-tokens: defaults(
   }
 
   .show-week-numbers table {
-    width: calc(var(--#{$prefix}calendar-table-cell-size) * 8); // stylelint-disable-line function-disallowed-list
+    width: calc(var(--#{$prefix}calendar-table-cell-size) * 8);
   }
 
   .calendars {
