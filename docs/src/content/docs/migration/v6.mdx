@@ -1302,6 +1302,23 @@ Multi Select's option indicators moved with it — they render as a decorative
   variant only has to set `--cui-table-color`, `--cui-table-bg` and
   `--cui-table-border-color`.
 
+#### Blockquote
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The source line reads `--cui-secondary-color`.** `.blockquote-footer` was
+  painted with `--cui-gray-600`, a fixed value that never flipped with the
+  colour mode: 4.15:1 on the light background and 3.65:1 on the dark one, both
+  under the 4.5:1 minimum. The secondary colour is defined per mode and clears
+  the threshold in both.
+- **The quote lays its children out with flex and `gap`.** Spacing inside a
+  multi-paragraph quote is `--cui-blockquote-gap` rather than each paragraph's
+  own bottom margin, and `.blockquote > :last-child { margin-bottom: 0 }` is
+  gone with the margins it existed to cancel.
+- **The footer no longer pulls itself up with a negative margin.** A quote
+  followed by `.blockquote-footer` drops its own bottom margin instead
+  (`:has()`), so the two spacings can be set independently:
+  `--cui-blockquote-margin-y` and `--cui-blockquote-footer-margin-y`.
+
 #### Toast
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

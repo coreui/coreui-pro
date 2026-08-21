@@ -232,7 +232,15 @@ Align terms and descriptions horizontally by using our grid system's predefined 
 
 Headings scale with the viewport: the larger sizes are written as `clamp()`, so they grow with the screen up to the size given as the ceiling and stop there.
 
-## Customization
+## Customizing
+
+### CSS variables
+
+Blockquotes carry their spacing, size and source colour as CSS variables, on the quote and on its footer separately — the footer is a sibling of the quote, not a child, so it cannot read anything declared on it.
+
+<ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-css-vars" />
+
+<ScssDocs file="scss/content/_blockquote.scss" capture="blockquote-footer-css-vars" />
 
 ### SASS variables
 
