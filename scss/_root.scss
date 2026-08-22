@@ -63,6 +63,10 @@ $shadow-strength:      1 !default;
 $shadow-strength-dark: 2.5 !default;
 // scss-docs-end box-shadow-variables
 
+// scss-docs-start transition-variables
+$transition-timing-overlay: cubic-bezier(.22, 1, .36, 1) !default;
+// scss-docs-end transition-variables
+
 // scss-docs-start focus-ring-variables
 $focus-ring-width:            .25rem !default;
 $focus-ring-opacity:          .25 !default;
@@ -230,6 +234,11 @@ $root-token-defaults: map.merge(
     // scss-docs-end root-border-var
     --#{$prefix}shadow-color: $shadow-color,
     --#{$prefix}shadow-strength: $shadow-strength,
+    // scss-docs-start root-transition-variables
+    // Easing shared by the components that float above the page — dialog,
+    // drawer, menu and popup. One override restyles all four.
+    --#{$prefix}transition-timing-overlay: $transition-timing-overlay,
+    // scss-docs-end root-transition-variables
     // Focus styles
     // scss-docs-start root-focus-variables
     --#{$prefix}focus-ring-width: $focus-ring-width,

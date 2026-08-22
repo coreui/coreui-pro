@@ -60,6 +60,22 @@ Those variables are then reassigned to `:root` level CSS variables that can be c
 
 <ScssDocs file="scss/_root.scss" capture="root-focus-variables" />
 
+## Overlay easing
+
+The components that float above the page — dialog, drawer, menu and the popup the field components open — read one easing curve from `:root` instead of carrying their own.
+
+<ScssDocs file="scss/_root.scss" capture="root-transition-variables" />
+
+Set it once and all four follow:
+
+```css
+:root {
+  --cui-transition-timing-overlay: linear;
+}
+```
+
+Each component still exposes its own `--cui-{component}-transition-timing`, so a single overlay can opt out without touching the others.
+
 ## Grid breakpoints
 
 While we include our grid breakpoints as CSS variables (except for `xs`), be aware that **CSS variables do not work in media queries**. This is by design in the CSS spec for variables, but may change in coming years with support for `env()` variables. Check out [this Stack Overflow answer](https://stackoverflow.com/a/47212942) for some helpful links. In the mean time, you can use these variables in other CSS situations, as well as in your JavaScript.

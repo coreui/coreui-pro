@@ -44,7 +44,7 @@ $menu-header-color:             var(--#{$prefix}tertiary-color) !default;
 $menu-header-padding-x:         .75rem !default;
 $menu-header-padding-y:         .25rem !default;
 $menu-transition-duration:      .15s !default;
-$menu-transition-timing:        cubic-bezier(.22, 1, .36, 1) !default;
+$menu-transition-timing:        var(--#{$prefix}transition-timing-overlay) !default;
 // scss-docs-end menu-variables
 
 $menu-tokens: () !default;
