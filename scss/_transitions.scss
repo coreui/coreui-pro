@@ -9,7 +9,7 @@ $transition-fade-timing:      linear !default;
 // scss-docs-end fade-transition
 
 // scss-docs-start collapse-transition
-$transition-collapse-property: height !default;
+$transition-collapse-property: "height, display" !default;
 $transition-collapse-duration: .35s !default;
 $transition-collapse-timing:   ease !default;
 // scss-docs-end collapse-transition
@@ -57,37 +57,97 @@ $collapse-tokens: defaults(
   }
 
   // scss-docs-start collapse-classes
-  // Both classes carry the tokens: JavaScript swaps `.collapse` for
-  // `.collapsing` while the size animates, and find-in-page reveals the content
-  // without either swap happening.
+  // Both classes carry the tokens: `.collapsing` marks a running transition on
+  // either path, and find-in-page reveals the content with neither toggle
+  // happening.
   .collapse,
   .collapsing {
     @include tokens($collapse-tokens);
   }
 
-  .collapse {
-    // `until-found` content is hidden by the browser instead, which keeps it
-    // laid out so find-in-page can reach it. `display: none` would take it back
-    // out of the layout and undo that.
-    &:not(.show, [hidden="until-found"]) {
-      display: none;
+  // As wide as its content, not as wide as its container: the open size is the
+  // animation's target, and a target of `auto` would spend most of the run
+  // growing an empty box past the content.
+  .collapse-horizontal {
+    width: fit-content;
+  }
+
+  // The browser animates the size itself: `interpolate-size` lets the `0` of
+  // the closed state interpolate to the `auto` of the open one, and `display`
+  // transitions discretely, so the element stays laid out until the size
+  // reaches `0`.
+  @supports (interpolate-size: allow-keywords) {
+    .collapse {
+      interpolate-size: allow-keywords;
+      @include transition-props(
+        var(--#{$prefix}transition-collapse-property),
+        var(--#{$prefix}transition-collapse-duration),
+        var(--#{$prefix}transition-collapse-timing),
+        allow-discrete
+      );
+
+      // `until-found` content is hidden by the browser instead, which keeps it
+      // laid out so find-in-page can reach it. `display: none` would take it
+      // back out of the layout and undo that.
+      &:not(.show, [hidden="until-found"]) {
+        display: none;
+        height: 0;
+      }
+
+      // The box is clipped only while the move runs, so a dropdown inside an
+      // open collapse can still spill out of it.
+      &.collapsing {
+        overflow: hidden;
+      }
+
+      // A hidden collapse is not rendered, so the opening side needs a start
+      // value of its own — but only when JavaScript marks the run: a collapse
+      // that loads already open must not play an entrance.
+      &.show.collapsing {
+        @starting-style {
+          height: 0;
+        }
+      }
+
+      &.collapse-horizontal {
+        --#{$prefix}transition-collapse-property: width, display;
+
+        &:not(.show, [hidden="until-found"]) {
+          width: 0;
+          height: auto;
+        }
+
+        &.show.collapsing {
+          @starting-style {
+            width: 0;
+          }
+        }
+      }
     }
   }
 
-  .collapsing {
-    height: 0;
-    overflow: hidden;
-    @include transition-props(
-      var(--#{$prefix}transition-collapse-property),
-      var(--#{$prefix}transition-collapse-duration),
-      var(--#{$prefix}transition-collapse-timing)
-    );
+  // Everywhere else JavaScript measures the two sizes and the stylesheet still
+  // times the move between them.
+  @supports not (interpolate-size: allow-keywords) {
+    .collapse:not(.show, .collapsing, [hidden="until-found"]) {
+      display: none;
+    }
 
-    &.collapse-horizontal {
-      --#{$prefix}transition-collapse-property: width;
+    .collapsing {
+      height: 0;
+      overflow: hidden;
+      @include transition-props(
+        var(--#{$prefix}transition-collapse-property),
+        var(--#{$prefix}transition-collapse-duration),
+        var(--#{$prefix}transition-collapse-timing)
+      );
 
-      width: 0;
-      height: auto;
+      &.collapse-horizontal {
+        --#{$prefix}transition-collapse-property: width;
+
+        width: 0;
+        height: auto;
+      }
     }
   }
   // scss-docs-end collapse-classes
@@ -97,25 +157,12 @@ $collapse-tokens: defaults(
   // JavaScript. Scoped to the option rather than to `[hidden]`, because that
   // attribute comes and goes while the opt-in does not.
   @supports (interpolate-size: allow-keywords) {
-    // Not scoped to `.collapse`: during the transition the element carries
-    // `.collapsing` instead, and the declaration has to survive that swap.
     [data-coreui-hidden-until-found="true"] {
       --#{$prefix}transition-collapse-property: height, content-visibility;
 
-      interpolate-size: allow-keywords;
+      // Clipped at all times, not only under `.collapsing`: find-in-page
+      // reveals the panel with no class toggle happening.
       overflow: hidden;
-      @include transition-props(
-        var(--#{$prefix}transition-collapse-property),
-        var(--#{$prefix}transition-collapse-duration),
-        var(--#{$prefix}transition-collapse-timing),
-        allow-discrete
-      );
-    }
-
-    // `.collapsing` still marks the transition for anyone styling it, but its
-    // own height would clamp the one being interpolated.
-    .collapsing[data-coreui-hidden-until-found="true"] {
-      height: auto;
     }
 
     [data-coreui-hidden-until-found="true"][hidden="until-found"] {

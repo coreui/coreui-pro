@@ -8,7 +8,8 @@
 import BaseComponent from './base-component.js'
 import EventHandler from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, reflow } from './util/index.js'
+import { defineJQueryPlugin } from './util/index.js'
+import { startSizeTransition, supportsInterpolateSize } from './util/size-transition.js'
 
 /**
  * Constants
@@ -31,14 +32,6 @@ const SELECTOR_ACCORDION = '.accordion'
 const SELECTOR_HEADER = '.accordion-header'
 const SELECTOR_INTERACTIVE = 'a, button, input, select, textarea'
 const SELECTOR_ITEM = 'details.accordion-item'
-
-// Chromium animates `block-size: 0 -> auto` on its own through `interpolate-size`,
-// so this component only exists for the browsers that cannot. It is safe to drop
-// once Firefox and WebKit ship `calc-size()`.
-const supportsNativeAnimation = (): boolean =>
-  typeof CSS !== 'undefined' &&
-  typeof CSS.supports === 'function' &&
-  CSS.supports('interpolate-size', 'allow-keywords')
 
 /**
  * Class definition
@@ -184,28 +177,17 @@ class Accordion extends BaseComponent {
     }
   }
 
-  // Sets the two sizes and lets the stylesheet time the move between them, so
-  // the duration, the easing and the reduced-motion decision are read from one
-  // place by both paths and this file needs no token names.
   async _animate(details: HTMLDetailsElement, from: number, to: number, onFinish?: () => void): Promise<void> {
     // Where the panel is animated by CSS, running this one too would drive the
     // same expansion from both ends.
-    if (supportsNativeAnimation()) {
+    if (supportsInterpolateSize()) {
       onFinish?.()
       return
     }
 
     details.setAttribute(ATTRIBUTE_ANIMATING, '')
 
-    // The starting size has to land unanimated, or the transition the attribute
-    // just enabled would run towards it and the real move would cancel it.
-    details.style.transition = 'none'
-    details.style.blockSize = `${from}px`
-
-    reflow(details)
-
-    details.style.transition = ''
-    details.style.blockSize = `${to}px`
+    startSizeTransition(details, 'blockSize', from, to)
 
     await this._queueCallback(() => {
       onFinish?.()
@@ -250,7 +232,7 @@ EventHandler.on(document, EVENT_TOGGLE_DATA_API, SELECTOR_ITEM, function (this: 
 // natively.
 EventHandler.on(document, EVENT_CLICK_DATA_API, (event: Event) => {
   // Where CSS can animate the panel, the element is left to toggle itself.
-  if (supportsNativeAnimation() || event.defaultPrevented) {
+  if (supportsInterpolateSize() || event.defaultPrevented) {
     return
   }
 

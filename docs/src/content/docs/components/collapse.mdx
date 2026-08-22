@@ -8,7 +8,7 @@ otherFrameworks:
 
 ## How it works
 
-The collapse JavaScript plugin is used to show and hide content. Buttons or anchors are used as triggers that are mapped to specific elements you toggle. Collapsing an element will animate the `height` from its current value to `0`. Given how CSS handles animations, you cannot use `padding` on a `.collapse` element. Instead, use the class as an independent wrapping element.
+The collapse JavaScript plugin is used to show and hide content. Buttons or anchors are used as triggers that are mapped to specific elements you toggle. Collapsing an element animates its `height` between `0` and the natural size of the content — the browser interpolates the size itself through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size), and where that is not supported JavaScript measures the two sizes and the stylesheet still times the move. Given how CSS handles animations, you cannot use `padding` on a `.collapse` element. Instead, use the class as an independent wrapping element.
 
 <Callout color="info">
 This component's animation effect relies on the `prefers-reduced-motion` media query. For more information, refer to the [reduced motion section of our accessibility documentation](/getting-started/accessibility/#reduced-motion).
@@ -18,9 +18,9 @@ This component's animation effect relies on the `prefers-reduced-motion` media q
 
 Click the buttons below to show and hide another element via class changes:
 
-- `.collapse` hides content
-- `.collapsing` is applied during transitions
-- `.collapse.show` shows content
+- `.collapse` stays on the element at all times; without `.show` the content is hidden
+- `.show` lands at the start of the opening transition and leaves at the start of the closing one
+- `.collapsing` is applied while either transition runs
 
 You can use a link with the `href` attribute, or a button with the `data-coreui-target` attribute. In both samples, the `data-coreui-toggle="collapse""` is required.
 
@@ -116,9 +116,9 @@ Note that CoreUI for Bootstrap's current implementation does not cover the vario
 
 The collapse plugin utilizes a few classes to handle the heavy lifting:
 
-- `.collapse` hides the content
-- `.collapse.show` shows the content
-- `.collapsing` is added when the transition starts, and removed when it finishes
+- `.collapse` marks the element and never leaves it; without `.show` the content is hidden
+- `.collapse.show` shows the content — the class is added when the opening transition starts and removed when the closing one starts
+- `.collapsing` is added when either transition starts, and removed when it finishes
 
 These classes can be found in `_transitions.scss`.
 
@@ -200,7 +200,7 @@ myCollapsible.addEventListener('hidden.coreui.collapse', event => {
 
 The three variables are declared on both `.collapse` and `.collapsing`, so overriding them on an ancestor retimes every collapse below it.
 
-`--cui-transition-collapse-property` names what animates. Adding to the animation is one declaration instead of a whole new `transition` — that is how `.collapse-horizontal` switches from `height` to `width`, and how the findable option adds `content-visibility`.
+`--cui-transition-collapse-property` names what animates. Adding to the animation is one declaration instead of a whole new `transition` — that is how `.collapse-horizontal` switches from `height` to `width`, and how the findable option adds `content-visibility`. Keep `display` in the list: it is what holds the element in the layout until the closing transition ends.
 
 <ScssDocs file="scss/_transitions.scss" capture="collapse-css-vars" />
 
