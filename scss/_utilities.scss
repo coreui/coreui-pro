@@ -551,6 +551,70 @@ $utilities: map.merge(
         stretch: stretch,
       )
     ),
+    // The inline-axis counterparts of the three above, which only grid can act
+    // on — flex has no `justify-items` and ignores `justify-self`.
+    // scss-docs-start utils-justify-items
+    "justify-items": (
+      responsive: true,
+      property: justify-items,
+      values: (
+        start: start,
+        end: end,
+        center: center,
+        stretch: stretch,
+      )
+    ),
+    "justify-self": (
+      responsive: true,
+      property: justify-self,
+      values: (
+        start: start,
+        end: end,
+        center: center,
+      )
+    ),
+    "place-items": (
+      responsive: true,
+      property: place-items,
+      values: (
+        start: start,
+        end: end,
+        center: center,
+        stretch: stretch,
+      )
+    ),
+    // scss-docs-end utils-justify-items
+    // scss-docs-start utils-grid
+    // `grid-cols-*` sets the track list on the container; `grid-cols-fill` is
+    // the item counterpart, spanning whatever the container ended up with.
+    "grid-template-columns": (
+      responsive: true,
+      property: grid-template-columns,
+      class: grid-cols,
+      values: (
+        1: 1fr,
+        2: repeat(2, 1fr),
+        3: repeat(3, 1fr),
+        4: repeat(4, 1fr),
+        6: repeat(6, 1fr),
+        subgrid: subgrid,
+      )
+    ),
+    "grid-column": (
+      responsive: true,
+      property: grid-column,
+      class: grid-cols,
+      values: (
+        fill: #{"1 / -1"},
+      )
+    ),
+    "grid-auto-flow": (
+      responsive: true,
+      property: grid-auto-flow,
+      class: grid-auto-flow,
+      values: row column dense
+    ),
+    // scss-docs-end utils-grid
     "order": (
       responsive: true,
       property: order,

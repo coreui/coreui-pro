@@ -372,6 +372,8 @@
       to: /utilities/flex/
     - title: Float
       to: /utilities/float/
+    - title: Grid
+      to: /utilities/grid/
     - title: Interactions
       to: /utilities/interactions/
     - title: Link
