@@ -1047,10 +1047,11 @@ adornment in the library — so the button needs no icon markup at all:
   in two.** `$transition-collapse` and `$transition-collapse-width` were
   shorthands carrying the property, the duration and the easing at once, which
   meant retiming a collapse required restating the property. They are replaced
-  by `$transition-collapse-duration` and `$transition-collapse-timing`, emitted
-  as `--cui-transition-collapse-duration` / `-timing` on `.collapsing`, so the
-  timing can also be changed per instance at runtime. `$transition-fade` splits
-  the same way into `$transition-fade-duration` / `$transition-fade-timing`.
+  by `$transition-collapse-property`, `$transition-collapse-duration` and
+  `$transition-collapse-timing`, emitted as `--cui-transition-collapse-property`
+  / `-duration` / `-timing` on `.collapse` and `.collapsing`, so all three can
+  also be changed per instance at runtime. `$transition-fade` splits the same
+  way into `$transition-fade-duration` / `$transition-fade-timing`.
 
 #### Button
 

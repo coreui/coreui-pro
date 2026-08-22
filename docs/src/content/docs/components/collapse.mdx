@@ -198,7 +198,9 @@ myCollapsible.addEventListener('hidden.coreui.collapse', event => {
 
 ### CSS variables
 
-The transition is declared on `.collapsing`, so overriding these on an ancestor retimes every collapse below it.
+The three variables are declared on both `.collapse` and `.collapsing`, so overriding them on an ancestor retimes every collapse below it.
+
+`--cui-transition-collapse-property` names what animates. Adding to the animation is one declaration instead of a whole new `transition` — that is how `.collapse-horizontal` switches from `height` to `width`, and how the findable option adds `content-visibility`.
 
 <ScssDocs file="scss/_transitions.scss" capture="collapse-css-vars" />
 

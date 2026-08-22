@@ -9,6 +9,7 @@ $transition-fade-timing:      linear !default;
 // scss-docs-end fade-transition
 
 // scss-docs-start collapse-transition
+$transition-collapse-property: height !default;
 $transition-collapse-duration: .35s !default;
 $transition-collapse-timing:   ease !default;
 // scss-docs-end collapse-transition
@@ -30,11 +31,12 @@ $fade-tokens: defaults(
 
 // stylelint-enable scss/dollar-variable-default
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start collapse-css-vars
 $collapse-tokens: defaults(
   (
+    --#{$prefix}transition-collapse-property: #{$transition-collapse-property},
     --#{$prefix}transition-collapse-duration: #{$transition-collapse-duration},
     --#{$prefix}transition-collapse-timing: #{$transition-collapse-timing},
   ),
@@ -42,7 +44,7 @@ $collapse-tokens: defaults(
 );
 // scss-docs-end collapse-css-vars
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 @layer components {
   .fade {
@@ -55,6 +57,14 @@ $collapse-tokens: defaults(
   }
 
   // scss-docs-start collapse-classes
+  // Both classes carry the tokens: JavaScript swaps `.collapse` for
+  // `.collapsing` while the size animates, and find-in-page reveals the content
+  // without either swap happening.
+  .collapse,
+  .collapsing {
+    @include tokens($collapse-tokens);
+  }
+
   .collapse {
     // `until-found` content is hidden by the browser instead, which keeps it
     // laid out so find-in-page can reach it. `display: none` would take it back
@@ -65,16 +75,19 @@ $collapse-tokens: defaults(
   }
 
   .collapsing {
-    @include tokens($collapse-tokens);
-
     height: 0;
     overflow: hidden;
-    @include transition(height var(--#{$prefix}transition-collapse-duration) var(--#{$prefix}transition-collapse-timing));
+    @include transition-props(
+      var(--#{$prefix}transition-collapse-property),
+      var(--#{$prefix}transition-collapse-duration),
+      var(--#{$prefix}transition-collapse-timing)
+    );
 
     &.collapse-horizontal {
+      --#{$prefix}transition-collapse-property: width;
+
       width: 0;
       height: auto;
-      @include transition(width var(--#{$prefix}transition-collapse-duration) var(--#{$prefix}transition-collapse-timing));
     }
   }
   // scss-docs-end collapse-classes
@@ -87,11 +100,15 @@ $collapse-tokens: defaults(
     // Not scoped to `.collapse`: during the transition the element carries
     // `.collapsing` instead, and the declaration has to survive that swap.
     [data-coreui-hidden-until-found="true"] {
+      --#{$prefix}transition-collapse-property: height, content-visibility;
+
       interpolate-size: allow-keywords;
       overflow: hidden;
-      @include transition(
-        height var(--#{$prefix}transition-collapse-duration) var(--#{$prefix}transition-collapse-timing),
-        content-visibility var(--#{$prefix}transition-collapse-duration) allow-discrete
+      @include transition-props(
+        var(--#{$prefix}transition-collapse-property),
+        var(--#{$prefix}transition-collapse-duration),
+        var(--#{$prefix}transition-collapse-timing),
+        allow-discrete
       );
     }
 
