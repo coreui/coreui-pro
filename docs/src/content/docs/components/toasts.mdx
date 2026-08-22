@@ -29,7 +29,7 @@ To encourage extensible and predictable toasts, we recommend a header and body. 
 
 Bootstrap toasts are as flexible as you need and require very little markup. At a minimum, you should have a single element containing your “toasted” content, and it's strongly recommended to include a dismiss button.
 
-<Example class=" bg-body-tertiary" code={`<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class=" bg-body-tertiary" code={`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
       <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -67,9 +67,9 @@ We use the following JavaScript to trigger our live toast demo:
 
 ### Translucent
 
-Toasts are slightly translucent to blend in with what's below them.
+Add `.toast-translucent` to let the background through the toast and blur it. The header thins out with it, so the whole toast reads as one surface.
 
-<Example class="bg-dark" code={`<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class="bg-dark" code={`<div class="toast toast-translucent show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
       <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -86,7 +86,7 @@ Toasts are slightly translucent to blend in with what's below them.
 Wrap toasts in a toast container to stack them, which adds vertical spacing.
 
 <Example class=" bg-body-tertiary" code={`<div class="toast-container position-static">
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
         <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
         <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -98,7 +98,7 @@ Wrap toasts in a toast container to stack them, which adds vertical spacing.
       </div>
     </div>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
         <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
         <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -115,7 +115,7 @@ Wrap toasts in a toast container to stack them, which adds vertical spacing.
 
 Customize your toasts by removing sub-components, adjusting them with [utilities](/utilities/api/), or adding your own markup. In this example, we've made a simpler toast by removing the default `.toast-header`, incorporating a custom hide icon from [CoreUI Icons](https://coreui.io/icons/), and using [flexbox utilities](/utilities/flex/) to modify the layout.
 
-<Example class=" bg-body-tertiary" code={`<div class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class=" bg-body-tertiary" code={`<div class="toast align-items-center show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">
       Hello, world! This is a toast message.
@@ -126,7 +126,7 @@ Customize your toasts by removing sub-components, adjusting them with [utilities
 
 Alternatively, you can also add additional controls and components to toasts.
 
-<Example class=" bg-body-tertiary" code={`<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class=" bg-body-tertiary" code={`<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-body">
       Hello, world! This is a toast message.
       <div class="mt-2 pt-2 border-top">
@@ -142,7 +142,7 @@ Building on the previous example, you can design various toast color schemes usi
 
 Building on the previous example, you can design various toast color schemes using our [color](/utilities/colors/) and [background](/utilities/background/) utilities. We added `.text-bg-primary` to the `.toast`; the close button takes the colour it inherits, so it stays legible on its own. To achieve a clean edge, we remove the default border with `.border-0`.
 
-<Example class=" bg-body-tertiary" code={`<div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class=" bg-body-tertiary" code={`<div class="toast align-items-center text-bg-primary border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">
         Hello, world! This is a toast message.
@@ -155,7 +155,7 @@ Building on the previous example, you can design various toast color schemes usi
 
 By default, toasts fade in and out. To disable the animation, add `.toast-instant` to the toast. The `show` and `hide` methods then finish immediately, so `shown.coreui.toast` and `hidden.coreui.toast` fire right away.
 
-<Example class=" bg-body-tertiary" code={`<div class="toast toast-instant" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class=" bg-body-tertiary" code={`<div class="toast toast-instant show" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
       <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -190,7 +190,7 @@ Place toasts with custom CSS where needed. The top right and top middle are comm
   </form>
   <div aria-live="polite" aria-atomic="true" class="bg-dark position-relative docs-example-toasts">
     <div class="toast-container position-absolute p-3" id="toastPlacement">
-      <div class="toast">
+      <div class="toast show">
         <div class="toast-header">
           <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
           <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -213,7 +213,7 @@ For systems that generate more notifications, consider using a wrapping element 
     <div class="toast-container top-0 end-0 p-3">
 
       <!-- Then put toasts within -->
-      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
           <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
           <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -225,7 +225,7 @@ For systems that generate more notifications, consider using a wrapping element 
         </div>
       </div>
 
-      <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
           <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
           <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -245,7 +245,7 @@ You can also get fancy with flexbox utilities to align toasts horizontally and/o
   <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center w-100">
 
     <!-- Then put toasts within -->
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header">
         <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
         <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -276,7 +276,7 @@ As the content changes, remember to update the [`delay` timeout](#options) so us
 
 When using `autohide: false`, you need to add a close button to let users dismiss the toast.
 
-<Example class=" bg-body-tertiary" code={`<div role="alert" aria-live="assertive" aria-atomic="true" class="toast" data-coreui-autohide="false">
+<Example class=" bg-body-tertiary" code={`<div role="alert" aria-live="assertive" aria-atomic="true" class="toast show" data-coreui-autohide="false">
     <div class="toast-header">
       <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
       <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -376,3 +376,7 @@ Toasts use local CSS variables on `.toast` for enhanced real-time customization.
 ### SASS variables
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-variables" />
+
+The `.toast-translucent` mix amount and backdrop filter are build-time only — they are not tokens, so a toast does not carry two custom properties it will never read.
+
+<ScssDocs file="scss/_toasts.scss" capture="toast-translucent-variables" />

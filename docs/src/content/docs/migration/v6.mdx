@@ -1400,6 +1400,14 @@ Multi Select's option indicators moved with it — they render as a decorative
     `--cui-toast-transition-timing`.
   - `isShown()` returns `false` as soon as `hide()` is called, rather than when
     the fade-out ends.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Toasts are opaque by default.** `--cui-toast-bg` and `--cui-toast-header-bg`
+  resolved to `color-mix(in srgb, var(--cui-body-bg) 85%, transparent)`, so every
+  toast let 15% of whatever sat behind it through — with no blur to settle it,
+  text underneath read straight through the message. Both now resolve to
+  `var(--cui-body-bg)`. Add `.toast-translucent` for the see-through look, which
+  puts `blur(5px) saturate(180%)` behind the toast and thins the header to match,
+  the same way `.card-translucent` and `.menu-translucent` work.
 
 #### Card
 
