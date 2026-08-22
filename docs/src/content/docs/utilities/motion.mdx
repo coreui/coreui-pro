@@ -1,0 +1,32 @@
+---
+title: "Bootstrap 5 Motion"
+name: "Motion"
+description: "Remove the transition from a single element with motion utilities."
+---
+
+Components animate with CSS transitions, and the timing is customizable — see [transitions](/customize/transitions/). Add `.transition-none` to set `transition: none` on one element, so its property changes apply instantly instead of animating.
+
+Hover both buttons. The first eases into its hover colour; the second snaps.
+
+<Example class="d-flex gap-3" code={`<button type="button" class="btn btn-primary">Default</button>
+<button type="button" class="btn btn-primary transition-none">No hover transition</button>`} />
+
+```html
+<button type="button" class="btn btn-primary transition-none">...</button>
+```
+
+The utility sets the `transition` shorthand, so it removes every transition on the element at once — including any you declared yourself. To retime one component instead of removing its motion, set its `--cui-{component}-transition-duration` to `0s`.
+
+## Reduced motion
+
+`.transition-none` applies whatever the reader's motion preference is. Reach for it when the motion has to go in every case.
+
+You do not need it to honour that preference: with `$enable-reduced-motion` on, which is the default, every component transition is already wrapped in `prefers-reduced-motion: no-preference`. See [reduced motion](/getting-started/accessibility/#reduced-motion).
+
+To remove every transition at build time instead, set the `$enable-transitions` Sass option to `false`.
+
+### Utilities API
+
+Motion utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-transition" />

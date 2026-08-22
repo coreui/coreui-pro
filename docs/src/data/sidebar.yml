@@ -378,6 +378,8 @@
       to: /utilities/interactions/
     - title: Link
       to: /utilities/link/
+    - title: Motion
+      to: /utilities/motion/
     - title: Object fit
       to: /utilities/object-fit/
     - title: Opacity
