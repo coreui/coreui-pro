@@ -50,6 +50,8 @@
       to: /customize/components/
     - title: CSS variables
       to: /customize/css-variables/
+    - title: Transitions
+      to: /customize/transitions/
     - title: Optimize
       to: /customize/optimize/
 - title: Layout

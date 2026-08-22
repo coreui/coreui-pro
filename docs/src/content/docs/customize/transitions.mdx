@@ -1,0 +1,103 @@
+---
+title: "Transitions"
+description: "How CoreUI components animate, which state classes drive them, and how to retime, extend or remove the motion without rewriting a component."
+---
+
+## How it works
+
+CSS owns every component transition. JavaScript toggles a state class and then waits for the transition to finish before it fires an event or resolves a promise. It never writes a `transition` and, apart from the collapse height it has to measure, never writes a style at all.
+
+That split is what makes the motion customizable: restyle it in CSS and the component follows, with no need to reimplement anything.
+
+Each animated component works the same way:
+
+1. The base selector holds the hidden state and the `transition` declaration.
+2. A state class holds the visible state.
+3. Components that live in the top layer add `@starting-style` for the enter-from state, because the element is not rendered before it opens.
+
+## State classes
+
+JavaScript adds and removes a small, fixed set of classes. Style these and your customizations follow the component.
+
+| Class | Meaning |
+| --- | --- |
+| `.show` | The component is shown; its absence is the hidden state. Used by collapse, menu, toast, tooltip, popover, sidebar and the tab pane. |
+| `.collapsing` | Present only while a collapse animates its height or width. Added when the transition starts, removed when it ends. |
+| `.hiding` | Present only while an exit transition plays, on the components that sit in the top layer — dialog, drawer, modal and offcanvas. They have to survive their own exit, so dropping `.show` is not enough to mark the outgoing state. |
+| `.active` | The shown state for a tab pane, where it also marks the selected pane. |
+| `.fade` | The fade itself, for your own markup and for the components that animate only when asked. The alert and the tab pane take it from your markup; the tooltip and popover add it themselves unless `animation` is off. |
+| `.{component}-instant` | Skips the transition on one element: `.dialog-instant`, `.drawer-instant`, `.modal-instant`, `.offcanvas-instant`, `.toast-instant`. |
+| `.{component}-static` | The short bounce that signals a refused close: `.dialog-static`, `.drawer-static`, `.modal-static`, `.offcanvas-static`. |
+
+## Customize the motion
+
+### Duration and easing
+
+Every animated component exposes its timing as CSS variables, so it can be retimed per instance at runtime rather than only at build time.
+
+| Custom property | Purpose |
+| --- | --- |
+| `--cui-{component}-transition-duration` | How long the animation runs. Set it to `0s` to remove the motion. |
+| `--cui-{component}-transition-timing` | The easing curve. |
+
+```css
+.dialog-slow {
+  --cui-dialog-transition-duration: .6s;
+}
+```
+
+### The animated property
+
+Where an animation is meant to be extended, a third variable names the properties it covers, so adding one is a single declaration instead of a rewritten rule. The accordion, button, collapse, form floating label, range thumb, search button and the check/radio/switch controls all expose `--cui-{component}-transition-property`.
+
+Add `transform` to the button list and a button lifts as it changes colour:
+
+```css
+.btn-lift {
+  --cui-btn-transition-property: color, background-color, border-color, box-shadow, transform;
+}
+
+.btn-lift:hover {
+  transform: translateY(-2px);
+}
+```
+
+Keep the properties that were already there. The variable replaces the list, it does not append to it.
+
+### Shared overlay easing
+
+Dialog, drawer, menu and the popup the field components open read one easing curve from `:root`, so a single override restyles all four.
+
+<ScssDocs file="scss/_root.scss" capture="root-transition-variables" />
+
+Each of them still has its own `--cui-{component}-transition-timing`, so one overlay can opt out without pulling the others with it.
+
+### Size animations
+
+Collapse and accordion animate a size rather than an opacity. The collapse measures its content in JavaScript, because `0` cannot interpolate to `auto` on its own.
+
+<ScssDocs file="scss/_transitions.scss" capture="collapse-transition" />
+
+Two cases hand that job back to the browser through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size): the accordion, which is built on the native disclosure element, and a collapse with [`data-coreui-hidden-until-found`](/components/collapse/#findable-when-collapsed) set. Where `interpolate-size` is missing the collapse falls back to the measured animation, so the motion is the same everywhere.
+
+## Remove the motion
+
+Four options, from the narrowest to the widest:
+
+1. Add the component's `-instant` class to one element, such as `.toast-instant`.
+2. Set a `-duration` variable to `0s` for one component or a whole subtree.
+3. Set `$enable-transitions` to `false` to remove every transition at build time.
+4. Leave it to the reader: with `$enable-reduced-motion` on, which is the default, every transition is wrapped in `prefers-reduced-motion: no-preference`, so anyone who asks their system for less motion already gets instant state changes. See [reduced motion](/getting-started/accessibility/#reduced-motion).
+
+Whichever you use, JavaScript reads the element's computed `transition-duration` before it waits. A duration of `0s` resolves events and promises on the next tick rather than hanging for a transition that never runs.
+
+## Events and promises
+
+`show()` and `hide()` return promises that settle once the transition has finished, at the same moment the matching `shown` and `hidden` events fire.
+
+```js
+const toast = new coreui.Toast('#myToast')
+
+await toast.show()
+// The fade-in has finished.
+```
