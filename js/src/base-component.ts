@@ -57,7 +57,7 @@ class BaseComponent extends Config {
   // Runs `callback` once the transition on `element` ends, and resolves afterwards.
   // Lifecycle methods return this promise, so `await instance.show()` continues at the
   // same moment a `shown.coreui.*` listener would run.
-  _queueCallback(callback: () => void, element: Element, isAnimated = true): Promise<void> {
+  _queueCallback(callback: () => void, element: Element, isAnimated = true, transitionProperty?: string): Promise<void> {
     return new Promise(resolve => {
       executeAfterTransition(() => {
         // Don't run the completion callback if the instance was disposed mid-transition.
@@ -67,7 +67,7 @@ class BaseComponent extends Config {
         }
 
         resolve()
-      }, element, isAnimated)
+      }, element, isAnimated, transitionProperty)
     })
   }
 

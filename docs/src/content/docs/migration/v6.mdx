@@ -1053,6 +1053,27 @@ adornment in the library — so the button needs no icon markup at all:
   also be changed per instance at runtime. `$transition-fade` splits the same
   way into `$transition-fade-duration` / `$transition-fade-timing`.
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **CSS owns the collapse animation, and the class choreography follows.**
+  Where `interpolate-size: allow-keywords` is supported the stylesheet
+  interpolates the size to the `auto` of the open state on its own; elsewhere
+  JavaScript measures the two sizes and the stylesheet still times the move.
+  Three observable changes come with that:
+
+  - **`.collapse` never leaves the element.** It used to be swapped out for
+    `.collapsing` while the transition ran; now `.collapsing` is added
+    alongside it, so `.collapse.collapsing` matches during a run and a selector
+    keying on the *absence* of `.collapse` no longer fires mid-animation.
+  - **`.show` toggles at the start of both directions.** It used to land at
+    the end of the opening transition. A rule styling `.collapse.show` applies
+    for the whole expansion now, and its absence marks the whole closing run.
+  - **An open `.collapse-horizontal` is `fit-content` wide, not as wide as its
+    container** — the open size is the animation's target, and a target of
+    `auto` would spend most of the run growing an empty box past the content.
+    This also removes the end-of-animation jump to full container width the
+    measured animation used to make. Style the child, as the docs always
+    showed, and nothing changes.
+
 #### Button
 
 - **A toggle button always exposes `aria-pressed` now.** The attribute has no

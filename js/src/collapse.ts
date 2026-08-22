@@ -15,9 +15,9 @@ import SelectorEngine from './dom/selector-engine.js'
 import {
   defineJQueryPlugin,
   getElement,
-  reflow,
   setAriaAttribute
 } from './util/index.js'
+import { startSizeTransition, supportsInterpolateSize } from './util/size-transition.js'
 
 /**
  * Constants
@@ -48,7 +48,9 @@ const HEIGHT = 'height'
 const ATTRIBUTE_HIDDEN = 'hidden'
 const VALUE_UNTIL_FOUND = 'until-found'
 
-const SELECTOR_ACTIVES = '.collapse.show, .collapse.collapsing'
+// `.show` lands at the start of both directions, so on its own it means
+// "open or opening" and leaves a closing sibling alone.
+const SELECTOR_ACTIVES = '.collapse.show'
 const SELECTOR_DATA_TOGGLE = '[data-coreui-toggle="collapse"]'
 const SELECTOR_HIDDEN_UNTIL_FOUND = '.collapse[data-coreui-hidden-until-found="true"]'
 
@@ -76,13 +78,6 @@ type CollapseConfig = {
 // with `!important` — so an area carrying a display utility would show.
 const supportsUntilFound = (): boolean =>
   typeof document !== 'undefined' && 'onbeforematch' in document.documentElement
-
-// Where `auto` can be interpolated, a `hidden="until-found"` area is animated by
-// the stylesheet: it stays in the layout, so its height needs no measuring.
-const usesInterpolatedHeight = (): boolean =>
-  typeof CSS !== 'undefined' &&
-  typeof CSS.supports === 'function' &&
-  CSS.supports('interpolate-size', 'allow-keywords')
 
 /**
  * Class definition
@@ -154,7 +149,7 @@ class Collapse extends BaseComponent {
     // find active children
     if (this._config.parent) {
       activeChildren = this._getFirstLevelChildren(SELECTOR_ACTIVES)
-        .filter(element => element !== this._element)
+        .filter(element => element !== this._element && !this._sharesTrigger(element))
         .map(element => Collapse.getOrCreateInstance(element))
     }
 
@@ -172,45 +167,37 @@ class Collapse extends BaseComponent {
     }
 
     const dimension = this._getDimension()
-    const interpolated = this._usesInterpolatedHeight()
 
     this._setHiddenUntilFound(false)
 
-    this._element.classList.remove(CLASS_NAME_COLLAPSE)
-    this._element.classList.add(CLASS_NAME_COLLAPSING)
-
-    if (!interpolated) {
-      this._element.style[dimension] = '0'
-    }
+    // `.show` lands at the start on both paths: the stylesheet reads it as the
+    // open state and animates towards it, while `.collapsing` marks the run.
+    this._element.classList.add(CLASS_NAME_COLLAPSING, CLASS_NAME_SHOW)
 
     this._setAriaExpanded(this._triggerArray, true)
     this._isTransitioning = true
 
     const complete = () => {
       this._isTransitioning = false
-
       this._element.classList.remove(CLASS_NAME_COLLAPSING)
-      this._element.classList.add(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW)
-
       this._element.style[dimension] = ''
 
       EventHandler.trigger(this._element, EVENT_SHOWN)
     }
 
-    if (interpolated) {
-      await this._queueCallback(complete, this._element, true)
+    // Where the stylesheet interpolates the size itself, the class toggle is
+    // the whole show; driving the size from here too would run the same
+    // expansion from both ends.
+    if (supportsInterpolateSize()) {
+      await this._queueCallback(complete, this._element, true, dimension)
       return
     }
 
     const capitalizedDimension = dimension[0].toUpperCase() + dimension.slice(1)
     const scrollSize = `scroll${capitalizedDimension}` as 'scrollWidth' | 'scrollHeight'
 
-    // Register the completion callback first, then set the target size to start the
-    // transition. Awaiting here instead would stop the size from ever being applied.
-    const transition = this._queueCallback(complete, this._element, true)
-    this._element.style[dimension] = `${this._element[scrollSize]}px`
-
-    await transition
+    startSizeTransition(this._element, dimension, 0, this._element[scrollSize])
+    await this._queueCallback(complete, this._element, true, dimension)
   }
 
   async hide(): Promise<void> {
@@ -223,22 +210,20 @@ class Collapse extends BaseComponent {
       return
     }
 
+    const cssPath = supportsInterpolateSize()
     const dimension = this._getDimension()
-    const interpolated = this._usesInterpolatedHeight()
+    const size = cssPath ? 0 : this._element.getBoundingClientRect()[dimension]
 
-    if (interpolated) {
+    this._element.classList.add(CLASS_NAME_COLLAPSING)
+
+    if (cssPath) {
       // The attribute is what the stylesheet animates towards, so it goes on
       // now rather than at the end; `content-visibility` is transitioned with
       // `allow-discrete`, which keeps the content on screen until it finishes.
       this._setHiddenUntilFound(true)
-    } else {
-      this._element.style[dimension] = `${this._element.getBoundingClientRect()[dimension]}px`
-
-      reflow(this._element)
     }
 
-    this._element.classList.add(CLASS_NAME_COLLAPSING)
-    this._element.classList.remove(CLASS_NAME_COLLAPSE, CLASS_NAME_SHOW)
+    this._element.classList.remove(CLASS_NAME_SHOW)
 
     for (const trigger of this._triggerArray) {
       const element = SelectorEngine.getElementFromSelector(trigger)
@@ -253,18 +238,25 @@ class Collapse extends BaseComponent {
     const complete = () => {
       this._isTransitioning = false
       this._element.classList.remove(CLASS_NAME_COLLAPSING)
-      this._element.classList.add(CLASS_NAME_COLLAPSE)
+      this._element.style[dimension] = ''
 
-      if (!interpolated) {
+      // A fallback browser gets the attribute only once the area is fully
+      // collapsed; mid-animation it would hide the content on the spot.
+      if (!cssPath) {
         this._setHiddenUntilFound(true)
       }
 
       EventHandler.trigger(this._element, EVENT_HIDDEN)
     }
 
-    this._element.style[dimension] = ''
+    if (!cssPath) {
+      startSizeTransition(this._element, dimension, size, 0)
+    }
 
-    await this._queueCallback(complete, this._element, true)
+    // The wait is pinned to the size property: `display` and
+    // `content-visibility` fire their own `transitionend`, and a leftover one
+    // from the previous run would settle this one on the spot.
+    await this._queueCallback(complete, this._element, true, dimension)
   }
 
   // Private
@@ -279,6 +271,14 @@ class Collapse extends BaseComponent {
 
   _getDimension(): 'width' | 'height' {
     return this._element.classList.contains(CLASS_NAME_HORIZONTAL) ? WIDTH : HEIGHT
+  }
+
+  // One trigger can target more than one collapse. Those collapses open
+  // together, so a shared parent must not close them against each other.
+  _sharesTrigger(element: HTMLElement): boolean {
+    return this._triggerArray.some(
+      trigger => SelectorEngine.getMultipleElementsFromSelector(trigger).includes(element)
+    )
   }
 
   _initializeChildren(): void {
@@ -301,10 +301,6 @@ class Collapse extends BaseComponent {
     const children = SelectorEngine.find(CLASS_NAME_DEEPER_CHILDREN, this._config.parent as ParentNode)
     // remove children if greater depth
     return SelectorEngine.find(selector, this._config.parent as ParentNode).filter(element => !children.includes(element))
-  }
-
-  _usesInterpolatedHeight(): boolean {
-    return this._config.hiddenUntilFound && supportsUntilFound() && usesInterpolatedHeight()
   }
 
   _setHiddenUntilFound(hidden: boolean): void {

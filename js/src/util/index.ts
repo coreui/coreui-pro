@@ -254,7 +254,12 @@ const execute = <T = any>(possibleCallback: T | ((...functionArgs: any[]) => T),
   return typeof possibleCallback === 'function' ? (possibleCallback as (...functionArgs: any[]) => T).call(...args as [any, ...any[]]) : defaultValue as T
 }
 
-const executeAfterTransition = (callback: () => void, transitionElement: Element, waitForTransition = true): void => {
+// `transitionProperty` narrows the wait to that property's own `transitionend`.
+// A multi-property transition fires one event per property, and the events of a
+// run that just finished can land after the next run has started waiting — an
+// unfiltered waiter picks such a leftover up and settles a whole animation
+// early. The emulated event carries no `propertyName` and always passes.
+const executeAfterTransition = (callback: () => void, transitionElement: Element, waitForTransition = true, transitionProperty?: string): void => {
   if (!waitForTransition) {
     execute(callback)
     return
@@ -265,8 +270,13 @@ const executeAfterTransition = (callback: () => void, transitionElement: Element
 
   let called = false
 
-  const handler = ({ target }: Event): void => {
-    if (target !== transitionElement) {
+  const handler = (event: Event): void => {
+    if (event.target !== transitionElement) {
+      return
+    }
+
+    const { propertyName } = event as TransitionEvent
+    if (transitionProperty && propertyName && propertyName !== transitionProperty) {
       return
     }
 

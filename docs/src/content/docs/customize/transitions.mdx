@@ -5,7 +5,7 @@ description: "How CoreUI components animate, which state classes drive them, and
 
 ## How it works
 
-CSS owns every component transition. JavaScript toggles a state class and then waits for the transition to finish before it fires an event or resolves a promise. It never writes a `transition` and, apart from the collapse height it has to measure, never writes a style at all.
+CSS owns every component transition. JavaScript toggles a state class and then waits for the transition to finish before it fires an event or resolves a promise. It never writes a `transition` and, apart from the sizes it measures for browsers without `interpolate-size`, never writes a style at all.
 
 That split is what makes the motion customizable: restyle it in CSS and the component follows, with no need to reimplement anything.
 
@@ -74,11 +74,11 @@ Each of them still has its own `--cui-{component}-transition-timing`, so one ove
 
 ### Size animations
 
-Collapse and accordion animate a size rather than an opacity. The collapse measures its content in JavaScript, because `0` cannot interpolate to `auto` on its own.
+Collapse and accordion animate a size rather than an opacity. `0` cannot interpolate to `auto` on its own, so both let the browser do it through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size): the stylesheet owns the whole animation and JavaScript only toggles the state class. Where `interpolate-size` is missing, JavaScript measures the two sizes and the stylesheet still times the move between them — the motion is the same everywhere, only who measures differs.
 
 <ScssDocs file="scss/_transitions.scss" capture="collapse-transition" />
 
-Two cases hand that job back to the browser through [`interpolate-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/interpolate-size): the accordion, which is built on the native disclosure element, and a collapse with [`data-coreui-hidden-until-found`](/components/collapse/#findable-when-collapsed) set. Where `interpolate-size` is missing the collapse falls back to the measured animation, so the motion is the same everywhere.
+The collapse's `display` transitions discretely with `allow-discrete`, which is what keeps the closing element in the layout until its size reaches `0`.
 
 ## Remove the motion
 
