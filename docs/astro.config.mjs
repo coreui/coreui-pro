@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
 import { defineConfig } from 'astro/config'
 import mdx from '@astrojs/mdx'
@@ -37,7 +38,26 @@ export default defineConfig({
     // lz-string (used by the engine's sandbox script) is a UMD/CJS package with no ESM
     // entry, and Vite's dep scanner doesn't reach the lazily-loaded sandbox script, so it
     // gets served raw and `import { compressToBase64 }` fails in dev. Force pre-bundling.
-    optimizeDeps: { include: ['lz-string'] }
+    optimizeDeps: { include: ['lz-string'] },
+    plugins: [
+      // Dev runs the library JS from js/src instead of the dist/js/coreui.esm.js
+      // the engine aliases. dist only changes on `npm run js`, so the dev server
+      // could pair stale JS with live-compiled SCSS — invisible in Chromium
+      // (`interpolate-size` animates in CSS) and indistinguishable from a
+      // Firefox-only bug. With the source alias a js/src edit reloads the page
+      // the same way an scss edit does. `astro build` keeps the dist alias, so
+      // the built docs still exercise the shipped artifact. A plugin `config`
+      // result is merged over the engine's alias (Vite prepends it), which is
+      // what lets this override win.
+      {
+        name: 'coreui-docs-dev-js-from-source',
+        config(_, { command }) {
+          return command === 'serve'
+            ? { resolve: { alias: { '@coreui-docs-js': fileURLToPath(new URL('../js/src/index.ts', import.meta.url)) } } }
+            : undefined
+        }
+      }
+    ]
   },
   integrations: [...coreuiDocs({ libraryConfig: 'src/styles/_library-config.scss' }), mdx()],
 })
