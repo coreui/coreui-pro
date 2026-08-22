@@ -317,9 +317,28 @@ Buttons use local CSS variables on `.btn` for enhanced real-time customization. 
 
 Each variant class rewrites those variables from the theme tokens, falling back to a neutral value, which is why one set of rules serves every colour — including a theme colour you add yourself, with no Sass to compile.
 
-A brand colour of your own is a theme, not a button: set the theme tokens on a class and every variant follows, in plain CSS.
+A brand colour of your own is a theme, not a button: set the theme tokens anywhere above the buttons and every variant follows, in plain CSS. The tokens inherit, so one ancestor themes the whole subtree.
 
-<Example html={[`<style>`, `    .theme-brand {`, `      --cui-theme-base: #6f42c1;`, `      --cui-theme-contrast: #fff;`, `      --cui-theme-hover: #6134ae;`, `      --cui-theme-active: #56309b;`, `      --cui-theme-bg-subtle: #e9e0f7;`, `      --cui-theme-fg: #59359a;`, `      --cui-theme-fg-emphasis: #432a72;`, `    }`, `  </style>`, `  <button type="button" class="btn-solid theme-brand">Solid</button>`, `  <button type="button" class="btn-outline theme-brand">Outline</button>`, `  <button type="button" class="btn-subtle theme-brand">Subtle</button>`, `  <button type="button" class="btn-ghost theme-brand">Ghost</button>`]} />
+<Example code={`<div style="--cui-theme-base: #6f42c1; --cui-theme-contrast: #fff; --cui-theme-hover: #6134ae; --cui-theme-active: #56309b; --cui-theme-bg-subtle: #e9e0f7; --cui-theme-fg: #59359a; --cui-theme-fg-emphasis: #432a72;">
+    <button type="button" class="btn-solid">Solid</button>
+    <button type="button" class="btn-outline">Outline</button>
+    <button type="button" class="btn-subtle">Subtle</button>
+    <button type="button" class="btn-ghost">Ghost</button>
+  </div>`} />
+
+In your own stylesheet that is a class, and the buttons carry it the way they carry `.theme-primary`:
+
+```css
+.theme-brand {
+  --cui-theme-base: #6f42c1;
+  --cui-theme-contrast: #fff;
+  --cui-theme-hover: #6134ae;
+  --cui-theme-active: #56309b;
+  --cui-theme-bg-subtle: #e9e0f7;
+  --cui-theme-fg: #59359a;
+  --cui-theme-fg-emphasis: #432a72;
+}
+```
 
 ### SASS variables
 

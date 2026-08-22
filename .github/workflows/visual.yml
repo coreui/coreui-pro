@@ -54,10 +54,16 @@ jobs:
           npm run js-test-visual -- --update
           echo "::notice::No Linux baselines yet — generated a set. Download the artifact and commit it to enable the gate."
 
+      # `.vitest-attachments/` is where the actual and diff images land. Without
+      # it a failing run hands back the stale baseline and nothing to compare it
+      # against; with it the actual image is also the replacement baseline when
+      # the change was intended.
       - name: Upload baselines or diffs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: visual-screenshots
-          path: js/tests/visual/__screenshots__/
+          path: |
+            js/tests/visual/__screenshots__/
+            .vitest-attachments/
           retention-days: 14
