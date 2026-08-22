@@ -164,6 +164,23 @@ Both return a promise that settles once the items have finished moving.
 
 <Code code={accordionToggleAll} lang="js" />
 
+## Findable when collapsed
+
+Nothing to enable here: a closed `<details>` keeps its content searchable, and the browser expands the item on a find-in-page match — the capability the [collapse opts into](/components/collapse/#findable-when-collapsed) with `data-coreui-hidden-until-found` is built into the disclosure element the accordion stands on.
+
+<Example code={`<div class="accordion">
+    <details class="accordion-item" name="accordionFindable" open>
+      <summary class="accordion-header">Accordion Item #1</summary>
+      <div class="accordion-body">This item starts open. The interesting one is below it.</div>
+    </details>
+    <details class="accordion-item" name="accordionFindable">
+      <summary class="accordion-header">Accordion Item #2</summary>
+      <div class="accordion-body">Search this page for <strong>axolotl</strong> with your browser's find-in-page and this closed item opens on its own.</div>
+    </details>
+  </div>`} />
+
+Everything composes with it: in an exclusive accordion the browser closes the previously open item as it reveals the match, `shown.coreui.accordion` fires the way it does for a click, and `<summary>` exposes the new state to assistive technology on its own. In browsers that do not search closed disclosure content the item simply is not found while collapsed — the same degradation the collapse option has.
+
 ## Headings
 
 `<summary>` accepts heading content, so wrap the label in a heading to keep the sections reachable by heading navigation. The heading inherits the summary's typography, so it does not change how the accordion looks.
