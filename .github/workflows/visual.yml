@@ -63,6 +63,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: visual-screenshots
+          # `.vitest-attachments/` is a dot directory, and upload-artifact skips
+          # those unless told otherwise.
+          include-hidden-files: true
           path: |
             js/tests/visual/__screenshots__/
             .vitest-attachments/
