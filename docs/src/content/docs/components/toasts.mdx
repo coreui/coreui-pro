@@ -67,9 +67,9 @@ We use the following JavaScript to trigger our live toast demo:
 
 ### Translucent
 
-Toasts are slightly translucent to blend in with what's below them.
+Add `.toast-translucent` to let the background through the toast and blur it. The header thins out with it, so the whole toast reads as one surface.
 
-<Example class="bg-dark" code={`<div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+<Example class="bg-dark" code={`<div class="toast toast-translucent" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <svg class="docs-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
       <strong class="me-auto">CoreUI for Bootstrap</strong>
@@ -376,3 +376,7 @@ Toasts use local CSS variables on `.toast` for enhanced real-time customization.
 ### SASS variables
 
 <ScssDocs file="scss/_toasts.scss" capture="toast-variables" />
+
+The `.toast-translucent` mix amount and backdrop filter are build-time only — they are not tokens, so a toast does not carry two custom properties it will never read.
+
+<ScssDocs file="scss/_toasts.scss" capture="toast-translucent-variables" />

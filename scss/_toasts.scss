@@ -12,7 +12,7 @@ $toast-padding-x:                   .75rem !default;
 $toast-padding-y:                   .5rem !default;
 $toast-font-size:                   .875rem !default;
 $toast-color:                       null !default;
-$toast-background-color:            color-mix(in srgb, var(--#{$prefix}body-bg) 85%, transparent) !default;
+$toast-background-color:            var(--#{$prefix}body-bg) !default;
 $toast-border-width:                var(--#{$prefix}border-width) !default;
 $toast-border-color:                var(--#{$prefix}border-color-translucent) !default;
 $toast-border-radius:               var(--#{$prefix}border-radius) !default;
@@ -22,9 +22,14 @@ $toast-transition-duration:         .15s !default;
 $toast-transition-timing:           linear !default;
 
 $toast-header-color:                var(--#{$prefix}secondary-color) !default;
-$toast-header-background-color:     color-mix(in srgb, var(--#{$prefix}body-bg) 85%, transparent) !default;
+$toast-header-background-color:     $toast-background-color !default;
 $toast-header-border-color:         $toast-border-color !default;
 // scss-docs-end toast-variables
+
+// scss-docs-start toast-translucent-variables
+$toast-translucent-bg-opacity:      85% !default;
+$toast-translucent-backdrop-filter: blur(5px) saturate(180%) !default;
+// scss-docs-end toast-translucent-variables
 
 $toast-tokens: () !default;
 
@@ -129,5 +134,14 @@ $toast-tokens: defaults(
   .toast-body {
     padding: var(--#{$prefix}toast-padding-x);
     word-wrap: break-word;
+  }
+
+  .toast-translucent {
+    background-color: color-mix(in oklch, var(--#{$prefix}toast-bg) #{$toast-translucent-bg-opacity}, transparent);
+    backdrop-filter: $toast-translucent-backdrop-filter;
+
+    .toast-header {
+      background-color: color-mix(in oklch, var(--#{$prefix}toast-header-bg) #{$toast-translucent-bg-opacity}, transparent);
+    }
   }
 }
