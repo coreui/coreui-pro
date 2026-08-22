@@ -131,7 +131,7 @@ If you set `data-coreui-track` to `false`, the slider's track will not display a
 
 Color the filled track and the handles by adding a [`.theme-{color}` class](/customize/components/#theme-variants) to the slider element.
 
-<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-toggle="range-slider" data-coreui-value="25, 75" aria-label="${c.title} range slider"></div>`)} />
+<Example pro class="d-flex flex-column gap-3" code={getData('theme-colors').map((c) => `<div class="theme-${c.name}" data-coreui-toggle="range-slider" data-coreui-value="25, 75" data-coreui-aria-labels='["${c.title} minimum", "${c.title} maximum"]'></div>`)} />
 
 ## Usage
 
