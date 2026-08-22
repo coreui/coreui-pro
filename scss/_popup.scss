@@ -13,7 +13,7 @@ $popup-border-color:    var(--#{$prefix}border-color) !default;
 $popup-border-radius:   var(--#{$prefix}border-radius) !default;
 $popup-box-shadow:      var(--#{$prefix}box-shadow) !default;
 $popup-transition-duration: .15s !default;
-$popup-transition-timing:   cubic-bezier(.22, 1, .36, 1) !default;
+$popup-transition-timing:   var(--#{$prefix}transition-timing-overlay) !default;
 // scss-docs-end popup-variables
 
 // stylelint-disable scss/dollar-variable-default

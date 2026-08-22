@@ -20,7 +20,7 @@ $dialog-border-width:               var(--#{$prefix}border-width) !default;
 $dialog-border-radius:              .75rem !default;
 $dialog-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
 $dialog-transition-duration:        .3s !default;
-$dialog-transition-timing:          cubic-bezier(.22, 1, .36, 1) !default;
+$dialog-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
 $dialog-slide-distance:             3rem !default;
 $dialog-scale-transform:            scale(1.02) !default;
 $dialog-backdrop-bg:                light-dark(rgb(0 0 0 / 50%), rgb(0 0 0 / 65%)) !default;

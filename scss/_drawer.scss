@@ -23,7 +23,7 @@ $drawer-border-width:               var(--#{$prefix}border-width) !default;
 $drawer-border-radius:              .75rem !default;
 $drawer-box-shadow:                 var(--#{$prefix}box-shadow-lg) !default;
 $drawer-transition-duration:        .3s !default;
-$drawer-transition-timing:          cubic-bezier(.22, 1, .36, 1) !default;
+$drawer-transition-timing:          var(--#{$prefix}transition-timing-overlay) !default;
 $drawer-scale-transform:            scale(1.02) !default;
 $drawer-title-line-height:          var(--#{$prefix}body-line-height) !default;
 $drawer-backdrop-bg:                color-mix(in oklch, var(--#{$prefix}body-bg) 25%, transparent) !default;
