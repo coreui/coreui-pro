@@ -43,7 +43,6 @@ $check-tokens: defaults(
     --#{$prefix}check-indeterminate-border-color: var(--#{$prefix}control-indeterminate-border-color),
     --#{$prefix}check-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}check-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}check-size)) * .5),
-    --#{$prefix}check-focus-border: var(--#{$prefix}control-focus-border-color),
     --#{$prefix}check-active-filter: var(--#{$prefix}control-active-filter),
     --#{$prefix}check-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
@@ -109,7 +108,6 @@ $check-selector: if(sass($enable-deprecated-form-check): ".check, .form-check-in
     }
 
     &:focus-visible {
-      border-color: var(--#{$prefix}check-focus-border);
       @include focus-ring(true);
     }
 
