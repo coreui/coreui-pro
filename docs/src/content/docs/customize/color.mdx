@@ -424,11 +424,15 @@ Be sure to monitor contrast ratios as you customize colors. As shown below, we'v
 
 ### Notes on Sass
 
-Sass cannot programmatically generate variables, so we manually created variables for every tint and shade ourselves. We specify the midpoint value (e.g., `$blue-500`) and use custom color functions to tint (lighten) or shade (darken) our colors via Sass's `mix()` color function.
+The tints and shades are not Sass variables any more. Every theme color gets a
+100–900 scale of `color-mix()` custom properties on `:root`, mixed in the browser
+from the color's own token — override `--cui-primary` and the whole family
+follows, in both color schemes. See [the theme colors page](/customize/theme/).
 
-Using `mix()` is not the same as `lighten()` and `darken()`—the former blends the specified color with white or black, while the latter only adjusts the lightness value of each color. The result is a much more complete suite of colors, as [shown in this CodePen demo](https://codepen.io/emdeoh/pen/zYOQOPB).
-
-Our `tint-color()` and `shade-color()` functions use `mix()` alongside our `$theme-color-interval` variable, which specifies a stepped percentage value for each mixed color we produce. See the `scss/_functions.scss` and `scss/_config.scss` files for the full source code.
+`tint-color()` and `shade-color()` still exist in `scss/functions/_color.scss` for
+Sass-side blending. They use `mix()`, which is not the same as `lighten()` and
+`darken()`: the former blends the color with white or black, the latter only
+adjusts its lightness value.
 
 ## Color Sass maps
 
