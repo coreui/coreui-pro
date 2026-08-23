@@ -92,7 +92,6 @@ $tooltip-tokens: defaults(
     }
   }
 
-  /* rtl:begin:ignore */
   .bs-tooltip-end .tooltip-arrow {
     left: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
     width: var(--#{$prefix}tooltip-arrow-height);
@@ -105,8 +104,6 @@ $tooltip-tokens: defaults(
     }
   }
 
-  /* rtl:end:ignore */
-
   .bs-tooltip-bottom .tooltip-arrow {
     top: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
 
@@ -117,7 +114,6 @@ $tooltip-tokens: defaults(
     }
   }
 
-  /* rtl:begin:ignore */
   .bs-tooltip-start .tooltip-arrow {
     right: calc(-1 * var(--#{$prefix}tooltip-arrow-height));
     width: var(--#{$prefix}tooltip-arrow-height);
@@ -129,8 +125,6 @@ $tooltip-tokens: defaults(
       border-left-color: var(--#{$prefix}tooltip-surface-bg);
     }
   }
-
-  /* rtl:end:ignore */
 
   .bs-tooltip-auto {
     &[data-coreui-placement^="top"] {

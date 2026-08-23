@@ -29,12 +29,6 @@ $popover-arrow-width:               1rem !default;
 $popover-arrow-height:              .5rem !default;
 // scss-docs-end popover-variables
 
-// fusv-disable
-// Deprecated in 4.2.0 for CSS variables
-$popover-arrow-color:               $popover-bg !default;
-$popover-arrow-outer-color:         var(--#{$prefix}border-color-translucent) !default;
-// fusv-enable
-
 $popover-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -44,6 +38,7 @@ $popover-tokens: defaults(
   (
     --#{$prefix}popover-zindex: var(--#{$prefix}z-popover),
     --#{$prefix}popover-max-width: #{$popover-max-width},
+    --#{$prefix}popover-font-size: #{$popover-font-size},
     --#{$prefix}popover-bg: #{$popover-bg},
     --#{$prefix}popover-border-width: #{$popover-border-width},
     --#{$prefix}popover-border-color: #{$popover-border-color},
@@ -52,6 +47,7 @@ $popover-tokens: defaults(
     --#{$prefix}popover-box-shadow: #{$popover-box-shadow},
     --#{$prefix}popover-header-padding-x: #{$popover-header-padding-x},
     --#{$prefix}popover-header-padding-y: #{$popover-header-padding-y},
+    --#{$prefix}popover-header-font-size: #{$popover-header-font-size},
     --#{$prefix}popover-header-color: #{$popover-header-color},
     --#{$prefix}popover-header-bg: #{$popover-header-bg},
     --#{$prefix}popover-body-padding-x: #{$popover-body-padding-x},
@@ -60,8 +56,6 @@ $popover-tokens: defaults(
     --#{$prefix}popover-arrow-width: #{$popover-arrow-width},
     --#{$prefix}popover-arrow-height: #{$popover-arrow-height},
     --#{$prefix}popover-arrow-border: var(--#{$prefix}popover-border-color),
-    --#{$prefix}popover-font-size: $popover-font-size,
-    --#{$prefix}popover-header-font-size: $popover-header-font-size,
   ),
   $popover-tokens
 );
@@ -125,7 +119,6 @@ $popover-tokens: defaults(
     }
   }
 
-  /* rtl:begin:ignore */
   .bs-popover-end {
     > .popover-arrow {
       left: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
@@ -149,8 +142,6 @@ $popover-tokens: defaults(
     }
   }
 
-  /* rtl:end:ignore */
-
   .bs-popover-bottom {
     > .popover-arrow {
       top: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
@@ -169,6 +160,10 @@ $popover-tokens: defaults(
         top: var(--#{$prefix}popover-border-width);
         border-bottom-color: var(--#{$prefix}popover-bg);
       }
+
+      &:has(+ .popover-header)::after {
+        border-bottom-color: var(--#{$prefix}popover-header-bg);
+      }
     }
 
     // This will remove the popover-header's border just below the arrow
@@ -184,7 +179,6 @@ $popover-tokens: defaults(
     }
   }
 
-  /* rtl:begin:ignore */
   .bs-popover-start {
     > .popover-arrow {
       right: calc(-1 * (var(--#{$prefix}popover-arrow-height)) - var(--#{$prefix}popover-border-width));
@@ -207,8 +201,6 @@ $popover-tokens: defaults(
       }
     }
   }
-
-  /* rtl:end:ignore */
 
   .bs-popover-auto {
     &[data-coreui-placement^="top"] {
