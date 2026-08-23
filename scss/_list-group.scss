@@ -6,8 +6,6 @@
 @use "theme" as *;
 @use "config" as *;
 
-// stylelint-disable custom-property-no-missing-var-function
-
 // List group
 // scss-docs-start list-group-variables
 $list-group-color:                  var(--#{$prefix}body-color) !default;
@@ -126,11 +124,11 @@ $list-group-tokens: defaults(
 
     // stylelint-disable-next-line scss/selector-no-redundant-nesting-selector
     & + .list-group-item {
-      border-top-width: 0;
+      border-block-start-width: 0;
 
       &.active {
         margin-top: calc(-1 * var(--#{$prefix}list-group-border-width));
-        border-top-width: var(--#{$prefix}list-group-border-width);
+        border-block-start-width: var(--#{$prefix}list-group-border-width);
       }
     }
   }
@@ -142,7 +140,7 @@ $list-group-tokens: defaults(
 
   .list-group-item-action {
     width: 100%; // For `<button>`s (anchors become 100% by default though)
-    color: var(--#{$prefix}list-group-action-color);
+    color: var(--#{$prefix}theme-fg, var(--#{$prefix}list-group-action-color));
     text-align: inherit; // For `<button>`s (anchors inherit)
 
     &:not(.active) {
@@ -150,13 +148,13 @@ $list-group-tokens: defaults(
       &:hover,
       &:focus {
         z-index: 1; // Place hover/focus items above their siblings for proper border styling
-        color: var(--#{$prefix}list-group-action-hover-color);
+        color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-action-hover-color));
         text-decoration: none;
-        background-color: var(--#{$prefix}theme-border, var(--#{$prefix}list-group-action-hover-bg));
+        background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}list-group-action-hover-bg));
       }
 
       &:active {
-        color: var(--#{$prefix}list-group-action-active-color);
+        color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-action-active-color));
         background-color: var(--#{$prefix}theme-border, var(--#{$prefix}list-group-action-active-bg));
       }
     }
@@ -218,11 +216,10 @@ $list-group-tokens: defaults(
       border-width: 0 0 var(--#{$prefix}list-group-border-width);
 
       &:last-child {
-        border-bottom-width: 0;
+        border-block-end-width: 0;
       }
     }
   }
-
 
   // scss-docs-start list-group-modifiers
   // List group contextual variants
@@ -230,23 +227,9 @@ $list-group-tokens: defaults(
   // Add modifier classes to change text and background color on individual items.
   // Organizationally, this must come after the `:hover` states.
 
-  // The variant sets the theme tokens, then maps them again on the item: the
-  // base tokens resolve their var() references on .list-group, so slots set on
-  // a single item are invisible to them.
   @each $state in map.keys($theme-colors) {
     .list-group-item-#{$state} {
       @include theme-tokens($state);
-
-      --#{$prefix}list-group-color: var(--#{$prefix}theme-fg-emphasis);
-      --#{$prefix}list-group-bg: var(--#{$prefix}theme-bg-subtle);
-      --#{$prefix}list-group-border-color: var(--#{$prefix}theme-border);
-      --#{$prefix}list-group-action-hover-color: var(--#{$prefix}emphasis-color);
-      --#{$prefix}list-group-action-hover-bg: var(--#{$prefix}theme-border);
-      --#{$prefix}list-group-action-active-color: var(--#{$prefix}emphasis-color);
-      --#{$prefix}list-group-action-active-bg: var(--#{$prefix}theme-border);
-      --#{$prefix}list-group-active-color: var(--#{$prefix}theme-bg-subtle);
-      --#{$prefix}list-group-active-bg: var(--#{$prefix}theme-fg-emphasis);
-      --#{$prefix}list-group-active-border-color: var(--#{$prefix}theme-fg-emphasis);
     }
   }
   // scss-docs-end list-group-modifiers
