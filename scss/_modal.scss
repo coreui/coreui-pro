@@ -52,6 +52,20 @@ $modal-transition-duration:         .3s !default;
 $modal-transition-timing:           ease-out !default;
 // scss-docs-end modal-variables
 
+$modal-sizes: () !default;
+
+// scss-docs-start modal-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$modal-sizes: defaults(
+  (
+    sm: $modal-sm,
+    lg: $modal-lg,
+    xl: $modal-xl,
+  ),
+  $modal-sizes
+);
+// scss-docs-end modal-sizes
+
 $modal-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -235,24 +249,16 @@ $modal-tokens: defaults(
       --#{$prefix}modal-margin: #{$modal-dialog-margin-y-sm-up};
       --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-sm-up};
     }
-
-    .modal-sm {
-      --#{$prefix}modal-width: #{$modal-sm};
-    }
   }
 
-  @include media-breakpoint-up(lg) {
-    .modal-lg,
-    .modal-xl {
-      --#{$prefix}modal-width: #{$modal-lg};
+  // Modal sizes
+  // scss-docs-start modal-sizes-loop
+  @each $size, $value in $modal-sizes {
+    .modal-#{$size} {
+      --#{$prefix}modal-width: #{$value};
     }
   }
-
-  @include media-breakpoint-up(xl) {
-    .modal-xl {
-      --#{$prefix}modal-width: #{$modal-xl};
-    }
-  }
+  // scss-docs-end modal-sizes-loop
 
   // scss-docs-start modal-fullscreen-loop
   @each $breakpoint in map.keys($grid-breakpoints) {

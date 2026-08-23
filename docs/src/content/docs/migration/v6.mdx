@@ -1508,6 +1508,28 @@ Multi Select's option indicators moved with it — they render as a decorative
   element that actually animates, instead of the tab button, which only
   transitions its colours.
 
+#### Modal
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A size modifier applies at every viewport.** `.modal-lg` and `.modal-xl`
+  were withheld until the `lg` and `xl` breakpoints, so on a tablet a large
+  modal was **500 px** — the same as one with no modifier at all — and an
+  extra-large modal on a 1100 px screen was 800 px. Both ask for their width
+  everywhere now, capped by `max-width: calc(100% - margin * 2)` exactly as
+  before, which is what kept horizontal scrollbars away in the first place.
+  At 768 px `.modal-lg` goes 500 → 712 px, and at 1100 px `.modal-xl` goes
+  800 → 1044 px.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.modal-sm` is narrow on phones too.** It used to fall back to the default
+  width below the `sm` breakpoint, so on a 360 px screen it filled the width;
+  it is 300 px there now. Drop the modifier for markup that should fill a small
+  screen.
+
+- **`$modal-sizes` replaces the three breakpoint blocks.** Sizes come from a map
+  and a loop, the same shape `.dialog-*` already used — one model for both
+  windows instead of two.
+
 #### Pagination
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
