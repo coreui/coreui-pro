@@ -391,9 +391,9 @@ Embedding YouTube videos in modals requires additional JavaScript not in Bootstr
 
 ## Optional sizes
 
-Modals have three optional sizes, available via modifier classes to be placed on the `<dialog class="modal">`. These sizes kick in at certain breakpoints to avoid horizontal scrollbars on narrower viewports.
+Modals have three optional sizes, available via modifier classes to be placed on the `<dialog class="modal">`. A size is a request: the modal is as wide as the class asks for, capped to the viewport less its margins, so it never produces a horizontal scrollbar.
 
-| Size | Class | Modal max-width
+| Size | Class | Modal width
 | --- | --- | --- |
 | Small | `.modal-sm` | `300px` |
 | Default | <span class="text-body-secondary">None</span> | `500px` |
@@ -649,6 +649,10 @@ Modals use local CSS variables on `.modal` for enhanced real-time customization.
 ### SASS variables
 
 <ScssDocs file="scss/_modal.scss" capture="modal-variables" />
+
+Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
+
+<ScssDocs file="scss/_modal.scss" capture="modal-sizes" />
 
 ### SASS Loop
 
