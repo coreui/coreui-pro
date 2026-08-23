@@ -62,6 +62,36 @@ Because the theme tokens are plain CSS variables, you can also scope a theme to 
 
 The classic color classes — `.btn-primary`, `.alert-success`, `.badge` color spellings from v5 — keep working: they are generated from the same theme tokens, so both APIs stay pixel-identical.
 
+### Building a themeable component
+
+A component reads a theme token **inside its own token's default**, never around that token at the property. Both forms below render identically until something overrides the token — and then the position of the slot decides who wins:
+
+```scss
+// Do this: the slot is the token's default, so the token stays the override point
+--cui-badge-bg: var(--cui-theme-base, #{$badge-bg}),
+// …
+background-color: var(--cui-badge-bg);
+
+// Not this: the slot wraps the token, so the token can no longer win
+--cui-badge-bg: #{$badge-bg},
+// …
+background-color: var(--cui-theme-base, var(--cui-badge-bg));
+```
+
+With the slot inside, setting `--cui-badge-bg` on a themed element beats the theme. With the slot outside, the theme always wins and the token is dead — and that takes every structural variant with it, because a variant is a rule that redeclares the component token. `.badge-subtle` and `.badge-outline` both collapse into the solid theme color.
+
+The rule holds one level down too. Where a state remaps a token, the slot belongs to the default being remapped from, not around it:
+
+```scss
+--cui-stepper-step-indicator-complete-color: var(--cui-theme-contrast, #{$stepper-step-indicator-complete-color}),
+// …
+.stepper-step-button.complete {
+  --cui-stepper-step-indicator-color: var(--cui-stepper-step-indicator-complete-color);
+}
+```
+
+One consequence to design around: a `var()` resolves where the property is declared, so a token declared on the component root cannot see a theme class placed on one of its parts. Declare the token on the part that should carry the theme.
+
 ## Responsive
 
 These Sass loops aren't limited to color maps, either. You can also generate responsive variations of your components. Take for example our responsive alignment of the dropdowns where we mix an `@each` loop for the `$grid-breakpoints` Sass map with a media query include.
