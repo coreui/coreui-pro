@@ -61,7 +61,6 @@ $switch-tokens: defaults(
     --#{$prefix}switch-disabled-thumb-bg: #{$switch-disabled-thumb-bg},
     --#{$prefix}switch-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}switch-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}switch-height)) * .5),
-    --#{$prefix}switch-focus-border: var(--#{$prefix}control-focus-border-color),
     --#{$prefix}switch-active-filter: var(--#{$prefix}control-active-filter),
     --#{$prefix}switch-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
@@ -118,7 +117,6 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
     }
 
     &:focus-visible {
-      border-color: var(--#{$prefix}switch-focus-border);
       @include focus-ring(true);
     }
 
