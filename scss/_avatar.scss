@@ -22,14 +22,23 @@ $avatar-status-border-color:   var(--#{$prefix}body-bg) !default;
 $avatar-stack-hover-transform: translateY(-2px) !default;
 $avatar-transition:            transform .15s ease-in-out !default;
 
-// `status-size` is optional: leave it out and the indicator keeps the base size.
-$avatar-sizes: (
-  sm: (size: 1.5rem, status-size: .4rem),
-  md: (size: 2.5rem, status-size: .7rem),
-  lg: (size: 3rem,   status-size: .8rem),
-  xl: (size: 4rem,   status-size: 1rem),
-) !default;
 // scss-docs-end avatar-variables
+
+$avatar-sizes: () !default;
+
+// `status-size` is optional: leave it out and the indicator keeps the base size.
+// scss-docs-start avatar-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$avatar-sizes: defaults(
+  (
+    sm: (size: 1.5rem, status-size: .4rem),
+    md: (size: 2.5rem, status-size: .7rem),
+    lg: (size: 3rem,   status-size: .8rem),
+    xl: (size: 4rem,   status-size: 1rem),
+  ),
+  $avatar-sizes
+);
+// scss-docs-end avatar-sizes
 
 $avatar-tokens: () !default;
 

@@ -13,10 +13,18 @@ $input-group-addon-font-weight:         var(--#{$prefix}btn-input-font-weight) !
 $input-group-addon-color:               var(--#{$prefix}btn-input-color) !default;
 $input-group-addon-bg:                  var(--#{$prefix}tertiary-bg) !default;
 $input-group-addon-border-color:        var(--#{$prefix}btn-input-border-color) !default;
+// scss-docs-end input-group-variables
+
+$input-group-sizes: () !default;
 
 // A button in the group sizes itself from `$button-sizes`, so it is not listed here.
-$input-group-sizes:                     ("sm", "lg") !default;
-// scss-docs-end input-group-variables
+// scss-docs-start input-group-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$input-group-sizes: defaults(
+  ("sm", "lg"),
+  $input-group-sizes
+);
+// scss-docs-end input-group-sizes
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
@@ -109,7 +117,7 @@ $input-group-tokens: defaults(
   // Remix the default form control sizing classes into new ones for easier
   // manipulation.
 
-  @each $size in $input-group-sizes {
+  @each $size, $_ in $input-group-sizes {
     .input-group-#{$size} > .form-control,
     .input-group-#{$size} > .form-select,
     .input-group-#{$size} > .input-group-text {

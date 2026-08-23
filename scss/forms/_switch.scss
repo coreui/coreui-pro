@@ -1,4 +1,3 @@
-@use "sass:list";
 @use "sass:map";
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
@@ -24,15 +23,32 @@ $switch-checked-thumb-bg:     var(--#{$prefix}primary-contrast) !default;
 $switch-disabled-bg:          var(--#{$prefix}control-disabled-bg) !default;
 $switch-disabled-thumb-bg:    var(--#{$prefix}tertiary-color) !default;
 
-$switch-sizes: (
-  sm: (height: 1rem,    font-size: var(--#{$prefix}font-size-sm)),
-  lg: (height: 1.5rem,  font-size: var(--#{$prefix}font-size-lg)),
-  xl: (height: 1.75rem, font-size: var(--#{$prefix}font-size-lg))
-) !default;
+// scss-docs-end switch-variables
+
+$switch-sizes: () !default;
+
+// scss-docs-start switch-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$switch-sizes: defaults(
+  (
+    sm: (height: 1rem,    font-size: var(--#{$prefix}font-size-sm)),
+    lg: (height: 1.5rem,  font-size: var(--#{$prefix}font-size-lg)),
+    xl: (height: 1.75rem, font-size: var(--#{$prefix}font-size-lg))
+  ),
+  $switch-sizes
+);
+// scss-docs-end switch-sizes
+
+$form-switch-sizes: () !default;
 
 // The v5 spelling shipped two sizes; both take their height from the map above.
-$form-switch-sizes: ("lg", "xl") !default;
-// scss-docs-end switch-variables
+// scss-docs-start form-switch-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-switch-sizes: defaults(
+  ("lg", "xl"),
+  $form-switch-sizes
+);
+// scss-docs-end form-switch-sizes
 
 $switch-tokens: () !default;
 
@@ -153,7 +169,7 @@ $switch-selector: if(sass($enable-deprecated-form-check): ".switch, .form-switch
       }
     }
 
-    @if $enable-deprecated-form-check and list.index($form-switch-sizes, $size) {
+    @if $enable-deprecated-form-check and map.has-key($form-switch-sizes, $size) {
       // Set on the input — the control declares these tokens itself, so an
       // inherited value would lose to its own declaration.
       .form-switch-#{$size} .form-check-input {

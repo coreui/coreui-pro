@@ -113,6 +113,12 @@ Modify the appearance of checked switches by adding a [`.theme-{color}` class](/
 
 <ScssDocs file="scss/forms/_switch.scss" capture="switch-variables" />
 
+Each size carries its own height and font size, and both maps merge with your overrides — set a key to `null` to drop a size:
+
+<ScssDocs file="scss/forms/_switch.scss" capture="switch-sizes" />
+
+<ScssDocs file="scss/forms/_switch.scss" capture="form-switch-sizes" />
+
 ### CSS variables
 
 Switchs read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
