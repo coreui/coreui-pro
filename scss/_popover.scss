@@ -3,6 +3,7 @@
 @use "mixins/box-shadow" as *;
 @use "mixins/reset-text" as *;
 @use "mixins/tokens" as *;
+@use "mixins/transition" as *;
 @use "config" as *;
 
 // scss-docs-start popover-variables
@@ -17,7 +18,7 @@ $popover-box-shadow:                var(--#{$prefix}box-shadow) !default;
 
 $popover-header-font-size:          var(--#{$prefix}body-font-size) !default;
 $popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
-$popover-header-color:              $headings-color !default;
+$popover-header-color:              var(--#{$prefix}heading-color) !default;
 $popover-header-padding-y:          .5rem !default;
 $popover-header-padding-x:          var(--#{$prefix}spacer-3) !default;
 
@@ -27,6 +28,10 @@ $popover-body-padding-x:            var(--#{$prefix}spacer-3) !default;
 
 $popover-arrow-width:               1rem !default;
 $popover-arrow-height:              .5rem !default;
+
+$popover-transition-property:       opacity !default;
+$popover-transition-duration:       .15s !default;
+$popover-transition-timing:         linear !default;
 // scss-docs-end popover-variables
 
 $popover-tokens: () !default;
@@ -56,6 +61,9 @@ $popover-tokens: defaults(
     --#{$prefix}popover-arrow-width: #{$popover-arrow-width},
     --#{$prefix}popover-arrow-height: #{$popover-arrow-height},
     --#{$prefix}popover-arrow-border: var(--#{$prefix}popover-border-color),
+    --#{$prefix}popover-transition-property: #{$popover-transition-property},
+    --#{$prefix}popover-transition-duration: #{$popover-transition-duration},
+    --#{$prefix}popover-transition-timing: #{$popover-transition-timing},
   ),
   $popover-tokens
 );
@@ -80,6 +88,19 @@ $popover-tokens: defaults(
     border: var(--#{$prefix}popover-border-width) solid var(--#{$prefix}popover-border-color);
     @include border-radius(var(--#{$prefix}popover-border-radius));
     @include box-shadow(var(--#{$prefix}popover-box-shadow));
+    opacity: 0;
+
+    &:not(.popover-instant) {
+      @include transition-props(
+        var(--#{$prefix}popover-transition-property),
+        var(--#{$prefix}popover-transition-duration),
+        var(--#{$prefix}popover-transition-timing)
+      );
+    }
+
+    &.show {
+      opacity: 1;
+    }
 
     .popover-arrow {
       display: block;
@@ -95,6 +116,14 @@ $popover-tokens: defaults(
         border-style: solid;
         border-width: 0;
       }
+    }
+  }
+
+  // The popover is inserted by JavaScript, so the fade-in needs an explicit
+  // state to animate FROM: the base rule cannot express it.
+  @starting-style {
+    .popover:not(.popover-instant).show {
+      opacity: 0;
     }
   }
 

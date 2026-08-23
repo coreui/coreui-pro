@@ -3,6 +3,7 @@
 @use "mixins/deprecate" as *;
 @use "mixins/reset-text" as *;
 @use "mixins/tokens" as *;
+@use "mixins/transition" as *;
 @use "config" as *;
 
 // scss-docs-start tooltip-variables
@@ -18,6 +19,10 @@ $tooltip-margin:                    null !default; // TODO: remove this in v6
 
 $tooltip-arrow-width:               .8rem !default;
 $tooltip-arrow-height:              .4rem !default;
+
+$tooltip-transition-property:       opacity !default;
+$tooltip-transition-duration:       .15s !default;
+$tooltip-transition-timing:         linear !default;
 // scss-docs-end tooltip-variables
 
 $tooltip-tokens: () !default;
@@ -39,6 +44,9 @@ $tooltip-tokens: defaults(
     --#{$prefix}tooltip-opacity: #{$tooltip-opacity},
     --#{$prefix}tooltip-arrow-width: #{$tooltip-arrow-width},
     --#{$prefix}tooltip-arrow-height: #{$tooltip-arrow-height},
+    --#{$prefix}tooltip-transition-property: #{$tooltip-transition-property},
+    --#{$prefix}tooltip-transition-duration: #{$tooltip-transition-duration},
+    --#{$prefix}tooltip-transition-timing: #{$tooltip-transition-timing},
   ),
   $tooltip-tokens
 );
@@ -66,6 +74,14 @@ $tooltip-tokens: defaults(
     word-wrap: break-word;
     opacity: 0;
 
+    &:not(.tooltip-instant) {
+      @include transition-props(
+        var(--#{$prefix}tooltip-transition-property),
+        var(--#{$prefix}tooltip-transition-duration),
+        var(--#{$prefix}tooltip-transition-timing)
+      );
+    }
+
     &.show { opacity: 1; }
 
     .tooltip-arrow {
@@ -79,6 +95,14 @@ $tooltip-tokens: defaults(
         border-color: transparent;
         border-style: solid;
       }
+    }
+  }
+
+  // The tooltip is inserted by JavaScript, so the fade-in needs an explicit
+  // state to animate FROM: the base rule cannot express it.
+  @starting-style {
+    .tooltip:not(.tooltip-instant).show {
+      opacity: 0;
     }
   }
 

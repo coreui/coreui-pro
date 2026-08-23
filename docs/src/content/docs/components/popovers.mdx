@@ -163,7 +163,7 @@ Note that for security reasons the `sanitize`, `sanitizeFn`, and `allowList` opt
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `allowList` | object | [Default value](/getting-started/javascript/#sanitizer) | Object which contains allowed attributes and tags. |
-| `animation` | boolean | `true` | Apply a CSS fade transition to the popover |
+| `animation` | boolean | `true` | Apply a CSS fade transition to the popover. The fade lives in the stylesheet: `false` renders `.popover-instant`, the same class you can put in a custom `template`. Retime it with `--cui-popover-transition-duration` and `--cui-popover-transition-timing`. |
 | `boundary` | string, element | `'clippingParents'` | Overflow constraint boundary of the popover. By default, it's `'clippingParents'` and can accept an HTMLElement reference (via JavaScript only). For more information refer to Floating UI's [detectOverflow docs](https://floating-ui.com/docs/detectOverflow/#boundary). |
 | `container` | string, element, false | `false` | Appends the popover to a specific element. Example: `container: 'body'`. This option is particularly useful in that it allows you to position the popover in the flow of the document near the triggering element - which will prevent the popover from floating away from the triggering element during a window resize. |
 | `content` | string, element, function | `''` | Default content value if `data-coreui-content` attribute isn't present. If a function is given, it will be called with its `this` reference set to the element that the popover is attached to.

@@ -1481,13 +1481,26 @@ Multi Select's option indicators moved with it — they render as a decorative
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
   needs no container.
 
-#### Popover
+#### Popover and Tooltip
+
+- **The fade moved to CSS.** Neither component renders the `fade` helper class
+  any more; `.show` alone drives the transition, with `@starting-style`
+  supplying the state to animate from. `animation: false` renders
+  `.popover-instant` / `.tooltip-instant` instead of omitting `fade`, and a
+  custom `template` opts out with the same class. The option itself is
+  unchanged; only custom CSS targeting `.popover.fade` or `.tooltip.fade` needs
+  updating. Tune the motion with `--cui-popover-transition-duration` /
+  `-timing` and their tooltip counterparts.
 
 - **A bottom-placed popover's arrow is filled like the header it points into.**
   The arrow sits above the header and was drawn in the body background, so it
   read as a notch cut out of the header strip. It takes
   `--cui-popover-header-bg` when a header follows it, and stays on
   `--cui-popover-bg` when there is none.
+
+- **`--cui-popover-header-color` reads `--cui-heading-color`.** It resolved
+  `$headings-color` at build time, so a runtime override of the heading colour
+  skipped the popover header. The default is unchanged.
 
 #### Progress
 
