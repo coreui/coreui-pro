@@ -86,7 +86,7 @@ You can optionally swap out active or disabled anchors for `<span>`, or omit the
 
 ## Sizing
 
-Fancy larger or smaller pagination? Add `.pagination-lg` or `.pagination-sm` for additional sizes.
+Fancy larger or smaller pagination? Add `.pagination-lg` or `.pagination-sm` for additional sizes. Each one maps the pagination's tokens onto the shared control scale, so a page link lines up with a button or an input of the same size.
 
 <Example code={`<nav aria-label="...">
     <ul class="pagination pagination-lg">
@@ -168,6 +168,8 @@ Pagination now uses local CSS variables on `.pagination` for enhanced real-time 
 
 <ScssDocs file="scss/_pagination.scss" capture="pagination-variables" />
 
-### SASS mixins
+### SASS loop
 
-<ScssDocs file="scss/mixins/_pagination.scss" capture="pagination-mixin" />
+Each size remaps the pagination's tokens onto the shared `--cui-btn-input-*` scale, so a new entry in `$pagination-sizes` picks up whatever that scale defines for it.
+
+<ScssDocs file="scss/_pagination.scss" capture="pagination-sizes-loop" />

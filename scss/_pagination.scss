@@ -3,26 +3,21 @@
 @use "mixins/focus-ring" as *;
 @use "mixins/gradients" as *;
 @use "mixins/lists" as *;
-@use "mixins/pagination" as *;
 @use "mixins/tokens" as *;
 @use "mixins/transition" as *;
 @use "config" as *;
 
 // scss-docs-start pagination-variables
-$pagination-padding-y:              .375rem !default;
-$pagination-padding-x:              .75rem !default;
-$pagination-padding-y-sm:           .25rem !default;
-$pagination-padding-x-sm:           .5rem !default;
-$pagination-padding-y-lg:           .75rem !default;
-$pagination-padding-x-lg:           1.5rem !default;
+$pagination-min-height:             var(--#{$prefix}btn-input-min-height) !default;
+$pagination-padding-y:              var(--#{$prefix}btn-input-padding-y) !default;
+$pagination-padding-x:              var(--#{$prefix}btn-input-padding-x) !default;
 
-$pagination-font-size:              var(--#{$prefix}body-font-size) !default;
+$pagination-font-size:              var(--#{$prefix}btn-input-font-size) !default;
 
 $pagination-color:                  var(--#{$prefix}link-color) !default;
 $pagination-bg:                     var(--#{$prefix}body-bg) !default;
-$pagination-border-radius:          var(--#{$prefix}border-radius) !default;
+$pagination-border-radius:          var(--#{$prefix}btn-input-border-radius) !default;
 $pagination-border-width:           var(--#{$prefix}border-width) !default;
-$pagination-margin-start:           calc(-1 * #{$pagination-border-width}) !default;
 $pagination-border-color:           var(--#{$prefix}border-color) !default;
 
 $pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
@@ -30,7 +25,7 @@ $pagination-focus-bg:               var(--#{$prefix}secondary-bg) !default;
 
 $pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
 $pagination-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
-$pagination-hover-border-color:     var(--#{$prefix}border-color) !default; // Todo in v6: remove this?
+$pagination-hover-border-color:     var(--#{$prefix}border-color) !default;
 
 $pagination-active-color:           var(--#{$prefix}primary-contrast) !default;
 $pagination-active-bg:              var(--#{$prefix}primary) !default;
@@ -40,21 +35,22 @@ $pagination-disabled-color:         var(--#{$prefix}secondary-color) !default;
 $pagination-disabled-bg:            var(--#{$prefix}secondary-bg) !default;
 $pagination-disabled-border-color:  var(--#{$prefix}border-color) !default;
 
-$pagination-transition:              color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
+$pagination-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 
-$pagination-border-radius-sm:       var(--#{$prefix}border-radius-sm) !default;
-$pagination-border-radius-lg:       var(--#{$prefix}border-radius-lg) !default;
+$pagination-sizes:                  ("sm", "lg") !default;
 // scss-docs-end pagination-variables
 
 $pagination-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start pagination-css-vars
 $pagination-tokens: defaults(
   (
+    --#{$prefix}pagination-min-height: #{$pagination-min-height},
     --#{$prefix}pagination-padding-x: #{$pagination-padding-x},
     --#{$prefix}pagination-padding-y: #{$pagination-padding-y},
+    --#{$prefix}pagination-font-size: #{$pagination-font-size},
     --#{$prefix}pagination-color: #{$pagination-color},
     --#{$prefix}pagination-bg: #{$pagination-bg},
     --#{$prefix}pagination-border-width: #{$pagination-border-width},
@@ -71,13 +67,12 @@ $pagination-tokens: defaults(
     --#{$prefix}pagination-disabled-color: #{$pagination-disabled-color},
     --#{$prefix}pagination-disabled-bg: #{$pagination-disabled-bg},
     --#{$prefix}pagination-disabled-border-color: #{$pagination-disabled-border-color},
-    --#{$prefix}pagination-font-size: $pagination-font-size,
   ),
   $pagination-tokens
 );
 // scss-docs-end pagination-css-vars
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
   .pagination {
     @include tokens($pagination-tokens);
@@ -88,7 +83,10 @@ $pagination-tokens: defaults(
 
   .page-link {
     position: relative;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--#{$prefix}pagination-min-height);
     padding: var(--#{$prefix}pagination-padding-y) var(--#{$prefix}pagination-padding-x);
     font-size: var(--#{$prefix}pagination-font-size);
     color: var(--#{$prefix}theme-fg, var(--#{$prefix}pagination-color));
@@ -108,8 +106,8 @@ $pagination-tokens: defaults(
 
     &:focus-visible {
       z-index: 3;
-      color: var(--#{$prefix}pagination-focus-color);
-      background-color: var(--#{$prefix}pagination-focus-bg);
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}pagination-focus-color));
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}pagination-focus-bg));
       @include focus-ring(true);
     }
 
@@ -132,26 +130,15 @@ $pagination-tokens: defaults(
 
   .page-item {
     &:not(:first-child) .page-link {
-      margin-inline-start: $pagination-margin-start;
+      margin-inline-start: calc(-1 * var(--#{$prefix}pagination-border-width));
     }
 
-    @if $pagination-margin-start == calc(-1 * #{$pagination-border-width}) {
-      &:first-child {
-        .page-link {
-          @include border-start-radius(var(--#{$prefix}pagination-border-radius));
-        }
-      }
+    &:first-child .page-link {
+      @include border-start-radius(var(--#{$prefix}pagination-border-radius));
+    }
 
-      &:last-child {
-        .page-link {
-          @include border-end-radius(var(--#{$prefix}pagination-border-radius));
-        }
-      }
-    } @else {
-      // Add border-radius to all pageLinks in case they have left margin
-      .page-link {
-        @include border-radius(var(--#{$prefix}pagination-border-radius));
-      }
+    &:last-child .page-link {
+      @include border-end-radius(var(--#{$prefix}pagination-border-radius));
     }
   }
 
@@ -160,11 +147,15 @@ $pagination-tokens: defaults(
   // Sizing
   //
 
-  .pagination-lg {
-    @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, var(--#{$prefix}font-size-lg), $pagination-border-radius-lg);
+  // scss-docs-start pagination-sizes-loop
+  @each $size in $pagination-sizes {
+    .pagination-#{$size} {
+      --#{$prefix}pagination-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
+      --#{$prefix}pagination-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
+      --#{$prefix}pagination-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
+      --#{$prefix}pagination-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}pagination-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
+    }
   }
-
-  .pagination-sm {
-    @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, var(--#{$prefix}font-size-sm), $pagination-border-radius-sm);
-  }
+  // scss-docs-end pagination-sizes-loop
 }
