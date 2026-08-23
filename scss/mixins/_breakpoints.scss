@@ -1,3 +1,4 @@
 // Moved to layout/_breakpoints.scss in v6, next to the layout config it reads.
-// Kept so an existing `@use "mixins/breakpoints"` resolves.
+// Kept only because @coreui/astro-docs reads this path, and it reads the same
+// path in v5, where the file is real.
 @forward "../layout/breakpoints";

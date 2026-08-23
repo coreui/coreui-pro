@@ -3,7 +3,7 @@
 @use "sass:meta";
 @use "../functions/math" as *;
 @use "../config" as *;
-@use "breakpoints" as *;
+@use "../layout/breakpoints" as *;
 
 $grid-row-columns:            6 !default;
 

@@ -32,9 +32,9 @@ your-project/
 
 ## Importing
 
-In your `custom.scss`, you'll import CoreUI's source Sass files. You have two options: include all of CoreUI, or pick the parts you need. We encourage the latter, though be aware there are some requirements and dependencies across our components. You also will need to include some JavaScript for our plugins.
+In your `custom.scss`, you'll load CoreUI's source Sass files with `@use`. You have two options: include all of CoreUI, or pick the parts you need. We encourage the latter, though be aware there are some requirements and dependencies across our components. You also will need to include some JavaScript for our plugins.
 
-<Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
+<Callout color="warning"><Fragment set:html={`<p> <strong>v6 is <code>@use</code> only.</strong> The <code>*.import.scss</code> files that let <code>@import</code> reach our modules are gone, so an <code>@import</code> of anything in <code>scss/</code> no longer resolves. <code>@import</code> is deprecated in Dart Sass and is removed in 3.0.0 — read the <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">migration guide</a> if you are still on it.</p>`} /></Callout>
 
 ```scss
 // Custom.scss
@@ -54,11 +54,11 @@ In your `custom.scss`, you'll import CoreUI's source Sass files. You have two op
 
 // 2. Optionally include any other parts as needed
 @use "@coreui/coreui/scss/utilities";
-@use "@coreui/coreui/scss/reboot";
-@use "@coreui/coreui/scss/type";
-@use "@coreui/coreui/scss/images";
-@use "@coreui/coreui/scss/containers";
-@use "@coreui/coreui/scss/grid";
+@use "@coreui/coreui/scss/content/reboot";
+@use "@coreui/coreui/scss/content/type";
+@use "@coreui/coreui/scss/content/images";
+@use "@coreui/coreui/scss/layout/containers";
+@use "@coreui/coreui/scss/layout/grid";
 @use "@coreui/coreui/scss/helpers";
 
 // 3. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
@@ -67,58 +67,18 @@ In your `custom.scss`, you'll import CoreUI's source Sass files. You have two op
 // 4. Add additional custom code here
 ```
 
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
+With that setup in place, you can begin to modify any of the Sass variables and maps in your `custom.scss`. You can also start to add parts of CoreUI for Bootstrap under the `// Optional` section as needed. We suggest using the full stack from our `coreui.scss` file as your starting point.
 
-```scss
-// Custom.scss
-// Option A: Include all of CoreUI
+Partials live in the directory named after the cascade layer they emit into, so
+`scss/content/`, `scss/layout/`, `scss/forms/` and `scss/buttons/` hold what used
+to sit at the root. The [migration guide](/migration/v6/) maps every old path to
+its new one.
 
-@import "../node_modules/@coreui/coreui/scss/coreui";
-
-// Then add additional custom code here
-```
-
-```scss
-// Custom.scss
-// Option B: Include parts of CoreUI
-
-// 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
-@import "../node_modules/@coreui/coreui/scss/functions";
-
-// 2. Include any default variable overrides here
-
-// 3. Include remainder of required CoreUI stylesheets
-@import "../node_modules/@coreui/coreui/scss/variables";
-
-// 4. Include any default map overrides here
-
-// 5. Include remainder of required parts
-@import "../node_modules/@coreui/coreui/scss/mixins";
-@import "../node_modules/@coreui/coreui/scss/root";
-
-// 6. Optionally include any other parts as needed
-@import "../node_modules/@coreui/coreui/scss/utilities";
-@import "../node_modules/@coreui/coreui/scss/reboot";
-@import "../node_modules/@coreui/coreui/scss/type";
-@import "../node_modules/@coreui/coreui/scss/images";
-@import "../node_modules/@coreui/coreui/scss/containers";
-@import "../node_modules/@coreui/coreui/scss/grid";
-@import "../node_modules/@coreui/coreui/scss/helpers";
-
-// 7. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
-@import "../node_modules/@coreui/coreui/scss/utilities/api";
-
-// 8. Add additional custom code here
-```
-
-With that setup in place, you can begin to modify any of the Sass variables and maps in your `custom.scss`. You can also start to add parts of CoreUI for Bootstrap under the `// Optional` section as needed. We suggest using the full import stack from our `coreui.scss` file as your starting point.
-
-The library's configuration is split across four modules, each importable on its
+The library's configuration is split across four modules, each loadable on its
 own: `scss/config` holds the global settings — options, spacing, breakpoints,
 borders, shadows, typography, z-index; `scss/colors` the palette and the grays;
 `scss/theme` the theme colours, the `$theme-colors` map and the runtime colour
-scale; and `scss/root` emits every token on `:root`. The pre-v6 `scss/variables`
-and `scss/maps` paths still resolve to the same modules.
+scale; and `scss/root` emits every token on `:root`.
 
 ## Compiling
 
@@ -163,34 +123,11 @@ Variable overrides must come after our functions are imported, but before the re
 
 Here's an example that changes the `background-color` and `color` for the `<body>` when importing and compiling CoreUI for Bootstrap via npm:
 
-<Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
-
 ```scss
 @use "@coreui/coreui/scss/coreui" with (
   $body-bg: #000,
   $body-color: #111
 )
-```
-
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
-
-```scss
-// Required
-@import "../node_modules/@coreui/coreui/scss/functions";
-
-// Default variable overrides
-$body-bg: #000;
-$body-color: #111;
-
-// Required
-@import "../node_modules/@coreui/coreui/scss/variables";
-@import "../node_modules/@coreui/coreui/scss/mixins";
-@import "../node_modules/@coreui/coreui/scss/root";
-
-// Optional CoreUI components here
-@import "../node_modules/@coreui/coreui/scss/reboot";
-@import "../node_modules/@coreui/coreui/scss/type";
-// etc
 ```
 
 Repeat as necessary for any variable in CoreUI, including the global options below.
@@ -229,8 +166,6 @@ $theme-colors: (
 
 Add new colors to `$theme-colors`, or any other map, by creating a new Sass map with your custom values and merging it with the original map. In this case, we'll create a new `$custom-colors` map and merge it with `$theme-colors`. A theme colour entry is a map of slots: give the new colour a `base` and a `contrast`, and point the remaining slots at the 100–900 scale the library mixes from the base at runtime, the same way the built-in colours do.
 
-<Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
-
 ```scss
 @use "sass:map";
 @use "@coreui/coreui/scss/theme" as *;
@@ -253,27 +188,9 @@ $theme-colors: map.merge($theme-colors, $custom-colors);
 @use "@coreui/coreui/scss/coreui";
 ```
 
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
-
-```scss
-// Create your own map
-$custom-colors: (
-  "custom-color": (
-    "base":     #900,
-    "contrast": #fff,
-    // …the remaining slots, as above
-  ),
-);
-
-// Merge the maps
-$theme-colors: map-merge($theme-colors, $custom-colors);
-```
-
 ### Remove from map
 
 To remove colors from `$theme-colors`, or any other map, use `map-remove`. Be aware you must insert it between our requirements and options:
-
-<Callout color="info"><Fragment set:html={`<p> <strong>Heads up!</strong> Since <code>@coreui/coreui</code> v5.3.0 and <code>@coreui/coreui-pro</code> v5.10.0, we support Sass modules. </p> <p> You can now use the modern <code>@use</code> and <code>@forward</code> rules instead of <code>@import</code>, which is deprecated and will be removed in Dart Sass 3.0.0. Using <code>@import</code> will result in a compilation warning. You can learn more about this transition <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>. </p>`} /></Callout>
 
 ```scss
 @use "sass:map";
@@ -286,23 +203,6 @@ $theme-colors-border-subtle: map.remove($theme-colors-border-subtle, "info", "li
 ```
 
 The `$theme-colors-*` families are derived from `$theme-colors` when the theme module first loads, so a later reassignment of the main map doesn't reach them — remove the keys from each derived map you use, as above.
-
-<Callout color="warning"><Fragment set:html={`<p> <strong>Sass <code>@import</code> are deprecated and will be removed in Dart Sass 3.0.0.!</strong> </p> <p>You can also use <code>@import</code> rules, but please be aware that they are deprecated and will be removed in Dart Sass 3.0.0, resulting in a compilation warning. You can learn more about this deprecation <a href="https://sass-lang.com/documentation/breaking-changes/import/" target="_blank">here</a>.</p>`} /></Callout>
-
-```scss
-// Required
-@import "../node_modules/@coreui/coreui/scss/functions";
-@import "../node_modules/@coreui/coreui/scss/variables";
-@import "../node_modules/@coreui/coreui/scss/mixins";
-@import "../node_modules/@coreui/coreui/scss/root";
-
-$theme-colors: map-remove($theme-colors, "info", "light", "dark");
-
-// Optional
-@import "../node_modules/@coreui/coreui/scss/reboot";
-@import "../node_modules/@coreui/coreui/scss/type";
-// etc
-```
 
 ## Required keys
 

@@ -3,6 +3,6 @@
 // which v6 no longer declares, and `$enable-cssgrid`, which v6 already defaults
 // to `true`.
 
-@forward "@coreui-docs-source/scss/variables" with (
+@forward "@coreui-docs-source/scss/config" with (
   $enable-deprecation-messages: false
 );
