@@ -1481,6 +1481,39 @@ Multi Select's option indicators moved with it — they render as a decorative
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
   needs no container.
 
+#### Spinner
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Spinners are sized in `em`, not `rem`.** `.spinner-border` and
+  `.spinner-grow` are now `1em` square with a `.125em` border, so a spinner
+  takes the font size of whatever it sits in instead of being a fixed 32 px
+  block. Inside a button or a paragraph it lands at the size you previously had
+  to ask for with a modifier; standalone it is half of what it was. Set
+  `--cui-spinner-width` / `-height`, or the `$spinner-width` /
+  `$spinner-height` Sass variables, to go back to a fixed size.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.spinner-border-sm` and `.spinner-grow-sm` are replaced by one
+  `.spinner-sm`.** The small variant no longer has to correct the border width,
+  so a single class serves both spinners.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`--cui-spinner-vertical-align` is gone.** Spinners are
+  `inline-flex` and assume a flex parent; the `-.125em` baseline nudge it used
+  to need no longer applies.
+
+- **The animation timing function is a token.** `.spinner-border` keeps
+  `linear`, while `.spinner-grow` now eases with `ease-in-out` instead of
+  pulsing linearly. Override
+  `--cui-spinner-animation-timing-function` to change either.
+
+- **`.spinner-rotate` is new.** It applies only the rotation, so you can spin
+  your own SVG or icon without inheriting the bordered circle.
+
+- **`.btn-loading` sizes its spinner from the button.** `LoadingButton` no
+  longer adds a `-sm` class to the spinner it injects; the spinner follows the
+  button's font size, so it now scales with `.btn-sm` and `.btn-lg`.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component
