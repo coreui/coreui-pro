@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "functions/defaults" as *;
 @use "mixins/gradients" as *;
 @use "mixins/tokens" as *;
@@ -27,6 +28,19 @@ $badge-padding-y-lg:                .375em !default;
 $badge-padding-x-lg:                .875em !default;
 $badge-font-size-lg:                .875em !default;
 // scss-docs-end badge-variables
+
+$badge-sizes: () !default;
+
+// scss-docs-start badge-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$badge-sizes: defaults(
+  (
+    "sm": (min-height: $badge-min-height-sm, padding-y: $badge-padding-y-sm, padding-x: $badge-padding-x-sm, font-size: $badge-font-size-sm),
+    "lg": (min-height: $badge-min-height-lg, padding-y: $badge-padding-y-lg, padding-x: $badge-padding-x-lg, font-size: $badge-font-size-lg),
+  ),
+  $badge-sizes
+);
+// scss-docs-end badge-sizes
 
 $badge-tokens: () !default;
 
@@ -120,17 +134,14 @@ $badge-variants: (
   }
   // scss-docs-end badge-modifiers
 
-  .badge-sm {
-    --#{$prefix}badge-min-height: #{$badge-min-height-sm};
-    --#{$prefix}badge-padding-x: #{$badge-padding-x-sm};
-    --#{$prefix}badge-padding-y: #{$badge-padding-y-sm};
-    --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, #{$badge-font-size-sm}, #{$badge-font-size-sm});
+  // scss-docs-start badge-sizes-loop
+  @each $size, $values in $badge-sizes {
+    .badge-#{$size} {
+      --#{$prefix}badge-min-height: #{map.get($values, min-height)};
+      --#{$prefix}badge-padding-x: #{map.get($values, padding-x)};
+      --#{$prefix}badge-padding-y: #{map.get($values, padding-y)};
+      --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, #{map.get($values, font-size)}, #{map.get($values, font-size)});
+    }
   }
-
-  .badge-lg {
-    --#{$prefix}badge-min-height: #{$badge-min-height-lg};
-    --#{$prefix}badge-padding-x: #{$badge-padding-x-lg};
-    --#{$prefix}badge-padding-y: #{$badge-padding-y-lg};
-    --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, #{$badge-font-size-lg}, #{$badge-font-size-lg});
-  }
+  // scss-docs-end badge-sizes-loop
 }

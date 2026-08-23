@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "../functions/defaults" as *;
 @use "../mixins/focus-ring" as *;
 @use "../mixins/tokens" as *;
@@ -32,6 +33,33 @@ $chip-input-font-size-lg:      var(--#{$prefix}btn-input-lg-font-size) !default;
 $chip-input-border-radius-lg:  var(--#{$prefix}border-radius-lg) !default;
 $chip-input-gap-lg:            .5rem !default;
 // scss-docs-end chip-input-variables
+
+$chip-input-sizes: () !default;
+
+// scss-docs-start chip-input-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$chip-input-sizes: defaults(
+  (
+    "sm": (
+      min-height:    $chip-input-min-height-sm,
+      padding-y:     $chip-input-padding-y-sm,
+      padding-x:     $chip-input-padding-x-sm,
+      font-size:     $chip-input-font-size-sm,
+      border-radius: $chip-input-border-radius-sm,
+      gap:           $chip-input-gap-sm,
+    ),
+    "lg": (
+      min-height:    $chip-input-min-height-lg,
+      padding-y:     $chip-input-padding-y-lg,
+      padding-x:     $chip-input-padding-x-lg,
+      font-size:     $chip-input-font-size-lg,
+      border-radius: $chip-input-border-radius-lg,
+      gap:           $chip-input-gap-lg,
+    ),
+  ),
+  $chip-input-sizes
+);
+// scss-docs-end chip-input-sizes
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
@@ -83,21 +111,16 @@ $chip-input-tokens: defaults(
     outline: 0;
   }
 
-  .chip-input-lg {
-    --#{$prefix}chip-input-min-height: #{$chip-input-min-height-lg};
-    --#{$prefix}control-padding-y: #{$chip-input-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$chip-input-padding-x-lg};
-    --#{$prefix}control-border-radius: #{$chip-input-border-radius-lg};
-    --#{$prefix}control-font-size: #{$chip-input-font-size-lg};
-    --#{$prefix}chip-input-gap: #{$chip-input-gap-lg};
+  // scss-docs-start chip-input-sizes-loop
+  @each $size, $values in $chip-input-sizes {
+    .chip-input-#{$size} {
+      --#{$prefix}chip-input-min-height: #{map.get($values, min-height)};
+      --#{$prefix}control-padding-y: #{map.get($values, padding-y)};
+      --#{$prefix}control-padding-x: #{map.get($values, padding-x)};
+      --#{$prefix}control-border-radius: #{map.get($values, border-radius)};
+      --#{$prefix}control-font-size: #{map.get($values, font-size)};
+      --#{$prefix}chip-input-gap: #{map.get($values, gap)};
+    }
   }
-
-  .chip-input-sm {
-    --#{$prefix}chip-input-min-height: #{$chip-input-min-height-sm};
-    --#{$prefix}control-padding-y: #{$chip-input-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$chip-input-padding-x-sm};
-    --#{$prefix}control-border-radius: #{$chip-input-border-radius-sm};
-    --#{$prefix}control-font-size: #{$chip-input-font-size-sm};
-    --#{$prefix}chip-input-gap: #{$chip-input-gap-sm};
-  }
+  // scss-docs-end chip-input-sizes-loop
 }

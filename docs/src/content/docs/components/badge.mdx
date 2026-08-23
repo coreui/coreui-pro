@@ -103,6 +103,10 @@ Badges use local CSS variables on `.badge` for enhanced real-time customization.
 
 <ScssDocs file="scss/_badge.scss" capture="badge-variables" />
 
+Each size is one entry, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
+
+<ScssDocs file="scss/_badge.scss" capture="badge-sizes" />
+
 Each entry in the variants map names the theme role every token reads, so adding a variant takes a map entry rather than a new rule.
 
 <ScssDocs file="scss/_badge.scss" capture="badge-variants" />
