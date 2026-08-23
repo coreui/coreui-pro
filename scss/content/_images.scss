@@ -21,6 +21,7 @@ $figure-caption-color:              var(--#{$prefix}secondary-color) !default;
 // scss-docs-end figure-variables
 
 $thumbnail-tokens: () !default;
+$figure-img-tokens: () !default;
 $figure-caption-tokens: () !default;
 
 // stylelint-disable scss/dollar-variable-default
@@ -40,6 +41,13 @@ $thumbnail-tokens: defaults(
 // scss-docs-end thumbnail-css-vars
 
 // scss-docs-start figure-css-vars
+$figure-img-tokens: defaults(
+  (
+    --#{$prefix}figure-img-margin-bottom: #{$figure-img-margin-bottom},
+  ),
+  $figure-img-tokens
+);
+
 $figure-caption-tokens: defaults(
   (
     --#{$prefix}figure-caption-font-size: #{$figure-caption-font-size},
@@ -84,7 +92,9 @@ $figure-caption-tokens: defaults(
   }
 
   .figure-img {
-    margin-bottom: $figure-img-margin-bottom;
+    @include tokens($figure-img-tokens);
+
+    margin-bottom: var(--#{$prefix}figure-img-margin-bottom);
     line-height: 1;
   }
 
