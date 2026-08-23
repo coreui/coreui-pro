@@ -229,8 +229,8 @@ $chip-outline-tokens: defaults(
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: var(--#{$prefix}chip-min-height);
-    height: var(--#{$prefix}chip-min-height);
+    width: var(--#{$prefix}chip-remove-size);
+    height: var(--#{$prefix}chip-remove-size);
     padding: 0;
     margin-inline-end: calc(var(--#{$prefix}chip-padding-x) * -.25);
     color: inherit;
@@ -263,8 +263,8 @@ $chip-outline-tokens: defaults(
       $chip-padding-x-lg,
       $chip-gap-lg,
       $chip-font-size-lg,
-      $chip-icon-size-lg,
       $chip-img-size-lg,
+      $chip-icon-size-lg,
       $chip-remove-size-lg
     );
   }
@@ -276,8 +276,8 @@ $chip-outline-tokens: defaults(
       $chip-padding-x-sm,
       $chip-gap-sm,
       $chip-font-size-sm,
-      $chip-icon-size-sm,
       $chip-img-size-sm,
+      $chip-icon-size-sm,
       $chip-remove-size-sm
     );
   }

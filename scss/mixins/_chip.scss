@@ -1,13 +1,13 @@
 @use "../config" as *;
 
 // scss-docs-start chip-mixin
-@mixin chip-size($height, $padding-x, $chip-gap, $font-size, $img-size, $icon-size, $dismiss-size) {
+@mixin chip-size($height, $padding-x, $chip-gap, $font-size, $img-size, $icon-size, $remove-size) {
   --#{$prefix}chip-height: #{$height};
   --#{$prefix}chip-padding-x: #{$padding-x};
   --#{$prefix}chip-gap: #{$chip-gap};
   --#{$prefix}chip-font-size: #{$font-size};
   --#{$prefix}chip-img-size: #{$img-size};
   --#{$prefix}chip-icon-size: #{$icon-size};
-  --#{$prefix}chip-dismiss-size: #{$dismiss-size};
+  --#{$prefix}chip-remove-size: #{$remove-size};
 }
 // scss-docs-end chip-mixin

@@ -98,7 +98,7 @@ $chip-input-tokens: defaults(
     &.disabled > .chip {
       opacity: .65;
 
-      .chip-dismiss {
+      .chip-remove {
         pointer-events: none;
       }
     }
