@@ -965,9 +965,10 @@ adornment in the library — so the button needs no icon markup at all:
   It also takes `--cui-nav-link-hover-bg` and `--cui-nav-link-active-bg`, rounded
   by `--cui-nav-link-border-radius` — the base nav used to change text color
   alone. Set the two backgrounds to `transparent` to keep the old look.
-  `.nav-underline` and `.nav-underline-border` opt out of the active fill
-  already: they mark the active item with a line, so a filled background would
-  say the same thing twice.
+  `.nav-tabs`, `.nav-underline` and `.nav-underline-border` square the link off
+  and the two underline variants also opt out of the active fill: they mark the
+  active item with a line, and a radius curves that line's ends while a fill says
+  the same thing twice.
 - **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
   base nav renders exactly as it did. It gives the token a home on the component
   whose name it carries: `.navbar-nav` already overrode it, and `.nav-underline`

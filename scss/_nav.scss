@@ -261,6 +261,8 @@ $tab-pane-tokens: defaults(
   .nav-tabs {
     @include tokens($nav-tabs-tokens);
 
+    --#{$prefix}nav-link-border-radius: 0;
+
     border-bottom: var(--#{$prefix}nav-tabs-border-width) solid var(--#{$prefix}nav-tabs-border-color);
 
     .nav-link {
@@ -319,6 +321,7 @@ $tab-pane-tokens: defaults(
     @include tokens($nav-underline-tokens);
 
     --#{$prefix}nav-link-active-bg: transparent;
+    --#{$prefix}nav-link-border-radius: 0;
 
     gap: var(--#{$prefix}nav-underline-gap);
 
@@ -346,6 +349,7 @@ $tab-pane-tokens: defaults(
     @include tokens($nav-underline-border-tokens);
 
     --#{$prefix}nav-link-active-bg: transparent;
+    --#{$prefix}nav-link-border-radius: 0;
     --#{$prefix}nav-link-color: var(--#{$prefix}nav-underline-border-link-color);
     --#{$prefix}nav-link-disabled-color: var(--#{$prefix}nav-underline-border-link-disabled-color);
 
