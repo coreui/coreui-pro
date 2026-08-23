@@ -21,6 +21,7 @@ $navbar-padding-y:                  var(--#{$prefix}spacer-2) !default;
 $navbar-padding-x:                  null !default;
 
 $navbar-nav-link-padding-x:         .5rem !default;
+$navbar-text-padding-y:             $nav-link-padding-y !default;
 
 $navbar-brand-font-size:            var(--#{$prefix}font-size-lg) !default;
 // Compute the navbar-brand padding-y so the navbar-brand will have the same height as navbar-text and nav-link
@@ -32,6 +33,7 @@ $navbar-brand-margin-end:           1rem !default;
 $navbar-toggler-padding-y:          .25rem !default;
 $navbar-toggler-padding-x:          .75rem !default;
 $navbar-toggler-font-size:          var(--#{$prefix}font-size-lg) !default;
+$navbar-toggler-icon-size:          1.5em !default;
 $navbar-toggler-border-radius:      var(--#{$prefix}border-radius) !default;
 $navbar-toggler-focus-width:        var(--#{$prefix}focus-ring-width) !default;
 $navbar-toggler-transition:         box-shadow .15s ease-in-out !default;
@@ -51,7 +53,7 @@ $navbar-dark-color:                 rgba($white, .55) !default;
 $navbar-dark-hover-color:           color-mix(in srgb, var(--#{$prefix}white) 75%, transparent) !default;
 $navbar-dark-active-color:          var(--#{$prefix}white) !default;
 $navbar-dark-disabled-color:        color-mix(in srgb, var(--#{$prefix}white) 25%, transparent) !default;
-$navbar-dark-toggler-border-color:  color-mix(in srgb, var(--#{$prefix}white) 10%, transparent) !default;$navbar-dark-toggler-border-color:  color-mix(in srgb, var(--#{$prefix}white) 10%, transparent) !default;
+$navbar-dark-toggler-border-color:  color-mix(in srgb, var(--#{$prefix}white) 10%, transparent) !default;
 $navbar-dark-brand-color:           $navbar-dark-active-color !default;
 $navbar-dark-brand-hover-color:     $navbar-dark-active-color !default;
 // scss-docs-end navbar-dark-variables
@@ -68,16 +70,18 @@ $navbar-tokens: defaults(
     --#{$prefix}navbar-color: #{$navbar-light-color},
     --#{$prefix}navbar-hover-color: #{$navbar-light-hover-color},
     --#{$prefix}navbar-disabled-color: #{$navbar-light-disabled-color},
-    --#{$prefix}navbar-active-color: var(--#{$prefix}theme-fg, #{$navbar-light-active-color}),
+    --#{$prefix}navbar-active-color: #{$navbar-light-active-color},
     --#{$prefix}navbar-brand-padding-y: #{$navbar-brand-padding-y},
     --#{$prefix}navbar-brand-margin-end: #{$navbar-brand-margin-end},
     --#{$prefix}navbar-brand-font-size: #{$navbar-brand-font-size},
-    --#{$prefix}navbar-brand-color: var(--#{$prefix}theme-fg, #{$navbar-light-brand-color}),
-    --#{$prefix}navbar-brand-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$navbar-light-brand-hover-color}),
+    --#{$prefix}navbar-brand-color: #{$navbar-light-brand-color},
+    --#{$prefix}navbar-brand-hover-color: #{$navbar-light-brand-hover-color},
     --#{$prefix}navbar-nav-link-padding-x: #{$navbar-nav-link-padding-x},
+    --#{$prefix}navbar-text-padding-y: #{$navbar-text-padding-y},
     --#{$prefix}navbar-toggler-padding-y: #{$navbar-toggler-padding-y},
     --#{$prefix}navbar-toggler-padding-x: #{$navbar-toggler-padding-x},
     --#{$prefix}navbar-toggler-font-size: #{$navbar-toggler-font-size},
+    --#{$prefix}navbar-toggler-icon-size: #{$navbar-toggler-icon-size},
     --#{$prefix}navbar-toggler-icon-bg: #{escape-svg($navbar-toggler-icon)},
     --#{$prefix}navbar-toggler-border-color: #{$navbar-light-toggler-border-color},
     --#{$prefix}navbar-toggler-border-radius: #{$navbar-toggler-border-radius},
@@ -121,9 +125,9 @@ $navbar-dark-tokens: defaults(
     --#{$prefix}navbar-color: #{$navbar-dark-color},
     --#{$prefix}navbar-hover-color: #{$navbar-dark-hover-color},
     --#{$prefix}navbar-disabled-color: #{$navbar-dark-disabled-color},
-    --#{$prefix}navbar-active-color: var(--#{$prefix}theme-fg, #{$navbar-dark-active-color}),
-    --#{$prefix}navbar-brand-color: var(--#{$prefix}theme-fg, #{$navbar-dark-brand-color}),
-    --#{$prefix}navbar-brand-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$navbar-dark-brand-hover-color}),
+    --#{$prefix}navbar-active-color: #{$navbar-dark-active-color},
+    --#{$prefix}navbar-brand-color: #{$navbar-dark-brand-color},
+    --#{$prefix}navbar-brand-hover-color: #{$navbar-dark-brand-hover-color},
     --#{$prefix}navbar-toggler-border-color: #{$navbar-dark-toggler-border-color},
   ),
   $navbar-dark-tokens
@@ -195,13 +199,13 @@ $navbar-dark-tokens: defaults(
     padding-bottom: var(--#{$prefix}navbar-brand-padding-y);
     margin-inline-end: var(--#{$prefix}navbar-brand-margin-end);
     font-size: var(--#{$prefix}navbar-brand-font-size);
-    color: var(--#{$prefix}navbar-brand-color);
+    color: var(--#{$prefix}theme-fg, var(--#{$prefix}navbar-brand-color));
     text-decoration: if(not sass($link-decoration == none): none);
     white-space: nowrap;
 
     &:hover,
     &:focus {
-      color: var(--#{$prefix}navbar-brand-hover-color);
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}navbar-brand-hover-color));
       // stylelint-disable-next-line scss/at-function-named-arguments
       text-decoration: if(sass($link-hover-decoration == underline): none);
     }
@@ -224,7 +228,7 @@ $navbar-dark-tokens: defaults(
     .nav-link {
       &.active,
       &.show {
-        color: var(--#{$prefix}navbar-active-color);
+        color: var(--#{$prefix}theme-fg, var(--#{$prefix}navbar-active-color));
       }
     }
 
@@ -239,14 +243,14 @@ $navbar-dark-tokens: defaults(
   //
 
   .navbar-text {
-    padding-top: $nav-link-padding-y;
-    padding-bottom: $nav-link-padding-y;
+    padding-top: var(--#{$prefix}navbar-text-padding-y);
+    padding-bottom: var(--#{$prefix}navbar-text-padding-y);
     color: var(--#{$prefix}navbar-color);
 
     a,
     a:hover,
-    a:focus  {
-      color: var(--#{$prefix}navbar-active-color);
+    a:focus {
+      color: var(--#{$prefix}theme-fg, var(--#{$prefix}navbar-active-color));
     }
   }
 
@@ -293,8 +297,8 @@ $navbar-dark-tokens: defaults(
   // or image file as needed.
   .navbar-toggler-icon {
     display: inline-block;
-    width: 1.5em;
-    height: 1.5em;
+    width: var(--#{$prefix}navbar-toggler-icon-size);
+    height: var(--#{$prefix}navbar-toggler-icon-size);
     vertical-align: middle;
     background-color: currentcolor;
     @include mask-icon(var(--#{$prefix}navbar-toggler-icon-bg), 100%);
