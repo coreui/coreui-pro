@@ -1005,6 +1005,25 @@ adornment in the library — so the button needs no icon markup at all:
   container.** The container is a generic element, so those attributes were
   invalid on it (axe `aria-allowed-attr`); the native `disabled`/`readonly`
   states on the inner `<input>` carry the semantics.
+- **The remove button gets its size back, and `.chip-sm`/`.chip-lg` resize
+  everything they claim to.** `.chip-remove` sized itself from a token that was
+  never declared, so both dimensions were invalid at computed-value time and fell
+  to `auto` — the button measured 0x0 at every chip size. It reads
+  `--cui-chip-remove-size` now (16px, 14px on `.chip-sm`, 20px on `.chip-lg`), so
+  a chip with a remove button is wider than it was.
+- **`.chip-dismiss` is `.chip-remove`.** The rename landed with the component; a
+  single selector kept the old name and styled nothing, so a disabled chip input
+  never reached its remove buttons through CSS. The button's `disabled` attribute
+  was doing the work on its own.
+- **`--cui-chip-dismiss-size` is gone; use `--cui-chip-remove-size`.** The size
+  classes wrote the first name and the glyph read the second, so the remove icon
+  stayed at its base size in every chip size. Nothing read the old token, so an
+  override of it never did anything.
+- **`.chip-sm` and `.chip-lg` no longer swap the image and icon sizes.** They
+  passed the two to `chip-size()` in the wrong order, so a large chip rendered its
+  icon at 24px and its image at 20px — the reverse of the base sizes, where the
+  image is the larger of the two. Large is now 24px image / 20px icon and small
+  16px / 14px.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The selected chip's text follows the palette.** `$chip-active-color` was
   white at 87% opacity, computed at build time — repaint the selected
