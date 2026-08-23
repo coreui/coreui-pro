@@ -55,19 +55,19 @@ $pagination-tokens: defaults(
   (
     --#{$prefix}pagination-padding-x: #{$pagination-padding-x},
     --#{$prefix}pagination-padding-y: #{$pagination-padding-y},
-    --#{$prefix}pagination-color: var(--#{$prefix}theme-fg, #{$pagination-color}),
+    --#{$prefix}pagination-color: #{$pagination-color},
     --#{$prefix}pagination-bg: #{$pagination-bg},
     --#{$prefix}pagination-border-width: #{$pagination-border-width},
     --#{$prefix}pagination-border-color: #{$pagination-border-color},
     --#{$prefix}pagination-border-radius: #{$pagination-border-radius},
-    --#{$prefix}pagination-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$pagination-hover-color}),
-    --#{$prefix}pagination-hover-bg: var(--#{$prefix}theme-bg-subtle, #{$pagination-hover-bg}),
-    --#{$prefix}pagination-hover-border-color: var(--#{$prefix}theme-border, #{$pagination-hover-border-color}),
+    --#{$prefix}pagination-hover-color: #{$pagination-hover-color},
+    --#{$prefix}pagination-hover-bg: #{$pagination-hover-bg},
+    --#{$prefix}pagination-hover-border-color: #{$pagination-hover-border-color},
     --#{$prefix}pagination-focus-color: #{$pagination-focus-color},
     --#{$prefix}pagination-focus-bg: #{$pagination-focus-bg},
-    --#{$prefix}pagination-active-color: var(--#{$prefix}theme-contrast, #{$pagination-active-color}),
-    --#{$prefix}pagination-active-bg: var(--#{$prefix}theme-base, #{$pagination-active-bg}),
-    --#{$prefix}pagination-active-border-color: var(--#{$prefix}theme-base, #{$pagination-active-border-color}),
+    --#{$prefix}pagination-active-color: #{$pagination-active-color},
+    --#{$prefix}pagination-active-bg: #{$pagination-active-bg},
+    --#{$prefix}pagination-active-border-color: #{$pagination-active-border-color},
     --#{$prefix}pagination-disabled-color: #{$pagination-disabled-color},
     --#{$prefix}pagination-disabled-bg: #{$pagination-disabled-bg},
     --#{$prefix}pagination-disabled-border-color: #{$pagination-disabled-border-color},
@@ -91,7 +91,7 @@ $pagination-tokens: defaults(
     display: block;
     padding: var(--#{$prefix}pagination-padding-y) var(--#{$prefix}pagination-padding-x);
     font-size: var(--#{$prefix}pagination-font-size);
-    color: var(--#{$prefix}pagination-color);
+    color: var(--#{$prefix}theme-fg, var(--#{$prefix}pagination-color));
     text-decoration: if(not sass($link-decoration == none): none);
     background-color: var(--#{$prefix}pagination-bg);
     border: var(--#{$prefix}pagination-border-width) solid var(--#{$prefix}pagination-border-color);
@@ -99,11 +99,11 @@ $pagination-tokens: defaults(
 
     &:hover {
       z-index: 2;
-      color: var(--#{$prefix}pagination-hover-color);
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}pagination-hover-color));
       // stylelint-disable-next-line scss/at-function-named-arguments
       text-decoration: if(sass($link-hover-decoration == underline): none);
-      background-color: var(--#{$prefix}pagination-hover-bg);
-      border-color: var(--#{$prefix}pagination-hover-border-color);
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}pagination-hover-bg));
+      border-color: var(--#{$prefix}theme-border, var(--#{$prefix}pagination-hover-border-color));
     }
 
     &:focus-visible {
@@ -116,9 +116,9 @@ $pagination-tokens: defaults(
     &.active,
     .active > & {
       z-index: 3;
-      color: var(--#{$prefix}pagination-active-color);
-      @include gradient-bg(var(--#{$prefix}pagination-active-bg));
-      border-color: var(--#{$prefix}pagination-active-border-color);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}pagination-active-color));
+      @include gradient-bg(var(--#{$prefix}theme-base, var(--#{$prefix}pagination-active-bg)));
+      border-color: var(--#{$prefix}theme-base, var(--#{$prefix}pagination-active-border-color));
     }
 
     &.disabled,

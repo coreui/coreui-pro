@@ -69,9 +69,9 @@ $accordion-tokens: defaults(
     --#{$prefix}accordion-btn-active-icon-color: #{$accordion-icon-active-color},
     --#{$prefix}accordion-btn-icon-transform: #{$accordion-icon-transform},
     --#{$prefix}accordion-btn-icon-transition: #{$accordion-icon-transition},
-    --#{$prefix}accordion-active-color: var(--#{$prefix}theme-fg-emphasis, #{$accordion-button-active-color}),
-    --#{$prefix}accordion-active-bg: var(--#{$prefix}theme-bg-subtle, #{$accordion-button-active-bg}),
-    --#{$prefix}accordion-active-border-color: var(--#{$prefix}theme-border, #{$accordion-active-border-color}),
+    --#{$prefix}accordion-active-color: #{$accordion-button-active-color},
+    --#{$prefix}accordion-active-bg: #{$accordion-button-active-bg},
+    --#{$prefix}accordion-active-border-color: #{$accordion-active-border-color},
     --#{$prefix}accordion-content-duration: #{$accordion-content-duration},
     --#{$prefix}accordion-content-easing: #{$accordion-content-easing},
   ),
@@ -143,16 +143,16 @@ $accordion-tokens: defaults(
 
     &[open] {
       z-index: 2;
-      border-color: var(--#{$prefix}accordion-active-border-color);
+      border-color: var(--#{$prefix}theme-border, var(--#{$prefix}accordion-active-border-color));
 
       &::details-content {
         block-size: auto;
       }
 
       > .accordion-header {
-        color: var(--#{$prefix}accordion-active-color);
-        background-color: var(--#{$prefix}accordion-active-bg);
-        box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}accordion-active-border-color);
+        color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}accordion-active-color));
+        background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}accordion-active-bg));
+        box-shadow: inset 0 calc(-1 * var(--#{$prefix}accordion-border-width)) 0 var(--#{$prefix}theme-border, var(--#{$prefix}accordion-active-border-color));
 
         &::after {
           mask-image: var(--#{$prefix}accordion-btn-active-icon);

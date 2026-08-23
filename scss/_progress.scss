@@ -33,8 +33,8 @@ $progress-tokens: defaults(
     --#{$prefix}progress-bg: #{$progress-bg},
     --#{$prefix}progress-border-radius: #{$progress-border-radius},
     --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
-    --#{$prefix}progress-bar-color: var(--#{$prefix}theme-contrast, #{$progress-bar-color}),
-    --#{$prefix}progress-bar-bg: var(--#{$prefix}theme-base, #{$progress-bar-bg}),
+    --#{$prefix}progress-bar-color: #{$progress-bar-color},
+    --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
     --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
     --#{$prefix}progress-font-size: $progress-font-size,
   ),
@@ -72,10 +72,10 @@ $progress-tokens: defaults(
     flex-direction: column;
     justify-content: center;
     overflow: hidden;
-    color: var(--#{$prefix}progress-bar-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}progress-bar-color));
     text-align: center;
     white-space: nowrap;
-    background-color: var(--#{$prefix}progress-bar-bg);
+    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}progress-bar-bg));
     @include transition(var(--#{$prefix}progress-bar-transition));
   }
 
