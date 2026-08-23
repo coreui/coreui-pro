@@ -7,42 +7,41 @@
 @use "config" as *;
 
 // scss-docs-start progress-variables
-$progress-height:                   1rem !default;
-$progress-font-size:                calc(var(--#{$prefix}body-font-size) * .75) !default;
-$progress-bg:                       var(--#{$prefix}secondary-bg) !default;
-$progress-border-radius:            var(--#{$prefix}border-radius) !default;
-$progress-box-shadow:               var(--#{$prefix}box-shadow-inset) !default;
-$progress-bar-color:                var(--#{$prefix}primary-contrast) !default;
-$progress-bar-bg:                   var(--#{$prefix}primary) !default;
-$progress-bar-animation-timing:     1s linear infinite !default;
-$progress-bar-transition:           width .6s ease !default;
+$progress-height:                      1rem !default;
+$progress-font-size:                   var(--#{$prefix}font-size-sm) !default;
+$progress-bg:                          var(--#{$prefix}secondary-bg) !default;
+$progress-border-radius:               var(--#{$prefix}border-radius) !default;
+$progress-box-shadow:                  var(--#{$prefix}box-shadow-inset) !default;
+$progress-bar-color:                   var(--#{$prefix}primary-contrast) !default;
+$progress-bar-bg:                      var(--#{$prefix}primary) !default;
+$progress-bar-transition:              width .6s ease !default;
+$progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
 
-// TODO: clean-up ???
-$progress-group-margin-bottom:         var(--#{$prefix}spacer-3) !default;
-$progress-group-header-margin-bottom:  var(--#{$prefix}spacer-1) !default;
+$progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
 
 $progress-tokens: () !default;
 
-// stylelint-disable scss/dollar-variable-default
+// stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
 // scss-docs-start progress-css-vars
 $progress-tokens: defaults(
   (
     --#{$prefix}progress-height: #{$progress-height},
+    --#{$prefix}progress-font-size: #{$progress-font-size},
     --#{$prefix}progress-bg: #{$progress-bg},
     --#{$prefix}progress-border-radius: #{$progress-border-radius},
     --#{$prefix}progress-box-shadow: #{$progress-box-shadow},
     --#{$prefix}progress-bar-color: #{$progress-bar-color},
     --#{$prefix}progress-bar-bg: #{$progress-bar-bg},
     --#{$prefix}progress-bar-transition: #{$progress-bar-transition},
-    --#{$prefix}progress-font-size: $progress-font-size,
+    --#{$prefix}progress-bar-animation: #{$progress-bar-animation},
   ),
   $progress-tokens
 );
 // scss-docs-end progress-css-vars
 
-// stylelint-enable scss/dollar-variable-default
+// stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
   // Disable animation if transitions are disabled
 
@@ -94,7 +93,7 @@ $progress-tokens: defaults(
 
   @if $enable-transitions {
     .progress-bar-animated {
-      animation: $progress-bar-animation-timing progress-bar-stripes;
+      animation: var(--#{$prefix}progress-bar-animation);
 
       @if $enable-reduced-motion {
         @media (prefers-reduced-motion: reduce) {
@@ -104,46 +103,12 @@ $progress-tokens: defaults(
     }
   }
 
-  .progress-thin {
-    height: 4px;
-  }
+  .progress-white {
+    --#{$prefix}progress-bg: #{color-mix(in oklch, currentcolor $progress-contrast-track-opacity, transparent)};
+    --#{$prefix}progress-bar-bg: currentcolor;
 
-  // White progress bar
-  .progress.progress-white {
-    background-color: rgba(255, 255, 255, .2);
     .progress-bar {
-      background-color: var(--#{$prefix}white);
+      background-color: var(--#{$prefix}progress-bar-bg);
     }
-  }
-
-  .progress-group {
-    display: flex;
-    flex-flow: row wrap;
-    margin-bottom: $progress-group-margin-bottom;
-  }
-
-  .progress-group-prepend {
-    flex: 0 0 100px;
-    align-self: center;
-  }
-
-  .progress-group-header {
-    display: flex;
-    flex-basis: 100%;
-    align-items: center;
-    margin-bottom: $progress-group-header-margin-bottom;
-  }
-
-  .progress-group-bars {
-    flex-grow: 1;
-    align-self: center;
-
-    .progress:not(:last-child) {
-      margin-bottom: 2px;
-    }
-  }
-
-  .progress-group-header + .progress-group-bars {
-    flex-basis: 100%;
   }
 }

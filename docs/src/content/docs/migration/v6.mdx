@@ -1481,6 +1481,42 @@ Multi Select's option indicators moved with it — they render as a decorative
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
   needs no container.
 
+#### Progress
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$progress-bar-animation-timing` is replaced by `$progress-bar-animation`,
+  which carries the keyframes name too.** The stripe animation is a CSS variable
+  now — `--cui-progress-bar-animation` — so its speed, easing and keyframes can
+  be changed on an instance instead of only at build time. A Sass override that
+  passed just the timing (`1s linear infinite`) has to pass the whole shorthand
+  (`progress-bar-stripes 1s linear infinite`).
+
+- **The label font size follows `--cui-font-size-sm`.** It was three quarters of
+  the body font size, a value only this component used; it is the shared small
+  size now, which makes it one step larger. Set `--cui-progress-font-size` to go
+  back.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.progress-group`, `.progress-group-prepend`, `.progress-group-header` and
+  `.progress-group-bars` are removed.** Four classes carried a flex row, a
+  100 px label column, a header row and a 2 px gap between bars — all of which
+  utilities already do. Use `.hstack` / `.vstack` with a `gap-*` and put the
+  label column's width in a style, as the Grouping bars examples now show.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.progress-thin` is removed.** It did nothing an inline height does not. Use
+  `style="height: 4px"` on the `.progress`, as the Height section shows, or set
+  `--cui-progress-height` if you want the stripe geometry to follow the height
+  too.
+
+- **`.progress-white` sets tokens, and paints with `currentcolor` instead of
+  literal white.** It was painting `background-color` past
+  `--cui-progress-bg`, so nothing could adjust it and a theme class on the same
+  bar overrode the white. On the coloured cards it is made for, the surrounding
+  text colour is the readable one, so the bar renders exactly as before — and on
+  a surface whose text is dark, the bar now follows instead of disappearing into
+  the background.
+
 #### Spinner
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
