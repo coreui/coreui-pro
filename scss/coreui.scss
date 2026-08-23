@@ -1,6 +1,6 @@
-@use "banner";
-
 // scss-docs-start import-stack
+@forward "banner";
+
 // Configuration
 @forward "config";
 @forward "colors";
@@ -9,57 +9,55 @@
 @forward "functions";
 @forward "mixins";
 
-// Layout & components
 @forward "root";
+
+// Subdir imports
 @forward "content";
 @forward "layout";
 @forward "forms";
-@forward "buttons/button";
-@forward "transitions";
-@forward "dropdown";
-@forward "menu";
-@forward "popup";
-@forward "buttons/button-group";
-@forward "nav";
-@forward "navbar";
-@forward "card";
-@forward "accordion";
-@forward "breadcrumb";
-@forward "pagination";
-@forward "badge";
-@forward "alert";
-@forward "progress";
-@forward "list-group";
-@forward "buttons/close";
-@forward "toasts";
-@forward "modal";
-@forward "dialog";
-@forward "tooltip";
-@forward "popover";
-@forward "carousel";
-@forward "spinner";
-@forward "offcanvas";
-@forward "drawer";
-@forward "placeholder";
-@forward "chip";
-@forward "chip-set";
+@forward "buttons";
 
+// Components
+@forward "accordion";
+@forward "alert";
 @forward "autocomplete";
-@forward "combobox";
 @forward "avatar";
+@forward "badge";
+@forward "breadcrumb";
 @forward "calendar";
 @forward "callout";
+@forward "card";
+@forward "carousel";
+@forward "chip";
+@forward "chip-set";
+@forward "combobox";
 @forward "date-picker";
+@forward "dialog";
+@forward "drawer";
+@forward "dropdown";
 @forward "footer";
 @forward "header";
 @forward "icon";
-@forward "buttons/loading-button";
+@forward "list-group";
+@forward "menu";
+@forward "modal";
+@forward "nav";
+@forward "navbar";
+@forward "offcanvas";
+@forward "pagination";
+@forward "placeholder";
+@forward "popover";
+@forward "popup";
+@forward "progress";
 @forward "range-slider";
 @forward "rating";
-@forward "buttons/search-button";
 @forward "sidebar";
+@forward "spinner";
 @forward "stepper";
 @forward "time-picker";
+@forward "toasts";
+@forward "tooltip";
+@forward "transitions";
 
 // Helpers
 @forward "helpers";
