@@ -30,6 +30,8 @@ export default defineConfig({
   // redirect target, so read it from the same config the engine does.
   redirects: {
     '/forms/checks-radios/': `${base}/forms/checkbox/`,
+    // `/components/navs-tabs/` split into a nav page and a tab page in v6.
+    '/components/navs-tabs/': `${base}/components/nav/`,
   },
   outDir: '../_site',
   cacheDir: '../.cache/astro',
