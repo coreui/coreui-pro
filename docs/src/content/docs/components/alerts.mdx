@@ -159,11 +159,12 @@ Using the JavaScript plugin, you can remove any alert.
 - Add a [close button](/components/close-button//) as a child of the alert. It is pushed to the end of the alert on its own — the `.alert-dismissible` class is no longer required.
 - `.alert-dismissible` no longer carries any styling. Markup that still has it renders the same, so there is nothing to remove, but the close button has to be a direct child of the alert to be pushed to its end — a button nested in a wrapper is laid out by that wrapper.
 - On the close button, include the `data-coreui-dismiss="alert"` attribute, which triggers the JavaScript functionality. You must use the `<button>` element with it for proper behavior across all devices.
-- Add the `.fade` and `.show` classes to animate the alert. It fades out when dismissed, and an alert added to the page while carrying them fades in on its own.
+- Every alert fades out when dismissed — the JavaScript marks it with `.hiding` for the length of the transition, then removes it. Add `.alert-instant` to an alert that should go at once, or retime the fade with `--cui-alert-transition-duration` and `--cui-alert-transition-timing`.
+- Add `.fade` and `.show` to an alert you insert into the page at runtime, and it fades **in** as well. An alert that is already in the markup does not need them.
 
 You can observe this in action with a live demonstration:
 
-<Example code={`<div class="alert alert-warning fade show" role="alert">
+<Example code={`<div class="alert alert-warning" role="alert">
     Wow, you might want to take a look at some of the fields listed below.
     <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
   </div>`} />
