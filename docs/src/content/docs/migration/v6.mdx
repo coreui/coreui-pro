@@ -1508,6 +1508,16 @@ Multi Select's option indicators moved with it — they render as a decorative
   element that actually animates, instead of the tab button, which only
   transitions its colours.
 
+#### Placeholder
+
+- **The two opacities are CSS variables.** `--cui-placeholder-opacity-max` and
+  `--cui-placeholder-opacity-min` are declared on `.placeholder` and
+  `.placeholder-wave`, and both animations read them, so the resting opacity,
+  the glow's pulse and the wave's gradient can be retuned on an instance. They
+  were compiled in, and the wave's trough was Sass arithmetic
+  (`1 - $placeholder-opacity-min`) resolved at build time — it is
+  `calc(1 - var(…))` now.
+
 #### Popover and Tooltip
 
 - **The fade moved to CSS.** Neither component renders the `fade` helper class
