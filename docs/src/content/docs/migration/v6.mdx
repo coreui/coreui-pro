@@ -958,6 +958,16 @@ adornment in the library — so the button needs no icon markup at all:
   while `.tab-pane` in the same file already read the three-token form, so half
   the file could be retimed in the browser and half could not. Setting
   `--cui-nav-link-transition-duration` now takes effect; before it was ignored.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.nav-link` is a flex row, and it fills on hover and when active.** The link
+  lays its children out with `--cui-nav-link-gap`, `--cui-nav-link-align` and
+  `--cui-nav-link-justify`, so an icon and its label line up without a wrapper.
+  It also takes `--cui-nav-link-hover-bg` and `--cui-nav-link-active-bg`, rounded
+  by `--cui-nav-link-border-radius` — the base nav used to change text color
+  alone. Set the two backgrounds to `transparent` to keep the old look.
+  `.nav-underline` and `.nav-underline-border` opt out of the active fill
+  already: they mark the active item with a line, so a filled background would
+  say the same thing twice.
 - **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
   base nav renders exactly as it did. It gives the token a home on the component
   whose name it carries: `.navbar-nav` already overrode it, and `.nav-underline`

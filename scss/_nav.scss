@@ -13,9 +13,16 @@ $nav-gap:                           0 !default;
 $nav-link-padding-y:                .5rem !default;
 $nav-link-padding-x:                1rem !default;
 $nav-link-font-size:                null !default;
+$nav-link-gap:                      .5rem !default;
+$nav-link-align:                    center !default;
+$nav-link-justify:                  center !default;
+$nav-link-border-radius:            var(--#{$prefix}border-radius) !default;
 $nav-link-font-weight:              null !default;
 $nav-link-color:                    var(--#{$prefix}link-color) !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
+$nav-link-hover-bg:                 var(--#{$prefix}tertiary-bg) !default;
+$nav-link-active-color:             var(--#{$prefix}emphasis-color) !default;
+$nav-link-active-bg:                var(--#{$prefix}secondary-bg) !default;
 $nav-link-transition-property:      color, background-color, border-color !default;
 $nav-link-transition-duration:      .15s !default;
 $nav-link-transition-timing:        ease-in-out !default;
@@ -72,12 +79,19 @@ $nav-tokens: () !default;
 $nav-tokens: defaults(
   (
     --#{$prefix}nav-gap: #{$nav-gap},
+    --#{$prefix}nav-link-gap: #{$nav-link-gap},
+    --#{$prefix}nav-link-align: #{$nav-link-align},
+    --#{$prefix}nav-link-justify: #{$nav-link-justify},
+    --#{$prefix}nav-link-border-radius: #{$nav-link-border-radius},
     --#{$prefix}nav-link-padding-x: #{$nav-link-padding-x},
     --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
     --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
     --#{$prefix}nav-link-font-weight: #{$nav-link-font-weight},
     --#{$prefix}nav-link-color: #{$nav-link-color},
     --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color},
+    --#{$prefix}nav-link-hover-bg: #{$nav-link-hover-bg},
+    --#{$prefix}nav-link-active-color: #{$nav-link-active-color},
+    --#{$prefix}nav-link-active-bg: #{$nav-link-active-bg},
     --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color},
     --#{$prefix}nav-link-transition-property: #{$nav-link-transition-property},
     --#{$prefix}nav-link-transition-duration: #{$nav-link-transition-duration},
@@ -195,7 +209,10 @@ $tab-pane-tokens: defaults(
   }
 
   .nav-link {
-    display: block;
+    display: flex;
+    gap: var(--#{$prefix}nav-link-gap);
+    align-items: var(--#{$prefix}nav-link-align);
+    justify-content: var(--#{$prefix}nav-link-justify);
     padding: var(--#{$prefix}nav-link-padding-y) var(--#{$prefix}nav-link-padding-x);
     font-size: var(--#{$prefix}nav-link-font-size);
     font-weight: var(--#{$prefix}nav-link-font-weight);
@@ -203,6 +220,7 @@ $tab-pane-tokens: defaults(
     text-decoration: if(not sass($link-decoration == none): none);
     background: none;
     border: 0;
+    @include border-radius(var(--#{$prefix}nav-link-border-radius));
     @include transition-props(
       var(--#{$prefix}nav-link-transition-property),
       var(--#{$prefix}nav-link-transition-duration),
@@ -214,6 +232,13 @@ $tab-pane-tokens: defaults(
       color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}nav-link-hover-color));
       // stylelint-disable-next-line scss/at-function-named-arguments
       text-decoration: if(sass($link-hover-decoration == underline): none);
+      background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}nav-link-hover-bg));
+    }
+
+    &.active,
+    &:active {
+      color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-active-color));
+      background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}nav-link-active-bg));
     }
 
     &:focus-visible {
@@ -293,6 +318,8 @@ $tab-pane-tokens: defaults(
   .nav-underline {
     @include tokens($nav-underline-tokens);
 
+    --#{$prefix}nav-link-active-bg: transparent;
+
     gap: var(--#{$prefix}nav-underline-gap);
 
     .nav-link {
@@ -318,6 +345,7 @@ $tab-pane-tokens: defaults(
   .nav-underline-border {
     @include tokens($nav-underline-border-tokens);
 
+    --#{$prefix}nav-link-active-bg: transparent;
     --#{$prefix}nav-link-color: var(--#{$prefix}nav-underline-border-link-color);
     --#{$prefix}nav-link-disabled-color: var(--#{$prefix}nav-underline-border-link-disabled-color);
 
