@@ -340,6 +340,7 @@ $tab-pane-tokens: defaults(
     .show > .nav-link {
       font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-underline-link-active-color));
+      background-color: var(--#{$prefix}nav-link-active-bg);
       border-bottom-color: currentcolor;
     }
   }
@@ -371,6 +372,7 @@ $tab-pane-tokens: defaults(
     .show > .nav-link {
       font-weight: var(--#{$prefix}font-weight-bold);
       color: var(--#{$prefix}theme-base, var(--#{$prefix}nav-underline-border-link-active-color));
+      background-color: var(--#{$prefix}nav-link-active-bg);
       border-bottom-color: currentcolor;
     }
   }
