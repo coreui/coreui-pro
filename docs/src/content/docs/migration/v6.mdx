@@ -1481,6 +1481,23 @@ Multi Select's option indicators moved with it — they render as a decorative
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
   needs no container.
 
+#### Tab
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **A tab pane fades on its own — `.fade` on a `.tab-pane` does nothing for
+  it.** `.tab-pane` carries the transition and
+  `--cui-tab-pane-transition-property` / `-duration` / `-timing`, and
+  `@starting-style` supplies the state to fade from. Drop `.fade` from your
+  panes; add `.tab-pane-instant` to a pane that should switch without one.
+  `.fade` itself stays as a generic helper for your own markup.
+
+- **The pane no longer waits a full transition before it starts fading.** The
+  JS added `.show` from inside the callback it had queued on the pane's own
+  transition — so it waited out a fade that had not begun, then began it. Both
+  classes land in the same frame now, and `shown` waits on the pane, the
+  element that actually animates, instead of the tab button, which only
+  transitions its colours.
+
 #### Popover and Tooltip
 
 - **The fade moved to CSS.** Neither component renders the `fade` helper class
