@@ -78,10 +78,10 @@ $chip-tokens: defaults(
     --#{$prefix}chip-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-bg}),
     --#{$prefix}chip-border-width: #{$chip-border-width},
     --#{$prefix}chip-border-color: #{$chip-border-color},
-    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
+    --#{$prefix}chip-active-color: #{$chip-active-color},
+    --#{$prefix}chip-active-bg: #{$chip-active-bg},
     --#{$prefix}chip-active-border-color: #{$chip-active-border-color},
-    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-hover-color}),
+    --#{$prefix}chip-hover-color: #{$chip-hover-color},
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
     --#{$prefix}chip-hover-border-color: #{$chip-hover-border-color},
   ),
@@ -102,10 +102,10 @@ $chip-outline-tokens: defaults(
     --#{$prefix}chip-bg: transparent,
     --#{$prefix}chip-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}border-color)),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-hover-bg}),
-    --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
+    --#{$prefix}chip-hover-color: #{$chip-color},
     --#{$prefix}chip-hover-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}border-color)),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
-    --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
+    --#{$prefix}chip-active-bg: #{$chip-active-bg},
+    --#{$prefix}chip-active-color: #{$chip-active-color},
   ),
   $chip-outline-tokens
 );
@@ -133,8 +133,8 @@ $chip-outline-tokens: defaults(
     @include transition(var(--#{$prefix}chip-transition));
 
     &.active {
-      color: var(--#{$prefix}chip-active-color);
-      background-color: var(--#{$prefix}chip-active-bg);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}chip-active-color));
+      background-color: var(--#{$prefix}theme-base, var(--#{$prefix}chip-active-bg));
       border-color: var(--#{$prefix}chip-active-border-color);
     }
 
@@ -167,14 +167,14 @@ $chip-outline-tokens: defaults(
     cursor: pointer;
 
     &:hover {
-      color: var(--#{$prefix}chip-hover-color);
+      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}chip-hover-color));
       background-color: var(--#{$prefix}chip-hover-bg);
       border-color: var(--#{$prefix}chip-hover-border-color);
     }
 
     &.active:hover {
-      color: var(--#{$prefix}chip-active-color);
-      background-color: var(--#{$prefix}chip-active-bg);
+      color: var(--#{$prefix}theme-contrast, var(--#{$prefix}chip-active-color));
+      background-color: var(--#{$prefix}theme-base, var(--#{$prefix}chip-active-bg));
       opacity: .9;
     }
   }

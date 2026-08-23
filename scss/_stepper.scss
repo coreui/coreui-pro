@@ -66,12 +66,12 @@ $stepper-tokens: defaults(
     --#{$prefix}stepper-step-indicator-border-width: #{$stepper-step-indicator-border-width},
     --#{$prefix}stepper-step-indicator-border-color: #{$stepper-step-indicator-border-color},
     --#{$prefix}stepper-step-indicator-transition: #{$stepper-step-indicator-transition},
-    --#{$prefix}stepper-step-indicator-active-color: var(--#{$prefix}theme-base, #{$stepper-step-indicator-active-color}),
+    --#{$prefix}stepper-step-indicator-active-color: #{$stepper-step-indicator-active-color},
     --#{$prefix}stepper-step-indicator-active-bg: #{$stepper-step-indicator-active-bg},
-    --#{$prefix}stepper-step-indicator-active-border-color: var(--#{$prefix}theme-base, #{$stepper-step-indicator-active-border-color}),
-    --#{$prefix}stepper-step-indicator-complete-color: var(--#{$prefix}theme-contrast, #{$stepper-step-indicator-complete-color}),
-    --#{$prefix}stepper-step-indicator-complete-bg: var(--#{$prefix}theme-base, #{$stepper-step-indicator-complete-bg}),
-    --#{$prefix}stepper-step-indicator-complete-border-color: var(--#{$prefix}theme-base, #{$stepper-step-indicator-complete-border-color}),
+    --#{$prefix}stepper-step-indicator-active-border-color: #{$stepper-step-indicator-active-border-color},
+    --#{$prefix}stepper-step-indicator-complete-color: #{$stepper-step-indicator-complete-color},
+    --#{$prefix}stepper-step-indicator-complete-bg: #{$stepper-step-indicator-complete-bg},
+    --#{$prefix}stepper-step-indicator-complete-border-color: #{$stepper-step-indicator-complete-border-color},
     --#{$prefix}stepper-step-indicator-disabled-color: #{$stepper-step-indicator-disabled-color},
     --#{$prefix}stepper-step-indicator-disabled-bg: #{$stepper-step-indicator-disabled-bg},
     --#{$prefix}stepper-step-indicator-disabled-border-color: #{$stepper-step-indicator-disabled-border-color},
@@ -81,7 +81,7 @@ $stepper-tokens: defaults(
     --#{$prefix}stepper-step-connector-height: #{$stepper-step-connector-height},
     --#{$prefix}stepper-step-connector-gap: #{$stepper-step-connector-gap},
     --#{$prefix}stepper-step-connector-bg: #{$stepper-step-connector-bg},
-    --#{$prefix}stepper-step-connector-complete-bg: var(--#{$prefix}theme-base, #{$stepper-step-connector-complete-bg}),
+    --#{$prefix}stepper-step-connector-complete-bg: #{$stepper-step-connector-complete-bg},
     --#{$prefix}stepper-step-connector-transition: #{$stepper-step-connector-transition},
     --#{$prefix}stepper-step-content-transition: #{$stepper-step-content-transition},
   ),
@@ -149,9 +149,9 @@ $stepper-tokens: defaults(
 
     &.active {
       --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-active-color);
-      --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}stepper-step-indicator-active-color);
+      --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-active-color));
       --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}stepper-step-indicator-active-bg);
-      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}stepper-step-indicator-active-border-color);
+      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-active-border-color));
     }
 
     &:disabled {
@@ -163,16 +163,16 @@ $stepper-tokens: defaults(
 
     &.complete {
       --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-complete-color);
-      --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}stepper-step-indicator-complete-color);
-      --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}stepper-step-indicator-complete-bg);
-      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}stepper-step-indicator-complete-border-color);
+      --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}stepper-step-indicator-complete-color));
+      --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-complete-bg));
+      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-complete-border-color));
 
       .stepper-step-indicator-text {
         display: none;
       }
 
       ~ .stepper-step-connector {
-        --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}stepper-step-connector-complete-bg);
+        --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-connector-complete-bg));
       }
     }
 

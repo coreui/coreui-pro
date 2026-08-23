@@ -41,8 +41,8 @@ $badge-tokens: defaults(
     --#{$prefix}badge-padding-y: #{$badge-padding-y},
     --#{$prefix}badge-font-size: clamp(#{$badge-font-size-floor}, #{$badge-font-size}, #{$badge-font-size}),
     --#{$prefix}badge-font-weight: #{$badge-font-weight},
-    --#{$prefix}badge-color: var(--#{$prefix}theme-contrast, #{$badge-color}),
-    --#{$prefix}badge-bg: var(--#{$prefix}theme-base, #{$badge-bg}),
+    --#{$prefix}badge-color: #{$badge-color},
+    --#{$prefix}badge-bg: #{$badge-bg},
     --#{$prefix}badge-border-width: #{$badge-border-width},
     --#{$prefix}badge-border-color: #{$badge-border-color},
     --#{$prefix}badge-border-radius: #{$badge-border-radius},
@@ -81,14 +81,14 @@ $badge-variants: (
     font-size: var(--#{$prefix}badge-font-size);
     font-weight: var(--#{$prefix}badge-font-weight);
     line-height: 1;
-    color: var(--#{$prefix}badge-color);
+    color: var(--#{$prefix}theme-contrast, var(--#{$prefix}badge-color));
     text-align: center;
     text-decoration: none;
     white-space: nowrap;
     vertical-align: baseline;
     border: var(--#{$prefix}badge-border-width) solid var(--#{$prefix}badge-border-color);
     border-radius: var(--#{$prefix}badge-border-radius, 0); // stylelint-disable-line property-disallowed-list
-    @include gradient-bg(var(--#{$prefix}badge-bg));
+    @include gradient-bg(var(--#{$prefix}theme-base, var(--#{$prefix}badge-bg)));
 
     // Empty badges collapse automatically
     &:empty {

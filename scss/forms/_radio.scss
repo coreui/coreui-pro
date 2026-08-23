@@ -29,8 +29,8 @@ $radio-tokens: defaults(
     --#{$prefix}radio-bg: #{$radio-bg},
     --#{$prefix}radio-border: #{$radio-border},
     --#{$prefix}radio-border-radius: #{$radio-border-radius},
-    --#{$prefix}radio-checked-bg: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-bg)),
-    --#{$prefix}radio-checked-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}control-checked-border-color)),
+    --#{$prefix}radio-checked-bg: var(--#{$prefix}control-checked-bg),
+    --#{$prefix}radio-checked-border-color: var(--#{$prefix}control-checked-border-color),
     --#{$prefix}radio-mark-color: #{$radio-mark-color},
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
     --#{$prefix}radio-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
@@ -79,8 +79,8 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     }
 
     &:checked {
-      background-color: var(--#{$prefix}radio-checked-bg);
-      border-color: var(--#{$prefix}radio-checked-border-color);
+      background-color: var(--#{$prefix}theme-base, var(--#{$prefix}radio-checked-bg));
+      border-color: var(--#{$prefix}theme-base, var(--#{$prefix}radio-checked-border-color));
 
       &::before {
         opacity: 1;

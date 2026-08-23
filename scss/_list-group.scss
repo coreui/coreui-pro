@@ -41,23 +41,23 @@ $list-group-tokens: () !default;
 // scss-docs-start list-group-css-vars
 $list-group-tokens: defaults(
   (
-    --#{$prefix}list-group-color: var(--#{$prefix}theme-fg-emphasis, #{$list-group-color}),
-    --#{$prefix}list-group-bg: var(--#{$prefix}theme-bg-subtle, #{$list-group-bg}),
-    --#{$prefix}list-group-border-color: var(--#{$prefix}theme-border, #{$list-group-border-color}),
+    --#{$prefix}list-group-color: #{$list-group-color},
+    --#{$prefix}list-group-bg: #{$list-group-bg},
+    --#{$prefix}list-group-border-color: #{$list-group-border-color},
     --#{$prefix}list-group-border-width: #{$list-group-border-width},
     --#{$prefix}list-group-border-radius: #{$list-group-border-radius},
     --#{$prefix}list-group-item-padding-x: #{$list-group-item-padding-x},
     --#{$prefix}list-group-item-padding-y: #{$list-group-item-padding-y},
     --#{$prefix}list-group-action-color: #{$list-group-action-color},
     --#{$prefix}list-group-action-hover-color: #{$list-group-action-hover-color},
-    --#{$prefix}list-group-action-hover-bg: var(--#{$prefix}theme-border, #{$list-group-hover-bg}),
+    --#{$prefix}list-group-action-hover-bg: #{$list-group-hover-bg},
     --#{$prefix}list-group-action-active-color: #{$list-group-action-active-color},
-    --#{$prefix}list-group-action-active-bg: var(--#{$prefix}theme-border, #{$list-group-action-active-bg}),
+    --#{$prefix}list-group-action-active-bg: #{$list-group-action-active-bg},
     --#{$prefix}list-group-disabled-color: #{$list-group-disabled-color},
     --#{$prefix}list-group-disabled-bg: #{$list-group-disabled-bg},
-    --#{$prefix}list-group-active-color: var(--#{$prefix}theme-bg-subtle, #{$list-group-active-color}),
-    --#{$prefix}list-group-active-bg: var(--#{$prefix}theme-fg-emphasis, #{$list-group-active-bg}),
-    --#{$prefix}list-group-active-border-color: var(--#{$prefix}theme-fg-emphasis, #{$list-group-active-border-color}),
+    --#{$prefix}list-group-active-color: #{$list-group-active-color},
+    --#{$prefix}list-group-active-bg: #{$list-group-active-bg},
+    --#{$prefix}list-group-active-border-color: #{$list-group-active-border-color},
   ),
   $list-group-tokens
 );
@@ -96,10 +96,10 @@ $list-group-tokens: defaults(
     position: relative;
     display: block;
     padding: var(--#{$prefix}list-group-item-padding-y) var(--#{$prefix}list-group-item-padding-x);
-    color: var(--#{$prefix}list-group-color);
+    color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-color));
     text-decoration: if(not sass($link-decoration == none): none);
-    background-color: var(--#{$prefix}list-group-bg);
-    border: var(--#{$prefix}list-group-border-width) solid var(--#{$prefix}list-group-border-color);
+    background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}list-group-bg));
+    border: var(--#{$prefix}list-group-border-width) solid var(--#{$prefix}theme-border, var(--#{$prefix}list-group-border-color));
 
     &:first-child {
       @include border-top-radius(inherit);
@@ -119,9 +119,9 @@ $list-group-tokens: defaults(
     // Include both here for `<a>`s and `<button>`s
     &.active {
       z-index: 2; // Place active items above their siblings for proper border styling
-      color: var(--#{$prefix}list-group-active-color);
-      background-color: var(--#{$prefix}list-group-active-bg);
-      border-color: var(--#{$prefix}list-group-active-border-color);
+      color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}list-group-active-color));
+      background-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-active-bg));
+      border-color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}list-group-active-border-color));
     }
 
     // stylelint-disable-next-line scss/selector-no-redundant-nesting-selector
@@ -152,12 +152,12 @@ $list-group-tokens: defaults(
         z-index: 1; // Place hover/focus items above their siblings for proper border styling
         color: var(--#{$prefix}list-group-action-hover-color);
         text-decoration: none;
-        background-color: var(--#{$prefix}list-group-action-hover-bg);
+        background-color: var(--#{$prefix}theme-border, var(--#{$prefix}list-group-action-hover-bg));
       }
 
       &:active {
         color: var(--#{$prefix}list-group-action-active-color);
-        background-color: var(--#{$prefix}list-group-action-active-bg);
+        background-color: var(--#{$prefix}theme-border, var(--#{$prefix}list-group-action-active-bg));
       }
     }
   }
