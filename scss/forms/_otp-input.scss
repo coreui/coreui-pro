@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "sass:math";
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
@@ -42,6 +43,31 @@ $form-otp-control-padding-x-lg:        0 !default;
 $form-otp-control-font-size-lg:        var(--#{$prefix}btn-input-lg-font-size) !default;
 $form-otp-control-border-radius-lg:    var(--#{$prefix}btn-input-lg-border-radius) !default;
 // scss-docs-end form-otp-variables
+
+$form-otp-sizes: () !default;
+
+// scss-docs-start form-otp-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-otp-sizes: defaults(
+  (
+    "sm": (
+      width:         $form-otp-control-width-sm,
+      padding-y:     $form-otp-control-padding-y-sm,
+      padding-x:     $form-otp-control-padding-x-sm,
+      font-size:     $form-otp-control-font-size-sm,
+      border-radius: $form-otp-control-border-radius-sm,
+    ),
+    "lg": (
+      width:         $form-otp-control-width-lg,
+      padding-y:     $form-otp-control-padding-y-lg,
+      padding-x:     $form-otp-control-padding-x-lg,
+      font-size:     $form-otp-control-font-size-lg,
+      border-radius: $form-otp-control-border-radius-lg,
+    ),
+  ),
+  $form-otp-sizes
+);
+// scss-docs-end form-otp-sizes
 
 // stylelint-disable scss/dollar-variable-default
 
@@ -133,29 +159,20 @@ $form-otp-control-tokens: defaults(
     }
   }
 
-  .form-otp-sm .form-otp-control {
-    --#{$prefix}control-padding-y: #{$form-otp-control-padding-y-sm};
-    --#{$prefix}control-padding-x: #{$form-otp-control-padding-x-sm};
-    --#{$prefix}control-font-size: #{$form-otp-control-font-size-sm};
-    --#{$prefix}control-border-radius: #{$form-otp-control-border-radius-sm};
-    --#{$prefix}form-otp-control-width: #{$form-otp-control-width-sm};
+  // scss-docs-start form-otp-sizes-loop
+  @each $size, $values in $form-otp-sizes {
+    .form-otp-#{$size} .form-otp-control {
+      --#{$prefix}control-padding-y: #{map.get($values, padding-y)};
+      --#{$prefix}control-padding-x: #{map.get($values, padding-x)};
+      --#{$prefix}control-font-size: #{map.get($values, font-size)};
+      --#{$prefix}control-border-radius: #{map.get($values, border-radius)};
+      --#{$prefix}form-otp-control-width: #{map.get($values, width)};
 
-    width: var(--#{$prefix}form-otp-control-width);
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    @include border-radius(var(--#{$prefix}control-border-radius));
+      width: var(--#{$prefix}form-otp-control-width);
+      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+      font-size: var(--#{$prefix}control-font-size);
+      @include border-radius(var(--#{$prefix}control-border-radius));
+    }
   }
-
-  .form-otp-lg .form-otp-control {
-    --#{$prefix}control-padding-y: #{$form-otp-control-padding-y-lg};
-    --#{$prefix}control-padding-x: #{$form-otp-control-padding-x-lg};
-    --#{$prefix}control-font-size: #{$form-otp-control-font-size-lg};
-    --#{$prefix}control-border-radius: #{$form-otp-control-border-radius-lg};
-    --#{$prefix}form-otp-control-width: #{$form-otp-control-width-lg};
-
-    width: var(--#{$prefix}form-otp-control-width);
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    @include border-radius(var(--#{$prefix}control-border-radius));
-  }
+  // scss-docs-end form-otp-sizes-loop
 }

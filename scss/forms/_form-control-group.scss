@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "../functions/defaults" as *;
 @use "../mixins/border-radius" as *;
 @use "../mixins/focus-ring" as *;
@@ -20,6 +21,19 @@ $form-control-group-action-hover-color: var(--#{$prefix}body-color) !default;
 $form-control-group-action-bg:        transparent !default;
 $form-control-group-action-hover-bg:  var(--#{$prefix}tertiary-bg) !default;
 // scss-docs-end form-control-group-variables
+
+$form-control-group-sizes: () !default;
+
+// scss-docs-start form-control-group-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$form-control-group-sizes: defaults(
+  (
+    "sm": (icon-size: $form-control-group-icon-size-sm, action-size: $form-control-group-action-size-sm),
+    "lg": (icon-size: $form-control-group-icon-size-lg, action-size: $form-control-group-action-size-lg),
+  ),
+  $form-control-group-sizes
+);
+// scss-docs-end form-control-group-sizes
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
@@ -79,25 +93,19 @@ $form-control-group-tokens: defaults(
 
     // Answered here because the group's own token block outranks the size
     // classes' declarations, which sit earlier in the cascade.
-    &.form-control-sm {
-      --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
-      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
-      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
-      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
-      --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-sm-border-radius);
-      --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-sm};
-      --#{$prefix}control-group-action-size: #{$form-control-group-action-size-sm};
+    // scss-docs-start form-control-group-sizes-loop
+    @each $size, $values in $form-control-group-sizes {
+      &.form-control-#{$size} {
+        --#{$prefix}control-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
+        --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
+        --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
+        --#{$prefix}control-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+        --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
+        --#{$prefix}control-group-icon-size: #{map.get($values, icon-size)};
+        --#{$prefix}control-group-action-size: #{map.get($values, action-size)};
+      }
     }
-
-    &.form-control-lg {
-      --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
-      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
-      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
-      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
-      --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-lg-border-radius);
-      --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size-lg};
-      --#{$prefix}control-group-action-size: #{$form-control-group-action-size-lg};
-    }
+    // scss-docs-end form-control-group-sizes-loop
 
     &:focus-within {
       @include form-control-group-focus();
