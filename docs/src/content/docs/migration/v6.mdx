@@ -1508,9 +1508,12 @@ Multi Select's option indicators moved with it — they render as a decorative
   `--cui-progress-height` at `1rem` — so a thin bar that was also striped drew
   1rem stripes and animated across 1rem. `.progress-white` was painting
   `background-color` past `--cui-progress-bg`, so nothing could adjust it and a
-  theme class on the same bar overrode the white. Both are token overrides now,
-  and `.progress-white` gives its label a dark colour so a label inside a white
-  bar is readable.
+  theme class on the same bar overrode the white. Both are token overrides now.
+
+- **`.progress-white` paints with `currentcolor` instead of literal white.** On
+  the coloured cards it is made for the surrounding text colour is the readable
+  one, so the bar renders exactly as before — and on a surface whose text is
+  dark, the bar now follows instead of disappearing into the background.
 
 #### Spinner
 

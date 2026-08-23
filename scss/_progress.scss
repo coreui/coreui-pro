@@ -19,9 +19,7 @@ $progress-bar-animation:               progress-bar-stripes 1s linear infinite !
 
 $progress-thin-height:                 4px !default;
 
-$progress-white-bg:                    color-mix(in oklch, var(--#{$prefix}white) 20%, transparent) !default;
-$progress-white-bar-color:             var(--#{$prefix}black) !default;
-$progress-white-bar-bg:                var(--#{$prefix}white) !default;
+$progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
 
 $progress-tokens: () !default;
@@ -111,14 +109,11 @@ $progress-tokens: defaults(
     --#{$prefix}progress-height: #{$progress-thin-height};
   }
 
-  // White progress bar
   .progress-white {
-    --#{$prefix}progress-bg: #{$progress-white-bg};
-    --#{$prefix}progress-bar-color: #{$progress-white-bar-color};
-    --#{$prefix}progress-bar-bg: #{$progress-white-bar-bg};
+    --#{$prefix}progress-bg: #{color-mix(in oklch, currentcolor $progress-contrast-track-opacity, transparent)};
+    --#{$prefix}progress-bar-bg: currentcolor;
 
     .progress-bar {
-      color: var(--#{$prefix}progress-bar-color);
       background-color: var(--#{$prefix}progress-bar-bg);
     }
   }
