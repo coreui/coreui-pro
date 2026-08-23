@@ -35,7 +35,6 @@ $radio-tokens: defaults(
     --#{$prefix}radio-mark: #{escape-svg($radio-mark)},
     --#{$prefix}radio-disabled-opacity: var(--#{$prefix}control-disabled-opacity),
     --#{$prefix}radio-margin-top: calc((var(--#{$prefix}body-line-height) * 1em - var(--#{$prefix}radio-size)) * .5),
-    --#{$prefix}radio-focus-border: var(--#{$prefix}control-focus-border-color),
     --#{$prefix}radio-active-filter: var(--#{$prefix}control-active-filter),
     --#{$prefix}radio-label-disabled-opacity: var(--#{$prefix}control-label-disabled-opacity),
   ),
@@ -89,7 +88,6 @@ $radio-selector: if(sass($enable-deprecated-form-check): ".radio, .form-check-in
     }
 
     &:focus-visible {
-      border-color: var(--#{$prefix}radio-focus-border);
       @include focus-ring(true);
     }
 
