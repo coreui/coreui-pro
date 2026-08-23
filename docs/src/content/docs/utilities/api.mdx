@@ -444,98 +444,129 @@ again. If it is easier to flip one switch than to move a legacy stylesheet, set
   $enable-important-utilities: true
 );
 ```
-
 ## Using the API
 
 Now that you're familiar with how the utilities API works, learn how to add your own custom classes and modify our default utilities.
 
-### Override utilities
+`$utilities` is a configurable variable of the `scss/utilities` module, so you change it with `@use ... with ()` rather than by reassigning it after an import. Two patterns cover every case:
 
-Override existing utilities by using the same key. For example, if you want additional responsive overflow utility classes, you can do this:
+- **One file** — configure `$utilities` where you load `@coreui/coreui/scss/coreui`. Use this to add a utility, replace one, or remove one.
+- **Two files** — put the change in a partial that loads `@coreui/coreui/scss/utilities`, then load that partial before CoreUI. Use this when your change has to *read* the default definition: a new value on an existing group, a renamed class, or responsive variants on a group you keep.
+
+Sass cannot read a module and configure the same module in one file, which is the whole reason the second pattern exists. In the partial, load the module with `as *` so `$utilities` needs no namespace prefix; assigning to it writes back into the module, and CoreUI picks the new map up when it loads.
 
 ```scss
-$utilities: (
-  "overflow": (
-    responsive: true,
-    property: overflow,
-    values: visible hidden scroll auto,
-  ),
+// my-coreui.scss
+@use "@coreui/coreui/scss/coreui" with (
+  $utilities: (
+    // Your utility groups go here
+  )
 );
 ```
 
-### Add utilities
+Your map is merged over the defaults, and the merge is shallow: a group you supply replaces the whole default group under that key. Include `property` and `values` in every group that emits CSS.
 
-New utilities can be added to the default `$utilities` map with a `map-merge`. Make sure our required Sass files and `_utilities.scss` are imported first, then use the `map-merge` to add your additional utilities. For example, here's how to add a responsive `cursor` utility with three values.
+For a utilities-only build, load the utilities module and then the API module, which emits the classes and nothing else:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
+// my-coreui-utilities.scss
+@use "@coreui/coreui/scss/utilities" with (
+  $utilities: (
+    // Your utility groups go here
+  )
+);
+@use "@coreui/coreui/scss/utilities/api";
+```
 
-$utilities: map-merge(
-  $utilities,
-  (
+### Override utilities
+
+Override an existing utility by reusing its key. For example, to make the overflow utilities responsive and change their values:
+
+```scss
+// my-coreui.scss
+@use "@coreui/coreui/scss/coreui" with (
+  $utilities: (
+    "overflow": (
+      property: overflow,
+      responsive: true,
+      values: visible hidden scroll auto,
+    ),
+  )
+);
+```
+
+Your group replaces the default one, so keep the `property` key or the build stops with an error.
+
+### Add utilities
+
+Add a new utility the same way — supply only what is new:
+
+```scss
+// my-coreui.scss
+@use "@coreui/coreui/scss/coreui" with (
+  $utilities: (
     "cursor": (
       property: cursor,
       class: cursor,
       responsive: true,
       values: auto pointer grab,
-    )
+    ),
   )
 );
-
-@import "@coreui/coreui/scss/utilities/api";
 ```
 
 ### Modify utilities
 
-Modify existing utilities in the default `$utilities` map with `map-get` and `map-merge` functions. In the example below, we're adding an additional value to the `width` utilities. Start with an initial `map-merge` and then specify which utility you want to modify. From there, fetch the nested `"width"` map with `map-get` to access and modify the utility's options and values.
+Modifying a utility means reading its default definition first, so this needs the two-file pattern. Below we add another value to the `width` utilities:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
+// _my-utilities.scss
+@use "sass:map";
+// `as *` so `$utilities` needs no prefix, and assigning to it writes back
+@use "@coreui/coreui/scss/utilities" as *;
 
-$utilities: map-merge(
+$utilities: map.merge(
   $utilities,
   (
-    "width": map-merge(
-      map-get($utilities, "width"),
+    "width": map.merge(
+      map.get($utilities, "width"),
       (
-        values: map-merge(
-          map-get(map-get($utilities, "width"), "values"),
+        values: map.merge(
+          map.get(map.get($utilities, "width"), "values"),
           (10: 10%),
         ),
       ),
     ),
   )
 );
+```
 
-@import "@coreui/coreui/scss/utilities/api";
+Load your partial first, then CoreUI:
+
+```scss
+// my-coreui.scss
+@use "my-utilities";
+@use "@coreui/coreui/scss/coreui";
 ```
 
 #### Enable responsive
 
-You can enable responsive classes for an existing set of utilities that are not currently responsive by default. For example, to make the `border` classes responsive:
+You can turn on responsive classes for a group that isn't responsive by default. This keeps the rest of the definition, so it takes the two-file pattern:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
+// _my-utilities.scss
+@use "sass:map";
+@use "@coreui/coreui/scss/utilities" as *;
 
-$utilities: map-merge(
-  $utilities, (
-    "border": map-merge(
-      map-get($utilities, "border"),
-      ( responsive: true ),
+$utilities: map.merge(
+  $utilities,
+  (
+    "border": map.merge(
+      map.get($utilities, "border"),
+      (responsive: true),
     ),
   )
 );
-
-@import "@coreui/coreui/scss/utilities/api";
 ```
 
 This will now generate responsive variations of `.border` and `.border-0` for each breakpoint. Your generated CSS will look like this:
@@ -572,91 +603,91 @@ This will now generate responsive variations of `.border` and `.border-0` for ea
 
 #### Rename utilities
 
-Missing v4 utilities, or used to another naming convention? The utilities API can be used to override the resulting `class` of a given utility—for example, to rename `.ms-*` utilities to oldish `.ml-*`:
+Missing v4 utilities, or used to another naming convention? The utilities API can override the resulting `class` of a given utility — for example, to rename `.ms-*` back to `.ml-*`. It reads the default definition, so it takes the two-file pattern:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
+// _my-utilities.scss
+@use "sass:map";
+@use "@coreui/coreui/scss/utilities" as *;
 
-$utilities: map-merge(
-  $utilities, (
-    "margin-start": map-merge(
-      map-get($utilities, "margin-start"),
-      ( class: ml ),
+$utilities: map.merge(
+  $utilities,
+  (
+    "margin-start": map.merge(
+      map.get($utilities, "margin-start"),
+      (class: ml),
     ),
   )
 );
-
-@import "@coreui/coreui/scss/utilities/api";
 ```
 
 ### Remove utilities
 
-Remove any of the default utilities with the [`map-remove()` Sass function](https://sass-lang.com/documentation/modules/map/#remove).
+Set a group to `null` to drop it:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
-
-// Remove multiple utilities with a comma-separated list
-$utilities: map-remove($utilities, "width", "float");
-
-@import "@coreui/coreui/scss/utilities/api";
-```
-
-To switch one off while keeping its definition around — so you can read it, or turn it back on later — set `enabled: false` instead:
-
-```scss
-$utilities: map-merge(
-  $utilities,
-  (
-    "width": map-merge(map-get($utilities, "width"), (enabled: false))
+// my-coreui.scss
+@use "@coreui/coreui/scss/coreui" with (
+  $utilities: (
+    "width": null,
   )
 );
 ```
 
-You can also use the [`map-merge()` Sass function](https://sass-lang.com/documentation/modules/map/#merge) and set the group key to `null` to remove the utility.
+To switch one off while keeping its definition around — so you can read it, or turn it back on later — set `enabled: false` instead. That reads the default definition, so it takes the two-file pattern:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
+// _my-utilities.scss
+@use "sass:map";
+@use "@coreui/coreui/scss/utilities" as *;
 
-$utilities: map-merge(
+$utilities: map.merge(
   $utilities,
   (
-    "width": null
+    "width": map.merge(map.get($utilities, "width"), (enabled: false)),
   )
 );
-
-@import "@coreui/coreui/scss/utilities/api";
 ```
 
 ### Add, remove, modify
 
-You can add, remove, and modify many utilities all at once with the [`map-merge()` Sass function](https://sass-lang.com/documentation/modules/map/#merge). Here's how you can combine the previous examples into one larger map.
+Anything that only adds or removes goes in one file:
 
 ```scss
-@import "@coreui/coreui/scss/functions";
-@import "@coreui/coreui/scss/variables";
-@import "@coreui/coreui/scss/mixins";
-@import "@coreui/coreui/scss/utilities";
+// my-coreui.scss
+@use "@coreui/coreui/scss/coreui" with (
+  $utilities: (
+    // Remove the `width` utility
+    "width": null,
 
-$utilities: map-merge(
+    // Add a new one
+    "cursor": (
+      property: cursor,
+      class: cursor,
+      responsive: true,
+      values: auto pointer grab,
+    ),
+  )
+);
+```
+
+As soon as one change has to read a default — making `border` responsive, say — the whole set moves into the partial:
+
+```scss
+// _my-utilities.scss
+@use "sass:map";
+@use "@coreui/coreui/scss/utilities" as *;
+
+$utilities: map.merge(
   $utilities,
   (
     // Remove the `width` utility
     "width": null,
 
     // Make an existing utility responsive
-    "border": map-merge(
-      map-get($utilities, "border"),
-      ( responsive: true ),
+    "border": map.merge(
+      map.get($utilities, "border"),
+      (responsive: true),
     ),
 
     // Add new utilities
@@ -665,9 +696,7 @@ $utilities: map-merge(
       class: cursor,
       responsive: true,
       values: auto pointer grab,
-    )
+    ),
   )
 );
-
-@import "@coreui/coreui/scss/utilities/api";
 ```

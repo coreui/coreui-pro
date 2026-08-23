@@ -1,6 +1,6 @@
-// Renamed to _config.scss in v6, matching upstream; the palette and the theme
-// colour system live in _colors.scss and _theme.scss. Kept so an existing
-// `@use "variables"` — with or without a `with()` configuration — resolves.
+// Renamed to _config.scss in v6; the palette and the theme colour system live in
+// _colors.scss and _theme.scss. Kept only because @coreui/astro-docs reads this
+// path, and it reads the same path in v5, where the file is real.
 @forward "config";
 @forward "colors";
 @forward "theme";

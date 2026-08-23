@@ -131,15 +131,15 @@ With dependencies installed and our project folder ready for us to start coding,
 1. **Now, let’s import CoreUI’s CSS.** Add the following to `resources/sass/app.scss` to import all of CoreUI’s source Sass.
 
    ```scss
-   // Import all of CoreUI's CSS
-   @import "@coreui/coreui/scss/coreui"
+   // Use all of CoreUI's CSS
+   @use "@coreui/coreui/scss/coreui";
    ```
 
    **For PRO users**
 
    ```scss
-   // Import all of CoreUI PRO's CSS
-   @import "@coreui/coreui-pro/scss/coreui"
+   // Use all of CoreUI PRO's CSS
+   @use "@coreui/coreui-pro/scss/coreui";
    ```
 
    *You can also import our stylesheets individually if you want. [Read our Sass import docs](/customize/sass/#importing) for details.*

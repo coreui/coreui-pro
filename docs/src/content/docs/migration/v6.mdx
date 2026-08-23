@@ -2686,9 +2686,8 @@ element a query container from markup. See
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
 
 Upstream's directories mirror the cascade layers, so partials now live in the
-directory named after the layer they emit into. **Every old path still resolves
-through a thin `@forward` shim**, for `@use` and the deprecated `@import` alike —
-nothing to change unless you want to.
+directory named after the layer they emit into. **The old paths no longer
+resolve** — point your `@use` rules at the paths on the right.
 
 | Was | Is |
 | --- | --- |
@@ -2707,8 +2706,44 @@ nothing to change unless you want to.
 The list rules from `_type.scss` moved to `content/_lists.scss` and the blockquote
 rules to `content/_blockquote.scss`, matching upstream's filenames.
 
-The three aggregators need no shim: Sass resolves `@use "mixins"` to
-`mixins/index.scss` on its own once the sibling file is gone.
+The three aggregators are unaffected: Sass resolves `@use "mixins"` to
+`mixins/index.scss` on its own.
+
+#### `@import` is no longer supported
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+The 87 `*.import.scss` files that let `@import` reach our modules are gone, so an
+`@import` of anything under `scss/` no longer resolves. Load the library with
+`@use` instead:
+
+```scss
+// Was
+@import "../node_modules/@coreui/coreui/scss/coreui";
+
+// Is
+@use "@coreui/coreui/scss/coreui";
+```
+
+Configuration moves with it. Where `@import` let you set variables by declaring
+them before the import, `@use` takes them in a `with ()` clause, and the rule has
+to be the first thing in the file:
+
+```scss
+@use "@coreui/coreui/scss/coreui" with (
+  $body-bg: #000,
+  $body-color: #111
+);
+```
+
+Sass deprecated `@import` and removes it in Dart Sass 3.0.0, so this is where it
+was heading regardless. The [Sass migration guide](https://sass-lang.com/documentation/breaking-changes/import/)
+covers the rules; `sass-migrator module` automates most of a conversion.
+
+One consequence worth calling out: a module is configured once, at load time. If
+your change has to *read* a default before changing it — merging into
+`$utilities`, for instance — it goes in a partial you load before the library.
+The [utilities API page](/utilities/api/#using-the-api) shows both patterns.
 
 **What we deliberately did not copy.** Upstream renamed three components *and their
 classes* — `.modal`, `.offcanvas`, `.dropdown`, `.dropdown-menu` and
@@ -2734,10 +2769,9 @@ the grid settings.
   every custom property keeps its name.
 - **Overriding through `@use "@coreui/coreui-pro/scss/coreui" with (...)` is
   unchanged** — the entry point forwards all of these modules.
-- **Old module paths keep resolving**: `scss/variables` and `scss/maps` are thin
-  `@forward` shims over the new modules, so an existing `@use` or `@import`
-  compiles as before. New code should import `.../scss/colors`,
-  `.../scss/theme` or `.../scss/utilities` directly.
+- **`scss/maps` is gone** and `scss/variables` is not part of the public surface
+  any more. Load `.../scss/config`, `.../scss/colors`, `.../scss/theme` or
+  `.../scss/utilities` directly, depending on what you need.
 
 #### The type scale is one named map
 

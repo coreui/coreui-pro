@@ -1,4 +1,4 @@
-@forward "banner" with (
+@use "banner" with (
   $file: "Grid"
 );
 
@@ -16,15 +16,23 @@ $utilities: map-get-multiple(
   (
     "display",
     "order",
+    "grid-template-columns",
+    "grid-column",
+    "grid-auto-flow",
+    "gap",
+    "row-gap",
+    "column-gap",
     "flex",
     "flex-direction",
     "flex-grow",
     "flex-shrink",
     "flex-wrap",
     "justify-content",
+    "justify-items",
     "align-items",
     "align-content",
     "align-self",
+    "place-items",
     "margin",
     "margin-x",
     "margin-y",

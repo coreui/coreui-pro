@@ -2,11 +2,11 @@
   "files": [
     {
       "path": "./dist/css/coreui-grid.css",
-      "maxSize": "7.5 kB"
+      "maxSize": "8.75 kB"
     },
     {
       "path": "./dist/css/coreui-grid.min.css",
-      "maxSize": "6.5 kB"
+      "maxSize": "7.75 kB"
     },
     {
       "path": "./dist/css/coreui-reboot.css",
