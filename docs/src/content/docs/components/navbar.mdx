@@ -664,6 +664,38 @@ When using offcanvas in a dark navbar, be aware that you may need to have a dark
     </div>
   </nav>`} />
 
+### Drawer
+
+The [drawer component](/components/drawer/) works the same way, with the v6 look — a floating, inset, rounded panel instead of an edge-to-edge one. Swap the `offcanvas` vocabulary for `drawer` and the `.navbar-expand-*` class flattens it into an inline nav at the breakpoint, exactly as it does for an offcanvas.
+
+<Example code={`<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Drawer navbar</a>
+      <button class="navbar-toggler" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerNavbar" aria-controls="drawerNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <dialog class="drawer drawer-end" id="drawerNavbar" aria-labelledby="drawerNavbarLabel">
+        <div class="drawer-header">
+          <h5 class="drawer-title" id="drawerNavbarLabel">Drawer</h5>
+          <button type="button" class="btn-close" data-coreui-dismiss="drawer" aria-label="Close"></button>
+        </div>
+        <div class="drawer-body">
+          <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Pricing</a>
+            </li>
+          </ul>
+        </div>
+      </dialog>
+    </div>
+  </nav>`} />
+
 ## Customizing
 
 ### CSS variables
