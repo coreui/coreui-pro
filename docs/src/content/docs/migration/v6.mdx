@@ -952,6 +952,16 @@ adornment in the library — so the button needs no icon markup at all:
   activated anything.
 - The `data-coreui-toggle="pill"` and `"list"` toggles **stay** — they are
   documented markup, and v6 keeps documented markup working.
+- **`$nav-link-transition` splits into
+  `$nav-link-transition-property`/`-duration`/`-timing`**, emitted as
+  `--cui-nav-link-transition-*`. The link's transition was compiled into its rule
+  while `.tab-pane` in the same file already read the three-token form, so half
+  the file could be retimed in the browser and half could not. Setting
+  `--cui-nav-link-transition-duration` now takes effect; before it was ignored.
+- **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
+  base nav renders exactly as it did. It gives the token a home on the component
+  whose name it carries: `.navbar-nav` already overrode it, and `.nav-underline`
+  keeps its own `--cui-nav-underline-gap`.
 
 #### Tooltip
 

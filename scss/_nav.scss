@@ -9,13 +9,16 @@
 // stylelint-disable custom-property-no-missing-var-function
 
 // scss-docs-start nav-variables
+$nav-gap:                           0 !default;
 $nav-link-padding-y:                .5rem !default;
 $nav-link-padding-x:                1rem !default;
 $nav-link-font-size:                null !default;
 $nav-link-font-weight:              null !default;
 $nav-link-color:                    var(--#{$prefix}link-color) !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
-$nav-link-transition:               color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out !default;
+$nav-link-transition-property:      color, background-color, border-color !default;
+$nav-link-transition-duration:      .15s !default;
+$nav-link-transition-timing:        ease-in-out !default;
 $nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
 
 $nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
@@ -68,6 +71,7 @@ $nav-tokens: () !default;
 // scss-docs-start nav-css-vars
 $nav-tokens: defaults(
   (
+    --#{$prefix}nav-gap: #{$nav-gap},
     --#{$prefix}nav-link-padding-x: #{$nav-link-padding-x},
     --#{$prefix}nav-link-padding-y: #{$nav-link-padding-y},
     --#{$prefix}nav-link-font-size: #{$nav-link-font-size},
@@ -75,6 +79,9 @@ $nav-tokens: defaults(
     --#{$prefix}nav-link-color: #{$nav-link-color},
     --#{$prefix}nav-link-hover-color: #{$nav-link-hover-color},
     --#{$prefix}nav-link-disabled-color: #{$nav-link-disabled-color},
+    --#{$prefix}nav-link-transition-property: #{$nav-link-transition-property},
+    --#{$prefix}nav-link-transition-duration: #{$nav-link-transition-duration},
+    --#{$prefix}nav-link-transition-timing: #{$nav-link-transition-timing},
   ),
   $nav-tokens
 );
@@ -181,6 +188,7 @@ $tab-pane-tokens: defaults(
 
     display: flex;
     flex-wrap: wrap;
+    gap: var(--#{$prefix}nav-gap);
     padding-inline-start: 0;
     margin-bottom: 0;
     list-style-type: "";
@@ -195,7 +203,11 @@ $tab-pane-tokens: defaults(
     text-decoration: if(not sass($link-decoration == none): none);
     background: none;
     border: 0;
-    @include transition($nav-link-transition);
+    @include transition-props(
+      var(--#{$prefix}nav-link-transition-property),
+      var(--#{$prefix}nav-link-transition-duration),
+      var(--#{$prefix}nav-link-transition-timing)
+    );
 
     &:hover,
     &:focus {
