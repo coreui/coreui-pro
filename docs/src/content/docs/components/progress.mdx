@@ -134,10 +134,10 @@ Related bars need no component of their own — [stacks](/helpers/stacks/) and [
 <Example code={`<div class="hstack gap-3 mb-4">
     <span class="text-body-secondary small flex-shrink-0" style="width: 100px">Title</span>
     <div class="vstack gap-1">
-      <div class="progress progress-thin">
+      <div class="progress" style="height: 4px">
         <div class="progress-bar bg-info" role="progressbar" style="width: 34%" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
-      <div class="progress progress-thin">
+      <div class="progress" style="height: 4px">
         <div class="progress-bar bg-danger" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
@@ -145,13 +145,13 @@ Related bars need no component of their own — [stacks](/helpers/stacks/) and [
   <div class="hstack gap-3 mb-4">
     <span class="text-body-secondary small flex-shrink-0" style="width: 100px">Title</span>
     <div class="vstack gap-1">
-      <div class="progress progress-thin">
+      <div class="progress" style="height: 4px">
         <div class="progress-bar bg-info" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
-      <div class="progress progress-thin">
+      <div class="progress" style="height: 4px">
         <div class="progress-bar bg-danger" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
-      <div class="progress progress-thin">
+      <div class="progress" style="height: 4px">
         <div class="progress-bar bg-success" role="progressbar" style="width: 67%" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
@@ -165,7 +165,7 @@ Or stack a header above the bar, with the value pushed to the end by `.ms-auto`:
       <div>Male</div>
       <div class="ms-auto fw-bold">43%</div>
     </div>
-    <div class="progress progress-thin">
+    <div class="progress" style="height: 4px">
       <div class="progress-bar bg-warning" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
   </div>`} />
@@ -177,29 +177,10 @@ Or stack a header above the bar, with the value pushed to the end by `.ms-auto`:
       <div class="ms-auto fw-bold me-2">191.235</div>
       <div class="text-body-secondary small">(56%)</div>
     </div>
-    <div class="progress progress-thin">
+    <div class="progress" style="height: 4px">
       <div class="progress-bar bg-success" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
   </div>`} />
-
-## On a coloured surface
-
-Inside a card that already carries a background and a text colour, a progress bar in the palette's own colours has nothing to contrast against. Add `.progress-white` and both the track and the bar are drawn from the surrounding text colour instead — so the same class works on a dark surface and on a light one.
-
-<Example code={`<div class="card text-white bg-primary" style="max-width: 18rem">
-    <div class="card-body">
-      <div class="fs-4 fw-semibold">89.9%</div>
-      <div>Widget title</div>
-      <div class="progress progress-white progress-thin w-100">
-        <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-      <small class="text-white text-opacity-75">Widget helper text</small>
-    </div>
-  </div>`} />
-
-<Callout color="warning">
-`.card-body` lays its children out with `align-items: flex-start`, and a progress bar has no width of its own — its bar is a percentage of the track. Without `.w-100` the track collapses to nothing and the bar disappears. The same applies to any full-width element you put in a card body.
-</Callout>
 
 ## Customizing
 

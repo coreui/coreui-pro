@@ -1503,17 +1503,19 @@ Multi Select's option indicators moved with it — they render as a decorative
   utilities already do. Use `.hstack` / `.vstack` with a `gap-*` and put the
   label column's width in a style, as the Grouping bars examples now show.
 
-- **`.progress-thin` and `.progress-white` set tokens instead of properties.**
-  `.progress-thin` was fixing `height` directly, which left
-  `--cui-progress-height` at `1rem` — so a thin bar that was also striped drew
-  1rem stripes and animated across 1rem. `.progress-white` was painting
-  `background-color` past `--cui-progress-bg`, so nothing could adjust it and a
-  theme class on the same bar overrode the white. Both are token overrides now.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.progress-thin` is removed.** It did nothing an inline height does not. Use
+  `style="height: 4px"` on the `.progress`, as the Height section shows, or set
+  `--cui-progress-height` if you want the stripe geometry to follow the height
+  too.
 
-- **`.progress-white` paints with `currentcolor` instead of literal white.** On
-  the coloured cards it is made for the surrounding text colour is the readable
-  one, so the bar renders exactly as before — and on a surface whose text is
-  dark, the bar now follows instead of disappearing into the background.
+- **`.progress-white` sets tokens, and paints with `currentcolor` instead of
+  literal white.** It was painting `background-color` past
+  `--cui-progress-bg`, so nothing could adjust it and a theme class on the same
+  bar overrode the white. On the coloured cards it is made for, the surrounding
+  text colour is the readable one, so the bar renders exactly as before — and on
+  a surface whose text is dark, the bar now follows instead of disappearing into
+  the background.
 
 #### Spinner
 

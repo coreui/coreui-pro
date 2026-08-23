@@ -17,8 +17,6 @@ $progress-bar-bg:                      var(--#{$prefix}primary) !default;
 $progress-bar-transition:              width .6s ease !default;
 $progress-bar-animation:               progress-bar-stripes 1s linear infinite !default;
 
-$progress-thin-height:                 4px !default;
-
 $progress-contrast-track-opacity:      20% !default;
 // scss-docs-end progress-variables
 
@@ -103,10 +101,6 @@ $progress-tokens: defaults(
         }
       }
     }
-  }
-
-  .progress-thin {
-    --#{$prefix}progress-height: #{$progress-thin-height};
   }
 
   .progress-white {
