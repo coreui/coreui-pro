@@ -135,7 +135,7 @@ class LoadingButton extends BaseComponent {
     if (this._config.spinner) {
       const spinner = document.createElement('span')
       const type = this._config.spinnerType
-      spinner.classList.add(CLASS_NAME_LOADING_BUTTON_SPINNER, `spinner-${type}`, `spinner-${type}-sm`)
+      spinner.classList.add(CLASS_NAME_LOADING_BUTTON_SPINNER, `spinner-${type}`)
       spinner.setAttribute('role', 'status')
       spinner.setAttribute('aria-hidden', 'true')
       this._element.insertBefore(spinner, this._element.firstChild)

@@ -12,14 +12,13 @@
   }
 
   .btn-loading-spinner {
-    margin-inline: ($spacer * -2) $spacer;
+    margin-inline: calc(-1 * (var(--#{$prefix}spinner-width) + #{$spacer})) $spacer;
     opacity: 0;
     @include transition(margin .15s, opacity .15s, border .15s);
   }
 
   .btn-loading.is-loading {
     .btn-loading-spinner {
-      width: 1rem;
       margin-inline-start: 0;
       opacity: 1;
     }

@@ -54,7 +54,7 @@ Once again, this spinner is built with `currentColor`, so you can easily change 
 
 ## Alignment
 
-Spinners in Bootstrap are built with `rem`s, `currentColor`, and `display: inline-flex`. This means they can easily be resized, recolored, and quickly aligned.
+Spinners in Bootstrap are built with `em`s, `currentColor`, and `display: inline-flex`. This means they can easily be resized, recolored, and quickly aligned.
 
 ### Margin
 
@@ -99,12 +99,17 @@ Use [flexbox utilities][flex], [float utilities][float], or [text alignment][tex
 
 ## Size
 
-Add `.spinner-border-sm` and `.spinner-grow-sm` to make a smaller spinner that can quickly be used within other components.
+Both spinners are `1em` square, so they match the font size of whatever they sit in — drop one into a heading or a button and it scales along with the text.
 
-<Example code={`<div class="spinner-border spinner-border-sm" role="status">
+<Example code={`<h3>Heading <span class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></span></h3>
+  <p>Paragraph <span class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></span></p>`} />
+
+Add `.spinner-sm` to make a smaller spinner. It works on both types.
+
+<Example code={`<div class="spinner-border spinner-sm" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>
-  <div class="spinner-grow spinner-grow-sm" role="status">
+  <div class="spinner-grow spinner-sm" role="status">
     <span class="visually-hidden">Loading...</span>
   </div>`} />
 
@@ -117,25 +122,40 @@ Or, use custom CSS or inline styles to change the dimensions as needed.
     <span class="visually-hidden">Loading...</span>
   </div>`} />
 
+## Custom spinners
+
+Add `.spinner-rotate` to any element to spin it at the same speed as `.spinner-border`. Use it when you want your own artwork instead of a bordered circle.
+
+<Example code={`<svg class="spinner-rotate" width="2rem" height="2rem" viewBox="0 0 16 16" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+    <path d="M8 1V4"/>
+    <path opacity=".8" d="M3.05 3.05L5.17 5.17"/>
+    <path opacity=".6" d="M4 8L1 8"/>
+    <path opacity=".5" d="M5.17 10.83L3.05 12.95"/>
+    <path opacity=".4" d="M8 12V15"/>
+    <path opacity=".3" d="M10.83 10.83L12.95 12.95"/>
+    <path opacity=".2" d="M15 8L12 8"/>
+    <path opacity=".1" d="M12.95 3.05L10.83 5.17"/>
+  </svg>`} />
+
 ## Buttons
 
 Use spinners within buttons to indicate an action is currently processing or taking place. You may also swap the text out of the spinner element and utilize button text as needed.
 
 <Example code={`<button class="btn btn-primary" type="button" disabled>
-    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+    <span class="spinner-border" aria-hidden="true"></span>
     <span class="visually-hidden" role="status">Loading...</span>
   </button>
   <button class="btn btn-primary" type="button" disabled>
-    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+    <span class="spinner-border" aria-hidden="true"></span>
     <span role="status">Loading...</span>
   </button>`} />
 
 <Example code={`<button class="btn btn-primary" type="button" disabled>
-    <span class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
+    <span class="spinner-grow" aria-hidden="true"></span>
     <span class="visually-hidden" role="status">Loading...</span>
   </button>
   <button class="btn btn-primary" type="button" disabled>
-    <span class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
+    <span class="spinner-grow" aria-hidden="true"></span>
     <span role="status">Loading...</span>
   </button>`} />
 
@@ -153,9 +173,9 @@ Growing spinner variables:
 
 <ScssDocs file="scss/_spinner.scss" capture="spinner-grow-css-vars" />
 
-For both spinners, small spinner modifier classes are used to update the values of these CSS variables as needed. For example, the `.spinner-border-sm` class does the following:
+The `.spinner-sm` modifier updates the values of these CSS variables, so it applies to both spinners:
 
-<ScssDocs file="scss/_spinner.scss" capture="spinner-border-sm-css-vars" />
+<ScssDocs file="scss/_spinner.scss" capture="spinner-sm-css-vars" />
 
 ### SASS variables
 
@@ -163,7 +183,7 @@ For both spinners, small spinner modifier classes are used to update the values 
 
 ### Keyframes
 
-Used for creating the CSS animations for our spinners. Included in `scss/_spinners.scss`.
+Used for creating the CSS animations for our spinners. Included in `scss/_spinner.scss`.
 
 <ScssDocs file="scss/_spinner.scss" capture="spinner-border-keyframes" />
 

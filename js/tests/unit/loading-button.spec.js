@@ -122,7 +122,6 @@ describe('LoadingButton', () => {
           const spinner = button.querySelector('.btn-loading-spinner')
           expect(spinner).toBeTruthy()
           expect(spinner.classList.contains('spinner-border')).toBe(true)
-          expect(spinner.classList.contains('spinner-border-sm')).toBe(true)
           expect(spinner.getAttribute('role')).toBe('status')
           expect(spinner.getAttribute('aria-hidden')).toBe('true')
           resolve()
@@ -145,7 +144,6 @@ describe('LoadingButton', () => {
           const spinner = button.querySelector('.btn-loading-spinner')
           expect(spinner).toBeTruthy()
           expect(spinner.classList.contains('spinner-grow')).toBe(true)
-          expect(spinner.classList.contains('spinner-grow-sm')).toBe(true)
           resolve()
         })
 
