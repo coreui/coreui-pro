@@ -23,7 +23,7 @@ Here are two examples of how we loop over the `$theme-colors` map to generate mo
 
 ## Theme variants
 
-Themeable components also support a single family of composable `.theme-*` classes that recolor a component without a per-component color class. A themeable component reads a shared set of generic `--cui-theme-*` tokens for its background, foreground, border, and focus styles — each with a fallback to the component's own default token. When no theme class is present, the fallback applies. Add a `.theme-*` class to the component (or to an ancestor) and it picks up that theme's colors instead.
+Themeable components also support a single family of composable `.theme-*` classes that recolor a component without a per-component color class. A themeable component reads a shared set of generic `--cui-theme-*` tokens for its background, foreground, border, and focus styles — each with a fallback to the component's own default token. When no theme class is present, the fallback applies. Add a `.theme-*` class to the component, to an ancestor, or to one of its parts, and it picks up that theme’s colors instead.
 
 | Token | Description |
 | --- | --- |
@@ -64,33 +64,27 @@ The classic color classes — `.btn-primary`, `.alert-success`, `.badge` color s
 
 ### Building a themeable component
 
-A component reads a theme token **inside its own token's default**, never around that token at the property. Both forms below render identically until something overrides the token — and then the position of the slot decides who wins:
+Read the theme slot **at the property**, wrapping the component's own token. Slots inherit, so one form covers every case — the class works on the component, on an ancestor, or on any part of it:
 
 ```scss
-// Do this: the slot is the token's default, so the token stays the override point
---cui-badge-bg: var(--cui-theme-base, #{$badge-bg}),
+--#{$prefix}badge-bg: #{$badge-bg},
 // …
-background-color: var(--cui-badge-bg);
-
-// Not this: the slot wraps the token, so the token can no longer win
---cui-badge-bg: #{$badge-bg},
-// …
-background-color: var(--cui-theme-base, var(--cui-badge-bg));
+background-color: var(--#{$prefix}theme-base, var(--#{$prefix}badge-bg));
 ```
 
-With the slot inside, setting `--cui-badge-bg` on a themed element beats the theme. With the slot outside, the theme always wins and the token is dead — and that takes every structural variant with it, because a variant is a rule that redeclares the component token. `.badge-subtle` and `.badge-outline` both collapse into the solid theme color.
-
-The rule holds one level down too. Where a state remaps a token, the slot belongs to the default being remapped from, not around it:
+A structural variant maps the token to a slot of its own, and then **re-declares the property with a plain read** so it wins over the base rule:
 
 ```scss
---cui-stepper-step-indicator-complete-color: var(--cui-theme-contrast, #{$stepper-step-indicator-complete-color}),
-// …
-.stepper-step-button.complete {
-  --cui-stepper-step-indicator-color: var(--cui-stepper-step-indicator-complete-color);
+.badge-subtle {
+  --#{$prefix}badge-bg: var(--#{$prefix}theme-bg-subtle);
+
+  background-color: var(--#{$prefix}badge-bg);
 }
 ```
 
-One consequence to design around: a `var()` resolves where the property is declared, so a token declared on the component root cannot see a theme class placed on one of its parts. Declare the token on the part that should carry the theme.
+The second line is the part that is easy to miss. Set the token alone and the base rule still applies its own slot, so `.badge-subtle` and `.badge-outline` collapse into the solid theme color.
+
+While no theme class is present the token behaves as an override point; under one, the theme wins.
 
 ## Responsive
 
