@@ -49,7 +49,6 @@ const DISALLOWED_ATTRIBUTES = new Set(['sanitize', 'allowList', 'sanitizeFn'])
 
 const ESCAPE_KEY = 'Escape'
 
-const CLASS_NAME_FADE = 'fade'
 const CLASS_NAME_MODAL = 'modal'
 const CLASS_NAME_SHOW = 'show'
 
@@ -315,7 +314,7 @@ class Tooltip extends BaseComponent {
       this._isHovered = false
     }
 
-    await this._queueCallback(complete, this.tip!, this._isAnimated()!)
+    await this._queueCallback(complete, this.tip!, this._isAnimated())
   }
 
   async hide(): Promise<void> {
@@ -359,7 +358,7 @@ class Tooltip extends BaseComponent {
       EventHandler.trigger(this._element, this.constructor.eventName(EVENT_HIDDEN))
     }
 
-    await this._queueCallback(complete, this.tip!, this._isAnimated()!)
+    await this._queueCallback(complete, this.tip!, this._isAnimated())
   }
 
   update(): void {
@@ -392,15 +391,15 @@ class Tooltip extends BaseComponent {
   protected _createTipElement(content: Record<string, TemplateContentEntry>): HTMLElement {
     const tip = this._getTemplateFactory(content).toHtml()
 
-    tip.classList.remove(CLASS_NAME_FADE, CLASS_NAME_SHOW)
+    tip.classList.remove(CLASS_NAME_SHOW)
     tip.classList.add(`bs-${this.constructor.NAME}-auto`)
 
     const tipId = getUID(this.constructor.NAME).toString()
 
     tip.setAttribute('id', tipId)
 
-    if (this._isAnimated()) {
-      tip.classList.add(CLASS_NAME_FADE)
+    if (!this._config.animation) {
+      tip.classList.add(this._getInstantClassName())
     }
 
     return tip
@@ -445,8 +444,12 @@ class Tooltip extends BaseComponent {
     return this.constructor.getOrCreateInstance(event.delegateTarget, this._getDelegateConfig())
   }
 
-  protected _isAnimated(): boolean | null {
-    return this._config.animation || (this.tip && this.tip.classList.contains(CLASS_NAME_FADE))
+  protected _getInstantClassName(): string {
+    return `${this.constructor.NAME}-instant`
+  }
+
+  protected _isAnimated(): boolean {
+    return !this.tip?.classList.contains(this._getInstantClassName())
   }
 
   protected _isShown(): boolean | null {
