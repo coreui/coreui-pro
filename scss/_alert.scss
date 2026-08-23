@@ -2,6 +2,7 @@
 @use "functions/defaults" as *;
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
+@use "mixins/transition" as *;
 @use "theme" as *;
 @use "config" as *;
 
@@ -13,6 +14,10 @@ $alert-margin-bottom:           1rem !default;
 $alert-border-radius:           var(--#{$prefix}border-radius) !default;
 $alert-link-font-weight:        var(--#{$prefix}font-weight-bold) !default;
 $alert-border-width:            var(--#{$prefix}border-width) !default;
+
+$alert-transition-property:     opacity !default;
+$alert-transition-duration:     .15s !default;
+$alert-transition-timing:       linear !default;
 // scss-docs-end alert-variables
 
 $alert-tokens: () !default;
@@ -32,6 +37,9 @@ $alert-tokens: defaults(
     --#{$prefix}alert-border-width: #{$alert-border-width},
     --#{$prefix}alert-border-radius: #{$alert-border-radius},
     --#{$prefix}alert-link-color: inherit,
+    --#{$prefix}alert-transition-property: #{$alert-transition-property},
+    --#{$prefix}alert-transition-duration: #{$alert-transition-duration},
+    --#{$prefix}alert-transition-timing: #{$alert-transition-timing},
     --#{$prefix}hr-border-color: var(--#{$prefix}theme-border, var(--#{$prefix}border-color)),
   ),
   $alert-tokens
@@ -63,6 +71,23 @@ $alert-variants: (
     background-color: var(--#{$prefix}theme-bg-subtle, var(--#{$prefix}alert-bg));
     border: var(--#{$prefix}alert-border-width) solid var(--#{$prefix}theme-border, var(--#{$prefix}alert-border-color));
     @include border-radius(var(--#{$prefix}alert-border-radius));
+
+    // scss-docs-start alert-transition
+    // An alert is already on the page, so only the exit animates. The JS marks
+    // it with `.hiding` for the length of the transition, then removes the
+    // element. Add `.alert-instant` to have it go at once.
+    &:not(.alert-instant) {
+      @include transition-props(
+        var(--#{$prefix}alert-transition-property),
+        var(--#{$prefix}alert-transition-duration),
+        var(--#{$prefix}alert-transition-timing)
+      );
+    }
+
+    &.hiding {
+      opacity: 0;
+    }
+    // scss-docs-end alert-transition
   }
 
   .alert > p {

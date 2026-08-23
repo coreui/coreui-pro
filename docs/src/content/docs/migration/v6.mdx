@@ -973,6 +973,16 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### Alert
 
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Every alert fades out when dismissed, and `.fade` no longer decides that.**
+  The alert carries its own transition and
+  `--cui-alert-transition-property` / `-duration` / `-timing`; the JavaScript
+  marks it with `.hiding` for the length of it, then removes the element. An
+  alert is already on the page, so only the exit is animated — `.fade` and
+  `.show` remain the way to fade one **in** when you insert it at runtime. Add
+  `.alert-instant` to an alert that should go at once, which is what an alert
+  without `.fade` used to do.
+
 - **`.alert-dismissible` is optional now.** An alert that contains a close
   button as a direct child makes room for it and positions it on its own
   (`.alert:has(> .btn-close)`). The class keeps working — and is still the way
