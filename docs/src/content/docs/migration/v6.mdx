@@ -1481,6 +1481,37 @@ Multi Select's option indicators moved with it — they render as a decorative
   list stays vertical. Plain `.list-group-horizontal` is unconditional and
   needs no container.
 
+#### Progress
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`$progress-bar-animation-timing` is replaced by `$progress-bar-animation`,
+  which carries the keyframes name too.** The stripe animation is a CSS variable
+  now — `--cui-progress-bar-animation` — so its speed, easing and keyframes can
+  be changed on an instance instead of only at build time. A Sass override that
+  passed just the timing (`1s linear infinite`) has to pass the whole shorthand
+  (`progress-bar-stripes 1s linear infinite`).
+
+- **The label font size follows `--cui-font-size-sm`.** It was three quarters of
+  the body font size, a value only this component used; it is the shared small
+  size now, which makes it one step larger. Set `--cui-progress-font-size` to go
+  back.
+
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.progress-group`, `.progress-group-prepend`, `.progress-group-header` and
+  `.progress-group-bars` are removed.** Four classes carried a flex row, a
+  100 px label column, a header row and a 2 px gap between bars — all of which
+  utilities already do. Use `.hstack` / `.vstack` with a `gap-*` and put the
+  label column's width in a style, as the Grouping bars examples now show.
+
+- **`.progress-thin` and `.progress-white` set tokens instead of properties.**
+  `.progress-thin` was fixing `height` directly, which left
+  `--cui-progress-height` at `1rem` — so a thin bar that was also striped drew
+  1rem stripes and animated across 1rem. `.progress-white` was painting
+  `background-color` past `--cui-progress-bg`, so nothing could adjust it and a
+  theme class on the same bar overrode the white. Both are token overrides now,
+  and `.progress-white` gives its label a dark colour so a label inside a white
+  bar is readable.
+
 #### Spinner
 
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
