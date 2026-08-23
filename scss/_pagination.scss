@@ -36,8 +36,6 @@ $pagination-disabled-bg:            var(--#{$prefix}secondary-bg) !default;
 $pagination-disabled-border-color:  var(--#{$prefix}border-color) !default;
 
 $pagination-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
-
-$pagination-sizes:                  ("sm", "lg") !default;
 // scss-docs-end pagination-variables
 
 $pagination-tokens: () !default;
@@ -71,6 +69,15 @@ $pagination-tokens: defaults(
   $pagination-tokens
 );
 // scss-docs-end pagination-css-vars
+
+$pagination-sizes: () !default;
+
+// scss-docs-start pagination-sizes
+$pagination-sizes: defaults(
+  ("sm", "lg"),
+  $pagination-sizes
+);
+// scss-docs-end pagination-sizes
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
 @layer components {
@@ -148,7 +155,7 @@ $pagination-tokens: defaults(
   //
 
   // scss-docs-start pagination-sizes-loop
-  @each $size in $pagination-sizes {
+  @each $size, $_ in $pagination-sizes {
     .pagination-#{$size} {
       --#{$prefix}pagination-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
       --#{$prefix}pagination-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
