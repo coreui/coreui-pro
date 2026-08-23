@@ -55,6 +55,10 @@ $nav-enclosed-link-active-bg:            var(--#{$prefix}body-bg) !default;
 $nav-enclosed-link-active-border-color:  var(--#{$prefix}border-color) !default;
 $nav-enclosed-link-hover-box-shadow:     var(--#{$prefix}box-shadow-sm) !default;
 $nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !default;
+
+$tab-pane-transition-property:           opacity !default;
+$tab-pane-transition-duration:           .15s !default;
+$tab-pane-transition-timing:             linear !default;
 // scss-docs-end nav-variables
 
 $nav-tokens: () !default;
@@ -152,6 +156,23 @@ $nav-underline-border-tokens: defaults(
   $nav-underline-border-tokens
 );
 // scss-docs-end nav-underline-border-css-vars
+
+// stylelint-enable scss/dollar-variable-default
+
+$tab-pane-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start tab-pane-css-vars
+$tab-pane-tokens: defaults(
+  (
+    --#{$prefix}tab-pane-transition-property: #{$tab-pane-transition-property},
+    --#{$prefix}tab-pane-transition-duration: #{$tab-pane-transition-duration},
+    --#{$prefix}tab-pane-transition-timing: #{$tab-pane-transition-timing},
+  ),
+  $tab-pane-tokens
+);
+// scss-docs-end tab-pane-css-vars
 
 // stylelint-enable scss/dollar-variable-default
 @layer components {
@@ -396,10 +417,31 @@ $nav-underline-border-tokens: defaults(
 
   .tab-content {
     > .tab-pane {
+      @include tokens($tab-pane-tokens);
+
       display: none;
+
+      // Only the entry animates: two in-flow panes cannot cross-fade without
+      // one stacking under the other, so the outgoing pane leaves at once.
+      // Add `.tab-pane-instant` to skip it.
+      &:not(.tab-pane-instant) {
+        @include transition-props(
+          var(--#{$prefix}tab-pane-transition-property),
+          var(--#{$prefix}tab-pane-transition-duration),
+          var(--#{$prefix}tab-pane-transition-timing)
+        );
+      }
     }
     > .active {
       display: block;
+    }
+  }
+
+  // The pane is not rendered before `.active` lands, so the fade-in needs an
+  // explicit state to animate FROM.
+  @starting-style {
+    .tab-content > .tab-pane:not(.tab-pane-instant).active {
+      opacity: 0;
     }
   }
 }

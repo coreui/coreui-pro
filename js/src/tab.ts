@@ -11,7 +11,9 @@
 import BaseComponent from './base-component.js'
 import EventHandler, { type CoreUIEvent } from './dom/event-handler.js'
 import SelectorEngine from './dom/selector-engine.js'
-import { defineJQueryPlugin, getNextActiveElement, isDisabled } from './util/index.js'
+import {
+  defineJQueryPlugin, getNextActiveElement, getTransitionDurationFromElement, isDisabled
+} from './util/index.js'
 
 /**
  * Constants
@@ -37,7 +39,6 @@ const HOME_KEY = 'Home'
 const END_KEY = 'End'
 
 const CLASS_NAME_ACTIVE = 'active'
-const CLASS_NAME_FADE = 'fade'
 const CLASS_NAME_SHOW = 'show'
 const CLASS_DROPDOWN = 'dropdown'
 
@@ -114,14 +115,17 @@ class Tab extends BaseComponent {
 
     element.classList.add(CLASS_NAME_ACTIVE)
 
-    this._activate(SelectorEngine.getElementFromSelector(element)) // Search and activate/show the proper section
+    // A pane animates itself in CSS, from `.active`. Both classes land in the
+    // same frame so nothing here sequences the fade.
+    if (element.getAttribute('role') !== 'tab') {
+      element.classList.add(CLASS_NAME_SHOW)
+      return
+    }
+
+    const pane = SelectorEngine.getElementFromSelector(element)
+    this._activate(pane) // Search and activate/show the proper section
 
     const complete = () => {
-      if (element.getAttribute('role') !== 'tab') {
-        element.classList.add(CLASS_NAME_SHOW)
-        return
-      }
-
       element.removeAttribute('tabindex')
       element.setAttribute('aria-selected', true as unknown as string)
       this._toggleDropDown(element, true)
@@ -130,7 +134,9 @@ class Tab extends BaseComponent {
       })
     }
 
-    await this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
+    // `shown` waits for the pane, the element that animates — the tab itself
+    // only transitions its colors. A tab with no pane has nothing to wait for.
+    await this._queueCallback(complete, pane ?? element, getTransitionDurationFromElement(pane) > 0)
   }
 
   async _deactivate(element: HTMLElement | null, relatedElem?: HTMLElement | null): Promise<void> {
@@ -141,21 +147,23 @@ class Tab extends BaseComponent {
     element.classList.remove(CLASS_NAME_ACTIVE)
     element.blur()
 
+    // A pane leaves at once: two in-flow panes cannot cross-fade without one
+    // stacking under the other.
+    if (element.getAttribute('role') !== 'tab') {
+      element.classList.remove(CLASS_NAME_SHOW)
+      return
+    }
+
     this._deactivate(SelectorEngine.getElementFromSelector(element)) // Search and deactivate the shown section too
 
     const complete = () => {
-      if (element.getAttribute('role') !== 'tab') {
-        element.classList.remove(CLASS_NAME_SHOW)
-        return
-      }
-
       element.setAttribute('aria-selected', false as unknown as string)
       element.setAttribute('tabindex', '-1')
       this._toggleDropDown(element, false)
       EventHandler.trigger(element, EVENT_HIDDEN, { relatedTarget: relatedElem })
     }
 
-    await this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE))
+    await this._queueCallback(complete, element, false)
   }
 
   _keydown(event: CoreUIEvent): void {
