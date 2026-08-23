@@ -1149,6 +1149,22 @@ adornment in the library — so the button needs no icon markup at all:
   matched from outside at all: the value it pairs with, `--cui-nav-link-padding-y`,
   is declared on `.navbar-nav`, which is `.navbar-text`'s sibling and therefore
   invisible to it. Both are declared on `.navbar` now, at their current values.
+- **An expanded navbar flattens a `.drawer`, not just an `.offcanvas`.** The
+  reset that turns the collapsed panel back into an inline nav named `.offcanvas`
+  only, so a `.drawer` inside a `.navbar-expand-*` stayed a fixed side panel over
+  the page at every width — measured at 400×868 next to the offcanvas's 1176×24.
+  Both are handled now.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **Three navbar defaults move.** `.navbar` takes
+  `--cui-navbar-min-height: 3.5rem`, so a navbar with short content no longer
+  collapses below the height of one with a brand in it. `.navbar-brand` takes
+  `--cui-navbar-brand-font-weight`, defaulting to medium rather than the body
+  weight. `.navbar-nav` takes `--cui-nav-gap`, a `.25rem` gap between links that
+  the link padding used to carry alone. Set any of the three to its old value to
+  keep the previous rendering.
+- **`.navbar-translucent` is new.** It tints and blurs the navbar the way
+  `.toast-translucent` does for a toast, mixing `--cui-navbar-bg` — a new token,
+  defaulting to the body background — at 85%.
 - **A theme beats a navbar token, as everywhere else.** `--cui-navbar-brand-color`,
   `-brand-hover-color` and `-active-color` carried the `--cui-theme-*` slot inside
   their own default, so setting one of them inside a `.theme-{color}` navbar

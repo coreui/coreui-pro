@@ -324,6 +324,21 @@ A [theme class](/customize/components/#theme-variants) accents the brand and the
 
 <Example html={[`<nav class="navbar navbar-expand-lg theme-primary bg-body-tertiary">`, `    <div class="container-fluid">`, `      <a class="navbar-brand" href="#">Navbar</a>`, `      <ul class="navbar-nav me-auto mb-2 mb-lg-0">`, `        <li class="nav-item">`, `          <a class="nav-link active" aria-current="page" href="#">Home</a>`, `        </li>`, `        <li class="nav-item">`, `          <a class="nav-link" href="#">Features</a>`, `        </li>`, `      </ul>`, `    </div>`, `  </nav>`]} />
 
+## Translucent
+
+Add `.navbar-translucent` to let the page through the navbar and blur it. The tint is mixed from `--cui-navbar-bg`, which defaults to the body background — set that token when the navbar sits on a surface of its own.
+
+<Example class="p-0" code={`<nav class="navbar navbar-expand-lg navbar-translucent">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Navbar</a>
+      <ul class="navbar-nav">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Features</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Pricing</a></li>
+      </ul>
+    </div>
+  </nav>`} />
+
 ## Containers
 
 Although it's not required, you can wrap a navbar in a `.container` to center it on a page–though note that an inner container is still required. Or you can add a container inside the `.navbar` to only center the contents of a [fixed or static top navbar](#placement).
@@ -670,6 +685,10 @@ Variables for all navbars:
 Variables for the [dark navbar](#color-schemes):
 
 <ScssDocs file="scss/_navbar.scss" capture="navbar-dark-variables" />
+
+The `.navbar-translucent` mix amount and backdrop filter are build-time only — they are not tokens, so a navbar does not carry two custom properties it will never read.
+
+<ScssDocs file="scss/_navbar.scss" capture="navbar-translucent-variables" />
 
 ### SASS loop
 
