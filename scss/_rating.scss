@@ -1,3 +1,4 @@
+@use "sass:map";
 @use "functions/defaults" as *;
 @use "functions/escape-svg" as *;
 @use "mixins/tokens" as *;
@@ -18,6 +19,19 @@ $rating-item-scale-transform:  scale(1.2) !default;
 $rating-item-active-color:     var(--#{$prefix}warning) !default;
 $rating-item-icon:             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='currentColor' d='M470.935,194.043,333.8,171.757,270.227,48.22a16,16,0,0,0-28.454,0L178.2,171.757,41.065,194.043A16,16,0,0,0,32.273,221.1l97.845,98.636L108.936,457.051a16,16,0,0,0,23.02,16.724L256,411.2l124.044,62.576a16,16,0,0,0,23.02-16.724L381.882,319.74,479.727,221.1A16,16,0,0,0,470.935,194.043Z'%3E%3C/path%3E%3C/svg%3E") !default;
 // scss-docs-end rating-variables
+
+$rating-sizes: () !default;
+
+// scss-docs-start rating-sizes
+// stylelint-disable-next-line scss/dollar-variable-default
+$rating-sizes: defaults(
+  (
+    "sm": (item-height: $rating-item-height-sm),
+    "lg": (item-height: $rating-item-height-lg),
+  ),
+  $rating-sizes
+);
+// scss-docs-end rating-sizes
 
 $rating-tokens: () !default;
 
@@ -125,11 +139,11 @@ $rating-tokens: defaults(
     display: none;
   }
 
-  .rating-sm {
-    --#{$prefix}rating-item-height: #{$rating-item-height-sm};
+  // scss-docs-start rating-sizes-loop
+  @each $size, $values in $rating-sizes {
+    .rating-#{$size} {
+      --#{$prefix}rating-item-height: #{map.get($values, item-height)};
+    }
   }
-
-  .rating-lg {
-    --#{$prefix}rating-item-height: #{$rating-item-height-lg};
-  }
+  // scss-docs-end rating-sizes-loop
 }

@@ -180,8 +180,13 @@ $button-link-tokens: defaults(
 );
 // scss-docs-end btn-link-tokens
 
+$button-sizes: () !default;
+
 // scss-docs-start btn-sizes
-$button-sizes: ("xs", "sm", "lg") !default;
+$button-sizes: defaults(
+  ("xs", "sm", "lg"),
+  $button-sizes
+);
 // scss-docs-end btn-sizes
 
 // stylelint-enable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -453,7 +458,7 @@ $btn-variant-selectors: (string.unquote(".btn"), string.unquote(".btn-link"), st
   //
 
   // scss-docs-start btn-sizes-loop
-  @each $size in $button-sizes {
+  @each $size, $_ in $button-sizes {
     .btn-#{$size},
     .btn-group-#{$size} > .btn,
     .input-group-#{$size} > .btn {

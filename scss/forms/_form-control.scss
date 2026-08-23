@@ -25,6 +25,15 @@ $form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
 
+$form-control-sizes: () !default;
+
+// scss-docs-start form-control-sizes
+$form-control-sizes: defaults(
+  ("sm", "lg"),
+  $form-control-sizes
+);
+// scss-docs-end form-control-sizes
+
 // scss-docs-start form-control-tokens
 $form-control-tokens: () !default;
 $form-control-tokens: defaults(
@@ -262,45 +271,29 @@ $form-control-select-tokens: defaults(
   //
   // Repeated in `_input_group.scss` to avoid Sass extend issues.
 
-  .form-control-sm,
-  .form-select-sm {
-    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-sm-min-height);
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-sm-padding-y);
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-sm-padding-x);
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-sm-font-size);
-    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-sm-border-radius);
+  // scss-docs-start form-control-sizes-loop
+  @each $size, $_ in $form-control-sizes {
+    .form-control-#{$size},
+    .form-select-#{$size} {
+      --#{$prefix}control-min-height: var(--#{$prefix}btn-input-#{$size}-min-height);
+      --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-#{$size}-padding-y);
+      --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-#{$size}-padding-x);
+      --#{$prefix}control-font-size: var(--#{$prefix}btn-input-#{$size}-font-size);
+      --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-#{$size}-border-radius);
 
-    min-height: var(--#{$prefix}control-min-height);
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    @include border-radius(var(--#{$prefix}control-border-radius));
-
-    &::file-selector-button {
+      min-height: var(--#{$prefix}control-min-height);
       padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
-      margin-inline-end: var(--#{$prefix}control-padding-x);
+      font-size: var(--#{$prefix}control-font-size);
+      @include border-radius(var(--#{$prefix}control-border-radius));
+
+      &::file-selector-button {
+        padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
+        margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
+        margin-inline-end: var(--#{$prefix}control-padding-x);
+      }
     }
   }
-
-  .form-control-lg,
-  .form-select-lg {
-    --#{$prefix}control-min-height: var(--#{$prefix}btn-input-lg-min-height);
-    --#{$prefix}control-padding-y: var(--#{$prefix}btn-input-lg-padding-y);
-    --#{$prefix}control-padding-x: var(--#{$prefix}btn-input-lg-padding-x);
-    --#{$prefix}control-font-size: var(--#{$prefix}btn-input-lg-font-size);
-    --#{$prefix}control-border-radius: var(--#{$prefix}btn-input-lg-border-radius);
-
-    min-height: var(--#{$prefix}control-min-height);
-    padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-    font-size: var(--#{$prefix}control-font-size);
-    @include border-radius(var(--#{$prefix}control-border-radius));
-
-    &::file-selector-button {
-      padding: var(--#{$prefix}control-padding-y) var(--#{$prefix}control-padding-x);
-      margin: calc(var(--#{$prefix}control-padding-y) * -1) calc(var(--#{$prefix}control-padding-x) * -1);
-      margin-inline-end: var(--#{$prefix}control-padding-x);
-    }
-  }
+  // scss-docs-end form-control-sizes-loop
 
   // stylelint-disable selector-no-qualifying-type
   select.form-control,
