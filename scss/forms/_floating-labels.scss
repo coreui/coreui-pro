@@ -56,6 +56,10 @@ $form-floating-tokens: defaults(
 // stylelint-enable scss/dollar-variable-default
 
 @layer forms {
+  // The label may sit either side of the control. Putting it first lets a screen
+  // reader announce it before the field's value, which is why the docs write it
+  // that way; the v5 order still works, so each state is matched in both
+  // directions — forward with `:has()`, backward with the sibling combinator.
   .form-floating {
     @include tokens($form-floating-tokens);
 
@@ -74,6 +78,8 @@ $form-floating-tokens: defaults(
       inset-inline-start: 0;
       top: 0;
       z-index: 2;
+      display: flex;
+      align-items: center;
       max-width: 100%;
       height: 100%; // allow textareas
       padding: var(--#{$prefix}form-floating-padding-y) var(--#{$prefix}form-floating-padding-x);
@@ -90,6 +96,12 @@ $form-floating-tokens: defaults(
         var(--#{$prefix}form-floating-transition-duration),
         var(--#{$prefix}form-floating-transition-timing)
       );
+    }
+
+    // A textarea grows, so its label stays at the top instead of centring
+    > label:has(~ textarea),
+    > textarea ~ label {
+      align-items: flex-start;
     }
 
     > .form-control,
@@ -118,44 +130,50 @@ $form-floating-tokens: defaults(
       padding-bottom: var(--#{$prefix}form-floating-input-padding-b);
     }
 
-    > .form-control:focus,
-    > .form-control:not(:placeholder-shown),
-    > .form-control-plaintext,
-    > .form-select {
-      ~ label {
-        transform: var(--#{$prefix}form-floating-label-transform);
-      }
+    > label:has(~ .form-control:focus),
+    > label:has(~ .form-control:not(:placeholder-shown)),
+    > label:has(~ .form-control-plaintext),
+    > label:has(~ .form-select),
+    > .form-control:focus ~ label,
+    > .form-control:not(:placeholder-shown) ~ label,
+    > .form-control-plaintext ~ label,
+    > .form-select ~ label {
+      transform: var(--#{$prefix}form-floating-label-transform);
     }
     // Duplicated because `:-webkit-autofill` invalidates other selectors when grouped
-    > .form-control:-webkit-autofill {
-      ~ label {
-        transform: var(--#{$prefix}form-floating-label-transform);
-      }
+    > label:has(~ .form-control:-webkit-autofill),
+    > .form-control:-webkit-autofill ~ label {
+      transform: var(--#{$prefix}form-floating-label-transform);
     }
-    > textarea:focus,
-    > textarea:not(:placeholder-shown) {
-      ~ label::after {
-        position: absolute;
-        inset: var(--#{$prefix}form-floating-padding-y) calc(var(--#{$prefix}form-floating-padding-x) * .5);
-        z-index: -1;
-        height: var(--#{$prefix}form-floating-label-height);
-        content: "";
-        background-color: var(--#{$prefix}form-floating-label-bg);
-        @include border-radius(var(--#{$prefix}form-floating-label-border-radius));
-      }
+
+    > label:has(~ textarea:focus)::after,
+    > label:has(~ textarea:not(:placeholder-shown))::after,
+    > textarea:focus ~ label::after,
+    > textarea:not(:placeholder-shown) ~ label::after {
+      position: absolute;
+      inset: var(--#{$prefix}form-floating-padding-y) calc(var(--#{$prefix}form-floating-padding-x) * .5);
+      z-index: -1;
+      height: var(--#{$prefix}form-floating-label-height);
+      content: "";
+      background-color: var(--#{$prefix}form-floating-label-bg);
+      @include border-radius(var(--#{$prefix}form-floating-label-border-radius));
     }
+
+    > label:has(~ textarea:disabled)::after,
     > textarea:disabled ~ label::after {
       background-color: var(--#{$prefix}form-floating-label-disabled-bg);
     }
 
-    > .form-control-plaintext {
-      ~ label {
-        border-width: var(--#{$prefix}btn-input-border-width) 0; // Required to properly position label text - as explained above
-      }
+    > label:has(~ .form-control-plaintext),
+    > .form-control-plaintext ~ label {
+      border-width: var(--#{$prefix}btn-input-border-width) 0; // Required to properly position label text - as explained above
     }
 
+    // `.form-control` is named on its own because of specificity
+    > label:has(~ :disabled),
+    > label:has(~ .form-control:disabled),
     > :disabled ~ label,
-    > .form-control:disabled ~ label { // Required for `.form-control`s because of specificity
+    > .form-control:disabled ~ label {
       color: var(--#{$prefix}form-floating-label-disabled-color);
     }
   }
