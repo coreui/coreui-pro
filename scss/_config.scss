@@ -265,5 +265,15 @@ $zindex-levels: (
 ) !default;
 // scss-docs-end zindex-levels-map
 
+// scss-docs-start aspect-ratios
+$aspect-ratios: (
+  "auto":  auto,
+  "1x1":   #{"1 / 1"},
+  "4x3":   #{"4 / 3"},
+  "16x9":  #{"16 / 9"},
+  "21x9":  #{"21 / 9"}
+) !default;
+// scss-docs-end aspect-ratios
+
 // Code
 

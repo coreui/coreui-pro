@@ -148,6 +148,22 @@ $utilities: map.merge(
     ),
     // scss-docs-end utils-float
     // Object Fit utilities
+    // scss-docs-start utils-aspect-ratio
+    // Two halves: `.ratio-*` sets the token, and any element carrying such a class reads
+    // it. Splitting them is what lets `--#{$prefix}ratio` be overridden inline for a
+    // ratio the map does not name.
+    "aspect-ratio-attr": (
+      selector: "attr-includes",
+      class: "ratio-",
+      property: aspect-ratio,
+      values: var(--#{$prefix}ratio)
+    ),
+    "aspect-ratio": (
+      property: --#{$prefix}ratio,
+      class: ratio,
+      values: $aspect-ratios
+    ),
+    // scss-docs-end utils-aspect-ratio
     // scss-docs-start utils-object-fit
     "object-fit": (
       responsive: true,

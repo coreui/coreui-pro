@@ -1758,6 +1758,30 @@ Multi Select's option indicators moved with it — they render as a decorative
   longer adds a `-sm` class to the spinner it injects; the spinner follows the
   button's font size, so it now scales with `.btn-sm` and `.btn-lg`.
 
+### Helpers
+
+- **`.ratio` is now a native aspect-ratio utility.** The helper built its ratio from a
+  `::before` with a percentage `padding-top`, which required a wrapper and absolutely
+  positioned its only child. The class names are unchanged — `.ratio-1x1`, `.ratio-4x3`,
+  `.ratio-16x9`, `.ratio-21x9` — but they now set the CSS `aspect-ratio` property on the
+  element itself.
+
+  ```html
+  <!-- v5 -->
+  <div class="ratio ratio-16x9">
+    <iframe src="..."></iframe>
+  </div>
+
+  <!-- v6 -->
+  <iframe class="w-100 ratio-16x9" src="..."></iframe>
+  ```
+
+  The wrapper and the bare `.ratio` class are gone; put the ratio class on the element you
+  want sized. A custom ratio moves from a percentage to a ratio:
+  `--cui-aspect-ratio: 50%` becomes `--cui-ratio: 2 / 1`, on `.ratio-auto`. The
+  `$aspect-ratios` map moved from `helpers/_ratio.scss` to `_config.scss` and its values
+  are ratios rather than percentages.
+
 ### Sass architecture & design tokens
 
 v6 adopts the Bootstrap v6 SCSS architecture: CSS cascade layers, per-component

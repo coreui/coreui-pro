@@ -39,6 +39,8 @@ export default defineConfig({
     '/utilities/borders/': `${base}/utilities/border/`,
     '/utilities/text/': `${base}/utilities/font-size/`,
     '/utilities/interactions/': `${base}/utilities/user-select/`,
+    // `.ratio` became a native aspect-ratio utility in v6.
+    '/helpers/ratio/': `${base}/utilities/aspect-ratio/`,
   },
   outDir: '../_site',
   cacheDir: '../.cache/astro',
