@@ -1024,7 +1024,9 @@ $utilities: map.merge(
       values: map.merge(
         $utilities-links-underline,
         (
-          null: var(--#{$prefix}link-color),
+          // currentColor, so a themed link underlines in its own colour rather than
+          // the global link blue. Name a colour explicitly to break that pairing.
+          null: currentcolor,
         )
       )
     ),
