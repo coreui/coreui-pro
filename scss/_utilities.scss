@@ -940,8 +940,7 @@ $utilities: map.merge(
           "body-secondary": var(--#{$prefix}secondary-color),
           "body-tertiary": var(--#{$prefix}tertiary-color),
           "body-emphasis": var(--#{$prefix}emphasis-color),
-          "reset": inherit,
-          "disabled": var(--#{$prefix}tertiary-color)
+          "reset": inherit
         )
       )
     ),
