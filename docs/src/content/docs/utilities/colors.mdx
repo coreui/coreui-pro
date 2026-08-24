@@ -11,10 +11,9 @@ import { getData } from '@coreui/astro-docs/data'
 Colorize text with color utilities. If you want to colorize links, you can use the [`.link-*` helper classes](/helpers/colored-links/) which have `:hover` and `:focus` states.
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<p class="text-${c.name}${c.contrast_color ? ` bg-${c.contrast_color}` : ``}">.text-${c.name}</p>
+  ...getData('theme-colors').map((c) => `<p class="text-${c.name}${c.contrast_color ? ` bg-${c.contrast_color}`: ``}">.text-${c.name}</p>
 <p class="text-${c.name}-emphasis">.text-${c.name}-emphasis</p>`),
-  `
-<p class="text-body">.text-body</p>
+  `<p class="text-body">.text-body</p>
 <p class="text-body-emphasis">.text-body-emphasis</p>
 <p class="text-body-secondary">.text-body-secondary</p>
 <p class="text-body-tertiary">.text-body-tertiary</p>
