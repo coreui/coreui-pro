@@ -258,6 +258,7 @@ $range-slider-vertical-tokens: defaults(
 
   .range-slider-label {
     position: absolute;
+    padding: var(--#{$prefix}range-slider-label-padding-y) var(--#{$prefix}range-slider-label-padding-x);
     font-size: var(--#{$prefix}range-slider-label-font-size);
     color: var(--#{$prefix}range-slider-label-color);
     @include ltr-rtl("transform", translateX(-50%), null, translateX(50%));
