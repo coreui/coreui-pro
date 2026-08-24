@@ -965,6 +965,11 @@ adornment in the library — so the button needs no icon markup at all:
   It also takes `--cui-nav-link-hover-bg` and `--cui-nav-link-active-bg`, rounded
   by `--cui-nav-link-border-radius` — the base nav used to change text color
   alone. Set the two backgrounds to `transparent` to keep the old look.
+  Under a theme, hover marks itself with the fill or the line and the tone change
+  belongs to the active item: hover reads `--cui-theme-fg` and the lighter
+  `--cui-theme-bg-subtle`, active the darker `--cui-theme-fg-emphasis` and
+  `--cui-theme-bg-muted`. `.nav-underline-border`'s themed active link takes the
+  emphasis tone with them, where it used to take the theme's base color.
   `.nav-tabs`, `.nav-underline` and `.nav-underline-border` square the link off,
   and the two underline variants take neither fill, hover or active: they mark
   their state with a line, and a radius curves that line's ends while a fill says
