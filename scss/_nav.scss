@@ -237,7 +237,7 @@ $tab-pane-tokens: defaults(
 
     &.active,
     &:active {
-      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}nav-link-active-color));
+      color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-link-active-color));
       background-color: var(--#{$prefix}theme-bg-muted, var(--#{$prefix}nav-link-active-bg));
     }
 
@@ -341,7 +341,7 @@ $tab-pane-tokens: defaults(
     .nav-link.active,
     .show > .nav-link {
       font-weight: var(--#{$prefix}font-weight-bold);
-      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}nav-underline-link-active-color));
+      color: var(--#{$prefix}theme-fg, var(--#{$prefix}nav-underline-link-active-color));
       background-color: var(--#{$prefix}nav-link-active-bg);
       border-bottom-color: currentcolor;
     }
@@ -375,7 +375,7 @@ $tab-pane-tokens: defaults(
     .nav-link.active,
     .show > .nav-link {
       font-weight: var(--#{$prefix}font-weight-bold);
-      color: var(--#{$prefix}theme-fg-emphasis, var(--#{$prefix}nav-underline-border-link-active-color));
+      color: var(--#{$prefix}theme-base, var(--#{$prefix}nav-underline-border-link-active-color));
       background-color: var(--#{$prefix}nav-link-active-bg);
       border-bottom-color: currentcolor;
     }
