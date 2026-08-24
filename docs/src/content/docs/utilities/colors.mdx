@@ -39,7 +39,7 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 <AddedIn version="4.1.0" />
 
-As of v4.1.0, text color utilities are generated with Sass using CSS variables. This allows for real-time color changes without compilation and dynamic alpha transparency changes.
+Every `.text-*` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
 
 ### How it works
 
@@ -47,12 +47,15 @@ Consider our default `.text-primary` utility.
 
 ```css
 .text-primary {
+  --cui-text: var(--cui-primary);
   --cui-text-opacity: 1;
-  color: rgba(var(--cui-primary-rgb), var(--cui-text-opacity));
+  color: color-mix(in srgb, var(--cui-text) calc(var(--cui-text-opacity) * 100%), transparent);
 }
 ```
 
-We use an RGB version of our `--cui-primary` (with the value of `13, 110, 253`) CSS variable and attached a second CSS variable, `--cui-text-opacity`, for the alpha transparency (with a default value `1` thanks to a local CSS variable). That means anytime you use `.text-primary` now, your computed `color` value is `rgba(13, 110, 253, 1)`. The local CSS variable inside each `.text-*` class avoids inheritance issues so nested instances of the utilities don't automatically have a modified alpha transparency.
+The utility points `--cui-text` at the theme color and sets `--cui-text-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.text-primary` computes to the solid color by default.
+
+Both halves are separate knobs: override `--cui-text` to repaint the utility with another color, or `--cui-text-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
 
 ### Example
 
