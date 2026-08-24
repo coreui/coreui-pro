@@ -1,9 +1,26 @@
+@use "../functions/defaults" as *;
 @use "../mixins/lists" as *;
+@use "../mixins/tokens" as *;
 @use "../config" as *;
 
 // scss-docs-start list-variables
 $list-inline-padding:         .5rem !default;
 // scss-docs-end list-variables
+
+$list-inline-tokens: () !default;
+
+// stylelint-disable scss/dollar-variable-default
+
+// scss-docs-start list-inline-css-vars
+$list-inline-tokens: defaults(
+  (
+    --#{$prefix}list-inline-padding: #{$list-inline-padding},
+  ),
+  $list-inline-tokens
+);
+// scss-docs-end list-inline-css-vars
+
+// stylelint-enable scss/dollar-variable-default
 
 @layer content {
   .list-unstyled {
@@ -12,13 +29,14 @@ $list-inline-padding:         .5rem !default;
 
   // Inline turns list items into inline-block
   .list-inline {
+    @include tokens($list-inline-tokens);
     @include list-unstyled();
   }
   .list-inline-item {
     display: inline-block;
 
     &:not(:last-child) {
-      margin-inline-end: $list-inline-padding;
+      margin-inline-end: var(--#{$prefix}list-inline-padding);
     }
   }
 }
