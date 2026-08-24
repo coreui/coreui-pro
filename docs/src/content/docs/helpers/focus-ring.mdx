@@ -6,15 +6,23 @@ description: "Utility classes that allows you to add and modify custom focus rin
 
 import { getData } from '@coreui/astro-docs/data'
 
-The `.focus-ring` helper removes the default `outline` on `:focus`, replacing it with a `box-shadow` that can be more broadly customized. The new shadow is made up of a series of CSS variables, inherited from the `:root` level, that can be modified for any element or component.
+The `.focus-ring` helper replaces the browser's default focus indicator with one of our own on `:focus-visible`. It is an `outline`, sized and coloured from a series of CSS variables inherited from the `:root` level, so it can be modified for any element or component.
 
 ## Example
 
-Click directly on the link below to see the focus ring in action, or into the example below and then press <kbd>Tab</kbd>.
+Tab to the link below to see the focus ring. Clicking it will not show one — the helper styles `:focus-visible`, which the browser reserves for keyboard focus.
 
 <Example code={`<a href="#" class="d-inline-flex focus-ring py-1 px-2 text-decoration-none border rounded-2">
     Custom focus ring
   </a>`} />
+
+## Variants
+
+Pair `.focus-ring` with a [theme color](/customize/theme/) class to recolour the ring. The helper reads `--cui-theme-focus-ring`, which every `.theme-*` class sets, so the ring follows the element's theme rather than needing its own class.
+
+<Example class="vstack gap-2 align-items-start" code={getData('theme-colors').map((c) => `<a href="#" class="d-inline-flex focus-ring theme-${c.name} py-1 px-2 text-decoration-none border rounded-2">${c.title} focus</a>`)} />
+
+Use this when the element already carries a theme; reach for the `.focus-ring-*` utilities below when you only want to change the ring.
 
 ## Customizing
 
