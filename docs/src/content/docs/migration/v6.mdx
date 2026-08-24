@@ -927,6 +927,13 @@ adornment in the library — so the button needs no icon markup at all:
 
 #### Range / Range Slider
 
+- **A theme beats `--cui-range-thumb-bg`, as everywhere else.** The token carried
+  the `--cui-theme-*` slot inside its own default, so setting it inside a themed
+  container dropped the theme. The slot sits on the property now.
+- **`--cui-range-slider-label-padding-x`/`-y` reach the label.** Both were
+  declared and nothing read them, so the knob existed and did nothing. They
+  default to `0`, so no label moves.
+
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
   **The pressed thumb adapts to the color mode.** Its color was 70% white
   mixed into the theme color at build time, so in dark mode the pressed
