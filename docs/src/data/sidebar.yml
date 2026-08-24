@@ -330,8 +330,6 @@
       to: /helpers/clearfix/
     - title: Color & background
       to: /helpers/color-background/
-    - title: Colored links
-      to: /helpers/colored-links/
     - title: Focus ring
       to: /helpers/focus-ring/
     - title: Hover lift

@@ -1760,6 +1760,33 @@ Multi Select's option indicators moved with it — they render as a decorative
 
 ### Helpers
 
+- **`.link-{color}` is gone; a theme class colours a link.** Reboot resolves a
+  link's colour from `--cui-theme-fg`, which every `.theme-*` class sets, so the
+  colour follows the theme instead of needing its own class:
+
+  ```html
+  <!-- v5 -->
+  <a href="#" class="link-primary link-underline-opacity-25">Primary link</a>
+
+  <!-- v6 -->
+  <a href="#" class="theme-primary link-underline link-underline-opacity-25">Primary link</a>
+  ```
+
+  Two things change beyond the class name. The theme slot is a **tone picked for
+  text** rather than the raw brand colour — it darkens on a light background and
+  lightens on a dark one, where `.link-*` gave the same colour in both, so the
+  link is more readable in dark mode and slightly different in light. And the
+  underline needs `.link-underline` to carry it; its colour now defaults to
+  `currentColor`, so it follows the theme unless you name one with
+  `.link-underline-{color}`.
+
+  `.link-body-emphasis` becomes `.text-body-emphasis`.
+
+  The removed classes also computed their `:hover` colour in Sass, which froze it
+  at build time — overriding `--cui-primary` at runtime never reached the hover
+  state. The theme slots are tokens, so it does.
+
+
 - **`.ratio` is now a native aspect-ratio utility.** The helper built its ratio from a
   `::before` with a percentage `padding-top`, which required a wrapper and absolutely
   positioned its only child. The class names are unchanged — `.ratio-1x1`, `.ratio-4x3`,

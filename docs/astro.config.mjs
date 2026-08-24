@@ -41,6 +41,8 @@ export default defineConfig({
     '/utilities/interactions/': `${base}/utilities/user-select/`,
     // `.ratio` became a native aspect-ratio utility in v6.
     '/helpers/ratio/': `${base}/utilities/aspect-ratio/`,
+    // `.link-{color}` gave way to the theme classes in v6.
+    '/helpers/colored-links/': `${base}/utilities/link/`,
   },
   outDir: '../_site',
   cacheDir: '../.cache/astro',
