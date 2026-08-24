@@ -68,7 +68,7 @@ A `.theme-{color}` class is generated for every key of `$theme-colors`. It sets 
 
 Because the tokens are ordinary custom properties, they inherit: put a `.theme-*` class on a container and every themeable component inside follows it. Components read the slots only as defaults of their own tokens, so an explicit component token override still wins over the region's theme.
 
-<Example html={[`<div class="theme-primary d-flex gap-2 align-items-center">`, `    <span class="badge">Regional</span>`, `    <span class="badge theme-danger">Local override</span>`, `  </div>`]} />
+<Example html={[`<div class="theme-primary d-flex gap-2 align-items-center">`, `  <span class="badge">Regional</span>`, `  <span class="badge theme-danger">Local override</span>`, `</div>`]} />
 
 ## Adding a theme color
 
@@ -102,7 +102,7 @@ Four style utilities pair a themed surface with its matching text color — comp
 
 <ScssDocs file="scss/_utilities.scss" capture="utils-theme" />
 
-<Example html={[`<div class="theme-success d-flex flex-column gap-2">`, `    <div class="theme-contrast p-2 rounded">Solid surface with contrast text</div>`, `    <div class="theme-subtle p-2 rounded">Subtle surface with readable text</div>`, `    <div class="theme-muted p-2 rounded">Muted surface with emphasis text</div>`, `    <div class="theme-border p-2 rounded">Themed border</div>`, `  </div>`]} />
+<Example html={[`<div class="theme-success d-flex flex-column gap-2">`, `  <div class="theme-contrast p-2 rounded">Solid surface with contrast text</div>`, `  <div class="theme-subtle p-2 rounded">Subtle surface with readable text</div>`, `  <div class="theme-muted p-2 rounded">Muted surface with emphasis text</div>`, `  <div class="theme-border p-2 rounded">Themed border</div>`, `</div>`]} />
 
 ## Customizing
 

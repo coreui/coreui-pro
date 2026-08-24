@@ -49,7 +49,7 @@ To see how a component consumes these tokens, here's the badge in `scss/_badge.s
 
 With no theme class the badge stays neutral; add `.theme-success` and the very same element resolves the success tokens — no `.badge-success` selector required. Structural variants compose with any theme:
 
-<Example html={[`<span class="badge">Default</span>`, `  <span class="badge theme-success">Success</span>`, `  <span class="badge badge-subtle theme-success">Success</span>`, `  <span class="badge badge-outline theme-success">Success</span>`]} />
+<Example html={[`<span class="badge">Default</span>`, `<span class="badge theme-success">Success</span>`, `<span class="badge badge-subtle theme-success">Success</span>`, `<span class="badge badge-outline theme-success">Success</span>`]} />
 
 Because the theme tokens are plain CSS variables, you can also scope a theme to a container and let everything inside inherit it, or define a brand of your own without recompiling:
 
@@ -102,7 +102,7 @@ For more information and examples on how to modify our Sass maps and variables, 
 
 We encourage you to adopt these guidelines when building with CoreUI for Bootstrap to create your own components. We've extended this approach ourselves to the custom components in our documentation and examples. Components like our callouts are built just like our provided components with base and modifier classes.
 
-<Example html={[`<div class="docs-callout my-0">`, `    <strong>This is a callout.</strong> We built it custom for our docs so our messages to you stand out. It has three variants via modifier classes.`, `  </div>`]} />
+<Example html={[`<div class="docs-callout my-0">`, `  <strong>This is a callout.</strong> We built it custom for our docs so our messages to you stand out. It has three variants via modifier classes.`, `</div>`]} />
 
 ```html
 <div class="callout">...</div>
