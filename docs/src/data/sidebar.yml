@@ -340,8 +340,6 @@
       to: /helpers/icon-link/
     - title: Position
       to: /helpers/position/
-    - title: Ratio
-      to: /helpers/ratio/
     - title: Stacks
       to: /helpers/stacks/
     - title: Stretched link
@@ -360,6 +358,8 @@
   pages:
     - title: API
       to: /utilities/api/
+    - title: Aspect ratio
+      to: /utilities/aspect-ratio/
     - title: Align content
       to: /utilities/align-content/
     - title: Align items
