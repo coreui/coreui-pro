@@ -559,22 +559,6 @@ Menus include built-in keyboard support for navigating menu items.
 | `Home` / `End` | Jump to first/last menu item |
 | `Tab` | Move focus and close the menu |
 
-## CSS
-
-### Variables
-
-<ScssDocs file="scss/_menu.scss" capture="menu-css-vars" />
-
-### Sass variables
-
-<ScssDocs file="scss/_menu.scss" capture="menu-variables" />
-
-<Callout>
-Menu items include at least one variable that is not set on `.menu`. This allows you to provide a new value while CoreUI defaults to a fallback value.
-
-- `--cui-menu-item-border-radius`
-</Callout>
-
 ## Usage
 
 Via data attributes or JavaScript, the menu plugin toggles hidden content (menus) by toggling the `.show` class on the `.menu`. The `data-coreui-toggle="menu"` attribute is relied on for closing menus at an application level, so it’s a good idea to always use it.
@@ -681,3 +665,19 @@ myMenu.addEventListener('show.coreui.menu', event => {
   // do something...
 })
 ```
+
+## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/_menu.scss" capture="menu-css-vars" />
+
+### SASS variables
+
+<ScssDocs file="scss/_menu.scss" capture="menu-variables" />
+
+<Callout>
+Menu items include at least one variable that is not set on `.menu`. This allows you to provide a new value while CoreUI defaults to a fallback value.
+
+- `--cui-menu-item-border-radius`
+</Callout>

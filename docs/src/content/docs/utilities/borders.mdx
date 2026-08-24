@@ -66,7 +66,7 @@ Or modify the default `border-color` of a component:
 
 <AddedIn version="4.2.6" />
 
-Bootstrap `border-{color}` utilities are generated with Sass using CSS variables. This allows for real-time color changes without compilation and dynamic alpha transparency changes.
+Every `.border-{color}` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
 
 ### How it works
 
@@ -74,12 +74,15 @@ Consider our default `.border-success` utility.
 
 ```css
 .border-success {
+  --cui-border: var(--cui-success);
   --cui-border-opacity: 1;
-  border-color: rgba(var(--cui-success-rgb), var(--cui-border-opacity));
+  border-color: color-mix(in srgb, var(--cui-border) calc(var(--cui-border-opacity) * 100%), transparent);
 }
 ```
 
-We use an RGB version of our `--cui-success` (with the value of `25, 135, 84`) CSS variable and attached a second CSS variable, `--cui-border-opacity`, for the alpha transparency (with a default value `1` thanks to a local CSS variable). That means anytime you use `.border-success` now, your computed `color` value is `rgba(25, 135, 84, 1)`. The local CSS variable inside each `.border-*` class avoids inheritance issues so nested instances of the utilities don't automatically have a modified alpha transparency.
+The utility points `--cui-border` at the theme color and sets `--cui-border-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.border-success` computes to the solid color by default.
+
+Both halves are separate knobs: override `--cui-border` to repaint the utility with another color, or `--cui-border-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
 
 ### Example
 
@@ -204,7 +207,7 @@ can be dropped anywhere it stops making sense.
 
 <ScssDocs file="scss/_root.scss" capture="root-border-var" />
 
-### Sass variables
+### SASS variables
 
 <ScssDocs file="scss/_config.scss" capture="border-variables" />
 <ScssDocs file="scss/_root.scss" capture="border-variables" />

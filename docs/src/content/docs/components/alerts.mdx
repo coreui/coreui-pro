@@ -156,7 +156,7 @@ Add `.alert-solid` for a high-contrast alert. The background takes the theme col
 Using the JavaScript plugin, you can remove any alert.
 
 - Ensure that you've loaded the Bootstrap alert plugin or the compiled CoreUI JavaScript.
-- Add a [close button](/components/close-button//) as a child of the alert. It is pushed to the end of the alert on its own — the `.alert-dismissible` class is no longer required.
+- Add a [close button](/components/close-button/) as a child of the alert. It is pushed to the end of the alert on its own — the `.alert-dismissible` class is no longer required.
 - `.alert-dismissible` no longer carries any styling. Markup that still has it renders the same, so there is nothing to remove, but the close button has to be a direct child of the alert to be pushed to its end — a button nested in a wrapper is laid out by that wrapper.
 - On the close button, include the `data-coreui-dismiss="alert"` attribute, which triggers the JavaScript functionality. You must use the `<button>` element with it for proper behavior across all devices.
 - Every alert fades out when dismissed — the JavaScript marks it with `.hiding` for the length of the transition, then removes it. Add `.alert-instant` to an alert that should go at once, or retime the fade with `--cui-alert-transition-duration` and `--cui-alert-transition-timing`.

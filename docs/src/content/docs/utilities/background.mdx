@@ -40,7 +40,7 @@ Do you need a gradient in your custom CSS? Just add `background-image: var(gradi
 
 <AddedIn version="4.1.0" />
 
-As of v4.1.0, `background-color` utilities are generated with Sass using CSS variables. This allows for real-time color changes without compilation and dynamic alpha transparency changes.
+Every `.bg-*` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
 
 ### How it works
 
@@ -48,12 +48,15 @@ Consider our default `.bg-success` utility.
 
 ```css
 .bg-success {
+  --cui-bg: var(--cui-success);
   --cui-bg-opacity: 1;
-  background-color: rgba(var(--cui-success-rgb), var(--cui-bg-opacity));
+  background-color: color-mix(in srgb, var(--cui-bg) calc(var(--cui-bg-opacity) * 100%), transparent);
 }
 ```
 
-We use an RGB version of our `--cui-success` (with the value of `25, 135, 84`) CSS variable and attached a second CSS variable, `--cui-bg-opacity`, for the alpha transparency (with a default value `1` thanks to a local CSS variable). That means anytime you use `.bg-success` now, your computed `color` value is `rgba(25, 135, 84, 1)`. The local CSS variable inside each `.bg-*` class avoids inheritance issues so nested instances of the utilities don't automatically have a modified alpha transparency.
+The utility points `--cui-bg` at the theme color and sets `--cui-bg-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.bg-success` computes to the solid color by default.
+
+Both halves are separate knobs: override `--cui-bg` to repaint the utility with another color, or `--cui-bg-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
 
 ### Example
 
