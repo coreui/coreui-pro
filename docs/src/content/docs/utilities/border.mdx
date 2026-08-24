@@ -1,0 +1,73 @@
+---
+title: "Bootstrap 6 Border"
+name: "Border"
+description: "Use border utilities to add or remove an element's borders, and to set how thick they are."
+---
+
+## Additive
+
+Use border utilities to add or remove an element's borders. Choose from all borders or one at a time.
+
+<Example class="docs-example-border-utils" code={`<span class="border"></span>
+  <span class="border-top"></span>
+  <span class="border-end"></span>
+  <span class="border-bottom"></span>
+  <span class="border-start"></span>`} />
+
+## Subtractive
+
+Or remove borders:
+
+<Example class="docs-example-border-utils" code={`<span class="border border-0"></span>
+  <span class="border border-top-0"></span>
+  <span class="border border-end-0"></span>
+  <span class="border border-bottom-0"></span>
+  <span class="border border-start-0"></span>`} />
+
+## Width
+
+<AddedIn version="6.0.0" /> `.border-keyline` sits below `1px`, for a hairline that stays hairline on a high-density screen instead of thickening to a full device pixel.
+
+<Example class="docs-example-border-utils" code={`<span class="border border-keyline"></span>
+  <span class="border border-1"></span>
+  <span class="border border-2"></span>
+  <span class="border border-3"></span>
+  <span class="border border-4"></span>
+  <span class="border border-5"></span>
+
+  <span class="border border-1 border-info"></span>
+  <span class="border border-2 border-info"></span>
+  <span class="border border-3 border-info"></span>
+  <span class="border border-4 border-info"></span>
+  <span class="border border-5 border-info"></span>
+
+  <span class="border-start border-start-keyline"></span>
+  <span class="border-start border-start-1"></span>
+  <span class="border-start border-start-2"></span>
+  <span class="border-start border-start-3"></span>
+  <span class="border-start border-start-4"></span>
+  <span class="border-start border-start-5"></span>
+
+  <span class="border-start border-start-1 border-start-info"></span>
+  <span class="border-start border-start-2 border-start-info"></span>
+  <span class="border-start border-start-3 border-start-info"></span>
+  <span class="border-start border-start-4 border-start-info"></span>
+  <span class="border-start border-start-5 border-start-info"></span>`} />
+
+## Customizing
+
+### CSS variables
+
+<ScssDocs file="scss/_root.scss" capture="root-border-var" />
+
+### SASS variables
+
+<ScssDocs file="scss/_config.scss" capture="border-variables" />
+<ScssDocs file="scss/_root.scss" capture="border-variables" />
+<ScssDocs file="scss/_utilities.scss" capture="border-variables" />
+
+Border utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-border-sides" />
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-border-width" />

@@ -1,0 +1,89 @@
+---
+title: "Bootstrap 6 Border Color"
+name: "Border color"
+description: "Change the border color of an element with utilities built on our theme colors, and fade it with the opacity utilities."
+---
+
+import { getData } from '@coreui/astro-docs/data'
+
+## Color
+
+Change the border color using utilities built on our theme colors.
+
+<Example class="docs-example-border-utils" code={[...getData('theme-colors').map((c) => `<span class="border border-${c.name}"></span>
+  <span class="border border-${c.name}-subtle"></span>`), ``, `  <span class="border border-black"></span>
+  <span class="border border-white"></span>`]} />
+
+Using utilities you can change the border on one side only, or you can change all borders to make them different colors.
+
+<Example class="docs-example-border-utils" code={`<span class="border-top border-top-primary"></span>
+  <span class="border-end border-end-primary"></span>
+  <span class="border-bottom border-bottom-primary"></span>
+  <span class="border-start border-start-primary"></span>
+  <span class="border-start border-start-primary border-end border-end-danger"></span>
+  <span class="border-top border-top-primary border-end border-end-danger border-bottom border-bottom-success"></span>
+  <span class="border border-top-primary border-end-danger border-bottom-success border-start-info"></span>`} />
+
+## Recoloring a component
+
+The same utilities repaint the border a component ships with:
+
+<Example code={`<div class="mb-4">
+    <label for="exampleFormControlInput1" class="form-label">Email address</label>
+    <input type="email" class="form-control border-success" id="exampleFormControlInput1" placeholder="name@example.com">
+  </div>
+
+  <div class="h4 pb-2 mb-4 text-danger border-bottom border-danger">
+    Dangerous heading
+  </div>
+
+  <div class="p-3 bg-info bg-opacity-10 border border-info border-start-0 rounded-end">
+    Changing border color and width
+  </div>`} />
+
+## Opacity
+
+<AddedIn version="4.2.6" />
+
+Every `.border-{color}` utility resolves its color in the browser, so both the color and its alpha transparency can change without recompiling Sass.
+
+### How it works
+
+Consider our default `.border-success` utility.
+
+```css
+.border-success {
+  --cui-border: var(--cui-success);
+  --cui-border-opacity: 1;
+  border-color: color-mix(in srgb, var(--cui-border) calc(var(--cui-border-opacity) * 100%), transparent);
+}
+```
+
+The utility points `--cui-border` at the theme color and sets `--cui-border-opacity` to `1`. `color-mix()` then fades that color toward `transparent` by whatever share the opacity leaves, so `.border-success` computes to the solid color by default.
+
+Both halves are separate knobs: override `--cui-border` to repaint the utility with another color, or `--cui-border-opacity` to change only the alpha. Both are declared on the class itself, so a nested instance of the utility starts from the default again instead of inheriting a modified transparency.
+
+### Example
+
+To change that opacity, override `--cui-border-opacity` via custom styles or inline styles.
+
+<Example code={`<div class="border border-success p-2 mb-2">This is default success border</div>
+  <div class="border border-success p-2" style="--cui-border-opacity: .5;">This is 50% opacity success border</div>`} />
+
+Or, choose from any of the `.border-opacity` utilities:
+
+<Example code={`<div class="border border-success p-2 mb-2">This is default success border</div>
+  <div class="border border-success p-2 mb-2 border-opacity-75">This is 75% opacity success border</div>
+  <div class="border border-success p-2 mb-2 border-opacity-50">This is 50% opacity success border</div>
+  <div class="border border-success p-2 mb-2 border-opacity-25">This is 25% opacity success border</div>
+  <div class="border border-success p-2 border-opacity-10">This is 10% opacity success border</div>`} />
+
+## Customizing
+
+### SASS variables
+
+Border color utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-border-color" />
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-border-color-subtle" />

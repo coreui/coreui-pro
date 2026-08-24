@@ -14,7 +14,7 @@ A Bootstrap card component is a content container. It incorporates options for i
 
 ## Example
 
-Cards are built with as little markup and styles as possible but still manage to deliver a bunch of control and customization. Built with flexbox, they offer easy alignment and mix well with other Bootstrap components. Cards have no top, left, and right margins by default, so use [spacing utilities](/utilities/spacing/) as needed. They have no fixed width to start, so they'll fill the full width of its parent.
+Cards are built with as little markup and styles as possible but still manage to deliver a bunch of control and customization. Built with flexbox, they offer easy alignment and mix well with other Bootstrap components. Cards have no top, left, and right margins by default, so use [spacing utilities](/utilities/margin/) as needed. They have no fixed width to start, so they'll fill the full width of its parent.
 
 Below is an example of a basic card with mixed content and a fixed width. Cards have no fixed width to start, so they'll naturally fill the full width of its parent element. This is easily customized with our various [sizing options](#sizing).
 
@@ -214,7 +214,7 @@ Using the grid, wrap cards in columns and rows as needed.
 
 ### Using utilities
 
-Use some of [available sizing utilities](/utilities/sizing/) to rapidly set a card's width.
+Use some of [available sizing utilities](/utilities/width/) to rapidly set a card's width.
 
 <Example code={`<div class="card w-75 mb-3">
     <div class="card-body">
@@ -246,9 +246,9 @@ Use custom CSS in your stylesheets or as inline styles to set a width.
 
 ## Text alignment
 
-You can instantly change the text arrangement of any card—in its whole or specific parts—with [text align classes](/utilities/text/#text-alignment).
+You can instantly change the text arrangement of any card—in its whole or specific parts—with [text align classes](/utilities/text-alignment/).
 
-`text-align` reaches the text but not the body's own flex items, so a button or a link stays at the start of the card. Move it with a [margin utility](/utilities/spacing/): `.mx-auto` to centre it, `.ms-auto` to push it to the end.
+`text-align` reaches the text but not the body's own flex items, so a button or a link stays at the start of the card. Move it with a [margin utility](/utilities/margin/): `.mx-auto` to centre it, `.ms-auto` to push it to the end.
 
 <Example code={`<div class="card mb-3" style="width: 18rem;">
     <div class="card-body">
@@ -414,7 +414,7 @@ Relying on color to convey meaning creates a visual cue that assistive technolog
 
 ### Border
 
-Use [border utilities](/utilities/borders/) to change just the `border-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
+Use [border utilities](/utilities/border/) to change just the `border-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
 
 <Example code={getData('theme-colors').map((c) => `<div class="card border-${c.name} mb-3" style="max-width: 18rem;">
     <div class="card-header">Header</div>
@@ -426,7 +426,7 @@ Use [border utilities](/utilities/borders/) to change just the `border-color` of
 
 ### Top border
 
-Use [border utilities](/utilities/borders/) to change just the `border-top-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
+Use [border utilities](/utilities/border/) to change just the `border-top-color` of a card. Note that you can put `.text-{color}` classes on the parent `.card` or a subset of the card's contents as shown below.
 
 <Example code={getData('theme-colors').map((c) => `<div class="card border-top-${c.name} border-top-3 mb-3" style="max-width: 18rem;">
     <div class="card-header">Header</div>

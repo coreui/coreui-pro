@@ -9,7 +9,7 @@ You can find and customize these variables for key global options in CoreUI for 
 
 | Variable                       | Values                             | Description                                                                            |
 | ------------------------------ | ---------------------------------- | -------------------------------------------------------------------------------------- |
-| `$spacer`                      | `1rem` (default), or any value > 0 | Specifies the default spacer value to programmatically generate our [spacer utilities](/utilities/spacing/). |
+| `$spacer`                      | `1rem` (default), or any value > 0 | Specifies the default spacer value to programmatically generate our [spacer utilities](/utilities/margin/). |
 | `$enable-dark-mode`            | `true` (default) or `false`        | Enables built-in [dark mode support](/customize/color-modes/#dark-mode) across the project and its components. |
 | `$enable-rounded`              | `true` (default) or `false`        | Enables predefined `border-radius` styles on various components. |
 | `$enable-shadows`              | `true` or `false` (default)        | Enables predefined decorative `box-shadow` styles on various components. Does not affect `box-shadow`s used for focus states. |
@@ -21,7 +21,7 @@ You can find and customize these variables for key global options in CoreUI for 
 | `$enable-caret`                | `true` (default) or `false`        | Enables pseudo element caret on `.dropdown-toggle`. |
 | `$enable-button-pointers`      | `true` (default) or `false`        | Add "hand" cursor to non-disabled button elements. |
 | `$enable-validation-icons`     | `true` (default) or `false`        | Enables `background-image` icons within textual inputs and some custom forms for validation states. |
-| `$enable-negative-margins`     | `true` or `false` (default)        | Enables the generation of [negative margin utilities](/utilities/spacing/#negative-margin). |
+| `$enable-negative-margins`     | `true` or `false` (default)        | Enables the generation of [negative margin utilities](/utilities/margin/#negative-margin). |
 | `$enable-deprecation-messages` | `true` (default) or `false`        | Set to `false` to hide warnings when using any of the deprecated variables, mixins and functions that are planned to be removed in the next major. |
 | `$enable-deprecated-form-check` | `true` (default) or `false`       | Keeps the v5 form check spelling — `.form-check`, `.form-check-input`, `.form-check-label`, `.form-check-inline`, `.form-switch` — as aliases of [`.form-field`](/forms/field/), [`.check`](/forms/checkbox/), [`.radio`](/forms/radio/) and [`.switch`](/forms/switch/). Set to `false` once your markup has moved; that removes every `.form-check*` selector and takes 455 bytes gzip off the stylesheet. Removed in v7. |
 | `$enable-important-utilities`  | `true` or `false` (default)        | Adds the `!important` suffix to utility classes. Off since v6: utilities are emitted in the last [cascade layer](/migration/v6/#cascade-layers), so they already beat every component. Turn it on if your own CSS sits outside a layer and has to lose to utilities — unlayered styles beat every layer. |

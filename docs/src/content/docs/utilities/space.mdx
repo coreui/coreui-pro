@@ -1,0 +1,66 @@
+---
+title: "Bootstrap 6 Space Between"
+name: "Space between"
+description: "Space siblings in a plain flow layout, where gap has no container to work from."
+---
+
+## Overview
+
+`gap` needs a flex or grid container. When the layout is plain flow — stacked
+blocks, an inline row of links — `space-x-*` and `space-y-*` put the spacing on
+the children themselves: every child except the last one gets a margin.
+
+<Example code={`<div class="space-y-3">
+    <div class="p-2 border">First</div>
+    <div class="p-2 border">Second</div>
+    <div class="p-2 border">Third</div>
+  </div>`} />
+
+## Horizontal
+
+`space-x-*` does the same along the inline axis. It reads the writing direction,
+so in a right-to-left document the spacing lands on the correct side without
+another class.
+
+<Example code={`<div class="space-x-3">
+    <a href="#">First</a>
+    <a href="#">Second</a>
+    <a href="#">Third</a>
+  </div>`} />
+
+## Changing axis across breakpoints
+
+Both are responsive and take the same `0`–`5` steps from the `$spacers` map as
+every other spacing utility. Combining the two axes is the usual reason to reach
+for them: a stack on small screens that becomes a row further up needs the
+spacing to change axis with it.
+
+<Example code={`<div class="d-md-flex space-y-3 space-y-md-0 space-x-md-3">
+    <div class="p-2 border">First</div>
+    <div class="p-2 border">Second</div>
+    <div class="p-2 border">Third</div>
+  </div>`} />
+
+`space-y-3` spaces the stack, `space-y-md-0` drops that spacing once the items
+sit in a row, and `space-x-md-3` takes over along the inline axis.
+
+## How it works
+
+<Callout color="info">
+  The generated rule is wrapped in `:where()`, so it adds **no specificity**: a
+  child that sets its own margin — a utility, or a component that ships with
+  one — still wins, and you never need `!important` to escape the container's
+  spacing.
+</Callout>
+
+## Customizing
+
+### SASS variables
+
+Space utilities are generated from the `$spacers` map.
+
+<ScssDocs file="scss/_config.scss" capture="spacer-variables-maps" />
+
+Space utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-space" />

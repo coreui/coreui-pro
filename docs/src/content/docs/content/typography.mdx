@@ -6,7 +6,7 @@ description: "Documentation and examples for Bootstrap typography, including glo
 
 ## Global settings
 
-CoreUI for Bootstrap sets basic global display, typography, and link styles. When more control is needed, check out the [textual utility classes](/utilities/text/).
+CoreUI for Bootstrap sets basic global display, typography, and link styles. When more control is needed, check out the [textual utility classes](/utilities/font-size/).
 
 - Use a [native font stack](/content/reboot/#native-font-stack) that selects the best `font-family` for each OS and device.
 - For a more inclusive and accessible type scale, we use the browser's default root `font-size` (typically 16px) so visitors can customize their browser defaults as needed.
@@ -114,7 +114,7 @@ While not shown above, feel free to use `<b>` and `<i>` in HTML5. `<b>` is meant
 
 ## Text utilities
 
-Change text alignment, transform, style, weight, line-height, decoration and color with our [text utilities](/utilities/text/) and [color utilities](/utilities/colors/).
+Change text alignment, transform, style, weight, line-height, decoration and color with our [text utilities](/utilities/font-size/) and [color utilities](/utilities/colors/).
 
 ## Abbreviations
 
@@ -243,7 +243,7 @@ Align terms and descriptions horizontally by using our grid system's predefined 
 
 Headings scale with the viewport: the larger sizes are written as `clamp()`, so they grow with the screen up to the size given as the ceiling and stop there.
 
-The same sizes are on `:root` as `--cui-font-size-*` tokens, one per stop of the `$font-sizes` scale, and reachable as [font size utilities](/utilities/text/#font-size) — `.fs-xs` through `.fs-4xl`, or `.text-*` for the size plus the leading that belongs to it. Use them to give a non-heading element a heading's size without also giving it a heading's weight.
+The same sizes are on `:root` as `--cui-font-size-*` tokens, one per stop of the `$font-sizes` scale, and reachable as [font size utilities](/utilities/font-size/) — `.fs-xs` through `.fs-4xl`, or `.text-*` for the size plus the leading that belongs to it. Use them to give a non-heading element a heading's size without also giving it a heading's weight.
 
 ## Customizing
 

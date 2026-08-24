@@ -360,26 +360,56 @@
   pages:
     - title: API
       to: /utilities/api/
+    - title: Align content
+      to: /utilities/align-content/
+    - title: Align items
+      to: /utilities/align-items/
+    - title: Align self
+      to: /utilities/align-self/
     - title: Background
       to: /utilities/background/
-    - title: Borders
-      to: /utilities/borders/
+    - title: Border
+      to: /utilities/border/
+    - title: Border color
+      to: /utilities/border-color/
+    - title: Border radius
+      to: /utilities/border-radius/
     - title: Colors
       to: /utilities/colors/
     - title: Container queries
       to: /utilities/container-queries/
-    - title: Display
+    - title: Display property
       to: /utilities/display/
+    - title: Divide
+      to: /utilities/divide/
     - title: Flex
       to: /utilities/flex/
     - title: Float
       to: /utilities/float/
+    - title: Font family
+      to: /utilities/font-family/
+    - title: Font size
+      to: /utilities/font-size/
+    - title: Font style
+      to: /utilities/font-style/
+    - title: Font weight
+      to: /utilities/font-weight/
+    - title: Gap
+      to: /utilities/gap/
     - title: Grid
       to: /utilities/grid/
-    - title: Interactions
-      to: /utilities/interactions/
+    - title: Height
+      to: /utilities/height/
+    - title: Justify content
+      to: /utilities/justify-content/
+    - title: Justify items
+      to: /utilities/justify-items/
+    - title: Line height
+      to: /utilities/line-height/
     - title: Link
       to: /utilities/link/
+    - title: Margin
+      to: /utilities/margin/
     - title: Motion
       to: /utilities/motion/
     - title: Object fit
@@ -388,20 +418,34 @@
       to: /utilities/opacity/
     - title: Overflow
       to: /utilities/overflow/
+    - title: Padding
+      to: /utilities/padding/
+    - title: Place items
+      to: /utilities/place-items/
+    - title: Pointer events
+      to: /utilities/pointer-events/
     - title: Position
       to: /utilities/position/
     - title: Shadows
       to: /utilities/shadows/
-    - title: Sizing
-      to: /utilities/sizing/
-    - title: Spacing
-      to: /utilities/spacing/
-    - title: Text
-      to: /utilities/text/
-    - title: Vertical align
+    - title: Space between
+      to: /utilities/space/
+    - title: Text alignment
+      to: /utilities/text-alignment/
+    - title: Text decoration
+      to: /utilities/text-decoration/
+    - title: Text transform
+      to: /utilities/text-transform/
+    - title: Text wrapping
+      to: /utilities/text-wrapping/
+    - title: User select
+      to: /utilities/user-select/
+    - title: Vertical alignment
       to: /utilities/vertical-align/
     - title: Visibility
       to: /utilities/visibility/
+    - title: Width
+      to: /utilities/width/
     - title: Z-index
       to: /utilities/z-index/
 - title: Templates

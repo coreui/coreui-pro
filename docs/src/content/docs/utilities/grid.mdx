@@ -57,37 +57,9 @@ On our `.grid` component the same job is done by `--cui-columns`, which takes an
 
 ## Alignment
 
-`align-items` and `align-self` position items on the block axis, and they work in both flexbox and grid — they are covered under [flex utilities](/utilities/flex/#align-items). The inline axis is grid-only.
+`align-items` and `align-self` position items on the block axis, and they work in both flexbox and grid — they are covered under [flex utilities](/utilities/align-items/). The inline axis is grid-only.
 
-### Justify items
-
-`.justify-items-{start|end|center|stretch}` sets the inline-axis alignment for every item in the container.
-
-<Example class="docs-example-cssgrid" code={`<div class="d-grid grid-cols-3 justify-items-center gap-2">
-    <div>1</div>
-    <div>2</div>
-    <div>3</div>
-  </div>`} />
-
-### Justify self
-
-`.justify-self-{start|end|center}` overrides that alignment for one item.
-
-<Example class="docs-example-cssgrid" code={`<div class="d-grid grid-cols-3 justify-items-start gap-2">
-    <div>1</div>
-    <div class="justify-self-end">Pushed to the end</div>
-    <div>3</div>
-  </div>`} />
-
-### Place items
-
-`.place-items-{start|end|center|stretch}` sets both axes at once — it is the shorthand for `align-items` and `justify-items` together.
-
-<Example class="docs-example-cssgrid" code={`<div class="d-grid grid-cols-3 place-items-center gap-2" style="height: 120px">
-    <div>1</div>
-    <div>2</div>
-    <div>3</div>
-  </div>`} />
+The inline axis is grid-only: see [justify items](/utilities/justify-items/) and [place items](/utilities/place-items/).
 
 ## Responsive
 
@@ -102,10 +74,8 @@ Every utility on this page has responsive variants at each [breakpoint](/layout/
 
 ## Customizing
 
-### SASS
+### SASS variables
 
 <ScssDocs file="scss/_utilities.scss" capture="utils-grid" />
 
-<ScssDocs file="scss/_utilities.scss" capture="utils-justify-items" />
-
-Both blocks live in the `$utilities` map, so the [utility API](/utilities/api/) can extend, restrict or remove them like any other family.
+The block lives in the `$utilities` map, so the [utility API](/utilities/api/) can extend, restrict or remove it like any other family.

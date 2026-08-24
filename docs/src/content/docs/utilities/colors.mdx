@@ -71,6 +71,14 @@ Or, choose from any of the `.text-opacity` utilities:
   <div class="text-primary text-opacity-50">This is 50% opacity primary text</div>
   <div class="text-primary text-opacity-25">This is 25% opacity primary text</div>`} />
 
+## Reset color
+
+Reset a text or link's color with `.text-reset`, so that it inherits the color from its parent.
+
+<Example code={`<p class="text-body-secondary">
+    Secondary body text with a <a href="#" class="text-reset">reset link</a>.
+  </p>`} />
+
 ## Specificity
 
 Sometimes contextual classes cannot be applied due to the specificity of another selector. In some cases, a sufficient workaround is to wrap your element's content in a `<div>` or more semantic element with the desired class.

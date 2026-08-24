@@ -1,0 +1,37 @@
+---
+title: "Bootstrap 6 Text Wrapping"
+name: "Text wrapping"
+description: "Control how text wraps, overflows, and breaks inside its container."
+---
+
+## Wrapping
+
+Wrap text with a `.text-wrap` class.
+
+<Example code={`<div class="badge text-bg-primary text-wrap" style="width: 6rem;">
+    This text should wrap.
+  </div>`} />
+
+Prevent text from wrapping with a `.text-nowrap` class.
+
+<Example code={`<div class="text-nowrap bg-body-secondary border" style="width: 8rem;">
+    This text should overflow the parent.
+  </div>`} />
+
+## Word break
+
+Prevent long strings of text from breaking your components' layout by using `.text-break` to set `word-wrap: break-word` and `word-break: break-word`. We use `word-wrap` instead of the more common `overflow-wrap` for wider browser support, and add the deprecated `word-break: break-word` to avoid issues with flex containers.
+
+<Example code={`<p class="text-break">mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</p>`} />
+
+<Callout color="warning">
+Note that [breaking words isn't possible in Arabic](https://rtlstyling.com/posts/rtl-styling#3.-line-break), which is the most used RTL language. Therefore `.text-break` is removed from our RTL compiled CSS.
+</Callout>
+
+## Customizing
+
+### SASS variables
+
+Text wrapping utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-text-wrap" />
