@@ -3,19 +3,19 @@ title: "CSS variables"
 description: "Use CoreUI for Bootstrap's CSS custom properties for fast and forward-looking design and development."
 ---
 
-CoreUI for Bootstrap includes around two dozen [CSS custom properties (variables)](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) in its compiled CSS, with dozens more on the way for improved customization on a per-component basis. These provide easy access to commonly used values like our theme colors, breakpoints, and primary font stacks when working in your browser's inspector, a code sandbox, or general prototyping.
+CoreUI for Bootstrap declares several hundred [CSS custom properties (variables)](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties) in its compiled CSS — on `:root` for global values, and on each component's base class for the rest. They give you the theme colors, spacing, typography and component internals as live values you can read in your browser's inspector and override without recompiling Sass.
 
 **All our custom properties are prefixed with `cui-`** to avoid conflicts with third party CSS.
 
 ## Root variables
 
-Here are the variables we include (note that the `:root` is required) that can be accessed anywhere CoreUI for Bootstrap's CSS is loaded. They're located in our `_root.scss` file and included in our compiled dist files.
+Here are the variables we include (note that the `:root` is required) that can be accessed anywhere CoreUI for Bootstrap's CSS is loaded. They're located in our `_root.scss` file and included in our compiled dist files. Most of them pick their light and dark value in a single declaration through the CSS [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) function, so one `:root` declaration covers both [color modes](/customize/color-modes/).
 
 <ScssDocs file="scss/_root.scss" capture="root-body-variables" />
 
 ### Dark mode
 
-These variables are scoped to our built-in dark mode.
+Because `light-dark()` resolves both modes above, only one value still needs a dark-mode declaration of its own — a shadow reads as depth against the surface behind it, and a dark surface swallows the same alpha, so its strength rises rather than its color changing.
 
 <ScssDocs file="scss/_root.scss" capture="root-dark-mode-vars" />
 
@@ -26,6 +26,8 @@ CoreUI is increasingly making use of custom properties as local variables for va
 Have a look at our table documentation for some [insight into how we're using CSS variables](/content/tables/#how-do-the-variants-and-accented-tables-work). Our [navbars also use CSS variables](/components/navbar/#css) as of v4.2.6. We're also using CSS variables across our grids—primarily for gutters the [new opt-in CSS grid](/layout/css-grid/)—with more component usage coming in the future.
 
 Whenever possible, we'll assign CSS variables at the base component level (e.g., `.navbar` for navbar and its sub-components). This reduces guessing on where and how to customize, and allows for easy modifications by our team in future updates.
+
+A variable resolves where it is **declared**, so override it on the element that carries the base class — setting `--cui-navbar-padding-y` on a wrapper around the navbar will not reach it.
 
 ## Prefix
 
