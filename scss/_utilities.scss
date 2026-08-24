@@ -36,6 +36,7 @@ $utilities-bg-colors: map.merge(
 ) !default;
 
 $utilities-bg-subtle: theme-color-refs("bg-subtle", "-subtle") !default;
+$utilities-bg-muted: theme-color-refs("bg-muted", "-muted") !default;
 // scss-docs-end utilities-bg-colors
 
 // scss-docs-start utilities-border-colors
@@ -1046,6 +1047,11 @@ $utilities: map.merge(
       property: background-color,
       class: bg,
       values: $utilities-bg-subtle
+    ),
+    "muted-background-color": (
+      property: background-color,
+      class: bg,
+      values: $utilities-bg-muted
     ),
     // scss-docs-end utils-bg-color
     // scss-docs-start utils-theme
