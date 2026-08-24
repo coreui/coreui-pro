@@ -1,0 +1,91 @@
+---
+title: "Bootstrap 6 Align Content"
+name: "Align content"
+description: "Distribute the space between and around rows of a wrapped flex container."
+---
+
+## Align content
+
+Use `align-content` utilities on flexbox containers to align flex items *together* on the cross axis. Choose from `start` (browser default), `end`, `center`, `between`, `around`, or `stretch`. To demonstrate these utilities, we've enforced `flex-wrap: wrap` and increased the number of flex items.
+
+**Heads up!** This property has no effect on single rows of flex items.
+
+<Example class="docs-example-flex" html={[`<div class="d-flex align-content-start flex-wrap mb-3" style="height: 200px">`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `</div>`]} />
+
+```html
+<div class="d-flex align-content-start flex-wrap">
+  ...
+</div>
+```
+
+<Example class="docs-example-flex" html={[`<div class="d-flex align-content-end flex-wrap mb-3" style="height: 200px">`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `</div>`]} />
+
+```html
+<div class="d-flex align-content-end flex-wrap">...</div>
+```
+
+<Example class="docs-example-flex" html={[`<div class="d-flex align-content-center flex-wrap mb-3" style="height: 200px">`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `</div>`]} />
+
+```html
+<div class="d-flex align-content-center flex-wrap">...</div>
+```
+
+<Example class="docs-example-flex" html={[`<div class="d-flex align-content-between flex-wrap mb-3" style="height: 200px">`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `</div>`]} />
+
+```html
+<div class="d-flex align-content-between flex-wrap">...</div>
+```
+
+<Example class="docs-example-flex" html={[`<div class="d-flex align-content-around flex-wrap mb-3" style="height: 200px">`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `</div>`]} />
+
+```html
+<div class="d-flex align-content-around flex-wrap">...</div>
+```
+
+<Example class="docs-example-flex" html={[`<div class="d-flex align-content-stretch flex-wrap mb-3" style="height: 200px">`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `  <div class="p-2">Flex item</div>`, `</div>`]} />
+
+```html
+<div class="d-flex align-content-stretch flex-wrap">...</div>
+```
+
+Responsive variations also exist for `align-content`.
+
+- `.align-content-start`
+- `.align-content-end`
+- `.align-content-center`
+- `.align-content-around`
+- `.align-content-stretch`
+- `.align-content-sm-start`
+- `.align-content-sm-end`
+- `.align-content-sm-center`
+- `.align-content-sm-around`
+- `.align-content-sm-stretch`
+- `.align-content-md-start`
+- `.align-content-md-end`
+- `.align-content-md-center`
+- `.align-content-md-around`
+- `.align-content-md-stretch`
+- `.align-content-lg-start`
+- `.align-content-lg-end`
+- `.align-content-lg-center`
+- `.align-content-lg-around`
+- `.align-content-lg-stretch`
+- `.align-content-xl-start`
+- `.align-content-xl-end`
+- `.align-content-xl-center`
+- `.align-content-xl-around`
+- `.align-content-xl-stretch`
+- `.align-content-xxl-start`
+- `.align-content-xxl-end`
+- `.align-content-xxl-center`
+- `.align-content-xxl-around`
+- `.align-content-xxl-stretch`
+
+
+## Customizing
+
+### SASS variables
+
+Align content utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-align-content" />

@@ -284,6 +284,7 @@ $utilities: map.merge(
     ),
     // scss-docs-end utils-position
     // scss-docs-start utils-borders
+    // scss-docs-start utils-border-sides
     "border": (
       property: border,
       values: (
@@ -321,6 +322,8 @@ $utilities: map.merge(
         0: 0,
       ),
     ),
+    // scss-docs-end utils-border-sides
+    // scss-docs-start utils-border-color
     "border-color": (
       property: (
         --#{$prefix}border: null,
@@ -350,6 +353,8 @@ $utilities: map.merge(
       class: border-start,
       values: map.merge(map-slot($theme-colors, "base"), ("white": var(--#{$prefix}white)))
     ),
+    // scss-docs-end utils-border-color
+    // scss-docs-start utils-border-width
     "border-width": (
       property: border-width,
       class: border,
@@ -375,6 +380,8 @@ $utilities: map.merge(
       class: border-start,
       values: $border-widths,
     ),
+    // scss-docs-end utils-border-width
+    // scss-docs-start utils-border-color-subtle
     "subtle-border-color": (
       property: border-color,
       class: border,
@@ -391,9 +398,11 @@ $utilities: map.merge(
         100: 1
       )
     ),
+    // scss-docs-end utils-border-color-subtle
     // scss-docs-end utils-borders
     // Sizing utilities
     // scss-docs-start utils-sizing
+    // scss-docs-start utils-width
     "width": (
       property: width,
       class: w,
@@ -430,6 +439,8 @@ $utilities: map.merge(
       class: min-dvw,
       values: (100: 100dvw)
     ),
+    // scss-docs-end utils-width
+    // scss-docs-start utils-height
     "height": (
       property: height,
       class: h,
@@ -466,9 +477,11 @@ $utilities: map.merge(
       class: min-dvh,
       values: (100: 100dvh)
     ),
+    // scss-docs-end utils-height
     // scss-docs-end utils-sizing
     // Flex utilities
     // scss-docs-start utils-flex
+    // scss-docs-start utils-flex-behavior
     "flex": (
       responsive: true,
       property: flex,
@@ -504,6 +517,8 @@ $utilities: map.merge(
       class: flex,
       values: wrap nowrap wrap-reverse
     ),
+    // scss-docs-end utils-flex-behavior
+    // scss-docs-start utils-justify-content
     "justify-content": (
       responsive: true,
       property: justify-content,
@@ -516,6 +531,8 @@ $utilities: map.merge(
         evenly: space-evenly,
       )
     ),
+    // scss-docs-end utils-justify-content
+    // scss-docs-start utils-align-items
     "align-items": (
       responsive: true,
       property: align-items,
@@ -527,6 +544,8 @@ $utilities: map.merge(
         stretch: stretch,
       )
     ),
+    // scss-docs-end utils-align-items
+    // scss-docs-start utils-align-content
     "align-content": (
       responsive: true,
       property: align-content,
@@ -539,6 +558,8 @@ $utilities: map.merge(
         stretch: stretch,
       )
     ),
+    // scss-docs-end utils-align-content
+    // scss-docs-start utils-align-self
     "align-self": (
       responsive: true,
       property: align-self,
@@ -553,6 +574,7 @@ $utilities: map.merge(
     ),
     // The inline-axis counterparts of the three above, which only grid can act
     // on — flex has no `justify-items` and ignores `justify-self`.
+    // scss-docs-end utils-align-self
     // scss-docs-start utils-justify-items
     "justify-items": (
       responsive: true,
@@ -615,6 +637,7 @@ $utilities: map.merge(
       values: row column dense
     ),
     // scss-docs-end utils-grid
+    // scss-docs-start utils-order
     "order": (
       responsive: true,
       property: order,
@@ -629,9 +652,11 @@ $utilities: map.merge(
         last: 6,
       ),
     ),
+    // scss-docs-end utils-order
     // scss-docs-end utils-flex
     // Margin utilities
     // scss-docs-start utils-spacing
+    // scss-docs-start utils-margin
     "margin": (
       responsive: true,
       property: margin,
@@ -718,6 +743,8 @@ $utilities: map.merge(
       values: $negative-spacers
     ),
     // Padding utilities
+    // scss-docs-end utils-margin
+    // scss-docs-start utils-padding
     "padding": (
       responsive: true,
       property: padding,
@@ -761,6 +788,8 @@ $utilities: map.merge(
       values: $spacers
     ),
     // Gap utility
+    // scss-docs-end utils-padding
+    // scss-docs-start utils-gap
     "gap": (
       responsive: true,
       property: gap,
@@ -779,6 +808,7 @@ $utilities: map.merge(
       class: column-gap,
       values: $spacers
     ),
+    // scss-docs-end utils-gap
     // scss-docs-end utils-spacing
     // scss-docs-start utils-space
     "space-x": (
@@ -820,11 +850,14 @@ $utilities: map.merge(
     // scss-docs-end utils-divide
     // Text
     // scss-docs-start utils-text
+    // scss-docs-start utils-font-family
     "font-family": (
       property: font-family,
       class: font,
       values: (monospace: var(--#{$prefix}font-monospace))
     ),
+    // scss-docs-end utils-font-family
+    // scss-docs-start utils-font-size
     "font-size": (
       property: font-size,
       class: fs,
@@ -836,16 +869,22 @@ $utilities: map.merge(
       class: text,
       values: $font-sizes
     ),
+    // scss-docs-end utils-font-size
+    // scss-docs-start utils-font-style
     "font-style": (
       property: font-style,
       class: fst,
       values: italic normal
     ),
+    // scss-docs-end utils-font-style
+    // scss-docs-start utils-font-weight
     "font-weight": (
       property: font-weight,
       class: fw,
       values: $font-weights
     ),
+    // scss-docs-end utils-font-weight
+    // scss-docs-start utils-line-height
     "line-height": (
       property: line-height,
       class: lh,
@@ -856,6 +895,8 @@ $utilities: map.merge(
         lg: $line-height-lg,
       )
     ),
+    // scss-docs-end utils-line-height
+    // scss-docs-start utils-text-align
     "text-align": (
       responsive: true,
       property: text-align,
@@ -866,15 +907,21 @@ $utilities: map.merge(
         center: center,
       )
     ),
+    // scss-docs-end utils-text-align
+    // scss-docs-start utils-text-decoration
     "text-decoration": (
       property: text-decoration,
       values: none underline line-through
     ),
+    // scss-docs-end utils-text-decoration
+    // scss-docs-start utils-text-transform
     "text-transform": (
       property: text-transform,
       class: text,
       values: lowercase uppercase capitalize
     ),
+    // scss-docs-end utils-text-transform
+    // scss-docs-start utils-text-wrap
     "white-space": (
       property: white-space,
       class: text,
@@ -888,6 +935,7 @@ $utilities: map.merge(
       class: text,
       values: (break: break-word),
     ),
+    // scss-docs-end utils-text-wrap
     // scss-docs-end utils-text
     // scss-docs-start utils-color
     "color": (
@@ -1052,15 +1100,19 @@ $utilities: map.merge(
       values: (gradient: var(--#{$prefix}gradient))
     ),
     // scss-docs-start utils-interaction
+    // scss-docs-start utils-user-select
     "user-select": (
       property: user-select,
       values: all auto none
     ),
+    // scss-docs-end utils-user-select
+    // scss-docs-start utils-pointer-events
     "pointer-events": (
       property: pointer-events,
       class: pe,
       values: none auto,
     ),
+    // scss-docs-end utils-pointer-events
     // scss-docs-end utils-interaction
     // scss-docs-start utils-border-radius
     "rounded": (

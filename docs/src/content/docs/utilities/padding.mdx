@@ -1,0 +1,69 @@
+---
+title: "Bootstrap 6 Padding"
+name: "Padding"
+description: "Assign responsive-friendly padding values to an element or a subset of its sides with shorthand classes."
+---
+
+## Overview
+
+Assign responsive-friendly `padding` values to an element or a subset of its sides with shorthand classes. Includes support for individual properties, all properties, and vertical and horizontal properties. Classes are built from a default Sass map ranging from `.25rem` to `3rem`.
+
+Unlike [margin](/utilities/margin/), `padding` takes no negative values and no `auto`, so there is no `.p-n1` and no `.px-auto`.
+
+## Notation
+
+Padding utilities that apply to all breakpoints, from `xs` to `xxl`, have no breakpoint abbreviation in them. This is because those classes are applied from `min-width: 0` and up, and thus are not bound by a media query. The remaining breakpoints, however, do include a breakpoint abbreviation.
+
+The classes are named using the format `p{sides}-{size}` for `xs` and `p{sides}-{breakpoint}-{size}` for `sm`, `md`, `lg`, `xl`, and `xxl`.
+
+Where *sides* is one of:
+
+- `t` - for classes that set `padding-top`
+- `b` - for classes that set `padding-bottom`
+- `s` - (start) for classes that set `padding-left` in LTR, `padding-right` in RTL
+- `e` - (end) for classes that set `padding-right` in LTR, `padding-left` in RTL
+- `x` - for classes that set both `padding-left` and `padding-right`
+- `y` - for classes that set both `padding-top` and `padding-bottom`
+- blank - for classes that set a `padding` on all 4 sides of the element
+
+Where *size* is one of:
+
+- `0` - for classes that eliminate the `padding` by setting it to `0`
+- `1` - (by default) for classes that set the `padding` to `$spacer * .25`
+- `2` - (by default) for classes that set the `padding` to `$spacer * .5`
+- `3` - (by default) for classes that set the `padding` to `$spacer`
+- `4` - (by default) for classes that set the `padding` to `$spacer * 1.5`
+- `5` - (by default) for classes that set the `padding` to `$spacer * 3`
+
+(You can add more sizes by adding entries to the `$spacers` Sass map variable.)
+
+## Examples
+
+Here are some representative examples of these classes:
+
+```scss
+.pt-0 {
+  padding-top: 0;
+}
+
+.px-2 {
+  padding-left: ($spacer * .5);
+  padding-right: ($spacer * .5);
+}
+
+.p-3 {
+  padding: $spacer;
+}
+```
+
+## Customizing
+
+### SASS variables
+
+Padding utilities are generated from the `$spacers` map.
+
+<ScssDocs file="scss/_config.scss" capture="spacer-variables-maps" />
+
+Padding utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-padding" />

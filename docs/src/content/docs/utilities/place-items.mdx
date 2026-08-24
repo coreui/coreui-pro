@@ -1,0 +1,23 @@
+---
+title: "Bootstrap 6 Place Items"
+name: "Place items"
+description: "Set both grid axes at once — the shorthand for align-items and justify-items."
+---
+
+## Place items
+
+`.place-items-{start|end|center|stretch}` sets both axes at once — it is the shorthand for `align-items` and `justify-items` together.
+
+<Example class="docs-example-cssgrid" code={`<div class="d-grid grid-cols-3 place-items-center gap-2" style="height: 120px">
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+  </div>`} />
+
+## Customizing
+
+### SASS variables
+
+Place items utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-justify-items" />

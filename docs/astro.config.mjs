@@ -32,6 +32,13 @@ export default defineConfig({
     '/forms/checks-radios/': `${base}/forms/checkbox/`,
     // `/components/navs-tabs/` split into a nav page and a tab page in v6.
     '/components/navs-tabs/': `${base}/components/nav/`,
+    // `/utilities/` went from grouped pages to one page per property in v6. Each old
+    // URL points at the property that carried the page's name.
+    '/utilities/sizing/': `${base}/utilities/width/`,
+    '/utilities/spacing/': `${base}/utilities/margin/`,
+    '/utilities/borders/': `${base}/utilities/border/`,
+    '/utilities/text/': `${base}/utilities/font-size/`,
+    '/utilities/interactions/': `${base}/utilities/user-select/`,
   },
   outDir: '../_site',
   cacheDir: '../.cache/astro',

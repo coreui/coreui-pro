@@ -1,0 +1,47 @@
+---
+title: "Bootstrap 6 Width"
+name: "Width"
+description: "Set an element's width relative to its parent or to the viewport with our width utilities."
+---
+
+## Relative to the parent
+
+Width utilities are generated from the utility API in `_utilities.scss`. Includes support for `25%`, `50%`, `75%`, `100%`, and `auto` by default. Modify those values as you need to generate different utilities here.
+
+<Example code={`<div class="w-25 p-3" style="background-color: #eee;">Width 25%</div>
+  <div class="w-50 p-3" style="background-color: #eee;">Width 50%</div>
+  <div class="w-75 p-3" style="background-color: #eee;">Width 75%</div>
+  <div class="w-100 p-3" style="background-color: #eee;">Width 100%</div>
+  <div class="w-auto p-3" style="background-color: #eee;">Width auto</div>`} />
+
+## Max width
+
+Use `.mw-100` to cap an element at the width of its parent — the usual reason to reach for it is an image or an SVG that would otherwise overflow.
+
+<Example code={`<svg class="docs-placeholder-img mw-100" width="100%" height="100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Max-width 100%" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Max-width 100%</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Max-width 100%</text></svg>`} />
+
+## Relative to the viewport
+
+`.vw-100` sets the width to the full viewport, `.min-vw-100` sets it as a floor.
+
+```html
+<div class="min-vw-100">Min-width 100vw</div>
+<div class="vw-100">Width 100vw</div>
+```
+
+## Dynamic viewport width
+
+A mobile browser resizes the viewport as it shows or hides its URL bar, so `vw` units can end up wider than the visible area. The `dvw` unit tracks that change instead of the largest possible viewport.
+
+```html
+<div class="min-dvw-100">Min-width 100dvw</div>
+<div class="dvw-100">Width 100dvw</div>
+```
+
+## Customizing
+
+### SASS variables
+
+Width utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-width" />

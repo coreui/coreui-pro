@@ -1,0 +1,24 @@
+---
+title: "Bootstrap 6 Line Height"
+name: "Line height"
+description: "Change the line height of text with our line-height utilities."
+---
+
+## Line height
+
+Change the line height with `.lh-*` utilities.
+
+<Example code={`<p class="lh-1">This is a long paragraph written to show how the line-height of an element is affected by our utilities. Classes are applied to the element itself or sometimes the parent element. These classes can be customized as needed with our utility API.</p>
+  <p class="lh-sm">This is a long paragraph written to show how the line-height of an element is affected by our utilities. Classes are applied to the element itself or sometimes the parent element. These classes can be customized as needed with our utility API.</p>
+  <p class="lh-base">This is a long paragraph written to show how the line-height of an element is affected by our utilities. Classes are applied to the element itself or sometimes the parent element. These classes can be customized as needed with our utility API.</p>
+  <p class="lh-lg">This is a long paragraph written to show how the line-height of an element is affected by our utilities. Classes are applied to the element itself or sometimes the parent element. These classes can be customized as needed with our utility API.</p>`} />
+
+A `.text-*` stop already carries the line height that belongs to its size — see [font size](/utilities/font-size/). Reach for `.lh-*` when you need to override that pairing.
+
+## Customizing
+
+### SASS variables
+
+Line height utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
+
+<ScssDocs file="scss/_utilities.scss" capture="utils-line-height" />
