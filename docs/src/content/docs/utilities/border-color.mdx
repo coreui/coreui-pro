@@ -14,6 +14,19 @@ Change the border color using utilities built on our theme colors.
   <span class="border border-${c.name}-subtle"></span>`), ``, `<span class="border border-black"></span>
   <span class="border border-white"></span>`]} />
 
+## Neutral
+
+Four weights sit between the page and a themed border, for lines that separate content without naming a color. `.border-emphasized` is the strongest, the default `--cui-border-color` sits in the middle, and `.border-subtle` is the faintest.
+
+<Example class="docs-example-border-utils" code={`<span class="border border-emphasized"></span>
+  <span class="border"></span>
+  <span class="border border-muted"></span>
+  <span class="border border-subtle"></span>`} />
+
+Each is a `light-dark()` pair, so the ladder keeps its order in both color schemes rather than fading out in one of them.
+
+## Sides
+
 Using utilities you can change the border on one side only, or you can change all borders to make them different colors.
 
 <Example class="docs-example-border-utils" code={`<span class="border-top border-top-primary"></span>

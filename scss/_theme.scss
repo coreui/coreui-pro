@@ -98,27 +98,8 @@ $theme-colors: (
 // Every theme color gets a 100–900 scale of `color-mix()` tokens in `:root`,
 // mixed at runtime from the color's own token. Override `--#{$prefix}primary`
 // (or `$primary`) and the whole family — subtle backgrounds, borders, emphasis
-// text — follows, in both color schemes.
-
-// scss-docs-start color-scale-variables
-$color-mix-space: lab !default;
-$tint-color:      var(--#{$prefix}white) !default;
-$shade-color:     var(--#{$prefix}black) !default;
-
-$color-tints: (
-  "100": 80%,
-  "200": 60%,
-  "300": 40%,
-  "400": 20%
-) !default;
-
-$color-shades: (
-  "600": 20%,
-  "700": 40%,
-  "800": 60%,
-  "900": 80%
-) !default;
-// scss-docs-end color-scale-variables
+// text — follows, in both color schemes. The stops and the mixing space live in
+// `scss/_colors.scss`, with the palette that uses the same generator.
 
 // The families below read the scales through `light-dark()`, so a theme color
 // reads correctly in both schemes without a second set of variables. `secondary`
@@ -240,18 +221,11 @@ $theme-state-colors: (
     $tokens: map.set($tokens, --#{$prefix}#{$color}, map.get($slots, "base"));
   }
 
-  // A 100-900 scale per theme color, mixed at runtime from the color's own
-  // token so overriding the token retints the whole family. The subtle
-  // backgrounds, borders and emphasis text below are `light-dark()` pairs of
-  // these stops (see $color-tints / $color-shades).
+  // A 100-900 scale per theme color, on the same generator the palette uses. The
+  // subtle backgrounds, borders and emphasis text below are `light-dark()` pairs
+  // of these stops.
   @each $color, $slots in $theme-colors {
-    @each $stop, $weight in $color-tints {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
-    }
-    $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
-    @each $stop, $weight in $color-shades {
-      $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
-    }
+    $tokens: map.merge($tokens, color-scale-tokens($color));
   }
 
   @each $color, $value in $theme-colors-text {
