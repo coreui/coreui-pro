@@ -280,8 +280,8 @@
       to: /components/modal/
     - title: Navbar
       to: /components/navbar/
-    - title: Navs & tabs
-      to: /components/navs-tabs/
+    - title: Nav
+      to: /components/nav/
     - title: Offcanvas
       to: /components/offcanvas/
     - title: Pagination
@@ -306,6 +306,8 @@
         text: NEW
     - title: Spinners
       to: /components/spinners/
+    - title: Tabs
+      to: /components/tab/
     - title: Toasts
       to: /components/toasts/
     - title: Tooltips

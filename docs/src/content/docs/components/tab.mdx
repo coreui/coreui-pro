@@ -1,356 +1,13 @@
 ---
-title: "Bootstrap 5 Navs And Tabs"
-name: "Navs and tabs"
-description: "Documentation and examples for how to use CoreUI for Bootstrap's included navigation components."
+title: "Bootstrap 5 Tabs"
+name: "Tabs"
+description: "Turn a nav into a tabbable interface with the tab plugin: panes of local content that swap without leaving the page."
 otherFrameworks:
   - navs-tabs
 ---
 
-## Base nav
-
-Navigation available in Bootstrap share general markup and styles, from the base `.nav` class to the active and disabled states. Swap modifier classes to switch between each style.
-
-The base `.nav` component is built with flexbox and provide a strong foundation for building all types of navigation components. It includes some style overrides (for working with lists), some link padding for larger hit areas, and basic disabled styling.
-
-<Callout color="info">
-The base `.nav` component does not include any `.active` state. The following examples include the class, mainly to demonstrate that this particular class does not trigger any special styling.
-
-To convey the active state to assistive technologies, use the `aria-current` attribute — using the `page` value for current page, or `true` for the current item in a set.
-</Callout>
-
-<Example code={`<ul class="nav">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-Classes are used throughout, so your markup can be super flexible. Use `<ul>`s like above, `<ol>` if the order of your items is important, or roll your own with a `<nav>` element. Because the `.nav` uses `display: flex`, the nav links behave the same as nav items would, but without the extra markup.
-
-<Example code={`<nav class="nav">
-    <a class="nav-link active" aria-current="page" href="#">Active</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-  </nav>`} />
-
-## Available styles
-
-Change the style of `.nav`s component with modifiers and utilities. Mix and match as needed, or build your own.
-
-### Horizontal alignment
-
-Change the horizontal alignment of your nav with [flexbox utilities](/utilities/flex/#horizontal-alignment). By default, navs are left-aligned, but you can easily change them to center or right aligned.
-
-Centered with `.justify-content-center`:
-
-<Example code={`<ul class="nav justify-content-center">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-Right-aligned with `.justify-content-end`:
-
-<Example code={`<ul class="nav justify-content-end">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Vertical
-
-Stack your navigation by changing the flex item direction with the `.flex-column` utility. Need to stack them on some viewports but not others? Use the responsive versions (e.g., `.flex-sm-column`).
-
-<Example code={`<ul class="nav flex-column">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-As always, vertical navigation is possible without `<ul>`s, too.
-
-<Example code={`<nav class="nav flex-column">
-    <a class="nav-link active" aria-current="page" href="#">Active</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-  </nav>`} />
-
-### Tabs
-
-Takes the basic nav from above and adds the `.nav-tabs` class to generate a tabbed interface. Use them to create tabbable regions with our [tab JavaScript plugin](#javascript-behavior).
-
-<Example code={`<ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Pills
-
-Take that same HTML, but use `.nav-pills` instead:
-
-<Example code={`<ul class="nav nav-pills">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Underline
-
-Take that same HTML, but use `.nav-underline` instead:
-
-<Example code={`<ul class="nav nav-underline">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Underline border
-
-Take that same HTML, but use `.nav-underline-border` instead:
-
-<Example code={`<ul class="nav nav-underline-border">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Enclosed
-
-Use the `.nav-enclosed` class to give your navigation items a subtle border and rounded styling.
-
-<Example code={`<ul class="nav nav-enclosed">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Enclosed pills
-
-Combine `.nav-enclosed` with `.nav-enclosed-pills` to achieve a pill-style appearance for each nav item, using pill-shaped borders and smoother outlines.
-
-<Example code={`<ul class="nav nav-enclosed nav-enclosed-pills">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Fill and justify
-
-Force your `.nav`'s contents to extend the full available width one of two modifier classes. To proportionately fill all available space with your `.nav-item`s, use `.nav-fill`. Notice that all horizontal space is occupied, but not every nav item has the same width.
-
-<Example code={`<ul class="nav nav-pills nav-fill">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Much longer nav link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-When using a `<nav>`-based navigation, you can safely omit `.nav-item` as only `.nav-link` is required for styling `<a>` elements.
-
-<Example code={`<nav class="nav nav-pills nav-fill">
-    <a class="nav-link active" aria-current="page" href="#">Active</a>
-    <a class="nav-link" href="#">Much longer nav link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-  </nav>`} />
-
-For equal-width elements, use `.nav-justified`. All horizontal space will be occupied by nav links, but unlike the `.nav-fill` above, every nav item will be the same width.
-
-<Example code={`<ul class="nav nav-pills nav-justified">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Much longer nav link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-Similar to the `.nav-fill` example using a `<nav>`-based navigation.
-
-<Example code={`<nav class="nav nav-pills nav-justified">
-    <a class="nav-link active" aria-current="page" href="#">Active</a>
-    <a class="nav-link" href="#">Much longer nav link</a>
-    <a class="nav-link" href="#">Link</a>
-    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-  </nav>`} />
-## Working with flex utilities
-
-If you need responsive nav variations, consider using a series of [flexbox utilities](/utilities/flex/). While more verbose, these utilities offer greater customization across responsive breakpoints. In the example below, our nav will be stacked on the lowest breakpoint, then adapt to a horizontal layout that fills the available width starting from the small breakpoint.
-
-<Example code={`<nav class="nav nav-pills flex-column flex-sm-row">
-    <a class="flex-sm-fill text-sm-center nav-link active" aria-current="page" href="#">Active</a>
-    <a class="flex-sm-fill text-sm-center nav-link" href="#">Longer nav link</a>
-    <a class="flex-sm-fill text-sm-center nav-link" href="#">Link</a>
-    <a class="flex-sm-fill text-sm-center nav-link disabled" aria-disabled="true">Disabled</a>
-  </nav>`} />
-
-## Regarding accessibility
-
-If you're using navs to provide a navigation bar, be sure to add a `role="navigation"` to the most logical parent container of the `<ul>`, or wrap a `<nav>` element around the whole navigation. Do not add the role to the `<ul>` itself, as this would prevent it from being announced as an actual list by assistive technologies.
-
-Note that navigation bars, even if visually styled as tabs with the `.nav-tabs` class, should **not** be given `role="tablist"`, `role="tab"` or `role="tabpanel"` attributes. These are only appropriate for dynamic tabbed interfaces, as described in the [ARIA Authoring Practices Guide tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/). See [JavaScript behavior](#javascript-behavior) for dynamic tabbed interfaces in this section for an example. The `aria-current` attribute is not necessary on dynamic tabbed interfaces since our JavaScript handles the selected state by adding `aria-selected="true"` on the active tab.
-
-## Using dropdowns
-
-Add dropdown menus with a little extra HTML and the [dropdowns JavaScript plugin](/components/dropdowns/#usage).
-
-### Tabs with dropdowns
-
-<Example code={`<ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" data-coreui-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-### Pills with dropdowns
-
-<Example code={`<ul class="nav nav-pills">
-    <li class="nav-item">
-      <a class="nav-link active" aria-current="page" href="#">Active</a>
-    </li>
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" data-coreui-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Another action</a></li>
-        <li><a class="dropdown-item" href="#">Something else here</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Separated link</a></li>
-      </ul>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Link</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-    </li>
-  </ul>`} />
-
-## JavaScript behavior
-
-Use the tab JavaScript plugin—include it individually or through the compiled `coreui.js` file—to extend our navigational tabs and pills to create tabbable panes of local content, even via dropdown menus.
+The tab plugin turns a [nav](/components/nav/) into a tabbable interface. The nav carries the markup and the styling; this page covers the behavior the plugin adds on top of it.
+Include the plugin individually or through the compiled `coreui.js` file to extend navigational tabs and pills into tabbable panes of local content, even via dropdown menus.
 
 Dynamic tabbed interfaces, as described in the [<abbr title="Web Accessibility Initiative">WAI</abbr> <abbr title="Accessible Rich Internet Applications">ARIA</abbr> Authoring Practices](https://www.w3.org/TR/wai-aria-practices/#tabpanel), require `role="tablist"`, `role="tab"`, `role="tabpanel"`, and additional `aria-` attributes in order to convey their structure, functionality and current state to users of assistive technologies (such as screen readers). As a best practice, we recommend using `<button>` elements for the tabs, as these are controls that trigger a dynamic change, rather than links that navigate to a new page or location.
 
@@ -452,7 +109,7 @@ And with vertical pills. Ideally, for vertical tabs, you should also add `aria-o
 </div>
 ```
 
-### Accessibility
+## Accessibility
 
 Dynamic tabbed interfaces, as described in the [ARIA Authoring Practices Guide tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabpanel/), require `role="tablist"`, `role="tab"`, `role="tabpanel"`, and additional `aria-` attributes in order to convey their structure, functionality, and current state to users of assistive technologies (such as screen readers). As a best practice, we recommend using `<button>` elements for the tabs, as these are controls that trigger a dynamic change, rather than links that navigate to a new page or location.
 
@@ -466,7 +123,7 @@ In general, to facilitate keyboard navigation, it's recommended to make the tab 
 The tab JavaScript plugin **does not** support tabbed interfaces that contain dropdown menus, as these cause both usability and accessibility issues. From a usability perspective, the fact that the currently displayed tab's trigger element is not immediately visible (as it's inside the closed dropdown menu) can cause confusion. From an accessibility point of view, there is currently no sensible way to map this sort of construct to a standard WAI ARIA pattern, meaning that it cannot be easily made understandable to users of assistive technologies.
 </Callout>
 
-### Using data attributes
+## Using data attributes
 
 You can activate a tab or pill navigation without writing any JavaScript by simply specifying `data-coreui-toggle="tab"` or `data-coreui-toggle="pill"` on an element. Use these data attributes on `.nav-tabs` or `.nav-pills`.
 
@@ -496,7 +153,7 @@ You can activate a tab or pill navigation without writing any JavaScript by simp
 </div>
 ```
 
-### Via JavaScript
+## Via JavaScript
 
 Enable tabbable tabs via JavaScript (each tab needs to be activated individually):
 
@@ -522,7 +179,7 @@ const triggerFirstTabEl = document.querySelector('#myTab li:first-child button')
 coreui.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
 ```
 
-### Fade effect
+## Fade effect
 
 Every `.tab-pane` fades in as it becomes active — no class to add. The pane you leave goes at once, because two in-flow panes cannot cross-fade without one stacking under the other.
 
@@ -535,7 +192,7 @@ Add `.tab-pane-instant` to a pane to switch its fade off, or retime it with `--c
 </div>
 ```
 
-### Methods
+## Methods
 
 <Callout color="info">
 #### Promises and transitions
@@ -560,7 +217,7 @@ const cuiTab = new coreui.Tab('#myTab')
 | `getOrCreateInstance` | *Static* method which allows you to get the tab instance associated with a DOM element, or create a new one in case it wasn't initialized You can use it like this: `coreui.Tab.getOrCreateInstance(element)`. |
 | `show` | Selects the given tab and shows its associated pane. Any other tab that was previously selected becomes unselected and its associated pane is hidden. **Returns to the caller before the tab pane has actually been shown** (i.e. before the `shown.coreui.tab` event occurs). |
 
-### Events
+## Events
 
 When showing a new tab, the events fire in the following order:
 
@@ -585,57 +242,3 @@ tabEl.addEventListener('shown.coreui.tab', event => {
   event.relatedTarget // previous active tab
 })
 ```
-
-## Theming
-
-A [theme class](/customize/components/#theme-variants) recolors a nav: links read the theme's foreground and the active pill or underline its solid color.
-
-<Example code={`<ul class="nav nav-pills theme-success">
-    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Active</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
-  </ul>`} />
-
-<Example code={`<ul class="nav nav-underline theme-success">
-    <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Active</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
-    <li class="nav-item"><a class="nav-link" href="#">Link</a></li>
-  </ul>`} />
-
-## Customizing
-
-### CSS variables
-
-Navs use local CSS variables on `.nav`, `.nav-tabs`, `.nav-pills`, `.nav-underline` and `.nav-underline-border` for enhanced real-time customization. Values for the CSS variables are set via Sass, so Sass customization is still supported, too.
-
-On the `.nav` base class:
-
-<ScssDocs file="scss/_nav.scss" capture="nav-css-vars" />
-
-On the `.nav-tabs` modifier class:
-
-<ScssDocs file="scss/_nav.scss" capture="nav-tabs-css-vars" />
-
-On the `.nav-pills` modifier class:
-
-<ScssDocs file="scss/_nav.scss" capture="nav-pills-css-vars" />
-
-<AddedIn version="5.0.0" />
-
-On the `.nav-underline` modifier class:
-
-<ScssDocs file="scss/_nav.scss" capture="nav-underline-css-vars" />
-
-<AddedIn version="5.0.0" />
-
-On the `.nav-underline-border` modifier class:
-
-<ScssDocs file="scss/_nav.scss" capture="nav-underline-border-css-vars" />
-
-Tab pane variables:
-
-<ScssDocs file="scss/_nav.scss" capture="tab-pane-css-vars" />
-
-### SASS variables
-
-<ScssDocs file="scss/_nav.scss" capture="nav-variables" />

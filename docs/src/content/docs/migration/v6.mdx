@@ -952,6 +952,30 @@ adornment in the library — so the button needs no icon markup at all:
   activated anything.
 - The `data-coreui-toggle="pill"` and `"list"` toggles **stay** — they are
   documented markup, and v6 keeps documented markup working.
+- **`$nav-link-transition` splits into
+  `$nav-link-transition-property`/`-duration`/`-timing`**, emitted as
+  `--cui-nav-link-transition-*`. The link's transition was compiled into its rule
+  while `.tab-pane` in the same file already read the three-token form, so half
+  the file could be retimed in the browser and half could not. Setting
+  `--cui-nav-link-transition-duration` now takes effect; before it was ignored.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **`.nav-link` is a flex row, and it fills on hover and when active.** The link
+  lays its children out with `--cui-nav-link-gap`, `--cui-nav-link-align` and
+  `--cui-nav-link-justify`, so an icon and its label line up without a wrapper.
+  It also takes `--cui-nav-link-hover-bg` and `--cui-nav-link-active-bg`, rounded
+  by `--cui-nav-link-border-radius` — the base nav used to change text color
+  alone. Set the two backgrounds to `transparent` to keep the old look.
+  Under a theme, hover reads `--cui-theme-fg` and the lighter
+  `--cui-theme-bg-subtle`, and the active item the darker `--cui-theme-bg-muted`,
+  so hovering a link never outweighs the selected one.
+  `.nav-tabs`, `.nav-underline` and `.nav-underline-border` square the link off,
+  and the two underline variants take neither fill, hover or active: they mark
+  their state with a line, and a radius curves that line's ends while a fill says
+  the same thing twice.
+- **`--cui-nav-gap` is new**, declared on `.nav` and defaulting to `0`, so the
+  base nav renders exactly as it did. It gives the token a home on the component
+  whose name it carries: `.navbar-nav` already overrode it, and `.nav-underline`
+  keeps its own `--cui-nav-underline-gap`.
 
 #### Tooltip
 
