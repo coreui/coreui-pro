@@ -322,6 +322,7 @@ $tab-pane-tokens: defaults(
 
     --#{$prefix}nav-link-active-bg: transparent;
     --#{$prefix}nav-link-border-radius: 0;
+    --#{$prefix}nav-link-hover-bg: transparent;
 
     gap: var(--#{$prefix}nav-underline-gap);
 
@@ -332,6 +333,7 @@ $tab-pane-tokens: defaults(
 
       &:hover,
       &:focus {
+        background-color: var(--#{$prefix}nav-link-hover-bg);
         border-bottom-color: currentcolor;
       }
     }
@@ -351,6 +353,7 @@ $tab-pane-tokens: defaults(
 
     --#{$prefix}nav-link-active-bg: transparent;
     --#{$prefix}nav-link-border-radius: 0;
+    --#{$prefix}nav-link-hover-bg: transparent;
     --#{$prefix}nav-link-color: var(--#{$prefix}nav-underline-border-link-color);
     --#{$prefix}nav-link-disabled-color: var(--#{$prefix}nav-underline-border-link-disabled-color);
 
@@ -364,6 +367,7 @@ $tab-pane-tokens: defaults(
 
       &:hover,
       &:focus {
+        background-color: var(--#{$prefix}nav-link-hover-bg);
         border-bottom-color: currentcolor;
       }
     }
