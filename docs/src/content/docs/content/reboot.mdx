@@ -125,7 +125,7 @@ All lists—`<ul>`, `<ol>`, and `<dl>`—have their `margin-top` removed and a `
 
 For simpler styling, clear hierarchy, and better spacing, description lists have updated `margin`s. `<dd>`s reset `margin-left` to `0` and add `margin-bottom: .5rem`. `<dt>`s are **bolded**.
 
-<Example html={[`<dl>`, `    <dt>Description lists</dt>`, `    <dd>A description list is perfect for defining terms.</dd>`, `    <dt>Term</dt>`, `    <dd>Definition for the term.</dd>`, `    <dd>A second definition for the same term.</dd>`, `    <dt>Another term</dt>`, `    <dd>Definition for this other term.</dd>`, `  </dl>`]} />
+<Example html={[`<dl>`, `  <dt>Description lists</dt>`, `  <dd>A description list is perfect for defining terms.</dd>`, `  <dt>Term</dt>`, `  <dd>Definition for the term.</dd>`, `  <dd>A second definition for the same term.</dd>`, `  <dt>Another term</dt>`, `  <dd>Definition for this other term.</dd>`, `</dl>`]} />
 
 ## Inline code
 
@@ -356,13 +356,13 @@ Reboot includes an enhancement for `role="button"` to change the default cursor 
 
 The `<address>` element is updated to reset the browser default `font-style` from `italic` to `normal`. `line-height` is also now inherited, and `margin-bottom: 1rem` has been added. `<address>`s are for presenting contact information for the nearest ancestor (or an entire body of work). Preserve formatting by ending lines with `<br />`.
 
-<Example html={[`<address>`, `    <strong>Twitter, Inc.</strong><br>`, `    1355 Market St, Suite 900<br>`, `    San Francisco, CA 94103<br>`, `    <abbr title="Phone">P:</abbr> (123) 456-7890`, `  </address>`, ``, `  <address>`, `    <strong>Full Name</strong><br>`, `    <a href="mailto:first.last@example.com">first.last@example.com</a>`, `  </address>`]} />
+<Example html={[`<address>`, `  <strong>Twitter, Inc.</strong><br>`, `  1355 Market St, Suite 900<br>`, `  San Francisco, CA 94103<br>`, `  <abbr title="Phone">P:</abbr> (123) 456-7890`, `</address>`, ``, `<address>`, `  <strong>Full Name</strong><br>`, `  <a href="mailto:first.last@example.com">first.last@example.com</a>`, `</address>`]} />
 
 ### Blockquote
 
 The default `margin` on blockquotes is `1em 40px`, so we reset that to `0 0 1rem` for something more consistent with other elements.
 
-<Example html={[`<blockquote class="blockquote">`, `    <p>A well-known quote, contained in a blockquote element.</p>`, `  </blockquote>`, `  <p>Someone famous in <cite title="Source Title">Source Title</cite></p>`]} />
+<Example html={[`<blockquote class="blockquote">`, `  <p>A well-known quote, contained in a blockquote element.</p>`, `</blockquote>`, `<p>Someone famous in <cite title="Source Title">Source Title</cite></p>`]} />
 
 ### Inline elements
 
@@ -374,7 +374,7 @@ The `<abbr>` element receives basic styling to make it stand out amongst paragra
 
 The default `cursor` on summary is `text`, so we reset that to `pointer` to convey that the element can be interacted with by clicking on it.
 
-<Example html={[`<details>`, `    <summary>Some details</summary>`, `    <p>More info about the details.</p>`, `  </details>`, ``, `  <details open>`, `    <summary>Even more details</summary>`, `    <p>Here are even more details about the details.</p>`, `  </details>`]} />
+<Example html={[`<details>`, `  <summary>Some details</summary>`, `  <p>More info about the details.</p>`, `</details>`, ``, `<details open>`, `  <summary>Even more details</summary>`, `  <p>Here are even more details about the details.</p>`, `</details>`]} />
 
 ## HTML5 `[hidden]` attribute
 
