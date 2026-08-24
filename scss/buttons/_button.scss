@@ -86,8 +86,8 @@ $button-variants: defaults(
     "solid": (
       "base": (
         "color": ("contrast", $btn-color),
-        "bg": ("base", $btn-bg),
-        "border-color": ("base", $btn-bg)
+        "bg": ("bg", $btn-bg),
+        "border-color": ("bg", $btn-bg)
       ),
       "hover": (
         "color": ("contrast", $btn-color),
@@ -102,9 +102,9 @@ $button-variants: defaults(
     ),
     "outline": (
       "base": (
-        "color": ("base", $btn-outline-color),
+        "color": ("fg", $btn-outline-color),
         "bg": "transparent",
-        "border-color": ("base", $btn-outline-border-color)
+        "border-color": ("border", $btn-outline-border-color)
       ),
       "hover": (
         "color": ("contrast", $btn-outline-hover-color),
@@ -136,7 +136,7 @@ $button-variants: defaults(
     ),
     "ghost": (
       "base": (
-        "color": ("base", $btn-ghost-color),
+        "color": ("fg", $btn-ghost-color),
         "bg": "transparent",
         "border-color": "transparent"
       ),

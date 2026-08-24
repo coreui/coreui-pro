@@ -418,7 +418,7 @@ check, radio, carousel and toggler icons already work:
   **`.btn-close-white` is gone**, deprecated since v5.0.0, and so is the
   dark-mode rule that forced the glyph white. Both restated what the inherited
   colour already produces on a surface that paints its own text — a
-  `.text-bg-dark` toast, a dark navbar's offcanvas, a `.bg-body.text-body`
+  `.text-bg-inverse` toast, a dark navbar's offcanvas, a `.bg-body.text-body`
   section under `data-coreui-theme="dark"`. Delete the class; the button
   renders identically without it. The rule additionally got the mirror case
   wrong: a `data-coreui-theme="light"` section inside a dark page inherited the
@@ -1525,7 +1525,7 @@ Multi Select's option indicators moved with it — they render as a decorative
   background, so flush against the header's inner edge they touch the border.
   Drop the class and keep `.nav.nav-pills`.
 - **The footer follows the theme colour like the header does.** A themed card
-  (`.card.theme-dark`, say) used to paint the footer's background from the theme
+  (`.card.theme-inverse`, say) used to paint the footer's background from the theme
   while leaving its text at the body colour, so the label sank into the fill.
   The footer now reads `--cui-theme-contrast` with `--cui-card-cap-color` as the
   fallback, the same expression the header already used.
@@ -2304,7 +2304,7 @@ tintable and lets dark mode deepen every shadow at once.
 #### Theme tokens
 
 - New `--cui-theme-*` indirection plus generated `.theme-primary` …
-  `.theme-dark` classes: a themed container sets `--cui-theme-fg`,
+  `.theme-inverse` classes: a themed container sets `--cui-theme-fg`,
   `--cui-theme-bg-subtle`, `--cui-theme-border`, and token-driven components
   (alert, buttons) read them. Contextual classes like `.alert-success` are now
   implemented through these tokens — same rendering, new mechanics.
@@ -2414,6 +2414,57 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   declares `color-scheme: light` and nothing ever declares `dark`, so every
   `light-dark()` pair resolves to its light side.
 
+#### `light` and `dark` are replaced by `inverse`
+
+<span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+
+`light` and `dark` were theme colours whose names described a colour scheme, and
+they behaved like it: `.theme-dark` sat next to `data-coreui-theme="dark"`
+meaning something else entirely, and neither followed the reader's scheme — a
+`.btn-dark` stayed near-black on a near-black page. There are seven theme colours
+now, and the two neutrals swap ends of the gray scale between schemes.
+
+- **`inverse` replaces `dark`.** It resolves to `gray-900` in light mode and
+  `gray-100` in dark, so `.btn-inverse`, `.text-bg-inverse` and
+  `.table-inverse` stand against the page in both.
+- **`secondary` takes over what `light` did.** It is a light neutral now
+  (`gray-100` in light mode, `gray-600` in dark) rather than the mid gray-blue
+  `#6b7785`, so `.btn-secondary` and `.bg-secondary` change appearance.
+- **Every `-light` and `-dark` class is gone.** Rename `-dark` to `-inverse` and
+  `-light` to `-secondary` across `alert`, `bg`, `border` (and its per-side
+  variants), `btn`, `btn-ghost`, `btn-outline`, `btn-subtle`, `callout`, `chip`,
+  `focus-ring`, `link-underline`, `list-group-item`, `shadow`, `table`, `text`,
+  `text-bg` and `theme`, plus the `-subtle` and `-emphasis` families. The
+  colour-scheme opt-ins keep their names: `.navbar-dark`, `.dropdown-menu-dark`,
+  `.carousel-dark` and `.sidebar-dark` are unaffected, as is `.fw-light`.
+- **A surface is not a theme colour.** Where `.bg-light` was a neutral panel,
+  reach for `.bg-body-secondary` or `.bg-body-tertiary`; where `.bg-dark` was a
+  fixed dark backdrop, set `data-coreui-theme="dark"` on the container and let
+  the surface classes follow.
+- **`--cui-theme-base` is now `--cui-theme-bg`.** The contextual token that
+  components read for a fill was named after the map slot rather than the job;
+  the slot is still `base`, and `--cui-{color}` is unchanged.
+- **Colour utilities read the slot that stays legible.** `.text-*` points at
+  `--cui-{color}-fg` instead of the raw colour, and `.btn-outline-*` and
+  `.btn-ghost-*` take their text from it too. For the five chromatic colours this
+  is a shade darker in light mode and a shade lighter in dark; for the neutrals it
+  is the difference between readable and gray-on-gray. `.btn-outline-*` also
+  takes its border from the `border` slot, so the outline is a subtle line
+  rather than a full-strength one. `.bg-*` and `.border-*` keep reading the
+  colour itself.
+- **`$light` and `$dark` are removed; `$inverse` is new.** `$secondary` and
+  `$inverse` hold a `light-dark()` expression rather than a Sass colour, so they
+  cannot be passed to `color-contrast()` or the tint/shade functions — read
+  `$gray-*` for that.
+- **`$utilities-colors` is removed.** It was a flat `name → colour` copy of the
+  map's `base` slot, and no utility reads the raw colour for every family any
+  more. Call `map-slot($theme-colors, "base")` where you need one, or
+  `theme-color-refs("fg")` for the slot a text utility uses.
+- **`$theme-lightness-overrides` is now `$theme-state-colors`** and carries
+  ready values rather than lightness multipliers. A single multiplier cannot
+  serve a colour that is dark in one scheme and light in the other, so the two
+  neutrals step along the gray scale instead.
+
 #### Component icons render through CSS masks
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2489,8 +2540,7 @@ Upstream v6 does the same, with a `mask-icon()` mixin.
   recompute it. The knobs moved with them: `$btn-hover-lightness`,
   `$btn-active-lightness` and `$btn-lightness-overrides` are now
   `$theme-hover-lightness`, `$theme-active-lightness` and
-  `$theme-lightness-overrides` in `scss/_theme.scss` (dark still brightens
-  instead of darkening).
+  `$theme-state-colors` in `scss/_theme.scss`.
 - **The dark-mode button block is gone** (~160 lines of CSS) — variants follow
   the root color tokens, which already switch in dark mode.
 - <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
@@ -2571,8 +2621,9 @@ The class API does not change — `.bg-primary` and `.bg-opacity-50` still exist
 and still compose. What changes is where the translucency expression lives:
 
 - **`$utilities-text-colors`, `$utilities-bg-colors`, `$utilities-border-colors`
-  and `$utilities-links-underline` now carry plain colour references**
-  (`var(--cui-primary)`) instead of a `color-mix()` expression per entry. The
+  and `$utilities-links-underline` now carry plain token references**
+  (`var(--cui-primary)`, `var(--cui-primary-fg)`) instead of a `color-mix()`
+  expression per entry. The
   expression is written once, in the utility's `property` map. If you built a
   map of your own by calling `translucent-css-var()`, call the new
   `color-var-ref()` instead — same arguments, without the wrapper.
@@ -2903,7 +2954,7 @@ names and their classes here.
 
 `_config.scss` no longer defines a single colour. The palette — the base
 colours, the grays and their maps — lives in `scss/_colors.scss`; the theme
-colour system — `$primary`…`$dark`, the `$theme-colors` map, the runtime
+colour system — `$primary`…`$inverse`, the `$theme-colors` map, the runtime
 colour-scale knobs and the `$theme-colors-*` slot maps — lives in
 `scss/_theme.scss`. `scss/_maps.scss` is dissolved: the `$utilities-*` maps and
 `$negative-spacers` sit in `scss/_utilities.scss` next to the `$utilities`

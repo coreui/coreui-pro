@@ -2,6 +2,7 @@
 @use "mixins/border-radius" as *;
 @use "mixins/tokens" as *;
 @use "config" as *;
+@use "theme" as *;
 
 // Callouts
 // scss-docs-start callout-variables
@@ -14,16 +15,7 @@ $callout-border-width:              var(--#{$prefix}border-width) !default;
 $callout-border-color:              var(--#{$prefix}border-color) !default;
 $callout-border-left-width:         calc(#{$callout-border-width} * 4) !default;
 
-$callout-variants: (
-  "primary":    var(--#{$prefix}primary),
-  "secondary":  var(--#{$prefix}secondary),
-  "success":    var(--#{$prefix}success),
-  "danger":     var(--#{$prefix}danger),
-  "warning":    var(--#{$prefix}warning),
-  "info":       var(--#{$prefix}info),
-  "light":      var(--#{$prefix}light),
-  "dark":       var(--#{$prefix}dark)
-) !default;
+$callout-variants: theme-color-refs("bg") !default;
 // scss-docs-end callout-variables
 
 $callout-tokens: () !default;

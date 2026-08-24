@@ -122,8 +122,8 @@ $pagination-sizes: defaults(
     .active > & {
       z-index: 3;
       color: var(--#{$prefix}theme-contrast, var(--#{$prefix}pagination-active-color));
-      @include gradient-bg(var(--#{$prefix}theme-base, var(--#{$prefix}pagination-active-bg)));
-      border-color: var(--#{$prefix}theme-base, var(--#{$prefix}pagination-active-border-color));
+      @include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}pagination-active-bg)));
+      border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}pagination-active-border-color));
     }
 
     &.disabled,

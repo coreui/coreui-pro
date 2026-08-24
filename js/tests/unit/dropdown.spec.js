@@ -1193,7 +1193,7 @@ describe('Dropdown', () => {
     it('should not use "static" Popper in navbar', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<nav class="navbar navbar-expand-md bg-light">',
+          '<nav class="navbar navbar-expand-md bg-body-secondary">',
           '  <div class="dropdown">',
           '    <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">Dropdown</button>',
           '    <div class="dropdown-menu">',
@@ -1264,7 +1264,7 @@ describe('Dropdown', () => {
     it('should manage bs attribute `data-coreui-popper`="static" when dropdown is in navbar', () => {
       return new Promise(resolve => {
         fixtureEl.innerHTML = [
-          '<nav class="navbar navbar-expand-md bg-light">',
+          '<nav class="navbar navbar-expand-md bg-body-secondary">',
           '  <div class="dropdown">',
           '    <button class="btn dropdown-toggle" data-coreui-toggle="dropdown" aria-expanded="false">Dropdown</button>',
           '    <div class="dropdown-menu">',

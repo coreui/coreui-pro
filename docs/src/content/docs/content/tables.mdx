@@ -123,9 +123,9 @@ Use `.table-striped-columns` to add zebra-striping to any table column.
 
 These classes can also be added to table variants:
 
-<Example html={demo('table table-dark table-striped')} code={snippet('table table-dark table-striped')} />
+<Example html={demo('table table-inverse table-striped')} code={snippet('table table-inverse table-striped')} />
 
-<Example html={demo('table table-dark table-striped-columns')} code={snippet('table table-dark table-striped-columns')} />
+<Example html={demo('table table-inverse table-striped-columns')} code={snippet('table table-inverse table-striped-columns')} />
 
 <Example html={demo('table table-success table-striped')} code={snippet('table table-success table-striped')} />
 
@@ -137,7 +137,7 @@ Add `.table-hover` to enable a hover state on table rows within a `<tbody>`.
 
 <Example html={demo('table table-hover')} code={snippet('table table-hover')} />
 
-<Example html={demo('table table-dark table-hover')} code={snippet('table table-dark table-hover')} />
+<Example html={demo('table table-inverse table-hover')} code={snippet('table table-inverse table-hover')} />
 
 These hoverable rows can also be combined with the striped rows variant:
 
@@ -170,10 +170,10 @@ Highlight a table row or cell by adding a `.table-active` class.
 </table>
 ```
 
-<Example html={[`<table class="table table-dark">`, `  <thead>`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr class="table-active">`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td colspan="2" class="table-active">Larry the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `</table>`]} />
+<Example html={[`<table class="table table-inverse">`, `  <thead>`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr class="table-active">`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td colspan="2" class="table-active">Larry the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `</table>`]} />
 
 ```html
-<table class="table table-dark">
+<table class="table table-inverse">
   <thead>
     ...
   </thead>
@@ -200,7 +200,7 @@ For the accented tables ([striped rows](#striped-rows), [striped columns](#strip
 - We start by setting the background of a table cell with the `--cui-table-bg` custom property. All table variants then set that custom property to colorize the table cells. This way, we don't get into trouble if semi-transparent colors are used as table backgrounds.
 - Then we add a gradient on the table cells with `background-image: linear-gradient(var(--cui-table-accent-bg), var(--cui-table-accent-bg));` to layer on top of any specified `background-color`. Since `--cui-table-accent-bg` is transparent by default, we have an invisible transparent linear gradient by default.
 - When either `.table-striped`, `.table-hover` or `.table-active` classes are added, the `--cui-table-accent-bg` is set to a semitransparent color to colorize the background.
-- For each table variant, we generate a `--cui-table-accent-bg` color with the highest contrast depending on that color. For example, the accent color for `.table-primary` is darker while `.table-dark` has a lighter accent color.
+- For each table variant, we generate a `--cui-table-accent-bg` color with the highest contrast depending on that color. For example, the accent color for `.table-primary` is darker while `.table-inverse` has a lighter accent color.
 - Text and border colors are generated the same way, and their colors are inherited by default.
 
 Behind the scenes it looks like this:
@@ -225,7 +225,7 @@ Add `.table-borderless` for a table without borders.
 
 <Example html={demo('table table-borderless')} code={snippet('table table-borderless')} />
 
-<Example html={demo('table table-dark table-borderless')} code={snippet('table table-dark table-borderless')} />
+<Example html={demo('table table-inverse table-borderless')} code={snippet('table table-inverse table-borderless')} />
 
 ## Small tables
 
@@ -233,7 +233,7 @@ Add `.table-sm` to make any `.table` more compact by cutting all cell `padding` 
 
 <Example html={demo('table table-sm')} code={snippet('table table-sm')} />
 
-<Example html={demo('table table-dark table-sm')} code={snippet('table table-dark table-sm')} />
+<Example html={demo('table table-inverse table-sm')} code={snippet('table table-inverse table-sm')} />
 
 ## Table group dividers
 
@@ -336,13 +336,13 @@ Note that if you add `<tr>`s as direct children of a table, those `<tr>` will be
 
 ### Table head
 
-Similar to tables and dark tables, use the modifier classes `.table-light` or `.table-dark` to make `<thead>`s appear light or dark gray.
+Similar to tables and dark tables, use the modifier classes `.table-secondary` or `.table-inverse` to make `<thead>`s appear light or dark gray.
 
-<Example html={[`<table class="table">`, `  <thead class="table-light">`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr>`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td>Larry</td>`, `      <td>the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `</table>`]} />
+<Example html={[`<table class="table">`, `  <thead class="table-secondary">`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr>`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td>Larry</td>`, `      <td>the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `</table>`]} />
 
 ```html
 <table class="table">
-  <thead class="table-light">
+  <thead class="table-secondary">
     ...
   </thead>
   <tbody>
@@ -351,11 +351,11 @@ Similar to tables and dark tables, use the modifier classes `.table-light` or `.
 </table>
 ```
 
-<Example html={[`<table class="table">`, `  <thead class="table-dark">`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr>`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td>Larry</td>`, `      <td>the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `</table>`]} />
+<Example html={[`<table class="table">`, `  <thead class="table-inverse">`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr>`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td>Larry</td>`, `      <td>the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `</table>`]} />
 
 ```html
 <table class="table">
-  <thead class="table-dark">
+  <thead class="table-inverse">
     ...
   </thead>
   <tbody>
@@ -366,7 +366,7 @@ Similar to tables and dark tables, use the modifier classes `.table-light` or `.
 
 ### Table foot
 
-<Example html={[`<table class="table">`, `  <thead class="table-light">`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr>`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td>Larry</td>`, `      <td>the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `  <tfoot>`, `    <tr>`, `      <td>Footer</td>`, `      <td>Footer</td>`, `      <td>Footer</td>`, `      <td>Footer</td>`, `    </tr>`, `  </tfoot>`, `</table>`]} />
+<Example html={[`<table class="table">`, `  <thead class="table-secondary">`, `    <tr>`, `      <th scope="col">#</th>`, `      <th scope="col">First</th>`, `      <th scope="col">Last</th>`, `      <th scope="col">Handle</th>`, `    </tr>`, `  </thead>`, `  <tbody>`, `    <tr>`, `      <th scope="row">1</th>`, `      <td>Mark</td>`, `      <td>Otto</td>`, `      <td>@mdo</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">2</th>`, `      <td>Jacob</td>`, `      <td>Thornton</td>`, `      <td>@fat</td>`, `    </tr>`, `    <tr>`, `      <th scope="row">3</th>`, `      <td>Larry</td>`, `      <td>the Bird</td>`, `      <td>@twitter</td>`, `    </tr>`, `  </tbody>`, `  <tfoot>`, `    <tr>`, `      <td>Footer</td>`, `      <td>Footer</td>`, `      <td>Footer</td>`, `      <td>Footer</td>`, `    </tr>`, `  </tfoot>`, `</table>`]} />
 
 ```html
 <table class="table">

@@ -74,7 +74,7 @@ $progress-tokens: defaults(
     color: var(--#{$prefix}theme-contrast, var(--#{$prefix}progress-bar-color));
     text-align: center;
     white-space: nowrap;
-    background-color: var(--#{$prefix}theme-base, var(--#{$prefix}progress-bar-bg));
+    background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}progress-bar-bg));
     @include transition(var(--#{$prefix}progress-bar-transition));
   }
 

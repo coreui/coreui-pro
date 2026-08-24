@@ -79,7 +79,7 @@ $chip-tokens: defaults(
     --#{$prefix}chip-border-width: #{$chip-border-width},
     --#{$prefix}chip-border-color: #{$chip-border-color},
     --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, #{$chip-active-bg}),
     --#{$prefix}chip-active-border-color: #{$chip-active-border-color},
     --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-hover-color}),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-muted, #{$chip-hover-bg}),
@@ -98,13 +98,13 @@ $chip-outline-tokens: () !default;
 // scss-docs-start chip-outline-css-vars
 $chip-outline-tokens: defaults(
   (
-    --#{$prefix}chip-color: var(--#{$prefix}theme-base, var(--#{$prefix}body-color)),
+    --#{$prefix}chip-color: var(--#{$prefix}theme-fg, var(--#{$prefix}body-color)),
     --#{$prefix}chip-bg: transparent,
-    --#{$prefix}chip-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}border-color)),
+    --#{$prefix}chip-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color)),
     --#{$prefix}chip-hover-bg: var(--#{$prefix}theme-bg-subtle, #{$chip-hover-bg}),
     --#{$prefix}chip-hover-color: var(--#{$prefix}theme-fg-emphasis, #{$chip-color}),
-    --#{$prefix}chip-hover-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}border-color)),
-    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-base, #{$chip-active-bg}),
+    --#{$prefix}chip-hover-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}border-color)),
+    --#{$prefix}chip-active-bg: var(--#{$prefix}theme-bg, #{$chip-active-bg}),
     --#{$prefix}chip-active-color: var(--#{$prefix}theme-contrast, #{$chip-active-color}),
   ),
   $chip-outline-tokens

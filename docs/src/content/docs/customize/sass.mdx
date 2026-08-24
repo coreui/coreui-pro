@@ -219,7 +219,7 @@ Next to the [Sass maps](/customize/color/#color-sass-maps) we have, theme colors
 ```scss
 .custom-element {
   color: $gray-100;
-  background-color: $dark;
+  background-color: $gray-900;
 }
 ```
 
@@ -282,7 +282,7 @@ You can also specify a base color with our color map functions:
 @use "@coreui/coreui/scss/functions/color-contrast" as *;
 
 .custom-element {
-  color: color-contrast($dark); // returns `color: #fff`
+  color: color-contrast($gray-900); // returns `color: #fff`
 }
 ```
 

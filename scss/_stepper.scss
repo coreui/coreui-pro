@@ -24,7 +24,7 @@ $stepper-step-indicator-border-width:           var(--#{$prefix}border-width) !d
 $stepper-step-indicator-border-color:           var(--#{$prefix}border-color) !default;
 $stepper-step-indicator-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 $stepper-step-indicator-active-color:           var(--#{$prefix}primary) !default;
-$stepper-step-indicator-active-bg:              color-mix(in srgb, var(--#{$prefix}theme-base, var(--#{$prefix}primary)) 5%, transparent) !default;
+$stepper-step-indicator-active-bg:              color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 5%, transparent) !default;
 $stepper-step-indicator-active-border-color:    var(--#{$prefix}primary) !default;
 $stepper-step-indicator-complete-color:         var(--#{$prefix}primary-contrast) !default;
 $stepper-step-indicator-complete-bg:            var(--#{$prefix}primary) !default;
@@ -149,9 +149,9 @@ $stepper-tokens: defaults(
 
     &.active {
       --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-active-color);
-      --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-active-color));
+      --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-fg, var(--#{$prefix}stepper-step-indicator-active-color));
       --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}stepper-step-indicator-active-bg);
-      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-active-border-color));
+      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-active-border-color));
     }
 
     &:disabled {
@@ -164,15 +164,15 @@ $stepper-tokens: defaults(
     &.complete {
       --#{$prefix}stepper-step-button-color: var(--#{$prefix}stepper-step-button-complete-color);
       --#{$prefix}stepper-step-indicator-color: var(--#{$prefix}theme-contrast, var(--#{$prefix}stepper-step-indicator-complete-color));
-      --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-complete-bg));
-      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-indicator-complete-border-color));
+      --#{$prefix}stepper-step-indicator-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-complete-bg));
+      --#{$prefix}stepper-step-indicator-border-color: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-indicator-complete-border-color));
 
       .stepper-step-indicator-text {
         display: none;
       }
 
       ~ .stepper-step-connector {
-        --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}theme-base, var(--#{$prefix}stepper-step-connector-complete-bg));
+        --#{$prefix}stepper-step-connector-bg: var(--#{$prefix}theme-bg, var(--#{$prefix}stepper-step-connector-complete-bg));
       }
     }
 
