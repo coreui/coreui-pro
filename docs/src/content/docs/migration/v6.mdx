@@ -1425,6 +1425,23 @@ Multi Select's option indicators moved with it — they render as a decorative
   (`address`, `ol`/`ul`/`dl`, `dd`, `blockquote`, `pre`, `figure`). Values are
   unchanged.
 
+#### Floating labels
+
+- **The label may now come first.** `.form-floating` matches the control's state
+  in both directions — forward from the label with `:has()`, backward from the
+  control with `~` — so `<label>` before the control floats and disables exactly
+  like the v5 order, which keeps working. Writing the label first lets a screen
+  reader announce it before the field's value, and the docs examples do.
+- **A textarea's label stays at the top.** The label is a flex box centred on the
+  control, and `label:has(~ textarea)` anchors it to the start instead, so it
+  floats correctly however tall the textarea is.
+
+#### Lists
+
+- **`--cui-list-inline-padding` is new.** The gap between `.list-inline-item`s was
+  compiled into the rule, so respacing an inline list meant rebuilding from Sass.
+  `.list-inline` declares it, at the same `.5rem`.
+
 #### Tables
 
 - **`.table-responsive*` is a query container.** It still scrolls horizontally
