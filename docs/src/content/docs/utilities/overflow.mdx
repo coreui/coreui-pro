@@ -15,6 +15,24 @@ Adjust the `overflow` property on the fly with four default values and classes. 
 <div class="overflow-scroll">...</div>
 ```
 
+## Overflow on one axis
+
+The same four values are generated per axis as `.overflow-x-*` and `.overflow-y-*`, which set `overflow-x` and `overflow-y` on their own. Use them when only one direction should scroll or clip.
+
+<Example class="d-md-flex" html={[`<div class="overflow-x-scroll p-3 mb-3 mb-md-0 me-md-3 bg-4" style="max-width: 260px; max-height: 100px;">`, `  This is an example of using <code>.overflow-x-scroll</code>, so this content scrolls horizontally and is clipped vertically.`, `</div>`, `<div class="overflow-y-scroll p-3 bg-4" style="max-width: 260px; max-height: 100px;">`, `  This is an example of using <code>.overflow-y-scroll</code>, so this content scrolls vertically and is clipped horizontally.`, `</div>`]} />
+
+```html
+<div class="overflow-x-auto">...</div>
+<div class="overflow-x-hidden">...</div>
+<div class="overflow-x-visible">...</div>
+<div class="overflow-x-scroll">...</div>
+
+<div class="overflow-y-auto">...</div>
+<div class="overflow-y-hidden">...</div>
+<div class="overflow-y-visible">...</div>
+<div class="overflow-y-scroll">...</div>
+```
+
 Using Sass variables, you may customize the overflow utilities by changing the `$overflows` variable in `_utilities.scss`.
 
 ## Customizing

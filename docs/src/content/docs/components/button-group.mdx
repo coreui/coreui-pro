@@ -137,7 +137,7 @@ Feel free to combine input groups with button groups in your toolbars. Similar t
 
 ## Sizing
 
-Alternatively, of implementing button sizing classes to each button in a group, add `.btn-group-*` to all `.btn-group`, including each one when nesting multiple groups.
+Alternatively, of implementing button sizing classes to each button in a group, add `.btn-group-*` to all `.btn-group`, including each one when nesting multiple groups. The sizes are `.btn-group-xs`, `.btn-group-sm` and `.btn-group-lg` — the same ladder the buttons themselves use.
 
 <Example code={`<div class="btn-group btn-group-lg" role="group" aria-label="Large button group">
     <button type="button" class="btn btn-outline-primary">Left</button>
@@ -152,6 +152,12 @@ Alternatively, of implementing button sizing classes to each button in a group, 
   </div>
   <br>
   <div class="btn-group btn-group-sm" role="group" aria-label="Small button group">
+    <button type="button" class="btn btn-outline-primary">Left</button>
+    <button type="button" class="btn btn-outline-primary">Middle</button>
+    <button type="button" class="btn btn-outline-primary">Right</button>
+  </div>
+  <br>
+  <div class="btn-group btn-group-xs" role="group" aria-label="Extra small button group">
     <button type="button" class="btn btn-outline-primary">Left</button>
     <button type="button" class="btn btn-outline-primary">Middle</button>
     <button type="button" class="btn btn-outline-primary">Right</button>
