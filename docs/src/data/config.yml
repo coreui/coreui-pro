@@ -17,7 +17,7 @@ header:
 seo:
   url: https://coreui.io/bootstrap/docs
   titleTemplate: "%s · CoreUI"
-  description: Open Source UI Components library built on top of Bootstrap 5.
+  description: Open Source UI Components library built on top of Bootstrap 6.
   image: https://coreui.io/bootstrap/docs/images/coreui-social.jpg
   twitter: core_ui
   author: CoreUI
