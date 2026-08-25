@@ -196,15 +196,15 @@ Modify the appearance of checked checkboxes by adding a [`.theme-{color}` class]
 
 ## Customizing
 
+### CSS variables
+
+Checkboxes read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
+
+<ScssDocs file="scss/forms/_check.scss" capture="check-css-vars" />
+
 ### SASS variables
 
 <ScssDocs file="scss/forms/_check.scss" capture="check-variables" />
-
-### CSS variables
-
-Checkboxs read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
-
-<ScssDocs file="scss/forms/_check.scss" capture="check-css-vars" />
 
 ### Shared variables
 
