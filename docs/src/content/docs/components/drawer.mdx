@@ -26,10 +26,10 @@ Toggle a drawer by clicking the button below.
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawer">`, `  Open drawer`, `</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawer">`, `  Open drawer`, `</button>`]} />
 
 ```html
-<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawer">
+<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawer">
   Open drawer
 </button>
 
@@ -94,7 +94,7 @@ Drawers can slide in from any edge of the viewport — apply one of the placemen
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerEnd">Right drawer</button>`, `<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerTop">Top drawer</button>`, `<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerBottom">Bottom drawer</button>`, `<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerFullscreen">Fullscreen drawer</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerEnd">Right drawer</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerTop">Top drawer</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerBottom">Bottom drawer</button>`, `<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerFullscreen">Fullscreen drawer</button>`]} />
 
 ## Variants
 
@@ -112,7 +112,7 @@ Add `.drawer-translucent` for a frosted-glass panel that blurs the content behin
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerTranslucent">Translucent drawer</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerTranslucent">Translucent drawer</button>`]} />
 
 ### Sheet
 
@@ -128,7 +128,7 @@ Combine `.drawer-bottom` with `.drawer-sheet` for a flush-to-edge bottom sheet w
   </div>
 </dialog>
 
-<Example html={[`<button type="button" class="btn btn-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerSheet">Bottom sheet</button>`]} />
+<Example html={[`<button type="button" class="btn-solid theme-primary" data-coreui-toggle="drawer" data-coreui-target="#exampleDrawerSheet">Bottom sheet</button>`]} />
 
 ### Fit content
 
@@ -138,7 +138,7 @@ Add `.drawer-fit-content` to a `.drawer-start`/`.drawer-end` drawer to keep the 
 
 The page scroll is blocked while a drawer is open. Set `scroll: true` to open the drawer non-modally instead — the page stays interactive and scrollable. A visible backdrop requires the top layer, so `backdrop: true` (the default) takes precedence over `scroll: true` for the page-interactivity part.
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerScrolling">Enable body scrolling</button>
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerScrolling">Enable body scrolling</button>
 
   <dialog class="drawer drawer-start" data-coreui-scroll="true" data-coreui-backdrop="false" id="drawerScrolling" aria-labelledby="drawerScrollingLabel">
     <div class="drawer-header">
@@ -154,7 +154,7 @@ The page scroll is blocked while a drawer is open. Set `scroll: true` to open th
 
 When the backdrop is set to `static`, the drawer will remain open when clicking outside of it.
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerStatic">
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerStatic">
     Toggle static drawer
   </button>
 
@@ -174,7 +174,7 @@ When the backdrop is set to `static`, the drawer will remain open when clicking 
 
 Responsive drawer classes hide content in a drawer below a specified breakpoint and render it inline above it. For example, `.drawer-lg` acts as a drawer below the `lg` breakpoint and displays the content inline above it.
 
-<Example code={`<button class="btn btn-primary d-lg-none" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerResponsive" aria-controls="drawerResponsive">Toggle drawer</button>
+<Example code={`<button class="btn-solid theme-primary d-lg-none" type="button" data-coreui-toggle="drawer" data-coreui-target="#drawerResponsive" aria-controls="drawerResponsive">Toggle drawer</button>
 
   <div class="alert alert-info d-none d-lg-block">Resize your browser to show the responsive drawer toggle.</div>
 

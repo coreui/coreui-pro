@@ -104,21 +104,21 @@ These work great with custom content as well.
         <div class="fw-bold">Subheading</div>
         Content for list item
       </div>
-      <span class="badge text-bg-primary rounded-pill">14</span>
+      <span class="badge theme-primary rounded-pill">14</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-start">
       <div class="ms-2 me-auto">
         <div class="fw-bold">Subheading</div>
         Content for list item
       </div>
-      <span class="badge text-bg-primary rounded-pill">14</span>
+      <span class="badge theme-primary rounded-pill">14</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-start">
       <div class="ms-2 me-auto">
         <div class="fw-bold">Subheading</div>
         Content for list item
       </div>
-      <span class="badge text-bg-primary rounded-pill">14</span>
+      <span class="badge theme-primary rounded-pill">14</span>
     </li>
   </ol>`} />
 
@@ -138,13 +138,13 @@ The responsive variants measure the nearest [query container](/utilities/contain
 
 ## Contextual classes
 
-Use contextual classes to style list items with a stateful background and color.
+Colour a list item with a [`.theme-*` class](/customize/components/#theme-variants). It works on the item, on the `.list-group` above it, or on both — an item's own theme wins over the one it inherits.
 
-<Example code={[`<ul class="list-group">`, `<li class="list-group-item">A simple default list group item</li>`, ...getData('theme-colors').map((c) => `<li class="list-group-item list-group-item-${c.name}">A simple ${c.name} list group item</li>`), ``, `</ul>`]} />
+<Example code={[`<ul class="list-group">`, `<li class="list-group-item">A simple default list group item</li>`, ...getData('theme-colors').map((c) => `<li class="list-group-item theme-${c.name}">A simple ${c.name} list group item</li>`), ``, `</ul>`]} />
 
 Contextual classes also work with `.list-group-item-action`. Note the addition of the hover styles here not present in the previous example. Also supported is the `.active` state; apply it to indicate an active selection on a contextual list group item.
 
-<Example code={[`<div class="list-group">`, `<a href="#" class="list-group-item list-group-item-action">A simple default list group item</a>`, ...getData('theme-colors').map((c) => `<a href="#" class="list-group-item list-group-item-action list-group-item-${c.name}">A simple ${c.name} list group item</a>`), ``, `</div>`]} />
+<Example code={[`<div class="list-group">`, `<a href="#" class="list-group-item list-group-item-action">A simple default list group item</a>`, ...getData('theme-colors').map((c) => `<a href="#" class="list-group-item list-group-item-action theme-${c.name}">A simple ${c.name} list group item</a>`), ``, `</div>`]} />
 
 <Callout color="info">
 ##### Conveying meaning to assistive technologies
@@ -159,15 +159,15 @@ Add badges to any list group item to show unread counts, activity, and more with
 <Example code={`<ul class="list-group">
     <li class="list-group-item d-flex justify-content-between align-items-center">
       A list item
-      <span class="badge text-bg-primary rounded-pill">14</span>
+      <span class="badge theme-primary rounded-pill">14</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
       A second list item
-      <span class="badge text-bg-primary rounded-pill">2</span>
+      <span class="badge theme-primary rounded-pill">2</span>
     </li>
     <li class="list-group-item d-flex justify-content-between align-items-center">
       A third list item
-      <span class="badge text-bg-primary rounded-pill">1</span>
+      <span class="badge theme-primary rounded-pill">1</span>
     </li>
   </ul>`} />
 
@@ -399,6 +399,23 @@ tabElms.forEach(tabElm => {
 })
 ```
 
+## Deprecated markup
+
+<DeprecatedIn version="6.0.0" />
+
+The v5 spelling — `.list-group-item` with a colour modifier — still works and renders identically. Each colour class is generated from the same theme map as the class it replaces, so `.list-group-item-primary` *is* `.list-group-item.theme-primary`. They are removed in v7.
+
+<Example code={[`<ul class="list-group">`, ...getData('theme-colors').map((c) => `<li class="list-group-item list-group-item-${c.name}">A simple ${c.name} list group item</li>`), ``, `</ul>`]} />
+
+```diff
+- <li class="list-group-item list-group-item-success">Done</li>
++ <li class="list-group-item theme-success">Done</li>
+```
+
+The rewrite buys two things the modifier cannot. A theme colour set on the `.list-group` reaches every item inside it, and a colour of your own works the moment you define its theme tokens, with no Sass to compile.
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
+
 ## Customizing
 
 ### CSS variables
@@ -417,9 +434,9 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 ### SASS loop
 
-Loop that generates the [contextual variant classes](#contextual-classes) for
-`.list-group-item`s. Each class sets the generic `--cui-theme-*` tokens, which the
-item, its `.active` state and `.list-group-item-action` read directly. Putting
-[`.theme-{color}`](/customize/theme/) on a list group colors it the same way.
+Loop that generates the [deprecated colour classes](#deprecated-markup) for
+`.list-group-item`s. Each class sets the same generic `--cui-theme-*` tokens that
+`.theme-{color}` sets, which is why the two spellings render identically — the item,
+its `.active` state and `.list-group-item-action` all read those tokens directly.
 
 <ScssDocs file="scss/_list-group.scss" capture="list-group-modifiers" />
