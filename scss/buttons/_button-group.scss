@@ -51,8 +51,11 @@
     }
 
     // Reset rounded corners
-    > .btn:not(:last-child, .dropdown-toggle),
+    // A menu trigger carries no class of its own, so it is recognised by the
+    // `.menu` that follows it.
+    > .btn:not(:last-child, .dropdown-toggle, :has(+ .menu)),
     > .btn.dropdown-toggle-split:first-child,
+    > .btn.menu-toggle-split:first-child,
     > .btn-group:not(:last-child) > .btn {
       @include border-end-radius(0);
     }
@@ -69,7 +72,8 @@
     }
   }
 
-  .dropdown-toggle-split {
+  .dropdown-toggle-split,
+  .menu-toggle-split {
     padding-inline: calc(var(--#{$prefix}btn-padding-x) * .75);
   }
 
@@ -106,7 +110,7 @@
     }
 
     // Reset rounded corners
-    > .btn:not(:last-child, .dropdown-toggle),
+    > .btn:not(:last-child, .dropdown-toggle, :has(+ .menu)),
     > .btn-group:not(:last-child) > .btn {
       @include border-bottom-radius(0);
     }
