@@ -164,6 +164,11 @@
       to: /forms/otp-input/
     - title: Password Input
       to: /forms/password-input/
+    - title: Password Strength
+      to: /forms/password-strength/
+      badge:
+        color: success
+        text: NEW
     - title: Radio
       to: /forms/radio/
     - title: Range
