@@ -27,7 +27,7 @@ Themeable components also support a single family of composable `.theme-*` class
 
 | Token | Description |
 | --- | --- |
-| `--cui-theme-base` | The theme color itself, e.g. a solid badge or button background |
+| `--cui-theme-bg` | The theme color itself, e.g. a solid badge or button background |
 | `--cui-theme-contrast` | Contrasting color for text and icons sitting on the solid base |
 | `--cui-theme-fg` | The theme's readable text color |
 | `--cui-theme-fg-emphasis` | High-contrast foreground, one step darker |
@@ -43,8 +43,13 @@ The `.theme-{name}` classes mirror the keys of the `$theme-colors` map in `scss/
 To see how a component consumes these tokens, here's the badge in `scss/_badge.scss`. Its color and background each read a theme token first, falling back to the badge's own default:
 
 ```scss
---cui-badge-color: var(--cui-theme-contrast, #{$badge-color}),
---cui-badge-bg: var(--cui-theme-base, #{$badge-bg}),
+// the token map carries only the badge's own default
+--#{$prefix}badge-color: #{$badge-color},
+--#{$prefix}badge-bg: #{$badge-bg},
+
+// the theme is read at the property, with the token as the fallback
+color: var(--#{$prefix}theme-contrast, var(--#{$prefix}badge-color));
+@include gradient-bg(var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg)));
 ```
 
 With no theme class the badge stays neutral; add `.theme-success` and the very same element resolves the success tokens — no `.badge-success` selector required. Structural variants compose with any theme:
@@ -55,12 +60,12 @@ Because the theme tokens are plain CSS variables, you can also scope a theme to 
 
 ```css
 .my-brand {
-  --cui-theme-base: #6f42c1;
+  --cui-theme-bg: #6f42c1;
   --cui-theme-contrast: #fff;
 }
 ```
 
-The classic color classes — `.btn-primary`, `.alert-success`, `.badge` color spellings from v5 — keep working: they are generated from the same theme tokens, so both APIs stay pixel-identical.
+Where a classic color class still exists — `.btn-primary`, `.alert-success` — it is generated from the same theme tokens, so both APIs stay pixel-identical. The badge is the exception: it has no `.badge-{color}` spelling, and `.theme-{color}` is the only way to color it.
 
 ### Building a themeable component
 
@@ -69,7 +74,7 @@ Read the theme slot **at the property**, wrapping the component's own token. Slo
 ```scss
 --#{$prefix}badge-bg: #{$badge-bg},
 // …
-background-color: var(--#{$prefix}theme-base, var(--#{$prefix}badge-bg));
+background-color: var(--#{$prefix}theme-bg, var(--#{$prefix}badge-bg));
 ```
 
 A structural variant maps the token to a slot of its own, and then **re-declares the property with a plain read** so it wins over the base rule:

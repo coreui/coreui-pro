@@ -186,6 +186,12 @@ Modify the appearance of checked radios by adding a [`.theme-{color}` class](/cu
 
 ## Customizing
 
+### CSS variables
+
+Radios read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
+
+<ScssDocs file="scss/forms/_radio.scss" capture="radio-css-vars" />
+
 ### SASS variables
 
 <DeprecatedIn version="6.0.0" />
@@ -193,12 +199,6 @@ Modify the appearance of checked radios by adding a [`.theme-{color}` class](/cu
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
 
 <ScssDocs file="scss/forms/_radio.scss" capture="radio-variables" />
-
-### CSS variables
-
-Radios read their own custom properties, so restyling one control does not touch the other two. Set them on the control itself — an ancestor cannot override a token the element declares for itself.
-
-<ScssDocs file="scss/forms/_radio.scss" capture="radio-css-vars" />
 
 ### Shared variables
 
