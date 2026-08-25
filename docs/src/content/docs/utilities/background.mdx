@@ -13,7 +13,7 @@ Similar to the contextual text color classes, set the background of an element t
 Each theme color comes in three weights: the solid color, `.bg-*-muted` and `.bg-*-subtle`. The two lighter ones are surfaces to read text on, and `.text-*-emphasis` is the color that reads on them — `.bg-*-muted` is the step you want when a subtle surface has to separate from a subtle surface behind it, which is what a hovered row or a selected item needs.
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 bg-${c.name} ${c.contrast_color ? `text-${c.contrast_color}` : `text-white`}">.bg-${c.name}</div>
+  ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 text-bg-${c.name}">.bg-${c.name}</div>
 <div class="p-3 mb-2 bg-${c.name}-muted text-${c.name}-emphasis">.bg-${c.name}-muted</div>
 <div class="p-3 mb-2 bg-${c.name}-subtle text-${c.name}-emphasis">.bg-${c.name}-subtle</div>`),
   `<div class="p-3 mb-2 bg-body text-body">.bg-body</div>

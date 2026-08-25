@@ -11,7 +11,7 @@ import { getData } from '@coreui/astro-docs/data'
 Colorize text with color utilities. To colorize a link, give it a [theme class](/customize/theme/) instead — Reboot resolves a link's colour from the theme, and the theme slot carries a hover tone with it. See [link utilities](/utilities/link/).
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<p class="text-${c.name}${c.contrast_color ? ` bg-${c.contrast_color}`: ``}">.text-${c.name}</p>
+  ...getData('theme-colors').map((c) => `<p class="text-${c.name}">.text-${c.name}</p>
 <p class="text-${c.name}-emphasis">.text-${c.name}-emphasis</p>`),
   `<p class="text-body">.text-body</p>
 <p class="text-body-emphasis">.text-body-emphasis</p>
