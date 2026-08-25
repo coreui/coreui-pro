@@ -14,6 +14,8 @@ We're building a Webpack project with CoreUI from scratch, so there are some pre
    npm init -y
    ```
 
+   Current npm versions write `"type": "commonjs"` into that fresh `package.json`. Delete that line. Our `src/js/main.js` is written with `import`, and under `"type": "commonjs"` Webpack refuses to parse it (*'import' and 'export' may appear only with 'sourceType: module'*). With no `type` field, Webpack detects the module system per file, so the ESM source and the CommonJS `webpack.config.js` below both work.
+
 2. **Install Webpack.** Next we need to install our Webpack development dependencies: `webpack` for the core of Webpack, `webpack-cli` so we can run Webpack commands from the terminal, and `webpack-dev-server` so we can run a local development server. We use `--save-dev` to signal that these dependencies are only for development use and not for production.
 
    ```sh
@@ -103,7 +105,7 @@ With dependencies installed and our project folder ready for us to start coding,
      <body>
        <div class="container py-4 px-3 mx-auto">
          <h1>Hello, CoreUI and Webpack!</h1>
-         <button class="btn btn-primary">Primary button</button>
+         <button class="btn-solid theme-primary">Primary button</button>
        </div>
        <script src="./main.js"></script>
      </body>
@@ -186,16 +188,18 @@ Importing CoreUI into Webpack requires the loaders we installed in the first sec
 
    Here's a recap of why we need all these loaders. `style-loader` injects the CSS into a `<style>` element in the `<head>` of the HTML page, `css-loader` helps with using `@import` and `url()`, `postcss-loader` is required for Autoprefixer, and `sass-loader` allows us to use Sass.
 
-2. **Now, let's import CoreUI's CSS.** Add the following to `src/scss/styles.scss` to import all of CoreUI's source Sass.
+2. **Now, let's import CoreUI's CSS.** Add the following to `src/scss/styles.scss` to import all of CoreUI's source Sass. `sass-loader` resolves the package name through `node_modules`, so the path needs no `~` prefix and no alias.
 
    ```scss
    // Use all of CoreUI's CSS
-   @use "~@coreui/coreui/scss/coreui";
-
-   // Or use all of CoreUI PRO's CSS
-   @use "~@coreui/coreui-pro/scss/coreui";
+   @use "@coreui/coreui/scss/coreui";
    ```
 
+   PRO users import the PRO package instead. Import **one** of the two — importing both emits the whole stylesheet twice.
+
+   ```scss
+   @use "@coreui/coreui-pro/scss/coreui";
+   ```
 
    *You can also import our stylesheets individually if you want. [Read our Sass import docs](/customize/sass/#importing) for details.*
 
@@ -207,8 +211,11 @@ Importing CoreUI into Webpack requires the loaders we installed in the first sec
 
    // Import all of CoreUI's JS
    import * as coreui from '@coreui/coreui'
+   ```
 
-   // Or import all of CoreUI PRO's JS
+   PRO users import the PRO package instead. Again, pick one — two `import * as coreui` statements in the same file bind the same name twice and the file will not parse.
+
+   ```js
    import * as coreui from '@coreui/coreui-pro'
    ```
 

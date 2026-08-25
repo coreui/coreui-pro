@@ -18,6 +18,7 @@ You can find and customize these variables for key global options in CoreUI for 
 | `$enable-reduced-motion`       | `true` (default) or `false`        | Enables the [`prefers-reduced-motion` media query](/getting-started/accessibility/#reduced-motion), which suppresses certain animations/transitions based on the users' browser/operating system preferences. |
 | `$enable-grid-classes`         | `true` (default) or `false`        | Enables the generation of CSS classes for the grid system (e.g. `.row`, `.col-md-1`, etc.). |
 | `$enable-container-classes`    | `true` (default) or `false`        | Enables the generation of CSS classes for layout containers. (New in v4.2.6) |
+| `$enable-cssgrid`              | `true` (default) or `false`        | Enables the generation of the [CSS Grid layout](/layout/css-grid/) classes (e.g. `.grid`, `.g-col-6`). |
 | `$enable-caret`                | `true` (default) or `false`        | Enables pseudo element caret on `.dropdown-toggle`. |
 | `$enable-button-pointers`      | `true` (default) or `false`        | Add "hand" cursor to non-disabled button elements. |
 | `$enable-validation-icons`     | `true` (default) or `false`        | Enables `background-image` icons within textual inputs and some custom forms for validation states. |
@@ -26,5 +27,5 @@ You can find and customize these variables for key global options in CoreUI for 
 | `$enable-deprecated-form-check` | `true` (default) or `false`       | Keeps the v5 form check spelling — `.form-check`, `.form-check-input`, `.form-check-label`, `.form-check-inline`, `.form-switch` — as aliases of [`.form-field`](/forms/field/), [`.check`](/forms/checkbox/), [`.radio`](/forms/radio/) and [`.switch`](/forms/switch/). Set to `false` once your markup has moved; that removes every `.form-check*` selector and takes 455 bytes gzip off the stylesheet. Removed in v7. |
 | `$enable-important-utilities`  | `true` or `false` (default)        | Adds the `!important` suffix to utility classes. Off since v6: utilities are emitted in the last [cascade layer](/migration/v6/#cascade-layers), so they already beat every component. Turn it on if your own CSS sits outside a layer and has to lose to utilities — unlayered styles beat every layer. |
 | `$enable-smooth-scroll`        | `true` (default) or `false`        | Applies `scroll-behavior: smooth` globally, except for users asking for reduced motion through [`prefers-reduced-motion` media query](/getting-started/accessibility/#reduced-motion) |
-| `$enable-ltr`                  | `false` or `false` (default)       | Enables Left-to-Right |
+| `$enable-ltr`                  | `true` (default) or `false`        | Enables Left-to-Right |
 | `$enable-rtl`                  | `true` (default) or `false`        | Enables Right-to-Left |

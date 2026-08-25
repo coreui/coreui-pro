@@ -58,6 +58,8 @@ For example, to change the color mode of a dropdown menu, add `data-coreui-theme
 
 - Almost every global color is declared once, as a native [`light-dark()`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark) pair, so there is no second set of dark declarations to keep in sync. The `data-coreui-theme="dark"` selector only has to declare `color-scheme: dark` and every pair — plus the native form widgets — follows. The exceptions are values `light-dark()` cannot hold: the colors baked into embedded SVGs (the select chevron, the switch knob) and filters keep their own dark rule.
 
+  Note that `light-dark()` is the *mechanism*, not the switch. `:root` declares `color-scheme: light` outright rather than `light dark`, so a pair resolves to its light value until something sets `color-scheme: dark` — which, in practice, means the `data-coreui-theme` attribute. The operating system preference does not reach the pairs on its own; see [Building with Sass](#building-with-sass) for the media-query build if that is what you want.
+
 ## Usage
 
 ### Enable dark mode

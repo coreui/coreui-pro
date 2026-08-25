@@ -1,5 +1,5 @@
 ---
-title: "Bootstrap 5 Progress"
+title: "Bootstrap 6 Progress"
 name: "Progress"
 description: "Documentation and examples for using Bootstrap custom progress bars featuring support for stacked bars, animated backgrounds, and text labels."
 otherFrameworks:
@@ -62,26 +62,28 @@ We only set a `height` value on the `.progress`, so if you change that value the
 
 ## Backgrounds
 
-Use background utility classes to change the appearance of individual progress bars.
+Colour a bar with a [`.theme-*` class](/customize/components/#theme-variants). The bar reads both the theme's fill and the contrast colour that reads on it, so a label stays legible whichever colour you pick.
 
 <Example code={`<div class="progress">
-    <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar theme-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar theme-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar theme-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar theme-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
-Or use a [theme class](/customize/components/#theme-variants) — the bar reads the theme's colors, including the label's contrast color:
+The class works one level up as well — put it on the `.progress` and every bar inside follows.
 
 <Example code={`<div class="progress theme-success">
     <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
   </div>`} />
+
+A [`.bg-*` utility](/utilities/background/) still paints a bar, but it sets the fill alone — the label keeps the default foreground colour rather than the one that reads on the fill.
 
 ## Multiple bars
 
@@ -89,8 +91,8 @@ Include multiple progress bars in a progress component if you need.
 
 <Example code={`<div class="progress">
     <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
-    <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-    <div class="progress-bar bg-info" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar theme-success" role="progressbar" style="width: 30%" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar theme-info" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
 ## Stacked
@@ -125,16 +127,16 @@ Add `.progress-bar-striped` to any `.progress-bar` to apply a stripe via CSS gra
     <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 10%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar progress-bar-striped theme-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar progress-bar-striped theme-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar progress-bar-striped theme-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
   </div>
   <div class="progress">
-    <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    <div class="progress-bar progress-bar-striped theme-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
   </div>`} />
 
 ## Animated stripes
@@ -159,10 +161,10 @@ Related bars need no component of their own — [stacks](/helpers/stacks/) and [
     <span class="fg-2 small flex-shrink-0" style="width: 100px">Title</span>
     <div class="vstack gap-1">
       <div class="progress" style="height: 4px">
-        <div class="progress-bar bg-info" role="progressbar" style="width: 34%" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar theme-info" role="progressbar" style="width: 34%" aria-valuenow="34" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <div class="progress" style="height: 4px">
-        <div class="progress-bar bg-danger" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar theme-danger" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
   </div>
@@ -170,13 +172,13 @@ Related bars need no component of their own — [stacks](/helpers/stacks/) and [
     <span class="fg-2 small flex-shrink-0" style="width: 100px">Title</span>
     <div class="vstack gap-1">
       <div class="progress" style="height: 4px">
-        <div class="progress-bar bg-info" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar theme-info" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <div class="progress" style="height: 4px">
-        <div class="progress-bar bg-danger" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar theme-danger" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <div class="progress" style="height: 4px">
-        <div class="progress-bar bg-success" role="progressbar" style="width: 67%" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
+        <div class="progress-bar theme-success" role="progressbar" style="width: 67%" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
     </div>
   </div>`} />
@@ -190,7 +192,7 @@ Or stack a header above the bar, with the value pushed to the end by `.ms-auto`:
       <div class="ms-auto fw-bold">43%</div>
     </div>
     <div class="progress" style="height: 4px">
-      <div class="progress-bar bg-warning" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="progress-bar theme-warning" role="progressbar" style="width: 43%" aria-valuenow="43" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
   </div>`} />
 
@@ -202,7 +204,7 @@ Or stack a header above the bar, with the value pushed to the end by `.ms-auto`:
       <div class="fg-2 small">(56%)</div>
     </div>
     <div class="progress" style="height: 4px">
-      <div class="progress-bar bg-success" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="progress-bar theme-success" role="progressbar" style="width: 56%" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
   </div>`} />
 
