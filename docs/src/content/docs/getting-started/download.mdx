@@ -5,25 +5,25 @@ description: "Download CoreUI for Bootstrap to get the compiled CSS and JavaScri
 
 ## Compiled CSS and JS
 
-Download ready-to-use compiled code for **CoreUI for Bootstrap v5.8.0** to easily drop into your project, which includes:
+Download ready-to-use compiled code for **CoreUI for Bootstrap v[[config:current_version]]** to easily drop into your project, which includes:
 
 - Compiled and minified CSS bundles (see [CSS files comparison](/getting-started/contents/#css-files))
 - Compiled and minified JavaScript plugins (see [JS files comparison](/getting-started/contents/#js-files))
 
 This doesn't include documentation, source files, or any optional JavaScript dependencies like Floating UI.
 
-<a href="https://github.com/coreui/coreui/releases/download/v5.8.0/coreui-5.8.0-dist.zip" class="btn btn-primary" onclick="ga('send', 'event', 'Getting started', 'Download', 'Download Bootstrap');">Download</a>
+<a href="https://github.com/coreui/coreui/releases/download/v[[config:current_version]]/coreui-[[config:current_version]]-dist.zip" class="btn-solid theme-primary">Download</a>
 
 ## Source files
 
 Compile CoreUI for Bootstrap with your own asset pipeline by downloading our source Sass, JavaScript, and documentation files. This option requires some additional tooling:
 
-- Sass compiler (Libsass or Ruby Sass is supported) for compiling your CSS.
+- [Dart Sass](https://sass-lang.com/dart-sass) for compiling your CSS.
 - [Autoprefixer](https://github.com/postcss/autoprefixer) for CSS vendor prefixing
 
 Should you require [build tools](/getting-started/build-tools/#tooling-setup), they are included for developing CoreUI for Bootstrap and its docs, but they're likely unsuitable for your own purposes.
 
-<a href="https://github.com/coreui/coreui/archive/v5.8.0.zip" class="btn btn-primary" onclick="ga('send', 'event', 'Getting started', 'Download', 'Download source');">Download source</a>
+<a href="https://github.com/coreui/coreui/archive/v[[config:current_version]].zip" class="btn-solid theme-primary">Download source</a>
 
 ## CDN via jsDelivr
 
@@ -108,5 +108,5 @@ bun add @coreui/coreui-pro
 You can also install and manage CoreUI's Sass and JavaScript using [Composer](https://getcomposer.org/):
 
 ```sh
-composer require coreui/coreui:5.8.0
+composer require coreui/coreui:[[config:current_version]]
 ```

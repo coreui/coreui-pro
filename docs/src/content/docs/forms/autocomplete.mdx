@@ -1,6 +1,6 @@
 ---
 pro: true
-title: "Bootstrap 5 Autocomplete"
+title: "Bootstrap 6 Autocomplete"
 name: "Autocomplete"
 description: "Create intelligent, responsive input fields using the Bootstrap Autocomplete plugin. This component enhances user input with dynamic dropdown suggestions, flexible data providers, and callback support."
 otherFrameworks:
@@ -163,18 +163,17 @@ Apply validation styling to indicate input validity.
 
 <Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-options="Angular, Bootstrap, React.js, Vue.js" data-coreui-placeholder="Invalid autocomplete..." data-coreui-invalid="true"></div>`} />
 
-## Disabled state
-
+## Disabled
 Add the `data-coreui-disabled="true"` attribute to disable the component:
 
 <Example pro code={`<div data-coreui-toggle="autocomplete" data-coreui-disabled="true" data-coreui-options="" data-coreui-placeholder="Disabled autocomplete..." ></div>`} />
 
 ## Sizing
 
-You may also choose from small and large auto completes to match our similarly sized text inputs.
+The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the element you initialize — it becomes the `.form-control-group`, so the field matches our similarly sized text inputs.
 
 <Example pro class="d-flex flex-column gap-3" code={`<div 
-    class="autocomplete-lg"
+    class="form-control-lg"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
     data-coreui-indicator="true"
@@ -195,7 +194,7 @@ You may also choose from small and large auto completes to match our similarly s
     data-coreui-toggle="autocomplete"
   ></div>
   <div 
-    class="autocomplete-sm"
+    class="form-control-sm"
     data-coreui-cleaner="true"
     data-coreui-highlight-options-on-search="true"
     data-coreui-indicator="true"

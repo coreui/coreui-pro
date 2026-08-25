@@ -1,5 +1,5 @@
 ---
-title: "Bootstrap 5 Chip"
+title: "Bootstrap 6 Chip"
 name: "Chip"
 preRelease: true
 description: "Bootstrap Chip component for CoreUI — build removable tags, selectable labels, and filterable chips with icons, avatars, and full keyboard support."
@@ -95,24 +95,24 @@ Add `.chip-img` for an image like an avatar or use our avatar component.
       Chip with avatar 2
     </span>
     <span class="chip">
-      <span class="avatar bg-primary text-white">L</span>
+      <span class="avatar theme-primary">L</span>
       Chip with avatar 3
     </span>
     <span class="chip">
-      <span class="avatar text-bg-success">L</span>
+      <span class="avatar theme-success">L</span>
       Chip with avatar 4
     </span>
   </div>`} />
 
 ## Variants
 
-Apply `.chip-*` classes to color your chips. Chips are subtle by default as this allows for a clear, themed active state.
+Colour a chip with a [`.theme-*` class](/customize/components/#theme-variants), on the chip itself or on any element above it. Chips are subtle by default as this allows for a clear, themed active state.
 
-<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip chip-${c.name} chip-clickable" tabindex="0">${c.title} chip</span>
-    <span class="chip chip-${c.name} active" tabindex="0">${c.title} chip</span>`), ``, `</div>`]} />
+<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip theme-${c.name} chip-clickable" tabindex="0">${c.title} chip</span>
+    <span class="chip theme-${c.name} active" tabindex="0">${c.title} chip</span>`), ``, `</div>`]} />
 
-<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip chip-outline chip-clickable chip-${c.name}" tabindex="0">${c.title} chip</span>
-    <span class="chip chip-outline chip-${c.name} active" tabindex="0">${c.title} chip</span>`), ``, `</div>`]} />
+<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip chip-outline chip-clickable theme-${c.name}" tabindex="0">${c.title} chip</span>
+    <span class="chip chip-outline theme-${c.name} active" tabindex="0">${c.title} chip</span>`), ``, `</div>`]} />
 
 ### Active state
 
@@ -121,14 +121,13 @@ Add `.active` to make chips use the solid appearance (bg/contrast). This is usef
 <Example code={`<div class="d-flex flex-wrap gap-1">
     <span class="chip">Default</span>
     <span class="chip active">Active</span>
-    <span class="chip chip-primary">Primary</span>
-    <span class="chip chip-primary active">Active</span>
-    <span class="chip chip-success">Success</span>
-    <span class="chip chip-success active">Active</span>
+    <span class="chip theme-primary">Primary</span>
+    <span class="chip theme-primary active">Active</span>
+    <span class="chip theme-success">Success</span>
+    <span class="chip theme-success active">Active</span>
   </div>`} />
 
-## Sizes
-
+## Sizing
 Use `.chip-sm` or `.chip-lg` for different sizes.
 
 <Example code={`<div class="d-flex flex-wrap gap-1 mb-3">
@@ -146,7 +145,7 @@ Use `.chip-sm` or `.chip-lg` for different sizes.
       Small with avatar
     </span>
     <span class="chip chip-sm">
-      <span class="avatar bg-primary text-white">L</span>
+      <span class="avatar theme-primary">L</span>
       Small with avatar 2
     </span>
     <span class="chip chip-sm">
@@ -175,7 +174,7 @@ Use `.chip-sm` or `.chip-lg` for different sizes.
       Default with avatar
     </span>
     <span class="chip">
-      <span class="avatar bg-primary text-white">L</span>
+      <span class="avatar theme-primary">L</span>
       Default with avatar1
     </span>
     <span class="chip">
@@ -204,7 +203,7 @@ Use `.chip-sm` or `.chip-lg` for different sizes.
       Large with avatar
     </span>
     <span class="chip chip-lg">
-      <span class="avatar bg-primary text-white">L</span>
+      <span class="avatar theme-primary">L</span>
       Large with avatar 2
     </span>
     <span class="chip chip-lg">
@@ -352,6 +351,23 @@ The Bootstrap Chip component follows WAI-ARIA patterns for interactive widgets, 
 - `aria-disabled="true"` is applied to disabled chips that carry a role; a role-less chip conveys the state through the `disabled` class and its removed interactivity.
 - Each `.chip-remove` button includes an accessible label via `ariaRemoveLabel`.
 - Use descriptive `aria-label` attributes on chip containers when the chip component group has a meaningful role (e.g., "Applied filters").
+
+## Deprecated markup
+
+<DeprecatedIn version="6.0.0" />
+
+The v5 spelling — `.chip` with a colour modifier — still works and renders identically. Each colour class is generated from the same theme map as the class it replaces, so `.chip-primary` *is* `.chip.theme-primary`. They are removed in v7.
+
+<Example code={[`<div class="d-flex flex-wrap gap-1">`, ...getData('theme-colors').map((c) => `<span class="chip chip-${c.name}">${c.title} chip</span>`), ``, `</div>`]} />
+
+```diff
+- <span class="chip chip-success">Done</span>
++ <span class="chip theme-success">Done</span>
+```
+
+The rewrite buys two things the modifier cannot. A theme colour set on a chip set reaches every chip inside it, and a colour of your own works the moment you define its theme tokens, with no Sass to compile.
+
+See the [v6 migration guide](/migration/v6/) for the full picture.
 
 ## Customizing
 
