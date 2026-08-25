@@ -2,7 +2,6 @@
 title: "Bootstrap 5 Background"
 name: "Background"
 description: "Convey meaning through `background-color` and add decoration with gradients."
-utility: ["bg", "bg-opacity", "bg-gradient"]
 ---
 
 import { getData } from '@coreui/astro-docs/data'
@@ -14,17 +13,26 @@ Similar to the contextual text color classes, set the background of an element t
 Each theme color comes in three weights: the solid color, `.bg-*-muted` and `.bg-*-subtle`. The two lighter ones are surfaces to read text on, and `.text-*-emphasis` is the color that reads on them — `.bg-*-muted` is the step you want when a subtle surface has to separate from a subtle surface behind it, which is what a hovered row or a selected item needs.
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 bg-${c.name} ${c.contrast_color ? `text-${c.contrast_color}` : `text-white`}">.bg-${c.name}</div>
+  ...getData('theme-colors').map((c) => `<div class="p-3 mb-2 text-bg-${c.name}">.bg-${c.name}</div>
 <div class="p-3 mb-2 bg-${c.name}-muted text-${c.name}-emphasis">.bg-${c.name}-muted</div>
 <div class="p-3 mb-2 bg-${c.name}-subtle text-${c.name}-emphasis">.bg-${c.name}-subtle</div>`),
-  `<p class="p-3 mb-2 bg-body-secondary">.bg-body-secondary</p>
-<p class="p-3 mb-2 bg-body-tertiary">.bg-body-tertiary</p>
-
-<div class="p-3 mb-2 bg-body text-body">.bg-body</div>
+  `<div class="p-3 mb-2 bg-body text-body">.bg-body</div>
 <div class="p-3 mb-2 bg-black text-white">.bg-black</div>
 <div class="p-3 mb-2 bg-white text-black">.bg-white</div>
 <div class="p-3 mb-2 bg-transparent text-body">.bg-transparent</div>`
 ]} />
+
+## Surface ladder
+
+Five neutral surfaces run from the page background to the deepest panel. The numbers say how far a surface sits from the body — `.bg-1` is barely off the page, `.bg-4` is the deepest — and the ladder keeps its order in both color schemes.
+
+<Example code={`<div class="p-3 mb-2 bg-body">.bg-body</div>
+<div class="p-3 mb-2 bg-1">.bg-1</div>
+<div class="p-3 mb-2 bg-2">.bg-2</div>
+<div class="p-3 mb-2 bg-3">.bg-3</div>
+<div class="p-3 mb-2 bg-4">.bg-4</div>`} />
+
+`.bg-body-secondary` and `.bg-body-tertiary` are deprecated names for `.bg-4` and `.bg-3` — they render identically and go away in v7. The ordinal names replace them because the old adjectives ran backwards for backgrounds: "tertiary" sat *closer* to the page than "secondary".
 
 ## Background gradient
 
@@ -32,12 +40,12 @@ By adding a `.bg-gradient` class, a linear gradient is added as background image
 
 Do you need a gradient in your custom CSS? Just add `background-image: var(gradient);`.
 
-<div class="p-3 mb-2 bg-primary bg-gradient text-white">.bg-primary.bg-gradient</div>
-<div class="p-3 mb-2 bg-secondary bg-gradient text-white">.bg-secondary.bg-gradient</div>
-<div class="p-3 mb-2 bg-success bg-gradient text-white">.bg-success.bg-gradient</div>
-<div class="p-3 mb-2 bg-danger bg-gradient text-white">.bg-danger.bg-gradient</div>
-<div class="p-3 mb-2 bg-warning bg-gradient text-black">.bg-warning.bg-gradient</div>
-<div class="p-3 mb-2 bg-info bg-gradient text-black">.bg-info.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-primary bg-gradient">.bg-primary.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-secondary bg-gradient">.bg-secondary.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-success bg-gradient">.bg-success.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-danger bg-gradient">.bg-danger.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-warning bg-gradient">.bg-warning.bg-gradient</div>
+<div class="p-3 mb-2 text-bg-info bg-gradient">.bg-info.bg-gradient</div>
 <div class="p-3 mb-2 bg-black bg-gradient text-white">.bg-black.bg-gradient</div>
 
 ## Opacity
@@ -66,16 +74,16 @@ Both halves are separate knobs: override `--cui-bg` to repaint the utility with 
 
 To change that opacity, override `--cui-bg-opacity` via custom styles or inline styles.
 
-<Example code={`<div class="bg-success p-2 text-white">This is default success background</div>
+<Example code={`<div class="text-bg-success p-2">This is default success background</div>
   <div class="bg-success p-2" style="--cui-bg-opacity: .5;">This is 50% opacity success background</div>`} />
 
 Or, choose from any of the `.bg-opacity` utilities:
 
-<Example code={`<div class="bg-success p-2 text-white">This is default success background</div>
-  <div class="bg-success p-2 text-white bg-opacity-75">This is 75% opacity success background</div>
-  <div class="bg-success p-2 text-black bg-opacity-50">This is 50% opacity success background</div>
-  <div class="bg-success p-2 text-black bg-opacity-25">This is 25% opacity success background</div>
-  <div class="bg-success p-2 text-black bg-opacity-10">This is 10% opacity success background</div>`} />
+<Example code={`<div class="text-bg-success p-2">This is default success background</div>
+  <div class="bg-success p-2 bg-opacity-75">This is 75% opacity success background</div>
+  <div class="bg-success p-2 bg-opacity-50">This is 50% opacity success background</div>
+  <div class="bg-success p-2 bg-opacity-25">This is 25% opacity success background</div>
+  <div class="bg-success p-2 bg-opacity-10">This is 10% opacity success background</div>`} />
 
 ## Sass
 

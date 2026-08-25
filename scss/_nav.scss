@@ -20,20 +20,20 @@ $nav-link-border-radius:            var(--#{$prefix}border-radius) !default;
 $nav-link-font-weight:              null !default;
 $nav-link-color:                    var(--#{$prefix}link-color) !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
-$nav-link-hover-bg:                 var(--#{$prefix}tertiary-bg) !default;
+$nav-link-hover-bg:                 var(--#{$prefix}bg-3) !default;
 $nav-link-active-color:             var(--#{$prefix}emphasis-color) !default;
-$nav-link-active-bg:                var(--#{$prefix}secondary-bg) !default;
+$nav-link-active-bg:                var(--#{$prefix}bg-4) !default;
 $nav-link-transition-property:      color, background-color, border-color !default;
 $nav-link-transition-duration:      .15s !default;
 $nav-link-transition-timing:        ease-in-out !default;
-$nav-link-disabled-color:           var(--#{$prefix}secondary-color) !default;
+$nav-link-disabled-color:           var(--#{$prefix}fg-2) !default;
 
 $nav-tabs-border-color:             var(--#{$prefix}border-color) !default;
 $nav-tabs-border-width:             var(--#{$prefix}border-width) !default;
 $nav-tabs-border-radius:            var(--#{$prefix}border-radius) !default;
-$nav-tabs-link-hover-border-color:  var(--#{$prefix}secondary-bg) var(--#{$prefix}secondary-bg) $nav-tabs-border-color !default;
+$nav-tabs-link-hover-border-color:  var(--#{$prefix}bg-4) var(--#{$prefix}bg-4) $nav-tabs-border-color !default;
 $nav-tabs-link-active-color:        var(--#{$prefix}emphasis-color) !default;
-$nav-tabs-link-active-bg:           var(--#{$prefix}body-bg) !default;
+$nav-tabs-link-active-bg:           var(--#{$prefix}bg-body) !default;
 $nav-tabs-link-active-border-color: var(--#{$prefix}border-color) var(--#{$prefix}border-color) $nav-tabs-link-active-bg !default;
 
 $nav-pills-border-radius:           var(--#{$prefix}border-radius) !default;
@@ -49,22 +49,22 @@ $nav-underline-border-border-color:         var(--#{$prefix}border-color) !defau
 $nav-underline-border-border-width:         .125rem !default;
 $nav-underline-border-link-padding-y:       .5rem !default;
 $nav-underline-border-link-padding-x:       .5rem !default;
-$nav-underline-border-link-color:           var(--#{$prefix}secondary-color) !default;
+$nav-underline-border-link-color:           var(--#{$prefix}fg-2) !default;
 $nav-underline-border-link-active-color:    var(--#{$prefix}primary) !default;
-$nav-underline-border-link-disabled-color:  var(--#{$prefix}tertiary-color) !default;
+$nav-underline-border-link-disabled-color:  var(--#{$prefix}fg-3) !default;
 
 $nav-enclosed-padding:                   .125rem !default;
-$nav-enclosed-bg:                        var(--#{$prefix}tertiary-bg) !default;
+$nav-enclosed-bg:                        var(--#{$prefix}bg-3) !default;
 $nav-enclosed-border-radius:             $border-radius-lg !default;
 $nav-enclosed-link-padding-y:            .375rem !default;
 $nav-enclosed-link-padding-x:            .875rem !default;
-$nav-enclosed-link-color:                var(--#{$prefix}body-color) !default;
+$nav-enclosed-link-color:                var(--#{$prefix}fg-body) !default;
 $nav-enclosed-link-border-width:         1px !default;
-$nav-enclosed-link-active-color:         var(--#{$prefix}body-color) !default;
-$nav-enclosed-link-active-bg:            var(--#{$prefix}body-bg) !default;
+$nav-enclosed-link-active-color:         var(--#{$prefix}fg-body) !default;
+$nav-enclosed-link-active-bg:            var(--#{$prefix}bg-body) !default;
 $nav-enclosed-link-active-border-color:  var(--#{$prefix}border-color) !default;
 $nav-enclosed-link-hover-box-shadow:     var(--#{$prefix}box-shadow-sm) !default;
-$nav-enclosed-link-disabled-color:       var(--#{$prefix}secondary-color) !default;
+$nav-enclosed-link-disabled-color:       var(--#{$prefix}fg-2) !default;
 
 $tab-pane-transition-property:           opacity !default;
 $tab-pane-transition-duration:           .15s !default;

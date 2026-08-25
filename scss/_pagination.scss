@@ -15,24 +15,24 @@ $pagination-padding-x:              var(--#{$prefix}btn-input-padding-x) !defaul
 $pagination-font-size:              var(--#{$prefix}btn-input-font-size) !default;
 
 $pagination-color:                  var(--#{$prefix}link-color) !default;
-$pagination-bg:                     var(--#{$prefix}body-bg) !default;
+$pagination-bg:                     var(--#{$prefix}bg-body) !default;
 $pagination-border-radius:          var(--#{$prefix}btn-input-border-radius) !default;
 $pagination-border-width:           var(--#{$prefix}border-width) !default;
 $pagination-border-color:           var(--#{$prefix}border-color) !default;
 
 $pagination-focus-color:            var(--#{$prefix}link-hover-color) !default;
-$pagination-focus-bg:               var(--#{$prefix}secondary-bg) !default;
+$pagination-focus-bg:               var(--#{$prefix}bg-4) !default;
 
 $pagination-hover-color:            var(--#{$prefix}link-hover-color) !default;
-$pagination-hover-bg:               var(--#{$prefix}tertiary-bg) !default;
+$pagination-hover-bg:               var(--#{$prefix}bg-3) !default;
 $pagination-hover-border-color:     var(--#{$prefix}border-color) !default;
 
 $pagination-active-color:           var(--#{$prefix}primary-contrast) !default;
 $pagination-active-bg:              var(--#{$prefix}primary) !default;
 $pagination-active-border-color:    $pagination-active-bg !default;
 
-$pagination-disabled-color:         var(--#{$prefix}secondary-color) !default;
-$pagination-disabled-bg:            var(--#{$prefix}secondary-bg) !default;
+$pagination-disabled-color:         var(--#{$prefix}fg-2) !default;
+$pagination-disabled-bg:            var(--#{$prefix}bg-4) !default;
 $pagination-disabled-border-color:  var(--#{$prefix}border-color) !default;
 
 $pagination-transition:             color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;

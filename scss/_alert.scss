@@ -52,8 +52,8 @@ $alert-tokens: defaults(
 $alert-variants: (
   "solid": (
     "color": "contrast",
-    "bg": "base",
-    "border-color": "base"
+    "bg": "bg",
+    "border-color": "bg"
   )
 ) !default;
 // scss-docs-end alert-variants

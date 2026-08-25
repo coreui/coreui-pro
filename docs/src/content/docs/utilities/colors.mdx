@@ -12,12 +12,10 @@ import { getData } from '@coreui/astro-docs/data'
 Colorize text with color utilities. To colorize a link, give it a [theme class](/customize/theme/) instead — Reboot resolves a link's colour from the theme, and the theme slot carries a hover tone with it. See [link utilities](/utilities/link/).
 
 <Example code={[
-  ...getData('theme-colors').map((c) => `<p class="text-${c.name}${c.contrast_color ? ` bg-${c.contrast_color}`: ``}">.text-${c.name}</p>
+  ...getData('theme-colors').map((c) => `<p class="text-${c.name}">.text-${c.name}</p>
 <p class="text-${c.name}-emphasis">.text-${c.name}-emphasis</p>`),
   `<p class="text-body">.text-body</p>
 <p class="text-body-emphasis">.text-body-emphasis</p>
-<p class="text-body-secondary">.text-body-secondary</p>
-<p class="text-body-tertiary">.text-body-tertiary</p>
 
 <p class="text-black bg-white">.text-black</p>
 <p class="text-white bg-black">.text-white</p>
@@ -28,6 +26,18 @@ Colorize text with color utilities. To colorize a link, give it a [theme class](
 <Callout color="warning">
 **Deprecation:** With the addition of `.text-opacity-*` utilities and CSS variables for text utilities, `.text-black-50` and `.text-white-50` are deprecated as of v4.1.0. They'll be removed in v6.0.0.
 </Callout>
+
+## Foreground ladder
+
+The neutral text hierarchy is a ladder, mirroring the [surface ladder](/utilities/background/#surface-ladder): `.fg-body` is the body text color and the numbers step away from it — `.fg-1` barely, `.fg-4` down to a watermark. The `.text-opacity-*` knob composes with all of them.
+
+<Example code={`<p class="fg-body">.fg-body</p>
+<p class="fg-1">.fg-1</p>
+<p class="fg-2">.fg-2</p>
+<p class="fg-3">.fg-3</p>
+<p class="fg-4">.fg-4</p>`} />
+
+`.text-body-secondary` and `.text-body-tertiary` are deprecated names for `.fg-2` and `.fg-3` — they render identically and go away in v7.
 
 <Callout color="info">
 ##### Conveying meaning to assistive technologies

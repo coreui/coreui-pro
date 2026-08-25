@@ -8,6 +8,8 @@
 // scss-docs-start gray-color-variables
 $white:     #fff !default;
 $gray-base: #323a49 !default;
+$gray-025:  #fcfcfd !default;
+$gray-050:  #f8f9fb !default;
 $gray-100:  #f3f4f7 !default;
 $gray-200:  #e7eaee !default;
 $gray-300:  #dbdfe6 !default;
@@ -23,6 +25,8 @@ $black:     #080a0c !default;
 // fusv-disable
 // scss-docs-start gray-colors-map
 $grays: (
+  "025": $gray-025,
+  "050": $gray-050,
   "100": $gray-100,
   "200": $gray-200,
   "300": $gray-300,

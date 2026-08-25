@@ -14,12 +14,12 @@ $sidebar-nav-gap:                             1px !default;
 $sidebar-nav-title-padding-y:                 .75rem !default;
 $sidebar-nav-title-padding-x:                 1rem !default;
 $sidebar-nav-title-margin-top:                1rem !default;
-$sidebar-nav-title-color:                     var(--#{$prefix}tertiary-color) !default;
+$sidebar-nav-title-color:                     var(--#{$prefix}fg-3) !default;
 $sidebar-nav-title-transition:                height .15s, margin .15s !default;
 
 $sidebar-nav-link-padding-y:                  .75rem !default;
 $sidebar-nav-link-padding-x:                  1rem !default;
-$sidebar-nav-link-color:                      var(--#{$prefix}body-color) !default;
+$sidebar-nav-link-color:                      var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-bg:                         transparent !default;
 $sidebar-nav-link-border-width:               0 !default;
 $sidebar-nav-link-border-color:               transparent !default;
@@ -32,7 +32,7 @@ $sidebar-narrow-nav-link-padding-y:           .75rem !default;
 $sidebar-narrow-nav-link-padding-x:           .5rem !default;
 
 $sidebar-nav-link-icon-margin:                .75rem !default;
-$sidebar-nav-link-icon-color:                 var(--#{$prefix}tertiary-color) !default;
+$sidebar-nav-link-icon-color:                 var(--#{$prefix}fg-3) !default;
 $sidebar-nav-link-icon-width:                 1.25rem !default;
 $sidebar-nav-link-icon-height:                1.25rem !default;
 $sidebar-nav-link-icon-font-size:             $sidebar-nav-link-icon-height !default;
@@ -40,14 +40,14 @@ $sidebar-nav-link-icon-font-size:             $sidebar-nav-link-icon-height !def
 $sidebar-nav-link-icon-bullet-size:           .3125rem !default;
 $sidebar-nav-link-icon-bullet-bg:             transparent !default;
 $sidebar-nav-link-icon-bullet-border-width:   1px !default;
-$sidebar-nav-link-icon-bullet-border-color:   var(--#{$prefix}tertiary-color) !default;
+$sidebar-nav-link-icon-bullet-border-color:   var(--#{$prefix}fg-3) !default;
 $sidebar-nav-link-icon-bullet-border-radius:  50rem !default;
 
 $sidebar-nav-link-hover-color:                        var(--#{$prefix}emphasis-color) !default;
 $sidebar-nav-link-hover-bg:                           var(--#{$prefix}tertiary-bg-translucent) !default;
-$sidebar-nav-link-hover-icon-color:                   var(--#{$prefix}body-color) !default;
+$sidebar-nav-link-hover-icon-color:                   var(--#{$prefix}fg-body) !default;
 $sidebar-nav-link-hover-icon-bullet-bg:               transparent !default;
-$sidebar-nav-link-hover-icon-bullet-border-color:     var(--#{$prefix}body-color) !default;
+$sidebar-nav-link-hover-icon-bullet-border-color:     var(--#{$prefix}fg-body) !default;
 
 $sidebar-nav-link-active-color:                       var(--#{$prefix}emphasis-color) !default;
 $sidebar-nav-link-active-bg:                          var(--#{$prefix}tertiary-bg-translucent) !default;
@@ -55,10 +55,10 @@ $sidebar-nav-link-active-icon-color:                  var(--#{$prefix}emphasis-c
 $sidebar-nav-link-active-icon-bullet-bg:              transparent !default;
 $sidebar-nav-link-active-icon-bullet-border-color:    var(--#{$prefix}emphasis-color) !default;
 
-$sidebar-nav-link-disabled-color:                     var(--#{$prefix}tertiary-color) !default;
-$sidebar-nav-link-disabled-icon-color:                var(--#{$prefix}tertiary-color) !default;
+$sidebar-nav-link-disabled-color:                     var(--#{$prefix}fg-3) !default;
+$sidebar-nav-link-disabled-icon-color:                var(--#{$prefix}fg-3) !default;
 $sidebar-nav-link-disabled-icon-bullet-bg:            transparent !default;
-$sidebar-nav-link-disabled-icon-bullet-border-color:  var(--#{$prefix}tertiary-color) !default;
+$sidebar-nav-link-disabled-icon-bullet-border-color:  var(--#{$prefix}fg-3) !default;
 
 $sidebar-nav-group-bg:                        transparent !default;
 $sidebar-nav-group-border-width:              0 !default;
@@ -71,7 +71,7 @@ $sidebar-nav-group-items-padding-y:           0 !default;
 $sidebar-nav-group-items-padding-x:           0 !default;
 $sidebar-nav-group-items-transition:          height .15s ease !default;
 
-$sidebar-nav-group-indicator-color:           var(--#{$prefix}tertiary-color) !default;
+$sidebar-nav-group-indicator-color:           var(--#{$prefix}fg-3) !default;
 $sidebar-nav-group-indicator-icon:            url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>") !default;
 $sidebar-nav-group-indicator-hover-color:     $sidebar-nav-link-hover-color !default;
 $sidebar-nav-group-indicator-hover-icon:      $sidebar-nav-group-indicator-icon !default;

@@ -7,7 +7,7 @@ $blockquote-margin-y:            var(--#{$prefix}spacer-3) !default;
 $blockquote-gap:                 var(--#{$prefix}spacer-3) !default;
 $blockquote-font-size:           calc(var(--#{$prefix}body-font-size) * 1.25) !default;
 $blockquote-footer-margin-y:     var(--#{$prefix}spacer-3) !default;
-$blockquote-footer-color:        var(--#{$prefix}secondary-color) !default;
+$blockquote-footer-color:        var(--#{$prefix}fg-2) !default;
 $blockquote-footer-font-size:    var(--#{$prefix}small-font-size) !default;
 // scss-docs-end blockquote-variables
 

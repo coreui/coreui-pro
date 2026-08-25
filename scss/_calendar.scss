@@ -31,20 +31,20 @@ $calendar-nav-btn-hover-border-color:        transparent !default;
 $calendar-nav-btn-focus-border-color:        transparent !default;
 
 $calendar-nav-date-font-weight:              600 !default;
-$calendar-nav-date-color:                    var(--#{$prefix}body-color) !default;
+$calendar-nav-date-color:                    var(--#{$prefix}fg-body) !default;
 $calendar-nav-date-hover-color:              var(--#{$prefix}primary) !default;
 
 $calendar-nav-icon-width:                    1rem !default;
 $calendar-nav-icon-height:                   1rem !default;
-$calendar-nav-icon-color:                    var(--#{$prefix}tertiary-color) !default;
-$calendar-nav-icon-hover-color:              var(--#{$prefix}body-color) !default;
+$calendar-nav-icon-color:                    var(--#{$prefix}fg-3) !default;
+$calendar-nav-icon-hover-color:              var(--#{$prefix}fg-body) !default;
 
 $calendar-cell-header-inner-font-weight:     600 !default;
-$calendar-cell-header-inner-color:           var(--#{$prefix}secondary-color) !default;
+$calendar-cell-header-inner-color:           var(--#{$prefix}fg-2) !default;
 
-$calendar-cell-hover-color:                  var(--#{$prefix}body-color) !default;
-$calendar-cell-hover-bg:                     var(--#{$prefix}tertiary-bg) !default;
-$calendar-cell-disabled-color:               var(--#{$prefix}tertiary-color) !default;
+$calendar-cell-hover-color:                  var(--#{$prefix}fg-body) !default;
+$calendar-cell-hover-bg:                     var(--#{$prefix}bg-3) !default;
+$calendar-cell-disabled-color:               var(--#{$prefix}fg-3) !default;
 
 
 $calendar-cell-selected-color:               var(--#{$prefix}white) !default;
@@ -57,7 +57,7 @@ $calendar-cell-range-hover-border-color:     var(--#{$prefix}primary) !default;
 $calendar-cell-today-color:                  var(--#{$prefix}danger) !default;
 
 $calendar-cell-week-number-font-weight:      600 !default;
-$calendar-cell-week-number-color:            var(--#{$prefix}secondary-color) !default;
+$calendar-cell-week-number-color:            var(--#{$prefix}fg-2) !default;
 // scss-docs-end calendar-variables
 
 $calendar-tokens: () !default;

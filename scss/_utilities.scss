@@ -18,7 +18,7 @@ $utilities-text-colors: map.merge(
   (
     "black": var(--#{$prefix}black),
     "white": var(--#{$prefix}white),
-    "body": var(--#{$prefix}body-color)
+    "body": var(--#{$prefix}fg-body)
   )
 ) !default;
 
@@ -31,7 +31,7 @@ $utilities-bg-colors: map.merge(
   (
     "black": var(--#{$prefix}black),
     "white": var(--#{$prefix}white),
-    "body": var(--#{$prefix}body-bg)
+    "body": var(--#{$prefix}bg-body)
   )
 ) !default;
 
@@ -938,14 +938,29 @@ $utilities: map.merge(
       values: map.merge(
         $utilities-text-colors,
         (
-          "muted": var(--#{$prefix}secondary-color), // deprecated
+          "muted": var(--#{$prefix}fg-2), // deprecated
           "black-50": color-mix(in srgb, var(--#{$prefix}black) 50%, transparent), // deprecated
           "white-50": color-mix(in srgb, var(--#{$prefix}white) 50%, transparent), // deprecated
-          "body-secondary": var(--#{$prefix}secondary-color),
-          "body-tertiary": var(--#{$prefix}tertiary-color),
+          "body-secondary": var(--#{$prefix}fg-2), // deprecated
+          "body-tertiary": var(--#{$prefix}fg-3), // deprecated
           "body-emphasis": var(--#{$prefix}emphasis-color),
           "reset": inherit
         )
+      )
+    ),
+    "fg-color": (
+      property: (
+        --#{$prefix}text: null,
+        --#{$prefix}text-opacity: 1,
+        color: color-mix(in srgb, var(--#{$prefix}text) calc(var(--#{$prefix}text-opacity) * 100%), transparent),
+      ),
+      class: fg,
+      values: (
+        "body": var(--#{$prefix}fg-body),
+        "1": var(--#{$prefix}fg-1),
+        "2": var(--#{$prefix}fg-2),
+        "3": var(--#{$prefix}fg-3),
+        "4": var(--#{$prefix}fg-4),
       )
     ),
     "text-opacity": (
@@ -1029,8 +1044,12 @@ $utilities: map.merge(
         $utilities-bg-colors,
         (
           "transparent": transparent,
-          "body-secondary": var(--#{$prefix}secondary-bg),
-          "body-tertiary": var(--#{$prefix}tertiary-bg),
+          "1": var(--#{$prefix}bg-1),
+          "2": var(--#{$prefix}bg-2),
+          "3": var(--#{$prefix}bg-3),
+          "4": var(--#{$prefix}bg-4),
+          "body-secondary": var(--#{$prefix}bg-4), // deprecated
+          "body-tertiary": var(--#{$prefix}bg-3), // deprecated
         )
       )
     ),

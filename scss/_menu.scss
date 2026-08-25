@@ -18,8 +18,8 @@ $menu-padding-x:                .25rem !default;
 $menu-padding-y:                .25rem !default;
 $menu-spacer:                   .125rem !default;
 $menu-font-size:                var(--#{$prefix}font-size-sm) !default;
-$menu-color:                    var(--#{$prefix}body-color) !default;
-$menu-bg:                       var(--#{$prefix}body-bg) !default;
+$menu-color:                    var(--#{$prefix}fg-body) !default;
+$menu-bg:                       var(--#{$prefix}bg-body) !default;
 $menu-border-color:             var(--#{$prefix}border-color-translucent) !default;
 $menu-border-radius:            $border-radius-lg !default;
 $menu-border-width:             var(--#{$prefix}border-width) !default;
@@ -27,12 +27,12 @@ $menu-box-shadow:               var(--#{$prefix}box-shadow-lg) !default;
 $menu-divider-bg:               var(--#{$prefix}border-color-translucent) !default;
 $menu-divider-margin-y:         .125rem !default;
 $menu-divider-margin-x:         .25rem !default;
-$menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}body-color)) !default;
-$menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}body-color)) !default;
-$menu-item-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
+$menu-item-color:               var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
+$menu-item-hover-color:         var(--#{$prefix}menu-color, var(--#{$prefix}fg-body)) !default;
+$menu-item-hover-bg:            var(--#{$prefix}bg-3) !default;
 $menu-item-active-color:        var(--#{$prefix}primary-contrast) !default;
 $menu-item-active-bg:           var(--#{$prefix}primary) !default;
-$menu-item-disabled-color:      var(--#{$prefix}tertiary-color) !default;
+$menu-item-disabled-color:      var(--#{$prefix}fg-3) !default;
 $menu-item-gap:                 .5rem !default;
 $menu-item-padding-x:           .75rem !default;
 $menu-item-padding-y:           .25rem !default;
@@ -40,7 +40,7 @@ $menu-item-border-radius:       $border-radius-sm !default;
 $menu-icon-size:                1rem !default;
 $menu-description-font-size:    calc(var(--#{$prefix}body-font-size) * .75) !default;
 $menu-check-color:              currentcolor !default;
-$menu-header-color:             var(--#{$prefix}tertiary-color) !default;
+$menu-header-color:             var(--#{$prefix}fg-3) !default;
 $menu-header-padding-x:         .75rem !default;
 $menu-header-padding-y:         .25rem !default;
 $menu-transition-duration:      .15s !default;
@@ -162,7 +162,7 @@ $menu-tokens: defaults(
   }
 
   .menu-translucent {
-    --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}tertiary-bg) 85%, transparent);
+    --#{$prefix}menu-item-hover-bg: color-mix(in oklch, var(--#{$prefix}bg-3) 85%, transparent);
     --#{$prefix}menu-item-active-bg: color-mix(in oklch, var(--#{$prefix}primary) 75%, transparent);
 
     background-color: color-mix(in oklch, var(--#{$prefix}menu-bg) 80%, transparent);
@@ -270,7 +270,7 @@ $menu-tokens: defaults(
   .menu-text {
     display: block;
     padding: var(--#{$prefix}menu-item-padding-y) var(--#{$prefix}menu-item-padding-x);
-    color: var(--#{$prefix}secondary-color);
+    color: var(--#{$prefix}fg-2);
   }
 
   // scss-docs-start submenu

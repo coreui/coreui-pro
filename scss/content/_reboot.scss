@@ -31,8 +31,8 @@ $pre-color:                   inherit !default;
 $kbd-padding-y:               .1875rem !default;
 $kbd-padding-x:               .375rem !default;
 $kbd-font-size:               $code-font-size !default;
-$kbd-color:                   var(--#{$prefix}body-bg) !default;
-$kbd-bg:                      var(--#{$prefix}body-color) !default;
+$kbd-color:                   var(--#{$prefix}bg-body) !default;
+$kbd-bg:                      var(--#{$prefix}fg-body) !default;
 $kbd-border-radius:           $border-radius-sm !default;
 // scss-docs-end kbd-variables
 
@@ -91,7 +91,7 @@ $reboot-kbd-tokens: defaults(
 // from the .table component's variables — that coupling is what kept the table
 // block pinned in _variables.scss.
 $caption-padding-y:    .5rem !default;
-$caption-color:        var(--#{$prefix}secondary-color) !default;
+$caption-color:        var(--#{$prefix}fg-2) !default;
 $th-font-weight:       null !default;
 // scss-docs-end reboot-table-variables
 
@@ -154,9 +154,9 @@ $th-font-weight:       null !default;
     font-size: var(--#{$prefix}body-font-size);
     font-weight: var(--#{$prefix}body-font-weight);
     line-height: var(--#{$prefix}body-line-height);
-    color: var(--#{$prefix}body-color);
+    color: var(--#{$prefix}fg-body);
     text-align: var(--#{$prefix}body-text-align);
-    background-color: var(--#{$prefix}body-bg); // 2
+    background-color: var(--#{$prefix}bg-body); // 2
     -webkit-text-size-adjust: 100%; // 3
     -webkit-tap-highlight-color: transparent; // 4
   }

@@ -33,7 +33,7 @@ The v5 `<div class="offcanvas">` markup is upgraded to the native `<dialog>` str
 
 Below is a default offcanvas example (via the `open` attribute on `.offcanvas`). Offcanvas supports a header with a close button and an optional body class for initial `padding`. We recommend including offcanvas headers with dismiss actions whenever possible, or providing an explicit dismiss action.
 
-<Example class="docs-example-offcanvas p-0 bg-body-secondary overflow-hidden" code={`<dialog class="offcanvas offcanvas-start" id="offcanvas" aria-labelledby="offcanvasLabel" open>
+<Example class="docs-example-offcanvas p-0 bg-4 overflow-hidden" code={`<dialog class="offcanvas offcanvas-start" id="offcanvas" aria-labelledby="offcanvasLabel" open>
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasLabel">Offcanvas</h5>
       <button type="button" class="btn-close" data-coreui-dismiss="offcanvas" aria-label="Close"></button>
@@ -140,7 +140,7 @@ Change the appearance of offcanvas elements using utilities to better match vari
 Attention! Dark variants for components are no longer supported as of v5.3.0 due to the introduction of color modes. Instead of manually adding the classes mentioned earlier, simply set `data-coreui-theme="dark"` on the root element, a parent wrapper, or the component itself.
 </Callout>
 
-<Example class="docs-example-offcanvas p-0 bg-body-secondary overflow-hidden" code={`<dialog class="offcanvas offcanvas-start text-bg-inverse" id="offcanvasDark" aria-labelledby="offcanvasDarkLabel" open>
+<Example class="docs-example-offcanvas p-0 bg-4 overflow-hidden" code={`<dialog class="offcanvas offcanvas-start text-bg-inverse" id="offcanvasDark" aria-labelledby="offcanvasDarkLabel" open>
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="offcanvasDarkLabel">Offcanvas</h5>
       <button type="button" class="btn-close" data-coreui-dismiss="offcanvasDark" aria-label="Close"></button>
