@@ -13,7 +13,7 @@
 @use "../config" as *;
 
 // scss-docs-start btn-variables
-$btn-white-space:             inherit !default; // Set to `nowrap` to prevent text wrapping
+$btn-white-space:             nowrap !default; // Set to `normal` to let button text wrap
 
 $btn-color:                   var(--#{$prefix}fg-body) !default;
 $btn-bg:                      var(--#{$prefix}bg-4) !default;
