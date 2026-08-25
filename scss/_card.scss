@@ -18,11 +18,11 @@ $card-box-shadow:                   none !default;
 $card-inner-border-radius:          calc(#{$card-border-radius} - #{$card-border-width}) !default;
 $card-cap-padding-y:                calc(#{$card-spacer-y} * .5) !default;
 $card-cap-padding-x:                $card-spacer-x !default;
-$card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}body-color) 3%, transparent) !default;
+$card-cap-bg:                       color-mix(in srgb, var(--#{$prefix}fg-body) 3%, transparent) !default;
 $card-cap-color:                    inherit !default;
 $card-height:                       auto !default;
 $card-color:                        inherit !default;
-$card-bg:                           var(--#{$prefix}body-bg) !default;
+$card-bg:                           var(--#{$prefix}bg-body) !default;
 $card-img-overlay-padding:          var(--#{$prefix}spacer-3) !default;
 $card-group-margin:                 $grid-gutter-width * .5 !default;
 // scss-docs-end card-variables
@@ -74,7 +74,7 @@ $card-tokens: defaults(
     flex-direction: column;
     min-width: 0; // See https://github.com/twbs/bootstrap/pull/22740#issuecomment-305868106
     height: var(--#{$prefix}card-height);
-    color: var(--#{$prefix}body-color);
+    color: var(--#{$prefix}fg-body);
     word-wrap: break-word;
     background-color: var(--#{$prefix}card-bg);
     background-clip: border-box;

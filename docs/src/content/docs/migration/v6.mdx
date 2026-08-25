@@ -2414,6 +2414,45 @@ pair, and `[data#{$data-infix}theme="dark"]` only declares `color-scheme: dark`.
   declares `color-scheme: light` and nothing ever declares `dark`, so every
   `light-dark()` pair resolves to its light side.
 
+#### The neutral surfaces are a numbered ladder
+
+`.bg-body-secondary`, `.bg-body-tertiary`, `.text-body-secondary` and
+`.text-body-tertiary` are deprecated. The replacements are ordinal:
+`.bg-1` … `.bg-4` for surfaces and `.fg-body`, `.fg-1` … `.fg-4` for the text
+hierarchy, with two new rungs (`.bg-1`, `.bg-2` on new `gray-025` / `gray-050`
+stops) between the body and the old surfaces. The deprecated names render
+identically and are removed in v7.
+
+The adjectives ran backwards for backgrounds — "tertiary" sat *closer* to the
+page than "secondary" — because for text, where the names came from, "stronger"
+means more visible, while for a surface it means further from the page. Numbers
+say how far from the body a rung sits and read the same on both sides.
+
+Two consequences for the tokens:
+
+- <span class="badge text-warning-emphasis bg-warning-subtle">Deprecated</span>
+  **The surface tokens move out of the theme-color namespace.**
+  `--cui-bg-body`, `--cui-bg-1` … `--cui-bg-4` and `--cui-fg-body`,
+  `--cui-fg-1` … `--cui-fg-4` are canonical; `--cui-body-bg`, `--cui-body-color`,
+  `--cui-secondary-bg`, `--cui-secondary-color`, `--cui-tertiary-bg` and
+  `--cui-tertiary-color` remain as aliases with identical values, and go away in
+  v7 — at which point `--cui-secondary-*` belongs to the `secondary` theme color
+  alone. Until then the two systems share the prefix, which is exactly why the
+  ladder moved out: `--cui-secondary-bg` (a page surface) sat next to
+  `--cui-secondary-bg-subtle` (a theme-color slot) with no way to tell which
+  system a token belonged to.
+- **`.text-body` and `.text-body-emphasis` are unaffected** — they are not
+  ordinal, any more than `.text-primary` is.
+- <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>
+  **The Sass knobs follow the ladder.** `$fg-body`, `$fg-1` … `$fg-4`,
+  `$bg-body`, `$bg-1` … `$bg-4` replace `$body-color`, `$body-bg`,
+  `$body-secondary-color`, `$body-secondary-bg`, `$body-tertiary-color` and
+  `$body-tertiary-bg`; every knob holds one `light-dark()` expression, so
+  `$body-bg-dark` and `$body-tertiary-bg-dark` are gone too — the translucent
+  tints that needed their Sass colors read the grays inline, which also means
+  the bundled Bootstrap theme recomputes them from its own grays instead of
+  forwarding frozen copies.
+
 #### `light` and `dark` are replaced by `inverse`
 
 <span class="badge text-danger-emphasis bg-danger-subtle">Breaking</span>

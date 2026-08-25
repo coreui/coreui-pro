@@ -18,7 +18,7 @@ $header-padding-y:              var(--#{$prefix}spacer-2) !default;
 $header-padding-x:              var(--#{$prefix}spacer-2) !default;
 $header-brand-font-size:        var(--#{$prefix}font-size-lg) !default;
 $header-color:                  color-mix(in srgb, var(--#{$prefix}emphasis-color) 65%, transparent) !default;
-$header-bg:                     var(--#{$prefix}body-bg) !default;
+$header-bg:                     var(--#{$prefix}bg-body) !default;
 $header-border-color:           var(--#{$prefix}border-color) !default;
 $header-border-width:           var(--#{$prefix}border-width) !default;
 $header-hover-color:            color-mix(in srgb, var(--#{$prefix}emphasis-color) 80%, transparent) !default;

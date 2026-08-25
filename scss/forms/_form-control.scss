@@ -19,8 +19,8 @@ $form-color-width:                3rem !default;
 
 // scss-docs-start form-file-variables
 $form-file-button-color:          var(--#{$prefix}btn-input-color) !default;
-$form-file-button-bg:             var(--#{$prefix}tertiary-bg) !default;
-$form-file-button-hover-bg:       var(--#{$prefix}secondary-bg) !default;
+$form-file-button-bg:             var(--#{$prefix}bg-3) !default;
+$form-file-button-hover-bg:       var(--#{$prefix}bg-4) !default;
 // scss-docs-end form-file-variables
 
 // stylelint-disable custom-property-no-missing-var-function, scss/dollar-variable-default
@@ -54,13 +54,13 @@ $form-control-tokens: defaults(
     --#{$prefix}control-transition-property: var(--#{$prefix}btn-input-transition-property),
     --#{$prefix}control-transition-duration: var(--#{$prefix}btn-input-transition-duration),
     --#{$prefix}control-transition-timing: var(--#{$prefix}btn-input-transition-timing),
-    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, var(--#{$prefix}secondary-color)),
+    --#{$prefix}control-placeholder-color: var(--#{$prefix}input-placeholder-color, var(--#{$prefix}fg-2)),
     --#{$prefix}control-focus-color: var(--#{$prefix}btn-input-focus-color),
     --#{$prefix}control-focus-bg: var(--#{$prefix}btn-input-focus-bg),
     --#{$prefix}control-focus-border-color: var(--#{$prefix}btn-input-focus-border-color),
     --#{$prefix}control-focus-ring: var(--#{$prefix}theme-focus-ring, var(--#{$prefix}focus-ring-color)),
-    --#{$prefix}control-disabled-color: var(--#{$prefix}body-color),
-    --#{$prefix}control-disabled-bg: var(--#{$prefix}secondary-bg),
+    --#{$prefix}control-disabled-color: var(--#{$prefix}fg-body),
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-4),
     --#{$prefix}control-disabled-border-color: var(--#{$prefix}border-color),
     --#{$prefix}control-action-color: #{$form-file-button-color},
     --#{$prefix}control-action-bg: #{$form-file-button-bg},
@@ -241,7 +241,7 @@ $form-control-select-tokens: defaults(
     // invalid and fall back to their initial values.
     @include tokens($form-control-tokens);
 
-    --#{$prefix}control-plaintext-color: var(--#{$prefix}body-color);
+    --#{$prefix}control-plaintext-color: var(--#{$prefix}fg-body);
 
     display: block;
     width: 100%;

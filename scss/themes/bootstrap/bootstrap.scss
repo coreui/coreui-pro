@@ -5,6 +5,8 @@
 
 // scss-docs-start gray-color-variables
 $white:    #fff !default;
+$gray-025: #fdfdfe !default;
+$gray-050: #fbfcfc !default;
 $gray-100: #f8f9fa !default;
 $gray-200: #e9ecef !default;
 $gray-300: #dee2e6 !default;
@@ -44,6 +46,8 @@ $inverse:       light-dark($gray-900, $gray-100) !default;
   $prefix:                        bs- !default,
   $data-infix:                    -bs- !default,
   $white:                         $white !default,
+  $gray-025:                      $gray-025 !default,
+  $gray-050:                      $gray-050 !default,
   $gray-100:                      $gray-100 !default,
   $gray-200:                      $gray-200 !default,
   $gray-300:                      $gray-300 !default,
@@ -61,11 +65,9 @@ $inverse:       light-dark($gray-900, $gray-100) !default;
   $warning:                       $warning !default,
   $danger:                        $danger !default,
   $inverse:                       $inverse !default,
-  $body-color:                    light-dark($gray-900, $gray-300) !default,
-  $body-secondary-color:          light-dark(rgba($gray-900, .75), rgba($gray-300, .75)) !default,
-  $body-tertiary-color:           light-dark(rgba($gray-900, .5), rgba($gray-300, .5)) !default,
-  $body-secondary-bg:             light-dark(var(--bs-gray-200), var(--bs-gray-800)) !default,
-  $body-tertiary-bg:              $gray-100 !default,
-  $body-bg-dark:                  $gray-900 !default,
-  $body-tertiary-bg-dark:         color.mix($gray-800, $gray-900, 50%) !default,
+  $fg-body:                       light-dark($gray-900, $gray-300) !default,
+  $fg-1:                          light-dark(rgba($gray-900, .85), rgba($gray-300, .85)) !default,
+  $fg-2:                          light-dark(rgba($gray-900, .75), rgba($gray-300, .75)) !default,
+  $fg-3:                          light-dark(rgba($gray-900, .5), rgba($gray-300, .5)) !default,
+  $fg-4:                          light-dark(rgba($gray-900, .25), rgba($gray-300, .25)) !default,
 );

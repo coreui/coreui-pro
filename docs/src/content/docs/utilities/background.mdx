@@ -25,6 +25,18 @@ Each theme color comes in three weights: the solid color, `.bg-*-muted` and `.bg
 <div class="p-3 mb-2 bg-transparent text-body">.bg-transparent</div>`
 ]} />
 
+## Surface ladder
+
+Five neutral surfaces run from the page background to the deepest panel. The numbers say how far a surface sits from the body — `.bg-1` is barely off the page, `.bg-4` is the deepest — and the ladder keeps its order in both color schemes.
+
+<Example code={`<div class="p-3 mb-2 bg-body">.bg-body</div>
+<div class="p-3 mb-2 bg-1">.bg-1</div>
+<div class="p-3 mb-2 bg-2">.bg-2</div>
+<div class="p-3 mb-2 bg-3">.bg-3</div>
+<div class="p-3 mb-2 bg-4">.bg-4</div>`} />
+
+`.bg-body-secondary` and `.bg-body-tertiary` are deprecated names for `.bg-4` and `.bg-3` — they render identically and go away in v7. The ordinal names replace them because the old adjectives ran backwards for backgrounds: "tertiary" sat *closer* to the page than "secondary".
+
 ## Background gradient
 
 By adding a `.bg-gradient` class, a linear gradient is added as background image to the backgrounds. This gradient starts with a semi-transparent white which fades out to the bottom.

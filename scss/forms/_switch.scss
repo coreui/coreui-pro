@@ -12,7 +12,7 @@ $switch-height:               1.25rem !default;
 $switch-border-radius:        var(--#{$prefix}border-radius-pill) !default;
 $switch-transition-duration:  var(--#{$prefix}control-transition-duration) !default;
 $switch-transition-timing:    var(--#{$prefix}control-transition-timing) !default;
-$switch-bg:                   var(--#{$prefix}tertiary-bg) !default;
+$switch-bg:                   var(--#{$prefix}bg-3) !default;
 $switch-box-shadow:           inset 0 1px 2px color-mix(in srgb, var(--#{$prefix}black) 5%, transparent) !default;
 $switch-border-width:         var(--#{$prefix}border-width) !default;
 $switch-border-color:         var(--#{$prefix}border-color) !default;
@@ -21,7 +21,7 @@ $switch-thumb-bg:             var(--#{$prefix}white) !default;
 $switch-thumb-shadow:         0 1px 2px color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
 $switch-checked-thumb-bg:     var(--#{$prefix}primary-contrast) !default;
 $switch-disabled-bg:          var(--#{$prefix}control-disabled-bg) !default;
-$switch-disabled-thumb-bg:    var(--#{$prefix}tertiary-color) !default;
+$switch-disabled-thumb-bg:    var(--#{$prefix}fg-3) !default;
 
 // scss-docs-end switch-variables
 

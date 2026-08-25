@@ -15,8 +15,8 @@
 // scss-docs-start btn-variables
 $btn-white-space:             null !default; // Set to `nowrap` to prevent text wrapping
 
-$btn-color:                   var(--#{$prefix}body-color) !default;
-$btn-bg:                      var(--#{$prefix}secondary-bg) !default;
+$btn-color:                   var(--#{$prefix}fg-body) !default;
+$btn-bg:                      var(--#{$prefix}bg-4) !default;
 $btn-hover-bg:                light-dark(var(--#{$prefix}gray-300), var(--#{$prefix}gray-700)) !default;
 $btn-box-shadow:              inset 0 1px 0 color-mix(in srgb, var(--#{$prefix}white) 15%, transparent), 0 1px 1px color-mix(in srgb, var(--#{$prefix}black) 7.5%, transparent) !default;
 $btn-active-box-shadow:       inset 0 3px 5px color-mix(in srgb, var(--#{$prefix}black) 12.5%, transparent) !default;
@@ -25,18 +25,18 @@ $btn-link-color:              var(--#{$prefix}link-color) !default;
 $btn-link-hover-color:        var(--#{$prefix}link-hover-color) !default;
 $btn-link-disabled-color:     var(--#{$prefix}gray-600) !default;
 
-$btn-outline-color:           var(--#{$prefix}secondary-color) !default;
+$btn-outline-color:           var(--#{$prefix}fg-2) !default;
 $btn-outline-border-color:    var(--#{$prefix}border-color) !default;
-$btn-outline-hover-color:     var(--#{$prefix}body-color) !default;
-$btn-outline-hover-bg:        var(--#{$prefix}tertiary-bg) !default;
+$btn-outline-hover-color:     var(--#{$prefix}fg-body) !default;
+$btn-outline-hover-bg:        var(--#{$prefix}bg-3) !default;
 
-$btn-subtle-color:            var(--#{$prefix}body-color) !default;
-$btn-subtle-bg:               var(--#{$prefix}secondary-bg) !default;
-$btn-subtle-hover-bg:         var(--#{$prefix}tertiary-bg) !default;
+$btn-subtle-color:            var(--#{$prefix}fg-body) !default;
+$btn-subtle-bg:               var(--#{$prefix}bg-4) !default;
+$btn-subtle-hover-bg:         var(--#{$prefix}bg-3) !default;
 
-$btn-ghost-color:             var(--#{$prefix}secondary-color) !default;
-$btn-ghost-hover-color:       var(--#{$prefix}body-color) !default;
-$btn-ghost-hover-bg:          var(--#{$prefix}tertiary-bg) !default;
+$btn-ghost-color:             var(--#{$prefix}fg-2) !default;
+$btn-ghost-hover-color:       var(--#{$prefix}fg-body) !default;
+$btn-ghost-hover-bg:          var(--#{$prefix}bg-3) !default;
 // scss-docs-end btn-variables
 
 // The v6 spelling puts `.btn-check` on the `<label>` next to `.btn`, so the

@@ -17,7 +17,7 @@
 $range-slider-track-width:                 100% !default;
 $range-slider-track-height:                .5rem !default;
 $range-slider-track-cursor:                pointer !default;
-$range-slider-track-bg:                    var(--#{$prefix}secondary-bg) !default;
+$range-slider-track-bg:                    var(--#{$prefix}bg-4) !default;
 $range-slider-track-border-radius:         1rem !default;
 $range-slider-track-box-shadow:            var(--#{$prefix}box-shadow-inset) !default;
 
@@ -27,7 +27,7 @@ $range-slider-disabled-track-in-range-bg:  color-mix(in srgb, var(--#{$prefix}se
 $range-slider-label-padding-y:             0 !default;
 $range-slider-label-padding-x:             0 !default;
 $range-slider-label-font-size:             var(--#{$prefix}font-size-sm) !default;
-$range-slider-label-color:                 var(--#{$prefix}body-color) !default;
+$range-slider-label-color:                 var(--#{$prefix}fg-body) !default;
 
 $range-slider-thumb-width:                 1rem !default;
 $range-slider-thumb-height:                $range-slider-thumb-width !default;
@@ -35,7 +35,7 @@ $range-slider-thumb-bg:                    var(--#{$prefix}theme-bg, var(--#{$pr
 $range-slider-thumb-border:                0 !default;
 $range-slider-thumb-border-radius:         1rem !default;
 $range-slider-thumb-box-shadow:            0 .1rem .25rem color-mix(in srgb, var(--#{$prefix}black) 10%, transparent) !default;
-$range-slider-thumb-active-bg:             color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 30%, var(--#{$prefix}body-bg)) !default;
+$range-slider-thumb-active-bg:             color-mix(in srgb, var(--#{$prefix}theme-bg, var(--#{$prefix}primary)) 30%, var(--#{$prefix}bg-body)) !default;
 $range-slider-thumb-disabled-bg:           color-mix(in srgb, var(--#{$prefix}secondary) 100%, transparent) !default;
 $range-slider-thumb-transition:            background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out !default;
 
@@ -45,8 +45,8 @@ $range-slider-tooltip-padding-x:           var(--#{$prefix}spacer-2) !default;
 $range-slider-tooltip-margin-end:          .25rem !default;
 $range-slider-tooltip-margin-bottom:       .25rem !default;
 $range-slider-tooltip-font-size:           var(--#{$prefix}font-size-sm) !default;
-$range-slider-tooltip-color:               var(--#{$prefix}body-color) !default;
-$range-slider-tooltip-bg:                  var(--#{$prefix}secondary-bg) !default;
+$range-slider-tooltip-color:               var(--#{$prefix}fg-body) !default;
+$range-slider-tooltip-bg:                  var(--#{$prefix}bg-4) !default;
 $range-slider-tooltip-border-radius:       var(--#{$prefix}border-radius) !default;
 $range-slider-tooltip-box-shadow:          var(--#{$prefix}box-shadow) !default;
 $range-slider-tooltip-transition:          visibility .15s, opacity .15s ease !default;

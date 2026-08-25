@@ -12,14 +12,14 @@ $form-control-group-gap:              .5rem !default;
 $form-control-group-icon-size:        1rem !default;
 $form-control-group-icon-size-sm:     .875rem !default;
 $form-control-group-icon-size-lg:     1.25rem !default;
-$form-control-group-icon-color:       var(--#{$prefix}tertiary-color) !default;
+$form-control-group-icon-color:       var(--#{$prefix}fg-3) !default;
 $form-control-group-action-size:      1.5rem !default;
 $form-control-group-action-size-sm:   1.25rem !default;
 $form-control-group-action-size-lg:   1.75rem !default;
-$form-control-group-action-color:     var(--#{$prefix}tertiary-color) !default;
-$form-control-group-action-hover-color: var(--#{$prefix}body-color) !default;
+$form-control-group-action-color:     var(--#{$prefix}fg-3) !default;
+$form-control-group-action-hover-color: var(--#{$prefix}fg-body) !default;
 $form-control-group-action-bg:        transparent !default;
-$form-control-group-action-hover-bg:  var(--#{$prefix}tertiary-bg) !default;
+$form-control-group-action-hover-bg:  var(--#{$prefix}bg-3) !default;
 // scss-docs-end form-control-group-variables
 
 $form-control-group-sizes: () !default;

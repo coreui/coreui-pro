@@ -11,8 +11,8 @@ $toast-max-width:                   350px !default;
 $toast-padding-x:                   .75rem !default;
 $toast-padding-y:                   .5rem !default;
 $toast-font-size:                   .875rem !default;
-$toast-color:                       var(--#{$prefix}body-color) !default;
-$toast-background-color:            var(--#{$prefix}body-bg) !default;
+$toast-color:                       var(--#{$prefix}fg-body) !default;
+$toast-background-color:            var(--#{$prefix}bg-body) !default;
 $toast-border-width:                var(--#{$prefix}border-width) !default;
 $toast-border-color:                var(--#{$prefix}border-color-translucent) !default;
 $toast-border-radius:               var(--#{$prefix}border-radius) !default;
@@ -21,7 +21,7 @@ $toast-spacing:                     $container-padding-x !default;
 $toast-transition-duration:         .15s !default;
 $toast-transition-timing:           linear !default;
 
-$toast-header-color:                var(--#{$prefix}secondary-color) !default;
+$toast-header-color:                var(--#{$prefix}fg-2) !default;
 $toast-header-background-color:     $toast-background-color !default;
 $toast-header-border-color:         $toast-border-color !default;
 // scss-docs-end toast-variables

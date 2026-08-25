@@ -12,10 +12,10 @@
 $stepper-steps-gap:                             .5rem !default;
 $stepper-step-gap:                              .5rem !default;
 $stepper-step-button-width:                     8rem !default;
-$stepper-step-button-color:                     var(--#{$prefix}secondary-color) !default;
-$stepper-step-button-active-color:              var(--#{$prefix}secondary-color) !default;
-$stepper-step-button-complete-color:            var(--#{$prefix}secondary-color) !default;
-$stepper-step-button-disabled-color:            var(--#{$prefix}secondary-color) !default;
+$stepper-step-button-color:                     var(--#{$prefix}fg-2) !default;
+$stepper-step-button-active-color:              var(--#{$prefix}fg-2) !default;
+$stepper-step-button-complete-color:            var(--#{$prefix}fg-2) !default;
+$stepper-step-button-disabled-color:            var(--#{$prefix}fg-2) !default;
 $stepper-step-indicator-width:                  2rem !default;
 $stepper-step-indicator-height:                 2rem !default;
 $stepper-step-indicator-color:                  var(--#{$prefix}secondary) !default;
@@ -38,7 +38,7 @@ $stepper-step-indicator-icon-size:              1rem !default;
 
 $stepper-step-connector-height:                 .125rem !default;
 $stepper-step-connector-gap:                    1rem !default;
-$stepper-step-connector-bg:                     var(--#{$prefix}secondary-bg) !default;
+$stepper-step-connector-bg:                     var(--#{$prefix}bg-4) !default;
 $stepper-step-connector-complete-bg:            var(--#{$prefix}primary) !default;
 $stepper-step-connector-transition:             background-color .15s ease-in-out !default;
 

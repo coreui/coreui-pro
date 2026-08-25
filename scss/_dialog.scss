@@ -13,8 +13,8 @@
 $dialog-padding:                    var(--#{$prefix}spacer-3) !default;
 $dialog-width:                      500px !default;
 $dialog-margin:                     1.75rem !default;
-$dialog-color:                      var(--#{$prefix}body-color) !default;
-$dialog-bg:                         var(--#{$prefix}body-bg) !default;
+$dialog-color:                      var(--#{$prefix}fg-body) !default;
+$dialog-bg:                         var(--#{$prefix}bg-body) !default;
 $dialog-border-color:               var(--#{$prefix}border-color-translucent) !default;
 $dialog-border-width:               var(--#{$prefix}border-width) !default;
 $dialog-border-radius:              .75rem !default;

@@ -26,8 +26,8 @@ $combobox-select-all-padding-y:       .5rem !default;
 $combobox-select-all-padding-x:       .75rem !default;
 $combobox-select-all-color:           var(--#{$prefix}body-secondary-color) !default;
 $combobox-select-all-bg:              transparent !default;
-$combobox-select-all-hover-color:     var(--#{$prefix}body-color) !default;
-$combobox-select-all-hover-bg:        var(--#{$prefix}tertiary-bg) !default;
+$combobox-select-all-hover-color:     var(--#{$prefix}fg-body) !default;
+$combobox-select-all-hover-bg:        var(--#{$prefix}bg-3) !default;
 $combobox-select-all-border-width:    0 !default;
 $combobox-select-all-border-color:    transparent !default;
 $combobox-select-all-border-radius:   var(--#{$prefix}border-radius) !default;
@@ -37,14 +37,14 @@ $combobox-options-padding-y:          .375rem !default;
 $combobox-options-padding-x:          .375rem !default;
 $combobox-options-font-size:          var(--#{$prefix}body-font-size) !default;
 $combobox-options-font-weight:        var(--#{$prefix}font-weight-normal) !default;
-$combobox-options-color:              var(--#{$prefix}body-color) !default;
+$combobox-options-color:              var(--#{$prefix}fg-body) !default;
 
 $combobox-optgroup-label-padding-y:      .5rem !default;
 $combobox-optgroup-label-padding-x:      .625rem !default;
 $combobox-optgroup-label-border-radius:  var(--#{$prefix}border-radius) !default;
 $combobox-optgroup-label-font-size:      80% !default;
 $combobox-optgroup-label-font-weight:    var(--#{$prefix}font-weight-bold) !default;
-$combobox-optgroup-label-color:          var(--#{$prefix}tertiary-color) !default;
+$combobox-optgroup-label-color:          var(--#{$prefix}fg-3) !default;
 $combobox-optgroup-label-text-transform: uppercase !default;
 
 $combobox-option-padding-y:           .5rem !default;
@@ -54,10 +54,10 @@ $combobox-option-margin-x:            0 !default;
 $combobox-option-border-width:        var(--#{$prefix}btn-input-border-width) !default;
 $combobox-option-border-color:        transparent !default;
 $combobox-option-border-radius:       var(--#{$prefix}border-radius) !default;
-$combobox-option-hover-color:         var(--#{$prefix}body-color) !default;
-$combobox-option-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-$combobox-option-disabled-color:      var(--#{$prefix}secondary-color) !default;
-$combobox-option-selected-bg:         var(--#{$prefix}secondary-bg) !default;
+$combobox-option-hover-color:         var(--#{$prefix}fg-body) !default;
+$combobox-option-hover-bg:            var(--#{$prefix}bg-3) !default;
+$combobox-option-disabled-color:      var(--#{$prefix}fg-2) !default;
+$combobox-option-selected-bg:         var(--#{$prefix}bg-4) !default;
 
 $combobox-option-indicator-width:         var(--#{$prefix}check-size, var(--#{$prefix}control-size)) !default;
 

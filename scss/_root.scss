@@ -4,7 +4,6 @@
 @use "functions/defaults" as *;
 @use "mixins/tokens" as *;
 @use "functions/color" as *;
-@use "functions/color-scheme" as *;
 @use "functions/color-translucent" as *;
 @use "mixins/color-mode" as *;
 @use "theme" as *;
@@ -31,25 +30,25 @@ $body-text-align:     null !default;
 $body-emphasis-color: light-dark($black, $white) !default;
 $link-hover-color:    var(--#{$prefix}primary-fg) !default;
 
-$body-color:                light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
-$body-bg:                   $white !default;
+// The surface ladder. `fg` is content, `bg` is surface; `body` is the page and
+// the numbers step away from it. New-rung dark backgrounds are mixed in the
+// browser between the grays the deeper rungs already use.
+$fg-body:     light-dark(rgba(shift-color($gray-base, +26%), .95), rgba($white, .87)) !default;
+$fg-1:        light-dark(rgba(shift-color($gray-base, +26%), .8), rgba($white, .75)) !default;
+$fg-2:        light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default;
+$fg-3:        light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
+$fg-4:        light-dark(rgba(shift-color($gray-base, +26%), .25), rgba($white, .25)) !default;
 
-$body-secondary-color:      light-dark(rgba(shift-color($gray-base, +26%), .681), rgba($white, .6)) !default;
-$body-secondary-bg:         light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
-
-$body-tertiary-color:       light-dark(rgba(shift-color($gray-base, +26%), .38), rgba($white, .38)) !default;
-$body-tertiary-bg:          $gray-100 !default;
-
-// `color-translucent()` un-blends a color against a background, so both sides
-// have to stay Sass colors — `light-dark()` would hand it a string. These two
-// are the only dark counterparts left; everything else pairs inline above.
-$body-bg-dark:              $gray-900 !default;
-$body-tertiary-bg-dark:     color.mix($gray-800, $gray-900) !default;
+$bg-body:     light-dark(var(--#{$prefix}white), var(--#{$prefix}gray-900)) !default;
+$bg-1:        light-dark(var(--#{$prefix}gray-025), color-mix(in srgb, var(--#{$prefix}gray-800) 15%, var(--#{$prefix}gray-900))) !default;
+$bg-2:        light-dark(var(--#{$prefix}gray-050), color-mix(in srgb, var(--#{$prefix}gray-800) 30%, var(--#{$prefix}gray-900))) !default;
+$bg-3:        light-dark(var(--#{$prefix}gray-100), color-mix(in srgb, var(--#{$prefix}gray-800) 50%, var(--#{$prefix}gray-900))) !default;
+$bg-4:        light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-800)) !default;
 
 // scss-docs-start border-variables
 $border-width:             1px !default;
 $border-style:             solid !default;
-$border-color-translucent: light-dark(color-translucent($gray-300, .175), color-translucent($gray-800, .175, $body-bg-dark)) !default;
+$border-color-translucent: light-dark(color-translucent($gray-300, .175), color-translucent($gray-800, .175, $gray-900)) !default;
 // scss-docs-end border-variables
 
 // scss-docs-start border-radius-variables
@@ -82,7 +81,7 @@ $font-family-monospace:  SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mo
 // scss-docs-end font-variables
 
 // scss-docs-start type-variables
-$mark-color: var(--#{$prefix}body-color) !default;
+$mark-color: var(--#{$prefix}fg-body) !default;
 $mark-bg:    light-dark($yellow-100, $yellow-800) !default;
 // scss-docs-end type-variables
 
@@ -202,14 +201,30 @@ $root-token-defaults: map.merge(
     --#{$prefix}body-font-weight: $font-weight-base,
     --#{$prefix}body-line-height: $line-height-base,
     --#{$prefix}body-text-align: $body-text-align,
-    --#{$prefix}body-color: $body-color,
-    --#{$prefix}body-bg: color-scheme($body-bg, $body-bg-dark),
+    // scss-docs-start root-surface-ladder
+    --#{$prefix}fg-body: $fg-body,
+    --#{$prefix}fg-1: $fg-1,
+    --#{$prefix}fg-2: $fg-2,
+    --#{$prefix}fg-3: $fg-3,
+    --#{$prefix}fg-4: $fg-4,
+    --#{$prefix}bg-body: $bg-body,
+    --#{$prefix}bg-1: $bg-1,
+    --#{$prefix}bg-2: $bg-2,
+    --#{$prefix}bg-3: $bg-3,
+    --#{$prefix}bg-4: $bg-4,
+    // scss-docs-end root-surface-ladder
+    // Deprecated in v6.0.0 aliases of the ladder above; removed in v7, when the
+    // secondary/tertiary namespace goes back to the theme colors alone.
+    --#{$prefix}body-color: var(--#{$prefix}fg-body),
+    --#{$prefix}body-bg: var(--#{$prefix}bg-body),
+    --#{$prefix}secondary-color: var(--#{$prefix}fg-2),
+    --#{$prefix}secondary-bg: var(--#{$prefix}bg-4),
+    --#{$prefix}tertiary-color: var(--#{$prefix}fg-3),
+    --#{$prefix}tertiary-bg: var(--#{$prefix}bg-3),
     --#{$prefix}emphasis-color: $body-emphasis-color,
-    --#{$prefix}secondary-color: $body-secondary-color,
-    --#{$prefix}secondary-bg: $body-secondary-bg,
-    --#{$prefix}tertiary-color: $body-tertiary-color,
-    --#{$prefix}tertiary-bg: color-scheme($body-tertiary-bg, $body-tertiary-bg-dark),
-    --#{$prefix}tertiary-bg-translucent: color-scheme(color-translucent($body-tertiary-bg), color-translucent($body-tertiary-bg-dark, .1, $body-bg-dark)),
+    // `color-translucent()` un-blends a color against a background — channel
+    // algebra, so it reads the grays as Sass colors, not as tokens.
+    --#{$prefix}tertiary-bg-translucent: light-dark(color-translucent($gray-100), color-translucent(color.mix($gray-800, $gray-900), .1, $gray-900)),
     // scss-docs-end root-body-variables
     --#{$prefix}heading-color: $headings-color,
     --#{$prefix}link-color: $link-color,
@@ -264,8 +279,8 @@ $root-token-defaults: map.merge(
     --#{$prefix}btn-input-transition-property: $input-btn-transition-property,
     --#{$prefix}btn-input-action-transition-property: $input-btn-action-transition-property,
     --#{$prefix}btn-input-disabled-opacity: $input-btn-disabled-opacity,
-    --#{$prefix}btn-input-color: var(--#{$prefix}body-color),
-    --#{$prefix}btn-input-bg: var(--#{$prefix}body-bg),
+    --#{$prefix}btn-input-color: var(--#{$prefix}fg-body),
+    --#{$prefix}btn-input-bg: var(--#{$prefix}bg-body),
     --#{$prefix}btn-input-font-weight: var(--#{$prefix}body-font-weight),
     --#{$prefix}btn-input-border-color: var(--#{$prefix}border-color),
     --#{$prefix}btn-input-border-radius: var(--#{$prefix}border-radius),
@@ -301,7 +316,7 @@ $root-token-defaults: map.merge(
     --#{$prefix}control-checked-border-color: $control-checked-border-color,
     --#{$prefix}control-indeterminate-bg: $control-indeterminate-bg,
     --#{$prefix}control-indeterminate-border-color: $control-indeterminate-border-color,
-    --#{$prefix}control-disabled-bg: var(--#{$prefix}tertiary-bg),
+    --#{$prefix}control-disabled-bg: var(--#{$prefix}bg-3),
     --#{$prefix}control-disabled-opacity: $control-disabled-opacity,
     --#{$prefix}control-label-disabled-opacity: $control-label-disabled-opacity,
     --#{$prefix}control-focus-border-color: $control-focus-border,
