@@ -319,7 +319,7 @@ Each variant class rewrites those variables from the theme tokens, falling back 
 
 A brand colour of your own is a theme, not a button: set the theme tokens anywhere above the buttons and every variant follows, in plain CSS. The tokens inherit, so one ancestor themes the whole subtree.
 
-<Example code={`<div style="--cui-theme-base: #6f42c1; --cui-theme-contrast: #fff; --cui-theme-hover: #6134ae; --cui-theme-active: #56309b; --cui-theme-bg-subtle: #e9e0f7; --cui-theme-fg: #59359a; --cui-theme-fg-emphasis: #432a72;">
+<Example code={`<div style="--cui-theme-bg: #6f42c1; --cui-theme-contrast: #fff; --cui-theme-hover: #6134ae; --cui-theme-active: #56309b; --cui-theme-bg-subtle: #e9e0f7; --cui-theme-fg: #59359a; --cui-theme-fg-emphasis: #432a72;">
     <button type="button" class="btn-solid">Solid</button>
     <button type="button" class="btn-outline">Outline</button>
     <button type="button" class="btn-subtle">Subtle</button>
@@ -330,7 +330,7 @@ In your own stylesheet that is a class, and the buttons carry it the way they ca
 
 ```css
 .theme-brand {
-  --cui-theme-base: #6f42c1;
+  --cui-theme-bg: #6f42c1;
   --cui-theme-contrast: #fff;
   --cui-theme-hover: #6134ae;
   --cui-theme-active: #56309b;
