@@ -10,7 +10,7 @@ description: "The Menu component toggles contextual overlays with submenus, cont
 
 Toggle menus with buttons whenever possible. Here’s an example using a CoreUI button:
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="menu" aria-expanded="false">
     Toggle menu
   </button>
   <div class="menu">
@@ -29,7 +29,7 @@ While `<button>` is the recommended control for a menu toggle, there might be si
 
 Use [button groups](/components/button-group/) to create split button menus where the menu is displayed when a secondary button is clicked. Give that second button `.menu-toggle-split`, which narrows its padding so the pair reads as one control.
 
-<Example code={`<a class="btn btn-primary" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<a class="btn-solid theme-primary" href="#" role="button" data-coreui-toggle="menu" aria-expanded="false">
     Toggle menu
   </a>
   <div class="menu">
@@ -39,8 +39,8 @@ Use [button groups](/components/button-group/) to create split button menus wher
   </div>
 
   <div class="btn-group">
-    <button type="button" class="btn btn-secondary">Split</button>
-    <button type="button" class="btn btn-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary">Split</button>
+    <button type="button" class="btn-solid theme-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false">
       <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 144a64 64 0 1 0-64-64 64.07 64.07 0 0 0 64 64m0-96a32 32 0 1 1-32 32 32.036 32.036 0 0 1 32-32m0 320a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32m0-272a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32"></path></svg>
       <span class="visually-hidden">Toggle menu</span>
     </button>
@@ -58,7 +58,7 @@ Use [button groups](/components/button-group/) to create split button menus wher
 Opt into darker menus to match a dark navbar or custom style by adding `data-coreui-theme="dark"` onto the toggle element or a parent.
 
 <Example code={`<div data-coreui-theme="dark">
-    <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
       Menu button
     </button>
     <div class="menu">
@@ -77,7 +77,7 @@ And putting it to use in a navbar:
       <a class="navbar-brand" href="#">Navbar</a>
       <ul class="navbar-nav">
         <li class="nav-item" data-coreui-theme="dark">
-          <button class="btn btn-secondary" data-coreui-toggle="menu" aria-expanded="false">
+          <button class="btn-solid theme-secondary" data-coreui-toggle="menu" aria-expanded="false">
             Menu
           </button>
           <div class="menu">
@@ -94,7 +94,7 @@ And putting it to use in a navbar:
 
 Blur and saturate the background of menus to create a translucent effect with `.menu-translucent`.
 
-<Example code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
     Menu button
   </button>
   <div class="menu menu-translucent">
@@ -104,7 +104,7 @@ Blur and saturate the background of menus to create a translucent effect with `.
     <a class="menu-item" href="#">Menu item</a>
     <a class="menu-item" href="#">Menu item</a>
     <hr class="menu-divider">
-    <a class="menu-item text-danger" href="#">Danger menu item</a>
+    <a class="menu-item theme-danger" href="#">Danger menu item</a>
   </div>`} />
 
 ## Placement
@@ -117,7 +117,7 @@ Use `data-coreui-placement` on the toggle element to control where the menu appe
 All placements support `-start` and `-end` alignment modifiers (e.g., `bottom-start`, `end-end`).
 
 <Example code={`<div class="btn-group">
-    <button type="button" class="btn btn-secondary" data-coreui-toggle="menu" data-coreui-placement="top-start" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary" data-coreui-toggle="menu" data-coreui-placement="top-start" aria-expanded="false">
       Top start
     </button>
     <div class="menu">
@@ -126,7 +126,7 @@ All placements support `-start` and `-end` alignment modifiers (e.g., `bottom-st
     </div>
   </div>
   <div class="btn-group">
-    <button type="button" class="btn btn-secondary" data-coreui-toggle="menu" data-coreui-placement="end" aria-expanded="false">
+    <button type="button" class="btn-solid theme-secondary" data-coreui-toggle="menu" data-coreui-placement="end" aria-expanded="false">
       End (logical)
     </button>
     <div class="menu">
@@ -145,7 +145,7 @@ For example, `data-coreui-placement="bottom-start md:bottom-end lg:end-start"` w
 - Switch to `bottom-end` at the `md` breakpoint
 - Switch to `right-start` at the `lg` breakpoint
 
-<Example class="d-flex flex-column flex-lg-row gap-2" code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
+<Example class="d-flex flex-column flex-lg-row gap-2" code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom-start md:bottom-end" aria-expanded="false">
     Bottom start → md:bottom-end
   </button>
   <div class="menu">
@@ -153,7 +153,7 @@ For example, `data-coreui-placement="bottom-start md:bottom-end lg:end-start"` w
     <a class="menu-item" href="#">Another action</a>
   </div>
 
-  <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom lg:right" aria-expanded="false">
+  <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="bottom lg:right" aria-expanded="false">
     Bottom → lg:right
   </button>
   <div class="menu">
@@ -161,7 +161,7 @@ For example, `data-coreui-placement="bottom-start md:bottom-end lg:end-start"` w
     <a class="menu-item" href="#">Another action</a>
   </div>
 
-  <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="top-end md:right-start xl:bottom-start" aria-expanded="false">
+  <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-placement="top-end md:right-start xl:bottom-start" aria-expanded="false">
     Multi-breakpoint
   </button>
   <div class="menu">
@@ -216,19 +216,19 @@ Add `.disabled` to items in the menu to style them as disabled.
 
 ### Variants
 
-Use our color utilities to tint individual menu items - the classic CoreUI idiom, with no extra component API involved.
+Colour an individual item with a [`.theme-*` class](/customize/components/#theme-variants). The item reads the theme's foreground while at rest and swaps to the theme's fill with a contrasting label once it is `.active`, so one class covers both states.
 
 <Example class="hstack gap-3" code={`<div class="menu show position-static">
-    <a class="menu-item text-primary" href="#">Primary link</a>
-    <a class="menu-item text-secondary" href="#">Secondary link</a>
-    <a class="menu-item text-success" href="#">Success link</a>
-    <a class="menu-item text-danger" href="#">Danger link</a>
+    <a class="menu-item theme-primary" href="#">Primary link</a>
+    <a class="menu-item theme-secondary" href="#">Secondary link</a>
+    <a class="menu-item theme-success" href="#">Success link</a>
+    <a class="menu-item theme-danger" href="#">Danger link</a>
   </div>
   <div class="menu show position-static">
-    <a class="menu-item active text-primary" href="#">Primary link</a>
-    <a class="menu-item active text-secondary" href="#">Secondary link</a>
-    <a class="menu-item active text-success" href="#">Success link</a>
-    <a class="menu-item active text-danger" href="#">Danger link</a>
+    <a class="menu-item active theme-primary" href="#">Primary link</a>
+    <a class="menu-item active theme-secondary" href="#">Secondary link</a>
+    <a class="menu-item active theme-success" href="#">Success link</a>
+    <a class="menu-item active theme-danger" href="#">Danger link</a>
   </div>`} />
 
 ### Icons
@@ -249,7 +249,7 @@ Add `.menu-item-icon` directly to an `<svg>` to add an icon slot to menu items.
       Cut
     </button>
     <hr class="menu-divider">
-    <button class="menu-item text-danger" type="button">
+    <button class="menu-item theme-danger" type="button">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="menu-item-icon" viewBox="0 0 16 16">
         <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
       </svg>
@@ -280,7 +280,7 @@ Use `.menu-item-content` for a flex column layout and `.menu-item-description` f
 
 Add `.selected` to a `.menu-item` to indicate the current selection.
 
-<Example code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">Select status</button>
+<Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">Select status</button>
   <div class="menu">
     <button class="menu-item selected" type="button">
       <span class="menu-item-content">
@@ -298,7 +298,7 @@ Add `.selected` to a `.menu-item` to indicate the current selection.
     </button>
   </div>
 
-  <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">Select status</button>
+  <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">Select status</button>
   <div class="menu">
     <button class="menu-item" type="button">
       Default menu item
@@ -373,9 +373,9 @@ Put a form within a menu, or make it into a menu, and use [spacing utilities](/u
         <label for="checkLabel">Example new checkbox</label>
       </div>
       <div class="vstack gap-2">
-        <button type="submit" class="btn btn-primary">Sign in</button>
-        <a class="btn btn-ghost-secondary" href="#">New around here? Sign up</a>
-        <a class="btn btn-ghost-secondary" href="#">Forgot password?</a>
+        <button type="submit" class="btn-solid theme-primary">Sign in</button>
+        <a class="btn-ghost theme-secondary" href="#">New around here? Sign up</a>
+        <a class="btn-ghost theme-secondary" href="#">Forgot password?</a>
       </div>
     </form>
   </div>`} />
@@ -403,7 +403,7 @@ Create nested menus with the `.submenu` wrapper class. Submenus support hover an
 
 Wrap a `.menu-item` trigger and a nested `.menu` inside a `.submenu` element.
 
-<Example code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
     Submenus
   </button>
   <div class="menu">
@@ -438,7 +438,7 @@ Wrap a `.menu-item` trigger and a nested `.menu` inside a `.submenu` element.
 
 Submenus can be nested to multiple levels. Each level opens to the side and flips direction when there’s not enough viewport space.
 
-<Example code={`<button class="btn btn-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
+<Example code={`<button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" aria-expanded="false">
     Multi-level menu
   </button>
   <div class="menu">
@@ -466,7 +466,7 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
 
 <Example code={`<div class="d-flex">
     <div class="me-1">
-      <button type="button" class="btn btn-secondary" data-coreui-toggle="menu" aria-expanded="false" data-coreui-offset="10,20">
+      <button type="button" class="btn-solid theme-secondary" data-coreui-toggle="menu" aria-expanded="false" data-coreui-offset="10,20">
         Offset
       </button>
       <div class="menu">
@@ -476,8 +476,8 @@ Use `data-coreui-offset` or `data-coreui-reference` to change the location of th
       </div>
     </div>
     <div class="btn-group">
-      <button type="button" class="btn btn-secondary">Reference</button>
-      <button type="button" class="btn btn-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false" data-coreui-reference="parent">
+      <button type="button" class="btn-solid theme-secondary">Reference</button>
+      <button type="button" class="btn-solid theme-secondary menu-toggle-split" data-coreui-toggle="menu" aria-expanded="false" data-coreui-reference="parent">
         <svg class="icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 144a64 64 0 1 0-64-64 64.07 64.07 0 0 0 64 64m0-96a32 32 0 1 1-32 32 32.036 32.036 0 0 1 32-32m0 320a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32m0-272a64 64 0 1 0 64 64 64.07 64.07 0 0 0-64-64m0 96a32 32 0 1 1 32-32 32.036 32.036 0 0 1-32 32"></path></svg>
         <span class="visually-hidden">Toggle Menu</span>
       </button>
@@ -498,7 +498,7 @@ By default, the menu is closed when clicking inside or outside the menu. You can
 Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is within the menu (its toggle or items) closes the menu and returns focus to the toggle.
 
 <Example class="d-flex flex-wrap gap-2" code={`<div class="btn-group">
-    <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="true" aria-expanded="false">
       Default menu
     </button>
     <div class="menu">
@@ -509,7 +509,7 @@ Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is wi
   </div>
 
   <div class="btn-group">
-    <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="inside" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="inside" aria-expanded="false">
       Clickable inside
     </button>
     <div class="menu">
@@ -520,7 +520,7 @@ Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is wi
   </div>
 
   <div class="btn-group">
-    <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="outside" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="outside" aria-expanded="false">
       Clickable outside
     </button>
     <div class="menu">
@@ -531,7 +531,7 @@ Regardless of the `autoClose` setting, pressing <kbd>Esc</kbd> while focus is wi
   </div>
 
   <div class="btn-group">
-    <button class="btn btn-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="false" aria-expanded="false">
+    <button class="btn-solid theme-secondary" type="button" data-coreui-toggle="menu" data-coreui-auto-close="false" aria-expanded="false">
       Manual close
     </button>
     <div class="menu">

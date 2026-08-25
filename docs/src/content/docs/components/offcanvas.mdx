@@ -49,10 +49,10 @@ Utilize the buttons below to toggle the visibility of an offcanvas element using
 
 You can employ a link with the `href` attribute or a button featuring the `data-coreui-target` attribute. In both instances, including `data-coreui-toggle="offcanvas"` is necessary.
 
-<Example code={`<a class="btn btn-primary" data-coreui-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
+<Example code={`<a class="btn-solid theme-primary" data-coreui-toggle="offcanvas" href="#offcanvasExample" role="button" aria-controls="offcanvasExample">
     Link with href
   </a>
-  <button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasExample" aria-controls="offcanvasExample">
+  <button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasExample" aria-controls="offcanvasExample">
     Button with data-coreui-target
   </button>
 
@@ -66,7 +66,7 @@ You can employ a link with the `href` attribute or a button featuring the `data-
         Some text as a placeholder. In real life, you can have the elements you have chosen, like text, images, lists, etc.
       </div>
       <div class="dropdown mt-3">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-coreui-toggle="dropdown">
+        <button class="btn-solid theme-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-coreui-toggle="dropdown">
           Dropdown button
         </button>
         <ul class="dropdown-menu">
@@ -82,7 +82,7 @@ You can employ a link with the `href` attribute or a button featuring the `data-
 
 The `<body>` element's scrolling is disabled when the Bootstrap offcanvas and its backdrop are visible. Utilize the `data-coreui-scroll` attribute to allow scrolling on the `<body>` — the offcanvas then opens non-modally, so the rest of the page also stays interactive.
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Enable body scrolling</button>
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">Enable body scrolling</button>
 
   <dialog class="offcanvas offcanvas-start" data-coreui-scroll="true" data-coreui-backdrop="false" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
     <div class="offcanvas-header">
@@ -99,7 +99,7 @@ The `<body>` element's scrolling is disabled when the Bootstrap offcanvas and it
 
 You can also enable `<body>` scrolling with a visible backdrop.
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Enable both scrolling & backdrop</button>
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">Enable both scrolling & backdrop</button>
 
   <dialog class="offcanvas offcanvas-start" data-coreui-scroll="true" id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
     <div class="offcanvas-header">
@@ -114,7 +114,7 @@ You can also enable `<body>` scrolling with a visible backdrop.
 ### Static backdrop
 
 When the backdrop is set to static, the Bootstrap offcanvas will remain open when clicking outside of it.
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#staticBackdrop" aria-controls="staticBackdrop">
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#staticBackdrop" aria-controls="staticBackdrop">
     Toggle static offcanvas
   </button>
 
@@ -156,7 +156,7 @@ Attention! Dark variants for components are no longer supported as of v5.3.0 due
 
 Responsive offcanvas classes hide content that is outside the viewport from a specified breakpoint and lower. Above that breakpoint, the content will behave normally. For example, `.offcanvas-lg` hides content in an offcanvas below the `lg` breakpoint, but displays the content above the `lg` breakpoint.
 
-<Example code={`<button class="btn btn-primary d-lg-none" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">Toggle offcanvas</button>
+<Example code={`<button class="btn-solid theme-primary d-lg-none" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">Toggle offcanvas</button>
 
   <div class="alert alert-info d-none d-lg-block">Resize your browser to show the responsive offcanvas toggle.</div>
 
@@ -190,7 +190,7 @@ Offcanvas components do not have a default position; therefore, you need to appl
 
 Feel free to experiment with the top, right, and bottom examples below.
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasTop" aria-controls="offcanvasTop">Toggle top offcanvas</button>
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasTop" aria-controls="offcanvasTop">Toggle top offcanvas</button>
 
   <dialog class="offcanvas offcanvas-top" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
     <div class="offcanvas-header">
@@ -202,7 +202,7 @@ Feel free to experiment with the top, right, and bottom examples below.
     </div>
   </dialog>`} />
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasRight" aria-controls="offcanvasRight">Toggle right offcanvas</button>
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasRight" aria-controls="offcanvasRight">Toggle right offcanvas</button>
 
   <dialog class="offcanvas offcanvas-end" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
     <div class="offcanvas-header">
@@ -214,7 +214,7 @@ Feel free to experiment with the top, right, and bottom examples below.
     </div>
   </dialog>`} />
 
-<Example code={`<button class="btn btn-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasBottom" aria-controls="offcanvasBottom">Toggle bottom offcanvas</button>
+<Example code={`<button class="btn-solid theme-primary" type="button" data-coreui-toggle="offcanvas" data-coreui-target="#offcanvasBottom" aria-controls="offcanvasBottom">Toggle bottom offcanvas</button>
 
   <dialog class="offcanvas offcanvas-bottom" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
     <div class="offcanvas-header">
