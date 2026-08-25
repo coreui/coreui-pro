@@ -68,6 +68,55 @@ $colors: (
 ) !default;
 // scss-docs-end colors-map
 
+// Color scales
+//
+// One generator for the palette and for the theme colors: every stop is a
+// `color-mix()` against the color's own token, so overriding the token retints
+// the whole scale in the browser.
+
+// scss-docs-start color-scale-variables
+$color-mix-space: lab !default;
+$tint-color:      var(--#{$prefix}white) !default;
+$shade-color:     var(--#{$prefix}black) !default;
+
+$color-tints: (
+  "100": 80%,
+  "200": 60%,
+  "300": 40%,
+  "400": 20%
+) !default;
+
+$color-shades: (
+  "600": 20%,
+  "700": 40%,
+  "800": 60%,
+  "900": 80%
+) !default;
+// scss-docs-end color-scale-variables
+
+// The palette colors that get a scale. `black` and `white` are the ends the
+// scale mixes towards, and `gray`/`gray-dark` are aliases of `$grays` stops that
+// carry their own.
+// scss-docs-start palette-scales-map
+$palette-scales: map.remove($colors, "black", "white", "gray", "gray-dark") !default;
+// scss-docs-end palette-scales-map
+
+@function color-scale-tokens($color) {
+  $tokens: ();
+
+  @each $stop, $weight in $color-tints {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $tint-color $weight, var(--#{$prefix}#{$color})));
+  }
+
+  $tokens: map.set($tokens, --#{$prefix}#{$color}-500, var(--#{$prefix}#{$color}));
+
+  @each $stop, $weight in $color-shades {
+    $tokens: map.set($tokens, --#{$prefix}#{$color}-#{$stop}, color-mix(in $color-mix-space, $shade-color $weight, var(--#{$prefix}#{$color})));
+  }
+
+  @return $tokens;
+}
+
 // See https://www.w3.org/TR/WCAG/#contrast-minimum
 $min-contrast-ratio:   4.5 !default;
 
@@ -103,6 +152,10 @@ $yellow-800: shade-color($yellow, 60%) !default;
 
   @each $color, $value in $grays {
     $tokens: map.set($tokens, --#{$prefix}gray-#{$color}, $value);
+  }
+
+  @each $color, $value in $palette-scales {
+    $tokens: map.merge($tokens, color-scale-tokens($color));
   }
 
   @return $tokens;

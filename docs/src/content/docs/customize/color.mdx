@@ -391,10 +391,17 @@ Be sure to monitor contrast ratios as you customize colors. As shown below, we'v
 
 ### Notes on Sass
 
-The tints and shades are not Sass variables any more. Every theme color gets a
-100–900 scale of `color-mix()` custom properties on `:root`, mixed in the browser
-from the color's own token — override `--cui-primary` and the whole family
-follows, in both color schemes. See [the theme colors page](/customize/theme/).
+The tints and shades are not Sass variables any more. Every palette color and
+every theme color gets a 100–900 scale of `color-mix()` custom properties on
+`:root`, mixed in the browser from the color's own token — override `--cui-blue`
+or `--cui-primary` and the whole family follows, in both color schemes. See
+[the theme colors page](/customize/theme/).
+
+Which palette colors get a scale is a map of its own: `$black` and `$white` are
+the ends the mix runs towards, and `$gray` / `$gray-dark` are aliases of `$grays`
+stops that carry their own.
+
+<ScssDocs file="scss/_colors.scss" capture="palette-scales-map" />
 
 `tint-color()` and `shade-color()` still exist in `scss/functions/_color.scss` for
 Sass-side blending. They use `mix()`, which is not the same as `lighten()` and

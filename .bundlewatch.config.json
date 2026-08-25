@@ -10,19 +10,19 @@
     },
     {
       "path": "./dist/css/coreui-reboot.css",
-      "maxSize": "5.25 kB"
+      "maxSize": "5.75 kB"
     },
     {
       "path": "./dist/css/coreui-reboot.min.css",
-      "maxSize": "5 kB"
+      "maxSize": "5.35 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.css",
-      "maxSize": "16.5 kB"
+      "maxSize": "17 kB"
     },
     {
       "path": "./dist/css/coreui-utilities.min.css",
-      "maxSize": "15 kB"
+      "maxSize": "15.5 kB"
     },
     {
       "path": "./dist/css/coreui.css",
