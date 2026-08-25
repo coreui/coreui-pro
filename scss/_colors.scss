@@ -82,7 +82,9 @@ $colors: (
 $color-mix-space: lab !default;
 $tint-color:      var(--#{$prefix}white) !default;
 $shade-color:     var(--#{$prefix}black) !default;
+// scss-docs-end color-scale-variables
 
+// scss-docs-start color-scale-maps
 $color-tints: (
   "100": 80%,
   "200": 60%,
@@ -96,7 +98,7 @@ $color-shades: (
   "800": 60%,
   "900": 80%
 ) !default;
-// scss-docs-end color-scale-variables
+// scss-docs-end color-scale-maps
 
 // The palette colors that get a scale. `black` and `white` are the ends the
 // scale mixes towards, and `gray`/`gray-dark` are aliases of `$grays` stops that

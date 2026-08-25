@@ -61,7 +61,7 @@ $utilities-links-underline: theme-color-refs("fg") !default;
 // stylelint-disable-next-line scss/at-function-named-arguments
 $negative-spacers: if(sass($enable-negative-margins): negativify-map($spacers)) !default;
 
-// scss-docs-start border-variables
+// scss-docs-start border-widths-map
 $border-widths: (
   keyline: .5px,
   1: 1px,
@@ -70,7 +70,7 @@ $border-widths: (
   4: 4px,
   5: 5px
 ) !default;
-// scss-docs-end border-variables
+// scss-docs-end border-widths-map
 
 // scss-docs-start font-sizes-legacy
 // The numeric keys v5 shipped, kept so `.fs-1` … `.fs-6` keep rendering. They

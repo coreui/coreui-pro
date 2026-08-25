@@ -86,9 +86,17 @@ The syntax is nearly the same as the default, positive margin utilities, but wit
 
 ### SASS variables
 
-Margin utilities are generated from the `$spacers` map.
+`$spacer` is the step the whole scale is built from, so changing it rescales every spacing utility at once.
 
-<ScssDocs file="scss/_config.scss" capture="spacer-variables-maps" />
+<ScssDocs file="scss/_config.scss" capture="spacer-variables" />
+
+### SASS maps
+
+Each entry is one step of the scale, generating the matching `.m-{key} class, and its per-side and negative variants,`. Add a key to define a step, or set one to `null` to drop it:
+
+<ScssDocs file="scss/_config.scss" capture="spacers-map" />
+
+### Utilities API
 
 Margin utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
 

@@ -22,11 +22,6 @@ $sidebar-toggler-transition:        transform .15s !default;
 
 // scss-docs-start sidebar-variables
 $sidebar-width:                            16rem !default;
-$sidebar-widths: (
-  sm: 12rem,
-  lg: 20rem,
-  xl: 24rem
-) !default;
 $sidebar-padding-y:                        var(--#{$prefix}spacer-3) !default;
 $sidebar-padding-x:                        var(--#{$prefix}spacer-3) !default;
 $sidebar-color:                            var(--#{$prefix}fg-body) !default;
@@ -42,6 +37,14 @@ $sidebar-narrow-width:                     4rem !default;
 $sidebar-narrow-padding-x:                 .5rem !default;
 $sidebar-narrow-unfoldable-box-shadow:     var(--#{$prefix}box-shadow) !default;
 // scss-docs-end sidebar-variables
+
+// scss-docs-start sidebar-widths
+$sidebar-widths: (
+  sm: 12rem,
+  lg: 20rem,
+  xl: 24rem
+) !default;
+// scss-docs-end sidebar-widths
 
 @layer components {
   .sidebar {

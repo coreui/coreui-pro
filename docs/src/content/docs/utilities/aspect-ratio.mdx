@@ -48,11 +48,13 @@ Because it is a custom property, it can also change across breakpoints:
 
 ## Customizing
 
-### SASS variables
+### SASS maps
 
-Change the ratios you want to generate in the `$aspect-ratios` map.
+Each entry is one `.ratio-{key}` class and the ratio it sets. Add a key to define a ratio, or set one to `null` to drop it:
 
 <ScssDocs file="scss/_config.scss" capture="aspect-ratios" />
+
+### Utilities API
 
 Aspect ratio utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
 

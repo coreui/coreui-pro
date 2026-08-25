@@ -122,14 +122,18 @@ Sass variables set these defaults at build time and are removed in v7. The CSS v
 
 <ScssDocs file="scss/forms/_switch.scss" capture="switch-variables" />
 
-Each size carries its own height and font size, and both maps merge with your overrides — set a key to `null` to drop a size:
-
-<ScssDocs file="scss/forms/_switch.scss" capture="switch-sizes" />
-
-<ScssDocs file="scss/forms/_switch.scss" capture="form-switch-sizes" />
-
 ### Shared variables
 
 The checkbox, the radio and the switch share their size and their focus, active and disabled states. Those live on `:root` as `--cui-control-*`, so one declaration retunes all three at runtime; the Sass variables behind them set the defaults:
 
 <ScssDocs file="scss/_root.scss" capture="control-state-variables" />
+
+### SASS maps
+
+Each entry is one `.switch-{size}` class with its own height and font size, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
+
+<ScssDocs file="scss/forms/_switch.scss" capture="switch-sizes" />
+
+The second map lists which of those sizes also answer to the deprecated `.form-switch-{size}` spelling. It holds names only — the heights come from the map above — so a size you add is reachable under the current spelling without appearing here:
+
+<ScssDocs file="scss/forms/_switch.scss" capture="form-switch-sizes" />

@@ -304,8 +304,11 @@ The addon declares its own tokens on `.input-group-text`, so a single addon can 
 <DeprecatedIn version="6.0.0" />
 
 Sass variables set these defaults at build time and are removed in v7. The CSS variables above reach the same values without recompiling, and can be set on a single element.
+
 <ScssDocs file="scss/forms/_input-group.scss" capture="input-group-variables" />
 
-The sizes are a map, so `@use ... with()` can add one or drop one — set a key to `null` to remove it:
+### SASS maps
+
+Each entry is one `.input-group-{size}` class, and the map merges with your overrides — add a key to define a size, or set one to `null` to drop it:
 
 <ScssDocs file="scss/forms/_input-group.scss" capture="input-group-sizes" />

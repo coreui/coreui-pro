@@ -170,10 +170,12 @@ $theme-token-refs: (
 // Tuned to land near the shade-color() amounts compiled before the states moved into CSS.
 $theme-hover-lightness:   .85 !default;
 $theme-active-lightness:  .8 !default;
+// scss-docs-end theme-interaction-variables
 
 // The neutral pair steps along the gray scale instead of shifting lightness: its
 // fill swaps ends between schemes, so one multiplier would darken a dark fill in
 // one scheme and wash out a light one in the other.
+// scss-docs-start theme-state-colors
 $theme-state-colors: (
   "secondary": (
     "hover":  light-dark(var(--#{$prefix}gray-200), var(--#{$prefix}gray-700)),
@@ -184,7 +186,7 @@ $theme-state-colors: (
     "active": light-dark(var(--#{$prefix}gray-700), var(--#{$prefix}gray-300))
   )
 ) !default;
-// scss-docs-end theme-interaction-variables
+// scss-docs-end theme-state-colors
 
 @mixin theme-tokens($state) {
   @each $token, $suffix in $theme-token-refs {

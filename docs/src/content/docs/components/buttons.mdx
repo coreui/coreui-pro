@@ -348,11 +348,11 @@ The variables below are the neutral fallbacks — what a variant renders as when
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-variables" />
 
-The sizes are a map, so `@use ... with()` can add one or drop one — set a key to `null` to remove it:
+### SASS maps
+
+`$button-sizes` lists the sizes that get a class. Each name generates `.btn-{size}` — plus the matching `.btn-group-{size}` and `.input-group-{size}` selectors — pointing the button's variables at the shared `--cui-btn-input-{size}-*` scale, so adding a name is enough once that scale defines it.
 
 <ScssDocs file="scss/buttons/_button.scss" capture="btn-sizes" />
-
-### SASS maps
 
 `$button-variants` holds every variant. Each entry names, per state, the theme token a button variable reads and the neutral value behind it; `disabled` repeats `base`. Add an entry and both spellings of the new variant are generated — the variant class and the `.btn-{variant}-{color}` class.
 

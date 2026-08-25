@@ -45,11 +45,13 @@ runtime:
 
 ## Customizing
 
-### SASS variables
+### SASS maps
 
-Font-size utilities are generated from this map, in combination with our utilities API.
+Each entry is one stop, pairing a font size with the line height that goes with it: `.fs-{key}` takes the size alone, `.text-{key}` takes both. Add a key to define a stop, or set one to `null` to drop it:
 
 <ScssDocs file="scss/_config.scss" capture="font-sizes" />
+
+### Utilities API
 
 Font size utilities are declared in our utilities API in `scss/_utilities.scss`. [Learn how to use the utilities API.](/utilities/api/#using-the-api)
 
