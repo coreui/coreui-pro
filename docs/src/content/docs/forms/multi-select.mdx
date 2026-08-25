@@ -383,11 +383,11 @@ We use the following JavaScript to set up our multi-select:
 
 ## Sizing
 
-You may also choose from small and large multi selects to match our similarly sized text inputs.
+The frame carries the size. Add `.form-control-sm` or `.form-control-lg` to the `<select>` — the component copies the element's classes onto the `.form-control-group` it builds, so the field matches our similarly sized text inputs.
 
 <Example pro code={`<div class="row">
     <div class="col-md-6">
-      <select id="multiple-select-counter-lg" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
+      <select id="multiple-select-counter-lg" class="form-control-lg mb-3" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -398,7 +398,7 @@ You may also choose from small and large multi selects to match our similarly si
           <option value="6">Node.js</option>
         </optgroup>
       </select>
-      <select id="multiple-select-counter-sm" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
+      <select id="multiple-select-counter-sm" class="form-control-sm" data-coreui-multi-select data-coreui-selection-type="counter" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -411,7 +411,7 @@ You may also choose from small and large multi selects to match our similarly si
       </select>
     </div>
     <div class="col-md-6">
-      <select id="multiple-select-tags-lg" class="form-multi-select-lg mb-3" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
+      <select id="multiple-select-tags-lg" class="form-control-lg mb-3" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
@@ -422,7 +422,7 @@ You may also choose from small and large multi selects to match our similarly si
           <option value="6">Node.js</option>
         </optgroup>
       </select>
-      <select id="multiple-select-tags-sm" class="form-multi-select-sm" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
+      <select id="multiple-select-tags-sm" class="form-control-sm" data-coreui-multi-select data-coreui-selection-type="tags" data-coreui-search="true">
         <option value="0">Angular</option>
         <option value="1">Bootstrap</option>
         <option value="2">React.js</option>
