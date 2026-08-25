@@ -13,6 +13,7 @@ $form-control-group-icon-size:        1rem !default;
 $form-control-group-icon-size-sm:     .875rem !default;
 $form-control-group-icon-size-lg:     1.25rem !default;
 $form-control-group-icon-color:       var(--#{$prefix}fg-3) !default;
+$form-control-group-text-color:       var(--#{$prefix}fg-3) !default;
 $form-control-group-action-size:      1.5rem !default;
 $form-control-group-action-size-sm:   1.25rem !default;
 $form-control-group-action-size-lg:   1.75rem !default;
@@ -44,6 +45,7 @@ $form-control-group-tokens: defaults(
     --#{$prefix}control-group-gap: #{$form-control-group-gap},
     --#{$prefix}control-group-icon-size: #{$form-control-group-icon-size},
     --#{$prefix}control-group-icon-color: #{$form-control-group-icon-color},
+    --#{$prefix}control-group-text-color: #{$form-control-group-text-color},
     --#{$prefix}control-group-action-size: #{$form-control-group-action-size},
     --#{$prefix}control-group-action-color: #{$form-control-group-action-color},
     --#{$prefix}control-group-action-hover-color: #{$form-control-group-action-hover-color},
@@ -122,7 +124,8 @@ $form-control-group-tokens: defaults(
 
       > .form-control-action,
       > .form-control-cleaner,
-      > .form-control-icon {
+      > .form-control-icon,
+      > .form-control-text {
         pointer-events: none;
         opacity: var(--#{$prefix}control-group-disabled-opacity);
       }
@@ -168,6 +171,13 @@ $form-control-group-tokens: defaults(
       width: var(--#{$prefix}control-group-icon-size);
       height: var(--#{$prefix}control-group-icon-size);
     }
+  }
+
+  .form-control-text {
+    flex: 0 0 auto;
+    color: var(--#{$prefix}control-group-text-color);
+    pointer-events: none;
+    user-select: none;
   }
 
   .form-control-action,
